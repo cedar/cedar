@@ -54,7 +54,7 @@ include_directories(${CEDAR_HOME})
 # third party libraries
 
 # Qt
-find_package(Qt4 4.6.2 COMPONENTS QtCore REQUIRED)
+find_package(Qt4 4.6.0 COMPONENTS QtCore REQUIRED)
 include(${QT_USE_FILE})
 
 # Boost
