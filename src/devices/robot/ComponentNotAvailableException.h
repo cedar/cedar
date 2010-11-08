@@ -2,34 +2,31 @@
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        Base.h
+ ----- File:        ComponentNotAvailableException.h
 
  ----- Author:      Mathis Richter
  ----- Email:       mathis.richter@ini.rub.de
- ----- Date:        2010 10 12
+ ----- Date:        2010 11 08
 
- ----- Description: Header for the \em cedar::aux::Base class.
+ ----- Description: Header of the \em cedar::dev::robot::ComponentNotAvailableException class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#ifndef CEDAR_AUX_BASE_H
-#define CEDAR_AUX_BASE_H
+#ifndef CEDAR_DEV_ROBOT_COMPONENT_NOT_AVAILABLE_EXCEPTION_BASE_H
+#define CEDAR_DEV_ROBOT_COMPONENT_NOT_AVAILABLE_EXCEPTION_BASE_H
 
 // LOCAL INCLUDES
 #include "Namespace.h"
 
 // PROJECT INCLUDES
+#include "src/auxiliaries/exceptions/ExceptionBase.h"
 
 // SYSTEM INCLUDES
-#include <string>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
- */
-class cedar::aux::Base
+/*!@brief Class for an exception, that is thrown when a non-existing component is requested from a robot. */
+class cedar::dev::robot::ComponentNotAvailableException : public cedar::aux::exc::ExceptionBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -40,22 +37,13 @@ class cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Base(void);
-
-  //!@brief Destructor
-  virtual ~Base(void) = 0;
+  ComponentNotAvailableException(void);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the name of the object.
-  //!@return Name of the object.
-  const std::string& getName(void) const;
-
-  //!@brief Sets the name of the object to the given name.
-  //!@param name New name of the object.
-  void setName(const std::string& rName);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -85,13 +73,10 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  //! name of the object
-  std::string _mName;
-
+  // none yet
 private:
   // none yet
 
-}; // class cedar::aux::Base
+}; // class cedar::dev::robot::ComponentNotAvailableException
 
-#endif // CEDAR_AUX_BASE_H
-
+#endif // CEDAR_DEV_ROBOT_COMPONENT_NOT_AVAILABLE_EXCEPTION_BASE_H

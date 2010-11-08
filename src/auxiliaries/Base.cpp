@@ -40,14 +40,14 @@ cedar::aux::Base::~Base()
 
 //!@brief Returns the name of the object.
 //!@return Name of the object.
-std::string cedar::aux::Base::getName(void)
+const std::string& cedar::aux::Base::getName(void) const
 {
   return _mName;
 }
 
 //!@brief Sets the name of the object to the given name.
 //!@param name New name of the object.
-void cedar::aux::Base::setName(std::string name)
+void cedar::aux::Base::setName(const std::string& rName)
 {
-  _mName = name;
+  _mName = rName;
 }
