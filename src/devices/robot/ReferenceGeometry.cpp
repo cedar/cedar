@@ -50,22 +50,22 @@ void ReferenceGeometry::init(void)
   addParameter(&_mName, "Name", "TutorialTemplate");
 }
 
-const ReferenceGeometry::JointPtr ReferenceGeometry::getJoint(const unsigned int index) const
+const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned int index) const
 {
   return _mJoints[index];
 }
 
-const ReferenceGeometry::JointLinkPtr ReferenceGeometry::getJointLink(const unsigned int index) const
+const ReferenceGeometry::JointLinkPtr& ReferenceGeometry::getJointLink(const unsigned int index) const
 {
   return _mJointLinks[index];
 }
 
-const std::vector<double> ReferenceGeometry::getBasePosition(void) const
+const std::vector<double>& ReferenceGeometry::getBasePosition(void) const
 {
   return _mBasePosition;
 }
 
-const ReferenceGeometry::EndEffectorPtr ReferenceGeometry::getEndEffector() const
+const ReferenceGeometry::EndEffectorPtr& ReferenceGeometry::getEndEffector() const
 {
   return _mpEndEffector;
 }

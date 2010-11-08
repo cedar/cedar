@@ -24,6 +24,8 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
+#include <set>
+#include <map>
 
 
 /*!@brief Abstract description of the class.
@@ -59,8 +61,7 @@ public:
   bool isComponentAvailable(
                              const std::string& componentName,
                              const std::string& parentComponentName
-                           ) const
-  {};
+                           ) const;
 
   /*! \brief Checks if a vector of subcomponents exist for a parent component with the
    * name \em parentComponentName.
@@ -72,8 +73,7 @@ public:
   bool areComponentsAvailable(
                                const std::vector<std::string>& components,
                                const std::string& parentComponentName
-                             ) const
-  {};
+                             ) const;
 
 
   /*! \brief Returns the number of subcomponents for a given parent component. */
@@ -83,23 +83,23 @@ public:
   const std::set<std::string>& getComponentNames(const std::string& parentComponentName) const;
 
   /*! \brief Checks if a component with the supplied \em componentName exists. */
-  virtual bool isComponentAvailable(const std::string& componentName) const {};
+  virtual bool isComponentAvailable(const std::string& componentName) const;
 
   /*! \brief Checks if all components with the names supplied in the vector \em components exist. */
-  virtual bool areComponentsAvailable(const std::vector<std::string>& components) const {};
+  virtual bool areComponentsAvailable(const std::vector<std::string>& components) const;
 
   /*! \brief Returns a pointer to the parent component.
    *
    * @return Pointer to the parent component.
    */
-  virtual ComponentPtr& getParent() {};
+  virtual ComponentPtr& getParent();
 
   /*! \brief Returns a pointer to the component with the name \em componentName.
    *
    * @return Pointer to the requested component.
    * @param[in] componentName Name of the component that is to be returned.
    */
-  virtual ComponentPtr& getComponent(const std::string& componentName) {};
+  virtual ComponentPtr& getComponent(const std::string& componentName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -119,7 +119,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  //! map of pointers to all sub components
+  std::map<std::string, ComponentPtr> mComponents;
+
 
 private:
   // none yet
@@ -130,7 +132,9 @@ private:
 public:
   // none yet
 protected:
-  // none yet
+  //! names of all components and all of their sub-components
+  std::map<std::string, std::set<std::string> > _mComponentNames;
+
 private:
   // none yet
 

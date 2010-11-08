@@ -89,10 +89,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const cedar::dev::robot::ReferenceGeometry::JointPtr getJoint(const unsigned int index) const;
-  const cedar::dev::robot::ReferenceGeometry::JointLinkPtr getJointLink(const unsigned int index) const;
-  const std::vector<double> getBasePosition(void) const;
-  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr getEndEffector(void) const;
+  const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(const unsigned int index) const;
+  const cedar::dev::robot::ReferenceGeometry::JointLinkPtr& getJointLink(const unsigned int index) const;
+  const std::vector<double>& getBasePosition(void) const;
+  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& getEndEffector(void) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
