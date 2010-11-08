@@ -6,5 +6,7 @@ add_library(devices ${CEDAR_LIB_TYPE}
   robot/ReferenceGeometry.h
   robot/ReferenceGeometry.cpp
   robot/Robot.h
+  robot/Robot.cpp
   robot/ComponentNotAvailableException.h
+  robot/ComponentNotAvailableException.cpp
 )
