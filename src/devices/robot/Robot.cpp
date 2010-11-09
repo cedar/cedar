@@ -18,6 +18,7 @@
 #include "ComponentNotAvailableException.h"
 
 // PROJECT INCLUDES
+#include "src/auxiliaries/exceptions/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -121,4 +122,12 @@ const std::set<std::string>& Robot::getComponentNames(const std::string& parentC
     = _mComponentNames.find(parentComponentName);
 
   return component_it->second;
+}
+
+ComponentPtr& Robot::getParent(void)
+{
+  CEDAR_THROW(cedar::aux::exc::ExceptionBase, "The robot itself does not have a parent component.");
+
+  ComponentPtr null;
+  return null;
 }

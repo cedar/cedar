@@ -54,17 +54,18 @@ public:
   /*! \brief Returns the name of the this component's parent. */
   const std::string& getParentName() const;
 
-  /*! \brief Checks if a component with the supplied \em componentName exists. */
-  virtual bool isComponentAvailable(const std::string& componentName) const;
-
-  /*! \brief Checks if all components with the names supplied in the vector \em components exist. */
-  virtual bool areComponentsAvailable(const std::vector<std::string>& components) const;
-
   /*! \brief Returns the number of subcomponents. */
   unsigned int getNumberOfComponents() const;
 
   /*! \brief Returns a set containing the names of all available subcomponents. */
   const std::set<std::string>& getComponentNames() const;
+
+
+  /*! \brief Checks if a component with the supplied \em componentName exists. */
+  virtual bool isComponentAvailable(const std::string& componentName) const;
+
+  /*! \brief Checks if all components with the names supplied in the vector \em components exist. */
+  virtual bool areComponentsAvailable(const std::vector<std::string>& components) const;
 
   /*! \brief Returns a pointer to the parent component.
    *
