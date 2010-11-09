@@ -69,7 +69,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual cedar::dev::robot::ComponentPtr& getComponent(const std::string& componentName);
+  virtual cedar::dev::robot::ComponentPtr createComponent(const std::string& rComponentName);
 
 protected:
   // none yet
