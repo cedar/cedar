@@ -65,16 +65,22 @@ public:
    */
   virtual ComponentPtr createComponent(const std::string& rComponentName) = 0;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
   /*! @brief Checks if a component with the supplied @em rComponentName exists within the robot.
    *
    * @param[in] componentName Name of the subcomponent we need to check.
    */
   bool isComponentAvailable(const std::string& rComponentName) const;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
   /*! @brief Checks if a subcomponent with the supplied @em rComponentName exists for a parent component
    * with the name @em parentComponentName.
    *
@@ -85,12 +91,6 @@ protected:
                              const std::string& rComponentName,
                              const std::string& rParentComponentName
                            ) const;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
