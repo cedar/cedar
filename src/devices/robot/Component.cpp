@@ -77,3 +77,8 @@ const std::set<std::string>& Component::getComponentNames(void) const
 {
   return mpRobot->getComponentNames(_mName);
 }
+
+ComponentPtr& Component::getParent(void)
+{
+  return mpRobot->getComponent(getParentName());
+}

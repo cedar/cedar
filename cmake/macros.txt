@@ -26,7 +26,7 @@ macro(cedar_add_unit_test arguments)
   
   string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${unitTestSubdirectory}")
   
-  target_link_libraries(${unitTestExecutableName} ${libraryName} ${QT_LIBRARIES} config++ ${Boost_LIBRARIES} ${OpenCV_LIBS})
+  target_link_libraries(${unitTestExecutableName} auxiliaries devices ${QT_LIBRARIES} config++ ${Boost_LIBRARIES} ${OpenCV_LIBS})
   
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR})
 endmacro(cedar_add_unit_test)
