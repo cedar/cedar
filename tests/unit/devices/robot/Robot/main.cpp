@@ -25,6 +25,8 @@ int main()
   cedar::aux::LogFile logFile("unitTest_robot.log");
 
   TestRobot robot;
+  robot.getComponent("TestComponent1");
+  robot.getComponent("TestComponent2");
 
   logFile.close();
 

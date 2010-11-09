@@ -42,7 +42,7 @@ class cedar::tests::unit::dev::robot::Robot::TestComponent : public cedar::dev::
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor that gets a configuration file name.
-  TestComponent(void);
+  TestComponent(const std::string& rTestParameter);
 
   //!@brief Destructor
   virtual ~TestComponent(void);
@@ -51,7 +51,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  const std::string& getTestName(void) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -74,7 +74,7 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  std::string mTestName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -83,7 +83,6 @@ public:
   // none yet (hopefully never!)
 protected:
   // none yet
-
 private:
   // none yet
 

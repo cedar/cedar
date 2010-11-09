@@ -51,34 +51,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! \brief Returns the name of the this component's parent. */
-  const std::string& getParentName() const;
 
-  /*! \brief Returns the number of subcomponents. */
-  unsigned int getNumberOfComponents() const;
-
-  /*! \brief Returns a set containing the names of all available subcomponents. */
-  const std::set<std::string>& getComponentNames() const;
-
-
-  /*! \brief Checks if a component with the supplied \em componentName exists. */
-  virtual bool isComponentAvailable(const std::string& componentName) const;
-
-  /*! \brief Checks if all components with the names supplied in the vector \em components exist. */
-  virtual bool areComponentsAvailable(const std::vector<std::string>& components) const;
-
-  /*! \brief Returns a pointer to the parent component.
-   *
-   * @return Pointer to the parent component.
-   */
-  virtual ComponentPtr& getParent();
-
-  /*! \brief Returns a pointer to the component with the name \em componentName.
-   *
-   * @return Pointer to the requested component.
-   * @param[in] componentName Name of the component that is to be returned.
-   */
-  virtual ComponentPtr& getComponent(const std::string& componentName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,11 +71,10 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  //! name of the category the component is in (in the config file)
+  //! name of the category the component is in (in the configuration file)
   std::string mCategoryName;
   //! pointer to the robot the component belongs to
   RobotPtr mpRobot;
-
 private:
   // none yet
 

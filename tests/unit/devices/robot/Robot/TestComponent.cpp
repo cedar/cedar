@@ -32,9 +32,10 @@ using namespace cedar::dev::robot;
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-TestComponent::TestComponent(void)
+TestComponent::TestComponent(const std::string& rTestName)
 :
-cedar::dev::robot::Component()
+cedar::dev::robot::Component(),
+mTestName(rTestName)
 {
 }
 
@@ -47,3 +48,7 @@ TestComponent::~TestComponent(void)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+const std::string& TestComponent::getTestName(void) const
+{
+  return mTestName;
+}

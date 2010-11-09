@@ -23,6 +23,7 @@
 
 // SYSTEM INCLUDES
 #include <string>
+#include <set>
 #include <iostream>
 
 
@@ -38,6 +39,8 @@ TestRobot::TestRobot(void)
 :
 cedar::dev::robot::Robot()
 {
+  _mSubComponentNames["TestComponent1"] = std::set<std::string>();
+  _mSubComponentNames["TestComponent2"] = std::set<std::string>();
 }
 
 //! destructor
@@ -49,8 +52,11 @@ TestRobot::~TestRobot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-ComponentPtr& TestRobot::getComponent(const std::string& componentName)
+ComponentPtr TestRobot::createComponent(const std::string& rComponentName)
 {
-  ComponentPtr test_component(new TestComponent());
+  ComponentPtr test_component(new TestComponent(rComponentName));
+
   return test_component;
 }
+
+
