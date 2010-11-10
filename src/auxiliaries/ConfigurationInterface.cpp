@@ -20,6 +20,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <libconfig.h++>
 
 using namespace std;
 using namespace libconfig;

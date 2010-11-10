@@ -1,4 +1,4 @@
-add_library(devices ${CEDAR_LIB_TYPE} 
+cedar_add_library(devices
   robot/KinematicChain.h
   robot/KinematicChainModel.h
   robot/Component.h
@@ -9,4 +9,5 @@ add_library(devices ${CEDAR_LIB_TYPE}
   robot/Robot.cpp
   robot/ComponentNotAvailableException.h
   robot/ComponentNotAvailableException.cpp
+  LINK_LIBRARIES auxiliaries
 )

@@ -16,8 +16,8 @@ unset(CedarSources)
 ########################################################################################################################
 # add preprocessor definitions 
 
+add_definitions(-Wall)
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
-
 
 ########################################################################################################################
 # default output directory for lib files
@@ -41,8 +41,8 @@ else (CEDAR_BUILD_STATIC_LIBS)
   set (CEDAR_LIB_TYPE SHARED)
 endif (CEDAR_BUILD_STATIC_LIBS)
 
-# link directories
-link_directories(/usr/local/lib)
+# include the cedar library directory in the library search path
+link_directories(${CEDAR_LIB_DIR})
 
 ########################################################################################################################
 #include settings
@@ -56,6 +56,8 @@ include_directories(${CEDAR_HOME})
 # Qt
 find_package(Qt4 4.6.0 COMPONENTS QtCore REQUIRED)
 include(${QT_USE_FILE})
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
+include_directories(${QT_INCLUDE_DIRS})
 
 # Boost
 if (${CMAKE_BUILD_STATIC_LIBS})
@@ -66,6 +68,7 @@ endif (${CMAKE_BUILD_STATIC_LIBS})
 
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.40.0 COMPONENTS system date_time)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
 
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -74,7 +77,10 @@ endif()
 # OpenCV
 set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
 find_package(OpenCV REQUIRED)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBRARIES})
 
+# libconfig
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
 
 ########################################################################################################################
 # testing settings
@@ -97,6 +103,9 @@ foreach (libDir ${cedarLibDirs})
 
     # add out-of-source directory tree
     set(subDir "${CEDAR_BUILD_DIR}/src/${libName}/${CMAKE_BUILD_TYPE}")
+
+    # add the library to the cedar libraries
+    set(CEDAR_LIBS ${CEDAR_LIBS} ${libName})
 
     # add the subdirectory
     add_subdirectory(${libDir} ${subDir})
