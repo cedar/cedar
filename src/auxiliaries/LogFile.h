@@ -52,7 +52,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void init(const std::string& logFilePath, const std::string& logFileName);
   void addSeparatorLine(void);
   void addTimeStamp(void);
 
@@ -60,7 +59,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void init(const std::string& logFilePath, const std::string& logFileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
