@@ -9,10 +9,11 @@
  ----- Date:        2010 10 21
 
  ----- Description: Constructs an object of a subclass of cedar::aux::ConfigurationInterface and lets it
-                    read the _mName parameter from a configuration file "test.conf".
+                    read in several combinations of configuration parameters. The creation of new files is also checked.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
+//!\todo write a function that deletes the files that are created in this test
 
 // LOCAL INCLUDES
 #include "TestClass.h"
@@ -22,16 +23,79 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
+using namespace cedar::tests::unit::aux::ConfigurationInterface;
 
 int main()
 {
-  cedar::tests::unit::aux::ConfigurationInterface::TestClass test("test.conf");
+  // the number of errors encountered in this test
+  int errors = 0;
+  // the current test number
+  int test_number = 0;
 
-  if (test.getName() == "name read from configuration file" &&
-      test.getTestString() == "test string read from configuration file")
+  // check all add parameter functions
+  // create test class part 1
+  std::cout << "Test " << test_number++ << std::endl;
+  TestClass test_standard("configDir/ConfigurationTest1.cfg");
+  test_standard.addStandardParameters();
+  test_standard.tryToReadManually();
+  test_standard.checkConfigurationStandardParameters();
+  test_standard.printErrors();
+  errors += test_standard.errors();
+
+  // create test class part 2
+  std::cout << "Test " << test_number++ << std::endl;
+  TestClass test_vectors_1("configDir/ConfigurationTest2.cfg");
+  test_vectors_1.addVectorParametersSingleDefaults();
+  test_vectors_1.tryToReadManually();
+  test_vectors_1.checkConfigurationVectorParameters();
+  test_vectors_1.printErrors();
+  errors += test_vectors_1.errors();
+
+  // create test class part 3
+  std::cout << "Test " << test_number++ << std::endl;
+  TestClass test_vectors_2("configDir/ConfigurationTest3.cfg");
+  test_vectors_2.addVectorParametersMultipleDefaults();
+  test_vectors_2.tryToReadManually();
+  test_vectors_2.checkConfigurationVectorParameters();
+  test_vectors_2.printErrors();
+  errors += test_vectors_2.errors();
+
+  // check if new file is created
+  std::cout << "Test " << test_number++ << std::endl;
+  TestClass new_file("configDir/ConfigurationNew.cfg");
+  new_file.addStandardParameters();
+  new_file.addVectorParametersMultipleDefaults();
+  new_file.readEmptyFile();
+  new_file.checkConfigurationStandardParameters();
+  new_file.checkConfigurationVectorParameters();
+  new_file.printErrors();
+  errors += new_file.errors();
+
+  // check if new folder is created
+  std::cout << "Test " << test_number++ << std::endl;
+  TestClass new_folder("configNew/newConfig/ConfigurationNew.cfg");
+  new_folder.addStandardParameters();
+  new_folder.addVectorParametersMultipleDefaults();
+  new_folder.readEmptyFileInNewFolder();
+  new_folder.checkConfigurationStandardParameters();
+  new_folder.checkConfigurationVectorParameters();
+  new_folder.printErrors();
+  errors += new_folder.errors();
+
+  // check groups
+  std::cout << "Test " << test_number++ << std::endl;
+  TestClass new_group("configDir/ConfigurationGroupsNew.cfg");
+  new_group.addGroupParameters();
+  new_group.readEmptyFileInNewFolder();
+  new_group.checkConfigurationStandardParameters();
+  new_group.checkConfigurationVectorParameters();
+  new_group.printErrors();
+  errors += new_group.errors();
+
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
+  if (errors > 255)
   {
-    return 0;
+    errors = 255;
   }
-
-  return -1;
+  return errors;
 }
