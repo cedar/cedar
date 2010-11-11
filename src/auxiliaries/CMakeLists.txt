@@ -14,4 +14,6 @@ cedar_add_library(
 		   exceptions/NullPointerException.cpp
 		   exceptions/IndexOutOfRangeException.h
 		   exceptions/IndexOutOfRangeException.cpp
+		   math/Sigmoids.h
+		   math/Sigmoids.cpp
 		 )
