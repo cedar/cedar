@@ -79,6 +79,7 @@ int main()
   new_file.checkConfigurationVectorParameters();
   new_file.printErrors(log_file);
   errors += new_file.errors();
+  new_file.removeFile("configDir/ConfigurationNew.cfg");
 
   // check if new folder is created
   log_file.addSeparatorLine();
@@ -91,6 +92,8 @@ int main()
   new_folder.checkConfigurationVectorParameters();
   new_folder.printErrors(log_file);
   errors += new_folder.errors();
+  new_folder.removeDir("configNew");
+
 
   // check groups
   log_file.addSeparatorLine();
@@ -102,6 +105,7 @@ int main()
   new_group.checkConfigurationVectorParameters();
   new_group.printErrors(log_file);
   errors += new_group.errors();
+  new_group.removeFile("configDir/ConfigurationGroupsNew.cfg");
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

@@ -305,3 +305,15 @@ void TestClass::checkConfigurationVectorParameters(void)
   }
 }
 
+void TestClass::removeFile(std::string file)
+{
+  std::string command = "rm " + file;
+  system(command.c_str());
+}
+
+void TestClass::removeDir(std::string dir)
+{
+  std::string command = "rm -r " + dir;
+  system(command.c_str());
+}
+

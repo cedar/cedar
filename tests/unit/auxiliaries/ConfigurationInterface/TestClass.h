@@ -75,6 +75,10 @@ public:
   void checkConfigurationStandardParameters(void);
   //!@brief Check if vector parameters are correctly read.
   void checkConfigurationVectorParameters(void);
+  //!@brief Remove a newly created configuration file.
+  void removeFile(std::string file);
+  //!@brief Remove a newly created directory.
+  void removeDir(std::string dir);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
