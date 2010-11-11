@@ -21,6 +21,7 @@
 
 // PROJECT INCLUDES
 #include "src/auxiliaries/ConfigurationInterface.h"
+#include "src/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -44,8 +45,8 @@ protected:
     std::string type;
     std::vector<double> position;
     std::vector<double> axis;
-    std::vector<double> angleLimits;
-    std::vector<double> velocityLimits;
+    cedar::aux::math::Limits<double, double> angleLimits;
+    cedar::aux::math::Limits<double, double> velocityLimits;
   };
 
   struct EndEffector
@@ -53,7 +54,7 @@ protected:
     std::vector<double> position;
     std::vector<double> direction;
     double orientation;
-    CvMat transformation;
+    cv::Mat transformation;
   };
 
   struct JointLink
