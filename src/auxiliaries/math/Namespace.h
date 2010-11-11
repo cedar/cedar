@@ -4,8 +4,8 @@
 
  ----- File:        Namespace.h
 
- ----- Author:      Stephan Zibner
- ----- Email:       stephan.zibner@ini.rub.de
+ ----- Author:      Mathis Richter
+ ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 11 11
 
  ----- Description: Namespace file for cedar::aux::math.
@@ -22,24 +22,16 @@
 #include "src/Namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
 
 namespace cedar
 {
   namespace aux
   {
-    //!@brief Namespace for all exception classes.
+    /*!@brief Namespace for all math classes. */
     namespace math
     {
-//      class ExceptionBase;
-//      typedef boost::shared_ptr<ExceptionBase> ExceptionBasePtr;
-//
-//      class NullPointerException;
-//      typedef boost::shared_ptr<NullPointerException> NullPointerExceptionPtr;
-//
-//      class IndexOutOfRangeException;
-//      typedef boost::shared_ptr<IndexOutOfRangeException> IndexOutOfRangePtr;
+      template <class T_MIN, class T_MAX> struct Limits;
     }
   }
 }
