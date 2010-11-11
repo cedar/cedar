@@ -28,7 +28,7 @@
  *
  * More detailed description of the struct.
  */
-template <class T_MIN, class T_MAX>
+template <typename T_MIN, typename T_MAX>
 struct cedar::aux::math::Limits
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ struct cedar::aux::math::Limits
   Limits(const T_MIN& newMin, const T_MAX& newMax) : min(newMin), max(newMax) {};
   
   //!@brief Copy constructor
-  template <class U, class V>
+  template <typename U, typename V>
   Limits(const Limits<U, V> &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
 
   //--------------------------------------------------------------------------------------------------------------------
