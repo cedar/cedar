@@ -4,6 +4,7 @@ build
 bin
 lib
 logs
+*.log
 Linux-*
 Darwin-*
 debug*
