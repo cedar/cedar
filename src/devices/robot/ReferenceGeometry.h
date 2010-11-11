@@ -42,35 +42,22 @@ class cedar::dev::robot::ReferenceGeometry : public cedar::aux::ConfigurationInt
 protected:
   struct Joint
   {
-    std::string type;
     std::vector<double> position;
     std::vector<double> axis;
     cedar::aux::math::Limits<double, double> angleLimits;
     cedar::aux::math::Limits<double, double> velocityLimits;
   };
 
-  struct EndEffector
+  struct LinkSegment
   {
-    std::vector<double> position;
-    std::vector<double> direction;
-    double orientation;
-    cv::Mat transformation;
-  };
-
-  struct JointLink
-  {
-    std::vector<double> position;
-    std::vector<double> direction;
-    std::vector<double> extension;
-    double mass;
-    double boundingCylinderRadius;
-    double boundingCylinderLength;
+    std::vector<double> centerOfMassPosition;
+    std::vector<double> centerOfMassdirection;
+    std::vector<double> inertiaMoments;
   };
 
 public:
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::Joint> JointPtr;
-  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::JointLink> JointLinkPtr;
-  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::EndEffector> EndEffectorPtr;
+  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::LinkSegment> LinkSegmentPtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -84,22 +71,21 @@ public:
   ReferenceGeometry(const std::string& configFileName);
 
   //!@brief destructor
-  virtual ~ReferenceGeometry(void);
+  virtual ~ReferenceGeometry();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(const unsigned int index) const;
-  const cedar::dev::robot::ReferenceGeometry::JointLinkPtr& getJointLink(const unsigned int index) const;
-  const std::vector<double>& getBasePosition(void) const;
-  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& getEndEffector(void) const;
+  const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& getLinkSegment(const unsigned int index) const;
+  const std::vector<double>& getBasePosition() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void init(void);
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -124,9 +110,8 @@ public:
   // none yet
 protected:
   std::vector<cedar::dev::robot::ReferenceGeometry::JointPtr> _mJoints;
-  std::vector<cedar::dev::robot::ReferenceGeometry::JointLinkPtr> _mJointLinks;
+  std::vector<cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr> _mLinkSegments;
   std::vector<double> _mBasePosition;
-  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr _mpEndEffector;
 
 private:
   // none yet
