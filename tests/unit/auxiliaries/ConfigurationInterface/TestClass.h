@@ -21,6 +21,7 @@
 
 // PROJECT INCLUDES
 #include "src/auxiliaries/ConfigurationInterface.h"
+#include "src/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -50,7 +51,30 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  std::string getTestString(void) const;
+  //!@brief Return number of errors in this object since creation.
+  unsigned int errors(void);
+  //!@brief Print all error messages.
+  void printErrors(cedar::aux::LogFile& rLogFile);
+  //!@brief Add a set of standard data types (bool, int, double, std::string).
+  void addStandardParameters(void);
+  //!@brief Add vectors of standard data types (bool, int, double, std::string) with a single default value.
+  void addVectorParametersSingleDefaults(void);
+  //!@brief Add vectors of standard data types (bool, int, double, std::string) with a default value vector.
+  void addVectorParametersMultipleDefaults(void);
+  //!@brief Add all possible data types in groups.
+  void addGroupParameters(void);
+  //!@brief Call readOrDefaultConfiguration.
+  void tryToRead(void);
+  //!@brief Read a configuration file that does not exist.
+  void readEmptyFile(void);
+  //!@brief Read a configuration file that does not exist in a folder that does not exist.
+  void readEmptyFileInNewFolder(void);
+  //!@brief Call readConfiguration.
+  void tryToReadManually(void);
+  //!@brief Check if standard parameters are correctly read.
+  void checkConfigurationStandardParameters(void);
+  //!@brief Check if vector parameters are correctly read.
+  void checkConfigurationVectorParameters(void);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -80,7 +104,24 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  std::string _mTest;
+  //! test member bool
+  bool mTestBool;
+  //! test member int
+  int mTestInt;
+  //! test member double
+  double mTestDouble;
+  //! test member std::string
+  std::string mTestString;
+  //! test member std::vector<bool>
+  std::vector<bool> mTestBoolVector;
+  //! test member std::vector<int>
+  std::vector<int> mTestIntVector;
+  //! test member std::vector<double>
+  std::vector<double> mTestDoubleVector;
+  //! test member std::vector<std::string>
+  std::vector<std::string> mTestStringVector;
+  //! vector that holds all error messages
+  std::vector<std::string> mFails;
 
 private:
   // none yet
