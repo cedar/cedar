@@ -16,8 +16,8 @@ cedar_add_library(auxiliaries
   math/Limits.h
   math/sigmoids.h
   math/sigmoids.cpp
-  math/Tools.h
-  math/Tools.cpp
-  math/AlgebraTools.h
-  math/AlgebraTools.cpp
+  math/tools.h
+  math/tools.cpp
+  math/algebraTools.h
+  math/algebraTools.cpp
 )
