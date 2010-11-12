@@ -2,7 +2,7 @@
  ----- Institute:   Ruhr-Universitaet-Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        Sigmoids.cpp
+ ----- File:        sigmoids.cpp
 
  ----- Author:      INI robotics group, maintained by HR
  ------Email:       ar@ini.rub.de
@@ -14,7 +14,7 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // includes
-#include "Sigmoids.h"
+#include "sigmoids.h"
 
 using namespace std;
 
