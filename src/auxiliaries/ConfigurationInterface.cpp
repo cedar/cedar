@@ -473,7 +473,20 @@ int ConfigurationInterface::readConfiguration()
     } // END case default
     } // END switch
   }
+
+  int class_specific_read_info = readClassSpecificConfiguration();
+
+  if (class_specific_read_info != CONFIG_SUCCESS)
+  {
+    info = class_specific_read_info;
+  }
+
   return info;
+}
+
+int ConfigurationInterface::readClassSpecificConfiguration()
+{
+  return CONFIG_SUCCESS;
 }
 
 int ConfigurationInterface::handleTypeException(const ConfigurationInterface::ParameterInfo& info)

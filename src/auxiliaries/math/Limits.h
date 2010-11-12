@@ -35,7 +35,7 @@ struct cedar::aux::math::Limits
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief The standard constructor
-  Limits();
+  Limits() {};
   //!@brief Constructor that takes a minimum and maximum value
   Limits(const T_MIN& newMin, const T_MAX& newMax) : min(newMin), max(newMax) {};
   
@@ -57,5 +57,8 @@ struct cedar::aux::math::Limits
 
 }; // class cedar::aux::math::Limits
 
-#endif // CEDAR_AUX_MATH_LIMITS_H
+template struct cedar::aux::math::Limits<double, double>;
+template struct cedar::aux::math::Limits<int, int>;
+template struct cedar::aux::math::Limits<unsigned int, unsigned int>;
 
+#endif // CEDAR_AUX_MATH_LIMITS_H

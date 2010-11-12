@@ -287,7 +287,12 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none
+  /*!@brief Reads configuration entries that can not be handled by the configuration interface.
+   *
+   * The default implementation is empty. Inheriting classes can implement this function to read libconfig
+   * structures (e.g., groups, lists) the @em ConfigurationInterface does not support.
+   */
+  virtual int readClassSpecificConfiguration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

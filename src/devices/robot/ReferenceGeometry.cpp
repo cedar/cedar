@@ -22,6 +22,8 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
+#include <iostream>
+#include <libconfig.h++>
 
 using namespace cedar::dev::robot;
 
@@ -34,6 +36,7 @@ ReferenceGeometry::ReferenceGeometry(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName)
 {
+  readOrDefaultConfiguration();
 }
 
 //! destructor
@@ -45,9 +48,26 @@ ReferenceGeometry::~ReferenceGeometry()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void ReferenceGeometry::init()
+int ReferenceGeometry::readClassSpecificConfiguration()
 {
-  readConfiguration();
+  // read joint information
+  std::string joint_path = "joints";
+  std::string joint_path_dot = joint_path + ".";
+
+  libconfig::Setting& r_joint_setting = mConfig.lookup(joint_path);
+  const unsigned int number_of_joints = static_cast<unsigned int>(r_joint_setting.getLength());
+
+  for (unsigned int i = 0; i < number_of_joints; ++i)
+  {
+    ReferenceGeometry::JointPtr p_joint(new ReferenceGeometry::Joint());
+    //TODO
+    //mConfig.lookupValue(joint_path_dot, p_joint.position);
+
+  }
+
+  std::cout << "number of joints: " << r_joint_setting.getLength() << "\n";
+
+  return cedar::aux::ConfigurationInterface::CONFIG_SUCCESS;
 }
 
 const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned int index) const
