@@ -48,9 +48,26 @@ namespace cedar
       template<typename T>
       void sphericalToCartesian(const cv::Mat& spherical, cv::Mat& cartesian);
 
-//      //! cartesian --> spherical coordinates of 3-dimensional real space
-//      //! spherical = r, phi, theta -- radius, azimuth, zenith
-//      void cartesianToSpherical(CvMAT& cartesian, CvMAT& spherical);
+      /*! spherical --> cartesian coordinates for points of 3-dimensional space
+       * spherical coordinate explanation:
+       * radius: distance from origin
+       * theta: angular displacement from the z-axis in radians (inclination)
+       * phi: angular displacement from positive x-axis in x-y-plane in radians (azimuth)
+       * @param spherical    spherical coordinates (radius, theta, phi), use 3 rows, 1 column
+       * @return Cartesian coordinates (x, y, z), uses 3 rows, 1 column
+       */
+      template<typename T>
+      cv::Mat sphericalToCartesian(const cv::Mat& spherical);
+
+      /*! cartesian --> spherical coordinates of 3-dimensional real space
+       * radius: distance from origin
+       * theta: angular displacement from the z-axis in radians (inclination)
+       * phi: angular displacement from positive x-axis in x-y-plane in radians (azimuth)
+       * @param cartesian    Cartesian coordinates (x, y, z), use 3 rows, 1 column
+       * @param spherical    spherical coordinates (radius, theta, phi), use 3 rows, 1 column
+       */
+      template<typename T>
+      void cartesianToSpherical(const cv::Mat& cartesian, cv::Mat& spherical);
 //
 //      //! transforms a vector at a point, both given in spherical coords, to a vector in cartesian coords
 //      //! spherical = r, phi, theta -- radius, azimuth, zenith

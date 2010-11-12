@@ -58,8 +58,9 @@ int main()
   {
     errors++;
     log_file << kevin.at<double>(0, 0)<< " " << kevin.at<double>(1, 0)<< " " << kevin.at<double>(2, 0) << std::endl;
-    log_file << "test of sphericalToCartesian failed!" << std::endl;
+    log_file << "test of sphericalToCartesian<double> failed!" << std::endl;
   }
+
 
   log_file << "test: sphericalToCartesian<float>" << std::endl;
   cv::Mat chantalle = cv::Mat::zeros(3, 1, CV_32FC1);
@@ -80,8 +81,27 @@ int main()
   {
     errors++;
     log_file << jaqueline.at<float>(0, 0)<< " " << jaqueline.at<float>(1, 0)<< " " << jaqueline.at<float>(2, 0) << std::endl;
-    log_file << "test of sphericalToCartesian failed!" << std::endl;
+    log_file << "test of sphericalToCartesian<float> failed!" << std::endl;
   }
+
+
+  log_file << "test: cartesianToSpherical<double>" << std::endl;
+  cartesianToSpherical<double>(kevin, horst);
+  if (
+       IsZero(horst.at<double>(0, 0) -sqrt(2.0))
+       && IsZero(horst.at<double>(1, 0) - M_PI/2.0)
+       && IsZero(horst.at<double>(2, 0) - M_PI/4.0)
+     )
+  {
+    ;
+  }
+  else
+  {
+    errors++;
+    log_file << horst.at<double>(0, 0)<< " " << horst.at<double>(1, 0)<< " " << horst.at<double>(2, 0) << std::endl;
+    log_file << "test of cartesianToSpherical<double> failed!" << std::endl;
+  }
+
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
