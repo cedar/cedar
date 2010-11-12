@@ -10,34 +10,14 @@
 
  ----- Description: solutions to algebraic problems, like finding zeroes of polynomials
 
- ----- Credits:
+ ----- Credits: from http://www.martinreddy.net/ukvrsig/docs/ggems/GemsI/
+                 Author: Jochen Schwarze (schwarze@isa.de)
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // includes
-#include "AlgebraTools.h"
+#include "algebraTools.h"
 
 using namespace std;
-
-// from http://www.martinreddy.net/ukvrsig/docs/ggems/GemsI/
-
-/*
- *  Utility functions to find cubic and quartic roots,
- *  coefficients are passed like this:
- *
- *      c[0] + c[1]*x + c[2]*x^2 + c[3]*x^3 + c[4]*x^4 = 0
- *
- *  The functions return the number of non-complex roots and
- *  put the values into the s array.
- *
- *  Author:         Jochen Schwarze (schwarze@isa.de)
- *
- *  Jan 26, 1990    Version for Graphics Gems
- *  Oct 11, 1990    Fixed sign problem for negative q's in SolveQuartic
- *  	    	    (reported by Mark Podlipec),
- *  	    	    Old-style function definitions,
- *  	    	    IsZero() as a macro
- */
-
 
 std::vector<double> cedar::aux::math::solveQuadric(const std::vector<double>& rCoefficients)
 {
@@ -168,22 +148,26 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
   if (IsZero(r))
   {
     /* no absolute term: y(y^3 + py + q) = 0 */
-    coeffs[0] = q;
-    coeffs[1] = p;
-    coeffs[2] = 0.0;
-    coeffs[3] = 1.0;
-    solutions = solveCubic(coeffs);
+    std::vector<double> cubic_coefficients;
+    cubic_coefficients.resize(4);
+    cubic_coefficients[0] = q;
+    cubic_coefficients[1] = p;
+    cubic_coefficients[2] = 0.0;
+    cubic_coefficients[3] = 1.0;
+    solutions = solveCubic(cubic_coefficients);
     solutions.push_back(0.0);
   }
   
   else
   {
     // solve the resolvent cubic and take the one real solution ...
-    coeffs[0] = 1.0/2.0*r*p - 1.0/8.0*q*q;
-    coeffs[1] = -r;
-    coeffs[2] = -1.0/2.0*p;
-    coeffs[3] = 1.0;
-    z = solveCubic(coeffs).at(0);
+    std::vector<double> cubic_coefficients;
+    cubic_coefficients.resize(4);
+    cubic_coefficients[0] = 1.0/2.0*r*p - 1.0/8.0*q*q;
+    cubic_coefficients[1] = -r;
+    cubic_coefficients[2] = -1.0/2.0*p;
+    cubic_coefficients[3] = 1.0;
+    z = solveCubic(cubic_coefficients).at(0);
 
     // ... to build two quadratic equations
     u = z * z - r;
@@ -214,30 +198,34 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
     {
       return solutions;
     }
-    coeffs[0] = z - u;
+
+    // solve first quadratic equation
+    std::vector<double> quadric_coefficients;
+    quadric_coefficients.resize(3);
+    quadric_coefficients[0] = z - u;
     if (q < 0)
     {
-      coeffs[1] = -v;
+      quadric_coefficients[1] = -v;
     }
     else
     {
-      coeffs[1] = v;
+      quadric_coefficients[1] = v;
     }
-    coeffs[2] = 1;
+    quadric_coefficients[2] = 1;
+    solutions = solveQuadric(quadric_coefficients);
     
-    solutions = solveQuadric(coeffs);
-    
-    coeffs[0]= z + u;
+    // solve second quadratic equation
+    quadric_coefficients[0]= z + u;
     if (q < 0)
     {
-      coeffs[1] = v;
+      quadric_coefficients[1] = v;
     }
     else
     {
-      coeffs[1] = -v;
+      quadric_coefficients[1] = -v;
     }
-    coeffs[2] = 1;
-    std::vector<double> second_solutions = solveQuadric(coeffs);
+    quadric_coefficients[2] = 1;
+    std::vector<double> second_solutions = solveQuadric(quadric_coefficients);
     solutions.insert(solutions.end(), second_solutions.begin(), second_solutions.end());
   }
   // resubstitute

@@ -10,14 +10,15 @@
 
  ----- Description: solutions to algebraic problems, like finding zeroes of polynomials
 
- ----- Credits:
+ ----- Credits: from http://www.martinreddy.net/ukvrsig/docs/ggems/GemsI/
+                 Author: Jochen Schwarze (schwarze@isa.de)
  ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 #define CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 
 // LOCAL INCLUDES
-#include "Tools.h"
+#include "tools.h"
 
 // PROJECT INCLUDES
 

@@ -16,7 +16,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/math/Tools.h"
+#include "src/auxiliaries/math/tools.h"
 #include "src/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
