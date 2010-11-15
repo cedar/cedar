@@ -14,4 +14,10 @@ cedar_add_library(auxiliaries
   exceptions/IndexOutOfRangeException.h
   exceptions/IndexOutOfRangeException.cpp
   math/Limits.h
+  math/sigmoids.h
+  math/sigmoids.cpp
+  math/tools.h
+  math/tools.cpp
+  math/algebraTools.h
+  math/algebraTools.cpp
 )
