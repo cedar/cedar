@@ -18,6 +18,7 @@
 #include "UserData.h"
 
 // PROJECT INCLUDES
+#include "src/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <libconfig.h++>
@@ -47,6 +48,7 @@ ConfigurationInterface::ConfigurationInterface()
 mConfigFileName("newConfiguration")
 {
   mParameterInfos.clear();
+  readConfigurationFile();
 }
 
 ConfigurationInterface::ConfigurationInterface(const std::string& configFileName)
@@ -54,6 +56,7 @@ ConfigurationInterface::ConfigurationInterface(const std::string& configFileName
 mConfigFileName(configFileName)
 {
   mParameterInfos.clear();
+  readConfigurationFile();
 }
 
 ConfigurationInterface::ConfigurationInterface(const char* pConfigFileName)
@@ -61,6 +64,7 @@ ConfigurationInterface::ConfigurationInterface(const char* pConfigFileName)
 mConfigFileName(std::string(pConfigFileName))
 {
   mParameterInfos.clear();
+  readConfigurationFile();
 }
 
 // Destructor
@@ -317,9 +321,8 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::readConfiguration()
+int ConfigurationInterface::readConfigurationFile()
 {
-  int info = CONFIG_SUCCESS;
   // Read the file. If there is an error, report it and exit.
   try
   {
@@ -370,6 +373,13 @@ int ConfigurationInterface::readConfiguration()
     }
     return CONFIG_FILE_ERROR;
   }
+
+  return CONFIG_SUCCESS;
+}
+
+int ConfigurationInterface::readConfiguration()
+{
+  int info = CONFIG_SUCCESS;
 
   for (ParameterInfoVector::iterator iter = this->mParameterInfos.begin(); iter
       != this->mParameterInfos.end(); ++iter)
@@ -474,19 +484,7 @@ int ConfigurationInterface::readConfiguration()
     } // END switch
   }
 
-  int class_specific_read_info = readClassSpecificConfiguration();
-
-  if (class_specific_read_info != CONFIG_SUCCESS)
-  {
-    info = class_specific_read_info;
-  }
-
   return info;
-}
-
-int ConfigurationInterface::readClassSpecificConfiguration()
-{
-  return CONFIG_SUCCESS;
 }
 
 int ConfigurationInterface::handleTypeException(const ConfigurationInterface::ParameterInfo& info)
