@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 10 12
 
- ----- Description: Header for the \em cedar::aux::Base class.
+ ----- Description: Header for the @em cedar::aux::Base class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

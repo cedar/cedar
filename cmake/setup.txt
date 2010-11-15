@@ -78,7 +78,6 @@ endif()
 set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
 find_package(OpenCV REQUIRED)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
-message(STATUS ${OpenCV_LIBS})
 
 # libconfig
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
