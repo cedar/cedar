@@ -1,0 +1,105 @@
+########################################################################################################################
+# CMake macros for cedar
+########################################################################################################################
+
+
+########################################################################################################################
+
+macro(cedar_add_unit_test arguments)
+  set(currentDirectory ${CMAKE_CURRENT_SOURCE_DIR})
+  string(REGEX REPLACE ".*/(.+)$" "\\1" unitTestName "${currentDirectory}")
+
+  file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+  string(REPLACE "${CEDAR_UNIT_TEST_DIR}/" "" unitTestSubdirectory "${currentDirectory}")
+  string(REPLACE "/${unitTestName}" "" unitTestSubdirectory "${unitTestSubdirectory}")
+
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${unitTestSubdirectory})
+
+  set(unitTestExecutableName unitTest_${unitTestName})
+  
+  # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
+  add_executable(${unitTestExecutableName} ${sourceFiles})
+  
+  # add_test(<test identifier> <executable name> <arguments for the test>)
+  add_test(${unitTestName} ${CMAKE_COMMAND} -E chdir ${CEDAR_UNIT_TEST_DIR}/${unitTestSubdirectory}/${unitTestName} ${CEDAR_EXE_DIR}/${unitTestSubdirectory}/${unitTestExecutableName} ${arguments})
+  
+  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${unitTestSubdirectory}")
+  
+  target_link_libraries(${unitTestExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  
+  set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR})
+endmacro(cedar_add_unit_test)
+
+
+########################################################################################################################
+
+macro(cedar_get_subdirectories path)
+  file(GLOB returnedSubdirectories ${path}/*/)
+  list(LENGTH returnedSubdirectories numberOfSubdirectories)
+
+  if (numberOfSubdirectories GREATER 0)
+    list(REMOVE_ITEM returnedSubdirectories "${path}/.svn")
+    foreach (subdirectory ${returnedSubdirectories})
+      if (NOT IS_DIRECTORY ${subdirectory})
+        list(REMOVE_ITEM returnedSubdirectories "${subdirectory}")
+      endif(NOT IS_DIRECTORY ${subdirectory})
+    endforeach(subdirectory)
+  endif (numberOfSubdirectories GREATER 0)
+endmacro(cedar_get_subdirectories)
+
+########################################################################################################################
+
+macro(cedar_add_library)
+  parse_arguments(LIBRARY "LINK_LIBRARIES" "" ${ARGN})
+  car(LIBRARY_NAME ${LIBRARY_DEFAULT_ARGS})
+  cdr(LIBRARY_SOURCES ${LIBRARY_DEFAULT_ARGS})
+
+  add_library(${LIBRARY_NAME} ${CEDAR_LIB_TYPE} ${LIBRARY_SOURCES})
+  target_link_libraries(${LIBRARY_NAME} ${CEDAR_THIRD_PARTY_LIBS} ${LIBRARY_LINK_LIBRARIES})
+endmacro(cedar_add_library)
+
+########################################################################################################################
+
+MACRO(CAR var)
+  SET(${var} ${ARGV1})
+ENDMACRO(CAR)
+
+########################################################################################################################
+
+MACRO(CDR var junk)
+  SET(${var} ${ARGN})
+ENDMACRO(CDR)
+
+########################################################################################################################
+
+MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
+  SET(DEFAULT_ARGS)
+  FOREACH(arg_name ${arg_names})    
+    SET(${prefix}_${arg_name})
+  ENDFOREACH(arg_name)
+  FOREACH(option ${option_names})
+    SET(${prefix}_${option} FALSE)
+  ENDFOREACH(option)
+
+  SET(current_arg_name DEFAULT_ARGS)
+  SET(current_arg_list)
+  FOREACH(arg ${ARGN})            
+    SET(larg_names ${arg_names})    
+    LIST(FIND larg_names "${arg}" is_arg_name)                   
+    IF (is_arg_name GREATER -1)
+      SET(${prefix}_${current_arg_name} ${current_arg_list})
+      SET(current_arg_name ${arg})
+      SET(current_arg_list)
+    ELSE (is_arg_name GREATER -1)
+      SET(loption_names ${option_names})    
+      LIST(FIND loption_names "${arg}" is_option)            
+      IF (is_option GREATER -1)
+	     SET(${prefix}_${arg} TRUE)
+      ELSE (is_option GREATER -1)
+	     SET(current_arg_list ${current_arg_list} ${arg})
+      ENDIF (is_option GREATER -1)
+    ENDIF (is_arg_name GREATER -1)
+  ENDFOREACH(arg)
+  SET(${prefix}_${current_arg_name} ${current_arg_list})
+ENDMACRO(PARSE_ARGUMENTS)
