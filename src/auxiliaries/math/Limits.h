@@ -28,7 +28,7 @@
  *
  * More detailed description of the struct.
  */
-template <typename T_MIN, typename T_MAX>
+template <typename T>
 struct cedar::aux::math::Limits
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -37,11 +37,11 @@ struct cedar::aux::math::Limits
   //!@brief The standard constructor
   Limits() {};
   //!@brief Constructor that takes a minimum and maximum value
-  Limits(const T_MIN& newMin, const T_MAX& newMax) : min(newMin), max(newMax) {};
+  Limits(const T& newMin, const T& newMax) : min(newMin), max(newMax) {};
   
   //!@brief Copy constructor
-  template <typename U, typename V>
-  Limits(const Limits<U, V> &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
+  template <typename U>
+  Limits(const Limits<U> &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
 
   //--------------------------------------------------------------------------------------------------------------------
   // methods
@@ -51,14 +51,14 @@ struct cedar::aux::math::Limits
   // members
   //--------------------------------------------------------------------------------------------------------------------
   //! minimum limit
-  T_MIN min;
+  T min;
   //! maximum limit
-  T_MAX max;
+  T max;
 
 }; // class cedar::aux::math::Limits
 
-template struct cedar::aux::math::Limits<double, double>;
-template struct cedar::aux::math::Limits<int, int>;
-template struct cedar::aux::math::Limits<unsigned int, unsigned int>;
+template struct cedar::aux::math::Limits<double>;
+template struct cedar::aux::math::Limits<int>;
+template struct cedar::aux::math::Limits<unsigned int>;
 
 #endif // CEDAR_AUX_MATH_LIMITS_H

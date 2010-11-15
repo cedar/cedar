@@ -21,7 +21,6 @@
 
 // PROJECT INCLUDES
 #include "src/auxiliaries/ConfigurationInterface.h"
-#include "src/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -44,14 +43,14 @@ protected:
   {
     std::vector<double> position;
     std::vector<double> axis;
-    cedar::aux::math::Limits<double, double> angleLimits;
-    cedar::aux::math::Limits<double, double> velocityLimits;
+    std::vector<double> angleLimits;
+    std::vector<double> velocityLimits;
   };
 
   struct LinkSegment
   {
     std::vector<double> centerOfMassPosition;
-    std::vector<double> centerOfMassdirection;
+    std::vector<double> centerOfMassDirection;
     std::vector<double> inertiaMoments;
   };
 
@@ -85,13 +84,13 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  virtual int readClassSpecificConfiguration();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

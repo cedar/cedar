@@ -31,7 +31,7 @@ namespace cedar
     /*!@brief Namespace for all math classes. */
     namespace math
     {
-      template <typename T_MIN, typename T_MAX> struct Limits;
+      template <typename T> struct Limits;
     }
   }
 }

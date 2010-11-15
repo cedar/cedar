@@ -22,6 +22,7 @@
 #include "src/Namespace.h"
 
 // SYSTEM INCLUDES
+#include <sstream>
 #include <boost/smart_ptr.hpp>
 
 
@@ -44,6 +45,18 @@ namespace cedar
 
     class LogFile;
     typedef boost::shared_ptr<LogFile> LogFilePtr;
+
+    /*!@brief Template method that converts simple data types to a string.
+     *
+     * @param[in] value The data value that will be converted to a string.
+     */
+    template<typename T>
+    std::string toString(const T &value)
+    {
+      std::ostringstream streamOut;
+      streamOut << value;
+      return streamOut.str();
+    }
   }
 }
 
