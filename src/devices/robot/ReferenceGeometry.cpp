@@ -31,9 +31,9 @@ using namespace cedar::dev::robot;
 
 //! constructor
 ReferenceGeometry::ReferenceGeometry(const std::string& configFileName)
-: cedar::aux::ConfigurationInterface(configFileName)
+:
+cedar::aux::ConfigurationInterface(configFileName)
 {
-
 }
 
 //! destructor
@@ -45,9 +45,9 @@ ReferenceGeometry::~ReferenceGeometry()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void ReferenceGeometry::init(void)
+void ReferenceGeometry::init()
 {
-  addParameter(&_mName, "Name", "TutorialTemplate");
+  readConfiguration();
 }
 
 const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned int index) const
@@ -55,17 +55,12 @@ const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned in
   return _mJoints[index];
 }
 
-const ReferenceGeometry::JointLinkPtr& ReferenceGeometry::getJointLink(const unsigned int index) const
+const ReferenceGeometry::LinkSegmentPtr& ReferenceGeometry::getLinkSegment(const unsigned int index) const
 {
-  return _mJointLinks[index];
+  return _mLinkSegments[index];
 }
 
-const std::vector<double>& ReferenceGeometry::getBasePosition(void) const
+const std::vector<double>& ReferenceGeometry::getBasePosition() const
 {
   return _mBasePosition;
-}
-
-const ReferenceGeometry::EndEffectorPtr& ReferenceGeometry::getEndEffector() const
-{
-  return _mpEndEffector;
 }

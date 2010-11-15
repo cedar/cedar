@@ -361,10 +361,10 @@ private:
 public:
   // none
 protected:
-  // none
-private:
   //! the Config object, which holds a tree of stored configuration entries
   libconfig::Config mConfig;
+private:
+
   //! the name of the configuration file
   std::string mConfigFileName;
   //! a vector of parameters, interfacing between the configuration tree and the child class' parameter pointers
