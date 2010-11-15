@@ -23,7 +23,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <cv>
+#include <cv.h>
 #include <vector>
 #include <string>
 
@@ -51,34 +51,33 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  std::vector<double> getReferenceGeometry(void) const;
-  unsigned int getNumberOfJoints(void) const;
+  const ReferenceGeometryPtr& getReferenceGeometry() const;
+  const unsigned int getNumberOfJoints() const;
+  void setReferenceGeometry(const ReferenceGeometryPtr& geometry);
 
-  virtual double getJointAngle(const unsigned int index) const = 0;
-  virtual std::vector<double> getJointAngles(void) const = 0;
-  virtual cv::Mat getJointAnglesMatrix(void) const = 0;
+  virtual const double getJointAngle(const unsigned int index) const = 0;
+  virtual const std::vector<double> getJointAngles() const = 0;
+  virtual const cv::Mat getJointAnglesMatrix() const = 0;
 
-  virtual double getJointVelocity(const unsigned int index) const;
-  virtual std::vector<double> getJointVelocities(void) const;
-  virtual cv::Mat getJointVelocitiesMatrix(void) const;
+  virtual const double getJointVelocity(const unsigned int index) const;
+  virtual const std::vector<double> getJointVelocities() const;
+  virtual const cv::Mat getJointVelocitiesMatrix() const;
 
-  virtual double getJointAcceleration(const unsigned int index) const;
-  virtual std::vector<double> getJointAccelerations(void) const;
-  virtual cv::Mat getJointAccelerationMatrix(void) const;
+  virtual const double getJointAcceleration(const unsigned int index) const;
+  virtual const std::vector<double> getJointAccelerations() const;
+  virtual const cv::Mat getJointAccelerationMatrix() const;
 
   virtual void setJointAngle(const unsigned int index, const double angle) = 0;
-  virtual void setJointAngles(const cv::Mat angleMatrix) = 0;
-  virtual void setJointAngles(const std::vector<double> angles) = 0;
+  virtual void setJointAngles(const cv::Mat& angleMatrix) = 0;
+  virtual void setJointAngles(const std::vector<double>& angles) = 0;
 
   virtual void setJointVelocity(const unsigned int index, const double velocity);
-  virtual void setJointVelocities(const cv::Mat velocities);
-  virtual void setJointVelocities(const std::vector<double> velocities);
+  virtual void setJointVelocities(const cv::Mat& velocities);
+  virtual void setJointVelocities(const std::vector<double>& velocities);
 
   virtual void setJointAcceleration(const unsigned int index, const double velocity);
-  virtual void setJointAccelerations(const cv::Mat velocities);
-  virtual void setJointAccelerations(const std::vector<double> velocities);
-
-  void setReferenceGeometry(const ReferenceGeometryPtr& geometry);
+  virtual void setJointAccelerations(const cv::Mat& velocities);
+  virtual void setJointAccelerations(const std::vector<double>& velocities);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,7 +97,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  cedar::dev::robot::ReferenceGeometryPtr mReferenceGeometry;
+  cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
   unsigned int mNumberOfJoints;
 
 private:

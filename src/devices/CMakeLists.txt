@@ -1,5 +1,6 @@
 cedar_add_library(devices
   robot/KinematicChain.h
+  robot/KinematicChain.cpp
   robot/KinematicChainModel.h
   robot/Component.h
   robot/Component.cpp
