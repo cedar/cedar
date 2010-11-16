@@ -1,17 +1,19 @@
-/*----------------------------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
  ----- File:        Thread.h
 
  ----- Author:      Christian Faubel
+                    Bjoern Weghenkel
  ----- Email:       christian.faubel@ini.rub.de
- ----- Date:        2010 10 12
+                    bjoern.weghenkel@ini.rub.de
+ ----- Date:        2010 11 16
 
  ----- Description: Header for the @em cedar::aux::Thread class.
 
  ----- Credits:
- ---------------------------------------------------------------------------------------------------------------------*/
+ -----------------------------------------------------------------------------*/
 
 #ifndef CEDAR_AUX_THREAD_H
 #define CEDAR_AUX_THREAD_H
@@ -56,7 +58,7 @@ public:
   /*!@brief The standard constructor.
    *
    * The standard constructor sets the idle time between
-   * two executions of step() to 100 microseconds.
+   * two executions of step() to 1 millisecond
    */
   Thread(void);
 
@@ -67,7 +69,7 @@ public:
    *
    * @param idleTime the time in microseconds used in usleep
    */
-  Thread(int idleTime);
+  Thread(unsigned idleTime);
 
   //!@brief Destructor
   virtual ~Thread(void) = 0;
@@ -76,17 +78,28 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Run executes step() and usleep in a while loop.
+  /*!@brief Executes step() in a while loop in fixed time intervals.
+   *
+   * If the system was not fast enough to execute step(time) in the desired
+   * time, step(time) is called with the proper multiple of mIdleTime to make
+   * up for the lost step(s).
+   */
   virtual void run();
 
   /*!@brief All calculations for each time step are put into step().
    *
-   * @param time determines externally measured time if step()
+   * @param time determines externally measured time since last step()
    */
-  virtual void step(double time = 0.001) = 0;
+  virtual void step( unsigned time ) = 0;
 
-  //!@brief Stops the thread.
-  void stop();
+  /*!@brief Stops the thread.
+   *
+   * Since the thread might be busy executing step(), it makes sense to wait a
+   * moment for the thread to finish its work.
+   *
+   * @param timeout the max. time to wait for the thread (in milliseconds).
+   */
+  void stop( unsigned timeout = 1000 );
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,15 +112,14 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   // none yet
+  bool mStop;
+  int mIdleTime; //!< idle time in microseconds
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
-  bool mStop;
-  bool mIsRunning;
-  int mIdleTime; //!< idle time in microseconds
 protected:
   // none yet
 private:
