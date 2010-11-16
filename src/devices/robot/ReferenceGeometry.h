@@ -66,7 +66,9 @@ protected:
   };
 
 public:
+  //! smart pointer definition for the Joint struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::Joint> JointPtr;
+  //! smart pointer definition for the LinkSegment struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::LinkSegment> LinkSegmentPtr;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -77,18 +79,34 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
+  //!@brief Constructor
   ReferenceGeometry(const std::string& configFileName);
 
-  //!@brief destructor
+  //!@brief Destructor
   virtual ~ReferenceGeometry();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns a pointer to a specific joint.
+   *
+   * @return    pointer to joint struct
+   * @param index    index of the joint
+   */
   const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(const unsigned int index) const;
+
+  /*!@brief Returns a pointer to a specific link segment.
+   *
+   * @return    pointer to link segment struct
+   * @param index    index of the link segment
+   */
   const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& getLinkSegment(const unsigned int index) const;
+
+  /*!@brief Returns a vector describing the position of the base of the robot in 3D space.
+   *
+   * @return    base position
+   */
   const std::vector<double>& getBasePosition() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,7 +119,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Initializes the configuration interface.
+   *
+   * Since the @em cedar::dev::robot::ReferenceGeometry has a more complex configuration, parts of which the
+   * @em cedar::aux::ConfigurationInterface does not support out of the box, the reading process must be prepared.
+   */
   void init();
+
+  // TODO: remove when debugged
   void testOutput() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -120,8 +145,11 @@ private:
 public:
   // none yet
 protected:
+  //! vector of all joints
   std::vector<cedar::dev::robot::ReferenceGeometry::JointPtr> _mJoints;
+  //! vector of all link segments
   std::vector<cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr> _mLinkSegments;
+  //! base position of the robot
   std::vector<double> _mBasePosition;
 
 private:
