@@ -2,7 +2,7 @@
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        Defines.h
+ ----- File:        defines.h
 
  ----- Author:      Mathis Richter
  ----- Email:       mathis.richter@ini.rub.de

@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 10 21
 
- ----- Description: Header for the \em cedar::tests::unit::aux::TestClass class.
+ ----- Description: Header for the @em cedar::tests::unit::aux::TestClass class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_TESTS_UNIT_AUX_CONFIGURATION_INTERFACE_TEST_CLASS_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 #include "src/auxiliaries/ConfigurationInterface.h"

@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 10 27
 
- ----- Description: Header for the \em cedar::aux::LogFile class.
+ ----- Description: Header for the @em cedar::aux::LogFile class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

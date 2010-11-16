@@ -10,12 +10,17 @@
 
  ----- Description: solutions to algebraic problems, like finding zeroes of polynomials
 
- ----- Credits: from http://www.martinreddy.net/ukvrsig/docs/ggems/GemsI/
-                 Author: Jochen Schwarze (schwarze@isa.de)
+ ----- Credits:     from http://www.martinreddy.net/ukvrsig/docs/ggems/GemsI/
+                    Author: Jochen Schwarze (schwarze@isa.de)
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// includes
+// LOCAL INCLUDES
 #include "algebraTools.h"
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+
 
 using namespace std;
 

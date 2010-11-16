@@ -6,28 +6,34 @@
 
  ----- Author:      Mathis Richter
  ----- Email:       mathis.richter@ini.rub.de
- ----- Date:        2010 10 29
+ ----- Date:        2010 11 11
 
- ----- Description: Namespace file for cedar.
+ ----- Description: Namespace file for cedar::aux::math.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#ifndef CEDAR_NAMESPACE_H
-#define CEDAR_NAMESPACE_H
+#ifndef CEDAR_AUX_MATH_NAMESPACE_H
+#define CEDAR_AUX_MATH_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "Defines.h" // IT MIGHT NOT BE A CLEAN DESIGN TO INCLUDE THIS HERE (?) ANY SUGGESTIONS?
 
 // PROJECT INCLUDES
+#include "src/namespace.h"
 
 // SYSTEM INCLUDES
 
 
-/*@brief Namespace for cedar (top level). */
 namespace cedar
 {
-
+  namespace aux
+  {
+    /*!@brief Namespace for all math classes. */
+    namespace math
+    {
+      template <typename T> struct Limits;
+    }
+  }
 }
 
-#endif // CEDAR_NAMESPACE_H
+#endif // CEDAR_AUX_MATH_NAMESPACE_H

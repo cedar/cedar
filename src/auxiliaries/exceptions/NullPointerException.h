@@ -8,7 +8,7 @@
  ----- Email:       oliver.lomp@ini.rub.de
  ----- Date:        2010 01 20
 
- ----- Description: Header for the \em cedar::aux::exc::NullPointerException class.
+ ----- Description: Header for the @em cedar::aux::exc::NullPointerException class.
 
  ----- Credits:     Christine Goehrke, Tim Dierkes, Marc Hoener, Tobias Kirchhof
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_AUX_EXC_NULL_POINTER_EXCEPTION_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 #include "ExceptionBase.h"
 
 // PROJECT INCLUDES

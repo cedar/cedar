@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 08 30
 
- ----- Description: Header for the \em cedar::dev::robot::KinematicChain class.
+ ----- Description: Header for the @em cedar::dev::robot::KinematicChain class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 #include "Component.h"
 
 // PROJECT INCLUDES

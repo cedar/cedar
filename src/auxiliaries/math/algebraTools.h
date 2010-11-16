@@ -8,10 +8,10 @@
  ------Email:       ar@ini.rub.de
  ----- Date:        2010 11 11
 
- ----- Description: solutions to algebraic problems, like finding zeroes of polynomials
+ ----- Description: Solutions to algebraic problems, like finding zeroes of polynomials
 
- ----- Credits: from http://www.martinreddy.net/ukvrsig/docs/ggems/GemsI/
-                 Author: Jochen Schwarze (schwarze@isa.de)
+ ----- Credits:     from http://www.martinreddy.net/ukvrsig/docs/ggems/GemsI/
+                    Author: Jochen Schwarze (schwarze@isa.de)
  ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
@@ -61,4 +61,4 @@ namespace cedar
     };
   };
 };
-#endif  // CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
+#endif // CEDAR_AUX_MATH_ALGEBRA_TOOLS_H

@@ -8,7 +8,7 @@
  ----- Email:       christian.faubel@ini.rub.de
  ----- Date:        2010 10 12
 
- ----- Description: Header for the \em cedar::aux::Thread class.
+ ----- Description: Header for the @em cedar::aux::Thread class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_AUX_THREAD_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 #include "Base.h"
 
 // PROJECT INCLUDES

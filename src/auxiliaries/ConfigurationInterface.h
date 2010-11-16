@@ -19,7 +19,7 @@
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 #include "Base.h"
 #include "UserData.h"
 

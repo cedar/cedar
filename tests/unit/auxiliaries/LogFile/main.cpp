@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 10 27
 
- ----- Description: Implements all unit tests for the \em cedar::aux::LogFile class.
+ ----- Description: Implements all unit tests for the @em cedar::aux::LogFile class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

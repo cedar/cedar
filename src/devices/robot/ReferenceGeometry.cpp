@@ -17,7 +17,7 @@
 #include "ReferenceGeometry.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/Namespace.h"
+#include "src/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -97,9 +97,9 @@ void ReferenceGeometry::testOutput() const
     std::cout << "]\n";
 
     std::cout << "link " << i << " center of mass direction" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->centerOfMassDirection.size(); ++j)
+    for (unsigned int j = 0; j < p_link_segment->centerOfMassOrientation.size(); ++j)
     {
-      std::cout << p_link_segment->centerOfMassDirection[j] << " ";
+      std::cout << p_link_segment->centerOfMassOrientation[j] << " ";
     }
     std::cout << "]\n";
 
@@ -152,7 +152,7 @@ void ReferenceGeometry::init()
     std::string parameter_path = link_segment_path + ".[" + cedar::aux::toString<unsigned int>(i) + "].";
 
     addParameter(&(p_link_segment->centerOfMassPosition), parameter_path + "centerOfMassPosition", 0.0);
-    addParameter(&(p_link_segment->centerOfMassDirection), parameter_path + "centerOfMassDirection", 0.0);
+    addParameter(&(p_link_segment->centerOfMassOrientation), parameter_path + "centerOfMassOrientation", 0.0);
     addParameter(&(p_link_segment->inertiaMoments), parameter_path + "inertiaMoments", 0.0);
   }
 }

@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 11 11
 
- ----- Description: Header for the \em cedar::aux::math::Limits struct.
+ ----- Description: Header for the @em cedar::aux::math::Limits struct.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_AUX_MATH_LIMITS_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 

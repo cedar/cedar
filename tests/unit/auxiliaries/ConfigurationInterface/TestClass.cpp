@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 10 21
 
- ----- Description: Header for the \em TestClass class.
+ ----- Description: Header for the @em TestClass class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

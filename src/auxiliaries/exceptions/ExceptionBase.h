@@ -8,7 +8,7 @@
  ----- Email:       oliver.lomp@ini.rub.de
  ----- Date:        2010 01 20
 
- ----- Description: Header for the \em cedar::aux::exc::ExceptionBase class.
+ ----- Description: Header for the @em cedar::aux::exc::ExceptionBase class.
 
  ----- Credits:     Christine Goehrke, Tim Dierkes, Marc Hoener, Tobias Kirchhof
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_AUX_EXC_EXCEPTION_BASE_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 

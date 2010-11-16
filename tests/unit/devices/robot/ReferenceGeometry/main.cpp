@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 11 12
 
- ----- Description: Implements all unit tests for the \em cedar::dev::robot::ReferenceGeometry class.
+ ----- Description: Implements all unit tests for the @em cedar::dev::robot::ReferenceGeometry class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

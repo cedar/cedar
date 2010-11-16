@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 11 08
 
- ----- Description: Header for the \em cedar::tests::unit::dev::robot::Robot::TestRobot class.
+ ----- Description: Header for the @em cedar::tests::unit::dev::robot::Robot::TestRobot class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_TESTS_UNIT_DEV_ROBOT_ROBOT_TEST_ROBOT_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 #include "src/devices/robot/Robot.h"

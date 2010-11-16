@@ -18,7 +18,6 @@
 #include "UserData.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <libconfig.h++>

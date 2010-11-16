@@ -17,7 +17,7 @@
 #define CEDAR_DEV_ROBOT_ROBOT_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 #include "src/auxiliaries/Base.h"

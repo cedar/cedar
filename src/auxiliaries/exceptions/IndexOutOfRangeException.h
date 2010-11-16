@@ -8,7 +8,7 @@
  ----- Email:       oliver.lomp@ini.rub.de
  ----- Date:        2010 03 08
 
- ----- Description: Header for the \em cedar::aux::exc::IndexOutOfRangeException class.
+ ----- Description: Header for the @em cedar::aux::exc::IndexOutOfRangeException class.
 
  ----- Credits:     Christine Goehrke, Tim Dierkes, Marc Hoener, Tobias Kirchhof
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_AUX_EXC_INDEX_OUT_OF_RANGE_EXCEPTION_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 #include "ExceptionBase.h"
 
 // PROJECT INCLUDES

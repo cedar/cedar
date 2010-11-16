@@ -8,7 +8,7 @@
  ----- Email:       christian.faubel@ini.rub.de
  ----- Date:        2010 10 12
 
- ----- Description: Implementation for the \em cedar::aux::Thread class.
+ ----- Description: Implementation for the @em cedar::aux::Thread class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
