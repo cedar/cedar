@@ -21,6 +21,7 @@
 
 // PROJECT INCLUDES
 #include "src/auxiliaries/ConfigurationInterface.h"
+#include "src/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -43,8 +44,8 @@ protected:
   {
     std::vector<double> position;
     std::vector<double> axis;
-    std::vector<double> angleLimits;
-    std::vector<double> velocityLimits;
+    cedar::aux::math::Limits<double> angleLimits;
+    cedar::aux::math::Limits<double> velocityLimits;
   };
 
   struct LinkSegment
@@ -91,6 +92,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void init();
+  void testOutput() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -39,6 +39,20 @@ cedar::aux::ConfigurationInterface(configFileName)
   init();
   readOrDefaultConfiguration();
 
+  testOutput();
+}
+
+//! destructor
+ReferenceGeometry::~ReferenceGeometry()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void ReferenceGeometry::testOutput() const
+{
   std::cout << "base position: [";
   for (unsigned int j = 0; j < _mBasePosition.size(); ++j)
   {
@@ -65,18 +79,10 @@ cedar::aux::ConfigurationInterface(configFileName)
     std::cout << "]\n";
 
     std::cout << "joint " << i << " angle limits" << ": [";
-    for (unsigned int j = 0; j < p_joint->angleLimits.size(); ++j)
-    {
-      std::cout << p_joint->angleLimits[j] << " ";
-    }
-    std::cout << "]\n";
+    std::cout << p_joint->angleLimits.min << " " << p_joint->angleLimits.max << "]\n";
 
     std::cout << "joint " << i << " velocity limits" << ": [";
-    for (unsigned int j = 0; j < p_joint->velocityLimits.size(); ++j)
-    {
-      std::cout << p_joint->velocityLimits[j] << " ";
-    }
-    std::cout << "]\n";
+    std::cout << p_joint->velocityLimits.min << " " << p_joint->velocityLimits.max << "]\n";
   }
 
   for (unsigned int i = 0; i < _mLinkSegments.size(); ++i)
@@ -106,15 +112,6 @@ cedar::aux::ConfigurationInterface(configFileName)
   }
 }
 
-//! destructor
-ReferenceGeometry::~ReferenceGeometry()
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
 void ReferenceGeometry::init()
 {
   // add parameter for base position
@@ -135,8 +132,10 @@ void ReferenceGeometry::init()
 
     addParameter(&(p_joint->position), parameter_path + "position", 0.0);
     addParameter(&(p_joint->axis), parameter_path + "axis", 0.0);
-    addParameter(&(p_joint->angleLimits), parameter_path + "angleLimits", 0.0);
-    addParameter(&(p_joint->velocityLimits), parameter_path + "velocityLimits", 0.0);
+    addParameter(&(p_joint->angleLimits.min), parameter_path + "angleLimits.[0]", 0.0);
+    addParameter(&(p_joint->angleLimits.max), parameter_path + "angleLimits.[1]", 0.0);
+    addParameter(&(p_joint->velocityLimits.min), parameter_path + "velocityLimits.[0]", 0.0);
+    addParameter(&(p_joint->velocityLimits.max), parameter_path + "velocityLimits.[1]", 0.0);
   }
 
   // add parameters for link segment information
