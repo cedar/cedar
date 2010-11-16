@@ -42,8 +42,8 @@ class cedar::aux::LogFile : public std::ofstream
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The constructor.
-  LogFile(const std::string& logFileName, const std::string& logFilePath = CEDAR_LOG_DIR);
-  LogFile(const char* pLogFileName, const char* pLogFilePath = CEDAR_LOG_DIR);
+  LogFile(const std::string& logFileName);
+  LogFile(const char* pLogFileName);
 
   //!@brief Destructor
   virtual ~LogFile(void);
@@ -59,7 +59,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void init(const std::string& logFilePath, const std::string& logFileName);
+  void init(const std::string& logFileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

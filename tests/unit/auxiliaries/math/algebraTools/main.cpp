@@ -27,7 +27,7 @@ using namespace std;
 
 int main()
 {
-  LogFile log_file("UnitTestAlgebraicTools.log", ".");
+  LogFile log_file("UnitTestAlgebraicTools.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test

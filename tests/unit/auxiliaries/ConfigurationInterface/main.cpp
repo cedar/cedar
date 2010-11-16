@@ -29,7 +29,7 @@ using namespace cedar::aux;
 
 int main()
 {
-  LogFile log_file("ConfigurationInterface.log",".");
+  LogFile log_file("ConfigurationInterface.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test
