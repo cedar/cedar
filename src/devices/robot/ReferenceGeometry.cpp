@@ -36,9 +36,12 @@ ReferenceGeometry::ReferenceGeometry(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName)
 {
+  // initialize the configuration reading process
   init();
+  // read configuration file
   readOrDefaultConfiguration();
 
+  // TODO: remove when ready
   testOutput();
 }
 
@@ -51,6 +54,7 @@ ReferenceGeometry::~ReferenceGeometry()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+// TODO: remove when ready
 void ReferenceGeometry::testOutput() const
 {
   std::cout << "base position: [";
