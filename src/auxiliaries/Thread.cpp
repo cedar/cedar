@@ -5,8 +5,10 @@
  ----- File:        Thread.cpp
 
  ----- Author:      Christian Faubel
+                    Bjoern Weghenkel
  ----- Email:       christian.faubel@ini.rub.de
- ----- Date:        2010 10 12
+                    bjoern.weghenkel@ini.rub.de
+ ----- Date:        2010 11 16
 
  ----- Description: Implementation for the @em cedar::aux::Thread class.
 
@@ -15,6 +17,7 @@
 
 // LOCAL INCLUDES
 #include "Thread.h"
+#include <QTime>
 
 // PROJECT INCLUDES
 
@@ -33,7 +36,7 @@ cedar::aux::Thread::Thread()
   mStop = false;
 }
 
-cedar::aux::Thread::Thread(int idleTime) : mIdleTime(idleTime)
+cedar::aux::Thread::Thread(unsigned idleTime) : mIdleTime(idleTime)
 {
   _mName = string("thread");
   mStop = false;
@@ -47,18 +50,55 @@ cedar::aux::Thread::~Thread()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Thread::stop()
+void cedar::aux::Thread::stop( unsigned time )
 {
-  mStop = true;
+	mStop = true;
+	wait( time );
 }
 
 void cedar::aux::Thread::run(void)
 {
-  mStop = false;
+	mStop = false;
 
-  while(!mStop)
-  {
-    usleep(mIdleTime);
-    step();
-  }
+	// some auxiliary variables
+	QTime lastWakeup = QTime::currentTime();
+	QTime scheduledWakeup = lastWakeup.addMSecs( 1000 );
+	QTime tmpTime;
+	srand ( QTime::currentTime().msec() );
+
+	while( !mStop ) {
+
+		// sleep until next wake up time
+		msleep( std::max<int>( 0, QTime::currentTime().msecsTo( scheduledWakeup ) ) );
+
+		// print wake up time
+		//QTime currentWakeup = QTime::currentTime();
+		//cout << currentWakeup.second() << ":" << currentWakeup.msec() << endl;
+
+		// determine number of time steps since last run
+		QTime wakeupMax = scheduledWakeup.addMSecs( 1000 ); // end of current time window
+		tmpTime = lastWakeup.addMSecs( 1000 );
+		unsigned stepsTaken = 0;
+		while( tmpTime < wakeupMax ) {
+			tmpTime = tmpTime.addMSecs( 1000 );
+			stepsTaken++;
+		}
+		lastWakeup = scheduledWakeup;	// remember the current wakeup time
+		scheduledWakeup = tmpTime;
+
+		// print warning if time steps have been skipped
+		if( stepsTaken > 1 )
+			cout << "WARNING: steps taken: " << stepsTaken << endl;
+
+		// call step function
+		step( stepsTaken * mIdleTime );
+
+		// if the execution lasted unexpectedly long, we'd like to wake up for
+		// the next regular time step
+		while( scheduledWakeup < QTime::currentTime() )
+			scheduledWakeup = scheduledWakeup.addMSecs( 1000 );
+	}
+
+	mStop = false;
+	return;
 }
