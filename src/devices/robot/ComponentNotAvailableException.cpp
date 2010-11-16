@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 11 08
 
- ----- Description: Header for the \em cedar::dev::robot::ComponentNotAvailableException class.
+ ----- Description: Header for the @em cedar::dev::robot::ComponentNotAvailableException class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

@@ -19,7 +19,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "src/Namespace.h"
+#include "src/namespace.h"
 
 // SYSTEM INCLUDES
 #include <sstream>

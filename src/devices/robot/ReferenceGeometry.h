@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 08 30
 
- ----- Description: Header for the \em cedar::dev::robot::ReferenceGeometry class.
+ ----- Description: Header for the @em cedar::dev::robot::ReferenceGeometry class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -17,7 +17,7 @@
 #define CEDAR_DEV_ROBOT_REFERENCE_GEOMETRY_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 #include "src/auxiliaries/ConfigurationInterface.h"
@@ -30,9 +30,10 @@
 #include <cv.h>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Encapsulates values that describe the physical properties of a robot.
  *
- * More detailed description of the class.
+ * Describes the position, axis and angle/velocity limits of all joints of a robot, as well as all properties of
+ * all link segments relevant for computing trajectories in a dynamical model.
  */
 class cedar::dev::robot::ReferenceGeometry : public cedar::aux::ConfigurationInterface
 {
@@ -40,18 +41,27 @@ class cedar::dev::robot::ReferenceGeometry : public cedar::aux::ConfigurationInt
   // structs
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Describes the hardware properties of a joint.
   struct Joint
   {
+    //! position of a joint in 3D space
     std::vector<double> position;
+    //! axis the joint moves in, in 3D space
     std::vector<double> axis;
+    //! minimum and maximum angular values
     cedar::aux::math::Limits<double> angleLimits;
+    //! minimum and maximum velocity values
     cedar::aux::math::Limits<double> velocityLimits;
   };
 
+  //!@brief Describes the hardware properties of a link segment.
   struct LinkSegment
   {
+    //! position of center of mass in 3D space
     std::vector<double> centerOfMassPosition;
-    std::vector<double> centerOfMassDirection;
+    //! orientation of center of mass in 3D space
+    std::vector<double> centerOfMassOrientation;
+    //! inertia moments in 3D space
     std::vector<double> inertiaMoments;
   };
 

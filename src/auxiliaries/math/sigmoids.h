@@ -16,7 +16,7 @@
 #define CEDAR_AUX_MATH_SIGMOIDS_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 

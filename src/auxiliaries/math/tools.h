@@ -2,7 +2,7 @@
  ----- Institute:   Ruhr-Universitaet-Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        Tools.h
+ ----- File:        tools.h
 
  ----- Author:      INI robotics group, maintained by HR
  ------Email:       ar@ini.rub.de
@@ -16,7 +16,7 @@
 #define CEDAR_AUX_MATH_TOOLS_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 

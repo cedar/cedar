@@ -17,10 +17,10 @@
 #define CEDAR_AUX_LOG_FILE_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
-#include "src/Namespace.h"
+#include "src/namespace.h"
 
 // SYSTEM INCLUDES
 #include <fstream>

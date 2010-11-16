@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 11 08
 
- ----- Description: Implements all unit tests for the \em cedar::dev::robot::Robot class.
+ ----- Description: Implements all unit tests for the @em cedar::dev::robot::Robot class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

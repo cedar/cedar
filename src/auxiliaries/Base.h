@@ -17,7 +17,7 @@
 #define CEDAR_AUX_BASE_H
 
 // LOCAL INCLUDES
-#include "Namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
 

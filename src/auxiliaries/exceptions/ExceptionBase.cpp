@@ -8,7 +8,7 @@
  ----- Email:       oliver.lomp@ini.rub.de
  ----- Date:        2010 01 20
 
- ----- Description: Implementation of the \em cedar::aux::exc::ExceptionBase class.
+ ----- Description: Implementation of the @em cedar::aux::exc::ExceptionBase class.
 
  ----- Credits:     Christine Goehrke, Tim Dierkes, Marc Hoener, Tobias Kirchhof
  ---------------------------------------------------------------------------------------------------------------------*/
