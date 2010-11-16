@@ -8,7 +8,7 @@
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 10 25
 
- ----- Description: Header for the \em ReferenceGeometry class.
+ ----- Description: Header for the @em ReferenceGeometry class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
