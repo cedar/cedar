@@ -88,7 +88,10 @@ void cedar::aux::Thread::run(void)
 
 		// print warning if time steps have been skipped
 		if( stepsTaken > 1 )
-			cout << "WARNING: steps taken: " << stepsTaken << endl;
+			cout << "WARNING: " << stepsTaken << " time steps taken at once! "
+			<< "Your system might be too slow for an execution interval of "
+			<< mIdleTime << " milliseconds. Consider using a longer interval!"
+			<< endl;
 
 		// call step function
 		step( stepsTaken * mIdleTime );
