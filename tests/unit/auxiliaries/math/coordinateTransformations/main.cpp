@@ -33,7 +33,7 @@ using namespace std;
 
 int main()
 {
-  LogFile log_file("UnitTestCoordinateTransformations.log", ".");
+  LogFile log_file("UnitTestCoordinateTransformations.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test

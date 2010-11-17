@@ -34,7 +34,7 @@ using namespace std;
 
 int main()
 {
-  LogFile log_file("UnitTestScrewCalculus.log", ".");
+  LogFile log_file("UnitTestScrewCalculus.log");
   log_file << std::endl;
   log_file.addTimeStamp();
   log_file << std::endl;
