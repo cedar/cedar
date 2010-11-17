@@ -1,3 +1,18 @@
+/*------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
+
+ ----- File:        thread-test.cpp
+
+ ----- Author:      Bjoern Weghenkel
+ ----- Email:       bjoern.weghenkel@ini.rub.de
+ ----- Date:        2010 11 17
+
+ ----- Description: Example for the behavior of the @em cedar::aux::Thread class.
+
+ ----- Credits:
+ -----------------------------------------------------------------------------*/
+
 #include "auxiliaries/Thread.h"
 
 #include <cstdlib>
