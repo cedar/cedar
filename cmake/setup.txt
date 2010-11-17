@@ -114,10 +114,9 @@ foreach (libDir ${cedarLibDirs})
 endforeach(libDir)
 
 ########################################################################################################################
-# cedar unit tests
-list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR})
-
-set(numberOfSubdirectories 1)
+# cedar unit tests and demos
+list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_DEMO_DIR})
+list(LENGTH subdirectories numberOfSubdirectories)
 
 while (${numberOfSubdirectories} STRGREATER 0)
   list(GET subdirectories 0 subdirectory)

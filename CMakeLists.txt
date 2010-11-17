@@ -11,11 +11,11 @@ include(${CEDAR_CONF_FILE})
 set (CEDAR_SOURCE_DIR     "${CEDAR_HOME}/src"         CACHE PATH "Directory all library source code will be stored in.")
 set (CEDAR_CMAKE_DIR      "${CEDAR_HOME}/cmake"       CACHE PATH "Directory all additional CMake files will be stored in.")
 set (CEDAR_UNIT_TEST_DIR  "${CEDAR_HOME}/tests/unit"  CACHE PATH "Directory all unit tests will be stored in.")
+set (CEDAR_DEMOS_DIR      "${CEDAR_HOME}/demos"       CACHE PATH "Directory all demos will be stored in.")
 
 # include the macro section
 include(${CEDAR_CMAKE_DIR}/macros.txt)
 
 # go on with the setup of cedar
 include(${CEDAR_CMAKE_DIR}/setup.txt)
-
 
