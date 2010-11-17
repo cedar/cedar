@@ -34,102 +34,170 @@ namespace cedar
       /*                transformations between different representations                                                   */
       /**********************************************************************************************************************/
  
-      /*! wedge operator for rotations
-       * maps a vector to the skew symmetric matrix encoding the cross product with this vector
-       * @param vector    operand, use 3 rows, 1 column
+      /*! wedge operator for axes of a rotation
+       * maps an axis vector to the skew symmetric matrix encoding the cross product with the axis vector
+       * @param axis    operand, use 3 rows, 1 column
        * @return    result of wedge operator on vector
        */
       template<typename T>
-      void wedgeRotation(const cv::Mat& vector, cv::Mat& result);
-      /*! wedge operator for rotations
-       * maps a vector to the skew symmetric matrix encoding the cross product with this vector
-       * @param vector    operand, use 3 rows, 1 column
+      void wedgeAxis(const cv::Mat& axis, cv::Mat& result);
+      /*! wedge operator for axes of a rotation
+       * maps an axis vector to the skew symmetric matrix encoding the cross product with the axis vector
+       * @param axis    operand, use 3 rows, 1 column
        * @return    result of wedge operator on vector
        */
       template<typename T>
-      cv::Mat wedgeRotation(const cv::Mat& vector);
+      cv::Mat wedgeAxis(const cv::Mat& axis);
 
-      /*! vee operator for rotations
+      /*! vee operator for axes of a rotation
        * maps a skew symmetric matrix encoding the cross product with a vector to that vector
        * @param matrix    skew symmetric matrix
-       * @param result    result of vee operator on matrix
+       * @param result    axis of the rotation represented by matrix
        */
       template<typename T>
-      void veeRotation(const cv::Mat& matrix, cv::Mat& result);
-      /*! vee operator for rotations
+      void veeAxis(const cv::Mat& matrix, cv::Mat& result);
+      /*! vee operator for axes of a rotation
        * maps a skew symmetric matrix encoding the cross product with a vector to that vector
        * @param matrix    skew symmetric matrix
-       * @param result    result of vee operator on matrix
+       * @return    axis of the rotation represented by matrix
        */
       template<typename T>
-      cv::Mat veeRotation(const cv::Mat& matrix);
+      cv::Mat veeAxis(const cv::Mat& matrix);
 
-//      //! wedge operator \f[\wedge: \mathbf R^6 \to se(3)\f] for rigid transformations
-//      //! from twist coordinates to a rigid transformation matrix in homogeneous coordinates
-//      void wedgeRigidTransformation(cv::Mat& twist, cv::Mat& result);
-//      //! wedge operator \f[\wedge: \mathbf R^6 \to se(3)\f] for rigid transformations
-//      //! from twist coordinates to a rigid transformation matrix in homogeneous coordinates
-//      cv::Mat wedgeRigidTransformation(cv::Mat& twist);
-//
-//      //! vee operator \f[\vee: se(3) \to \mathbf R^6\f] for rigid transformations
-//      //! from a rigid transformation matrix in homogeneous coordinates to twist coordinates
-//      void veeRigidTransformation(cv::Mat& matrix, cv::Mat& result);
-//      //! vee operator \f[\vee: se(3) \to \mathbf R^6\f] for rigid transformations
-//      //! from a rigid transformation matrix in homogeneous coordinates to twist coordinates
-//      cv::Mat veeRigidTransformation(cv::Mat& matrix);
-//
-//      //! calculates the exponential of a skew symmetric matrix, given as vector, using Rodriguez' formula
-//      //! omega must be normed
-//      void expRotation(cv::Mat& omega, double theta, cv::Mat& result);
-//      //! calculates the exponential of a skew symmetric matrix, given as vector, using Rodriguez' formula
-//      //! omega must be normed
-//      cv::Mat expRotation(cv::Mat& omega, double theta);
-//
-//      //! inverse of the exponential map for rotations
-//      //! calculates exponential coordinates for a rotation matrix \f[\in \mathbf R^{3 \times 3}\f]
-//      //! which solution is chosen?
-//      void logRotation(cv::Mat& rotation, cv::Mat& omega, double& theta, bool optionalThetaChoice = false);
-//
-//      //! calculates the exponential of a twist given in twist coordinates
-//      void expRigidTransformation(cv::Mat& xi, double theta, cv::Mat& result);
-//      //! calculates the exponential of a twist given in twist coordinates
-//      cv::Mat expRigidTransformation(cv::Mat& xi, double theta);
-//
-//      //! calculates twist coordinates for a rigid transformation matrix \f[\in se(3) \f]
-//      void logRansformation(cv::Mat& transformation, cv::Mat& xi, double& theta, bool optionalThetaChoice = false);
-//
-//      //! creates adjoint transformation (6x6) of twist space corresponding to a rigid transformation (4x4)
-//      void rigidToAdjointTransformation(cv::Mat& rigidTransformation, cv::Mat& adjointTransformation);
-//      //! creates adjoint transformation (6x6) of twist space corresponding to a rigid transformation (4x4)
-//      cv::Mat rigidToAdjointTransformation(cv::Mat& rigidTransformation);
-//
-//      //! calculates the rigid transformation (4x4) corresponding to the given adjoint (6x6)
-//      void adjointToRigidTransformation(cv::Mat& adjointTransformation, cv::Mat& rigidTransformation);
-//      //! calculates the rigid transformation (4x4) corresponding to the given adjoint (6x6)
-//      cv::Mat adjointToRigidTransformation(cv::Mat& adjointTransformation);
-//
-//      //! inverts an adjoint transformation
-//      void invertAdjointTransformation(cv::Mat& adjointTransformation, cv::Mat& inverse);
-//      //! inverts an adjoint transformation
-//      cv::Mat invertAdjointTransformation(cv::Mat& adjointTransformation);
-//
-//      /**********************************************************************************************************************/
-//      /*                generation of matrix representations from basic information                                         */
-//      /**********************************************************************************************************************/
-//
-//      //! creates the generalized inertia matrix (6x6) for a link segment, given mass and main axes moments of inertia
-//      cv::Mat createGeneralizedInertiaMatrix(double mass, double Ix, double Iy, double Iz);
-//
-//      //! creates the generalized inertia matrix (6x6) for a homogeneous block mass link segment
-//      cv::Mat createGeneralizedInertiaMatrixBlockMass(double mass, double length, double width, double height);
-//
-//      //! returns the twist coordinates for a rigid motion, given axis and a support point
-//      cv::Mat twistCoordinates(cv::Mat& supportPoint, cv::Mat& axis);
+      /*! wedge operator for rigid transformations
+       * maps the twist coordinate vector of a rigid transformation to the matrix representation
+       * @param twist    coordinate vector, use 6 rows, 1 column, axis (row 4-6) must be normed
+       * @param result    twist in matrix form (4 \times 4)
+       */
+      template<typename T>
+      void wedgeTwist(const cv::Mat& twist, cv::Mat& result);
+      /*! wedge operator for twists
+       * maps coordinate vector of a twist to the matrix representation
+       * @param twist    coordinate vector, use 6 rows, 1 column, axis (row 4-6) must be normed
+       * @return    twist in matrix form (4 \times 4)
+       */
+      template<typename T>
+      cv::Mat wedgeTwist(const cv::Mat& twist);
 
-/*
-//! concatenates a position and orientation to a rigid transformation
-void rigidFromPositionOrientation(CvMAT& position, CvMAT& orientation, CvMAT& rigidTransformation);
-*/
+      /*! vee operator for twists
+       * maps a twist matrix to the twist coordinates in vector form
+       * @param matrix    twist matrix (4 \times 4, upper left 3 \times 3 is skew symmetric)
+       * @param result    vector of twist coordinates
+       */
+      template<typename T>
+      void veeTwist(const cv::Mat& matrix, cv::Mat& result);
+      /*! vee operator for twists
+       * maps a twist matrix to the twist coordinates in vector form
+       * @param matrix    twist matrix (4 \times 4, upper left 3 \times 3 is skew symmetric)
+       * @return    vector of twist coordinates
+       */
+      template<typename T>
+      cv::Mat veeTwist(const cv::Mat& matrix);
+
+      /*! exponential map for wedges of axes, using Rodriguez' formula
+       * maps an axis and angle of rotation to the rotation matrix
+       * @param axis    axis of rotation, 3 \times 1
+       * @param theta    angle of rotation
+       * @param result    rotation matrix, 3 \times 3 orthonormal
+       */
+      template<typename T>
+      void expAxis(const cv::Mat& axis, double theta, cv::Mat& result);
+      /*! exponential map for wedges of axes, using Rodriguez' formula
+       * maps an axis and angle of rotation to the rotation matrix
+       * @param axis    axis of rotation, 3 \times 1
+       * @param theta    angle of rotation
+       * @return    rotation matrix, 3 \times 3 orthonormal
+       */
+      template<typename T>
+      cv::Mat expAxis(const cv::Mat& axis, double theta);
+
+      /*! inverse of the exponential map for skew symmetric matrices
+       * maps a rotation matrix to its axis and angle of rotation, angle is chosen positive
+       * @param rotation    rotation matrix, 3 \times 3, orthonormal
+       * @param omega    axis of the rotation
+       * @param theta    angle of rotation
+       * @param optionalThetaChoice gives negative theta and changes the axis accordingly
+       */
+      template<typename T>
+      void logAxis(const cv::Mat& rotation, cv::Mat& omega, double& theta, bool optionalThetaChoice = false);
+
+      /*! exponential map for twists matrices
+       * maps a twist matrix corresponding to an axis and support point to the rotation around that axis with the given angle
+       * @param xi    twist matrix, 4 \times 4
+       * @param theta    angle of rotation
+       * @param result    rigid transformation matrix, 4 \times 4
+       */
+      template<typename T>
+      void expTwist(const cv::Mat& xi, double theta, cv::Mat& result);
+      /*! exponential map for twists matrices
+       * maps a twist matrix corresponding to an axis and support point to the rotation around that axis with the given angle
+       * @param xi    twist matrix, 4 \times 4
+       * @param theta    angle of rotation
+       * @return    rigid transformation matrix, 4 \times 4
+       */
+      template<typename T>
+      cv::Mat expTwist(const cv::Mat& xi, double theta);
+
+      /*! inverse of the exponential map for twist matrices
+       * maps a rigid transformation matrix to a twist matrix and angle of rotation, angle is chosen positive
+       * @param transformation    rigid transformation matrix, 4 \times 4
+       * @param xi    twist matrix
+       * @param theta    angle of rotation
+       * @param optionalThetaChoice gives negative theta and changes the axis accordingly
+       */
+      template<typename T>
+      void logTwist(const cv::Mat& transformation, cv::Mat& xi, double& theta, bool optionalThetaChoice = false);
+
+      /*! creates adjoint transformation (6x6) of twist space corresponding to a rigid transformation (4x4)
+       * @param rigidTransformation    rigid transformation matrix, 4 \times 4
+       * @param adjointTransformation    adjoint transformation matrix, 6 \times 6
+       */
+      template<typename T>
+      void rigidToAdjointTransformation(const cv::Mat& rigidTransformation, cv::Mat& adjointTransformation);
+      /*! creates adjoint transformation (6x6) of twist space corresponding to a rigid transformation (4x4)
+       * @param rigidTransformation    rigid transformation matrix, 4 \times 4
+       * @return    adjoint transformation matrix, 6 \times 6
+       */
+      template<typename T>
+      cv::Mat rigidToAdjointTransformation(const cv::Mat& rigidTransformation);
+
+      /*! calculates the rigid transformation (4x4) corresponding to the given adjoint (6x6)
+       * @param adjointTransformation    adjoint transformation matrix, 6 \times 6
+       * @param rigidTransformation    rigid transformation matrix, 4 \times 4
+       */
+      template<typename T>
+      void adjointToRigidTransformation(const cv::Mat& adjointTransformation, cv::Mat& rigidTransformation);
+      /*! calculates the rigid transformation (4x4) corresponding to the given adjoint (6x6)
+       * @param adjointTransformation    adjoint transformation matrix, 6 \times 6
+       * @return    rigid transformation matrix, 4 \times 4
+       */
+      template<typename T>
+      cv::Mat adjointToRigidTransformation(const cv::Mat& adjointTransformation);
+
+      /*! calculates the inverse of the adjoint of a rigid transformation
+       * @param adjointTransformation    adjoint transformation matrix, 6 \times 6
+       * @param inverse    inverse of the given adjoint, 6 \times 6
+       */
+      template<typename T>
+      void invertAdjointTransformation(const cv::Mat& adjointTransformation, cv::Mat& inverse);
+      /*! calculates the inverse of the adjoint of a rigid transformation
+       * @param adjointTransformation    adjoint transformation matrix, 6 \times 6
+       * @return    inverse of the given adjoint, 6 \times 6
+       */
+      template<typename T>
+      cv::Mat invertAdjointTransformation(const cv::Mat& adjointTransformation);
+
+      /**********************************************************************************************************************/
+      /*                generation of matrix representations from basic information                                         */
+      /**********************************************************************************************************************/
+
+      /*! calculates the twist coordinates for a purely rotational motion, given axis and a support point
+       * @param supportPoint    point on the line around which is rotated in , 3 \times 1
+       * @param axis    direction of the line around which is rotated in , 3 \times 1
+       */
+      template<typename T>
+      cv::Mat twistCoordinates(const cv::Mat& supportPoint, const cv::Mat& axis);
+
 
     };
   };
