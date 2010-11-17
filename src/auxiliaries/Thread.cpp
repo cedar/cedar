@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
@@ -13,7 +13,7 @@
  ----- Description: Implementation for the @em cedar::aux::Thread class.
 
  ----- Credits:
- ---------------------------------------------------------------------------------------------------------------------*/
+ -----------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
 #include "Thread.h"
@@ -25,13 +25,13 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 cedar::aux::Thread::Thread()
 {
-  mIdleTime = 100;
+  mIdleTime = 1;
   _mName = string("thread");
   mStop = false;
 }
@@ -46,9 +46,9 @@ cedar::aux::Thread::~Thread()
 {
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // methods
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 void cedar::aux::Thread::stop( unsigned time )
 {
@@ -62,7 +62,7 @@ void cedar::aux::Thread::run(void)
 
 	// some auxiliary variables
 	QTime lastWakeup = QTime::currentTime();
-	QTime scheduledWakeup = lastWakeup.addMSecs( 1000 );
+	QTime scheduledWakeup = lastWakeup.addMSecs( mIdleTime );
 	QTime tmpTime;
 	srand ( QTime::currentTime().msec() );
 
@@ -71,16 +71,12 @@ void cedar::aux::Thread::run(void)
 		// sleep until next wake up time
 		msleep( std::max<int>( 0, QTime::currentTime().msecsTo( scheduledWakeup ) ) );
 
-		// print wake up time
-		//QTime currentWakeup = QTime::currentTime();
-		//cout << currentWakeup.second() << ":" << currentWakeup.msec() << endl;
-
 		// determine number of time steps since last run
-		QTime wakeupMax = scheduledWakeup.addMSecs( 1000 ); // end of current time window
-		tmpTime = lastWakeup.addMSecs( 1000 );
+		QTime wakeupMax = scheduledWakeup.addMSecs( mIdleTime ); // end of current time window
+		tmpTime = lastWakeup.addMSecs( mIdleTime );
 		unsigned stepsTaken = 0;
 		while( tmpTime < wakeupMax ) {
-			tmpTime = tmpTime.addMSecs( 1000 );
+			tmpTime = tmpTime.addMSecs( mIdleTime );
 			stepsTaken++;
 		}
 		lastWakeup = scheduledWakeup;	// remember the current wakeup time
@@ -88,7 +84,7 @@ void cedar::aux::Thread::run(void)
 
 		// print warning if time steps have been skipped
 		if( stepsTaken > 1 )
-			cout << "WARNING: " << stepsTaken << " time steps taken at once! "
+			cerr << "WARNING: " << stepsTaken << " time steps taken at once! "
 			<< "Your system might be too slow for an execution interval of "
 			<< mIdleTime << " milliseconds. Consider using a longer interval!"
 			<< endl;
@@ -99,7 +95,7 @@ void cedar::aux::Thread::run(void)
 		// if the execution lasted unexpectedly long, we'd like to wake up for
 		// the next regular time step
 		while( scheduledWakeup < QTime::currentTime() )
-			scheduledWakeup = scheduledWakeup.addMSecs( 1000 );
+			scheduledWakeup = scheduledWakeup.addMSecs( mIdleTime );
 	}
 
 	mStop = false;
