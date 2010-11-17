@@ -1,38 +1,33 @@
-/*--------------------------------------------------------------------------
- ----- Institute:   Ruhr-Universitaet-Bochum, Institut fuer Neuroinformatik
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet-Bochum
+                    Institut fuer Neuroinformatik
 
- ----- File:        rgScrewCalculus.cpp
- 
+ ----- File:        coordinateTransformations.h
+
  ----- Author:      Hendrik Reimann
- 
+ ------Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 11 01
- 
- ----- Description:
+
+ ----- Description: this file provides screw calculus functions for rigid body geometry
 
  ----- Credits:
- --------------------------------------------------------------------------*/
+ ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES (includes from this project)
+// LOCAL INCLUDES
 #include "screwCalculus.h"
 
-// PROJECT INCLUDES (includes from other projects)
+// PROJECT INCLUDES
 #include "tools.h"
 
-// SYSTEM INCLUDES (everything else)
+// SYSTEM INCLUDES
 
 using namespace std;
 using namespace cv;
 
-/* epsilon surrounding for near zero values */
-//#ifndef EQN_EPS_LOC
-//#define EQN_EPS_LOC 1e-7
-//#endif
-//
-//#ifndef IsZeroLoc(x)
-//#define	IsZeroLoc(x)	((x) > -EQN_EPS_LOC && (x) < EQN_EPS_LOC)
-//#endif
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// wedge axis functions
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
 void cedar::aux::math::wedgeAxis(const cv::Mat& axis, cv::Mat& result)
 {
@@ -61,7 +56,9 @@ cv::Mat cedar::aux::math::wedgeAxis(const cv::Mat& axis)
 template cv::Mat cedar::aux::math::wedgeAxis<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::wedgeAxis<float>(const cv::Mat&);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// vee axis functions
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
 void cedar::aux::math::veeAxis(const cv::Mat& matrix, cv::Mat& result)
 {
@@ -330,7 +327,7 @@ void cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rigidTransfor
   Mat posWedgeTimesRot = posWedge * rot;
 
   // concatenate to form adjoint
-  adjointTransformation *= 0;
+  adjointTransformation = cv::Mat::zeros(6, 6, rigidTransformation.type());
 	adjointTransformation.at<T>(0, 0) = rot.at<T>(0, 0);
 	adjointTransformation.at<T>(0, 1) = rot.at<T>(0, 1);
 	adjointTransformation.at<T>(0, 2) = rot.at<T>(0, 2);
@@ -492,33 +489,3 @@ cv::Mat cedar::aux::math::twistCoordinates(const cv::Mat& supportPoint, const cv
 
 template cv::Mat cedar::aux::math::twistCoordinates<double>(const cv::Mat&, const cv::Mat&);
 template cv::Mat cedar::aux::math::twistCoordinates<float>(const cv::Mat&, const cv::Mat&);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
