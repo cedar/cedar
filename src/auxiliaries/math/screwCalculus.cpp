@@ -24,37 +24,35 @@
 using namespace std;
 using namespace cv;
 
-
-// /TODO: change names of references to "r..."
 // /TODO: shorten code
 // /TODO: avoid allocation of memory wherever unnecessary
 
 
 //----------------------------------------------------------------------------------------------------------------------
-// wedge axis functions
+// wedge functions for axis vectors
 //----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::wedgeAxis(const cv::Mat& axis, cv::Mat& result)
+void cedar::aux::math::wedgeAxis(const cv::Mat& rAxis, cv::Mat& rResult)
 {
-	result.at<T>(0, 0) = 0.0;
-	result.at<T>(0, 1) = -axis.at<T>(2, 0);
-	result.at<T>(0, 2) = axis.at<T>(1, 0);
-	result.at<T>(1, 0) = axis.at<T>(2, 0);
-	result.at<T>(1, 1) = 0.0;
-	result.at<T>(1, 2) = -axis.at<T>(0, 0);
-	result.at<T>(2, 0) = -axis.at<T>(1, 0);
-	result.at<T>(2, 1) = axis.at<T>(0, 0);
-	result.at<T>(2, 2) = 0.0;
+	rResult.at<T>(0, 0) = 0.0;
+	rResult.at<T>(0, 1) = -rAxis.at<T>(2, 0);
+	rResult.at<T>(0, 2) = rAxis.at<T>(1, 0);
+	rResult.at<T>(1, 0) = rAxis.at<T>(2, 0);
+	rResult.at<T>(1, 1) = 0.0;
+	rResult.at<T>(1, 2) = -rAxis.at<T>(0, 0);
+	rResult.at<T>(2, 0) = -rAxis.at<T>(1, 0);
+	rResult.at<T>(2, 1) = rAxis.at<T>(0, 0);
+	rResult.at<T>(2, 2) = 0.0;
 }
 
 template void cedar::aux::math::wedgeAxis<double>(const cv::Mat&, cv::Mat&);
 template void cedar::aux::math::wedgeAxis<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::wedgeAxis(const cv::Mat& axis)
+cv::Mat cedar::aux::math::wedgeAxis(const cv::Mat& rAxis)
 {
-  cv::Mat result(3, 3, axis.type());
-  wedgeAxis<T>(axis, result);
+  cv::Mat result(3, 3, rAxis.type());
+  wedgeAxis<T>(rAxis, result);
   return result;
 }
 
@@ -62,168 +60,176 @@ template cv::Mat cedar::aux::math::wedgeAxis<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::wedgeAxis<float>(const cv::Mat&);
 
 //----------------------------------------------------------------------------------------------------------------------
-// vee axis functions
+// vee functions for axis vectors
 //----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::veeAxis(const cv::Mat& matrix, cv::Mat& result)
+void cedar::aux::math::veeAxis(const cv::Mat& rMatrix, cv::Mat& rResult)
 {
-	result.at<T>(0, 0) = matrix.at<T>(2, 1);
-	result.at<T>(1, 0) = matrix.at<T>(0, 2);
-	result.at<T>(2, 0) = matrix.at<T>(1, 0);
+	rResult.at<T>(0, 0) = rMatrix.at<T>(2, 1);
+	rResult.at<T>(1, 0) = rMatrix.at<T>(0, 2);
+	rResult.at<T>(2, 0) = rMatrix.at<T>(1, 0);
 }
 
 template void cedar::aux::math::veeAxis<double>(const cv::Mat&, cv::Mat&);
 template void cedar::aux::math::veeAxis<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::veeAxis(const cv::Mat& matrix)
+cv::Mat cedar::aux::math::veeAxis(const cv::Mat& rMatrix)
 {
-  cv::Mat result(3, 1, matrix.type());
-  veeAxis<T>(matrix, result);
+  cv::Mat result = cv::Mat::zeros(3, 1, rMatrix.type());
+  veeAxis<T>(rMatrix, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::veeAxis<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::veeAxis<float>(const cv::Mat&);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// wedge functions for twists
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::wedgeTwist(const cv::Mat& twist, cv::Mat& result)
+void cedar::aux::math::wedgeTwist(const cv::Mat& rTwist, cv::Mat& rResult)
 {
-	result.at<T>(0, 0) = 0.0;
-	result.at<T>(0, 1) = -twist.at<T>(5, 0);
-	result.at<T>(0, 2) = twist.at<T>(4, 0);
-	result.at<T>(1, 0) = twist.at<T>(5, 0);
-	result.at<T>(1, 1) = 0.0;
-	result.at<T>(1, 2) = -twist.at<T>(3, 0);
-	result.at<T>(2, 0) = -twist.at<T>(4, 0);
-	result.at<T>(2, 1) = twist.at<T>(3, 0);
-	result.at<T>(2, 2) = 0.0;
+	rResult.at<T>(0, 0) = 0.0;
+	rResult.at<T>(0, 1) = -rTwist.at<T>(5, 0);
+	rResult.at<T>(0, 2) = rTwist.at<T>(4, 0);
+	rResult.at<T>(1, 0) = rTwist.at<T>(5, 0);
+	rResult.at<T>(1, 1) = 0.0;
+	rResult.at<T>(1, 2) = -rTwist.at<T>(3, 0);
+	rResult.at<T>(2, 0) = -rTwist.at<T>(4, 0);
+	rResult.at<T>(2, 1) = rTwist.at<T>(3, 0);
+	rResult.at<T>(2, 2) = 0.0;
 
-	result.at<T>(0, 3) = twist.at<T>(0, 0);
-	result.at<T>(1, 3) = twist.at<T>(1, 0);
-	result.at<T>(2, 3) = twist.at<T>(2, 0);
+	rResult.at<T>(0, 3) = rTwist.at<T>(0, 0);
+	rResult.at<T>(1, 3) = rTwist.at<T>(1, 0);
+	rResult.at<T>(2, 3) = rTwist.at<T>(2, 0);
 
-	result.at<T>(3, 0) = 0.0;
-	result.at<T>(3, 1) = 0.0;
-	result.at<T>(3, 2) = 0.0;
-	result.at<T>(3, 3) = 0.0;
+	rResult.at<T>(3, 0) = 0.0;
+	rResult.at<T>(3, 1) = 0.0;
+	rResult.at<T>(3, 2) = 0.0;
+	rResult.at<T>(3, 3) = 0.0;
 }
 
 template void cedar::aux::math::wedgeTwist<double>(const cv::Mat&, cv::Mat&);
 template void cedar::aux::math::wedgeTwist<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::wedgeTwist(const cv::Mat& twist)
+cv::Mat cedar::aux::math::wedgeTwist(const cv::Mat& rTwist)
 {
-  Mat result(4, 4, twist.type());
-  wedgeTwist<T>(twist, result);
+  Mat result(4, 4, rTwist.type());
+  wedgeTwist<T>(rTwist, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::wedgeTwist<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::wedgeTwist<float>(const cv::Mat&);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// vee functions for twists
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::veeTwist(const cv::Mat& matrix, cv::Mat& result)
+void cedar::aux::math::veeTwist(const cv::Mat& rMatrix, cv::Mat& rResult)
 {
 	// position
-	result.at<T>(0, 0) = matrix.at<T>(0, 3);
-	result.at<T>(1, 0) = matrix.at<T>(1, 3);
-	result.at<T>(2, 0) = matrix.at<T>(2, 3);
+	rResult.at<T>(0, 0) = rMatrix.at<T>(0, 3);
+	rResult.at<T>(1, 0) = rMatrix.at<T>(1, 3);
+	rResult.at<T>(2, 0) = rMatrix.at<T>(2, 3);
 	// axis
-	result.at<T>(3, 0) = matrix.at<T>(2, 1);
-	result.at<T>(4, 0) = matrix.at<T>(0, 2);
-	result.at<T>(5, 0) = matrix.at<T>(1, 0);
+	rResult.at<T>(3, 0) = rMatrix.at<T>(2, 1);
+	rResult.at<T>(4, 0) = rMatrix.at<T>(0, 2);
+	rResult.at<T>(5, 0) = rMatrix.at<T>(1, 0);
 }
 
 template void cedar::aux::math::veeTwist<double>(const cv::Mat&, cv::Mat&);
 template void cedar::aux::math::veeTwist<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::veeTwist(const cv::Mat& matrix)
+cv::Mat cedar::aux::math::veeTwist(const cv::Mat& rMatrix)
 {
-  Mat result(6, 1, matrix.type());
-  veeTwist<T>(matrix, result);
+  Mat result = cv::Mat::zeros(6, 1, rMatrix.type());
+  veeTwist<T>(rMatrix, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::veeTwist<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::veeTwist<float>(const cv::Mat&);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// exp functions for axis vectors
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::expAxis(const cv::Mat& axis, double theta, cv::Mat& result)
+void cedar::aux::math::expAxis(const cv::Mat& rAxis, double theta, cv::Mat& rResult)
 {
-  setIdentity(result);
-  cv::Mat omegaWedge(3, 3, axis.type());
-  wedgeAxis<T>(axis, omegaWedge);
-  result += (omegaWedge * sin(theta)) + (omegaWedge * omegaWedge * (1 - cos(theta)));
+  setIdentity(rResult);
+  cv::Mat omega_wedge = cv::Mat::zeros(3, 3, rAxis.type());
+  wedgeAxis<T>(rAxis, omega_wedge);
+  rResult += (omega_wedge * sin(theta)) + (omega_wedge * omega_wedge * (1 - cos(theta)));
 }
 
 template void cedar::aux::math::expAxis<double>(const cv::Mat&, double, cv::Mat&);
 template void cedar::aux::math::expAxis<float>(const cv::Mat&, double, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::expAxis(const cv::Mat& axis, double theta)
+cv::Mat cedar::aux::math::expAxis(const cv::Mat& rAxis, double theta)
 {
-  Mat result(3, 3, axis.type());
-  expAxis<T>(axis, theta, result);
+  Mat result(3, 3, rAxis.type());
+  expAxis<T>(rAxis, theta, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::expAxis<double>(const cv::Mat&, double);
 template cv::Mat cedar::aux::math::expAxis<float>(const cv::Mat&, double);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// log functions for axis vectors
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::logAxis(const cv::Mat& rotation, cv::Mat& omega, double& theta, bool optionalThetaChoice)
+void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double& rTheta, bool optionalThetaChoice)
 {
-	T trace = rotation.at<T>(0, 0) + rotation.at<T>(1, 1) + rotation.at<T>(2, 2);
+	T trace = rRotation.at<T>(0, 0) + rRotation.at<T>(1, 1) + rRotation.at<T>(2, 2);
   // calculate rotation angle
-	theta = acos((trace - 1) / 2.0);
+	rTheta = acos((trace - 1) / 2.0);
   if (trace <= -1)
   {
     // capture numeric failures for trace very close to one
-    theta = M_PI;
+    rTheta = M_PI;
   }
 	if (optionalThetaChoice)
   {
-    theta = 2*M_PI - theta;
+    rTheta = 2*M_PI - rTheta;
   }
   // calculate axis of rotation
-	omega.at<T>(0, 0) = 1 / (2 * sin(theta)) * (rotation.at<T>(2, 1) - rotation.at<T>(1, 2));
-	omega.at<T>(1, 0) = 1 / (2 * sin(theta)) * (rotation.at<T>(0, 2) - rotation.at<T>(2, 0));
-	omega.at<T>(2, 0) = 1 / (2 * sin(theta)) * (rotation.at<T>(1, 0) - rotation.at<T>(0, 1));
-  omega = omega * (1 / norm(omega));
+	rOmega.at<T>(0, 0) = 1 / (2 * sin(rTheta)) * (rRotation.at<T>(2, 1) - rRotation.at<T>(1, 2));
+	rOmega.at<T>(1, 0) = 1 / (2 * sin(rTheta)) * (rRotation.at<T>(0, 2) - rRotation.at<T>(2, 0));
+	rOmega.at<T>(2, 0) = 1 / (2 * sin(rTheta)) * (rRotation.at<T>(1, 0) - rRotation.at<T>(0, 1));
+  rOmega = rOmega * (1 / norm(rOmega));
 
-  if (IsZero(theta - M_PI))
+  if (IsZero(rTheta - M_PI))
   {
     // easy way of calculating axis fails for numerical reasons, choose different formula
-    if ((rotation.at<T>(1, 0) > 0) && (rotation.at<T>(2, 0) > 0) && (rotation.at<T>(2, 1) > 0))
+    if ((rRotation.at<T>(1, 0) > 0) && (rRotation.at<T>(2, 0) > 0) && (rRotation.at<T>(2, 1) > 0))
     {
-      omega.at<T>(0, 0) = + sqrt((rotation.at<T>(0, 0) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(1, 0) = + sqrt((rotation.at<T>(1, 1) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(2, 0) = + sqrt((rotation.at<T>(2, 2) - cos(theta)) / (1-cos(theta)));
+      rOmega.at<T>(0, 0) = + sqrt((rRotation.at<T>(0, 0) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(1, 0) = + sqrt((rRotation.at<T>(1, 1) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(2, 0) = + sqrt((rRotation.at<T>(2, 2) - cos(rTheta)) / (1-cos(rTheta)));
     }
-    if ((rotation.at<T>(1, 0) > 0) && (rotation.at<T>(2, 0) > 0) && (rotation.at<T>(2, 1) < 0))
+    if ((rRotation.at<T>(1, 0) > 0) && (rRotation.at<T>(2, 0) > 0) && (rRotation.at<T>(2, 1) < 0))
     {
-      omega.at<T>(0, 0) = + sqrt((rotation.at<T>(0, 0) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(1, 0) = + sqrt((rotation.at<T>(1, 1) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(2, 0) = - sqrt((rotation.at<T>(2, 2) - cos(theta)) / (1-cos(theta)));
+      rOmega.at<T>(0, 0) = + sqrt((rRotation.at<T>(0, 0) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(1, 0) = + sqrt((rRotation.at<T>(1, 1) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(2, 0) = - sqrt((rRotation.at<T>(2, 2) - cos(rTheta)) / (1-cos(rTheta)));
     }
-    if ((rotation.at<T>(1, 0) < 0) && (rotation.at<T>(2, 0) > 0) && (rotation.at<T>(2, 1) < 0))
+    if ((rRotation.at<T>(1, 0) < 0) && (rRotation.at<T>(2, 0) > 0) && (rRotation.at<T>(2, 1) < 0))
     {
-      omega.at<T>(0, 0) = + sqrt((rotation.at<T>(0, 0) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(1, 0) = - sqrt((rotation.at<T>(1, 1) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(2, 0) = + sqrt((rotation.at<T>(2, 2) - cos(theta)) / (1-cos(theta)));
+      rOmega.at<T>(0, 0) = + sqrt((rRotation.at<T>(0, 0) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(1, 0) = - sqrt((rRotation.at<T>(1, 1) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(2, 0) = + sqrt((rRotation.at<T>(2, 2) - cos(rTheta)) / (1-cos(rTheta)));
     }
-    if ((rotation.at<T>(1, 0) < 0) && (rotation.at<T>(2, 0) < 0) && (rotation.at<T>(2, 1) > 0))
+    if ((rRotation.at<T>(1, 0) < 0) && (rRotation.at<T>(2, 0) < 0) && (rRotation.at<T>(2, 1) > 0))
     {
-      omega.at<T>(0, 0) = + sqrt((rotation.at<T>(0, 0) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(1, 0) = - sqrt((rotation.at<T>(1, 1) - cos(theta)) / (1-cos(theta)));
-      omega.at<T>(2, 0) = - sqrt((rotation.at<T>(2, 2) - cos(theta)) / (1-cos(theta)));
+      rOmega.at<T>(0, 0) = + sqrt((rRotation.at<T>(0, 0) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(1, 0) = - sqrt((rRotation.at<T>(1, 1) - cos(rTheta)) / (1-cos(rTheta)));
+      rOmega.at<T>(2, 0) = - sqrt((rRotation.at<T>(2, 2) - cos(rTheta)) / (1-cos(rTheta)));
     }
   }
 }
@@ -231,15 +237,17 @@ void cedar::aux::math::logAxis(const cv::Mat& rotation, cv::Mat& omega, double& 
 template void cedar::aux::math::logAxis<double>(const cv::Mat&, cv::Mat&, double&, bool);
 template void cedar::aux::math::logAxis<float>(const cv::Mat&, cv::Mat&, double&, bool);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// exp functions for twists
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::expTwist(const cv::Mat& xi, double theta, cv::Mat& result)
+void cedar::aux::math::expTwist(const cv::Mat& rXi, double theta, cv::Mat& rResult)
 {
-  Mat v = xi(Rect(0, 0, 1, 3));
-  Mat omega = xi(Rect(0, 3, 1, 3));
+  Mat v = rXi(Rect(0, 0, 1, 3));
+  Mat omega = rXi(Rect(0, 3, 1, 3));
 
 	// rotation
-  Mat R(3, 3, xi.type());
+  Mat R(3, 3, rXi.type());
 	expAxis<T>(omega, theta, R);
 	Mat p;
 
@@ -251,223 +259,228 @@ void cedar::aux::math::expTwist(const cv::Mat& xi, double theta, cv::Mat& result
 	else // translation and rotation
 	{
 		// p = (eye(3,3) - r)*(cross(w,v)) + w*w'*v*theta (Matlab notation)
-//		cv::Mat I(3, 3, xi.type());
-//		setIdentity(I);
-    cv::Mat I = cv::Mat::eye(3, 3, xi.type());
+    cv::Mat I = cv::Mat::eye(3, 3, rXi.type());
     cv::Mat s1 = (I - R) * omega.cross(v);
     p = s1 + (omega * omega.t() * v * theta);
 	}
 	// join to form rigid transformation matrix
 	// a = [ R p
 	//			 0 1 ]
-	result.at<T>(0, 0) = R.at<T>(0, 0);
-	result.at<T>(0, 1) = R.at<T>(0, 1);
-	result.at<T>(0, 2) = R.at<T>(0, 2);
-	result.at<T>(1, 0) = R.at<T>(1, 0);
-	result.at<T>(1, 1) = R.at<T>(1, 1);
-	result.at<T>(1, 2) = R.at<T>(1, 2);
-	result.at<T>(2, 0) = R.at<T>(2, 0);
-	result.at<T>(2, 1) = R.at<T>(2, 1);
-	result.at<T>(2, 2) = R.at<T>(2, 2);
+	rResult.at<T>(0, 0) = R.at<T>(0, 0);
+	rResult.at<T>(0, 1) = R.at<T>(0, 1);
+	rResult.at<T>(0, 2) = R.at<T>(0, 2);
+	rResult.at<T>(1, 0) = R.at<T>(1, 0);
+	rResult.at<T>(1, 1) = R.at<T>(1, 1);
+	rResult.at<T>(1, 2) = R.at<T>(1, 2);
+	rResult.at<T>(2, 0) = R.at<T>(2, 0);
+	rResult.at<T>(2, 1) = R.at<T>(2, 1);
+	rResult.at<T>(2, 2) = R.at<T>(2, 2);
 
-	result.at<T>(0, 3) = p.at<T>(0, 0);
-	result.at<T>(1, 3) = p.at<T>(1, 0);
-	result.at<T>(2, 3) = p.at<T>(2, 0);
+	rResult.at<T>(0, 3) = p.at<T>(0, 0);
+	rResult.at<T>(1, 3) = p.at<T>(1, 0);
+	rResult.at<T>(2, 3) = p.at<T>(2, 0);
 
-	result.at<T>(3, 0) = 0.0;
-	result.at<T>(3, 1) = 0.0;
-	result.at<T>(3, 2) = 0.0;
-	result.at<T>(3, 3) = 1.0;
+	rResult.at<T>(3, 0) = 0.0;
+	rResult.at<T>(3, 1) = 0.0;
+	rResult.at<T>(3, 2) = 0.0;
+	rResult.at<T>(3, 3) = 1.0;
 }
 
 template void cedar::aux::math::expTwist<double>(const cv::Mat&, double, cv::Mat&);
 template void cedar::aux::math::expTwist<float>(const cv::Mat&, double, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::expTwist(const cv::Mat& xi, double theta)
+cv::Mat cedar::aux::math::expTwist(const cv::Mat& rXi, double theta)
 {
-  Mat result(4, 4, xi.type());
-  expTwist<T>(xi, theta, result);
+  Mat result = cv::Mat::zeros(4, 4, rXi.type());
+  expTwist<T>(rXi, theta, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::expTwist<double>(const cv::Mat&, double);
 template cv::Mat cedar::aux::math::expTwist<float>(const cv::Mat&, double);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// log functions for twists
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::logTwist(const cv::Mat& transformation, cv::Mat& xi, double& theta, bool optionalThetaChoice)
+void cedar::aux::math::logTwist(const cv::Mat& rTransformation, cv::Mat& rXi, double& rTheta, bool optionalThetaChoice)
 {
 	// extract rotation and translation
-  Mat R = transformation(Rect(0, 0, 3, 3));
-  Mat p = transformation(Rect(3, 0, 1, 3));
+  Mat R = rTransformation(Rect(0, 0, 3, 3));
+  Mat p = rTransformation(Rect(3, 0, 1, 3));
 
 	// calculate exponential coordinates for R = exp(\wedge \omega \theta)
-	Mat omega(3, 1, transformation.type());
-	logAxis<T>(R, omega, theta, optionalThetaChoice);
+	Mat omega(3, 1, rTransformation.type());
+	logAxis<T>(R, omega, rTheta, optionalThetaChoice);
 
 	// calculate v
-	Mat omegaWedge(3, 3, transformation.type());
-  wedgeAxis<T>(omega, omegaWedge);
-  Mat I(3, 3, transformation.type());
-  setIdentity(I);
-  Mat s1 = (I - R) * omegaWedge;
-	Mat v = (s1 + omega * omega.t() * theta).inv() * p;
+	Mat omega_wedge = cv::Mat::zeros(3, 3, rTransformation.type());
+  wedgeAxis<T>(omega, omega_wedge);
+  Mat I = cv::Mat::eye(3, 3, rTransformation.type());
+  Mat s1 = (I - R) * omega_wedge;
+	Mat v = (s1 + omega_wedge * omega_wedge.t() * rTheta).inv() * p;
 
 	// concatenate omega and v to get twist coordinates
-	xi.at<T>(0, 0) = v.at<T>(0, 0);
-	xi.at<T>(1, 0) = v.at<T>(1, 0);
-	xi.at<T>(2, 0) = v.at<T>(2, 0);
-	xi.at<T>(3, 0) = omega.at<T>(0, 0);
-	xi.at<T>(4, 0) = omega.at<T>(1, 0);
-	xi.at<T>(5, 0) = omega.at<T>(2, 0);
+	rXi.at<T>(0, 0) = v.at<T>(0, 0);
+	rXi.at<T>(1, 0) = v.at<T>(1, 0);
+	rXi.at<T>(2, 0) = v.at<T>(2, 0);
+	rXi.at<T>(3, 0) = omega.at<T>(0, 0);
+	rXi.at<T>(4, 0) = omega.at<T>(1, 0);
+	rXi.at<T>(5, 0) = omega.at<T>(2, 0);
 }
 
 template void cedar::aux::math::logTwist<double>(const cv::Mat&, cv::Mat&, double&, bool);
 template void cedar::aux::math::logTwist<float>(const cv::Mat&, cv::Mat&, double&, bool);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// rigid --> adjoint transformation
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rigidTransformation, cv::Mat& adjointTransformation)
+void cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rRigidTransformation, cv::Mat& rAdjointTransformation)
 {
   // extract componenets
-	Mat rot = rigidTransformation(Rect(0, 0, 3, 3));
-	Mat pos = rigidTransformation(Rect(3, 0, 1, 3));
-  Mat posWedge(3, 3, rigidTransformation.type());
-  wedgeAxis<T>(pos, posWedge);
-  Mat posWedgeTimesRot = posWedge * rot;
+	Mat rot = rRigidTransformation(Rect(0, 0, 3, 3));
+	Mat pos = rRigidTransformation(Rect(3, 0, 1, 3));
+  Mat pos_wedge(3, 3, rRigidTransformation.type());
+  wedgeAxis<T>(pos, pos_wedge);
+  Mat pos_wedge_times_rot = pos_wedge * rot;
 
   // concatenate to form adjoint
-  adjointTransformation = cv::Mat::zeros(6, 6, rigidTransformation.type());
-	adjointTransformation.at<T>(0, 0) = rot.at<T>(0, 0);
-	adjointTransformation.at<T>(0, 1) = rot.at<T>(0, 1);
-	adjointTransformation.at<T>(0, 2) = rot.at<T>(0, 2);
-	adjointTransformation.at<T>(1, 0) = rot.at<T>(1, 0);
-	adjointTransformation.at<T>(1, 1) = rot.at<T>(1, 1);
-	adjointTransformation.at<T>(1, 2) = rot.at<T>(1, 2);
-	adjointTransformation.at<T>(2, 0) = rot.at<T>(2, 0);
-	adjointTransformation.at<T>(2, 1) = rot.at<T>(2, 1);
-	adjointTransformation.at<T>(2, 2) = rot.at<T>(2, 2);
+  rAdjointTransformation = cv::Mat::zeros(6, 6, rRigidTransformation.type());
+	rAdjointTransformation.at<T>(0, 0) = rot.at<T>(0, 0);
+	rAdjointTransformation.at<T>(0, 1) = rot.at<T>(0, 1);
+	rAdjointTransformation.at<T>(0, 2) = rot.at<T>(0, 2);
+	rAdjointTransformation.at<T>(1, 0) = rot.at<T>(1, 0);
+	rAdjointTransformation.at<T>(1, 1) = rot.at<T>(1, 1);
+	rAdjointTransformation.at<T>(1, 2) = rot.at<T>(1, 2);
+	rAdjointTransformation.at<T>(2, 0) = rot.at<T>(2, 0);
+	rAdjointTransformation.at<T>(2, 1) = rot.at<T>(2, 1);
+	rAdjointTransformation.at<T>(2, 2) = rot.at<T>(2, 2);
 
-	adjointTransformation.at<T>(0, 3) = posWedgeTimesRot.at<T>(0, 0);
-	adjointTransformation.at<T>(0, 4) = posWedgeTimesRot.at<T>(0, 1);
-	adjointTransformation.at<T>(0, 5) = posWedgeTimesRot.at<T>(0, 2);
-	adjointTransformation.at<T>(1, 3) = posWedgeTimesRot.at<T>(1, 0);
-	adjointTransformation.at<T>(1, 4) = posWedgeTimesRot.at<T>(1, 1);
-	adjointTransformation.at<T>(1, 5) = posWedgeTimesRot.at<T>(1, 2);
-	adjointTransformation.at<T>(2, 3) = posWedgeTimesRot.at<T>(2, 0);
-	adjointTransformation.at<T>(2, 4) = posWedgeTimesRot.at<T>(2, 1);
-	adjointTransformation.at<T>(2, 5) = posWedgeTimesRot.at<T>(2, 2);
+	rAdjointTransformation.at<T>(0, 3) = pos_wedge_times_rot.at<T>(0, 0);
+	rAdjointTransformation.at<T>(0, 4) = pos_wedge_times_rot.at<T>(0, 1);
+	rAdjointTransformation.at<T>(0, 5) = pos_wedge_times_rot.at<T>(0, 2);
+	rAdjointTransformation.at<T>(1, 3) = pos_wedge_times_rot.at<T>(1, 0);
+	rAdjointTransformation.at<T>(1, 4) = pos_wedge_times_rot.at<T>(1, 1);
+	rAdjointTransformation.at<T>(1, 5) = pos_wedge_times_rot.at<T>(1, 2);
+	rAdjointTransformation.at<T>(2, 3) = pos_wedge_times_rot.at<T>(2, 0);
+	rAdjointTransformation.at<T>(2, 4) = pos_wedge_times_rot.at<T>(2, 1);
+	rAdjointTransformation.at<T>(2, 5) = pos_wedge_times_rot.at<T>(2, 2);
 
-	adjointTransformation.at<T>(3, 3) = rot.at<T>(0, 0);
-	adjointTransformation.at<T>(3, 4) = rot.at<T>(0, 1);
-	adjointTransformation.at<T>(3, 5) = rot.at<T>(0, 2);
-	adjointTransformation.at<T>(4, 3) = rot.at<T>(1, 0);
-	adjointTransformation.at<T>(4, 4) = rot.at<T>(1, 1);
-	adjointTransformation.at<T>(4, 5) = rot.at<T>(1, 2);
-	adjointTransformation.at<T>(5, 3) = rot.at<T>(2, 0);
-	adjointTransformation.at<T>(5, 4) = rot.at<T>(2, 1);
-	adjointTransformation.at<T>(5, 5) = rot.at<T>(2, 2);
+	rAdjointTransformation.at<T>(3, 3) = rot.at<T>(0, 0);
+	rAdjointTransformation.at<T>(3, 4) = rot.at<T>(0, 1);
+	rAdjointTransformation.at<T>(3, 5) = rot.at<T>(0, 2);
+	rAdjointTransformation.at<T>(4, 3) = rot.at<T>(1, 0);
+	rAdjointTransformation.at<T>(4, 4) = rot.at<T>(1, 1);
+	rAdjointTransformation.at<T>(4, 5) = rot.at<T>(1, 2);
+	rAdjointTransformation.at<T>(5, 3) = rot.at<T>(2, 0);
+	rAdjointTransformation.at<T>(5, 4) = rot.at<T>(2, 1);
+	rAdjointTransformation.at<T>(5, 5) = rot.at<T>(2, 2);
 }
 
 template void cedar::aux::math::rigidToAdjointTransformation<double>(const cv::Mat&, cv::Mat&);
 template void cedar::aux::math::rigidToAdjointTransformation<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rigidTransformation)
+cv::Mat cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rRigidTransformation)
 {
-  Mat result = Mat::zeros(6, 6, rigidTransformation.type());
-  rigidToAdjointTransformation<T>(rigidTransformation, result);
+  Mat result = Mat::zeros(6, 6, rRigidTransformation.type());
+  rigidToAdjointTransformation<T>(rRigidTransformation, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::rigidToAdjointTransformation<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::rigidToAdjointTransformation<float>(const cv::Mat&);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// adjoint --> rigid transformation
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::adjointToRigidTransformation(const cv::Mat& adjointTransformation, cv::Mat& rigidTransformation)
+void cedar::aux::math::adjointToRigidTransformation(const cv::Mat& rAdjointTransformation, cv::Mat& rRigidTransformation)
 {
-  Mat R = adjointTransformation(Rect(0, 0, 3, 3));
-  Mat pWedgeTimesR = adjointTransformation(Rect(3, 0, 3, 3));
-  Mat pWedge = pWedgeTimesR * R.inv();
-  Mat p(3, 1, adjointTransformation.type());
-  veeAxis<T>(pWedge, p);
+  Mat rot = rAdjointTransformation(Rect(0, 0, 3, 3));
+  Mat pos_wedge_times_rot = rAdjointTransformation(Rect(3, 0, 3, 3));
+  Mat pos_wedge = pos_wedge_times_rot * rot.inv();
+  Mat pos = cv::Mat::zeros(3, 1, rAdjointTransformation.type());
+  veeAxis<T>(pos_wedge, pos);
 
-	rigidTransformation.at<T>(0, 0) = R.at<T>(0, 0);
-	rigidTransformation.at<T>(0, 1) = R.at<T>(0, 1);
-	rigidTransformation.at<T>(0, 2) = R.at<T>(0, 2);
-	rigidTransformation.at<T>(1, 0) = R.at<T>(1, 0);
-	rigidTransformation.at<T>(1, 1) = R.at<T>(1, 1);
-	rigidTransformation.at<T>(1, 2) = R.at<T>(1, 2);
-	rigidTransformation.at<T>(2, 0) = R.at<T>(2, 0);
-	rigidTransformation.at<T>(2, 1) = R.at<T>(2, 1);
-	rigidTransformation.at<T>(2, 2) = R.at<T>(2, 2);
+	rRigidTransformation.at<T>(0, 0) = rot.at<T>(0, 0);
+	rRigidTransformation.at<T>(0, 1) = rot.at<T>(0, 1);
+	rRigidTransformation.at<T>(0, 2) = rot.at<T>(0, 2);
+	rRigidTransformation.at<T>(1, 0) = rot.at<T>(1, 0);
+	rRigidTransformation.at<T>(1, 1) = rot.at<T>(1, 1);
+	rRigidTransformation.at<T>(1, 2) = rot.at<T>(1, 2);
+	rRigidTransformation.at<T>(2, 0) = rot.at<T>(2, 0);
+	rRigidTransformation.at<T>(2, 1) = rot.at<T>(2, 1);
+	rRigidTransformation.at<T>(2, 2) = rot.at<T>(2, 2);
 
-	rigidTransformation.at<T>(0, 3) = p.at<T>(0, 0);
-	rigidTransformation.at<T>(1, 3) = p.at<T>(1, 0);
-	rigidTransformation.at<T>(2, 3) = p.at<T>(2, 0);
+	rRigidTransformation.at<T>(0, 3) = pos.at<T>(0, 0);
+	rRigidTransformation.at<T>(1, 3) = pos.at<T>(1, 0);
+	rRigidTransformation.at<T>(2, 3) = pos.at<T>(2, 0);
 
-	rigidTransformation.at<T>(3, 0) = 0;
-	rigidTransformation.at<T>(3, 1) = 0;
-	rigidTransformation.at<T>(3, 2) = 0;
-	rigidTransformation.at<T>(3, 3) = 1;
+	rRigidTransformation.at<T>(3, 0) = 0;
+	rRigidTransformation.at<T>(3, 1) = 0;
+	rRigidTransformation.at<T>(3, 2) = 0;
+	rRigidTransformation.at<T>(3, 3) = 1;
 }
 
 template void cedar::aux::math::adjointToRigidTransformation<double>(const cv::Mat&, cv::Mat&);
 template void cedar::aux::math::adjointToRigidTransformation<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::adjointToRigidTransformation(const cv::Mat& adjointTransformation)
+cv::Mat cedar::aux::math::adjointToRigidTransformation(const cv::Mat& rAdjointTransformation)
 {
-  Mat result(4, 4, adjointTransformation.type());
-  adjointToRigidTransformation<T>(adjointTransformation, result);
+  Mat result = cv::Mat::zeros(4, 4, rAdjointTransformation.type());
+  adjointToRigidTransformation<T>(rAdjointTransformation, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::adjointToRigidTransformation<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::adjointToRigidTransformation<float>(const cv::Mat&);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// inverse for adjoint transformations
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-void cedar::aux::math::invertAdjointTransformation(const cv::Mat& adjointTransformation, cv::Mat& inverse)
+void cedar::aux::math::invertAdjointTransformation(const cv::Mat& rAdjointTransformation, cv::Mat& rInverse)
 {
-  Mat rot = adjointTransformation(Rect(0, 0, 3, 3));
-  Mat posWedgeTimesRot = adjointTransformation(Rect(3, 0, 3, 3));
-  Mat rotTranspose = rot.t();
-	Mat upperRight = - rotTranspose * posWedgeTimesRot * rotTranspose;
+  Mat rot = rAdjointTransformation(Rect(0, 0, 3, 3));
+  Mat pos_wedge_times_rot = rAdjointTransformation(Rect(3, 0, 3, 3));
+  Mat rot_transpose = rot.t();
+	Mat upper_right = - rot_transpose * pos_wedge_times_rot * rot_transpose;
 
-	inverse *= 0;
+	rInverse = cv::Mat::zeros(6, 6, rAdjointTransformation.type());
 
-	inverse.at<T>(0, 0) = rotTranspose.at<T>(0, 0);
-	inverse.at<T>(0, 1) = rotTranspose.at<T>(0, 1);
-	inverse.at<T>(0, 2) = rotTranspose.at<T>(0, 2);
-	inverse.at<T>(1, 0) = rotTranspose.at<T>(1, 0);
-	inverse.at<T>(1, 1) = rotTranspose.at<T>(1, 1);
-	inverse.at<T>(1, 2) = rotTranspose.at<T>(1, 2);
-	inverse.at<T>(2, 0) = rotTranspose.at<T>(2, 0);
-	inverse.at<T>(2, 1) = rotTranspose.at<T>(2, 1);
-	inverse.at<T>(2, 2) = rotTranspose.at<T>(2, 2);
+	rInverse.at<T>(0, 0) = rot_transpose.at<T>(0, 0);
+	rInverse.at<T>(0, 1) = rot_transpose.at<T>(0, 1);
+	rInverse.at<T>(0, 2) = rot_transpose.at<T>(0, 2);
+	rInverse.at<T>(1, 0) = rot_transpose.at<T>(1, 0);
+	rInverse.at<T>(1, 1) = rot_transpose.at<T>(1, 1);
+	rInverse.at<T>(1, 2) = rot_transpose.at<T>(1, 2);
+	rInverse.at<T>(2, 0) = rot_transpose.at<T>(2, 0);
+	rInverse.at<T>(2, 1) = rot_transpose.at<T>(2, 1);
+	rInverse.at<T>(2, 2) = rot_transpose.at<T>(2, 2);
 
-	inverse.at<T>(0, 3) = upperRight.at<T>(0, 0);
-	inverse.at<T>(0, 4) = upperRight.at<T>(0, 1);
-	inverse.at<T>(0, 5) = upperRight.at<T>(0, 2);
-	inverse.at<T>(1, 3) = upperRight.at<T>(1, 0);
-	inverse.at<T>(1, 4) = upperRight.at<T>(1, 1);
-	inverse.at<T>(1, 5) = upperRight.at<T>(1, 2);
-	inverse.at<T>(2, 3) = upperRight.at<T>(2, 0);
-	inverse.at<T>(2, 4) = upperRight.at<T>(2, 1);
-	inverse.at<T>(2, 5) = upperRight.at<T>(2, 2);
+	rInverse.at<T>(0, 3) = upper_right.at<T>(0, 0);
+	rInverse.at<T>(0, 4) = upper_right.at<T>(0, 1);
+	rInverse.at<T>(0, 5) = upper_right.at<T>(0, 2);
+	rInverse.at<T>(1, 3) = upper_right.at<T>(1, 0);
+	rInverse.at<T>(1, 4) = upper_right.at<T>(1, 1);
+	rInverse.at<T>(1, 5) = upper_right.at<T>(1, 2);
+	rInverse.at<T>(2, 3) = upper_right.at<T>(2, 0);
+	rInverse.at<T>(2, 4) = upper_right.at<T>(2, 1);
+	rInverse.at<T>(2, 5) = upper_right.at<T>(2, 2);
 
-	inverse.at<T>(3, 3) = rotTranspose.at<T>(0, 0);
-	inverse.at<T>(3, 4) = rotTranspose.at<T>(0, 1);
-	inverse.at<T>(3, 5) = rotTranspose.at<T>(0, 2);
-	inverse.at<T>(4, 3) = rotTranspose.at<T>(1, 0);
-	inverse.at<T>(4, 4) = rotTranspose.at<T>(1, 1);
-	inverse.at<T>(4, 5) = rotTranspose.at<T>(1, 2);
-	inverse.at<T>(5, 3) = rotTranspose.at<T>(2, 0);
-	inverse.at<T>(5, 4) = rotTranspose.at<T>(2, 1);
-	inverse.at<T>(5, 5) = rotTranspose.at<T>(2, 2);
+	rInverse.at<T>(3, 3) = rot_transpose.at<T>(0, 0);
+	rInverse.at<T>(3, 4) = rot_transpose.at<T>(0, 1);
+	rInverse.at<T>(3, 5) = rot_transpose.at<T>(0, 2);
+	rInverse.at<T>(4, 3) = rot_transpose.at<T>(1, 0);
+	rInverse.at<T>(4, 4) = rot_transpose.at<T>(1, 1);
+	rInverse.at<T>(4, 5) = rot_transpose.at<T>(1, 2);
+	rInverse.at<T>(5, 3) = rot_transpose.at<T>(2, 0);
+	rInverse.at<T>(5, 4) = rot_transpose.at<T>(2, 1);
+	rInverse.at<T>(5, 5) = rot_transpose.at<T>(2, 2);
 
 }
 
@@ -475,23 +488,25 @@ template void cedar::aux::math::invertAdjointTransformation<double>(const cv::Ma
 template void cedar::aux::math::invertAdjointTransformation<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
-cv::Mat cedar::aux::math::invertAdjointTransformation(const cv::Mat& adjointTransformation)
+cv::Mat cedar::aux::math::invertAdjointTransformation(const cv::Mat& rAdjointTransformation)
 {
-  Mat result(6, 6, adjointTransformation.type());
-  invertAdjointTransformation<T>(adjointTransformation, result);
+  Mat result = cv::Mat::zeros(6, 6, rAdjointTransformation.type());
+  invertAdjointTransformation<T>(rAdjointTransformation, result);
   return result;
 }
 
 template cv::Mat cedar::aux::math::invertAdjointTransformation<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::invertAdjointTransformation<float>(const cv::Mat&);
 
-/* ------------------------------------------------------------------------------------------------- */
+//----------------------------------------------------------------------------------------------------------------------
+// generation of matrix representations from basic information
+//----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-cv::Mat cedar::aux::math::twistCoordinates(const cv::Mat& supportPoint, const cv::Mat& axis)
+cv::Mat cedar::aux::math::twistCoordinates(const cv::Mat& rSupportPoint, const cv::Mat& rAxis)
 {
-	Mat twist(6, 1, supportPoint.type());
-	Mat omega = axis(Rect(0, 0, 1, 3)) * (1 / norm(axis(Rect(0, 0, 1, 3))));
-  Mat cross = supportPoint(Rect(0, 0, 1, 3)).cross(omega);
+	Mat twist = cv::Mat::zeros(6, 1, rSupportPoint.type());
+	Mat omega = rAxis(Rect(0, 0, 1, 3)) * (1 / norm(rAxis(Rect(0, 0, 1, 3))));
+  Mat cross = rSupportPoint(Rect(0, 0, 1, 3)).cross(omega);
 	twist.at<double>(0, 0) = cross.at<double>(0, 0);
 	twist.at<double>(1, 0) = cross.at<double>(1, 0);
 	twist.at<double>(2, 0) = cross.at<double>(2, 0);
