@@ -2,9 +2,9 @@
  ----- Institute:   Ruhr-Universitaet-Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        coordinateTransformations.h
+ ----- File:        screwCalculus.cpp
 
- ----- Author:      Hendrik Reimann
+ ----- Maintainer:  Hendrik Reimann
  ------Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 11 01
 
@@ -23,10 +23,6 @@
 
 using namespace std;
 using namespace cv;
-
-// /TODO: shorten code
-// /TODO: avoid allocation of memory wherever unnecessary
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // wedge functions for axis vectors

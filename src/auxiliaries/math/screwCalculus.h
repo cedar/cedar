@@ -2,9 +2,9 @@
  ----- Institute:   Ruhr-Universitaet-Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        coordinateTransformations.h
+ ----- File:        screwCalculus.h
 
- ----- Author:      Hendrik Reimann
+ ----- Maintainer:  Hendrik Reimann
  ------Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 11 01
 
