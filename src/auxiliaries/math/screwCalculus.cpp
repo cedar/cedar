@@ -25,6 +25,11 @@ using namespace std;
 using namespace cv;
 
 
+// /TODO: change names of references to "r..."
+// /TODO: shorten code
+// /TODO: avoid allocation of memory wherever unnecessary
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // wedge axis functions
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,6 +124,7 @@ cv::Mat cedar::aux::math::wedgeTwist(const cv::Mat& twist)
 template cv::Mat cedar::aux::math::wedgeTwist<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::wedgeTwist<float>(const cv::Mat&);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::veeTwist(const cv::Mat& matrix, cv::Mat& result)
 {
@@ -146,6 +152,7 @@ cv::Mat cedar::aux::math::veeTwist(const cv::Mat& matrix)
 template cv::Mat cedar::aux::math::veeTwist<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::veeTwist<float>(const cv::Mat&);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::expAxis(const cv::Mat& axis, double theta, cv::Mat& result)
 {
@@ -169,6 +176,7 @@ cv::Mat cedar::aux::math::expAxis(const cv::Mat& axis, double theta)
 template cv::Mat cedar::aux::math::expAxis<double>(const cv::Mat&, double);
 template cv::Mat cedar::aux::math::expAxis<float>(const cv::Mat&, double);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::logAxis(const cv::Mat& rotation, cv::Mat& omega, double& theta, bool optionalThetaChoice)
 {
@@ -223,6 +231,7 @@ void cedar::aux::math::logAxis(const cv::Mat& rotation, cv::Mat& omega, double& 
 template void cedar::aux::math::logAxis<double>(const cv::Mat&, cv::Mat&, double&, bool);
 template void cedar::aux::math::logAxis<float>(const cv::Mat&, cv::Mat&, double&, bool);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::expTwist(const cv::Mat& xi, double theta, cv::Mat& result)
 {
@@ -285,6 +294,7 @@ cv::Mat cedar::aux::math::expTwist(const cv::Mat& xi, double theta)
 template cv::Mat cedar::aux::math::expTwist<double>(const cv::Mat&, double);
 template cv::Mat cedar::aux::math::expTwist<float>(const cv::Mat&, double);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::logTwist(const cv::Mat& transformation, cv::Mat& xi, double& theta, bool optionalThetaChoice)
 {
@@ -316,6 +326,7 @@ void cedar::aux::math::logTwist(const cv::Mat& transformation, cv::Mat& xi, doub
 template void cedar::aux::math::logTwist<double>(const cv::Mat&, cv::Mat&, double&, bool);
 template void cedar::aux::math::logTwist<float>(const cv::Mat&, cv::Mat&, double&, bool);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rigidTransformation, cv::Mat& adjointTransformation)
 {
@@ -373,6 +384,7 @@ cv::Mat cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rigidTrans
 template cv::Mat cedar::aux::math::rigidToAdjointTransformation<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::rigidToAdjointTransformation<float>(const cv::Mat&);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::adjointToRigidTransformation(const cv::Mat& adjointTransformation, cv::Mat& rigidTransformation)
 {
@@ -416,6 +428,7 @@ cv::Mat cedar::aux::math::adjointToRigidTransformation(const cv::Mat& adjointTra
 template cv::Mat cedar::aux::math::adjointToRigidTransformation<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::adjointToRigidTransformation<float>(const cv::Mat&);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 void cedar::aux::math::invertAdjointTransformation(const cv::Mat& adjointTransformation, cv::Mat& inverse)
 {
@@ -472,6 +485,7 @@ cv::Mat cedar::aux::math::invertAdjointTransformation(const cv::Mat& adjointTran
 template cv::Mat cedar::aux::math::invertAdjointTransformation<double>(const cv::Mat&);
 template cv::Mat cedar::aux::math::invertAdjointTransformation<float>(const cv::Mat&);
 
+/* ------------------------------------------------------------------------------------------------- */
 template<typename T>
 cv::Mat cedar::aux::math::twistCoordinates(const cv::Mat& supportPoint, const cv::Mat& axis)
 {

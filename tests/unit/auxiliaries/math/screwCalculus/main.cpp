@@ -23,6 +23,10 @@
 // SYSTEM INCLUDES
 #include <cv.h>
 
+// /TODO: remove the unneccesarily complex if else structures where the if does nothing
+// /TODO: differentiate log file entries for the two different kinds of the same function
+
+
 using namespace cedar::aux;
 using namespace cedar::aux::math;
 using namespace std;
