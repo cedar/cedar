@@ -20,4 +20,8 @@ cedar_add_library(auxiliaries
   math/tools.cpp
   math/algebraTools.h
   math/algebraTools.cpp
+  math/coordinateTransformations.h
+  math/coordinateTransformations.cpp
+  math/screwCalculus.h
+  math/screwCalculus.cpp
 )
