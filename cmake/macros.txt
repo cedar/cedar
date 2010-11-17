@@ -1,0 +1,156 @@
+########################################################################################################################
+# CMake macros for cedar
+########################################################################################################################
+
+
+########################################################################################################################
+
+macro(cedar_add_unit_test arguments)
+  # extract the folder name from the current source path and use it as a name for the unit test 
+  string(REGEX REPLACE ".*/(.+)$" "\\1" unitTestName "${CMAKE_CURRENT_SOURCE_DIR}")
+
+  # find all cpp source files in the current source folder and save them in a list
+  file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+  # remove the ${CEDAR_UNIT_TEST_DIR} from the current source path and save the result in 'unitTestSubdirectory'
+  string(REPLACE "${CEDAR_UNIT_TEST_DIR}/" "" unitTestSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
+  # remove the folder name from 'unitTestSubdirectory'
+  string(REPLACE "/${unitTestName}" "" unitTestSubdirectory "${unitTestSubdirectory}")
+
+  # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
+  set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${unitTestSubdirectory})
+
+  # compose the name of the executable from a 'unitTest_' prefix and the unit test name
+  set(unitTestExecutableName unitTest_${unitTestName})
+  
+  # add the executable with the given name, specifying all source files needed for compilation
+  #
+  # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
+  add_executable(${unitTestExecutableName} ${sourceFiles})
+  
+  # add the unit test to the CMake build system (will create a build target and run the test when calling 'make test')
+  # This sets up the unit test so that it is run as if the executable were lying in the source path of the unit test,
+  # so that you can put test configuration files into the source directory.
+  #
+  # add_test(<test identifier> <executable name> <arguments for the test>)
+  add_test(${unitTestName} ${CMAKE_COMMAND} -E chdir ${CEDAR_UNIT_TEST_DIR}/${unitTestSubdirectory}/${unitTestName} ${CEDAR_EXE_DIR}/${unitTestSubdirectory}/${unitTestExecutableName} ${arguments})
+  
+  # extract the name of the library from the unit test source path
+  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${unitTestSubdirectory}")
+  
+  # link all cedar and third party libraries into the unit test executable
+  target_link_libraries(${unitTestExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  
+  # change the runtime output directory back to the original value
+  set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
+endmacro(cedar_add_unit_test)
+
+########################################################################################################################
+
+macro(cedar_add_demo arguments)
+  # extract the folder name from the current source path and use it as a name for the demo
+  string(REGEX REPLACE ".*/(.+)$" "\\1" demoName "${CMAKE_CURRENT_SOURCE_DIR}")
+
+  # find all cpp source files in the current source folder and save them in a list
+  file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+
+  # remove the ${CEDAR_DEMO_DIR} from the current source path and save the result in 'demoSubdirectory'
+  string(REPLACE "${CEDAR_DEMO_DIR}/" "" demoSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
+  # remove the folder name from 'demoSubdirectory'
+  string(REPLACE "/${demoName}" "" demoSubdirectory "${demoSubdirectory}")
+
+  # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
+  set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${demoSubdirectory})
+
+  # compose the name of the executable from a 'demo_' prefix and the demo name
+  set(demoExecutableName demo_${demoName})
+  
+  # add the executable with the given name, specifying all source files needed for compilation
+  #
+  # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
+  add_executable(${demoExecutableName} ${sourceFiles})
+
+  # extract the name of the library from the demo source path
+  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${demoSubdirectory}")
+  
+  # link all cedar and third party libraries into the demo executable
+  target_link_libraries(${demoExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  
+  # change the runtime output directory back to the original value
+  set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
+endmacro(cedar_add_demo)
+
+
+########################################################################################################################
+
+macro(cedar_get_subdirectories path)
+  file(GLOB returnedSubdirectories ${path}/*/)
+  list(LENGTH returnedSubdirectories numberOfSubdirectories)
+
+  if (numberOfSubdirectories GREATER 0)
+    list(REMOVE_ITEM returnedSubdirectories "${path}/.svn")
+    foreach (subdirectory ${returnedSubdirectories})
+      if (NOT IS_DIRECTORY ${subdirectory})
+        list(REMOVE_ITEM returnedSubdirectories "${subdirectory}")
+      endif(NOT IS_DIRECTORY ${subdirectory})
+    endforeach(subdirectory)
+  endif (numberOfSubdirectories GREATER 0)
+endmacro(cedar_get_subdirectories)
+
+########################################################################################################################
+
+macro(cedar_add_library)
+  parse_arguments(LIBRARY "LINK_LIBRARIES" "" ${ARGN})
+  car(LIBRARY_NAME ${LIBRARY_DEFAULT_ARGS})
+  cdr(LIBRARY_SOURCES ${LIBRARY_DEFAULT_ARGS})
+
+  add_library(${LIBRARY_NAME} ${CEDAR_LIB_TYPE} ${LIBRARY_SOURCES})
+  target_link_libraries(${LIBRARY_NAME} ${CEDAR_THIRD_PARTY_LIBS} ${LIBRARY_LINK_LIBRARIES})
+endmacro(cedar_add_library)
+
+########################################################################################################################
+
+MACRO(CAR var)
+  SET(${var} ${ARGV1})
+ENDMACRO(CAR)
+
+########################################################################################################################
+
+MACRO(CDR var junk)
+  SET(${var} ${ARGN})
+ENDMACRO(CDR)
+
+########################################################################################################################
+
+MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
+  SET(DEFAULT_ARGS)
+  FOREACH(arg_name ${arg_names})    
+    SET(${prefix}_${arg_name})
+  ENDFOREACH(arg_name)
+  FOREACH(option ${option_names})
+    SET(${prefix}_${option} FALSE)
+  ENDFOREACH(option)
+
+  SET(current_arg_name DEFAULT_ARGS)
+  SET(current_arg_list)
+  FOREACH(arg ${ARGN})            
+    SET(larg_names ${arg_names})    
+    LIST(FIND larg_names "${arg}" is_arg_name)                   
+    IF (is_arg_name GREATER -1)
+      SET(${prefix}_${current_arg_name} ${current_arg_list})
+      SET(current_arg_name ${arg})
+      SET(current_arg_list)
+    ELSE (is_arg_name GREATER -1)
+      SET(loption_names ${option_names})    
+      LIST(FIND loption_names "${arg}" is_option)            
+      IF (is_option GREATER -1)
+	     SET(${prefix}_${arg} TRUE)
+      ELSE (is_option GREATER -1)
+	     SET(current_arg_list ${current_arg_list} ${arg})
+      ENDIF (is_option GREATER -1)
+    ENDIF (is_arg_name GREATER -1)
+  ENDFOREACH(arg)
+  SET(${prefix}_${current_arg_name} ${current_arg_list})
+ENDMACRO(PARSE_ARGUMENTS)
