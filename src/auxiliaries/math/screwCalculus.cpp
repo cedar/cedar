@@ -368,7 +368,7 @@ template void cedar::aux::math::rigidToAdjointTransformation<float>(const cv::Ma
 template<typename T>
 cv::Mat cedar::aux::math::rigidToAdjointTransformation(const cv::Mat& rigidTransformation)
 {
-  Mat result(6, 6, rigidTransformation.type());
+  Mat result = Mat::zeros(6, 6, rigidTransformation.type());
   rigidToAdjointTransformation<T>(rigidTransformation, result);
   return result;
 }
