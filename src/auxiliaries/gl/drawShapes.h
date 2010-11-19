@@ -22,8 +22,6 @@
 
 // SYSTEM INCLUDES
 #include "cv.h"
-//#include "gl.h"
-//#include "glu.h"
 
 namespace cedar
 {
@@ -95,13 +93,6 @@ namespace cedar
                     const int loops,
                     const bool invert=false,
                     const bool wireFrame=false);
-      
-      /*!	draws a pyramid with rectangular base, the base is in the xy-plane, centered at the origin
-       * @param length    extension in x-direction of current coordinate frame
-       * @param width    extension in y-direction of current coordinate frame
-       * @param height    extension in z-direction of current coordinate frame
-       * @param wireFrame    decides whether to draw full surfaces or only a wire frame
-       */
       
       /*!	draws a pyramid with rectangular base, base is centered at origin of object frame
        * @param length    base extension in x-direction of current coordinate frame
