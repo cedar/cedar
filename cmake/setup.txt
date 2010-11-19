@@ -85,7 +85,7 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
 # OpenGL
 find_package(OpenGL)
 find_package(GLUT)
-set(CEDAR_THIRD_PARTH_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES})
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenGL_LIBRARIES} ${GLUT_LIBRARIES})
 
 
 ########################################################################################################################
