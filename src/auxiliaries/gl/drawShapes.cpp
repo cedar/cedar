@@ -20,6 +20,8 @@
 
 // SYSTEM INCLUDES
 #include <math.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 
 using namespace std;
 using namespace cv;
@@ -105,7 +107,7 @@ void cedar::aux::gl::drawCone(const cv::Mat start,
                               const int slices,
                               const bool wireFrame)
 {
-  Mat line = (to-from)(Rect(0, 0, 1, 3)).clone();
+  Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
   // for to = from do nothing
   if (norm(line) == 0)
   {
@@ -114,7 +116,7 @@ void cedar::aux::gl::drawCone(const cv::Mat start,
   // save the current transformation
   glPushMatrix();
   // move to start of line
-  glTranslated(from.at<T>(0, 0), from.at<T>(1, 0), from.at<T>(2, 0));
+  glTranslated(start.at<T>(0, 0), start.at<T>(1, 0), start.at<T>(2, 0));
   // make z-axis collinear with the cone center line
   Mat z = Mat::zeros(3, 1, start.type());
   z.at<T>(2, 0) = 1;
@@ -129,6 +131,18 @@ void cedar::aux::gl::drawCone(const cv::Mat start,
   // return to saved transformation
   glPopMatrix();
 }
+template void cedar::aux::gl::drawCone<double>(const cv::Mat,
+                                               const cv::Mat,
+                                               const double,
+                                               const double,
+                                               const int,
+                                               const bool);
+template void cedar::aux::gl::drawCone<float>(const cv::Mat,
+                                              const cv::Mat,
+                                              const double,
+                                              const double,
+                                              const int,
+                                              const bool);
 
 void cedar::aux::gl::drawSphere(const  double radius,
                                 const int slices,
@@ -151,7 +165,7 @@ void cedar::aux::gl::drawDisk(const double innerRadius,
                               const double outerRadius,
                               const int slices,
                               const int loops,
-                              const bool invert=false,
+                              const bool invert,
                               const bool wireFrame)
 {
 	if (wireFrame)
@@ -225,7 +239,7 @@ void cedar::aux::gl::drawPyramid(const double length,
 	}
 }
 
-void cedar::aux::gl::drawPrism(const double width, const double height, const bool wireFrame=false )
+void cedar::aux::gl::drawPrism(const double width, const double height, const bool wireFrame)
 {
 	if (wireFrame)
 	{
@@ -325,7 +339,7 @@ void cedar::aux::gl::drawEllipse(const double a,
                                  const double thickness,
                                  const int slices,
                                  const int stacks,
-                                 const bool wireFrame=false)
+                                 const bool wireFrame)
 {
 	double alpha = 2 * M_PI / slices;
 	double beta = 2 * M_PI / stacks;
