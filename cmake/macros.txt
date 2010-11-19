@@ -87,16 +87,16 @@ endmacro(cedar_add_demo)
 
 macro(cedar_get_subdirectories path)
   file(GLOB returnedSubdirectories ${path}/*/)
-  list(LENGTH returnedSubdirectories numberOfSubdirectories)
+  list(LENGTH returnedSubdirectories localNumberOfSubdirectories)
 
-  if (numberOfSubdirectories GREATER 0)
+  if (localNumberOfSubdirectories GREATER 0)
     list(REMOVE_ITEM returnedSubdirectories "${path}/.svn")
     foreach (subdirectory ${returnedSubdirectories})
       if (NOT IS_DIRECTORY ${subdirectory})
         list(REMOVE_ITEM returnedSubdirectories "${subdirectory}")
       endif(NOT IS_DIRECTORY ${subdirectory})
     endforeach(subdirectory)
-  endif (numberOfSubdirectories GREATER 0)
+  endif (localNumberOfSubdirectories GREATER 0)
 endmacro(cedar_get_subdirectories)
 
 ########################################################################################################################
