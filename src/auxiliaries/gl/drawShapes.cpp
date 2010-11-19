@@ -108,7 +108,7 @@ void cedar::aux::gl::drawCone(const cv::Mat start,
                               const bool wireFrame)
 {
   Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
-  // for to = from do nothing
+  // if start = end do nothing
   if (norm(line) == 0)
   {
     return;
