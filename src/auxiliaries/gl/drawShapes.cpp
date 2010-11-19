@@ -20,8 +20,8 @@
 
 // SYSTEM INCLUDES
 #include <math.h>
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 using namespace std;
 using namespace cv;
