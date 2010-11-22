@@ -31,15 +31,17 @@ using namespace std;
 
 cedar::aux::Thread::Thread()
 {
+  _mName    = string("thread");
   mIdleTime = 1;
-  _mName = string("thread");
-  mStop = false;
+  mStop     = false;
+  initStatistics();
 }
 
 cedar::aux::Thread::Thread(unsigned idleTime) : mIdleTime(idleTime)
 {
   _mName = string("thread");
-  mStop = false;
+  mStop  = false;
+  initStatistics();
 }
 
 cedar::aux::Thread::~Thread()
@@ -54,6 +56,9 @@ void cedar::aux::Thread::stop( unsigned time )
 {
 	mStop = true;
 	wait( time );
+	cout << "Execution stats:" << endl;
+	cout << "  avg. time steps between execution: " << (double)mSumOfStepsTaken / (double)mNumberOfSteps << endl;
+	cout << "  max. time steps between execution: " << mMaxStepsTaken << endl;
 }
 
 void cedar::aux::Thread::run(void)
@@ -81,6 +86,7 @@ void cedar::aux::Thread::run(void)
 		}
 		lastWakeup = scheduledWakeup;	// remember the current wakeup time
 		scheduledWakeup = tmpTime;
+		updateStatistics(stepsTaken);
 
 		// print warning if time steps have been skipped
 		if( stepsTaken > 1 )
@@ -100,4 +106,27 @@ void cedar::aux::Thread::run(void)
 
 	mStop = false;
 	return;
+}
+
+void cedar::aux::Thread::initStatistics() {
+  mNumberOfSteps   = 0;
+  mSumOfStepsTaken = 0;
+  mMaxStepsTaken   = 0;
+}
+
+void cedar::aux::Thread::updateStatistics(unsigned stepsTaken) {
+
+  unsigned long oldSum = mSumOfStepsTaken;
+
+  mNumberOfSteps++;
+  mSumOfStepsTaken += stepsTaken;
+  if( stepsTaken > mMaxStepsTaken )
+    mMaxStepsTaken = stepsTaken;
+
+  if( oldSum > mSumOfStepsTaken ) {
+    cerr << "Warning: Value overflow in thread statistics. Statistics will be reseted." << endl;
+    initStatistics();
+  }
+
+  return;
 }
