@@ -105,13 +105,15 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-  int mIdleTime; //!< idle time in microseconds
+  // none yet
 
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
 private:
-  bool mStop;
+  void initStatistics(void);
+  inline void updateStatistics(unsigned stepsTaken);
+  // none yet
 
   //----------------------------------------------------------------------------
   // members
@@ -119,9 +121,13 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  int mIdleTime; //!< idle time in microseconds
 private:
-  // none yet
+  bool mStop;
+  // gather some statistics
+  long unsigned mNumberOfSteps;
+  long unsigned mSumOfStepsTaken;
+  unsigned mMaxStepsTaken;
 
   //----------------------------------------------------------------------------
   // parameters
