@@ -19,6 +19,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <cv.h>
 
 using namespace cedar::tests::unit::aux::gl::Object;
 
@@ -35,9 +36,14 @@ TestObject::TestObject()
 //! destructor
 TestObject::~TestObject()
 {
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void TestObject::draw()
+{
+
+}
