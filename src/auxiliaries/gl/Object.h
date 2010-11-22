@@ -48,12 +48,24 @@ public:
   std::string objectName();
   //!@brief returns type of the object
   std::string objectType();
+  //!@brief returns current resolution
+  int resolution();
+  //!@brief returns R value of main object color in RGB
+  double colorR();
+  //!@brief returns G value of main object color in RGB
+  double colorG();
+  //!@brief returns B value of main object color in RGB
+  double colorB();
+  //!@brief returns position of the object in homogeneous coordinates
+  cv::Mat position();
   //!@brief returns x-position of the object frame origin in world frame
   double positionX();
   //!@brief returns y-position of the object frame origin in world frame
   double positionY();
   //!@brief returns z-position of the object frame origin in world frame
   double positionZ();
+  //!@brief returns object frame orientation as vector of ???-Euler angles
+  cv::Mat orientationAngles();
   //!@brief returns alpha (first) angle of the object orientation in ???-Euler angles
   double orientationAngleAlpha();
   //!@brief returns beta (second) angle of the object orientation in ???-Euler angles
@@ -62,12 +74,6 @@ public:
   double orientationAngleGamma();
   //!@brief returns the 4 \time 4 rigid transformation matrix of the object frame relative to the world frame
   cv::Mat transformation();
-  //!@brief returns R value of main object color in RGB
-  double colorR();
-  //!@brief returns G value of main object color in RGB
-  double colorG();
-  //!@brief returns B value of main object color in RGB
-  double colorB();
   
   //!@brief switch betwen drawing the object with full surfaces or as wire frame only
   void drawAsWireFrame(const bool state);
@@ -78,7 +84,7 @@ public:
   //!@brief set the position of the object frame origin in the world frame
   void setPosition(const double x, const double y, const double z);
   //!@brief set the position of the object frame origin in the world frame
-  void setPosition(const cv::Mat position);
+  void setPosition(const cv::Mat& position);
   //!@brief set the orientation of the object frame, given in ??? Euler angles
   void setOrientationAngles(const double alpha, const double beta, const double gamma);
   //!@brief set the orientation of the object frame, given in ??? Euler angles
