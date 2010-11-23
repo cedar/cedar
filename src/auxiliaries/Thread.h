@@ -99,7 +99,7 @@ public:
    *
    * @param timeout the max. time to wait for the thread (in milliseconds).
    */
-  void stop( unsigned timeout = 1000 );
+  void stop( unsigned timeout = 1000, bool suppressWarning = false );
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -113,7 +113,6 @@ protected:
 private:
   void initStatistics(void);
   inline void updateStatistics(unsigned stepsTaken);
-  // none yet
 
   //----------------------------------------------------------------------------
   // members
