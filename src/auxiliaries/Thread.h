@@ -98,8 +98,15 @@ public:
    * moment for the thread to finish its work.
    *
    * @param timeout the max. time to wait for the thread (in milliseconds).
+   * @param suppressWarning by default a warning about occurring timing problems will be given
    */
   void stop( unsigned timeout = 1000, bool suppressWarning = false );
+
+  /*!@brief Performs a single step with default idle time.
+   *
+   * This has no effect if the thread is already running.
+   */
+  void singleStep(void);
 
   //----------------------------------------------------------------------------
   // protected methods

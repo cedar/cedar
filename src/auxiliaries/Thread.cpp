@@ -141,3 +141,8 @@ void cedar::aux::Thread::updateStatistics(unsigned stepsTaken)
 
   return;
 }
+
+void cedar::aux::Thread::singleStep() {
+  if( !isRunning() )
+    step(mIdleTime);
+}
