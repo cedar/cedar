@@ -29,6 +29,6 @@ cedar_add_library(auxiliaries
   gl/Object.h
   gl/Object.cpp
   MOC_HEADERS
-  LogFile.h
+  gl/Object.h
 )
 
