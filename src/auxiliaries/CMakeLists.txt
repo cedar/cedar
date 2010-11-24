@@ -24,6 +24,11 @@ cedar_add_library(auxiliaries
   math/coordinateTransformations.cpp
   math/screwCalculus.h
   math/screwCalculus.cpp
+  gl/drawShapes.h
+  gl/drawShapes.cpp
+  gl/Object.h
+  gl/Object.cpp
   MOC_HEADERS
   LogFile.h
 )
+
