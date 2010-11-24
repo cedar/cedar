@@ -34,6 +34,11 @@ Object::Object()
 	init();
 }
 
+Object::~Object()
+{
+
+}
+
 void Object::init()
 {
   mName = std::string("thou shalt not be named");

@@ -1,3 +1,7 @@
+qt4_wrap_cpp(AUX_MOC_OUTFILES
+  gl/Object.h
+)              
+
 cedar_add_library(auxiliaries
   Base.h
   Base.cpp
@@ -28,4 +32,6 @@ cedar_add_library(auxiliaries
   gl/drawShapes.cpp
   gl/Object.h
   gl/Object.cpp
+  ${AUX_MOC_OUTFILES}
 )
+
