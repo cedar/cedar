@@ -101,10 +101,26 @@ endmacro(cedar_get_subdirectories)
 
 ########################################################################################################################
 
+# This macro adds a new library to cedar.
+# Syntax:
+# cedar_add_library(
+#                     library_name source1 source2 ...
+#                     [LINK_LIBRARIES lib1 lib2 ...]
+#                     [MOC_HEADERS header1 header2 ...]
+#                   )
+# library_name   name of the new library
+# source1 ...    *.cpp and *.h files that have to be compiled into the library
+# LINK_LIBRARIES libraries that need to link to from the new library (important for MacOS linking process)
+# MOC_HEADERS    header files that generate (Qt) moc-files
+#
+# see http://www.cmake.org/Wiki/CMakeMacroParseArguments for a description of the parsing
 macro(cedar_add_library)
-  parse_arguments(LIBRARY "LINK_LIBRARIES" "" ${ARGN})
+  parse_arguments(LIBRARY "LINK_LIBRARIES;MOC_HEADERS" "" ${ARGN})
   car(LIBRARY_NAME ${LIBRARY_DEFAULT_ARGS})
   cdr(LIBRARY_SOURCES ${LIBRARY_DEFAULT_ARGS})
+
+  qt4_wrap_cpp(mocHeaders ${MOC_HEADERS})
+  set(LIBRARY_SOURCES ${LIBRARY_SOURCES} ${MOC_HEADERS})
 
   add_library(${LIBRARY_NAME} ${CEDAR_LIB_TYPE} ${LIBRARY_SOURCES})
   target_link_libraries(${LIBRARY_NAME} ${CEDAR_THIRD_PARTY_LIBS} ${LIBRARY_LINK_LIBRARIES})
