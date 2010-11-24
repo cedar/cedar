@@ -119,8 +119,8 @@ macro(cedar_add_library)
   car(LIBRARY_NAME ${LIBRARY_DEFAULT_ARGS})
   cdr(LIBRARY_SOURCES ${LIBRARY_DEFAULT_ARGS})
 
-  qt4_wrap_cpp(mocHeaders ${MOC_HEADERS})
-  set(LIBRARY_SOURCES ${LIBRARY_SOURCES} ${MOC_HEADERS})
+  qt4_wrap_cpp(mocHeaders ${LIBRARY_MOC_HEADERS})
+  set(LIBRARY_SOURCES ${LIBRARY_SOURCES} ${mocHeaders})
 
   add_library(${LIBRARY_NAME} ${CEDAR_LIB_TYPE} ${LIBRARY_SOURCES})
   target_link_libraries(${LIBRARY_NAME} ${CEDAR_THIRD_PARTY_LIBS} ${LIBRARY_LINK_LIBRARIES})
