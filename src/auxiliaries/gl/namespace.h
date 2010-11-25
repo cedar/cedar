@@ -32,6 +32,7 @@ namespace cedar
     namespace gl
     {
       class Object;
+      class Block;
     }
   }
 }
