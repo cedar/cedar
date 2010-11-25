@@ -31,6 +31,7 @@ namespace cedar
     /*!@brief Namespace for all gl classes. */
     namespace gl
     {
+      class Scene;
       class Object;
       class Block;
     }

@@ -26,6 +26,8 @@ cedar_add_library(auxiliaries
   math/screwCalculus.cpp
   gl/drawShapes.h
   gl/drawShapes.cpp
+  gl/Scene.h
+  gl/Scene.cpp
   gl/Object.h
   gl/Object.cpp
   gl/Block.h
