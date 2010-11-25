@@ -54,7 +54,7 @@ include_directories(${CEDAR_HOME})
 # third party libraries
 
 # Qt
-find_package(Qt4 4.6.0 COMPONENTS QtCore REQUIRED)
+find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
 include(${QT_USE_FILE})
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
 include_directories(${QT_INCLUDE_DIRS})
@@ -81,6 +81,9 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
 
 # libconfig
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
+
+# libQGLViewer
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QGLViewer)
 
 # OpenGL
 find_package(OpenGL)

@@ -27,6 +27,7 @@
 #include <vector>
 #include <cv.h>
 #include <QObject>
+#include <QGLViewer/qglviewer.h>
 
 class cedar::aux::gl::Object : public QObject
 {
@@ -132,9 +133,9 @@ private:
   //!@brief recalculates the rigid transformation to the object frame from position and orientation
   void updateTransformation();
   
-//public slots:
-//  //!@brief turns the visibility of the object on and off
-//  void setVisibility(const bool state = true);
+public slots:
+  //!@brief turns the visibility of the object on and off
+  void setVisibility(const bool state = true);
   
 public:
   std::string mName;
