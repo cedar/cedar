@@ -203,10 +203,10 @@ void Object::updateTransformation()
 	mTransformation.at<double>(3, 3) = 1;
 }
 
-//void Object::setVisibility(bool state)
-//{ 
-//  mIsVisible = state;
-//}
+void Object::setVisibility(bool state)
+{ 
+  mIsVisible = state;
+}
 
 
 
