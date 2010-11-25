@@ -25,3 +25,5 @@ cedar_add_library(auxiliaries
   math/screwCalculus.h
   math/screwCalculus.cpp
 )
+
+#install(TARGETS auxiliaries LIBRARY DESTINATION "blub/lib")

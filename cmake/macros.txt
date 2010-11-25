@@ -124,6 +124,8 @@ macro(cedar_add_library)
 
   add_library(${LIBRARY_NAME} ${CEDAR_LIB_TYPE} ${LIBRARY_SOURCES})
   target_link_libraries(${LIBRARY_NAME} ${CEDAR_THIRD_PARTY_LIBS} ${LIBRARY_LINK_LIBRARIES})
+
+  install(TARGETS ${LIBRARY_NAME} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR})
 endmacro(cedar_add_library)
 
 ########################################################################################################################
