@@ -128,6 +128,9 @@ public:
   //!@brief set the orientation of the object frame, given in ??? Euler angles
   void setOrientationAngles(const cv::Mat angles);
  
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
 private:
   virtual void init();
   //!@brief recalculates the rigid transformation to the object frame from position and orientation
@@ -137,7 +140,10 @@ public slots:
   //!@brief turns the visibility of the object on and off
   void setVisibility(const bool state = true);
   
-public:
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
   std::string mName;
   std::string mObjectType;
 
