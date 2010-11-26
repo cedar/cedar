@@ -8,15 +8,24 @@ set(CEDAR_CONF_FILE ${CEDAR_HOME}/cedar.conf CACHE FILEPATH "Default configurati
 message (STATUS "including ${CEDAR_CONF_FILE} configuration file")
 include(${CEDAR_CONF_FILE})
 
-INCLUDE_DIRECTORIES( ${CEDAR_HOME}/src )
-
-set (CEDAR_SOURCE_DIR     "${CEDAR_HOME}/src"         CACHE PATH "Directory all library source code will be stored in.")
-set (CEDAR_CMAKE_DIR      "${CEDAR_HOME}/cmake"       CACHE PATH "Directory all additional CMake files will be stored in.")
-set (CEDAR_UNIT_TEST_DIR  "${CEDAR_HOME}/tests/unit"  CACHE PATH "Directory all unit tests will be stored in.")
-set (CEDAR_DEMO_DIR       "${CEDAR_HOME}/demos"       CACHE PATH "Directory all demos will be stored in.")
+set(CEDAR_CMAKE_DIR "${CEDAR_HOME}/cmake" CACHE PATH "Directory all additional CMake files will be stored in.")
 
 # include the macro section
 include(${CEDAR_CMAKE_DIR}/macros.txt)
 
-# go on with the setup of cedar
+# general setup of cedar variables
 include(${CEDAR_CMAKE_DIR}/setup.txt)
+
+# setup of all cedar and third party libraries
+include(${CEDAR_CMAKE_DIR}/libraries.txt)
+
+# setup of unit and interactive tests
+include(${CEDAR_CMAKE_DIR}/testing.txt)
+
+# setup of files that are installed (additionally to the libraries)
+include(${CEDAR_CMAKE_DIR}/install.txt)
+
+# setup of packaging
+include(${CEDAR_CMAKE_DIR}/packaging.txt)
+
+

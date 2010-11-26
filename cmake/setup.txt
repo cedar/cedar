@@ -10,31 +10,20 @@
 project(cedar)
 
 # set the directory for source code
-set(CEDAR_SOURCE_DIR "${CEDAR_HOME}/cedar")
+set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
+# directory for all unit tests
+set (CEDAR_UNIT_TEST_DIR        "${CEDAR_HOME}/tests/unit")
+# directory for all interactive tests
+set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_HOME}/tests/interactive")
 
-# append a 'cedar' subdirectory, so that the includes are bundled
-set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
-
-########################################################################################################################
-# add preprocessor definitions 
-
-add_definitions(-Wall)
-add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
-
-########################################################################################################################
 # default output directory for lib files
-if (CEDAR_LIB_DIR)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}/${CMAKE_BUILD_TYPE}" CACHE STRING "Lib output directory" ${F})
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}/${CMAKE_BUILD_TYPE}" CACHE STRING "DLL/SO output directory" ${F})
-endif(CEDAR_LIB_DIR)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
 # default output directory for exe files
-if (CEDAR_EXE_DIR)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}" CACHE STRING "executable output directory" ${F})
-endif(CEDAR_EXE_DIR)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}")
 
-
-########################################################################################################################
-# library settings
+# append a 'cedar' subdirectory to the header install directory, so that the includes are bundled
+set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
 
 # Shared or static libraries?
 if (CEDAR_BUILD_STATIC_LIBS)
@@ -46,138 +35,13 @@ endif (CEDAR_BUILD_STATIC_LIBS)
 # include the cedar library directory in the library search path
 link_directories(${CEDAR_LIB_DIR})
 
-########################################################################################################################
-#include settings
-
-# add the source directory to the ones that need to be included
+# add the cedar home directory to the ones that need to be included
 include_directories(${CEDAR_HOME})
 
-########################################################################################################################
-# third party libraries
-
-# Qt
-find_package(Qt4 4.6.0 COMPONENTS QtCore REQUIRED)
-include(${QT_USE_FILE})
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
-include_directories(${QT_INCLUDE_DIRS})
-
-# Boost
-if (${CMAKE_BUILD_STATIC_LIBS})
-  set(Boost_USE_STATIC_LIBS ON)
-else (${CMAKE_BUILD_STATIC_LIBS})
-  set(Boost_USE_STATIC_LIBS OFF)
-endif (${CMAKE_BUILD_STATIC_LIBS})
-
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.40.0 COMPONENTS system date_time)
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
-
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
-# OpenCV
-set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
-find_package(OpenCV REQUIRED)
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
-
-# libconfig
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
-
-# OpenGL
-find_package(OpenGL)
-set(CEDAR_THIRD_PARTH_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
-
 
 ########################################################################################################################
-# testing settings
+# add preprocessor definitions 
 
-# enable unit tests via ctest
-enable_testing()
+add_definitions(-Wall)
+add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
-
-########################################################################################################################
-# cedar libraries
-file(GLOB cedarLibDirs ${CEDAR_SOURCE_DIR}/*/)
-
-# remove svn directory from list
-#list(REMOVE_ITEM cedarLibDirs "${CEDAR_SOURCE_DIR}/.svn")
-foreach (libDir ${cedarLibDirs})
-  if (IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
-
-    # get the name of the libary
-    string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libName "${libDir}")
-
-    # add out-of-source directory tree
-    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libName}/${CMAKE_BUILD_TYPE}")
-
-    # add the library to the cedar libraries
-    set(CEDAR_LIBS ${CEDAR_LIBS} ${libName})
-
-    # add the subdirectory
-    add_subdirectory(${libDir} ${subDir})
-
-  endif(IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
-endforeach(libDir)
-
-########################################################################################################################
-# cedar unit tests and demos
-list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_DEMO_DIR})
-list(LENGTH subdirectories numberOfSubdirectories)
-
-while (${numberOfSubdirectories} STRGREATER 0)
-  list(GET subdirectories 0 subdirectory)
-  list(REMOVE_AT subdirectories 0)
-
-  cedar_get_subdirectories(${subdirectory})
-
-  foreach(newSubdirectory ${returnedSubdirectories})
-
-    if (EXISTS "${newSubdirectory}/CMakeLists.txt")
-      add_subdirectory(${newSubdirectory})
-    endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
-
-    list(APPEND subdirectories ${newSubdirectory})
-  endforeach(newSubdirectory)
-
-  list(LENGTH subdirectories ${numberOfSubdirectories})
-endwhile (${numberOfSubdirectories} STRGREATER 0)
-
-########################################################################################################################
-# install setup
-
-file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
-install(FILES ${cedarHeaders} DESTINATION ${CEDAR_HEADER_INSTALL_DIR})
-
-########################################################################################################################
-# CPack - cedar packaging setup
-
-SET(CPACK_PACKAGE_NAME "cedar")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "cedar - Cognition, Embodiment, and Dynamics ARchitecture")
-SET(CPACK_PACKAGE_VENDOR "Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CEDAR_HOME}/readme.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${CEDAR_HOME}/license.txt")
-SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "1")
-SET(CPACK_PACKAGE_VERSION_PATCH "0")
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
-IF(WIN32 AND NOT UNIX)
-  # There is a bug in NSI that does not handle full unix paths properly. Make
-  # sure there is at least one set of four (4) backlasshes.
-  SET(CPACK_PACKAGE_ICON "${CMake_SOURCE_DIR}/Utilities/Release\\\\InstallIcon.bmp")
-  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\MyExecutable.exe")
-  SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} My Famous Project")
-  SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.my-project-home-page.org")
-  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.my-personal-home-page.com")
-  SET(CPACK_NSIS_CONTACT "me@my-personal-home-page.com")
-  SET(CPACK_NSIS_MODIFY_PATH ON)
-ELSE(WIN32 AND NOT UNIX)
-  SET(CPACK_STRIP_FILES "bin/MyExecutable")
-  SET(CPACK_SOURCE_STRIP_FILES "")
-ENDIF(WIN32 AND NOT UNIX)
-SET(CPACK_PACKAGE_EXECUTABLES "MyExecutable" "My Executable")
-
-SET(CPACK_GENERATOR "DEB" "TBZ2")
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Mathis Richter")
- 
-INCLUDE(CPack)
