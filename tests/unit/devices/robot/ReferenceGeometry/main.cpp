@@ -13,8 +13,14 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#include "src/devices/robot/ReferenceGeometry.h"
+// LOCAL INCLUDES
+
+// PROJECT INCLUDES
+#include "cedar/devices/robot/ReferenceGeometry.h"
+
+// SYSTEM INCLUDES
 #include <string>
+
 
 using namespace cedar::dev::robot;
 

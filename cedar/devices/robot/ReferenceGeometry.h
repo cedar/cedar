@@ -20,8 +20,8 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/ConfigurationInterface.h"
-#include "src/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <vector>

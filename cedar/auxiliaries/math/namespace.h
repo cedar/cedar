@@ -19,7 +19,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "src/namespace.h"
+#include "cedar/namespace.h"
 
 // SYSTEM INCLUDES
 

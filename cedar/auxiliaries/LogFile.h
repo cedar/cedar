@@ -2,31 +2,36 @@
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        ComponentNotAvailableException.h
+ ----- File:        LogFile.h
 
  ----- Author:      Mathis Richter
  ----- Email:       mathis.richter@ini.rub.de
- ----- Date:        2010 11 08
+ ----- Date:        2010 10 27
 
- ----- Description: Header of the @em cedar::dev::robot::ComponentNotAvailableException class.
+ ----- Description: Header for the \em cedar::aux::LogFile class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_NOT_AVAILABLE_EXCEPTION_BASE_H
-#define CEDAR_DEV_ROBOT_COMPONENT_NOT_AVAILABLE_EXCEPTION_BASE_H
+#ifndef CEDAR_AUX_LOG_FILE_H
+#define CEDAR_AUX_LOG_FILE_H
 
 // LOCAL INCLUDES
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/namespace.h"
 
 // SYSTEM INCLUDES
+#include <fstream>
+#include <string>
 
 
-/*!@brief Class for an exception, that is thrown when a non-existing component is requested from a robot. */
-class cedar::dev::robot::ComponentNotAvailableException : public cedar::aux::exc::ExceptionBase
+/*!@brief Abstract description of the class.
+ *
+ * More detailed description of the class.
+ */
+class cedar::aux::LogFile : public std::ofstream
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -36,20 +41,25 @@ class cedar::dev::robot::ComponentNotAvailableException : public cedar::aux::exc
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ComponentNotAvailableException(void);
+  //!@brief The constructor.
+  LogFile(const std::string& logFileName);
+  LogFile(const char* pLogFileName);
+
+  //!@brief Destructor
+  virtual ~LogFile(void);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void addSeparatorLine(void);
+  void addTimeStamp(void);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void init(const std::string& logFileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -74,9 +84,11 @@ public:
   // none yet (hopefully never!)
 protected:
   // none yet
+
 private:
   // none yet
 
-}; // class cedar::dev::robot::ComponentNotAvailableException
+}; // class cedar::aux::LogFile
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_NOT_AVAILABLE_EXCEPTION_BASE_H
+#endif // CEDAR_AUX_LOG_FILE_H
+

@@ -17,7 +17,7 @@
 #include "TestClass.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <string>

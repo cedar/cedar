@@ -2,7 +2,7 @@
  ----- Institute:   Ruhr-Universitaet-Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        AlgebraTools.cpp
+ ----- File:        algebraTools.cpp
 
  ----- Author:      INI robotics group, maintained by HR
  ------Email:       ar@ini.rub.de

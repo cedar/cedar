@@ -16,6 +16,10 @@
 #ifndef CEDAR_DEV_ROBOT_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
+// LOCAL INCLUDES
+
+// PROJECT INCLUDES
+
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
 

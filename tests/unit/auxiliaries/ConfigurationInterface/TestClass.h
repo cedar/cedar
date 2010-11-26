@@ -20,8 +20,8 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/ConfigurationInterface.h"
-#include "src/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

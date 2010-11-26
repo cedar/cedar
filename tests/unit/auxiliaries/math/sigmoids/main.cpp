@@ -16,8 +16,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/math/sigmoids.h"
-#include "src/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 

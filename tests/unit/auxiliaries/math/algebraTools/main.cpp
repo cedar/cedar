@@ -16,8 +16,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/math/algebraTools.h"
-#include "src/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/math/algebraTools.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 

@@ -2,36 +2,38 @@
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
- ----- File:        LogFile.h
+ ----- File:        Robot.h
 
  ----- Author:      Mathis Richter
  ----- Email:       mathis.richter@ini.rub.de
- ----- Date:        2010 10 27
+ ----- Date:        2010 11 08
 
- ----- Description: Header for the \em cedar::aux::LogFile class.
+ ----- Description: Header for the @em cedar::dev::robot::Robot class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#ifndef CEDAR_AUX_LOG_FILE_H
-#define CEDAR_AUX_LOG_FILE_H
+#ifndef CEDAR_DEV_ROBOT_ROBOT_H
+#define CEDAR_DEV_ROBOT_ROBOT_H
 
 // LOCAL INCLUDES
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "src/namespace.h"
+#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
-#include <fstream>
+#include <vector>
 #include <string>
+#include <set>
+#include <map>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::LogFile : public std::ofstream
+class cedar::dev::robot::Robot : public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -41,31 +43,54 @@ class cedar::aux::LogFile : public std::ofstream
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  LogFile(const std::string& logFileName);
-  LogFile(const char* pLogFileName);
-
-  //!@brief Destructor
-  virtual ~LogFile(void);
+  //!@brief constructor
+  Robot();
+  //!@brief destructor
+  virtual ~Robot() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void addSeparatorLine(void);
-  void addTimeStamp(void);
+  /*! @brief Returns a pointer to the component with the name @em componentName.
+   *
+   * @return Pointer to the requested component.
+   * @param[in] componentName Name of the component that is to be returned.
+   */
+  ComponentPtr& getComponent(const std::string& rComponentName);
+
+  /*! @brief Creates a specified component.
+   *
+   * Abstract factory class, which will be implemented by the concrete subclass.
+   */
+  virtual ComponentPtr createComponent(const std::string& rComponentName) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void init(const std::string& logFileName);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*! @brief Checks if a component with the supplied @em rComponentName exists within the robot.
+   *
+   * @param[in] componentName Name of the subcomponent we need to check.
+   */
+  bool isComponentAvailable(const std::string& rComponentName) const;
+
+  /*! @brief Checks if a subcomponent with the supplied @em rComponentName exists for a parent component
+   * with the name @em parentComponentName.
+   *
+   * @param[in] rComponentName Name of the subcomponent we need to check.
+   * @param[in] rParentComponentName Name of the component, that might be the parent of @em componentName.
+   */
+  bool isComponentAvailable(
+                             const std::string& rComponentName,
+                             const std::string& rParentComponentName
+                           ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -73,7 +98,11 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  //! map of pointers to all sub components
+  std::map<std::string, ComponentPtr> mComponents;
+  //!< names of all components and their corresponding sub-components
+  std::map<std::string, std::set<std::string> > _mSubComponentNames;
+
 private:
   // none yet
 
@@ -81,14 +110,13 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (hopefully never!)
+  // none yet
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::LogFile
+}; // class cedar::dev::robot::Robot
 
-#endif // CEDAR_AUX_LOG_FILE_H
-
+#endif // CEDAR_DEV_ROBOT_ROBOT_H

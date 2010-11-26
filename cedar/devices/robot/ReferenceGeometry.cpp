@@ -17,7 +17,7 @@
 #include "ReferenceGeometry.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>
