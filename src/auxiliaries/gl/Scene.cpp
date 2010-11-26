@@ -136,12 +136,6 @@ Object* Scene::object(int index)
   return mObjects[index];
 }
 
-void Scene::init()
-{
-  mIsDrawingFloor = true;
-  mSceneLimit = 10;
-}
-
 void Scene::initLighting()
 {
   // TODO: this somehow sets the light relative to the camerea, which might not be wanted. check!
@@ -160,6 +154,12 @@ void Scene::initLighting()
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
+}
+
+void Scene::init()
+{
+  mIsDrawingFloor = true;
+  mSceneLimit = 10;
 }
 
 

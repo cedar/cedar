@@ -28,11 +28,14 @@ cedar_add_library(auxiliaries
   gl/drawShapes.cpp
   gl/Scene.h
   gl/Scene.cpp
+  gl/Viewer.h
+  gl/Viewer.cpp
   gl/Object.h
   gl/Object.cpp
   gl/Block.h
   gl/Block.cpp
   MOC_HEADERS
+  gl/Viewer.h
   gl/Object.h
 )
 
