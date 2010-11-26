@@ -36,7 +36,7 @@ macro(cedar_add_unit_test)
   add_test(${unitTestName} ${CMAKE_COMMAND} -E chdir ${CEDAR_UNIT_TEST_DIR}/${unitTestSubdirectory}/${unitTestName} ${CEDAR_EXE_DIR}/${unitTestSubdirectory}/${unitTestExecutableName} ${unitTest_ARGUMENTS})
   
   # extract the name of the library from the unit test source path
-  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${unitTestSubdirectory}")
+#  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${unitTestSubdirectory}")
   
   # link all cedar and third party libraries into the unit test executable
   target_link_libraries(${unitTestExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
@@ -72,7 +72,7 @@ macro(cedar_add_demo arguments)
   add_executable(${demoExecutableName} ${sourceFiles})
 
   # extract the name of the library from the demo source path
-  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${demoSubdirectory}")
+#  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${demoSubdirectory}")
   
   # link all cedar and third party libraries into the demo executable
   target_link_libraries(${demoExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
@@ -120,20 +120,27 @@ macro(cedar_add_library)
   car(libraryName ${library_DEFAULT_ARGS})
   cdr(librarySources ${library_DEFAULT_ARGS})
 
+  # extract the path to the header files, relative to the cedar source directory
   string(REGEX REPLACE "${CEDAR_SOURCE_DIR}" "" relativePathToHeaders "${CMAKE_CURRENT_SOURCE_DIR}")
 
-  # extract the relative path information from the header files
   foreach(headerFile ${library_HEADERS})
+    # extract the relative path information that is stored in the 'name' of the header file
+    # (they are potentially listed like 'math/sigmoids.h')
     string(REGEX REPLACE "((.*/)*).+$" "\\1" relativePathInfo "${headerFile}")
+    # add the header file to the 'make install' target
     install(FILES ${headerFile} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/${relativePathToHeaders}/${relativePathInfo})
   endforeach(headerFile)
 
+  # create moc files from those headers that contain the Q_OBJECT macro
   qt4_wrap_cpp(mocHeaders ${library_MOC_HEADERS})
   set(librarySources ${librarySources} ${mocHeaders})
 
+  # add the library and link it to all relevant cedar and third party libraries
+  set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName})
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${librarySources})
   target_link_libraries(${libraryName} ${CEDAR_THIRD_PARTY_LIBS} ${library_LINK_LIBRARIES})
 
+  # add the library to the 'make install' target
   install(TARGETS ${libraryName} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR})
 endmacro(cedar_add_library)
 
