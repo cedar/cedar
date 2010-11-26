@@ -33,6 +33,38 @@ double cedar::aux::math::sigmoidAbs(const double x, const double beta, const dou
   return 0.5 * (1. + beta * (x - threshold) / (1. + beta * fabs(x - threshold)));
 }
 
+template<typename T>
+cv::Mat cedar::aux::math::sigmoid(const cv::Mat& mat, const double beta, const double threshold = 0)
+{
+  cv::Mat result = mat.clone();
+  for (int col = 0; col < mat.cols; col++)
+  {
+    for (int row = 0; row < mat.rows; row++)
+    {
+      result.at<T>(row,col) = sigmoid(mat.at<T>(row,col),beta,threshold);
+    }
+  }
+  return result;
+}
+template cv::Mat cedar::aux::math::sigmoid<double>(const cv::Mat&, const double, const double);
+template cv::Mat cedar::aux::math::sigmoid<float>(const cv::Mat&, const double, const double);
+
+template<typename T>
+cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0)
+{
+  cv::Mat result = mat.clone();
+  for (int col = 0; col < mat.cols; col++)
+  {
+    for (int row = 0; row < mat.rows; row++)
+    {
+      result.at<T>(row,col) = sigmoidAbs(mat.at<T>(row,col),beta,threshold);
+    }
+  }
+  return result;
+}
+template cv::Mat cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, const double, const double);
+template cv::Mat cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, const double, const double);
+
 std::vector<double> cedar::aux::math::sigmoid(const std::vector<double>& x, const double beta, const double threshold)
 {
   std::vector<double> buffer;
