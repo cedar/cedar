@@ -1,1 +1,1 @@
-cedar_add_unit_test("")
+cedar_add_unit_test(coordinateTransformations main.cpp)
