@@ -19,7 +19,7 @@
 #include "TestClass.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

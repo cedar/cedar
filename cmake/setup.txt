@@ -10,7 +10,7 @@
 project(cedar)
 
 # set the directory for source code
-set(CEDAR_SOURCE_DIR "${CEDAR_HOME}/src")
+set(CEDAR_SOURCE_DIR "${CEDAR_HOME}/cedar")
 
 # append a 'cedar' subdirectory, so that the includes are bundled
 set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
@@ -109,7 +109,7 @@ foreach (libDir ${cedarLibDirs})
     string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libName "${libDir}")
 
     # add out-of-source directory tree
-    set(subDir "${CEDAR_BUILD_DIR}/src/${libName}/${CMAKE_BUILD_TYPE}")
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libName}/${CMAKE_BUILD_TYPE}")
 
     # add the library to the cedar libraries
     set(CEDAR_LIBS ${CEDAR_LIBS} ${libName})

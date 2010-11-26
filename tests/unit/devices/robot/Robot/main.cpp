@@ -13,10 +13,16 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
+// LOCAL INCLUDES
 #include "TestRobot.h"
-#include "src/devices/robot/Robot.h"
-#include "src/auxiliaries/LogFile.h"
+
+// PROJECT INCLUDES
+#include "cedar/devices/robot/Robot.h"
+#include "cedar/auxiliaries/LogFile.h"
+
+// SYSTEM INCLUDES
 #include <string>
+
 
 using namespace cedar::tests::unit::dev::robot::Robot;
 

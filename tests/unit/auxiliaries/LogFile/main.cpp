@@ -13,7 +13,7 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#include "src/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LogFile.h"
 #include <string>
 
 int main()

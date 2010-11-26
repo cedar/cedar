@@ -17,11 +17,11 @@
 
 // LOCAL INCLUDES
 #include "Thread.h"
-#include <QTime>
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QTime>
 
 using namespace std;
 

@@ -20,7 +20,7 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/Base.h"
+#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <vector>

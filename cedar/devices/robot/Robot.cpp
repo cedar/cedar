@@ -18,7 +18,7 @@
 #include "ComponentNotAvailableException.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <map>

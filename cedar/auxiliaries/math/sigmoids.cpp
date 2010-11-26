@@ -13,8 +13,13 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// includes
+// LOCAL INCLUDES
 #include "sigmoids.h"
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+
 
 using namespace std;
 
