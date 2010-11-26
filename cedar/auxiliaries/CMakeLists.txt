@@ -1,0 +1,28 @@
+cedar_add_library(cedaraux
+  Base.cpp
+  Thread.cpp
+  ConfigurationInterface.cpp
+  LogFile.cpp
+  exceptions/ExceptionBase.cpp
+  exceptions/NullPointerException.cpp
+  exceptions/IndexOutOfRangeException.cpp
+  math/sigmoids.h
+  math/sigmoids.cpp
+  math/tools.cpp
+  math/algebraTools.cpp
+  math/coordinateTransformations.cpp
+  math/screwCalculus.cpp
+  HEADERS
+  Base.h
+  Thread.h
+  ConfigurationInterface.h
+  LogFile.h
+  exceptions/ExceptionBase.h
+  exceptions/NullPointerException.h
+  exceptions/IndexOutOfRangeException.h
+  math/Limits.h
+  math/tools.h
+  math/algebraTools.h
+  math/coordinateTransformations.h
+  math/screwCalculus.h
+)
