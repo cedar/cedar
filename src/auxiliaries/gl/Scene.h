@@ -91,12 +91,15 @@ public:
    */
   cedar::aux::gl::Object* object(int index);
   
+  /*!@brief initializes lighting setup, can be called from different viewers */
+  void initLighting(); // do I need this?
+  
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief class initialization */
 	void init();
-  void initLighting(); // do I need this?
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

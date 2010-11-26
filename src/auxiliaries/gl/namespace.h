@@ -32,6 +32,7 @@ namespace cedar
     namespace gl
     {
       class Scene;
+      class Viewer;
       class Object;
       class Block;
     }
