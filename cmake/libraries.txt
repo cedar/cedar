@@ -40,7 +40,8 @@ set(CEDAR_THIRD_PARTH_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
 ########################################################################################################################
 # cedar libraries
 file(GLOB cedarLibDirs ${CEDAR_SOURCE_DIR}/*/)
-
+# clear CEDAR_LIBS
+set(CEDAR_LIBS CACHE INTERNAL "")
 # remove svn directory from list
 foreach (libDir ${cedarLibDirs})
   if (IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
@@ -50,13 +51,10 @@ foreach (libDir ${cedarLibDirs})
 
     # add out-of-source directory tree
     set(subDir "${CEDAR_BUILD_DIR}/cedar/${libName}/${CMAKE_BUILD_TYPE}")
-
-    # add the library to the cedar libraries
-    set(CEDAR_LIBS ${CEDAR_LIBS} ${libName})
-
+    # add the library to the cedar libraries (obsolete)
+    #set(CEDAR_LIBS ${CEDAR_LIBS} ${libName})
     # add the subdirectory
     add_subdirectory(${libDir} ${subDir})
 
   endif(IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
 endforeach(libDir)
-
