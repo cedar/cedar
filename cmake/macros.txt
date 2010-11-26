@@ -10,40 +10,55 @@ macro(cedar_add_unit_test)
   car(unitTestName ${unitTest_DEFAULT_ARGS})
   cdr(unitTestSources ${unitTest_DEFAULT_ARGS})
 
-  # remove the ${CEDAR_UNIT_TEST_DIR} from the current source path and save the result in 'unitTestSubdirectory'
-  string(REPLACE "${CEDAR_UNIT_TEST_DIR}/" "" unitTestSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
-  # extract the folder name from the current source path and remove it from 'unitTestSubdirectory'
-  string(REGEX REPLACE ".*/(.+)$" "\\1" unitTestFolderName "${CMAKE_CURRENT_SOURCE_DIR}")
-  string(REPLACE "/${unitTestFolderName}" "" unitTestSubdirectory "${unitTestSubdirectory}")
+  cedar_add_test(${unitTestName} ${unitTestSources} PREFIX "unitTest" DIRECTORY ${CEDAR_UNIT_TEST_DIR} ARGUMENTS unitTest_ARGUMENTS AUTOMATIC)
+endmacro(cedar_add_unit_test)
+
+macro(cedar_add_interactive_test)
+  parse_arguments(interactiveTest "ARGUMENTS" "" ${ARGN})
+  car(interactiveTestName ${interactiveTest_DEFAULT_ARGS})
+  cdr(interactiveTestSources ${interactiveTest_DEFAULT_ARGS})
+
+  cedar_add_test(${interactiveTestName} ${interactiveTestSources} PREFIX "interactiveTest" DIRECTORY ${CEDAR_INTERACTIVE_TEST_DIR} ARGUMENTS interactiveTest_ARGUMENTS)
+endmacro(cedar_add_interactive_test)
+
+macro(cedar_add_test)
+  parse_arguments(test "PREFIX;DIRECTORY;ARGUMENTS" "AUTOMATIC" ${ARGN})
+  car(testName ${test_DEFAULT_ARGS})
+  cdr(testSources ${test_DEFAULT_ARGS})
+
+  # remove the absolute part from the current source path and save the result in 'testSubdirectory'
+  string(REPLACE "${test_DIRECTORY}/" "" testSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
+  # extract the folder name from the current source path and remove it from 'testSubdirectory'
+  string(REGEX REPLACE ".*/(.+)$" "\\1" testFolderName "${CMAKE_CURRENT_SOURCE_DIR}")
+  string(REPLACE "/${testFolderName}" "" testSubdirectory "${testSubdirectory}")
 
   # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
   set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${unitTestSubdirectory})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${testSubdirectory})
 
-  # compose the name of the executable from a 'unitTest_' prefix and the unit test name
-  set(unitTestExecutableName "unitTest_${unitTestName}")
+  # compose the name of the executable from a given prefix and the test name
+  set(testExecutableName "${test_PREFIX}_${testName}")
   
   # add the executable with the given name, specifying all source files needed for compilation
   #
   # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
-  add_executable(${unitTestExecutableName} ${unitTestSources})
+  add_executable(${testExecutableName} ${testSources})
   
   # add the unit test to the CMake build system (will create a build target and run the test when calling 'make test')
   # This sets up the unit test so that it is run as if the executable were lying in the source path of the unit test,
   # so that you can put test configuration files into the source directory.
   #
   # add_test(<test identifier> <executable name> <arguments for the test>)
-  add_test(${unitTestName} ${CMAKE_COMMAND} -E chdir ${CEDAR_UNIT_TEST_DIR}/${unitTestSubdirectory}/${unitTestName} ${CEDAR_EXE_DIR}/${unitTestSubdirectory}/${unitTestExecutableName} ${unitTest_ARGUMENTS})
-  
-  # extract the name of the library from the unit test source path
-#  string(REGEX REPLACE "([^/]+)(/[^/]*)*$" "\\1" libraryName "${unitTestSubdirectory}")
+  if (test_AUTOMATIC)
+    add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})
+  endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable
-  target_link_libraries(${unitTestExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  target_link_libraries(${testExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
-endmacro(cedar_add_unit_test)
+endmacro(cedar_add_test)
 
 ########################################################################################################################
 
