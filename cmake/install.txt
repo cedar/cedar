@@ -1,0 +1,6 @@
+########################################################################################################################
+# install setup
+
+file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+install(FILES ${cedarHeaders} DESTINATION ${CEDAR_HEADER_INSTALL_DIR})
+
