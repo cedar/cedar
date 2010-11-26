@@ -1,29 +1,28 @@
 cedar_add_library(auxiliaries
-  Base.h
   Base.cpp
-  Thread.h
   Thread.cpp
-  ConfigurationInterface.h
   ConfigurationInterface.cpp
-  LogFile.h
   LogFile.cpp
-  exceptions/ExceptionBase.h
   exceptions/ExceptionBase.cpp
-  exceptions/NullPointerException.h
   exceptions/NullPointerException.cpp
-  exceptions/IndexOutOfRangeException.h
   exceptions/IndexOutOfRangeException.cpp
-  math/Limits.h
   math/sigmoids.h
   math/sigmoids.cpp
-  math/tools.h
   math/tools.cpp
-  math/algebraTools.h
   math/algebraTools.cpp
-  math/coordinateTransformations.h
   math/coordinateTransformations.cpp
-  math/screwCalculus.h
   math/screwCalculus.cpp
+  HEADERS
+  Base.h
+  Thread.h
+  ConfigurationInterface.h
+  LogFile.h
+  exceptions/ExceptionBase.h
+  exceptions/NullPointerException.h
+  exceptions/IndexOutOfRangeException.h
+  math/Limits.h
+  math/tools.h
+  math/algebraTools.h
+  math/coordinateTransformations.h
+  math/screwCalculus.h
 )
-
-#install(TARGETS auxiliaries LIBRARY DESTINATION "blub/lib")

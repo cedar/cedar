@@ -12,6 +12,9 @@ project(cedar)
 # set the directory for source code
 set(CEDAR_SOURCE_DIR "${CEDAR_HOME}/src")
 
+# append a 'cedar' subdirectory, so that the includes are bundled
+set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
+
 ########################################################################################################################
 # add preprocessor definitions 
 
@@ -143,9 +146,8 @@ endwhile (${numberOfSubdirectories} STRGREATER 0)
 ########################################################################################################################
 # install setup
 
-#message(STATUS "${CEDAR_SOURCE_DIR}")
-#file(GLOB_RECURSE cedarHeaders RELATIVE ${CEDAR_SOURCE_DIR} *.h)
-#message(STATUS "${cedarHeaders}")
+file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+install(FILES ${cedarHeaders} DESTINATION ${CEDAR_HEADER_INSTALL_DIR})
 
 ########################################################################################################################
 # CPack - cedar packaging setup
@@ -158,7 +160,7 @@ SET(CPACK_RESOURCE_FILE_LICENSE "${CEDAR_HOME}/license.txt")
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
 SET(CPACK_PACKAGE_VERSION_MINOR "1")
 SET(CPACK_PACKAGE_VERSION_PATCH "0")
-SET(CPACK_PACKAGE_INSTALL_DIRECTORY "moetCMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
 IF(WIN32 AND NOT UNIX)
   # There is a bug in NSI that does not handle full unix paths properly. Make
   # sure there is at least one set of four (4) backlasshes.
