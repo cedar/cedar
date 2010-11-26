@@ -17,8 +17,8 @@
 #include "TestObject.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/gl/object.h"
-#include "src/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

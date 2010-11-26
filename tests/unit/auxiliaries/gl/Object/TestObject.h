@@ -20,7 +20,7 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "src/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
 

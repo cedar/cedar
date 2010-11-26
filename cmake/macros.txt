@@ -151,7 +151,7 @@ macro(cedar_add_library)
   set(librarySources ${librarySources} ${mocHeaders})
 
   # add the library and link it to all relevant cedar and third party libraries
-  set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName})
+  set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${librarySources})
   target_link_libraries(${libraryName} ${CEDAR_THIRD_PARTY_LIBS} ${library_LINK_LIBRARIES})
 
