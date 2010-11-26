@@ -23,6 +23,7 @@
 // SYSTEM INCLUDES
 #include <math.h>
 #include <vector>
+#include <cv.h>
 
 /*
  *  different sigmoid functions for different data formats
@@ -40,6 +41,14 @@ namespace cedar
 
       //! an abs-based sigmoid for a single double value
       double sigmoidAbs(const double x, const double beta, const double threshold = 0);
+
+      //! an exponential-based sigmoid for a cv::Mat
+      template<typename T>
+      cv::Mat sigmoid(const cv::Mat& mat, const double beta, const double threshold = 0);
+
+      //! an abs-based sigmoid for a cv::Mat
+      template<typename T>
+      cv::Mat sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0);
 
       //! a sigmoid for a vector of doubles
       std::vector<double> sigmoid(const std::vector<double>& x, const double beta, const double threshold = 0);

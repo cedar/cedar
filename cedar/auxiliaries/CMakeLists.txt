@@ -12,6 +12,7 @@ cedar_add_library(cedaraux
   math/algebraTools.cpp
   math/coordinateTransformations.cpp
   math/screwCalculus.cpp
+  gui/BaseWidget.cpp
   HEADERS
   Base.h
   Thread.h
@@ -25,4 +26,7 @@ cedar_add_library(cedaraux
   math/algebraTools.h
   math/coordinateTransformations.h
   math/screwCalculus.h
+  gui/BaseWidget.h
+  MOC_HEADERS
+  gui/BaseWidget.h
 )
