@@ -17,7 +17,7 @@
 #include "TestComponent.h"
 
 // PROJECT INCLUDES
-#include "src/devices/robot/Component.h"
+#include "cedar/devices/robot/Component.h"
 
 // SYSTEM INCLUDES
 #include <string>

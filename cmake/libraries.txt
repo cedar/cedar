@@ -1,0 +1,62 @@
+########################################################################################################################
+# third party libraries
+
+# Qt
+find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
+include(${QT_USE_FILE})
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
+include_directories(${QT_INCLUDE_DIRS})
+
+# Boost
+if (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS ON)
+else (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS OFF)
+endif (${CMAKE_BUILD_STATIC_LIBS})
+
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost 1.40.0 COMPONENTS system date_time)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
+
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
+# OpenCV
+set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
+find_package(OpenCV REQUIRED)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
+
+# libconfig
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
+
+# libQGLViewer
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QGLViewer)
+
+# OpenGL
+find_package(OpenGL)
+set(CEDAR_THIRD_PARTH_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
+
+########################################################################################################################
+# cedar libraries
+file(GLOB cedarLibDirs ${CEDAR_SOURCE_DIR}/*/)
+
+# remove svn directory from list
+foreach (libDir ${cedarLibDirs})
+  if (IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
+
+    # get the name of the libary
+    string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libName "${libDir}")
+
+    # add out-of-source directory tree
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libName}/${CMAKE_BUILD_TYPE}")
+
+    # add the library to the cedar libraries
+    set(CEDAR_LIBS ${CEDAR_LIBS} ${libName})
+
+    # add the subdirectory
+    add_subdirectory(${libDir} ${subDir})
+
+  endif(IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
+endforeach(libDir)
+
