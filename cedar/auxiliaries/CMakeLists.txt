@@ -1,4 +1,4 @@
-cedar_add_library(auxiliaries
+cedar_add_library(cedaraux
   Base.cpp
   Thread.cpp
   ConfigurationInterface.cpp
