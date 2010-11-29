@@ -106,15 +106,17 @@ void KinematicChain::setJointVelocities(const cv::Mat& velocities)
   // TODO: Implementation (Bjoern Weghenkel)
 }
 
-void KinematicChain::setJointAcceleration(const unsigned int index, const double velocity)
+void KinematicChain::setJointAcceleration(const unsigned int index, const double acceleration)
 {
   // TODO: Implementation (Bjoern Weghenkel)
 }
-void KinematicChain::setJointAccelerations(const cv::Mat& velocities)
+
+void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
   // TODO: Implementation (Bjoern Weghenkel)
 }
-void KinematicChain::setJointAccelerations(const std::vector<double>& velocities)
+
+void KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
   // TODO: Implementation (Bjoern Weghenkel)
 }

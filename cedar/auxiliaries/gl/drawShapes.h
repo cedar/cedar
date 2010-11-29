@@ -125,10 +125,10 @@ namespace cedar
                      const int stacks,
                      const bool wireFrame=false);
       
-      /*!	draws a torus an ellipse in the xy-plane of the current frame
+      /*!	draws a torus around an ellipse in the xy-plane of the current frame
        * @param a    extension of the ellipse in x-direction of the current frame
        * @param b    extension of the ellipse in y-direction of the current frame
-       * @param thickness    distance of the torus walls to the ellipse in the xy-plane
+       * @param thickness    distance of the ellipse walls to the ellipse in the xy-plane
        * @param slices    number of orthogonal cuts through the torus (i.e. hyperplanes orthogonal to the xy-plane)
        * @param stacks    number of trapezoid plates used to approximate cylinder cut between two slices
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame

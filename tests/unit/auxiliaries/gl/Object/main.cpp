@@ -18,6 +18,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -29,7 +30,7 @@ using namespace cedar::aux;
 
 int main()
 {
-  LogFile log_file("ConfigurationInterface.log");
+  LogFile log_file("Object.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test
@@ -41,9 +42,13 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // wire frame
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: drawAsWireFrame" << std::endl;
+  log_file << "test: wire frame" << std::endl;
   object.drawAsWireFrame(true);
-  object.drawAsWireFrame(false);
+  if (!object.isDrawnAsWireFrame())
+  {
+    errors++;
+    log_file << "ERROR with wire frame" << std::endl;
+  }
   
   //--------------------------------------------------------------------------------------------------------------------
   // resolution

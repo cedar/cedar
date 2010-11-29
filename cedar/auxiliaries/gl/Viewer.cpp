@@ -27,9 +27,11 @@ using namespace std;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Viewer::Viewer(Scene* scene)
+Viewer::Viewer(cedar::aux::gl::Scene* const scene)
+:
+mpScene(scene)
 {
-  mpScene = scene;
+
 }
 
 Viewer::~Viewer()

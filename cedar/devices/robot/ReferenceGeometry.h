@@ -30,10 +30,10 @@
 #include <cv.h>
 
 
-/*!@brief Encapsulates values that describe the physical properties of a robot.
+/*!@brief Encapsulates values that describe the physical properties of a kinematic chain.
  *
- * Describes the position, axis and angle/velocity limits of all joints of a robot, as well as all properties of
- * all link segments relevant for computing trajectories in a dynamical model.
+ * Describes the position, axis and angle/velocity limits of all joints of a kinematic chain, as well as all properties
+ * of all link segments relevant for computing trajectories in a dynamical model.
  */
 class cedar::dev::robot::ReferenceGeometry : public cedar::aux::ConfigurationInterface
 {
@@ -49,11 +49,20 @@ protected:
     //! axis the joint moves in, in 3D space
     std::vector<double> axis;
     //! minimum and maximum angular values
-    cedar::aux::math::Limits<double> angleLimits;
+    cedar::aux::math::Limits angleLimits;
     //! minimum and maximum velocity values
-    cedar::aux::math::Limits<double> velocityLimits;
+    cedar::aux::math::Limits velocityLimits;
   };
 
+  //!@brief Describes the hardware properties of an end-effector.
+  struct EndEffector
+  {
+    //! position of a tool in 3D space
+    std::vector<double> position;
+    //! orientation of a tool in 3D space
+    std::vector<double> orientation;
+  };
+  
   //!@brief Describes the hardware properties of a link segment.
   struct LinkSegment
   {
@@ -68,12 +77,10 @@ protected:
 public:
   //! smart pointer definition for the Joint struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::Joint> JointPtr;
+  //! smart pointer definition for the Tool struct
+  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::EndEffector> EndEffectorPtr;
   //! smart pointer definition for the LinkSegment struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::LinkSegment> LinkSegmentPtr;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -89,6 +96,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the number of joints in the robot
+   *
+   * @return    number of joints
+   */
+  const unsigned int numberOfJoints() const;
+  
   /*!@brief Returns a pointer to a specific joint.
    *
    * @return    pointer to joint struct
@@ -96,6 +109,12 @@ public:
    */
   const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(const unsigned int index) const;
 
+  /*!@brief Returns a pointer to the end-effector.
+   *
+   * @return    pointer to endEffector struct
+   */
+  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& getEndEffector() const;
+  
   /*!@brief Returns a pointer to a specific link segment.
    *
    * @return    pointer to link segment struct
@@ -147,6 +166,8 @@ public:
 protected:
   //! vector of all joints
   std::vector<cedar::dev::robot::ReferenceGeometry::JointPtr> _mJoints;
+  //! end effector
+  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr _mEndEffector;
   //! vector of all link segments
   std::vector<cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr> _mLinkSegments;
   //! base position of the robot

@@ -142,6 +142,11 @@ void Object::drawAsWireFrame(bool state)
   mIsDrawnAsWireFrame = state;
 }
 
+bool Object::isDrawnAsWireFrame()
+{
+  return mIsDrawnAsWireFrame;
+}
+
 void Object::setResolution(int value)
 {
   mResolution = value;

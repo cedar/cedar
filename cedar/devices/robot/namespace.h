@@ -42,6 +42,12 @@ namespace cedar
       class KinematicChainModel;
       typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
 
+      class KinematicChainSimulation;
+      typedef boost::shared_ptr<KinematicChainSimulation> KinematicChainSimulationPtr;
+      
+      class KinematicChainVisualization;
+      typedef boost::shared_ptr<KinematicChainVisualization> KinematicChainVisualizationPtr;
+      
       class ReferenceGeometry;
       typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
 

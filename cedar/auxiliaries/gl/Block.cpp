@@ -29,7 +29,7 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Block::Block(std::string name)
+Block::Block(const std::string name)
 {
 	mName = name;
 	mLength = 3;
@@ -49,7 +49,7 @@ Block::Block(
              const double R,
              const double G,
              const double B
-           )
+            )
 {
 	mName = name;
 	mLength = length;

@@ -48,7 +48,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-  
+public:
   //!@brief draws a visualization of the object in the current GL context
   virtual void draw()=0;
   
@@ -99,6 +99,9 @@ public:
   
   //!@brief switch betwen drawing the object with full surfaces or as wire frame only
   void drawAsWireFrame(const bool state);
+
+  //!@brief get state of object being drawn with full surfaces or as wire frame only
+  bool isDrawnAsWireFrame();
   
   /*!@brief set the general resolution of the object, 10 is a usual value
    * @param value    new resolution value

@@ -34,7 +34,16 @@ namespace cedar
       class Scene;
       class Viewer;
       class Object;
+      class SceneWidget;
       class Block;
+      class Sphere;
+      class Cone;
+      class Cylinder;
+      class Prism;
+      class Pyramid;
+      class Torus;
+      class Ellipse;
+      class Chessboard;
     }
   }
 }

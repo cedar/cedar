@@ -91,7 +91,7 @@ void cedar::aux::gl::drawCone(const double floor,
   // TODO: check whether these have to be static ... what does static mean exactly anyways
 	static GLUquadric* quadric = gluNewQuadric();
 	glTranslatef(0.0, 0.0, floor);
-	gluCylinder(quadric, radiusFloor, radiusCeiling, radiusCeiling - floor, slices, 1);
+	gluCylinder(quadric, radiusFloor, radiusCeiling, ceiling - floor, slices, 1);
 	glTranslatef(0.0, 0.0, -floor);
 	if (wireFrame)
 	{

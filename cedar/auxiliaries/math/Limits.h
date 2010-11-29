@@ -28,7 +28,7 @@
  *
  * More detailed description of the struct.
  */
-template <typename T>
+//template <typename T>
 struct cedar::aux::math::Limits
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -37,28 +37,28 @@ struct cedar::aux::math::Limits
   //!@brief The standard constructor
   Limits() {};
   //!@brief Constructor that takes a minimum and maximum value
-  Limits(const T& newMin, const T& newMax) : min(newMin), max(newMax) {};
-  
-  //!@brief Copy constructor
-  template <typename U>
-  Limits(const Limits<U> &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
+//  Limits(const T& newMin, const T& newMax) : min(newMin), max(newMax) {};
+  Limits(const double& newMin, const double& newMax) : min(newMin), max(newMax) {};
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // methods
-  //--------------------------------------------------------------------------------------------------------------------
+  //!@brief Copy constructor
+//  template <typename U>
+//  Limits(const Limits<U> &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
+  Limits(const Limits &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  //! minimum limit
-  T min;
-  //! maximum limit
-  T max;
+  //! lower limit
+//  T min;
+  double min;
+  //! upper limit
+//  T max;
+  double max;
 
 }; // class cedar::aux::math::Limits
 
-template struct cedar::aux::math::Limits<double>;
-template struct cedar::aux::math::Limits<int>;
-template struct cedar::aux::math::Limits<unsigned int>;
+//template struct cedar::aux::math::Limits<double>;
+//template struct cedar::aux::math::Limits<int>;
+//template struct cedar::aux::math::Limits<unsigned int>;
 
 #endif // CEDAR_AUX_MATH_LIMITS_H

@@ -37,20 +37,20 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-	Viewer(cedar::aux::gl::Scene* scene);
+  Viewer(cedar::aux::gl::Scene* const scene);
 
   /*!@brief the constructor */
-	~Viewer();
+  ~Viewer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief draws all objects in the scene */
-	void draw();
+  void draw();
 
   /*!@brief function being called automatically when a timer is up, usually in a loop */
-	void timerEvent(QTimerEvent* pEvent);
+  void timerEvent(QTimerEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -62,7 +62,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  cedar::aux::gl::Scene* mpScene;
+  cedar::aux::gl::Scene* const mpScene;
 
 };
 

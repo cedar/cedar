@@ -33,7 +33,7 @@ public:
   /*!@brief standard constructor. 
    * @param name    identifier of the instance, should be unique
    */
-	Block(std::string name);
+	Block(const std::string name);
 
   /*!@brief constructor. 
    * @param name    identifier of the instance, should be unique
@@ -52,11 +52,12 @@ public:
         const double R=1,
         const double G=0,
         const double B=0
-        );
+       );
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+public:
   //!@brief draws a visualization of the object in the current GL context
 	void draw();
 
