@@ -1,6 +1,6 @@
-/*----------------------------------------------------------------------------------------------------------------------
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
  ----- File:        Object.cpp
  

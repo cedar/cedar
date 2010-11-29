@@ -24,15 +24,12 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Hendrik Reimann
-#   Email:       hendrik.reimann@ini.rub.de
-#   Date:        2010 11 29
+#   Maintainer:  <first name> <last name>
+#   Email:       <email address>
+#   Date:        <creation date YYYY MM DD>
 #
 #   Description:
 #
 #   Credits:
 #
 #=======================================================================================================================
-
-
-cedar_add_unit_test(algebraTools main.cpp)
