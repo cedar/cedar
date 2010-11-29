@@ -47,7 +47,7 @@ private:
   KinematicChain() {};  // disabled!
 public:
   //!@brief constructor
-  KinematicChain(unsigned numberOfJoints);
+  KinematicChain(unsigned numberOfJoints, unsigned stepSize = 1);
   //!@brief destructor
   virtual ~KinematicChain() = 0;
 
