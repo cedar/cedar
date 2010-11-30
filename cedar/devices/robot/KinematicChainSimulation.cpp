@@ -59,12 +59,12 @@ KinematicChainSimulation::~KinematicChainSimulation()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const double KinematicChainSimulation::getJointAngle(const unsigned int index) const
+double KinematicChainSimulation::getJointAngle(unsigned int index) const
 {
   return mJointAngles.at<double>(index, 0);
 }
 
-const std::vector<double> KinematicChainSimulation::getJointAngles(void) const
+std::vector<double> KinematicChainSimulation::getJointAngles(void) const
 {
   vector<double> angles;
   angles.resize(mNumberOfJoints);
@@ -75,7 +75,7 @@ const std::vector<double> KinematicChainSimulation::getJointAngles(void) const
   return angles;
 }
 
-const cv::Mat KinematicChainSimulation::getJointAnglesMatrix(void) const
+cv::Mat KinematicChainSimulation::getJointAnglesMatrix(void) const
 {
   // TODO: data should be locked, I guess - check what how to do that in cedar
   Mat angles;
@@ -83,7 +83,7 @@ const cv::Mat KinematicChainSimulation::getJointAnglesMatrix(void) const
   return angles;
 }
 
-void KinematicChainSimulation::setJointAngle(const unsigned int index, const double angle)
+void KinematicChainSimulation::setJointAngle(unsigned int index, double angle)
 {
   mJointAngles.at<double>(index, 0) = angle;
   mKinematicChainModel.calculateTransformations(mJointAngles);

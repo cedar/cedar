@@ -19,7 +19,7 @@
 // LOCAL INCLUDES
 #include "namespace.h"
 #include "Component.h"
-#include "auxiliaries/Thread.h"
+#include "cedar/auxiliaries/Thread.h"
 
 // PROJECT INCLUDES
 
@@ -43,6 +43,8 @@ class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, p
   // constructors and destructor
   //----------------------------------------------------------------------------
 public:
+  //!@brief constructor
+  KinematicChain();
   //!@brief constructor
   KinematicChain(unsigned numberOfJoints, unsigned stepSize = 1);
   //!@brief destructor
