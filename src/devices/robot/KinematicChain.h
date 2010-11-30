@@ -57,7 +57,7 @@ public:
 public:
   const ReferenceGeometryPtr& getReferenceGeometry() const;
   unsigned int getNumberOfJoints() const;
-  void setReferenceGeometry(const ReferenceGeometryPtr& geometry);
+  void setReferenceGeometry(const ReferenceGeometryPtr geometry);
 
   virtual double getJointAngle(unsigned int index) const = 0;
   virtual std::vector<double> getJointAngles() const = 0;
@@ -71,9 +71,9 @@ public:
   virtual std::vector<double> getJointAccelerations() const;
   virtual cv::Mat getJointAccelerationMatrix() const;
 
-  virtual void setJointAngle(unsigned int index, double angle) = 0;
-  virtual void setJointAngles(const cv::Mat& angleMatrix) = 0;
-  virtual void setJointAngles(const std::vector<double>& angles) = 0;
+  virtual void setJointAngle(unsigned int index, double angle);
+  virtual void setJointAngles(const cv::Mat& angleMatrix);
+  virtual void setJointAngles(const std::vector<double>& angles);
 
   virtual void setJointVelocity(unsigned int index, double velocity);
   virtual void setJointVelocities(const cv::Mat& velocities);
@@ -87,7 +87,9 @@ public:
   // protected methods
   //----------------------------------------------------------------------------
 protected:
-  // none yet
+
+  virtual void setJointAngleOnDevice(unsigned int index, double angle) = 0;
+
 
   //----------------------------------------------------------------------------
   // private methods
