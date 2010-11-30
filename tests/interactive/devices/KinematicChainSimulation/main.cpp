@@ -37,7 +37,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/robot/ReferenceGeometry.h"
-#include "cedar/devices/robot/KinematicChainSimulation.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -45,12 +45,18 @@
 using namespace std;
 using namespace cv;
 //using namespace cedar::aux::gl;
-//using namespace cedar::dev::robot;
+using namespace cedar::dev::robot;
 
 
 int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
+
+
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/home/reimajbi/srcMercurial/cedar.dev/tests/interactive/devices/KinematicChainSimulation/test_arm.conf"));
+  SimulatedKinematicChain test_arm(p_reference_geometry);
+  test_arm.setJointAngle(0, 1);
+
 
 //  ReferenceGeometry reference_geometry("/Users/reimajbi/src/cedar/tests/interactive/devices/KinematicChainSimulation/test_arm.conf");
 //  ReferenceGeometry reference_geometry("test_arm.conf");

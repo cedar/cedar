@@ -36,7 +36,7 @@
 
 
 #ifndef CEDAR_DEV_ROBOT_GUI_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_GUI_NAMESPACE_H
+#define CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 
 // LOCAL INCLUDES
 
@@ -53,13 +53,13 @@ namespace cedar
     namespace robot
     {
       //!@brief Namespace for widget classes.
-      namespace gui
+      namespace gl
       {
-        class KinematicChainVisualization;
-        typedef boost::shared_ptr<KinematicChainVisualization> KinematicChainVisualizationPtr;
+        class KinematicChain;
+        typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
       }
     }
   }
 }
 
-#endif // CEDAR_DEV_ROBOT_GUI_NAMESPACE_H
+#endif // CEDAR_DEV_ROBOT_GL_NAMESPACE_H

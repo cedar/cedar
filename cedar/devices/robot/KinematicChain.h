@@ -223,7 +223,6 @@ public:
   // none yet (hopefully never!)
 protected:
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
-  unsigned int mNumberOfJoints;
 
 private:
   // none yet

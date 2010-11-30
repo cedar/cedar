@@ -24,7 +24,7 @@
 
  ----- File:        Namespace.h
 
- ----- Author:      Mathis Richter
+ ----- Maintainer:  Mathis Richter
  ----- Email:       mathis.richter@ini.rub.de
  ----- Date:        2010 08 30
 
@@ -62,11 +62,8 @@ namespace cedar
       class KinematicChainModel;
       typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
 
-      class KinematicChainSimulation;
-      typedef boost::shared_ptr<KinematicChainSimulation> KinematicChainSimulationPtr;
-      
-      class KinematicChainVisualization;
-      typedef boost::shared_ptr<KinematicChainVisualization> KinematicChainVisualizationPtr;
+      class SimulatedKinematicChain;
+      typedef boost::shared_ptr<SimulatedKinematicChain> SimulatedKinematicChainPtr;
       
       class ReferenceGeometry;
       typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
