@@ -1,3 +1,39 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        setup.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: General setup of cedar.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
 ########################################################################################################################
 # CMake setup of cedar
 ########################################################################################################################
@@ -9,30 +45,21 @@
 # set the project name
 project(cedar)
 
-# clear list of libraries; this will be filled in the subdirectories
-unset(CedarLibraries)
-unset(CedarSources)
+# set the directory for source code
+set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
+# directory for all unit tests
+set (CEDAR_UNIT_TEST_DIR        "${CEDAR_HOME}/tests/unit")
+# directory for all interactive tests
+set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_HOME}/tests/interactive")
 
-########################################################################################################################
-# add preprocessor definitions 
-
-add_definitions(-Wall)
-add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
-
-########################################################################################################################
 # default output directory for lib files
-if (CEDAR_LIB_DIR)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}/${CMAKE_BUILD_TYPE}" CACHE STRING "Lib output directory" ${F})
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}/${CMAKE_BUILD_TYPE}" CACHE STRING "DLL/SO output directory" ${F})
-endif(CEDAR_LIB_DIR)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
 # default output directory for exe files
-if (CEDAR_EXE_DIR)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}" CACHE STRING "executable output directory" ${F})
-endif(CEDAR_EXE_DIR)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}")
 
-
-########################################################################################################################
-# library settings
+# append a 'cedar' subdirectory to the header install directory, so that the includes are bundled
+set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
 
 # Shared or static libraries?
 if (CEDAR_BUILD_STATIC_LIBS)
@@ -44,99 +71,13 @@ endif (CEDAR_BUILD_STATIC_LIBS)
 # include the cedar library directory in the library search path
 link_directories(${CEDAR_LIB_DIR})
 
-########################################################################################################################
-#include settings
-
-# add the source directory to the ones that need to be included
+# add the cedar home directory to the ones that need to be included
 include_directories(${CEDAR_HOME})
 
-########################################################################################################################
-# third party libraries
-
-# Qt
-find_package(Qt4 4.6.0 COMPONENTS QtCore REQUIRED)
-include(${QT_USE_FILE})
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
-include_directories(${QT_INCLUDE_DIRS})
-
-# Boost
-if (${CMAKE_BUILD_STATIC_LIBS})
-  set(Boost_USE_STATIC_LIBS ON)
-else (${CMAKE_BUILD_STATIC_LIBS})
-  set(Boost_USE_STATIC_LIBS OFF)
-endif (${CMAKE_BUILD_STATIC_LIBS})
-
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.40.0 COMPONENTS system date_time)
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
-
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
-# OpenCV
-set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
-find_package(OpenCV REQUIRED)
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
-
-# libconfig
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
-
-# OpenGL
-find_package(OpenGL)
-set(CEDAR_THIRD_PARTH_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
-
 
 ########################################################################################################################
-# testing settings
+# add preprocessor definitions 
 
-# enable unit tests via ctest
-enable_testing()
+add_definitions(-Wall)
+add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
-
-########################################################################################################################
-# cedar libraries
-file(GLOB cedarLibDirs ${CEDAR_SOURCE_DIR}/*/)
-
-# remove svn directory from list
-list(REMOVE_ITEM cedarLibDirs "${CEDAR_SOURCE_DIR}/.svn")
-foreach (libDir ${cedarLibDirs})
-  if (IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
-
-    # get the name of the libary
-    string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libName "${libDir}")
-
-    # add out-of-source directory tree
-    set(subDir "${CEDAR_BUILD_DIR}/src/${libName}/${CMAKE_BUILD_TYPE}")
-
-    # add the library to the cedar libraries
-    set(CEDAR_LIBS ${CEDAR_LIBS} ${libName})
-
-    # add the subdirectory
-    add_subdirectory(${libDir} ${subDir})
-
-  endif(IS_DIRECTORY ${libDir} AND EXISTS "${libDir}/CMakeLists.txt")
-endforeach(libDir)
-
-########################################################################################################################
-# cedar unit tests and demos
-list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_DEMO_DIR})
-list(LENGTH subdirectories numberOfSubdirectories)
-
-while (${numberOfSubdirectories} STRGREATER 0)
-  list(GET subdirectories 0 subdirectory)
-  list(REMOVE_AT subdirectories 0)
-
-  cedar_get_subdirectories(${subdirectory})
-
-  foreach(newSubdirectory ${returnedSubdirectories})
-
-    if (EXISTS "${newSubdirectory}/CMakeLists.txt")
-      add_subdirectory(${newSubdirectory})
-    endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
-
-    list(APPEND subdirectories ${newSubdirectory})
-  endforeach(newSubdirectory)
-
-  list(LENGTH subdirectories ${numberOfSubdirectories})
-endwhile (${numberOfSubdirectories} STRGREATER 0)

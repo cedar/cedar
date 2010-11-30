@@ -1,3 +1,39 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        CMakeLists.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description:
+#
+#   Credits:
+#
+#=======================================================================================================================
+
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -10,15 +46,22 @@ set(CEDAR_CONF_FILE ${CEDAR_HOME}/cedar.conf CACHE FILEPATH "Default configurati
 message (STATUS "including ${CEDAR_CONF_FILE} configuration file")
 include(${CEDAR_CONF_FILE})
 
-INCLUDE_DIRECTORIES( ${CEDAR_HOME}/src )
-
-set (CEDAR_SOURCE_DIR     "${CEDAR_HOME}/src"         CACHE PATH "Directory all library source code will be stored in.")
-set (CEDAR_CMAKE_DIR      "${CEDAR_HOME}/cmake"       CACHE PATH "Directory all additional CMake files will be stored in.")
-set (CEDAR_UNIT_TEST_DIR  "${CEDAR_HOME}/tests/unit"  CACHE PATH "Directory all unit tests will be stored in.")
-set (CEDAR_DEMO_DIR       "${CEDAR_HOME}/demos"       CACHE PATH "Directory all demos will be stored in.")
+set(CEDAR_CMAKE_DIR "${CEDAR_HOME}/cmake" CACHE PATH "Directory all additional CMake files will be stored in.")
 
 # include the macro section
 include(${CEDAR_CMAKE_DIR}/macros.txt)
 
-# go on with the setup of cedar
+# general setup of cedar variables
 include(${CEDAR_CMAKE_DIR}/setup.txt)
+
+# setup of all cedar and third party libraries
+include(${CEDAR_CMAKE_DIR}/libraries.txt)
+
+# setup of unit and interactive tests
+include(${CEDAR_CMAKE_DIR}/testing.txt)
+
+# setup of files that are installed (additionally to the libraries)
+include(${CEDAR_CMAKE_DIR}/install.txt)
+
+# setup of packaging
+include(${CEDAR_CMAKE_DIR}/packaging.txt)
