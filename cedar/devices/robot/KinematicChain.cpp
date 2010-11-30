@@ -47,7 +47,9 @@ using namespace cedar::dev::robot;
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-KinematicChain::KinematicChain()
+KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+:
+mpReferenceGeometry(rpReferenceGeometry)
 {
 }
 

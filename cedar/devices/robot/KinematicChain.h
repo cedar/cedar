@@ -63,7 +63,7 @@ class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain();
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
   //!@brief destructor
   virtual ~KinematicChain() = 0;
 

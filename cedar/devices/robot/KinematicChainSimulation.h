@@ -40,12 +40,8 @@
 #include "namespace.h"
 #include "ReferenceGeometry.h"
 #include "KinematicChain.h"
-#include "KinematicChainModel.h"
-#include "KinematicChainVisualization.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/auxiliaries/gl/Viewer.h"
 
 // SYSTEM INCLUDES
 #include <cv.h>
@@ -64,7 +60,7 @@ public:
   //!@brief constructor
 //  KinematicChainSimulation();
   //!@brief constructor
-  KinematicChainSimulation(cedar::dev::robot::ReferenceGeometry* pReferenceGeometry);
+  KinematicChainSimulation(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
   //!@brief destructor
   ~KinematicChainSimulation();
   
@@ -120,16 +116,6 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
-  KinematicChainModel mKinematicChainModel;
-//  KinematicChainModelPtr mpKinematicChainModel;
-  KinematicChainVisualization mKinematicChainVisualization;
-  cedar::aux::gl::Scene mScene;
-  cedar::aux::gl::Viewer mViewer;
-  
-  //TODO: use smart pointers
-  //TODO: provide access functions to scene and viewer
-  
   //! vector of joint angles, in radians
   cv::Mat mJointAngles;
   

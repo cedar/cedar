@@ -59,14 +59,10 @@ using namespace cv;
 //  init();
 //}
 
-KinematicChainSimulation::KinematicChainSimulation(cedar::dev::robot::ReferenceGeometry* pReferenceGeometry)
+KinematicChainSimulation::KinematicChainSimulation(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-mKinematicChainModel(pReferenceGeometry),
-mKinematicChainVisualization(&mKinematicChainModel),
-mScene(),
-mViewer(&mScene)
+KinematicChain(rpReferenceGeometry)
 {
-  std::cout << "running KinematicChainSimulation(cedar::dev::robot::ReferenceGeometry* pReferenceGeometry)" << endl;
   init();
 }
 
@@ -106,14 +102,12 @@ const cv::Mat KinematicChainSimulation::getJointAnglesMatrix(void) const
 void KinematicChainSimulation::setJointAngle(const unsigned int index, const double angle)
 {
   mJointAngles.at<double>(index, 0) = angle;
-  mKinematicChainModel.calculateTransformations(mJointAngles);
 }
 
 void KinematicChainSimulation::setJointAngles(const cv::Mat& angleMatrix)
 {
   // TODO: assert that the passed matrix has the right size
   mJointAngles = angleMatrix;
-  mKinematicChainModel.calculateTransformations(mJointAngles);
 }
 
 void KinematicChainSimulation::setJointAngles(const std::vector<double>& angles)
@@ -123,36 +117,9 @@ void KinematicChainSimulation::setJointAngles(const std::vector<double>& angles)
   {
     mJointAngles.at<double>(j, 0) = angles[j];
   }
-  mKinematicChainModel.calculateTransformations(mJointAngles);
 }
 
 void KinematicChainSimulation::init(void)
 {
-  mScene.addObject(&mKinematicChainVisualization);
-  mScene.setSceneLimit(2);
-  mScene.drawFloor(true);
-  
-  mViewer.show();
-  mViewer.setSceneRadius(3);
-  mViewer.startTimer(50);
-  
-  mNumberOfJoints = mKinematicChainModel.numberOfJoints();
   mJointAngles = Mat::zeros(mNumberOfJoints, 1, CV_64FC1);
-  mKinematicChainModel.calculateTransformations(mJointAngles);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
