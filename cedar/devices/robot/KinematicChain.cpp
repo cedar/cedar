@@ -35,6 +35,7 @@
 
 // LOCAL INCLUDES
 #include "KinematicChain.h"
+#include "ReferenceGeometry.h"
 
 // PROJECT INCLUDES
 
@@ -69,7 +70,7 @@ const ReferenceGeometryPtr& KinematicChain::getReferenceGeometry() const
 
 const unsigned int KinematicChain::getNumberOfJoints() const
 {
-  return mNumberOfJoints;
+  return mpReferenceGeometry->numberOfJoints();
 }
 
 void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)

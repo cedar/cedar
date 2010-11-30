@@ -22,19 +22,19 @@
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
  
- ----- File:        KinematicChainSimulation.h
+ ----- File:        SimulatedKinematicChain.h
  
  ----- Maintainer:  Hendrik Reimann
  ----- Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 11 06
  
- ----- Description: Header for the \em cedar::dev::robot::KinematicChainSimulation class.
+ ----- Description: Header for the \em cedar::dev::robot::SimulatedKinematicChain class.
  
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#ifndef CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_SIMULATION_H
-#define CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_SIMULATION_H
+#ifndef CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
+#define CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
 
 // LOCAL INCLUDES
 #include "namespace.h"
@@ -51,18 +51,16 @@
  * This class provides a simulation of a kinematic chain determined by the specified reference geometry.
  * The current configuration state of the kinematic chain is represented by a vector of joint angles
  */
-class cedar::dev::robot::KinematicChainSimulation : public cedar::dev::robot::KinematicChain
+class cedar::dev::robot::SimulatedKinematicChain : public cedar::dev::robot::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-//  KinematicChainSimulation();
-  //!@brief constructor
-  KinematicChainSimulation(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  SimulatedKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
   //!@brief destructor
-  ~KinematicChainSimulation();
+  ~SimulatedKinematicChain();
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -119,6 +117,6 @@ private:
   //! vector of joint angles, in radians
   cv::Mat mJointAngles;
   
-}; // class cedar::dev::robot::KinematicChainSimulation
+}; // class cedar::dev::robot::SimulatedKinematicChain
 
-#endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_SIMULATION_H
+#endif // CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
