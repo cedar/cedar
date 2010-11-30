@@ -79,6 +79,7 @@ void cedar::aux::Thread::run(void)
 
   while (!mStop)
   {
+    cout << "mStop = true" << endl;
 
     // sleep until next wake up time
     msleep(std::max<int>(0, QTime::currentTime().msecsTo(scheduledWakeup)));
