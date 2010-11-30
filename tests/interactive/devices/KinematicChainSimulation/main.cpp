@@ -24,18 +24,18 @@
 
 using namespace std;
 using namespace cv;
-using namespace cedar::aux::gl;
-using namespace cedar::dev::robot;
+//using namespace cedar::aux::gl;
+//using namespace cedar::dev::robot;
 
 
 int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-  ReferenceGeometry reference_geometry("/Users/reimajbi/src/cedar/tests/interactive/devices/KinematicChainSimulation/test_arm.conf");
+//  ReferenceGeometry reference_geometry("/Users/reimajbi/src/cedar/tests/interactive/devices/KinematicChainSimulation/test_arm.conf");
 //  ReferenceGeometry reference_geometry("test_arm.conf");
 //  KinematicChainModel test_arm_model(&reference_geometry);
-  KinematicChainSimulation test_arm(&reference_geometry);
+//  KinematicChainSimulation test_arm(&reference_geometry);
 
 //  KinematicChainSimulation test_arm;
   
