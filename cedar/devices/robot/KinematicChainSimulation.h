@@ -56,27 +56,27 @@ public:
    *
    * @return    joint angle value
    */
-  const double getJointAngle(const unsigned int index) const;
+  double getJointAngle(unsigned int index) const;
   
   /*!@brief get current state of all joint angles
    *
    * @param index    specifies the joint
    * @return    vector of joint angles
    */
-  const std::vector<double> getJointAngles(void) const;
+  std::vector<double> getJointAngles(void) const;
   
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  const cv::Mat getJointAnglesMatrix(void) const;
+  cv::Mat getJointAnglesMatrix(void) const;
   
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
    * @param angle    new joint angle value
    */
-  void setJointAngle(const unsigned int index, const double angle);
+  void setJointAngle(unsigned int index, const double angle);
   
   /*!@brief set current state of all joint angles
    *

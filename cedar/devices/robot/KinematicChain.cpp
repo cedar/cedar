@@ -31,6 +31,11 @@ using namespace cedar::dev::robot;
 //------------------------------------------------------------------------------
 
 //! constructor
+KinematicChain::KinematicChain()
+{
+}
+
+//! constructor
 KinematicChain::KinematicChain(unsigned numberOfJoints, unsigned stepSize) : Thread(stepSize)
 {
   mNumberOfJoints = numberOfJoints;
