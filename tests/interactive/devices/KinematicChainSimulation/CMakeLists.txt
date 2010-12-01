@@ -1,1 +1,0 @@
-cedar_add_interactive_test("KinematicChainSimulation" main.cpp)
