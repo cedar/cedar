@@ -52,10 +52,9 @@ int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/home/reimajbi/srcMercurial/cedar.dev/tests/interactive/devices/KinematicChainSimulation/test_arm.conf"));
-  SimulatedKinematicChain test_arm(p_reference_geometry);
-  test_arm.setJointAngle(0, 1);
+//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/home/reimajbi/srcMercurial/cedar.dev/tests/interactive/devices/KinematicChainSimulation/test_arm.conf"));
+//  SimulatedKinematicChain test_arm(p_reference_geometry);
+//  test_arm.setJointAngle(0, 1);
 
 
 //  ReferenceGeometry reference_geometry("/Users/reimajbi/src/cedar/tests/interactive/devices/KinematicChainSimulation/test_arm.conf");
