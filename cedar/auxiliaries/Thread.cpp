@@ -89,18 +89,14 @@ void cedar::aux::Thread::stop(unsigned time, bool suppressWarning)
 
 void cedar::aux::Thread::run(void)
 {
-  mStop = false;
-
   // some auxiliary variables
   QTime lastWakeup = QTime::currentTime();
   QTime scheduledWakeup = lastWakeup.addMSecs(mStepSize);
   QTime tmpTime;
   srand(QTime::currentTime().msec());
 
-  while (!mStop)
+  while(!mStop)
   {
-    cout << "mStop = true" << endl;
-
     // sleep until next wake up time
     msleep(std::max<int>(0, QTime::currentTime().msecsTo(scheduledWakeup)));
 
@@ -130,8 +126,11 @@ void cedar::aux::Thread::run(void)
     // if the execution lasted unexpectedly long, we'd like to wake up for
     // the next regular time step
     while (scheduledWakeup < QTime::currentTime())
+    {
       scheduledWakeup = scheduledWakeup.addMSecs(mStepSize);
-  }
+    }
+
+  } // while(!mStop)
 
   mStop = false;
   return;
@@ -151,10 +150,12 @@ void cedar::aux::Thread::updateStatistics(unsigned stepsTaken)
 
   mNumberOfSteps++;
   mSumOfStepsTaken += stepsTaken;
-  if (stepsTaken > mMaxStepsTaken)
+  if(stepsTaken > mMaxStepsTaken)
+  {
     mMaxStepsTaken = stepsTaken;
+  }
 
-  if (oldSum > mSumOfStepsTaken)
+  if(oldSum > mSumOfStepsTaken)
   {
     cerr << "Warning: Value overflow in thread statistics. Statistics will be reseted." << endl;
     initStatistics();
@@ -164,6 +165,9 @@ void cedar::aux::Thread::updateStatistics(unsigned stepsTaken)
 }
 
 void cedar::aux::Thread::singleStep() {
-  if( !isRunning() )
+  if(!isRunning())
+  {
     step(mStepSize);
+  }
+
 }
