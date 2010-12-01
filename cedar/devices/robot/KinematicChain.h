@@ -81,7 +81,7 @@ public:
    *
    * @return    number of joints
    */
-  const unsigned int getNumberOfJoints() const;
+  unsigned int getNumberOfJoints() const;
   
   /*!@brief set a new reference geometry
    *
