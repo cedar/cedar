@@ -41,6 +41,8 @@
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <cv.h>
 
 using namespace cedar::dev::robot;
 using namespace cedar::aux;
@@ -59,7 +61,7 @@ int main()
   SimulatedKinematicChain test_arm(p_reference_geometry);
   
   //--------------------------------------------------------------------------------------------------------------------
-  // setting a single angle
+  // single angle
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: single angle functions" << std::endl;
   test_arm.setJointAngle(0, 1);
@@ -76,8 +78,48 @@ int main()
     errors++;
     log_file << "ERROR with setJointAngle() or getJointAngle()" << std::endl;
   }
-  // ...
   
+  //--------------------------------------------------------------------------------------------------------------------
+  // std::vector of angle values
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: std::vector angle functions" << std::endl;
+  std::vector<double> angle_vector;
+  angle_vector.push_back(0.5);
+  angle_vector.push_back(1.5);
+  angle_vector.push_back(2.5);
+  angle_vector.push_back(3.5);
+  test_arm.setJointAngles(angle_vector);
+  if (
+      !IsZero(test_arm.getJointAngles()[0] - 0.5)
+      || !IsZero(test_arm.getJointAngles()[1] - 1.5)
+      || !IsZero(test_arm.getJointAngles()[2] - 2.5)
+      || !IsZero(test_arm.getJointAngles()[3] - 3.5)
+      )
+  {
+    errors++;
+    log_file << "ERROR with setJointAngles() or getJointAngles()" << std::endl;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // cv::Mat of angle values
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: cv::Mat angle functions" << std::endl;
+  cv::Mat angle_matrix = cv::Mat::zeros(4, 1, CV_64FC1);
+  angle_matrix.at<double>(0, 0) = 0.1;
+  angle_matrix.at<double>(1, 0) = 0.2;
+  angle_matrix.at<double>(2, 0) = 0.3;
+  angle_matrix.at<double>(3, 0) = 0.4;
+  test_arm.setJointAngles(angle_matrix);
+  if (
+      !IsZero(test_arm.getJointAnglesMatrix().at<double>(0, 0) - 0.1)
+      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(1, 0) - 0.2)
+      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(2, 0) - 0.3)
+      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(3, 0) - 0.4)
+      )
+  {
+    errors++;
+    log_file << "ERROR with setJointAnglesMatrix() or getJointAnglesMatrix()" << std::endl;
+  }
   
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
