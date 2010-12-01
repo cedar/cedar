@@ -1,142 +1,355 @@
-/*======================================================================================================================
+/*------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ ----- File:        KinematicChain.cpp
 
-    This file is part of cedar.
+ ----- Author:      Mathis Richter
+                    Bjoern Weghenkel
+ ----- Email:       mathis.richter@ini.rub.de
+                    bjoern.weghenkel@ini.ruhr-uni-bochum.de
+ ----- Date:        2010 11 25
 
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
+ ----- Description: Header for the @em cedar::aux::KinematicChain class.
 
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        KinematicChain.cpp
-
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 15
-
-    Description: Chain of joints (e.g., a robotic arm).
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- Credits:
+ -----------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
 #include "KinematicChain.h"
+#include "ReferenceGeometry.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+using namespace std;
 using namespace cedar::dev::robot;
 
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //! constructor
 KinematicChain::KinematicChain()
 {
 }
 
+//! constructor
+KinematicChain::KinematicChain(unsigned numberOfJoints, unsigned stepSize) : Thread(stepSize)
+{
+  mNumberOfJoints = numberOfJoints;
+  mJointAngles.resize(mNumberOfJoints);
+  mJointVelocities.resize(mNumberOfJoints);
+  mJointAccelerations.resize(mNumberOfJoints);
+  mJointWorkingModes.resize(mNumberOfJoints);
+  return;
+}
+
+
 //! destructor
 KinematicChain::~KinematicChain()
 {
 }
 
-//----------------------------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 // methods
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 const ReferenceGeometryPtr& KinematicChain::getReferenceGeometry() const
 {
   return mpReferenceGeometry;
 }
 
-const unsigned int KinematicChain::getNumberOfJoints() const
+
+unsigned int KinematicChain::getNumberOfJoints() const
 {
   return mNumberOfJoints;
 }
 
-void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)
+
+void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr rpGeometry)
 {
   mpReferenceGeometry = rpGeometry;
 }
 
-const double KinematicChain::getJointVelocity(const unsigned int index) const
+
+double KinematicChain::getJointVelocity(unsigned int index) const
 {
-  // TODO: Implementation (Bjoern Weghenkel)
-  return 0.0;
-}
-const std::vector<double> KinematicChain::getJointVelocities() const
-{
-  // TODO: Implementation (Bjoern Weghenkel)
-  std::vector<double> dummy;
-  return dummy;
-}
-const cv::Mat KinematicChain::getJointVelocitiesMatrix() const
-{
-  // TODO: Implementation (Bjoern Weghenkel)
-  return cv::Mat();
+  if(index >= mNumberOfJoints)
+    return 0.0;
+  return mJointVelocities[index];
 }
 
-const double KinematicChain::getJointAcceleration(const unsigned int index) const
-{
-  // TODO: Implementation (Bjoern Weghenkel)
-  return 0.0;
-}
 
-const std::vector<double> KinematicChain::getJointAccelerations() const
+std::vector<double> KinematicChain::getJointVelocities() const
 {
-  // TODO: Implementation (Bjoern Weghenkel)
-  std::vector<double> dummy;
+  std::vector<double> dummy(mJointVelocities);
   return dummy;
 }
 
-const cv::Mat KinematicChain::getJointAccelerationMatrix() const
+
+cv::Mat KinematicChain::getJointVelocitiesMatrix() const
 {
-  // TODO: Implementation (Bjoern Weghenkel)
-  return cv::Mat();
+  cv::Mat dummy(mNumberOfJoints, 1, CV_32F);
+  for (unsigned i = 0; i < mNumberOfJoints; i++)
+    dummy.at<double>(i,0) = mJointVelocities[i];
+  return dummy;
 }
 
-void KinematicChain::setJointVelocity(const unsigned int index, const double velocity)
+
+double KinematicChain::getJointAcceleration(unsigned int index) const
 {
-  // TODO: Implementation (Bjoern Weghenkel)
+  if(index >= mNumberOfJoints)
+    return 0.0;
+  return mJointAccelerations[index];
 }
+
+
+std::vector<double> KinematicChain::getJointAccelerations() const
+{
+  std::vector<double> dummy(mJointAccelerations);
+  return dummy;
+}
+
+
+cv::Mat KinematicChain::getJointAccelerationMatrix() const
+{
+  cv::Mat dummy(mNumberOfJoints, 1, CV_32F);
+  for (unsigned i = 0; i < mNumberOfJoints; i++)
+    dummy.at<double>(i,0) = mJointAccelerations[i];
+  return dummy;
+}
+
+
+void KinematicChain::setJointAngle(unsigned index, double angle)
+{
+
+  if(index >= mNumberOfJoints)
+    return;
+
+  angle = max<double>( angle, mpReferenceGeometry->getJoint(index)->angleLimits.min );
+  angle = min<double>( angle, mpReferenceGeometry->getJoint(index)->angleLimits.max );
+
+  mJointAngles[index] = angle;
+  mJointWorkingModes[index] = ANGLE;
+
+  return;
+}
+
+
+void KinematicChain::setJointAngles(const std::vector<double>& angles)
+{
+
+  if(angles.size() != mNumberOfJoints)
+    return;
+
+  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+
+    double angle = angles[i];
+    angle = max<double>( angle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
+    angle = min<double>( angle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
+
+    mJointAngles[i] = angle;
+    mJointWorkingModes[i] = ANGLE;
+
+  }
+
+  return;
+}
+
+
+void KinematicChain::setJointAngles(const cv::Mat& angles)
+{
+
+  if(angles.size().height != (int)mNumberOfJoints || angles.size().width != 1)
+    return;
+
+  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+
+    double angle = angles.at<double>(i,0);
+
+    angle = max<double>( angle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
+    angle = min<double>( angle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
+
+    mJointAngles[i] = angle;
+    mJointWorkingModes[i] = ANGLE;
+  }
+
+  return;
+}
+
+
+void KinematicChain::setJointVelocity(unsigned index, double velocity)
+{
+
+  if(index >= mNumberOfJoints)
+    return;
+
+  velocity = max<double>( velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min );
+  velocity = min<double>( velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max );
+
+  mJointVelocities[index] = velocity;
+  mJointWorkingModes[index] = VELOCITY;
+
+  return;
+}
+
 
 void KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
-  // TODO: Implementation (Bjoern Weghenkel)
+
+  if(velocities.size() != mNumberOfJoints)
+    return;
+
+  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+
+    double velocity = velocities[i];
+    velocity = max<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
+    velocity = min<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
+
+    mJointVelocities[i] = velocity;
+    mJointWorkingModes[i] = VELOCITY;
+
+  }
+
+  return;
 }
+
 
 void KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
-  // TODO: Implementation (Bjoern Weghenkel)
+
+  if(velocities.size().height != (int)mNumberOfJoints || velocities.size().width != 1)
+    return;
+
+  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+
+    double velocity = velocities.at<double>(i,0);
+
+    velocity = max<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
+    velocity = min<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
+
+    mJointVelocities[i] = velocity;
+    mJointWorkingModes[i] = VELOCITY;
+  }
+
+  return;
 }
 
-void KinematicChain::setJointAcceleration(const unsigned int index, const double velocity)
+
+void KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
-  // TODO: Implementation (Bjoern Weghenkel)
+  if(index >= mNumberOfJoints)
+    return;
+  mJointAccelerations[index] = acceleration;
+  mJointWorkingModes[index] = ACCELERATION;
 }
-void KinematicChain::setJointAccelerations(const cv::Mat& velocities)
+
+
+void KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
-  // TODO: Implementation (Bjoern Weghenkel)
+  if(accelerations.size() != mNumberOfJoints)
+    return;
+  mJointAccelerations = accelerations;
+  for(unsigned i = 0; i < mNumberOfJoints; i++)
+    mJointWorkingModes[i] = ACCELERATION;
 }
-void KinematicChain::setJointAccelerations(const std::vector<double>& velocities)
+
+
+void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
-  // TODO: Implementation (Bjoern Weghenkel)
+  if(accelerations.size().height != (int)mNumberOfJoints || accelerations.size().width != 1)
+    return;
+  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+    mJointAccelerations[i] = accelerations.at<double>(i,0);
+    mJointWorkingModes[i] = ACCELERATION;
+  }
+}
+
+
+void KinematicChain::step(unsigned time) {
+
+  cout << "step" << endl;
+
+  double currentAngle = 0.0;
+  double newAngle = 0.0;
+  double velocity = 0.0;
+
+  // update joint angle depending on working mode
+  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+
+    // get current joint angle from the device
+    currentAngle = getJointAngle(i);
+    cout << "currentAngle = " << currentAngle << endl;
+
+    // update the angle according to working mode
+    switch(mJointWorkingModes[i]) {
+
+    case ANGLE:
+
+      // calculate velocity
+      newAngle = mJointAngles[i];
+      cout << "newAngle = " << newAngle << endl;
+      velocity = ( newAngle - currentAngle ) * ( 1000.0 / (double) time );
+      cout << "velocity = " << velocity << endl;
+
+      // consider limits
+      newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
+      newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
+      cout << "newAngle* = " << newAngle << endl;
+
+      // apply new values
+      setJointAngleOnDevice( i, newAngle );
+      mJointVelocities[i] = velocity;
+
+      break;
+
+    case VELOCITY:
+
+      // calculate new angle
+      velocity = mJointVelocities[i];
+      newAngle = currentAngle + velocity * ( (double) time / 1000.0 );
+      cout << "newAngle = " << newAngle << endl;
+
+      // consider angle limits
+      newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
+      newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
+      cout << "newAngle* = " << newAngle << endl;
+
+      // set new joint angle
+      setJointAngleOnDevice( i, newAngle );
+      mJointAngles[i] = newAngle;
+
+      break;
+
+    case ACCELERATION:
+
+      velocity = mJointVelocities[i] + mJointAccelerations[i] * ( (double) time / 1000.0 );
+
+      // consider velocity limits
+      velocity = max( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
+      velocity = min( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
+
+      newAngle = currentAngle + velocity * ( (double) time / 1000.0 );
+
+      // consider angle limits
+      newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
+      newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
+
+      // set new values
+      setJointAngleOnDevice( i, newAngle );
+      mJointAngles[i] = newAngle;
+      mJointVelocities[i] = velocity;
+
+      break;
+
+    default:
+      cerr << "Oh oh, something went terribly wrong here!" << endl;
+    }
+
+  }
+
+  return;
 }

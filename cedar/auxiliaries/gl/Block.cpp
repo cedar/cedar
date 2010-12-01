@@ -2,38 +2,16 @@
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
  
-    This file is part of cedar.
-
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
-
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        Block.cpp
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 25
-
-    Description: Visualization for a block, i.e., a parallelepiped with rectangular sides
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- File:        Block.cpp
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ------Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 25
+ 
+ ----- Description: visualization for a block, i.e. a parallelepiped with rectangular sides
+ 
+ ----- Credits:     
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
 #include "drawShapes.h"
@@ -51,7 +29,7 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Block::Block(std::string name)
+Block::Block(const std::string name)
 {
 	mName = name;
 	mLength = 3;
@@ -71,7 +49,7 @@ Block::Block(
              const double R,
              const double G,
              const double B
-           )
+            )
 {
 	mName = name;
 	mLength = length;

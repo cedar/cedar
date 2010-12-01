@@ -36,6 +36,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+#set(CMAKE_BUILD_TYPE Debug)
+
 # set the cedar home directory to the current directory
 set(CEDAR_HOME ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Home of cedar; should NOT be altered.")
 

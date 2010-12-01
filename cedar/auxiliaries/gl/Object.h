@@ -22,18 +22,16 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.h
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 27
-
-    Description: Virtual class for a simple object geometry for visualization with OpenGL
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- File:        Object.h
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ------Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 10 27
+ 
+ ----- Description: virtual class for a simple object geometry for visualization with OpenGL
+ 
+ ----- Credits:     
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_AUX_GL_OBJECT_H
 #define CEDAR_AUX_GL_OBJECT_H
@@ -70,7 +68,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-  
+public:
   //!@brief draws a visualization of the object in the current GL context
   virtual void draw()=0;
   
@@ -121,6 +119,9 @@ public:
   
   //!@brief switch betwen drawing the object with full surfaces or as wire frame only
   void drawAsWireFrame(const bool state);
+
+  //!@brief get state of object being drawn with full surfaces or as wire frame only
+  bool isDrawnAsWireFrame();
   
   /*!@brief set the general resolution of the object, 10 is a usual value
    * @param value    new resolution value

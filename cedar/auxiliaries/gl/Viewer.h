@@ -1,39 +1,17 @@
-/*======================================================================================================================
-
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet-Bochum
+                    Institut fuer Neuroinformatik
  
-    This file is part of cedar.
-
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
-
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        Viewer.h
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 28
-
-    Description: Simple viewer for visualizing a scene of objects
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- File:        Viewer.h
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ------Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 10 28
+ 
+ ----- Description: simple viewer for visualizing a Scene of Objects
+ 
+ ----- Credits:     
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_AUX_GL_VIEWER_H
 #define CEDAR_AUX_GL_VIEWER_H
@@ -59,20 +37,20 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-	Viewer(cedar::aux::gl::Scene* scene);
+  Viewer(cedar::aux::gl::Scene* const scene);
 
   /*!@brief the constructor */
-	~Viewer();
+  ~Viewer();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief draws all objects in the scene */
-	void draw();
+  void draw();
 
   /*!@brief function being called automatically when a timer is up, usually in a loop */
-	void timerEvent(QTimerEvent* pEvent);
+  void timerEvent(QTimerEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -84,7 +62,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  cedar::aux::gl::Scene* mpScene;
+  cedar::aux::gl::Scene* const mpScene;
 
 };
 

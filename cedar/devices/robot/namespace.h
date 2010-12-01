@@ -1,39 +1,17 @@
-/*======================================================================================================================
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ ----- File:        Namespace.h
 
-    This file is part of cedar.
+ ----- Author:      Mathis Richter
+ ----- Email:       mathis.richter@ini.rub.de
+ ----- Date:        2010 08 30
 
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
+ ----- Description: Namespace file for cedar::dev::robot.
 
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        namespace.h
-
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
-
-    Description: Namespace file for cedar::dev::robot.
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- Credits:
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_DEV_ROBOT_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
@@ -64,6 +42,12 @@ namespace cedar
       class KinematicChainModel;
       typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
 
+      class KinematicChainSimulation;
+      typedef boost::shared_ptr<KinematicChainSimulation> KinematicChainSimulationPtr;
+      
+      class KinematicChainVisualization;
+      typedef boost::shared_ptr<KinematicChainVisualization> KinematicChainVisualizationPtr;
+      
       class ReferenceGeometry;
       typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
 

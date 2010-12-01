@@ -1,39 +1,17 @@
-/*======================================================================================================================
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ ----- File:        ReferenceGeometry.h
 
-    This file is part of cedar.
+ ----- Author:      Mathis Richter
+ ----- Email:       mathis.richter@ini.rub.de
+ ----- Date:        2010 08 30
 
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
+ ----- Description: Header for the @em cedar::dev::robot::ReferenceGeometry class.
 
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        ReferenceGeometry.h
-
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
-
-    Description: Encapsulates values that describe the physical properties of a robot.
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- Credits:
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_DEV_ROBOT_REFERENCE_GEOMETRY_H
 #define CEDAR_DEV_ROBOT_REFERENCE_GEOMETRY_H
@@ -52,10 +30,10 @@
 #include <cv.h>
 
 
-/*!@brief Encapsulates values that describe the physical properties of a robot.
+/*!@brief Encapsulates values that describe the physical properties of a kinematic chain.
  *
- * Describes the position, axis and angle/velocity limits of all joints of a robot, as well as all properties of
- * all link segments relevant for computing trajectories in a dynamical model.
+ * Describes the position, axis and angle/velocity limits of all joints of a kinematic chain, as well as all properties
+ * of all link segments relevant for computing trajectories in a dynamical model.
  */
 class cedar::dev::robot::ReferenceGeometry : public cedar::aux::ConfigurationInterface
 {
@@ -71,11 +49,20 @@ protected:
     //! axis the joint moves in, in 3D space
     std::vector<double> axis;
     //! minimum and maximum angular values
-    cedar::aux::math::Limits<double> angleLimits;
+    cedar::aux::math::Limits angleLimits;
     //! minimum and maximum velocity values
-    cedar::aux::math::Limits<double> velocityLimits;
+    cedar::aux::math::Limits velocityLimits;
   };
 
+  //!@brief Describes the hardware properties of an end-effector.
+  struct EndEffector
+  {
+    //! position of a tool in 3D space
+    std::vector<double> position;
+    //! orientation of a tool in 3D space
+    std::vector<double> orientation;
+  };
+  
   //!@brief Describes the hardware properties of a link segment.
   struct LinkSegment
   {
@@ -90,12 +77,10 @@ protected:
 public:
   //! smart pointer definition for the Joint struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::Joint> JointPtr;
+  //! smart pointer definition for the Tool struct
+  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::EndEffector> EndEffectorPtr;
   //! smart pointer definition for the LinkSegment struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::LinkSegment> LinkSegmentPtr;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -111,6 +96,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the number of joints in the robot
+   *
+   * @return    number of joints
+   */
+  const unsigned int numberOfJoints() const;
+  
   /*!@brief Returns a pointer to a specific joint.
    *
    * @return    pointer to joint struct
@@ -118,6 +109,12 @@ public:
    */
   const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(const unsigned int index) const;
 
+  /*!@brief Returns a pointer to the end-effector.
+   *
+   * @return    pointer to endEffector struct
+   */
+  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& getEndEffector() const;
+  
   /*!@brief Returns a pointer to a specific link segment.
    *
    * @return    pointer to link segment struct
@@ -169,6 +166,8 @@ public:
 protected:
   //! vector of all joints
   std::vector<cedar::dev::robot::ReferenceGeometry::JointPtr> _mJoints;
+  //! end effector
+  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr _mEndEffector;
   //! vector of all link segments
   std::vector<cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr> _mLinkSegments;
   //! base position of the robot

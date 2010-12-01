@@ -1,39 +1,17 @@
-/*======================================================================================================================
-
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet-Bochum
+                    Institut fuer Neuroinformatik
  
-    This file is part of cedar.
-
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
-
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        drawShapes.cpp
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
-
-    Description: Functions drawing simple geometric shapes in the current OpenGL coordinate frame
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- File:        drawShapes.cpp
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ------Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 19
+ 
+ ----- Description: functions drawing simple geometric shapes in the current OpenGL coordinate frame
+ 
+ ----- Credits:     
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
 #include "drawShapes.h"
@@ -113,7 +91,7 @@ void cedar::aux::gl::drawCone(const double floor,
   // TODO: check whether these have to be static ... what does static mean exactly anyways
 	static GLUquadric* quadric = gluNewQuadric();
 	glTranslatef(0.0, 0.0, floor);
-	gluCylinder(quadric, radiusFloor, radiusCeiling, radiusCeiling - floor, slices, 1);
+	gluCylinder(quadric, radiusFloor, radiusCeiling, ceiling - floor, slices, 1);
 	glTranslatef(0.0, 0.0, -floor);
 	if (wireFrame)
 	{

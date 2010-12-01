@@ -1,39 +1,17 @@
-/*======================================================================================================================
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ ----- File:        Limits.h
 
-    This file is part of cedar.
+ ----- Author:      Mathis Richter
+ ----- Email:       mathis.richter@ini.rub.de
+ ----- Date:        2010 11 11
 
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
+ ----- Description: Header for the @em cedar::aux::math::Limits struct.
 
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        Limits.h
-
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 11
-
-    Description: Header for the @em cedar::aux::math::Limits struct.
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- Credits:
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_AUX_MATH_LIMITS_H
 #define CEDAR_AUX_MATH_LIMITS_H
@@ -50,7 +28,7 @@
  *
  * More detailed description of the struct.
  */
-template <typename T>
+//template <typename T>
 struct cedar::aux::math::Limits
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -59,28 +37,28 @@ struct cedar::aux::math::Limits
   //!@brief The standard constructor
   Limits() {};
   //!@brief Constructor that takes a minimum and maximum value
-  Limits(const T& newMin, const T& newMax) : min(newMin), max(newMax) {};
-  
-  //!@brief Copy constructor
-  template <typename U>
-  Limits(const Limits<U> &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
+//  Limits(const T& newMin, const T& newMax) : min(newMin), max(newMax) {};
+  Limits(const double& newMin, const double& newMax) : min(newMin), max(newMax) {};
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // methods
-  //--------------------------------------------------------------------------------------------------------------------
+  //!@brief Copy constructor
+//  template <typename U>
+//  Limits(const Limits<U> &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
+  Limits(const Limits &otherLimits) : min(otherLimits.min), max(otherLimits.max) {};
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  //! minimum limit
-  T min;
-  //! maximum limit
-  T max;
+  //! lower limit
+//  T min;
+  double min;
+  //! upper limit
+//  T max;
+  double max;
 
 }; // class cedar::aux::math::Limits
 
-template struct cedar::aux::math::Limits<double>;
-template struct cedar::aux::math::Limits<int>;
-template struct cedar::aux::math::Limits<unsigned int>;
+//template struct cedar::aux::math::Limits<double>;
+//template struct cedar::aux::math::Limits<int>;
+//template struct cedar::aux::math::Limits<unsigned int>;
 
 #endif // CEDAR_AUX_MATH_LIMITS_H

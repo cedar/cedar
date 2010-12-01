@@ -77,19 +77,19 @@ class cedar::aux::Thread : public Base, public QThread
 public:
   /*!@brief The standard constructor.
    *
-   * The standard constructor sets the idle time between
-   * two executions of step() to 1 millisecond
+   * The standard constructor sets the time between two executions of step() to
+   * 1 millisecond
    */
   Thread(void);
 
-  /*!@brief Constructor with idle time parameter.
+  /*!@brief Constructor with step size parameter.
    *
-   * This constructor sets the idle time between two executions of
-   * step() to a given value.
+   * This constructor sets the time between two executions of step() to a
+   * certain value.
    *
-   * @param idleTime the time in milliseconds used in msleep
+   * @param stepSize time between wake ups in milliseconds
    */
-  Thread(unsigned idleTime);
+  Thread(unsigned stepSize);
 
   //!@brief Destructor
   virtual ~Thread(void) = 0;
@@ -101,7 +101,7 @@ public:
   /*!@brief Executes step() in a while loop in fixed time intervals.
    *
    * If the system was not fast enough to execute step(time) in the desired
-   * time, step(time) is called with the proper multiple of mIdleTime to make
+   * time, step(time) is called with the proper multiple of mStepSize to make
    * up for the lost step(s).
    */
   virtual void run();
@@ -118,8 +118,15 @@ public:
    * moment for the thread to finish its work.
    *
    * @param timeout the max. time to wait for the thread (in milliseconds).
+   * @param suppressWarning by default a warning about occurring timing problems will be given
    */
   void stop( unsigned timeout = 1000, bool suppressWarning = false );
+
+  /*!@brief Performs a single step with default step size.
+   *
+   * This has no effect if the thread is already running.
+   */
+  void singleStep(void);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -140,7 +147,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  int mIdleTime; //!< idle time in microseconds
+  int mStepSize; //!< time between wake ups in microseconds
 private:
   bool mStop;
   // gather some statistics

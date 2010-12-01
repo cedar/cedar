@@ -1,39 +1,17 @@
-/*======================================================================================================================
-
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet-Bochum
+                    Institut fuer Neuroinformatik
  
-    This file is part of cedar.
-
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
-
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        drawShapes.h
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
-
-    Description: Functions drawing simple geometric shapes in the current OpenGL coordinate frame
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- File:        drawShapes.h
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ------Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 19
+ 
+ ----- Description: functions drawing simple geometric shapes in the current OpenGL coordinate frame
+ 
+ ----- Credits:     
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 #ifndef CEDAR_AUX_GL_DRAW_SHAPES_H
 #define CEDAR_AUX_GL_DRAW_SHAPES_H
@@ -147,10 +125,10 @@ namespace cedar
                      const int stacks,
                      const bool wireFrame=false);
       
-      /*!	draws a torus an ellipse in the xy-plane of the current frame
+      /*!	draws a torus around an ellipse in the xy-plane of the current frame
        * @param a    extension of the ellipse in x-direction of the current frame
        * @param b    extension of the ellipse in y-direction of the current frame
-       * @param thickness    distance of the torus walls to the ellipse in the xy-plane
+       * @param thickness    distance of the ellipse walls to the ellipse in the xy-plane
        * @param slices    number of orthogonal cuts through the torus (i.e. hyperplanes orthogonal to the xy-plane)
        * @param stacks    number of trapezoid plates used to approximate cylinder cut between two slices
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame

@@ -1,45 +1,24 @@
-/*======================================================================================================================
+/*----------------------------------------------------------------------------------------------------------------------
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
 
-    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ ----- File:        main.cpp
 
-    This file is part of cedar.
+ ----- Author:      Hendrik Reimann
+ ----- Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 19
 
-    cedar is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License as published by the
-    Free Software Foundation, either version 3 of the License, or (at your
-    option) any later version.
+ ----- Description: Implements all unit tests for the @em cedar::aux::gl::object class.
 
-    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-    License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with cedar. If not, see <http://www.gnu.org/licenses/>.
-
-========================================================================================================================
-
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        main.cpp
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
-
-    Description: Implements all unit tests for the @em cedar::aux::gl::object class.
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- Credits:
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
 #include "TestObject.h"
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -51,7 +30,7 @@ using namespace cedar::aux;
 
 int main()
 {
-  LogFile log_file("ConfigurationInterface.log");
+  LogFile log_file("Object.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test
@@ -63,9 +42,13 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // wire frame
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: drawAsWireFrame" << std::endl;
+  log_file << "test: wire frame" << std::endl;
   object.drawAsWireFrame(true);
-  object.drawAsWireFrame(false);
+  if (!object.isDrawnAsWireFrame())
+  {
+    errors++;
+    log_file << "ERROR with wire frame" << std::endl;
+  }
   
   //--------------------------------------------------------------------------------------------------------------------
   // resolution
