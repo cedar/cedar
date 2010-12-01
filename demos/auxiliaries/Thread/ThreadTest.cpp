@@ -35,7 +35,7 @@ public:
     srand( QTime::currentTime().msec() );
   }
 
-  MyTestThread( unsigned idleTime, bool delay = false ) : Thread( idleTime ) {
+  MyTestThread( unsigned stepSize, bool delay = false ) : Thread( stepSize ) {
     mArtificialDelay = delay;
     srand( QTime::currentTime().msec() );
   }
@@ -44,7 +44,7 @@ public:
     QTime now = QTime::currentTime();
     cout << "wake up time (sec/msec): " << now.second() << " / " << now.msec() << endl;
     if( mArtificialDelay )
-      msleep( rand() % (3*mIdleTime) );
+      msleep( rand() % (3*mStepSize) );
   }
 
   bool getArtificialDelay() {
