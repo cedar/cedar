@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-  ReferenceGeometry reference_geometry("/Users/reimajbi/src/cedar/tests/interactive/devices/KinematicChainSimulation/test_arm.conf");
+  //ReferenceGeometry reference_geometry("/Users/reimajbi/src/cedar/tests/interactive/devices/KinematicChainSimulation/test_arm.conf");
 //  ReferenceGeometry reference_geometry("test_arm.conf");
 //  KinematicChainModel test_arm_model(&reference_geometry);
 
