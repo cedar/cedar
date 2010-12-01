@@ -79,7 +79,7 @@ void ReferenceGeometry::testOutput() const
 {
   std::cout << "name: " << _mName.c_str() << "\n";
 
-  std::cout << "number of joints: " << numberOfJoints() << "\n";
+  std::cout << "number of joints: " << getNumberOfJoints() << "\n";
 
   std::cout << "base position: [";
   for (unsigned int j = 0; j < _mBasePosition.size(); ++j)
@@ -211,7 +211,7 @@ void ReferenceGeometry::init()
   }
 }
 
-const unsigned int ReferenceGeometry::numberOfJoints() const
+const unsigned int ReferenceGeometry::getNumberOfJoints() const
 {
   return _mJoints.size();
 }

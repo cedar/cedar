@@ -120,7 +120,7 @@ public:
    *
    * @return    number of joints
    */
-  const unsigned int numberOfJoints() const;
+  const unsigned int getNumberOfJoints() const;
   
   /*!@brief Returns a pointer to a specific joint.
    *

@@ -68,9 +68,9 @@ const ReferenceGeometryPtr& KinematicChain::getReferenceGeometry() const
   return mpReferenceGeometry;
 }
 
-const unsigned int KinematicChain::getNumberOfJoints() const
+unsigned int KinematicChain::getNumberOfJoints() const
 {
-  return mpReferenceGeometry->numberOfJoints();
+  return mpReferenceGeometry->getNumberOfJoints();
 }
 
 void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)

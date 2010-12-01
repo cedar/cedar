@@ -48,21 +48,14 @@ using namespace cv;
 
 int main()
 {
-  LogFile log_file("KinematicChainModel.log");
+  LogFile log_file("SimulatedKinematicChain.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
   
   // create instance of test class
-  log_file << "constructing reference geometry" << std::endl;
   ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("test.conf"));
-
-  log_file << p_reference_geometry->numberOfJoints() << std::endl;
-
-//  ReferenceGeometry::EndEffectorPtr p_end_effector(new ReferenceGeometry::EndEffector());
-
-  log_file << "constructing arm" << std::endl;
   SimulatedKinematicChain test_arm(p_reference_geometry);
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -75,15 +68,14 @@ int main()
   test_arm.setJointAngle(3, sqrt(2));
   if (
       !IsZero(test_arm.getJointAngle(0) - 1.0)
-      || !IsZero(test_arm.getJointAngle(0) - 2.0)
-      || !IsZero(test_arm.getJointAngle(0) - M_PI/2.0)
-      || !IsZero(test_arm.getJointAngle(0) - sqrt(2.0))
+      || !IsZero(test_arm.getJointAngle(1) - 2.0)
+      || !IsZero(test_arm.getJointAngle(2) - M_PI/2.0)
+      || !IsZero(test_arm.getJointAngle(3) - sqrt(2.0))
       )
   {
     errors++;
     log_file << "ERROR with setJointAngle() or getJointAngle()" << std::endl;
   }
-  
   // ...
   
   
