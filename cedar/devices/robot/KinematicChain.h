@@ -199,7 +199,7 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
-  void step(unsigned time);
+  void step(unsigned long time);
 
   //----------------------------------------------------------------------------
   // parameters
