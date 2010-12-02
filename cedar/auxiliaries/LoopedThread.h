@@ -26,9 +26,9 @@
 
     Maintainer:  Bjoern Weghenkel
     Email:       bjoern.weghenkel@ini.rub.de
-    Date:        2010 11 16
+    Date:        2010 12 02
 
-    Description: Header for the @em cedar::aux::Thread class.
+    Description: Header for the @em cedar::aux::LoopedThread class.
 
     Credits:
 
