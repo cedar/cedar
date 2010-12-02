@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Thread.cpp
+    File:        LoopedThread.cpp
 
     Maintainer:  Bjoern Weghenkel
     Email:       bjoern.weghenkel@ini.rub.de
-    Date:        2010 11 16
+    Date:        2010 12 02
 
-    Description: Implementation of the @em cedar::aux::Thread class.
+    Description: Implementation of the @em cedar::aux::LoopedThread class.
 
     Credits:
 
@@ -165,5 +165,4 @@ void cedar::aux::LoopedThread::singleStep() {
   {
     step(mStepSize.total_microseconds());
   }
-
 }
