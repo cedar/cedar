@@ -48,13 +48,15 @@
 #include <string>
 #include <iostream>
 #include <QThread>
+#include "boost/date_time/posix_time/posix_time_types.hpp" //no i/o just types
 
 
-/*!@brief Cedar interface for threads
+/*!@brief Cedar interface for looped threads
  *
  * Use this interface if your class should be executable as a Qt thread.
  * Just inherit from this class and implement a step function with the
- * given parameter.
+ * given parameter. This step function is called in an loop until the thread is
+ * stopped again.
  *
  * - to start your thread, call start()
  * - to stop your thread, call stop()
@@ -66,7 +68,7 @@
  * all step functions consecutively and also pass measured time to each step function
  * to fulfill real-time constraints.
  */
-class cedar::aux::Thread : public Base, public QThread
+class cedar::aux::LoopedThread : public Base, public QThread
 {
   //----------------------------------------------------------------------------
   // macros
@@ -75,24 +77,18 @@ class cedar::aux::Thread : public Base, public QThread
   // constructors and destructor
   //----------------------------------------------------------------------------
 public:
-  /*!@brief The standard constructor.
-   *
-   * The standard constructor sets the time between two executions of step() to
-   * 1 millisecond
-   */
-  Thread(void);
 
   /*!@brief Constructor with step size parameter.
    *
    * This constructor sets the time between two executions of step() to a
-   * certain value.
+   * certain value (in microseconds).
    *
-   * @param stepSize time between wake ups in milliseconds
+   * @param stepSize time window for each step function in microseconds
    */
-  Thread(unsigned stepSize);
+  LoopedThread(unsigned long stepSize = 1000);
 
   //!@brief Destructor
-  virtual ~Thread(void) = 0;
+  virtual ~LoopedThread(void) = 0;
 
   //----------------------------------------------------------------------------
   // public methods
@@ -101,14 +97,14 @@ public:
   /*!@brief Executes step() in a while loop in fixed time intervals.
    *
    * If the system was not fast enough to execute step(time) in the desired
-   * time, step(time) is called with the proper multiple of mStepSize to make
-   * up for the lost step(s).
+   * time, step(time) is called with the proper multiple of mStepSize to allow
+   * you making up for the lost steps.
    */
   virtual void run();
 
   /*!@brief All calculations for each time step are put into step().
    *
-   * @param time length of the time step to be calculated in \mu seconds (not milliseconds!)
+   * @param time length of the time step to be calculated in microseconds
    */
   virtual void step(unsigned long time) = 0;
 
@@ -120,13 +116,13 @@ public:
    * @param timeout the max. time to wait for the thread (in milliseconds).
    * @param suppressWarning by default a warning about occurring timing problems will be given
    */
-  void stop( unsigned timeout = 1000, bool suppressWarning = false );
+  void stop( unsigned int timeout = 1000, bool suppressWarning = false );
 
   /*!@brief Performs a single step with default step size.
    *
    * This has no effect if the thread is already running.
    */
-  void singleStep(void);
+  void singleStep();
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -147,7 +143,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  int mStepSize; //!< time between wake ups in microseconds
+  boost::posix_time::time_duration mStepSize;
 private:
   bool mStop;
   // gather some statistics

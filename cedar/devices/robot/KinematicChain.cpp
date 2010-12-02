@@ -36,7 +36,7 @@ KinematicChain::KinematicChain()
 }
 
 //! constructor
-KinematicChain::KinematicChain(unsigned numberOfJoints, unsigned stepSize) : Thread(stepSize)
+KinematicChain::KinematicChain(unsigned numberOfJoints, unsigned stepSize) : LoopedThread(stepSize)
 {
   mNumberOfJoints = numberOfJoints;
   mJointAngles.resize(mNumberOfJoints);

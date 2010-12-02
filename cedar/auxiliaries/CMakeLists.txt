@@ -36,7 +36,7 @@
 
 cedar_add_library(cedaraux
   Base.cpp
-  Thread.cpp
+  LoopedThread.cpp
   ConfigurationInterface.cpp
   LogFile.cpp
   exceptions/ExceptionBase.cpp
@@ -65,7 +65,7 @@ cedar_add_library(cedaraux
   gl/Chessboard.cpp
   HEADERS
   Base.h
-  Thread.h
+  LoopedThread.h
   ConfigurationInterface.h
   LogFile.h
   exceptions/ExceptionBase.h
