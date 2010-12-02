@@ -19,7 +19,7 @@
 // LOCAL INCLUDES
 #include "namespace.h"
 #include "Component.h"
-#include "cedar/auxiliaries/Thread.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 
 // PROJECT INCLUDES
 
@@ -33,7 +33,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::Thread
+class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
 {
   //----------------------------------------------------------------------------
   // macros
