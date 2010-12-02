@@ -62,7 +62,7 @@ public:
     srand( QTime::currentTime().msec() );
   }
 
-  void step(unsigned int time) {
+  void step(unsigned long time) {
     QTime now = QTime::currentTime();
     cout << "wake up time (sec/msec): " << now.second() << " / " << now.msec() << endl;
     if( mArtificialDelay )
@@ -82,12 +82,12 @@ public:
 
 int main() {
 
-  unsigned int timeInterval = 100;
+  unsigned int timeInterval = 1;
   MyTestThread thread( timeInterval );
 
   cout << "Starting a thread and let it run for 2 seconds ..." << endl;
   thread.start();
-  thread.wait(2*1000);
+  thread.wait(100);
   cout << "Stopping thread ..." << endl;
   thread.stop();
 
@@ -95,7 +95,7 @@ int main() {
   cout << "Starting thread again with an artificially unreliable execution time ..." << endl;
   thread.setArtificalDelay( true );
   thread.start();
-  thread.wait(2*1000);
+  thread.wait(100);
   cout << "Stopping thread ..." << endl;
   thread.stop();
 
