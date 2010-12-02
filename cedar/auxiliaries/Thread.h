@@ -108,9 +108,9 @@ public:
 
   /*!@brief All calculations for each time step are put into step().
    *
-   * @param time determines externally measured time since last step()
+   * @param time length of the time step to be calculated in \mu seconds (not milliseconds!)
    */
-  virtual void step( unsigned time ) = 0;
+  virtual void step(unsigned long time) = 0;
 
   /*!@brief Stops the thread.
    *

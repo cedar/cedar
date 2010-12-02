@@ -113,15 +113,17 @@ void cedar::aux::Thread::run(void)
     scheduledWakeup = tmpTime;
     updateStatistics(stepsTaken);
 
+#ifdef DEBUG
     // print warning if time steps have been skipped
-    //if( stepsTaken > 1 )
-    //	cerr << "WARNING: " << stepsTaken << " time steps taken at once! "
-    //	<< "Your system might be too slow for an execution interval of "
-    //	<< mStepSize << " milliseconds. Consider using a longer interval!"
-    //	<< endl;
+    if( stepsTaken > 1 )
+    	cerr << "WARNING: " << stepsTaken << " time steps taken at once! "
+    	<< "Your system might be too slow for an execution interval of "
+    	<< mStepSize << " milliseconds. Consider using a longer interval!"
+    	<< endl;
+#endif
 
     // call step function
-    step(stepsTaken * mStepSize);
+    step(stepsTaken * 1000 * mStepSize);
 
     // if the execution lasted unexpectedly long, we'd like to wake up for
     // the next regular time step
@@ -167,7 +169,7 @@ void cedar::aux::Thread::updateStatistics(unsigned stepsTaken)
 void cedar::aux::Thread::singleStep() {
   if(!isRunning())
   {
-    step(mStepSize);
+    step(1000*mStepSize);
   }
 
 }
