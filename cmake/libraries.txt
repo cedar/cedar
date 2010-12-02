@@ -70,9 +70,11 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QGLViewer)
 
 # OpenGL
-
 find_package(OpenGL)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
+
+# libFRI
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} FRI)
 
 
 ########################################################################################################################
