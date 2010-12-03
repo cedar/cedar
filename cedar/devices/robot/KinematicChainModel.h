@@ -1,4 +1,24 @@
-/*----------------------------------------------------------------------------------------------------------------------
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
@@ -20,6 +40,7 @@
 // LOCAL INCLUDES
 #include "namespace.h"
 #include "ReferenceGeometry.h"
+#include "KinematicChain.h"
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/math/screwCalculus.h"
@@ -28,7 +49,7 @@
 #include <string>
 #include <cv.h>
 #include <QReadWriteLock>
-
+#include <QObject>
 
 /*! \brief Calculates the geometric transformations occurring in a serial chain depending upon joint angles
  * 
@@ -37,22 +58,31 @@
  * angle vector \theta, first call calculateTransformations( .. ). Then the transformations and jacobians can be 
  * accessed using the appropriate functions.
  */
-class cedar::dev::robot::KinematicChainModel
+class cedar::dev::robot::KinematicChainModel : QObject
 {
+private:
+
+  Q_OBJECT;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor - should be removed when the one using an instance of ReferenceGeometry is usable
-//  KinematicChainModel();
   //!@brief constructor
-  KinematicChainModel(cedar::dev::robot::ReferenceGeometry* pReferenceGeometry);
-  //TODO: use smart pointer
+  KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain);
   //!@brief destructor
-  virtual ~KinematicChainModel(void);
+  virtual ~KinematicChainModel();
   //TODO: represent type of cv::Mat being used, offer it in constructor
   
   //--------------------------------------------------------------------------------------------------------------------
+  // slots
+  //--------------------------------------------------------------------------------------------------------------------
+public slots:
+
+//!@brief updates the model to the current configuration of the kinematic chain
+  void update();
+
+//--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -60,20 +90,14 @@ public:
    *
    * @return    number of joints
    */
-  unsigned int numberOfJoints();
+  unsigned int getNumberOfJoints();
   
-  /*!@brief calculates the transformations to the joint frames for the given joint angle vector
-   *
-   * @param jointAngles    vector of angles for each joint
-   */
-  void calculateTransformations(const cv::Mat& jointAngles);
-
   /*!@brief transformation matrix between base frame and the specified joint frame
    *
    * @param index    index of the joint to which the transformation is given
    * @return    rigid transformation matrix, 4 \times 4
    */
-  cv::Mat jointTransformation(const unsigned int index);
+  cv::Mat getJointTransformation(const unsigned int index);
   
   /*!@brief calculates cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
    *
@@ -82,12 +106,12 @@ public:
    * @param result    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
-  void jacobian(
-                const cv::Mat& point,
-                const unsigned int jointIndex,
-                cv::Mat& result,
-                const unsigned int coordinateFrame
-               );
+  void calculateJacobian(
+                         const cv::Mat& point,
+                         const unsigned int jointIndex,
+                         cv::Mat& result,
+                         const unsigned int coordinateFrame
+                        );
   
   /*!@brief calculates cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
    * slightly slower than the function above that uses references //TODO: doxygen reference to that function
@@ -97,35 +121,35 @@ public:
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    * @return    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
    */
-  cv::Mat jacobian(
-                   const cv::Mat& point,
-                   const unsigned int jointIndex,
-                   const unsigned int coordinateFrame
-                  );
+  cv::Mat calculateJacobian(
+                            const cv::Mat& point,
+                            const unsigned int jointIndex,
+                            const unsigned int coordinateFrame
+                           );
   
   /*!@brief gives the spatial Jacobian in the current configuration
    * 
    * @return    spatial Jacobian, 6 \times N matrix, where N = number of joints
    */
-  cv::Mat spatialJacobian();
+  cv::Mat calculateSpatialJacobian();
   
   /*!@brief gives the end-effector position in the current configuration
    * 
    * @return    end effector position in homogeneous coordinates, 4 \times 1 matrix
    */
-  cv::Mat endEffectorPosition();
+  cv::Mat calculateEndEffectorPosition();
 
   /*!@brief gives the transformation from base frame to the end-effector frame in the current configuration
    * 
    * @return    rigid transformation matrix from base to end-effector frame, 4 \times 4 matrix
    */
-  cv::Mat endEffectorTransformation();
+  cv::Mat calculateEndEffectorTransformation();
 
   /*!@brief gives the cartesian end-effector Jacobian in the current configuration
    * 
    * @return    end effector Jacobian, 3 \times N matrix, where N = number of joints
    */
-  cv::Mat endEffectorJacobian();
+  cv::Mat calculateEndEffectorJacobian();
   
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -137,7 +161,10 @@ private:
 
   //!@brief initialization
   void init();
-
+  
+  //!@brief calculates the transformations to the joint frames for the given joint angle vector
+  void calculateTransformations();
+  
   //--------------------------------------------------------------------------------------------------------------------
   // public members
   //--------------------------------------------------------------------------------------------------------------------
@@ -152,7 +179,7 @@ public:
   // protected members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::dev::robot::ReferenceGeometry* mpReferenceGeometry;
+  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private members
@@ -161,8 +188,6 @@ private:
   // locks
 	QReadWriteLock mTransformationsLock;
   
-  //! number of degrees of freedom in the chain
-  int mNumberOfJoints;
   //! twist coordinates for the transformations induced by rotating the joints (assuming reference configurations)
   std::vector<cv::Mat> mReferenceJointTwists;
   //! transformations to the joint frames (assuming reference configurations)

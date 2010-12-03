@@ -19,29 +19,29 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
+ ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
  
- ----- File:        Pyramid.cpp
+ ----- File:        KinematicChain.cpp
  
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
+ ----- Author:      Hendrik Reimann
+ ----- Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 06
  
- ----- Description: visualization for a pyramid
+ ----- Description: implementation for the \em cedar::dev::robot::SimulatedKinematicChain class
  
- ----- Credits:     
+ ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "drawShapes.h"
-#include "Pyramid.h"
+#include "SimulatedKinematicChain.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
-using namespace cedar::aux::gl;
+using namespace cedar::dev::robot;
 using namespace std;
 using namespace cv;
 
@@ -49,92 +49,70 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Pyramid::Pyramid(const std::string name)
+SimulatedKinematicChain::SimulatedKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+:
+KinematicChain(rpReferenceGeometry)
 {
-	mName = name;
-	mLength = 2;
-	mWidth = 3;
-	mHeight = 2;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Pyramid";
+  init();
 }
 
-Pyramid::Pyramid(
-                 const std::string name,
-                 const double length,
-                 const double width,
-                 const double height,
-                 const double R,
-                 const double G,
-                 const double B
-                )
+SimulatedKinematicChain::~SimulatedKinematicChain()
 {
-	mName = name;
-	mLength = length;
-	mWidth = width;
-	mHeight = height;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Pyramid";
+  
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Pyramid::draw()
+double SimulatedKinematicChain::getJointAngle(unsigned int index) const
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
-  
-	// move to object coordinates
-	mTransformationTranspose = mTransformation.t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
-  
-	// draw object
-	if (mIsVisible)
-	{
-		gl::setColor(mColorR, mColorG, mColorB);
-		drawPyramid(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
-	}
+  return mJointAngles.at<double>(index, 0);
 }
 
-void Pyramid::setLength(double value)
+std::vector<double> SimulatedKinematicChain::getJointAngles() const
 {
-  mLength = value;
+  vector<double> angles;
+  angles.resize(getNumberOfJoints());
+  for (unsigned int j=0; j<getNumberOfJoints(); j++)
+  {
+    angles[j] = mJointAngles.at<double>(j, 0);
+  }
+  return angles;
 }
 
-void Pyramid::setWidth(double value)
+cv::Mat SimulatedKinematicChain::getJointAnglesMatrix() const
 {
-  mWidth = value;
+  // TODO: data should be locked, I guess - check what how to do that in cedar
+  Mat angles;
+  angles = mJointAngles.clone();
+  return angles;
 }
 
-void Pyramid::setHeight(double value)
+void SimulatedKinematicChain::setJointAngle(unsigned int index, double angle)
 {
-  mHeight = value;
+  mJointAngles.at<double>(index, 0) = angle;
 }
 
-double Pyramid::length()
+void SimulatedKinematicChain::setJointAngles(const cv::Mat& angleMatrix)
 {
-  return mLength;
+  // TODO: assert that the passed matrix has the right size
+  mJointAngles = angleMatrix;
 }
 
-double Pyramid::width()
+void SimulatedKinematicChain::setJointAngles(const std::vector<double>& angles)
 {
-  return mWidth;
+  // TODO: assert that the passed vector has the right size
+  for (unsigned int j=0; j<getNumberOfJoints(); j++)
+  {
+    mJointAngles.at<double>(j, 0) = angles[j];
+  }
 }
 
-double Pyramid::height()
+void SimulatedKinematicChain::init()
 {
-  return mHeight;
+  mJointAngles = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 }
-
-
-
 
 
 

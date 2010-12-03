@@ -1,4 +1,5 @@
 syntax: glob
+.qglviewer*
 .project
 build
 bin

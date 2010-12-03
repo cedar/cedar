@@ -19,8 +19,8 @@
 
 ========================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
+  ----- Institute:  Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
 
  ----- File:        Object.h
  

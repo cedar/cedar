@@ -1,4 +1,24 @@
-/*------------------------------------------------------------------------------
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
 
@@ -44,9 +64,7 @@ class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, p
   //----------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain();
-  //!@brief constructor
-  KinematicChain(unsigned numberOfJoints, unsigned stepSize = 1);
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
   //!@brief destructor
   virtual ~KinematicChain() = 0;
 
@@ -70,7 +88,7 @@ public:
    *
    * @param geometry    new reference geometry
    */
-  void setReferenceGeometry(const ReferenceGeometryPtr geometry);
+  void setReferenceGeometry(const ReferenceGeometryPtr& geometry);
 
   /*!@brief get current state of a single joint angle
    *
@@ -135,19 +153,19 @@ public:
    * @param index    specifies the joint
    * @param angle    new joint angle value
    */
-  virtual void setJointAngle(unsigned int index, double angle);
+  virtual void setJointAngle(unsigned int index, double angle) = 0;
 
   /*!@brief set current state of all joint angles
    *
    * @param angleMatrix    vector of new joint angle values
    */
-  virtual void setJointAngles(const cv::Mat& angleMatrix);
+  virtual void setJointAngles(const cv::Mat& angleMatrix) = 0;
 
   /*!@brief set current state of all joint angles
    *
    * @param angles    vector of new joint angle values
    */
-  virtual void setJointAngles(const std::vector<double>& angles);
+  virtual void setJointAngles(const std::vector<double>& angles) = 0;
 
   /*!@brief set current state of a single joint velocity
    *
@@ -192,9 +210,6 @@ public:
   //----------------------------------------------------------------------------
 protected:
 
-  virtual void setJointAngleOnDevice(unsigned int index, double angle) = 0;
-
-
   //----------------------------------------------------------------------------
   // private methods
   //----------------------------------------------------------------------------
@@ -220,7 +235,6 @@ protected:
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
   unsigned int mNumberOfJoints;
 private:
-  std::vector<double> mJointAngles;
   std::vector<double> mJointVelocities;
   std::vector<double> mJointAccelerations;
   std::vector<ActionType> mJointWorkingModes;
