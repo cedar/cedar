@@ -58,7 +58,7 @@
  * angle vector \theta, first call calculateTransformations( .. ). Then the transformations and jacobians can be 
  * accessed using the appropriate functions.
  */
-class cedar::dev::robot::KinematicChainModel : QObject
+class cedar::dev::robot::KinematicChainModel : public QObject
 {
 private:
 
@@ -75,7 +75,12 @@ public:
   //TODO: represent type of cv::Mat being used, offer it in constructor
   
   //--------------------------------------------------------------------------------------------------------------------
-  // slots
+  // Qt events
+  //--------------------------------------------------------------------------------------------------------------------
+  void timerEvent(QTimerEvent* event);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // Qt slots
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
 

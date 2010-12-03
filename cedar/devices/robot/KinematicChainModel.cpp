@@ -67,14 +67,19 @@ KinematicChainModel::~KinematicChainModel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-unsigned int KinematicChainModel::getNumberOfJoints()
+void KinematicChainModel::timerEvent(QTimerEvent*)
 {
-  return mpKinematicChain->getNumberOfJoints();
+  update();
 }
 
 void KinematicChainModel::update()
 {
   calculateTransformations();
+}
+
+unsigned int KinematicChainModel::getNumberOfJoints()
+{
+  return mpKinematicChain->getNumberOfJoints();
 }
 
 cv::Mat KinematicChainModel::getJointTransformation(const unsigned int index)
