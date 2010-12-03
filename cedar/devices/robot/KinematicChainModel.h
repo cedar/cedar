@@ -49,7 +49,7 @@
 #include <string>
 #include <cv.h>
 #include <QReadWriteLock>
-
+#include <QObject>
 
 /*! \brief Calculates the geometric transformations occurring in a serial chain depending upon joint angles
  * 
@@ -58,22 +58,31 @@
  * angle vector \theta, first call calculateTransformations( .. ). Then the transformations and jacobians can be 
  * accessed using the appropriate functions.
  */
-class cedar::dev::robot::KinematicChainModel
+class cedar::dev::robot::KinematicChainModel : QObject
 {
+private:
+
+  Q_OBJECT;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor - should be removed when the one using an instance of ReferenceGeometry is usable
-//  KinematicChainModel();
   //!@brief constructor
   KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain);
-  //TODO: use smart pointer
   //!@brief destructor
   virtual ~KinematicChainModel();
   //TODO: represent type of cv::Mat being used, offer it in constructor
   
   //--------------------------------------------------------------------------------------------------------------------
+  // slots
+  //--------------------------------------------------------------------------------------------------------------------
+public slots:
+
+//!@brief updates the model to the current configuration of the kinematic chain
+  void update();
+
+//--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -83,9 +92,6 @@ public:
    */
   unsigned int getNumberOfJoints();
   
-  //!@brief updates the model to the current configuration of the kinematic chain
-  void update();
-
   /*!@brief transformation matrix between base frame and the specified joint frame
    *
    * @param index    index of the joint to which the transformation is given

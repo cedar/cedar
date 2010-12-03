@@ -84,12 +84,8 @@ public:
   ~SceneWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
-  // public methods
+  // slots
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  /*!@brief updates the parameters displayed in the widget */
-	void updateWidgetObjectParameters();
-  
 public slots:
   /*!@brief sets the wire frame state of the current object according to the widget control */
 	void setWireFrame(int state);
@@ -152,6 +148,13 @@ public slots:
 	
   /*!@brief set the current object according to combo box status */
   void setActiveObject();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*!@brief updates the parameters displayed in the widget */
+  void updateWidgetObjectParameters();
   
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

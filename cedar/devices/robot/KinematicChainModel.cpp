@@ -51,12 +51,6 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//KinematicChainModel::KinematicChainModel()
-//{
-//  std::cout << "running KinematicChainModel()" << endl;
-//  initExample();
-//}
-
 KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain)
 :
 mpKinematicChain(rpKinematicChain)
@@ -93,10 +87,10 @@ cv::Mat KinematicChainModel::getJointTransformation(const unsigned int index)
 }
 
 void KinematicChainModel::calculateJacobian(
-                                            const cv::Mat& point,
-                                            const unsigned int jointIndex,
-                                            cv::Mat& result,
-                                            const unsigned int coordinateFrame
+                                             const cv::Mat& point,
+                                             const unsigned int jointIndex,
+                                             cv::Mat& result,
+                                             const unsigned int coordinateFrame
                                            )
 {
   // transform to local coordinates if necessary
@@ -125,9 +119,9 @@ void KinematicChainModel::calculateJacobian(
 }
 
 cv::Mat KinematicChainModel::calculateJacobian(
-                                               const cv::Mat& point,
-                                               const unsigned int jointIndex,
-                                               const unsigned int coordinateFrame
+                                                const cv::Mat& point,
+                                                const unsigned int jointIndex,
+                                                const unsigned int coordinateFrame
                                               )
 {
   cv::Mat J = Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
@@ -174,52 +168,6 @@ cv::Mat KinematicChainModel::calculateEndEffectorJacobian()
   return calculateJacobian(p, getNumberOfJoints()-1, BASE_COORDINATES);
 }
 
-//void KinematicChainModel::initExample()
-//{
-//  // this hard-codes a planar manipulator with 4 joints, just to test stuff
-//  
-//  getNumberOfJoints() = 4;
-//  Mat xi;
-//  Mat T;
-//  Mat p;
-//  Mat omega = Mat::zeros(3, 1, CV_64FC1);
-//  omega.at<double>(0, 0) = 1;
-//  for (int j=0; j<getNumberOfJoints(); j++)
-//  {
-//    // reference twists
-//    p = Mat::zeros(3, 1, CV_64FC1);
-//    p.at<double>(2, 0) = j*2.0;
-//    xi = twistCoordinates<double>(p, omega);
-//    //    cout << "xi = twistCoordinates(p, omega):" << endl;
-//    //    write(xi);
-//    //    xi = Mat::zeros(6, 1, CV_64FC1);
-//    //    xi.at<double>(1, 0) = j*2.0;
-//    //    xi.at<double>(3, 0) = 1;
-//    //    cout << "xi by hand:" << endl;
-//    //    write(xi);
-//    mReferenceJointTwists.push_back(xi.clone());
-//    T = Mat::eye(4, 4, CV_64FC1);
-//    T.at<double>(2, 3) = j*2.0;
-//    mReferenceJointTransformations.push_back(T.clone());
-//    mTwistExponentials.push_back(Mat::zeros(4, 4, CV_64FC1));
-//    mProductsOfExponentials.push_back(Mat::zeros(4, 4, CV_64FC1));
-//    mJointTransformations.push_back(Mat::zeros(4, 4, CV_64FC1));
-//    mJointTwists.push_back(Mat::zeros(6, 1, CV_64FC1));
-//  }
-//  mReferenceEndEffectorTransformation = Mat::eye(4, 4, CV_64FC1);
-//  mReferenceEndEffectorTransformation.at<double>(2, 3) = 8;
-//  mEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
-//  
-//  //  for (int j=0; j<getNumberOfJoints(); j++)
-//  //  {
-//  //    write(mReferenceJointTwists[j]);
-//  //    write(mReferenceJointTransformations[j]);
-//  //    cout << "--------------------------" << endl;
-//  //    
-//  //  }  
-//  
-//}
-
 void KinematicChainModel::init()
 {
 
@@ -241,13 +189,6 @@ void KinematicChainModel::init()
     omega.at<double>(2, 0) = joint->axis[2];
     xi = twistCoordinates<double>(p, omega);
     
-    cout << "xi = twistCoordinates(p, omega):" << endl;
-    write(xi);
-    //    xi = Mat::zeros(6, 1, CV_64FC1);
-    //    xi.at<double>(1, 0) = j*2.0;
-    //    xi.at<double>(3, 0) = 1;
-    //    cout << "xi by hand:" << endl;
-    //    write(xi);
     mReferenceJointTwists.push_back(xi.clone());
     T = Mat::eye(4, 4, CV_64FC1);
     T.at<double>(0, 3) = joint->position[0];
@@ -279,17 +220,7 @@ void KinematicChainModel::init()
 
   mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
 
-  write(mReferenceEndEffectorTransformation);
-  
   mEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
-  
-  //  for (int j=0; j<getNumberOfJoints(); j++)
-  //  {
-  //    write(mReferenceJointTwists[j]);
-  //    write(mReferenceJointTransformations[j]);
-  //    cout << "--------------------------" << endl;
-  //    
-  //  }  
   update();
 }
 
@@ -313,24 +244,3 @@ void KinematicChainModel::calculateTransformations()
   mEndEffectorTransformation = mProductsOfExponentials[getNumberOfJoints()-1] * mReferenceEndEffectorTransformation;
 	mTransformationsLock.unlock();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
