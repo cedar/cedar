@@ -81,11 +81,9 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(2);
   viewer.startTimer(50);
 
-  p_test_arm_model->startTimer(50);
-
   p_test_arm->setJointAngle(0, 1);
   p_test_arm->setJointAngle(1, M_PI/2);
-
+//  p_test_arm_model->startTimer(50);
   
   a.exec();
   return 0;

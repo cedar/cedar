@@ -34,4 +34,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_interactive_test("Thread" main.cpp)
+cedar_add_interactive_test("LoopedThread" main.cpp)
