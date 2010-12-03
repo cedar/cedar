@@ -21,76 +21,105 @@
 
  ----- Institute:   Ruhr-Universitaet Bochum
                     Institut fuer Neuroinformatik
-
+ 
  ----- File:        main.cpp
-
+ 
  ----- Author:      Hendrik Reimann
  ----- Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 11 27
-
- ----- Description: Tests cedar::aux::gl::Ellipse class
-
+ ----- Date:        2010 11 30
+ 
+ ----- Description: unit test for the @em cedar::dev::robot::SimulatedKinematicChain class.
+ 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Ellipse.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
-#include <string>
+#include <vector>
+#include <cv.h>
 
+using namespace cedar::dev::robot;
 using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
+using namespace cv;
 
 int main()
 {
-  LogFile log_file("UnitTestEllipse.log");
+  LogFile log_file("SimulatedKinematicChain.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
+  
+  // create instance of test class
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("test.conf"));
+  SimulatedKinematicChain test_arm(p_reference_geometry);
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  // single angle
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: single angle functions" << std::endl;
+  test_arm.setJointAngle(0, 1);
+  test_arm.setJointAngle(1, 2.0);
+  test_arm.setJointAngle(2, M_PI/2);
+  test_arm.setJointAngle(3, sqrt(2));
+  if (
+      !IsZero(test_arm.getJointAngle(0) - 1.0)
+      || !IsZero(test_arm.getJointAngle(1) - 2.0)
+      || !IsZero(test_arm.getJointAngle(2) - M_PI/2.0)
+      || !IsZero(test_arm.getJointAngle(3) - sqrt(2.0))
+      )
+  {
+    errors++;
+    log_file << "ERROR with setJointAngle() or getJointAngle()" << std::endl;
+  }
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  // std::vector of angle values
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: std::vector angle functions" << std::endl;
+  std::vector<double> angle_vector;
+  angle_vector.push_back(0.5);
+  angle_vector.push_back(1.5);
+  angle_vector.push_back(2.5);
+  angle_vector.push_back(3.5);
+  test_arm.setJointAngles(angle_vector);
+  if (
+      !IsZero(test_arm.getJointAngles()[0] - 0.5)
+      || !IsZero(test_arm.getJointAngles()[1] - 1.5)
+      || !IsZero(test_arm.getJointAngles()[2] - 2.5)
+      || !IsZero(test_arm.getJointAngles()[3] - 3.5)
+      )
+  {
+    errors++;
+    log_file << "ERROR with setJointAngles() or getJointAngles()" << std::endl;
+  }
 
-  // test constructors
-  Ellipse testEllipse(std::string("test ellipse"));
-  Ellipse ellipse(std::string("second test ellipse"), 1, 2, 0.1);
-
   //--------------------------------------------------------------------------------------------------------------------
-  // length
+  // cv::Mat of angle values
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: length" << std::endl;
-  ellipse.setLength(10.1);
-  if (ellipse.length() != 10.1)
+  log_file << "test: cv::Mat angle functions" << std::endl;
+  cv::Mat angle_matrix = cv::Mat::zeros(4, 1, CV_64FC1);
+  angle_matrix.at<double>(0, 0) = 0.1;
+  angle_matrix.at<double>(1, 0) = 0.2;
+  angle_matrix.at<double>(2, 0) = 0.3;
+  angle_matrix.at<double>(3, 0) = 0.4;
+  test_arm.setJointAngles(angle_matrix);
+  if (
+      !IsZero(test_arm.getJointAnglesMatrix().at<double>(0, 0) - 0.1)
+      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(1, 0) - 0.2)
+      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(2, 0) - 0.3)
+      || !IsZero(test_arm.getJointAnglesMatrix().at<double>(3, 0) - 0.4)
+      )
   {
     errors++;
-    log_file << "ERROR with setLength() or length()" << std::endl;
+    log_file << "ERROR with setJointAnglesMatrix() or getJointAnglesMatrix()" << std::endl;
   }
-  
-  //--------------------------------------------------------------------------------------------------------------------
-  // width
-  //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: width" << std::endl;
-  ellipse.setWidth(10.2);
-  if (ellipse.width() != 10.2)
-  {
-    errors++;
-    log_file << "ERROR with setWidth() or width()" << std::endl;
-  }
-  
-  //--------------------------------------------------------------------------------------------------------------------
-  // thickness
-  //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: thickness" << std::endl;
-  ellipse.setThickness(10.3);
-  if (ellipse.thickness() != 10.3)
-  {
-    errors++;
-    log_file << "ERROR with setThickness() or thickness()" << std::endl;
-  }
-  
   
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
@@ -99,3 +128,14 @@ int main()
   }
   return errors;
 }
+
+
+
+
+
+
+
+
+
+
+

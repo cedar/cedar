@@ -19,22 +19,24 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet Bochum
-                    Institut fuer Neuroinformatik
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
- ----- File:        Namespace.h
+    File:        namespace.h
 
- ----- Author:      Hendrik Reimann
- ----- Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 11 19
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 30
 
- ----- Description: Namespace file for cedar::aux::gl
+    Description: Namespace file for cedar::dev::robot::gui.
 
- ----- Credits:
- ---------------------------------------------------------------------------------------------------------------------*/
+    Credits:
 
-#ifndef CEDAR_AUX_GL_NAMESPACE_H
-#define CEDAR_AUX_GL_NAMESPACE_H
+======================================================================================================================*/
+
+
+#ifndef CEDAR_DEV_ROBOT_GUI_NAMESPACE_H
+#define CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 
 // LOCAL INCLUDES
 
@@ -42,30 +44,22 @@
 #include "cedar/namespace.h"
 
 // SYSTEM INCLUDES
-
+#include <boost/smart_ptr.hpp>
 
 namespace cedar
 {
-  namespace aux
+  namespace dev
   {
-    /*!@brief Namespace for all gl classes. */
-    namespace gl
+    namespace robot
     {
-      class Scene;
-      class Viewer;
-      class Object;
-      class SceneWidget;
-      class Block;
-      class Sphere;
-      class Cone;
-      class Cylinder;
-      class Prism;
-      class Pyramid;
-      class Torus;
-      class Ellipse;
-      class Chessboard;
+      //!@brief Namespace for widget classes.
+      namespace gl
+      {
+        class KinematicChain;
+        typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
+      }
     }
   }
 }
 
-#endif // CEDAR_AUX_MATH_NAMESPACE_H
+#endif // CEDAR_DEV_ROBOT_GL_NAMESPACE_H

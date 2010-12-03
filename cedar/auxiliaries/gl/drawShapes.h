@@ -1,4 +1,24 @@
-/*----------------------------------------------------------------------------------------------------------------------
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
  ----- Institute:   Ruhr-Universitaet-Bochum
                     Institut fuer Neuroinformatik
  
@@ -23,13 +43,21 @@
 // SYSTEM INCLUDES
 #include "cv.h"
 
+//TODO: add setColor function, so this is the only file that needs to include gl
 namespace cedar
 {
   namespace aux
   {
     namespace gl
     {
-      /*!	draws a rectangular block in the current coordinate frame
+      /*!@brief changes the current color to the specified RGB values
+       * @param R    R value of RGB color
+       * @param G    G value of RGB color
+       * @param B    B value of RGB color
+       */
+      void setColor(double R, double G, double B);
+
+      /*!@brief	draws a rectangular block in the current coordinate frame
        * @param length    extension in x-direction of current coordinate frame
        * @param width    extension in y-direction of current coordinate frame
        * @param height    extension in z-direction of current coordinate frame
@@ -37,7 +65,7 @@ namespace cedar
        */
       void drawBlock(const double length, const double width, const double height, const bool wireFrame=false);
       
-      /*!	draws a cone in direction of the z-axis of the current coordinate frame
+      /*!@brief	draws a cone in direction of the z-axis of the current coordinate frame
        * @param floor    distance from the floor to the xy-plane along the z-axis
        * @param ceiling    distance from the xy-plane to the ceiling along the z-axis
        * @param radiusFloor    radius of the cone at the lower end
@@ -52,7 +80,7 @@ namespace cedar
                     const int slices,
                     const bool wireFrame=false);
       
-      /*!	draws a cone around an arbitrary line segment in the current coordinate frame
+      /*!@brief	draws a cone around an arbitrary line segment in the current coordinate frame
        * @param start    start of the line segment
        * @param end    end of the line segment
        * @param radiusStart    radius of the cone at the start point
@@ -68,7 +96,7 @@ namespace cedar
                     const int slices,
                     const bool wireFrame=false);
       
-      /*!	draws a sphere around the origin of the current coordinate frame
+      /*!@brief	draws a sphere around the origin of the current coordinate frame
        * @param radius    radius of the sphere
        * @param slices    number of longitudinal cuts used to approximate the sphere walls
        * @param stacks    number of latitudinal cuts used to approximate the sphere walls
@@ -79,7 +107,7 @@ namespace cedar
                       const int stacks,
                       const bool wireFrame=false);
       
-      /*!	draws a holed disk (i.e. ring) in the xy-plane around the origin of the current coordinate frame
+      /*!@brief	draws a holed disk (i.e. ring) in the xy-plane around the origin of the current coordinate frame
        * @param innerRadius    radius of the inner empty disk
        * @param outerRadius    radius of the whole disk
        * @param slices    number of radial cuts used to approximate the disk
@@ -94,7 +122,7 @@ namespace cedar
                     const bool invert=false,
                     const bool wireFrame=false);
       
-      /*!	draws a pyramid with rectangular base, base is centered at origin of object frame
+      /*!@brief	draws a pyramid with rectangular base, base is centered at origin of object frame
        * @param length    base extension in x-direction of current coordinate frame
        * @param width    base extension in y-direction of current coordinate frame
        * @param height    extension in z-direction of current coordinate frame, from origin to tip of the pyramid
@@ -105,14 +133,14 @@ namespace cedar
                        const double height,
                        const bool wireFrame=false);
       
-      /*!	draws a prism with an equilateral triangle as base, in xy-plane, prism extends in positive z-direction
+      /*!@brief	draws a prism with an equilateral triangle as base, in xy-plane, prism extends in positive z-direction
        * @param width    edge length of the equilateral triangle forming the prism's base
        * @param height    extension of the prism in z-direction of the current frame
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */ 
       void drawPrism(const double width, const double height, const bool wireFrame=false );
       
-      /*!	draws a torus around a circle in the xy-plane of the current frame
+      /*!@brief	draws a torus around a circle in the xy-plane of the current frame
        * @param radius    the radius of the circle in the xy-plane the torus is drawn around
        * @param thickness    distance of the torus walls to the circle in the xy-plane
        * @param slices    number of orthogonal cuts through the torus (i.e. hyperplanes orthogonal to the xy-plane)
@@ -125,7 +153,7 @@ namespace cedar
                      const int stacks,
                      const bool wireFrame=false);
       
-      /*!	draws a torus around an ellipse in the xy-plane of the current frame
+      /*!@brief	draws a torus around an ellipse in the xy-plane of the current frame
        * @param a    extension of the ellipse in x-direction of the current frame
        * @param b    extension of the ellipse in y-direction of the current frame
        * @param thickness    distance of the ellipse walls to the ellipse in the xy-plane

@@ -1,4 +1,24 @@
-/*----------------------------------------------------------------------------------------------------------------------
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
  ----- Institute:   Ruhr-Universitaet-Bochum
                     Institut fuer Neuroinformatik
  
@@ -50,114 +70,6 @@ SceneWidget::~SceneWidget()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void SceneWidget::updateWidgetObjectParameters()
-{
-	mSwitchingSelectedObject = true;
-  
-	// general parameters
-	mpDoubleSpinBoxPositionX->setValue(mpActiveObject->positionX());
-	mpDoubleSpinBoxPositionY->setValue(mpActiveObject->positionY());
-	mpDoubleSpinBoxPositionZ->setValue(mpActiveObject->positionZ());
-	mpDoubleSpinBoxRotationX->setValue(mpActiveObject->orientationAngleAlpha());
-	mpDoubleSpinBoxRotationY->setValue(mpActiveObject->orientationAngleBeta());
-	mpDoubleSpinBoxRotationZ->setValue(mpActiveObject->orientationAngleGamma());
-	mpDoubleSpinBoxColorR->setValue(mpActiveObject->colorR());
-	mpDoubleSpinBoxColorG->setValue(mpActiveObject->colorG());
-	mpDoubleSpinBoxColorB->setValue(mpActiveObject->colorB());
-	mpWireFrameCheckBox->setChecked(mpActiveObject->isDrawnAsWireFrame());
-  
-	// disable all elements
-	mpDoubleSpinBoxLength->setEnabled(false);
-	mpDoubleSpinBoxWidth->setEnabled(false);
-	mpDoubleSpinBoxHeight->setEnabled(false);
-	mpDoubleSpinBoxRadius->setEnabled(false);
-	mpDoubleSpinBoxThickness->setEnabled(false);
-	mpSpinBoxChessboardRows->setEnabled(false);
-	mpSpinBoxChessboardColumns->setEnabled(false);
-	mpDoubleSpinBoxSecondColorR->setEnabled(false);
-	mpDoubleSpinBoxSecondColorG->setEnabled(false);
-	mpDoubleSpinBoxSecondColorB->setEnabled(false);
-  
-	if (mpActiveObject->objectType().compare("Cylinder") == 0)
-	{
-		// enable those elements that apply
-		mpDoubleSpinBoxRadius->setEnabled(true);
-		mpDoubleSpinBoxHeight->setEnabled(true);
-		// set values
-		mpDoubleSpinBoxHeight->setValue(((Cylinder*)mpActiveObject)->height());
-		mpDoubleSpinBoxRadius->setValue(((Cylinder*)mpActiveObject)->radius());
-	}
-	else if (mpActiveObject->objectType().compare("Sphere") == 0)
-	{
-		mpDoubleSpinBoxRadius->setEnabled(true);
-		mpDoubleSpinBoxRadius->setValue(((Sphere*)mpActiveObject)->radius());
-	}
-	else if (mpActiveObject->objectType().compare("Block") == 0)
-	{
-		mpDoubleSpinBoxLength->setEnabled(true);
-		mpDoubleSpinBoxWidth->setEnabled(true);
-		mpDoubleSpinBoxHeight->setEnabled(true);
-		mpDoubleSpinBoxHeight->setValue(((Block*)mpActiveObject)->height());
-		mpDoubleSpinBoxWidth->setValue(((Block*)mpActiveObject)->width());
-		mpDoubleSpinBoxLength->setValue(((Block*)mpActiveObject)->length());
-	}
-	else if (mpActiveObject->objectType().compare("Cone") == 0)
-	{
-		mpDoubleSpinBoxRadius->setEnabled(true);
-		mpDoubleSpinBoxHeight->setEnabled(true);
-		mpDoubleSpinBoxHeight->setValue(((Cone*)mpActiveObject)->height());
-		mpDoubleSpinBoxRadius->setValue(((Cone*)mpActiveObject)->radius());
-	}
-	else if (mpActiveObject->objectType().compare("Pyramid") == 0)
-	{
-		mpDoubleSpinBoxLength->setEnabled(true);
-		mpDoubleSpinBoxWidth->setEnabled(true);
-		mpDoubleSpinBoxHeight->setEnabled(true);
-    
-		mpDoubleSpinBoxHeight->setValue(((Block*)mpActiveObject)->height());
-		mpDoubleSpinBoxWidth->setValue(((Block*)mpActiveObject)->width());
-		mpDoubleSpinBoxLength->setValue(((Block*)mpActiveObject)->length());
-	}
-	else if (mpActiveObject->objectType().compare("Chessboard") == 0)
-	{
-		mpDoubleSpinBoxLength->setEnabled(true);
-		mpDoubleSpinBoxWidth->setEnabled(true);
-		mpDoubleSpinBoxHeight->setEnabled(true);
-		mpSpinBoxChessboardRows->setEnabled(true);
-		mpSpinBoxChessboardColumns->setEnabled(true);
-		mpDoubleSpinBoxSecondColorR->setEnabled(true);
-		mpDoubleSpinBoxSecondColorG->setEnabled(true);
-		mpDoubleSpinBoxSecondColorB->setEnabled(true);
-    
-		mpDoubleSpinBoxHeight->setValue(((Chessboard*)mpActiveObject)->height());
-		mpDoubleSpinBoxWidth->setValue(((Chessboard*)mpActiveObject)->width());
-		mpDoubleSpinBoxLength->setValue(((Chessboard*)mpActiveObject)->length());
-		mpSpinBoxChessboardRows->setValue(((Chessboard*)mpActiveObject)->numberOfRows());
-		mpSpinBoxChessboardColumns->setValue(((Chessboard*)mpActiveObject)->numberOfColumns());
-		mpDoubleSpinBoxSecondColorR->setValue(((Chessboard*)mpActiveObject)->secondColorR());
-		mpDoubleSpinBoxSecondColorG->setValue(((Chessboard*)mpActiveObject)->secondColorG());
-		mpDoubleSpinBoxSecondColorB->setValue(((Chessboard*)mpActiveObject)->secondColorB());
-	}
-	else if (mpActiveObject->objectType().compare("Torus") == 0)
-	{
-		mpDoubleSpinBoxRadius->setEnabled(true);
-		mpDoubleSpinBoxThickness->setEnabled(true);
-		mpDoubleSpinBoxRadius->setValue(((Torus*)mpActiveObject)->radius());
-		mpDoubleSpinBoxThickness->setValue(((Torus*)mpActiveObject)->thickness());
-	}
-	else if (mpActiveObject->objectType().compare("Ellipse") == 0)
-	{
-		mpDoubleSpinBoxThickness->setEnabled(true);
-		mpDoubleSpinBoxLength->setEnabled(true);
-		mpDoubleSpinBoxWidth->setEnabled(true);
-		mpDoubleSpinBoxThickness->setValue(((Ellipse*)mpActiveObject)->thickness());
-		mpDoubleSpinBoxLength->setValue(((Ellipse*)mpActiveObject)->length());
-		mpDoubleSpinBoxWidth->setValue(((Ellipse*)mpActiveObject)->width());
-	}
-  
-	mSwitchingSelectedObject = false;
-}
 
 void SceneWidget::setWireFrame(int state)
 {
@@ -437,6 +349,114 @@ void SceneWidget::setActiveObject()
     mpActiveObject = mpScene->object(mpComboBoxName->currentIndex());
     updateWidgetObjectParameters();
   }
+}
+
+void SceneWidget::updateWidgetObjectParameters()
+{
+  mSwitchingSelectedObject = true;
+
+  // general parameters
+  mpDoubleSpinBoxPositionX->setValue(mpActiveObject->positionX());
+  mpDoubleSpinBoxPositionY->setValue(mpActiveObject->positionY());
+  mpDoubleSpinBoxPositionZ->setValue(mpActiveObject->positionZ());
+  mpDoubleSpinBoxRotationX->setValue(mpActiveObject->orientationAngleAlpha());
+  mpDoubleSpinBoxRotationY->setValue(mpActiveObject->orientationAngleBeta());
+  mpDoubleSpinBoxRotationZ->setValue(mpActiveObject->orientationAngleGamma());
+  mpDoubleSpinBoxColorR->setValue(mpActiveObject->colorR());
+  mpDoubleSpinBoxColorG->setValue(mpActiveObject->colorG());
+  mpDoubleSpinBoxColorB->setValue(mpActiveObject->colorB());
+  mpWireFrameCheckBox->setChecked(mpActiveObject->isDrawnAsWireFrame());
+
+  // disable all elements
+  mpDoubleSpinBoxLength->setEnabled(false);
+  mpDoubleSpinBoxWidth->setEnabled(false);
+  mpDoubleSpinBoxHeight->setEnabled(false);
+  mpDoubleSpinBoxRadius->setEnabled(false);
+  mpDoubleSpinBoxThickness->setEnabled(false);
+  mpSpinBoxChessboardRows->setEnabled(false);
+  mpSpinBoxChessboardColumns->setEnabled(false);
+  mpDoubleSpinBoxSecondColorR->setEnabled(false);
+  mpDoubleSpinBoxSecondColorG->setEnabled(false);
+  mpDoubleSpinBoxSecondColorB->setEnabled(false);
+
+  if (mpActiveObject->objectType().compare("Cylinder") == 0)
+  {
+    // enable those elements that apply
+    mpDoubleSpinBoxRadius->setEnabled(true);
+    mpDoubleSpinBoxHeight->setEnabled(true);
+    // set values
+    mpDoubleSpinBoxHeight->setValue(((Cylinder*)mpActiveObject)->height());
+    mpDoubleSpinBoxRadius->setValue(((Cylinder*)mpActiveObject)->radius());
+  }
+  else if (mpActiveObject->objectType().compare("Sphere") == 0)
+  {
+    mpDoubleSpinBoxRadius->setEnabled(true);
+    mpDoubleSpinBoxRadius->setValue(((Sphere*)mpActiveObject)->radius());
+  }
+  else if (mpActiveObject->objectType().compare("Block") == 0)
+  {
+    mpDoubleSpinBoxLength->setEnabled(true);
+    mpDoubleSpinBoxWidth->setEnabled(true);
+    mpDoubleSpinBoxHeight->setEnabled(true);
+    mpDoubleSpinBoxHeight->setValue(((Block*)mpActiveObject)->height());
+    mpDoubleSpinBoxWidth->setValue(((Block*)mpActiveObject)->width());
+    mpDoubleSpinBoxLength->setValue(((Block*)mpActiveObject)->length());
+  }
+  else if (mpActiveObject->objectType().compare("Cone") == 0)
+  {
+    mpDoubleSpinBoxRadius->setEnabled(true);
+    mpDoubleSpinBoxHeight->setEnabled(true);
+    mpDoubleSpinBoxHeight->setValue(((Cone*)mpActiveObject)->height());
+    mpDoubleSpinBoxRadius->setValue(((Cone*)mpActiveObject)->radius());
+  }
+  else if (mpActiveObject->objectType().compare("Pyramid") == 0)
+  {
+    mpDoubleSpinBoxLength->setEnabled(true);
+    mpDoubleSpinBoxWidth->setEnabled(true);
+    mpDoubleSpinBoxHeight->setEnabled(true);
+
+    mpDoubleSpinBoxHeight->setValue(((Block*)mpActiveObject)->height());
+    mpDoubleSpinBoxWidth->setValue(((Block*)mpActiveObject)->width());
+    mpDoubleSpinBoxLength->setValue(((Block*)mpActiveObject)->length());
+  }
+  else if (mpActiveObject->objectType().compare("Chessboard") == 0)
+  {
+    mpDoubleSpinBoxLength->setEnabled(true);
+    mpDoubleSpinBoxWidth->setEnabled(true);
+    mpDoubleSpinBoxHeight->setEnabled(true);
+    mpSpinBoxChessboardRows->setEnabled(true);
+    mpSpinBoxChessboardColumns->setEnabled(true);
+    mpDoubleSpinBoxSecondColorR->setEnabled(true);
+    mpDoubleSpinBoxSecondColorG->setEnabled(true);
+    mpDoubleSpinBoxSecondColorB->setEnabled(true);
+
+    mpDoubleSpinBoxHeight->setValue(((Chessboard*)mpActiveObject)->height());
+    mpDoubleSpinBoxWidth->setValue(((Chessboard*)mpActiveObject)->width());
+    mpDoubleSpinBoxLength->setValue(((Chessboard*)mpActiveObject)->length());
+    mpSpinBoxChessboardRows->setValue(((Chessboard*)mpActiveObject)->numberOfRows());
+    mpSpinBoxChessboardColumns->setValue(((Chessboard*)mpActiveObject)->numberOfColumns());
+    mpDoubleSpinBoxSecondColorR->setValue(((Chessboard*)mpActiveObject)->secondColorR());
+    mpDoubleSpinBoxSecondColorG->setValue(((Chessboard*)mpActiveObject)->secondColorG());
+    mpDoubleSpinBoxSecondColorB->setValue(((Chessboard*)mpActiveObject)->secondColorB());
+  }
+  else if (mpActiveObject->objectType().compare("Torus") == 0)
+  {
+    mpDoubleSpinBoxRadius->setEnabled(true);
+    mpDoubleSpinBoxThickness->setEnabled(true);
+    mpDoubleSpinBoxRadius->setValue(((Torus*)mpActiveObject)->radius());
+    mpDoubleSpinBoxThickness->setValue(((Torus*)mpActiveObject)->thickness());
+  }
+  else if (mpActiveObject->objectType().compare("Ellipse") == 0)
+  {
+    mpDoubleSpinBoxThickness->setEnabled(true);
+    mpDoubleSpinBoxLength->setEnabled(true);
+    mpDoubleSpinBoxWidth->setEnabled(true);
+    mpDoubleSpinBoxThickness->setValue(((Ellipse*)mpActiveObject)->thickness());
+    mpDoubleSpinBoxLength->setValue(((Ellipse*)mpActiveObject)->length());
+    mpDoubleSpinBoxWidth->setValue(((Ellipse*)mpActiveObject)->width());
+  }
+
+  mSwitchingSelectedObject = false;
 }
 
 void SceneWidget::init(Scene* pScene)
