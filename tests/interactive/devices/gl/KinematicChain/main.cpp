@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 
   p_test_arm->setJointAngle(0, 1);
   p_test_arm->setJointAngle(1, M_PI/2);
-  p_test_arm_model->update();
+//  p_test_arm_model->startTimer(50);
   
   a.exec();
   return 0;
