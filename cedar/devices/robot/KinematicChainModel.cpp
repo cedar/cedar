@@ -60,7 +60,6 @@ using namespace cv;
 KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain)
 :
 mpKinematicChain(rpKinematicChain)
-
 {
   init();
 }
@@ -291,7 +290,7 @@ void KinematicChainModel::init()
   //    cout << "--------------------------" << endl;
   //    
   //  }  
-  
+  update();
 }
 
 void KinematicChainModel::calculateTransformations()

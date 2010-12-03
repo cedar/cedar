@@ -46,6 +46,11 @@
 using namespace std;
 using namespace cv;
 
+void cedar::aux::gl::setColor(double R, double G, double B)
+{
+  glColor4d(R, G, B, 0);
+}
+
 void cedar::aux::gl::drawBlock(const double length, const double width, const double height, const bool wireFrame)
 {
 	if (wireFrame)

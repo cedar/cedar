@@ -98,7 +98,7 @@ void Pyramid::draw()
 	// draw object
 	if (mIsVisible)
 	{
-		glColor4d(mColorR, mColorG, mColorB, 0);
+		gl::setColor(mColorR, mColorG, mColorB);
 		drawPyramid(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
 	}
 }

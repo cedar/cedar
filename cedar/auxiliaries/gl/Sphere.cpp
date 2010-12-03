@@ -102,7 +102,7 @@ void Sphere::draw()
 	// draw the sphere
 	if (mIsVisible)
 	{
-	  glColor4d(mColorR, mColorG, mColorB, 0);
+	  gl::setColor(mColorR, mColorG, mColorB);
 		drawSphere(mRadius, mResolution*2, mResolution, mIsDrawnAsWireFrame);
 	}
 }

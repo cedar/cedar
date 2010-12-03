@@ -95,7 +95,7 @@ void Prism::draw()
 	// draw object
 	if (mIsVisible)
 	{
-		glColor4d(mColorR, mColorG, mColorB, 0);
+		gl::setColor(mColorR, mColorG, mColorB);
 		drawPrism(mWidth, mHeight, mIsDrawnAsWireFrame);
 	}
 }
