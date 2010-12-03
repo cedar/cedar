@@ -233,7 +233,6 @@ public:
   // none yet (hopefully never!)
 protected:
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
-  unsigned int mNumberOfJoints;
 private:
   std::vector<double> mJointVelocities;
   std::vector<double> mJointAccelerations;

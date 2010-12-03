@@ -53,12 +53,12 @@ using namespace cedar::dev::robot;
 //! constructor
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(1), //TODO: this step size should be set different, should be a parameter, i.e. read inf from config file
+LoopedThread(50000), //TODO: this step size should be set different, should be a parameter, i.e. read inf from config file
 mpReferenceGeometry(rpReferenceGeometry)
 {
-  mJointVelocities.resize(mNumberOfJoints);
-  mJointAccelerations.resize(mNumberOfJoints);
-  mJointWorkingModes.resize(mNumberOfJoints);
+  mJointVelocities.resize(getNumberOfJoints());
+  mJointAccelerations.resize(getNumberOfJoints());
+  mJointWorkingModes.resize(getNumberOfJoints());
 }
 
 //! destructor
@@ -90,7 +90,7 @@ void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry
 
 double KinematicChain::getJointVelocity(unsigned int index) const
 {
-  if(index >= mNumberOfJoints)
+  if(index >= getNumberOfJoints())
     return 0.0;
   return mJointVelocities[index];
 }
@@ -105,9 +105,9 @@ std::vector<double> KinematicChain::getJointVelocities() const
 
 cv::Mat KinematicChain::getJointVelocitiesMatrix() const
 {
-  cv::Mat dummy(mNumberOfJoints, 1, CV_32F);
+  cv::Mat dummy(getNumberOfJoints(), 1, CV_32F);
   //TODO: check matrix type
-  for (unsigned i = 0; i < mNumberOfJoints; i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
     dummy.at<double>(i,0) = mJointVelocities[i];
   return dummy;
 }
@@ -115,7 +115,7 @@ cv::Mat KinematicChain::getJointVelocitiesMatrix() const
 
 double KinematicChain::getJointAcceleration(unsigned int index) const
 {
-  if(index >= mNumberOfJoints)
+  if(index >= getNumberOfJoints())
     return 0.0;
   return mJointAccelerations[index];
 }
@@ -130,8 +130,8 @@ std::vector<double> KinematicChain::getJointAccelerations() const
 
 cv::Mat KinematicChain::getJointAccelerationMatrix() const
 {
-  cv::Mat dummy(mNumberOfJoints, 1, CV_32F);
-  for (unsigned i = 0; i < mNumberOfJoints; i++)
+  cv::Mat dummy(getNumberOfJoints(), 1, CV_32F);
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
     dummy.at<double>(i,0) = mJointAccelerations[i];
   return dummy;
 }
@@ -139,7 +139,7 @@ cv::Mat KinematicChain::getJointAccelerationMatrix() const
 void KinematicChain::setJointVelocity(unsigned index, double velocity)
 {
 
-  if(index >= mNumberOfJoints)
+  if(index >= getNumberOfJoints())
     return;
 
   velocity = max<double>( velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min );
@@ -155,10 +155,10 @@ void KinematicChain::setJointVelocity(unsigned index, double velocity)
 void KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
 
-  if(velocities.size() != mNumberOfJoints)
+  if(velocities.size() != getNumberOfJoints())
     return;
 
-  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+  for(unsigned i = 0; i < getNumberOfJoints(); i++) {
 
     double velocity = velocities[i];
     velocity = max<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
@@ -176,10 +176,10 @@ void KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 void KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
 
-  if(velocities.size().height != (int)mNumberOfJoints || velocities.size().width != 1)
+  if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
     return;
 
-  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+  for(unsigned i = 0; i < getNumberOfJoints(); i++) {
 
     double velocity = velocities.at<double>(i,0);
 
@@ -196,7 +196,7 @@ void KinematicChain::setJointVelocities(const cv::Mat& velocities)
 
 void KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
-  if(index >= mNumberOfJoints)
+  if(index >= getNumberOfJoints())
     return;
   mJointAccelerations[index] = acceleration;
   mJointWorkingModes[index] = ACCELERATION;
@@ -205,19 +205,19 @@ void KinematicChain::setJointAcceleration(unsigned int index, double acceleratio
 
 void KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
-  if(accelerations.size() != mNumberOfJoints)
+  if(accelerations.size() != getNumberOfJoints())
     return;
   mJointAccelerations = accelerations;
-  for(unsigned i = 0; i < mNumberOfJoints; i++)
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
     mJointWorkingModes[i] = ACCELERATION;
 }
 
 
 void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
-  if(accelerations.size().height != (int)mNumberOfJoints || accelerations.size().width != 1)
+  if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
     return;
-  for(unsigned i = 0; i < mNumberOfJoints; i++) {
+  for(unsigned i = 0; i < getNumberOfJoints(); i++) {
     mJointAccelerations[i] = accelerations.at<double>(i,0);
     mJointWorkingModes[i] = ACCELERATION;
   }
@@ -227,14 +227,14 @@ void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 void KinematicChain::step(unsigned long time)
 {
 
-  cout << "step" << endl;
+  cout << "running KinematicChain::step(" << time << ")" << endl;
 
   double currentAngle = 0.0;
   double newAngle = 0.0;
   double velocity = 0.0;
 
   // update joint angle depending on working mode
-  for(unsigned i = 0; i < mNumberOfJoints; i++)
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     // get current joint angle from the device
     currentAngle = getJointAngle(i);
@@ -245,7 +245,6 @@ void KinematicChain::step(unsigned long time)
     {
 
     case ANGLE:
-
       // calculate velocity
       newAngle = getJointAngles()[i];
       cout << "newAngle = " << newAngle << endl;
