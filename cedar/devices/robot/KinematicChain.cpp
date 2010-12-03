@@ -241,12 +241,13 @@ void KinematicChain::step(unsigned long time)
     cout << "currentAngle = " << currentAngle << endl;
 
     // update the angle according to working mode
-    switch(mJointWorkingModes[i]) {
+    switch(mJointWorkingModes[i])
+    {
 
     case ANGLE:
 
       // calculate velocity
-      newAngle = mJointAngles[i];
+      newAngle = getJointAngles()[i];
       cout << "newAngle = " << newAngle << endl;
       velocity = ( newAngle - currentAngle ) * ( 1000000.0 / (double) time );
       cout << "velocity = " << velocity << endl;
@@ -257,7 +258,8 @@ void KinematicChain::step(unsigned long time)
       cout << "newAngle* = " << newAngle << endl;
 
       // apply new values
-      setJointAngleOnDevice( i, newAngle );
+      setJointAngle(i, newAngle);
+      //TODO: setJointAngle is called for each joint separately. Change this to only call it once for a vector of angles
       mJointVelocities[i] = velocity;
 
       break;
@@ -275,8 +277,7 @@ void KinematicChain::step(unsigned long time)
       cout << "newAngle* = " << newAngle << endl;
 
       // set new joint angle
-      setJointAngleOnDevice( i, newAngle );
-      mJointAngles[i] = newAngle;
+      setJointAngle(i, newAngle);
 
       break;
 
@@ -295,8 +296,7 @@ void KinematicChain::step(unsigned long time)
       newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
 
       // set new values
-      setJointAngleOnDevice( i, newAngle );
-      mJointAngles[i] = newAngle;
+      setJointAngle(i, newAngle);
       mJointVelocities[i] = velocity;
 
       break;
