@@ -65,6 +65,7 @@ int main(int argc, char **argv)
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
+  p_test_arm_model->startTimer(50);
 
   // create gl visualization object
   cedar::dev::robot::gl::KinematicChain test_arm_visualization(p_test_arm_model);
@@ -81,9 +82,11 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(2);
   viewer.startTimer(50);
 
-  p_test_arm->setJointAngle(0, 1);
-  p_test_arm->setJointAngle(1, M_PI/2);
-//  p_test_arm_model->startTimer(50);
+  p_test_arm->start();
+  p_test_arm->setJointVelocity(0, .1);
+  p_test_arm->setJointVelocity(1, .3);
+  p_test_arm->setJointVelocity(2, .2);
+  p_test_arm->setJointVelocity(3, .15);
   
   a.exec();
   return 0;
