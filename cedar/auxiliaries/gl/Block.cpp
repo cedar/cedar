@@ -98,7 +98,8 @@ void Block::draw()
 	// draw object
 	if (mIsVisible)
 	{
-		glColor4d(mColorR, mColorG, mColorB, 0);
+//	  glColor4d(mColorR, mColorG, mColorB, 0);
+	  gl::setColor(mColorR, mColorG, mColorB);
 		drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
 	}
 }

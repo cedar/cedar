@@ -44,6 +44,7 @@
 #include <OpenGL/gl.h>
 
 using namespace cedar::dev::robot;
+using namespace cedar::dev::robot::gl;
 using namespace cedar::aux::gl;
 using namespace std;
 using namespace cv;
@@ -52,19 +53,25 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-KinematicChain::KinematicChain(KinematicChainModel* pKinematicChainModel)
+//KinematicChain::KinematicChain(KinematicChainModel* pKinematicChainModel)
+//{
+//  mpKinematicChainModel = pKinematicChainModel;
+//}
+gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+:
+mpKinematicChainModel(rpKinematicChainModel)
 {
-  mpKinematicChainModel = pKinematicChainModel;
+
 }
 
-KinematicChain::~KinematicChain()
+gl::KinematicChain::~KinematicChain()
 {
   
 }
 
-void KinematicChain::draw(void)
+void gl::KinematicChain::draw(void)
 {
-  for (unsigned int j=0; j<mpKinematicChainModel->numberOfJoints(); j++)
+  for (unsigned int j=0; j<mpKinematicChainModel->getNumberOfJoints(); j++)
   {
     drawSegment(j);
   }
@@ -73,14 +80,14 @@ void KinematicChain::draw(void)
   glPopMatrix(); // TODO: check if this is needed
 }
 
-void KinematicChain::drawSegment(unsigned int index)
+void gl::KinematicChain::drawSegment(unsigned int index)
 {
   // move to origin transformation and resave it to the stack
   glPopMatrix();
   glPushMatrix();
   
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->jointTransformation(index).t();
+  mTransformationTranspose = mpKinematicChainModel->getJointTransformation(index).t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
   // draw the joint
@@ -93,27 +100,27 @@ void KinematicChain::drawSegment(unsigned int index)
 
   // draw the link
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  Mat proximal = mpKinematicChainModel->jointTransformation(index)(Rect(3, 0, 1, 3)).clone();
+  Mat proximal = mpKinematicChainModel->getJointTransformation(index)(Rect(3, 0, 1, 3)).clone();
   Mat distal;
-  if (index+1 < mpKinematicChainModel->numberOfJoints())
+  if (index+1 < mpKinematicChainModel->getNumberOfJoints())
   {
-    distal = mpKinematicChainModel->jointTransformation(index+1)(Rect(3, 0, 1, 3)).clone();
+    distal = mpKinematicChainModel->getJointTransformation(index+1)(Rect(3, 0, 1, 3)).clone();
   }
   else
   {
-    distal = mpKinematicChainModel->endEffectorTransformation()(Rect(3, 0, 1, 3)).clone();
+    distal = mpKinematicChainModel->calculateEndEffectorTransformation()(Rect(3, 0, 1, 3)).clone();
   }
   drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
 }
 
-void KinematicChain::drawEndEffector(void)
+void gl::KinematicChain::drawEndEffector(void)
 {
   // move to origin
   glPopMatrix();
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->endEffectorTransformation().t();
+  mTransformationTranspose = mpKinematicChainModel->calculateEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw the joint

@@ -118,11 +118,11 @@ void Chessboard::draw()
       {
         if(((i+j) % 2) == 0)
         {
-          glColor4d(mColorR, mColorG, mColorB, 0);
+          gl::setColor(mColorR, mColorG, mColorB);
 				} 
 				else
 				{
-          glColor4d(mSecondColorR, mSecondColorG, mSecondColorB, 0);
+          gl::setColor(mSecondColorR, mSecondColorG, mSecondColorB);
 				} // end if
 				drawBlock(l, w, mHeight, mIsDrawnAsWireFrame);
 				glTranslated(0, w, 0);

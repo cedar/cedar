@@ -60,7 +60,8 @@ class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::Object
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-	KinematicChain(KinematicChainModel* pKinematicChainModel);
+//	KinematicChain(KinematicChainModel* pKinematicChainModel);
+  KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
   //!@brief destructor
   ~KinematicChain();
   
@@ -86,7 +87,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
-  KinematicChainModel* mpKinematicChainModel;
+//  KinematicChainModel* mpKinematicChainModel;
+  cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
   
 }; // class cedar::dev::robot::KinematicChainSimulation
 

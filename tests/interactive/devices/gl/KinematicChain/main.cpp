@@ -38,13 +38,19 @@
 // PROJECT INCLUDES
 #include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/Viewer.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
 
 using namespace std;
 using namespace cv;
-//using namespace cedar::aux::gl;
+using namespace cedar::aux::gl;
+using namespace cedar::dev::robot::gl;
 using namespace cedar::dev::robot;
 
 
@@ -52,17 +58,33 @@ int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/home/reimajbi/srcMercurial/cedar.dev/tests/interactive/devices/KinematicChainSimulation/test_arm.conf"));
-//  SimulatedKinematicChain test_arm(p_reference_geometry);
-//  test_arm.setJointAngle(0, 1);
+  // create simulated arm
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/Users/reimajbi/src/cedar.dev/tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
+//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/home/reimajbi/srcMercurial/cedar.dev/tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
+
+  // create model of simulated arm
+  KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
+
+  // create gl visualization object
+  cedar::dev::robot::gl::KinematicChain test_arm_visualization(p_test_arm_model);
+
+  // create scene and viewer to display the arm
+  Scene scene;
+  scene.setSceneLimit(2);
+  scene.drawFloor(true);
+  scene.addObject(&test_arm_visualization);
+
+  // create a simple viewer for the scene
+  Viewer viewer(&scene);
+  viewer.show();
+  viewer.setSceneRadius(2);
+  viewer.startTimer(50);
 
 
-//  ReferenceGeometry reference_geometry("/Users/reimajbi/src/cedar/tests/interactive/devices/KinematicChainSimulation/test_arm.conf");
-//  ReferenceGeometry reference_geometry("test_arm.conf");
-//  KinematicChainModel test_arm_model(&reference_geometry);
-//  KinematicChainSimulation test_arm(&reference_geometry);
+  p_test_arm->setJointAngle(0, 1);
 
-//  KinematicChainSimulation test_arm;
+
   
   a.exec();
   return 0;

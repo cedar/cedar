@@ -95,7 +95,7 @@ void Cylinder::draw()
 	// draw object
 	if (mIsVisible)
 	{
-		glColor4d(mColorR, mColorG, mColorB, 0);
+		gl::setColor(mColorR, mColorG, mColorB);
 		drawCone(-mHeight*0.5, mHeight*0.5, mRadius, mRadius, mResolution*2, mIsDrawnAsWireFrame);
 		glTranslated(0, 0, mHeight*-0.5);
 		drawDisk(0, mRadius, mResolution*2, mResolution, true, mIsDrawnAsWireFrame);

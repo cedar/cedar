@@ -70,7 +70,7 @@ public:
   KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain);
   //TODO: use smart pointer
   //!@brief destructor
-  virtual ~KinematicChainModel(void);
+  virtual ~KinematicChainModel();
   //TODO: represent type of cv::Mat being used, offer it in constructor
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -182,8 +182,6 @@ private:
   // locks
 	QReadWriteLock mTransformationsLock;
   
-  //! number of degrees of freedom in the chain
-  int mgetNumberOfJoints;
   //! twist coordinates for the transformations induced by rotating the joints (assuming reference configurations)
   std::vector<cv::Mat> mReferenceJointTwists;
   //! transformations to the joint frames (assuming reference configurations)

@@ -6,7 +6,7 @@ cedar_add_library(cedardev
   robot/Robot.cpp
   robot/ComponentNotAvailableException.cpp
   robot/SimulatedKinematicChain.cpp
-  robot/gl/KinematicChain.h
+  robot/gl/KinematicChain.cpp
   HEADERS
   robot/KinematicChain.h
   robot/KinematicChainModel.h
