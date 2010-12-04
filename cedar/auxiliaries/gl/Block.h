@@ -41,6 +41,8 @@
 #include "Object.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
 
@@ -53,7 +55,7 @@ public:
   /*!@brief standard constructor. 
    * @param name    identifier of the instance, should be unique
    */
-	Block(const std::string name);
+	Block(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
    * @param name    identifier of the instance, should be unique
@@ -65,13 +67,13 @@ public:
    * @param B    color, value for blue channel in RGB
    */
 	Block(
-        const std::string name,
-        const double length,
-        const double width,
-        const double height,
-        const double R=1,
-        const double G=0,
-        const double B=0
+    	   cedar::aux::ObjectPtr pObject,
+         const double length,
+         const double width,
+         const double height,
+         const double R=1,
+         const double G=0,
+         const double B=0
        );
   
   //--------------------------------------------------------------------------------------------------------------------

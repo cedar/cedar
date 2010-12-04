@@ -36,6 +36,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/Object.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/LogFile.h"
 
@@ -55,8 +56,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Block test_block(std::string("test block"));
-  Block block(std::string("second test block"), 1, 2, 3);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Block test_block(p_object);
+  Block block(p_object, 1, 2, 3);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

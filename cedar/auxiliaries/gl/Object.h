@@ -38,9 +38,12 @@
 
 // LOCAL INCLUDES
 #include "namespace.h"
-#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -49,7 +52,7 @@
 #include <QObject>
 #include <QGLViewer/qglviewer.h>
 
-class cedar::aux::gl::Object : public QObject
+class cedar::aux::gl::Object : public QObject, public Base
 {
 private:
   
@@ -60,10 +63,10 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. */
-  Object();
+  Object(cedar::aux::ObjectPtr pObject);
   
   /*!@brief destructor. */
-  virtual ~Object(void);
+  virtual ~Object();
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -91,31 +94,31 @@ public:
   double colorB();
   
   //!@brief returns position of the object in homogeneous coordinates
-  cv::Mat position();
+//  cv::Mat position();
   
   //!@brief returns x-position of the object frame origin in world frame
-  double positionX();
+//  double positionX();
   
   //!@brief returns y-position of the object frame origin in world frame
-  double positionY();
+//  double positionY();
   
   //!@brief returns z-position of the object frame origin in world frame
-  double positionZ();
+//  double positionZ();
   
   //!@brief returns object frame orientation as vector of ???-Euler angles
-  cv::Mat orientationAngles();
+//  cv::Mat orientationAngles();
   
   //!@brief returns alpha (first) angle of the object orientation in ???-Euler angles
-  double orientationAngleAlpha();
+//  double orientationAngleAlpha();
   
   //!@brief returns beta (second) angle of the object orientation in ???-Euler angles
-  double orientationAngleBeta();
+//  double orientationAngleBeta();
   
   //!@brief returns gamma (third) angle of the object orientation in ???-Euler angles
-  double orientationAngleGamma();
+//  double orientationAngleGamma();
   
   //!@brief returns the 4 \time 4 rigid transformation matrix of the object frame relative to the world frame
-  cv::Mat transformation();
+//  cv::Mat transformation();
   
   //!@brief switch betwen drawing the object with full surfaces or as wire frame only
   void drawAsWireFrame(const bool state);
@@ -140,16 +143,16 @@ public:
    * @param y    value for green channel in RGB color
    * @param z    value for blue channel in RGB color
    */
-  void setPosition(const double x, const double y, const double z);
+//  void setPosition(const double x, const double y, const double z);
   
   //!@brief set the position of the object frame origin in the world frame
-  void setPosition(const cv::Mat& position);
+//  void setPosition(const cv::Mat& position);
   
   //!@brief set the orientation of the object frame, given in ??? Euler angles
-  void setOrientationAngles(const double alpha, const double beta, const double gamma);
+//  void setOrientationAngles(const double alpha, const double beta, const double gamma);
   
   //!@brief set the orientation of the object frame, given in ??? Euler angles
-  void setOrientationAngles(const cv::Mat angles);
+//  void setOrientationAngles(const cv::Mat angles);
  
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -157,7 +160,7 @@ public:
 private:
   virtual void init();
   //!@brief recalculates the rigid transformation to the object frame from position and orientation
-  void updateTransformation();
+//  void updateTransformation();
   
 public slots:
   //!@brief turns the visibility of the object on and off
@@ -179,12 +182,13 @@ protected:
   double mColorB;
   
   //TODO: remove when functionable in cedar::aux::Object
-  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
-  cv::Mat mOrientationAngles; // vector of Euler angles
-  cv::Mat mTransformation; // rigid transformation to the object
-  cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl 
+//  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
+//  cv::Mat mOrientationAngles; // vector of Euler angles
+//  cv::Mat mTransformation; // rigid transformation to the object
 
-  
+  cedar::aux::ObjectPtr mpObject;
+
+  cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
 };
 
 #endif  // CEDAR_AUX_GL_OBJECT_H

@@ -41,6 +41,7 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
@@ -56,10 +57,10 @@ class cedar::tests::unit::aux::gl::Object::TestObject : public cedar::aux::gl::O
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor that gets a configuration file name.
-  TestObject();
+  TestObject(cedar::aux::ObjectPtr pObject);
 
   //!@brief Destructor
-  virtual ~TestObject(void);
+  virtual ~TestObject();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

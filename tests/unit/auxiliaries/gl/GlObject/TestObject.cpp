@@ -50,7 +50,9 @@ using namespace cedar::tests::unit::aux::gl::Object;
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-TestObject::TestObject()
+TestObject::TestObject(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
   
 }

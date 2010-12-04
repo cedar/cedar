@@ -57,7 +57,7 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-  Viewer(cedar::aux::gl::Scene* const scene);
+  Viewer(cedar::aux::gl::ScenePtr& p_scene);
 
   /*!@brief the constructor */
   ~Viewer();
@@ -82,7 +82,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  cedar::aux::gl::Scene* const mpScene;
+  cedar::aux::gl::ScenePtr const mpScene;
 
 };
 
