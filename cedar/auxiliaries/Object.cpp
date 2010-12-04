@@ -38,17 +38,24 @@
 #include "Object.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
 using namespace cedar::aux;
+using namespace cedar::aux::math;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::Object::Object()
+:
+mPosition(4, 1, CV_64FC1),
+mOrientationAngles(3, 1, CV_64FC1),
+mTransformation(4, 4, CV_64FC1),
+mTransformationTranspose(4, 4, CV_64FC1)
 {
-
+  init();
 }
 
 cedar::aux::Object::~Object()
@@ -59,3 +66,109 @@ cedar::aux::Object::~Object()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cv::Mat Object::getPosition()
+{
+  return mPosition.clone();
+}
+
+double Object::getPositionX()
+{
+  return mPosition.at<double>(0, 0);
+}
+
+double Object::getPositionY()
+{
+  return mPosition.at<double>(1, 0);
+}
+
+double Object::getPositionZ()
+{
+  return mPosition.at<double>(2, 0);
+}
+
+cv::Mat Object::getOrientationAngles()
+{
+  return mOrientationAngles.clone();
+}
+
+double Object::getOrientationAngleAlpha()
+{
+  return mOrientationAngles.at<double>(0, 0);
+}
+
+double Object::getOrientationAngleBeta()
+{
+  return mOrientationAngles.at<double>(1, 0);
+}
+
+double Object::getOrientationAngleGamma()
+{
+  return mOrientationAngles.at<double>(2, 0);
+}
+
+cv::Mat Object::getTransformation()
+{
+  return mTransformation.clone();
+}
+
+void Object::setPosition(double x, double y, double z)
+{
+  mPosition.at<double>(0, 0) = x;
+  mPosition.at<double>(1, 0) = y;
+  mPosition.at<double>(2, 0) = z;
+  updateTransformation();
+}
+
+void Object::setPosition(const cv::Mat& position)
+{
+  assert(position.type() == mPosition.type());
+  mPosition = position.clone();
+  updateTransformation();
+}
+
+void Object::setOrientationAngles(double alpha, double beta, double gamma)
+{
+  mOrientationAngles.at<double>(0, 0) = cedar::aux::math::normalizeAngle(alpha);
+  mOrientationAngles.at<double>(1, 0) = cedar::aux::math::normalizeAngle(beta);
+  mOrientationAngles.at<double>(2, 0) = cedar::aux::math::normalizeAngle(gamma);
+  updateTransformation();
+}
+
+void Object::setOrientationAngles(cv::Mat angles)
+{
+  mOrientationAngles.at<double>(0, 0) = cedar::aux::math::normalizeAngle(angles.at<double>(0, 0));
+  mOrientationAngles.at<double>(1, 0) = cedar::aux::math::normalizeAngle(angles.at<double>(1, 0));
+  mOrientationAngles.at<double>(2, 0) = cedar::aux::math::normalizeAngle(angles.at<double>(2, 0));
+  updateTransformation();
+}
+
+void Object::updateTransformation()
+{
+  double alpha = mOrientationAngles.at<double>(0, 0);
+  double beta  = mOrientationAngles.at<double>(1, 0);
+  double gamma = mOrientationAngles.at<double>(2, 0);
+  mTransformation.at<double>(0, 0) = cos(alpha) * cos(beta) * cos(gamma) - sin(alpha) * sin(gamma);
+  mTransformation.at<double>(1, 0) = sin(alpha) * cos(beta) * cos(gamma) + cos(alpha) * sin(gamma);
+  mTransformation.at<double>(2, 0) = - sin(beta) * cos(gamma);
+  mTransformation.at<double>(0, 1) = - cos(alpha) * cos(beta) * sin(gamma) - sin(alpha) * cos(gamma);
+  mTransformation.at<double>(1, 1) = - sin(alpha) * cos(beta) * sin(gamma) + cos(alpha) * cos(gamma);
+  mTransformation.at<double>(2, 1) = sin(beta) * sin(gamma);
+  mTransformation.at<double>(0, 2) = cos(alpha) * sin(beta);
+  mTransformation.at<double>(1, 2) = sin(alpha) * sin(beta);
+  mTransformation.at<double>(2, 2) = cos(beta);
+
+  mTransformation.at<double>(0, 3) = mPosition.at<double>(0, 0);
+  mTransformation.at<double>(1, 3) = mPosition.at<double>(1, 0);
+  mTransformation.at<double>(2, 3) = mPosition.at<double>(2, 0);
+
+  mTransformation.at<double>(3, 3) = 1;
+}
+
+void Object::init()
+{
+  mPosition = 0.0;
+  mOrientationAngles = 0.0;
+  mTransformation = 0.0;
+  mTransformationTranspose = 0.0;
+}
