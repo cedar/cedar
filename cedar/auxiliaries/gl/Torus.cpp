@@ -49,9 +49,10 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Torus::Torus(const std::string name)
+Torus::Torus(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mRadius = 3;
 	mThickness = .5;
 	mColorR = 1;
@@ -61,15 +62,16 @@ Torus::Torus(const std::string name)
 }
 
 Torus::Torus(
-             const std::string name,
-             const double radius,
-             const double thickness,
-             const double R,
-             const double G,
-             const double B
+              cedar::aux::ObjectPtr pObject,
+              const double radius,
+              const double thickness,
+              const double R,
+              const double G,
+              const double B
             )
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mRadius = radius;
 	mThickness = thickness;
 	mColorR = R;
@@ -109,7 +111,7 @@ void Torus::draw()
 	glPushMatrix();
   
 	// move to object coordinates
-	mTransformationTranspose = mTransformation.t();
+  mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw the Torus

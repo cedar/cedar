@@ -55,8 +55,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Torus testTorus(std::string("test torus"));
-  Torus torus(std::string("second test torus"), 1, 0.1);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Torus testTorus(p_object);
+  Torus torus(p_object, 1, 0.1);
 
   //--------------------------------------------------------------------------------------------------------------------
   // radius

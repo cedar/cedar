@@ -49,9 +49,10 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Sphere::Sphere(const std::string name)
+Sphere::Sphere(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mRadius = 2;
 	mColorR = 1;
 	mColorG = 0;
@@ -60,14 +61,15 @@ Sphere::Sphere(const std::string name)
 }
 
 Sphere::Sphere(
-               const std::string name,
-               const double radius,
-               const double R,
-               const double G,
-               const double B
+                cedar::aux::ObjectPtr pObject,
+                const double radius,
+                const double R,
+                const double G,
+                const double B
               )
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mRadius = radius;
 	mColorR = R;
 	mColorG = G;
@@ -96,7 +98,7 @@ void Sphere::draw()
 	glPushMatrix();
   
 	// move to object coordinates
-	mTransformationTranspose = mTransformation.t();
+  mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
 	// draw the sphere

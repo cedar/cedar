@@ -55,8 +55,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Sphere testSphere(std::string("test sphere"));
-  Sphere sphere(std::string("second test sphere"), 1);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Sphere testSphere(p_object);
+  Sphere sphere(p_object, 1);
 
   //--------------------------------------------------------------------------------------------------------------------
   // radius

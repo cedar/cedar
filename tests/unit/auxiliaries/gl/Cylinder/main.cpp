@@ -55,8 +55,9 @@ int main()
   int errors = 0;
   
   // test constructors
-  Cylinder testCylinder(std::string("test cylinder"));
-  Cylinder cylinder(std::string("second test cylinder"), 1, 5);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Cylinder testCylinder(p_object);
+  Cylinder cylinder(p_object, 1, 5);
   
   //--------------------------------------------------------------------------------------------------------------------
   // radius

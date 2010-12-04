@@ -55,8 +55,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Cone testCone(std::string("test cone"));
-  Cone cone(std::string("second test cone"), 1, 5);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Cone testCone(p_object);
+  Cone cone(p_object, 1, 5);
 
   //--------------------------------------------------------------------------------------------------------------------
   // radius

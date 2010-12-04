@@ -53,7 +53,7 @@ public:
   /*!@brief standard constructor. 
    * @param name    identifier of the instance, should be unique
    */
-	Chessboard(const std::string name);
+	Chessboard(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
    * @param name    identifier of the instance, should be unique
@@ -70,18 +70,18 @@ public:
    * @param B2    second color, value for blue channel in RGB
    */
 	Chessboard(
-             const std::string name,
-             const double length,
-             const double width,
-             const double height,
-             const int rows,
-             const int columns,
-             const double R1=1,
-             const double G1=1,
-             const double B1=1,
-             const double R2=0,
-             const double G2=0,
-             const double B2=0
+        	    cedar::aux::ObjectPtr pObject,
+              const double length,
+              const double width,
+              const double height,
+              const int rows,
+              const int columns,
+              const double R1=1,
+              const double G1=1,
+              const double B1=1,
+              const double R2=0,
+              const double G2=0,
+              const double B2=0
             );
   
   //--------------------------------------------------------------------------------------------------------------------

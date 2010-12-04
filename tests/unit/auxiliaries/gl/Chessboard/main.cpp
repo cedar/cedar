@@ -55,8 +55,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Chessboard test_chessboard(std::string("test chessboard"));
-  Chessboard chessboard(std::string("second test chessboard"), 1, 2, 3, 5, 500);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Chessboard test_chessboard(p_object);
+  Chessboard chessboard(p_object, 1, 2, 3, 5, 500);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

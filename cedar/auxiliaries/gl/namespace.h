@@ -66,14 +66,29 @@ namespace cedar
       class Block;
       typedef boost::shared_ptr<Block> BlockPtr;
 
-//      class Sphere;
-//      class Cone;
-//      class Cylinder;
-//      class Prism;
-//      class Pyramid;
-//      class Torus;
-//      class Ellipse;
-//      class Chessboard;
+      class Sphere;
+      typedef boost::shared_ptr<Sphere> SpherePtr;
+
+      class Cone;
+      typedef boost::shared_ptr<Cone> ConePtr;
+
+      class Cylinder;
+      typedef boost::shared_ptr<Cylinder> CylinderPtr;
+
+      class Prism;
+      typedef boost::shared_ptr<Prism> PrismPtr;
+
+      class Pyramid;
+      typedef boost::shared_ptr<Pyramid> PyramidPtr;
+
+      class Torus;
+      typedef boost::shared_ptr<Torus> TorusPtr;
+
+      class Ellipse;
+      typedef boost::shared_ptr<Ellipse> EllipsePtr;
+
+      class Chessboard;
+      typedef boost::shared_ptr<Chessboard> ChessboardPtr;
     }
   }
 }
