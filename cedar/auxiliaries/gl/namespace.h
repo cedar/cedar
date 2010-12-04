@@ -42,6 +42,7 @@
 #include "cedar/namespace.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
 
 namespace cedar
@@ -52,18 +53,27 @@ namespace cedar
     namespace gl
     {
       class Scene;
+      typedef boost::shared_ptr<Scene> ScenePtr;
+
       class Viewer;
+      typedef boost::shared_ptr<Viewer> ViewerPtr;
+
       class Object;
-      class SceneWidget;
+      typedef boost::shared_ptr<Object> ObjectPtr;
+
+//      class SceneWidget;
+
       class Block;
-      class Sphere;
-      class Cone;
-      class Cylinder;
-      class Prism;
-      class Pyramid;
-      class Torus;
-      class Ellipse;
-      class Chessboard;
+      typedef boost::shared_ptr<Block> BlockPtr;
+
+//      class Sphere;
+//      class Cone;
+//      class Cylinder;
+//      class Prism;
+//      class Pyramid;
+//      class Torus;
+//      class Ellipse;
+//      class Chessboard;
     }
   }
 }

@@ -77,14 +77,14 @@ double Scene::sceneLimit()
   return mSceneLimit;
 }
 
-int Scene::addObject(Object* pObject)
+int Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
 {
   // TODO: prevent different objects with same names
 //  if (object name exists)
 //  {
 //    return false;
 //  }
-	mObjects.push_back(pObject);
+	mObjects.push_back(rpObject);
   return mObjects.size() - 1;
 }
 
@@ -148,7 +148,7 @@ bool Scene::isEmpty()
   return (mObjects.size() == 0);
 }
 
-Object* Scene::object(int index)
+cedar::aux::gl::ObjectPtr Scene::getObject(int index)
 {
   return mObjects[index];
 }

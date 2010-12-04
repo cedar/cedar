@@ -49,9 +49,10 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Block::Block(const std::string name)
+Block::Block(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mLength = 3;
 	mWidth = 2;
 	mHeight = 1;
@@ -62,16 +63,17 @@ Block::Block(const std::string name)
 }
 
 Block::Block(
-             const std::string name,
-             const double length,
-             const double width,
-             const double height,
-             const double R,
-             const double G,
-             const double B
+              cedar::aux::ObjectPtr pObject,
+              const double length,
+              const double width,
+              const double height,
+              const double R,
+              const double G,
+              const double B
             )
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mLength = length;
 	mWidth = width;
 	mHeight = height;
@@ -92,13 +94,12 @@ void Block::draw()
 	glPushMatrix();
   
 	// move to object coordinates
-	mTransformationTranspose = mTransformation.t();
+	mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw object
 	if (mIsVisible)
 	{
-//	  glColor4d(mColorR, mColorG, mColorB, 0);
 	  gl::setColor(mColorR, mColorG, mColorB);
 		drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
 	}
