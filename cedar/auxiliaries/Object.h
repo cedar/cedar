@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <cv.h>
 
 
 /*!@brief Provides the geometry of a rigid object
@@ -69,7 +70,49 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //
+  //!@brief returns position of the object in homogeneous coordinates
+  cv::Mat getPosition();
+
+  //!@brief returns x-position of the object frame origin in world frame
+  double getPositionX();
+
+  //!@brief returns y-position of the object frame origin in world frame
+  double getPositionY();
+
+  //!@brief returns z-position of the object frame origin in world frame
+  double getPositionZ();
+
+  //!@brief returns object frame orientation as vector of ???-Euler angles
+  cv::Mat getOrientationAngles();
+
+  //!@brief returns alpha (first) angle of the object orientation in ???-Euler angles
+  double getOrientationAngleAlpha();
+
+  //!@brief returns beta (second) angle of the object orientation in ???-Euler angles
+  double getOrientationAngleBeta();
+
+  //!@brief returns gamma (third) angle of the object orientation in ???-Euler angles
+  double getOrientationAngleGamma();
+
+  //!@brief returns the 4 \time 4 rigid transformation matrix of the object frame relative to the world frame
+  cv::Mat getTransformation();
+
+public slots:
+  /*!@brief set the position of the object frame origin in the world frame
+   * @param x    coordinates of
+   * @param y    value for green channel in RGB color
+   * @param z    value for blue channel in RGB color
+   */
+  void setPosition(const double x, const double y, const double z);
+
+  //!@brief set the position of the object frame origin in the world frame
+  void setPosition(const cv::Mat& position);
+
+  //!@brief set the orientation of the object frame, given in ??? Euler angles
+  void setOrientationAngles(const double alpha, const double beta, const double gamma);
+
+  //!@brief set the orientation of the object frame, given in ??? Euler angles
+  void setOrientationAngles(const cv::Mat angles);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -81,7 +124,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief recalculates the rigid transformation to the object frame from position and orientation
+  void updateTransformation();
+  //!@brief initialization function
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -91,7 +137,10 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
+  cv::Mat mOrientationAngles; // vector of Euler angles
+  cv::Mat mTransformation; // rigid transformation to the object
+  cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
