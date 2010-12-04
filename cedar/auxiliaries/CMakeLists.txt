@@ -56,14 +56,14 @@ cedar_add_library(cedaraux
   gl/Object.cpp
 #  gl/SceneWidget.cpp
   gl/Block.cpp
-#  gl/Sphere.cpp
-#  gl/Cone.cpp
-#  gl/Cylinder.cpp
-#  gl/Pyramid.cpp
-#  gl/Prism.cpp
-#  gl/Torus.cpp
-#  gl/Ellipse.cpp
-#  gl/Chessboard.cpp
+  gl/Sphere.cpp
+  gl/Cone.cpp
+  gl/Cylinder.cpp
+  gl/Pyramid.cpp
+  gl/Prism.cpp
+  gl/Torus.cpp
+  gl/Ellipse.cpp
+  gl/Chessboard.cpp
   HEADERS
   Base.h
   LoopedThread.h
@@ -85,14 +85,14 @@ cedar_add_library(cedaraux
   gl/Object.h
 #  gl/SceneWidget.h
   gl/Block.h
-#  gl/Sphere.h
-#  gl/Cone.h
-#  gl/Cylinder.h
-#  gl/Pyramid.h
-#  gl/Prism.h
-#  gl/Torus.h
-#  gl/Ellipse.h
-#  gl/Chessboard.h
+  gl/Sphere.h
+  gl/Cone.h
+  gl/Cylinder.h
+  gl/Pyramid.h
+  gl/Prism.h
+  gl/Torus.h
+  gl/Ellipse.h
+  gl/Chessboard.h
   MOC_HEADERS
   Object.h
   gui/BaseWidget.h

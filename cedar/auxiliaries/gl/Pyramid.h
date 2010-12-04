@@ -53,7 +53,7 @@ public:
   /*!@brief standard constructor. 
    * @param name    identifier of the instance, should be unique
    */
-	Pyramid(const std::string name);
+	Pyramid(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
    * @param name    identifier of the instance, should be unique
@@ -65,13 +65,13 @@ public:
    * @param B    color, value for blue channel in RGB
    */
 	Pyramid(
-          const std::string name,
-          const double length,
-          const double width,
-          const double height,
-          const double R=1,
-          const double G=0,
-          const double B=0
+      	   cedar::aux::ObjectPtr pObject,
+           const double length,
+           const double width,
+           const double height,
+           const double R=1,
+           const double G=0,
+           const double B=0
          );
   
   //--------------------------------------------------------------------------------------------------------------------

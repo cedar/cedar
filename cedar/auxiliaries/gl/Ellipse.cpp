@@ -49,9 +49,10 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Ellipse::Ellipse(const std::string name)
+Ellipse::Ellipse(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mLength = 2;
 	mWidth = 3;
 	mThickness = .3;
@@ -62,16 +63,17 @@ Ellipse::Ellipse(const std::string name)
 }
 
 Ellipse::Ellipse(
-                 const std::string name,
-                 const double length,
-                 const double width,
-                 const double thickness,
-                 const double R,
-                 const double G,
-                 const double B
+                  cedar::aux::ObjectPtr pObject,
+                  const double length,
+                  const double width,
+                  const double thickness,
+                  const double R,
+                  const double G,
+                  const double B
                 )
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mLength = length;
 	mWidth = width;
 	mThickness = thickness;
@@ -122,7 +124,7 @@ void Ellipse::draw()
 	glPushMatrix();
   
 	// move to object coordinates
-	mTransformationTranspose = mTransformation.t();
+  mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw the Ellipse

@@ -55,8 +55,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Prism testPrism(std::string("test prism"));
-  Prism prism(std::string("second test prism"), 1, 2);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Prism testPrism(p_object);
+  Prism prism(p_object, 1, 2);
 
   //--------------------------------------------------------------------------------------------------------------------
   // width

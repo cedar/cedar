@@ -1,1 +1,1 @@
-#cedar_add_unit_test(Torus main.cpp)
+cedar_add_unit_test(Torus main.cpp)

@@ -55,8 +55,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Pyramid testPyramid(std::string("test pyramid"));
-  Pyramid pyramid(std::string("second test pyramid"), 1, 2, 3);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Pyramid testPyramid(p_object);
+  Pyramid pyramid(p_object, 1, 2, 3);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

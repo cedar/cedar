@@ -55,8 +55,9 @@ int main()
   int errors = 0;
 
   // test constructors
-  Ellipse testEllipse(std::string("test ellipse"));
-  Ellipse ellipse(std::string("second test ellipse"), 1, 2, 0.1);
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  Ellipse testEllipse(p_object);
+  Ellipse ellipse(p_object, 1, 2, 0.1);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

@@ -49,9 +49,10 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Chessboard::Chessboard(const std::string name)
+Chessboard::Chessboard(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mLength = 4;
 	mWidth = 4;
 	mHeight = 0.2;
@@ -67,21 +68,22 @@ Chessboard::Chessboard(const std::string name)
 }
 
 Chessboard::Chessboard(
-                       const std::string name,
-                       const double length,
-                       const double width,
-                       const double height,
-                       const int rows,
-                       const int cols,
-                       const double R1,
-                       const double G1,
-                       const double B1,
-                       const double R2,
-                       const double G2,
-                       const double B2
+                        cedar::aux::ObjectPtr pObject,
+                        const double length,
+                        const double width,
+                        const double height,
+                        const int rows,
+                        const int cols,
+                        const double R1,
+                        const double G1,
+                        const double B1,
+                        const double R2,
+                        const double G2,
+                        const double B2
                       )
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mLength = length;
 	mWidth = width;
 	mHeight = height;
@@ -103,7 +105,7 @@ void Chessboard::draw()
 	glPushMatrix();
   
 	// move to object coordinates
-	mTransformationTranspose = mTransformation.t();
+  mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw object

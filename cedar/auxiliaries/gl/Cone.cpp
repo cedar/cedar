@@ -49,9 +49,10 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Cone::Cone(const std::string name)
+Cone::Cone(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mRadius = 2;
 	mHeight = 2;
 	mColorR = 1;
@@ -61,15 +62,16 @@ Cone::Cone(const std::string name)
 }
 
 Cone::Cone(
-           const std::string name,
-           const double radius,
-           const double height,
-           const double R,
-           const double G,
-           const double B
+            cedar::aux::ObjectPtr pObject,
+            const double radius,
+            const double height,
+            const double R,
+            const double G,
+            const double B
           )
+:
+cedar::aux::gl::Object(pObject)
 {
-	mName = name;
 	mRadius = radius;
 	mHeight = height;
 	mColorR = R;
@@ -89,7 +91,7 @@ void Cone::draw()
 	glPushMatrix();
   
 	// move to object coordinates
-	mTransformationTranspose = mTransformation.t();
+  mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw object
