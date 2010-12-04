@@ -1,0 +1,98 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        libraries.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: Setup of cedar and third party libraries.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# third party libraries
+
+# Qt
+find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
+include(${QT_USE_FILE})
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
+include_directories(${QT_INCLUDE_DIRS})
+
+# Boost
+if (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS ON)
+else (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS OFF)
+endif (${CMAKE_BUILD_STATIC_LIBS})
+
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost 1.40.0 COMPONENTS system date_time)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
+
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
+# OpenCV
+set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
+find_package(OpenCV REQUIRED)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
+
+# libconfig
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} config++)
+
+# libQGLViewer
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QGLViewer)
+
+# OpenGL
+
+find_package(OpenGL)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
+
+
+########################################################################################################################
+# cedar libraries
+file(GLOB cedarLibPaths "${CEDAR_SOURCE_DIR}/*/")
+
+# set up the global variable CEDAR_LIBS, which holds the names of all cedar libraries
+set(CEDAR_LIBS CACHE INTERNAL "")
+
+foreach (libPath ${cedarLibPaths})
+  if (IS_DIRECTORY ${libPath} AND EXISTS "${libPath}/CMakeLists.txt")
+
+    # get the name of the libary
+    string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libDirName "${libPath}")
+
+    # add out-of-source directory tree
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}/${CMAKE_BUILD_TYPE}")
+
+    # add the subdirectory
+    add_subdirectory(${libPath} ${subDir})
+
+  endif(IS_DIRECTORY ${libPath} AND EXISTS "${libPath}/CMakeLists.txt")
+endforeach(libPath)

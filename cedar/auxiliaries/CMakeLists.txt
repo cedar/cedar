@@ -1,0 +1,104 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        CMakeLists.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description:
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+cedar_add_library(cedaraux
+  Base.cpp
+  LoopedThread.cpp
+  ConfigurationInterface.cpp
+  LogFile.cpp
+  Object.cpp
+  exceptions/ExceptionBase.cpp
+  exceptions/NullPointerException.cpp
+  exceptions/IndexOutOfRangeException.cpp
+  math/sigmoids.h
+  math/sigmoids.cpp
+  math/tools.cpp
+  math/algebraTools.cpp
+  math/coordinateTransformations.cpp
+  math/screwCalculus.cpp
+  gui/BaseWidget.cpp
+  gl/drawShapes.cpp
+  gl/Viewer.cpp
+  gl/Scene.cpp
+  gl/Object.cpp
+  gl/SceneWidget.cpp
+  gl/Block.cpp
+  gl/Sphere.cpp
+  gl/Cone.cpp
+  gl/Cylinder.cpp
+  gl/Pyramid.cpp
+  gl/Prism.cpp
+  gl/Torus.cpp
+  gl/Ellipse.cpp
+  gl/Chessboard.cpp
+  HEADERS
+  Base.h
+  LoopedThread.h
+  ConfigurationInterface.h
+  LogFile.h
+  Object.h
+  exceptions/ExceptionBase.h
+  exceptions/NullPointerException.h
+  exceptions/IndexOutOfRangeException.h
+  math/Limits.h
+  math/tools.h
+  math/algebraTools.h
+  math/coordinateTransformations.h
+  math/screwCalculus.h
+  gui/BaseWidget.h
+  gl/drawShapes.h
+  gl/Viewer.h
+  gl/Scene.h
+  gl/Object.h
+  gl/SceneWidget.h
+  gl/Block.h
+  gl/Sphere.h
+  gl/Cone.h
+  gl/Cylinder.h
+  gl/Pyramid.h
+  gl/Prism.h
+  gl/Torus.h
+  gl/Ellipse.h
+  gl/Chessboard.h
+  MOC_HEADERS
+  Object.h
+  gui/BaseWidget.h
+  gl/Viewer.h
+  gl/Object.h
+  gl/SceneWidget.h
+  UIC_FILES
+  gl/SceneWidget.ui
+)
