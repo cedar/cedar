@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,21 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Base.h
+    File:        Object.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 12
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 12 04
 
-    Description: Header for the @em cedar::aux::Base class.
+    Description: header of cedar::aux::Object class, providing geometry of a rigid object
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_BASE_H
-#define CEDAR_AUX_BASE_H
+#ifndef CEDAR_AUX_OBJECT_H
+#define CEDAR_AUX_OBJECT_H
 
 // LOCAL INCLUDES
 #include "namespace.h"
@@ -44,40 +43,33 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <string>
+#include <QObject>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Provides the geometry of a rigid object
  *
- * More detailed description of the class.
+ * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::Base
+class cedar::aux::Object : public QObject
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+private:
+
+  Q_OBJECT;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Base();
+  Object();
 
   //!@brief Destructor
-  virtual ~Base() = 0;
-
+  virtual ~Object();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns the name of the object.
-  //!@return Name of the object.
-  const std::string& getName(void) const;
-
-  //!@brief Sets the name of the object to the given name.
-  //!@param name New name of the object.
-  void setName(const std::string& rName);
+  //
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,13 +99,12 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  //! name of the object
-  std::string _mName;
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Base
+}; // class cedar::aux::Object
 
-#endif // CEDAR_AUX_BASE_H
+#endif // CEDAR_AUX_OBJECT_H
 

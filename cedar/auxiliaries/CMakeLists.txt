@@ -39,6 +39,7 @@ cedar_add_library(cedaraux
   LoopedThread.cpp
   ConfigurationInterface.cpp
   LogFile.cpp
+  Object.cpp
   exceptions/ExceptionBase.cpp
   exceptions/NullPointerException.cpp
   exceptions/IndexOutOfRangeException.cpp
@@ -68,6 +69,7 @@ cedar_add_library(cedaraux
   LoopedThread.h
   ConfigurationInterface.h
   LogFile.h
+  Object.h
   exceptions/ExceptionBase.h
   exceptions/NullPointerException.h
   exceptions/IndexOutOfRangeException.h
@@ -92,6 +94,7 @@ cedar_add_library(cedaraux
   gl/Ellipse.h
   gl/Chessboard.h
   MOC_HEADERS
+  Object.h
   gui/BaseWidget.h
   gl/Viewer.h
   gl/Object.h

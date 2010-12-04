@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,67 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Object.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 12
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 12 04
 
-    Description: Namespace file for cedar::aux.
+    Description: implementation of cedar::aux::Object class, providing geometry of a rigid object
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_NAMESPACE_H
-#define CEDAR_AUX_NAMESPACE_H
-
 // LOCAL INCLUDES
+#include "Object.h"
 
 // PROJECT INCLUDES
-#include "cedar/namespace.h"
 
 // SYSTEM INCLUDES
-#include <sstream>
-#include <boost/smart_ptr.hpp>
 
+using namespace cedar::aux;
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+cedar::aux::Object::Object()
 {
-  /*@brief Namespace for all aux classes. */
-  namespace aux
-  {
-    class Base;
-    typedef boost::shared_ptr<Base> BasePtr;
 
-    class LoopedThread;
-    typedef boost::shared_ptr<LoopedThread> ThreadPtr;
-
-    class ConfigurationInterface;
-    typedef boost::shared_ptr<ConfigurationInterface> ConfigurationInterfacePtr;
-
-    class UserData;
-    typedef boost::shared_ptr<UserData> UserDataPtr;
-
-    class LogFile;
-    typedef boost::shared_ptr<LogFile> LogFilePtr;
-
-    class Object;
-    typedef boost::shared_ptr<Object> ObjectPtr;
-
-    /*!@brief Template method that converts simple data types to a string.
-     *
-     * @param[in] value The data value that will be converted to a string.
-     */
-    template<typename T>
-    std::string toString(const T &value)
-    {
-      std::ostringstream streamOut;
-      streamOut << value;
-      return streamOut.str();
-    }
-  }
 }
 
-#endif // CEDAR_AUX_NAMESPACE_H
+cedar::aux::Object::~Object()
+{
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
