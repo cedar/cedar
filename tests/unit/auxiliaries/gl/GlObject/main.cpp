@@ -28,7 +28,7 @@
  ----- Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 11 19
 
- ----- Description: Implements all unit tests for the @em cedar::aux::gl::object class.
+ ----- Description: Implements all unit tests for the @em cedar::aux::gl::Object class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/

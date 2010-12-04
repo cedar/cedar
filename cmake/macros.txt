@@ -51,6 +51,14 @@ macro(cedar_add_test)
   # add_test(<test identifier> <executable name> <arguments for the test>)
   if (test_AUTOMATIC)
     add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})
+    message("test directory = " ${test_DIRECTORY})
+    message("test subdirectory = " ${testSubdirectory})
+    message("test name = " ${testName})
+    
+    message("test directory = " ${CEDAR_EXE_DIR})
+    message("test subdirectory = " ${testSubdirectory})
+    message("test name = " ${testExecutableName})
+    message("")
   endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable

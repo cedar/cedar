@@ -35,7 +35,7 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(Object
+cedar_add_unit_test(GlObject
   main.cpp
   namespace.h
   TestObject.h
