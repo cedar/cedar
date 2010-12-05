@@ -43,7 +43,6 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Object.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -52,7 +51,7 @@
 #include <QObject>
 #include <QGLViewer/qglviewer.h>
 
-class cedar::aux::gl::Object : public QObject, public Base
+class cedar::aux::gl::Object : public QObject
 {
 private:
   
@@ -76,10 +75,10 @@ public:
   virtual void draw()=0;
   
   //!@brief returns name of the object
-  std::string objectName();
+  std::string getObjectName();
 
   //!@brief returns type of the object
-  std::string objectType();
+  std::string getObjectType();
   
   //!@brief returns current resolution
   int resolution();
@@ -132,7 +131,6 @@ public slots:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  std::string mName;
   std::string mObjectType;
 
   bool mIsVisible;
