@@ -54,7 +54,7 @@ cedar_add_library(cedaraux
   gl/Viewer.cpp
   gl/Scene.cpp
   gl/Object.cpp
-#  gl/SceneWidget.cpp
+  gl/SceneWidget.cpp
   gl/Block.cpp
   gl/Sphere.cpp
   gl/Cone.cpp
@@ -83,7 +83,7 @@ cedar_add_library(cedaraux
   gl/Viewer.h
   gl/Scene.h
   gl/Object.h
-#  gl/SceneWidget.h
+  gl/SceneWidget.h
   gl/Block.h
   gl/Sphere.h
   gl/Cone.h
@@ -98,7 +98,7 @@ cedar_add_library(cedaraux
   gui/BaseWidget.h
   gl/Viewer.h
   gl/Object.h
-#  gl/SceneWidget.h
-#  UIC_FILES
-#  gl/SceneWidget.ui
+  gl/SceneWidget.h
+  UIC_FILES
+  gl/SceneWidget.ui
 )
