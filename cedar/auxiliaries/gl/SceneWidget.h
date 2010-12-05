@@ -78,7 +78,7 @@ public:
 	SceneWidget(QWidget* parent=0);
 
   /*!@brief constructor with parent widget */
-	SceneWidget(Scene* pScene, QWidget* parent=0);
+	SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget* parent=0);
   
   /*!@brief the destructor */
   ~SceneWidget();
@@ -160,17 +160,17 @@ public:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	void init(Scene* pScene);
+	void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! pointer to the scene being displayed
-	cedar::aux::gl::Scene* mpScene;
+	cedar::aux::gl::ScenePtr mpScene;
 
 	// pointer to the currently selected object
-  cedar::aux::gl::Object* mpActiveObject;
+  cedar::aux::gl::ObjectPtr mpActiveObject;
 
   //! checks whether the widget is currently being changed due to a switch in the selected object
 	bool mSwitchingSelectedObject;

@@ -56,10 +56,12 @@ SceneWidget::SceneWidget(QWidget*)
 	setupUi(this);
 }
 
-SceneWidget::SceneWidget(Scene* pScene,	QWidget*)
+SceneWidget::SceneWidget(cedar::aux::gl::ScenePtr p_scene,	QWidget*)
+:
+mpScene(p_scene)
 {
 	setupUi(this);
-	init(pScene);
+	init();
 }
 
 SceneWidget::~SceneWidget()
@@ -83,7 +85,7 @@ void SceneWidget::setPosition()
 {
 	if(!mSwitchingSelectedObject)
 	{
-		mpActiveObject->setPosition(mpDoubleSpinBoxPositionX->value(),
+		mpActiveObject->getObject()->setPosition(mpDoubleSpinBoxPositionX->value(),
                                 mpDoubleSpinBoxPositionY->value(),
                                 mpDoubleSpinBoxPositionZ->value()
                               );
@@ -94,7 +96,7 @@ void SceneWidget::setOrientationAngles()
 {
 	if(!mSwitchingSelectedObject)
 	{
-		mpActiveObject->setOrientationAngles(mpDoubleSpinBoxRotationX->value(),
+		mpActiveObject->getObject()->setOrientationAngles(mpDoubleSpinBoxRotationX->value(),
                                          mpDoubleSpinBoxRotationY->value(),
                                          mpDoubleSpinBoxRotationZ->value()
                                        );
@@ -118,7 +120,7 @@ void SceneWidget::setSecondColor()
 	{
 		if (mpActiveObject->objectType().compare("Chessboard") == 0)
 		{
-			((Chessboard*)mpActiveObject)->setSecondColor(mpDoubleSpinBoxSecondColorR->value(),
+      ((ChessboardPtr)mpActiveObject)->setSecondColor(mpDoubleSpinBoxSecondColorR->value(),
                                                         mpDoubleSpinBoxSecondColorG->value(),
                                                         mpDoubleSpinBoxSecondColorB->value()
                                                       );
@@ -132,7 +134,7 @@ void SceneWidget::setRadius(double value)
 	{
 		if (mpActiveObject->objectType().compare("Cylinder") == 0)
 		{
-			((Cylinder*)mpActiveObject)->setRadius(value);
+			((CylinderPtr)mpActiveObject)->setRadius(value);
 		}
 		else if (mpActiveObject->objectType().compare("Sphere") == 0)
 		{
