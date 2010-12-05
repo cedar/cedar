@@ -64,7 +64,6 @@ Object::~Object()
 
 void Object::init()
 {
-  mName = std::string("thou shalt not be named");
   mObjectType = std::string("no type");
 	mIsVisible = true;
 	mIsDrawnAsWireFrame = false;
@@ -72,25 +71,18 @@ void Object::init()
 	mColorR = 1;
 	mColorG = 0;
 	mColorB = 0;
-  
-	// geometric basics
-//  mPosition = Mat::zeros(4, 1, CV_64FC1);
-//  mOrientationAngles = Mat::zeros(3, 1, CV_64FC1);
-//  mTransformation = Mat::eye(4, 4, CV_64FC1);
-//  mTransformationTranspose = Mat::eye(4, 4, CV_64FC1);
-//	updateTransformation();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string Object::objectName()
+std::string Object::getObjectName()
 {
-  return mName;
+  return mpObject->getName();
 }
 
-std::string Object::objectType()
+std::string Object::getObjectType()
 {
   return mObjectType;
 }

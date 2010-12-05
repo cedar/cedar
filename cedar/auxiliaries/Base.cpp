@@ -62,7 +62,7 @@ cedar::aux::Base::~Base()
 
 //!@brief Returns the name of the object.
 //!@return Name of the object.
-const std::string& cedar::aux::Base::getName(void) const
+const std::string& cedar::aux::Base::getName() const
 {
   return _mName;
 }

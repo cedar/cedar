@@ -118,7 +118,7 @@ void SceneWidget::setSecondColor()
 {
 	if(!mSwitchingSelectedObject)
 	{
-		if (mpActiveObject->objectType().compare("Chessboard") == 0)
+		if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
 		{
       ((Chessboard*)mpActiveObject.get())->setSecondColor(mpDoubleSpinBoxSecondColorR->value(),
                                                         mpDoubleSpinBoxSecondColorG->value(),
@@ -132,19 +132,19 @@ void SceneWidget::setRadius(double value)
 {
 	if(!mSwitchingSelectedObject)
 	{
-		if (mpActiveObject->objectType().compare("Cylinder") == 0)
+		if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
 		{
 			((Cylinder*)mpActiveObject.get())->setRadius(value);
 		}
-		else if (mpActiveObject->objectType().compare("Sphere") == 0)
+		else if (mpActiveObject->getObjectType().compare("Sphere") == 0)
 		{
 			((Sphere*)mpActiveObject.get())->setRadius(value);
 		}
-		else if (mpActiveObject->objectType().compare("Cone") == 0)
+		else if (mpActiveObject->getObjectType().compare("Cone") == 0)
 		{
 			((Cone*)mpActiveObject.get())->setRadius(value);
 		}
-		else if (mpActiveObject->objectType().compare("Torus") == 0)
+		else if (mpActiveObject->getObjectType().compare("Torus") == 0)
 		{
 			((Torus*)mpActiveObject.get())->setRadius(value);
 		}
@@ -155,11 +155,11 @@ void SceneWidget::setThickness(double value)
 {
 	if(!mSwitchingSelectedObject)
 	{
-		if (mpActiveObject->objectType().compare("Torus") == 0)
+		if (mpActiveObject->getObjectType().compare("Torus") == 0)
 		{
 			((Torus*)mpActiveObject.get())->setThickness(value);
 		}
-		else if (mpActiveObject->objectType().compare("Ellipse") == 0)
+		else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
 		{
 			((Ellipse*)mpActiveObject.get())->setThickness(value);
 		}
@@ -170,19 +170,19 @@ void SceneWidget::setLength(double value)
 {
 	if(!mSwitchingSelectedObject)
 	{
-		if (mpActiveObject->objectType().compare("Block") == 0)
+		if (mpActiveObject->getObjectType().compare("Block") == 0)
 		{
 			((Block*)mpActiveObject.get())->setLength(value);
 		}
-		else if (mpActiveObject->objectType().compare("Pyramid") == 0)
+		else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
 		{
 			((Pyramid*)mpActiveObject.get())->setLength(value);
 		}
-		else if (mpActiveObject->objectType().compare("Chessboard") == 0)
+		else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
 		{
 			((Chessboard*)mpActiveObject.get())->setLength(value);
 		}
-		else if (mpActiveObject->objectType().compare("Ellipse") == 0)
+		else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
 		{
 			((Ellipse*)mpActiveObject.get())->setLength(value);
 		}
@@ -193,19 +193,19 @@ void SceneWidget::setWidth(double value)
 {
 	if(!mSwitchingSelectedObject)
 	{
-		if (mpActiveObject->objectType().compare("Block") == 0)
+		if (mpActiveObject->getObjectType().compare("Block") == 0)
 		{
 			((Block*)mpActiveObject.get())->setWidth(value);
 		}
-		else if (mpActiveObject->objectType().compare("Pyramid") == 0)
+		else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
 		{
 			((Pyramid*)mpActiveObject.get())->setWidth(value);
 		}
-		else if (mpActiveObject->objectType().compare("Chessboard") == 0)
+		else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
 		{
 			((Chessboard*)mpActiveObject.get())->setWidth(value);
 		}
-		else if (mpActiveObject->objectType().compare("Ellipse") == 0)
+		else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
 		{
 			((Ellipse*)mpActiveObject.get())->setWidth(value);
 		}
@@ -215,23 +215,23 @@ void SceneWidget::setWidth(double value)
 void SceneWidget::setHeight(double value)
 {
 	if(!mSwitchingSelectedObject) {
-		if (mpActiveObject->objectType().compare("Cylinder") == 0)
+		if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
 		{
 			((Cylinder*)mpActiveObject.get())->setHeight(value);
 		}
-		else if (mpActiveObject->objectType().compare("Block") == 0)
+		else if (mpActiveObject->getObjectType().compare("Block") == 0)
 		{
 			((Block*)mpActiveObject.get())->setHeight(value);
 		}
-		else if (mpActiveObject->objectType().compare("Cone") == 0)
+		else if (mpActiveObject->getObjectType().compare("Cone") == 0)
 		{
 			((Cone*)mpActiveObject.get())->setHeight(value);
 		}
-		else if (mpActiveObject->objectType().compare("Pyramid") == 0)
+		else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
 		{
 			((Pyramid*)mpActiveObject.get())->setHeight(value);
 		}
-		else if (mpActiveObject->objectType().compare("Chessboard") == 0)
+		else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
 		{
 			((Chessboard*)mpActiveObject.get())->setHeight(value);
 		}
@@ -243,7 +243,7 @@ void SceneWidget::setNumberOfRows(int value)
 {
 	if(!mSwitchingSelectedObject)
 	{
-		if (mpActiveObject->objectType().compare("Chessboard") == 0)
+		if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
 		{
 			((Chessboard*)mpActiveObject.get())->setNumberOfRows(value);
 		}
@@ -254,7 +254,7 @@ void SceneWidget::setNumberOfColumns(int value)
 {
 	if(!mSwitchingSelectedObject)
 	{
-		if (mpActiveObject->objectType().compare("Chessboard") == 0)
+		if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
 		{
 			((Chessboard*)mpActiveObject.get())->setNumberOfColumns(value);
 		}
@@ -377,7 +377,7 @@ void SceneWidget::updateWidgetObjectParameters()
   mpDoubleSpinBoxSecondColorG->setEnabled(false);
   mpDoubleSpinBoxSecondColorB->setEnabled(false);
 
-  if (mpActiveObject->objectType().compare("Cylinder") == 0)
+  if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
   {
     // enable those elements that apply
     mpDoubleSpinBoxRadius->setEnabled(true);
@@ -386,12 +386,12 @@ void SceneWidget::updateWidgetObjectParameters()
     mpDoubleSpinBoxHeight->setValue(((Cylinder*)mpActiveObject.get())->height());
     mpDoubleSpinBoxRadius->setValue(((Cylinder*)mpActiveObject.get())->radius());
   }
-  else if (mpActiveObject->objectType().compare("Sphere") == 0)
+  else if (mpActiveObject->getObjectType().compare("Sphere") == 0)
   {
     mpDoubleSpinBoxRadius->setEnabled(true);
     mpDoubleSpinBoxRadius->setValue(((Sphere*)mpActiveObject.get())->radius());
   }
-  else if (mpActiveObject->objectType().compare("Block") == 0)
+  else if (mpActiveObject->getObjectType().compare("Block") == 0)
   {
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
@@ -400,14 +400,14 @@ void SceneWidget::updateWidgetObjectParameters()
     mpDoubleSpinBoxWidth->setValue(((Block*)mpActiveObject.get())->width());
     mpDoubleSpinBoxLength->setValue(((Block*)mpActiveObject.get())->length());
   }
-  else if (mpActiveObject->objectType().compare("Cone") == 0)
+  else if (mpActiveObject->getObjectType().compare("Cone") == 0)
   {
     mpDoubleSpinBoxRadius->setEnabled(true);
     mpDoubleSpinBoxHeight->setEnabled(true);
     mpDoubleSpinBoxHeight->setValue(((Cone*)mpActiveObject.get())->height());
     mpDoubleSpinBoxRadius->setValue(((Cone*)mpActiveObject.get())->radius());
   }
-  else if (mpActiveObject->objectType().compare("Pyramid") == 0)
+  else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
   {
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
@@ -417,7 +417,7 @@ void SceneWidget::updateWidgetObjectParameters()
     mpDoubleSpinBoxWidth->setValue(((Block*)mpActiveObject.get())->width());
     mpDoubleSpinBoxLength->setValue(((Block*)mpActiveObject.get())->length());
   }
-  else if (mpActiveObject->objectType().compare("Chessboard") == 0)
+  else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
   {
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
@@ -437,14 +437,14 @@ void SceneWidget::updateWidgetObjectParameters()
     mpDoubleSpinBoxSecondColorG->setValue(((Chessboard*)mpActiveObject.get())->secondColorG());
     mpDoubleSpinBoxSecondColorB->setValue(((Chessboard*)mpActiveObject.get())->secondColorB());
   }
-  else if (mpActiveObject->objectType().compare("Torus") == 0)
+  else if (mpActiveObject->getObjectType().compare("Torus") == 0)
   {
     mpDoubleSpinBoxRadius->setEnabled(true);
     mpDoubleSpinBoxThickness->setEnabled(true);
     mpDoubleSpinBoxRadius->setValue(((Torus*)mpActiveObject.get())->radius());
     mpDoubleSpinBoxThickness->setValue(((Torus*)mpActiveObject.get())->thickness());
   }
-  else if (mpActiveObject->objectType().compare("Ellipse") == 0)
+  else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
   {
     mpDoubleSpinBoxThickness->setEnabled(true);
     mpDoubleSpinBoxLength->setEnabled(true);
@@ -462,7 +462,7 @@ void SceneWidget::init()
   // fill combo box with names of objects in the scene
   for (int i=0; i<mpScene->numberOfObjects(); i++)
   {
-    mpComboBoxName->addItem(QString(mpScene->getObject(i)->objectName().c_str()));
+    mpComboBoxName->addItem(QString(mpScene->getObject(i)->getObjectName().c_str()));
   }
   
   if (mpScene->isEmpty())

@@ -43,12 +43,6 @@
 #ifndef CEDAR_AUX_GL_SCENE_WIDGET_H
 #define CEDAR_AUX_GL_SCENE_WIDGET_H
 
-// SYSTEM INCLUDES
-#include <Qt>
-
-// PROJECT INCLUDES
-#include "build/cedar/auxiliaries/ui_SceneWidget.h"
-
 // LOCAL INCLUDES
 #include "namespace.h"
 #include "Scene.h"
@@ -63,8 +57,15 @@
 #include "Ellipse.h"
 #include "Chessboard.h"
 
+// PROJECT INCLUDES
+#include "build/cedar/auxiliaries/ui_SceneWidget.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 
-class cedar::aux::gl::SceneWidget : public QWidget, private Ui_SceneWidget
+// SYSTEM INCLUDES
+#include <Qt>
+
+
+class cedar::aux::gl::SceneWidget : public cedar::aux::gui::BaseWidget, private Ui_SceneWidget
 {
 private:
 

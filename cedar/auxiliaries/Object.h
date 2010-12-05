@@ -39,6 +39,7 @@
 
 // LOCAL INCLUDES
 #include "namespace.h"
+#include "Base.h"
 
 // PROJECT INCLUDES
 
@@ -51,7 +52,7 @@
  *
  * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::Object : public QObject
+class cedar::aux::Object : public QObject, public cedar::aux::Base
 {
 private:
 
