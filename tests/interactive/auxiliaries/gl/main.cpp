@@ -37,7 +37,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/Scene.h"
-//#include "cedar/auxiliaries/gl/SceneWidget.h"
+#include "cedar/auxiliaries/gl/SceneWidget.h"
 #include "cedar/auxiliaries/gl/Viewer.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
@@ -136,9 +136,9 @@ int main(int argc, char **argv)
   p_chessboard->setName(std::string("Caspar the checkered Chessboard"));
   p_scene->addObject(p_chessboard);
 
-//  // create a widget to control the scene
-//  SceneWidget* p_scene_widget = new SceneWidget(&scene);
-//  p_scene_widget->show();
+  // create a widget to control the scene
+  SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
+  p_scene_widget->show();
 
   a.exec();
   return 0;
