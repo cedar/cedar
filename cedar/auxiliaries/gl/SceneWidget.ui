@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>537</width>
+    <width>612</width>
     <height>813</height>
    </rect>
   </property>
@@ -219,58 +219,8 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="mpLabelRotationX">
-        <property name="text">
-         <string>x:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1" colspan="3">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotationX">
-        <property name="minimum">
-         <double>-5.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="4">
-       <widget class="QLabel" name="mpLabelRotationY">
-        <property name="text">
-         <string>y:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="5" colspan="2">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotationY">
-        <property name="decimals">
-         <number>2</number>
-        </property>
-        <property name="minimum">
-         <double>-5.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>5.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="7">
-       <widget class="QLabel" name="mpLabelRotationZ">
-        <property name="text">
-         <string>z:</string>
-        </property>
-       </widget>
-      </item>
       <item row="9" column="8">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotationZ">
+       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotation3">
         <property name="minimum">
          <double>-5.000000000000000</double>
         </property>
@@ -557,6 +507,48 @@
         </property>
         <property name="value">
          <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="6">
+       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotation2">
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <double>-5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="3" colspan="2">
+       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotation1">
+        <property name="minimum">
+         <double>-5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0" colspan="2">
+       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotation0">
+        <property name="minimum">
+         <double>-5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
         </property>
        </widget>
       </item>

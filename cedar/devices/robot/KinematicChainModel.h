@@ -52,10 +52,10 @@
 #include <QObject>
 
 /*! \brief Calculates the geometric transformations occurring in a serial chain depending upon joint angles
- * 
+ * TODO: update these comments
  * A KinematicChainModel is initialized with an instance of ReferenceGeometry, containing all geometric information 
  * about the kinematic chain in reference configuration, i.e. \theta = 0. For a configuration given by a specific joint 
- * angle vector \theta, first call calculateTransformations( .. ). Then the transformations and jacobians can be 
+ * angle vector \theta, first call update(). Then the transformations and jacobians can be
  * accessed using the appropriate functions.
  */
 class cedar::dev::robot::KinematicChainModel : public cedar::aux::Object

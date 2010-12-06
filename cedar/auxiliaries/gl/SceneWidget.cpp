@@ -95,14 +95,29 @@ void SceneWidget::setPosition()
 
 void SceneWidget::setOrientationAngles()
 {
-	if(!mSwitchingSelectedObject)
-	{
-		mpActiveObject->getObject()->setOrientationAngles(
-		                                                   mpDoubleSpinBoxRotationX->value(),
-                                                       mpDoubleSpinBoxRotationY->value(),
-                                                       mpDoubleSpinBoxRotationZ->value()
-                                                     );
-	}
+//	if(!mSwitchingSelectedObject)
+//	{
+//		mpActiveObject->getObject()->setOrientationAngles(
+//		                                                   mpDoubleSpinBoxRotationX->value(),
+//                                                       mpDoubleSpinBoxRotationY->value(),
+//                                                       mpDoubleSpinBoxRotationZ->value()
+//                                                     );
+//	}
+}
+
+void SceneWidget::setOrientationQuaternion()
+{
+  if(!mSwitchingSelectedObject)
+  {
+    cv::Mat q(4, 1, CV_64FC1);
+    q.at<double>(0, 0) = mpDoubleSpinBoxRotation0->value();
+    q.at<double>(1, 0) = mpDoubleSpinBoxRotation1->value();
+    q.at<double>(2, 0) = mpDoubleSpinBoxRotation2->value();
+    q.at<double>(3, 0) = mpDoubleSpinBoxRotation3->value();
+    q = q * 1 / norm(q);
+    mpActiveObject->getObject()->setOrientationQuaternion(q);
+  }
+  //TODO: this does not really make sense yet, should think of better representation, e.g. remove the first box and always norm the others
 }
 
 void SceneWidget::setColor()
@@ -361,9 +376,13 @@ void SceneWidget::updateWidgetObjectParameters()
   mpDoubleSpinBoxPositionX->setValue(mpActiveObject->getObject()->getPositionX());
   mpDoubleSpinBoxPositionY->setValue(mpActiveObject->getObject()->getPositionY());
   mpDoubleSpinBoxPositionZ->setValue(mpActiveObject->getObject()->getPositionZ());
-  mpDoubleSpinBoxRotationX->setValue(mpActiveObject->getObject()->getOrientationAngleAlpha());
-  mpDoubleSpinBoxRotationY->setValue(mpActiveObject->getObject()->getOrientationAngleBeta());
-  mpDoubleSpinBoxRotationZ->setValue(mpActiveObject->getObject()->getOrientationAngleGamma());
+//  mpDoubleSpinBoxRotationX->setValue(mpActiveObject->getObject()->getOrientationAngleAlpha());
+//  mpDoubleSpinBoxRotationY->setValue(mpActiveObject->getObject()->getOrientationAngleBeta());
+//  mpDoubleSpinBoxRotationZ->setValue(mpActiveObject->getObject()->getOrientationAngleGamma());
+  mpDoubleSpinBoxRotation0->setValue(mpActiveObject->getObject()->getOrientationQuaternion(0));
+  mpDoubleSpinBoxRotation1->setValue(mpActiveObject->getObject()->getOrientationQuaternion(1));
+  mpDoubleSpinBoxRotation2->setValue(mpActiveObject->getObject()->getOrientationQuaternion(2));
+  mpDoubleSpinBoxRotation3->setValue(mpActiveObject->getObject()->getOrientationQuaternion(3));
   mpDoubleSpinBoxColorR->setValue(mpActiveObject->colorR());
   mpDoubleSpinBoxColorG->setValue(mpActiveObject->colorG());
   mpDoubleSpinBoxColorB->setValue(mpActiveObject->colorB());
@@ -495,9 +514,13 @@ void SceneWidget::init()
 	connect(mpDoubleSpinBoxPositionX, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
 	connect(mpDoubleSpinBoxPositionY, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
 	connect(mpDoubleSpinBoxPositionZ, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
-	connect(mpDoubleSpinBoxRotationX, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
-	connect(mpDoubleSpinBoxRotationY, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
-	connect(mpDoubleSpinBoxRotationZ, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
+//  connect(mpDoubleSpinBoxRotationX, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
+//  connect(mpDoubleSpinBoxRotationY, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
+//  connect(mpDoubleSpinBoxRotationZ, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
+  connect(mpDoubleSpinBoxRotation0, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
+  connect(mpDoubleSpinBoxRotation1, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
+  connect(mpDoubleSpinBoxRotation2, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
+  connect(mpDoubleSpinBoxRotation3, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
 	connect(mpDoubleSpinBoxColorR, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
 	connect(mpDoubleSpinBoxColorG, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
 	connect(mpDoubleSpinBoxColorB, SIGNAL(valueChanged(double)), this, SLOT(setColor()));

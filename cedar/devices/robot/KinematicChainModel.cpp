@@ -209,7 +209,8 @@ void KinematicChainModel::init()
   }
   // end effector
   mReferenceEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
-  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr endEffector = mpKinematicChain->getReferenceGeometry()->getEndEffector();
+  cedar::dev::robot::ReferenceGeometry::RigidTransformationPtr endEffector
+    = mpKinematicChain->getReferenceGeometry()->getEndEffectorTransformation();
   
   mReferenceEndEffectorTransformation.at<double>(0, 3) = endEffector->position[0];
   mReferenceEndEffectorTransformation.at<double>(1, 3) = endEffector->position[1];

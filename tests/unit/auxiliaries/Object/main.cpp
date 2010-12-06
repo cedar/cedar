@@ -72,17 +72,17 @@ int main()
     log_file << "ERROR with setPosition(double, double, double) or getPositionX/Y/Z()" << std::endl;
   }
 
-  cv::Mat p = cv::Mat::ones(4, 1, CV_64FC1);
-  p.at<double>(0, 0) = 555.555;
-  p.at<double>(1, 0) = 2;
-  p.at<double>(2, 0) = sqrt(3);
-  object.setPosition(p);
-  cv::Mat q = object.getPosition();
+  cv::Mat p1 = cv::Mat::ones(4, 1, CV_64FC1);
+  p1.at<double>(0, 0) = 555.555;
+  p1.at<double>(1, 0) = 2;
+  p1.at<double>(2, 0) = sqrt(3);
+  object.setPosition(p1);
+  cv::Mat p2 = object.getPosition();
   if (
-      q.at<double>(0, 0) != 555.555
-      || q.at<double>(1, 0) != 2.0
-      || q.at<double>(2, 0) != sqrt(3)
-      || q.at<double>(3, 0) != 1.0
+      p2.at<double>(0, 0) != 555.555
+      || p2.at<double>(1, 0) != 2.0
+      || p2.at<double>(2, 0) != sqrt(3)
+      || p2.at<double>(3, 0) != 1.0
       )
   {
     errors++;
@@ -120,6 +120,43 @@ int main()
     log_file << "ERROR with setOrientationAngles(Mat) or getOrientationAngles()" << std::endl;
   }
   
+  //--------------------------------------------------------------------------------------------------------------------
+  // orientation (quaternion)
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: orientation" << std::endl;
+  object.setOrientationQuaternion(0, 1);
+  object.setOrientationQuaternion(1, 1);
+  object.setOrientationQuaternion(3, 1);
+
+  if (
+      object.getOrientationQuaternion(0) != 0.5
+      || object.getOrientationQuaternion(1) != 0.5
+      || object.getOrientationQuaternion(2) != 0.0
+      || object.getOrientationQuaternion(3) != sqrt(2)/2
+      )
+  {
+    errors++;
+    log_file << "ERROR with setOrientationQuaternion(unsigned int, double) or getOrientationQuaternion(unsigned int)"
+             << std::endl;
+  }
+
+  cv::Mat q1 = cv::Mat::zeros(4, 1, CV_64FC1);
+  q1.at<double>(1, 0) = 3.3;
+  q1.at<double>(2, 0) = 4.4;
+  q1.at<double>(3, 0) = 0.5;
+  object.setOrientationQuaternion(q1);
+  cv::Mat q2 = object.getOrientationQuaternion();
+  if (
+      !IsZero(q2.at<double>(0, 0) - 0.0)
+      || q2.at<double>(1, 0) != 3.3
+      || q2.at<double>(2, 0) != 4.4
+      || q2.at<double>(3, 0) != 0.5
+      )
+  {
+    errors++;
+    log_file << "ERROR with setOrientationQuaternion(Mat) or getOrientationQuaternion()" << std::endl;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // transformation
   //--------------------------------------------------------------------------------------------------------------------

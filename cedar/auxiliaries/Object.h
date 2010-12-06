@@ -98,6 +98,12 @@ public:
   //!@brief returns gamma (third) angle of the object orientation in ???-Euler angles
   double getOrientationAngleGamma();
 
+  //!@brief returns object frame orientation as a unit quaternion
+  double getOrientationQuaternion(unsigned int component);
+
+  //!@brief returns object frame orientation as a unit quaternion
+  cv::Mat getOrientationQuaternion();
+
   //!@brief returns the 4 \time 4 rigid transformation matrix of the object frame relative to the world frame
   cv::Mat getTransformation();
 
@@ -117,6 +123,12 @@ public slots:
 
   //!@brief set the orientation of the object frame, given in ??? Euler angles
   void setOrientationAngles(const cv::Mat angles);
+
+  //!@brief set the orientation of the object frame, given as a unit quaternion
+  void setOrientationQuaternion(unsigned int component, double value);
+
+  //!@brief set the orientation of the object frame, given as a unit quaternion
+  void setOrientationQuaternion(const cv::Mat quaternion);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -143,6 +155,7 @@ protected:
 private:
   cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
   cv::Mat mOrientationAngles; // vector of Euler angles
+  cv::Mat mOrientationQuaternion; // quaternion representing the orientation
   cv::Mat mTransformation; // rigid transformation to the object
   cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
 
