@@ -227,7 +227,7 @@ void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 void KinematicChain::step(unsigned long time)
 {
 
-  cout << "running KinematicChain::step(" << time << ")" << endl;
+//  cout << "running KinematicChain::step(" << time << ")" << endl;
 
   double currentAngle = 0.0;
   double newAngle = 0.0;
@@ -238,7 +238,7 @@ void KinematicChain::step(unsigned long time)
   {
     // get current joint angle from the device
     currentAngle = getJointAngle(i);
-    cout << "currentAngle = " << currentAngle << endl;
+//    cout << "currentAngle = " << currentAngle << endl;
 
     // update the angle according to working mode
     switch(mJointWorkingModes[i])
@@ -247,14 +247,14 @@ void KinematicChain::step(unsigned long time)
     case ANGLE:
       // calculate velocity
       newAngle = getJointAngles()[i];
-      cout << "newAngle = " << newAngle << endl;
+//      cout << "newAngle = " << newAngle << endl;
       velocity = ( newAngle - currentAngle ) * ( 1000000.0 / (double) time );
-      cout << "velocity = " << velocity << endl;
+//      cout << "velocity = " << velocity << endl;
 
       // consider limits
       newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
       newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
-      cout << "newAngle* = " << newAngle << endl;
+//      cout << "newAngle* = " << newAngle << endl;
 
       // apply new values
       setJointAngle(i, newAngle);
@@ -268,12 +268,12 @@ void KinematicChain::step(unsigned long time)
       // calculate new angle
       velocity = mJointVelocities[i];
       newAngle = currentAngle + velocity * ( (double) time / 1000000.0 );
-      cout << "newAngle = " << newAngle << endl;
+//      cout << "newAngle = " << newAngle << endl;
 
       // consider angle limits
       newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
       newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
-      cout << "newAngle* = " << newAngle << endl;
+//      cout << "newAngle* = " << newAngle << endl;
 
       // set new joint angle
       setJointAngle(i, newAngle);

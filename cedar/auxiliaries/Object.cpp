@@ -53,7 +53,6 @@ using namespace cedar::aux::math;
 cedar::aux::Object::Object()
 :
 mPosition(4, 1, CV_64FC1),
-mOrientationAngles(3, 1, CV_64FC1),
 mOrientationQuaternion(4, 1, CV_64FC1),
 mTransformation(4, 4, CV_64FC1),
 mTransformationTranspose(4, 4, CV_64FC1)
@@ -65,7 +64,6 @@ cedar::aux::Object::Object(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName),
 mPosition(4, 1, CV_64FC1),
-mOrientationAngles(3, 1, CV_64FC1),
 mOrientationQuaternion(4, 1, CV_64FC1),
 mTransformation(4, 4, CV_64FC1),
 mTransformationTranspose(4, 4, CV_64FC1)
@@ -77,9 +75,6 @@ mTransformationTranspose(4, 4, CV_64FC1)
   mPosition.at<double>(0, 0) = _mPosition[0];
   mPosition.at<double>(1, 0) = _mPosition[1];
   mPosition.at<double>(2, 0) = _mPosition[2];
-  mOrientationAngles.at<double>(0, 0) = _mOrientation[0];
-  mOrientationAngles.at<double>(1, 0) = _mOrientation[1];
-  mOrientationAngles.at<double>(2, 0) = _mOrientation[2];
   mOrientationQuaternion.at<double>(0, 0) = _mOrientation[0];
   mOrientationQuaternion.at<double>(1, 0) = _mOrientation[1];
   mOrientationQuaternion.at<double>(2, 0) = _mOrientation[2];
@@ -117,26 +112,6 @@ double Object::getPositionZ()
   return mPosition.at<double>(2, 0);
 }
 
-cv::Mat Object::getOrientationAngles()
-{
-  return mOrientationAngles.clone();
-}
-
-double Object::getOrientationAngleAlpha()
-{
-  return mOrientationAngles.at<double>(0, 0);
-}
-
-double Object::getOrientationAngleBeta()
-{
-  return mOrientationAngles.at<double>(1, 0);
-}
-
-double Object::getOrientationAngleGamma()
-{
-  return mOrientationAngles.at<double>(2, 0);
-}
-
 double Object::getOrientationQuaternion(unsigned int component)
 {
   return mOrientationQuaternion.at<double>(component, 0);
@@ -167,22 +142,6 @@ void Object::setPosition(const cv::Mat& position)
   updateTransformation();
 }
 
-void Object::setOrientationAngles(double alpha, double beta, double gamma)
-{
-  mOrientationAngles.at<double>(0, 0) = cedar::aux::math::normalizeAngle(alpha);
-  mOrientationAngles.at<double>(1, 0) = cedar::aux::math::normalizeAngle(beta);
-  mOrientationAngles.at<double>(2, 0) = cedar::aux::math::normalizeAngle(gamma);
-  updateTransformation();
-}
-
-void Object::setOrientationAngles(cv::Mat angles)
-{
-  mOrientationAngles.at<double>(0, 0) = cedar::aux::math::normalizeAngle(angles.at<double>(0, 0));
-  mOrientationAngles.at<double>(1, 0) = cedar::aux::math::normalizeAngle(angles.at<double>(1, 0));
-  mOrientationAngles.at<double>(2, 0) = cedar::aux::math::normalizeAngle(angles.at<double>(2, 0));
-  updateTransformation();
-}
-
 void Object::setOrientationQuaternion(cv::Mat quaternion)
 {
   std::cout << "running setOrientationQuaternion()" << std::endl;
@@ -201,19 +160,6 @@ void Object::setOrientationQuaternion(unsigned int component, double value)
 
 void Object::updateTransformation()
 {
-//  double alpha = mOrientationAngles.at<double>(0, 0);
-//  double beta  = mOrientationAngles.at<double>(1, 0);
-//  double gamma = mOrientationAngles.at<double>(2, 0);
-//  mTransformation.at<double>(0, 0) = cos(alpha) * cos(beta) * cos(gamma) - sin(alpha) * sin(gamma);
-//  mTransformation.at<double>(1, 0) = sin(alpha) * cos(beta) * cos(gamma) + cos(alpha) * sin(gamma);
-//  mTransformation.at<double>(2, 0) = - sin(beta) * cos(gamma);
-//  mTransformation.at<double>(0, 1) = - cos(alpha) * cos(beta) * sin(gamma) - sin(alpha) * cos(gamma);
-//  mTransformation.at<double>(1, 1) = - sin(alpha) * cos(beta) * sin(gamma) + cos(alpha) * cos(gamma);
-//  mTransformation.at<double>(2, 1) = sin(beta) * sin(gamma);
-//  mTransformation.at<double>(0, 2) = cos(alpha) * sin(beta);
-//  mTransformation.at<double>(1, 2) = sin(alpha) * sin(beta);
-//  mTransformation.at<double>(2, 2) = cos(beta);
-
   // now using quaternions
   double a = mOrientationQuaternion.at<double>(0, 0);
   double b = mOrientationQuaternion.at<double>(1, 0);
@@ -236,8 +182,8 @@ void Object::updateTransformation()
   mTransformation.at<double>(2, 3) = mPosition.at<double>(2, 0);
 
   mTransformation.at<double>(3, 3) = 1;
-  std::cout << "running updateTransformation()" << std::endl;
-  write(mTransformation);
+//  std::cout << "running updateTransformation()" << std::endl;
+//  write(mTransformation);
 
 }
 
@@ -245,7 +191,6 @@ void Object::init()
 {
   mPosition = 0.0;
   mPosition.at<double>(3, 0) = 1.0;
-  mOrientationAngles = 0.0;
   mOrientationQuaternion = 0.0;
   mOrientationQuaternion.at<double>(0, 0) = 1.0;
   mTransformation = 0.0;

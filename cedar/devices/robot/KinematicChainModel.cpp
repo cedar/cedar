@@ -54,6 +54,7 @@ using namespace cv;
 
 KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain)
 :
+cedar::aux::Object(rpKinematicChain->getReferenceGeometry()->getConfigFileName()),
 mpKinematicChain(rpKinematicChain)
 {
   init();
@@ -87,8 +88,45 @@ cv::Mat KinematicChainModel::getJointTransformation(const unsigned int index)
 {
   Mat T;
   mTransformationsLock.lockForRead();
-  T = mJointTransformations[index].clone();
+//  cout << mTransformation.type() << endl;
+//  cout << mJointTransformations[index].type() << endl;
+//  cout << mTwistExponentials[index].type() << endl;
+//  cout << mReferenceJointTransformations[index].type() << endl;
+//  cout << CV_32F << endl;
+//  cout << CV_64F << endl;
+//  cout << CV_64FC1 << endl;
+//  T = mTransformation * mJointTransformations[index];
+//  T =  mJointTransformations[index] * mTransformation.inv();
+//  T = mJointTransformations[index];
+  cout << index << endl;
+  T = mTransformation * mJointTransformations[index];
+
+  cout << "mTransformation:" << endl;
+  write(mTransformation);
+
+  cout << "mJointTransformations[1]:" << endl;
+  write(mJointTransformations[index]);
+
+  cout << "T:" << endl;
+  write(T);
+
+  cout << "---" << endl;
   mTransformationsLock.unlock();
+  if (index == 10)
+  {
+//    cout << mReferenceJointTransformations[index].type() << endl;
+//    cout << mJointTransformations[index].type() << endl;
+//    cout << mTransformation.type() << endl;
+//    cout << "---" << endl;
+//    T = mTransformation * mJointTransformations[index];
+//    cout << "running getJointTransformation(1)" << endl;
+//    cout << "mTransformation:" << endl;
+//    write(mTransformation);
+//    cout << "mJointTransformations[1]:" << endl;
+//    write(mJointTransformations[index]);
+//    cout << "T:" << endl;
+//    write(T);
+  }
   return T;
 }
 
@@ -164,7 +202,7 @@ cv::Mat KinematicChainModel::calculateEndEffectorTransformation()
 {
   Mat T;
   mTransformationsLock.lockForRead();
-  T = mEndEffectorTransformation.clone();
+  T = mTransformation * mEndEffectorTransformation;
   mTransformationsLock.unlock();
   return T;
 }
@@ -207,6 +245,9 @@ void KinematicChainModel::init()
     mJointTransformations.push_back(Mat::zeros(4, 4, CV_64FC1));
     mJointTwists.push_back(Mat::zeros(6, 1, CV_64FC1));
   }
+
+
+
   // end effector
   mReferenceEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
   cedar::dev::robot::ReferenceGeometry::RigidTransformationPtr endEffector
@@ -230,6 +271,7 @@ void KinematicChainModel::init()
 
   mEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
   update();
+  cout << mReferenceJointTransformations[1].type() << endl;
 }
 
 void KinematicChainModel::calculateTransformations()
