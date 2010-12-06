@@ -78,7 +78,7 @@ public:
   /*!@brief returns the rough delimiter of the scene within which things are guaranteed to be visualized
    * @return    scene limit
    */
-  double sceneLimit();
+  double getSceneLimit();
   
   /*!@brief adds an object to the scene
    * @param pObject    pointer to the object

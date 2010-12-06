@@ -43,6 +43,8 @@
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/gl/Viewer.h"
+#include "cedar/auxiliaries/gl/SceneWidget.h"
+
 
 // SYSTEM INCLUDES
 #include <QApplication>
@@ -64,7 +66,6 @@ int main(int argc, char **argv)
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
-  cedar::aux::math::write(p_test_arm_model->getTransformation());
   p_test_arm_model->startTimer(50);
 
   // create gl visualization object
@@ -72,30 +73,28 @@ int main(int argc, char **argv)
 
   // create scene and viewer to display the arm
   ScenePtr p_scene(new cedar::aux::gl::Scene);
-  p_scene->setSceneLimit(4);
+  p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
 
   cedar::aux::gl::ObjectPtr object = p_test_arm_visualization;
-//  ((Cylinder*)mpActiveObject.get())->setRadius(value);
-
-
   p_scene->addObject(object);
 
   // create a simple viewer for the scene
   Viewer viewer(p_scene);
   viewer.show();
-  viewer.setSceneRadius(4);
+  viewer.setSceneRadius(p_scene->getSceneLimit());
   viewer.startTimer(50);
 
+  // create a widget to control the scene
+  SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
+  p_scene_widget->show();
+
   p_test_arm->start();
-//  p_test_arm->setJointAngle(0, M_PI/4);
-//  p_test_arm->setJointAngle(1, M_PI/2);
   p_test_arm->setJointVelocity(0, .1);
   p_test_arm->setJointVelocity(1, .3);
   p_test_arm->setJointVelocity(2, .2);
   p_test_arm->setJointVelocity(3, .15);
-//  cedar::aux::math::write(p_test_arm_model->getJointTransformation(1));
-//  cedar::aux::math::write(p_test_arm_model->getJointTransformation(2));
+
   a.exec();
   return 0;
 }
