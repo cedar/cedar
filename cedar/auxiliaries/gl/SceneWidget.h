@@ -75,9 +75,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief the constructor */
-	SceneWidget(QWidget* parent=0);
-
   /*!@brief constructor with parent widget */
 	SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget* parent=0);
   

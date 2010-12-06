@@ -40,7 +40,13 @@
   4.) add in the function setWidgetObjectParameters() your ObjectType
  ---------------------------------------------------------------------------------------------------------------------*/
 
+// LOCAL INCLUDES
 #include "SceneWidget.h"
+
+// PROJECT INCLUDES
+#include "cedar/auxiliaries/Object.h"
+
+// SYSTEM INCLUDES
 
 using namespace cedar::aux::gl;
 using namespace std;
@@ -49,12 +55,6 @@ using namespace cv;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-SceneWidget::SceneWidget(QWidget*)
-{
-  // TODO: this is the constructor for an empty scene. Implement accordingly.
-	setupUi(this);
-}
 
 SceneWidget::SceneWidget(cedar::aux::gl::ScenePtr p_scene,	QWidget*)
 :
@@ -85,10 +85,11 @@ void SceneWidget::setPosition()
 {
 	if(!mSwitchingSelectedObject)
 	{
-		mpActiveObject->getObject()->setPosition(mpDoubleSpinBoxPositionX->value(),
-                                mpDoubleSpinBoxPositionY->value(),
-                                mpDoubleSpinBoxPositionZ->value()
-                              );
+		mpActiveObject->getObject()->setPosition(
+		                                          mpDoubleSpinBoxPositionX->value(),
+                                              mpDoubleSpinBoxPositionY->value(),
+                                              mpDoubleSpinBoxPositionZ->value()
+                                            );
 	}
 }
 
@@ -96,10 +97,11 @@ void SceneWidget::setOrientationAngles()
 {
 	if(!mSwitchingSelectedObject)
 	{
-		mpActiveObject->getObject()->setOrientationAngles(mpDoubleSpinBoxRotationX->value(),
-                                         mpDoubleSpinBoxRotationY->value(),
-                                         mpDoubleSpinBoxRotationZ->value()
-                                       );
+		mpActiveObject->getObject()->setOrientationAngles(
+		                                                   mpDoubleSpinBoxRotationX->value(),
+                                                       mpDoubleSpinBoxRotationY->value(),
+                                                       mpDoubleSpinBoxRotationZ->value()
+                                                     );
 	}
 }
 
@@ -107,10 +109,11 @@ void SceneWidget::setColor()
 {
 	if(!mSwitchingSelectedObject)
 	{
-		mpActiveObject->setColor(mpDoubleSpinBoxColorR->value(),
-                             mpDoubleSpinBoxColorG->value(),
-                             mpDoubleSpinBoxColorB->value()
-                           );
+		mpActiveObject->setColor(
+		                          mpDoubleSpinBoxColorR->value(),
+                              mpDoubleSpinBoxColorG->value(),
+                              mpDoubleSpinBoxColorB->value()
+                            );
 	}
 }
 
@@ -120,10 +123,11 @@ void SceneWidget::setSecondColor()
 	{
 		if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
 		{
-      ((Chessboard*)mpActiveObject.get())->setSecondColor(mpDoubleSpinBoxSecondColorR->value(),
-                                                        mpDoubleSpinBoxSecondColorG->value(),
-                                                        mpDoubleSpinBoxSecondColorB->value()
-                                                      );
+      ((Chessboard*)mpActiveObject.get())->setSecondColor(
+                                                           mpDoubleSpinBoxSecondColorR->value(),
+                                                           mpDoubleSpinBoxSecondColorG->value(),
+                                                           mpDoubleSpinBoxSecondColorB->value()
+                                                         );
 		}
 	}
 }
@@ -134,7 +138,7 @@ void SceneWidget::setRadius(double value)
 	{
 		if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
 		{
-			((Cylinder*)mpActiveObject.get())->setRadius(value);
+      ((Cylinder*)mpActiveObject.get())->setRadius(value);
 		}
 		else if (mpActiveObject->getObjectType().compare("Sphere") == 0)
 		{
@@ -214,7 +218,8 @@ void SceneWidget::setWidth(double value)
 
 void SceneWidget::setHeight(double value)
 {
-	if(!mSwitchingSelectedObject) {
+	if(!mSwitchingSelectedObject)
+	{
 		if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
 		{
 			((Cylinder*)mpActiveObject.get())->setHeight(value);
@@ -235,7 +240,6 @@ void SceneWidget::setHeight(double value)
 		{
 			((Chessboard*)mpActiveObject.get())->setHeight(value);
 		}
-
 	}
 }
 
@@ -263,81 +267,81 @@ void SceneWidget::setNumberOfColumns(int value)
 
 void SceneWidget::createObject()
 {
-//  // create the new object
-//  Object* newObject;
-//  if(mpComboBoxType->currentText().compare("Cylinder") == 0)
-//  {
-//    newObject = new Cylinder(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if (mpComboBoxType->currentText().compare("Sphere") == 0)
-//  {
-//    newObject = new Sphere(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if (mpComboBoxType->currentText().compare("Block") == 0)
-//  {
-//    newObject = new Block(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if (mpComboBoxType->currentText().compare("Cone") == 0)
-//  {
-//    newObject = new Cone(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if (mpComboBoxType->currentText().compare("Pyramid") == 0)
-//  {
-//    newObject = new Pyramid(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if (mpComboBoxType->currentText().compare("Chessboard") == 0)
-//  {
-//    newObject = new Chessboard(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if(mpComboBoxType->currentText().compare("Torus") == 0)
-//  {
-//    newObject = new Torus(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if(mpComboBoxType->currentText().compare("Ellipse") == 0)
-//  {
-//    newObject = new Ellipse(mpLineEditName->text().simplified().toStdString());
-//  }
-//  else if(mpComboBoxType->currentText().compare("Prism") == 0)
-//  {
-//    newObject = new Prism(mpLineEditName->text().simplified().toStdString());
-//  }
-//
-//  // try to add it to the scene and the combo box
-//  if (mpScene->addObject(newObject))
-//  {
-//    mpComboBoxName->addItem(QString(mpLineEditName->text()));
-//    mpComboBoxName->setCurrentIndex(mpComboBoxName->count() - 1);
-//    mpLineEditName->setText("");
-//    mpObjectSettingsBox->setEnabled(true);
-//  }
-//  else
-//  {
-//    delete newObject;
-//  }
-}
+  // create the new object
+  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
+  p_object->setName(mpLineEditName->text().simplified().toStdString());
+  cedar::aux::gl::ObjectPtr p_gl_object;
+  if(mpComboBoxType->currentText().compare("Cylinder") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Cylinder(p_object));
+  }
+  if(mpComboBoxType->currentText().compare("Cylinder") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Cylinder(p_object));
+  }
+  else if (mpComboBoxType->currentText().compare("Sphere") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Sphere(p_object));
+  }
+  else if (mpComboBoxType->currentText().compare("Block") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Block(p_object));
+  }
+  else if (mpComboBoxType->currentText().compare("Cone") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Cone(p_object));
+  }
+  else if (mpComboBoxType->currentText().compare("Pyramid") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Pyramid(p_object));
+  }
+  else if (mpComboBoxType->currentText().compare("Chessboard") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Chessboard(p_object));
+  }
+  else if(mpComboBoxType->currentText().compare("Torus") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Torus(p_object));
+  }
+  else if(mpComboBoxType->currentText().compare("Ellipse") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Ellipse(p_object));
+  }
+  else if(mpComboBoxType->currentText().compare("Prism") == 0)
+  {
+    p_gl_object = cedar::aux::gl::ObjectPtr(new Prism(p_object));
+  }
 
-void SceneWidget::deleteAllObjects()
-{
-//  mpScene->clear();
-//  mpComboBoxName->clear();
-//  mpActiveObject = NULL;
-//  mpObjectSettingsBox->setEnabled(false);
+  // add the new object to the scene and the combo box
+  mpScene->addObject(p_gl_object);
+  mpComboBoxName->addItem(QString(mpLineEditName->text()));
+  mpComboBoxName->setCurrentIndex(mpComboBoxName->count() - 1);
+  mpLineEditName->setText("");
+  mpObjectSettingsBox->setEnabled(true);
 }
 
 void SceneWidget::deleteObject()
 {
-//  // remove from scene
-//  mpScene->deleteObject(mpComboBoxName->currentIndex());
-//
-//  // remove from comboBox
-//  mpComboBoxName->removeItem(mpComboBoxName->currentIndex());
-//
-//  // if this was the last one
-//	if(mpScene->numberOfObjects() == 0)
-//	{
-//		mpActiveObject = NULL;
-//		mpObjectSettingsBox->setEnabled(false);
-//	}
+  // remove from scene
+  mpScene->deleteObject(mpComboBoxName->currentIndex());
+
+  // remove from comboBox
+  mpComboBoxName->removeItem(mpComboBoxName->currentIndex());
+
+  // if this was the last one
+	if(mpScene->numberOfObjects() == 0)
+	{
+	  mpActiveObject = cedar::aux::gl::ObjectPtr();
+		mpObjectSettingsBox->setEnabled(false);
+	}
+}
+
+void SceneWidget::deleteAllObjects()
+{
+  mpScene->clear();
+  mpComboBoxName->clear();
+  mpActiveObject = cedar::aux::gl::ObjectPtr();
+  mpObjectSettingsBox->setEnabled(false);
 }
 
 void SceneWidget::setActiveObject()

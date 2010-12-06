@@ -171,4 +171,5 @@ void Object::init()
   mOrientationAngles = 0.0;
   mTransformation = 0.0;
   mTransformationTranspose = 0.0;
+  updateTransformation();
 }
