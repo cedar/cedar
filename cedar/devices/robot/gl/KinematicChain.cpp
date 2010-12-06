@@ -59,6 +59,7 @@ using namespace cv;
 //}
 gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
+cedar::aux::gl::Object(rpKinematicChainModel),
 mpKinematicChainModel(rpKinematicChainModel)
 {
 

@@ -93,37 +93,6 @@ int main()
   // orientation
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: orientation" << std::endl;
-  object.setOrientationAngles(1.0, 0, M_PI/4);
-  if (
-      object.getOrientationAngleAlpha() != 1.0
-      || object.getOrientationAngleBeta() != 0.0
-      || object.getOrientationAngleGamma() != M_PI/4
-      )
-  {
-    errors++;
-    log_file << "ERROR with setOrientationAngles(double, double, double) or getOrientationAngleAlpha/Beta/Gamma()" << std::endl;
-  }
-
-  cv::Mat o = cv::Mat::ones(3, 1, CV_64FC1);
-  o.at<double>(0, 0) = 9*M_PI;
-  o.at<double>(1, 0) = 2;
-  o.at<double>(2, 0) = 0.0;
-  object.setOrientationAngles(o);
-  cv::Mat r = object.getOrientationAngles();
-  if (
-      !IsZero(r.at<double>(0, 0) - M_PI)
-      || r.at<double>(1, 0) != 2.0
-      || r.at<double>(2, 0) != 0.0
-      )
-  {
-    errors++;
-    log_file << "ERROR with setOrientationAngles(Mat) or getOrientationAngles()" << std::endl;
-  }
-  
-  //--------------------------------------------------------------------------------------------------------------------
-  // orientation (quaternion)
-  //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: orientation" << std::endl;
   object.setOrientationQuaternion(0, 1);
   object.setOrientationQuaternion(1, 1);
   object.setOrientationQuaternion(3, 1);
@@ -162,7 +131,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: transformation" << std::endl;
   object.setPosition(1, 10, 100);
-  object.setOrientationAngles(M_PI/2, M_PI/2, M_PI/4);
+//  object.setOrientationAngles(M_PI/2, M_PI/2, M_PI/4);
   cv::Mat T = object.getTransformation();
   if (
       !IsZero(T.at<double>(0, 0) - -sqrt(2)/2)
@@ -194,15 +163,15 @@ int main()
   cedar::aux::Object configured_object("test.conf");
   cv::Mat C = configured_object.getTransformation();
   if (
-      !IsZero(C.at<double>(0, 0) - -sqrt(2)/2)
-      || !IsZero(C.at<double>(0, 1) - -sqrt(2)/2)
+      !IsZero(C.at<double>(0, 0) - 1)
+      || !IsZero(C.at<double>(0, 1) - 0)
       || !IsZero(C.at<double>(0, 2) - 0)
       || !IsZero(C.at<double>(1, 0) - 0)
-      || !IsZero(C.at<double>(1, 1) - 0)
-      || !IsZero(C.at<double>(1, 2) - 1)
-      || !IsZero(C.at<double>(2, 0) - -sqrt(2)/2)
-      || !IsZero(C.at<double>(2, 1) - sqrt(2)/2)
-      || !IsZero(C.at<double>(2, 2) - 0)
+      || !IsZero(C.at<double>(1, 1) - 1)
+      || !IsZero(C.at<double>(1, 2) - 0)
+      || !IsZero(C.at<double>(2, 0) - 0)
+      || !IsZero(C.at<double>(2, 1) - 0)
+      || !IsZero(C.at<double>(2, 2) - 1)
       || !IsZero(C.at<double>(0, 3) - 0.0)
       || !IsZero(C.at<double>(1, 3) - 1.2)
       || !IsZero(C.at<double>(2, 3) - 0.5)
@@ -215,6 +184,17 @@ int main()
     errors++;
     log_file << "ERROR with configured_object(const std::string& configFileName)" << std::endl;
   }
+
+  log_file << configured_object.getOrientationQuaternion(0) << " "
+           << configured_object.getOrientationQuaternion(1) << " "
+           << configured_object.getOrientationQuaternion(2) << " "
+           << configured_object.getOrientationQuaternion(3) << std::endl;
+
+  log_file << C.at<double>(0, 0) << " " << C.at<double>(0, 1) << " " << C.at<double>(0, 2) << " " << C.at<double>(0, 3) << std::endl
+           << C.at<double>(1, 0) << " " << C.at<double>(1, 1) << " " << C.at<double>(1, 2) << " " << C.at<double>(1, 3) << std::endl
+           << C.at<double>(2, 0) << " " << C.at<double>(2, 1) << " " << C.at<double>(2, 2) << " " << C.at<double>(2, 3) << std::endl
+           << C.at<double>(3, 0) << " " << C.at<double>(3, 1) << " " << C.at<double>(3, 2) << " " << C.at<double>(3, 3) << std::endl
+           << std::endl;
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

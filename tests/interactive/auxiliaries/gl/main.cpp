@@ -116,7 +116,6 @@ int main(int argc, char **argv)
   // create a torus visualization and add it to the scene
   cedar::aux::ObjectPtr p_torus_object(new cedar::aux::Object());
   p_torus_object->setPosition( -7.5, 3, 3 );
-  p_torus_object->setOrientationAngles( M_PI*0.5, M_PI*0.5, 0 );
   p_torus_object->setName(std::string("Tom the Torus"));
   ObjectPtr p_torus(new Torus(p_torus_object, 2, 0.3, 1, 0.5, 0));
   p_scene->addObject(p_torus);
@@ -124,7 +123,6 @@ int main(int argc, char **argv)
   // create a torus visualization and add it to the scene
   cedar::aux::ObjectPtr p_ellipse_object(new cedar::aux::Object());
   p_ellipse_object->setPosition(-7.5, -3, 3);
-  p_ellipse_object->setOrientationAngles(M_PI*0.5, M_PI*0.5, 0);
   p_ellipse_object->setName(std::string("Elfriede la Ellipse"));
   ObjectPtr p_ellipse(new Ellipse(p_ellipse_object, 1, 2, 0.3, 1, 1, 0));
   p_scene->addObject(p_ellipse);

@@ -86,18 +86,6 @@ public:
   //!@brief returns z-position of the object frame origin in world frame
   double getPositionZ();
 
-  //!@brief returns object frame orientation as vector of ???-Euler angles
-  cv::Mat getOrientationAngles();
-
-  //!@brief returns alpha (first) angle of the object orientation in ???-Euler angles
-  double getOrientationAngleAlpha();
-
-  //!@brief returns beta (second) angle of the object orientation in ???-Euler angles
-  double getOrientationAngleBeta();
-
-  //!@brief returns gamma (third) angle of the object orientation in ???-Euler angles
-  double getOrientationAngleGamma();
-
   //!@brief returns object frame orientation as a unit quaternion
   double getOrientationQuaternion(unsigned int component);
 
@@ -117,12 +105,6 @@ public slots:
 
   //!@brief set the position of the object frame origin in the world frame
   void setPosition(const cv::Mat& position);
-
-  //!@brief set the orientation of the object frame, given in ??? Euler angles
-  void setOrientationAngles(const double alpha, const double beta, const double gamma);
-
-  //!@brief set the orientation of the object frame, given in ??? Euler angles
-  void setOrientationAngles(const cv::Mat angles);
 
   //!@brief set the orientation of the object frame, given as a unit quaternion
   void setOrientationQuaternion(unsigned int component, double value);
@@ -150,13 +132,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
+
 protected:
-  // none yet
+  cv::Mat mTransformation; // rigid transformation to the object
+
 private:
   cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
-  cv::Mat mOrientationAngles; // vector of Euler angles
   cv::Mat mOrientationQuaternion; // quaternion representing the orientation
-  cv::Mat mTransformation; // rigid transformation to the object
   cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
 
   //--------------------------------------------------------------------------------------------------------------------

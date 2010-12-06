@@ -59,35 +59,43 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/Users/reimajbi/src/cedar.dev/tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
-//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/home/reimajbi/srcMercurial/cedar.dev/tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/Users/reimajbi/src/cedar.object/tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
   cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
+  cedar::aux::math::write(p_test_arm_model->getTransformation());
   p_test_arm_model->startTimer(50);
 
   // create gl visualization object
-  cedar::dev::robot::gl::KinematicChain test_arm_visualization(p_test_arm_model);
+  cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_test_arm_model));
 
   // create scene and viewer to display the arm
-  Scene scene;
-  scene.setSceneLimit(2);
-  scene.drawFloor(true);
-  scene.addObject(&test_arm_visualization);
+  ScenePtr p_scene(new cedar::aux::gl::Scene);
+  p_scene->setSceneLimit(4);
+  p_scene->drawFloor(true);
+
+  cedar::aux::gl::ObjectPtr object = p_test_arm_visualization;
+//  ((Cylinder*)mpActiveObject.get())->setRadius(value);
+
+
+  p_scene->addObject(object);
 
   // create a simple viewer for the scene
-  Viewer viewer(&scene);
+  Viewer viewer(p_scene);
   viewer.show();
-  viewer.setSceneRadius(2);
+  viewer.setSceneRadius(4);
   viewer.startTimer(50);
 
   p_test_arm->start();
+//  p_test_arm->setJointAngle(0, M_PI/4);
+//  p_test_arm->setJointAngle(1, M_PI/2);
   p_test_arm->setJointVelocity(0, .1);
   p_test_arm->setJointVelocity(1, .3);
   p_test_arm->setJointVelocity(2, .2);
   p_test_arm->setJointVelocity(3, .15);
-  
+//  cedar::aux::math::write(p_test_arm_model->getJointTransformation(1));
+//  cedar::aux::math::write(p_test_arm_model->getJointTransformation(2));
   a.exec();
   return 0;
 }
