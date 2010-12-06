@@ -40,6 +40,7 @@
 // LOCAL INCLUDES
 #include "namespace.h"
 #include "Base.h"
+#include "ConfigurationInterface.h"
 
 // PROJECT INCLUDES
 
@@ -52,7 +53,7 @@
  *
  * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::Object : public QObject, public cedar::aux::Base
+class cedar::aux::Object : public QObject, public cedar::aux::ConfigurationInterface
 {
 private:
 
@@ -64,6 +65,8 @@ private:
 public:
   //!@brief The standard constructor.
   Object();
+  //!@brief constructor for setting saved to a configuration file
+  Object(const std::string& configFileName);
 
   //!@brief Destructor
   virtual ~Object();
@@ -152,7 +155,10 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //! position
+  std::vector<double> _mPosition;
+  //! orientation
+  std::vector<double> _mOrientation;
 
 }; // class cedar::aux::Object
 

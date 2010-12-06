@@ -116,7 +116,7 @@ public:
 
   /*!@brief The standard constructor.
    */
-  ConfigurationInterface(void);
+  ConfigurationInterface();
 
   /*!@brief Constructor with name of configuration file.
    * @param configFileName    the name of a configuration file
@@ -129,7 +129,7 @@ public:
   ConfigurationInterface(const char* pConfigFileName);
 
   /*!@brief Destructor. */
-  virtual ~ConfigurationInterface(void);
+  virtual ~ConfigurationInterface();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

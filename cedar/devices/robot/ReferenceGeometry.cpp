@@ -181,8 +181,6 @@ void ReferenceGeometry::init()
     addParameter(&(p_joint->velocityLimits.min), parameter_path + "velocityLimits.[0]", 0.0);
     addParameter(&(p_joint->velocityLimits.max), parameter_path + "velocityLimits.[1]", 0.0);
   }
-
-  std::cout << "trying to add end effector\n";
   
   // add parameter for end effector information
   ReferenceGeometry::EndEffectorPtr p_end_effector(new ReferenceGeometry::EndEffector());
@@ -190,8 +188,6 @@ void ReferenceGeometry::init()
   addParameter(&(_mEndEffector->position), "endEffector.position", 0.0);
   addParameter(&(_mEndEffector->orientation), "endEffector.orientation", 0.0);
 
-  std::cout << "added end effector\n";
-  
   // add parameters for link segment information
   const std::string link_segment_path = "links";
 
