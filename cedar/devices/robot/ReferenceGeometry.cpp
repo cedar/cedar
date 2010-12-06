@@ -114,15 +114,15 @@ void ReferenceGeometry::testOutput() const
   }
 
   std::cout << "end effector position: [";
-  for (unsigned int j = 0; j < _mEndEffector->position.size(); ++j)
+  for (unsigned int j = 0; j < _mpEndEffectorTransformation->position.size(); ++j)
   {
-    std::cout << _mEndEffector->position[j] << " ";
+    std::cout << _mpEndEffectorTransformation->position[j] << " ";
   }
   std::cout << "]\n";
   std::cout << "end effector orientation: [";
-  for (unsigned int j = 0; j < _mEndEffector->orientation.size(); ++j)
+  for (unsigned int j = 0; j < _mpEndEffectorTransformation->orientation.size(); ++j)
   {
-    std::cout << _mEndEffector->orientation[j] << " ";
+    std::cout << _mpEndEffectorTransformation->orientation[j] << " ";
   }
   std::cout << "]\n";
   
@@ -161,6 +161,11 @@ void ReferenceGeometry::init()
   // add parameter for base position
   addParameter(&_mBasePosition, "base.position", 0.0);
 
+  ReferenceGeometry::RigidTransformationPtr p_base_transformation(new ReferenceGeometry::RigidTransformation);
+  _mpBaseTransformation = p_base_transformation;
+  addParameter(&(_mpBaseTransformation->position), "base.position", 0.0);
+  addParameter(&(_mpBaseTransformation->orientation), "base.orientation", 0.0);
+
   // add parameters for joint information
   const std::string joint_path = "joints";
 
@@ -183,10 +188,10 @@ void ReferenceGeometry::init()
   }
   
   // add parameter for end effector information
-  ReferenceGeometry::EndEffectorPtr p_end_effector(new ReferenceGeometry::EndEffector());
-  _mEndEffector = p_end_effector;
-  addParameter(&(_mEndEffector->position), "endEffector.position", 0.0);
-  addParameter(&(_mEndEffector->orientation), "endEffector.orientation", 0.0);
+  ReferenceGeometry::RigidTransformationPtr p_end_effector(new ReferenceGeometry::RigidTransformation());
+  _mpEndEffectorTransformation = p_end_effector;
+  addParameter(&(_mpEndEffectorTransformation->position), "endEffector.position", 0.0);
+  addParameter(&(_mpEndEffectorTransformation->orientation), "endEffector.orientation", 0.0);
 
   // add parameters for link segment information
   const std::string link_segment_path = "links";
@@ -212,14 +217,19 @@ const unsigned int ReferenceGeometry::getNumberOfJoints() const
   return _mJoints.size();
 }
 
+const ReferenceGeometry::RigidTransformationPtr& ReferenceGeometry::getBaseTransformation() const
+{
+  return _mpBaseTransformation;
+}
+
 const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned int index) const
 {
   return _mJoints[index];
 }
 
-const ReferenceGeometry::EndEffectorPtr& ReferenceGeometry::getEndEffector() const
+const ReferenceGeometry::RigidTransformationPtr& ReferenceGeometry::getEndEffectorTransformation() const
 {
-  return _mEndEffector;
+  return _mpEndEffectorTransformation;
 }
 
 const ReferenceGeometry::LinkSegmentPtr& ReferenceGeometry::getLinkSegment(const unsigned int index) const

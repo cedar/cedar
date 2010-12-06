@@ -93,6 +93,9 @@ public slots:
 	
   /*!@brief sets the orientation of the current object according to the widget control */
   void setOrientationAngles();
+
+  /*!@brief sets the orientation of the current object according to the widget control */
+  void setOrientationQuaternion();
 	
   /*!@brief sets the color of the current object according to the widget control */
   void setColor();
