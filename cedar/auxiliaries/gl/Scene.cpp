@@ -72,7 +72,7 @@ void Scene::setSceneLimit(double value)
   mSceneLimit = value;
 }
 
-double Scene::sceneLimit()
+double Scene::getSceneLimit()
 {
   return mSceneLimit;
 }

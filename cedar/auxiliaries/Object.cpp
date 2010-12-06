@@ -52,9 +52,9 @@ using namespace cedar::aux::math;
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::Object::Object()
 :
+mTransformation(4, 4, CV_64FC1),
 mPosition(4, 1, CV_64FC1),
 mOrientationQuaternion(4, 1, CV_64FC1),
-mTransformation(4, 4, CV_64FC1),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
   init();
@@ -63,9 +63,9 @@ mTransformationTranspose(4, 4, CV_64FC1)
 cedar::aux::Object::Object(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName),
+mTransformation(4, 4, CV_64FC1),
 mPosition(4, 1, CV_64FC1),
 mOrientationQuaternion(4, 1, CV_64FC1),
-mTransformation(4, 4, CV_64FC1),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
   init();
@@ -144,9 +144,6 @@ void Object::setPosition(const cv::Mat& position)
 
 void Object::setOrientationQuaternion(cv::Mat quaternion)
 {
-  std::cout << "running setOrientationQuaternion()" << std::endl;
-  write(quaternion);
-
   assert(quaternion.type() == mOrientationQuaternion.type());
   mOrientationQuaternion = quaternion.clone();
   updateTransformation();
@@ -182,8 +179,6 @@ void Object::updateTransformation()
   mTransformation.at<double>(2, 3) = mPosition.at<double>(2, 0);
 
   mTransformation.at<double>(3, 3) = 1;
-//  std::cout << "running updateTransformation()" << std::endl;
-//  write(mTransformation);
 
 }
 
