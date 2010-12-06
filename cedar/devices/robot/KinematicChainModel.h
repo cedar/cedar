@@ -43,7 +43,7 @@
 #include "KinematicChain.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -58,7 +58,7 @@
  * angle vector \theta, first call calculateTransformations( .. ). Then the transformations and jacobians can be 
  * accessed using the appropriate functions.
  */
-class cedar::dev::robot::KinematicChainModel : public QObject
+class cedar::dev::robot::KinematicChainModel : public cedar::aux::Object
 {
 private:
 
@@ -112,10 +112,10 @@ public:
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
   void calculateJacobian(
-                         const cv::Mat& point,
-                         const unsigned int jointIndex,
-                         cv::Mat& result,
-                         const unsigned int coordinateFrame
+                          const cv::Mat& point,
+                          const unsigned int jointIndex,
+                          cv::Mat& result,
+                          const unsigned int coordinateFrame
                         );
   
   /*!@brief calculates cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
@@ -127,9 +127,9 @@ public:
    * @return    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
    */
   cv::Mat calculateJacobian(
-                            const cv::Mat& point,
-                            const unsigned int jointIndex,
-                            const unsigned int coordinateFrame
+                             const cv::Mat& point,
+                             const unsigned int jointIndex,
+                             const unsigned int coordinateFrame
                            );
   
   /*!@brief gives the spatial Jacobian in the current configuration
@@ -160,10 +160,6 @@ public:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief initialization of simple example
-//  void initExample();
-  //TODO: remove when working properly
-
   //!@brief initialization
   void init();
   
@@ -176,8 +172,9 @@ private:
 public:
   //TODO: these are needed in more situations and should be a global cedar thing, check where to put them
   enum {
-        BASE_COORDINATES, 
-        LOCAL_COORDINATES 
+         WORLD_COORDINATES,
+         BASE_COORDINATES,
+         LOCAL_COORDINATES
        };
   
   //--------------------------------------------------------------------------------------------------------------------

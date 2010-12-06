@@ -58,6 +58,29 @@ mTransformationTranspose(4, 4, CV_64FC1)
   init();
 }
 
+cedar::aux::Object::Object(const std::string& configFileName)
+:
+cedar::aux::ConfigurationInterface(configFileName),
+mPosition(4, 1, CV_64FC1),
+mOrientationAngles(3, 1, CV_64FC1),
+mTransformation(4, 4, CV_64FC1),
+mTransformationTranspose(4, 4, CV_64FC1)
+{
+  init();
+  //TODO: try to remove the brackets around _mPosition ...
+  addParameter(&(_mPosition), "Object.position", 1.0);
+  addParameter(&(_mOrientation), "Object.orientation", 0.0);
+  readOrDefaultConfiguration();
+  mPosition.at<double>(0, 0) = _mPosition[0];
+  mPosition.at<double>(1, 0) = _mPosition[1];
+  mPosition.at<double>(2, 0) = _mPosition[2];
+  mOrientationAngles.at<double>(0, 0) = _mOrientation[0];
+  mOrientationAngles.at<double>(1, 0) = _mOrientation[1];
+  mOrientationAngles.at<double>(2, 0) = _mOrientation[2];
+  updateTransformation();
+}
+
+
 cedar::aux::Object::~Object()
 {
 
@@ -168,6 +191,7 @@ void Object::updateTransformation()
 void Object::init()
 {
   mPosition = 0.0;
+  mPosition.at<double>(3, 0) = 1.0;
   mOrientationAngles = 0.0;
   mTransformation = 0.0;
   mTransformationTranspose = 0.0;

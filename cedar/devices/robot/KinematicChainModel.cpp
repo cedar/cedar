@@ -39,6 +39,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
 
 // SYSTEM INCLUDES
 
@@ -104,10 +105,11 @@ void KinematicChainModel::calculateJacobian(
   {
     point_local = mJointTransformations[jointIndex].inv() * point;
   }
-  else
+  else if (coordinateFrame == LOCAL_COORDINATES)
   {
     point_local = point;
   }
+  //TODO: world coordinates
   
   // calculate Jacobian column by column
   Mat column;

@@ -119,7 +119,6 @@ int main()
     errors++;
     log_file << "ERROR with setOrientationAngles(Mat) or getOrientationAngles()" << std::endl;
   }
-  log_file << r.at<double>(0, 0) << std::endl;
   
   //--------------------------------------------------------------------------------------------------------------------
   // transformation
@@ -149,6 +148,35 @@ int main()
   {
     errors++;
     log_file << "ERROR with getTransformation()" << std::endl;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // configuration file constructor
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: configuration file constructor" << std::endl;
+  cedar::aux::Object configured_object("test.conf");
+  cv::Mat C = configured_object.getTransformation();
+  if (
+      !IsZero(C.at<double>(0, 0) - -sqrt(2)/2)
+      || !IsZero(C.at<double>(0, 1) - -sqrt(2)/2)
+      || !IsZero(C.at<double>(0, 2) - 0)
+      || !IsZero(C.at<double>(1, 0) - 0)
+      || !IsZero(C.at<double>(1, 1) - 0)
+      || !IsZero(C.at<double>(1, 2) - 1)
+      || !IsZero(C.at<double>(2, 0) - -sqrt(2)/2)
+      || !IsZero(C.at<double>(2, 1) - sqrt(2)/2)
+      || !IsZero(C.at<double>(2, 2) - 0)
+      || !IsZero(C.at<double>(0, 3) - 0.0)
+      || !IsZero(C.at<double>(1, 3) - 1.2)
+      || !IsZero(C.at<double>(2, 3) - 0.5)
+      || !IsZero(C.at<double>(3, 0) - 0)
+      || !IsZero(C.at<double>(3, 1) - 0)
+      || !IsZero(C.at<double>(3, 2) - 0)
+      || !IsZero(C.at<double>(3, 3) - 1)
+      )
+  {
+    errors++;
+    log_file << "ERROR with configured_object(const std::string& configFileName)" << std::endl;
   }
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
