@@ -192,18 +192,18 @@ void TestClass::tryToRead(void)
 
 void TestClass::readEmptyFile(void)
 {
-  if (readConfiguration() != ConfigurationInterface::CONFIG_FILE_ERROR)
-    mFails.push_back("readConfiguration(void) does not notice missing file or file exists");
-  if (writeConfiguration() != ConfigurationInterface::CONFIG_SUCCESS)
-    mFails.push_back("writeConfiguration(void) cannot write new file");
+  if (getErrors().size() == 0)
+  {
+    mFails.push_back("readConfiguration(void) does not notice missing file");
+  }
 }
 
 void TestClass::readEmptyFileInNewFolder(void)
 {
-  if (readConfiguration() != ConfigurationInterface::CONFIG_FILE_ERROR)
-    mFails.push_back("readConfiguration(void) does not notice missing file or file exists");
-  if (writeConfiguration() != ConfigurationInterface::CONFIG_SUCCESS)
-    mFails.push_back("writeConfiguration(void) cannot write new file in non-existing folder");
+  if (getErrors().size() == 0)
+  {
+    mFails.push_back("readConfiguration(void) does not notice missing file");
+  }
 }
 
 void TestClass::tryToReadManually(void)
