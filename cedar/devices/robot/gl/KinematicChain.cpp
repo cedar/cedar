@@ -139,11 +139,5 @@ void gl::KinematicChain::drawEndEffectorVelocity()
   cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition()(Rect(0, 0, 1, 3));
   cv::Mat to = mpKinematicChainModel->calculateEndEffectorPosition()(Rect(0, 0, 1, 3))
                + mpKinematicChainModel->calculateEndEffectorVelocity();
-  drawArrow<double>(from, to, 0.01, 0.01, 0.001, mResolution);
-//  const cv::Mat start,
-//  const cv::Mat end,
-//  double shaftRadius,
-//  double headRadius,
-//  double headLength,
-//  int patches,
+  drawArrow<double>(from, to, 0.01, 0.02, 0.0005, mResolution);
 }
