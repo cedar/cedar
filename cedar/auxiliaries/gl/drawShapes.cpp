@@ -156,18 +156,56 @@ void cedar::aux::gl::drawCone(const cv::Mat start,
   // return to saved transformation
   glPopMatrix();
 }
-template void cedar::aux::gl::drawCone<double>(const cv::Mat,
+template void cedar::aux::gl::drawCone<double>(
+                                                const cv::Mat,
+                                                const cv::Mat,
+                                                const double,
+                                                const double,
+                                                const int,
+                                                const bool
+                                              );
+
+template void cedar::aux::gl::drawCone<float>(
+                                               const cv::Mat,
                                                const cv::Mat,
                                                const double,
                                                const double,
                                                const int,
-                                               const bool);
-template void cedar::aux::gl::drawCone<float>(const cv::Mat,
-                                              const cv::Mat,
-                                              const double,
-                                              const double,
-                                              const int,
-                                              const bool);
+                                               const bool
+                                             );
+
+template<typename T>
+void cedar::aux::gl::drawArrow(
+                                const cv::Mat start,
+                                const cv::Mat end,
+                                double shaftRadius,
+                                double headRadius,
+                                double headLength,
+                                int patches,
+                                bool wireFrame=false
+                              )
+{
+  drawCone<T>(start, end, shaftRadius, shaftRadius, patches, wireFrame);
+
+}
+template void cedar::aux::gl::drawArrow<float>(
+                                                const cv::Mat start,
+                                                const cv::Mat end,
+                                                double shaftRadius,
+                                                double headRadius,
+                                                double headLength,
+                                                int patches,
+                                                bool wireFrame=false
+                                              );
+template void cedar::aux::gl::drawArrow<double>(
+                                                 const cv::Mat start,
+                                                 const cv::Mat end,
+                                                 double shaftRadius,
+                                                 double headRadius,
+                                                 double headLength,
+                                                 int patches,
+                                                 bool wireFrame=false
+                                               );
 
 void cedar::aux::gl::drawSphere(const  double radius,
                                 const int slices,

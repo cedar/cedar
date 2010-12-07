@@ -102,22 +102,42 @@ void KinematicChainModel::calculateJacobian(
 {
   // transform to local coordinates if necessary
   Mat point_local;
-  if (coordinateFrame == BASE_COORDINATES)
+  switch (coordinateFrame)
   {
-    point_local = mJointTransformations[jointIndex].inv() * point;
+    case WORLD_COORDINATES :
+    {
+      point_local = mJointTransformations[jointIndex].inv() * point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+//      point_local = mJointTransformations[jointIndex].inv() * point;
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_local = point;
+      break;
+    }
   }
-  else if (coordinateFrame == LOCAL_COORDINATES)
-  {
-    point_local = point;
-  }
-  //TODO: world coordinates
+  cout << "point_local:" << endl;
+  write(point_local);
+
+
+  //TODO: I don't really understand what works here, or why... what is currently coded under world coordinates
+  // should be under base coordinates - at least for the end-effector, the position in world coordinates
+  // is used, but the base transformation does not appear in the formula above...
+  // apparently the point_local isn't really the point in the local coordinates, because it changes when the
+  // base transformation is changed. Why is the jacobian still calculated correctly?
   
   // calculate Jacobian column by column
   Mat column;
   mTransformationsLock.lockForRead();
 	for (unsigned int j = 0; j <=  jointIndex; j++)
 	{
-		column = wedgeTwist<double>(mJointTwists[j]) * mJointTransformations[jointIndex] * point_local;
+    column = wedgeTwist<double>(rigidToAdjointTransformation<double>(mTransformation)*mJointTwists[j])
+             * mJointTransformations[jointIndex]
+             * point_local;
 		// export
 		result.at<double>(0, j) = column.at<double>(0, 0);
 		result.at<double>(1, j) = column.at<double>(1, 0);
@@ -135,6 +155,15 @@ cv::Mat KinematicChainModel::calculateJacobian(
   cv::Mat J = Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
   calculateJacobian(point, jointIndex, J, coordinateFrame);
   return J;
+}
+
+cv::Mat KinematicChainModel::calculateVelocity(
+                                                const cv::Mat& point,
+                                                const unsigned int jointIndex,
+                                                const unsigned int coordinateFrame
+                                              )
+{
+  return calculateJacobian(point, jointIndex, coordinateFrame) * mpKinematicChain->getJointVelocitiesMatrix();
 }
 
 cv::Mat KinematicChainModel::calculateSpatialJacobian()
@@ -156,7 +185,7 @@ cv::Mat KinematicChainModel::calculateEndEffectorPosition()
 {
   Mat position;
 	mTransformationsLock.lockForRead();
-  position = mEndEffectorTransformation(Rect(3, 0, 1, 4)).clone();
+  position = (mTransformation*mEndEffectorTransformation)(Rect(3, 0, 1, 4));
 	mTransformationsLock.unlock();
   return position;
 }
@@ -173,7 +202,21 @@ cv::Mat KinematicChainModel::calculateEndEffectorTransformation()
 cv::Mat KinematicChainModel::calculateEndEffectorJacobian()
 {
   Mat p = calculateEndEffectorPosition();
-  return calculateJacobian(p, getNumberOfJoints()-1, BASE_COORDINATES);
+  //TODO: this should be world coordinates, really
+//  return calculateJacobian(p, getNumberOfJoints()-1, BASE_COORDINATES);
+  return calculateJacobian(p, getNumberOfJoints()-1, WORLD_COORDINATES);
+}
+
+cv::Mat KinematicChainModel::calculateEndEffectorVelocity()
+{
+  Mat p = calculateEndEffectorPosition();
+
+  cout << "end effector position:" << endl;
+  write(p);
+
+  //TODO: this should be world coordinates, really
+//  return calculateVelocity(p, getNumberOfJoints()-1, BASE_COORDINATES);
+  return calculateVelocity(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 
 void KinematicChainModel::init()
