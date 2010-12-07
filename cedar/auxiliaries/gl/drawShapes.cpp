@@ -384,17 +384,12 @@ void cedar::aux::gl::drawTorus(
   double d = 4/3*1*(sqrt(2)-1);
   double r = radius;
   double t = thickness;
-  GLfloat firstQuarter[4][4][3] =
+  GLfloat I_I[4][4][3] =
   {
-//      {{-l/2, -w/2, h/2}, {-l/4, -w/2, h/2}, {l/4, -w/2, h/2}, {l/2, -w/2, h/2}},
-//      {{-l/2, -w/4, h/2}, {-l/4, -w/4, h/2}, {l/4, -w/4, h/2}, {l/2, -w/4, h/2}},
-//      {{-l/2, w/4, h/2}, {-l/4, w/4, h/2}, {l/4, w/4, h/2}, {l/2, w/4, h/2}},
-//      {{-l/2, w/2, h/2}, {-l/4, w/2, h/2}, {l/4, w/2, h/2}, {l/2, w/2, h/2}}
-//      {{thickness, 0.0, 0.0}, {thickness, 0.0, d*thickness}, {d*thickness, 0.0, thickness}, {0.0, 0.0, thickness}},
-      {{r, 0.0, t}, {r+d*t, 0.0, t}, {r+t, 0.0, d*t}, {r+t, 0.0, 0.0}},
-      {{r, 0.25, t}, {r+d*t, 0.25, t}, {r+t, 0.25, d*t}, {r+t, 0.25, 0.0}},
-      {{r, 0.75, t}, {r+d*t, 0.75, t}, {r+t, 0.75, d*t}, {r+t, 0.75, 0.0}},
-      {{r, 1.0, t}, {r+d*t, 1.0, t}, {r+t, 1.0, d*t}, {r+t, 1.0, 0.0}}
+    {{r, 0.0, t}, {r+d*t, 0.0, t},    {r+t, 0.0, d*t},    {r+t, 0.0, 0.0}},
+    {{r, d*r, t}, {r+d*t, d*(r+d*t), t}, {r+t, d*(r+t), d*t}, {r+t, d*(r+t), 0.0}},
+    {{d*r, r, t}, {d*(r+d*t), r+d*t, t}, {d*(r+t), r+t, d*t}, {d*(r+t), r+t, 0.0}},
+    {{0.0, r, t}, {0.0, r+d*t, t},    {0.0, r+t, d*t},    {0.0, r+t, 0.0}}
   };
 
   //TODO: check which of these should move to the init function
