@@ -194,20 +194,12 @@ cv::Mat KinematicChainModel::calculateEndEffectorTransformation()
 cv::Mat KinematicChainModel::calculateEndEffectorJacobian()
 {
   Mat p = calculateEndEffectorPosition();
-  //TODO: this should be world coordinates, really
-//  return calculateJacobian(p, getNumberOfJoints()-1, BASE_COORDINATES);
   return calculateJacobian(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 
 cv::Mat KinematicChainModel::calculateEndEffectorVelocity()
 {
   Mat p = calculateEndEffectorPosition();
-
-  cout << "end effector position:" << endl;
-  write(p);
-
-  //TODO: this should be world coordinates, really
-//  return calculateVelocity(p, getNumberOfJoints()-1, BASE_COORDINATES);
   return calculateVelocity(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 

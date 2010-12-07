@@ -51,72 +51,72 @@ void cedar::aux::gl::setColor(double R, double G, double B)
   glColor4d(R, G, B, 0);
 }
 
-void cedar::aux::gl::drawBlock(const double length, const double width, const double height, const bool wireFrame)
+void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
 {
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
 	glBegin(GL_QUADS);
 	// front
 	glNormal3d(-1.0, 0.0, 0.0);
-	glVertex3d(-length/2, -width/2, -height/2);
-	glVertex3d(-length/2, width/2, -height/2);
-	glVertex3d(-length/2, width/2, height/2);
-	glVertex3d(-length/2, -width/2, height/2);
+	glVertex3d(-l/2, -w/2, -h/2);
+	glVertex3d(-l/2, w/2, -h/2);
+	glVertex3d(-l/2, w/2, h/2);
+	glVertex3d(-l/2, -w/2, h/2);
 	// right
 	glNormal3d(0.0, 1.0, 0.0);
-	glVertex3d(-length/2, width/2, -height/2);
-	glVertex3d(length/2, width/2, -height/2);
-	glVertex3d(length/2, width/2, height/2);
-	glVertex3d(-length/2, width/2, height/2);
+	glVertex3d(-l/2, w/2, -h/2);
+	glVertex3d(l/2, w/2, -h/2);
+	glVertex3d(l/2, w/2, h/2);
+	glVertex3d(-l/2, w/2, h/2);
 	// bottom
 	glNormal3d(0.0, 0.0, -1.0);
-	glVertex3d(-length/2, -width/2, -height/2);
-	glVertex3d(length/2, -width/2, -height/2);
-	glVertex3d(length/2, width/2, -height/2);
-	glVertex3d(-length/2, width/2, -height/2);
+	glVertex3d(-l/2, -w/2, -h/2);
+	glVertex3d(l/2, -w/2, -h/2);
+	glVertex3d(l/2, w/2, -h/2);
+	glVertex3d(-l/2, w/2, -h/2);
 	// back
 	glNormal3d(1.0, 0.0, 0.0);
-	glVertex3d(length/2, -width/2, -height/2);
-	glVertex3d(length/2, width/2, -height/2);
-	glVertex3d(length/2, width/2, height/2);
-	glVertex3d(length/2, -width/2, height/2);
+	glVertex3d(l/2, -w/2, -h/2);
+	glVertex3d(l/2, w/2, -h/2);
+	glVertex3d(l/2, w/2, h/2);
+	glVertex3d(l/2, -w/2, h/2);
 	// left
 	glNormal3d(0.0, -1.0, 0.0);
-	glVertex3d(-length/2, -width/2, -height/2);
-	glVertex3d(length/2, -width/2, -height/2);
-	glVertex3d(length/2, -width/2, height/2);
-	glVertex3d(-length/2, -width/2, height/2);
+	glVertex3d(-l/2, -w/2, -h/2);
+	glVertex3d(l/2, -w/2, -h/2);
+	glVertex3d(l/2, -w/2, h/2);
+	glVertex3d(-l/2, -w/2, h/2);
 	// top
 	glNormal3d(0.0, 0.0, 1.0);
-	glVertex3d(-length/2, -width/2, height/2);
-	glVertex3d(length/2, -width/2, height/2);
-	glVertex3d(length/2, width/2, height/2);
-	glVertex3d(-length/2, width/2, height/2);
+	glVertex3d(-l/2, -w/2, h/2);
+	glVertex3d(l/2, -w/2, h/2);
+	glVertex3d(l/2, w/2, h/2);
+	glVertex3d(-l/2, w/2, h/2);
 	glEnd();
   
+
+
 	if (wireFrame)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 }
 
-void cedar::aux::gl::drawCone(const double floor,
-                              const double ceiling,
-                              const double radiusFloor,
-                              const double radiusCeiling,
-                              const int slices,
-                              const bool wireFrame)
+void cedar::aux::gl::drawCone(
+                               double floor,
+                               double ceiling,
+                               double radiusFloor,
+                               double radiusCeiling,
+                               int slices,
+                               bool wireFrame
+                             )
 {
 	if (wireFrame)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
-  // TODO: check whether these have to be static ... what does static mean exactly anyways
-	static GLUquadric* quadric = gluNewQuadric();
-	glTranslatef(0.0, 0.0, floor);
+  glTranslatef(0.0, 0.0, floor);
+  GLUquadric* quadric = gluNewQuadric();
 	gluCylinder(quadric, radiusFloor, radiusCeiling, ceiling - floor, slices, 1);
+  gluDeleteQuadric(quadric);
 	glTranslatef(0.0, 0.0, -floor);
 	if (wireFrame)
 	{
@@ -125,12 +125,14 @@ void cedar::aux::gl::drawCone(const double floor,
 }
 
 template<typename T>
-void cedar::aux::gl::drawCone(const cv::Mat start,
-                              const cv::Mat end,
-                              const double radiusStart,
-                              const double radiusEnd,
-                              const int slices,
-                              const bool wireFrame)
+void cedar::aux::gl::drawCone(
+                               const cv::Mat start,
+                               const cv::Mat end,
+                               double radiusStart,
+                               double radiusEnd,
+                               int slices,
+                               bool wireFrame
+                             )
 {
   Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
   // if start = end do nothing
@@ -159,19 +161,19 @@ void cedar::aux::gl::drawCone(const cv::Mat start,
 template void cedar::aux::gl::drawCone<double>(
                                                 const cv::Mat,
                                                 const cv::Mat,
-                                                const double,
-                                                const double,
-                                                const int,
-                                                const bool
+                                                double,
+                                                double,
+                                                int,
+                                                bool
                                               );
 
 template void cedar::aux::gl::drawCone<float>(
                                                const cv::Mat,
                                                const cv::Mat,
-                                               const double,
-                                               const double,
-                                               const int,
-                                               const bool
+                                               double,
+                                               double,
+                                               int,
+                                               bool
                                              );
 
 template<typename T>
@@ -186,14 +188,15 @@ void cedar::aux::gl::drawArrow(
                               )
 {
   drawCone<T>(
-               start, start+(1-headLength)/norm(end-start)*(end-start),
+               start,
+               start+(1-headLength/norm(end-start))*(end-start),
                shaftRadius,
                shaftRadius,
                patches,
                wireFrame
              );
   drawCone<T>(
-               start+(1-headLength)/norm(end-start)*(end-start),
+               start+(1-headLength/norm(end-start))*(end-start),
                end,
                headRadius,
                0,
@@ -221,29 +224,34 @@ template void cedar::aux::gl::drawArrow<double>(
                                                  bool wireFrame=false
                                                );
 
-void cedar::aux::gl::drawSphere(const  double radius,
-                                const int slices,
-                                const int stacks,
-                                const bool wireFrame)
+void cedar::aux::gl::drawSphere(
+                                 const  double radius,
+                                 int slices,
+                                 int stacks,
+                                 bool wireFrame
+                               )
 {
 	if (wireFrame)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
-	static GLUquadric* quadric = gluNewQuadric();
+  GLUquadric* quadric = gluNewQuadric();
 	gluSphere(quadric, radius, slices, stacks);
+  gluDeleteQuadric(quadric);
 	if (wireFrame)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 }
 
-void cedar::aux::gl::drawDisk(const double innerRadius, 
-                              const double outerRadius,
-                              const int slices,
-                              const int loops,
-                              const bool invert,
-                              const bool wireFrame)
+void cedar::aux::gl::drawDisk(
+                               double innerRadius,
+                               double outerRadius,
+                               int slices,
+                               int loops,
+                               bool invert,
+                               bool wireFrame
+                             )
 {
 	if (wireFrame)
 	{
@@ -253,8 +261,9 @@ void cedar::aux::gl::drawDisk(const double innerRadius,
 	{
 		glRotated(180, 1, 0, 0);
 	}
-	static GLUquadric* quadric = gluNewQuadric();
+  GLUquadric* quadric = gluNewQuadric();
 	gluDisk(quadric, innerRadius, outerRadius, slices, loops);
+  gluDeleteQuadric(quadric);
 	if (invert)
 	{
 		glRotated(180, 1, 0, 0);
@@ -265,10 +274,12 @@ void cedar::aux::gl::drawDisk(const double innerRadius,
 	}
 }
 
-void cedar::aux::gl::drawPyramid(const double length,
-                                 const double width,
-                                 const double height,
-                                 const bool wireFrame)
+void cedar::aux::gl::drawPyramid(
+                                  double length,
+                                  double width,
+                                  double height,
+                                  bool wireFrame
+                                )
 {
   // TODO: normals are not calculated correctly
   // TODO: origin should be at the center of the base rectangle
@@ -316,7 +327,7 @@ void cedar::aux::gl::drawPyramid(const double length,
 	}
 }
 
-void cedar::aux::gl::drawPrism(const double width, const double height, const bool wireFrame)
+void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
 {
 	if (wireFrame)
 	{
@@ -362,61 +373,112 @@ void cedar::aux::gl::drawPrism(const double width, const double height, const bo
 	}
 }
 
-void cedar::aux::gl::drawTorus(const double radius,
-                               const double thickness,
-                               const int slices,
-                               const int stacks,
-                               const bool wireFrame)
+void cedar::aux::gl::drawTorus(
+                                double radius,
+                                double thickness,
+                                int slices,
+                                int stacks,
+                                bool wireFrame
+                              )
 {
+  double d = 4/3*1*(sqrt(2)-1);
+  double r = radius;
+  double t = thickness;
+  GLfloat firstQuarter[4][4][3] =
+  {
+//      {{-l/2, -w/2, h/2}, {-l/4, -w/2, h/2}, {l/4, -w/2, h/2}, {l/2, -w/2, h/2}},
+//      {{-l/2, -w/4, h/2}, {-l/4, -w/4, h/2}, {l/4, -w/4, h/2}, {l/2, -w/4, h/2}},
+//      {{-l/2, w/4, h/2}, {-l/4, w/4, h/2}, {l/4, w/4, h/2}, {l/2, w/4, h/2}},
+//      {{-l/2, w/2, h/2}, {-l/4, w/2, h/2}, {l/4, w/2, h/2}, {l/2, w/2, h/2}}
+//      {{thickness, 0.0, 0.0}, {thickness, 0.0, d*thickness}, {d*thickness, 0.0, thickness}, {0.0, 0.0, thickness}},
+      {{r, 0.0, t}, {r+d*t, 0.0, t}, {r+t, 0.0, d*t}, {r+t, 0.0, 0.0}},
+      {{r, 0.25, t}, {r+d*t, 0.25, t}, {r+t, 0.25, d*t}, {r+t, 0.25, 0.0}},
+      {{r, 0.75, t}, {r+d*t, 0.75, t}, {r+t, 0.75, d*t}, {r+t, 0.75, 0.0}},
+      {{r, 1.0, t}, {r+d*t, 1.0, t}, {r+t, 1.0, d*t}, {r+t, 1.0, 0.0}}
+  };
+
+  //TODO: check which of these should move to the init function
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_MAP2_VERTEX_3);
+  glEnable(GL_AUTO_NORMAL);
+
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &firstQuarter[0][0][0]);
+  glMapGrid2f(20, 0.0, 1.0, 20, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, 20, 0, 20);
+
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
   // TODO: for small sizes, the reflections are not right
- 	double alpha = 2 * M_PI / slices;
-	double beta = 2 * M_PI / stacks;
-  
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	for (int i=0; i<slices; i++)
-	{
-		for (int j=0; j<stacks; j++)
-		{
-			glBegin(GL_QUADS);
-      glNormal3d(-thickness * sin((i + 0.5) * alpha) * thickness * cos((j + 0.5) * beta ),
-                 -thickness * cos((i + 0.5) * alpha) * thickness * cos((j + 0.5) * beta ),
-                 thickness * sin((j + 0.5) * beta )
-                );
-      
-      glVertex3d((radius - thickness * cos(j*beta)) * sin(i*alpha),
-                 (radius - thickness * cos(j*beta)) * cos(i*alpha),
-                 thickness * sin(j*beta)
-                );
-      glVertex3d((radius - thickness * cos(j*beta)) * sin((i+1)*alpha),
-                 (radius - thickness * cos(j*beta)) * cos((i+1)*alpha),
-                 thickness * sin(j*beta) 
-                );
-      glVertex3d((radius - thickness * cos((j+1)*beta)) * sin((i+1)*alpha),
-                 (radius - thickness * cos((j+1)*beta)) * cos((i+1)*alpha), 
-                 thickness * sin((j+1)*beta)
-                );
-      glVertex3d((radius - thickness * cos((j+1)*beta)) * sin(i*alpha),
-                 (radius - thickness * cos((j+1)*beta)) * cos(i*alpha),
-                 thickness * sin((j+1)*beta)
-                );
-			glEnd();
-		}
-	}
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+// 	double alpha = 2 * M_PI / slices;
+//	double beta = 2 * M_PI / stacks;
+//
+//	if (wireFrame)
+//	{
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//	}
+//	for (int i=0; i<slices; i++)
+//	{
+//		for (int j=0; j<stacks; j++)
+//		{
+//			glBegin(GL_QUADS);
+//      glNormal3d(-thickness * sin((i + 0.5) * alpha) * thickness * cos((j + 0.5) * beta ),
+//                 -thickness * cos((i + 0.5) * alpha) * thickness * cos((j + 0.5) * beta ),
+//                 thickness * sin((j + 0.5) * beta )
+//                );
+//
+//      glVertex3d((radius - thickness * cos(j*beta)) * sin(i*alpha),
+//                 (radius - thickness * cos(j*beta)) * cos(i*alpha),
+//                 thickness * sin(j*beta)
+//                );
+//      glVertex3d((radius - thickness * cos(j*beta)) * sin((i+1)*alpha),
+//                 (radius - thickness * cos(j*beta)) * cos((i+1)*alpha),
+//                 thickness * sin(j*beta)
+//                );
+//      glVertex3d((radius - thickness * cos((j+1)*beta)) * sin((i+1)*alpha),
+//                 (radius - thickness * cos((j+1)*beta)) * cos((i+1)*alpha),
+//                 thickness * sin((j+1)*beta)
+//                );
+//      glVertex3d((radius - thickness * cos((j+1)*beta)) * sin(i*alpha),
+//                 (radius - thickness * cos((j+1)*beta)) * cos(i*alpha),
+//                 thickness * sin((j+1)*beta)
+//                );
+//			glEnd();
+//		}
+//	}
+//	if (wireFrame)
+//	{
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//	}
 }
 
-void cedar::aux::gl::drawEllipse(const double a,
-                                 const double b,
-                                 const double thickness,
-                                 const int slices,
-                                 const int stacks,
-                                 const bool wireFrame)
+void cedar::aux::gl::drawEllipse(
+                                  double a,
+                                  double b,
+                                  double thickness,
+                                  int slices,
+                                  int stacks,
+                                  bool wireFrame
+                                )
 {
 	double alpha = 2 * M_PI / slices;
 	double beta = 2 * M_PI / stacks;

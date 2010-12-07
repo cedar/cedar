@@ -96,7 +96,7 @@ void gl::KinematicChain::drawSegment(unsigned int index)
   glColor4d(mColorR, mColorG, mColorB, 0);
   drawSphere(.05, mResolution, mResolution, mIsDrawnAsWireFrame);
   
-  // move to origin transformation and resave it to the stack
+  // move to origin transformation and re-save it to the stack
   glPopMatrix();
   glPushMatrix();
 
@@ -139,5 +139,5 @@ void gl::KinematicChain::drawEndEffectorVelocity()
   cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition()(Rect(0, 0, 1, 3));
   cv::Mat to = mpKinematicChainModel->calculateEndEffectorPosition()(Rect(0, 0, 1, 3))
                + mpKinematicChainModel->calculateEndEffectorVelocity();
-  drawArrow<double>(from, to, 0.01, 0.02, 0.0005, mResolution);
+  drawArrow<double>(from, to, 0.01, 0.03, 0.1, mResolution);
 }
