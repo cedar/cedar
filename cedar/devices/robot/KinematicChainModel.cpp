@@ -106,12 +106,12 @@ void KinematicChainModel::calculateJacobian(
   {
     case WORLD_COORDINATES :
     {
-      point_local = mJointTransformations[jointIndex].inv() * point;
+      point_local = (mTransformation * mJointTransformations[jointIndex]).inv() * point;
       break;
     }
     case BASE_COORDINATES :
     {
-//      point_local = mJointTransformations[jointIndex].inv() * point;
+      point_local = mJointTransformations[jointIndex].inv() * point;
       break;
     }
     case LOCAL_COORDINATES :
@@ -120,15 +120,6 @@ void KinematicChainModel::calculateJacobian(
       break;
     }
   }
-  cout << "point_local:" << endl;
-  write(point_local);
-
-
-  //TODO: I don't really understand what works here, or why... what is currently coded under world coordinates
-  // should be under base coordinates - at least for the end-effector, the position in world coordinates
-  // is used, but the base transformation does not appear in the formula above...
-  // apparently the point_local isn't really the point in the local coordinates, because it changes when the
-  // base transformation is changed. Why is the jacobian still calculated correctly?
   
   // calculate Jacobian column by column
   Mat column;
@@ -136,6 +127,7 @@ void KinematicChainModel::calculateJacobian(
 	for (unsigned int j = 0; j <=  jointIndex; j++)
 	{
     column = wedgeTwist<double>(rigidToAdjointTransformation<double>(mTransformation)*mJointTwists[j])
+             * mTransformation
              * mJointTransformations[jointIndex]
              * point_local;
 		// export

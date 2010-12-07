@@ -185,7 +185,21 @@ void cedar::aux::gl::drawArrow(
                                 bool wireFrame=false
                               )
 {
-  drawCone<T>(start, end, shaftRadius, shaftRadius, patches, wireFrame);
+  drawCone<T>(
+               start, start+(1-headLength)/norm(end-start)*(end-start),
+               shaftRadius,
+               shaftRadius,
+               patches,
+               wireFrame
+             );
+  drawCone<T>(
+               start+(1-headLength)/norm(end-start)*(end-start),
+               end,
+               headRadius,
+               0,
+               patches,
+               wireFrame
+             );
 
 }
 template void cedar::aux::gl::drawArrow<float>(
