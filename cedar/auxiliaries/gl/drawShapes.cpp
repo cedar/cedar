@@ -381,16 +381,131 @@ void cedar::aux::gl::drawTorus(
                                 bool wireFrame
                               )
 {
-  double d = 4/3*1*(sqrt(2)-1);
+  // approximates the Torus with 16 3rd order Bezier surfaces, which is not perfect, but almost
   double r = radius;
   double t = thickness;
-  GLfloat I_I[4][4][3] =
+  double d = 4.0/3.0*(sqrt(2)-1);
+  // first quarter
+  GLfloat I_1[4][4][3] =
   {
     {{r, 0.0, t}, {r+d*t, 0.0, t},    {r+t, 0.0, d*t},    {r+t, 0.0, 0.0}},
     {{r, d*r, t}, {r+d*t, d*(r+d*t), t}, {r+t, d*(r+t), d*t}, {r+t, d*(r+t), 0.0}},
     {{d*r, r, t}, {d*(r+d*t), r+d*t, t}, {d*(r+t), r+t, d*t}, {d*(r+t), r+t, 0.0}},
     {{0.0, r, t}, {0.0, r+d*t, t},    {0.0, r+t, d*t},    {0.0, r+t, 0.0}}
   };
+  GLfloat I_2[4][4][3] =
+  {
+    {{0.0, r, t}, {0.0, r-d*t, t},    {0.0, r-t, d*t},    {0.0, r-t, 0.0}},
+    {{d*r, r, t}, {d*(r-d*t), r-d*t, t}, {d*(r-t), r-t, d*t}, {d*(r-t), r-t, 0.0}},
+    {{r, d*r, t}, {r-d*t, d*(r-d*t), t}, {r-t, d*(r-t), d*t}, {r-t, d*(r-t), 0.0}},
+    {{r, 0.0, t}, {r-d*t, 0.0, t},    {r-t, 0.0, d*t},    {r-t, 0.0, 0.0}}
+  };
+  GLfloat I_3[4][4][3] =
+  {
+    {{r, 0.0, -t}, {r-d*t, 0.0, -t},    {r-t, 0.0, -d*t},    {r-t, 0.0, 0.0}},
+    {{r, d*r, -t}, {r-d*t, d*(r-d*t), -t}, {r-t, d*(r-t), -d*t}, {r-t, d*(r-t), 0.0}},
+    {{d*r, r, -t}, {d*(r-d*t), r-d*t, -t}, {d*(r-t), r-t, -d*t}, {d*(r-t), r-t, 0.0}},
+    {{0.0, r, -t}, {0.0, r-d*t, -t},    {0.0, r-t, -d*t},    {0.0, r-t, 0.0}}
+  };
+  GLfloat I_4[4][4][3] =
+  {
+    {{0.0, r, -t}, {0.0, r+d*t, -t},    {0.0, r+t, -d*t},    {0.0, r+t, -0.0}},
+    {{d*r, r, -t}, {d*(r+d*t), r+d*t, -t}, {d*(r+t), r+t, -d*t}, {d*(r+t), r+t, -0.0}},
+    {{r, d*r, -t}, {r+d*t, d*(r+d*t), -t}, {r+t, d*(r+t), -d*t}, {r+t, d*(r+t), -0.0}},
+    {{r, 0.0, -t}, {r+d*t, 0.0, -t},    {r+t, 0.0, -d*t},    {r+t, 0.0, -0.0}}
+  };
+
+  // second quarter
+  GLfloat II_1[4][4][3] =
+  {
+    {{0.0, r, t}, {0.0, r+d*t, t},    {0.0, r+t, d*t},    {0.0, r+t, 0.0}},
+    {{-d*r, r, t}, {-d*(r+d*t), r+d*t, t}, {-d*(r+t), r+t, d*t}, {-d*(r+t), r+t, 0.0}},
+    {{-r, d*r, t}, {-r-d*t, d*(r+d*t), t}, {-r-t, d*(r+t), d*t}, {-r-t, d*(r+t), 0.0}},
+    {{-r, 0.0, t}, {-r-d*t, 0.0, t},    {-r-t, 0.0, d*t},    {-r-t, 0.0, 0.0}}
+  };
+  GLfloat II_2[4][4][3] =
+  {
+    {{-r, 0.0, t}, {-r+d*t, 0.0, t},    {-r+t, 0.0, d*t},    {-r+t, 0.0, 0.0}},
+    {{-r, d*r, t}, {-r+d*t, d*(r-d*t), t}, {-r+t, d*(r-t), d*t}, {-r+t, d*(r-t), 0.0}},
+    {{-d*r, r, t}, {-d*(r-d*t), r-d*t, t}, {-d*(r-t), r-t, d*t}, {-d*(r-t), r-t, 0.0}},
+    {{0.0, r, t}, {0.0, r-d*t, t},    {0.0, r-t, d*t},    {0.0, r-t, 0.0}}
+  };
+  GLfloat II_3[4][4][3] =
+  {
+    {{0.0, r, -t}, {0.0, r-d*t, -t},    {0.0, r-t, -d*t},    {0.0, r-t, 0.0}},
+    {{-d*r, r, -t}, {-d*(r-d*t), r-d*t, -t}, {-d*(r-t), r-t, -d*t}, {-d*(r-t), r-t, 0.0}},
+    {{-r, d*r, -t}, {-r+d*t, d*(r-d*t), -t}, {-r+t, d*(r-t), -d*t}, {-r+t, d*(r-t), 0.0}},
+    {{-r, 0.0, -t}, {-r+d*t, 0.0, -t},    {-r+t, 0.0, -d*t},    {-r+t, 0.0, 0.0}}
+  };
+  GLfloat II_4[4][4][3] =
+  {
+    {{-r, 0.0, -t}, {-r-d*t, 0.0, -t},    {-r-t, 0.0, -d*t},    {-r-t, 0.0, 0.0}},
+    {{-r, d*r, -t}, {-r-d*t, d*(r+d*t), -t}, {-r-t, d*(r+t), -d*t}, {-r-t, d*(r+t), 0.0}},
+    {{-d*r, r, -t}, {-d*(r+d*t), r+d*t, -t}, {-d*(r+t), r+t, -d*t}, {-d*(r+t), r+t, 0.0}},
+    {{0.0, r, -t}, {0.0, r+d*t, -t},    {0.0, r+t, -d*t},    {0.0, r+t, 0.0}}
+  };
+
+  // third quarter
+  GLfloat III_1[4][4][3] =
+  {
+    {{0.0, -r, t}, {0.0, -r-d*t, t},    {0.0, -r-t, d*t},    {0.0, -r-t, 0.0}},
+    {{d*r, -r, t}, {d*(r+d*t), -r-d*t, t}, {d*(r+t), -r-t, d*t}, {d*(r+t), -r-t, 0.0}},
+    {{r, -d*r, t}, {r+d*t, -d*(r+d*t), t}, {r+t, -d*(r+t), d*t}, {r+t, -d*(r+t), 0.0}},
+    {{r, 0.0, t}, {r+d*t, 0.0, t},    {r+t, 0.0, d*t},    {r+t, 0.0, 0.0}}
+  };
+  GLfloat III_2[4][4][3] =
+  {
+    {{r, 0.0, t}, {r-d*t, 0.0, t},    {r-t, 0.0, d*t},    {r-t, 0.0, 0.0}},
+    {{r, -d*r, t}, {r-d*t, -d*(r-d*t), t}, {r-t, -d*(r-t), d*t}, {r-t, -d*(r-t), 0.0}},
+    {{d*r, -r, t}, {d*(r-d*t), -r+d*t, t}, {d*(r-t), -r+t, d*t}, {d*(r-t), -r+t, 0.0}},
+    {{0.0, -r, t}, {0.0, -r+d*t, t},    {0.0, -r+t, d*t},    {0.0, -r+t, 0.0}}
+  };
+  GLfloat III_3[4][4][3] =
+  {
+    {{0.0, -r, -t}, {0.0, -r+d*t, -t},    {0.0, -r+t, -d*t},    {0.0, -r+t, 0.0}},
+    {{d*r, -r, -t}, {d*(r-d*t), -r+d*t, -t}, {d*(r-t), -r+t, -d*t}, {d*(r-t), -r+t, 0.0}},
+    {{r, -d*r, -t}, {r-d*t, -d*(r-d*t), -t}, {r-t, -d*(r-t), -d*t}, {r-t, -d*(r-t), 0.0}},
+    {{r, 0.0, -t}, {r-d*t, 0.0, -t},    {r-t, 0.0, -d*t},    {r-t, 0.0, 0.0}}
+  };
+  GLfloat III_4[4][4][3] =
+  {
+    {{r, 0.0, -t}, {r+d*t, 0.0, -t},    {r+t, 0.0, -d*t},    {r+t, 0.0, -0.0}},
+    {{r, -d*r, -t}, {r+d*t, -d*(r+d*t), -t}, {r+t, -d*(r+t), -d*t}, {r+t, -d*(r+t), -0.0}},
+    {{d*r, -r, -t}, {d*(r+d*t), -r-d*t, -t}, {d*(r+t), -r-t, -d*t}, {d*(r+t), -r-t, -0.0}},
+    {{0.0, -r, -t}, {0.0, -r-d*t, -t},    {0.0, -r-t, -d*t},    {0.0, -r-t, -0.0}}
+  };
+
+  // fourth quarter
+  GLfloat IV_1[4][4][3] =
+  {
+    {{-r, 0.0, t}, {-r-d*t, 0.0, t},    {-r-t, 0.0, d*t},    {-r-t, 0.0, 0.0}},
+    {{-r, -d*r, t}, {-r-d*t, -d*(r+d*t), t}, {-r-t, -d*(r+t), d*t}, {-r-t, -d*(r+t), 0.0}},
+    {{-d*r, -r, t}, {-d*(r+d*t), -r-d*t, t}, {-d*(r+t), -r-t, d*t}, {-d*(r+t), -r-t, 0.0}},
+    {{0.0, -r, t}, {0.0, -r-d*t, t},    {0.0, -r-t, d*t},    {0.0, -r-t, 0.0}}
+  };
+  GLfloat IV_2[4][4][3] =
+  {
+    {{0.0, -r, t}, {0.0, -r+d*t, t},    {0.0, -r+t, d*t},    {0.0, -r+t, 0.0}},
+    {{-d*r, -r, t}, {-d*(r-d*t), -r+d*t, t}, {-d*(r-t), -r+t, d*t}, {-d*(r-t), -r+t, 0.0}},
+    {{-r, -d*r, t}, {-r+d*t, -d*(r-d*t), t}, {-r+t, -d*(r-t), d*t}, {-r+t, -d*(r-t), 0.0}},
+    {{-r, 0.0, t}, {-r+d*t, 0.0, t},    {-r+t, 0.0, d*t},    {-r+t, 0.0, 0.0}}
+  };
+  GLfloat IV_3[4][4][3] =
+  {
+    {{-r, 0.0, -t}, {-r+d*t, 0.0, -t},    {-r+t, 0.0, -d*t},    {-r+t, 0.0, 0.0}},
+    {{-r, -d*r, -t}, {-r+d*t, -d*(r-d*t), -t}, {-r+t, -d*(r-t), -d*t}, {-r+t, -d*(r-t), 0.0}},
+    {{-d*r, -r, -t}, {-d*(r-d*t), -r+d*t, -t}, {-d*(r-t), -r+t, -d*t}, {-d*(r-t), -r+t, 0.0}},
+    {{0.0, -r, -t}, {0.0, -r+d*t, -t},    {0.0, -r+t, -d*t},    {0.0, -r+t, 0.0}}
+  };
+  GLfloat IV_4[4][4][3] =
+  {
+    {{0.0, -r, -t}, {0.0, -r-d*t, -t},    {0.0, -r-t, -d*t},    {0.0, -r-t, 0.0}},
+    {{-d*r, -r, -t}, {-d*(r+d*t), -r-d*t, -t}, {-d*(r+t), -r-t, -d*t}, {-d*(r+t), -r-t, 0.0}},
+    {{-r, -d*r, -t}, {-r-d*t, -d*(r+d*t), -t}, {-r-t, -d*(r+t), -d*t}, {-r-t, -d*(r+t), 0.0}},
+    {{-r, 0.0, -t}, {-r-d*t, 0.0, -t},    {-r-t, 0.0, -d*t},    {-r-t, 0.0, 0.0}}
+  };
+
+
 
   //TODO: check which of these should move to the init function
   glEnable(GL_DEPTH_TEST);
@@ -401,10 +516,73 @@ void cedar::aux::gl::drawTorus(
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
+  // first quarter
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &I_1[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
 
-  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &firstQuarter[0][0][0]);
-  glMapGrid2f(20, 0.0, 1.0, 20, 0.0, 1.0);
-  glEvalMesh2(GL_FILL, 0, 20, 0, 20);
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &I_2[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &I_3[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &I_4[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  // second quarter
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &II_1[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &II_2[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &II_3[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &II_4[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  // third quarter
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &III_1[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &III_2[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &III_3[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &III_4[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  // fourth quarter
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &IV_1[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &IV_2[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &IV_3[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
+
+  glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &IV_4[0][0][0]);
+  glMapGrid2f(slices, 0.0, 1.0, stacks, 0.0, 1.0);
+  glEvalMesh2(GL_FILL, 0, slices, 0, stacks);
 
   if (wireFrame)
   {
