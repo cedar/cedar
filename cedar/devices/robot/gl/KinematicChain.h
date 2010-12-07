@@ -80,14 +80,16 @@ protected:
   void drawSegment(unsigned int index);
 
   //!@brief draws the end-effector
-  void drawEndEffector(void);
+  void drawEndEffector();
+
+  //!@brief draws the end-effector
+  void drawEndEffectorVelocity();
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
-//  KinematicChainModel* mpKinematicChainModel;
   cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
   
 }; // class cedar::dev::robot::KinematicChainSimulation

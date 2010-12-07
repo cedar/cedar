@@ -132,6 +132,19 @@ public:
                              const unsigned int coordinateFrame
                            );
   
+  /*!@brief calculates cartesian velocity of a point given in homogeneous coordinates of the relevant joint frame
+   *
+   * @param point    point for which the velocity is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    velocity of the given point, in base coordinates, 3 \times 1 matrix
+   */
+  cv::Mat calculateVelocity(
+                             const cv::Mat& point,
+                             const unsigned int jointIndex,
+                             const unsigned int coordinateFrame
+                           );
+
   /*!@brief gives the spatial Jacobian in the current configuration
    * 
    * @return    spatial Jacobian, 6 \times N matrix, where N = number of joints
@@ -155,7 +168,13 @@ public:
    * @return    end effector Jacobian, 3 \times N matrix, where N = number of joints
    */
   cv::Mat calculateEndEffectorJacobian();
-  
+
+  /*!@brief gives the cartesian end-effector velocity
+   *
+   * @return    end effector velocity, 3 \times 1 matrix
+   */
+  cv::Mat calculateEndEffectorVelocity();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

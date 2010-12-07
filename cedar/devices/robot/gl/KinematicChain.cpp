@@ -77,6 +77,7 @@ void gl::KinematicChain::draw(void)
     drawSegment(j);
   }
   drawEndEffector();
+  drawEndEffectorVelocity();
   
   glPopMatrix(); // TODO: check if this is needed
 }
@@ -114,7 +115,7 @@ void gl::KinematicChain::drawSegment(unsigned int index)
   drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
 }
 
-void gl::KinematicChain::drawEndEffector(void)
+void gl::KinematicChain::drawEndEffector()
 {
   // move to origin
   glPopMatrix();
@@ -127,4 +128,22 @@ void gl::KinematicChain::drawEndEffector(void)
 	// draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
   drawSphere(.05, mResolution, mResolution);
+}
+
+void gl::KinematicChain::drawEndEffectorVelocity()
+{
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
+
+  cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition()(Rect(0, 0, 1, 3));
+  cv::Mat to = mpKinematicChainModel->calculateEndEffectorPosition()(Rect(0, 0, 1, 3))
+               + mpKinematicChainModel->calculateEndEffectorVelocity();
+  drawArrow<double>(from, to, 0.01, 0.01, 0.001, mResolution);
+//  const cv::Mat start,
+//  const cv::Mat end,
+//  double shaftRadius,
+//  double headRadius,
+//  double headLength,
+//  int patches,
 }

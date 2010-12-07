@@ -105,7 +105,7 @@ std::vector<double> KinematicChain::getJointVelocities() const
 
 cv::Mat KinematicChain::getJointVelocitiesMatrix() const
 {
-  cv::Mat dummy(getNumberOfJoints(), 1, CV_32F);
+  cv::Mat dummy(getNumberOfJoints(), 1, CV_64FC1);
   //TODO: check matrix type
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
     dummy.at<double>(i,0) = mJointVelocities[i];
@@ -130,7 +130,7 @@ std::vector<double> KinematicChain::getJointAccelerations() const
 
 cv::Mat KinematicChain::getJointAccelerationMatrix() const
 {
-  cv::Mat dummy(getNumberOfJoints(), 1, CV_32F);
+  cv::Mat dummy(getNumberOfJoints(), 1, CV_64FC1);
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
     dummy.at<double>(i,0) = mJointAccelerations[i];
   return dummy;

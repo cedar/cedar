@@ -95,6 +95,26 @@ namespace cedar
                     const double radiusEnd,
                     const int slices,
                     const bool wireFrame=false);
+
+      /*!@brief draws an arrow between two arbitrary points in the current coordinate frame
+       * @param start    start of the arrow
+       * @param end    end of the arrow
+       * @param shaftRadius    radius of the arrow shaft
+       * @param headRadius    radius of the arrow head
+       * @param headLength    length of the arrow head
+       * @param patches    number of cuts parallel to the line used to approximate the cone walls
+       * @param wireFrame    decides whether to draw full surfaces or only a wire frame
+       */
+      template<typename T>
+      void drawArrow(
+                     const cv::Mat start,
+                     const cv::Mat end,
+                     double shaftRadius,
+                     double headRadius,
+                     double headLength,
+                     int patches,
+                     bool wireFrame=false
+                   );
       
       /*!@brief	draws a sphere around the origin of the current coordinate frame
        * @param radius    radius of the sphere
