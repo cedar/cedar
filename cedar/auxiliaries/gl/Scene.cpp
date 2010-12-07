@@ -155,7 +155,7 @@ cedar::aux::gl::ObjectPtr Scene::getObject(int index)
 
 void Scene::initLighting()
 {
-  // TODO: this somehow sets the light relative to the camerea, which might not be wanted. check!
+  // TODO: this somehow sets the light relative to the camera, which might not be wanted. check!
 	// set light
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
