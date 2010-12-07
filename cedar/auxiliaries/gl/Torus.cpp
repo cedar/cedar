@@ -118,6 +118,6 @@ void Torus::draw()
 	if (mIsVisible)
 	{
 	  gl::setColor(mColorR, mColorG, mColorB);
-		drawTorus(mRadius, mThickness, mResolution*2, mResolution, mIsDrawnAsWireFrame);
+		drawTorus(mRadius, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
 	}
 }
