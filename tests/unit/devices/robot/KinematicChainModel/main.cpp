@@ -74,15 +74,18 @@ int main()
   cv::Mat joint_transformation_3 = test_arm_model.getJointTransformation(3);
   if (
       // transformation to joint 1 frame
-      !IsZero(joint_transformation_1.at<double>(0, 0) - 1)
-      || !IsZero(joint_transformation_1.at<double>(0, 1) - 0)
+      !IsZero(joint_transformation_1.at<double>(0, 0) - 0)
+      || !IsZero(joint_transformation_1.at<double>(0, 1) - -1)
       || !IsZero(joint_transformation_1.at<double>(0, 2) - 0)
-      || !IsZero(joint_transformation_1.at<double>(1, 0) - 0)
-      || !IsZero(joint_transformation_1.at<double>(1, 1) - 1)
+
+      || !IsZero(joint_transformation_1.at<double>(1, 0) - 1)
+      || !IsZero(joint_transformation_1.at<double>(1, 1) - 0)
       || !IsZero(joint_transformation_1.at<double>(1, 2) - 0)
+
       || !IsZero(joint_transformation_1.at<double>(2, 0) - 0)
       || !IsZero(joint_transformation_1.at<double>(2, 1) - 0)
       || !IsZero(joint_transformation_1.at<double>(2, 2) - 1)
+
       || !IsZero(joint_transformation_1.at<double>(0, 3) - 0)
       || !IsZero(joint_transformation_1.at<double>(1, 3) - 0)
       || !IsZero(joint_transformation_1.at<double>(2, 3) - 2)
@@ -91,17 +94,18 @@ int main()
       || !IsZero(joint_transformation_1.at<double>(3, 2) - 0)
       || !IsZero(joint_transformation_1.at<double>(3, 3) - 1)
       // transformation to joint 3 frame
-      || !IsZero(joint_transformation_3.at<double>(0, 0) - 1)
-      || !IsZero(joint_transformation_3.at<double>(0, 1) - 0)
+      || !IsZero(joint_transformation_3.at<double>(0, 0) - 0)
+      || !IsZero(joint_transformation_3.at<double>(0, 1) - -1)
       || !IsZero(joint_transformation_3.at<double>(0, 2) - 0)
-      || !IsZero(joint_transformation_3.at<double>(1, 0) - 0)
-      || !IsZero(joint_transformation_3.at<double>(1, 1) - 1)
+      || !IsZero(joint_transformation_3.at<double>(1, 0) - 1)
+      || !IsZero(joint_transformation_3.at<double>(1, 1) - 0)
       || !IsZero(joint_transformation_3.at<double>(1, 2) - 0)
       || !IsZero(joint_transformation_3.at<double>(2, 0) - 0)
+
       || !IsZero(joint_transformation_3.at<double>(2, 1) - 0)
       || !IsZero(joint_transformation_3.at<double>(2, 2) - 1)
       || !IsZero(joint_transformation_3.at<double>(0, 3) - 0)
-      || !IsZero(joint_transformation_3.at<double>(1, 3) - 2)
+      || !IsZero(joint_transformation_3.at<double>(1, 3) - -2)
       || !IsZero(joint_transformation_3.at<double>(2, 3) - 4)
       || !IsZero(joint_transformation_3.at<double>(3, 0) - 0)
       || !IsZero(joint_transformation_3.at<double>(3, 1) - 0)
@@ -112,15 +116,15 @@ int main()
     errors++;
     log_file << "ERROR with calculateTransformations() or transformation()" << std::endl;
   }
-  log_file << joint_transformation_1.at<double>(0, 0) << " " << joint_transformation_1.at<double>(0, 1) << " " << joint_transformation_1.at<double>(0, 2) << " " << joint_transformation_1.at<double>(0, 3) << std::endl;
-  log_file << joint_transformation_1.at<double>(1, 0) << " " << joint_transformation_1.at<double>(1, 1) << " " << joint_transformation_1.at<double>(1, 2) << " " << joint_transformation_1.at<double>(1, 3) << std::endl;
-  log_file << joint_transformation_1.at<double>(2, 0) << " " << joint_transformation_1.at<double>(2, 1) << " " << joint_transformation_1.at<double>(2, 2) << " " << joint_transformation_1.at<double>(2, 3) << std::endl;
-  log_file << joint_transformation_1.at<double>(3, 0) << " " << joint_transformation_1.at<double>(3, 1) << " " << joint_transformation_1.at<double>(3, 2) << " " << joint_transformation_1.at<double>(3, 3) << std::endl;
-
-  log_file << joint_transformation_3.at<double>(0, 0) << " " << joint_transformation_3.at<double>(0, 1) << " " << joint_transformation_3.at<double>(0, 2) << " " << joint_transformation_3.at<double>(0, 3) << std::endl;
-  log_file << joint_transformation_3.at<double>(1, 0) << " " << joint_transformation_3.at<double>(1, 1) << " " << joint_transformation_3.at<double>(1, 2) << " " << joint_transformation_3.at<double>(1, 3) << std::endl;
-  log_file << joint_transformation_3.at<double>(2, 0) << " " << joint_transformation_3.at<double>(2, 1) << " " << joint_transformation_3.at<double>(2, 2) << " " << joint_transformation_3.at<double>(2, 3) << std::endl;
-  log_file << joint_transformation_3.at<double>(3, 0) << " " << joint_transformation_3.at<double>(3, 1) << " " << joint_transformation_3.at<double>(3, 2) << " " << joint_transformation_3.at<double>(3, 3) << std::endl;
+//  log_file << joint_transformation_1.at<double>(0, 0) << " " << joint_transformation_1.at<double>(0, 1) << " " << joint_transformation_1.at<double>(0, 2) << " " << joint_transformation_1.at<double>(0, 3) << std::endl;
+//  log_file << joint_transformation_1.at<double>(1, 0) << " " << joint_transformation_1.at<double>(1, 1) << " " << joint_transformation_1.at<double>(1, 2) << " " << joint_transformation_1.at<double>(1, 3) << std::endl;
+//  log_file << joint_transformation_1.at<double>(2, 0) << " " << joint_transformation_1.at<double>(2, 1) << " " << joint_transformation_1.at<double>(2, 2) << " " << joint_transformation_1.at<double>(2, 3) << std::endl;
+//  log_file << joint_transformation_1.at<double>(3, 0) << " " << joint_transformation_1.at<double>(3, 1) << " " << joint_transformation_1.at<double>(3, 2) << " " << joint_transformation_1.at<double>(3, 3) << std::endl;
+//
+//  log_file << joint_transformation_3.at<double>(0, 0) << " " << joint_transformation_3.at<double>(0, 1) << " " << joint_transformation_3.at<double>(0, 2) << " " << joint_transformation_3.at<double>(0, 3) << std::endl;
+//  log_file << joint_transformation_3.at<double>(1, 0) << " " << joint_transformation_3.at<double>(1, 1) << " " << joint_transformation_3.at<double>(1, 2) << " " << joint_transformation_3.at<double>(1, 3) << std::endl;
+//  log_file << joint_transformation_3.at<double>(2, 0) << " " << joint_transformation_3.at<double>(2, 1) << " " << joint_transformation_3.at<double>(2, 2) << " " << joint_transformation_3.at<double>(2, 3) << std::endl;
+//  log_file << joint_transformation_3.at<double>(3, 0) << " " << joint_transformation_3.at<double>(3, 1) << " " << joint_transformation_3.at<double>(3, 2) << " " << joint_transformation_3.at<double>(3, 3) << std::endl;
   
   //--------------------------------------------------------------------------------------------------------------------
   // Jacobians
@@ -135,7 +139,7 @@ int main()
   if (
       // Jacobian of joint 1
       !IsZero(jacobian_1.at<double>(0, 0) - 0)
-      || !IsZero(jacobian_1.at<double>(1, 0) - -2)
+      || !IsZero(jacobian_1.at<double>(1, 0) - 2)
       || !IsZero(jacobian_1.at<double>(2, 0) - 0)
       || !IsZero(jacobian_1.at<double>(0, 1) - 0)
       || !IsZero(jacobian_1.at<double>(1, 1) - 0)
@@ -149,10 +153,10 @@ int main()
       || !IsZero(norm(jacobian_1 - test_arm_model.calculateJacobian(origin, 1, KinematicChainModel::LOCAL_COORDINATES)))
       // Jacobian of joint 3
       || !IsZero(jacobian_3.at<double>(0, 0) - 0)
-      || !IsZero(jacobian_3.at<double>(1, 0) - -4)
+      || !IsZero(jacobian_3.at<double>(1, 0) - 4)
       || !IsZero(jacobian_3.at<double>(2, 0) - 2)
       || !IsZero(jacobian_3.at<double>(0, 1) - 0)
-      || !IsZero(jacobian_3.at<double>(1, 1) - -2)
+      || !IsZero(jacobian_3.at<double>(1, 1) - 2)
       || !IsZero(jacobian_3.at<double>(2, 1) - 2)
       || !IsZero(jacobian_3.at<double>(0, 2) - 0)
       || !IsZero(jacobian_3.at<double>(1, 2) - 0)
@@ -166,15 +170,15 @@ int main()
     errors++;
     log_file << "ERROR with calculateJacobian()" << std::endl;
   }
-  //  log_file << jacobian_1.at<double>(0, 0) << " " << jacobian_1.at<double>(0, 1) << " " << jacobian_1.at<double>(0, 2) << " " << jacobian_1.at<double>(0, 3) << std::endl;
-  //  log_file << jacobian_1.at<double>(1, 0) << " " << jacobian_1.at<double>(1, 1) << " " << jacobian_1.at<double>(1, 2) << " " << jacobian_1.at<double>(1, 3) << std::endl;
-  //  log_file << jacobian_1.at<double>(2, 0) << " " << jacobian_1.at<double>(2, 1) << " " << jacobian_1.at<double>(2, 2) << " " << jacobian_1.at<double>(2, 3) << std::endl;
-  //  log_file << std::endl;
-  //
-  //  log_file << jacobian_3.at<double>(0, 0) << " " << jacobian_3.at<double>(0, 1) << " " << jacobian_3.at<double>(0, 2) << " " << jacobian_3.at<double>(0, 3) << std::endl;
-  //  log_file << jacobian_3.at<double>(1, 0) << " " << jacobian_3.at<double>(1, 1) << " " << jacobian_3.at<double>(1, 2) << " " << jacobian_3.at<double>(1, 3) << std::endl;
-  //  log_file << jacobian_3.at<double>(2, 0) << " " << jacobian_3.at<double>(2, 1) << " " << jacobian_3.at<double>(2, 2) << " " << jacobian_3.at<double>(2, 3) << std::endl;
-  //  log_file << std::endl;
+//  log_file << jacobian_1.at<double>(0, 0) << " " << jacobian_1.at<double>(0, 1) << " " << jacobian_1.at<double>(0, 2) << " " << jacobian_1.at<double>(0, 3) << std::endl;
+//  log_file << jacobian_1.at<double>(1, 0) << " " << jacobian_1.at<double>(1, 1) << " " << jacobian_1.at<double>(1, 2) << " " << jacobian_1.at<double>(1, 3) << std::endl;
+//  log_file << jacobian_1.at<double>(2, 0) << " " << jacobian_1.at<double>(2, 1) << " " << jacobian_1.at<double>(2, 2) << " " << jacobian_1.at<double>(2, 3) << std::endl;
+//  log_file << std::endl;
+//
+//  log_file << jacobian_3.at<double>(0, 0) << " " << jacobian_3.at<double>(0, 1) << " " << jacobian_3.at<double>(0, 2) << " " << jacobian_3.at<double>(0, 3) << std::endl;
+//  log_file << jacobian_3.at<double>(1, 0) << " " << jacobian_3.at<double>(1, 1) << " " << jacobian_3.at<double>(1, 2) << " " << jacobian_3.at<double>(1, 3) << std::endl;
+//  log_file << jacobian_3.at<double>(2, 0) << " " << jacobian_3.at<double>(2, 1) << " " << jacobian_3.at<double>(2, 2) << " " << jacobian_3.at<double>(2, 3) << std::endl;
+//  log_file << std::endl;
   
   log_file << "test: calculateSpatialJacobian" << std::endl;
   cv::Mat spatial_jacobian = test_arm_model.calculateSpatialJacobian();
@@ -182,28 +186,28 @@ int main()
       !IsZero(spatial_jacobian.at<double>(0, 0) - 0)
       || !IsZero(spatial_jacobian.at<double>(1, 0) - 0)
       || !IsZero(spatial_jacobian.at<double>(2, 0) - 0)
-      || !IsZero(spatial_jacobian.at<double>(3, 0) - 1)
+      || !IsZero(spatial_jacobian.at<double>(3, 0) - -1)
       || !IsZero(spatial_jacobian.at<double>(4, 0) - 0)
       || !IsZero(spatial_jacobian.at<double>(5, 0) - 0)
 
       || !IsZero(spatial_jacobian.at<double>(0, 1) - 0)
-      || !IsZero(spatial_jacobian.at<double>(1, 1) - 2)
+      || !IsZero(spatial_jacobian.at<double>(1, 1) - -2)
       || !IsZero(spatial_jacobian.at<double>(2, 1) - 0)
-      || !IsZero(spatial_jacobian.at<double>(3, 1) - 1)
+      || !IsZero(spatial_jacobian.at<double>(3, 1) - -1)
       || !IsZero(spatial_jacobian.at<double>(4, 1) - 0)
       || !IsZero(spatial_jacobian.at<double>(5, 1) - 0)
 
       || !IsZero(spatial_jacobian.at<double>(0, 2) - 0)
-      || !IsZero(spatial_jacobian.at<double>(1, 2) - 4)
+      || !IsZero(spatial_jacobian.at<double>(1, 2) - -4)
       || !IsZero(spatial_jacobian.at<double>(2, 2) - 0)
-      || !IsZero(spatial_jacobian.at<double>(3, 2) - 1)
+      || !IsZero(spatial_jacobian.at<double>(3, 2) - -1)
       || !IsZero(spatial_jacobian.at<double>(4, 2) - 0)
       || !IsZero(spatial_jacobian.at<double>(5, 2) - 0)
 
       || !IsZero(spatial_jacobian.at<double>(0, 3) - 0)
-      || !IsZero(spatial_jacobian.at<double>(1, 3) - 4)
+      || !IsZero(spatial_jacobian.at<double>(1, 3) - -4)
       || !IsZero(spatial_jacobian.at<double>(2, 3) - -2)
-      || !IsZero(spatial_jacobian.at<double>(3, 3) - 1)
+      || !IsZero(spatial_jacobian.at<double>(3, 3) - -1)
       || !IsZero(spatial_jacobian.at<double>(4, 3) - 0)
       || !IsZero(spatial_jacobian.at<double>(5, 3) - 0)
      )
@@ -227,7 +231,7 @@ int main()
   cv::Mat end_effector_position = test_arm_model.calculateEndEffectorPosition();
   if (
       !IsZero(end_effector_position.at<double>(0, 0) - 0)
-      || !IsZero(end_effector_position.at<double>(1, 0) - 2)
+      || !IsZero(end_effector_position.at<double>(1, 0) - -2)
       || !IsZero(end_effector_position.at<double>(2, 0) - 6)
       || !IsZero(end_effector_position.at<double>(3, 0) - 1)
      )
@@ -242,17 +246,17 @@ int main()
   log_file << "test: calculateEndEffectorTransformation" << std::endl;
   cv::Mat end_effector_transformation = test_arm_model.calculateEndEffectorTransformation();
   if (
-      !IsZero(end_effector_transformation.at<double>(0, 0) - 1)
-      || !IsZero(end_effector_transformation.at<double>(0, 1) - 0)
+      !IsZero(end_effector_transformation.at<double>(0, 0) - 0)
+      || !IsZero(end_effector_transformation.at<double>(0, 1) - -1)
       || !IsZero(end_effector_transformation.at<double>(0, 2) - 0)
-      || !IsZero(end_effector_transformation.at<double>(1, 0) - 0)
-      || !IsZero(end_effector_transformation.at<double>(1, 1) - 1)
+      || !IsZero(end_effector_transformation.at<double>(1, 0) - 1)
+      || !IsZero(end_effector_transformation.at<double>(1, 1) - 0)
       || !IsZero(end_effector_transformation.at<double>(1, 2) - 0)
       || !IsZero(end_effector_transformation.at<double>(2, 0) - 0)
       || !IsZero(end_effector_transformation.at<double>(2, 1) - 0)
       || !IsZero(end_effector_transformation.at<double>(2, 2) - 1)
       || !IsZero(end_effector_transformation.at<double>(0, 3) - 0)
-      || !IsZero(end_effector_transformation.at<double>(1, 3) - 2)
+      || !IsZero(end_effector_transformation.at<double>(1, 3) - -2)
       || !IsZero(end_effector_transformation.at<double>(2, 3) - 6)
       || !IsZero(end_effector_transformation.at<double>(3, 0) - 0)
       || !IsZero(end_effector_transformation.at<double>(3, 1) - 0)
@@ -277,16 +281,16 @@ int main()
   cv::Mat end_effector_jacobian = test_arm_model.calculateEndEffectorJacobian();
   if (
       !IsZero(end_effector_jacobian.at<double>(0, 0) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 0) - -6)
+      || !IsZero(end_effector_jacobian.at<double>(1, 0) - 6)
       || !IsZero(end_effector_jacobian.at<double>(2, 0) - 2)
       || !IsZero(end_effector_jacobian.at<double>(0, 1) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 1) - -4)
+      || !IsZero(end_effector_jacobian.at<double>(1, 1) - 4)
       || !IsZero(end_effector_jacobian.at<double>(2, 1) - 2)
       || !IsZero(end_effector_jacobian.at<double>(0, 2) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 2) - -2)
+      || !IsZero(end_effector_jacobian.at<double>(1, 2) - 2)
       || !IsZero(end_effector_jacobian.at<double>(2, 2) - 2)
       || !IsZero(end_effector_jacobian.at<double>(0, 3) - 0)
-      || !IsZero(end_effector_jacobian.at<double>(1, 3) - -2)
+      || !IsZero(end_effector_jacobian.at<double>(1, 3) - 2)
       || !IsZero(end_effector_jacobian.at<double>(2, 3) - 0)
      )
   {
