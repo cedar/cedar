@@ -84,7 +84,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
     mOrientationQuaternion.at<double>(0, 0) = 1;
   }
   else
-  {
+  { //TODO: this doesn't really take care of negatives, should compare absolute values, really
     if (_mOrientation[0] > _mOrientation[4] && _mOrientation[0] > _mOrientation[8] )
     {      // Column 0:
       r  = sqrt( 1.0 + _mOrientation[0] - _mOrientation[4] - _mOrientation[8] ) * 2.0;
@@ -150,14 +150,14 @@ double Object::getPositionZ()
   return mPosition.at<double>(2, 0);
 }
 
-double Object::getOrientationQuaternion(unsigned int component)
-{
-  return mOrientationQuaternion.at<double>(component, 0);
-}
-
 cv::Mat Object::getOrientationQuaternion()
 {
   return mOrientationQuaternion.clone();
+}
+
+double Object::getOrientationQuaternion(unsigned int component)
+{
+  return mOrientationQuaternion.at<double>(component, 0);
 }
 
 cv::Mat Object::getTransformation()
@@ -180,17 +180,11 @@ void Object::setPosition(const cv::Mat& position)
   updateTransformation();
 }
 
-void Object::setOrientationQuaternion(cv::Mat quaternion)
+void Object::setOrientationQuaternion(const cv::Mat quaternion)
 {
   assert(quaternion.type() == mOrientationQuaternion.type());
   mOrientationQuaternion = quaternion.clone();
   updateTransformation();
-}
-
-void Object::setOrientationQuaternion(unsigned int component, double value)
-{
-  mOrientationQuaternion.at<double>(component, 0) = value;
-  mOrientationQuaternion = mOrientationQuaternion * 1.0 / norm(mOrientationQuaternion);
 }
 
 void Object::rotate(unsigned int axis, double angle)

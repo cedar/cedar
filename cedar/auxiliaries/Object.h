@@ -109,12 +109,6 @@ public slots:
   void setPosition(const cv::Mat& position);
 
   /*!@brief set the orientation of the object frame, given as a unit quaternion
-   * @param component    index of the quaternion component being changed, between 0 and 3
-   * @param value    new value
-   */
-  void setOrientationQuaternion(unsigned int component, double value);
-
-  /*!@brief set the orientation of the object frame, given as a unit quaternion
    * @param quaternion    new unit quaternion for the rotation, 4x1 matrix with norm 1
    */
   void setOrientationQuaternion(const cv::Mat quaternion);
