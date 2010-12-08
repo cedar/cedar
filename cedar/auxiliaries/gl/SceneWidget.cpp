@@ -93,16 +93,39 @@ void SceneWidget::setPosition()
 	}
 }
 
-void SceneWidget::setOrientationAngles()
+void SceneWidget::rotate()
 {
-//	if(!mSwitchingSelectedObject)
-//	{
-//		mpActiveObject->getObject()->setOrientationAngles(
-//		                                                   mpDoubleSpinBoxRotationX->value(),
-//                                                       mpDoubleSpinBoxRotationY->value(),
-//                                                       mpDoubleSpinBoxRotationZ->value()
-//                                                     );
-//	}
+  mpRotateXSpinBox->blockSignals(true);
+  mpRotateYSpinBox->blockSignals(true);
+  mpRotateZSpinBox->blockSignals(true);
+  mpDoubleSpinBoxRotation0->blockSignals(true);
+  mpDoubleSpinBoxRotation1->blockSignals(true);
+  mpDoubleSpinBoxRotation2->blockSignals(true);
+  mpDoubleSpinBoxRotation3->blockSignals(true);
+
+  double angle;
+  angle = mpRotateXSpinBox->value();
+  mpActiveObject->getObject()->rotate(0, angle);
+  mpRotateXSpinBox->setValue(0.0);
+  angle = mpRotateYSpinBox->value();
+  mpActiveObject->getObject()->rotate(1, angle);
+  mpRotateYSpinBox->setValue(0.0);
+  angle = mpRotateZSpinBox->value();
+  mpActiveObject->getObject()->rotate(2, angle);
+  mpRotateZSpinBox->setValue(0.0);
+
+  mpDoubleSpinBoxRotation0->setValue(mpActiveObject->getObject()->getOrientationQuaternion(0));
+  mpDoubleSpinBoxRotation1->setValue(mpActiveObject->getObject()->getOrientationQuaternion(1));
+  mpDoubleSpinBoxRotation2->setValue(mpActiveObject->getObject()->getOrientationQuaternion(2));
+  mpDoubleSpinBoxRotation3->setValue(mpActiveObject->getObject()->getOrientationQuaternion(3));
+
+  mpRotateXSpinBox->blockSignals(false);
+  mpRotateYSpinBox->blockSignals(false);
+  mpRotateZSpinBox->blockSignals(false);
+  mpDoubleSpinBoxRotation0->blockSignals(false);
+  mpDoubleSpinBoxRotation1->blockSignals(false);
+  mpDoubleSpinBoxRotation2->blockSignals(false);
+  mpDoubleSpinBoxRotation3->blockSignals(false);
 }
 
 void SceneWidget::setOrientationQuaternion()
@@ -116,6 +139,18 @@ void SceneWidget::setOrientationQuaternion()
     q.at<double>(3, 0) = mpDoubleSpinBoxRotation3->value();
     q = q * 1 / norm(q);
     mpActiveObject->getObject()->setOrientationQuaternion(q);
+    mpDoubleSpinBoxRotation0->blockSignals(true);
+    mpDoubleSpinBoxRotation1->blockSignals(true);
+    mpDoubleSpinBoxRotation2->blockSignals(true);
+    mpDoubleSpinBoxRotation3->blockSignals(true);
+    mpDoubleSpinBoxRotation0->setValue(mpActiveObject->getObject()->getOrientationQuaternion(0));
+    mpDoubleSpinBoxRotation1->setValue(mpActiveObject->getObject()->getOrientationQuaternion(1));
+    mpDoubleSpinBoxRotation2->setValue(mpActiveObject->getObject()->getOrientationQuaternion(2));
+    mpDoubleSpinBoxRotation3->setValue(mpActiveObject->getObject()->getOrientationQuaternion(3));
+    mpDoubleSpinBoxRotation0->blockSignals(false);
+    mpDoubleSpinBoxRotation1->blockSignals(false);
+    mpDoubleSpinBoxRotation2->blockSignals(false);
+    mpDoubleSpinBoxRotation3->blockSignals(false);
   }
   //TODO: this does not really make sense yet, should think of better representation, e.g. remove the first box and always norm the others
 }
@@ -376,9 +411,6 @@ void SceneWidget::updateWidgetObjectParameters()
   mpDoubleSpinBoxPositionX->setValue(mpActiveObject->getObject()->getPositionX());
   mpDoubleSpinBoxPositionY->setValue(mpActiveObject->getObject()->getPositionY());
   mpDoubleSpinBoxPositionZ->setValue(mpActiveObject->getObject()->getPositionZ());
-//  mpDoubleSpinBoxRotationX->setValue(mpActiveObject->getObject()->getOrientationAngleAlpha());
-//  mpDoubleSpinBoxRotationY->setValue(mpActiveObject->getObject()->getOrientationAngleBeta());
-//  mpDoubleSpinBoxRotationZ->setValue(mpActiveObject->getObject()->getOrientationAngleGamma());
   mpDoubleSpinBoxRotation0->setValue(mpActiveObject->getObject()->getOrientationQuaternion(0));
   mpDoubleSpinBoxRotation1->setValue(mpActiveObject->getObject()->getOrientationQuaternion(1));
   mpDoubleSpinBoxRotation2->setValue(mpActiveObject->getObject()->getOrientationQuaternion(2));
@@ -514,10 +546,10 @@ void SceneWidget::init()
 	connect(mpDoubleSpinBoxPositionX, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
 	connect(mpDoubleSpinBoxPositionY, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
 	connect(mpDoubleSpinBoxPositionZ, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
-//  connect(mpDoubleSpinBoxRotationX, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
-//  connect(mpDoubleSpinBoxRotationY, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
-//  connect(mpDoubleSpinBoxRotationZ, SIGNAL(valueChanged(double)), this, SLOT(setOrientationAngles()));
-  connect(mpDoubleSpinBoxRotation0, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
+  connect(mpRotateXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(rotate()));
+  connect(mpRotateYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(rotate()));
+  connect(mpRotateZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(rotate()));
+	connect(mpDoubleSpinBoxRotation0, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
   connect(mpDoubleSpinBoxRotation1, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
   connect(mpDoubleSpinBoxRotation2, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
   connect(mpDoubleSpinBoxRotation3, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));

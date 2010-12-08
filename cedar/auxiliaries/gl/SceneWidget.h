@@ -92,11 +92,11 @@ public slots:
 	void setPosition();
 	
   /*!@brief sets the orientation of the current object according to the widget control */
-  void setOrientationAngles();
-
-  /*!@brief sets the orientation of the current object according to the widget control */
   void setOrientationQuaternion();
-	
+
+  /*!@brief rotates the currently active object by the values specified in the rotation boxes */
+  void rotate();
+
   /*!@brief sets the color of the current object according to the widget control */
   void setColor();
 	

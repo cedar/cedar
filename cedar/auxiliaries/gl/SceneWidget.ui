@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>612</width>
-    <height>813</height>
+    <width>542</width>
+    <height>801</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -526,7 +526,7 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="3" colspan="2">
+      <item row="9" column="4">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotation1">
         <property name="minimum">
          <double>-5.000000000000000</double>
@@ -539,7 +539,46 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0" colspan="2">
+      <item row="8" column="3">
+       <widget class="QDoubleSpinBox" name="mpRotateXSpinBox">
+        <property name="minimum">
+         <double>-5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="8">
+       <widget class="QDoubleSpinBox" name="mpRotateZSpinBox">
+        <property name="minimum">
+         <double>-5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="6">
+       <widget class="QDoubleSpinBox" name="mpRotateYSpinBox">
+        <property name="minimum">
+         <double>-5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="3">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRotation0">
         <property name="minimum">
          <double>-5.000000000000000</double>
