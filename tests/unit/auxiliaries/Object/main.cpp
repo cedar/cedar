@@ -93,22 +93,6 @@ int main()
   // orientation
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: orientation" << std::endl;
-  object.setOrientationQuaternion(0, 1);
-  object.setOrientationQuaternion(1, 1);
-  object.setOrientationQuaternion(3, 1);
-
-  if (
-      object.getOrientationQuaternion(0) != 0.5
-      || object.getOrientationQuaternion(1) != 0.5
-      || object.getOrientationQuaternion(2) != 0.0
-      || object.getOrientationQuaternion(3) != sqrt(2)/2
-      )
-  {
-    errors++;
-    log_file << "ERROR with setOrientationQuaternion(unsigned int, double) or getOrientationQuaternion(unsigned int)"
-             << std::endl;
-  }
-
   cv::Mat q1 = cv::Mat::zeros(4, 1, CV_64FC1);
   q1.at<double>(1, 0) = 3.3;
   q1.at<double>(2, 0) = 4.4;
@@ -131,18 +115,22 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: transformation" << std::endl;
   object.setPosition(1, 10, 100);
-//  object.setOrientationAngles(M_PI/2, M_PI/2, M_PI/4);
+  cv::Mat q3 = cv::Mat::zeros(4, 1, CV_64FC1);
+  q3.at<double>(0, 0) = -0.923879532511287;
+  q3.at<double>(2, 0) = 0.38268343236509;
+  object.setOrientationQuaternion(q3);
+
   cv::Mat T = object.getTransformation();
   if (
-      !IsZero(T.at<double>(0, 0) - -sqrt(2)/2)
-      || !IsZero(T.at<double>(0, 1) - -sqrt(2)/2)
-      || !IsZero(T.at<double>(0, 2) - 0)
+      !IsZero(T.at<double>(0, 0) - sqrt(2)/2)
+      || !IsZero(T.at<double>(0, 1) - 0.0)
+      || !IsZero(T.at<double>(0, 2) - -sqrt(2)/2)
       || !IsZero(T.at<double>(1, 0) - 0)
-      || !IsZero(T.at<double>(1, 1) - 0)
-      || !IsZero(T.at<double>(1, 2) - 1)
-      || !IsZero(T.at<double>(2, 0) - -sqrt(2)/2)
-      || !IsZero(T.at<double>(2, 1) - sqrt(2)/2)
-      || !IsZero(T.at<double>(2, 2) - 0)
+      || !IsZero(T.at<double>(1, 1) - 1)
+      || !IsZero(T.at<double>(1, 2) - 0)
+      || !IsZero(T.at<double>(2, 0) - sqrt(2)/2)
+      || !IsZero(T.at<double>(2, 1) - 0)
+      || !IsZero(T.at<double>(2, 2) - sqrt(2)/2)
       || !IsZero(T.at<double>(0, 3) - 1)
       || !IsZero(T.at<double>(1, 3) - 10)
       || !IsZero(T.at<double>(2, 3) - 100)
@@ -163,18 +151,18 @@ int main()
   cedar::aux::Object configured_object("test.conf");
   cv::Mat C = configured_object.getTransformation();
   if (
-      !IsZero(C.at<double>(0, 0) - 1)
+      !IsZero(C.at<double>(0, 0) - cos(M_PI/6))
       || !IsZero(C.at<double>(0, 1) - 0)
-      || !IsZero(C.at<double>(0, 2) - 0)
+      || !IsZero(C.at<double>(0, 2) - -0.5)
       || !IsZero(C.at<double>(1, 0) - 0)
       || !IsZero(C.at<double>(1, 1) - 1)
       || !IsZero(C.at<double>(1, 2) - 0)
-      || !IsZero(C.at<double>(2, 0) - 0)
+      || !IsZero(C.at<double>(2, 0) - 0.5)
       || !IsZero(C.at<double>(2, 1) - 0)
-      || !IsZero(C.at<double>(2, 2) - 1)
-      || !IsZero(C.at<double>(0, 3) - 0.0)
-      || !IsZero(C.at<double>(1, 3) - 1.2)
-      || !IsZero(C.at<double>(2, 3) - 0.5)
+      || !IsZero(C.at<double>(2, 2) - cos(M_PI/6))
+      || !IsZero(C.at<double>(0, 3) - 2.0)
+      || !IsZero(C.at<double>(1, 3) - 2.2)
+      || !IsZero(C.at<double>(2, 3) - 2.5)
       || !IsZero(C.at<double>(3, 0) - 0)
       || !IsZero(C.at<double>(3, 1) - 0)
       || !IsZero(C.at<double>(3, 2) - 0)
@@ -184,18 +172,6 @@ int main()
     errors++;
     log_file << "ERROR with configured_object(const std::string& configFileName)" << std::endl;
   }
-
-  log_file << configured_object.getOrientationQuaternion(0) << " "
-           << configured_object.getOrientationQuaternion(1) << " "
-           << configured_object.getOrientationQuaternion(2) << " "
-           << configured_object.getOrientationQuaternion(3) << std::endl;
-  log_file << std::endl;
-
-  log_file << C.at<double>(0, 0) << " " << C.at<double>(0, 1) << " " << C.at<double>(0, 2) << " " << C.at<double>(0, 3) << std::endl
-           << C.at<double>(1, 0) << " " << C.at<double>(1, 1) << " " << C.at<double>(1, 2) << " " << C.at<double>(1, 3) << std::endl
-           << C.at<double>(2, 0) << " " << C.at<double>(2, 1) << " " << C.at<double>(2, 2) << " " << C.at<double>(2, 3) << std::endl
-           << C.at<double>(3, 0) << " " << C.at<double>(3, 1) << " " << C.at<double>(3, 2) << " " << C.at<double>(3, 3) << std::endl
-           << std::endl;
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
