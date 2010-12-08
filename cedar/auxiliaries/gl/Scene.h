@@ -113,8 +113,8 @@ public:
    */
   cedar::aux::gl::ObjectPtr getObject(int index);
   
-  /*!@brief initializes lighting setup, can be called from different viewers */
-  void initLighting(); // do I need this?
+  /*!@brief initializes gl setup, should be called from all viewers */
+  void initGl();
   
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
