@@ -419,7 +419,7 @@ void cedar::aux::gl::drawEllipse(
   GLfloat I_3[4][4][3] =
   {
     {{b, 0.0, -t}, {b-d*t, 0.0, -t},    {b-t, 0.0, -d*t},    {b-t, 0.0, 0.0}},
-    {{b, d*a, -t}, {b-d*t, d*(b-d*t), -t}, {b-t, d*(a-t), -d*t}, {b-t, d*(a-t), 0.0}},
+    {{b, d*a, -t}, {b-d*t, d*(a-d*t), -t}, {b-t, d*(a-t), -d*t}, {b-t, d*(a-t), 0.0}},
     {{d*b, a, -t}, {d*(b-d*t), a-d*t, -t}, {d*(b-t), a-t, -d*t}, {d*(b-t), a-t, 0.0}},
     {{0.0, a, -t}, {0.0, a-d*t, -t},    {0.0, a-t, -d*t},    {0.0, a-t, 0.0}}
   };
