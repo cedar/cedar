@@ -112,15 +112,15 @@ int main()
     errors++;
     log_file << "ERROR with calculateTransformations() or transformation()" << std::endl;
   }
-//  log_file << joint_transformation_1.at<double>(0, 0) << " " << joint_transformation_1.at<double>(0, 1) << " " << joint_transformation_1.at<double>(0, 2) << " " << joint_transformation_1.at<double>(0, 3) << std::endl;
-//  log_file << joint_transformation_1.at<double>(1, 0) << " " << joint_transformation_1.at<double>(1, 1) << " " << joint_transformation_1.at<double>(1, 2) << " " << joint_transformation_1.at<double>(1, 3) << std::endl;
-//  log_file << joint_transformation_1.at<double>(2, 0) << " " << joint_transformation_1.at<double>(2, 1) << " " << joint_transformation_1.at<double>(2, 2) << " " << joint_transformation_1.at<double>(2, 3) << std::endl;
-//  log_file << joint_transformation_1.at<double>(3, 0) << " " << joint_transformation_1.at<double>(3, 1) << " " << joint_transformation_1.at<double>(3, 2) << " " << joint_transformation_1.at<double>(3, 3) << std::endl;
-//
-//  log_file << joint_transformation_3.at<double>(0, 0) << " " << joint_transformation_3.at<double>(0, 1) << " " << joint_transformation_3.at<double>(0, 2) << " " << joint_transformation_3.at<double>(0, 3) << std::endl;
-//  log_file << joint_transformation_3.at<double>(1, 0) << " " << joint_transformation_3.at<double>(1, 1) << " " << joint_transformation_3.at<double>(1, 2) << " " << joint_transformation_3.at<double>(1, 3) << std::endl;
-//  log_file << joint_transformation_3.at<double>(2, 0) << " " << joint_transformation_3.at<double>(2, 1) << " " << joint_transformation_3.at<double>(2, 2) << " " << joint_transformation_3.at<double>(2, 3) << std::endl;
-//  log_file << joint_transformation_3.at<double>(3, 0) << " " << joint_transformation_3.at<double>(3, 1) << " " << joint_transformation_3.at<double>(3, 2) << " " << joint_transformation_3.at<double>(3, 3) << std::endl;
+  log_file << joint_transformation_1.at<double>(0, 0) << " " << joint_transformation_1.at<double>(0, 1) << " " << joint_transformation_1.at<double>(0, 2) << " " << joint_transformation_1.at<double>(0, 3) << std::endl;
+  log_file << joint_transformation_1.at<double>(1, 0) << " " << joint_transformation_1.at<double>(1, 1) << " " << joint_transformation_1.at<double>(1, 2) << " " << joint_transformation_1.at<double>(1, 3) << std::endl;
+  log_file << joint_transformation_1.at<double>(2, 0) << " " << joint_transformation_1.at<double>(2, 1) << " " << joint_transformation_1.at<double>(2, 2) << " " << joint_transformation_1.at<double>(2, 3) << std::endl;
+  log_file << joint_transformation_1.at<double>(3, 0) << " " << joint_transformation_1.at<double>(3, 1) << " " << joint_transformation_1.at<double>(3, 2) << " " << joint_transformation_1.at<double>(3, 3) << std::endl;
+
+  log_file << joint_transformation_3.at<double>(0, 0) << " " << joint_transformation_3.at<double>(0, 1) << " " << joint_transformation_3.at<double>(0, 2) << " " << joint_transformation_3.at<double>(0, 3) << std::endl;
+  log_file << joint_transformation_3.at<double>(1, 0) << " " << joint_transformation_3.at<double>(1, 1) << " " << joint_transformation_3.at<double>(1, 2) << " " << joint_transformation_3.at<double>(1, 3) << std::endl;
+  log_file << joint_transformation_3.at<double>(2, 0) << " " << joint_transformation_3.at<double>(2, 1) << " " << joint_transformation_3.at<double>(2, 2) << " " << joint_transformation_3.at<double>(2, 3) << std::endl;
+  log_file << joint_transformation_3.at<double>(3, 0) << " " << joint_transformation_3.at<double>(3, 1) << " " << joint_transformation_3.at<double>(3, 2) << " " << joint_transformation_3.at<double>(3, 3) << std::endl;
   
   //--------------------------------------------------------------------------------------------------------------------
   // Jacobians
