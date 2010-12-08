@@ -151,6 +151,27 @@ int ConfigurationInterface::addParameter(
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = this->toString(defaultValue);
   parameter_info.mMembersType = Setting::TypeInt;
+  parameter_info.mIsUnsigned = false;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = Setting::TypeNone;
+  parameter_info.mpUserData = pUserData;
+  return CONFIG_SUCCESS;
+}
+
+int ConfigurationInterface::addParameter(
+                                          unsigned int* pMember,
+                                          const std::string& name,
+                                          const unsigned int& defaultValue,
+                                          UserData *pUserData
+                                        )
+{
+  mParameterInfos.push_back(ParameterInfo());
+  ParameterInfo& parameter_info = mParameterInfos.back();
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.resize(1);
+  parameter_info.mDefaultValues.at(0) = this->toString(defaultValue);
+  parameter_info.mMembersType = Setting::TypeInt;
+  parameter_info.mIsUnsigned = true;
   parameter_info.mName = name;
   parameter_info.mIsVectorOfType = Setting::TypeNone;
   parameter_info.mpUserData = pUserData;
@@ -242,6 +263,25 @@ int ConfigurationInterface::addParameter(
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = ConfigurationInterface::toString(defaultValue);
   parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mIsUnsigned = false;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = Setting::TypeInt;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
+}
+
+int ConfigurationInterface::addParameter(
+                                          vector<unsigned int>* pMember,
+                                          const std::string& name,
+                                          const unsigned int& defaultValue
+                                        )
+{
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.resize(1);
+  parameter_info.mDefaultValues.at(0) = ConfigurationInterface::toString(defaultValue);
+  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mIsUnsigned = true;
   parameter_info.mName = name;
   parameter_info.mIsVectorOfType = Setting::TypeInt;
   mParameterInfos.push_back(parameter_info);
@@ -264,6 +304,28 @@ int ConfigurationInterface::addParameter(
   parameter_info.mMembersType = Setting::TypeArray;
   parameter_info.mName = name;
   parameter_info.mIsVectorOfType = Setting::TypeInt;
+  parameter_info.mIsUnsigned = false;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
+}
+
+int ConfigurationInterface::addParameter(
+                                          vector<unsigned int>* pMember,
+                                          const std::string& name,
+                                          const std::vector<unsigned int>& defaultValues
+                                        )
+{
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.clear();
+  for(unsigned int i = 0; i < defaultValues.size(); i++)
+  {
+    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
+  }
+  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = Setting::TypeInt;
+  parameter_info.mIsUnsigned = true;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -358,6 +420,7 @@ int ConfigurationInterface::readConfigurationFile()
     {
       setParameterToDefault(*iter);
     }
+    mConfigurationErrors.push_back("error in " + mConfigFileName + ": I/O error while reading file.");
     return CONFIG_FILE_ERROR;
   } catch (const ParseException &pex) // parser error - some errors can be fixed
   {
@@ -392,6 +455,7 @@ int ConfigurationInterface::readConfigurationFile()
         root.remove(parameter_name);
       }
     }
+    mConfigurationErrors.push_back("error in " + mConfigFileName + ": Parse error");
     return CONFIG_FILE_ERROR;
   }
 
@@ -439,8 +503,14 @@ int ConfigurationInterface::readConfiguration()
     {
       try
       {
-        int temp = mConfig.lookup(iter->mName);
-        *(static_cast<int*> (iter->mpMember)) = temp;
+        if(iter->mIsUnsigned)
+        {
+          *(static_cast<unsigned int*> (iter->mpMember)) = mConfig.lookup(iter->mName);
+        }
+        else
+        {
+          *(static_cast<int*> (iter->mpMember)) = mConfig.lookup(iter->mName);
+        }
       } catch (const SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
@@ -471,7 +541,14 @@ int ConfigurationInterface::readConfiguration()
       {
       case (Setting::TypeInt):
       {
-        readArray<int>(*iter);
+        if (iter->mIsUnsigned)
+        {
+          readArray<unsigned int>(*iter);
+        }
+        else
+        {
+          readArray<int>(*iter);
+        }
         break;
       } // END array case int
       case (Setting::TypeFloat):
@@ -551,11 +628,27 @@ int ConfigurationInterface::writeConfiguration()
     {
       try
       {
-        mConfig.lookup(iter->mName) = *(static_cast<int*> (iter->mpMember));
+        if (iter->mIsUnsigned)
+        {
+          int temp = *(static_cast<unsigned int*> (iter->mpMember));
+          mConfig.lookup(iter->mName) = temp;
+        }
+        else
+        {
+          mConfig.lookup(iter->mName) = *(static_cast<int*> (iter->mpMember));
+        }
       } catch (const SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
-        mConfig.lookup(iter->mName) = *(static_cast<int*> (iter->mpMember));
+        if (iter->mIsUnsigned)
+        {
+          int temp = *(static_cast<unsigned int*> (iter->mpMember));
+          mConfig.lookup(iter->mName) = temp;
+        }
+        else
+        {
+          mConfig.lookup(iter->mName) = *(static_cast<int*> (iter->mpMember));
+        }
       }
       break;
     } // END case TypeInt
@@ -595,7 +688,14 @@ int ConfigurationInterface::writeConfiguration()
         } // END case array bool
       case (Setting::TypeInt):
       {
-        writeArray<int>(iter->mpMember, iter->mName, iter->mIsVectorOfType);
+        if (iter->mIsUnsigned)
+        {
+          writeArrayUInt(iter->mpMember, iter->mName, iter->mIsVectorOfType);
+        }
+        else
+        {
+          writeArray<int>(iter->mpMember, iter->mName, iter->mIsVectorOfType);
+        }
         break;
       }
       case (Setting::TypeFloat):
@@ -912,6 +1012,40 @@ void ConfigurationInterface::writeArray(
   }
 }
 
+void ConfigurationInterface::writeArrayUInt(
+                                             void* pVector,
+                                             const std::string& name,
+                                             const libconfig::Setting::Type vectorType
+                                           )
+{
+  // cast to right type
+  std::vector<unsigned int>* p_vector = static_cast<std::vector<unsigned int>*>(pVector);
+  // first, try to write to configuration tree
+  try
+  {
+    adjustVectorSize(pVector, vectorType, mConfig.lookup(name));
+    for (unsigned int j = 0; j < p_vector->size(); j++)
+    {
+      mConfig.lookup(name)[j] = static_cast<int>(p_vector->at(j));
+    }
+  }
+
+  catch (const libconfig::SettingNotFoundException &nfex)
+  {
+    createNewGroupEntry(name, libconfig::Setting::TypeArray, mConfig.getRoot());
+    libconfig::Setting &array = mConfig.lookup(name);
+    for (unsigned int j = 0; j < p_vector->size(); j++)
+    {
+      array.add(vectorType);
+    }
+    adjustVectorSize(pVector, vectorType, mConfig.lookup(name));
+    for (unsigned int j = 0; j < p_vector->size(); j++)
+    {
+      mConfig.lookup(name)[j] = static_cast<int>(p_vector->at(j));
+    }
+  }
+}
+
 template<typename T>
 void ConfigurationInterface::adjustVector(
                                            void* pVector,
@@ -1009,4 +1143,9 @@ void ConfigurationInterface::removeItem(const std::string& name)
     Setting& group = mConfig.lookup(group_name);
     group.remove(leaf_name);
   }
+}
+
+const std::vector<std::string>& ConfigurationInterface::getErrors()
+{
+  return mConfigurationErrors;
 }
