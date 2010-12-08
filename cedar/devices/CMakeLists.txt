@@ -40,6 +40,7 @@ cedar_add_library(cedardev
   robot/ReferenceGeometry.cpp
   robot/Robot.cpp
   robot/ComponentNotAvailableException.cpp
+  robot/kuka/KukaInterface.cpp
   HEADERS
   robot/KinematicChain.h
   robot/KinematicChainModel.h
@@ -47,6 +48,7 @@ cedar_add_library(cedardev
   robot/ReferenceGeometry.h
   robot/Robot.h
   robot/ComponentNotAvailableException.h
+  robot/kuka/KukaInterface.h
   LINK_LIBRARIES
   cedaraux
 )
