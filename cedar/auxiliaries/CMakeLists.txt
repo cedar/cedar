@@ -59,16 +59,23 @@ cedar_add_library(cedaraux
   Thread.h
   ConfigurationInterface.h
   LogFile.h
+  UserData.h
+  namespace.h
   exceptions/ExceptionBase.h
   exceptions/NullPointerException.h
   exceptions/IndexOutOfRangeException.h
+  exceptions/namespace.h
   math/Limits.h
   math/tools.h
   math/algebraTools.h
   math/coordinateTransformations.h
   math/screwCalculus.h
+  math/sigmoids.h
+  math/tools.h
   gui/BaseWidget.h
+  gui/namespace.h
   gl/drawShapes.h
+  gl/namespace.h
   gl/Viewer.h
   gl/Scene.h
   gl/Object.h

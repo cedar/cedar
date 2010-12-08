@@ -47,6 +47,7 @@ cedar_add_library(cedardev
   robot/ReferenceGeometry.h
   robot/Robot.h
   robot/ComponentNotAvailableException.h
+  robot/namespace.h
   LINK_LIBRARIES
   cedaraux
 )
