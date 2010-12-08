@@ -69,6 +69,10 @@ namespace cedar
 
       class ComponentNotAvailableException;
       typedef boost::shared_ptr<ComponentNotAvailableException> ComponentNotAvailableExceptionPtr;
+      namespace kuka
+      {
+        class KukaInterface;
+      }
     }
   }
 }

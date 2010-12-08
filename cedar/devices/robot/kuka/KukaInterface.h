@@ -15,15 +15,18 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 //Ready for some KukaIn?
-#ifndef KUKA_INTERFACE_H
-#define KUKA_INTERFACE_H
+
+
+#ifndef CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H
+#define CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H
+
 // LOCAL INCLUDES (includes from this project)
 // none yet
 
 // PROJECT INCLUDES
-#include "KinematicChain.h"
-#include "ConfigurationInterface.h"
-#include "namespace.h"
+#include "../KinematicChain.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/namespace.h"
 // SYSTEM INCLUDES
 #include <QObject>
 #include <fri/friremote.h>
@@ -32,7 +35,7 @@
 /*!@brief cedar Interface for the KUKA LBR
  * This class wraps the KUKA Fast Research Interface (FRI)
  */
-class cedar::dev::robot::kuka::KukaInterface :  public cedar::dev::robot::Component,
+class cedar::dev::robot::kuka::KukaInterface :  public cedar::dev::robot::KinematicChain,
                                                 public cedar::aux::ConfigurationInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -51,7 +54,7 @@ public:
   KukaInterface(const std::string& configFileName);
 
   /*!the Destructor*/
-  virtual ~KukaInterface(void);
+  virtual ~KukaInterface();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -131,6 +134,4 @@ private:
 
 };
 
-} //namespace GK
-
-#endif /* KUKAINTERFACE_H_ */
+#endif /* CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H */

@@ -34,14 +34,14 @@ using namespace libconfig;
 //----------------------------------------------------------------------------------------------------------------------
 KukaInterface::KukaInterface(const string& configFileName)
 :
-SZ::ConfigurationInterface(configFileName)
+ConfigurationInterface(configFileName)
 {
   mIsInit = false;
   mpFriRemote = 0;
   init();
 }
 
-KukaInterface::~KukaInterface(void)
+KukaInterface::~KukaInterface()
 {
   if(mIsInit)
   {
@@ -55,14 +55,15 @@ KukaInterface::~KukaInterface(void)
 //----------------------------------------------------------------------------------------------------------------------
 // member functions
 //----------------------------------------------------------------------------------------------------------------------
-KukaInterface::init()
+void KukaInterface::init()
 {
   //The number of joints the KUKA LBR has
-  mNumberOfJoints = LBR_MNJ;
+  KinematicChain::mNumberOfJoints = LBR_MNJ;
   //Load Parameters from the configuration file
   //ServerPort: 0 means, FRI will use the default Port
   addParameter(&_mServerPort, "ServerPort", 0);
-  //RemoteHost: 127.0.0.1 overwrites the FRI default, but it should make no difference
+  //RemoteHost: 127.0.0.1 overwrites the FRI default
+  //TODO define a commandline parameter that can be NULL
   addParameter(&_mRemoteHost, "RemoteHost", "127.0.0.1");
 
   //create a new Instance of the friRemote
@@ -76,7 +77,7 @@ const double KukaInterface::getJointAngle(const unsigned int index)const
   //Receive data from the Kuka LBR
   mpFriRemote->doReceiveData();
   //does not test if index is out of bounds yet
-  return (double)mpFriRemote->getMsrMsrJntPosition()[i];
+  return (double)mpFriRemote->getMsrMsrJntPosition()[index];
 }
 const vector<double> KukaInterface::getJointAngles() const
 {
@@ -86,7 +87,7 @@ const vector<double> KukaInterface::getJointAngles() const
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
   return vector<double>(pJointPos, pJointPos + getNumberOfJoints());
 }
-const cv::Mat KukaInterace::getJointAnglesMatrix() const
+const cv::Mat KukaInterface::getJointAnglesMatrix() const
 {
   //This may be inefficient, but heck, the bloody udp-communication is imho more slow than this
   return cv::Mat(getJointAngles(), true);
@@ -101,14 +102,14 @@ void KukaInterface::setJointAngle(const unsigned int index, const double angle)
 void KukaInterface::setJointAngles(const std::vector<double>& angles)
 {
   //The FRI function is expecting a float array, so I have to allocate a temporary array.
-  float p_angles[] = new float[getNumberOfJoints()];
+  float *p_angles = new float[getNumberOfJoints()];
 
-  for (int i=0; i<getNumberOfJoints(); i++)
+  for (unsigned i=0; i<getNumberOfJoints(); i++)
   {
     p_angles[i] = float(angles[i]);
   }
 
-  //This FRI function copies the content of the first Parameter
+  //Although the first parameter is not const, this FRI function copies the content and does not change
   //Second Parameter defines if the Data should be transfered to the LBR right now.
   mpFriRemote->doPositionControl(p_angles, true);
 
@@ -118,7 +119,17 @@ void KukaInterface::setJointAngles(const cv::Mat& angleMatrix)
 {
   //The cv::Mat Matrix has a template method to return a specific type.
   //I don't know if it works without problems, though
-  float *p_angles = angleMatrix.ptr<float>();
-  mpFriRemote->doPositionControl(p_angles, true);
+  const float *p_angles = angleMatrix.ptr<float>();
+  //since the fri expects a non-constant array, I have to copy the array.
+  float *p_angles_copy = new float[getNumberOfJoints()];
+  for(unsigned i=0; i<getNumberOfJoints(); i++)
+  {
+    p_angles_copy[i] = p_angles[i];
+  }
+
+  //Al
+  mpFriRemote->doPositionControl(p_angles_copy, true);
+
+  delete[] p_angles_copy;
 }
 
