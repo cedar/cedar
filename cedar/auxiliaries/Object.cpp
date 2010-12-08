@@ -155,6 +155,33 @@ void Object::setOrientationQuaternion(unsigned int component, double value)
   mOrientationQuaternion = mOrientationQuaternion * 1.0 / norm(mOrientationQuaternion);
 }
 
+void Object::rotate(unsigned int axis, double angle)
+{
+  // rotation quaternion
+  cv::Mat q_rot = cv::Mat::zeros(4, 1, CV_64FC1);
+  q_rot.at<double>(0, 0) = cos(angle/2.0);
+  q_rot.at<double>(axis+1, 0) = sin(angle/2.0);
+
+  // calculate new object orientation quaternion
+  double a1 = mOrientationQuaternion.at<double>(0, 0);
+  double b1 = mOrientationQuaternion.at<double>(1, 0);
+  double c1 = mOrientationQuaternion.at<double>(2, 0);
+  double d1 = mOrientationQuaternion.at<double>(3, 0);
+  double a2 = q_rot.at<double>(0, 0);
+  double b2 = q_rot.at<double>(1, 0);
+  double c2 = q_rot.at<double>(2, 0);
+  double d2 = q_rot.at<double>(3, 0);
+  cv::Mat q_new = cv::Mat::zeros(4, 1, CV_64FC1);
+  q_new.at<double>(0, 0) = a1*a2 - b1*b2 - c1*c2 - d1*d2;
+  q_new.at<double>(1, 0) = a1*b2 + b1*a2 + c1*d2 - d1*c2;
+  q_new.at<double>(2, 0) = a1*c2 - b1*d2 + c1*a2 + d1*b2;
+  q_new.at<double>(3, 0) = a1*d2 + b1*c2 - c1*b2 + d1*a2;
+
+  // set new quaternion
+  mOrientationQuaternion = q_new;
+  updateTransformation();
+}
+
 void Object::updateTransformation()
 {
   // now using quaternions

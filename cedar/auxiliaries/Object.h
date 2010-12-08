@@ -103,14 +103,27 @@ public slots:
    */
   void setPosition(const double x, const double y, const double z);
 
-  //!@brief set the position of the object frame origin in the world frame
+  /*!@brief set the position of the object frame origin in the world frame
+   * @param position    new position in homogeneous coordinates
+   */
   void setPosition(const cv::Mat& position);
 
-  //!@brief set the orientation of the object frame, given as a unit quaternion
+  /*!@brief set the orientation of the object frame, given as a unit quaternion
+   * @param component    index of the quaternion component being changed, between 0 and 3
+   * @param value    new value
+   */
   void setOrientationQuaternion(unsigned int component, double value);
 
-  //!@brief set the orientation of the object frame, given as a unit quaternion
+  /*!@brief set the orientation of the object frame, given as a unit quaternion
+   * @param quaternion    new unit quaternion for the rotation, 4x1 matrix with norm 1
+   */
   void setOrientationQuaternion(const cv::Mat quaternion);
+
+  /*!@brief rotates the object around one of the main axes of the object frame
+   * @param axis    index of the axis to rotate around, between 0 and 2
+   * @param angle    value of angle that the object is rotated by
+   */
+  void rotate(unsigned int axis, double angle);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -189,6 +189,7 @@ int main()
            << configured_object.getOrientationQuaternion(1) << " "
            << configured_object.getOrientationQuaternion(2) << " "
            << configured_object.getOrientationQuaternion(3) << std::endl;
+  log_file << std::endl;
 
   log_file << C.at<double>(0, 0) << " " << C.at<double>(0, 1) << " " << C.at<double>(0, 2) << " " << C.at<double>(0, 3) << std::endl
            << C.at<double>(1, 0) << " " << C.at<double>(1, 1) << " " << C.at<double>(1, 2) << " " << C.at<double>(1, 3) << std::endl
