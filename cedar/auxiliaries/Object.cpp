@@ -52,6 +52,8 @@ using namespace cedar::aux::math;
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::Object::Object()
 :
+//    TODO: get rid of error output occurring with this constructor (config file not found)
+//cedar::aux::ConfigurationInterface(""),
 mTransformation(4, 4, CV_64FC1),
 mPosition(4, 1, CV_64FC1),
 mOrientationQuaternion(4, 1, CV_64FC1),
@@ -75,11 +77,47 @@ mTransformationTranspose(4, 4, CV_64FC1)
   mPosition.at<double>(0, 0) = _mPosition[0];
   mPosition.at<double>(1, 0) = _mPosition[1];
   mPosition.at<double>(2, 0) = _mPosition[2];
-  mOrientationQuaternion.at<double>(0, 0) = _mOrientation[0];
-  mOrientationQuaternion.at<double>(1, 0) = _mOrientation[1];
-  mOrientationQuaternion.at<double>(2, 0) = _mOrientation[2];
-  mOrientationQuaternion.at<double>(3, 0) = _mOrientation[3];
+  // read out quaternion from orientation _mOrientationrix
+  double r;
+  if (IsZero(_mOrientation[0] + _mOrientation[4] + _mOrientation[8] - 3))
+  {
+    mOrientationQuaternion.at<double>(0, 0) = 1;
+  }
+  else
+  {
+    if (_mOrientation[0] > _mOrientation[4] && _mOrientation[0] > _mOrientation[8] )
+    {      // Column 0:
+      r  = sqrt( 1.0 + _mOrientation[0] - _mOrientation[4] - _mOrientation[8] ) * 2.0;
+      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[7] - _mOrientation[5] ) / r;
+      mOrientationQuaternion.at<double>(1, 0) = 0.25 * r;
+      mOrientationQuaternion.at<double>(2, 0) = (_mOrientation[3] + _mOrientation[1] ) / r;
+      mOrientationQuaternion.at<double>(3, 0) = (_mOrientation[2] + _mOrientation[6] ) / r;
+      std::cout << "case 1:" << std::endl;
+    }
+    else if ( _mOrientation[4] > _mOrientation[8] )
+    {      // Column 1:
+      r  = sqrt( 1.0 + _mOrientation[4] - _mOrientation[0] - _mOrientation[8] ) * 2.0;
+      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[2] - _mOrientation[6] ) / r;
+      mOrientationQuaternion.at<double>(1, 0) = (_mOrientation[3] + _mOrientation[1] ) / r;
+      mOrientationQuaternion.at<double>(2, 0) = 0.25 * r;
+      mOrientationQuaternion.at<double>(3, 0) = (_mOrientation[7] + _mOrientation[5] ) / r;
+      std::cout << "case 2:" << std::endl;
+    }
+    else
+    {            // Column 2:
+      r  = sqrt( 1.0 + _mOrientation[8] - _mOrientation[0] - _mOrientation[4] ) * 2.0;
+      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[3] - _mOrientation[1] ) / r;
+      mOrientationQuaternion.at<double>(1, 0) = (_mOrientation[6] + _mOrientation[2] ) / r;
+      mOrientationQuaternion.at<double>(2, 0) = (_mOrientation[5] + _mOrientation[7] ) / r;
+      mOrientationQuaternion.at<double>(3, 0) = 0.25 * r;
+      std::cout << "case 3:" << std::endl;
+    }
+  }
   updateTransformation();
+  std::cout << "quaternion:" << std::endl;
+  write(mOrientationQuaternion);
+  std::cout << "transformation:" << std::endl;
+  write(mTransformation);
 }
 
 
