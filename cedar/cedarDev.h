@@ -45,9 +45,11 @@
 #include "cedar/devices/robot/ComponentNotAvailableException.h"
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/devices/robot/Robot.h"
+#include "cedar/devices/robot/gl/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
