@@ -76,56 +76,63 @@ int main(int argc, char **argv)
   p_block_object->setPosition(3, -3, 3);
   p_block_object->setName(std::string("Bernd the Block"));
   ObjectPtr p_block(new Block(p_block_object, 1, 1, 2, 0, 1, 0.5));
-//  p_scene->addObject(p_block);
+  p_scene->addObject(p_block);
+
+  // create a sphere visualization and add it to the scene
+  cedar::aux::ObjectPtr p_sphere_object(new cedar::aux::Object());
+  p_sphere_object->setPosition(3, 3, 3);
+  p_sphere_object->setName(std::string("Susi the Sphere"));
+  ObjectPtr p_sphere(new Sphere(p_sphere_object, 1, 1, 0, 0.5));
+  p_scene->addObject(p_sphere);
 
   // create a cone visualization and add it to the scene
   cedar::aux::ObjectPtr p_cone_object(new cedar::aux::Object());
   p_cone_object->setPosition(-3, 3, 3);
   p_cone_object->setName(std::string("Carl the Cone"));
   ObjectPtr p_cone(new Cone(p_cone_object, 1, 3, 0, 0, 1));
-//  p_scene->addObject(p_cone);
+  p_scene->addObject(p_cone);
 
   // create a cylinder visualization and add it to the scene
   cedar::aux::ObjectPtr p_cylinder_object(new cedar::aux::Object());
   p_cylinder_object->setPosition(-3, -3, 3);
   p_cylinder_object->setName(std::string("Cindy the Cylinder"));
   ObjectPtr p_cylinder(new Cylinder(p_cylinder_object, 1, 3, 0, 1, 1));
-//  p_scene->addObject(p_cylinder);
+  p_scene->addObject(p_cylinder);
 
   // create a pyramid visualization and add it to the scene
   cedar::aux::ObjectPtr p_pyramid_object(new cedar::aux::Object());
   p_pyramid_object->setPosition( 9, -3, 3 );
   p_pyramid_object->setName(std::string("Peter the Pyramid"));
   ObjectPtr p_pyramid(new Pyramid(p_pyramid_object, 2, 1.5, 1.5, 1, 1, 0));
-//  p_scene->addObject(p_pyramid);
+  p_scene->addObject(p_pyramid);
 
   // create a torus visualization and add it to the scene
   cedar::aux::ObjectPtr p_prism_object(new cedar::aux::Object());
   p_prism_object->setPosition(0, 0, 5);
   p_prism_object->setName(std::string("Pamela Prisma"));
   ObjectPtr p_prism(new Prism(p_prism_object, 2, 1));
-//  p_scene->addObject(p_prism);
+  p_scene->addObject(p_prism);
 
   // create a torus visualization and add it to the scene
   cedar::aux::ObjectPtr p_torus_object(new cedar::aux::Object());
-//  p_torus_object->setPosition( -7.5, 3, 3 );
+  p_torus_object->setPosition( -7.5, 3, 3 );
   p_torus_object->setName(std::string("Tom the Torus"));
   ObjectPtr p_torus(new Torus(p_torus_object, 2, 0.3, 1, 0.5, 0));
-//  p_scene->addObject(p_torus);
+  p_scene->addObject(p_torus);
 
   // create a torus visualization and add it to the scene
   cedar::aux::ObjectPtr p_ellipse_object(new cedar::aux::Object());
-//  p_ellipse_object->setPosition(-7.5, -3, 3);
+  p_ellipse_object->setPosition(-7.5, -3, 3);
   p_ellipse_object->setName(std::string("Elfriede la Ellipse"));
   ObjectPtr p_ellipse(new Ellipse(p_ellipse_object, 1, 2, 0.3, 1, 1, 0));
   p_scene->addObject(p_ellipse);
 
   // create a chessboard visualization and add it to the scene
-//  cedar::aux::ObjectPtr p_chessboard_object(new cedar::aux::Object());
-//  p_chessboard_object->setPosition( 7.5, 1.5, 3 );
-//  p_chessboard_object->setName(std::string("Caspar the checkered Chessboard"));
-//  ObjectPtr p_chessboard(new Chessboard(p_chessboard_object, 3, 3, 0.2, 8, 8, 1, 1, 1, 0, 0, 0));
-//  p_scene->addObject(p_chessboard);
+  cedar::aux::ObjectPtr p_chessboard_object(new cedar::aux::Object());
+  p_chessboard_object->setPosition( 7.5, 1.5, 3 );
+  p_chessboard_object->setName(std::string("Caspar the checkered Chessboard"));
+  ObjectPtr p_chessboard(new Chessboard(p_chessboard_object, 3, 3, 0.2, 8, 8, 1, 1, 1, 0, 0, 0));
+  p_scene->addObject(p_chessboard);
 
   // create a widget to control the scene
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));

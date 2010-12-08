@@ -153,8 +153,12 @@ cedar::aux::gl::ObjectPtr Scene::getObject(int index)
   return mObjects[index];
 }
 
-void Scene::initLighting()
+void Scene::initGl()
 {
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_MAP2_VERTEX_3);
+  glEnable(GL_AUTO_NORMAL);
+
   // TODO: this somehow sets the light relative to the camera, which might not be wanted. check!
 	// set light
 	glEnable(GL_LIGHTING);

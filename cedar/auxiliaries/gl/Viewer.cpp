@@ -66,7 +66,7 @@ Viewer::~Viewer()
 void Viewer::init()
 {
   restoreStateFromFile();
-//  mpScene->initLighting();
+  mpScene->initGl();
 }
 
 void Viewer::draw()

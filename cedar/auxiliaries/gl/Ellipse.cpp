@@ -131,6 +131,6 @@ void Ellipse::draw()
 	if (mIsVisible)
 	{
 	  gl::setColor(mColorR, mColorG, mColorB);
-		drawEllipse(mWidth, mLength, mThickness, mResolution*2, mResolution, mIsDrawnAsWireFrame);
+		drawEllipse(mWidth, mLength, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
 	}
 }
