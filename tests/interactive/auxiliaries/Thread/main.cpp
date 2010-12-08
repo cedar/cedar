@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 
-#include "cedar/auxiliaries/Thread.h"
+#include "auxiliaries/Thread.h"
 
 #include <cstdlib>
 #include <iostream>

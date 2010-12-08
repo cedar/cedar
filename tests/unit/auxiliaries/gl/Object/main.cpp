@@ -36,11 +36,11 @@
 
 
 // LOCAL INCLUDES
-#include "TestObject.h"
+#include "unit/auxiliaries/gl/Object/TestObject.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Object.h"
-#include "cedar/auxiliaries/LogFile.h"
+#include "auxiliaries/gl/Object.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

@@ -39,8 +39,8 @@
 #define CEDAR_AUX_GL_SCENE_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Object.h"
+#include "auxiliaries/gl/namespace.h"
+#include "auxiliaries/gl/Object.h"
 
 // PROJECT INCLUDES
 

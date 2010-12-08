@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "Scene.h"
+#include "auxiliaries/gl/Scene.h"
 
 // PROJECT INCLUDES
 

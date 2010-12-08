@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "KinematicChain.h"
+#include "devices/robot/KinematicChain.h"
 
 // PROJECT INCLUDES
 

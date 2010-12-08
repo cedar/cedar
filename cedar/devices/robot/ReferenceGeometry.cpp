@@ -36,10 +36,10 @@
 
 
 // LOCAL INCLUDES
-#include "ReferenceGeometry.h"
+#include "devices/robot/ReferenceGeometry.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>

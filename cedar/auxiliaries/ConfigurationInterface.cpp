@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "ConfigurationInterface.h"
-#include "UserData.h"
+#include "auxiliaries/ConfigurationInterface.h"
+#include "auxiliaries/UserData.h"
 
 // PROJECT INCLUDES
 

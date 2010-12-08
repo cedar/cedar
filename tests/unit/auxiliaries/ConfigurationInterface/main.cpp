@@ -38,10 +38,10 @@
 //!@todo write a function that deletes the files that are created in this test
 
 // LOCAL INCLUDES
-#include "TestClass.h"
+#include "unit/auxiliaries/ConfigurationInterface/TestClass.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

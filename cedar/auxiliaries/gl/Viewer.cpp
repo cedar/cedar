@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "Viewer.h"
+#include "auxiliaries/gl/Viewer.h"
 
 // PROJECT INCLUDES
 

@@ -38,11 +38,11 @@
 #define CEDAR_TESTS_UNIT_DEV_ROBOT_ROBOT_TEST_ROBOT_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "unit/devices/robot/Robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/Robot.h"
-#include "cedar/devices/robot/Component.h"
+#include "devices/robot/Robot.h"
+#include "devices/robot/Component.h"
 
 // SYSTEM INCLUDES
 #include <string>

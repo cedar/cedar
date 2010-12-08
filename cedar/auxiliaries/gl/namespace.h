@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/namespace.h"
+#include "namespace.h"
 
 // SYSTEM INCLUDES
 

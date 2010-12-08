@@ -38,10 +38,10 @@
 #define CEDAR_DEV_ROBOT_COMPONENT_NOT_AVAILABLE_EXCEPTION_BASE_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 

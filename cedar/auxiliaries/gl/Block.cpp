@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "drawShapes.h"
-#include "Block.h"
+#include "auxiliaries/gl/drawShapes.h"
+#include "auxiliaries/gl/Block.h"
 
 // PROJECT INCLUDES
 

@@ -38,10 +38,10 @@
 #define CEDAR_TESTS_UNIT_AUX_GL_OBJECT_TEST_OBJECT_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "unit/auxiliaries/gl/Object/namespace.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Object.h"
+#include "auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
 

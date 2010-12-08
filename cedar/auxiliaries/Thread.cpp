@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "Thread.h"
+#include "auxiliaries/Thread.h"
 
 // PROJECT INCLUDES
 

@@ -39,8 +39,8 @@
 #define CEDAR_AUX_THREAD_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Base.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
 

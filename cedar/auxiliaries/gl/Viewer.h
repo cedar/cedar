@@ -39,8 +39,8 @@
 #define CEDAR_AUX_GL_VIEWER_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Scene.h"
+#include "auxiliaries/gl/namespace.h"
+#include "auxiliaries/gl/Scene.h"
 
 // PROJECT INCLUDES
 

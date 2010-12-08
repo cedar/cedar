@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "NullPointerException.h"
+#include "auxiliaries/exceptions/NullPointerException.h"
 
 // PROJECT INCLUDES
 

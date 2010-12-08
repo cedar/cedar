@@ -36,10 +36,10 @@
 
 
 // LOCAL INCLUDES
-#include "TestClass.h"
+#include "unit/auxiliaries/ConfigurationInterface/TestClass.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <string>

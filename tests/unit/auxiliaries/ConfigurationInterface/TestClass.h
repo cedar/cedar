@@ -38,11 +38,11 @@
 #define CEDAR_TESTS_UNIT_AUX_CONFIGURATION_INTERFACE_TEST_CLASS_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "unit/auxiliaries/ConfigurationInterface/namespace.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/ConfigurationInterface.h"
-#include "cedar/auxiliaries/LogFile.h"
+#include "auxiliaries/ConfigurationInterface.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

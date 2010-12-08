@@ -35,12 +35,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "TestRobot.h"
-#include "TestComponent.h"
+#include "unit/devices/robot/Robot/TestRobot.h"
+#include "unit/devices/robot/Robot/TestComponent.h"
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/Robot.h"
-#include "cedar/devices/robot/Component.h"
+#include "devices/robot/Robot.h"
+#include "devices/robot/Component.h"
 
 // SYSTEM INCLUDES
 #include <string>

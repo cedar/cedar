@@ -37,9 +37,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/math/coordinateTransformations.h"
-#include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/LogFile.h"
+#include "auxiliaries/math/coordinateTransformations.h"
+#include "auxiliaries/math/tools.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 

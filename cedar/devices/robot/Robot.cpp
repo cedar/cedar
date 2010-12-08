@@ -36,11 +36,11 @@
 
 
 // LOCAL INCLUDES
-#include "Robot.h"
-#include "ComponentNotAvailableException.h"
+#include "devices/robot/Robot.h"
+#include "devices/robot/ComponentNotAvailableException.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <map>

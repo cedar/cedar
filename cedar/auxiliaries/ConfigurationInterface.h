@@ -41,9 +41,9 @@
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Base.h"
-#include "UserData.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/Base.h"
+#include "auxiliaries/UserData.h"
 
 // PROJECT INCLUDES
 

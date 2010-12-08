@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "sigmoids.h"
+#include "auxiliaries/math/sigmoids.h"
 
 // PROJECT INCLUDES
 
