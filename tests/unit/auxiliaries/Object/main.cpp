@@ -182,11 +182,6 @@ int main()
     log_file << "ERROR with rotate()" << std::endl;
   }
 
-  log_file << D.at<double>(0, 0) << " " << D.at<double>(0, 1) << " " << D.at<double>(0, 2) << " " << D.at<double>(0, 3) << std::endl;
-  log_file << D.at<double>(1, 0) << " " << D.at<double>(1, 1) << " " << D.at<double>(1, 2) << " " << D.at<double>(1, 3) << std::endl;
-  log_file << D.at<double>(2, 0) << " " << D.at<double>(2, 1) << " " << D.at<double>(2, 2) << " " << D.at<double>(2, 3) << std::endl;
-  log_file << D.at<double>(3, 0) << " " << D.at<double>(3, 1) << " " << D.at<double>(3, 2) << " " << D.at<double>(3, 3) << std::endl;
-
   //--------------------------------------------------------------------------------------------------------------------
   // configuration file constructor
   //--------------------------------------------------------------------------------------------------------------------
