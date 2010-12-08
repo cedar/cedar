@@ -145,6 +145,49 @@ int main()
   }
 
   //--------------------------------------------------------------------------------------------------------------------
+  // rotate
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: rotate" << std::endl;
+  object.setPosition(0, 0, 0);
+  cv::Mat q4 = cv::Mat::zeros(4, 1, CV_64FC1);
+  q4.at<double>(0, 0) = 1.0;
+  object.setOrientationQuaternion(q4);
+  object.rotate(0, M_PI/2);
+  object.rotate(1, M_PI/4);
+
+  cv::Mat D = object.getTransformation();
+  if (
+      !IsZero(D.at<double>(0, 0) - sqrt(2)/2)
+      || !IsZero(D.at<double>(0, 1) - 0.0)
+      || !IsZero(D.at<double>(0, 2) - sqrt(2)/2)
+
+      || !IsZero(D.at<double>(1, 0) - sqrt(2)/2)
+      || !IsZero(D.at<double>(1, 1) - 0)
+      || !IsZero(D.at<double>(1, 2) - -sqrt(2)/2)
+
+      || !IsZero(D.at<double>(2, 0) - 0)
+      || !IsZero(D.at<double>(2, 1) - 1)
+      || !IsZero(D.at<double>(2, 2) - 0)
+
+      || !IsZero(D.at<double>(0, 3) - 0)
+      || !IsZero(D.at<double>(1, 3) - 0)
+      || !IsZero(D.at<double>(2, 3) - 0)
+      || !IsZero(D.at<double>(3, 0) - 0)
+      || !IsZero(D.at<double>(3, 1) - 0)
+      || !IsZero(D.at<double>(3, 2) - 0)
+      || !IsZero(D.at<double>(3, 3) - 1)
+      )
+  {
+    errors++;
+    log_file << "ERROR with rotate()" << std::endl;
+  }
+
+  log_file << D.at<double>(0, 0) << " " << D.at<double>(0, 1) << " " << D.at<double>(0, 2) << " " << D.at<double>(0, 3) << std::endl;
+  log_file << D.at<double>(1, 0) << " " << D.at<double>(1, 1) << " " << D.at<double>(1, 2) << " " << D.at<double>(1, 3) << std::endl;
+  log_file << D.at<double>(2, 0) << " " << D.at<double>(2, 1) << " " << D.at<double>(2, 2) << " " << D.at<double>(2, 3) << std::endl;
+  log_file << D.at<double>(3, 0) << " " << D.at<double>(3, 1) << " " << D.at<double>(3, 2) << " " << D.at<double>(3, 3) << std::endl;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // configuration file constructor
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: configuration file constructor" << std::endl;
