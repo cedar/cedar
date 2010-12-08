@@ -170,7 +170,7 @@ cv::Mat KinematicChainModel::calculateSpatialJacobian()
     }
   }
 	mTransformationsLock.unlock();
-  return jacobian;
+  return rigidToAdjointTransformation<double>(mTransformation)*jacobian;
 }
 
 cv::Mat KinematicChainModel::calculateEndEffectorPosition()
