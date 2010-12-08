@@ -59,8 +59,7 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/Users/reimajbi/src/cedar.dev/tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
-//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("/home/reimajbi/srcMercurial/cedar.dev/tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
   cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
 
   // create model of simulated arm
