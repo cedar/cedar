@@ -38,5 +38,7 @@
 # install setup
 
 file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+file(GLOB cedarDoc "${CEDAR_BUILD_DIR}/doc/*")
 install(FILES ${cedarHeaders} DESTINATION ${CEDAR_HEADER_INSTALL_DIR})
+install(DIRECTORY ${cedarDoc} DESTINATION ${CEDAR_DOC_INSTALL_DIR})
 
