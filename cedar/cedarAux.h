@@ -61,6 +61,8 @@
 #include "auxiliaries/math/sigmoids.h"
 #include "auxiliaries/math/tools.h"
 
+#include "auxiliaries/gui/namespace.h"
+#include "auxiliaries/gui/BaseWidget.h"
 // SYSTEM INCLUDES
 
 #endif // CEDAR_CEDAR_AUX_H
