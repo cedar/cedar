@@ -106,6 +106,12 @@ public:
    * the get-Functions don't, though
    */
   void doDataExchange();
+  /* @brief returns desired command sample time
+   * @return sample time in
+   */
+  //TODO find out, what measure is used to represent the sample time
+  float getSampleTime()const;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // public slots
