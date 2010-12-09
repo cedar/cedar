@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //! Constructor
-cedar::aux::exc::IBadConnectionException::BadConnectionException()
+cedar::aux::exc::BadConnectionException::BadConnectionException()
 {
   // Sets the type name.
   this->mType = "BadConnectionException";
