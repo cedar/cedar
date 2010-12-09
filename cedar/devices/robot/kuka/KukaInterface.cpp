@@ -102,10 +102,8 @@ const cv::Mat KukaInterface::getJointAnglesMatrix() const
 void KukaInterface::setJointAngle(const unsigned int index, const double angle) throw()
 {
   //If the KUKA/LBR is not in command mode, throw an Exception
-  if(mpFriRemote->getState() != FRI_STATE_CMD)
-  {
-    //CEDAR_THROW(BadConnectionException, "KUKA LBR is not in command mode. This may mean the connection is not good enough or command mode has been stopped by the robot")
-  }
+  commandModeTest();
+
   //We want to move exactly one joint. Therefore, the other joints must have the same commanded Positions as before.
   float *p_angles = mpFriRemote->getMsrCmdJntPosition();
   p_angles[index] = float(angle);
@@ -113,6 +111,9 @@ void KukaInterface::setJointAngle(const unsigned int index, const double angle) 
 }
 void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
 {
+  //If the KUKA/LBR is not in command mode, throw an Exception
+  commandModeTest();
+
   //The FRI function is expecting a float array, so I have to allocate a temporary array.
   float *p_angles = new float[getNumberOfJoints()];
 
@@ -129,6 +130,9 @@ void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
 }
 void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
 {
+  //If the KUKA/LBR is not in command mode, throw an Exception
+  commandModeTest();
+
   //The cv::Mat Matrix has a template method to return a specific type.
   //I don't know if it works without problems, though
   const float *p_angles = angleMatrix.ptr<float>();
@@ -145,3 +149,27 @@ void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
   delete[] p_angles_copy;
 }
 
+FRI_STATE KukaInterface::getFriState()const
+{
+  return mpFriRemote->getState();
+}
+
+FRI_QUALITY KukaInterface::getFriQuality()const
+{
+  return mpFriRemote->getQuality();
+}
+void doDataExchange()
+{
+  mpFriRemote->doDataExchange();
+}
+
+void KukaInterface::commandModeTest()const throw()
+{
+  if(mpFriRemote->getState() != FRI_STATE_CMD)
+    {
+      CEDAR_THROW(aux::exc::BadConnectionException,
+                  "KUKA LBR is not in command mode. This may mean the connection "\
+                  "is not good enough or command mode has been stopped by the robot"
+                 );
+    }
+}
