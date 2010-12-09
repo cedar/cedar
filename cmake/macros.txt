@@ -154,46 +154,90 @@ endmacro(cedar_get_subdirectories)
 # This macro adds a new library to cedar.
 # Syntax:
 # cedar_add_library(
-#                     library_name source1 source2 ...
-#                     [HEADERS header1 header2 ...]
+#                     library_name
 #                     [MOC_HEADERS header1 header2 ...]
 #                     [LINK_LIBRARIES lib1 lib2 ...]
 #                   )
 # library_name   name of the new library
-# source1 ...    *.cpp and *.h files that have to be compiled into the library
-# HEADERS        header files (will be installed when calling 'make install')
 # MOC_HEADERS    header files that generate (Qt) moc-files
 # LINK_LIBRARIES libraries that need to link to from the new library (important for MacOS linking process)
 #
 # see http://www.cmake.org/Wiki/CMakeMacroParseArguments for a description of the parsing
 macro(cedar_add_library)
-  parse_arguments(library "HEADERS;MOC_HEADERS;LINK_LIBRARIES" "" ${ARGN})
+  parse_arguments(library "MOC_HEADERS;LINK_LIBRARIES" "" ${ARGN})
   car(libraryName ${library_DEFAULT_ARGS})
-  cdr(librarySources ${library_DEFAULT_ARGS})
 
-  # extract the path to the header files, relative to the cedar source directory
-  string(REGEX REPLACE "${CEDAR_SOURCE_DIR}" "" relativePathToHeaders "${CMAKE_CURRENT_SOURCE_DIR}")
-
-  foreach(headerFile ${library_HEADERS})
-    # extract the relative path information that is stored in the 'name' of the header file
-    # (they are potentially listed like 'math/sigmoids.h')
-    string(REGEX REPLACE "((.*/)*).+$" "\\1" relativePathInfo "${headerFile}")
-    # add the header file to the 'make install' target
-    install(FILES ${headerFile} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/${relativePathToHeaders}/${relativePathInfo})
-  endforeach(headerFile)
+  # find files
+  findfiles(${CMAKE_CURRENT_SOURCE_DIR})
 
   # create moc files from those headers that contain the Q_OBJECT macro
-  qt4_wrap_cpp(mocHeaders ${library_MOC_HEADERS})
-  set(librarySources ${librarySources} ${mocHeaders})
+  qt4_wrap_cpp(generatedMocSourceFiles ${library_MOC_HEADERS})
+  set(sourceFiles ${sourceFiles} ${generatedMocSourceFiles})
+
+  # create ui headers from ui files
+  cedar_qt4_wrap_ui(generatedUiHeaders ${uiFiles})
+  set(headerFiles ${headerFiles} ${generatedUiHeaders})
+
+  foreach(headerFile ${headerFiles})
+    # get the path of the file
+    get_filename_component(headerFilePath ${headerFile} PATH)
+    # extract the path to the header file, relative to the cedar source directory
+    string(REGEX REPLACE "${CEDAR_SOURCE_DIR}" "" relativeHeaderFilePath "${headerFilePath}")
+    # extract the path to the header file, relative to the cedar build directory
+    string(REGEX REPLACE "${CEDAR_BUILD_DIR}/cedar" "" relativeHeaderFilePath "${relativeHeaderFilePath}")
+    # add the header file to the 'make install' target
+    install(FILES ${headerFile} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/${relativeHeaderFilePath})
+  endforeach(headerFile ${headerFiles})
 
   # add the library and link it to all relevant cedar and third party libraries
   set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
-  add_library(${libraryName} ${CEDAR_LIB_TYPE} ${librarySources})
+  add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles})
+
+  # link library to all relevant cedar and third party libraries
   target_link_libraries(${libraryName} ${CEDAR_THIRD_PARTY_LIBS} ${library_LINK_LIBRARIES})
 
   # add the library to the 'make install' target
   install(TARGETS ${libraryName} LIBRARY DESTINATION ${CEDAR_LIB_INSTALL_DIR})
 endmacro(cedar_add_library)
+
+
+
+################################################################################################################
+# macro for finding all source, header and other dependent files
+macro(findfiles directory)
+  # collect files from given directory
+  file(GLOB_RECURSE sourceFiles ${directory}/*.cpp)
+  file(GLOB_RECURSE headerFiles ${directory}/*.h)
+  file(GLOB_RECURSE uiFiles ${directory}/*.ui)
+endmacro(findfiles)
+
+
+################################################################################################################
+# Custom implementation of QT4_WRAP_UI.
+#
+# The builtin QT4_WRAP_UI puts all generated files in the current binary dir, ignoring
+# the relative path of the ui file in the project directory structure.
+# The custom implementation copies the directory structure to the build
+# directory and generates the header files in the same relative path. When the
+# binary dir is included in the include path, these files can then be accessed.
+macro(cedar_qt4_wrap_ui outfiles)
+  qt4_extract_options(ui_files ui_options ${ARGN})
+
+  foreach (it ${ui_files})
+    get_filename_component(outfile ${it} NAME_WE)
+    get_filename_component(infile ${it} ABSOLUTE)
+    get_filename_component(generated_path ${it} PATH)
+    string(REGEX REPLACE "${CMAKE_CURRENT_SOURCE_DIR}" "" generated_path "${generated_path}")
+    set(generated_path ${CMAKE_CURRENT_BINARY_DIR}${generated_path})
+    set(outfile ${generated_path}/ui_${outfile}.h)
+    add_custom_command(OUTPUT ${outfile}
+      COMMAND ${QT_UIC_EXECUTABLE}
+      ARGS ${ui_options} -o ${outfile} ${infile}
+      MAIN_DEPENDENCY ${infile})
+    set(${outfiles} ${${outfiles}} ${outfile})
+  endforeach (it)
+
+endmacro(cedar_qt4_wrap_ui)
 
 ########################################################################################################################
 

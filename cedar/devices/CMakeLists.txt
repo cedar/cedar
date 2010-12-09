@@ -35,19 +35,6 @@
 #=======================================================================================================================
 
 cedar_add_library(cedardev
-  robot/KinematicChain.cpp
-  robot/Component.cpp
-  robot/ReferenceGeometry.cpp
-  robot/Robot.cpp
-  robot/ComponentNotAvailableException.cpp
-  HEADERS
-  robot/KinematicChain.h
-  robot/KinematicChainModel.h
-  robot/Component.h
-  robot/ReferenceGeometry.h
-  robot/Robot.h
-  robot/ComponentNotAvailableException.h
-  robot/namespace.h
   LINK_LIBRARIES
   cedaraux
 )
