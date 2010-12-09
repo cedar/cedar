@@ -42,6 +42,7 @@ cedar_add_library(cedaraux
   exceptions/ExceptionBase.cpp
   exceptions/NullPointerException.cpp
   exceptions/IndexOutOfRangeException.cpp
+  exceptions/BadConnectionException.cpp
   math/sigmoids.h
   math/sigmoids.cpp
   math/tools.cpp

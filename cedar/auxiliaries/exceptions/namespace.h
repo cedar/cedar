@@ -62,6 +62,9 @@ namespace cedar
 
       class IndexOutOfRangeException;
       typedef boost::shared_ptr<IndexOutOfRangeException> IndexOutOfRangePtr;
+
+      class BadConnectionException;
+      typedef boost::shared_ptr<BadConnectionException> BadConnectionPtr;
     }
   }
 }

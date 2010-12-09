@@ -37,8 +37,6 @@
 #ifndef CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
 #define CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
 
-#endif  //CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
-
 // LOCAL INCLUDES
 #include "ExceptionBase.h"
 
@@ -48,9 +46,7 @@
 //none yet
 
 
-/*!@brief Abstraction thrown when a connection (i.e. a network connection) is too bad to continue
- *
- */
+/*!@brief Abstraction thrown when a connection (i.e. a network connection) is too bad to continue*/
 class cedar::aux::exc::BadConnectionException : public cedar::aux::exc::ExceptionBase
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,3 +101,5 @@ private:
   // none yet
 
 }; //class BadConnectionException
+
+#endif  //CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
