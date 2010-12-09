@@ -19,7 +19,7 @@
 #include "KukaInterface.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/BadConnectionException.h"
+#include "auxiliaries/exceptions/BadConnectionException.h"
 
 // SYSTEM INCLUDES
 #ifdef DEBUG
@@ -162,7 +162,7 @@ void KukaInterface::doDataExchange()
 {
   mpFriRemote->doDataExchange();
 }
-float getSampleTime()const
+float KukaInterface::getSampleTime()const
 {
   mpFriRemote->getSampleTime();
 }
