@@ -158,7 +158,7 @@ FRI_QUALITY KukaInterface::getFriQuality()const
 {
   return mpFriRemote->getQuality();
 }
-void doDataExchange()
+void KukaInterface::doDataExchange()
 {
   mpFriRemote->doDataExchange();
 }
