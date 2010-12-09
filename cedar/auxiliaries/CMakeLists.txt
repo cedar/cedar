@@ -48,6 +48,7 @@ cedar_add_library(cedaraux
   math/algebraTools.cpp
   math/coordinateTransformations.cpp
   math/screwCalculus.cpp
+  math/planarGeometry.cpp
   gui/BaseWidget.cpp
   gl/drawShapes.cpp
   gl/Viewer.cpp
@@ -72,6 +73,7 @@ cedar_add_library(cedaraux
   math/screwCalculus.h
   math/sigmoids.h
   math/tools.h
+  math/planaGeometry.h
   gui/BaseWidget.h
   gui/namespace.h
   gl/drawShapes.h
