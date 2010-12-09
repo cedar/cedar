@@ -87,6 +87,25 @@ public:
    */
   virtual void setJointAngles(const cv::Mat& angleMatrix) throw();
 
+  /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
+
+  /*! @brief returns the state of the Interface.
+   * this can be FRI_STATE_OFF, FRI_STATE_MON and FRI_STATE_CMD
+   * Commands can only be send if the state is FRI_STATE_CMD, which represents the command mode
+   * @return current state of the interface
+   */
+  FRI_STATE getFriState()const;
+  /*! @brief returns the quality of the connection.
+   * this can range from FRI_QUALITY_UNACCEPTABLE to FRI_QUALITY_PERFECT
+   * if the Quality is worse (means: less) than FRI_QUALITY_GOOD, command mode switches to monitor mode automatically
+   * @return current Quality of the connection
+   */
+  FRI_QUALITY getFriQuality()const;
+  /*! @brief does Data exchange with the KUKA-LBR
+   * normally not necessary, the functions setJointAngle() and setJointAngles() do this by themselves.
+   * the get-Functions don't, though
+   */
+  void doDataExchange();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public slots
@@ -107,6 +126,10 @@ private:
    * This method is called from all constructors of the class.
    */
   void init();
+  /*! @brief tests if the KUKA-LBR is in command mode
+   *  \throws BadConnectionException if the KUKA-LBR is not in command mode
+   */
+  void commandModeTest()const throw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
