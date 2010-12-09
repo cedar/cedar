@@ -65,7 +65,19 @@ int main()
   p_test_arm->setJointAngle(2, -M_PI*0.5);
   p_test_arm->setJointAngle(3, M_PI*0.5);
   test_arm_model.update();
+  p_test_arm->setJointVelocity(1, 1);
+  p_test_arm->setJointVelocity(2, 1);
   
+  //--------------------------------------------------------------------------------------------------------------------
+  // number of joints
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: getNumberOfJoints" << std::endl;
+  if (test_arm_model.getNumberOfJoints() != 4)
+  {
+    errors++;
+    log_file << "ERROR with getNumberOfJoints()" << std::endl;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // transformation
   //--------------------------------------------------------------------------------------------------------------------
@@ -224,6 +236,37 @@ int main()
 //  log_file << spatial_jacobian.at<double>(5, 0) << " " << spatial_jacobian.at<double>(5, 1) << " " << spatial_jacobian.at<double>(5, 2) << " " << spatial_jacobian.at<double>(5, 3) << std::endl;
 //  log_file << std::endl;
   
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // velocity
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: calculateVelocity" << std::endl;
+  cv::Mat p = cv::Mat::zeros(4, 1, CV_64FC1);
+  p.at<double>(2, 0) = 1.0;
+  p.at<double>(3, 0) = 1.0;
+  cv::Mat v0 = test_arm_model.calculateVelocity(p, 0, KinematicChainModel::LOCAL_COORDINATES);
+  cv::Mat v1 = test_arm_model.calculateVelocity(p, 1, KinematicChainModel::LOCAL_COORDINATES);
+  cv::Mat v2 = test_arm_model.calculateVelocity(p, 2, KinematicChainModel::LOCAL_COORDINATES);
+  cv::Mat v3 = test_arm_model.calculateVelocity(p, 3, KinematicChainModel::LOCAL_COORDINATES);
+  if (
+      !IsZero(v0.at<double>(0, 0) - 0)
+      || !IsZero(v0.at<double>(1, 0) - 0)
+      || !IsZero(v0.at<double>(2, 0) - 0)
+      || !IsZero(v1.at<double>(0, 0) - 0)
+      || !IsZero(v1.at<double>(1, 0) - 1)
+      || !IsZero(v1.at<double>(2, 0) - 0)
+      || !IsZero(v2.at<double>(0, 0) - 0)
+      || !IsZero(v2.at<double>(1, 0) - 2)
+      || !IsZero(v2.at<double>(2, 0) - 2)
+      || !IsZero(v3.at<double>(0, 0) - 0)
+      || !IsZero(v3.at<double>(1, 0) - 4)
+      || !IsZero(v3.at<double>(2, 0) - 4)
+     )
+  {
+    errors++;
+    log_file << "ERROR with calculateVelocity()" << std::endl;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector position
   //--------------------------------------------------------------------------------------------------------------------
@@ -298,6 +341,21 @@ int main()
     log_file << "ERROR with calculateEndEffectorJacobian()" << std::endl;
   }
   
+  //--------------------------------------------------------------------------------------------------------------------
+  // end-effector velocity
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: calculateVelocity" << std::endl;
+  cv::Mat v4 = test_arm_model.calculateEndEffectorVelocity();
+  if (
+      !IsZero(v4.at<double>(0, 0) - 0)
+      || !IsZero(v4.at<double>(1, 0) - 6)
+      || !IsZero(v4.at<double>(2, 0) - 4)
+     )
+  {
+    errors++;
+    log_file << "ERROR with calculateVelocity()" << std::endl;
+  }
+
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
