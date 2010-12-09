@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.cpp
+    File:        BadConnectionException.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.rub.de
+    Date:        2010 12 08
 
-    Description: Implementation of the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description: Implementation of the @em cedar::aux:BadConnectionException
 
     Credits:
 
@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "BadConnectionException.h"
 
 // PROJECT INCLUDES
 
@@ -47,10 +47,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //! Constructor
-cedar::aux::exc::IndexOutOfRangeException::IndexOutOfRangeException()
+cedar::aux::exc::BadConnectionException::BadConnectionException()
 {
   // Sets the type name.
-  this->mType = "IndexOutOfRangeException";
+  this->mType = "BadConnectionException";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
