@@ -36,10 +36,11 @@
 
 
 // LOCAL INCLUDES
-#include "screwCalculus.h"
+#include "auxiliaries/math/screwCalculus.h"
+#include "auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
-#include "tools.h"
+
 
 // SYSTEM INCLUDES
 

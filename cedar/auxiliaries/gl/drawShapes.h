@@ -43,7 +43,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include "cv.h"
+#include <cv.h>
 
 namespace cedar
 {

@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "BaseWidget.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // PROJECT INCLUDES
 

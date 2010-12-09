@@ -39,7 +39,7 @@
 #define CEDAR_AUX_EXC_EXCEPTION_BASE_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "auxiliaries/exceptions/namespace.h"
 
 // PROJECT INCLUDES
 

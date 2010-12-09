@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "ComponentNotAvailableException.h"
+#include "devices/robot/ComponentNotAvailableException.h"
 
 // PROJECT INCLUDES
 

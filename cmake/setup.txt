@@ -47,10 +47,12 @@ project(cedar)
 
 # set the directory for source code
 set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
+# directory for all tests
+set (CEDAR_TEST_DIR             "${CEDAR_HOME}/tests")
 # directory for all unit tests
-set (CEDAR_UNIT_TEST_DIR        "${CEDAR_HOME}/tests/unit")
+set (CEDAR_UNIT_TEST_DIR        "${CEDAR_TEST_DIR}/unit")
 # directory for all interactive tests
-set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_HOME}/tests/interactive")
+set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
 
 # default output directory for lib files
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
@@ -72,7 +74,7 @@ endif (CEDAR_BUILD_STATIC_LIBS)
 link_directories(${CEDAR_LIB_DIR})
 
 # add the cedar home directory to the ones that need to be included
-include_directories(${CEDAR_HOME})
+include_directories(${CEDAR_SOURCE_DIR} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
 
 ########################################################################################################################

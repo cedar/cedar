@@ -39,10 +39,10 @@
 #define CEDAR_AUX_GL_OBJECT_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "cedar/auxiliaries/math/tools.h"
+#include "auxiliaries/gl/namespace.h"
 
 // PROJECT INCLUDES
+#include "auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <string>

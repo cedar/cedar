@@ -41,9 +41,9 @@
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Base.h"
-#include "UserData.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/Base.h"
+#include "auxiliaries/UserData.h"
 
 // PROJECT INCLUDES
 
@@ -80,6 +80,8 @@ public:
     std::string mName;
     //! flag if this parameter is a vector of a certain type
     libconfig::Setting::Type mIsVectorOfType;
+    //! flag if a stored integer is unsigned (cannot extend Setting::Type)
+    bool mIsUnsigned;
 
     /*!@brief Contains user defined data. To use this, inherit from UserData and add
      * your user-data in the derived class.
@@ -168,6 +170,19 @@ public:
    * @param pUserData    multi-purpose data structure for further extensions
    */
   virtual int addParameter(
+                            unsigned int* pMember,
+                            const std::string& name,
+                            const unsigned int& defaultValue,
+                            UserData *pUserData = NULL
+                          );
+
+  /*!@brief Adds a parameter to the parameter list.
+   * @param pMember    pointer to member variable
+   * @param name    name of variable in the scope of the configuration file (no preceding underscores allowed!!)
+   * @param defaultValue    default value for the parameter
+   * @param pUserData    multi-purpose data structure for further extensions
+   */
+  virtual int addParameter(
                             double* pMember,
                             const std::string& name,
                             const double& defaultValue,
@@ -206,6 +221,17 @@ public:
    * @param name    name of variable in th scope of the configuration file (no preceding underscores allowed!!)
    * @param defaultValue    default value for the parameter
    */
+  virtual int addParameter(
+                            std::vector<unsigned int>* pMember,
+                            const std::string& name,
+                            const unsigned int& defaultValue
+                          );
+
+  /*!@brief Adds a parameter to the parameter list. Default value for a vector can only be a single element...
+   * @param pMember    pointer to member variable
+   * @param name    name of variable in th scope of the configuration file (no preceding underscores allowed!!)
+   * @param defaultValue    default value for the parameter
+   */
   virtual int addParameter(std::vector<double>* pMember, const std::string& name, const double& defaultValue);
 
   /*!@brief Adds a parameter to the parameter list. Default value for a vector can only be a single element...
@@ -228,6 +254,17 @@ public:
    * @param defaultValues    vector of default values for the parameter
    */
   virtual int addParameter(std::vector<int>* pMember, const std::string& name, const std::vector<int>& defaultValues);
+
+  /*!@brief Adds a parameter to the parameter list. Default value for a vector can only be a single element...
+   * @param pMember    pointer to member variable
+   * @param name    name of variable in th scope of the configuration file (no preceding underscores allowed!!)
+   * @param defaultValues    vector of default values for the parameter
+   */
+  virtual int addParameter(
+                            std::vector<unsigned int>* pMember,
+                            const std::string& name,
+                            const std::vector<unsigned int>& defaultValues
+                          );
 
   /*!@brief Adds a parameter to the parameter list. Default value for a vector can only be a single element...
    * @param pMember    pointer to member variable
@@ -305,6 +342,10 @@ public:
    */
   void readOrDefaultConfiguration();
 
+  /*!@brief Returns a vector of error messages that occured so far.
+   */
+  const std::vector<std::string>& getErrors();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -357,6 +398,13 @@ private:
   template<typename T>
   void writeArray(void* pVector, const std::string& name, const libconfig::Setting::Type vectorType);
 
+  /*!@brief This function writes a vector of the type unsigned int to the Setting structure.
+   * @param pVector    void pointer to std::vector<T>
+   * @param name    name of the configuration
+   * @param vectorType    type of the vector
+   */
+  void writeArrayUInt(void* pVector, const std::string& name, const libconfig::Setting::Type vectorType);
+
   /*!@brief This template function adjusts the size of a Type::Array to match pVector.
    * @param pVector    void pointer to std::vector<T>
    * @param type    type of the array/vector, taken from Setting::Type
@@ -393,7 +441,9 @@ private:
   std::string mConfigFileName;
   //! a vector of parameters, interfacing between the configuration tree and the child class' parameter pointers
   ParameterInfoVector mParameterInfos;
-}; // class cedar::dev::robot::Component
+  //! a vector holding various error messages
+  std::vector<std::string> mConfigurationErrors;
+}; // class cedar::aux::ConfigurationInterface
 
 /*!@example ConfigurationInterfaceTest.cpp
  *this is an example of how to use the template

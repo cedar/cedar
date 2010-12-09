@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "TestObject.h"
+#include "unit/auxiliaries/gl/Object/TestObject.h"
 
 // PROJECT INCLUDES
 

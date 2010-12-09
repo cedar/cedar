@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,43 +22,32 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Limits.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2010 12 09
 
-    Description: Namespace file for cedar::aux::gl
+    Description: Specialization for the @em cedar::aux::math::Limits struct.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_GL_NAMESPACE_H
-#define CEDAR_AUX_GL_NAMESPACE_H
-
 // LOCAL INCLUDES
+#include "auxiliaries/math/Limits.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+template struct cedar::aux::math::Limits<double>;
+template struct cedar::aux::math::Limits<int>;
+template struct cedar::aux::math::Limits<unsigned int>;
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
-{
-  namespace aux
-  {
-    /*!@brief Namespace for all gl classes. */
-    namespace gl
-    {
-      class Scene;
-      class Viewer;
-      class Object;
-      class Block;
-    }
-  }
-}
-
-#endif // CEDAR_AUX_MATH_NAMESPACE_H

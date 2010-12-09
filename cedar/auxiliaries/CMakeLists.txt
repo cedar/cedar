@@ -35,45 +35,6 @@
 #=======================================================================================================================
 
 cedar_add_library(cedaraux
-  Base.cpp
-  Thread.cpp
-  ConfigurationInterface.cpp
-  LogFile.cpp
-  exceptions/ExceptionBase.cpp
-  exceptions/NullPointerException.cpp
-  exceptions/IndexOutOfRangeException.cpp
-  exceptions/BadConnectionException.cpp
-  math/sigmoids.h
-  math/sigmoids.cpp
-  math/tools.cpp
-  math/algebraTools.cpp
-  math/coordinateTransformations.cpp
-  math/screwCalculus.cpp
-  gui/BaseWidget.cpp
-  gl/drawShapes.cpp
-  gl/Viewer.cpp
-  gl/Scene.cpp
-  gl/Object.cpp
-  gl/Block.cpp
-  HEADERS
-  Base.h
-  Thread.h
-  ConfigurationInterface.h
-  LogFile.h
-  exceptions/ExceptionBase.h
-  exceptions/NullPointerException.h
-  exceptions/IndexOutOfRangeException.h
-  math/Limits.h
-  math/tools.h
-  math/algebraTools.h
-  math/coordinateTransformations.h
-  math/screwCalculus.h
-  gui/BaseWidget.h
-  gl/drawShapes.h
-  gl/Viewer.h
-  gl/Scene.h
-  gl/Object.h
-  gl/Block.h
   MOC_HEADERS
   gui/BaseWidget.h
   gl/Viewer.h

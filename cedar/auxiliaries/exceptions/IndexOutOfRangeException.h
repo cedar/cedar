@@ -39,8 +39,8 @@
 #define CEDAR_AUX_EXC_INDEX_OUT_OF_RANGE_EXCEPTION_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "ExceptionBase.h"
+#include "auxiliaries/exceptions/namespace.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 

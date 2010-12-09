@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "IndexOutOfRangeException.h"
+#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 

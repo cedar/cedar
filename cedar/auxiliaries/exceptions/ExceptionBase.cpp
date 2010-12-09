@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "ExceptionBase.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 

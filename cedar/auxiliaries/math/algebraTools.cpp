@@ -37,7 +37,7 @@
 
 
 // LOCAL INCLUDES
-#include "algebraTools.h"
+#include "auxiliaries/math/algebraTools.h"
 
 // PROJECT INCLUDES
 

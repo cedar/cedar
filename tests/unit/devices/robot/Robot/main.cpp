@@ -36,11 +36,11 @@
 
 
 // LOCAL INCLUDES
-#include "TestRobot.h"
+#include "unit/devices/robot/Robot/TestRobot.h"
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/Robot.h"
-#include "cedar/auxiliaries/LogFile.h"
+#include "devices/robot/Robot.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

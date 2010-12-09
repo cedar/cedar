@@ -38,10 +38,10 @@
 //!@todo write a function that deletes the files that are created in this test
 
 // LOCAL INCLUDES
-#include "TestClass.h"
+#include "unit/auxiliaries/ConfigurationInterface/TestClass.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -94,9 +94,10 @@ int main()
   log_file.addSeparatorLine();
   log_file << "Test " << test_number++ << std::endl;
   TestClass new_file("configDir/ConfigurationNew.cfg");
+  new_file.readEmptyFile();
   new_file.addStandardParameters();
   new_file.addVectorParametersMultipleDefaults();
-  new_file.readEmptyFile();
+  new_file.readOrDefaultConfiguration();
   new_file.checkConfigurationStandardParameters();
   new_file.checkConfigurationVectorParameters();
   new_file.printErrors(log_file);
@@ -107,9 +108,10 @@ int main()
   log_file.addSeparatorLine();
   log_file << "Test " << test_number++ << std::endl;
   TestClass new_folder("configNew/newConfig/ConfigurationNew.cfg");
+  new_folder.readEmptyFileInNewFolder();
   new_folder.addStandardParameters();
   new_folder.addVectorParametersMultipleDefaults();
-  new_folder.readEmptyFileInNewFolder();
+  new_folder.readOrDefaultConfiguration();
   new_folder.checkConfigurationStandardParameters();
   new_folder.checkConfigurationVectorParameters();
   new_folder.printErrors(log_file);
@@ -121,8 +123,9 @@ int main()
   log_file.addSeparatorLine();
   log_file << "Test " << test_number++ << std::endl;
   TestClass new_group("configDir/ConfigurationGroupsNew.cfg");
-  new_group.addGroupParameters();
   new_group.readEmptyFileInNewFolder();
+  new_group.addGroupParameters();
+  new_group.readOrDefaultConfiguration();
   new_group.checkConfigurationStandardParameters();
   new_group.checkConfigurationVectorParameters();
   new_group.printErrors(log_file);

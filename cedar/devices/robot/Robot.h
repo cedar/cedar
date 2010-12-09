@@ -38,10 +38,10 @@
 #define CEDAR_DEV_ROBOT_ROBOT_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/Base.h"
+#include "auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <vector>

@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "LogFile.h"
+#include "auxiliaries/LogFile.h"
 
 // PROJECT INCLUDES
 

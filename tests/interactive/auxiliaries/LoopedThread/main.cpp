@@ -35,16 +35,16 @@
 ======================================================================================================================*/
 
 
-#include "cedar/auxiliaries/Thread.h"
+#include "auxiliaries/LoopedThread.h"
 
 #include <cstdlib>
 #include <iostream>
-#include <QTime>
 
 using namespace std;
+using namespace boost::posix_time;
 
 
-class MyTestThread : public cedar::aux::Thread {
+class MyTestThread : public cedar::aux::LoopedThread {
 
 private:
 
@@ -54,19 +54,21 @@ public:
 
   MyTestThread( bool delay = false ) {
     mArtificialDelay = delay;
-    srand( QTime::currentTime().msec() );
+    srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
   }
 
-  MyTestThread( unsigned idleTime, bool delay = false ) : Thread( idleTime ) {
+  MyTestThread( unsigned long stepSize, bool delay = false ) : LoopedThread( stepSize ) {
     mArtificialDelay = delay;
-    srand( QTime::currentTime().msec() );
+    srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
   }
 
-  void step(unsigned int time) {
-    QTime now = QTime::currentTime();
-    cout << "wake up time (sec/msec): " << now.second() << " / " << now.msec() << endl;
+  void step(unsigned long time) {
+    ptime now = microsec_clock::universal_time();
+    cout << "current time (sec/usec): " << now.time_of_day().seconds()
+         << " / " << now.time_of_day().total_microseconds() % 1000000
+         << " (time in step(): " << time << ")" << endl;
     if( mArtificialDelay )
-      msleep( rand() % (3*mIdleTime) );
+      usleep( rand() % (3*mStepSize.total_microseconds()) );
   }
 
   bool getArtificialDelay() {
@@ -82,20 +84,31 @@ public:
 
 int main() {
 
-  unsigned int timeInterval = 100;
+  unsigned long timeInterval = 100000;  // microseconds
   MyTestThread thread( timeInterval );
+  //thread.useFixedStepSize(false);
+  //thread.setSimulatedTime(50000);
 
-  cout << "Starting a thread and let it run for 2 seconds ..." << endl;
+  cout << "Starting a thread and let it run for 1 seconds ..." << endl;
   thread.start();
-  thread.wait(2*1000);
+  thread.wait(1000);
   cout << "Stopping thread ..." << endl;
   thread.stop();
 
   cout << endl;
   cout << "Starting thread again with an artificially unreliable execution time ..." << endl;
-  thread.setArtificalDelay( true );
+  thread.setArtificalDelay(true);
   thread.start();
-  thread.wait(2*1000);
+  thread.wait(1000);
+  cout << "Stopping thread ..." << endl;
+  thread.stop();
+  thread.setArtificalDelay(false);
+
+  cout << endl;
+  cout << "Starting thread again with step size 0 for one millisecond ..." << endl;
+  thread.setStepSize(0);
+  thread.start();
+  thread.wait(1);
   cout << "Stopping thread ..." << endl;
   thread.stop();
 
