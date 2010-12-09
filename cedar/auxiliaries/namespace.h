@@ -56,8 +56,8 @@ namespace cedar
     class Base;
     typedef boost::shared_ptr<Base> BasePtr;
 
-    class Thread;
-    typedef boost::shared_ptr<Thread> ThreadPtr;
+    class LoopedThread;
+    typedef boost::shared_ptr<LoopedThread> LoopedThreadPtr;
 
     class ConfigurationInterface;
     typedef boost::shared_ptr<ConfigurationInterface> ConfigurationInterfacePtr;
