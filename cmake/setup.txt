@@ -1,0 +1,85 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        setup.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: General setup of cedar.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# CMake setup of cedar
+########################################################################################################################
+
+
+########################################################################################################################
+# general settings
+
+# set the project name
+project(cedar)
+
+# set the directory for source code
+set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
+# directory for all tests
+set (CEDAR_TEST_DIR             "${CEDAR_HOME}/tests")
+# directory for all unit tests
+set (CEDAR_UNIT_TEST_DIR        "${CEDAR_TEST_DIR}/unit")
+# directory for all interactive tests
+set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
+
+# default output directory for lib files
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")
+# default output directory for exe files
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}")
+
+# append a 'cedar' subdirectory to the header install directory, so that the includes are bundled
+set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
+
+# Shared or static libraries?
+if (CEDAR_BUILD_STATIC_LIBS)
+  set (CEDAR_LIB_TYPE STATIC)
+else (CEDAR_BUILD_STATIC_LIBS)
+  set (CEDAR_LIB_TYPE SHARED)
+endif (CEDAR_BUILD_STATIC_LIBS)
+
+# include the cedar library directory in the library search path
+link_directories(${CEDAR_LIB_DIR})
+
+# add the cedar home directory to the ones that need to be included
+include_directories(${CEDAR_SOURCE_DIR} ${CEDAR_TEST_DIR})
+
+
+########################################################################################################################
+# add preprocessor definitions 
+
+add_definitions(-Wall)
+add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
+
