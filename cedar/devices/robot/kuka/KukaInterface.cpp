@@ -19,6 +19,7 @@
 #include "KukaInterface.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/exceptions/BadConnectionException.h"
 
 // SYSTEM INCLUDES
 #ifdef DEBUG
@@ -69,6 +70,12 @@ void KukaInterface::init()
   //create a new Instance of the friRemote
   mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
 
+  /* Do Handshakes to the remote host until the robot is in command mode*/
+  while(mpFriRemote->getState() != FRI_STATE_CMD)
+  {
+    mpFriRemote->setToKRLInt(0, 1);
+    mpFriRemote->doDataExchange();
+  }
   mIsInit = true;
 }
 
@@ -92,14 +99,19 @@ const cv::Mat KukaInterface::getJointAnglesMatrix() const
   //This may be inefficient, but heck, the bloody udp-communication is imho more slow than this
   return cv::Mat(getJointAngles(), true);
 }
-void KukaInterface::setJointAngle(const unsigned int index, const double angle)
+void KukaInterface::setJointAngle(const unsigned int index, const double angle) throw()
 {
+  //If the KUKA/LBR is not in command mode, throw an Exception
+  if(mpFriRemote->getState() != FRI_STATE_CMD)
+  {
+    //CEDAR_THROW(BadConnectionException, "KUKA LBR is not in command mode. This may mean the connection is not good enough or command mode has been stopped by the robot")
+  }
   //We want to move exactly one joint. Therefore, the other joints must have the same commanded Positions as before.
   float *p_angles = mpFriRemote->getMsrCmdJntPosition();
   p_angles[index] = float(angle);
   mpFriRemote->doPositionControl(p_angles, true);
 }
-void KukaInterface::setJointAngles(const std::vector<double>& angles)
+void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
 {
   //The FRI function is expecting a float array, so I have to allocate a temporary array.
   float *p_angles = new float[getNumberOfJoints()];
@@ -115,7 +127,7 @@ void KukaInterface::setJointAngles(const std::vector<double>& angles)
 
   delete[] p_angles;
 }
-void KukaInterface::setJointAngles(const cv::Mat& angleMatrix)
+void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
 {
   //The cv::Mat Matrix has a template method to return a specific type.
   //I don't know if it works without problems, though

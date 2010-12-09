@@ -52,23 +52,11 @@ namespace cedar
     /*! @brief Namespace for all robot interfaces. */
     namespace robot
     {
-      class Component;
-      typedef boost::shared_ptr<Component> ComponentPtr;
-
-      class Robot;
-      typedef boost::shared_ptr<Robot> RobotPtr;
-
-      class KinematicChain;
-      typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
-
-      class KinematicChainModel;
-      typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
-
-      class ReferenceGeometry;
-      typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
-
-      class ComponentNotAvailableException;
-      typedef boost::shared_ptr<ComponentNotAvailableException> ComponentNotAvailableExceptionPtr;
+      namespace kuka
+      {
+        class KukaInterface;
+        typedef boost::shared_ptr<KukaInterface> KukaInterfacePtr;
+      }
     }
   }
 }
