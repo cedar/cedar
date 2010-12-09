@@ -90,10 +90,11 @@ int main(int argc, char **argv)
   p_scene_widget->show();
 
   p_test_arm->start();
-  p_test_arm->setJointVelocity(0, .5);
-  p_test_arm->setJointVelocity(1, .3);
-  p_test_arm->setJointVelocity(2, .2);
-  p_test_arm->setJointVelocity(3, .15);
+  p_test_arm->setJointAngle(0, M_PI/4);
+  p_test_arm->setJointVelocity(0, .1);
+//  p_test_arm->setJointVelocity(1, .3);
+//  p_test_arm->setJointVelocity(2, .2);
+//  p_test_arm->setJointVelocity(3, .15);
 
   a.exec();
   return 0;

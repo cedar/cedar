@@ -155,7 +155,27 @@ cv::Mat KinematicChainModel::calculateVelocity(
                                                 const unsigned int coordinateFrame
                                               )
 {
-  return calculateJacobian(point, jointIndex, coordinateFrame) * mpKinematicChain->getJointVelocitiesMatrix();
+  Mat point_world;
+  switch (coordinateFrame)
+  {
+    case WORLD_COORDINATES :
+    {
+      point_world = point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+      //TODO: add base coordinate treatment
+//      point_local = mJointTransformations[jointIndex].inv() * point; ...
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_world = mTransformation * mJointTransformations[jointIndex] * point; //... check this
+      break;
+    }
+  }
+  return wedgeTwist<double>(calculateSpatialJacobian() * mpKinematicChain->getJointVelocitiesMatrix()) * point_world;
 }
 
 cv::Mat KinematicChainModel::calculateSpatialJacobian()

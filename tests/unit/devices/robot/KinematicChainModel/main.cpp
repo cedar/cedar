@@ -244,7 +244,7 @@ int main()
   cv::Mat p = cv::Mat::zeros(4, 1, CV_64FC1);
   p.at<double>(2, 0) = 1.0;
   p.at<double>(3, 0) = 1.0;
-  cv::Mat v0 = test_arm_model.calculateVelocity(p, 0, KinematicChainModel::LOCAL_COORDINATES);
+  cv::Mat v0 = test_arm_model.calculateVelocity(p, 0, KinematicChainModel::WORLD_COORDINATES);
   cv::Mat v1 = test_arm_model.calculateVelocity(p, 1, KinematicChainModel::LOCAL_COORDINATES);
   cv::Mat v2 = test_arm_model.calculateVelocity(p, 2, KinematicChainModel::LOCAL_COORDINATES);
   cv::Mat v3 = test_arm_model.calculateVelocity(p, 3, KinematicChainModel::LOCAL_COORDINATES);
@@ -266,6 +266,29 @@ int main()
     errors++;
     log_file << "ERROR with calculateVelocity()" << std::endl;
   }
+
+  log_file << v0.at<double>(0, 0) << std::endl;
+  log_file << v0.at<double>(1, 0) << std::endl;
+  log_file << v0.at<double>(2, 0) << std::endl;
+
+  Mat E = test_arm_model.getJointTransformation(0);
+  log_file << E.at<double>(0, 0) << " " << E.at<double>(0, 1) << " " << E.at<double>(0, 2) << " " << E.at<double>(0, 3) << std::endl;
+  log_file << E.at<double>(1, 0) << " " << E.at<double>(1, 1) << " " << E.at<double>(1, 2) << " " << E.at<double>(1, 3) << std::endl;
+  log_file << E.at<double>(2, 0) << " " << E.at<double>(2, 1) << " " << E.at<double>(2, 2) << " " << E.at<double>(2, 3) << std::endl;
+  log_file << E.at<double>(3, 0) << " " << E.at<double>(3, 1) << " " << E.at<double>(3, 2) << " " << E.at<double>(3, 3) << std::endl;
+  log_file << std::endl;
+  E = test_arm_model.getTransformation();
+  log_file << E.at<double>(0, 0) << " " << E.at<double>(0, 1) << " " << E.at<double>(0, 2) << " " << E.at<double>(0, 3) << std::endl;
+  log_file << E.at<double>(1, 0) << " " << E.at<double>(1, 1) << " " << E.at<double>(1, 2) << " " << E.at<double>(1, 3) << std::endl;
+  log_file << E.at<double>(2, 0) << " " << E.at<double>(2, 1) << " " << E.at<double>(2, 2) << " " << E.at<double>(2, 3) << std::endl;
+  log_file << E.at<double>(3, 0) << " " << E.at<double>(3, 1) << " " << E.at<double>(3, 2) << " " << E.at<double>(3, 3) << std::endl;
+  log_file << std::endl;
+  E = test_arm_model.getJointTransformation(0) * p;
+  log_file << E.at<double>(0, 0) << std::endl;
+  log_file << E.at<double>(1, 0) << std::endl;
+  log_file << E.at<double>(2, 0) << std::endl;
+  log_file << E.at<double>(3, 0) << std::endl;
+  log_file << std::endl;
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector position
@@ -344,7 +367,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector velocity
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateVelocity" << std::endl;
+  log_file << "test: calculateEndEffectorVelocity" << std::endl;
   cv::Mat v4 = test_arm_model.calculateEndEffectorVelocity();
   if (
       !IsZero(v4.at<double>(0, 0) - 0)
@@ -353,8 +376,11 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateVelocity()" << std::endl;
+    log_file << "ERROR with calculateEndEffectorVelocity()" << std::endl;
   }
+  log_file << v4.at<double>(0, 0) << std::endl;
+  log_file << v4.at<double>(1, 0) << std::endl;
+  log_file << v4.at<double>(2, 0) << std::endl;
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
