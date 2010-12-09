@@ -26,7 +26,7 @@
 // PROJECT INCLUDES
 #include "../KinematicChain.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
-#include "cedar/namespace.h"
+#include "namespace.h"
 // SYSTEM INCLUDES
 #include <QObject>
 #include <fri/friremote.h>
@@ -77,15 +77,17 @@ public:
    *  @param index  index of the joint
    *  @param angle  angle to be set, in radian measure
    */
-  virtual void setJointAngle(const unsigned int index, const double angle);
+  virtual void setJointAngle(const unsigned int index, const double angle) throw();
   /*! @brief set the angle for all joints
    *  @param angles vector of angles to be set, in radian measure
    */
-  virtual void setJointAngles(const std::vector<double>& angles);
+  virtual void setJointAngles(const std::vector<double>& angles) throw();
   /*! @brief set the angle for all joints
    *  @param angles OpenCV-Matrix of angles to be set, in radian measure
    */
-  virtual void setJointAngles(const cv::Mat& angleMatrix);
+  virtual void setJointAngles(const cv::Mat& angleMatrix) throw();
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // public slots
   //--------------------------------------------------------------------------------------------------------------------
