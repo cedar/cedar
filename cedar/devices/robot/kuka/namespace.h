@@ -24,19 +24,19 @@
 
     File:        namespace.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.rub.de
+    Date:        2010 12 9
 
-    Description: Namespace file for cedar::dev::robot.
+    Description: Namespace file for cedar::dev::robot::kuka.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_DEV_ROBOT_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_NAMESPACE_H
+#ifndef CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+#define CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
 
 // LOCAL INCLUDES
 
@@ -61,4 +61,4 @@ namespace cedar
   }
 }
 
-#endif // CEDAR_DEV_ROBOT_NAMESPACE_H
+#endif // CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
