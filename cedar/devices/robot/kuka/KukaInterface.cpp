@@ -162,6 +162,10 @@ void KukaInterface::doDataExchange()
 {
   mpFriRemote->doDataExchange();
 }
+float getSampleTime()const
+{
+  mpFriRemote->getSampleTime();
+}
 
 void KukaInterface::commandModeTest()const throw()
 {
