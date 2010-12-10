@@ -45,7 +45,7 @@
 #include "auxiliaries/ConfigurationInterface.h"
 #include "auxiliaries/LogFile.h"
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Thread.h"
+#include "auxiliaries/LoopedThread.h"
 #include "auxiliaries/UserData.h"
 
 #include "auxiliaries/exceptions/ExceptionBase.h"

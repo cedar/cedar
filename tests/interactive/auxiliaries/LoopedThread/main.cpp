@@ -52,11 +52,6 @@ private:
 
 public:
 
-  MyTestThread( bool delay = false ) {
-    mArtificialDelay = delay;
-    srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
-  }
-
   MyTestThread( unsigned long stepSize, bool delay = false ) : LoopedThread( stepSize ) {
     mArtificialDelay = delay;
     srand(microsec_clock::universal_time().time_of_day().total_milliseconds());

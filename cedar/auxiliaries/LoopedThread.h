@@ -192,6 +192,25 @@ public:
    */
   void setSimulatedTime(unsigned long simulatedTime = 0) { mSimulatedTime = boost::posix_time::microseconds(simulatedTime); };
 
+
+  /*!@brief Returns the last timesteps start time.
+   *
+   */
+  boost::posix_time::ptime getLastTimeStepStart() const { return mLastTimeStepStart; };
+
+
+  /*!@brief Returns the last timesteps end time.
+   *
+   */
+  boost::posix_time::ptime getLastTimeStepEnd() const { return mLastTimeStepEnd; };
+
+
+  /*!@brief Returns the last timesteps duration.
+   *
+   */
+  boost::posix_time::time_duration getLastTimeStepDuration() const { return mLastTimeStepStart - mLastTimeStepEnd; };
+
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
@@ -221,6 +240,10 @@ private:
   unsigned long mNumberOfSteps;
   double mSumOfStepsTaken;
   double mMaxStepsTaken;
+  //remeber time stamps of last step
+  boost::posix_time::ptime mLastTimeStepStart;
+  boost::posix_time::ptime mLastTimeStepEnd;
+
 
   //----------------------------------------------------------------------------
   // parameters
