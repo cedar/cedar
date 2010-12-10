@@ -79,8 +79,5 @@ struct cedar::aux::math::Limits
 
 }; // class cedar::aux::math::Limits
 
-template struct cedar::aux::math::Limits<double>;
-template struct cedar::aux::math::Limits<int>;
-template struct cedar::aux::math::Limits<unsigned int>;
 
 #endif // CEDAR_AUX_MATH_LIMITS_H

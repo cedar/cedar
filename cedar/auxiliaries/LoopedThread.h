@@ -109,7 +109,7 @@ public:
    * @param stepSize time window for each step function in microseconds
    * @param idleTime idle time (in microseconds) used in fast running mode (i.e. stepSize = 0)
    */
-  LoopedThread(unsigned long stepSize = 1000, unsigned int idleTime = 1);
+  LoopedThread(unsigned int stepSize = 1000, unsigned int idleTime = 1);
 
   //!@brief Destructor
   virtual ~LoopedThread(void) = 0;
@@ -127,7 +127,7 @@ public:
    *
    * @param time length of the time step to be calculated in microseconds
    */
-  virtual void step(unsigned long time) = 0;
+  virtual void step(unsigned int time) = 0;
 
   /*!@brief Stops the thread.
    *
