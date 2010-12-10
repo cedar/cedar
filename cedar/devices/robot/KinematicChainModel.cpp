@@ -175,14 +175,14 @@ cv::Mat KinematicChainModel::calculateVelocity(
       break;
     }
   }
-  return wedgeTwist<double>(calculateSpatialJacobian() * mpKinematicChain->getJointVelocitiesMatrix()) * point_world;
+  return wedgeTwist<double>(calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocitiesMatrix()) * point_world;
 }
 
-cv::Mat KinematicChainModel::calculateSpatialJacobian()
+cv::Mat KinematicChainModel::calculateSpatialJacobian(unsigned int index)
 {
   Mat jacobian = Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
 	mTransformationsLock.lockForRead();
-	for (unsigned int j = 0; j < getNumberOfJoints(); j++)
+	for (unsigned int j = 0; j <= index; j++)
 	{
     for (int i = 0; i < 6; i++)
     {
@@ -191,6 +191,10 @@ cv::Mat KinematicChainModel::calculateSpatialJacobian()
   }
 	mTransformationsLock.unlock();
   return rigidToAdjointTransformation<double>(mTransformation)*jacobian;
+}
+
+cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned int index)
+{
 }
 
 cv::Mat KinematicChainModel::calculateEndEffectorPosition()
