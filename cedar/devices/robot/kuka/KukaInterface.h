@@ -28,7 +28,6 @@
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "namespace.h"
 // SYSTEM INCLUDES
-#include <QObject>
 #include <fri/friremote.h>
 
 
@@ -38,12 +37,6 @@
 class cedar::dev::robot::kuka::KukaInterface :  public cedar::dev::robot::KinematicChain,
                                                 public cedar::aux::ConfigurationInterface
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,6 +60,7 @@ public:
   virtual const double getJointAngle(const unsigned int index) const;
   /*! @brief returns all joint angles
    *  @return a vector filled with the joint angles
+   *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
   virtual const std::vector<double> getJointAngles() const;
   /*! @brief returns all joint angles
@@ -76,14 +70,18 @@ public:
   /*! @brief set the angle for a specified joint
    *  @param index  index of the joint
    *  @param angle  angle to be set, in radian measure
+   *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
    */
   virtual void setJointAngle(const unsigned int index, const double angle) throw();
   /*! @brief set the angle for all joints
    *  @param angles vector of angles to be set, in radian measure
+   *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
+   *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
   virtual void setJointAngles(const std::vector<double>& angles) throw();
   /*! @brief set the angle for all joints
    *  @param angles OpenCV-Matrix of angles to be set, in radian measure
+   *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
    */
   virtual void setJointAngles(const cv::Mat& angleMatrix) throw();
 
@@ -112,11 +110,13 @@ public:
   //TODO find out, what measure is used to represent the sample time
   float getSampleTime()const;
 
+  /*Some other FRI-specific functions that are not directly wrapped*/
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // public slots
-  //--------------------------------------------------------------------------------------------------------------------
-public slots:
+  /*! @brief brings the Interface into command mode
+   * it is important to call FRIstart.src on the KUKA-LBR
+   * This function will turn into an infinite loop if there is no connection to the KUKA-LBR!
+   */
+  void initCommandMode();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

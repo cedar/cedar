@@ -20,6 +20,7 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/exceptions/BadConnectionException.h"
+#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // SYSTEM INCLUDES
 #ifdef DEBUG
@@ -35,7 +36,7 @@ using namespace libconfig;
 //----------------------------------------------------------------------------------------------------------------------
 KukaInterface::KukaInterface(const string& configFileName)
 :
-ConfigurationInterface(configFileName)
+cedar::aux::ConfigurationInterface(configFileName)
 {
   mIsInit = false;
   mpFriRemote = 0;
@@ -63,24 +64,33 @@ void KukaInterface::init()
   //Load Parameters from the configuration file
   //ServerPort: 0 means, FRI will use the default Port
   addParameter(&_mServerPort, "ServerPort", 0);
-  //RemoteHost: 127.0.0.1 overwrites the FRI default
-  //TODO define a commandline parameter that can be NULL
-  addParameter(&_mRemoteHost, "RemoteHost", "127.0.0.1");
+  /*RemoteHost: if the string is "NULL", the friRemote instance will be created with NULL,
+   * else it will interprete it as IP-Address
+   */
+  addParameter(&_mRemoteHost, "RemoteHost", "NULL");
 
   //create a new Instance of the friRemote
-  mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
-
-  /* Do Handshakes to the remote host until the robot is in command mode*/
-  while(mpFriRemote->getState() != FRI_STATE_CMD)
+  if(_mRemoteHost != string("NULL"))
   {
-    mpFriRemote->setToKRLInt(0, 1);
-    mpFriRemote->doDataExchange();
+    mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
+  }
+  else
+  {
+    mpFriRemote = new friRemote(_mServerPort);
   }
   mIsInit = true;
+
+  //try to initialize the command mode
+  initCommandMode();
 }
 
 const double KukaInterface::getJointAngle(const unsigned int index)const
 {
+  //The index must be less than the number of angles
+  if (index >= getNumberOfJoints() )
+  {
+    CEDAR_THROW(aux::exc::IndexOutOfRangeException, "KukaInterface: invalid joint index");
+  }
   //Receive data from the Kuka LBR
   mpFriRemote->doReceiveData();
   //does not test if index is out of bounds yet
@@ -101,6 +111,11 @@ const cv::Mat KukaInterface::getJointAnglesMatrix() const
 }
 void KukaInterface::setJointAngle(const unsigned int index, const double angle) throw()
 {
+  //The index must be less than the number of angles
+  if (index >= getNumberOfJoints() )
+  {
+    CEDAR_THROW(aux::exc::IndexOutOfRangeException, "KukaInterface: invalid joint index");
+  }
   //If the KUKA/LBR is not in command mode, throw an Exception
   commandModeTest();
 
@@ -143,7 +158,7 @@ void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
     p_angles_copy[i] = p_angles[i];
   }
 
-  //Al
+  //send the new joint positions to the arm
   mpFriRemote->doPositionControl(p_angles_copy, true);
 
   delete[] p_angles_copy;
@@ -164,12 +179,22 @@ void KukaInterface::doDataExchange()
 }
 float KukaInterface::getSampleTime()const
 {
-  mpFriRemote->getSampleTime();
+  return mpFriRemote->getSampleTime();
+}
+
+void KukaInterface::initCommandMode()
+{
+  /* Do Handshakes to the remote host until the robot is in command mode*/
+  while(getFriState() != FRI_STATE_CMD)
+  {
+    mpFriRemote->setToKRLInt(0, 1);
+    mpFriRemote->doDataExchange();
+  }
 }
 
 void KukaInterface::commandModeTest()const throw()
 {
-  if(mpFriRemote->getState() != FRI_STATE_CMD)
+  if(getFriState() != FRI_STATE_CMD)
     {
       CEDAR_THROW(aux::exc::BadConnectionException,
                   "KUKA LBR is not in command mode. This may mean the connection "\
