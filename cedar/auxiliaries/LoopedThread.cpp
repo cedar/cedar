@@ -52,7 +52,7 @@ using namespace boost::posix_time;
 // constructors and destructor
 //------------------------------------------------------------------------------
 
-cedar::aux::LoopedThread::LoopedThread(unsigned long stepSize, unsigned int idleTime)
+cedar::aux::LoopedThread::LoopedThread(unsigned int stepSize, unsigned int idleTime)
 {
   _mName = string("thread");
   mStepSize = microseconds(stepSize);

@@ -22,47 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cedarAux.h
+    File:        planarTransformations.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 26
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 12 09
 
-    Description: Header file that includes all headers of the auxiliaries library.
+    Description: This file provides solutions to geometric problems in Cartesian 2d-space.
 
-    Credits:
+    Credits: For mathematical background check http://mathforum.org/library/drmath/view/52082.html.
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_CEDAR_AUX_H
-#define CEDAR_CEDAR_AUX_H
+#ifndef CEDAR_AUX_MATH_PLANAR_GEOMETRY_H
+#define CEDAR_AUX_MATH_PLANAR_GEOMETRY_H
 
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "auxiliaries/ConfigurationInterface.h"
-#include "auxiliaries/LogFile.h"
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/LoopedThread.h"
-#include "auxiliaries/UserData.h"
 
-#include "auxiliaries/exceptions/ExceptionBase.h"
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
-#include "auxiliaries/exceptions/namespace.h"
-#include "auxiliaries/exceptions/NullPointerException.h"
-
-#include "auxiliaries/math/algebraTools.h"
-#include "auxiliaries/math/coordinateTransformations.h"
-#include "auxiliaries/math/Limits.h"
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/math/screwCalculus.h"
-#include "auxiliaries/math/sigmoids.h"
-#include "auxiliaries/math/tools.h"
-
-#include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/gui/BaseWidget.h"
 // SYSTEM INCLUDES
 
-#endif // CEDAR_CEDAR_AUX_H
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      //! computes the distance from a point (u, v) to an ellipse with axes a and b in the plane.
+      //! closest point (x, y) on the ellipse as optional argument
+      //! @param a    one axis of ellipse in the plane
+      //! @param b    one axis of ellipse in the plane
+      //! @param u    first point coordinate
+      //! @param v    second point coordinate
+      //! @param[out] p_x    optional first coordinate of closest point on ellipse
+      //! @param[out] p_y    optional second coordinate of closest point on ellipse
+      double distancePointEllipse(double a, double b, double u, double v, double* p_x = 0, double* p_y = 0);
+    };
+  };
+};
+#endif  // CEDAR_AUX_MATH_PLANAR_GEOMETRY_H

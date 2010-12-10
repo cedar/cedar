@@ -52,12 +52,12 @@ private:
 
 public:
 
-  MyTestThread( unsigned long stepSize, bool delay = false ) : LoopedThread( stepSize ) {
+  MyTestThread( unsigned int stepSize, bool delay = false ) : LoopedThread( stepSize ) {
     mArtificialDelay = delay;
     srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
   }
 
-  void step(unsigned long time) {
+  void step(unsigned int time) {
     ptime now = microsec_clock::universal_time();
     cout << "current time (sec/usec): " << now.time_of_day().seconds()
          << " / " << now.time_of_day().total_microseconds() % 1000000
@@ -79,7 +79,7 @@ public:
 
 int main() {
 
-  unsigned long timeInterval = 100000;  // microseconds
+  unsigned int timeInterval = 100000;  // microseconds
   MyTestThread thread( timeInterval );
   //thread.useFixedStepSize(false);
   //thread.setSimulatedTime(50000);
