@@ -147,10 +147,18 @@ public:
 
   /*!@brief gives the spatial Jacobian in the current configuration
    * 
+   * @param index    index of the joint up to which rotations are considered
    * @return    spatial Jacobian, 6 \times N matrix, where N = number of joints
    */
-  cv::Mat calculateSpatialJacobian();
-  
+  cv::Mat calculateSpatialJacobian(unsigned int index);
+
+  /*!@brief gives the temporal derivative of the spatial Jacobian in the current configuration
+   *
+   * @param index    index of the joint up to which rotations are considered
+   * @return    derivative of the spatial Jacobian, 6 \times N matrix, where N = number of joints
+   */
+  cv::Mat calculateSpatialJacobianTemporalDerivative(unsigned int index);
+
   /*!@brief gives the end-effector position in the current configuration
    * 
    * @return    end effector position in homogeneous coordinates, 4 \times 1 matrix
