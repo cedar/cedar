@@ -53,6 +53,11 @@ cedar::aux::exc::BadConnectionException::BadConnectionException()
   this->mType = "BadConnectionException";
 }
 
+//! Deconstructor
+cedar::aux::exc::BadConnectionException::~BadConnectionException(void) throw()
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
