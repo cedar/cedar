@@ -43,7 +43,7 @@
 using namespace std;
 using namespace boost::posix_time;
 
-
+//! threaded test class
 class MyTestThread : public cedar::aux::LoopedThread {
 
 private:
