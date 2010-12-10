@@ -164,6 +164,37 @@ void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
   delete[] p_angles_copy;
 }
 
+void KukaInterface::initCommandMode()
+{
+  /* Do Handshakes to the remote host until the robot is in command mode*/
+  while (getFriState() != FRI_STATE_CMD)
+  {
+    mpFriRemote->setToKRLInt(0, 1);
+    mpFriRemote->doDataExchange();
+  }
+}
+
+void KukaInterface::commandModeTest()const throw()
+{
+  if (getFriState() != FRI_STATE_CMD)
+    {
+      CEDAR_THROW(aux::exc::BadConnectionException,
+                  "KUKA LBR is not in command mode. This may mean the connection "\
+                  "is not good enough or command mode has been stopped by the robot"
+                 );
+    }
+}
+
+void KukaInterface::validateKRLIndex(int index)const throw(){
+  if (index >= FRI_USER_SIZE || index < 0)
+  {
+    CEDAR_THROW(aux::exc::IndexOutOfRangeException, "Index for received or outgoing data is >= FRI_USER_SIZE!");
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// wrapped fri-functions
+//----------------------------------------------------------------------------------------------------------------------
 FRI_STATE KukaInterface::getFriState()const
 {
   return mpFriRemote->getState();
@@ -181,24 +212,34 @@ float KukaInterface::getSampleTime()const
 {
   return mpFriRemote->getSampleTime();
 }
-
-void KukaInterface::initCommandMode()
+int KukaInterface::getIntFromKRL(int index)const throw()
 {
-  /* Do Handshakes to the remote host until the robot is in command mode*/
-  while(getFriState() != FRI_STATE_CMD)
-  {
-    mpFriRemote->setToKRLInt(0, 1);
-    mpFriRemote->doDataExchange();
-  }
+  validateKRLIndex(index);
+  return mpFriRemote->getFrmKRLInt(index);
+}
+float KukaInterface::getFloatFromKRL(int index)const throw()
+{
+  validateKRLIndex(index);
+  return mpFriRemote->getFrmKRLReal(index);
+}
+bool KukaInterface::getBoolFromKRL(int index)const throw()
+{
+  validateKRLIndex(index);
+  return mpFriRemote->getFrmKRLBool(index);
+}
+void KukaInterface::setToKRL(int index, int value) throw()
+{
+  validateKRLIndex(index);
+  mpFriRemote->setToKRLInt(index, value);
+}
+void KukaInterface::setToKRL(int index, float value) throw()
+{
+  validateKRLIndex(index);
+  mpFriRemote->setToKRLReal(index, value);
+}
+void KukaInterface::setToKRL(int index, bool value) throw()
+{
+  validateKRLIndex(index);
+  mpFriRemote->setToKRLBool(index, value);
 }
 
-void KukaInterface::commandModeTest()const throw()
-{
-  if(getFriState() != FRI_STATE_CMD)
-    {
-      CEDAR_THROW(aux::exc::BadConnectionException,
-                  "KUKA LBR is not in command mode. This may mean the connection "\
-                  "is not good enough or command mode has been stopped by the robot"
-                 );
-    }
-}

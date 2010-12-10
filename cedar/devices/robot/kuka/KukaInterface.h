@@ -109,6 +109,44 @@ public:
    */
   //TODO find out, what measure is used to represent the sample time
   float getSampleTime()const;
+  /*!@brief get an integer-value from the KUKA Robot Language
+   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
+   * @return integer value at position \e index received from the KRL
+   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
+   */
+  int getIntFromKRL(int index)const throw();
+  /*!@brief get a float-value from the KUKA Robot Language
+   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
+   * @return float value at position \e index received from the KRL
+   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
+   */
+  float getFloatFromKRL(int index)const throw();
+  /*!@brief get a bool-value from the KUKA Robot Language
+   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
+   * @return bool value at position \e index received from the KRL
+   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
+   */
+  bool getBoolFromKRL(int index)const throw();
+  /*!@brief send an integer-value to the KUKA Robot Language
+   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
+   * @param value the value to be send
+   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
+   */
+  void setToKRL(int index, int value) throw();
+  /*!@brief send an float-value to the KUKA Robot Language
+   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
+   * @param value the value to be send
+   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
+   */
+  void setToKRL(int index, float value) throw();
+  /*!@brief send an bool-value to the KUKA Robot Language
+   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
+   * @param value the value to be send
+   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
+   */
+  void setToKRL(int index, bool value) throw();
+
+
 
   /*Some other FRI-specific functions that are not directly wrapped*/
 
@@ -136,6 +174,11 @@ private:
    *  \throws BadConnectionException if the KUKA-LBR is not in command mode
    */
   void commandModeTest()const throw();
+  /*!@brief tests if the index for values to be send or to receive is valid
+   * @param i value to be tested
+   * \throws cedar::aux::exc::IndexOutOfRangeException if index is not less than FRI_USER_SIZE
+   */
+  void validateKRLIndex(int index) const throw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
