@@ -406,6 +406,12 @@ int ConfigurationInterface::addParameter(
 
 int ConfigurationInterface::readConfigurationFile()
 {
+  // check if file was given
+  if (!mConfigFileName.compare(""))
+  {
+    mConfigurationErrors.push_back("configuration file name is empty");
+    return CONFIG_FILE_ERROR;
+  }
   // Read the file. If there is an error, report it and exit.
   try
   {
