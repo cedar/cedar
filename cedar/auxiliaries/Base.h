@@ -76,7 +76,7 @@ public:
   const std::string& getName(void) const;
 
   //!@brief Sets the name of the object to the given name.
-  //!@param name New name of the object.
+  //!@param rName New name of the object.
   void setName(const std::string& rName);
 
   //--------------------------------------------------------------------------------------------------------------------
