@@ -53,12 +53,7 @@ using namespace boost::posix_time;
 //! constructor
 LogFile::LogFile(const std::string& logFileName)
 {
-  init(logFileName);
-}
-
-LogFile::LogFile(const char* pLogFileName)
-{
-  init(std::string(pLogFileName));
+  open(logFileName.c_str(), ios_base::in | ios_base::app);
 }
 
 //! destructor
@@ -69,11 +64,6 @@ LogFile::~LogFile()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void LogFile::init(const std::string& logFileName)
-{
-  open(logFileName.c_str(), ios_base::in | ios_base::app);
-}
 
 void LogFile::addSeparatorLine(void)
 {

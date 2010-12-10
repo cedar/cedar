@@ -65,7 +65,6 @@ class cedar::aux::LogFile : public std::ofstream
 public:
   //!@brief The constructor.
   LogFile(const std::string& logFileName);
-  LogFile(const char* pLogFileName);
 
   //!@brief Destructor
   virtual ~LogFile(void);
@@ -74,14 +73,15 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Adds a separator line to the log file.
   void addSeparatorLine(void);
+  //!@brief Adds a time stamp to the log file, without linefeed.
   void addTimeStamp(void);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void init(const std::string& logFileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
