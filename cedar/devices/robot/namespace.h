@@ -53,21 +53,27 @@ namespace cedar
     namespace robot
     {
       class Component;
+      //!@brief smart pointer for Component
       typedef boost::shared_ptr<Component> ComponentPtr;
 
       class Robot;
+      //!@brief smart pointer for Robot
       typedef boost::shared_ptr<Robot> RobotPtr;
 
       class KinematicChain;
+      //!@brief smart pointer for KinematicChain
       typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
 
       class KinematicChainModel;
+      //!@brief smart pointer for KinematicChainModel
       typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
 
       class ReferenceGeometry;
+      //!@brief smart pointer for ReferenceGeometry
       typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
 
       class ComponentNotAvailableException;
+      //!@brief smart pointer for ComponentNotAvailableException
       typedef boost::shared_ptr<ComponentNotAvailableException> ComponentNotAvailableExceptionPtr;
     }
   }

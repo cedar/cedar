@@ -76,7 +76,7 @@ public:
   /*! @brief Returns a pointer to the component with the name @em componentName.
    *
    * @return Pointer to the requested component.
-   * @param[in] componentName Name of the component that is to be returned.
+   * @param[in] rComponentName Name of the component that is to be returned.
    */
   ComponentPtr& getComponent(const std::string& rComponentName);
 
