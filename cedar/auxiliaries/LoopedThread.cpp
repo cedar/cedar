@@ -52,11 +52,11 @@ using namespace boost::posix_time;
 // constructors and destructor
 //------------------------------------------------------------------------------
 
-cedar::aux::LoopedThread::LoopedThread(unsigned int stepSize, unsigned int idleTime)
+cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime)
 {
   _mName = string("thread");
-  mStepSize = microseconds(stepSize);
-  mIdleTime = idleTime;
+  mStepSize = microseconds( static_cast<unsigned int>( 1000 * stepSize + 0.5 ) );
+  mIdleTime = static_cast<unsigned int>( 1000 * idleTime + 0.5 );
   mStop  = false;
   mUseFixedStepSize = true;
   mSimulatedTime = microseconds(0);
@@ -113,11 +113,11 @@ void cedar::aux::LoopedThread::run(void)
       if(mSimulatedTime.total_microseconds() == 0)
       {
         time_difference = mLastTimeStepEnd - mLastTimeStepStart;
-        step(time_difference.total_microseconds());
+        step(time_difference.total_microseconds() * 0.001);
       }
       else
       {
-        step(mSimulatedTime.total_microseconds());
+        step(mSimulatedTime.total_microseconds() * 0.001);
       }
     }
   }
@@ -170,11 +170,11 @@ void cedar::aux::LoopedThread::run(void)
         // call step function
         if(mSimulatedTime.total_microseconds() == 0)
         {
-          step(full_steps_taken * step_size.total_microseconds());
+          step(full_steps_taken * step_size.total_microseconds() * 0.001);
         }
         else
         {
-          step(mSimulatedTime.total_microseconds());
+          step(mSimulatedTime.total_microseconds() * 0.001);
         }
 
         // schedule the next wake up
@@ -192,11 +192,11 @@ void cedar::aux::LoopedThread::run(void)
         // call step function
         if(mSimulatedTime.total_microseconds() == 0)
         {
-          step(steps_taken * step_size.total_microseconds());
+          step(steps_taken * step_size.total_microseconds() * 0.001);
         }
         else
         {
-          step(mSimulatedTime.total_microseconds());
+          step(mSimulatedTime.total_microseconds() * 0.001);
         }
 
         // schedule the next wake up
