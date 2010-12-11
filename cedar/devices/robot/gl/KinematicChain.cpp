@@ -72,6 +72,7 @@ gl::KinematicChain::~KinematicChain()
 
 void gl::KinematicChain::draw(void)
 {
+  drawBase();
   for (unsigned int j=0; j<mpKinematicChainModel->getNumberOfJoints(); j++)
   {
     drawSegment(j);
@@ -80,6 +81,32 @@ void gl::KinematicChain::draw(void)
   drawEndEffectorVelocity();
   
   glPopMatrix(); // TODO: check if this is needed
+}
+
+void gl::KinematicChain::drawBase()
+{
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
+
+  // draw the link to the first joint
+  glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+  Mat proximal = mpKinematicChainModel->getTransformation()(Rect(3, 0, 1, 3)).clone();
+  Mat distal = mpKinematicChainModel->getJointTransformation(0)(Rect(3, 0, 1, 3)).clone();
+  drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
+
+  // move to object coordinates
+  mTransformationTranspose = mpKinematicChainModel->getTransformation().t();
+  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+
+  // draw the base
+  glColor4d(mColorR, mColorG, mColorB, 0);
+  drawTorus(0.1, 0.015, mResolution, mResolution);
+  glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+  drawDisk(0.0, 0.1, mResolution, mResolution);
+
+
+//  drawSphere(.05, mResolution, mResolution);
 }
 
 void gl::KinematicChain::drawSegment(unsigned int index)

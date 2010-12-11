@@ -62,7 +62,6 @@ int main(int argc, char **argv)
 
   // create simulated arm
   ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
-//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/unit/devices/robot/KinematicChainModel/test.conf"));
   cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
 
   // create model of simulated arm
