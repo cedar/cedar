@@ -85,41 +85,34 @@ mTransformationTranspose(4, 4, CV_64FC1)
   }
   else
   { //TODO: this doesn't really take care of negatives, should compare absolute values, really
-    if (_mOrientation[0] > _mOrientation[4] && _mOrientation[0] > _mOrientation[8] )
+    //TODO: this should be moved to a general tranformation matrix -> quaternion function
+    if (_mOrientation[0] > _mOrientation[4] && _mOrientation[0] > _mOrientation[8])
     {      // Column 0:
-      r  = sqrt( 1.0 + _mOrientation[0] - _mOrientation[4] - _mOrientation[8] ) * 2.0;
-      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[7] - _mOrientation[5] ) / r;
+      r  = sqrt(1.0 + _mOrientation[0] - _mOrientation[4] - _mOrientation[8]) * 2.0;
+      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[7] - _mOrientation[5]) / r;
       mOrientationQuaternion.at<double>(1, 0) = 0.25 * r;
-      mOrientationQuaternion.at<double>(2, 0) = (_mOrientation[3] + _mOrientation[1] ) / r;
-      mOrientationQuaternion.at<double>(3, 0) = (_mOrientation[2] + _mOrientation[6] ) / r;
-      std::cout << "case 1:" << std::endl;
+      mOrientationQuaternion.at<double>(2, 0) = (_mOrientation[3] + _mOrientation[1]) / r;
+      mOrientationQuaternion.at<double>(3, 0) = (_mOrientation[2] + _mOrientation[6]) / r;
     }
-    else if ( _mOrientation[4] > _mOrientation[8] )
+    else if (_mOrientation[4] > _mOrientation[8])
     {      // Column 1:
-      r  = sqrt( 1.0 + _mOrientation[4] - _mOrientation[0] - _mOrientation[8] ) * 2.0;
-      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[2] - _mOrientation[6] ) / r;
-      mOrientationQuaternion.at<double>(1, 0) = (_mOrientation[3] + _mOrientation[1] ) / r;
+      r  = sqrt(1.0 + _mOrientation[4] - _mOrientation[0] - _mOrientation[8]) * 2.0;
+      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[2] - _mOrientation[6]) / r;
+      mOrientationQuaternion.at<double>(1, 0) = (_mOrientation[3] + _mOrientation[1]) / r;
       mOrientationQuaternion.at<double>(2, 0) = 0.25 * r;
-      mOrientationQuaternion.at<double>(3, 0) = (_mOrientation[7] + _mOrientation[5] ) / r;
-      std::cout << "case 2:" << std::endl;
+      mOrientationQuaternion.at<double>(3, 0) = (_mOrientation[7] + _mOrientation[5]) / r;
     }
     else
     {            // Column 2:
-      r  = sqrt( 1.0 + _mOrientation[8] - _mOrientation[0] - _mOrientation[4] ) * 2.0;
-      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[3] - _mOrientation[1] ) / r;
-      mOrientationQuaternion.at<double>(1, 0) = (_mOrientation[6] + _mOrientation[2] ) / r;
-      mOrientationQuaternion.at<double>(2, 0) = (_mOrientation[5] + _mOrientation[7] ) / r;
+      r  = sqrt(1.0 + _mOrientation[8] - _mOrientation[0] - _mOrientation[4]) * 2.0;
+      mOrientationQuaternion.at<double>(0, 0) = (_mOrientation[3] - _mOrientation[1]) / r;
+      mOrientationQuaternion.at<double>(1, 0) = (_mOrientation[6] + _mOrientation[2]) / r;
+      mOrientationQuaternion.at<double>(2, 0) = (_mOrientation[5] + _mOrientation[7]) / r;
       mOrientationQuaternion.at<double>(3, 0) = 0.25 * r;
-      std::cout << "case 3:" << std::endl;
     }
   }
   updateTransformation();
-  std::cout << "quaternion:" << std::endl;
-  write(mOrientationQuaternion);
-  std::cout << "transformation:" << std::endl;
-  write(mTransformation);
 }
-
 
 cedar::aux::Object::~Object()
 {
