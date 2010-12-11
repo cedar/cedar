@@ -76,6 +76,9 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief draws the base
+  void drawBase();
+
   //!@brief draws the segment attached to the specified joint
   void drawSegment(unsigned int index);
 
