@@ -61,8 +61,8 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/unit/devices/robot/KinematicChainModel/test.conf"));
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
+//  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/unit/devices/robot/KinematicChainModel/test.conf"));
   cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
 
   // create model of simulated arm
@@ -90,20 +90,13 @@ int main(int argc, char **argv)
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-//  p_test_arm->start();
+  p_test_arm->start();
   p_test_arm->setJointAngle(2, -M_PI*0.5);
   p_test_arm->setJointAngle(3, M_PI*0.5);
-  p_test_arm_model->update();
-  p_test_arm->setJointVelocity(1, 1);
-  p_test_arm->setJointVelocity(2, 1);
-
-  cv::Mat p = cv::Mat::zeros(4, 1, CV_64FC1);
-  p.at<double>(2, 0) = 1.0;
-  p.at<double>(3, 0) = 1.0;
-  cedar::aux::math::write(p_test_arm_model->calculateVelocity(p, 0, KinematicChainModel::LOCAL_COORDINATES));
-//  p_test_arm->setJointVelocity(1, .3);
-//  p_test_arm->setJointVelocity(2, .2);
-//  p_test_arm->setJointVelocity(3, .15);
+  p_test_arm->setJointVelocity(0, .3);
+  p_test_arm->setJointVelocity(1, -1);
+  p_test_arm->setJointVelocity(2, -.5);
+  p_test_arm->setJointVelocity(3, .3);
 
   a.exec();
   return 0;

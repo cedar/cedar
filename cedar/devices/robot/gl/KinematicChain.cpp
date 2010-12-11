@@ -135,9 +135,7 @@ void gl::KinematicChain::drawEndEffectorVelocity()
   // move to origin
   glPopMatrix();
   glPushMatrix();
-
-//  cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition();
-//  cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorVelocity();
-//
-//  drawArrow<double>(from, to, 0.01, 0.03, 0.1, mResolution);
+  cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition();
+  cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorVelocity();
+  drawArrow<double>(from, to, 0.01, 0.03, 0.1, mResolution);
 }

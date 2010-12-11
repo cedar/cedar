@@ -195,6 +195,8 @@ cv::Mat KinematicChainModel::calculateSpatialJacobian(unsigned int index)
 
 cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned int index)
 {
+  // dummy to return something until function is implemented
+  return cv::Mat::zeros(0, 0, CV_64FC1);
 }
 
 cv::Mat KinematicChainModel::calculateEndEffectorPosition()
