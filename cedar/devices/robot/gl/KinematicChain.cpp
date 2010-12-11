@@ -104,9 +104,6 @@ void gl::KinematicChain::drawBase()
   drawTorus(0.1, 0.015, mResolution, mResolution);
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
   drawDisk(0.0, 0.1, mResolution, mResolution);
-
-
-//  drawSphere(.05, mResolution, mResolution);
 }
 
 void gl::KinematicChain::drawSegment(unsigned int index)
