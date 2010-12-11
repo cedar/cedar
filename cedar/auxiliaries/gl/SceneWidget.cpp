@@ -572,12 +572,12 @@ void SceneWidget::init()
 	connect(mpPushButtonDeleteAllObjects, SIGNAL(pressed()), this, SLOT(deleteAllObjects()));
 	connect(mpPushButtonDeleteObject, SIGNAL(pressed()), this, SLOT(deleteObject()));
   
-	mpDoubleSpinBoxPositionX->setMaximum(mpScene->getSceneLimit());
-	mpDoubleSpinBoxPositionY->setMaximum(mpScene->getSceneLimit());
-	mpDoubleSpinBoxPositionZ->setMaximum(mpScene->getSceneLimit());
-	mpDoubleSpinBoxPositionX->setMinimum(-mpScene->getSceneLimit());
-	mpDoubleSpinBoxPositionY->setMinimum(-mpScene->getSceneLimit());
-	mpDoubleSpinBoxPositionZ->setMinimum(-mpScene->getSceneLimit());
+  mpDoubleSpinBoxPositionX->setRange(-mpScene->getSceneLimit(), mpScene->getSceneLimit());
+  mpDoubleSpinBoxPositionX->setSingleStep(mpScene->getSceneLimit()*0.1);
+  mpDoubleSpinBoxPositionY->setRange(-mpScene->getSceneLimit(), mpScene->getSceneLimit());
+  mpDoubleSpinBoxPositionY->setSingleStep(mpScene->getSceneLimit()*0.1);
+  mpDoubleSpinBoxPositionZ->setRange(-mpScene->getSceneLimit(), mpScene->getSceneLimit());
+  mpDoubleSpinBoxPositionZ->setSingleStep(mpScene->getSceneLimit()*0.1);
   
 }
 
