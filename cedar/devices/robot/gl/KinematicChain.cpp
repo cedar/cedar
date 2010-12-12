@@ -37,8 +37,8 @@
 #include "KinematicChain.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/drawShapes.h"
-#include "cedar/auxiliaries/math/tools.h"
+#include "auxiliaries/gl/drawShapes.h"
+#include "auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <OpenGL/gl.h>

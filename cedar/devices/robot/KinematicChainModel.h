@@ -44,7 +44,7 @@
 #include "KinematicChain.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/Object.h"
+#include "auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
 #include <string>

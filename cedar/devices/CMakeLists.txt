@@ -35,6 +35,8 @@
 #=======================================================================================================================
 
 cedar_add_library(cedardev
+  MOC_HEADERS
+  robot/KinematicChainModel.h
   LINK_LIBRARIES
   cedaraux
 )

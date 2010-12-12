@@ -58,8 +58,8 @@
 #include "Chessboard.h"
 
 // PROJECT INCLUDES
-#include "build/cedar/auxiliaries/ui_SceneWidget.h"
-#include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/gl/ui_SceneWidget.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 #include <Qt>

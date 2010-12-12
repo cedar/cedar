@@ -234,7 +234,7 @@ void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 }
 
 
-void KinematicChain::step(unsigned long time)
+void KinematicChain::step(double time)
 {
 
 //  cout << "running KinematicChain::step(" << time << ")" << endl;
@@ -258,7 +258,7 @@ void KinematicChain::step(unsigned long time)
       // calculate velocity
       newAngle = getJointAngles()[i];
 //      cout << "newAngle = " << newAngle << endl;
-      velocity = ( newAngle - currentAngle ) * ( 1000000.0 / (double) time );
+      velocity = (newAngle - currentAngle) * (1000000.0 / time);
 //      cout << "velocity = " << velocity << endl;
 
       // consider limits
@@ -277,7 +277,7 @@ void KinematicChain::step(unsigned long time)
 
       // calculate new angle
       velocity = mJointVelocities[i];
-      newAngle = currentAngle + velocity * ( (double) time / 1000000.0 );
+      newAngle = currentAngle + velocity * (time / 1000000.0);
 //      cout << "newAngle = " << newAngle << endl;
 
       // consider angle limits
@@ -298,11 +298,11 @@ void KinematicChain::step(unsigned long time)
       velocity = max( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
       velocity = min( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
 
-      newAngle = currentAngle + velocity * ( (double) time / 1000000.0 );
+      newAngle = currentAngle + velocity * (time / 1000000.0);
 
       // consider angle limits
-      newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
-      newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
+      newAngle = max<double>(newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+      newAngle = min<double>(newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
 
       // set new values
       setJointAngle(i, newAngle);

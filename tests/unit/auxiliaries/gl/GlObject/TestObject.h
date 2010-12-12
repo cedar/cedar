@@ -41,8 +41,8 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "auxiliaries/gl/namespace.h"
+#include "auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
 
