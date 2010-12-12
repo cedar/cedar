@@ -160,6 +160,13 @@ public:
    */
   cv::Mat calculateSpatialJacobianTemporalDerivative(unsigned int index);
 
+  /*!@brief gives the temporal derivative of a joint twist in the current configuration
+   *
+   * @param index    index of the joint twist
+   * @return    derivative of the joint twist, 6 \times 1 matrix
+   */
+  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
+
   /*!@brief gives the end-effector position in the current configuration
    * 
    * @return    end effector position in homogeneous coordinates, 4 \times 1 matrix
