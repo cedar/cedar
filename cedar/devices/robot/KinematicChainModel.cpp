@@ -78,24 +78,33 @@ void KinematicChainModel::update()
 {
   calculateTransformations();
 
-  cedar::aux::math::write(calculateSpatialJacobianTemporalDerivative(getNumberOfJoints()));
 
   // analytic solution from note paper
-  cv::Mat J = cv::Mat::zeros(6, 3, CV_64FC1);
   double s0 = sin(mpKinematicChain->getJointAngle(0));
   double c0 = cos(mpKinematicChain->getJointAngle(0));
-  double s01 = sin(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
-  double c01 = cos(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
+//  double s01 = sin(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
+//  double c01 = cos(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
   double dot_theta_0 = mpKinematicChain->getJointVelocity(0);
-  double dot_theta_1 = mpKinematicChain->getJointVelocity(1);
+//  double dot_theta_1 = mpKinematicChain->getJointVelocity(1);
+  double ddot_theta_0 = mpKinematicChain->getJointAcceleration(0);
 
-//  J.at<double>(1, 1) = - sin(mpKinematicChain->getJointAngle(0))*mpKinematicChain->getJointVelocity(0);
-//  J.at<double>(2, 1) = cos(mpKinematicChain->getJointAngle(0))*mpKinematicChain->getJointVelocity(0);
-  J.at<double>(1, 1) = - s0*dot_theta_0;
-  J.at<double>(2, 1) = c0*dot_theta_0;
-  J.at<double>(1, 2) = - s0*dot_theta_0 - s01*(dot_theta_0 + dot_theta_1);
-  J.at<double>(2, 2) = c0*dot_theta_0 + c01*(dot_theta_0 + dot_theta_1);;
-  cedar::aux::math::write(J);
+  cedar::aux::math::write(calculateAcceleration(
+                                                 calculateEndEffectorPosition(),
+                                                 getNumberOfJoints()-1,
+                                                 WORLD_COORDINATES
+                                               ));
+  cv::Mat a = cv::Mat::zeros(4, 1, CV_64FC1);
+  a.at<double>(1, 0) = -c0 * ddot_theta_0 + s0 * dot_theta_0 * dot_theta_0;
+  a.at<double>(2, 0) = -s0 * ddot_theta_0 - c0 * dot_theta_0 * dot_theta_0;
+  cedar::aux::math::write(a);
+
+//  cv::Mat J = cv::Mat::zeros(6, 3, CV_64FC1);
+//  J.at<double>(1, 1) = - s0*dot_theta_0;
+//  J.at<double>(2, 1) = c0*dot_theta_0;
+//  J.at<double>(1, 2) = - s0*dot_theta_0 - s01*(dot_theta_0 + dot_theta_1);
+//  J.at<double>(2, 2) = c0*dot_theta_0 + c01*(dot_theta_0 + dot_theta_1);;
+//  cedar::aux::math::write(calculateSpatialJacobianTemporalDerivative(getNumberOfJoints()));
+//  cedar::aux::math::write(J);
   cout << "--------------" << endl;
 
 
@@ -198,6 +207,67 @@ cv::Mat KinematicChainModel::calculateVelocity(
     }
   }
   return wedgeTwist<double>(calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocitiesMatrix()) * point_world;
+}
+
+cv::Mat KinematicChainModel::calculateAcceleration(
+                                                    const cv::Mat& point,
+                                                    const unsigned int jointIndex,
+                                                    const unsigned int coordinateFrame
+                                                  )
+{
+  Mat point_world;
+  switch (coordinateFrame)
+  {
+    case WORLD_COORDINATES :
+    {
+      point_world = point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+      //TODO: add base coordinate treatment
+//      point_local = mJointTransformations[jointIndex].inv() * point; ...
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_world = mTransformation * mJointTransformations[jointIndex] * point; //... check this
+      break;
+    }
+  }
+  Mat J = calculateSpatialJacobian(jointIndex);
+  Mat J_dot = calculateSpatialJacobianTemporalDerivative(jointIndex);
+  Mat T1 = J_dot * mpKinematicChain->getJointVelocitiesMatrix();
+  Mat T2 = J * mpKinematicChain->getJointAccelerationsMatrix();
+  Mat S1 = wedgeTwist<double>(T1 + T2) * point_world;
+  Mat S2 = wedgeTwist<double>(calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocitiesMatrix())
+           * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
+
+//  cout << "angles" << endl;
+//  cedar::aux::math::write(mpKinematicChain->getJointAnglesMatrix());
+//  cout << "velocities" << endl;
+//  cedar::aux::math::write(mpKinematicChain->getJointVelocitiesMatrix());
+//  cout << "acceleration" << endl;
+//  cedar::aux::math::write(mpKinematicChain->getJointAccelerationsMatrix());
+//  cout << "v" << endl;
+//  cedar::aux::math::write(calculateVelocity(point_world, jointIndex, WORLD_COORDINATES));
+//  cedar::aux::math::write(calculateEndEffectorVelocity());
+//  cout << "J" << endl;
+//  cedar::aux::math::write(J);
+//  cout << "J_dot" << endl;
+//  cedar::aux::math::write(J_dot);
+//  cout << "T1" << endl;
+//  cedar::aux::math::write(T1);
+//  cout << "T2" << endl;
+//  cedar::aux::math::write(T2);
+//  cout << "S1" << endl;
+//  cedar::aux::math::write(S1);
+//  cout << "S2" << endl;
+//  cedar::aux::math::write(S2);
+
+
+
+  return S1 + S2;
 }
 
 cv::Mat KinematicChainModel::calculateSpatialJacobian(unsigned int index)
