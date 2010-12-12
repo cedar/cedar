@@ -53,7 +53,7 @@ using namespace cedar::dev::robot;
 //! constructor
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(50.5), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(50.0), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
 mpReferenceGeometry(rpReferenceGeometry)
 {
   mJointVelocities.resize(getNumberOfJoints());
@@ -101,7 +101,9 @@ void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry
 double KinematicChain::getJointVelocity(unsigned int index) const
 {
   if(index >= getNumberOfJoints())
+  {
     return 0.0;
+  }
   return mJointVelocities[index];
 }
 
@@ -118,7 +120,9 @@ cv::Mat KinematicChain::getJointVelocitiesMatrix() const
   cv::Mat dummy(getNumberOfJoints(), 1, CV_64FC1);
   //TODO: check matrix type
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
     dummy.at<double>(i,0) = mJointVelocities[i];
+  }
   return dummy;
 }
 
@@ -126,7 +130,9 @@ cv::Mat KinematicChain::getJointVelocitiesMatrix() const
 double KinematicChain::getJointAcceleration(unsigned int index) const
 {
   if(index >= getNumberOfJoints())
+  {
     return 0.0;
+  }
   return mJointAccelerations[index];
 }
 
@@ -142,18 +148,21 @@ cv::Mat KinematicChain::getJointAccelerationMatrix() const
 {
   cv::Mat dummy(getNumberOfJoints(), 1, CV_64FC1);
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
     dummy.at<double>(i,0) = mJointAccelerations[i];
+  }
   return dummy;
 }
 
 void KinematicChain::setJointVelocity(unsigned index, double velocity)
 {
-
   if(index >= getNumberOfJoints())
+  {
     return;
+  }
 
-  velocity = max<double>( velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min );
-  velocity = min<double>( velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max );
+  velocity = max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
+  velocity = min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
 
   mJointVelocities[index] = velocity;
   mJointWorkingModes[index] = VELOCITY;
@@ -164,19 +173,19 @@ void KinematicChain::setJointVelocity(unsigned index, double velocity)
 
 void KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
-
   if(velocities.size() != getNumberOfJoints())
+  {
     return;
+  }
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++) {
-
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
     double velocity = velocities[i];
-    velocity = max<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
-    velocity = min<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
+    velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
+    velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
 
     mJointVelocities[i] = velocity;
     mJointWorkingModes[i] = VELOCITY;
-
   }
 
   return;
@@ -187,14 +196,16 @@ void KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
 
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
+  {
     return;
+  }
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++) {
-
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
     double velocity = velocities.at<double>(i,0);
 
-    velocity = max<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
-    velocity = min<double>( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
+    velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
+    velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
 
     mJointVelocities[i] = velocity;
     mJointWorkingModes[i] = VELOCITY;
@@ -207,7 +218,9 @@ void KinematicChain::setJointVelocities(const cv::Mat& velocities)
 void KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
   if(index >= getNumberOfJoints())
+  {
     return;
+  }
   mJointAccelerations[index] = acceleration;
   mJointWorkingModes[index] = ACCELERATION;
 }
@@ -216,18 +229,25 @@ void KinematicChain::setJointAcceleration(unsigned int index, double acceleratio
 void KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
   if(accelerations.size() != getNumberOfJoints())
+  {
     return;
+  }
   mJointAccelerations = accelerations;
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
     mJointWorkingModes[i] = ACCELERATION;
+  }
 }
 
 
 void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
+  {
     return;
-  for(unsigned i = 0; i < getNumberOfJoints(); i++) {
+  }
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
     mJointAccelerations[i] = accelerations.at<double>(i,0);
     mJointWorkingModes[i] = ACCELERATION;
   }
@@ -262,8 +282,8 @@ void KinematicChain::step(double time)
 //      cout << "velocity = " << velocity << endl;
 
       // consider limits
-      newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
-      newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
+      newAngle = max<double>(newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+      newAngle = min<double>(newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
 //      cout << "newAngle* = " << newAngle << endl;
 
       // apply new values
@@ -293,11 +313,11 @@ void KinematicChain::step(double time)
 
     case ACCELERATION:
 
-      velocity = mJointVelocities[i] + mJointAccelerations[i] * ( (double) time / 1000.0 );
+      velocity = mJointVelocities[i] + mJointAccelerations[i] * (time / 1000.0);
 
       // consider velocity limits
-      velocity = max( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
-      velocity = min( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
+      velocity = max(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
+      velocity = min(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
 
       newAngle = currentAngle + velocity * (time / 1000.0);
 
@@ -312,10 +332,8 @@ void KinematicChain::step(double time)
       break;
 
     default:
-      cerr << "Oh oh, something went terribly wrong here!" << endl;
+      cerr << "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double time)!" << endl;
     }
-
   }
-
   return;
 }
