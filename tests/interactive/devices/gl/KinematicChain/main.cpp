@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
-  p_test_arm_model->startTimer(50);
+  p_test_arm_model->startTimer(1000.0);
 
   // create gl visualization object
   cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_test_arm_model));
@@ -78,10 +78,6 @@ int main(int argc, char **argv)
 
   cedar::aux::gl::ObjectPtr p_object = p_test_arm_visualization;
   p_scene->addObject(p_object);
-
-  cout << "name = " << p_test_arm->getName() << endl;
-  cout << "name = " << p_object->getObjectName() << endl;
-
 
   // create a simple viewer for the scene
   Viewer viewer(p_scene);
@@ -101,11 +97,10 @@ int main(int argc, char **argv)
 //  p_test_arm->setJointVelocity(2, -.5);
 //  p_test_arm->setJointVelocity(3, .3);
 
-    p_test_arm->setJointAngle(0, 0);
+    p_test_arm->start();
+    p_test_arm->setJointAngle(0, M_PI/6);
     p_test_arm->setJointVelocity(0, 1);
     p_test_arm_model->update();
-    cedar::aux::math::write(p_test_arm_model->calculateSpatialJacobianTemporalDerivative(p_test_arm->getNumberOfJoints()));
-
   a.exec();
   return 0;
 }

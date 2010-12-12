@@ -77,6 +77,28 @@ void KinematicChainModel::timerEvent(QTimerEvent*)
 void KinematicChainModel::update()
 {
   calculateTransformations();
+
+  cedar::aux::math::write(calculateSpatialJacobianTemporalDerivative(getNumberOfJoints()));
+
+  // analytic solution from note paper
+  cv::Mat J = cv::Mat::zeros(6, 3, CV_64FC1);
+  double s0 = sin(mpKinematicChain->getJointAngle(0));
+  double c0 = cos(mpKinematicChain->getJointAngle(0));
+  double s01 = sin(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
+  double c01 = cos(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
+  double dot_theta_0 = mpKinematicChain->getJointVelocity(0);
+  double dot_theta_1 = mpKinematicChain->getJointVelocity(1);
+
+//  J.at<double>(1, 1) = - sin(mpKinematicChain->getJointAngle(0))*mpKinematicChain->getJointVelocity(0);
+//  J.at<double>(2, 1) = cos(mpKinematicChain->getJointAngle(0))*mpKinematicChain->getJointVelocity(0);
+  J.at<double>(1, 1) = - s0*dot_theta_0;
+  J.at<double>(2, 1) = c0*dot_theta_0;
+  J.at<double>(1, 2) = - s0*dot_theta_0 - s01*(dot_theta_0 + dot_theta_1);
+  J.at<double>(2, 2) = c0*dot_theta_0 + c01*(dot_theta_0 + dot_theta_1);;
+  cedar::aux::math::write(J);
+  cout << "--------------" << endl;
+
+
 }
 
 unsigned int KinematicChainModel::getNumberOfJoints()
@@ -195,6 +217,8 @@ cv::Mat KinematicChainModel::calculateSpatialJacobian(unsigned int index)
 
 cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned int index)
 {
+  cout << "calculating temporal derivative of spatial jacobian up to " << index << "-th joint frame" << endl;
+
   // create k-th column
   cv::Mat J = cv::Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
   for (unsigned int i=0; i<index; i++)
@@ -213,34 +237,45 @@ cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned
 
 cv::Mat KinematicChainModel::calculateTwistTemporalDerivative(unsigned int j)
 {
+//  cout << "calculating temporal derivative of " << j << "-th joint twist" << endl;
   // calculate transformation to (j-1)-th joint frame
   cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);
   // g is a product of j-1 exponentials, so the temporal derivative is a sum with j-1 summands
-  for (unsigned int k=0; k<j-1; k++)
+  for (unsigned int k=0; k<j; k++)
   {
+//    cout << "--" << k << "-th summand" << endl;
     // for the k-th summand, we derive the k-th factor and leave the other ones
     cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // k-th summand
     // factors before the k-th
     for (unsigned int i=0; i<k; i++)
     {
+//      cout << "----" << i << "-th factor" << endl;
       // i-th factor stays the same for i < k
       s_k = s_k * mTwistExponentials[i];
     }
     // the k-th factor of the k-th summand is derived by time
-    s_k = s_k * wedgeTwist<double>(mJointTwists[k])
+//    cout << "----" << k << "-th factor" << endl;
+    s_k = s_k * wedgeTwist<double>(mReferenceJointTwists[k])
               * mTwistExponentials[k]
               * mpKinematicChain->getJointVelocity(k);
     // factors after the k-th
     for (unsigned int i=k+1; i<j-1; i++)
     {
+//      cout << "----" << i << "-th factor" << endl;
       // ith factor stays the same for i > k
       s_k = s_k * mTwistExponentials[i];
     }
     // add this summand to the sum
     g = g + s_k;
+//    cout << "g:" << endl;
+//    cedar::aux::math::write(g);
   }
   // adjoint of the calculated sum times the j-th twist is the derivative
-  return rigidToAdjointTransformation<double>(g) * mJointTwists[j];
+//  cout << "j = " << j << endl;
+//  cout << "mReferenceJointTwists[j]" << endl;
+//  cedar::aux::math::write(mReferenceJointTwists[j]);
+//  cedar::aux::math::write(rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j]);
+  return rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j];
  }
 
 cv::Mat KinematicChainModel::calculateEndEffectorPosition()
@@ -252,7 +287,6 @@ cv::Mat KinematicChainModel::calculateEndEffectorPosition()
   return position;
 }
 
-
 cv::Mat KinematicChainModel::calculateEndEffectorTransformation()
 {
   Mat T;
@@ -262,20 +296,17 @@ cv::Mat KinematicChainModel::calculateEndEffectorTransformation()
   return T;
 }
 
-
 cv::Mat KinematicChainModel::calculateEndEffectorJacobian()
 {
   Mat p = calculateEndEffectorPosition();
   return calculateJacobian(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 
-
 cv::Mat KinematicChainModel::calculateEndEffectorVelocity()
 {
   Mat p = calculateEndEffectorPosition();
   return calculateVelocity(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
-
 
 void KinematicChainModel::init()
 {
@@ -334,7 +365,6 @@ void KinematicChainModel::init()
   mEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
   update();
 }
-
 
 void KinematicChainModel::calculateTransformations()
 {

@@ -64,7 +64,7 @@ cedar::aux::ConfigurationInterface(configFileName)
   readOrDefaultConfiguration();
 
   // TODO: remove when ready
-  testOutput();
+//  testOutput();
 }
 
 //! destructor
