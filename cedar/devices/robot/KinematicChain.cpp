@@ -53,7 +53,7 @@ using namespace cedar::dev::robot;
 //! constructor
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(50000), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(50), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
 mpReferenceGeometry(rpReferenceGeometry)
 {
   mJointVelocities.resize(getNumberOfJoints());
@@ -61,15 +61,15 @@ mpReferenceGeometry(rpReferenceGeometry)
   mJointWorkingModes.resize(getNumberOfJoints());
 }
 
-KinematicChain::KinematicChain(const std::string& configFileName)
-:
-LoopedThread(50000), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
-mpReferenceGeometry(new ReferenceGeometry(configFileName))
-{
-  mJointVelocities.resize(getNumberOfJoints());
-  mJointAccelerations.resize(getNumberOfJoints());
-  mJointWorkingModes.resize(getNumberOfJoints());
-}
+//KinematicChain::KinematicChain(const std::string& configFileName)
+//:
+//LoopedThread(50000), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
+//mpReferenceGeometry(new ReferenceGeometry(configFileName))
+//{
+//  mJointVelocities.resize(getNumberOfJoints());
+//  mJointAccelerations.resize(getNumberOfJoints());
+//  mJointWorkingModes.resize(getNumberOfJoints());
+//}
 
 //! destructor
 KinematicChain::~KinematicChain()
@@ -258,7 +258,7 @@ void KinematicChain::step(double time)
       // calculate velocity
       newAngle = getJointAngles()[i];
 //      cout << "newAngle = " << newAngle << endl;
-      velocity = (newAngle - currentAngle) * (1000000.0 / time);
+      velocity = (newAngle - currentAngle) * (1000.0 / time);
 //      cout << "velocity = " << velocity << endl;
 
       // consider limits
@@ -274,16 +274,17 @@ void KinematicChain::step(double time)
       break;
 
     case VELOCITY:
+//      cout << "velocity mode" << endl;
 
       // calculate new angle
       velocity = mJointVelocities[i];
-      newAngle = currentAngle + velocity * (time / 1000000.0);
+      newAngle = currentAngle + velocity * (time / 1000.0);
 //      cout << "newAngle = " << newAngle << endl;
 
       // consider angle limits
-      newAngle = max<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min );
-      newAngle = min<double>( newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max );
-//      cout << "newAngle* = " << newAngle << endl;
+      newAngle = max<double>(newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+      newAngle = min<double>(newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+//      cout << "newAngle = " << newAngle << endl;
 
       // set new joint angle
       setJointAngle(i, newAngle);
@@ -292,13 +293,13 @@ void KinematicChain::step(double time)
 
     case ACCELERATION:
 
-      velocity = mJointVelocities[i] + mJointAccelerations[i] * ( (double) time / 1000000.0 );
+      velocity = mJointVelocities[i] + mJointAccelerations[i] * ( (double) time / 1000.0 );
 
       // consider velocity limits
       velocity = max( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min );
       velocity = min( velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max );
 
-      newAngle = currentAngle + velocity * (time / 1000000.0);
+      newAngle = currentAngle + velocity * (time / 1000.0);
 
       // consider angle limits
       newAngle = max<double>(newAngle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
