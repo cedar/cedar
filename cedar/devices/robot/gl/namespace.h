@@ -22,50 +22,44 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.cpp
+    File:        namespace.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
+    Date:        2010 11 30
 
-    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestObject class.
+    Description: Namespace file for cedar::dev::robot::gui.
 
     Credits:
 
 ======================================================================================================================*/
 
 
+#ifndef CEDAR_DEV_ROBOT_GUI_NAMESPACE_H
+#define CEDAR_DEV_ROBOT_GL_NAMESPACE_H
+
 // LOCAL INCLUDES
-#include "unit/auxiliaries/gl/Object/TestObject.h"
 
 // PROJECT INCLUDES
+#include "cedar/namespace.h"
 
 // SYSTEM INCLUDES
-#include <cv.h>
+#include <boost/smart_ptr.hpp>
 
-using namespace cedar::tests::unit::aux::gl::Object;
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//! constructor
-TestObject::TestObject()
+namespace cedar
 {
-  
+  namespace dev
+  {
+    namespace robot
+    {
+      //!@brief Namespace for widget classes.
+      namespace gl
+      {
+        class KinematicChain;
+        typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
+      }
+    }
+  }
 }
 
-//! destructor
-TestObject::~TestObject()
-{
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-void TestObject::draw()
-{
-
-}
+#endif // CEDAR_DEV_ROBOT_GL_NAMESPACE_H

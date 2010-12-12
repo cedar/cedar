@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_LOOPEDTHREAD_H
-#define CEDAR_AUX_LOOPEDTHREAD_H
+#ifndef CEDAR_AUX_LOOPED_THREAD_H
+#define CEDAR_AUX_LOOPED_THREAD_H
 
 // LOCAL INCLUDES
 #include "namespace.h"

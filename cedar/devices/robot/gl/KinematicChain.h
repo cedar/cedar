@@ -19,89 +19,82 @@
 
 ========================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
+ 
+ ----- File:        KinematicChain.h
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ----- Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 06
+ 
+ ----- Description: Header for the \em cedar::dev::robot::gl::KinematicChain class.
+ 
+ ----- Credits:
+ ---------------------------------------------------------------------------------------------------------------------*/
 
-    File:        TestObject.h
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
-
-    Description: Header for the @em cedar::tests::unit::aux::gl::TestObject class.
-
-    Credits:
-
-======================================================================================================================*/
-
-#ifndef CEDAR_TESTS_UNIT_AUX_GL_OBJECT_TEST_OBJECT_H
-#define CEDAR_TESTS_UNIT_AUX_GL_OBJECT_TEST_OBJECT_H
+#ifndef CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H
+#define CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H
 
 // LOCAL INCLUDES
-#include "unit/auxiliaries/gl/Object/namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
 
 // SYSTEM INCLUDES
+#include <cv.h>
 
-/*!@brief Abstract description of the class.
+/*!@brief Visualization of a kinematic chain
  *
- * More detailed description of the class.
+ * This class provides a simple OpenGL visualization of any kinematic chain. It has to be provided with a pointer to an 
+ * instance of KinematicChainModel, used to get the transformations to the joint coordinate frames. To actually display
+ * the chain, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer for that scene 
+ * (cedar::aux::gl::Viewer). 
  */
-class cedar::tests::unit::aux::gl::Object::TestObject : public cedar::aux::gl::Object
+class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::Object
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor that gets a configuration file name.
-  TestObject();
-
-  //!@brief Destructor
-  virtual ~TestObject(void);
-
+  //!@brief constructor
+//	KinematicChain(KinematicChainModel* pKinematicChainModel);
+  KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  //!@brief destructor
+  ~KinematicChain();
+  
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void draw();
-
-
+  //!@brief draws a visualization of the object in the current GL context
+  void draw(void);
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief draws the base
+  void drawBase();
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
+  //!@brief draws the segment attached to the specified joint
+  void drawSegment(unsigned int index);
 
+  //!@brief draws the end-effector
+  void drawEndEffector();
+
+  //!@brief draws the end-effector
+  void drawEndEffectorVelocity();
+  
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
 private:
-  // none yet
+  //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
+  cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
+  
+}; // class cedar::dev::robot::KinematicChainSimulation
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  //! test member bool
-
-private:
-  // none yet
-
-}; // class cedar::tests::unit::aux::gl::Object::TestObject
-
-#endif // CEDAR_TESTS_UNIT_AUX_CONFIGURATION_INTERFACE_TEST_CLASS_H
-
+#endif // CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H

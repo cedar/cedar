@@ -68,6 +68,9 @@ namespace cedar
     class LogFile;
     typedef boost::shared_ptr<LogFile> LogFilePtr;
 
+    class Object;
+    typedef boost::shared_ptr<Object> ObjectPtr;
+
     /*!@brief Template method that converts simple data types to a string.
      *
      * @param[in] value The data value that will be converted to a string.

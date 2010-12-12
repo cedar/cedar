@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -49,9 +49,11 @@ using namespace std;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Viewer::Viewer(Scene* scene)
+Viewer::Viewer(cedar::aux::gl::ScenePtr& p_scene)
+:
+mpScene(p_scene)
 {
-  mpScene = scene;
+
 }
 
 Viewer::~Viewer()
@@ -66,7 +68,7 @@ Viewer::~Viewer()
 void Viewer::init()
 {
   restoreStateFromFile();
-  mpScene->initLighting();
+  mpScene->initGl();
 }
 
 void Viewer::draw()

@@ -60,7 +60,7 @@ cedar::aux::Base::~Base()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const std::string& cedar::aux::Base::getName(void) const
+const std::string& cedar::aux::Base::getName() const
 {
   return _mName;
 }

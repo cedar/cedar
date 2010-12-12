@@ -39,18 +39,25 @@
 
 // PROJECT INCLUDES
 #include "devices/robot/ReferenceGeometry.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
 
-
+using namespace cedar::aux;
 using namespace cedar::dev::robot;
 
 int main()
 {
+  LogFile log_file("ReferenceGeometry.log");
+  log_file.addTimeStamp();
+  log_file << std::endl;
+  // the number of errors encountered in this test
+  int errors = 0;
+
   ReferenceGeometry reference_geometry("test.conf");
 
-  std::cout << "name: " << reference_geometry.getName() << "\n";
+  log_file << "name: " << reference_geometry.getName() << "\n";
 
-  return 0;
+  return errors;
 }

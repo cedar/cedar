@@ -79,6 +79,10 @@ ReferenceGeometry::~ReferenceGeometry()
 // TODO: remove when ready
 void ReferenceGeometry::testOutput() const
 {
+  std::cout << "name: " << _mName.c_str() << "\n";
+
+  std::cout << "number of joints: " << getNumberOfJoints() << "\n";
+
   std::cout << "base position: [";
   for (unsigned int j = 0; j < _mBasePosition.size(); ++j)
   {
@@ -111,6 +115,19 @@ void ReferenceGeometry::testOutput() const
     std::cout << p_joint->velocityLimits.min << " " << p_joint->velocityLimits.max << "]\n";
   }
 
+  std::cout << "end effector position: [";
+  for (unsigned int j = 0; j < _mpEndEffectorTransformation->position.size(); ++j)
+  {
+    std::cout << _mpEndEffectorTransformation->position[j] << " ";
+  }
+  std::cout << "]\n";
+  std::cout << "end effector orientation: [";
+  for (unsigned int j = 0; j < _mpEndEffectorTransformation->orientation.size(); ++j)
+  {
+    std::cout << _mpEndEffectorTransformation->orientation[j] << " ";
+  }
+  std::cout << "]\n";
+  
   for (unsigned int i = 0; i < _mLinkSegments.size(); ++i)
   {
     ReferenceGeometry::LinkSegmentPtr p_link_segment = _mLinkSegments[i];
@@ -143,6 +160,11 @@ void ReferenceGeometry::init()
   // add parameter for base position
   addParameter(&_mBasePosition, "base.position", 0.0);
 
+  ReferenceGeometry::RigidTransformationPtr p_base_transformation(new ReferenceGeometry::RigidTransformation);
+  _mpBaseTransformation = p_base_transformation;
+  addParameter(&(_mpBaseTransformation->position), "base.position", 0.0);
+  addParameter(&(_mpBaseTransformation->orientation), "base.orientation", 0.0);
+
   // add parameters for joint information
   const std::string joint_path = "joints";
 
@@ -163,6 +185,12 @@ void ReferenceGeometry::init()
     addParameter(&(p_joint->velocityLimits.min), parameter_path + "velocityLimits.[0]", 0.0);
     addParameter(&(p_joint->velocityLimits.max), parameter_path + "velocityLimits.[1]", 0.0);
   }
+  
+  // add parameter for end effector information
+  ReferenceGeometry::RigidTransformationPtr p_end_effector(new ReferenceGeometry::RigidTransformation());
+  _mpEndEffectorTransformation = p_end_effector;
+  addParameter(&(_mpEndEffectorTransformation->position), "endEffector.position", 0.0);
+  addParameter(&(_mpEndEffectorTransformation->orientation), "endEffector.orientation", 0.0);
 
   // add parameters for link segment information
   const std::string link_segment_path = "links";
@@ -183,9 +211,24 @@ void ReferenceGeometry::init()
   }
 }
 
+const unsigned int ReferenceGeometry::getNumberOfJoints() const
+{
+  return _mJoints.size();
+}
+
+const ReferenceGeometry::RigidTransformationPtr& ReferenceGeometry::getBaseTransformation() const
+{
+  return _mpBaseTransformation;
+}
+
 const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned int index) const
 {
   return _mJoints[index];
+}
+
+const ReferenceGeometry::RigidTransformationPtr& ReferenceGeometry::getEndEffectorTransformation() const
+{
+  return _mpEndEffectorTransformation;
 }
 
 const ReferenceGeometry::LinkSegmentPtr& ReferenceGeometry::getLinkSegment(const unsigned int index) const
