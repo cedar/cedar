@@ -63,10 +63,6 @@ int main(int argc, char **argv)
   // create simulated arm
   cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
 
-
-  cout << "name = " << p_test_arm->getName() << endl;
-
-
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
   p_test_arm_model->startTimer(50);
@@ -79,8 +75,12 @@ int main(int argc, char **argv)
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
 
-  cedar::aux::gl::ObjectPtr object = p_test_arm_visualization;
-  p_scene->addObject(object);
+  cedar::aux::gl::ObjectPtr p_object = p_test_arm_visualization;
+  p_scene->addObject(p_object);
+
+  cout << "name = " << p_test_arm->getName() << endl;
+  cout << "name = " << p_object->getObjectName() << endl;
+
 
   // create a simple viewer for the scene
   Viewer viewer(p_scene);
