@@ -69,6 +69,7 @@ ConfigurationInterface::ConfigurationInterface()
 mConfigFileName("newConfiguration")
 {
   mParameterInfos.clear();
+  addParameter(&_mName, "name", "<name>");
   readConfigurationFile();
 }
 
