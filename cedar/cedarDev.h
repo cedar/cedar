@@ -45,9 +45,11 @@
 #include "devices/robot/ComponentNotAvailableException.h"
 #include "devices/robot/KinematicChain.h"
 #include "devices/robot/KinematicChainModel.h"
+#include "devices/robot/SimulatedKinematicChain.h"
 #include "devices/robot/namespace.h"
 #include "devices/robot/ReferenceGeometry.h"
 #include "devices/robot/Robot.h"
+#include "devices/robot/gl/KinematicChain.h"
 
 // SYSTEM INCLUDES
 

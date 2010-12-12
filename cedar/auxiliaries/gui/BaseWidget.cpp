@@ -59,12 +59,12 @@ cedar::aux::gui::BaseWidget::~BaseWidget()
 
 void cedar::aux::gui::BaseWidget::showEvent(QShowEvent*)
 {
-  emit visibleChanged(true);
+  emit visibilityChanged(true);
 }
 
 void cedar::aux::gui::BaseWidget::hideEvent(QHideEvent*)
 {
-  emit visibleChanged(false);
+  emit visibilityChanged(false);
 }
 
 void cedar::aux::gui::BaseWidget::readCustomSettings(QSettings&)

@@ -62,10 +62,10 @@ class cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Base(void);
+  Base();
 
   //!@brief Destructor
-  virtual ~Base(void) = 0;
+  virtual ~Base() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -73,7 +73,7 @@ public:
 public:
   //!@brief Returns the name of the object.
   //!@return Name of the object.
-  const std::string& getName(void) const;
+  const std::string& getName() const;
 
   //!@brief Sets the name of the object to the given name.
   //!@param rName New name of the object.

@@ -78,13 +78,13 @@ public:
   /*!@brief returns the rough delimiter of the scene within which things are guaranteed to be visualized
    * @return    scene limit
    */
-  double sceneLimit();
+  double getSceneLimit();
   
   /*!@brief adds an object to the scene
    * @param pObject    pointer to the object
    * @return    index of the object in the scene
    */
-  int addObject(Object* pObject);
+  int addObject(cedar::aux::gl::ObjectPtr& rpObject);
   
   /*!@brief removes an object from the scene
    * @param index    index of the object in the scene
@@ -111,10 +111,10 @@ public:
    * @param index    index of the desired object within the scene
    * @return    pointer to the object with the specified index
    */
-  cedar::aux::gl::Object* object(int index);
+  cedar::aux::gl::ObjectPtr getObject(int index);
   
-  /*!@brief initializes lighting setup, can be called from different viewers */
-  void initLighting(); // do I need this?
+  /*!@brief initializes gl setup, should be called from all viewers */
+  void initGl();
   
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -129,7 +129,7 @@ private:
 private:
 	bool mIsDrawingFloor;
   double mSceneLimit;
-  QList<cedar::aux::gl::Object*> mObjects;
+  QList<cedar::aux::gl::ObjectPtr> mObjects;
 };
 
 #endif  // CEDAR_AUX_GL_SCENE_H

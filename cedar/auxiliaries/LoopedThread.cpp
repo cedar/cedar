@@ -47,7 +47,6 @@
 using namespace std;
 using namespace boost::posix_time;
 
-
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
@@ -65,11 +64,9 @@ cedar::aux::ConfigurationInterface(configFileName)
   initStatistics();
 }
 
-
 cedar::aux::LoopedThread::~LoopedThread()
 {
 }
-
 
 //------------------------------------------------------------------------------
 // methods
@@ -88,7 +85,6 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
     cout << "  max. time steps between execution: " << mMaxStepsTaken << endl;
   }
 }
-
 
 void cedar::aux::LoopedThread::run(void)
 {
@@ -214,14 +210,12 @@ void cedar::aux::LoopedThread::run(void)
   return;
 }
 
-
 void cedar::aux::LoopedThread::initStatistics()
 {
   mNumberOfSteps = 0;
   mSumOfStepsTaken = 0.0;
   mMaxStepsTaken = 0.0;
 }
-
 
 void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
 {
@@ -243,7 +237,6 @@ void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
 
   return;
 }
-
 
 void cedar::aux::LoopedThread::singleStep() {
   if(!isRunning())
