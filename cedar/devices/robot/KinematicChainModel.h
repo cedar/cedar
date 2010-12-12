@@ -200,9 +200,15 @@ public:
 
   /*!@brief gives the cartesian end-effector velocity
    *
-   * @return    end effector velocity, 3 \times 1 matrix
+   * @return    end effector velocity, 4 \times 1 matrix (homogeneous coordinates)
    */
   cv::Mat calculateEndEffectorVelocity();
+
+  /*!@brief gives the cartesian end-effector acceleration
+   *
+   * @return    end effector acceleration, 4 \times 1 matrix (homogeneous coordinates)
+   */
+  cv::Mat calculateEndEffectorAcceleration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
