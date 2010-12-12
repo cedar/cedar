@@ -155,9 +155,6 @@ void ReferenceGeometry::testOutput() const
 
 void ReferenceGeometry::init()
 {
-  // add parameter name
-  addParameter(&_mName, "name", "<name>");
-
   // add parameter for base position
   addParameter(&_mBasePosition, "base.position", 0.0);
 

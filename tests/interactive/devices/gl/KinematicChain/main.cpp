@@ -64,6 +64,9 @@ int main(int argc, char **argv)
   ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
   cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
 
+//  cout << "name = " << p_test_arm->getName();
+
+
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
   p_test_arm_model->startTimer(50);

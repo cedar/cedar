@@ -53,8 +53,18 @@ using namespace cedar::dev::robot;
 //! constructor
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(50000), //TODO: this step size should be set different, should be a parameter, i.e. read inf from config file
+LoopedThread(50000), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
 mpReferenceGeometry(rpReferenceGeometry)
+{
+  mJointVelocities.resize(getNumberOfJoints());
+  mJointAccelerations.resize(getNumberOfJoints());
+  mJointWorkingModes.resize(getNumberOfJoints());
+}
+
+KinematicChain::KinematicChain(const std::string& configFileName)
+:
+LoopedThread(50000), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
+mpReferenceGeometry(new ReferenceGeometry(configFileName))
 {
   mJointVelocities.resize(getNumberOfJoints());
   mJointAccelerations.resize(getNumberOfJoints());
