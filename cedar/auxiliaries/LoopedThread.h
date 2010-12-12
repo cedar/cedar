@@ -113,7 +113,7 @@ public:
   LoopedThread(double stepSize = 1.0, double idleTime = 0.001, const std::string& configFileName = "");
 
   //!@brief Destructor
-  virtual ~LoopedThread(void) = 0;
+  virtual ~LoopedThread() = 0;
 
   //----------------------------------------------------------------------------
   // public methods
