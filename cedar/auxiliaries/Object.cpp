@@ -71,6 +71,7 @@ mOrientationQuaternion(4, 1, CV_64FC1),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
   init();
+  addParameter(&_mName, "name", "<name>");
   addParameter(&_mPosition, "Object.position", 1.0);
   addParameter(&_mOrientation, "Object.orientation", 0.0);
   readOrDefaultConfiguration();

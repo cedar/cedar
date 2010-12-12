@@ -56,7 +56,7 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-SceneWidget::SceneWidget(cedar::aux::gl::ScenePtr p_scene,	QWidget*)
+SceneWidget::SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget*)
 :
 mpScene(p_scene)
 {
