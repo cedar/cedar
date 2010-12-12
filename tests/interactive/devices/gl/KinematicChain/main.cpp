@@ -61,7 +61,8 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
+//  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/acceleration_test_arm.conf")));
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
@@ -92,13 +93,18 @@ int main(int argc, char **argv)
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_test_arm->start();
-  p_test_arm->setJointAngle(2, -M_PI*0.5);
-  p_test_arm->setJointAngle(3, M_PI*0.5);
-  p_test_arm->setJointVelocity(0, .3);
-  p_test_arm->setJointVelocity(1, -1);
-  p_test_arm->setJointVelocity(2, -.5);
-  p_test_arm->setJointVelocity(3, .3);
+//  p_test_arm->start();
+//  p_test_arm->setJointAngle(2, -M_PI*0.5);
+//  p_test_arm->setJointAngle(3, M_PI*0.5);
+//  p_test_arm->setJointVelocity(0, .3);
+//  p_test_arm->setJointVelocity(1, -1);
+//  p_test_arm->setJointVelocity(2, -.5);
+//  p_test_arm->setJointVelocity(3, .3);
+
+    p_test_arm->setJointAngle(0, 0);
+    p_test_arm->setJointVelocity(0, 1);
+    p_test_arm_model->update();
+    cedar::aux::math::write(p_test_arm_model->calculateSpatialJacobianTemporalDerivative(p_test_arm->getNumberOfJoints()));
 
   a.exec();
   return 0;
