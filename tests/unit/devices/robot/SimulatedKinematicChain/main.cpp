@@ -36,9 +36,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/LogFile.h"
+#include "devices/robot/SimulatedKinematicChain.h"
+#include "auxiliaries/math/tools.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <vector>

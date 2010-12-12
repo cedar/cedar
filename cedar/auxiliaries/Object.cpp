@@ -38,7 +38,7 @@
 #include "Object.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/math/tools.h"
+#include "auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <cv.h>
@@ -50,7 +50,7 @@ using namespace cedar::aux::math;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::Object::Object()
+Object::Object()
 :
 //    TODO: get rid of error output occurring with this constructor (config file not found)
 //cedar::aux::ConfigurationInterface(""),
@@ -62,7 +62,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
   init();
 }
 
-cedar::aux::Object::Object(const std::string& configFileName)
+Object::Object(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName),
 mTransformation(4, 4, CV_64FC1),
@@ -114,7 +114,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
   updateTransformation();
 }
 
-cedar::aux::Object::~Object()
+Object::~Object()
 {
 
 }

@@ -44,6 +44,7 @@
 #include "namespace.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
 
 namespace cedar
@@ -95,4 +96,4 @@ namespace cedar
   }
 }
 
-#endif // CEDAR_AUX_MATH_NAMESPACE_H
+#endif // CEDAR_AUX_GL_NAMESPACE_H

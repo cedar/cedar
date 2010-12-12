@@ -36,14 +36,14 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/ReferenceGeometry.h"
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
-#include "cedar/devices/robot/gl/KinematicChain.h"
-#include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/auxiliaries/gl/Block.h"
-#include "cedar/auxiliaries/gl/Viewer.h"
-#include "cedar/auxiliaries/gl/SceneWidget.h"
+#include "devices/robot/ReferenceGeometry.h"
+#include "devices/robot/SimulatedKinematicChain.h"
+#include "devices/robot/KinematicChainModel.h"
+#include "devices/robot/gl/KinematicChain.h"
+#include "auxiliaries/gl/Scene.h"
+#include "auxiliaries/gl/Block.h"
+#include "auxiliaries/gl/Viewer.h"
+#include "auxiliaries/gl/SceneWidget.h"
 
 
 // SYSTEM INCLUDES

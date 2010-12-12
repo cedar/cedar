@@ -36,8 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Cylinder.h"
-#include "cedar/auxiliaries/LogFile.h"
+#include "auxiliaries/gl/Cylinder.h"
+#include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

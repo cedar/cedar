@@ -38,8 +38,8 @@
 #include "KinematicChainModel.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "auxiliaries/math/tools.h"
+#include "auxiliaries/math/screwCalculus.h"
 
 // SYSTEM INCLUDES
 
