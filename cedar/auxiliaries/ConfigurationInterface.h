@@ -58,7 +58,7 @@
 
 /*!@brief Interface for classes with configuration parameters.
  */
-class cedar::aux::ConfigurationInterface : public cedar::aux::Base
+class cedar::aux::ConfigurationInterface : public virtual cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros, structs, enums

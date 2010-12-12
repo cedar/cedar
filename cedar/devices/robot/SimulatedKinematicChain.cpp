@@ -56,6 +56,13 @@ KinematicChain(rpReferenceGeometry)
   init();
 }
 
+SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
+:
+KinematicChain(configFileName)
+{
+  init();
+}
+
 SimulatedKinematicChain::~SimulatedKinematicChain()
 {
   

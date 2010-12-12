@@ -55,9 +55,11 @@ cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime, const s
 :
 cedar::aux::ConfigurationInterface(configFileName)
 {
-  _mName = string("thread");
-  mStepSize = microseconds( static_cast<unsigned int>( 1000 * stepSize + 0.5 ) );
-  mIdleTime = static_cast<unsigned int>( 1000 * idleTime + 0.5 );
+  // TODO: step size should be moved to the configuration file
+  addParameter(&_mName, "name", "<name>");
+  readConfiguration();
+  mStepSize = microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
+  mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
   mStop  = false;
   mUseFixedStepSize = true;
   mSimulatedTime = microseconds(0);

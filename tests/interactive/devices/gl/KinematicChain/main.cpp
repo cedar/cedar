@@ -61,10 +61,10 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
 
-//  cout << "name = " << p_test_arm->getName();
+
+  cout << "name = " << p_test_arm->getName() << endl;
 
 
   // create model of simulated arm
