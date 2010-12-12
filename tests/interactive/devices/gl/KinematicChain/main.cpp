@@ -100,6 +100,7 @@ int main(int argc, char **argv)
     p_test_arm->start();
     p_test_arm->setJointAngle(0, M_PI/6);
     p_test_arm->setJointVelocity(0, 1);
+    p_test_arm->setJointAcceleration(0, 1);
     p_test_arm_model->update();
   a.exec();
   return 0;
