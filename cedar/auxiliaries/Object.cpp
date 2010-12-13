@@ -52,8 +52,6 @@ using namespace cedar::aux::math;
 //----------------------------------------------------------------------------------------------------------------------
 Object::Object()
 :
-//    TODO: get rid of error output occurring with this constructor (config file not found)
-//cedar::aux::ConfigurationInterface(""),
 mTransformation(4, 4, CV_64FC1),
 mPosition(4, 1, CV_64FC1),
 mOrientationQuaternion(4, 1, CV_64FC1),
@@ -85,8 +83,8 @@ mTransformationTranspose(4, 4, CV_64FC1)
     mOrientationQuaternion.at<double>(0, 0) = 1;
   }
   else
-  { //TODO: this doesn't really take care of negatives, should compare absolute values, really
-    //TODO: this should be moved to a general tranformation matrix -> quaternion function
+  { //!\todo: this doesn't really take care of negatives, should compare absolute values, really
+    //!\todo: this should be moved to a general transformation matrix -> quaternion function
     if (_mOrientation[0] > _mOrientation[4] && _mOrientation[0] > _mOrientation[8])
     {      // Column 0:
       r  = sqrt(1.0 + _mOrientation[0] - _mOrientation[4] - _mOrientation[8]) * 2.0;

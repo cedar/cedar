@@ -90,7 +90,7 @@ std::vector<double> SimulatedKinematicChain::getJointAngles() const
 
 cv::Mat SimulatedKinematicChain::getJointAnglesMatrix() const
 {
-  // TODO: data should be locked, I guess - check what how to do that in cedar
+  //!\todo data should be locked, I guess - check what how to do that in cedar
   Mat angles;
   angles = mJointAngles.clone();
   return angles;
@@ -103,13 +103,13 @@ void SimulatedKinematicChain::setJointAngle(unsigned int index, double angle)
 
 void SimulatedKinematicChain::setJointAngles(const cv::Mat& angleMatrix)
 {
-  // TODO: assert that the passed matrix has the right size
+  //!\todo assert that the passed matrix has the right size
   mJointAngles = angleMatrix;
 }
 
 void SimulatedKinematicChain::setJointAngles(const std::vector<double>& angles)
 {
-  // TODO: assert that the passed vector has the right size
+  //!\todo assert that the passed vector has the right size
   for (unsigned int j=0; j<getNumberOfJoints(); j++)
   {
     mJointAngles.at<double>(j, 0) = angles[j];

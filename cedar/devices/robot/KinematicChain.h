@@ -150,7 +150,7 @@ public:
    *
    * @return    vector of joint accelerations
    */
-  virtual cv::Mat getJointAccelerationMatrix() const;
+  virtual cv::Mat getJointAccelerationsMatrix() const;
 
   /*!@brief set current state of a single joint angle
    *

@@ -79,8 +79,9 @@ void gl::KinematicChain::draw(void)
   }
   drawEndEffector();
   drawEndEffectorVelocity();
+  drawEndEffectorAcceleration();
   
-  glPopMatrix(); // TODO: check if this is needed
+  glPopMatrix(); //!\todo check if this is needed
 }
 
 void gl::KinematicChain::drawBase()
@@ -159,7 +160,19 @@ void gl::KinematicChain::drawEndEffectorVelocity()
   // move to origin
   glPopMatrix();
   glPushMatrix();
+  glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
   cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition();
   cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorVelocity();
+  drawArrow<double>(from, to, 0.01, 0.03, 0.1, mResolution);
+}
+
+void gl::KinematicChain::drawEndEffectorAcceleration()
+{
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
+  glColor4d(mColorR, mColorG, mColorB, 0);
+  cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition() + mpKinematicChainModel->calculateEndEffectorVelocity();
+  cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorAcceleration();
   drawArrow<double>(from, to, 0.01, 0.03, 0.1, mResolution);
 }
