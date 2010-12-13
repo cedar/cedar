@@ -320,6 +320,25 @@ int main()
   }
 
   //--------------------------------------------------------------------------------------------------------------------
+  // temporal derivative of Cartesian Jacobian
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
+  cv::Mat t = acceleration_test_arm_model.calculateEndEffectorPosition();
+  cv::Mat cartesian_jacobian_dot = acceleration_test_arm_model.calculateCartesianJacobianTemporalDerivative(t, acceleration_test_arm_model.getNumberOfJoints()-1, KinematicChainModel::WORLD_COORDINATES);
+  if (
+      !IsZero(cartesian_jacobian_dot.at<double>(0, 0) - 0)
+      || !IsZero(cartesian_jacobian_dot.at<double>(1, 0) - (s0*dot_theta_0 + s01*dot_theta_01))
+      || !IsZero(cartesian_jacobian_dot.at<double>(2, 0) - (-c0*dot_theta_0 - c01*dot_theta_01))
+      || !IsZero(cartesian_jacobian_dot.at<double>(0, 1) - 0)
+      || !IsZero(cartesian_jacobian_dot.at<double>(1, 1) - s01*dot_theta_01)
+      || !IsZero(cartesian_jacobian_dot.at<double>(2, 1) - -c01*dot_theta_01)
+     )
+  {
+    errors++;
+    log_file << "ERROR with calculateCartesianJacobianTemporalDerivative()" << std::endl;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
   // end-effector position
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: calculateEndEffectorPosition" << std::endl;
