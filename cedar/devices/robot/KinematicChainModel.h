@@ -106,36 +106,63 @@ public:
    */
   cv::Mat getJointTransformation(const unsigned int index);
   
-  /*!@brief calculates cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
+  /*!@brief calculates cartesian Jacobian of a point/vector
    *
    * @param point    relevant point for which the Jacobian is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
    * @param result    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
-  void calculateJacobian(
-                          const cv::Mat& point,
-                          const unsigned int jointIndex,
-                          cv::Mat& result,
-                          const unsigned int coordinateFrame
-                        );
+  void calculateCartesianJacobian(
+                                   const cv::Mat& point,
+                                   const unsigned int jointIndex,
+                                   cv::Mat& result,
+                                   const unsigned int coordinateFrame
+                                 );
   
-  /*!@brief calculates Cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
-   * slightly slower than calculateJacobian() that uses references
-   *
-   * \todo doxygen reference to that function
+  /*!@brief calculates Cartesian Jacobian of a point/vector
+   * slightly slower than calculateJacobian()
    *
    * @param point    relevant point for which the Jacobian is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    * @return    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
    */
-  cv::Mat calculateJacobian(
-                             const cv::Mat& point,
-                             const unsigned int jointIndex,
-                             const unsigned int coordinateFrame
-                           );
-  
+  cv::Mat calculateCartesianJacobian(
+                                      const cv::Mat& point,
+                                      const unsigned int jointIndex,
+                                      const unsigned int coordinateFrame
+                                    );
+
+  //! \todo explain coordinate system enum and give default
+  /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param result    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   */
+  void calculateCartesianJacobianTemporalDerivative(
+                                                     const cv::Mat& point,
+                                                     const unsigned int jointIndex,
+                                                     cv::Mat& result,
+                                                     const unsigned int coordinateFrame
+                                                   );
+
+  /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector given in homogeneous
+   * coordinates of the relevant joint frame
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
+   */
+  cv::Mat calculateCartesianJacobianTemporalDerivative(
+                                                        const cv::Mat& point,
+                                                        const unsigned int jointIndex,
+                                                        const unsigned int coordinateFrame
+                                                      );
+
   /*!@brief calculates cartesian velocity of a point
    *
    * @param point    point for which the velocity is calculated
