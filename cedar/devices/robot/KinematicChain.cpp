@@ -51,6 +51,7 @@ using namespace cedar::dev::robot;
 //------------------------------------------------------------------------------
 
 //! constructor
+//! \todo this constructor does not take care of the object transformation properly
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
 LoopedThread(50.0), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
