@@ -134,9 +134,9 @@ void ReferenceGeometry::testOutput() const
     std::cout << "]\n";
 
     std::cout << "link " << i << " center of mass direction" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->centerOfMassOrientation.size(); ++j)
+    for (unsigned int j = 0; j < p_link_segment->orientation.size(); ++j)
     {
-      std::cout << p_link_segment->centerOfMassOrientation[j] << " ";
+      std::cout << p_link_segment->orientation[j] << " ";
     }
     std::cout << "]\n";
 
@@ -151,6 +151,9 @@ void ReferenceGeometry::testOutput() const
 
 void ReferenceGeometry::init()
 {
+  //! \todo this will be moved to configurationInterface, when this is done, remove here
+  addParameter(&_mName, "Name", "<name>");
+
   // add parameters for joint information
   const std::string joint_path = "joints";
 
@@ -192,7 +195,7 @@ void ReferenceGeometry::init()
     std::string parameter_path = link_segment_path + ".[" + cedar::aux::toString<unsigned int>(i) + "].";
 
     addParameter(&(p_link_segment->centerOfMassPosition), parameter_path + "centerOfMassPosition", 0.0);
-    addParameter(&(p_link_segment->centerOfMassOrientation), parameter_path + "centerOfMassOrientation", 0.0);
+    addParameter(&(p_link_segment->orientation), parameter_path + "orientation", 0.0);
     addParameter(&(p_link_segment->inertiaMoments), parameter_path + "inertiaMoments", 0.0);
   }
 }

@@ -91,7 +91,7 @@ protected:
     //! position of center of mass in 3D space
     std::vector<double> centerOfMassPosition;
     //! orientation of center of mass in 3D space
-    std::vector<double> centerOfMassOrientation;
+    std::vector<double> orientation;
     //! inertia moments in 3D space
     std::vector<double> inertiaMoments;
   };
