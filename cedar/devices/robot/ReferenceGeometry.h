@@ -184,7 +184,7 @@ private:
    */
   void init();
 
-  // TODO: remove when debugged
+  //!\todo remove when debugged
   void testOutput() const;
 
   //--------------------------------------------------------------------------------------------------------------------

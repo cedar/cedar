@@ -152,7 +152,7 @@ void SceneWidget::setOrientationQuaternion()
     mpDoubleSpinBoxRotation2->blockSignals(false);
     mpDoubleSpinBoxRotation3->blockSignals(false);
   }
-  //TODO: this does not really make sense yet, should think of better representation, e.g. remove the first box and always norm the others
+  //!\todo this does not really make sense yet, should think of better representation, e.g. remove the first box and always norm the others
 }
 
 void SceneWidget::setColor()

@@ -63,7 +63,7 @@ cedar::aux::ConfigurationInterface(configFileName)
   // read configuration file
   readOrDefaultConfiguration();
 
-  // TODO: remove when ready
+  //!\todo remove when ready
   testOutput();
 }
 
@@ -76,7 +76,7 @@ ReferenceGeometry::~ReferenceGeometry()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-// TODO: remove when ready
+//!\todo remove when ready
 void ReferenceGeometry::testOutput() const
 {
   std::cout << "name: " << _mName.c_str() << "\n";
