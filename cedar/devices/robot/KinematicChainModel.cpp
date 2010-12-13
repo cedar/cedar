@@ -72,29 +72,6 @@ KinematicChainModel::~KinematicChainModel()
 void KinematicChainModel::timerEvent(QTimerEvent*)
 {
   update();
-
-  cv::Mat p = calculateEndEffectorPosition();
-  cout << "cartesian jacobian temporal derivative:" << endl;
-  cedar::aux::math::write(calculateCartesianJacobianTemporalDerivative(p, getNumberOfJoints()-1, WORLD_COORDINATES));
-
-  double s0 = sin(mpKinematicChain->getJointAngle(0));
-  double c0 = cos(mpKinematicChain->getJointAngle(0));
-  double s01 = sin(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
-  double c01 = cos(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
-  double dot_theta_0 = mpKinematicChain->getJointVelocity(0);
-  double dot_theta_1 = mpKinematicChain->getJointVelocity(1);
-  double dot_theta_01 = dot_theta_0 + dot_theta_1;
-
-  cv::Mat J_dot = cv::Mat::zeros(3, 2, CV_64FC1);
-  J_dot.at<double>(1, 0) = s0*dot_theta_0 + s01*dot_theta_01;
-  J_dot.at<double>(2, 0) = -c0*dot_theta_0 - c01*dot_theta_01;
-  J_dot.at<double>(1, 1) = s01*dot_theta_01;
-  J_dot.at<double>(2, 1) = -c01*dot_theta_01;
-
-  cout << "analytic solution:" << endl;
-  cedar::aux::math::write(J_dot);
-
-
 }
 
 void KinematicChainModel::update()
