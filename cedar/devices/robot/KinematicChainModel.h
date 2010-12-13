@@ -136,12 +136,12 @@ public:
                              const unsigned int coordinateFrame
                            );
   
-  /*!@brief calculates cartesian velocity of a point given in homogeneous coordinates of the relevant joint frame
+  /*!@brief calculates cartesian velocity of a point
    *
    * @param point    point for which the velocity is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
-   * @return    velocity of the given point, in base coordinates, 3 \times 1 matrix
+   * @return    velocity of the given point, in world coordinates (homogeneous) 4 \times 1 matrix
    */
   cv::Mat calculateVelocity(
                              const cv::Mat& point,
@@ -163,6 +163,19 @@ public:
    */
   cv::Mat calculateSpatialJacobianTemporalDerivative(unsigned int index);
 
+  /*!@brief calculates cartesian acceleration of a point
+   *
+   * @param point    point for which the acceleration is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    acceleration of the given point, in world coordinates (homogeneous) 4 \times 1 matrix
+   */
+  cv::Mat calculateAcceleration(
+                             const cv::Mat& point,
+                             const unsigned int jointIndex,
+                             const unsigned int coordinateFrame
+                           );
+
   /*!@brief gives the end-effector position in the current configuration
    * 
    * @return    end effector position in homogeneous coordinates, 4 \times 1 matrix
@@ -183,9 +196,15 @@ public:
 
   /*!@brief gives the cartesian end-effector velocity
    *
-   * @return    end effector velocity, 3 \times 1 matrix
+   * @return    end effector velocity, 4 \times 1 matrix (homogeneous coordinates)
    */
   cv::Mat calculateEndEffectorVelocity();
+
+  /*!@brief gives the cartesian end-effector acceleration
+   *
+   * @return    end effector acceleration, 4 \times 1 matrix (homogeneous coordinates)
+   */
+  cv::Mat calculateEndEffectorAcceleration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -197,6 +216,13 @@ private:
   //!@brief calculates the transformations to the joint frames for the given joint angle vector
   void calculateTransformations();
   
+  /*!@brief gives the temporal derivative of a joint twist in the current configuration
+   *
+   * @param index    index of the joint twist
+   * @return    derivative of the joint twist, 6 \times 1 matrix
+   */
+  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public members
   //--------------------------------------------------------------------------------------------------------------------
