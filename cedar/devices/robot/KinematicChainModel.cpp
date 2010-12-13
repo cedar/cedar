@@ -93,12 +93,12 @@ cv::Mat KinematicChainModel::getJointTransformation(const unsigned int index)
   return T;
 }
 
-void KinematicChainModel::calculateJacobian(
-                                             const cv::Mat& point,
-                                             const unsigned int jointIndex,
-                                             cv::Mat& result,
-                                             const unsigned int coordinateFrame
-                                           )
+void KinematicChainModel::calculateCartesianJacobian(
+                                                      const cv::Mat& point,
+                                                      const unsigned int jointIndex,
+                                                      cv::Mat& result,
+                                                      const unsigned int coordinateFrame
+                                                    )
 {
   // transform to local coordinates if necessary
   Mat point_local;
@@ -138,14 +138,73 @@ void KinematicChainModel::calculateJacobian(
 	mTransformationsLock.unlock();
 }
 
-cv::Mat KinematicChainModel::calculateJacobian(
-                                                const cv::Mat& point,
-                                                const unsigned int jointIndex,
-                                                const unsigned int coordinateFrame
-                                              )
+cv::Mat KinematicChainModel::calculateCartesianJacobian(
+                                                         const cv::Mat& point,
+                                                         const unsigned int jointIndex,
+                                                         const unsigned int coordinateFrame
+                                                       )
 {
   cv::Mat J = Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
-  calculateJacobian(point, jointIndex, J, coordinateFrame);
+  calculateCartesianJacobian(point, jointIndex, J, coordinateFrame);
+  return J;
+}
+
+void KinematicChainModel::calculateCartesianJacobianTemporalDerivative(
+                                                                        const cv::Mat& point,
+                                                                        const unsigned int jointIndex,
+                                                                        cv::Mat& result,
+                                                                        const unsigned int coordinateFrame
+                                                                      )
+{
+  Mat point_world;
+  switch (coordinateFrame)
+  {
+    case WORLD_COORDINATES :
+    {
+      point_world = point;
+      break;
+    }
+    case BASE_COORDINATES :
+    {
+      //!\todo add base coordinate treatment
+//      point_local = mJointTransformations[jointIndex].inv() * point; ...
+      break;
+    }
+    case LOCAL_COORDINATES :
+    {
+      point_world = mTransformation * mJointTransformations[jointIndex] * point; //... check this
+      break;
+    }
+  }
+
+  // calculate Jacobian temporal derivative column by column
+  Mat column;
+  Mat S1;
+  Mat S2;
+  mTransformationsLock.lockForRead();
+  for (unsigned int j = 0; j <= jointIndex; j++)
+  {
+    S1 = wedgeTwist<double>(calculateTwistTemporalDerivative(j)) * point_world;
+    S2 = wedgeTwist<double>(rigidToAdjointTransformation<double>(mTransformation)*mJointTwists[j])
+         * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
+
+    column = S1 + S2;
+    // export
+    result.at<double>(0, j) = column.at<double>(0, 0);
+    result.at<double>(1, j) = column.at<double>(1, 0);
+    result.at<double>(2, j) = column.at<double>(2, 0);
+  }
+  mTransformationsLock.unlock();
+}
+
+cv::Mat KinematicChainModel::calculateCartesianJacobianTemporalDerivative(
+                                                                           const cv::Mat& point,
+                                                                           const unsigned int jointIndex,
+                                                                           const unsigned int coordinateFrame
+                                                                         )
+{
+  cv::Mat J = Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
+  calculateCartesianJacobianTemporalDerivative(point, jointIndex, J, coordinateFrame);
   return J;
 }
 
@@ -300,7 +359,7 @@ cv::Mat KinematicChainModel::calculateEndEffectorTransformation()
 cv::Mat KinematicChainModel::calculateEndEffectorJacobian()
 {
   Mat p = calculateEndEffectorPosition();
-  return calculateJacobian(p, getNumberOfJoints()-1, WORLD_COORDINATES);
+  return calculateCartesianJacobian(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 
 cv::Mat KinematicChainModel::calculateEndEffectorVelocity()

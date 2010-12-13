@@ -147,8 +147,8 @@ int main()
   origin.at<double>( 3, 0 ) = 1;
   cv::Mat jacobian_1 = Mat::zeros(3, 4, CV_64FC1);
   cv::Mat jacobian_3 = Mat::zeros(3, 4, CV_64FC1);
-  test_arm_model.calculateJacobian(origin, 1, jacobian_1, KinematicChainModel::LOCAL_COORDINATES);
-  test_arm_model.calculateJacobian(origin, 3, jacobian_3, KinematicChainModel::LOCAL_COORDINATES);
+  test_arm_model.calculateCartesianJacobian(origin, 1, jacobian_1, KinematicChainModel::LOCAL_COORDINATES);
+  test_arm_model.calculateCartesianJacobian(origin, 3, jacobian_3, KinematicChainModel::LOCAL_COORDINATES);
   if (
       // Jacobian of joint 1
       !IsZero(jacobian_1.at<double>(0, 0) - 0)
@@ -163,7 +163,7 @@ int main()
       || !IsZero(jacobian_1.at<double>(0, 3) - 0)
       || !IsZero(jacobian_1.at<double>(1, 3) - 0)
       || !IsZero(jacobian_1.at<double>(2, 3) - 0)
-      || !IsZero(norm(jacobian_1 - test_arm_model.calculateJacobian(origin, 1, KinematicChainModel::LOCAL_COORDINATES)))
+      || !IsZero(norm(jacobian_1 - test_arm_model.calculateCartesianJacobian(origin, 1, KinematicChainModel::LOCAL_COORDINATES)))
       // Jacobian of joint 3
       || !IsZero(jacobian_3.at<double>(0, 0) - 0)
       || !IsZero(jacobian_3.at<double>(1, 0) - 4)
@@ -177,11 +177,11 @@ int main()
       || !IsZero(jacobian_3.at<double>(0, 3) - 0)
       || !IsZero(jacobian_3.at<double>(1, 3) - 0)
       || !IsZero(jacobian_3.at<double>(2, 3) - 0)
-      || !IsZero(norm(jacobian_3 - test_arm_model.calculateJacobian(origin, 3, KinematicChainModel::LOCAL_COORDINATES)))
+      || !IsZero(norm(jacobian_3 - test_arm_model.calculateCartesianJacobian(origin, 3, KinematicChainModel::LOCAL_COORDINATES)))
      )
   {
     errors++;
-    log_file << "ERROR with calculateJacobian()" << std::endl;
+    log_file << "ERROR with calculateCartesianJacobian()" << std::endl;
   }
   
   log_file << "test: calculateSpatialJacobian" << std::endl;
