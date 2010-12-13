@@ -138,7 +138,7 @@ std::vector<double> KinematicChain::getJointAccelerations() const
 }
 
 
-cv::Mat KinematicChain::getJointAccelerationMatrix() const
+cv::Mat KinematicChain::getJointAccelerationsMatrix() const
 {
   cv::Mat dummy(getNumberOfJoints(), 1, CV_64FC1);
   for (unsigned i = 0; i < getNumberOfJoints(); i++)

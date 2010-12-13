@@ -56,18 +56,28 @@ int main()
   // the number of errors encountered in this test
   int errors = 0;
   
-  // create instance of test class
+  // create instances of test class
   ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("test.conf"));
   KinematicChainPtr p_test_arm(new SimulatedKinematicChain(p_reference_geometry));
   KinematicChainModel test_arm_model(p_test_arm);
 
-  // set configuration
+  ReferenceGeometryPtr p_acceleration_reference_geometry(new ReferenceGeometry("acceleration_test_arm.conf"));
+  KinematicChainPtr p_acceleration_test_arm (new SimulatedKinematicChain(p_acceleration_reference_geometry));
+  KinematicChainModel acceleration_test_arm_model(p_acceleration_test_arm);
+
+  // set test configurations
   p_test_arm->setJointAngle(2, -M_PI*0.5);
   p_test_arm->setJointAngle(3, M_PI*0.5);
-  test_arm_model.update();
   p_test_arm->setJointVelocity(1, 1);
   p_test_arm->setJointVelocity(2, 1);
-  
+  test_arm_model.update();
+
+  p_acceleration_test_arm->setJointAngle(0, 0.1);
+  p_acceleration_test_arm->setJointAngle(1, 0.2);
+  p_acceleration_test_arm->setJointVelocity(0, 1.1);
+  p_acceleration_test_arm->setJointVelocity(1, 1.2);
+  acceleration_test_arm_model.update();
+
   //--------------------------------------------------------------------------------------------------------------------
   // number of joints
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,15 +138,6 @@ int main()
     errors++;
     log_file << "ERROR with calculateTransformations() or transformation()" << std::endl;
   }
-//  log_file << joint_transformation_1.at<double>(0, 0) << " " << joint_transformation_1.at<double>(0, 1) << " " << joint_transformation_1.at<double>(0, 2) << " " << joint_transformation_1.at<double>(0, 3) << std::endl;
-//  log_file << joint_transformation_1.at<double>(1, 0) << " " << joint_transformation_1.at<double>(1, 1) << " " << joint_transformation_1.at<double>(1, 2) << " " << joint_transformation_1.at<double>(1, 3) << std::endl;
-//  log_file << joint_transformation_1.at<double>(2, 0) << " " << joint_transformation_1.at<double>(2, 1) << " " << joint_transformation_1.at<double>(2, 2) << " " << joint_transformation_1.at<double>(2, 3) << std::endl;
-//  log_file << joint_transformation_1.at<double>(3, 0) << " " << joint_transformation_1.at<double>(3, 1) << " " << joint_transformation_1.at<double>(3, 2) << " " << joint_transformation_1.at<double>(3, 3) << std::endl;
-//
-//  log_file << joint_transformation_3.at<double>(0, 0) << " " << joint_transformation_3.at<double>(0, 1) << " " << joint_transformation_3.at<double>(0, 2) << " " << joint_transformation_3.at<double>(0, 3) << std::endl;
-//  log_file << joint_transformation_3.at<double>(1, 0) << " " << joint_transformation_3.at<double>(1, 1) << " " << joint_transformation_3.at<double>(1, 2) << " " << joint_transformation_3.at<double>(1, 3) << std::endl;
-//  log_file << joint_transformation_3.at<double>(2, 0) << " " << joint_transformation_3.at<double>(2, 1) << " " << joint_transformation_3.at<double>(2, 2) << " " << joint_transformation_3.at<double>(2, 3) << std::endl;
-//  log_file << joint_transformation_3.at<double>(3, 0) << " " << joint_transformation_3.at<double>(3, 1) << " " << joint_transformation_3.at<double>(3, 2) << " " << joint_transformation_3.at<double>(3, 3) << std::endl;
   
   //--------------------------------------------------------------------------------------------------------------------
   // Jacobians
@@ -182,15 +183,6 @@ int main()
     errors++;
     log_file << "ERROR with calculateJacobian()" << std::endl;
   }
-//  log_file << jacobian_1.at<double>(0, 0) << " " << jacobian_1.at<double>(0, 1) << " " << jacobian_1.at<double>(0, 2) << " " << jacobian_1.at<double>(0, 3) << std::endl;
-//  log_file << jacobian_1.at<double>(1, 0) << " " << jacobian_1.at<double>(1, 1) << " " << jacobian_1.at<double>(1, 2) << " " << jacobian_1.at<double>(1, 3) << std::endl;
-//  log_file << jacobian_1.at<double>(2, 0) << " " << jacobian_1.at<double>(2, 1) << " " << jacobian_1.at<double>(2, 2) << " " << jacobian_1.at<double>(2, 3) << std::endl;
-//  log_file << std::endl;
-//
-//  log_file << jacobian_3.at<double>(0, 0) << " " << jacobian_3.at<double>(0, 1) << " " << jacobian_3.at<double>(0, 2) << " " << jacobian_3.at<double>(0, 3) << std::endl;
-//  log_file << jacobian_3.at<double>(1, 0) << " " << jacobian_3.at<double>(1, 1) << " " << jacobian_3.at<double>(1, 2) << " " << jacobian_3.at<double>(1, 3) << std::endl;
-//  log_file << jacobian_3.at<double>(2, 0) << " " << jacobian_3.at<double>(2, 1) << " " << jacobian_3.at<double>(2, 2) << " " << jacobian_3.at<double>(2, 3) << std::endl;
-//  log_file << std::endl;
   
   log_file << "test: calculateSpatialJacobian" << std::endl;
   cv::Mat spatial_jacobian = test_arm_model.calculateSpatialJacobian(test_arm_model.getNumberOfJoints()-1);
@@ -228,14 +220,6 @@ int main()
     log_file << "ERROR with spatialJacobian()" << std::endl;
   }
   
-//  log_file << spatial_jacobian.at<double>(0, 0) << " " << spatial_jacobian.at<double>(0, 1) << " " << spatial_jacobian.at<double>(0, 2) << " " << spatial_jacobian.at<double>(0, 3) << std::endl;
-//  log_file << spatial_jacobian.at<double>(1, 0) << " " << spatial_jacobian.at<double>(1, 1) << " " << spatial_jacobian.at<double>(1, 2) << " " << spatial_jacobian.at<double>(1, 3) << std::endl;
-//  log_file << spatial_jacobian.at<double>(2, 0) << " " << spatial_jacobian.at<double>(2, 1) << " " << spatial_jacobian.at<double>(2, 2) << " " << spatial_jacobian.at<double>(2, 3) << std::endl;
-//  log_file << spatial_jacobian.at<double>(3, 0) << " " << spatial_jacobian.at<double>(3, 1) << " " << spatial_jacobian.at<double>(3, 2) << " " << spatial_jacobian.at<double>(3, 3) << std::endl;
-//  log_file << spatial_jacobian.at<double>(4, 0) << " " << spatial_jacobian.at<double>(4, 1) << " " << spatial_jacobian.at<double>(4, 2) << " " << spatial_jacobian.at<double>(4, 3) << std::endl;
-//  log_file << spatial_jacobian.at<double>(5, 0) << " " << spatial_jacobian.at<double>(5, 1) << " " << spatial_jacobian.at<double>(5, 2) << " " << spatial_jacobian.at<double>(5, 3) << std::endl;
-//  log_file << std::endl;
-  
 
   //--------------------------------------------------------------------------------------------------------------------
   // velocity
@@ -267,28 +251,73 @@ int main()
     log_file << "ERROR with calculateVelocity()" << std::endl;
   }
 
-//  log_file << v0.at<double>(0, 0) << std::endl;
-//  log_file << v0.at<double>(1, 0) << std::endl;
-//  log_file << v0.at<double>(2, 0) << std::endl;
+  //--------------------------------------------------------------------------------------------------------------------
+  // temporal derivative of spatial Jacobian
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
+  cv::Mat spatial_jacobian_dot = acceleration_test_arm_model.calculateSpatialJacobianTemporalDerivative(acceleration_test_arm_model.getNumberOfJoints()-1);
+  if (
+      !IsZero(spatial_jacobian_dot.at<double>(0, 0) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(1, 0) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(2, 0) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(3, 0) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(4, 0) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(5, 0) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(0, 1) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(1, 1) - -sin(0.1)*1.1)
+      || !IsZero(spatial_jacobian_dot.at<double>(2, 1) - cos(0.1)*1.1)
+      || !IsZero(spatial_jacobian_dot.at<double>(3, 1) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(4, 1) - 0)
+      || !IsZero(spatial_jacobian_dot.at<double>(5, 1) - 0)
+     )
+  {
+    errors++;
+    log_file << "ERROR with calculateSpatialJacobianTemporalDerivative()" << std::endl;
+  }
 
-//  Mat E = test_arm_model.getJointTransformation(0);
-//  log_file << E.at<double>(0, 0) << " " << E.at<double>(0, 1) << " " << E.at<double>(0, 2) << " " << E.at<double>(0, 3) << std::endl;
-//  log_file << E.at<double>(1, 0) << " " << E.at<double>(1, 1) << " " << E.at<double>(1, 2) << " " << E.at<double>(1, 3) << std::endl;
-//  log_file << E.at<double>(2, 0) << " " << E.at<double>(2, 1) << " " << E.at<double>(2, 2) << " " << E.at<double>(2, 3) << std::endl;
-//  log_file << E.at<double>(3, 0) << " " << E.at<double>(3, 1) << " " << E.at<double>(3, 2) << " " << E.at<double>(3, 3) << std::endl;
-//  log_file << std::endl;
-//  E = test_arm_model.getTransformation();
-//  log_file << E.at<double>(0, 0) << " " << E.at<double>(0, 1) << " " << E.at<double>(0, 2) << " " << E.at<double>(0, 3) << std::endl;
-//  log_file << E.at<double>(1, 0) << " " << E.at<double>(1, 1) << " " << E.at<double>(1, 2) << " " << E.at<double>(1, 3) << std::endl;
-//  log_file << E.at<double>(2, 0) << " " << E.at<double>(2, 1) << " " << E.at<double>(2, 2) << " " << E.at<double>(2, 3) << std::endl;
-//  log_file << E.at<double>(3, 0) << " " << E.at<double>(3, 1) << " " << E.at<double>(3, 2) << " " << E.at<double>(3, 3) << std::endl;
-//  log_file << std::endl;
-//  E = test_arm_model.getJointTransformation(0) * p;
-//  log_file << E.at<double>(0, 0) << std::endl;
-//  log_file << E.at<double>(1, 0) << std::endl;
-//  log_file << E.at<double>(2, 0) << std::endl;
-//  log_file << E.at<double>(3, 0) << std::endl;
-//  log_file << std::endl;
+  //--------------------------------------------------------------------------------------------------------------------
+  // acceleration
+  //--------------------------------------------------------------------------------------------------------------------
+  p_acceleration_test_arm->setJointAcceleration(0, 2.1);
+  p_acceleration_test_arm->setJointAcceleration(1, 2.2);
+  acceleration_test_arm_model.update();
+  log_file << "test: calculateAcceleration" << std::endl;
+  cv::Mat a0 = acceleration_test_arm_model.calculateAcceleration(p, 0, KinematicChainModel::LOCAL_COORDINATES);
+  cv::Mat a1 = acceleration_test_arm_model.calculateAcceleration(p, 1, KinematicChainModel::LOCAL_COORDINATES);
+  double s0 = sin(p_acceleration_test_arm->getJointAngle(0));
+  double c0 = cos(p_acceleration_test_arm->getJointAngle(0));
+  double s01 = sin(p_acceleration_test_arm->getJointAngle(0) + p_acceleration_test_arm->getJointAngle(1));
+  double c01 = cos(p_acceleration_test_arm->getJointAngle(0) + p_acceleration_test_arm->getJointAngle(1));
+  double dot_theta_0 = p_acceleration_test_arm->getJointVelocity(0);
+  double dot_theta_1 = p_acceleration_test_arm->getJointVelocity(1);
+  double dot_theta_01 = dot_theta_0 + dot_theta_1;
+  double ddot_theta_0 = p_acceleration_test_arm->getJointAcceleration(0);
+  double ddot_theta_1 = p_acceleration_test_arm->getJointAcceleration(1);
+  double ddot_theta_01 = ddot_theta_0 + ddot_theta_1;
+  double a0_1 = s0*dot_theta_0*dot_theta_0
+                - c0*ddot_theta_0;
+  double a0_2 = - c0*dot_theta_0*dot_theta_0
+                - s0*ddot_theta_0;
+  double a1_1 = s0*dot_theta_0*dot_theta_0
+                + s01*dot_theta_01*dot_theta_01
+                - c0*ddot_theta_0
+                - c01*ddot_theta_01;
+  double a1_2 = - c0*dot_theta_0*dot_theta_0
+                - c01*dot_theta_01*dot_theta_01
+                - s0*ddot_theta_0
+                - s01*ddot_theta_01;
+  if (
+      !IsZero(a0.at<double>(0, 0) - 0)
+      || !IsZero(a0.at<double>(1, 0) - a0_1)
+      || !IsZero(a0.at<double>(2, 0) - a0_2)
+      || !IsZero(a1.at<double>(0, 0) - 0)
+      || !IsZero(a1.at<double>(1, 0) - a1_1)
+      || !IsZero(a1.at<double>(2, 0) - a1_2)
+     )
+  {
+    errors++;
+    log_file << "ERROR with calculateAcceleration()" << std::endl;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector position
@@ -334,12 +363,6 @@ int main()
     log_file << "ERROR with calculateEndEffectorTransformation()" << std::endl;
   }
   
-//  log_file << end_effector_transformation.at<double>(0, 0) << " " << end_effector_transformation.at<double>(0, 1) << " " << end_effector_transformation.at<double>(0, 2) << " " << end_effector_transformation.at<double>(0, 3) << std::endl;
-//  log_file << end_effector_transformation.at<double>(1, 0) << " " << end_effector_transformation.at<double>(1, 1) << " " << end_effector_transformation.at<double>(1, 2) << " " << end_effector_transformation.at<double>(1, 3) << std::endl;
-//  log_file << end_effector_transformation.at<double>(2, 0) << " " << end_effector_transformation.at<double>(2, 1) << " " << end_effector_transformation.at<double>(2, 2) << " " << end_effector_transformation.at<double>(2, 3) << std::endl;
-//  log_file << end_effector_transformation.at<double>(3, 0) << " " << end_effector_transformation.at<double>(3, 1) << " " << end_effector_transformation.at<double>(3, 2) << " " << end_effector_transformation.at<double>(3, 3) << std::endl;
-//  log_file << std::endl;
-  
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector jacobian
   //--------------------------------------------------------------------------------------------------------------------
@@ -378,15 +401,22 @@ int main()
     errors++;
     log_file << "ERROR with calculateEndEffectorVelocity()" << std::endl;
   }
-//  log_file << "p" << std::endl;
-//  log_file << end_effector_position.at<double>(0, 0) << std::endl;
-//  log_file << end_effector_position.at<double>(1, 0) << std::endl;
-//  log_file << end_effector_position.at<double>(2, 0) << std::endl;
-//
-//  log_file << "v" << std::endl;
-//  log_file << v4.at<double>(0, 0) << std::endl;
-//  log_file << v4.at<double>(1, 0) << std::endl;
-//  log_file << v4.at<double>(2, 0) << std::endl;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // end-effector acceleration
+  //--------------------------------------------------------------------------------------------------------------------
+  log_file << "test: calculateEndEffectorAcceleration" << std::endl;
+  cv::Mat a2 = acceleration_test_arm_model.calculateEndEffectorAcceleration();
+  if (
+      !IsZero(a2.at<double>(0, 0) - 0)
+      || !IsZero(a2.at<double>(1, 0) - a1_1)
+      || !IsZero(a2.at<double>(2, 0) - a1_2)
+     )
+  {
+    errors++;
+    log_file << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
+  }
+
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
