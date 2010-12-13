@@ -77,58 +77,6 @@ void KinematicChainModel::timerEvent(QTimerEvent*)
 void KinematicChainModel::update()
 {
   calculateTransformations();
-
-
-  // analytic solution from note paper
-  double s0 = sin(mpKinematicChain->getJointAngle(0));
-  double c0 = cos(mpKinematicChain->getJointAngle(0));
-  double s01 = sin(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
-  double c01 = cos(mpKinematicChain->getJointAngle(0) + mpKinematicChain->getJointAngle(1));
-  double dot_theta_0 = mpKinematicChain->getJointVelocity(0);
-  double dot_theta_1 = mpKinematicChain->getJointVelocity(1);
-  double dot_theta_01 = dot_theta_0 + dot_theta_1;
-  double ddot_theta_0 = mpKinematicChain->getJointAcceleration(0);
-  double ddot_theta_1 = mpKinematicChain->getJointAcceleration(1);
-  double ddot_theta_01 = ddot_theta_0 + ddot_theta_1;
-
-//  cout << "calculateAcceleration:" << endl;
-//  cedar::aux::math::write(calculateAcceleration(
-//                                                 calculateEndEffectorPosition(),
-//                                                 getNumberOfJoints()-1,
-//                                                 WORLD_COORDINATES
-//                                               ));
-  cv::Mat a = cv::Mat::zeros(4, 1, CV_64FC1);
-//  a.at<double>(1, 0) = -c0 * ddot_theta_0 + s0 * dot_theta_0 * dot_theta_0;
-//  a.at<double>(2, 0) = -s0 * ddot_theta_0 - c0 * dot_theta_0 * dot_theta_0;
-    a.at<double>(1, 0) = s0*dot_theta_0*dot_theta_0
-                         + s01*dot_theta_01*dot_theta_01
-                         - c0*ddot_theta_0
-                         - c01*ddot_theta_01;
-    a.at<double>(2, 0) = - c0*dot_theta_0*dot_theta_0
-                         - c01*dot_theta_01*dot_theta_01
-                         - s0*ddot_theta_0
-                         - s01*ddot_theta_01;
-
-//  cout << "analytical solution:" << endl;
-//  cedar::aux::math::write(a);
-//
-//  cout << "difference:" << endl;
-//  cedar::aux::math::write(calculateAcceleration(
-//      calculateEndEffectorPosition(),
-//      getNumberOfJoints()-1,
-//      WORLD_COORDINATES
-//    ) - a);
-
-//  cv::Mat J = cv::Mat::zeros(6, 3, CV_64FC1);
-//  J.at<double>(1, 1) = - s0*dot_theta_0;
-//  J.at<double>(2, 1) = c0*dot_theta_0;
-//  J.at<double>(1, 2) = - s0*dot_theta_0 - s01*(dot_theta_0 + dot_theta_1);
-//  J.at<double>(2, 2) = c0*dot_theta_0 + c01*(dot_theta_0 + dot_theta_1);;
-//  cedar::aux::math::write(calculateSpatialJacobianTemporalDerivative(getNumberOfJoints()));
-//  cedar::aux::math::write(J);
-//  cout << "--------------" << endl;
-
-
 }
 
 unsigned int KinematicChainModel::getNumberOfJoints()
@@ -263,31 +211,6 @@ cv::Mat KinematicChainModel::calculateAcceleration(
   Mat S1 = wedgeTwist<double>(T1 + T2) * point_world;
   Mat S2 = wedgeTwist<double>(calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocitiesMatrix())
            * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
-
-//  cout << "angles" << endl;
-//  cedar::aux::math::write(mpKinematicChain->getJointAnglesMatrix());
-//  cout << "velocities" << endl;
-//  cedar::aux::math::write(mpKinematicChain->getJointVelocitiesMatrix());
-//  cout << "acceleration" << endl;
-//  cedar::aux::math::write(mpKinematicChain->getJointAccelerationsMatrix());
-//  cout << "v" << endl;
-//  cedar::aux::math::write(calculateVelocity(point_world, jointIndex, WORLD_COORDINATES));
-//  cedar::aux::math::write(calculateEndEffectorVelocity());
-//  cout << "J" << endl;
-//  cedar::aux::math::write(J);
-//  cout << "J_dot" << endl;
-//  cedar::aux::math::write(J_dot);
-//  cout << "T1" << endl;
-//  cedar::aux::math::write(T1);
-//  cout << "T2" << endl;
-//  cedar::aux::math::write(T2);
-//  cout << "S1" << endl;
-//  cedar::aux::math::write(S1);
-//  cout << "S2" << endl;
-//  cedar::aux::math::write(S2);
-
-
-
   return S1 + S2;
 }
 
@@ -308,8 +231,6 @@ cv::Mat KinematicChainModel::calculateSpatialJacobian(unsigned int index)
 
 cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned int index)
 {
-//  cout << "calculating temporal derivative of spatial jacobian up to " << index << "-th joint frame" << endl;
-
   // create k-th column
   cv::Mat J = cv::Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
   for (unsigned int i=0; i<=index; i++)
@@ -328,44 +249,33 @@ cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned
 
 cv::Mat KinematicChainModel::calculateTwistTemporalDerivative(unsigned int j)
 {
-//  cout << "calculating temporal derivative of " << j << "-th joint twist" << endl;
   // calculate transformation to (j-1)-th joint frame
   cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);
   // g is a product of j-1 exponentials, so the temporal derivative is a sum with j-1 summands
   for (unsigned int k=0; k<j; k++)
   {
-//    cout << "--" << k << "-th summand" << endl;
     // for the k-th summand, we derive the k-th factor and leave the other ones
     cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // k-th summand
     // factors before the k-th
     for (unsigned int i=0; i<k; i++)
     {
-//      cout << "----" << i << "-th factor" << endl;
       // i-th factor stays the same for i < k
       s_k = s_k * mTwistExponentials[i];
     }
     // the k-th factor of the k-th summand is derived by time
-//    cout << "----" << k << "-th factor" << endl;
     s_k = s_k * wedgeTwist<double>(mReferenceJointTwists[k])
               * mTwistExponentials[k]
               * mpKinematicChain->getJointVelocity(k);
     // factors after the k-th
     for (unsigned int i=k+1; i<j-1; i++)
     {
-//      cout << "----" << i << "-th factor" << endl;
-      // ith factor stays the same for i > k
+      // i-th factor stays the same for i > k
       s_k = s_k * mTwistExponentials[i];
     }
     // add this summand to the sum
     g = g + s_k;
-//    cout << "g:" << endl;
-//    cedar::aux::math::write(g);
   }
   // adjoint of the calculated sum times the j-th twist is the derivative
-//  cout << "j = " << j << endl;
-//  cout << "mReferenceJointTwists[j]" << endl;
-//  cedar::aux::math::write(mReferenceJointTwists[j]);
-//  cedar::aux::math::write(rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j]);
   return rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j];
  }
 
