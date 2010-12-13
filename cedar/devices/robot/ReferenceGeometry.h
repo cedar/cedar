@@ -85,15 +85,6 @@ protected:
     std::vector<double> orientation;
   };
   
-  //!@brief Describes the rigid transformation to a local coordinate frame of interest
-  struct RigidTransformation
-  {
-    //! position
-    std::vector<double> position;
-    //! orientation matrix
-    std::vector<double> orientation;
-  };
-
   //!@brief Describes the hardware properties of a link segment.
   struct LinkSegment
   {
@@ -110,8 +101,6 @@ public:
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::Joint> JointPtr;
   //! smart pointer definition for the EndEffector struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::EndEffector> EndEffectorPtr;
-  //! smart pointer definition for the rigidTransformation struct
-  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::RigidTransformation> RigidTransformationPtr;
   //! smart pointer definition for the LinkSegment struct
   typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::LinkSegment> LinkSegmentPtr;
 
@@ -134,12 +123,6 @@ public:
    * @return    number of joints
    */
   const unsigned int getNumberOfJoints() const;
-  
-  /*!@brief Returns a pointer to the base transformation
-   *
-   * @return    pointer to RigidTransformation
-   */
-  const cedar::dev::robot::ReferenceGeometry::RigidTransformationPtr& getBaseTransformation() const;
 
   /*!@brief Returns a pointer to a specific joint.
    *
@@ -152,7 +135,7 @@ public:
    *
    * @return    pointer to endEffector struct
    */
-  const cedar::dev::robot::ReferenceGeometry::RigidTransformationPtr& getEndEffectorTransformation() const;
+  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& getEndEffector() const;
   
   /*!@brief Returns a pointer to a specific link segment.
    *
@@ -160,12 +143,6 @@ public:
    * @param index    index of the link segment
    */
   const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& getLinkSegment(const unsigned int index) const;
-
-  /*!@brief Returns a vector describing the position of the base of the robot in 3D space.
-   *
-   * @return    base position
-   */
-  const std::vector<double>& getBasePosition() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -190,32 +167,17 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
 protected:
-  //! transformation between world coordinates and base coordinates of the robot
-  cedar::dev::robot::ReferenceGeometry::RigidTransformationPtr _mpBaseTransformation;
   //! vector of all joints
   std::vector<cedar::dev::robot::ReferenceGeometry::JointPtr> _mJoints;
   //! end effector
-  cedar::dev::robot::ReferenceGeometry::RigidTransformationPtr _mpEndEffectorTransformation;
+  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr _mpEndEffector;
   //! vector of all link segments
   std::vector<cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr> _mLinkSegments;
-  //! base position of the robot
-  std::vector<double> _mBasePosition;
-
-private:
-  // none yet
 
 }; // class cedar::dev:robot::ReferenceGeometry
 
