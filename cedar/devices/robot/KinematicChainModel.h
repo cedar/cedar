@@ -160,13 +160,6 @@ public:
    */
   cv::Mat calculateSpatialJacobianTemporalDerivative(unsigned int index);
 
-  /*!@brief gives the temporal derivative of a joint twist in the current configuration
-   *
-   * @param index    index of the joint twist
-   * @return    derivative of the joint twist, 6 \times 1 matrix
-   */
-  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
-
   /*!@brief calculates cartesian acceleration of a point
    *
    * @param point    point for which the acceleration is calculated
@@ -220,6 +213,13 @@ private:
   //!@brief calculates the transformations to the joint frames for the given joint angle vector
   void calculateTransformations();
   
+  /*!@brief gives the temporal derivative of a joint twist in the current configuration
+   *
+   * @param index    index of the joint twist
+   * @return    derivative of the joint twist, 6 \times 1 matrix
+   */
+  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public members
   //--------------------------------------------------------------------------------------------------------------------
