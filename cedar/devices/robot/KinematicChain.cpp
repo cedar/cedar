@@ -51,10 +51,9 @@ using namespace cedar::dev::robot;
 //------------------------------------------------------------------------------
 
 //! constructor
-//! \todo this constructor does not take care of the object transformation properly
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(50.0), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(50.5), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
 mpReferenceGeometry(rpReferenceGeometry)
 {
   mJointVelocities.resize(getNumberOfJoints());
@@ -64,7 +63,7 @@ mpReferenceGeometry(rpReferenceGeometry)
 
 KinematicChain::KinematicChain(const std::string& configFileName)
 :
-LoopedThread(50.0, 0.001, configFileName), //TODO: this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(50.0, 0.001, configFileName), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
 mpReferenceGeometry(new ReferenceGeometry(configFileName))
 {
   mJointVelocities.resize(getNumberOfJoints());
@@ -119,7 +118,7 @@ std::vector<double> KinematicChain::getJointVelocities() const
 cv::Mat KinematicChain::getJointVelocitiesMatrix() const
 {
   cv::Mat dummy(getNumberOfJoints(), 1, CV_64FC1);
-  //TODO: check matrix type
+  //!\todo check matrix type
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     dummy.at<double>(i,0) = mJointVelocities[i];
@@ -145,7 +144,7 @@ std::vector<double> KinematicChain::getJointAccelerations() const
 }
 
 
-cv::Mat KinematicChain::getJointAccelerationMatrix() const
+cv::Mat KinematicChain::getJointAccelerationsMatrix() const
 {
   cv::Mat dummy(getNumberOfJoints(), 1, CV_64FC1);
   for (unsigned i = 0; i < getNumberOfJoints(); i++)
@@ -289,7 +288,7 @@ void KinematicChain::step(double time)
 
       // apply new values
       setJointAngle(i, newAngle);
-      //TODO: setJointAngle is called for each joint separately. Change this to only call it once for a vector of angles
+      //!\todo setJointAngle is called for each joint separately. Change this to only call it once for a vector of angles
       mJointVelocities[i] = velocity;
 
       break;

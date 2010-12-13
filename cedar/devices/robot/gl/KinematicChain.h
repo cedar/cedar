@@ -85,8 +85,11 @@ protected:
   //!@brief draws the end-effector
   void drawEndEffector();
 
-  //!@brief draws the end-effector
+  //!@brief draws the end-effector velocity vector
   void drawEndEffectorVelocity();
+
+  //!@brief draws the end-effector acceleration vector
+  void drawEndEffectorAcceleration();
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

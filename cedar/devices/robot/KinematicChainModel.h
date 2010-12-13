@@ -53,7 +53,8 @@
 #include <QObject>
 
 /*! \brief Calculates the geometric transformations occurring in a serial chain depending upon joint angles
- * TODO: update these comments
+ *
+ * \todo update these comments
  * A KinematicChainModel is initialized with an instance of ReferenceGeometry, containing all geometric information 
  * about the kinematic chain in reference configuration, i.e. \theta = 0. For a configuration given by a specific joint 
  * angle vector \theta, first call update(). Then the transformations and jacobians can be
@@ -73,7 +74,7 @@ public:
   KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain);
   //!@brief destructor
   virtual ~KinematicChainModel();
-  //TODO: represent type of cv::Mat being used, offer it in constructor
+  //\todo represent type of cv::Mat being used, offer it in constructor
   
   //--------------------------------------------------------------------------------------------------------------------
   // Qt events
@@ -105,40 +106,69 @@ public:
    */
   cv::Mat getJointTransformation(const unsigned int index);
   
-  /*!@brief calculates cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
+  /*!@brief calculates cartesian Jacobian of a point/vector
    *
    * @param point    relevant point for which the Jacobian is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
    * @param result    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    */
-  void calculateJacobian(
-                          const cv::Mat& point,
-                          const unsigned int jointIndex,
-                          cv::Mat& result,
-                          const unsigned int coordinateFrame
-                        );
+  void calculateCartesianJacobian(
+                                   const cv::Mat& point,
+                                   const unsigned int jointIndex,
+                                   cv::Mat& result,
+                                   const unsigned int coordinateFrame
+                                 );
   
-  /*!@brief calculates cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
-   * slightly slower than the function above that uses references //TODO: doxygen reference to that function
+  /*!@brief calculates Cartesian Jacobian of a point/vector
+   * slightly slower than calculateJacobian()
    *
    * @param point    relevant point for which the Jacobian is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
    * @return    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
    */
-  cv::Mat calculateJacobian(
-                             const cv::Mat& point,
-                             const unsigned int jointIndex,
-                             const unsigned int coordinateFrame
-                           );
-  
-  /*!@brief calculates cartesian velocity of a point given in homogeneous coordinates of the relevant joint frame
+  cv::Mat calculateCartesianJacobian(
+                                      const cv::Mat& point,
+                                      const unsigned int jointIndex,
+                                      const unsigned int coordinateFrame
+                                    );
+
+  //! \todo explain coordinate system enum and give default
+  /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param result    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   */
+  void calculateCartesianJacobianTemporalDerivative(
+                                                     const cv::Mat& point,
+                                                     const unsigned int jointIndex,
+                                                     cv::Mat& result,
+                                                     const unsigned int coordinateFrame
+                                                   );
+
+  /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector given in homogeneous
+   * coordinates of the relevant joint frame
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    Jacobian of the given point, in base coordinates, 3 \times N matrix, where N = number of joints
+   */
+  cv::Mat calculateCartesianJacobianTemporalDerivative(
+                                                        const cv::Mat& point,
+                                                        const unsigned int jointIndex,
+                                                        const unsigned int coordinateFrame
+                                                      );
+
+  /*!@brief calculates cartesian velocity of a point
    *
    * @param point    point for which the velocity is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
    * @param coordinateFrame    specifies in which coordinate frame the point is represented
-   * @return    velocity of the given point, in base coordinates, 3 \times 1 matrix
+   * @return    velocity of the given point, in world coordinates (homogeneous) 4 \times 1 matrix
    */
   cv::Mat calculateVelocity(
                              const cv::Mat& point,
@@ -160,6 +190,19 @@ public:
    */
   cv::Mat calculateSpatialJacobianTemporalDerivative(unsigned int index);
 
+  /*!@brief calculates cartesian acceleration of a point
+   *
+   * @param point    point for which the acceleration is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    acceleration of the given point, in world coordinates (homogeneous) 4 \times 1 matrix
+   */
+  cv::Mat calculateAcceleration(
+                             const cv::Mat& point,
+                             const unsigned int jointIndex,
+                             const unsigned int coordinateFrame
+                           );
+
   /*!@brief gives the end-effector position in the current configuration
    * 
    * @return    end effector position in homogeneous coordinates, 4 \times 1 matrix
@@ -180,9 +223,15 @@ public:
 
   /*!@brief gives the cartesian end-effector velocity
    *
-   * @return    end effector velocity, 3 \times 1 matrix
+   * @return    end effector velocity, 4 \times 1 matrix (homogeneous coordinates)
    */
   cv::Mat calculateEndEffectorVelocity();
+
+  /*!@brief gives the cartesian end-effector acceleration
+   *
+   * @return    end effector acceleration, 4 \times 1 matrix (homogeneous coordinates)
+   */
+  cv::Mat calculateEndEffectorAcceleration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -194,6 +243,13 @@ private:
   //!@brief calculates the transformations to the joint frames for the given joint angle vector
   void calculateTransformations();
   
+  /*!@brief gives the temporal derivative of a joint twist in the current configuration
+   *
+   * @param index    index of the joint twist
+   * @return    derivative of the joint twist, 6 \times 1 matrix
+   */
+  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public members
   //--------------------------------------------------------------------------------------------------------------------

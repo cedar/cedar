@@ -65,7 +65,6 @@ int main(int argc, char **argv)
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
-  p_test_arm_model->startTimer(50);
 
   // create gl visualization object
   cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_test_arm_model));
@@ -78,28 +77,27 @@ int main(int argc, char **argv)
   cedar::aux::gl::ObjectPtr p_object = p_test_arm_visualization;
   p_scene->addObject(p_object);
 
-  cout << "name = " << p_test_arm->getName() << endl;
-  cout << "name = " << p_object->getObjectName() << endl;
-
-
   // create a simple viewer for the scene
   Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
-  viewer.startTimer(50);
 
   // create a widget to control the scene
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_test_arm->start();
-  p_test_arm->setJointAngle(2, -M_PI*0.5);
-  p_test_arm->setJointAngle(3, M_PI*0.5);
-  p_test_arm->setJointVelocity(0, .3);
-  p_test_arm->setJointVelocity(1, -1);
-  p_test_arm->setJointVelocity(2, -.5);
-  p_test_arm->setJointVelocity(3, .3);
+  p_test_arm->setJointAcceleration(0, .03);
+  p_test_arm->setJointAcceleration(1, -.045);
+  p_test_arm->setJointAcceleration(2, -.015);
+  p_test_arm->setJointAcceleration(3, .025);
 
+  p_test_arm->start();
+  p_test_arm_model->startTimer(50.0);
+  viewer.startTimer(50);
   a.exec();
+
+  p_test_arm->stop();
+  sleep(1);
+
   return 0;
 }

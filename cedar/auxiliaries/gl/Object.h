@@ -144,7 +144,7 @@ protected:
   double mColorG;
   double mColorB;
   
-  //TODO: remove when functionable in cedar::aux::Object
+  //!\todo remove when functionable in cedar::aux::Object
 //  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
 //  cv::Mat mOrientationAngles; // vector of Euler angles
 //  cv::Mat mTransformation; // rigid transformation to the object
@@ -155,37 +155,3 @@ protected:
 };
 
 #endif  // CEDAR_AUX_GL_OBJECT_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
