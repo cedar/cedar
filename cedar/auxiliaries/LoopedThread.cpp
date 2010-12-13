@@ -50,12 +50,11 @@ using namespace boost::posix_time;
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-
+//!\todo step size should be moved to the configuration file
 cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime, const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName)
 {
-  // TODO: step size should be moved to the configuration file
   addParameter(&_mName, "Name", "<name>");
   readConfiguration();
   mStepSize = microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));

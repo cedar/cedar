@@ -136,5 +136,5 @@ double cedar::aux::math::distancePointEllipse(double a, double b, double u, doub
 
   return distance;
 
-  // TODO: check for a = 0.63662; b = 0.63662; u = 1.15139; v = 0.198351
+  //!\todo check for a = 0.63662; b = 0.63662; u = 1.15139; v = 0.198351
 }

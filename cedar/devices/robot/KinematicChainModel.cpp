@@ -165,7 +165,7 @@ cv::Mat KinematicChainModel::calculateVelocity(
     }
     case BASE_COORDINATES :
     {
-      //TODO: add base coordinate treatment
+      //!\todo add base coordinate treatment
 //      point_local = mJointTransformations[jointIndex].inv() * point; ...
       break;
     }

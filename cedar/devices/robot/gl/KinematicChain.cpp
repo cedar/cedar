@@ -80,7 +80,7 @@ void gl::KinematicChain::draw(void)
   drawEndEffector();
   drawEndEffectorVelocity();
   
-  glPopMatrix(); // TODO: check if this is needed
+  glPopMatrix(); //!\todo check if this is needed
 }
 
 void gl::KinematicChain::drawBase()

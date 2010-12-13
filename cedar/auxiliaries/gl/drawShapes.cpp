@@ -279,6 +279,7 @@ void cedar::aux::gl::drawDisk(
 	}
 }
 
+//!\todo origin should be at the center of the base rectangle
 void cedar::aux::gl::drawPyramid(
                                   double length,
                                   double width,
@@ -286,13 +287,11 @@ void cedar::aux::gl::drawPyramid(
                                   bool wireFrame
                                 )
 {
-  // TODO: normals are not calculated correctly
-  // TODO: origin should be at the center of the base rectangle
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	glBegin(GL_TRIANGLES);
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+  glBegin( GL_TRIANGLES);
   // front
   glNormal3d(0.0, 1.0, 0.0);
   glVertex3d(0, 0, height/2);                     // Top Of Triangle (Front)
@@ -353,19 +352,19 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   
 	glBegin(GL_QUADS);
   // front left
-  glNormal3d(.33, -.66, 0.0); // TODO: check normal
+  glNormal3d(.33, -.66, 0.0);
   glVertex3d(0, -width/2, height);
   glVertex3d(sqrt(3)*width/2, 0, height);
   glVertex3d(sqrt(3)*width/2, 0, 0);
   glVertex3d(0, -width/2, 0);
   // front right
-  glNormal3d(.33, .66, 0.0); // TODO: check normal
+  glNormal3d(.33, .66, 0.0);
   glVertex3d(sqrt(3)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   glVertex3d(0, width/2, height);
   glVertex3d(sqrt(3)*width/2, 0, height);
   // back
-  glNormal3d(-1.0, 0.0, 0.0); // TODO: correct normal
+  glNormal3d(-1.0, 0.0, 0.0);
   glVertex3d(0, -width/2, 0);
   glVertex3d(0, width/2, 0);
   glVertex3d(0, width/2, height);
@@ -524,7 +523,7 @@ void cedar::aux::gl::drawEllipse(
 
 
 
-  //TODO: check which of these should move to the init function
+  //!\todo check which of these should move to the init function
 //  glEnable(GL_DEPTH_TEST);
 //  glEnable(GL_MAP2_VERTEX_3);
 //  glEnable(GL_AUTO_NORMAL);

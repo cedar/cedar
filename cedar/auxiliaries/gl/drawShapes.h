@@ -45,7 +45,7 @@
 // SYSTEM INCLUDES
 #include <cv.h>
 
-//TODO: add setColor function, so this is the only file that needs to include gl
+//!\todo add setColor function, so this is the only file that needs to include gl
 namespace cedar
 {
   namespace aux
