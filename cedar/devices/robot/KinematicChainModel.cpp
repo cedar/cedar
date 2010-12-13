@@ -91,12 +91,12 @@ void KinematicChainModel::update()
   double ddot_theta_1 = mpKinematicChain->getJointAcceleration(1);
   double ddot_theta_01 = ddot_theta_0 + ddot_theta_1;
 
-  cout << "calculateAcceleration:" << endl;
-  cedar::aux::math::write(calculateAcceleration(
-                                                 calculateEndEffectorPosition(),
-                                                 getNumberOfJoints()-1,
-                                                 WORLD_COORDINATES
-                                               ));
+//  cout << "calculateAcceleration:" << endl;
+//  cedar::aux::math::write(calculateAcceleration(
+//                                                 calculateEndEffectorPosition(),
+//                                                 getNumberOfJoints()-1,
+//                                                 WORLD_COORDINATES
+//                                               ));
   cv::Mat a = cv::Mat::zeros(4, 1, CV_64FC1);
 //  a.at<double>(1, 0) = -c0 * ddot_theta_0 + s0 * dot_theta_0 * dot_theta_0;
 //  a.at<double>(2, 0) = -s0 * ddot_theta_0 - c0 * dot_theta_0 * dot_theta_0;
@@ -109,15 +109,15 @@ void KinematicChainModel::update()
                          - s0*ddot_theta_0
                          - s01*ddot_theta_01;
 
-  cout << "analytical solution:" << endl;
-  cedar::aux::math::write(a);
-
-  cout << "difference:" << endl;
-  cedar::aux::math::write(calculateAcceleration(
-      calculateEndEffectorPosition(),
-      getNumberOfJoints()-1,
-      WORLD_COORDINATES
-    ) - a);
+//  cout << "analytical solution:" << endl;
+//  cedar::aux::math::write(a);
+//
+//  cout << "difference:" << endl;
+//  cedar::aux::math::write(calculateAcceleration(
+//      calculateEndEffectorPosition(),
+//      getNumberOfJoints()-1,
+//      WORLD_COORDINATES
+//    ) - a);
 
 //  cv::Mat J = cv::Mat::zeros(6, 3, CV_64FC1);
 //  J.at<double>(1, 1) = - s0*dot_theta_0;
@@ -126,7 +126,7 @@ void KinematicChainModel::update()
 //  J.at<double>(2, 2) = c0*dot_theta_0 + c01*(dot_theta_0 + dot_theta_1);;
 //  cedar::aux::math::write(calculateSpatialJacobianTemporalDerivative(getNumberOfJoints()));
 //  cedar::aux::math::write(J);
-  cout << "--------------" << endl;
+//  cout << "--------------" << endl;
 
 
 }

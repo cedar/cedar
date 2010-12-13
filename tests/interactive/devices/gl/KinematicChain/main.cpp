@@ -62,7 +62,6 @@ int main(int argc, char **argv)
 
   // create simulated arm
   cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
-//  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/acceleration_test_arm.conf")));
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
@@ -82,30 +81,23 @@ int main(int argc, char **argv)
   Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
-  viewer.startTimer(50);
 
   // create a widget to control the scene
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-//  p_test_arm->start();
-//  p_test_arm->setJointAngle(2, -M_PI*0.5);
-//  p_test_arm->setJointAngle(3, M_PI*0.5);
-//  p_test_arm->setJointVelocity(0, .3);
-//  p_test_arm->setJointVelocity(1, -1);
-//  p_test_arm->setJointVelocity(2, -.5);
-//  p_test_arm->setJointVelocity(3, .3);
-
-    p_test_arm->setJointAngle(0, M_PI/6);
-    p_test_arm->setJointVelocity(0, 0);
-    p_test_arm->setJointVelocity(1, 0);
-    p_test_arm->setJointAcceleration(0, .01);
-    p_test_arm->setJointAcceleration(1, -.015);
-    p_test_arm_model->update();
-
+  p_test_arm->setJointAcceleration(0, .03);
+  p_test_arm->setJointAcceleration(1, -.045);
+  p_test_arm->setJointAcceleration(2, -.015);
+  p_test_arm->setJointAcceleration(3, .025);
 
   p_test_arm->start();
   p_test_arm_model->startTimer(50.0);
+  viewer.startTimer(50);
   a.exec();
+
+  p_test_arm->stop();
+  sleep(1);
+
   return 0;
 }
