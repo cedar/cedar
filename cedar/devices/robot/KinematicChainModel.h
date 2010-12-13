@@ -53,7 +53,8 @@
 #include <QObject>
 
 /*! \brief Calculates the geometric transformations occurring in a serial chain depending upon joint angles
- * TODO: update these comments
+ *
+ * \todo update these comments
  * A KinematicChainModel is initialized with an instance of ReferenceGeometry, containing all geometric information 
  * about the kinematic chain in reference configuration, i.e. \theta = 0. For a configuration given by a specific joint 
  * angle vector \theta, first call update(). Then the transformations and jacobians can be
@@ -73,7 +74,7 @@ public:
   KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain);
   //!@brief destructor
   virtual ~KinematicChainModel();
-  //TODO: represent type of cv::Mat being used, offer it in constructor
+  //\todo represent type of cv::Mat being used, offer it in constructor
   
   //--------------------------------------------------------------------------------------------------------------------
   // Qt events
@@ -119,8 +120,10 @@ public:
                           const unsigned int coordinateFrame
                         );
   
-  /*!@brief calculates cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
-   * slightly slower than the function above that uses references //TODO: doxygen reference to that function
+  /*!@brief calculates Cartesian Jacobian of a point/vector given in homogeneous coordinates of the relevant joint frame
+   * slightly slower than calculateJacobian() that uses references
+   *
+   * \todo doxygen reference to that function
    *
    * @param point    relevant point for which the Jacobian is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
