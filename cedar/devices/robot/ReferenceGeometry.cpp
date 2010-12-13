@@ -62,9 +62,6 @@ cedar::aux::ConfigurationInterface(configFileName)
   init();
   // read configuration file
   readOrDefaultConfiguration();
-
-  // TODO: remove when ready
-  testOutput();
 }
 
 //! destructor
@@ -75,79 +72,6 @@ ReferenceGeometry::~ReferenceGeometry()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-// TODO: remove when ready
-void ReferenceGeometry::testOutput() const
-{
-  std::cout << "name: " << _mName.c_str() << "\n";
-
-  std::cout << "number of joints: " << getNumberOfJoints() << "\n";
-
-
-  for (unsigned int i = 0; i < _mJoints.size(); ++i)
-  {
-    ReferenceGeometry::JointPtr p_joint = _mJoints[i];
-
-    std::cout << "joint " << i << " position" << ": [";
-    for (unsigned int j = 0; j < p_joint->position.size(); ++j)
-    {
-      std::cout << p_joint->position[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "joint " << i << " axis" << ": [";
-    for (unsigned int j = 0; j < p_joint->axis.size(); ++j)
-    {
-      std::cout << p_joint->axis[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "joint " << i << " angle limits" << ": [";
-    std::cout << p_joint->angleLimits.min << " " << p_joint->angleLimits.max << "]\n";
-
-    std::cout << "joint " << i << " velocity limits" << ": [";
-    std::cout << p_joint->velocityLimits.min << " " << p_joint->velocityLimits.max << "]\n";
-  }
-
-  std::cout << "end effector position: [";
-  for (unsigned int j = 0; j < _mpEndEffector->position.size(); ++j)
-  {
-    std::cout << _mpEndEffector->position[j] << " ";
-  }
-  std::cout << "]\n";
-  std::cout << "end effector orientation: [";
-  for (unsigned int j = 0; j < _mpEndEffector->orientation.size(); ++j)
-  {
-    std::cout << _mpEndEffector->orientation[j] << " ";
-  }
-  std::cout << "]\n";
-  
-  for (unsigned int i = 0; i < _mLinkSegments.size(); ++i)
-  {
-    ReferenceGeometry::LinkSegmentPtr p_link_segment = _mLinkSegments[i];
-
-    std::cout << "link " << i << " center of mass position" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->centerOfMassPosition.size(); ++j)
-    {
-      std::cout << p_link_segment->centerOfMassPosition[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "link " << i << " center of mass direction" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->orientation.size(); ++j)
-    {
-      std::cout << p_link_segment->orientation[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "link " << i << " inertia moments" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->inertiaMoments.size(); ++j)
-    {
-      std::cout << p_link_segment->inertiaMoments[j] << " ";
-    }
-    std::cout << "]\n";
-  }
-}
 
 void ReferenceGeometry::init()
 {
