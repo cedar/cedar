@@ -202,6 +202,11 @@ namespace cedar
                         int stacks,
                         bool wireFrame=false
                       );
+
+      /*!@brief draws axes of the current coordinate frame
+       * @param length    length of each arrow in direction of the base vectors
+       */
+      void drawAxes(double length);
     };
   };
 };

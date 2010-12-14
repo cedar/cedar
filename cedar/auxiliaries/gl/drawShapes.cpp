@@ -606,3 +606,20 @@ void cedar::aux::gl::drawEllipse(
   }
 }
 
+void cedar::aux::gl::drawAxes(double length)
+{
+  cv::Mat o = cv::Mat::zeros(3, 1, CV_64FC1);
+  cv::Mat x = cv::Mat::zeros(3, 1, CV_64FC1);
+  x.at<double>(0, 0) = length;
+  cv::Mat y = cv::Mat::zeros(3, 1, CV_64FC1);
+  y.at<double>(1, 0) = length;
+  cv::Mat z = cv::Mat::zeros(3, 1, CV_64FC1);
+  z.at<double>(2, 0) = length;
+  setColor(1, 0, 0);
+  drawArrow<double>(o, x, length*0.015, length*0.04, length*0.2, 10);
+  setColor(0, 1, 0);
+  drawArrow<double>(o, y, length*0.015, length*0.04, length*0.2, 10);
+  setColor(0, 0, 1);
+  drawArrow<double>(o, z, length*0.015, length*0.04, length*0.2, 10);
+}
+
