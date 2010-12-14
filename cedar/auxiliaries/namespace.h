@@ -67,7 +67,8 @@ namespace cedar
 
     template <typename T>
     class IntervalData;
-//    typedef boost::shared_ptr<IntervalData> IntervalDataPtr;
+    typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;
+    typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
 
     class LogFile;
     typedef boost::shared_ptr<LogFile> LogFilePtr;
