@@ -41,9 +41,8 @@
 #include "devices/robot/KinematicChainModel.h"
 #include "devices/robot/gl/KinematicChain.h"
 #include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gl/Block.h"
-#include "auxiliaries/gl/Viewer.h"
-#include "auxiliaries/gl/SceneWidget.h"
+#include "auxiliaries/gui/Viewer.h"
+#include "auxiliaries/gui/SceneWidget.h"
 
 
 // SYSTEM INCLUDES
@@ -52,6 +51,7 @@
 using namespace std;
 using namespace cv;
 using namespace cedar::aux::gl;
+using namespace cedar::aux::gui;
 using namespace cedar::dev::robot::gl;
 using namespace cedar::dev::robot;
 

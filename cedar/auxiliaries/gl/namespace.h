@@ -57,14 +57,8 @@ namespace cedar
       class Scene;
       typedef boost::shared_ptr<Scene> ScenePtr;
 
-      class Viewer;
-      typedef boost::shared_ptr<Viewer> ViewerPtr;
-
       class Object;
       typedef boost::shared_ptr<Object> ObjectPtr;
-
-      class SceneWidget;
-      typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
 
       class Block;
       typedef boost::shared_ptr<Block> BlockPtr;

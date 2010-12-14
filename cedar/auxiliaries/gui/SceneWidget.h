@@ -40,32 +40,32 @@
   4.) add in the function setWidgetObjectParameters() your ObjectType
  ---------------------------------------------------------------------------------------------------------------------*/
 
-#ifndef CEDAR_AUX_GL_SCENE_WIDGET_H
-#define CEDAR_AUX_GL_SCENE_WIDGET_H
+#ifndef CEDAR_AUX_GUI_SCENE_WIDGET_H
+#define CEDAR_AUX_GUI_SCENE_WIDGET_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Scene.h"
-#include "Object.h"
-#include "Block.h"
-#include "Sphere.h"
-#include "Cone.h"
-#include "Cylinder.h"
-#include "Pyramid.h"
-#include "Prism.h"
-#include "Torus.h"
-#include "Ellipse.h"
-#include "Chessboard.h"
+#include "auxiliaries/gui/namespace.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/ui_SceneWidget.h"
-#include "auxiliaries/gui/BaseWidget.h"
+#include "auxiliaries/gl/Scene.h"
+#include "auxiliaries/gl/Object.h"
+#include "auxiliaries/gl/Block.h"
+#include "auxiliaries/gl/Sphere.h"
+#include "auxiliaries/gl/Cone.h"
+#include "auxiliaries/gl/Cylinder.h"
+#include "auxiliaries/gl/Pyramid.h"
+#include "auxiliaries/gl/Prism.h"
+#include "auxiliaries/gl/Torus.h"
+#include "auxiliaries/gl/Ellipse.h"
+#include "auxiliaries/gl/Chessboard.h"
+#include "cedar/auxiliaries/gui/ui_SceneWidget.h"
 
 // SYSTEM INCLUDES
 #include <Qt>
 
 
-class cedar::aux::gl::SceneWidget : public cedar::aux::gui::BaseWidget, private Ui_SceneWidget
+class cedar::aux::gui::SceneWidget : public cedar::aux::gui::BaseWidget, private Ui_SceneWidget
 {
 private:
 
@@ -177,4 +177,4 @@ private:
 	bool mSwitchingSelectedObject;
 };
 
-#endif // CEDAR_AUX_GL_SCENE_WIDGET_H
+#endif // CEDAR_AUX_GUI_SCENE_WIDGET_H

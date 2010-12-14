@@ -35,20 +35,21 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_GL_VIEWER_H
-#define CEDAR_AUX_GL_VIEWER_H
+#ifndef CEDAR_AUX_GUI_VIEWER_H
+#define CEDAR_AUX_GUI_VIEWER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/namespace.h"
-#include "auxiliaries/gl/Scene.h"
+#include "auxiliaries/gui/namespace.h"
 
 // PROJECT INCLUDES
+#include "auxiliaries/gl/namespace.h"
+#include "auxiliaries/gl/Scene.h"
 
 // SYSTEM INCLUDES
 #include <QGLViewer/qglviewer.h>
 #include <QList>
 
-class cedar::aux::gl::Viewer : public QGLViewer
+class cedar::aux::gui::Viewer : public QGLViewer
 {
 private:
   
@@ -88,4 +89,4 @@ private:
 
 };
 
-#endif  // CEDAR_AUX_GL_VIEWER_H
+#endif  // CEDAR_AUX_GUI_VIEWER_H

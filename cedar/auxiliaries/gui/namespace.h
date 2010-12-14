@@ -55,6 +55,13 @@ namespace cedar
     {
       class BaseWidget;
       typedef boost::shared_ptr<BaseWidget> BaseWidgetPtr;
+
+      class SceneWidget;
+      typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
+
+      class Viewer;
+      typedef boost::shared_ptr<Viewer> ViewerPtr;
+
     }
   }
 }
