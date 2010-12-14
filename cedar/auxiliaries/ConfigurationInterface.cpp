@@ -404,6 +404,30 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
+void ConfigurationInterface::addParameter(int* pMember,
+                                  const std::string& name,
+                                  int defaultValue,
+                                  int min,
+                                  int max,
+                                  int step,
+                                  bool readOnly
+                                  )
+{
+  this->addParameter(pMember, name, defaultValue, new cedar::aux::IntervalData<int>(min, max, step, readOnly));
+}
+
+void ConfigurationInterface::addParameter(double* pMember,
+                                  const std::string& name,
+                                  double defaultValue,
+                                  double min,
+                                  double max,
+                                  double step,
+                                  bool readOnly
+                                  )
+{
+  this->addParameter(pMember, name, defaultValue, new cedar::aux::IntervalData<double>(min, max, step, readOnly));
+}
+
 int ConfigurationInterface::readConfigurationFile()
 {
   // check if file was specified
