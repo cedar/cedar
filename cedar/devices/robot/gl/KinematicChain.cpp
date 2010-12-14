@@ -34,7 +34,7 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "KinematicChain.h"
+#include "devices/robot/gl/KinematicChain.h"
 
 // PROJECT INCLUDES
 #include "auxiliaries/gl/drawShapes.h"
