@@ -44,6 +44,7 @@
 #include "auxiliaries/namespace.h"
 #include "auxiliaries/Base.h"
 #include "auxiliaries/UserData.h"
+#include "auxiliaries/IntervalData.h"
 
 // PROJECT INCLUDES
 
@@ -287,6 +288,47 @@ public:
                             const std::string& name,
                             const std::vector<std::string>& defaultValues
                           );
+
+  /*!
+   * @brief Adds a \em int parameter to the step.
+   *
+   * @param pMember Pointer to the variable to be added to the configuration.
+   * @param name Name of the parameter used for the UI and the configuration file.
+   * @param defaultValue The default value to be set if the parameter cannot be read from file.
+   * @param min The minimum value allowed to be set in the UI.
+   * @param max The maximum value allowed to be set in the UI.
+   * @param step The increment/decrement step for the UI.
+   * @param readOnly Whether or not the parameter can be modified in the UI.
+   */
+  void addParameter(int* pMember,
+                    const std::string& name,
+                    int defaultValue,
+                    int min,
+                    int max,
+                    int step = 1,
+                    bool readOnly = false
+                    );
+
+
+  /*!
+   * @brief Adds a \em double parameter to the step.
+   *
+   * @param pMember Pointer to the variable to be added to the configuration.
+   * @param name Name of the parameter used for the UI and the configuration file.
+   * @param defaultValue The default value to be set if the parameter cannot be read from file.
+   * @param min The minimum value allowed to be set in the UI.
+   * @param max The maximum value allowed to be set in the UI.
+   * @param step The increment/decrement step for the UI.
+   * @param readOnly Whether or not the parameter can be modified in the UI.
+   */
+  void addParameter(double* pMember,
+                    const std::string& name,
+                    double defaultValue,
+                    double min,
+                    double max,
+                    double step = 1.0,
+                    bool readOnly = false
+                    );
 
   /*!@brief Reads in the given set of parameters.
    * @return CONFIG_SUCCESS if successful, an error of the same enum otherwise
