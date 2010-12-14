@@ -300,13 +300,14 @@ public:
    * @param step The increment/decrement step for the UI.
    * @param readOnly Whether or not the parameter can be modified in the UI.
    */
-  void addParameter(int* pMember,
-                    const std::string& name,
-                    int defaultValue,
-                    int min,
-                    int max,
-                    int step = 1,
-                    bool readOnly = false
+  void addParameter(
+                     int* pMember,
+                     const std::string& name,
+                     int defaultValue,
+                     int min,
+                     int max,
+                     int step = 1,
+                     bool readOnly = false
                     );
 
 
@@ -321,13 +322,14 @@ public:
    * @param step The increment/decrement step for the UI.
    * @param readOnly Whether or not the parameter can be modified in the UI.
    */
-  void addParameter(double* pMember,
-                    const std::string& name,
-                    double defaultValue,
-                    double min,
-                    double max,
-                    double step = 1.0,
-                    bool readOnly = false
+  void addParameter(
+                     double* pMember,
+                     const std::string& name,
+                     double defaultValue,
+                     double min,
+                     double max,
+                     double step = 1.0,
+                     bool readOnly = false
                     );
 
   /*!@brief Reads in the given set of parameters.
