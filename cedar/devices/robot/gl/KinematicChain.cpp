@@ -34,7 +34,7 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "devices/robot/gl/KinematicChain.h"
+#include "KinematicChain.h"
 
 // PROJECT INCLUDES
 #include "auxiliaries/gl/drawShapes.h"
@@ -53,10 +53,6 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//KinematicChain::KinematicChain(KinematicChainModel* pKinematicChainModel)
-//{
-//  mpKinematicChainModel = pKinematicChainModel;
-//}
 gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
 cedar::aux::gl::Object(rpKinematicChainModel),
@@ -69,6 +65,10 @@ gl::KinematicChain::~KinematicChain()
 {
   
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
 
 void gl::KinematicChain::draw(void)
 {
@@ -104,7 +104,10 @@ void gl::KinematicChain::drawBase()
   glColor4d(mColorR, mColorG, mColorB, 0);
   drawTorus(0.1, 0.015, mResolution, mResolution);
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
+  glTranslatef(0.0, 0.0, 0.005);
   drawDisk(0.0, 0.1, mResolution, mResolution);
+  glTranslatef(0.0, 0.0, -0.01);
+  drawDisk(0.0, 0.1, mResolution, mResolution, true);
 }
 
 void gl::KinematicChain::drawSegment(unsigned int index)
