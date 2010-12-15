@@ -236,6 +236,7 @@ protected:
   //----------------------------------------------------------------------------
 private:
   void step(double time);
+  void init();
 
   //----------------------------------------------------------------------------
   // members
@@ -247,7 +248,7 @@ protected:
 private:
   cv::Mat mJointVelocities;
   cv::Mat mJointAccelerations;
-  ActionType mCurrentWorkingModes;
+  ActionType mCurrentWorkingMode;
 
 }; // class cedar::dev::robot::KinematicChain
 
