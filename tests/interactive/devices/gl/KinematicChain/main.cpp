@@ -61,7 +61,7 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
@@ -86,7 +86,8 @@ int main(int argc, char **argv)
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_test_arm->setJointAcceleration(0, .03);
+  p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::ACCELERATION);
+  p_test_arm->setJointAcceleration(0, 0.3);
   p_test_arm->setJointAcceleration(1, -.045);
   p_test_arm->setJointAcceleration(2, -.015);
   p_test_arm->setJointAcceleration(3, .025);
