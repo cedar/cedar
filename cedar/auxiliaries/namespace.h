@@ -50,7 +50,7 @@
 
 namespace cedar
 {
-  /*@brief Namespace for all aux classes. */
+  /*!@brief Namespace for all aux classes. */
   namespace aux
   {
     class Base;

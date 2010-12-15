@@ -87,6 +87,8 @@
  * thread with multiple objects that inherit the thread interface, you can call
  * all step functions consecutively and also pass measured time to each step function
  * to fulfill real-time constraints.
+ *
+ * \todo fill in doxygen comments for all member variables
  */
 class cedar::aux::LoopedThread : public cedar::aux::ConfigurationInterface, public QThread
 {

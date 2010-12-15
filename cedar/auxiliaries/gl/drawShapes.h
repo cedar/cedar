@@ -72,7 +72,7 @@ namespace cedar
        * @param ceiling    distance from the xy-plane to the ceiling along the z-axis
        * @param radiusFloor    radius of the cone at the lower end
        * @param radiusCeiling    radius of the cone at the upper end
-       * @param patches    number of vertical cuts used to approximate the cone walls
+       * @param slices    number of vertical cuts used to approximate the cone walls
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */
       void drawCone(
@@ -89,7 +89,7 @@ namespace cedar
        * @param end    end of the line segment
        * @param radiusStart    radius of the cone at the start point
        * @param radiusEnd    radius of the cone at the end point
-       * @param patches    number of cuts parallel to the line used to approximate the cone walls
+       * @param slices    number of cuts parallel to the line used to approximate the cone walls
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */
       template<typename T>

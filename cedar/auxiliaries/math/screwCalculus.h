@@ -177,7 +177,7 @@ namespace cedar
       void rigidToAdjointTransformation(const cv::Mat& rRigidTransformation, cv::Mat& rAdjointTransformation);
       /*! creates adjoint transformation \f$(6 \times 6)\f$ of twist space corresponding to a rigid transformation (4x4)
        * @param rRigidTransformation    rigid transformation matrix, \f$4 \times 4\f$
-       * @return    adjoint transformation matrix, 6 \times 6
+       * @return    adjoint transformation matrix, \f$6 \times 6\f$
        */
       template<typename T>
       cv::Mat rigidToAdjointTransformation(const cv::Mat& rRigidTransformation);
@@ -189,7 +189,7 @@ namespace cedar
       template<typename T>
       void adjointToRigidTransformation(const cv::Mat& rAdjointTransformation, cv::Mat& rRigidTransformation);
       /*! calculates the rigid transformation \f$(4 \times 4)\f$ corresponding to the given adjoint \f$(6 \times 6)\f$
-       * @param adjointTransformation    adjoint transformation matrix, \f$6 \times 6\f$
+       * @param rAdjointTransformation    adjoint transformation matrix, \f$6 \times 6\f$
        * @return    rigid transformation matrix, \f$4 \times 4\f$
        */
       template<typename T>
@@ -206,7 +206,7 @@ namespace cedar
        * @return    inverse of the given adjoint, \f$6 \times 6\f$
        */
       template<typename T>
-      cv::Mat invertAdjointTransformation(const cv::Mat& adjointTransformation);
+      cv::Mat invertAdjointTransformation(const cv::Mat& rAdjointTransformation);
 
       //----------------------------------------------------------------------------------------------------------------
       // generation of matrix representations from basic information

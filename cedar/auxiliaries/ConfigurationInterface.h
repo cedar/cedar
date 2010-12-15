@@ -489,8 +489,4 @@ private:
   std::vector<std::string> mConfigurationErrors;
 }; // class cedar::aux::ConfigurationInterface
 
-/*!@example ConfigurationInterfaceTest.cpp
- *this is an example of how to use the template
-*/
-
 #endif // CEDAR_AUX_CONFIGURATION_INTERFACE_H
