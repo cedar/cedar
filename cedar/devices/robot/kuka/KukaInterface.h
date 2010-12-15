@@ -145,6 +145,10 @@ public:
    * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
    */
   void setToKRL(int index, bool value) throw();
+  /* @brief
+   * TODO: find out, what the heck "Power on" means in this context, and write a proper comment
+   */
+  bool isPowerOn()const;
 
 
 
