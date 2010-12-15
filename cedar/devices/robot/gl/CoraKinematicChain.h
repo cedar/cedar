@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CoraArm.h
+    File:        CoraKinematicChain.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 12 14
+    Date:        2010 12 15
 
     Description: header for a class visualizing the arm of CoRA
 
@@ -34,26 +34,26 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
-#define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+#ifndef CEDAR_DEV_ROBOT_GL_CORA_KINEMATIC_CHAIN_H
+#define CEDAR_DEV_ROBOT_GL_CORA_KINEMATIC_CHAIN_H
 
 // LOCAL INCLUDES
 #include "devices/robot/gl/namespace.h"
-#include "devices/robot/gl/CoraKinematicChain.h"
+#include "devices/robot/gl/KinematicChain.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Visualization of the CoRA arm
+/*!@brief Visualization of one of the CoRA arm
  *
  * This class provides a simple OpenGL visualization of the CoRA arm. It has to be provided with a pointer to an
  * instance of KinematicChainModel of the CoRA arm, used to get the transformations to the joint coordinate frames.
  * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
  * for that scene (cedar::aux::gl::Viewer).
  */
-class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::CoraKinematicChain
+class cedar::dev::robot::gl::CoraKinematicChain : public cedar::dev::robot::gl::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,9 +64,9 @@ class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::CoraKinemat
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  CoraKinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
   //!@brief destructor
-  ~CoraArm();
+  ~CoraKinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -79,13 +79,16 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief draws the base
-  void drawBase();
+  virtual void drawBase() = 0;
 
   //!@brief draws the segment attached to the specified joint
-  void drawSegment(unsigned int index);
+  virtual void drawSegment(unsigned int index) = 0;
 
   //!@brief draws the end-effector
-  void drawEndEffector();
+  virtual void drawEndEffector() = 0;
+
+  //!@brief sets the material for gl visualization
+  void setMaterial(int material);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -96,25 +99,30 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
+  enum MaterialType {
+                      NO_MATERIAL,
+                      DARK_BLUE_METAL,
+                      LIGHT_BLUE_METAL,
+                      BRASS,
+                      ARTIFICIAL_SKIN,
+                      WHITE_PLASTIC,
+                      BLACK_METAL,
+                      CHROME
+                    };
 private:
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::dev::robot::gl::CoraArm
+}; // class cedar::dev::robot::gl::CoraKinematicChain
 
-#endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+#endif // CEDAR_DEV_ROBOT_GL_CORA_KINEMATIC_CHAIN_H
 

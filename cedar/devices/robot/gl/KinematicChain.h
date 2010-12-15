@@ -76,13 +76,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief draws the base
-  void drawBase();
+  virtual void drawBase();
 
   //!@brief draws the segment attached to the specified joint
-  void drawSegment(unsigned int index);
+  virtual void drawSegment(unsigned int index);
 
   //!@brief draws the end-effector
-  void drawEndEffector();
+  virtual void drawEndEffector();
 
   //!@brief draws the end-effector velocity vector
   void drawEndEffectorVelocity();
