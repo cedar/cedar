@@ -54,7 +54,7 @@ using namespace cedar::dev::robot::gl;
 
 gl::CoraArm::CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
-gl::KinematicChain(rpKinematicChainModel)
+gl::CoraKinematicChain(rpKinematicChainModel)
 {
 
 }
@@ -67,3 +67,18 @@ gl::CoraArm::~CoraArm()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void gl::CoraArm::drawBase()
+{
+  KinematicChain::drawBase();
+}
+
+void gl::CoraArm::drawSegment(unsigned int index)
+{
+  KinematicChain::drawSegment(index);
+}
+
+void gl::CoraArm::drawEndEffector()
+{
+  KinematicChain::drawEndEffector();
+}
