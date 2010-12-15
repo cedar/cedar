@@ -66,6 +66,7 @@ int main()
   KinematicChainModel acceleration_test_arm_model(p_acceleration_test_arm);
 
   // set test configurations
+  p_test_arm->setWorkingMode(KinematicChain::VELOCITY);
   p_test_arm->setJointAngle(2, -M_PI*0.5);
   p_test_arm->setJointAngle(3, M_PI*0.5);
   p_test_arm->setJointVelocity(1, 1);

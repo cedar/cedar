@@ -65,11 +65,11 @@ class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, p
   // parameters
   //----------------------------------------------------------------------------
 public:
-  // none yet
+  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
 protected:
   // none yet
 private:
-  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
+  // none yet
 
   //----------------------------------------------------------------------------
   // constructors and destructor
