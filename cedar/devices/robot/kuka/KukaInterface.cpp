@@ -242,4 +242,7 @@ void KukaInterface::setToKRL(int index, bool value) throw()
   validateKRLIndex(index);
   mpFriRemote->setToKRLBool(index, value);
 }
+bool isPowerOn()const{
+  return isPowerOn();
+}
 
