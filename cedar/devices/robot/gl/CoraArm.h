@@ -46,9 +46,12 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Visualization of the CoRA arm
  *
- * More detailed description of the class.
+ * This class provides a simple OpenGL visualization of the CoRA arm. It has to be provided with a pointer to an
+ * instance of KinematicChainModel of the CoRA arm, used to get the transformations to the joint coordinate frames.
+ * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
+ * for that scene (cedar::aux::gl::Viewer).
  */
 class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::KinematicChain
 {
@@ -60,9 +63,10 @@ class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::KinematicCh
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
+  //!@brief constructor
+  CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  //!@brief destructor
+  ~CoraArm();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

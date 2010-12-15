@@ -60,7 +60,6 @@ class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::Object
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-//	KinematicChain(KinematicChainModel* pKinematicChainModel);
   KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
   //!@brief destructor
   ~KinematicChain();

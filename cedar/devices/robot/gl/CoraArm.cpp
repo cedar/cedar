@@ -36,14 +36,33 @@
 
 // LOCAL INCLUDES
 #include "CoraArm.h"
+#include "devices/robot/gl/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+using namespace cedar::dev::robot;
+using namespace cedar::dev::robot::gl;
+//using namespace cedar::aux::gl;
+//using namespace std;
+//using namespace cv;
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+gl::CoraArm::CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+:
+gl::KinematicChain(rpKinematicChainModel)
+{
+
+}
+
+gl::CoraArm::~CoraArm()
+{
+
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
