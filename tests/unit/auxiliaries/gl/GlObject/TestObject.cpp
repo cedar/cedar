@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Viewer.cpp
+    File:        TestObject.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 28
+    Date:        2010 11 19
 
-    Description: Simple viewer for visualizing a scene of objects
+    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestObject class.
 
     Credits:
 
@@ -36,49 +36,38 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/Viewer.h"
+#include "TestObject.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <cv.h>
 
-using namespace cedar::aux::gl;
-using namespace std;
+using namespace cedar::tests::unit::aux::gl::Object;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Viewer::Viewer(Scene* scene)
-{
-  mpScene = scene;
-}
-
-Viewer::~Viewer()
+//! constructor
+TestObject::TestObject(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
   
+}
+
+//! destructor
+TestObject::~TestObject()
+{
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Viewer::init()
+void TestObject::draw()
 {
-  restoreStateFromFile();
-  mpScene->initLighting();
-}
 
-void Viewer::draw()
-{
-  mpScene->draw();
 }
-
-void Viewer::timerEvent(QTimerEvent*)
-{
-  if (isVisible())
-  {
-    update();
-  }
-}
-

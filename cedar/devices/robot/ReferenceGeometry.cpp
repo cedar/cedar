@@ -62,9 +62,6 @@ cedar::aux::ConfigurationInterface(configFileName)
   init();
   // read configuration file
   readOrDefaultConfiguration();
-
-  // TODO: remove when ready
-  testOutput();
 }
 
 //! destructor
@@ -76,72 +73,10 @@ ReferenceGeometry::~ReferenceGeometry()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-// TODO: remove when ready
-void ReferenceGeometry::testOutput() const
-{
-  std::cout << "base position: [";
-  for (unsigned int j = 0; j < _mBasePosition.size(); ++j)
-  {
-    std::cout << _mBasePosition[j] << " ";
-  }
-  std::cout << "]\n";
-
-  for (unsigned int i = 0; i < _mJoints.size(); ++i)
-  {
-    ReferenceGeometry::JointPtr p_joint = _mJoints[i];
-
-    std::cout << "joint " << i << " position" << ": [";
-    for (unsigned int j = 0; j < p_joint->position.size(); ++j)
-    {
-      std::cout << p_joint->position[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "joint " << i << " axis" << ": [";
-    for (unsigned int j = 0; j < p_joint->axis.size(); ++j)
-    {
-      std::cout << p_joint->axis[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "joint " << i << " angle limits" << ": [";
-    std::cout << p_joint->angleLimits.min << " " << p_joint->angleLimits.max << "]\n";
-
-    std::cout << "joint " << i << " velocity limits" << ": [";
-    std::cout << p_joint->velocityLimits.min << " " << p_joint->velocityLimits.max << "]\n";
-  }
-
-  for (unsigned int i = 0; i < _mLinkSegments.size(); ++i)
-  {
-    ReferenceGeometry::LinkSegmentPtr p_link_segment = _mLinkSegments[i];
-
-    std::cout << "link " << i << " center of mass position" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->centerOfMassPosition.size(); ++j)
-    {
-      std::cout << p_link_segment->centerOfMassPosition[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "link " << i << " center of mass direction" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->centerOfMassOrientation.size(); ++j)
-    {
-      std::cout << p_link_segment->centerOfMassOrientation[j] << " ";
-    }
-    std::cout << "]\n";
-
-    std::cout << "link " << i << " inertia moments" << ": [";
-    for (unsigned int j = 0; j < p_link_segment->inertiaMoments.size(); ++j)
-    {
-      std::cout << p_link_segment->inertiaMoments[j] << " ";
-    }
-    std::cout << "]\n";
-  }
-}
-
 void ReferenceGeometry::init()
 {
-  // add parameter for base position
-  addParameter(&_mBasePosition, "base.position", 0.0);
+  //! \todo this will be moved to configurationInterface, when this is done, remove here
+  addParameter(&_mName, "Name", "<name>");
 
   // add parameters for joint information
   const std::string joint_path = "joints";
@@ -163,6 +98,12 @@ void ReferenceGeometry::init()
     addParameter(&(p_joint->velocityLimits.min), parameter_path + "velocityLimits.[0]", 0.0);
     addParameter(&(p_joint->velocityLimits.max), parameter_path + "velocityLimits.[1]", 0.0);
   }
+  
+  // add parameter for end effector information
+  ReferenceGeometry::EndEffectorPtr p_end_effector(new ReferenceGeometry::EndEffector());
+  _mpEndEffector = p_end_effector;
+  addParameter(&(_mpEndEffector->position), "endEffector.position", 0.0);
+  addParameter(&(_mpEndEffector->orientation), "endEffector.orientation", 0.0);
 
   // add parameters for link segment information
   const std::string link_segment_path = "links";
@@ -178,9 +119,14 @@ void ReferenceGeometry::init()
     std::string parameter_path = link_segment_path + ".[" + cedar::aux::toString<unsigned int>(i) + "].";
 
     addParameter(&(p_link_segment->centerOfMassPosition), parameter_path + "centerOfMassPosition", 0.0);
-    addParameter(&(p_link_segment->centerOfMassOrientation), parameter_path + "centerOfMassOrientation", 0.0);
+    addParameter(&(p_link_segment->orientation), parameter_path + "orientation", 0.0);
     addParameter(&(p_link_segment->inertiaMoments), parameter_path + "inertiaMoments", 0.0);
   }
+}
+
+const unsigned int ReferenceGeometry::getNumberOfJoints() const
+{
+  return _mJoints.size();
 }
 
 const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned int index) const
@@ -188,12 +134,12 @@ const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned in
   return _mJoints[index];
 }
 
+const ReferenceGeometry::EndEffectorPtr& ReferenceGeometry::getEndEffector() const
+{
+  return _mpEndEffector;
+}
+
 const ReferenceGeometry::LinkSegmentPtr& ReferenceGeometry::getLinkSegment(const unsigned int index) const
 {
   return _mLinkSegments[index];
-}
-
-const std::vector<double>& ReferenceGeometry::getBasePosition() const
-{
-  return _mBasePosition;
 }

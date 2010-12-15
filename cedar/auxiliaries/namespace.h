@@ -50,7 +50,7 @@
 
 namespace cedar
 {
-  /*@brief Namespace for all aux classes. */
+  /*!@brief Namespace for all aux classes. */
   namespace aux
   {
     class Base;
@@ -65,8 +65,16 @@ namespace cedar
     class UserData;
     typedef boost::shared_ptr<UserData> UserDataPtr;
 
+    template <typename T>
+    class IntervalData;
+    typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;
+    typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
+
     class LogFile;
     typedef boost::shared_ptr<LogFile> LogFilePtr;
+
+    class Object;
+    typedef boost::shared_ptr<Object> ObjectPtr;
 
     /*!@brief Template method that converts simple data types to a string.
      *

@@ -49,7 +49,8 @@
 #include <QKeyEvent>
 #include <QWidget>
 
-/*!
+/*!@brief A base class for all widgets.
+ *
  * This class implements various base functions for widgets. This includes reading and writing of the window settings.
  *
  * @remarks To read/write the window settings, call the corresponding functions. To read/write custom settings,
@@ -111,11 +112,13 @@ protected:
   virtual void keyPressEvent(QKeyEvent* pEvent);
 
 signals:
-  void visibleChanged(bool);
+  /*!@brief This signal is triggered if a showEvent or hideEvent occurs.
+   */
+  void visibilityChanged(bool);
 
 private:
   //! Unique identifier for each instance. This is used to associate the window settings with the instance.
   std::string mWidgetName;
 };
 
-#endif  // OL_BASE_WIDGET_H
+#endif  // CEDAR_AUX_GUI_BASE_WIDGET_H

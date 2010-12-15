@@ -47,27 +47,27 @@
 using namespace std;
 using namespace boost::posix_time;
 
-
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-
-cedar::aux::LoopedThread::LoopedThread(unsigned long stepSize, unsigned int idleTime)
+//!\todo step size should be moved to the configuration file
+cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime, const std::string& configFileName)
+:
+cedar::aux::ConfigurationInterface(configFileName)
 {
-  _mName = string("thread");
-  mStepSize = microseconds(stepSize);
-  mIdleTime = idleTime;
+  addParameter(&_mName, "Name", "<name>");
+  readConfiguration();
+  mStepSize = microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
+  mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
   mStop  = false;
   mUseFixedStepSize = true;
   mSimulatedTime = microseconds(0);
   initStatistics();
 }
 
-
 cedar::aux::LoopedThread::~LoopedThread()
 {
 }
-
 
 //------------------------------------------------------------------------------
 // methods
@@ -87,11 +87,11 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
   }
 }
 
-
 void cedar::aux::LoopedThread::run(void)
 {
   // we do not want to change the step size while running
   time_duration step_size = mStepSize;
+  bool use_fixed_step_size = mUseFixedStepSize;
   initStatistics();
 
   // which mode?
@@ -99,50 +99,54 @@ void cedar::aux::LoopedThread::run(void)
   {
     // fast running mode
 
-    ptime last_wakeup = microsec_clock::universal_time();
-    ptime current_wakeup = microsec_clock::universal_time();
+    mLastTimeStepStart = microsec_clock::universal_time();
+    mLastTimeStepEnd = microsec_clock::universal_time();
     time_duration time_difference;
 
     while(!mStop)
     {
+      usleep(mIdleTime);
+      mLastTimeStepStart = mLastTimeStepEnd;
+      mLastTimeStepEnd = microsec_clock::universal_time();
+
       if(mSimulatedTime.total_microseconds() == 0)
       {
-        current_wakeup = microsec_clock::universal_time();
-        time_difference = current_wakeup - last_wakeup;
-        step(time_difference.total_microseconds());
-        last_wakeup = current_wakeup;
+        time_difference = mLastTimeStepEnd - mLastTimeStepStart;
+        step(time_difference.total_microseconds() * 0.001);
       }
       else
       {
-        step(mSimulatedTime.total_microseconds());
+        step(mSimulatedTime.total_microseconds() * 0.001);
       }
-      usleep(mIdleTime);
     }
   }
   else // if(step_size == 0)
   {
     // regular mode with time slots
 
-    // some auxiliary variables
-    ptime last_wakeup = microsec_clock::universal_time();
-    ptime scheduled_wakeup = last_wakeup + step_size;
-    ptime wakeup_max;
-    ptime tmp_time;
+    // initialization
+    mLastTimeStepStart = microsec_clock::universal_time();
+    mLastTimeStepEnd = microsec_clock::universal_time();
+    ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
     srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
+
+    // some auxiliary variables
+    time_duration sleep_duration = microseconds(0);
+    time_duration step_duration = microseconds(0);
 
     while(!mStop)
     {
       // sleep until next wake up time
-      time_duration time_diff = scheduled_wakeup - microsec_clock::universal_time();
-      usleep(std::max<int>(0, time_diff.total_microseconds()));
+      sleep_duration = scheduled_wakeup - microsec_clock::universal_time();
+      usleep(std::max<int>(0, sleep_duration.total_microseconds()));
 
       // determine time since last run
-      ptime now = microsec_clock::universal_time();
-      time_diff = now - last_wakeup;
-      last_wakeup = now; // remember current wake up time
+      mLastTimeStepStart = mLastTimeStepEnd;
+      mLastTimeStepEnd = scheduled_wakeup;
+      step_duration = mLastTimeStepEnd - mLastTimeStepStart;
 
       // calculate number of time steps taken
-      double steps_taken = static_cast<double>(time_diff.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
+      double steps_taken = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
       unsigned int full_steps_taken = static_cast<unsigned int>( steps_taken + 0.5 );
 
       #ifdef DEBUG
@@ -157,7 +161,7 @@ void cedar::aux::LoopedThread::run(void)
       // here we have to distinguish between the different working modes of the
       // thread. either we want to wake up on the next fixed time step or as
       // soon as possible if we are already late.
-      if(mUseFixedStepSize)
+      if(use_fixed_step_size)
       {
         // update statistics
         updateStatistics(full_steps_taken);
@@ -165,11 +169,11 @@ void cedar::aux::LoopedThread::run(void)
         // call step function
         if(mSimulatedTime.total_microseconds() == 0)
         {
-          step(full_steps_taken * step_size.total_microseconds());
+          step(full_steps_taken * step_size.total_microseconds() * 0.001);
         }
         else
         {
-          step(mSimulatedTime.total_microseconds());
+          step(mSimulatedTime.total_microseconds() * 0.001);
         }
 
         // schedule the next wake up
@@ -187,11 +191,11 @@ void cedar::aux::LoopedThread::run(void)
         // call step function
         if(mSimulatedTime.total_microseconds() == 0)
         {
-          step(steps_taken * step_size.total_microseconds());
+          step(steps_taken * step_size.total_microseconds() * 0.001);
         }
         else
         {
-          step(mSimulatedTime.total_microseconds());
+          step(mSimulatedTime.total_microseconds() * 0.001);
         }
 
         // schedule the next wake up
@@ -207,14 +211,12 @@ void cedar::aux::LoopedThread::run(void)
   return;
 }
 
-
 void cedar::aux::LoopedThread::initStatistics()
 {
-  mNumberOfSteps   = 0;
+  mNumberOfSteps = 0;
   mSumOfStepsTaken = 0.0;
-  mMaxStepsTaken   = 0.0;
+  mMaxStepsTaken = 0.0;
 }
-
 
 void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
 {
@@ -236,7 +238,6 @@ void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
 
   return;
 }
-
 
 void cedar::aux::LoopedThread::singleStep() {
   if(!isRunning())

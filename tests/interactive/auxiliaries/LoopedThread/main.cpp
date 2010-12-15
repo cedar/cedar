@@ -43,7 +43,7 @@
 using namespace std;
 using namespace boost::posix_time;
 
-
+//! threaded test class
 class MyTestThread : public cedar::aux::LoopedThread {
 
 private:
@@ -52,17 +52,14 @@ private:
 
 public:
 
-  MyTestThread( bool delay = false ) {
+  MyTestThread(double stepSize, bool delay = false) : LoopedThread(stepSize) 
+  {
     mArtificialDelay = delay;
     srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
   }
 
-  MyTestThread( unsigned long stepSize, bool delay = false ) : LoopedThread( stepSize ) {
-    mArtificialDelay = delay;
-    srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
-  }
-
-  void step(unsigned long time) {
+  void step(double time)
+	{
     ptime now = microsec_clock::universal_time();
     cout << "current time (sec/usec): " << now.time_of_day().seconds()
          << " / " << now.time_of_day().total_microseconds() % 1000000
@@ -71,23 +68,26 @@ public:
       usleep( rand() % (3*mStepSize.total_microseconds()) );
   }
 
-  bool getArtificialDelay() {
+  bool getArtificialDelay() 
+  {
     return mArtificialDelay;
   }
 
-  void setArtificalDelay( bool delay ) {
+  void setArtificalDelay( bool delay ) 
+  {
     mArtificialDelay = delay;
   }
 
 };
 
 
-int main() {
+int main()
+{
 
-  unsigned long timeInterval = 100000;  // microseconds
+  double timeInterval = 100.0;  // milliseconds
   MyTestThread thread( timeInterval );
   //thread.useFixedStepSize(false);
-  //thread.setSimulatedTime(50000);
+  //thread.setSimulatedTime(50);
 
   cout << "Starting a thread and let it run for 1 seconds ..." << endl;
   thread.start();

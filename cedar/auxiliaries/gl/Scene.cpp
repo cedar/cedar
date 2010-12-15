@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -57,10 +57,7 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-	for (int i=0; i<mObjects.size(); i++)
-	{
-		delete mObjects[ i ];
-	}
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,19 +74,19 @@ void Scene::setSceneLimit(double value)
   mSceneLimit = value;
 }
 
-double Scene::sceneLimit()
+double Scene::getSceneLimit()
 {
   return mSceneLimit;
 }
 
-int Scene::addObject(Object* pObject)
+int Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
 {
-  // TODO: prevent different objects with same names
+  //!\todo prevent different objects with same names
 //  if (object name exists)
 //  {
 //    return false;
 //  }
-	mObjects.push_back(pObject);
+	mObjects.push_back(rpObject);
   return mObjects.size() - 1;
 }
 
@@ -153,14 +150,18 @@ bool Scene::isEmpty()
   return (mObjects.size() == 0);
 }
 
-Object* Scene::object(int index)
+cedar::aux::gl::ObjectPtr Scene::getObject(int index)
 {
   return mObjects[index];
 }
 
-void Scene::initLighting()
+void Scene::initGl()
 {
-  // TODO: this somehow sets the light relative to the camerea, which might not be wanted. check!
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_MAP2_VERTEX_3);
+  glEnable(GL_AUTO_NORMAL);
+
+  //!\todo this somehow sets the light relative to the camera, which might not be wanted. check!
 	// set light
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);

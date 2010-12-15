@@ -54,7 +54,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::dev::robot::Component : public cedar::aux::Base
+class cedar::dev::robot::Component : public virtual cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

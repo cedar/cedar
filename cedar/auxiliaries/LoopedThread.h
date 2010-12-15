@@ -35,12 +35,12 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_LOOPEDTHREAD_H
-#define CEDAR_AUX_LOOPEDTHREAD_H
+#ifndef CEDAR_AUX_LOOPED_THREAD_H
+#define CEDAR_AUX_LOOPED_THREAD_H
 
 // LOCAL INCLUDES
 #include "namespace.h"
-#include "Base.h"
+#include "ConfigurationInterface.h"
 
 // PROJECT INCLUDES
 
@@ -87,8 +87,10 @@
  * thread with multiple objects that inherit the thread interface, you can call
  * all step functions consecutively and also pass measured time to each step function
  * to fulfill real-time constraints.
+ *
+ * \todo fill in doxygen comments for all member variables
  */
-class cedar::aux::LoopedThread : public Base, public QThread
+class cedar::aux::LoopedThread : public cedar::aux::ConfigurationInterface, public QThread
 {
   //----------------------------------------------------------------------------
   // macros
@@ -106,13 +108,14 @@ public:
    * If stepSize == 0 the step() function is called as fast as possible with a
    * short idle time in between to keep the system responsive.
    *
-   * @param stepSize time window for each step function in microseconds
-   * @param idleTime idle time (in microseconds) used in fast running mode (i.e. stepSize = 0)
+   * @param stepSize time window for each step function in milliseconds
+   * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
+   * @param configFileName an optional configuration file for reading and writing thread configurations
    */
-  LoopedThread(unsigned long stepSize = 1000, unsigned int idleTime = 1);
+  LoopedThread(double stepSize = 1.0, double idleTime = 0.001, const std::string& configFileName = "");
 
   //!@brief Destructor
-  virtual ~LoopedThread(void) = 0;
+  virtual ~LoopedThread() = 0;
 
   //----------------------------------------------------------------------------
   // public methods
@@ -125,9 +128,9 @@ public:
 
   /*!@brief All calculations for each time step are put into step().
    *
-   * @param time length of the time step to be calculated in microseconds
+   * @param time length of the time step to be calculated in milliseconds
    */
-  virtual void step(unsigned long time) = 0;
+  virtual void step(double time) = 0;
 
   /*!@brief Stops the thread.
    *
@@ -137,7 +140,7 @@ public:
    * @param timeout the max. time to wait for the thread (in milliseconds).
    * @param suppressWarning by default a warning about occurring timing problems will be given
    */
-  void stop( unsigned int timeout = 1000, bool suppressWarning = false );
+  void stop(unsigned int timeout = 1000, bool suppressWarning = false);
 
   /*!@brief Performs a single step with default step size (or simulated time).
    *
@@ -150,9 +153,9 @@ public:
    * Sets the a new time interval for calling the step() function. If the
    * thread is running, the new value has its effect only after restarting it.
    *
-   * @param stepSize the new step size in microseconds
+   * @param stepSize the new step size in milliseconds
    */
-  void setStepSize(unsigned long stepSize) { mStepSize = boost::posix_time::microseconds(stepSize); };
+  void setStepSize(double stepSize) { mStepSize = boost::posix_time::microseconds( static_cast<unsigned int>( 1000*stepSize+.5 ) ); };
 
   /*!@brief Sets a new idle time.
    *
@@ -160,9 +163,9 @@ public:
    * running in fast running mode (step size == 0). If your system becomes
    * unresponsive try a larger idle time.
    *
-   * @param idleTime the new idle time in microseconds
+   * @param idleTime the new idle time in milliseconds
    */
-  void setIdleTime(unsigned int idleTime) { mIdleTime = idleTime; };
+  void setIdleTime(double idleTime = 0.001) { mIdleTime = static_cast<unsigned int>( 1000*idleTime+0.5 ); };
 
   /*!@brief Decide if a fixed step size is used in cases of delay.
    *
@@ -188,9 +191,28 @@ public:
    * If simulatedTime > 0 instead of the real (measured) time, the given
    * simulated time is used to call step().
    *
-   * @param simulatedTime the desired simulated step size in microseconds
+   * @param simulatedTime the desired simulated step size in milliseconds
    */
-  void setSimulatedTime(unsigned long simulatedTime = 0) { mSimulatedTime = boost::posix_time::microseconds(simulatedTime); };
+  void setSimulatedTime(double simulatedTime = 0.0) { mSimulatedTime = boost::posix_time::microseconds( static_cast<unsigned>( 1000*simulatedTime+.5 ) ); };
+
+
+  /*!@brief Returns the last timesteps start time.
+   *
+   */
+  boost::posix_time::ptime getLastTimeStepStart() const { return mLastTimeStepStart; };
+
+
+  /*!@brief Returns the last timesteps end time.
+   *
+   */
+  boost::posix_time::ptime getLastTimeStepEnd() const { return mLastTimeStepEnd; };
+
+
+  /*!@brief Returns the last timesteps duration.
+   *
+   */
+  boost::posix_time::time_duration getLastTimeStepDuration() const { return mLastTimeStepStart - mLastTimeStepEnd; };
+
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -214,13 +236,17 @@ protected:
   boost::posix_time::time_duration mStepSize;
 private:
   bool mStop;
-  unsigned int mIdleTime;
+  unsigned int mIdleTime; // in microseconds
   bool mUseFixedStepSize;
   boost::posix_time::time_duration mSimulatedTime;
   // gather some statistics
   unsigned long mNumberOfSteps;
   double mSumOfStepsTaken;
   double mMaxStepsTaken;
+  //remeber time stamps of last step
+  boost::posix_time::ptime mLastTimeStepStart;
+  boost::posix_time::ptime mLastTimeStepEnd;
+
 
   //----------------------------------------------------------------------------
   // parameters

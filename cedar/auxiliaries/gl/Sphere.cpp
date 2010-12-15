@@ -19,53 +19,92 @@
 
 ========================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
-
-    File:        TestObject.cpp
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
-
-    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestObject class.
-
-    Credits:
-
-======================================================================================================================*/
-
+ ----- Institute:   Ruhr-Universitaet-Bochum
+                    Institut fuer Neuroinformatik
+ 
+ ----- File:        Sphere.cpp
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ------Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 10 28
+ 
+ ----- Description: visualization for a sphere
+ 
+ ----- Credits:     
+ ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "unit/auxiliaries/gl/Object/TestObject.h"
+#include "drawShapes.h"
+#include "Sphere.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <cv.h>
 
-using namespace cedar::tests::unit::aux::gl::Object;
+using namespace cedar::aux::gl;
+using namespace std;
+using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//! constructor
-TestObject::TestObject()
+Sphere::Sphere(cedar::aux::ObjectPtr pObject)
+:
+cedar::aux::gl::Object(pObject)
 {
-  
+	mRadius = 2;
+	mColorR = 1;
+	mColorG = 0;
+	mColorB = 0;
+	mObjectType = "Sphere";
 }
 
-//! destructor
-TestObject::~TestObject()
+Sphere::Sphere(
+                cedar::aux::ObjectPtr pObject,
+                const double radius,
+                const double R,
+                const double G,
+                const double B
+              )
+:
+cedar::aux::gl::Object(pObject)
 {
-
+	mRadius = radius;
+	mColorR = R;
+	mColorG = G;
+	mColorB = B;
+	mObjectType = "Sphere";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void TestObject::draw()
+void Sphere::setRadius(double value)
 {
+  mRadius = value;
+}
 
+double Sphere::radius()
+{
+  return mRadius;
+}
+
+void Sphere::draw()
+{
+	// move to origin
+	glPopMatrix();
+	glPushMatrix();
+  
+	// move to object coordinates
+  mTransformationTranspose = mpObject->getTransformation().t();
+  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+
+	// draw the sphere
+	if (mIsVisible)
+	{
+	  gl::setColor(mColorR, mColorG, mColorB);
+		drawSphere(mRadius, mResolution*2, mResolution, mIsDrawnAsWireFrame);
+	}
 }

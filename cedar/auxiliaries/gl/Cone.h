@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -19,73 +19,92 @@
 
 ========================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
+ ----- Institute:   Ruhr-Universitaet-Bochum
+                    Institut fuer Neuroinformatik
+ 
+ ----- File:        Cone.h
+ 
+ ----- Maintainer:  Hendrik Reimann
+ ------Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 10 29
+ 
+ ----- Description: visualization for a cone
+ 
+ ----- Credits:     
+ ---------------------------------------------------------------------------------------------------------------------*/
 
-    File:        Viewer.h
-
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 28
-
-    Description: Simple viewer for visualizing a scene of objects
-
-    Credits:
-
-======================================================================================================================*/
-
-
-#ifndef CEDAR_AUX_GL_VIEWER_H
-#define CEDAR_AUX_GL_VIEWER_H
+#ifndef CEDAR_AUX_GL_CONE_H
+#define CEDAR_AUX_GL_CONE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/namespace.h"
-#include "auxiliaries/gl/Scene.h"
+#include "namespace.h"
+#include "Object.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGLViewer/qglviewer.h>
-#include <QList>
 
-class cedar::aux::gl::Viewer : public QGLViewer
+class cedar::aux::gl::Cone : public cedar::aux::gl::Object
 {
-private:
-  
-	Q_OBJECT
-  
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief the constructor */
-	Viewer(cedar::aux::gl::Scene* scene);
+  /*!@brief standard constructor. 
+   * @param name    identifier of the instance, should be unique
+   */
+	Cone(cedar::aux::ObjectPtr pObject);
 
-  /*!@brief the constructor */
-	~Viewer();
-
+  /*!@brief constructor. 
+   * @param name    identifier of the instance, should be unique
+   * @param radius    radius of the cone
+   * @param height    height of the cone
+   * @param R    color, value for red channel in RGB
+   * @param G    color, value for green channel in RGB
+   * @param B    color, value for blue channel in RGB
+   */
+  Cone(
+        cedar::aux::ObjectPtr pObject,
+        const double radius,
+        const double height,
+        const double R=1,
+        const double G=0,
+        const double B=0
+      );
+  
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief draws all objects in the scene */
+  //!@brief draws a visualization of the object in the current GL context
 	void draw();
 
-  /*!@brief function being called automatically when a timer is up, usually in a loop */
-	void timerEvent(QTimerEvent* pEvent);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  /*!@brief initialization */
-  void init();
+  /*!@brief set radius of the cone at the base
+   * @param value    new radius
+   */
+  void setRadius(double value);
+	
+  /*!@brief set height of the cone, i.e. distance from base to tip
+   * @param value    new height
+   */
+  void setHeight(double value);
+	
+  /*!@brief get radius of the cone at the base
+   * @return    radius
+   */
+  double radius();
+	
+  /*!@brief get height of the cone, i.e. distance from base to tip
+   * @return    height
+   */
+  double height();
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  cedar::aux::gl::Scene* mpScene;
-
+private:
+	double mRadius;
+  double mHeight;
 };
 
-#endif  // CEDAR_AUX_GL_VIEWER_H
+#endif // CEDAR_AUX_GL_CONE_H

@@ -76,7 +76,7 @@ public:
   /*! @brief Returns a pointer to the component with the name @em componentName.
    *
    * @return Pointer to the requested component.
-   * @param[in] componentName Name of the component that is to be returned.
+   * @param[in] rComponentName Name of the component that is to be returned.
    */
   ComponentPtr& getComponent(const std::string& rComponentName);
 
@@ -98,7 +98,7 @@ protected:
 private:
   /*! @brief Checks if a component with the supplied @em rComponentName exists within the robot.
    *
-   * @param[in] componentName Name of the subcomponent we need to check.
+   * @param[in] rComponentName Name of the subcomponent we need to check.
    */
   bool isComponentAvailable(const std::string& rComponentName) const;
 
@@ -121,7 +121,7 @@ public:
 protected:
   //! map of pointers to all sub components
   std::map<std::string, ComponentPtr> mComponents;
-  //!< names of all components and their corresponding sub-components
+  //! names of all components and their corresponding sub-components
   std::map<std::string, std::set<std::string> > _mSubComponentNames;
 
 private:

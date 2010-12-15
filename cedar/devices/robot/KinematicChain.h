@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "devices/robot/namespace.h"
 #include "devices/robot/Component.h"
+#include "auxiliaries/LoopedThread.h"
 
 // PROJECT INCLUDES
 
@@ -54,86 +55,192 @@
  *
  * More detailed description of the class.
  */
-class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component
+class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
 {
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
   // macros
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
   // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain();
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  //!@brief constructor
+  KinematicChain(const std::string& configFileName);
   //!@brief destructor
   virtual ~KinematicChain() = 0;
 
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
   // public methods
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 public:
+  /*!@brief get reference geometry for this kinematic chain
+   *
+   * @return    reference geometry
+   */
   const ReferenceGeometryPtr& getReferenceGeometry() const;
-  const unsigned int getNumberOfJoints() const;
+
+  /*!@brief get number of joints in this kinematic chain
+   *
+   * @return    number of joints
+   */
+  unsigned int getNumberOfJoints() const;
+
+  /*!@brief set a new reference geometry
+   *
+   * @param geometry    new reference geometry
+   */
   void setReferenceGeometry(const ReferenceGeometryPtr& geometry);
 
-  virtual const double getJointAngle(const unsigned int index) const = 0;
-  virtual const std::vector<double> getJointAngles() const = 0;
-  virtual const cv::Mat getJointAnglesMatrix() const = 0;
+  /*!@brief get current state of a single joint angle
+   *
+   * @return    joint angle value
+   */
+  virtual double getJointAngle(unsigned int index) const = 0;
 
-  virtual const double getJointVelocity(const unsigned int index) const;
-  virtual const std::vector<double> getJointVelocities() const;
-  virtual const cv::Mat getJointVelocitiesMatrix() const;
+  /*!@brief get current state of all joint angles
+   *
+   * @param index    specifies the joint
+   * @return    vector of joint angles
+   */
+  virtual std::vector<double> getJointAngles() const = 0;
 
-  virtual const double getJointAcceleration(const unsigned int index) const;
-  virtual const std::vector<double> getJointAccelerations() const;
-  virtual const cv::Mat getJointAccelerationMatrix() const;
+  /*!@brief get current state of all joint angles
+   *
+   * @return    vector of joint angles
+   */
+  virtual cv::Mat getJointAnglesMatrix() const = 0;
 
-  virtual void setJointAngle(const unsigned int index, const double angle) = 0;
+  /*!@brief get current state of a single joint velocity
+   *
+   * @return    joint velocity value
+   */
+  virtual double getJointVelocity(unsigned int index) const;
+
+  /*!@brief get current state of all joint velocities
+   *
+   * @param index    specifies the joint
+   * @return    vector of joint velocities
+   */
+  virtual std::vector<double> getJointVelocities() const;
+
+  /*!@brief get current state of all joint velocities
+   *
+   * @param index    specifies the joint
+   * @return    vector of joint velocities
+   */
+  virtual cv::Mat getJointVelocitiesMatrix() const;
+
+  /*!@brief get current state of a single joint acceleration
+   *
+   * @return    joint acceleration value
+   */
+  virtual double getJointAcceleration(unsigned int index) const;
+
+  /*!@brief get current state of all joint accelerations
+   *
+   * @param index    specifies the joint
+   * @return    vector of joint accelerations
+   */
+  virtual std::vector<double> getJointAccelerations() const;
+
+  /*!@brief get current state of all joint accelerations
+   *
+   * @return    vector of joint accelerations
+   */
+  virtual cv::Mat getJointAccelerationsMatrix() const;
+
+  /*!@brief set current state of a single joint angle
+   *
+   * @param index    specifies the joint
+   * @param angle    new joint angle value
+   */
+  virtual void setJointAngle(unsigned int index, double angle) = 0;
+
+  /*!@brief set current state of all joint angles
+   *
+   * @param angleMatrix    vector of new joint angle values
+   */
   virtual void setJointAngles(const cv::Mat& angleMatrix) = 0;
+
+  /*!@brief set current state of all joint angles
+   *
+   * @param angles    vector of new joint angle values
+   */
   virtual void setJointAngles(const std::vector<double>& angles) = 0;
 
-  virtual void setJointVelocity(const unsigned int index, const double velocity);
+  /*!@brief set current state of a single joint velocity
+   *
+   * @param index    specifies the joint
+   * @param velocity    new joint velocity value
+   */
+  virtual void setJointVelocity(unsigned int index, double velocity);
+
+  /*!@brief set current state of all joint velocities
+   *
+   * @param velocities    vector of new joint velocity values
+   */
   virtual void setJointVelocities(const cv::Mat& velocities);
+
+  /*!@brief set current state of all joint velocities
+   *
+   * @param velocities    vector of new joint velocity values
+   */
   virtual void setJointVelocities(const std::vector<double>& velocities);
 
-  virtual void setJointAcceleration(const unsigned int index, const double velocity);
-  virtual void setJointAccelerations(const cv::Mat& velocities);
-  virtual void setJointAccelerations(const std::vector<double>& velocities);
+  /*!@brief set current state of a single joint acceleration
+   *
+   * @param index    specifies the joint
+   * @param acceleration    new joint acceleration value
+   */
+  virtual void setJointAcceleration(unsigned int index, double acceleration);
 
-  //--------------------------------------------------------------------------------------------------------------------
+  /*!@brief set current state of all joint velocities
+   *
+   * @param accelerations    vector of new joint velocity values
+   */
+  virtual void setJointAccelerations(const cv::Mat& accelerations);
+
+  /*!@brief set current state of all joint velocities
+   *
+   * @param accelerations    vector of new joint velocity values
+   */
+  virtual void setJointAccelerations(const std::vector<double>& accelerations);
+
+  //----------------------------------------------------------------------------
   // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+protected:
+
+  //----------------------------------------------------------------------------
+  // private methods
+  //----------------------------------------------------------------------------
+private:
+  void step(double time);
+
+  //----------------------------------------------------------------------------
+  // parameters
+  //----------------------------------------------------------------------------
+public:
+  // none yet
 protected:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
 
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
   // members
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
 protected:
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
-  unsigned int mNumberOfJoints;
-
 private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
-private:
-  // none yet
+  std::vector<double> mJointVelocities;
+  std::vector<double> mJointAccelerations;
+  std::vector<ActionType> mJointWorkingModes;
 
 }; // class cedar::dev::robot::KinematicChain
 
