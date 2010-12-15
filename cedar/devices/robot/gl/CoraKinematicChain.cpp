@@ -70,7 +70,7 @@ gl::CoraKinematicChain::~CoraKinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 
 void gl::CoraKinematicChain::setMaterial(int material)
-{/*
+{
   switch (material)
   {
   case NO_MATERIAL:
@@ -80,17 +80,17 @@ void gl::CoraKinematicChain::setMaterial(int material)
     break;
   case LIGHT_BLUE_METAL:
     glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mLighterBlueMetal_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mLighterBlueMetal_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mLighterBlueMetal_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mLighterBlueMetal_Shininess);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mLightBlueMetal_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mLightBlueMetal_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mLightBlueMetal_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mLightBlueMetal_Shininess);
     break;
   case DARK_BLUE_METAL:
     glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mDarkerBlueMetal_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mDarkerBlueMetal_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mDarkerBlueMetal_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mDarkerBlueMetal_Shininess);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mDarkBlueMetal_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mDarkBlueMetal_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mDarkBlueMetal_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mDarkBlueMetal_Shininess);
     break;
   case BRASS:
     glDisable(GL_COLOR_MATERIAL);
@@ -128,7 +128,6 @@ void gl::CoraKinematicChain::setMaterial(int material)
     glMaterialfv(GL_FRONT, GL_SHININESS, mChrome_Shininess);
     break;
   }
-*/
 }
 
 
