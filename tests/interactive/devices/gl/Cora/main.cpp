@@ -83,15 +83,15 @@ int main(int argc, char **argv)
 
   // create a widget to control the scene
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
-//  p_scene_widget->show();
+  p_scene_widget->show();
 
-  p_test_arm->setJointAcceleration(0, .03);
-  p_test_arm->setJointAcceleration(1, -.045);
-  p_test_arm->setJointAcceleration(2, -.015);
-  p_test_arm->setJointAcceleration(3, .025);
-  p_test_arm->setJointAcceleration(4, .01);
-  p_test_arm->setJointAcceleration(5, -.015);
-  p_test_arm->setJointAcceleration(6, -.011);
+  p_test_arm->setJointAcceleration(0, .003);
+  p_test_arm->setJointAcceleration(1, -.0045);
+  p_test_arm->setJointAcceleration(2, -.0015);
+  p_test_arm->setJointAcceleration(3, .0025);
+  p_test_arm->setJointAcceleration(4, .001);
+  p_test_arm->setJointAcceleration(5, -.0015);
+  p_test_arm->setJointAcceleration(6, -.0011);
   p_test_arm->setJointAcceleration(7, .005);
 
   p_test_arm->start();
