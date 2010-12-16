@@ -266,15 +266,15 @@ void KinematicChain::step(double time)
 
     case VELOCITY:
       angles = getJointAnglesMatrix();
-      angles = angles.mul( getJointVelocitiesMatrix(), time / 1000.0 );
+      angles += angles.mul( getJointVelocitiesMatrix(), time / 1000.0 );
       setJointAngles(angles);
       break;
 
     case ACCELERATION:
       velocities = getJointVelocitiesMatrix();
-      velocities = velocities.mul( getJointAccelerationsMatrix(), time / 1000.0 );
+      velocities += velocities.mul( getJointAccelerationsMatrix(), time / 1000.0 );
       angles = getJointAnglesMatrix();
-      angles = angles.mul( velocities, time / 1000.0 );
+      angles += angles.mul( velocities, time / 1000.0 );
       setJointVelocities(velocities);
       setJointAngles(angles);
       break;
