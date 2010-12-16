@@ -49,6 +49,45 @@ using namespace cedar::dev::robot::gl;
 //using namespace std;
 //using namespace cv;
 
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mNoSpecular[3] = {0.0, 0.0, 0.0};
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mDarkBlueMetal_Ambient[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::CoraKinematicChain::mDarkBlueMetal_Diffuse[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::CoraKinematicChain::mDarkBlueMetal_Specular[3] = {0.1, 0.175, 0.35};
+const float cedar::dev::robot::gl::CoraKinematicChain::mDarkBlueMetal_Shininess[1] = {1.0};
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mLightBlueMetal_Ambient[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::CoraKinematicChain::mLightBlueMetal_Diffuse[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::CoraKinematicChain::mLightBlueMetal_Specular[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::CoraKinematicChain::mLightBlueMetal_Shininess[1] = {1.0};
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mBrass_Ambient[3] = {0.329412, 0.223529, 0.027451};
+const float cedar::dev::robot::gl::CoraKinematicChain::mBrass_Diffuse[3] = {0.780392, 0.568627, 0.113725};
+const float cedar::dev::robot::gl::CoraKinematicChain::mBrass_Specular[3] = {0.992157, 0.941176, 0.807843};
+const float cedar::dev::robot::gl::CoraKinematicChain::mBrass_Shininess[1] = {0.81794872};
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mArtificialSkin_Ambient[3] = {0.2, 0.2, 0.2 };
+const float cedar::dev::robot::gl::CoraKinematicChain::mArtificialSkin_Diffuse[3] = {0.01, 0.01, 0.01};
+const float cedar::dev::robot::gl::CoraKinematicChain::mArtificialSkin_Specular[3] = {0.04, 0.04, 0.04};
+const float cedar::dev::robot::gl::CoraKinematicChain::mArtificialSkin_Shininess[1] = {0.078125};
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mWhitePlastic_Ambient[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::CoraKinematicChain::mWhitePlastic_Diffuse[3] = {0.5, 0.5, 0.5 };
+const float cedar::dev::robot::gl::CoraKinematicChain::mWhitePlastic_Specular[3] = {0.7, 0.7, 0.7 };
+const float cedar::dev::robot::gl::CoraKinematicChain::mWhitePlastic_Shininess[1] = {0.078125};
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mBlackMetal_Ambient[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::CoraKinematicChain::mBlackMetal_Diffuse[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::CoraKinematicChain::mBlackMetal_Specular[3] = {0.4 , 0.4 , 0.4};
+const float cedar::dev::robot::gl::CoraKinematicChain::mBlackMetal_Shininess[1] = {0.678125};
+
+const float cedar::dev::robot::gl::CoraKinematicChain::mChrome_Ambient[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::CoraKinematicChain::mChrome_Diffuse[3] = {0.5, 0.5, 0.5 };
+const float cedar::dev::robot::gl::CoraKinematicChain::mChrome_Specular[3] = {0.7, 0.7, 0.7 };
+const float cedar::dev::robot::gl::CoraKinematicChain::mChrome_Shininess[1] = {0.078125};
+//! \todo disambiguate white plastic from chrome
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------

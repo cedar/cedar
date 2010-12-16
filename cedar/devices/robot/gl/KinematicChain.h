@@ -93,7 +93,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-private:
+protected:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
   cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
   
