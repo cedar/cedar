@@ -57,6 +57,12 @@ namespace cedar
       {
         class KinematicChain;
         typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
+
+        class CoraKinematicChain;
+        typedef boost::shared_ptr<CoraKinematicChain> CoraKinematicChainPtr;
+
+        class CoraArm;
+        typedef boost::shared_ptr<CoraArm> CoraArmPtr;
       }
     }
   }
