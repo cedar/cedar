@@ -203,7 +203,7 @@ namespace cedar
                         bool wireFrame=false
                       );
 
-      /*@\todo comment this function*/
+      /*!\todo comment this function*/
       void drawAxes(double length);
     };
   };
