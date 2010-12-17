@@ -202,6 +202,9 @@ namespace cedar
                         int stacks,
                         bool wireFrame=false
                       );
+
+      /*@\todo comment this function*/
+      void drawAxes(double length);
     };
   };
 };
