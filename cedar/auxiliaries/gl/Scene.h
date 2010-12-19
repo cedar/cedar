@@ -48,6 +48,12 @@
 #include <string>
 #include <QList>
 
+/*!@brief This class visualizes several objects in the same environment
+ *
+ * An instance of this class manages pointers to several instances of gl::Object.
+ *
+ * @remarks To get a simple visualization of the Objects in the scene, create a aux::gui::Viewer for it
+ */
 class cedar::aux::gl::Scene
 {
 public:

@@ -44,6 +44,13 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief Simple OpenGL visualization of a torus around a circle
+ *
+ * This class visualizes an instance of cedar::aux::Object as a torus with specified dimensions
+ *
+ * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
+ */
 class cedar::aux::gl::Torus : public cedar::aux::gl::Object
 {
 public:

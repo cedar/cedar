@@ -44,6 +44,13 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief Simple OpenGL visualization of a prism with a equilateral triangle as base
+ *
+ * This class visualizes an instance of cedar::aux::Object as a prism with specified dimensions
+ *
+ * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
+ */
 class cedar::aux::gl::Prism : public cedar::aux::gl::Object
 {
 public:
@@ -107,7 +114,5 @@ private:
   
   double mHeight;
 };
-
-
 
 #endif // CEDAR_AUX_GL_PRISM_H

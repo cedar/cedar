@@ -49,6 +49,14 @@
 #include <QGLViewer/qglviewer.h>
 #include <QList>
 
+/*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
+ *
+ * Use this class to draw instances of classes inherited from cedar::aux::gl::Object. This viewer has freely movable
+ * camera position and other perks, coming from QGLViewer.
+ *
+ * @remarks To visualize an object, add it to an instance of cedar::aux::gl::Scene, then create a Viewer for this Scene
+ *
+ */
 class cedar::aux::gui::Viewer : public QGLViewer
 {
 private:

@@ -54,6 +54,9 @@
 #include <QObject>
 #include <QGLViewer/qglviewer.h>
 
+/*!@brief Base class for simple OpenGL visualizations of geometric objects
+ *
+ */
 class cedar::aux::gl::Object : public QObject
 {
 private:
