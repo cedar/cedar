@@ -56,7 +56,7 @@ Object::Object(cedar::aux::ObjectPtr pObject)
 mpObject(pObject),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
-	init();
+  init();
 }
 
 Object::~Object()
@@ -67,12 +67,12 @@ Object::~Object()
 void Object::init()
 {
   mObjectType = std::string("no type");
-	mIsVisible = true;
-	mIsDrawnAsWireFrame = false;
-	mResolution = 10;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
+  mIsVisible = true;
+  mIsDrawnAsWireFrame = false;
+  mResolution = 10;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

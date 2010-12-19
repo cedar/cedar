@@ -58,12 +58,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Chessboard(cedar::aux::ObjectPtr pObject);
+  Chessboard(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param length    extension of the board in x-direction of the object coordinate frame
    * @param width    extension of the board in y-direction of the object coordinate frame
    * @param height    extension of the board in z-direction of the object coordinate frame
@@ -76,8 +76,8 @@ public:
    * @param G2    second color, value for green channel in RGB
    * @param B2    second color, value for blue channel in RGB
    */
-	Chessboard(
-        	    cedar::aux::ObjectPtr pObject,
+  Chessboard(
+              cedar::aux::ObjectPtr pObject,
               const double length,
               const double width,
               const double height,
@@ -96,18 +96,18 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
   
   /*!@brief set extension of the board in x-direction of the object coordinate frame
    * @param value    new extension value
    */
-	void setLength(double value);
-	
+  void setLength(double value);
+
   /*!@brief set extension of the board in y-direction of the object coordinate frame
    * @param value    new extension value
    */
   void setWidth(double value);
-	
+
   /*!@brief set extension of the board in z-direction of the object coordinate frame
    * @param value    new extension value
    */
@@ -122,24 +122,24 @@ public:
    * @param value    new extension value
    */
   void setNumberOfColumns(int value);
-	
+
   /*!@brief sets the secondary color of the board, in RGB
    * @param R    value for red channel in RGB color
    * @param G    value for green channel in RGB color
    * @param B    value for blue channel in RGB color
    */
   void setSecondColor(double R, double G, double B);
-	
+
   /*!@brief get extension of the board in x-direction of the object coordinate frame
    * @return    extension value
    */
   double length();
-	
+
   /*!@brief get extension of the board in y-direction of the object coordinate frame
    * @return    extension value
    */
   double width();
-	
+
   /*!@brief get extension of the board in z-direction of the object coordinate frame
    * @return    extension value
    */
@@ -168,7 +168,7 @@ public:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	double mLength;
+  double mLength;
   
   double mWidth;
   

@@ -57,13 +57,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+  /*!@brief standard constructor.
+   * @param pObject    pointer to the aux::Object being visualized
    */
 	Pyramid(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param length    extension of the pyramid's base in x-direction of object coordinate frame
    * @param width    extension of the pyramid's base in y-direction of object coordinate frame
    * @param height    height of the pyramid, i.e. distance from base to tip

@@ -58,12 +58,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Prism(cedar::aux::ObjectPtr pObject);
+  Prism(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param width    edge length of the prism's triangular base
    * @param height    height of the prism, i.e. distance between floor (=base) and ceiling
    * @param R    color, value for red channel in RGB
@@ -84,23 +84,23 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set edge length of the prism's triangular base
    * @param value    new edge length value
    */
-	void setWidth(double value);
-	
+  void setWidth(double value);
+
   /*!@brief set height of the prism, i.e. distance between floor (=base) and ceiling
    * @param value    new height value
    */
   void setHeight(double value);
-	
+
   /*!@brief get edge length of the prism's triangular base
    * @return    edge length value
    */
   double width();
-	
+
   /*!@brief get height of the prism, i.e. distance between floor (=base) and ceiling
    * @return    height value
    */

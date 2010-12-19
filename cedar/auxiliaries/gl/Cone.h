@@ -58,12 +58,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Cone(cedar::aux::ObjectPtr pObject);
+  Cone(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param radius    radius of the cone
    * @param height    height of the cone
    * @param R    color, value for red channel in RGB
@@ -84,23 +84,23 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set radius of the cone at the base
    * @param value    new radius
    */
   void setRadius(double value);
-	
+
   /*!@brief set height of the cone, i.e. distance from base to tip
    * @param value    new height
    */
   void setHeight(double value);
-	
+
   /*!@brief get radius of the cone at the base
    * @return    radius
    */
   double radius();
-	
+
   /*!@brief get height of the cone, i.e. distance from base to tip
    * @return    height
    */
@@ -110,7 +110,7 @@ public:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	double mRadius;
+  double mRadius;
   double mHeight;
 };
 

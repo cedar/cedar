@@ -57,13 +57,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+  /*!@brief standard constructor.
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Sphere(cedar::aux::ObjectPtr pObject);
+  Sphere(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param radius    radius of the sphere
    * @param R    color, value for red channel in RGB
    * @param G    color, value for green channel in RGB
@@ -82,13 +82,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set radius of the sphere
    * @param value    new radius
    */
-	void setRadius(double value);
-	
+  void setRadius(double value);
+
   /*!@brief get radius of the sphere
    * @return    radius
    */
@@ -98,7 +98,7 @@ public:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	double mRadius;
+  double mRadius;
 };
 
 #endif // CEDAR_AUX_GL_SPHERE_H
