@@ -100,6 +100,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief encodes the different materials of CoRA
   enum MaterialType {
                       NO_MATERIAL,
                       DARK_BLUE_METAL,
@@ -111,45 +112,71 @@ protected:
                       CHROME
                     };
 
+  //!@brief material information
   static const float mNoSpecular[3];
 
+  //!@brief material information
   static const float mDarkBlueMetal_Ambient[3];
+  //!@brief material information
   static const float mDarkBlueMetal_Diffuse[3];
+  //!@brief material information
   static const float mDarkBlueMetal_Specular[3];
+  //!@brief material information
   static const float mDarkBlueMetal_Shininess[1];
 
+  //!@brief material information
   static const float mLightBlueMetal_Ambient[3];
+  //!@brief material information
   static const float mLightBlueMetal_Diffuse[3];
+  //!@brief material information
   static const float mLightBlueMetal_Specular[3];
+  //!@brief material information
   static const float mLightBlueMetal_Shininess[1];
 
+  //!@brief material information
   static const float mBrass_Ambient[3];
+  //!@brief material information
   static const float mBrass_Diffuse[3];
+  //!@brief material information
   static const float mBrass_Specular[3];
+  //!@brief material information
   static const float mBrass_Shininess[1];
 
+  //!@brief material information
   static const float mArtificialSkin_Ambient[3];
+  //!@brief material information
   static const float mArtificialSkin_Diffuse[3];
+  //!@brief material information
   static const float mArtificialSkin_Specular[3];
+  //!@brief material information
   static const float mArtificialSkin_Shininess[1];
 
+  //!@brief material information
   static const float mWhitePlastic_Ambient[3];
+  //!@brief material information
   static const float mWhitePlastic_Diffuse[3];
+  //!@brief material information
   static const float mWhitePlastic_Specular[3];
+  //!@brief material information
   static const float mWhitePlastic_Shininess[1];
 
+  //!@brief material information
   static const float mBlackMetal_Ambient[3];
+  //!@brief material information
   static const float mBlackMetal_Diffuse[3];
+  //!@brief material information
   static const float mBlackMetal_Specular[3];
+  //!@brief material information
   static const float mBlackMetal_Shininess[1];
 
+  //!@brief material information
   static const float mChrome_Ambient[3];
+  //!@brief material information
   static const float mChrome_Diffuse[3];
+  //!@brief material information
   static const float mChrome_Specular[3];
+  //!@brief material information
   static const float mChrome_Shininess[1];
-
-private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

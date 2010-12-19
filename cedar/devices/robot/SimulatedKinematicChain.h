@@ -76,16 +76,15 @@ public:
   
   /*!@brief get current state of all joint angles
    *
-   * @param index    specifies the joint
    * @return    vector of joint angles
    */
-  std::vector<double> getJointAngles(void) const;
+  std::vector<double> getJointAngles() const;
   
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  cv::Mat getJointAnglesMatrix(void) const;
+  cv::Mat getJointAnglesMatrix() const;
   
   /*!@brief set current state of a single joint angle
    *

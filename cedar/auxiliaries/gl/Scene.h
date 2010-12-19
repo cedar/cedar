@@ -87,7 +87,7 @@ public:
   double getSceneLimit();
   
   /*!@brief adds an object to the scene
-   * @param pObject    pointer to the object
+   * @param rpObject    pointer to the object
    * @return    index of the object in the scene
    */
   int addObject(cedar::aux::gl::ObjectPtr& rpObject);

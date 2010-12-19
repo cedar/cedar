@@ -56,12 +56,15 @@ namespace cedar
       namespace gl
       {
         class KinematicChain;
+        //!@brief smart pointer for KinematicChain
         typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
 
         class CoraKinematicChain;
+        //!@brief smart pointer for CoraKinematicChain
         typedef boost::shared_ptr<CoraKinematicChain> CoraKinematicChainPtr;
 
         class CoraArm;
+        //!@brief smart pointer for CoraArm
         typedef boost::shared_ptr<CoraArm> CoraArmPtr;
       }
     }
