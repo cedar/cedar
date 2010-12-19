@@ -62,12 +62,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Block(cedar::aux::ObjectPtr pObject);
+  Block(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param length    extension of the block in x-direction of the object coordinate frame
    * @param width    extension of the block in y-direction of the object coordinate frame
    * @param height    extension of the block in z-direction of the object coordinate frame
@@ -75,8 +75,8 @@ public:
    * @param G    color, value for green channel in RGB
    * @param B    color, value for blue channel in RGB
    */
-	Block(
-    	   cedar::aux::ObjectPtr pObject,
+  Block(
+         cedar::aux::ObjectPtr pObject,
          const double length,
          const double width,
          const double height,
@@ -90,33 +90,33 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set extension of the block in x-direction of the object coordinate frame
    * @param value    new extension value
    */
-	void setLength(double value);
-	
+  void setLength(double value);
+
   /*!@brief set extension of the block in y-direction of the object coordinate frame
    * @param value    new extension value
    */
   void setWidth(double value);
-	
+
   /*!@brief set extension of the block in z-direction of the object coordinate frame
    * @param value    new extension value
    */
   void setHeight(double value);
-	
+
   /*!@brief get extension of the block in x-direction of the object coordinate frame
    * @return    extension value
    */
   double length();
-	
+
   /*!@brief get extension of the block in y-direction of the object coordinate frame
    * @return    extension value
    */
   double width();
-	
+
   /*!@brief get extension of the block in z-direction of the object coordinate frame
    * @return    extension value
    */
@@ -126,7 +126,7 @@ public:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	double mLength;
+  double mLength;
   
   double mWidth;
   

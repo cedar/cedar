@@ -53,12 +53,12 @@ Torus::Torus(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = 3;
-	mThickness = .5;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Torus";
+  mRadius = 3;
+  mThickness = .5;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Torus";
 }
 
 Torus::Torus(
@@ -72,12 +72,12 @@ Torus::Torus(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = radius;
-	mThickness = thickness;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Torus";
+  mRadius = radius;
+  mThickness = thickness;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Torus";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,18 +106,18 @@ double Torus::thickness()
 
 void Torus::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw the Torus
-	if (mIsVisible)
-	{
-	  gl::setColor(mColorR, mColorG, mColorB);
-		drawTorus(mRadius, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
-	}
+  // draw the Torus
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawTorus(mRadius, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
+  }
 }

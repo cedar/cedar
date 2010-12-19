@@ -86,7 +86,7 @@ int Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
 //  {
 //    return false;
 //  }
-	mObjects.push_back(rpObject);
+  mObjects.push_back(rpObject);
   return mObjects.size() - 1;
 }
 
@@ -102,28 +102,28 @@ void Scene::clear()
 
 void Scene::draw()
 {
-	// save origin transformation to stack
-	glPushMatrix();
+  // save origin transformation to stack
+  glPushMatrix();
 
-	// draw all items in the scene
-	for (int i=0; i<mObjects.size(); i++)
-	{
-		mObjects[ i ]->draw();
-	}
+  // draw all items in the scene
+  for (int i=0; i<mObjects.size(); i++)
+  {
+    mObjects[ i ]->draw();
+  }
   
   // return to origin transformation
-	glPopMatrix();
+  glPopMatrix();
   
-	// draw the floor
-	if (mIsDrawingFloor)
+  // draw the floor
+  if (mIsDrawingFloor)
   {
-		// Draw the ground
-		glColor3f(1.0, 1.0, 1.0);
-		const float numberOfPatches = 100;
-		glNormal3f(0.0, 0.0, 1.0);
-		for (int j=0; j<numberOfPatches; ++j)
+    // Draw the ground
+    glColor3f(1.0, 1.0, 1.0);
+    const float numberOfPatches = 100;
+    glNormal3f(0.0, 0.0, 1.0);
+    for (int j=0; j<numberOfPatches; ++j)
     {
-			glBegin(GL_QUAD_STRIP);
+      glBegin(GL_QUAD_STRIP);
         for (int i=0; i<=numberOfPatches; ++i)
         {
           glVertex2f(
@@ -135,9 +135,9 @@ void Scene::draw()
                       (mSceneLimit*2*(j+1)/numberOfPatches-mSceneLimit)
                     );
         }
-			glEnd();
-		}
-	}
+      glEnd();
+    }
+  }
 }
 
 int Scene::numberOfObjects()
@@ -162,21 +162,21 @@ void Scene::initGl()
   glEnable(GL_AUTO_NORMAL);
 
   //!\todo this somehow sets the light relative to the camera, which might not be wanted. check!
-	// set light
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+  // set light
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
   
-	// Create light components
-	GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-	GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
-	GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
-	GLfloat position[] = { -0.5f, 1.0f, -1.0f, 1.0f };
+  // Create light components
+  GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+  GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+  GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+  GLfloat position[] = { -0.5f, 1.0f, -1.0f, 1.0f };
   
-	// Assign created components to GL_LIGHT0
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-	glLightfv(GL_LIGHT0, GL_POSITION, position);
+  // Assign created components to GL_LIGHT0
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
+  glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
 void Scene::init()

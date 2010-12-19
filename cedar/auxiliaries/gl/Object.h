@@ -137,24 +137,28 @@ public slots:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief geometric type of the object
   std::string mObjectType;
 
+  //!@brief the object will only be drawn if this is true
   bool mIsVisible;
+  //!@brief determines if the object is drawn with full surfaces or as wire frame only
   bool mIsDrawnAsWireFrame;
-  int mResolution; // determines how nice the image is drawn
+  //!@brief determines how well curves and surfaces are approximated (default 10)
+  int mResolution;
   
+  //!@brief object color in RGB, R channel
   double mColorR;
+  //!@brief object color in RGB, G channel
   double mColorG;
+  //!@brief object color in RGB, B channel
   double mColorB;
   
-  //!\todo remove when functionable in cedar::aux::Object
-//  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
-//  cv::Mat mOrientationAngles; // vector of Euler angles
-//  cv::Mat mTransformation; // rigid transformation to the object
-
+  //!@brief pointer to the geometric object that is visualized
   cedar::aux::ObjectPtr mpObject;
 
-  cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
+  //!@brief dummy matrix to hold the transpose of the current object transformation (it's what OpenGL needs)
+  cv::Mat mTransformationTranspose;
 };
 
 #endif  // CEDAR_AUX_GL_OBJECT_H

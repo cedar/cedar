@@ -53,17 +53,17 @@ Chessboard::Chessboard(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = 4;
-	mWidth = 4;
-	mHeight = 0.2;
+  mLength = 4;
+  mWidth = 4;
+  mHeight = 0.2;
   mNumberOfRows = 8;
   mNumberOfColumns = 8;
-	mColorR = 0;
-	mColorG = 0;
-	mColorB = 0;
-	mSecondColorR = 1;
-	mSecondColorG = 1;
-	mSecondColorB = 1;
+  mColorR = 0;
+  mColorG = 0;
+  mColorB = 0;
+  mSecondColorR = 1;
+  mSecondColorG = 1;
+  mSecondColorB = 1;
   mObjectType = "Chessboard";
 }
 
@@ -84,54 +84,54 @@ Chessboard::Chessboard(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = length;
-	mWidth = width;
-	mHeight = height;
+  mLength = length;
+  mWidth = width;
+  mHeight = height;
   mNumberOfRows = rows;
   mNumberOfColumns = cols;
-	mColorR = R1;
-	mColorG = G1;
-	mColorB = B1;
-	mSecondColorR = R2;
-	mSecondColorG = G2;
-	mSecondColorB = B2;
-	mObjectType = "Chessboard";
+  mColorR = R1;
+  mColorG = G1;
+  mColorB = B1;
+  mSecondColorR = R2;
+  mSecondColorG = G2;
+  mSecondColorB = B2;
+  mObjectType = "Chessboard";
 }
 
 void Chessboard::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw object
-	if (mIsVisible)
-	{
+  // draw object
+  if (mIsVisible)
+  {
     double l = mLength/mNumberOfRows;
     double w = mWidth/mNumberOfColumns;
-		glTranslated(l/2, w/2, 0);
-		for (int i=0; i < mNumberOfRows; i++)
-		{
+    glTranslated(l/2, w/2, 0);
+    for (int i=0; i < mNumberOfRows; i++)
+    {
       for (int j=0; j < mNumberOfColumns; j++)
       {
         if(((i+j) % 2) == 0)
         {
           gl::setColor(mColorR, mColorG, mColorB);
-				} 
-				else
-				{
+        }
+        else
+        {
           gl::setColor(mSecondColorR, mSecondColorG, mSecondColorB);
-				} // end if
-				drawBlock(l, w, mHeight, mIsDrawnAsWireFrame);
-				glTranslated(0, w, 0);
-			} // end for (cols)
-			glTranslated(l, -mWidth, 0);
-		} // end for (rows)
-	}
+        } // end if
+        drawBlock(l, w, mHeight, mIsDrawnAsWireFrame);
+        glTranslated(0, w, 0);
+      } // end for (cols)
+      glTranslated(l, -mWidth, 0);
+    } // end for (rows)
+  }
 }
 
 void Chessboard::setLength(double value)

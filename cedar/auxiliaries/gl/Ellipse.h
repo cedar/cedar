@@ -58,12 +58,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Ellipse(cedar::aux::ObjectPtr pObject);
+  Ellipse(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param length    extension of the ellipse in x-direction of the object frame
    * @param width    extension of the ellipse in y-direction of the object frame
    * @param thickness    distance of the walls to the ellipse
@@ -71,8 +71,8 @@ public:
    * @param G    color, value for green channel in RGB
    * @param B    color, value for blue channel in RGB
    */
-	Ellipse(
-  	       cedar::aux::ObjectPtr pObject,
+  Ellipse(
+           cedar::aux::ObjectPtr pObject,
            const double length,
            const double width,
            const double thickness,
@@ -86,33 +86,33 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set extension of the ellipse in x-direction of the object frame
    * @param value    new extension value
    */
   void setLength(double value);
-	
+
   /*!@brief set extension of the ellipse in y-direction of the object frame
    * @param value    new extension value
    */
   void setWidth(double value);
-	
+
   /*!@brief set distance of the walls to the ellipse
    * @param value    new thickness value
    */
   void setThickness(double value);
-	
+
   /*!@brief get extension of the ellipse in x-direction of the object frame
    * @return    extension value
    */
   double length();
-	
+
   /*!@brief get extension of the ellipse in y-direction of the object frame
    * @return    extension value
    */
   double width();
-	
+
   /*!@brief get distance of the walls to the ellipse
    * @return    thickness value
    */
@@ -122,10 +122,10 @@ public:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	double mLength;
-	
+  double mLength;
+
   double mWidth;
-	
+
   double mThickness;
 };
 

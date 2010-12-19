@@ -74,7 +74,7 @@ public:
   /*!@brief tells the scene whether a simple floor in the xy-plane should be drawn or not
    * @param state    truth value of 'floor being drawn'
    */
-	void drawFloor(bool state=true);
+  void drawFloor(bool state=true);
 
   /*!@brief sets a rough delimiter of the scene within which things are guaranteed to be visualized
    * @param value    new scene delimiter
@@ -127,13 +127,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief class initialization */
-	void init();
+  void init();
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	bool mIsDrawingFloor;
+  bool mIsDrawingFloor;
   double mSceneLimit;
   QList<cedar::aux::gl::ObjectPtr> mObjects;
 };
