@@ -96,13 +96,13 @@ public:
 
   /*!@brief get current state of a single joint angle
    *
+   * @param index    specifies the joint
    * @return    joint angle value
    */
   virtual double getJointAngle(unsigned int index) const = 0;
 
   /*!@brief get current state of all joint angles
    *
-   * @param index    specifies the joint
    * @return    vector of joint angles
    */
   virtual std::vector<double> getJointAngles() const = 0;
@@ -115,33 +115,32 @@ public:
 
   /*!@brief get current state of a single joint velocity
    *
+   * @param index    specifies the joint
    * @return    joint velocity value
    */
   virtual double getJointVelocity(unsigned int index) const;
 
   /*!@brief get current state of all joint velocities
    *
-   * @param index    specifies the joint
    * @return    vector of joint velocities
    */
   virtual std::vector<double> getJointVelocities() const;
 
   /*!@brief get current state of all joint velocities
    *
-   * @param index    specifies the joint
    * @return    vector of joint velocities
    */
   virtual cv::Mat getJointVelocitiesMatrix() const;
 
   /*!@brief get current state of a single joint acceleration
    *
+   * @param index    specifies the joint
    * @return    joint acceleration value
    */
   virtual double getJointAcceleration(unsigned int index) const;
 
   /*!@brief get current state of all joint accelerations
    *
-   * @param index    specifies the joint
    * @return    vector of joint accelerations
    */
   virtual std::vector<double> getJointAccelerations() const;
@@ -236,6 +235,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief geometry in reference configuration
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
 private:
   std::vector<double> mJointVelocities;
