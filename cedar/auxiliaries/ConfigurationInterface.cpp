@@ -216,7 +216,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<bool>* pMember,
+                                          std::vector<bool>* pMember,
                                           const std::string& name,
                                           const bool& defaultValue
                                         )
@@ -233,7 +233,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<bool>* pMember,
+                                          std::vector<bool>* pMember,
                                           const std::string& name,
                                           const std::vector<bool>& defaultValues
                                         )
@@ -253,7 +253,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<int>* pMember,
+                                          std::vector<int>* pMember,
                                           const std::string& name,
                                           const int& defaultValue
                                         )
@@ -271,7 +271,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<unsigned int>* pMember,
+                                          std::vector<unsigned int>* pMember,
                                           const std::string& name,
                                           const unsigned int& defaultValue
                                         )
@@ -289,7 +289,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<int>* pMember,
+                                          std::vector<int>* pMember,
                                           const std::string& name,
                                           const std::vector<int>& defaultValues
                                         )
@@ -310,7 +310,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<unsigned int>* pMember,
+                                          std::vector<unsigned int>* pMember,
                                           const std::string& name,
                                           const std::vector<unsigned int>& defaultValues
                                         )
@@ -331,7 +331,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<double>* pMember,
+                                          std::vector<double>* pMember,
                                           const std::string& name,
                                           const double& defaultValue
                                         )
@@ -348,7 +348,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<double>* pMember,
+                                          std::vector<double>* pMember,
                                           const std::string& name,
                                           const std::vector<double>& defaultValues
                                         )
@@ -368,7 +368,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<std::string>* pMember,
+                                          std::vector<std::string>* pMember,
                                           const std::string& name,
                                           const std::string& defaultValue
                                         )
@@ -385,7 +385,7 @@ int ConfigurationInterface::addParameter(
 }
 
 int ConfigurationInterface::addParameter(
-                                          vector<std::string>* pMember,
+                                          std::vector<std::string>* pMember,
                                           const std::string& name,
                                           const std::vector<std::string>& defaultValues
                                         )
@@ -892,7 +892,11 @@ const std::string& ConfigurationInterface::getConfigFileName() const
   return this->mConfigFileName;
 }
 
-void ConfigurationInterface::adjustVectorSize(void* pVector, const libconfig::Setting::Type type, Setting& element)
+void ConfigurationInterface::adjustVectorSize(
+                                               void* pVector,
+                                               const libconfig::Setting::Type type,
+                                               libconfig::Setting& element
+                                             )
 {
   switch (type)
   {

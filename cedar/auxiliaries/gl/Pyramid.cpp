@@ -53,13 +53,13 @@ Pyramid::Pyramid(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = 2;
-	mWidth = 3;
-	mHeight = 2;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Pyramid";
+  mLength = 2;
+  mWidth = 3;
+  mHeight = 2;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Pyramid";
 }
 
 Pyramid::Pyramid(
@@ -74,13 +74,13 @@ Pyramid::Pyramid(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = length;
-	mWidth = width;
-	mHeight = height;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Pyramid";
+  mLength = length;
+  mWidth = width;
+  mHeight = height;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Pyramid";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,20 +89,20 @@ cedar::aux::gl::Object(pObject)
 
 void Pyramid::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw object
-	if (mIsVisible)
-	{
-		gl::setColor(mColorR, mColorG, mColorB);
-		drawPyramid(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
-	}
+  // draw object
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawPyramid(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
+  }
 }
 
 void Pyramid::setLength(double value)

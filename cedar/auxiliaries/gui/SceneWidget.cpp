@@ -41,7 +41,7 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "SceneWidget.h"
+#include "auxiliaries/gui/SceneWidget.h"
 
 // PROJECT INCLUDES
 #include "auxiliaries/Object.h"
@@ -49,6 +49,7 @@
 // SYSTEM INCLUDES
 
 using namespace cedar::aux::gl;
+using namespace cedar::aux::gui;
 using namespace std;
 using namespace cv;
 

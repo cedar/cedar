@@ -37,8 +37,8 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gl/SceneWidget.h"
-#include "auxiliaries/gl/Viewer.h"
+#include "auxiliaries/gui/SceneWidget.h"
+#include "auxiliaries/gui/Viewer.h"
 #include "auxiliaries/gl/Block.h"
 #include "auxiliaries/gl/Sphere.h"
 #include "auxiliaries/gl/Cone.h"
@@ -54,6 +54,7 @@
 
 using namespace std;
 using namespace cedar::aux::gl;
+using namespace cedar::aux::gui;
 
 
 int main(int argc, char **argv)
@@ -74,7 +75,6 @@ int main(int argc, char **argv)
   // create a rectangular block and add it to the scene
   cedar::aux::ObjectPtr p_block_object(new cedar::aux::Object());
   p_block_object->setPosition(3, -3, 3);
-  p_block_object->setPosition(0, 0, 0);
   p_block_object->setName(std::string("Bernd the Block"));
   ObjectPtr p_block(new Block(p_block_object, 1, 2, 3, 0, 1, 0.5));
   p_scene->addObject(p_block);

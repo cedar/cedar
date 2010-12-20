@@ -112,6 +112,8 @@ protected:
   virtual void keyPressEvent(QKeyEvent* pEvent);
 
 signals:
+  /*!@brief This signal is triggered if a showEvent or hideEvent occurs.
+   */
   void visibilityChanged(bool);
 
 private:

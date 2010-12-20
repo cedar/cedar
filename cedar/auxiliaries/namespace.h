@@ -50,30 +50,38 @@
 
 namespace cedar
 {
-  /*@brief Namespace for all aux classes. */
+  /*!@brief Namespace for all aux classes. */
   namespace aux
   {
     class Base;
+    //!@brief smart pointer for Base
     typedef boost::shared_ptr<Base> BasePtr;
 
     class LoopedThread;
+    //!@brief smart pointer for LoopedThread
     typedef boost::shared_ptr<LoopedThread> LoopedThreadPtr;
 
     class ConfigurationInterface;
+    //!@brief smart pointer for ConfigurationInterface
     typedef boost::shared_ptr<ConfigurationInterface> ConfigurationInterfacePtr;
 
     class UserData;
+    //!@brief smart pointer for UserData
     typedef boost::shared_ptr<UserData> UserDataPtr;
 
     template <typename T>
     class IntervalData;
+    //!@brief smart pointer for IntervalData<double>
     typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;
+    //!@brief smart pointer for IntervalData<int>
     typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
 
     class LogFile;
+    //!@brief smart pointer for LogFile
     typedef boost::shared_ptr<LogFile> LogFilePtr;
 
     class Object;
+    //!@brief smart pointer for Object
     typedef boost::shared_ptr<Object> ObjectPtr;
 
     /*!@brief Template method that converts simple data types to a string.

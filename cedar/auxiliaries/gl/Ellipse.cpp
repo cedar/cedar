@@ -53,13 +53,13 @@ Ellipse::Ellipse(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = 2;
-	mWidth = 3;
-	mThickness = .3;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Ellipse";
+  mLength = 2;
+  mWidth = 3;
+  mThickness = .3;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Ellipse";
 }
 
 Ellipse::Ellipse(
@@ -74,13 +74,13 @@ Ellipse::Ellipse(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = length;
-	mWidth = width;
-	mThickness = thickness;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Ellipse";
+  mLength = length;
+  mWidth = width;
+  mThickness = thickness;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Ellipse";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,18 +119,18 @@ double Ellipse::thickness()
 
 void Ellipse::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw the Ellipse
-	if (mIsVisible)
-	{
-	  gl::setColor(mColorR, mColorG, mColorB);
-		drawEllipse(mWidth, mLength, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
-	}
+  // draw the Ellipse
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawEllipse(mWidth, mLength, mThickness, mResolution, mResolution, mIsDrawnAsWireFrame);
+  }
 }

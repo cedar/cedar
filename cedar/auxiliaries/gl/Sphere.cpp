@@ -53,11 +53,11 @@ Sphere::Sphere(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = 2;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Sphere";
+  mRadius = 2;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Sphere";
 }
 
 Sphere::Sphere(
@@ -70,11 +70,11 @@ Sphere::Sphere(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = radius;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Sphere";
+  mRadius = radius;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Sphere";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,18 +93,18 @@ double Sphere::radius()
 
 void Sphere::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
-	// draw the sphere
-	if (mIsVisible)
-	{
-	  gl::setColor(mColorR, mColorG, mColorB);
-		drawSphere(mRadius, mResolution*2, mResolution, mIsDrawnAsWireFrame);
-	}
+  // draw the sphere
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawSphere(mRadius, mResolution*2, mResolution, mIsDrawnAsWireFrame);
+  }
 }

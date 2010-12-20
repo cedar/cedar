@@ -50,6 +50,13 @@ template <typename T>
 class cedar::aux::IntervalData : public cedar::aux::UserData
 {
   public:
+    /*!@brief The default constructor of IntervalData.
+     *
+     * @param min    the left (included) border of the interval
+     * @param max    the right (included) border of the interval
+     * @param step    the step size of this interval (e.g. usable by SpinBoxes)
+     * @param isReadOnly    represented interval is read-only (doesn't affect a member)
+     */
     IntervalData(T min = 0, T max = 255, T step = 1, bool isReadOnly = false)
     {
       mMin = min;
