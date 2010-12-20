@@ -53,10 +53,6 @@ using namespace cv;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//KinematicChain::KinematicChain(KinematicChainModel* pKinematicChainModel)
-//{
-//  mpKinematicChainModel = pKinematicChainModel;
-//}
 gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
 cedar::aux::gl::Object(rpKinematicChainModel),
@@ -70,7 +66,11 @@ gl::KinematicChain::~KinematicChain()
   
 }
 
-void gl::KinematicChain::draw(void)
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void gl::KinematicChain::draw()
 {
   drawBase();
   for (unsigned int j=0; j<mpKinematicChainModel->getNumberOfJoints(); j++)
@@ -102,9 +102,12 @@ void gl::KinematicChain::drawBase()
 
   // draw the base
   glColor4d(mColorR, mColorG, mColorB, 0);
-  drawTorus(0.1, 0.015, mResolution, mResolution);
+  drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  drawDisk(0.0, 0.1, mResolution, mResolution);
+  glTranslatef(0.0, 0.0, 0.005);
+  drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+  glTranslatef(0.0, 0.0, -0.01);
+  drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
 }
 
 void gl::KinematicChain::drawSegment(unsigned int index)
@@ -152,7 +155,7 @@ void gl::KinematicChain::drawEndEffector()
   
 	// draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
-  drawSphere(.05, mResolution, mResolution);
+  drawSphere(.05, mResolution, mResolution, mIsDrawnAsWireFrame);
 }
 
 void gl::KinematicChain::drawEndEffectorVelocity()
@@ -163,7 +166,7 @@ void gl::KinematicChain::drawEndEffectorVelocity()
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
   cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition();
   cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorVelocity();
-  drawArrow<double>(from, to, 0.01, 0.03, 0.1, mResolution);
+  drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
 }
 
 void gl::KinematicChain::drawEndEffectorAcceleration()
@@ -174,5 +177,5 @@ void gl::KinematicChain::drawEndEffectorAcceleration()
   glColor4d(mColorR, mColorG, mColorB, 0);
   cv::Mat from = mpKinematicChainModel->calculateEndEffectorPosition() + mpKinematicChainModel->calculateEndEffectorVelocity();
   cv::Mat to = from + mpKinematicChainModel->calculateEndEffectorAcceleration();
-  drawArrow<double>(from, to, 0.01, 0.03, 0.1, mResolution);
+  drawArrow<double>(from, to, 0.005, 0.015, 0.05, mResolution);
 }

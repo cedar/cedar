@@ -53,12 +53,12 @@ Cylinder::Cylinder(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = 1;
-	mHeight = 2;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Cylinder";
+  mRadius = 1;
+  mHeight = 2;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Cylinder";
 }
 
 Cylinder::Cylinder(
@@ -72,12 +72,12 @@ Cylinder::Cylinder(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = radius;
-	mHeight = height;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Cylinder";
+  mRadius = radius;
+  mHeight = height;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Cylinder";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,24 +86,24 @@ cedar::aux::gl::Object(pObject)
 
 void Cylinder::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw object
-	if (mIsVisible)
-	{
-		gl::setColor(mColorR, mColorG, mColorB);
-		drawCone(-mHeight*0.5, mHeight*0.5, mRadius, mRadius, mResolution*2, mIsDrawnAsWireFrame);
-		glTranslated(0, 0, mHeight*-0.5);
-		drawDisk(0, mRadius, mResolution*2, mResolution, true, mIsDrawnAsWireFrame);
-		glTranslated(0, 0, mHeight);
-		drawDisk(0, mRadius, mResolution*2, mResolution, false, mIsDrawnAsWireFrame);
-	}
+  // draw object
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawCone(-mHeight*0.5, mHeight*0.5, mRadius, mRadius, mResolution*2, mIsDrawnAsWireFrame);
+    glTranslated(0, 0, mHeight*-0.5);
+    drawDisk(0, mRadius, mResolution*2, mResolution, true, mIsDrawnAsWireFrame);
+    glTranslated(0, 0, mHeight);
+    drawDisk(0, mRadius, mResolution*2, mResolution, false, mIsDrawnAsWireFrame);
+  }
 }
 
 void Cylinder::setRadius(double value)

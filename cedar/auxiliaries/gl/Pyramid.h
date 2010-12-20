@@ -44,19 +44,26 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief Simple OpenGL visualization of a pyramid with rectangular base
+ *
+ * This class visualizes an instance of cedar::aux::Object as a pyramid with specified dimensions
+ *
+ * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
+ */
 class cedar::aux::gl::Pyramid : public cedar::aux::gl::Object
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+  /*!@brief standard constructor.
+   * @param pObject    pointer to the aux::Object being visualized
    */
 	Pyramid(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param length    extension of the pyramid's base in x-direction of object coordinate frame
    * @param width    extension of the pyramid's base in y-direction of object coordinate frame
    * @param height    height of the pyramid, i.e. distance from base to tip
@@ -121,7 +128,5 @@ private:
   
   double mHeight;
 };
-
-
 
 #endif // CEDAR_AUX_GL_PYRAMID_H

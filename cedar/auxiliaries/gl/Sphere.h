@@ -44,19 +44,26 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief Simple OpenGL visualization of a sphere
+ *
+ * This class visualizes an instance of cedar::aux::Object as a sphere with specified dimensions
+ *
+ * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
+ */
 class cedar::aux::gl::Sphere : public cedar::aux::gl::Object
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+  /*!@brief standard constructor.
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Sphere(cedar::aux::ObjectPtr pObject);
+  Sphere(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param radius    radius of the sphere
    * @param R    color, value for red channel in RGB
    * @param G    color, value for green channel in RGB
@@ -75,13 +82,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set radius of the sphere
    * @param value    new radius
    */
-	void setRadius(double value);
-	
+  void setRadius(double value);
+
   /*!@brief get radius of the sphere
    * @return    radius
    */
@@ -91,7 +98,7 @@ public:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	double mRadius;
+  double mRadius;
 };
 
 #endif // CEDAR_AUX_GL_SPHERE_H
