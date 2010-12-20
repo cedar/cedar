@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,79 +22,102 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Viewer.h
+    File:        CoraArm.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 28
+    Date:        2010 12 14
 
-    Description: Simple viewer for visualizing a scene of objects
+    Description: header for a class visualizing the arm of CoRA
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_GUI_VIEWER_H
-#define CEDAR_AUX_GUI_VIEWER_H
+#ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+#define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/namespace.h"
+#include "devices/robot/gl/namespace.h"
+#include "devices/robot/gl/CoraKinematicChain.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/namespace.h"
-#include "auxiliaries/gl/Scene.h"
 
 // SYSTEM INCLUDES
-#include <QGLViewer/qglviewer.h>
-#include <QList>
 
-/*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
+
+/*!@brief Visualization of the CoRA arm
  *
- * Use this class to draw instances of classes inherited from cedar::aux::gl::Object. This viewer has freely movable
- * camera position and other perks, coming from QGLViewer.
- *
- * @remarks To visualize an object, add it to an instance of cedar::aux::gl::Scene, then create a Viewer for this Scene
- *
+ * This class provides a simple OpenGL visualization of the CoRA arm. It has to be provided with a pointer to an
+ * instance of KinematicChainModel of the CoRA arm, used to get the transformations to the joint coordinate frames.
+ * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
+ * for that scene (cedar::aux::gl::Viewer).
  */
-class cedar::aux::gui::Viewer : public QGLViewer
+class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::CoraKinematicChain
 {
-private:
-  
-	Q_OBJECT
-  
-public:
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief the constructor */
-  Viewer(cedar::aux::gl::ScenePtr& p_scene);
-
-  /*!@brief the constructor */
-  ~Viewer();
+public:
+  //!@brief constructor
+  CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  //!@brief destructor
+  ~CoraArm();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief draws all objects in the scene */
-  void draw();
+  // none yet
 
-  /*!@brief function being called automatically when a timer is up, usually in a loop */
-  void timerEvent(QTimerEvent* pEvent);
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief draws the base
+  void drawBase();
+
+  //!@brief draws the segment attached to the specified joint
+  void drawSegment(unsigned int index);
+
+  //!@brief draws the end-effector
+  void drawEndEffector();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief initialization */
-  void init();
-  
+  void drawLinkedModule(double size);
+
+  void drawTriangleLink(int link);
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-  cedar::aux::gl::ScenePtr const mpScene;
+public:
+  // none yet (hopefully never!)
+protected:
+  // none yet
+private:
+  // none yet
 
-};
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+  // none yet
 
-#endif  // CEDAR_AUX_GUI_VIEWER_H
+private:
+  // none yet
+
+}; // class cedar::dev::robot::gl::CoraArm
+
+#endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+

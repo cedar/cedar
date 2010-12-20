@@ -60,7 +60,6 @@ class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::Object
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-//	KinematicChain(KinematicChainModel* pKinematicChainModel);
   KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
   //!@brief destructor
   ~KinematicChain();
@@ -77,13 +76,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief draws the base
-  void drawBase();
+  virtual void drawBase();
 
   //!@brief draws the segment attached to the specified joint
-  void drawSegment(unsigned int index);
+  virtual void drawSegment(unsigned int index);
 
   //!@brief draws the end-effector
-  void drawEndEffector();
+  virtual void drawEndEffector();
 
   //!@brief draws the end-effector velocity vector
   void drawEndEffectorVelocity();
@@ -94,7 +93,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-private:
+protected:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
   cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
   

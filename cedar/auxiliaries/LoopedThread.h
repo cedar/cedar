@@ -230,6 +230,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief desired length of a single step, in milliseconds
   boost::posix_time::time_duration mStepSize;
 private:
   bool mStop;
