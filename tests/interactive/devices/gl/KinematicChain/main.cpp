@@ -86,11 +86,11 @@ int main(int argc, char **argv)
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::ACCELERATION);
-  p_test_arm->setJointAcceleration(0, 0.3);
-  p_test_arm->setJointAcceleration(1, -.045);
-  p_test_arm->setJointAcceleration(2, -.015);
-  p_test_arm->setJointAcceleration(3, .025);
+  p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  p_test_arm->setJointVelocity(0, 0.31);
+  p_test_arm->setJointVelocity(1, -.045);
+  p_test_arm->setJointVelocity(2, -.015);
+  p_test_arm->setJointVelocity(3, .025);
 
   p_test_arm->start();
   p_test_arm_model->startTimer(50.0);
