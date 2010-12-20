@@ -55,42 +55,47 @@ namespace cedar
     namespace gl
     {
       class Scene;
+      //!@brief smart pointer for Scene
       typedef boost::shared_ptr<Scene> ScenePtr;
 
-      class Viewer;
-      typedef boost::shared_ptr<Viewer> ViewerPtr;
-
       class Object;
+      //!@brief smart pointer for Object
       typedef boost::shared_ptr<Object> ObjectPtr;
 
-      class SceneWidget;
-      typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
-
       class Block;
+      //!@brief smart pointer for Block
       typedef boost::shared_ptr<Block> BlockPtr;
 
       class Sphere;
+      //!@brief smart pointer for Sphere
       typedef boost::shared_ptr<Sphere> SpherePtr;
 
       class Cone;
+      //!@brief smart pointer for Cone
       typedef boost::shared_ptr<Cone> ConePtr;
 
       class Cylinder;
+      //!@brief smart pointer for Cylinder
       typedef boost::shared_ptr<Cylinder> CylinderPtr;
 
       class Prism;
+      //!@brief smart pointer for Prism
       typedef boost::shared_ptr<Prism> PrismPtr;
 
       class Pyramid;
+      //!@brief smart pointer for Pyramid
       typedef boost::shared_ptr<Pyramid> PyramidPtr;
 
       class Torus;
+      //!@brief smart pointer for Torus
       typedef boost::shared_ptr<Torus> TorusPtr;
 
       class Ellipse;
+      //!@brief smart pointer for Ellipse
       typedef boost::shared_ptr<Ellipse> EllipsePtr;
 
       class Chessboard;
+      //!@brief smart pointer for Chessboard
       typedef boost::shared_ptr<Chessboard> ChessboardPtr;
     }
   }

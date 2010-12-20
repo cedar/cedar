@@ -36,10 +36,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/ReferenceGeometry.h"
 #include "devices/robot/SimulatedKinematicChain.h"
 #include "devices/robot/KinematicChainModel.h"
-#include "devices/robot/gl/KinematicChain.h"
+#include "devices/robot/gl/CoraArm.h"
 #include "auxiliaries/gl/Scene.h"
 #include "auxiliaries/gui/Viewer.h"
 #include "auxiliaries/gui/SceneWidget.h"
@@ -61,13 +60,13 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/Cora/cora_arm.conf")));
 
   // create model of simulated arm
   KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
 
   // create gl visualization object
-  cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_test_arm_model));
+  cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_test_arm_model));
 
   // create scene and viewer to display the arm
   ScenePtr p_scene(new cedar::aux::gl::Scene);
@@ -86,11 +85,14 @@ int main(int argc, char **argv)
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::ACCELERATION);
-  p_test_arm->setJointAcceleration(0, 0.3);
-  p_test_arm->setJointAcceleration(1, -.045);
-  p_test_arm->setJointAcceleration(2, -.015);
-  p_test_arm->setJointAcceleration(3, .025);
+  p_test_arm->setJointAcceleration(0, .003);
+  p_test_arm->setJointAcceleration(1, -.0045);
+  p_test_arm->setJointAcceleration(2, -.0015);
+  p_test_arm->setJointAcceleration(3, .0025);
+  p_test_arm->setJointAcceleration(4, .001);
+  p_test_arm->setJointAcceleration(5, -.0015);
+  p_test_arm->setJointAcceleration(6, -.0011);
+  p_test_arm->setJointAcceleration(7, .005);
 
   p_test_arm->start();
   p_test_arm_model->startTimer(50.0);

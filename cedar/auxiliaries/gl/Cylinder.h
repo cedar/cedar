@@ -44,6 +44,13 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief Simple OpenGL visualization of a cylinder
+ *
+ * This class visualizes an instance of cedar::aux::Object as a cylinder with specified dimensions
+ *
+ * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
+ */
 class cedar::aux::gl::Cylinder : public cedar::aux::gl::Object
 {
 public:
@@ -51,20 +58,20 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    */
-	Cylinder(cedar::aux::ObjectPtr pObject);
+  Cylinder(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param name    identifier of the instance, should be unique
+   * @param pObject    pointer to the aux::Object being visualized
    * @param radius    radius of the cylinder
    * @param height    height of the cylinder
    * @param R    color, value for red channel in RGB
    * @param G    color, value for green channel in RGB
    * @param B    color, value for blue channel in RGB
    */
-	Cylinder(
-      	    cedar::aux::ObjectPtr pObject,
+  Cylinder(
+            cedar::aux::ObjectPtr pObject,
             const double radius,
             const double height,
             const double R=1,
@@ -77,23 +84,23 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set radius of the cylinder
    * @param value    new radius
    */
-	void setRadius(double value );
-	
+  void setRadius(double value );
+
   /*!@brief set height of the cylinder
    * @param value    new height
    */
   void setHeight(double value );
-	
+
   /*!@brief get radius of the cylinder
    * @return    radius
    */
   double radius();
-	
+
   /*!@brief get height of the cylinder
    * @return    height
    */
@@ -103,7 +110,7 @@ public:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	double mRadius;
+  double mRadius;
   
   double mHeight;
 };

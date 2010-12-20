@@ -34,7 +34,8 @@
                  Author: Jochen Schwarze (schwarze@isa.de)
 
 ======================================================================================================================*/
-
+//!\todo why not rewrite these functions as templates?
+//!\todo implement solvePolynomial
 
 #ifndef CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 #define CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
@@ -55,31 +56,31 @@ namespace cedar
     {
       /*! returns the zeroes of a quadratic polynomial (degree 2)
        * coefficients are given in increasing order, i.e. constant first
-       * @param coefficients    coefficients of polynomial, beginning at x^0 to x^2
+       * @param rCoefficients    coefficients of polynomial, beginning at x^0 to x^2
        * @return    vector of solutions/zeroes
        */
       std::vector<double> solveQuadric(const std::vector<double>& rCoefficients);
 
       /*! returns the zeroes of a cubic polynomial (degree 3)
        * coefficients are given in increasing order, i.e. constant first
-       * @param coefficients    coefficients of polynomial, beginning at x^0 to x^3
+       * @param rCoefficients    coefficients of polynomial, beginning at x^0 to x^3
        * @return    vector of solutions/zeroes
        */
       std::vector<double> solveCubic(const std::vector<double>& rCoefficients);
 
       /*! returns the zeroes of a quartic polynomial (degree 4)
        * coefficients are given in increasing order, i.e. constant first
-       * @param coefficients    coefficients of polynomial, beginning at x^0 to x^4
+       * @param rCoefficients    coefficients of polynomial, beginning at x^0 to x^4
        * @return    vector of solutions/zeroes
        */
       std::vector<double> solveQuartic(const std::vector<double>& rCoefficients);
 
       /*! returns the zeroes of a quadratic polynomial (degree n<=4)
        * coefficients are given in increasing order, i.e. constant first
-       * @param coefficients    coefficients of polynomial, beginning from x^0 to x^n
+       * @param rCoefficients    coefficients of polynomial, beginning from x^0 to x^n
        * @return    vector of solutions
        */
-      std::vector<double> solvePolynomial(const std::vector<double>& coefficients);
+      std::vector<double> solvePolynomial(const std::vector<double>& rCoefficients);
     };
   };
 };

@@ -55,13 +55,13 @@ Block::Block(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = 3;
-	mWidth = 2;
-	mHeight = 1;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Block";
+  mLength = 3;
+  mWidth = 2;
+  mHeight = 1;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Block";
 }
 
 Block::Block(
@@ -76,13 +76,13 @@ Block::Block(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mLength = length;
-	mWidth = width;
-	mHeight = height;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Block";
+  mLength = length;
+  mWidth = width;
+  mHeight = height;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Block";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,20 +91,20 @@ cedar::aux::gl::Object(pObject)
 
 void Block::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
-	mTransformationTranspose = mpObject->getTransformation().t();
+  // move to object coordinates
+  mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw object
-	if (mIsVisible)
-	{
-	  gl::setColor(mColorR, mColorG, mColorB);
-		drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
-	}
+  // draw object
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
+  }
 }
 
 void Block::setLength(double value)

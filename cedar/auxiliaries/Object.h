@@ -92,7 +92,7 @@ public:
   //!@brief returns object frame orientation as a unit quaternion
   cv::Mat getOrientationQuaternion();
 
-  //!@brief returns the 4 \time 4 rigid transformation matrix of the object frame relative to the world frame
+  //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
   cv::Mat getTransformation();
 
 public slots:
@@ -141,7 +141,8 @@ public:
   // none yet (hopefully never!)
 
 protected:
-  cv::Mat mTransformation; // rigid transformation to the object
+  //!@brief rigid transformation to the object
+  cv::Mat mTransformation;
 
 private:
   cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates

@@ -19,86 +19,82 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Sphere.h
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 28
- 
- ----- Description: visualization for a sphere
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
-#ifndef CEDAR_AUX_GL_SPHERE_H
-#define CEDAR_AUX_GL_SPHERE_H
+    File:        Viewer.h
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 10 28
+
+    Description: Simple viewer for visualizing a scene of objects
+
+    Credits:
+
+======================================================================================================================*/
+
+
+#ifndef CEDAR_AUX_GUI_VIEWER_H
+#define CEDAR_AUX_GUI_VIEWER_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Object.h"
+#include "auxiliaries/gui/namespace.h"
 
 // PROJECT INCLUDES
+#include "auxiliaries/gl/namespace.h"
+#include "auxiliaries/gl/Scene.h"
 
 // SYSTEM INCLUDES
+#include <QGLViewer/qglviewer.h>
+#include <QList>
 
-/*!@brief Simple OpenGL visualization of a sphere
+/*!@brief A simple viewer for OpenGL drawing routines, based on QGLViewer
  *
- * This class visualizes an instance of cedar::aux::Object as a sphere with specified dimensions
+ * Use this class to draw instances of classes inherited from cedar::aux::gl::Object. This viewer has freely movable
+ * camera position and other perks, coming from QGLViewer.
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
- * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
+ * @remarks To visualize an object, add it to an instance of cedar::aux::gl::Scene, then create a Viewer for this Scene
+ *
  */
-class cedar::aux::gl::Sphere : public cedar::aux::gl::Object
+class cedar::aux::gui::Viewer : public QGLViewer
 {
+private:
+  
+	Q_OBJECT
+  
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor.
-   * @param pObject    pointer to the aux::Object being visualized
-   */
-  Sphere(cedar::aux::ObjectPtr pObject);
+  /*!@brief the constructor */
+  Viewer(cedar::aux::gl::ScenePtr& p_scene);
 
-  /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param radius    radius of the sphere
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
-   */
-  Sphere(
-          cedar::aux::ObjectPtr pObject,
-          const double radius,
-          const double R=1,
-          const double G=0,
-          const double B=0
-        );
-  
+  /*!@brief the constructor */
+  ~Viewer();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief draws a visualization of the object in the current GL context
+  /*!@brief draws all objects in the scene */
   void draw();
 
-  /*!@brief set radius of the sphere
-   * @param value    new radius
-   */
-  void setRadius(double value);
+  /*!@brief function being called automatically when a timer is up, usually in a loop */
+  void timerEvent(QTimerEvent* pEvent);
 
-  /*!@brief get radius of the sphere
-   * @return    radius
-   */
-  double radius();
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  /*!@brief initialization */
+  void init();
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  double mRadius;
+  cedar::aux::gl::ScenePtr const mpScene;
+
 };
 
-#endif // CEDAR_AUX_GL_SPHERE_H
+#endif  // CEDAR_AUX_GUI_VIEWER_H

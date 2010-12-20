@@ -53,12 +53,12 @@ Prism::Prism(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mWidth = 3;
-	mHeight = 1;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Prism";
+  mWidth = 3;
+  mHeight = 1;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Prism";
 }
 
 Prism::Prism(
@@ -72,12 +72,12 @@ Prism::Prism(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mWidth = width;
-	mHeight = height;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Prism";
+  mWidth = width;
+  mHeight = height;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Prism";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,20 +86,20 @@ cedar::aux::gl::Object(pObject)
 
 void Prism::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw object
-	if (mIsVisible)
-	{
-		gl::setColor(mColorR, mColorG, mColorB);
-		drawPrism(mWidth, mHeight, mIsDrawnAsWireFrame);
-	}
+  // draw object
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawPrism(mWidth, mHeight, mIsDrawnAsWireFrame);
+  }
 }
 
 void Prism::setWidth(double value)

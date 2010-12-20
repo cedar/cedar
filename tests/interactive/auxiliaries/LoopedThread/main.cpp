@@ -43,15 +43,17 @@
 using namespace std;
 using namespace boost::posix_time;
 
-//! threaded test class
+//!@brief threaded test class
 class MyTestThread : public cedar::aux::LoopedThread {
 
 private:
 
+  //!@brief decides whether to add an artificial delay
   bool mArtificialDelay;
 
 public:
 
+  //!@brief constructor
   MyTestThread(double stepSize, bool delay = false) : LoopedThread(stepSize) 
   {
     mArtificialDelay = delay;
@@ -68,12 +70,20 @@ public:
       usleep( rand() % (3*mStepSize.total_microseconds()) );
   }
 
+  /*!@brief get info whether an artificial delay is added
+   *
+   * @return    state of mArtificialDelay
+   */
   bool getArtificialDelay() 
   {
     return mArtificialDelay;
   }
 
-  void setArtificalDelay( bool delay ) 
+  /*!@brief set whether an artificial delay is added
+   *
+   * @param delay    state of mArtificialDelay
+   */
+  void setArtificalDelay(bool delay)
   {
     mArtificialDelay = delay;
   }

@@ -446,37 +446,37 @@ void cedar::aux::math::invertAdjointTransformation(const cv::Mat& rAdjointTransf
 	Mat upper_right = - rot_transpose * rAdjointTransformation(Rect(3, 0, 3, 3)) * rot_transpose;
 
   // concatenate to inverse
-	rInverse = cv::Mat::zeros(6, 6, rAdjointTransformation.type());
+  rInverse = cv::Mat::zeros(6, 6, rAdjointTransformation.type());
 
-	rInverse.at<T>(0, 0) = rot_transpose.at<T>(0, 0);
-	rInverse.at<T>(0, 1) = rot_transpose.at<T>(0, 1);
-	rInverse.at<T>(0, 2) = rot_transpose.at<T>(0, 2);
-	rInverse.at<T>(1, 0) = rot_transpose.at<T>(1, 0);
-	rInverse.at<T>(1, 1) = rot_transpose.at<T>(1, 1);
-	rInverse.at<T>(1, 2) = rot_transpose.at<T>(1, 2);
-	rInverse.at<T>(2, 0) = rot_transpose.at<T>(2, 0);
-	rInverse.at<T>(2, 1) = rot_transpose.at<T>(2, 1);
-	rInverse.at<T>(2, 2) = rot_transpose.at<T>(2, 2);
+  rInverse.at<T> (0, 0) = rot_transpose.at<T> (0, 0);
+  rInverse.at<T> (0, 1) = rot_transpose.at<T> (0, 1);
+  rInverse.at<T> (0, 2) = rot_transpose.at<T> (0, 2);
+  rInverse.at<T> (1, 0) = rot_transpose.at<T> (1, 0);
+  rInverse.at<T> (1, 1) = rot_transpose.at<T> (1, 1);
+  rInverse.at<T> (1, 2) = rot_transpose.at<T> (1, 2);
+  rInverse.at<T> (2, 0) = rot_transpose.at<T> (2, 0);
+  rInverse.at<T> (2, 1) = rot_transpose.at<T> (2, 1);
+  rInverse.at<T> (2, 2) = rot_transpose.at<T> (2, 2);
 
-	rInverse.at<T>(0, 3) = upper_right.at<T>(0, 0);
-	rInverse.at<T>(0, 4) = upper_right.at<T>(0, 1);
-	rInverse.at<T>(0, 5) = upper_right.at<T>(0, 2);
-	rInverse.at<T>(1, 3) = upper_right.at<T>(1, 0);
-	rInverse.at<T>(1, 4) = upper_right.at<T>(1, 1);
-	rInverse.at<T>(1, 5) = upper_right.at<T>(1, 2);
-	rInverse.at<T>(2, 3) = upper_right.at<T>(2, 0);
-	rInverse.at<T>(2, 4) = upper_right.at<T>(2, 1);
-	rInverse.at<T>(2, 5) = upper_right.at<T>(2, 2);
+  rInverse.at<T> (0, 3) = upper_right.at<T> (0, 0);
+  rInverse.at<T> (0, 4) = upper_right.at<T> (0, 1);
+  rInverse.at<T> (0, 5) = upper_right.at<T> (0, 2);
+  rInverse.at<T> (1, 3) = upper_right.at<T> (1, 0);
+  rInverse.at<T> (1, 4) = upper_right.at<T> (1, 1);
+  rInverse.at<T> (1, 5) = upper_right.at<T> (1, 2);
+  rInverse.at<T> (2, 3) = upper_right.at<T> (2, 0);
+  rInverse.at<T> (2, 4) = upper_right.at<T> (2, 1);
+  rInverse.at<T> (2, 5) = upper_right.at<T> (2, 2);
 
-	rInverse.at<T>(3, 3) = rot_transpose.at<T>(0, 0);
-	rInverse.at<T>(3, 4) = rot_transpose.at<T>(0, 1);
-	rInverse.at<T>(3, 5) = rot_transpose.at<T>(0, 2);
-	rInverse.at<T>(4, 3) = rot_transpose.at<T>(1, 0);
-	rInverse.at<T>(4, 4) = rot_transpose.at<T>(1, 1);
-	rInverse.at<T>(4, 5) = rot_transpose.at<T>(1, 2);
-	rInverse.at<T>(5, 3) = rot_transpose.at<T>(2, 0);
-	rInverse.at<T>(5, 4) = rot_transpose.at<T>(2, 1);
-	rInverse.at<T>(5, 5) = rot_transpose.at<T>(2, 2);
+  rInverse.at<T> (3, 3) = rot_transpose.at<T> (0, 0);
+  rInverse.at<T> (3, 4) = rot_transpose.at<T> (0, 1);
+  rInverse.at<T> (3, 5) = rot_transpose.at<T> (0, 2);
+  rInverse.at<T> (4, 3) = rot_transpose.at<T> (1, 0);
+  rInverse.at<T> (4, 4) = rot_transpose.at<T> (1, 1);
+  rInverse.at<T> (4, 5) = rot_transpose.at<T> (1, 2);
+  rInverse.at<T> (5, 3) = rot_transpose.at<T> (2, 0);
+  rInverse.at<T> (5, 4) = rot_transpose.at<T> (2, 1);
+  rInverse.at<T> (5, 5) = rot_transpose.at<T> (2, 2);
 
 }
 

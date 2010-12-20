@@ -37,8 +37,8 @@
 cedar_add_library(cedaraux
   MOC_HEADERS
   Object.h
-  gui/BaseWidget.h
-  gl/Viewer.h
   gl/Object.h
-  gl/SceneWidget.h
+  gui/BaseWidget.h
+  gui/Viewer.h
+  gui/SceneWidget.h
 )

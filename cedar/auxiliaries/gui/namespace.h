@@ -54,7 +54,17 @@ namespace cedar
     namespace gui
     {
       class BaseWidget;
+      //!@brief smart pointer for BaseWidget
       typedef boost::shared_ptr<BaseWidget> BaseWidgetPtr;
+
+      class SceneWidget;
+      //!@brief smart pointer for SceneWidget
+      typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
+
+      class Viewer;
+      //!@brief smart pointer for Viewer
+      typedef boost::shared_ptr<Viewer> ViewerPtr;
+
     }
   }
 }
