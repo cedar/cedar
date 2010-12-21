@@ -244,7 +244,8 @@ void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
   return;
 }
 
-void cedar::aux::LoopedThread::singleStep() {
+void cedar::aux::LoopedThread::singleStep()
+{
   if(!isRunning())
   {
     if(mSimulatedTime.total_microseconds() == 0)
@@ -256,4 +257,14 @@ void cedar::aux::LoopedThread::singleStep() {
       step(mSimulatedTime.total_microseconds());
     }
   }
+}
+
+bool cedar::aux::LoopedThread::stopRequested()
+{
+  if(isRunning() && mStop == true)
+  {
+    return true;
+  }
+
+  return false;
 }

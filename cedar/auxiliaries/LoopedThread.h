@@ -210,6 +210,12 @@ public:
   boost::posix_time::time_duration getLastTimeStepDuration() const { return mLastTimeStepStart - mLastTimeStepEnd; };
 
 
+  /*!@brief Returns true if the thread is running but stop() was called.
+   *
+   */
+  bool stopRequested();
+
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
