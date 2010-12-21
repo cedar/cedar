@@ -80,7 +80,13 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
   {
     mStop = true;
     wait(time);
-    if (suppressWarning == false && mMaxStepsTaken > 1.01 && mSimulatedTime.total_microseconds() == 0)
+
+    if(isRunning())
+    {
+      cout << "Warning: Thread is still running after call of stop()!" << endl;
+    }
+
+    if(suppressWarning == false && mMaxStepsTaken > 1.01 && mSimulatedTime.total_microseconds() == 0)
     {
       cout << "Warning: The system was not fast enough to stay to scheduled thread timing. ";
       cout << "Consider using a larger step size." << endl;
