@@ -154,7 +154,7 @@ cv::Mat KinematicChain::getJointAccelerationsMatrix() const
   return dummy;
 }
 
-void KinematicChain::setJointVelocity(unsigned index, double velocity)
+void KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
   if(index >= getNumberOfJoints())
   {

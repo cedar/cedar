@@ -48,6 +48,12 @@
 #include <string>
 #include <QList>
 
+/*!@brief This class visualizes several objects in the same environment
+ *
+ * An instance of this class manages pointers to several instances of gl::Object.
+ *
+ * @remarks To get a simple visualization of the Objects in the scene, create a aux::gui::Viewer for it
+ */
 class cedar::aux::gl::Scene
 {
 public:
@@ -68,7 +74,7 @@ public:
   /*!@brief tells the scene whether a simple floor in the xy-plane should be drawn or not
    * @param state    truth value of 'floor being drawn'
    */
-	void drawFloor(bool state=true);
+  void drawFloor(bool state=true);
 
   /*!@brief sets a rough delimiter of the scene within which things are guaranteed to be visualized
    * @param value    new scene delimiter
@@ -81,7 +87,7 @@ public:
   double getSceneLimit();
   
   /*!@brief adds an object to the scene
-   * @param pObject    pointer to the object
+   * @param rpObject    pointer to the object
    * @return    index of the object in the scene
    */
   int addObject(cedar::aux::gl::ObjectPtr& rpObject);
@@ -121,13 +127,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief class initialization */
-	void init();
+  void init();
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	bool mIsDrawingFloor;
+  bool mIsDrawingFloor;
   double mSceneLimit;
   QList<cedar::aux::gl::ObjectPtr> mObjects;
 };
