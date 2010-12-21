@@ -36,7 +36,7 @@ using namespace libconfig;
 //----------------------------------------------------------------------------------------------------------------------
 KukaInterface::KukaInterface(const string& configFileName)
 :
-cedar::aux::ConfigurationInterface(configFileName)
+cedar::dev::robot::KinematicChain(configFileName)
 {
   mIsInit = false;
   mpFriRemote = 0;
@@ -60,7 +60,8 @@ KukaInterface::~KukaInterface()
 void KukaInterface::init()
 {
   //The number of joints the KUKA LBR has
-  KinematicChain::mNumberOfJoints = LBR_MNJ;
+  //TODO: mNumberOfJoints does not exist anymore - remove this
+  //KinematicChain::mNumberOfJoints = LBR_MNJ;
   //Load Parameters from the configuration file
   //ServerPort: 0 means, FRI will use the default Port
   addParameter(&_mServerPort, "ServerPort", 0);
@@ -84,7 +85,7 @@ void KukaInterface::init()
   initCommandMode();
 }
 
-const double KukaInterface::getJointAngle(const unsigned int index)const
+double KukaInterface::getJointAngle(const unsigned int index)const
 {
   //The index must be less than the number of angles
   if (index >= getNumberOfJoints() )
@@ -96,7 +97,7 @@ const double KukaInterface::getJointAngle(const unsigned int index)const
   //does not test if index is out of bounds yet
   return (double)mpFriRemote->getMsrMsrJntPosition()[index];
 }
-const vector<double> KukaInterface::getJointAngles() const
+vector<double> KukaInterface::getJointAngles() const
 {
   //Receive data from the Kuka LBR
   mpFriRemote->doReceiveData();
@@ -104,7 +105,7 @@ const vector<double> KukaInterface::getJointAngles() const
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
   return vector<double>(pJointPos, pJointPos + getNumberOfJoints());
 }
-const cv::Mat KukaInterface::getJointAnglesMatrix() const
+cv::Mat KukaInterface::getJointAnglesMatrix() const
 {
   //This may be inefficient, but heck, the bloody udp-communication is imho more slow than this
   return cv::Mat(getJointAngles(), true);
@@ -166,12 +167,20 @@ void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
 
 void KukaInterface::initCommandMode()
 {
+  //how many times has doDataExchange() been called, before the command mode started?
+  unsigned counter = 0;
+
   /* Do Handshakes to the remote host until the robot is in command mode*/
   while (getFriState() != FRI_STATE_CMD)
   {
     mpFriRemote->setToKRLInt(0, 1);
     mpFriRemote->doDataExchange();
+    counter++;
   }
+  //Debug output: number of data exchanges before command mode
+  #ifdef DEBUG
+  cout << "KukaInterface::initCommandMode: " << counter << "data exchanges before command mode" << endl;
+  #endif
 }
 
 void KukaInterface::commandModeTest()const throw()
@@ -242,7 +251,7 @@ void KukaInterface::setToKRL(int index, bool value) throw()
   validateKRLIndex(index);
   mpFriRemote->setToKRLBool(index, value);
 }
-bool isPowerOn()const{
+bool KukaInterface::isPowerOn()const{
   return isPowerOn();
 }
 
