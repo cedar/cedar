@@ -53,12 +53,12 @@ Cone::Cone(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = 2;
-	mHeight = 2;
-	mColorR = 1;
-	mColorG = 0;
-	mColorB = 0;
-	mObjectType = "Cone";
+  mRadius = 2;
+  mHeight = 2;
+  mColorR = 1;
+  mColorG = 0;
+  mColorB = 0;
+  mObjectType = "Cone";
 }
 
 Cone::Cone(
@@ -72,12 +72,12 @@ Cone::Cone(
 :
 cedar::aux::gl::Object(pObject)
 {
-	mRadius = radius;
-	mHeight = height;
-	mColorR = R;
-	mColorG = G;
-	mColorB = B;
-	mObjectType = "Cone";
+  mRadius = radius;
+  mHeight = height;
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mObjectType = "Cone";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,20 +86,20 @@ cedar::aux::gl::Object(pObject)
 
 void Cone::draw()
 {
-	// move to origin
-	glPopMatrix();
-	glPushMatrix();
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
   
-	// move to object coordinates
+  // move to object coordinates
   mTransformationTranspose = mpObject->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
-	// draw object
-	if (mIsVisible)
-	{
-		gl::setColor(mColorR, mColorG, mColorB);
-		drawCone(0, mHeight, mRadius, 0, mResolution*2, mIsDrawnAsWireFrame);
-	}
+  // draw object
+  if (mIsVisible)
+  {
+    gl::setColor(mColorR, mColorG, mColorB);
+    drawCone(0, mHeight, mRadius, 0, mResolution*2, mIsDrawnAsWireFrame);
+  }
 }
 
 void Cone::setRadius(double value)

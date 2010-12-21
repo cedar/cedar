@@ -121,10 +121,6 @@ public:
   // public methods
   //----------------------------------------------------------------------------
 public:
-  /*!@brief Executes step() in a while loop in fixed time intervals.
-   *
-   */
-  virtual void run();
 
   /*!@brief All calculations for each time step are put into step().
    *
@@ -224,6 +220,7 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 private:
+  virtual void run(); // the thread does its work here!
   void initStatistics(void);
   inline void updateStatistics(double stepsTaken);
 
@@ -233,6 +230,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief desired length of a single step, in milliseconds
   boost::posix_time::time_duration mStepSize;
 private:
   bool mStop;

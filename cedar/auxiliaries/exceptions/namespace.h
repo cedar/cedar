@@ -55,12 +55,15 @@ namespace cedar
     namespace exc
     {
       class ExceptionBase;
+      //!@brief smart pointer for ExceptionBase
       typedef boost::shared_ptr<ExceptionBase> ExceptionBasePtr;
 
       class NullPointerException;
+      //!@brief smart pointer for NullPointerException
       typedef boost::shared_ptr<NullPointerException> NullPointerExceptionPtr;
 
       class IndexOutOfRangeException;
+      //!@brief smart pointer for IndexOutOfRangeException
       typedef boost::shared_ptr<IndexOutOfRangeException> IndexOutOfRangePtr;
 
       class BadConnectionException;

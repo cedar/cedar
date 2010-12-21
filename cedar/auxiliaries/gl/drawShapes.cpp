@@ -58,51 +58,51 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
-	glBegin(GL_QUADS);
-	// front
-	glNormal3d(-1.0, 0.0, 0.0);
-	glVertex3d(-l/2, -w/2, -h/2);
-	glVertex3d(-l/2, w/2, -h/2);
-	glVertex3d(-l/2, w/2, h/2);
-	glVertex3d(-l/2, -w/2, h/2);
-	// right
-	glNormal3d(0.0, 1.0, 0.0);
-	glVertex3d(-l/2, w/2, -h/2);
-	glVertex3d(l/2, w/2, -h/2);
-	glVertex3d(l/2, w/2, h/2);
-	glVertex3d(-l/2, w/2, h/2);
-	// bottom
-	glNormal3d(0.0, 0.0, -1.0);
-	glVertex3d(-l/2, -w/2, -h/2);
-	glVertex3d(l/2, -w/2, -h/2);
-	glVertex3d(l/2, w/2, -h/2);
-	glVertex3d(-l/2, w/2, -h/2);
-	// back
-	glNormal3d(1.0, 0.0, 0.0);
-	glVertex3d(l/2, -w/2, -h/2);
-	glVertex3d(l/2, w/2, -h/2);
-	glVertex3d(l/2, w/2, h/2);
-	glVertex3d(l/2, -w/2, h/2);
-	// left
-	glNormal3d(0.0, -1.0, 0.0);
-	glVertex3d(-l/2, -w/2, -h/2);
-	glVertex3d(l/2, -w/2, -h/2);
-	glVertex3d(l/2, -w/2, h/2);
-	glVertex3d(-l/2, -w/2, h/2);
-	// top
-	glNormal3d(0.0, 0.0, 1.0);
-	glVertex3d(-l/2, -w/2, h/2);
-	glVertex3d(l/2, -w/2, h/2);
-	glVertex3d(l/2, w/2, h/2);
-	glVertex3d(-l/2, w/2, h/2);
-	glEnd();
+  glBegin(GL_QUADS);
+  // front
+  glNormal3d(-1.0, 0.0, 0.0);
+  glVertex3d(-l/2, -w/2, -h/2);
+  glVertex3d(-l/2, w/2, -h/2);
+  glVertex3d(-l/2, w/2, h/2);
+  glVertex3d(-l/2, -w/2, h/2);
+  // right
+  glNormal3d(0.0, 1.0, 0.0);
+  glVertex3d(-l/2, w/2, -h/2);
+  glVertex3d(l/2, w/2, -h/2);
+  glVertex3d(l/2, w/2, h/2);
+  glVertex3d(-l/2, w/2, h/2);
+  // bottom
+  glNormal3d(0.0, 0.0, -1.0);
+  glVertex3d(-l/2, -w/2, -h/2);
+  glVertex3d(l/2, -w/2, -h/2);
+  glVertex3d(l/2, w/2, -h/2);
+  glVertex3d(-l/2, w/2, -h/2);
+  // back
+  glNormal3d(1.0, 0.0, 0.0);
+  glVertex3d(l/2, -w/2, -h/2);
+  glVertex3d(l/2, w/2, -h/2);
+  glVertex3d(l/2, w/2, h/2);
+  glVertex3d(l/2, -w/2, h/2);
+  // left
+  glNormal3d(0.0, -1.0, 0.0);
+  glVertex3d(-l/2, -w/2, -h/2);
+  glVertex3d(l/2, -w/2, -h/2);
+  glVertex3d(l/2, -w/2, h/2);
+  glVertex3d(-l/2, -w/2, h/2);
+  // top
+  glNormal3d(0.0, 0.0, 1.0);
+  glVertex3d(-l/2, -w/2, h/2);
+  glVertex3d(l/2, -w/2, h/2);
+  glVertex3d(l/2, w/2, h/2);
+  glVertex3d(-l/2, w/2, h/2);
+  glEnd();
   
 
 
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
 
 void cedar::aux::gl::drawCone(
@@ -114,19 +114,19 @@ void cedar::aux::gl::drawCone(
                                bool wireFrame
                              )
 {
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
   glTranslatef(0.0, 0.0, floor);
   GLUquadric* quadric = gluNewQuadric();
-	gluCylinder(quadric, radiusFloor, radiusCeiling, ceiling - floor, slices, 1);
+  gluCylinder(quadric, radiusFloor, radiusCeiling, ceiling - floor, slices, 1);
   gluDeleteQuadric(quadric);
-	glTranslatef(0.0, 0.0, -floor);
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+  glTranslatef(0.0, 0.0, -floor);
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
 
 template<typename T>
@@ -236,17 +236,17 @@ void cedar::aux::gl::drawSphere(
                                  bool wireFrame
                                )
 {
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
   GLUquadric* quadric = gluNewQuadric();
-	gluSphere(quadric, radius, slices, stacks);
+  gluSphere(quadric, radius, slices, stacks);
   gluDeleteQuadric(quadric);
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
 
 void cedar::aux::gl::drawDisk(
@@ -258,25 +258,25 @@ void cedar::aux::gl::drawDisk(
                                bool wireFrame
                              )
 {
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	if (invert)
-	{
-		glRotated(180, 1, 0, 0);
-	}
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+  if (invert)
+  {
+    glRotated(180, 1, 0, 0);
+  }
   GLUquadric* quadric = gluNewQuadric();
-	gluDisk(quadric, innerRadius, outerRadius, slices, loops);
+  gluDisk(quadric, innerRadius, outerRadius, slices, loops);
   gluDeleteQuadric(quadric);
-	if (invert)
-	{
-		glRotated(180, 1, 0, 0);
-	}
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+  if (invert)
+  {
+    glRotated(180, 1, 0, 0);
+  }
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
 
 //!\todo origin should be at the center of the base rectangle
@@ -301,43 +301,43 @@ void cedar::aux::gl::drawPyramid(
   // right side
   glNormal3d(1.0, 0.0, 0.0);
   glVertex3d(0, 0, height/2);                     // Top Of Triangle (Right)
-  glVertex3d(length/2,  width/2, -height/2);			// Left Of Triangle (Right)
-  glVertex3d(length/2, -width/2, -height/2);			// Right Of Triangle (Right)
+  glVertex3d(length/2,  width/2, -height/2);      // Left Of Triangle (Right)
+  glVertex3d(length/2, -width/2, -height/2);      // Right Of Triangle (Right)
   
   // back
   glNormal3d(0.0, -1.0, 0.0);
   glVertex3d(0, 0, height/2);                     // Top Of Triangle (Back)
-  glVertex3d(length/2, -width/2, -height/2);			// Left Of Triangle (Back)
-  glVertex3d(-length/2, -width/2, -height/2);			// Right Of Triangle (Back)
+  glVertex3d(length/2, -width/2, -height/2);      // Left Of Triangle (Back)
+  glVertex3d(-length/2, -width/2, -height/2);      // Right Of Triangle (Back)
   
   // left side
   glNormal3d(-1.0, 0.0, 0.0);
   glVertex3d(0, 0, height/2);                     // Top Of Triangle (Left)
-  glVertex3d(-length/2, -width/2, -height/2);			// Left Of Triangle (Left)
-  glVertex3d(-length/2,  width/2, -height/2);			// Right Of Triangle (Left)
-	glEnd();
+  glVertex3d(-length/2, -width/2, -height/2);      // Left Of Triangle (Left)
+  glVertex3d(-length/2,  width/2, -height/2);      // Right Of Triangle (Left)
+  glEnd();
   
-	glBegin(GL_QUADS);
+  glBegin(GL_QUADS);
   // base
   glNormal3d(0.0, 0.0, -1.0);
-  glVertex3d(-length/2,  width/2, -height/2);			// Left Of Triangle (Front)
-  glVertex3d(length/2,  width/2, -height/2);			// Right Of Triangle (Front)
-  glVertex3d(length/2, -width/2, -height/2);			// Right Of Triangle (Back)
-  glVertex3d(-length/2, -width/2, -height/2);			// Left Of Triangle (Back)
-	glEnd();
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+  glVertex3d(-length/2,  width/2, -height/2);      // Left Of Triangle (Front)
+  glVertex3d(length/2,  width/2, -height/2);      // Right Of Triangle (Front)
+  glVertex3d(length/2, -width/2, -height/2);      // Right Of Triangle (Back)
+  glVertex3d(-length/2, -width/2, -height/2);      // Left Of Triangle (Back)
+  glEnd();
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
 
 void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
 {
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	glBegin(GL_TRIANGLES);					// Start Drawing The Pyramid
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+  glBegin(GL_TRIANGLES);          // Start Drawing The Pyramid
   // bottom
   glNormal3d(0.0, 0.0, -1.0);
   glVertex3d(0, -width/2, 0);
@@ -348,9 +348,9 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   glVertex3d(0, -width/2, height);
   glVertex3d(sqrt(3)*width/2, 0, height);
   glVertex3d(0, width/2, height);
-	glEnd();
+  glEnd();
   
-	glBegin(GL_QUADS);
+  glBegin(GL_QUADS);
   // front left
   glNormal3d(.33, -.66, 0.0);
   glVertex3d(0, -width/2, height);
@@ -370,11 +370,11 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   glVertex3d(0, width/2, height);
   glVertex3d(0, -width/2, height);
   
-	glEnd();
-	if (wireFrame)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+  glEnd();
+  if (wireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
 
 void cedar::aux::gl::drawTorus(
@@ -604,5 +604,22 @@ void cedar::aux::gl::drawEllipse(
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
+}
+
+void cedar::aux::gl::drawAxes(double length)
+{
+  cv::Mat o = cv::Mat::zeros(3, 1, CV_64FC1);
+  cv::Mat x = cv::Mat::zeros(3, 1, CV_64FC1);
+  x.at<double>(0, 0) = length;
+  cv::Mat y = cv::Mat::zeros(3, 1, CV_64FC1);
+  y.at<double>(1, 0) = length;
+  cv::Mat z = cv::Mat::zeros(3, 1, CV_64FC1);
+  z.at<double>(2, 0) = length;
+  setColor(1, 0, 0);
+  drawArrow<double>(o, x, length*0.015, length*0.04, length*0.2, 10);
+  setColor(0, 1, 0);
+  drawArrow<double>(o, y, length*0.015, length*0.04, length*0.2, 10);
+  setColor(0, 0, 1);
+  drawArrow<double>(o, z, length*0.015, length*0.04, length*0.2, 10);
 }
 
