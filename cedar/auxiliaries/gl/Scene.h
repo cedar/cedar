@@ -108,6 +108,7 @@ public:
    */
   bool isEmpty();
   
+  //! \todo rename getNumberOfObjects
   /*!@brief gives the number of objects currently in the scene
    * @return    number of objects currently in the scene
    */

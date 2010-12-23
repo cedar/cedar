@@ -136,7 +136,7 @@ public:
    * @param timeout the max. time to wait for the thread (in milliseconds).
    * @param suppressWarning by default a warning about occurring timing problems will be given
    */
-  void stop(unsigned int timeout = 1000, bool suppressWarning = false);
+  void stop(unsigned int timeout = 500, bool suppressWarning = false);
 
   /*!@brief Performs a single step with default step size (or simulated time).
    *
@@ -208,6 +208,12 @@ public:
    *
    */
   boost::posix_time::time_duration getLastTimeStepDuration() const { return mLastTimeStepStart - mLastTimeStepEnd; };
+
+
+  /*!@brief Returns true if the thread is running but stop() was called.
+   *
+   */
+  bool stopRequested();
 
 
   //----------------------------------------------------------------------------
