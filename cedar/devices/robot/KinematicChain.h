@@ -62,6 +62,16 @@ class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, p
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
+  // parameters
+  //----------------------------------------------------------------------------
+public:
+  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
+protected:
+  // none yet
+private:
+  // none yet
+
+  //----------------------------------------------------------------------------
   // constructors and destructor
   //----------------------------------------------------------------------------
 public:
@@ -208,6 +218,13 @@ public:
    */
   virtual void setJointAccelerations(const std::vector<double>& accelerations);
 
+  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
+   *
+   * @param actionType new working mode
+   */
+  void setWorkingMode(ActionType actionType);
+
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
@@ -218,16 +235,7 @@ protected:
   //----------------------------------------------------------------------------
 private:
   void step(double time);
-
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
-private:
-  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
+  void init();
 
   //----------------------------------------------------------------------------
   // members
@@ -238,9 +246,9 @@ protected:
   //!@brief geometry in reference configuration
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
 private:
-  std::vector<double> mJointVelocities;
-  std::vector<double> mJointAccelerations;
-  std::vector<ActionType> mJointWorkingModes;
+  cv::Mat mJointVelocities;
+  cv::Mat mJointAccelerations;
+  ActionType mCurrentWorkingMode;
 
 }; // class cedar::dev::robot::KinematicChain
 
