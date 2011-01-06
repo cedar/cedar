@@ -51,9 +51,13 @@
 #include <string>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Interface for a chain of joints
  *
- * More detailed description of the class.
+ * This interface lets you to set angle, velocity and acceleration values for
+ * each joint of the kinematic chain. If your hardware (or driver) does not
+ * allow you to control velocities or accelerations directly, you can start the
+ * the KinematicChain as a thread to handle velocities and accelerations
+ * "manually".
  */
 class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
 {
@@ -222,7 +226,9 @@ public:
    *
    * Setting a working mode will also stop the KinematicChain to allow you to
    * set new target values for each joint. You have to restart the
-   * KinematicChain afterwards.
+   * KinematicChain afterwards if you want it to take care of velocities or
+   * accelerations. If your hardware lets you set these values directly you
+   * do not want to start the thread of KinematicChain.
    *
    * @param actionType new working mode
    */
@@ -240,6 +246,8 @@ protected:
 private:
   void step(double time);
   void init();
+  void applyAngleLimits(cv::Mat &angles);
+  void applyVelocityLimits(cv::Mat &velocities);
 
   //----------------------------------------------------------------------------
   // members
