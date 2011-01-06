@@ -261,19 +261,46 @@ void KinematicChain::step(double time)
   switch(mCurrentWorkingMode)
   {
     case ANGLE:
+
       break;
 
     case VELOCITY:
+
       angles = getJointAnglesMatrix();
       angles += getJointVelocitiesMatrix() * ( time / 1000.0 );
+
+      for(unsigned i = 0; i < getNumberOfJoints(); i++)
+      {
+        double angle = angles.at<double>(i, 0);
+        angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+        angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+      }
+
       setJointAngles(angles);
       break;
 
     case ACCELERATION:
+
       velocities = getJointVelocitiesMatrix();
       velocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
+
+      for(unsigned i = 0; i < getNumberOfJoints(); i++)
+      {
+        double velocity = velocities.at<double>(i, 0);
+        velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
+        velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
+      }
+
       angles = getJointAnglesMatrix();
       angles += velocities * ( time / 1000.0 );
+
+      for(unsigned i = 0; i < getNumberOfJoints(); i++)
+      {
+        double angle = angles.at<double>(i,0);
+        angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+        angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+      }
+
       mJointVelocities = velocities;
       setJointAngles(angles);
       break;
