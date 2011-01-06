@@ -37,7 +37,7 @@
 
 // LOCAL INCLUDES
 
-#include "KinematicChainWidget.h"
+#include "devices/robot/gui/KinematicChainWidget.h"
 
 // PROJECT INCLUDES
 

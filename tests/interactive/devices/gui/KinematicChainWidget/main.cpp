@@ -38,7 +38,7 @@
 
 // PROJECT INCLUDES
 
-#include "KinematicChainWidget.h"
+#include "devices/robot/gui/KinematicChainWidget.h"
 #include "devices/robot/SimulatedKinematicChain.h"
 
 // SYSTEM INCLUDES
