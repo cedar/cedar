@@ -205,7 +205,7 @@ void KinematicChain::setJointVelocities(const cv::Mat& velocities)
   }
 
   mJointVelocities = velocities;
-
+  applyVelocityLimits(mJointVelocities);
   return;
 }
 
@@ -218,6 +218,7 @@ void KinematicChain::setJointAcceleration(unsigned int index, double acceleratio
   }
 
   mJointAccelerations.at<double>(index,0) = acceleration;
+  return;
 }
 
 
@@ -250,6 +251,7 @@ void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
   }
 
   mJointAccelerations = accelerations;
+  return;
 }
 
 
@@ -268,13 +270,7 @@ void KinematicChain::step(double time)
 
       angles = getJointAnglesMatrix();
       angles += getJointVelocitiesMatrix() * ( time / 1000.0 );
-
-      for(unsigned i = 0; i < getNumberOfJoints(); i++)
-      {
-        double angle = angles.at<double>(i, 0);
-        angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-        angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
-      }
+      applyAngleLimits(angles);
 
       setJointAngles(angles);
       break;
@@ -283,23 +279,11 @@ void KinematicChain::step(double time)
 
       velocities = getJointVelocitiesMatrix();
       velocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
-
-      for(unsigned i = 0; i < getNumberOfJoints(); i++)
-      {
-        double velocity = velocities.at<double>(i, 0);
-        velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
-        velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
-      }
+      applyVelocityLimits(velocities);
 
       angles = getJointAnglesMatrix();
       angles += velocities * ( time / 1000.0 );
-
-      for(unsigned i = 0; i < getNumberOfJoints(); i++)
-      {
-        double angle = angles.at<double>(i,0);
-        angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-        angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
-      }
+      applyAngleLimits(angles);
 
       mJointVelocities = velocities;
       setJointAngles(angles);
@@ -325,5 +309,35 @@ void KinematicChain::init()
 {
   mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
   mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  return;
+}
+
+
+void KinematicChain::applyAngleLimits(Mat &angles)
+{
+
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
+    double angle = angles.at<double>(i, 0);
+    angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+    angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+    angles.at<double>(i, 0) = angle;
+  }
+
+  return;
+}
+
+
+void KinematicChain::applyVelocityLimits(Mat &velocities)
+{
+
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
+    double velocity = velocities.at<double>(i, 0);
+    velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
+    velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
+    velocities.at<double>(i, 0) = velocity;
+  }
+
   return;
 }
