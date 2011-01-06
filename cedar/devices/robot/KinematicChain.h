@@ -220,6 +220,10 @@ public:
 
   /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
    *
+   * Setting a working mode will also stop the KinematicChain to allow you to
+   * set new target values for each joint. You have to restart the
+   * KinematicChain afterwards.
+   *
    * @param actionType new working mode
    */
   void setWorkingMode(ActionType actionType);
