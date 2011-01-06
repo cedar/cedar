@@ -261,7 +261,6 @@ void KinematicChain::step(double time)
   switch(mCurrentWorkingMode)
   {
     case ANGLE:
-      stop(); // no thread necessary to set angles
       break;
 
     case VELOCITY:
