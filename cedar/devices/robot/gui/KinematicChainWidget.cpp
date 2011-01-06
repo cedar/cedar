@@ -95,6 +95,9 @@ KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicCha
     for(unsigned int j = 0; j < 3; ++j)
     {
       QDoubleSpinBox *doubleSpinBox = new QDoubleSpinBox();
+      doubleSpinBox->setRange(-999999.0, 999999.0);
+      doubleSpinBox->setValue(0.0);
+      doubleSpinBox->setSingleStep(0.1);
       mpGridLayout->addWidget(doubleSpinBox, i+1, j+1);
       connect(doubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateJointValue(double)));
     }
