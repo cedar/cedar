@@ -55,9 +55,6 @@ cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime, const s
 :
 cedar::aux::ConfigurationInterface(configFileName)
 {
-  // TODO produces error message in example program
-  addParameter(&_mName, "Name", "<name>");
-  readConfiguration();
   mStepSize = microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
   mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
   mStop  = false;
@@ -80,7 +77,13 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
   {
     mStop = true;
     wait(time);
-    if (suppressWarning == false && mMaxStepsTaken > 1.01 && mSimulatedTime.total_microseconds() == 0)
+
+    if(isRunning())
+    {
+      cout << "Warning: Thread is still running after call of stop()!" << endl;
+    }
+
+    if(suppressWarning == false && mMaxStepsTaken > 1.01 && mSimulatedTime.total_microseconds() == 0)
     {
       cout << "Warning: The system was not fast enough to stay to scheduled thread timing. ";
       cout << "Consider using a larger step size." << endl;
@@ -244,7 +247,8 @@ void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
   return;
 }
 
-void cedar::aux::LoopedThread::singleStep() {
+void cedar::aux::LoopedThread::singleStep()
+{
   if(!isRunning())
   {
     if(mSimulatedTime.total_microseconds() == 0)
@@ -256,4 +260,14 @@ void cedar::aux::LoopedThread::singleStep() {
       step(mSimulatedTime.total_microseconds());
     }
   }
+}
+
+bool cedar::aux::LoopedThread::stopRequested()
+{
+  if(isRunning() && mStop == true)
+  {
+    return true;
+  }
+
+  return false;
 }
