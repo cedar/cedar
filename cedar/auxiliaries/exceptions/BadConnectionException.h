@@ -46,7 +46,7 @@
 //none yet
 
 
-/*!@brief Abstraction thrown when a connection (i.e. a network connection) is too bad to continue*/
+/*!@brief Exception thrown when a connection (i.e. a network connection) is too bad to continue*/
 class cedar::aux::exc::BadConnectionException : public cedar::aux::exc::ExceptionBase
 {
   //--------------------------------------------------------------------------------------------------------------------
