@@ -44,8 +44,9 @@ public:
   /*!@brief Constructor that takes the name of the configuration file to use with the object.
 
    * @param configFileName    Name of the configuration file containing the parameters
+   * @param commandMode   if true KukaInterface immediately tries to establish command mode
    */
-  KukaInterface(const std::string& configFileName);
+  KukaInterface(const std::string& configFileName, bool commandMode=true);
 
   /*!the Destructor*/
   virtual ~KukaInterface();
@@ -189,10 +190,13 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief This method initializes the object.
+   *
    * This method is called from all constructors of the class.
+   * @param commandMode establish command mode if true
    */
-  void init();
+  void init(bool commandMode);
   /*! @brief tests if the KUKA-LBR is in command mode
+   *
    *  \throws BadConnectionException if the KUKA-LBR is not in command mode
    */
   void commandModeTest()const throw();

@@ -34,13 +34,13 @@ using namespace libconfig;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-KukaInterface::KukaInterface(const string& configFileName)
+KukaInterface::KukaInterface(const string& configFileName, bool commandMode)
 :
 cedar::dev::robot::KinematicChain(configFileName)
 {
   mIsInit = false;
   mpFriRemote = 0;
-  init();
+  init(commandMode);
 }
 
 KukaInterface::~KukaInterface()
@@ -57,7 +57,7 @@ KukaInterface::~KukaInterface()
 //----------------------------------------------------------------------------------------------------------------------
 // member functions
 //----------------------------------------------------------------------------------------------------------------------
-void KukaInterface::init()
+void KukaInterface::init(bool commandMode)
 {
   //The number of joints the KUKA LBR has
   //TODO: mNumberOfJoints does not exist anymore - remove this
@@ -82,7 +82,10 @@ void KukaInterface::init()
   mIsInit = true;
 
   //try to initialize the command mode
-  initCommandMode();
+  if(commandMode)
+  {
+    initCommandMode();
+  }
 }
 
 double KukaInterface::getJointAngle(const unsigned int index)const
@@ -93,14 +96,14 @@ double KukaInterface::getJointAngle(const unsigned int index)const
     CEDAR_THROW(aux::exc::IndexOutOfRangeException, "KukaInterface: invalid joint index");
   }
   //Receive data from the Kuka LBR
-  mpFriRemote->doReceiveData();
+  mpFriRemote->doDataExchange();
   //does not test if index is out of bounds yet
   return (double)mpFriRemote->getMsrMsrJntPosition()[index];
 }
 vector<double> KukaInterface::getJointAngles() const
 {
   //Receive data from the Kuka LBR
-  mpFriRemote->doReceiveData();
+  mpFriRemote->doDataExchange();
   //Create a std::vector from the float-Array
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
   return vector<double>(pJointPos, pJointPos + getNumberOfJoints());
