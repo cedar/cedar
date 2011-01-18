@@ -146,7 +146,6 @@ void KinematicChainWidget::radioButtonAngleClicked()
   setActiveColumn(0);
   mpKinematicChain->stop();
   mpKinematicChain->setWorkingMode(KinematicChain::ANGLE);
-  mpKinematicChain->start();
   updateSpinBoxes();
 }
 
