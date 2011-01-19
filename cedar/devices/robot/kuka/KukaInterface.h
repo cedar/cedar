@@ -129,6 +129,7 @@ public:
   int getIntFromKRL(int index)const throw();
   /*!@brief get a float-value from the KUKA Robot Language
 
+   * This method does not call doDataExchange itself
    * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
    * @return float value at position \e index received from the KRL
    * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
@@ -136,6 +137,7 @@ public:
   float getFloatFromKRL(int index)const throw();
   /*!@brief get a bool-value from the KUKA Robot Language
 
+   * This method does not call doDataExchange itself
    * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
    * @return bool value at position \e index received from the KRL
    * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
@@ -143,6 +145,7 @@ public:
   bool getBoolFromKRL(int index)const throw();
   /*!@brief send an integer-value to the KUKA Robot Language
 
+   * This method does not call doDataExchange itself
    * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
    * @param value the value to be send
    * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
@@ -150,6 +153,7 @@ public:
   void setToKRL(int index, int value) throw();
   /*!@brief send an float-value to the KUKA Robot Language
 
+   * This method does not call doDataExchange itself
    * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
    * @param value the value to be send
    * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
@@ -157,6 +161,7 @@ public:
   void setToKRL(int index, float value) throw();
   /*!@brief send an bool-value to the KUKA Robot Language
 
+   * This method does not call doDataExchange itself
    * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
    * @param value the value to be send
    * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
@@ -164,6 +169,7 @@ public:
   void setToKRL(int index, bool value) throw();
   /* @brief check if the robot is powered
 
+   * This method does not call doDataExchange itself
    * this especially means the dead man switch is in the right position and the robot is in command mode
    * @return true, if power is on
    */
@@ -176,6 +182,7 @@ public:
   /*! @brief brings the Interface into command mode
    * it is important to call FRIstart.src on the KUKA-LBR
    * This function will turn into an infinite loop if there is no connection to the KUKA-LBR!
+   * \TODO set timeout, so it won't be an infinite loop
    */
   void initCommandMode();
 
@@ -230,7 +237,6 @@ private:
   std::string _mRemoteHost;
   //!local server port
   int _mServerPort;
-
 
 };
 

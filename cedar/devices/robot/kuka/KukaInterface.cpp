@@ -60,8 +60,6 @@ KukaInterface::~KukaInterface()
 void KukaInterface::init(bool commandMode)
 {
   //The number of joints the KUKA LBR has
-  //TODO: mNumberOfJoints does not exist anymore - remove this
-  //KinematicChain::mNumberOfJoints = LBR_MNJ;
   //Load Parameters from the configuration file
   //ServerPort: 0 means, FRI will use the default Port
   addParameter(&_mServerPort, "ServerPort", 0);
@@ -69,6 +67,9 @@ void KukaInterface::init(bool commandMode)
    * else it will interprete it as IP-Address
    */
   addParameter(&_mRemoteHost, "RemoteHost", "NULL");
+
+  //now read the configuration file
+  readOrDefaultConfiguration();
 
   //create a new Instance of the friRemote
   if(_mRemoteHost != string("NULL"))
@@ -255,6 +256,6 @@ void KukaInterface::setToKRL(int index, bool value) throw()
   mpFriRemote->setToKRLBool(index, value);
 }
 bool KukaInterface::isPowerOn()const{
-  return isPowerOn();
+  return mpFriRemote->isPowerOn();
 }
 
