@@ -124,49 +124,60 @@ void KukaInterface::setJointAngle(const unsigned int index, const double angle) 
   //If the KUKA/LBR is not in command mode, throw an Exception
   commandModeTest();
 
-  //We want to move exactly one joint. Therefore, the other joints must have the same commanded Positions as before.
-  float *p_angles = mpFriRemote->getMsrCmdJntPosition();
-  p_angles[index] = float(angle);
-  mpFriRemote->doPositionControl(p_angles, true);
+  //only do this if power is on
+  if (isPowerOn())
+  {
+    //We want to move exactly one joint. Therefore, the other joints must have the same commanded Positions as before.
+    float *p_angles = mpFriRemote->getMsrCmdJntPosition();
+    p_angles[index] = float(angle);
+    mpFriRemote->doPositionControl(p_angles, true);
+  }
 }
 void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
 {
   //If the KUKA/LBR is not in command mode, throw an Exception
   commandModeTest();
-
-  //The FRI function is expecting a float array, so I have to allocate a temporary array.
-  float *p_angles = new float[getNumberOfJoints()];
-
-  for (unsigned i=0; i<getNumberOfJoints(); i++)
+  //You can only move the arm if power is on
+  if (isPowerOn())
   {
-    p_angles[i] = float(angles[i]);
+    //The FRI function is expecting a float array, so I have to allocate a temporary array.
+    float *p_angles = new float[getNumberOfJoints()];
+
+    for (unsigned i=0; i<getNumberOfJoints(); i++)
+    {
+      p_angles[i] = float(angles[i]);
+    }
+
+    //Although the first parameter is not const, this FRI function copies the content and does not change
+    //Second Parameter defines if the Data should be transfered to the LBR right now.
+    mpFriRemote->doPositionControl(p_angles, true);
+
+    delete[] p_angles;
   }
-
-  //Although the first parameter is not const, this FRI function copies the content and does not change
-  //Second Parameter defines if the Data should be transfered to the LBR right now.
-  mpFriRemote->doPositionControl(p_angles, true);
-
-  delete[] p_angles;
 }
 void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
 {
   //If the KUKA/LBR is not in command mode, throw an Exception
   commandModeTest();
 
-  //The cv::Mat Matrix has a template method to return a specific type.
-  //I don't know if it works without problems, though
-  const float *p_angles = angleMatrix.ptr<float>();
-  //since the fri expects a non-constant array, I have to copy the array.
-  float *p_angles_copy = new float[getNumberOfJoints()];
-  for(unsigned i=0; i<getNumberOfJoints(); i++)
+  //You can only move the arm if power is on
+  if(isPowerOn())
   {
-    p_angles_copy[i] = p_angles[i];
+    //The cv::Mat Matrix has a template method to return a specific type.
+    //I don't know if it works without problems, though
+    const float *p_angles = angleMatrix.ptr<float>();
+    //since the fri expects a non-constant array, I have to copy the array.
+    float *p_angles_copy = new float[getNumberOfJoints()];
+    for(unsigned i=0; i<getNumberOfJoints(); i++)
+    {
+      p_angles_copy[i] = p_angles[i];
+    }
+
+    //send the new joint positions to the arm
+    mpFriRemote->doPositionControl(p_angles_copy, true);
+
+    delete[] p_angles_copy;
   }
-
-  //send the new joint positions to the arm
-  mpFriRemote->doPositionControl(p_angles_copy, true);
-
-  delete[] p_angles_copy;
 }
 
 void KukaInterface::initCommandMode()
