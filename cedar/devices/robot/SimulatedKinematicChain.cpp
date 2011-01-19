@@ -77,17 +77,6 @@ double SimulatedKinematicChain::getJointAngle(unsigned int index) const
   return mJointAngles.at<double>(index, 0);
 }
 
-std::vector<double> SimulatedKinematicChain::getJointAngles() const
-{
-  vector<double> angles;
-  angles.resize(getNumberOfJoints());
-  for (unsigned int j=0; j<getNumberOfJoints(); j++)
-  {
-    angles[j] = mJointAngles.at<double>(j, 0);
-  }
-  return angles;
-}
-
 cv::Mat SimulatedKinematicChain::getJointAnglesMatrix() const
 {
   //!\todo data should be locked, I guess - check what how to do that in cedar
@@ -107,32 +96,7 @@ void SimulatedKinematicChain::setJointAngles(const cv::Mat& angleMatrix)
   mJointAngles = angleMatrix;
 }
 
-void SimulatedKinematicChain::setJointAngles(const std::vector<double>& angles)
-{
-  //!\todo assert that the passed vector has the right size
-  for (unsigned int j=0; j<getNumberOfJoints(); j++)
-  {
-    mJointAngles.at<double>(j, 0) = angles[j];
-  }
-}
-
 void SimulatedKinematicChain::init()
 {
   mJointAngles = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
