@@ -119,13 +119,13 @@ public:
    *
    * @return    vector of joint angles
    */
-  virtual std::vector<double> getJointAngles() const = 0;
+  virtual std::vector<double> getJointAngles() const;
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  virtual cv::Mat getJointAnglesMatrix() const = 0;
+  virtual cv::Mat getJointAnglesMatrix() const;
 
   /*!@brief get current state of a single joint velocity
    *
@@ -176,13 +176,13 @@ public:
    *
    * @param angleMatrix    vector of new joint angle values
    */
-  virtual void setJointAngles(const cv::Mat& angleMatrix) = 0;
+  virtual void setJointAngles(const cv::Mat& angles);
 
   /*!@brief set current state of all joint angles
    *
    * @param angles    vector of new joint angle values
    */
-  virtual void setJointAngles(const std::vector<double>& angles) = 0;
+  virtual void setJointAngles(const std::vector<double>& angles);
 
   /*!@brief set current state of a single joint velocity
    *
