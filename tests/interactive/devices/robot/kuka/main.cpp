@@ -41,16 +41,22 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+#include <exception>
 
 using namespace std;
 using cedar::dev::robot::kuka::KukaInterface;
 
 int main(int argc, char **argv)
 {
-  KukaInterface kukain("kukain.cfg");
-  vector<double> angles = kukain.getJointAngles();
-  for(unsigned i=0; i<angles.length(); i++){
-    cout << i+1 << "\t" << angles[i];
-  }
-  return 0;
+
+    KukaInterface kukain("test_arm.conf", false);
+    vector<double> angles = kukain.getJointAngles();
+    for(unsigned i=0; i<angles.size(); i++)
+    {
+      cout << i+1 << "\t" << angles[i] << "\t" << angles[i]/3.14*180 << endl;
+    }
+    cout << "Current State: " <<kukain.getFriState()<<endl;
+    while(!kukain.isPowerOn());
+    cout <<"Power is " << (kukain.isPowerOn()?string("ON"):string("OFF")) <<endl;
+    return 0;
 }
