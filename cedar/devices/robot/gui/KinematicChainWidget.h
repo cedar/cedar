@@ -91,7 +91,7 @@ private slots:
   void radioButtonAngleClicked();
   void radioButtonVelocityClicked();
   void radioButtonAccelerationClicked();
-  void updateJointValue(double value);
+  void updateJointValue();
   void updateSpinBoxes();
 
 private:
