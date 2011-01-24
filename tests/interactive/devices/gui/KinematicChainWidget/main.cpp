@@ -57,10 +57,10 @@ using namespace cedar::dev::robot;
 
 int main(int argc, char *argv[]) {
   KinematicChainPtr p_kinematic_chain(new SimulatedKinematicChain("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
-  //p_kinematic_chain->start();
-
   QApplication app(argc, argv);
-  KinematicChainWidget kcw(p_kinematic_chain);
-  kcw.show();
+  KinematicChainWidget widget(p_kinematic_chain);
+  widget.simulateVelocity(true);
+  widget.simulateAcceleration(true);
+  widget.show();
   return app.exec();
 }
