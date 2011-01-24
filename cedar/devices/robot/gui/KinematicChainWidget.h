@@ -71,7 +71,8 @@ public:
   // public methods
   //----------------------------------------------------------------------------
 
-  // none yet
+  void simulateVelocity(bool);
+  void simulateAcceleration(bool);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -116,6 +117,8 @@ private:
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
   QGridLayout *mpGridLayout;
   QTimer *mpTimer;
+  bool mSimulateVelocity;
+  bool mSimulateAcceleration;
 
   //----------------------------------------------------------------------------
   // parameters
