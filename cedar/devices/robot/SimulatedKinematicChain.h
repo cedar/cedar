@@ -78,14 +78,8 @@ public:
    *
    * @return    vector of joint angles
    */
-  std::vector<double> getJointAngles() const;
-  
-  /*!@brief get current state of all joint angles
-   *
-   * @return    vector of joint angles
-   */
   cv::Mat getJointAnglesMatrix() const;
-  
+
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
@@ -98,13 +92,8 @@ public:
    * @param angleMatrix    vector of new joint angle values
    */
   void setJointAngles(const cv::Mat& angleMatrix);
-  
-  /*!@brief set current state of all joint angles
-   *
-   * @param angles    vector of new joint angle values
-   */
-  void setJointAngles(const std::vector<double>& angles);
-  
+  using cedar::dev::robot::KinematicChain::setJointAngles;
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

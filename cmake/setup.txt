@@ -83,3 +83,6 @@ include_directories(${CEDAR_SOURCE_DIR} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 add_definitions(-Wall)
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
+if (UNIX)
+  add_definitions(-DLINUX -D__LINUX__)  
+endif (UNIX)
