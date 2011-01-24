@@ -38,6 +38,7 @@
 #include "AmtecKinematicChain.h"
 
 // PROJECT INCLUDES
+#include "auxiliaries/exceptions/InitializationException.h"
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/m5apiw32.h"
@@ -45,11 +46,32 @@
 
 using namespace std;
 using namespace cv;
+using namespace cedar::dev::robot;
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeometryPtr& rpReferenceGeometry) :
+    KinematicChain(rpReferenceGeometry)
+{
+  if(!init())
+  {
+    CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
+  }
+}
+
+
+cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& configFileName) :
+    KinematicChain(configFileName)
+{
+  if(!init())
+  {
+    CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
+  }
+}
+
 
 cedar::dev::robot::AmtecKinematicChain::~AmtecKinematicChain()
 {
@@ -140,6 +162,28 @@ double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
   mpDevice->getPos(module, &position);
 
   return position;
+}
+
+
+void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, double value)
+{
+  if(!mpDevice)
+  {
+    cout << "Error: No Amtec device!" << endl;
+    return;
+  }
+
+  if(index >= mModules.size())
+  {
+    cout << "Error: Trying to access the " << index << ". module while only "
+        << mModules.size() << " were found." << endl;
+    return;
+  }
+
+  int module = mModules[index];
+  mpDevice->moveRamp(module, value, mpReferenceGeometry->getJoint(index)->velocityLimits.max, M_2_PI);
+
+  return;
 }
 
 
