@@ -88,7 +88,8 @@ protected:
 private:
   bool init();
   bool calibrateModule(unsigned int module);
-  double getJointAngle(unsigned int) const;
+  double getJointAngle(unsigned int index) const;
+  void setJointAngle(unsigned int index, double value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
