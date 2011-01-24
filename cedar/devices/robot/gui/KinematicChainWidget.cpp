@@ -70,7 +70,7 @@ KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicCha
   mpGridLayout = new QGridLayout();
   QRadioButton *radioButtonAngle = new QRadioButton(QApplication::translate("KinematicChainWindow", "Angle [rad]"));
   QRadioButton *radioButtonVelocity = new QRadioButton(QApplication::translate("KinematicChainWindow", "Velocity [rad/s]"));
-  QRadioButton *radioButtonAcceleration = new QRadioButton(QApplication::translate("KinematicChainWindow", "Acceleration [rad/s]"));
+  QRadioButton *radioButtonAcceleration = new QRadioButton(QApplication::translate("KinematicChainWindow", "Acceleration [rad/s^2]"));
   mpGridLayout->addWidget(radioButtonAngle, 0, 1);
   mpGridLayout->addWidget(radioButtonVelocity, 0, 2);
   mpGridLayout->addWidget(radioButtonAcceleration, 0, 3);
@@ -178,9 +178,20 @@ void KinematicChainWidget::updateSpinBoxes()
     QDoubleSpinBox *p_spin_box_velocity = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(i+1, 2)->widget());
     QDoubleSpinBox *p_spin_box_acceleration = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(i+1, 3)->widget());
 
-    p_spin_box_angle->setValue(mpKinematicChain->getJointAngle(i));
-    p_spin_box_velocity->setValue(mpKinematicChain->getJointVelocity(i));
-    p_spin_box_acceleration->setValue(mpKinematicChain->getJointAcceleration(i));
+    if(!p_spin_box_angle->hasFocus())
+    {
+      p_spin_box_angle->setValue(mpKinematicChain->getJointAngle(i));
+    }
+
+    if(!p_spin_box_velocity->hasFocus())
+    {
+      p_spin_box_velocity->setValue(mpKinematicChain->getJointVelocity(i));
+    }
+
+    if(!p_spin_box_acceleration->hasFocus())
+    {
+      p_spin_box_acceleration->setValue(mpKinematicChain->getJointAcceleration(i));
+    }
   }
 }
 
