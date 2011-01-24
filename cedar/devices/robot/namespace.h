@@ -68,6 +68,10 @@ namespace cedar
       //!@brief smart pointer for KinematicChainModel
       typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
 
+      class AmtecKinematicChain;
+      //!@brief smart pointer for AmtecKinematicChainModel
+      typedef boost::shared_ptr<AmtecKinematicChain> AmtecKinematicChainPtr;
+
       class SimulatedKinematicChain;
       //!@brief smart pointer for SimulatedKinematicChainModel
       typedef boost::shared_ptr<SimulatedKinematicChain> SimulatedKinematicChainPtr;
