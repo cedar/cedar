@@ -103,7 +103,7 @@ KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicCha
       doubleSpinBox->setValue(0.0);
       doubleSpinBox->setSingleStep(0.1);
       mpGridLayout->addWidget(doubleSpinBox, i+1, j+1);
-      connect(doubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(updateJointValue(double)));
+      connect(doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(updateJointValue(void)));
     }
   }
 
@@ -210,9 +210,9 @@ void KinematicChainWidget::updateSpinBoxes()
 }
 
 
-void KinematicChainWidget::updateJointValue(double value)
+void KinematicChainWidget::updateJointValue()
 {
-  QWidget *sender = static_cast<QWidget*>(this->sender());
+  QDoubleSpinBox *sender = static_cast<QDoubleSpinBox*>(this->sender());
   int index_sender = mpGridLayout->indexOf(sender);
 
   int row, column;
@@ -222,6 +222,8 @@ void KinematicChainWidget::updateJointValue(double value)
   mpGridLayout->getItemPosition(index_sender, &row, &column, &dummy1, &dummy2);
   joint = row - 1;
   mode = column - 1;
+
+  double value = sender->value();
 
   switch(mode)
   {
