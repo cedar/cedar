@@ -165,6 +165,30 @@ double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
 }
 
 
+double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joint) const
+{
+  if(!mpDevice)
+  {
+    cout << "Error: No Amtec device!" << endl;
+    return 0.0;
+  }
+
+  if(joint >= mModules.size())
+  {
+    cout << "Error: Trying to access the " << joint << ". module while only "
+        << mModules.size() << " were found." << endl;
+    return 0.0;
+  }
+
+  int module = mModules[joint];
+  float velocity = 0.0f;
+
+  mpDevice->getVel(module, &velocity);
+
+  return velocity;
+}
+
+
 void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, double value)
 {
   if(!mpDevice)
@@ -182,6 +206,28 @@ void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, d
 
   int module = mModules[index];
   mpDevice->moveRamp(module, value, mpReferenceGeometry->getJoint(index)->velocityLimits.max, M_2_PI);
+
+  return;
+}
+
+
+void cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index, double velocity)
+{
+  if(!mpDevice)
+  {
+    cout << "Error: No Amtec device!" << endl;
+    return;
+  }
+
+  if(index >= mModules.size())
+  {
+    cout << "Error: Trying to access the " << index << ". module while only "
+        << mModules.size() << " were found." << endl;
+    return;
+  }
+
+  int module = mModules[index];
+  mpDevice->moveVel(module, velocity);
 
   return;
 }
