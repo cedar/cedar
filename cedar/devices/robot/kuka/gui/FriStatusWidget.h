@@ -25,7 +25,7 @@
     File:        FriStatusWidget.h
 
     Maintainer:  Guido Knips
-    Email:       gknips@ini.rub.de
+    Email:       guido.knips@ini.rub.de
     Date:        2011 01 25
 
     Description: Widget for showing FRI information
@@ -33,24 +33,27 @@
     Credits:
 
 ======================================================================================================================*/
-//TODO find the correct namespace
 
-#ifndef CEDAR_TEST_FRI_STATUS_WIDGET_H
-#define CEDAR_TEST_FRI_STATUS_WIDGET_H
+#ifndef CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+#define CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
 
 // LOCAL INCLUDES
+#include "ui_FriStatusWidget"
+#include "namespace.h"
 
 // PROJECT INCLUDES
+//TODO: find out, whether this counts as local or as project include
 #include "devices/robot/kuka/KukaInterface.h"
 
 // SYSTEM INCLUDES
-#include <QObject>
+#include <Qt>
 
 /*!@brief Widget that displays informations about the status of the KUKA-FRI
  *
  * This includes the status, the connection quality, the sample time and if the robot is powered
  */
-class cedar::test::FriStatusWidget
+class cedar::dev::robot::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
+                                                      private Ui_FriStatusWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -117,5 +120,5 @@ private:
 
 }; // class cedar::test::FriStatusWidget
 
-#endif // CEDAR_TEST_FRI_STATUS_WIDGET_H
+#endif // CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
 

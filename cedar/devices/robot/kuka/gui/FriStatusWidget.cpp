@@ -25,7 +25,7 @@
     File:        FriStatusWidget.cpp
 
     Maintainer:  Guido Knips
-    Email:       gknips@ini.rub.de
+    Email:       guido.knips@ini.rub.de
     Date:        2011 01 25
 
     Description: implementation of the widget that shows information about the status of the Kuka FRI
