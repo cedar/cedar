@@ -50,7 +50,7 @@
  *
  * This includes the status, the connection quality, the sample time and if the robot is powered
  */
-class cedar::test::FriStatusWidget :
+class cedar::test::FriStatusWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,9 +65,10 @@ public:
 
    * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
    */
-  FriStatusWidget(cedar::dev::robot::kuka::KukaInterface * pKukaIn, QWidget *parent=0);
+  FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn, QWidget *parent=0);
 
   //!@brief Destructor
+  ~FriStatusWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -100,6 +101,7 @@ public:
 protected:
   // none yet
 private:
+  bool mIsInit; //!<true, if object has been initialized
   cedar::dev::robot::kuka::KukaInterface *mpKukaIn //!<this is an external reference
 
   //--------------------------------------------------------------------------------------------------------------------

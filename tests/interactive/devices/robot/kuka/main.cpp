@@ -39,24 +39,20 @@
 #include "devices/robot/kuka/KukaInterface.h"
 
 // SYSTEM INCLUDES
-#include <iostream>
 #include <vector>
-#include <exception>
+#include <QApplication>
 
 using namespace std;
 using cedar::dev::robot::kuka::KukaInterface;
 
 int main(int argc, char **argv)
 {
+  //QApplication a(argc, argv);
 
-    KukaInterface kukain("test_arm.conf", false);
-    vector<double> angles = kukain.getJointAngles();
-    for(unsigned i=0; i<angles.size(); i++)
-    {
-      cout << i+1 << "\t" << angles[i] << "\t" << angles[i]/3.14*180 << endl;
-    }
-    cout << "Current State: " <<kukain.getFriState()<<endl;
-    while(!kukain.isPowerOn());
-    cout <<"Power is " << (kukain.isPowerOn()?string("ON"):string("OFF")) <<endl;
+  KukaInterface kukain("test_arm.conf", false);
+//  FriStatusWidget * p_fri_status_widget(
+
+
+
     return 0;
 }
