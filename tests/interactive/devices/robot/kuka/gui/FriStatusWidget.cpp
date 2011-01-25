@@ -49,10 +49,26 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn, QWidget *parent=0)
+{
+  mIsInit = false;
+  mpKukaIn = pKukaIn;
 
+  init();
+}
+
+~FriStatusWidget()
+{
+  //nothing yet
+}
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void init()
+{
+  mIsInit = true;
+}
+
 void FriStatusWidget::updateInformation()
 {
   //Translations from status-/quality-values to text
