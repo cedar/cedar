@@ -56,8 +56,11 @@ using namespace cedar::dev::robot;
 cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeometryPtr& rpReferenceGeometry) :
     KinematicChain(rpReferenceGeometry)
 {
+  mpDevice = 0;
+
   if(!init())
   {
+    cout << "Error initializing the Amtec module!" << endl;
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
   }
 }
@@ -66,8 +69,11 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
 cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& configFileName) :
     KinematicChain(configFileName)
 {
+  mpDevice = 0;
+
   if(!init())
   {
+    cout << "Error initializing the Amtec module!" << endl;
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
   }
 }
@@ -165,28 +171,28 @@ double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
 }
 
 
-double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joint) const
-{
-  if(!mpDevice)
-  {
-    cout << "Error: No Amtec device!" << endl;
-    return 0.0;
-  }
-
-  if(joint >= mModules.size())
-  {
-    cout << "Error: Trying to access the " << joint << ". module while only "
-        << mModules.size() << " were found." << endl;
-    return 0.0;
-  }
-
-  int module = mModules[joint];
-  float velocity = 0.0f;
-
-  mpDevice->getVel(module, &velocity);
-
-  return velocity;
-}
+//double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joint) const
+//{
+//  if(!mpDevice)
+//  {
+//    cout << "Error: No Amtec device!" << endl;
+//    return 0.0;
+//  }
+//
+//  if(joint >= mModules.size())
+//  {
+//    cout << "Error: Trying to access the " << joint << ". module while only "
+//        << mModules.size() << " were found." << endl;
+//    return 0.0;
+//  }
+//
+//  int module = mModules[joint];
+//  float velocity = 0.0f;
+//
+//  mpDevice->getVel(module, &velocity);
+//
+//  return velocity;
+//}
 
 
 void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, double value)
@@ -211,26 +217,26 @@ void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, d
 }
 
 
-void cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index, double velocity)
-{
-  if(!mpDevice)
-  {
-    cout << "Error: No Amtec device!" << endl;
-    return;
-  }
-
-  if(index >= mModules.size())
-  {
-    cout << "Error: Trying to access the " << index << ". module while only "
-        << mModules.size() << " were found." << endl;
-    return;
-  }
-
-  int module = mModules[index];
-  mpDevice->moveVel(module, velocity);
-
-  return;
-}
+//void cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index, double velocity)
+//{
+//  if(!mpDevice)
+//  {
+//    cout << "Error: No Amtec device!" << endl;
+//    return;
+//  }
+//
+//  if(index >= mModules.size())
+//  {
+//    cout << "Error: Trying to access the " << index << ". module while only "
+//        << mModules.size() << " were found." << endl;
+//    return;
+//  }
+//
+//  int module = mModules[index];
+//  mpDevice->moveVel(module, velocity);
+//
+//  return;
+//}
 
 
 bool cedar::dev::robot::AmtecKinematicChain::calibrateModule(unsigned int module)
