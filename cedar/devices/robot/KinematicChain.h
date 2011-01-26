@@ -186,22 +186,44 @@ public:
 
   /*!@brief set current state of a single joint velocity
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own velocity control you would probably like to
+   * override this method and return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
    * @param index    specifies the joint
    * @param velocity    new joint velocity value
+   * @return true iff hardware handles velocity itself
    */
-  virtual void setJointVelocity(unsigned int index, double velocity);
+  virtual bool setJointVelocity(unsigned int index, double velocity);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own velocity control and you want to override this
+   * method, then you have to return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
+   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   *
    * @param velocities    vector of new joint velocity values
+   * @return true iff hardware handles velocity itself
    */
-  void setJointVelocities(const cv::Mat& velocities);
+  bool setJointVelocities(const cv::Mat& velocities);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own velocity control and you want to override this
+   * method, then you have to return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
+   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   *
    * @param velocities    vector of new joint velocity values
+   * @return true iff hardware handles velocity itself
    */
-  void setJointVelocities(const std::vector<double>& velocities);
+  bool setJointVelocities(const std::vector<double>& velocities);
 
   /*!@brief set current state of a single joint acceleration
    *
@@ -238,9 +260,9 @@ public:
    *
    * For hardware that does not support velocity or acceleration control you can
    * start the KinematicChain as a thread to simulate this behavior. For such a
-   * simulation a vector of ideal target values is kept. But if you trust your
-   * hardware to be fast and reliable enough, you can also integrate using the
-   * current hardware values.
+   * simulation a vector of ideal angle/velocity values is kept. But if you
+   * trust your hardware to be fast and reliable enough, you can also integrate
+   * using the current hardware values.
    *
    * @param useCurrentHardwareValues
    */
