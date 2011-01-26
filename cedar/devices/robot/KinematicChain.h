@@ -119,13 +119,13 @@ public:
    *
    * @return    vector of joint angles
    */
-  virtual std::vector<double> getJointAngles() const = 0;
+  std::vector<double> getJointAngles() const;
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  virtual cv::Mat getJointAnglesMatrix() const = 0;
+  cv::Mat getJointAnglesMatrix() const;
 
   /*!@brief get current state of a single joint velocity
    *
@@ -138,13 +138,13 @@ public:
    *
    * @return    vector of joint velocities
    */
-  virtual std::vector<double> getJointVelocities() const;
+  std::vector<double> getJointVelocities() const;
 
   /*!@brief get current state of all joint velocities
    *
    * @return    vector of joint velocities
    */
-  virtual cv::Mat getJointVelocitiesMatrix() const;
+  cv::Mat getJointVelocitiesMatrix() const;
 
   /*!@brief get current state of a single joint acceleration
    *
@@ -157,13 +157,13 @@ public:
    *
    * @return    vector of joint accelerations
    */
-  virtual std::vector<double> getJointAccelerations() const;
+  std::vector<double> getJointAccelerations() const;
 
   /*!@brief get current state of all joint accelerations
    *
    * @return    vector of joint accelerations
    */
-  virtual cv::Mat getJointAccelerationsMatrix() const;
+  cv::Mat getJointAccelerationsMatrix() const;
 
   /*!@brief set current state of a single joint angle
    *
@@ -176,13 +176,13 @@ public:
    *
    * @param angleMatrix    vector of new joint angle values
    */
-  virtual void setJointAngles(const cv::Mat& angleMatrix) = 0;
+  void setJointAngles(const cv::Mat& angles);
 
   /*!@brief set current state of all joint angles
    *
    * @param angles    vector of new joint angle values
    */
-  virtual void setJointAngles(const std::vector<double>& angles) = 0;
+  void setJointAngles(const std::vector<double>& angles);
 
   /*!@brief set current state of a single joint velocity
    *
@@ -195,13 +195,13 @@ public:
    *
    * @param velocities    vector of new joint velocity values
    */
-  virtual void setJointVelocities(const cv::Mat& velocities);
+  void setJointVelocities(const cv::Mat& velocities);
 
   /*!@brief set current state of all joint velocities
    *
    * @param velocities    vector of new joint velocity values
    */
-  virtual void setJointVelocities(const std::vector<double>& velocities);
+  void setJointVelocities(const std::vector<double>& velocities);
 
   /*!@brief set current state of a single joint acceleration
    *
@@ -214,13 +214,13 @@ public:
    *
    * @param accelerations    vector of new joint velocity values
    */
-  virtual void setJointAccelerations(const cv::Mat& accelerations);
+  void setJointAccelerations(const cv::Mat& accelerations);
 
   /*!@brief set current state of all joint velocities
    *
    * @param accelerations    vector of new joint velocity values
    */
-  virtual void setJointAccelerations(const std::vector<double>& accelerations);
+  void setJointAccelerations(const std::vector<double>& accelerations);
 
   /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
    *
@@ -233,6 +233,21 @@ public:
    * @param actionType new working mode
    */
   void setWorkingMode(ActionType actionType);
+
+  /*!@brief Controls if real hardware values are used when integrating velocity/acceleration.
+   *
+   * For hardware that does not support velocity or acceleration control you can
+   * start the KinematicChain as a thread to simulate this behavior. For such a
+   * simulation a vector of ideal target values is kept. But if you trust your
+   * hardware to be fast and reliable enough, you can also integrate using the
+   * current hardware values.
+   *
+   * @param useCurrentHardwareValues
+   */
+  void useCurrentHardwareValues(bool useCurrentHardwareValues);
+
+
+  void start(Priority priority = InheritPriority);
 
 
   //----------------------------------------------------------------------------
@@ -258,6 +273,8 @@ protected:
   //!@brief geometry in reference configuration
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
 private:
+  bool mUseCurrentHardwareValues;
+  cv::Mat mJointAngles;
   cv::Mat mJointVelocities;
   cv::Mat mJointAccelerations;
   ActionType mCurrentWorkingMode;
