@@ -77,23 +77,9 @@ double SimulatedKinematicChain::getJointAngle(unsigned int index) const
   return mJointAngles.at<double>(index, 0);
 }
 
-cv::Mat SimulatedKinematicChain::getJointAnglesMatrix() const
-{
-  //!\todo data should be locked, I guess - check what how to do that in cedar
-  Mat angles;
-  angles = mJointAngles.clone();
-  return angles;
-}
-
 void SimulatedKinematicChain::setJointAngle(unsigned int index, double angle)
 {
   mJointAngles.at<double>(index, 0) = angle;
-}
-
-void SimulatedKinematicChain::setJointAngles(const cv::Mat& angleMatrix)
-{
-  //!\todo assert that the passed matrix has the right size
-  mJointAngles = angleMatrix;
 }
 
 void SimulatedKinematicChain::init()
