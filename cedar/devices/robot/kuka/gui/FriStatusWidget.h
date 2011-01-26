@@ -38,15 +38,16 @@
 #define CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
 
 // LOCAL INCLUDES
-#include "ui_FriStatusWidget"
 #include "namespace.h"
 
 // PROJECT INCLUDES
-//TODO: find out, whether this counts as local or as project include
 #include "devices/robot/kuka/KukaInterface.h"
+#include "cedar/devices/robot/kuka/gui/ui_FriStatusWidget.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 #include <Qt>
+#include <QObject>
 
 /*!@brief Widget that displays informations about the status of the KUKA-FRI
  *
@@ -105,7 +106,7 @@ protected:
   // none yet
 private:
   bool mIsInit; //!<true, if object has been initialized
-  cedar::dev::robot::kuka::KukaInterface *mpKukaIn //!<this is an external reference
+  cedar::dev::robot::kuka::KukaInterface *mpKukaIn; //!<this is an external reference
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -118,7 +119,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::test::FriStatusWidget
+}; // class cedar::dev::robot::kuka::gui::FriStatusWidget
 
 #endif // CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
 
