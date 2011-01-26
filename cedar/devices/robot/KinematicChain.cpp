@@ -58,6 +58,7 @@ LoopedThread(50.5), //!\todo this step size should be set different, should be a
 mpReferenceGeometry(rpReferenceGeometry)
 {
   setWorkingMode(ANGLE);
+  mUseCurrentHardwareValues = false;
   init();
 }
 
@@ -67,6 +68,7 @@ LoopedThread(50.0, 0.001, configFileName), //!\todo this step size should be set
 mpReferenceGeometry(new ReferenceGeometry(configFileName))
 {
   setWorkingMode(ANGLE);
+  mUseCurrentHardwareValues = false;
   init();
 }
 
@@ -373,11 +375,15 @@ void KinematicChain::step(double time)
 
     case VELOCITY:
 
-      angles = getJointAnglesMatrix();
-      angles += getJointVelocitiesMatrix() * ( time / 1000.0 );
-      applyAngleLimits(angles);
+      if(mUseCurrentHardwareValues)
+      {
+        mJointAngles = getJointAnglesMatrix();
+      }
 
-      setJointAngles(angles);
+      mJointAngles += getJointVelocitiesMatrix() * ( time / 1000.0 );
+      applyAngleLimits(mJointAngles);
+
+      setJointAngles(mJointAngles);
       break;
 
     case ACCELERATION:
@@ -413,6 +419,7 @@ void KinematicChain::setWorkingMode(ActionType actionType)
 void KinematicChain::init()
 {
   stop();
+  mJointAngles = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
   mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
   mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
   return;
@@ -443,6 +450,29 @@ void KinematicChain::applyVelocityLimits(Mat &velocities)
     velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
     velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
     velocities.at<double>(i, 0) = velocity;
+  }
+
+  return;
+}
+
+
+/*
+ * Overwritten start function of QThread
+ */
+void KinematicChain::start(Priority priority)
+{
+  switch(mCurrentWorkingMode)
+  {
+  case ANGLE:
+    cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << endl;
+    return;
+    break;
+  case VELOCITY:
+    mJointAngles = getJointAnglesMatrix();
+    QThread::start(priority);
+    break;
+  case ACCELERATION:
+    break;
   }
 
   return;
