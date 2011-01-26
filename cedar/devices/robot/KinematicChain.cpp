@@ -230,17 +230,17 @@ void KinematicChain::setJointAngles(const Mat& angles)
 }
 
 
-void KinematicChain::setJointVelocity(unsigned index, double velocity)
+bool KinematicChain::setJointVelocity(unsigned index, double velocity)
 {
   if(mCurrentWorkingMode != VELOCITY)
   {
-    return;
+    return false;
   }
 
   if(index >= getNumberOfJoints())
   {
     cout << "Error: Trying to set velocity for joint " << index << "!" << endl;
-    return;
+    return false;
   }
 
   velocity = max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
@@ -248,43 +248,44 @@ void KinematicChain::setJointVelocity(unsigned index, double velocity)
 
   mJointVelocities.at<double>(index,0) = velocity;
 
-  return;
+  return false;
 }
 
 
-void KinematicChain::setJointVelocities(const std::vector<double>& velocities)
+bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
   if(mCurrentWorkingMode != VELOCITY)
   {
-    return;
+    return false;
   }
 
   if(velocities.size() != getNumberOfJoints())
   {
     cout << "Error: You provided an vector of velocities with the wrong size ("
         << velocities.size() << " != " << getNumberOfJoints() << ")!" << endl;
-    return;
+    return false;
   }
+
+  bool hardware_velocity = true;
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
-    double velocity = velocities[i];
-    velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
-    velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
-
-    mJointVelocities.at<double>(i,0) = velocity;
+    if(!setJointVelocity(i, velocities[i]))
+    {
+      hardware_velocity = false;
+    }
   }
 
-  return;
+  return hardware_velocity;
 }
 
 
-void KinematicChain::setJointVelocities(const cv::Mat& velocities)
+bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
 
   if(mCurrentWorkingMode != VELOCITY)
   {
-    return;
+    return false;
   }
 
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
@@ -292,12 +293,20 @@ void KinematicChain::setJointVelocities(const cv::Mat& velocities)
     cout << "Error: You provided an matrix of velocities with the wrong size [("
         << velocities.size().height << "," << velocities.size().width
         << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
-    return;
+    return false;
   }
 
-  mJointVelocities = velocities;
-  applyVelocityLimits(mJointVelocities);
-  return;
+  bool hardware_velocity = true;
+
+  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  {
+    if(!setJointVelocity(i, velocities.at<double>(i, 0)))
+    {
+      hardware_velocity = false;
+    }
+  }
+
+  return hardware_velocity;
 }
 
 
@@ -364,7 +373,6 @@ void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 
 void KinematicChain::step(double time)
 {
-  Mat angles, velocities;
 
   // update the angle according to working mode
   switch(mCurrentWorkingMode)
@@ -372,6 +380,21 @@ void KinematicChain::step(double time)
     case ANGLE:
 
       break;
+
+    case ACCELERATION:
+
+      if(mUseCurrentHardwareValues)
+      {
+        mJointVelocities = getJointVelocitiesMatrix();
+      }
+
+      mJointVelocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
+      applyVelocityLimits(mJointVelocities);
+
+      if(setJointVelocities(mJointVelocities))
+      {
+        break;
+      }
 
     case VELOCITY:
 
@@ -382,22 +405,7 @@ void KinematicChain::step(double time)
 
       mJointAngles += getJointVelocitiesMatrix() * ( time / 1000.0 );
       applyAngleLimits(mJointAngles);
-
       setJointAngles(mJointAngles);
-      break;
-
-    case ACCELERATION:
-
-      velocities = getJointVelocitiesMatrix();
-      velocities += getJointAccelerationsMatrix() * ( time / 1000.0 );
-      applyVelocityLimits(velocities);
-
-      angles = getJointAnglesMatrix();
-      angles += velocities * ( time / 1000.0 );
-      applyAngleLimits(angles);
-
-      mJointVelocities = velocities;
-      setJointAngles(angles);
       break;
 
     default:
@@ -461,6 +469,11 @@ void KinematicChain::applyVelocityLimits(Mat &velocities)
  */
 void KinematicChain::start(Priority priority)
 {
+  if(isRunning())
+  {
+    return;
+  }
+
   switch(mCurrentWorkingMode)
   {
   case ANGLE:
@@ -472,6 +485,7 @@ void KinematicChain::start(Priority priority)
     QThread::start(priority);
     break;
   case ACCELERATION:
+    QThread::start(priority);
     break;
   }
 
