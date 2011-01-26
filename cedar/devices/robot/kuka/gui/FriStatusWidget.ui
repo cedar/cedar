@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>cedar::test::FriStatusWidget</class>
- <widget class="QWidget" name="cedar::test::FriStatusWidget">
+ <class>FriStatusWidget</class>
+ <widget class="QWidget" name="FriStatusWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>388</width>
-    <height>181</height>
+    <width>331</width>
+    <height>154</height>
    </rect>
   </property>
   <property name="focusPolicy">

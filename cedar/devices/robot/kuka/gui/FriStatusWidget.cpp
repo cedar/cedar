@@ -42,14 +42,14 @@
 // SYSTEM INCLUDES
 #include <sstream>
 
+using namespace cedar::dev::robot::kuka::gui;
 using namespace cedar::dev::robot::kuka;
-using namespace cedar::test;
 using namespace std;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn, QWidget *parent=0)
+FriStatusWidget::FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn, QWidget *parent)
 {
   mIsInit = false;
   mpKukaIn = pKukaIn;
@@ -57,14 +57,14 @@ FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn, QWidget *parent
   init();
 }
 
-~FriStatusWidget()
+FriStatusWidget::~FriStatusWidget()
 {
   //nothing yet
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void init()
+void FriStatusWidget::init()
 {
   mIsInit = true;
 }
@@ -75,10 +75,10 @@ void FriStatusWidget::updateInformation()
   string quality_names[] = { string("BAD (0)"), string("UNACCEPTABLE (1)"), string("GOOD (2)"), string("PERFECT (3)") };
   string state_names[] = { string("OFF (0)"), string("Monitor Mode"), string("Command Mode") };
   //set Text for Fri state and Fri quality
-  mpLabelStateData->setText(state_names[mpKukaIn.getState()]);
-  mpLabelQualData->setText(quality_names[mp.kukaIn.getState()]);
+  mpLabelStateData->setText(state_names[mpKukaIn->getFriState()].c_str());
+  mpLabelQualData->setText(quality_names[mpKukaIn->getFriQuality()].c_str());
   //set text for power status
-  if (mpKukaIn.isPowerOn())
+  if (mpKukaIn->isPowerOn())
   {
     mpLabelPowerData->setText("ON");
   }
@@ -88,6 +88,6 @@ void FriStatusWidget::updateInformation()
   }
   //set text for sample time
   stringstream s;
-  s <<mpKukaIn.getSampleTime()<<"s";
-  mpLabelSampleTimeData->setText(s.to_s());
+  s <<mpKukaIn->getSampleTime()<<"s";
+  mpLabelSampleTimeData->setText(s.str().c_str());
 }
