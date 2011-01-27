@@ -457,3 +457,9 @@ void KinematicChain::start(Priority priority)
 
   return;
 }
+
+
+void KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
+{
+  mUseCurrentHardwareValues = useCurrentHardwareValues;
+}
