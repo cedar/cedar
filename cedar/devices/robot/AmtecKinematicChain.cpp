@@ -217,25 +217,28 @@ void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, d
 }
 
 
-//void cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index, double velocity)
+//bool cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index, double velocity)
 //{
 //  if(!mpDevice)
 //  {
 //    cout << "Error: No Amtec device!" << endl;
-//    return;
+//    return true;
 //  }
 //
 //  if(index >= mModules.size())
 //  {
 //    cout << "Error: Trying to access the " << index << ". module while only "
 //        << mModules.size() << " were found." << endl;
-//    return;
+//    return true;
 //  }
+//
+//  velocity = max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
+//  velocity = min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
 //
 //  int module = mModules[index];
 //  mpDevice->moveVel(module, velocity);
 //
-//  return;
+//  return true;
 //}
 
 
