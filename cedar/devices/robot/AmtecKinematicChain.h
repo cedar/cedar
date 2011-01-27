@@ -89,9 +89,9 @@ private:
   bool init();
   bool calibrateModule(unsigned int module);
   double getJointAngle(unsigned int index) const;
-  //double getJointVelocity(unsigned int index) const;
+  double getJointVelocity(unsigned int index) const;
   void setJointAngle(unsigned int index, double value);
-  //bool setJointVelocity(unsigned int index, double velocity);
+  bool setJointVelocity(unsigned int index, double velocity);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
