@@ -232,11 +232,6 @@ void KinematicChain::setJointAngles(const Mat& angles)
 
 bool KinematicChain::setJointVelocity(unsigned index, double velocity)
 {
-  if(mCurrentWorkingMode != VELOCITY)
-  {
-    return false;
-  }
-
   if(index >= getNumberOfJoints())
   {
     cout << "Error: Trying to set velocity for joint " << index << "!" << endl;
@@ -254,11 +249,6 @@ bool KinematicChain::setJointVelocity(unsigned index, double velocity)
 
 bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
-  if(mCurrentWorkingMode != VELOCITY)
-  {
-    return false;
-  }
-
   if(velocities.size() != getNumberOfJoints())
   {
     cout << "Error: You provided an vector of velocities with the wrong size ("
@@ -282,12 +272,6 @@ bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 
 bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
-
-  if(mCurrentWorkingMode != VELOCITY)
-  {
-    return false;
-  }
-
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
     cout << "Error: You provided an matrix of velocities with the wrong size [("
@@ -312,11 +296,6 @@ bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 
 bool KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
-  if(mCurrentWorkingMode != ACCELERATION)
-  {
-    return false;
-  }
-
   if(index >= getNumberOfJoints())
   {
     cout << "Error: Trying to set acceleration for joint " << index << "!" << endl;
@@ -330,11 +309,6 @@ bool KinematicChain::setJointAcceleration(unsigned int index, double acceleratio
 
 bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
-  if(mCurrentWorkingMode != ACCELERATION)
-  {
-    return false;
-  }
-
   if(accelerations.size() != getNumberOfJoints())
   {
     cout << "Error: You provided an matrix of accelerations with the wrong size ("
@@ -353,11 +327,6 @@ bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerati
 
 bool KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
-  if(mCurrentWorkingMode != ACCELERATION)
-  {
-    return false;
-  }
-
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
     cout << "Error: You provided an matrix of accelerations with the wrong size [("
@@ -479,12 +448,9 @@ void KinematicChain::start(Priority priority)
   case ANGLE:
     cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << endl;
     return;
-    break;
   case VELOCITY:
-    mJointAngles = getJointAnglesMatrix();
-    QThread::start(priority);
-    break;
   case ACCELERATION:
+    mJointAngles = getJointAnglesMatrix();
     QThread::start(priority);
     break;
   }
