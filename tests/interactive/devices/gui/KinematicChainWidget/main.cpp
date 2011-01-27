@@ -59,8 +59,6 @@ int main(int argc, char *argv[]) {
   KinematicChainPtr p_kinematic_chain(new SimulatedKinematicChain("../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
   QApplication app(argc, argv);
   KinematicChainWidget widget(p_kinematic_chain);
-  widget.simulateVelocity(true);
-  widget.simulateAcceleration(true);
   widget.show();
   return app.exec();
 }
