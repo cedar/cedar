@@ -64,10 +64,6 @@ KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicCha
   // store a smart pointer to KinematicChain
   mpKinematicChain = kinematicChain;
 
-  // init members
-  mSimulateVelocity = false;
-  mSimulateAcceleration = false;
-
   // Set up the model and configure the view...
   setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
 
@@ -160,7 +156,8 @@ void KinematicChainWidget::radioButtonVelocityClicked()
   mpKinematicChain->stop();
   mpKinematicChain->setWorkingMode(KinematicChain::VELOCITY);
 
-  if(mSimulateVelocity)
+  // here we check if velocity has to be integrated
+  if(!mpKinematicChain->setJointVelocity(0, 0.0))
   {
     mpKinematicChain->start();
   }
@@ -175,7 +172,8 @@ void KinematicChainWidget::radioButtonAccelerationClicked()
   mpKinematicChain->stop();
   mpKinematicChain->setWorkingMode(KinematicChain::ACCELERATION);
 
-  if(mSimulateAcceleration)
+  // here we check if acceleration has to be integrated
+  if(!mpKinematicChain->setJointAcceleration(0, 0.0))
   {
     mpKinematicChain->start();
   }
@@ -244,16 +242,4 @@ void KinematicChainWidget::updateJointValue()
   }
 
   return;
-}
-
-
-void KinematicChainWidget::simulateVelocity(bool simulate)
-{
-  mSimulateVelocity = simulate;
-}
-
-
-void KinematicChainWidget::simulateAcceleration(bool simulate)
-{
-  mSimulateAcceleration = simulate;
 }
