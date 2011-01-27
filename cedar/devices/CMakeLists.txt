@@ -37,6 +37,7 @@
 cedar_add_library(cedardev
   MOC_HEADERS
   robot/KinematicChainModel.h
+  robot/gui/KinematicChainWidget.h
   robot/kuka/gui/FriStatusWidget.h
   LINK_LIBRARIES
   cedaraux

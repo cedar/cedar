@@ -57,7 +57,7 @@ int main()
   int errors = 0;
   
   // create instance of test class
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("test.conf"));
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/unit/devices/robot/SimulatedKinematicChain/test.conf"));
   SimulatedKinematicChain test_arm(p_reference_geometry);
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,14 +128,3 @@ int main()
   }
   return errors;
 }
-
-
-
-
-
-
-
-
-
-
-
