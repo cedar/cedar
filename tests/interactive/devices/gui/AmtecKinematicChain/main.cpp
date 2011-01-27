@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
   try
   {
     KinematicChainPtr p_kinematic_chain(new AmtecKinematicChain("../../../tests/interactive/devices/gui/AmtecKinematicChain/test_arm.conf"));
+    p_kinematic_chain->useCurrentHardwareValues(true);
     QApplication app(argc, argv);
     KinematicChainWidget widget(p_kinematic_chain);
     widget.show();
