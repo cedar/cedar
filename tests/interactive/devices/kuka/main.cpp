@@ -28,7 +28,7 @@
  ----- Email:       guido.knips@ini.rub.de
  ----- Date:        2011 1 11
 
- ----- Description:
+ ----- Description: Testing of the interface for the KUKA LBR
 
  ----- Credits:
  -----------------------------------------------------------------------------*/
@@ -36,23 +36,30 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/kuka/KukaInterface.h"
+#include "devices/robot/kuka/gui/FriStatusWidget.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <QApplication>
+#include <iostream>
 
 using namespace std;
 using cedar::dev::robot::kuka::KukaInterface;
+using cedar::dev::robot::kuka::gui::FriStatusWidget;
 
 int main(int argc, char **argv)
 {
-  //QApplication a(argc, argv);
+  QApplication a(argc, argv);
 
   KukaInterface kukain("test_arm.conf", false);
-//  FriStatusWidget * p_fri_status_widget(
 
+  FriStatusWidget * p_fri_status_widget = new FriStatusWidget(&kukain);
+  p_fri_status_widget->startTimer(100);
+  p_fri_status_widget->show();
 
+  a.exec();
 
-    return 0;
+  delete p_fri_status_widget;
+
+  return 0;
 }
