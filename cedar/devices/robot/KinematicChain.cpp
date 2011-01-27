@@ -387,9 +387,35 @@ void KinematicChain::step(double time)
 
 void KinematicChain::setWorkingMode(ActionType actionType)
 {
-  mCurrentWorkingMode = actionType;
   stop();
-  init();
+
+  Mat zeros = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+
+  // need to stop something?
+  switch(mCurrentWorkingMode)
+  {
+    case ACCELERATION:
+      setJointAccelerations(zeros);
+    case VELOCITY:
+      setJointVelocities(zeros);
+    case ANGLE:
+      break;
+  }
+
+  mCurrentWorkingMode = actionType;
+
+  // want to reset something?
+  switch(mCurrentWorkingMode)
+  {
+    case ACCELERATION:
+      mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+    case VELOCITY:
+      mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+    case ANGLE:
+      break;
+  }
+
+  return;
 }
 
 
