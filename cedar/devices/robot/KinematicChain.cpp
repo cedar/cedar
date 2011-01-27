@@ -310,36 +310,36 @@ bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 }
 
 
-void KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
+bool KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
   if(mCurrentWorkingMode != ACCELERATION)
   {
-    return;
+    return false;
   }
 
   if(index >= getNumberOfJoints())
   {
     cout << "Error: Trying to set acceleration for joint " << index << "!" << endl;
-    return;
+    return false;
   }
 
   mJointAccelerations.at<double>(index,0) = acceleration;
-  return;
+  return false;
 }
 
 
-void KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
+bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
   if(mCurrentWorkingMode != ACCELERATION)
   {
-    return;
+    return false;
   }
 
   if(accelerations.size() != getNumberOfJoints())
   {
     cout << "Error: You provided an matrix of accelerations with the wrong size ("
         << accelerations.size() << " != " << getNumberOfJoints() << ")!" << endl;
-    return;
+    return false;
   }
 
   for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
@@ -347,15 +347,15 @@ void KinematicChain::setJointAccelerations(const std::vector<double>& accelerati
     mJointAccelerations.at<double>(i,0) = accelerations[i];
   }
 
-  return;
+  return false;
 }
 
 
-void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
+bool KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
   if(mCurrentWorkingMode != ACCELERATION)
   {
-    return;
+    return false;
   }
 
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
@@ -363,11 +363,11 @@ void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
     cout << "Error: You provided an matrix of accelerations with the wrong size [("
         << accelerations.size().height << "," << accelerations.size().width
         << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
-    return;
+    return false;
   }
 
   mJointAccelerations = accelerations;
-  return;
+  return false;
 }
 
 
