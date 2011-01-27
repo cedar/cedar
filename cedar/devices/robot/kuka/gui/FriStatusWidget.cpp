@@ -54,6 +54,7 @@ FriStatusWidget::FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn
   mIsInit = false;
   mpKukaIn = pKukaIn;
 
+  setupUi(this);
   init();
 }
 
@@ -66,6 +67,7 @@ FriStatusWidget::~FriStatusWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void FriStatusWidget::init()
 {
+  updateInformation();
   mIsInit = true;
 }
 
@@ -90,4 +92,12 @@ void FriStatusWidget::updateInformation()
   stringstream s;
   s <<mpKukaIn->getSampleTime()<<"s";
   mpLabelSampleTimeData->setText(s.str().c_str());
+}
+
+void FriStatusWidget::timerEvent(QTimerEvent* pEvent)
+{
+  //Exchange data with the KUKA LBR
+  mpKukaIn->doDataExchange();
+  //set the displayed data
+  updateInformation();
 }

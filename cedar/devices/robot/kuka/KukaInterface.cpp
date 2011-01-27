@@ -130,8 +130,9 @@ void KukaInterface::setJointAngle(const unsigned int index, const double angle) 
     //We want to move exactly one joint. Therefore, the other joints must have the same commanded Positions as before.
     float *p_angles = mpFriRemote->getMsrCmdJntPosition();
     p_angles[index] = float(angle);
-    mpFriRemote->doPositionControl(p_angles, true);
+    mpFriRemote->doPositionControl(p_angles, false);
   }
+  doDataExchange();
 }
 void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
 {
@@ -150,10 +151,11 @@ void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
 
     //Although the first parameter is not const, this FRI function copies the content and does not change
     //Second Parameter defines if the Data should be transfered to the LBR right now.
-    mpFriRemote->doPositionControl(p_angles, true);
+    mpFriRemote->doPositionControl(p_angles, false);
 
     delete[] p_angles;
   }
+  doDataExchange();
 }
 void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
 {
@@ -174,10 +176,11 @@ void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
     }
 
     //send the new joint positions to the arm
-    mpFriRemote->doPositionControl(p_angles_copy, true);
+    mpFriRemote->doPositionControl(p_angles_copy, false);
 
     delete[] p_angles_copy;
   }
+  doDataExchange();
 }
 
 void KukaInterface::initCommandMode()
