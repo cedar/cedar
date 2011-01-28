@@ -49,7 +49,7 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-FriStatusWidget::FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn, QWidget *parent)
+FriStatusWidget::FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
 {
   mIsInit = false;
   mpKukaIn = pKukaIn;
