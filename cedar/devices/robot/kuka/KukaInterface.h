@@ -78,20 +78,20 @@ public:
    *  @param angle  angle to be set, in radian measure
    *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
    */
-  virtual void setJointAngle(const unsigned int index, const double angle) throw();
+  virtual void setJointAngle(const unsigned int index, const double angle);
   /*! @brief set the angle for all joints
 
    *  @param angles vector of angles to be set, in radian measure
    *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
    *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
-  virtual void setJointAngles(const std::vector<double>& angles) throw();
+  virtual void setJointAngles(const std::vector<double>& angles);
   /*! @brief set the angle for all joints
 
    *  @param angles OpenCV-Matrix of angles to be set, in radian measure
    *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
    */
-  virtual void setJointAngles(const cv::Mat& angleMatrix) throw();
+  virtual void setJointAngles(const cv::Mat& angleMatrix);
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
@@ -202,11 +202,6 @@ private:
    * @param commandMode establish command mode if true
    */
   void init(bool commandMode);
-  /*! @brief tests if the KUKA-LBR is in command mode
-   *
-   *  \throws BadConnectionException if the KUKA-LBR is not in command mode
-   */
-  void commandModeTest()const throw();
   /*!@brief tests if the index for values to be send or to receive is valid
    * @param i value to be tested
    * \throws cedar::aux::exc::IndexOutOfRangeException if index is not less than FRI_USER_SIZE

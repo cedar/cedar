@@ -69,7 +69,7 @@ public:
 
    * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
    */
-  FriStatusWidget(cedar::dev::robot::kuka::KukaInterface *pKukaIn, QWidget *parent=0);
+  FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
 
   //!@brief Destructor
   ~FriStatusWidget();
@@ -107,7 +107,7 @@ protected:
   // none yet
 private:
   bool mIsInit; //!<true, if object has been initialized
-  cedar::dev::robot::kuka::KukaInterface *mpKukaIn; //!<this is an external reference
+  cedar::dev::robot::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

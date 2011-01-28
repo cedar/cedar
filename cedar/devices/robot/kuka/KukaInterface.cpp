@@ -47,6 +47,10 @@ KukaInterface::~KukaInterface()
 {
   if(mIsInit)
   {
+    //If the script "kukain.src" is startet on the KUKA-LBR, the first boolean value means "Stop the FRI"
+    //it won't throw an exception, because the index is 0 and therefor valid
+    setToKRL(0, true);
+    doDataExchange();
     //Free Memory
     if(mpFriRemote)
     {
@@ -114,18 +118,16 @@ cv::Mat KukaInterface::getJointAnglesMatrix() const
   //This may be inefficient, but heck, the bloody udp-communication is imho more slow than this
   return cv::Mat(getJointAngles(), true);
 }
-void KukaInterface::setJointAngle(const unsigned int index, const double angle) throw()
+void KukaInterface::setJointAngle(const unsigned int index, const double angle)
 {
   //The index must be less than the number of angles
   if (index >= getNumberOfJoints() )
   {
     CEDAR_THROW(aux::exc::IndexOutOfRangeException, "KukaInterface: invalid joint index");
   }
-  //If the KUKA/LBR is not in command mode, throw an Exception
-  commandModeTest();
 
-  //only do this if power is on
-  if (isPowerOn())
+  //only do this if power is on and robot is in CommandMode
+  if (isPowerOn() && getFriState() == FRI_STATE_CMD)
   {
     //We want to move exactly one joint. Therefore, the other joints must have the same commanded Positions as before.
     float *p_angles = mpFriRemote->getMsrCmdJntPosition();
@@ -134,12 +136,10 @@ void KukaInterface::setJointAngle(const unsigned int index, const double angle) 
   }
   doDataExchange();
 }
-void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
+void KukaInterface::setJointAngles(const std::vector<double>& angles)
 {
-  //If the KUKA/LBR is not in command mode, throw an Exception
-  commandModeTest();
   //You can only move the arm if power is on
-  if (isPowerOn())
+  if (isPowerOn() && getFriState() == FRI_STATE_CMD)
   {
     //The FRI function is expecting a float array, so I have to allocate a temporary array.
     float *p_angles = new float[getNumberOfJoints()];
@@ -157,13 +157,10 @@ void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
   }
   doDataExchange();
 }
-void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
+void KukaInterface::setJointAngles(const cv::Mat& angleMatrix)
 {
-  //If the KUKA/LBR is not in command mode, throw an Exception
-  commandModeTest();
-
   //You can only move the arm if power is on
-  if(isPowerOn())
+  if(isPowerOn() && getFriState() == FRI_STATE_CMD)
   {
     //The cv::Mat Matrix has a template method to return a specific type.
     //I don't know if it works without problems, though
@@ -199,17 +196,6 @@ void KukaInterface::initCommandMode()
   #ifdef DEBUG
   cout << "KukaInterface::initCommandMode: " << counter << "data exchanges before command mode" << endl;
   #endif
-}
-
-void KukaInterface::commandModeTest()const throw()
-{
-  if (getFriState() != FRI_STATE_CMD)
-    {
-      CEDAR_THROW(aux::exc::BadConnectionException,
-                  "KUKA LBR is not in command mode. This may mean the connection "\
-                  "is not good enough or command mode has been stopped by the robot"
-                 );
-    }
 }
 
 void KukaInterface::validateKRLIndex(int index)const throw(){
