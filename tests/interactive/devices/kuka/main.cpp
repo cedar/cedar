@@ -37,6 +37,7 @@
 
 // PROJECT INCLUDES
 #include "devices/robot/kuka/gui/FriStatusWidget.h"
+#include "devices/robot/gui/KinematicChainWidget.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -44,22 +45,27 @@
 #include <iostream>
 
 using namespace std;
-using cedar::dev::robot::kuka::KukaInterface;
+using namespace cedar::dev::robot::kuka;
 using cedar::dev::robot::kuka::gui::FriStatusWidget;
+using cedar::dev::robot::KinematicChainPtr;
 
 int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-  KukaInterface kukain("test_arm.conf", false);
+  KukaInterfacePtr kukain(new KukaInterface("test_arm.conf", false));
 
-  FriStatusWidget * p_fri_status_widget = new FriStatusWidget(&kukain);
+  FriStatusWidget * p_fri_status_widget = new FriStatusWidget(kukain);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
+
+  KinematicChainWidget * p_kinematic_chain_widget = new KinematicChainWidget(kukain);
+  p_kinematic_chain_widget->show();
 
   a.exec();
 
   delete p_fri_status_widget;
+  delete p_kinematic_chain_widget;
 
   return 0;
 }
