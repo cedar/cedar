@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,45 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        <filename>
 
-    Maintainer:  Guido Knips
-    Email:       guido.knips@ini.rub.de
-    Date:        2010 12 9
+    Maintainer:  <first name> <last name>
+    Email:       <email address>
+    Date:        <creation date YYYY MM DD>
 
-    Description: Namespace file for cedar::dev::robot::kuka.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
-
-
-#ifndef CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
 
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
-{
-  namespace dev
-  {
-    /*! @brief Namespace for all robot interfaces. */
-    namespace robot
-    {
-      namespace kuka
-      {
-        class KukaInterface;
-        typedef boost::shared_ptr<KukaInterface> KukaInterfacePtr;
-        class KukaCommunicator;
-        typedef boost::shared_ptr<KukaCommunicator> KukaCommunicatorPtr;
-      }
-    }
-  }
-}
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-#endif // CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

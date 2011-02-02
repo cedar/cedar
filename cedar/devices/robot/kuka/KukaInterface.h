@@ -21,12 +21,12 @@
 #define CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H
 
 // LOCAL INCLUDES (includes from this project)
-// none yet
+#include "namespace.h"
 
 // PROJECT INCLUDES
 #include "../KinematicChain.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
-#include "namespace.h"
+
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
 
