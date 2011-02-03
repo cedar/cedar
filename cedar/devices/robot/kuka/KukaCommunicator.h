@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KukaCommunicator.cpp
+    File:        KukaCommunicator.h
 
     Maintainer:  Guido Knips
     Email:       guido.knips@ini.rub.de
@@ -41,9 +41,13 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "uxiliaries/LoopedThread.h"
+#include "auxiliaries/LoopedThread.h"
 
 // SYSTEM INCLUDES
+#include <fri/friremote.h>
+#include <QReadWriteLock>
+#include <vector>
+#include <string>
 
 
 /*!@brief Abstract description of the class.
@@ -64,7 +68,7 @@ public:
    *
    * @param configFileName Name of the coniguration file tha should be used
    */
-  KukaCommunicator(String configFileName);
+  KukaCommunicator(const std::string& configFileName);
 
 
   //!@brief Destructor
@@ -74,7 +78,56 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief get the measured angle of a specific joint
+   *
+   * @param index index to specify the joint
+   * @return angle of the specified joint in rad
+   */
+  double getJointAngle(unsigned index);
+  /*!@brief get a vector of all joint angles
+   *
+   * @return std::vector with all measured joint angles in rad
+   */
+  const std::vector<double> getJointAngles();
+  /*!@brief set a single joint position
+   *
+   * @param index index to specify the joint
+   * @param value value for the new joint angle in rad
+   */
+  void setJointAngle(unsigned index, double value);
+  /*!@brief set all joint angles
+   *
+   * @param values std::vector with the new angles in rad
+   */
+  void setJointAngles(const std::vector<double>& value);
+
+  /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
+
+  /*! @brief returns the state of the Interface.
+
+   * this can be FRI_STATE_OFF, FRI_STATE_MON and FRI_STATE_CMD
+   * Commands can only be send if the state is FRI_STATE_CMD, which represents the command mode
+   * @return current state of the interface
+   */
+  FRI_STATE getFriState();
+  /*! @brief returns the quality of the connection.
+   * this can range from FRI_QUALITY_UNACCEPTABLE to FRI_QUALITY_PERFECT
+   * if the Quality is worse (means: less) than FRI_QUALITY_GOOD, command mode switches to monitor mode automatically
+   * @return current Quality of the connection
+   */
+  FRI_QUALITY getFriQuality();
+  /*! @brief does Data exchange with the KUKA-LBR
+   * normally not necessary, the functions setJointAngle() and setJointAngles() do this by themselves.
+   * the get-Functions don't, though
+   */
+  float getSampleTime();
+  /* @brief check if the robot is powered
+
+   * This method does not call doDataExchange itself
+   * this especially means the dead man switch is in the right position and the robot is in command mode
+   * @return true, if power is on
+   */
+  bool isPowerOn();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,6 +142,11 @@ private:
   //!@brief every step is used to do communication between FRI and KUKA-RC
   void step(double time);
   //!@brief is called by every constructor
+  void init();
+  //!@brief copies data from the FRI to member variables for acces from outside the loop thread
+  void copyFromFRI();
+  //!@brief copies data to the FRI member variables
+  void copyToFRI();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -98,20 +156,39 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  //true, if the object has ben initialized
+  bool mIsInit;
+  //KUKA Vendor-Interface, wrapped by this class
+  friRemote *mpFriRemote;
+  //locker for read/write protection
+  QReadWriteLock mLock;
+  //last commanded joint position
+  std::vector<double> mCommandedJointPosition;
+  //last measured joint Position
+  std::vector<double> mMeasuredJointPosition;
+  //Copy of the FRI state
+  FRI_STATE mFriState;
+  //Copy of the current FRI quality
+  FRI_QUALITY mFriQuality;
+  //Sample Time of the FRI connection
+  float mSampleTime;
+  //last known status if power is on on the Kuka RC
+  bool mPowerOn;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (hopefully never!)
+  // none yet
 protected:
   // none yet
-
 private:
-  // none yet
+  //!IP Address of the remote host
+  std::string _mRemoteHost;
+  //!local server port
+  int _mServerPort;
 
-}; // class cedar::xxx
+}; // class cedar::dev::robot::kuka::KukaCommunicator
 
 #endif // CEDAR_DEV_ROBOT_KUKA_KUKA_COMMUNICATOR_H
 
