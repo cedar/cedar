@@ -96,8 +96,6 @@ void FriStatusWidget::updateInformation()
 
 void FriStatusWidget::timerEvent(QTimerEvent* pEvent)
 {
-  //Exchange data with the KUKA LBR
-  mpKukaIn->doDataExchange();
   //set the displayed data
   updateInformation();
 }

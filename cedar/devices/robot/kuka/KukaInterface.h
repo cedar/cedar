@@ -22,9 +22,10 @@
 
 // LOCAL INCLUDES (includes from this project)
 #include "namespace.h"
+#include "KukaCommunicator.h"
 
 // PROJECT INCLUDES
-#include "../KinematicChain.h"
+#include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
@@ -44,9 +45,9 @@ public:
   /*!@brief Constructor that takes the name of the configuration file to use with the object.
 
    * @param configFileName    Name of the configuration file containing the parameters
-   * @param commandMode   if true KukaInterface immediately tries to establish command mode
+   * @param communicatorConfigFileName  Name of the configuration file for the communicator member variable
    */
-  KukaInterface(const std::string& configFileName, bool commandMode=true);
+  KukaInterface(const std::string& configFileName, const std::string& communicatorConfigFileName);
 
   /*!the Destructor*/
   virtual ~KukaInterface();
@@ -114,59 +115,7 @@ public:
    * normally not necessary, the functions setJointAngle() and setJointAngles() do this by themselves.
    * the get-Functions don't, though
    */
-  void doDataExchange();
-  /* @brief returns desired command sample time
-
-   * @return sample time in seconds
-   */
   float getSampleTime()const;
-  /*!@brief get an integer-value from the KUKA Robot Language
-
-   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
-   * @return integer value at position \e index received from the KRL
-   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
-   */
-  int getIntFromKRL(int index)const throw();
-  /*!@brief get a float-value from the KUKA Robot Language
-
-   * This method does not call doDataExchange itself
-   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
-   * @return float value at position \e index received from the KRL
-   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
-   */
-  float getFloatFromKRL(int index)const throw();
-  /*!@brief get a bool-value from the KUKA Robot Language
-
-   * This method does not call doDataExchange itself
-   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
-   * @return bool value at position \e index received from the KRL
-   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
-   */
-  bool getBoolFromKRL(int index)const throw();
-  /*!@brief send an integer-value to the KUKA Robot Language
-
-   * This method does not call doDataExchange itself
-   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
-   * @param value the value to be send
-   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
-   */
-  void setToKRL(int index, int value) throw();
-  /*!@brief send an float-value to the KUKA Robot Language
-
-   * This method does not call doDataExchange itself
-   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
-   * @param value the value to be send
-   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
-   */
-  void setToKRL(int index, float value) throw();
-  /*!@brief send an bool-value to the KUKA Robot Language
-
-   * This method does not call doDataExchange itself
-   * @param index index of the value, must be less than FRI_USER_SIZE (which is 16)
-   * @param value the value to be send
-   * \throws cedar::aux::exc::IndexOutOfRangeException if \e index is out of range
-   */
-  void setToKRL(int index, bool value) throw();
   /* @brief check if the robot is powered
 
    * This method does not call doDataExchange itself
@@ -174,17 +123,6 @@ public:
    * @return true, if power is on
    */
   bool isPowerOn()const;
-
-
-
-  /*Some other FRI-specific functions that are not directly wrapped*/
-
-  /*! @brief brings the Interface into command mode
-   * it is important to call FRIstart.src on the KUKA-LBR
-   * This function will turn into an infinite loop if there is no connection to the KUKA-LBR!
-   * \TODO set timeout, so it won't be an infinite loop
-   */
-  void initCommandMode();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -201,13 +139,7 @@ private:
    * This method is called from all constructors of the class.
    * @param commandMode establish command mode if true
    */
-  void init(bool commandMode);
-  /*!@brief tests if the index for values to be send or to receive is valid
-   * @param i value to be tested
-   * \throws cedar::aux::exc::IndexOutOfRangeException if index is not less than FRI_USER_SIZE
-   */
-  void validateKRLIndex(int index) const throw();
-
+  void init();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -218,8 +150,8 @@ protected:
 private:
   //true, if the object has ben initialized
   bool mIsInit;
-  //KUKA Vendor-Interface, wrapped by this class
-  friRemote *mpFriRemote;
+  //KukaCommunicator, a looped thread that communicates steadily with the KUKA-RC and allows to send commands
+  cedar::dev::robot::kuka::KukaCommunicator *mpCommunicator;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -228,11 +160,7 @@ public:
 protected:
   // none yet
 private:
-  //!IP Address of the remote host
-  std::string _mRemoteHost;
-  //!local server port
-  int _mServerPort;
-
+  //none yet
 };
 
 #endif /* CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H */
