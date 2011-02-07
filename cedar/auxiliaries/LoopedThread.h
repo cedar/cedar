@@ -110,9 +110,34 @@ public:
    *
    * @param stepSize time window for each step function in milliseconds
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
+   */
+  LoopedThread(double stepSize = 1.0, double idleTime = 0.001);
+
+  /*!@brief Constructor with configuration file parameter.
+   *
+   * This constructor creates a LoopedThread with parameters taken from a
+   * configuration file.
+   *
+   * In the configuration file the parameter names are the following:
+   *
+   * stepSize, idleTime, useFixedStepSize, simlatedTime
+   *
    * @param configFileName an optional configuration file for reading and writing thread configurations
    */
-  LoopedThread(double stepSize = 1.0, double idleTime = 0.001, const std::string& configFileName = "");
+  LoopedThread(const std::string& configFileName = "");
+
+  /*!@brief Constructor with configuration file parameter.
+   *
+   * This constructor creates a LoopedThread with parameters taken from a
+   * configuration file.
+   *
+   * In the configuration file the parameter names are the following:
+   *
+   * stepSize, idleTime, useFixedStepSize, simlatedTime
+   *
+   * @param configFileName an optional configuration file for reading and writing thread configurations
+   */
+  LoopedThread(const char* pConfigFileName);
 
   //!@brief Destructor
   virtual ~LoopedThread() = 0;
@@ -151,7 +176,7 @@ public:
    *
    * @param stepSize the new step size in milliseconds
    */
-  void setStepSize(double stepSize) { mStepSize = boost::posix_time::microseconds( static_cast<unsigned int>( 1000*stepSize+.5 ) ); };
+  void setStepSize(double stepSize);
 
   /*!@brief Sets a new idle time.
    *
@@ -161,7 +186,7 @@ public:
    *
    * @param idleTime the new idle time in milliseconds
    */
-  void setIdleTime(double idleTime = 0.001) { mIdleTime = static_cast<unsigned int>( 1000*idleTime+0.5 ); };
+  void setIdleTime(double idleTime = 0.001);
 
   /*!@brief Decide if a fixed step size is used in cases of delay.
    *
@@ -177,7 +202,7 @@ public:
    *
    * @param useFixedStepSize
    */
-  void useFixedStepSize(bool useFixedStepSize = true) { mUseFixedStepSize = useFixedStepSize; };
+  void useFixedStepSize(bool useFixedStepSize = true);
 
 
   /*!@brief Sets a simulated time to be used in step().
@@ -189,25 +214,25 @@ public:
    *
    * @param simulatedTime the desired simulated step size in milliseconds
    */
-  void setSimulatedTime(double simulatedTime = 0.0) { mSimulatedTime = boost::posix_time::microseconds( static_cast<unsigned>( 1000*simulatedTime+.5 ) ); };
+  void setSimulatedTime(double simulatedTime = 0.0);
 
 
   /*!@brief Returns the last timesteps start time.
    *
    */
-  boost::posix_time::ptime getLastTimeStepStart() const { return mLastTimeStepStart; };
+  boost::posix_time::ptime getLastTimeStepStart() const;
 
 
   /*!@brief Returns the last timesteps end time.
    *
    */
-  boost::posix_time::ptime getLastTimeStepEnd() const { return mLastTimeStepEnd; };
+  boost::posix_time::ptime getLastTimeStepEnd() const;
 
 
   /*!@brief Returns the last timesteps duration.
    *
    */
-  boost::posix_time::time_duration getLastTimeStepDuration() const { return mLastTimeStepStart - mLastTimeStepEnd; };
+  boost::posix_time::time_duration getLastTimeStepDuration() const;
 
 
   /*!@brief Returns true if the thread is running but stop() was called.
@@ -227,8 +252,9 @@ protected:
   //----------------------------------------------------------------------------
 private:
   virtual void run(); // the thread does its work here!
-  void initStatistics(void);
+  void initStatistics();
   inline void updateStatistics(double stepsTaken);
+  void readParamsFromConfigFile();
 
   //----------------------------------------------------------------------------
   // members

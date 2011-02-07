@@ -64,7 +64,7 @@ mpReferenceGeometry(rpReferenceGeometry)
 
 KinematicChain::KinematicChain(const std::string& configFileName)
 :
-LoopedThread(50.0, 0.001, configFileName), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(configFileName),
 mpReferenceGeometry(new ReferenceGeometry(configFileName))
 {
   setWorkingMode(ANGLE);
