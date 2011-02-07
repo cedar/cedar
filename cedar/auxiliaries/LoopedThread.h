@@ -120,7 +120,7 @@ public:
    *
    * In the configuration file the parameter names are the following:
    *
-   * stepSize, idleTime, useFixedStepSize, simlatedTime
+   * threadStepSize, threadIdleTime, threadUseFixedStepSize, threadSimulatedTime
    *
    * @param configFileName an optional configuration file for reading and writing thread configurations
    */
@@ -133,7 +133,7 @@ public:
    *
    * In the configuration file the parameter names are the following:
    *
-   * stepSize, idleTime, useFixedStepSize, simlatedTime
+   * threadStepSize, threadIdleTime, threadUseFixedStepSize, threadSimulatedTime
    *
    * @param configFileName an optional configuration file for reading and writing thread configurations
    */
