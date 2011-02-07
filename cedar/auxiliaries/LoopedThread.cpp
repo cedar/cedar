@@ -295,28 +295,28 @@ void cedar::aux::LoopedThread::readParamsFromConfigFile()
 
   // mStepSize
 
-  if(addParameter(&step_size, "stepSize", 100.0) != CONFIG_SUCCESS)
+  if(addParameter(&step_size, "threadStepSize", 100.0) != CONFIG_SUCCESS)
   {
     cout << "LoopedThread: Error reading parameter 'stepSize' from config file!" << endl;
   }
 
   // mIdleTime
 
-  if(addParameter(&idle_time, "idleTime", 0.001) != CONFIG_SUCCESS)
+  if(addParameter(&idle_time, "threadIdleTime", 0.001) != CONFIG_SUCCESS)
   {
     cout << "LoopedThread: Error reading parameter 'idleTime' from config file!" << endl;
   }
 
   // mUseFixedStepSize
 
-  if(addParameter(&mUseFixedStepSize, "useFixedStepSize", true) != CONFIG_SUCCESS)
+  if(addParameter(&mUseFixedStepSize, "threadUseFixedStepSize", true) != CONFIG_SUCCESS)
   {
     cout << "LoopedThread: Error reading parameter 'useFixedStepSize' from config file!" << endl;
   }
 
   // mSimulatedTime
 
-  if(addParameter(&simulated_time, "simlatedTime", 0.0) != CONFIG_SUCCESS)
+  if(addParameter(&simulated_time, "threadSimulatedTime", 0.0) != CONFIG_SUCCESS)
   {
     cout << "LoopedThread: Error reading parameter 'simulatedTime' from config file!" << endl;
   }
