@@ -41,6 +41,9 @@
 
 // SYSTEM INCLUDES
 #include <sstream>
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 using namespace cedar::dev::robot::kuka::gui;
 using namespace cedar::dev::robot::kuka;
