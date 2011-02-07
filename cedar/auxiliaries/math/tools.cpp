@@ -59,6 +59,20 @@ double cedar::aux::math::normalizeAngle(double value)
   return value;
 }
 
+double cedar::aux::math::max(const cv::Mat matrix)
+{
+  double max;
+  cv::minMaxLoc(matrix, 0 , &max);
+  return max;
+}
+
+double cedar::aux::math::min(const cv::Mat matrix)
+{
+  double min;
+  cv::minMaxLoc(matrix, &min );
+  return min;
+}
+
 void cedar::aux::math::write(cv::Mat matrix)
 {
   switch (matrix.type())

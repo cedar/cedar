@@ -63,6 +63,19 @@ int main()
   log_file << "this should be the 3x3 identity matrix:" << std::endl;
   write(identity);
 
+  double min_val, max_val;
+  min_val = min(identity);
+  max_val = max(identity);
+  if (min_val!=0.0)
+  {
+    log_file<<"error in min(const cv::Mat)"<<std::endl;
+    errors++;
+  }
+  if ( max_val!=1.0)
+   {
+     log_file<<"error in max(const cv::Mat)"<<std::endl;
+     errors++;
+   }
   log_file << "test no" << test_number++ << std::endl;
   if (normalizeAngle(5.9) <= -M_PI || normalizeAngle(5.9) > M_PI)
   {

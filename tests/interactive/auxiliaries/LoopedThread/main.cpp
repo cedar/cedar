@@ -95,7 +95,7 @@ int main()
 {
 
   double timeInterval = 100.0;  // milliseconds
-  MyTestThread thread( timeInterval );
+  MyTestThread thread(timeInterval);
   //thread.useFixedStepSize(false);
   //thread.setSimulatedTime(50);
 
