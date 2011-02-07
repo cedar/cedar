@@ -50,7 +50,6 @@ using namespace boost::posix_time;
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-//!\todo step size should be moved to the configuration file
 cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime)
 {
   mStop  = false;

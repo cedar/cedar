@@ -22,55 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        KinematicChainWidget.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 19
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.rub.de
+    Date:        2011 01 06
 
-    Description: Namespace file for cedar::aux::exc.
+    Description: Example for an @em cedar::dev::robot::KinematicChainWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_EXC_NAMESPACE_H
-#define CEDAR_AUX_EXC_NAMESPACE_H
-
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "namespace.h"
+
+#include "devices/robot/gui/KinematicChainWidget.h"
+#include "devices/robot/AmtecKinematicChain.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+
+#include <iostream>
+#include <QtGui/QApplication>
 
 
-namespace cedar
-{
-  namespace aux
+using namespace std;
+using namespace cedar::dev::robot;
+
+
+//------------------------------------------------------------------------------
+// methods
+//------------------------------------------------------------------------------
+
+int main(int argc, char *argv[]) {
+  try
   {
-    //!@brief Namespace for all exception classes.
-    namespace exc
-    {
-      class ExceptionBase;
-      //!@brief smart pointer for ExceptionBase
-      typedef boost::shared_ptr<ExceptionBase> ExceptionBasePtr;
-
-      class NullPointerException;
-      //!@brief smart pointer for NullPointerException
-      typedef boost::shared_ptr<NullPointerException> NullPointerExceptionPtr;
-
-      class IndexOutOfRangeException;
-      //!@brief smart pointer for IndexOutOfRangeException
-      typedef boost::shared_ptr<IndexOutOfRangeException> IndexOutOfRangePtr;
-
-      class InitializationException;
-      //!@brief smart pointer for InitializationException
-      typedef boost::shared_ptr<InitializationException> InitializationExceptionPtr;
-    }
+    KinematicChainPtr p_kinematic_chain(new AmtecKinematicChain("../../../tests/interactive/devices/gui/AmtecKinematicChain/test_arm.conf"));
+    p_kinematic_chain->useCurrentHardwareValues(true);
+    QApplication app(argc, argv);
+    KinematicChainWidget widget(p_kinematic_chain);
+    widget.show();
+    return app.exec();
+  }
+  catch(exception e)
+  {
+    cout << "Exception: " << e.what() << endl;
   }
 }
-
-#endif // CEDAR_AUX_EXC_NAMESPACE_H
