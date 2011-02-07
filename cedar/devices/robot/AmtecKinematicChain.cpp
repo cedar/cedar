@@ -57,8 +57,9 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
     KinematicChain(rpReferenceGeometry)
 {
   mpDevice = 0;
+  readParamsFromConfigFile();
 
-  if(!init())
+  if(!initDevice())
   {
     cout << "Error initializing the Amtec module!" << endl;
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
@@ -70,8 +71,9 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& config
     KinematicChain(configFileName)
 {
   mpDevice = 0;
+  readParamsFromConfigFile();
 
-  if(!init())
+  if(!initDevice())
   {
     cout << "Error initializing the Amtec module!" << endl;
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
@@ -94,17 +96,15 @@ cedar::dev::robot::AmtecKinematicChain::~AmtecKinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::dev::robot::AmtecKinematicChain::init()
+bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 {
-  // TODO parameterize init string
-  const char *init_string = "ESD:0,450";
 
   if(!mpDevice)
   {
-    mpDevice = newDevice(init_string);
+    mpDevice = newDevice(mInitString.c_str());
   }
 
-  int ret_val = mpDevice->init(init_string);
+  int ret_val = mpDevice->init(mInitString.c_str());
 
   switch(ret_val)
   {
@@ -295,3 +295,14 @@ bool cedar::dev::robot::AmtecKinematicChain::calibrateModule(unsigned int module
   return true;
 }
 
+
+void cedar::dev::robot::AmtecKinematicChain::readParamsFromConfigFile()
+{
+  if(addParameter(&mInitString, "amtecInitString", "ESD:0,450") != CONFIG_SUCCESS)
+  {
+    cout << "AmtecKinematicChain: Error reading 'amtecInitString' from config file!" << endl;
+  }
+
+  readOrDefaultConfiguration();
+  return;
+}
