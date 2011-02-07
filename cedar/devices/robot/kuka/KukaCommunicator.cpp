@@ -40,7 +40,9 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 using namespace std;
 using namespace cedar::dev::robot::kuka;
@@ -49,7 +51,7 @@ using namespace cedar::dev::robot::kuka;
 //----------------------------------------------------------------------------------------------------------------------
 KukaCommunicator::KukaCommunicator(const string& configFileName)
 :
-cedar::aux::LoopedThread(0.012),
+cedar::aux::LoopedThread(0.012, 0.001, configFileName),
 mCommandedJointPosition(LBR_MNJ),
 mMeasuredJointPosition(LBR_MNJ)
 {
@@ -108,6 +110,7 @@ void KukaCommunicator::init()
 }
 void KukaCommunicator::step(double time)
 {
+  cout <<"KEIN SEGFAULT"<<endl;
   //only, if properly initialized
   if(mIsInit)
   {
