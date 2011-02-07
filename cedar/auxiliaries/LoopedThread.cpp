@@ -51,16 +51,31 @@ using namespace boost::posix_time;
 // constructors and destructor
 //------------------------------------------------------------------------------
 //!\todo step size should be moved to the configuration file
-cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime, const std::string& configFileName)
-:
-cedar::aux::ConfigurationInterface(configFileName)
+cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime)
 {
+  mStop  = false;
+  initStatistics();
+
   mStepSize = microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
   mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
-  mStop  = false;
   mUseFixedStepSize = true;
   mSimulatedTime = microseconds(0);
+}
+
+cedar::aux::LoopedThread::LoopedThread(const std::string& configFileName)
+  :cedar::aux::ConfigurationInterface(configFileName)
+{
+  mStop = false;
   initStatistics();
+  readParamsFromConfigFile();
+}
+
+cedar::aux::LoopedThread::LoopedThread(const char* pConfigFileName)
+  :cedar::aux::ConfigurationInterface(pConfigFileName)
+{
+  mStop = false;
+  initStatistics();
+  readParamsFromConfigFile();
 }
 
 cedar::aux::LoopedThread::~LoopedThread()
@@ -270,4 +285,82 @@ bool cedar::aux::LoopedThread::stopRequested()
   }
 
   return false;
+}
+
+void cedar::aux::LoopedThread::readParamsFromConfigFile()
+{
+  double step_size = 100.0;
+  double idle_time = 0.001;
+  double simulated_time = 0.0;
+
+  // mStepSize
+
+  if(addParameter(&step_size, "stepSize", 100.0) != CONFIG_SUCCESS)
+  {
+    cout << "LoopedThread: Error reading parameter 'stepSize' from config file!" << endl;
+  }
+
+  // mIdleTime
+
+  if(addParameter(&idle_time, "idleTime", 0.001) != CONFIG_SUCCESS)
+  {
+    cout << "LoopedThread: Error reading parameter 'idleTime' from config file!" << endl;
+  }
+
+  // mUseFixedStepSize
+
+  if(addParameter(&mUseFixedStepSize, "useFixedStepSize", true) != CONFIG_SUCCESS)
+  {
+    cout << "LoopedThread: Error reading parameter 'useFixedStepSize' from config file!" << endl;
+  }
+
+  // mSimulatedTime
+
+  if(addParameter(&simulated_time, "simlatedTime", 0.0) != CONFIG_SUCCESS)
+  {
+    cout << "LoopedThread: Error reading parameter 'simulatedTime' from config file!" << endl;
+  }
+
+  readOrDefaultConfiguration();
+
+  mStepSize = microseconds(static_cast<unsigned int>(1000 * step_size + 0.5));
+  mIdleTime = static_cast<unsigned int>(1000 * idle_time + 0.5);
+  mSimulatedTime = microseconds(static_cast<unsigned>(1000 * simulated_time + 0.5));
+
+  return;
+}
+
+void cedar::aux::LoopedThread::setStepSize(double stepSize)
+{
+  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
+}
+
+void cedar::aux::LoopedThread::setIdleTime(double idleTime)
+{
+  mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
+}
+
+void cedar::aux::LoopedThread::useFixedStepSize(bool useFixedStepSize)
+{
+  mUseFixedStepSize = useFixedStepSize;
+}
+
+void cedar::aux::LoopedThread::setSimulatedTime(double simulatedTime)
+{
+  mSimulatedTime = boost::posix_time::microseconds(static_cast<unsigned>(1000 * simulatedTime + 0.5));
+}
+
+boost::posix_time::ptime cedar::aux::LoopedThread::getLastTimeStepStart() const
+{
+  return mLastTimeStepStart;
+}
+
+boost::posix_time::ptime cedar::aux::LoopedThread::getLastTimeStepEnd() const
+{
+  return mLastTimeStepEnd;
+}
+
+boost::posix_time::time_duration cedar::aux::LoopedThread::getLastTimeStepDuration() const
+{
+  return mLastTimeStepStart - mLastTimeStepEnd;
 }
