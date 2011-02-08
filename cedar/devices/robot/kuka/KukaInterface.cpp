@@ -42,7 +42,6 @@ KinematicChain(configFileName)
   mpCommunicator = new KukaCommunicator(communicatorConfigFileName);
   init();
 }
-
 KukaInterface::~KukaInterface()
 {
   if(mIsInit)
@@ -62,7 +61,7 @@ void KukaInterface::init()
   mIsInit = true;
 }
 
-double KukaInterface::getJointAngle(const unsigned int index)const
+double KukaInterface::getJointAngle(unsigned int index)const
 {
   //The index must be less than the number of angles
   if (index >= getNumberOfJoints() )
@@ -75,7 +74,7 @@ vector<double> KukaInterface::getJointAngles() const
 {
   return mpCommunicator->getJointAngles();
 }
-void KukaInterface::setJointAngle(const unsigned int index, const double angle)
+void KukaInterface::setJointAngle(unsigned int index, double angle)
 {
   //The index must be less than the number of angles
   if (index >= getNumberOfJoints() )
