@@ -75,11 +75,6 @@ vector<double> KukaInterface::getJointAngles() const
 {
   return mpCommunicator->getJointAngles();
 }
-cv::Mat KukaInterface::getJointAnglesMatrix() const
-{
-  //This may be inefficient... but I'm lazy
-  return cv::Mat(mpCommunicator->getJointAngles(), true);
-}
 void KukaInterface::setJointAngle(const unsigned int index, const double angle)
 {
   //The index must be less than the number of angles
@@ -99,19 +94,6 @@ void KukaInterface::setJointAngles(const std::vector<double>& angles)
   //You can only move the arm if power is on
   if (isPowerOn() && getFriState() == FRI_STATE_CMD)
   {
-    mpCommunicator->setJointAngles(angles);
-  }
-}
-void KukaInterface::setJointAngles(const cv::Mat& angleMatrix)
-{
-  //You can only move the arm if power is on
-  if(isPowerOn() && getFriState() == FRI_STATE_CMD)
-  {
-    vector<double> angles(LBR_MNJ);
-    for(int i=0; i<LBR_MNJ; i++)
-    {
-      angles[i] = angleMatrix.at<double>(i,0);
-    }
     mpCommunicator->setJointAngles(angles);
   }
 }
