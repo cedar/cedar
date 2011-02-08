@@ -29,14 +29,13 @@
 
 using namespace cedar::dev::robot::kuka;
 using namespace std;
-using namespace libconfig;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-KukaInterface::KukaInterface(const string& configFileName, const std::string& communicatorConfigFileName)
+KukaInterface::KukaInterface(const string& configFileName, const string& communicatorConfigFileName)
 :
-cedar::dev::robot::KinematicChain(configFileName)
+KinematicChain(configFileName)
 {
   mIsInit = false;
   mpCommunicator = 0;
@@ -133,7 +132,8 @@ float KukaInterface::getSampleTime()const
 {
   return mpCommunicator->getSampleTime();
 }
-bool KukaInterface::isPowerOn()const{
+bool KukaInterface::isPowerOn()const
+{
   return mpCommunicator->isPowerOn();
 }
 

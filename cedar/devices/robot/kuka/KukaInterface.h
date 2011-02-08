@@ -118,7 +118,6 @@ public:
   float getSampleTime()const;
   /* @brief check if the robot is powered
 
-   * This method does not call doDataExchange itself
    * this especially means the dead man switch is in the right position and the robot is in command mode
    * @return true, if power is on
    */

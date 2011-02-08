@@ -106,11 +106,13 @@ void KukaCommunicator::init()
   //copy default values from the FRI
   copyFromFRI();
 
+  //start the thread
+  start();
+
   mIsInit = true;
 }
 void KukaCommunicator::step(double time)
 {
-  cout <<"KEIN SEGFAULT"<<endl;
   //only, if properly initialized
   if(mIsInit)
   {
