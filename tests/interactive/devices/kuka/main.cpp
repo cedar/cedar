@@ -55,11 +55,11 @@ int main(int argc, char **argv)
 
   KukaInterfacePtr p_kukain(new KukaInterface("test_arm.conf", "test_communicator.conf"));
 
-  //FriStatusWidget * p_fri_status_widget = new FriStatusWidget(p_kukain);
-  //p_fri_status_widget->startTimer(100);
-  //p_fri_status_widget->show();
-  //KinematicChainWidget * p_kinematic_chain_widget = new KinematicChainWidget(p_kukain);
-  //p_kinematic_chain_widget->show();
+  FriStatusWidget * p_fri_status_widget = new FriStatusWidget(p_kukain);
+  p_fri_status_widget->startTimer(100);
+  p_fri_status_widget->show();
+  KinematicChainWidget * p_kinematic_chain_widget = new KinematicChainWidget(p_kukain);
+  p_kinematic_chain_widget->show();
 
   a.exec();
 

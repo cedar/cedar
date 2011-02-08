@@ -25,8 +25,8 @@
 #include "KukaCommunicator.h"
 
 // PROJECT INCLUDES
-#include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "devices/robot/KinematicChain.h"
+#include "auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
@@ -61,7 +61,7 @@ public:
    *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
    *  @return joint angle for the given index
    */
-  virtual double getJointAngle(const unsigned int index) const;
+  virtual double getJointAngle(unsigned int index) const;
   /*! @brief returns all joint angles
 
    *  @return a vector filled with the joint angles
@@ -74,7 +74,7 @@ public:
    *  @param angle  angle to be set, in radian measure
    *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
    */
-  virtual void setJointAngle(const unsigned int index, const double angle);
+  virtual void setJointAngle(unsigned int index, double angle);
   /*! @brief set the angle for all joints
 
    *  @param angles vector of angles to be set, in radian measure
@@ -82,7 +82,6 @@ public:
    *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
   virtual void setJointAngles(const std::vector<double>& angles);
-
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
   /*! @brief returns the state of the Interface.
