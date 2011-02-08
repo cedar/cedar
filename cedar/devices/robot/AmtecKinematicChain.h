@@ -104,6 +104,7 @@ protected:
 private:
   CDevice *mpDevice;
   std::string mInitString;
+  int mInit;
   std::vector<int> mModules;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -57,6 +57,7 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
     KinematicChain(rpReferenceGeometry)
 {
   mpDevice = 0;
+  mInitString = string("ESD:0,450");
   readParamsFromConfigFile();
 
   if(!initDevice())
@@ -71,6 +72,7 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& config
     KinematicChain(configFileName)
 {
   mpDevice = 0;
+  mInitString = string("ESD:0,450");
   readParamsFromConfigFile();
 
   if(!initDevice())
