@@ -68,11 +68,6 @@ public:
    *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
   virtual std::vector<double> getJointAngles() const;
-  /*! @brief returns all joint angles
-
-   *  @return a OpenCV-Matrix filled with the joint angles
-   */
-  virtual cv::Mat getJointAnglesMatrix() const;
   /*! @brief set the angle for a specified joint
 
    *  @param index  index of the joint
@@ -87,12 +82,6 @@ public:
    *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
   virtual void setJointAngles(const std::vector<double>& angles);
-  /*! @brief set the angle for all joints
-
-   *  @param angles OpenCV-Matrix of angles to be set, in radian measure
-   *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
-   */
-  virtual void setJointAngles(const cv::Mat& angleMatrix);
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
