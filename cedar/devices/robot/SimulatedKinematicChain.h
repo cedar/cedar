@@ -72,7 +72,7 @@ public:
    *
    * @return    joint angle value
    */
-  double getJointAngle(unsigned int index) const;
+  double getJointAngle(unsigned int index);
   
   /*!@brief set current state of a single joint angle
    *
