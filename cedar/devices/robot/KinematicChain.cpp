@@ -99,7 +99,7 @@ void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry
 }
 
 
-std::vector<double> KinematicChain::getJointAngles() const
+std::vector<double> KinematicChain::getJointAngles()
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -112,7 +112,7 @@ std::vector<double> KinematicChain::getJointAngles() const
 }
 
 
-Mat KinematicChain::getJointAnglesMatrix() const
+Mat KinematicChain::getJointAnglesMatrix()
 {
   Mat dummy = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
@@ -125,7 +125,7 @@ Mat KinematicChain::getJointAnglesMatrix() const
 }
 
 
-double KinematicChain::getJointVelocity(unsigned int index) const
+double KinematicChain::getJointVelocity(unsigned int index)
 {
   if(index >= getNumberOfJoints())
   {
@@ -136,7 +136,7 @@ double KinematicChain::getJointVelocity(unsigned int index) const
 }
 
 
-std::vector<double> KinematicChain::getJointVelocities() const
+std::vector<double> KinematicChain::getJointVelocities()
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -149,13 +149,13 @@ std::vector<double> KinematicChain::getJointVelocities() const
 }
 
 
-Mat KinematicChain::getJointVelocitiesMatrix() const
+Mat KinematicChain::getJointVelocitiesMatrix()
 {
   return mJointVelocities.clone();
 }
 
 
-double KinematicChain::getJointAcceleration(unsigned int index) const
+double KinematicChain::getJointAcceleration(unsigned int index)
 {
   if(index >= getNumberOfJoints())
   {
@@ -166,7 +166,7 @@ double KinematicChain::getJointAcceleration(unsigned int index) const
 }
 
 
-std::vector<double> KinematicChain::getJointAccelerations() const
+std::vector<double> KinematicChain::getJointAccelerations()
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -179,7 +179,7 @@ std::vector<double> KinematicChain::getJointAccelerations() const
 }
 
 
-cv::Mat KinematicChain::getJointAccelerationsMatrix() const
+cv::Mat KinematicChain::getJointAccelerationsMatrix()
 {
   return mJointAccelerations.clone();
 }
