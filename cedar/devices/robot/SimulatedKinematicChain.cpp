@@ -72,7 +72,7 @@ SimulatedKinematicChain::~SimulatedKinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double SimulatedKinematicChain::getJointAngle(unsigned int index) const
+double SimulatedKinematicChain::getJointAngle(unsigned int index)
 {
   return mJointAngles.at<double>(index, 0);
 }

@@ -113,57 +113,57 @@ public:
    * @param index    specifies the joint
    * @return    joint angle value
    */
-  virtual double getJointAngle(unsigned int index) const = 0;
+  virtual double getJointAngle(unsigned int index) = 0;
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  std::vector<double> getJointAngles() const;
+  std::vector<double> getJointAngles();
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  cv::Mat getJointAnglesMatrix() const;
+  cv::Mat getJointAnglesMatrix();
 
   /*!@brief get current state of a single joint velocity
    *
    * @param index    specifies the joint
    * @return    joint velocity value
    */
-  virtual double getJointVelocity(unsigned int index) const;
+  virtual double getJointVelocity(unsigned int index);
 
   /*!@brief get current state of all joint velocities
    *
    * @return    vector of joint velocities
    */
-  std::vector<double> getJointVelocities() const;
+  std::vector<double> getJointVelocities();
 
   /*!@brief get current state of all joint velocities
    *
    * @return    vector of joint velocities
    */
-  cv::Mat getJointVelocitiesMatrix() const;
+  cv::Mat getJointVelocitiesMatrix();
 
   /*!@brief get current state of a single joint acceleration
    *
    * @param index    specifies the joint
    * @return    joint acceleration value
    */
-  virtual double getJointAcceleration(unsigned int index) const;
+  virtual double getJointAcceleration(unsigned int index);
 
   /*!@brief get current state of all joint accelerations
    *
    * @return    vector of joint accelerations
    */
-  std::vector<double> getJointAccelerations() const;
+  std::vector<double> getJointAccelerations();
 
   /*!@brief get current state of all joint accelerations
    *
    * @return    vector of joint accelerations
    */
-  cv::Mat getJointAccelerationsMatrix() const;
+  cv::Mat getJointAccelerationsMatrix();
 
   /*!@brief set current state of a single joint angle
    *
