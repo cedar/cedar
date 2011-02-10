@@ -57,7 +57,8 @@ int main()
   int errors = 0;
   
   // create instance of test class
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("../../../tests/unit/devices/robot/SimulatedKinematicChain/test.conf"));
+  log_file << "reading kinematic chain from conig file ..." << std::endl;
+  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("test.conf"));
   SimulatedKinematicChain test_arm(p_reference_geometry);
   
   //--------------------------------------------------------------------------------------------------------------------
