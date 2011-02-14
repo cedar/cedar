@@ -193,7 +193,7 @@ public:
    *
    * @param index    specifies the joint
    * @param velocity    new joint velocity value
-   * @return true iff hardware handles velocity itself
+   * @return true iff your subclass handles velocity itself
    */
   virtual bool setJointVelocity(unsigned int index, double velocity);
 
@@ -207,7 +207,7 @@ public:
    * Note that it is sufficient to override setJointVelocity(unsigned int, double).
    *
    * @param velocities    vector of new joint velocity values
-   * @return true iff hardware handles velocity itself
+   * @return true iff your subclass handles velocity itself
    */
   bool setJointVelocities(const cv::Mat& velocities);
 
@@ -221,28 +221,46 @@ public:
    * Note that it is sufficient to override setJointVelocity(unsigned int, double).
    *
    * @param velocities    vector of new joint velocity values
-   * @return true iff hardware handles velocity itself
+   * @return true iff your subclass handles velocity itself
    */
   bool setJointVelocities(const std::vector<double>& velocities);
 
   /*!@brief set current state of a single joint acceleration
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own acceleration control you would probably like to
+   * override this method and return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
    * @param index    specifies the joint
    * @param acceleration    new joint acceleration value
+   * @return true iff your subclass handles acceleration itself
    */
-  virtual void setJointAcceleration(unsigned int index, double acceleration);
+  virtual bool setJointAcceleration(unsigned int index, double acceleration);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own acceleration control and you want to override
+   * this method, then you have to return true here. By returning true you
+   * indicate to the KinematicChain base class that no integration is necessary.
+   *
    * @param accelerations    vector of new joint velocity values
+   * @return true iff your subclass handles acceleration itself
    */
-  void setJointAccelerations(const cv::Mat& accelerations);
+  bool setJointAccelerations(const cv::Mat& accelerations);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own acceleration control and you want to override
+   * this method, then you have to return true here. By returning true you
+   * indicate to the KinematicChain base class that no integration is necessary.
+   *
    * @param accelerations    vector of new joint velocity values
+   * @return true iff your subclass handles acceleration itself
    */
-  void setJointAccelerations(const std::vector<double>& accelerations);
+  bool setJointAccelerations(const std::vector<double>& accelerations);
 
   /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
    *

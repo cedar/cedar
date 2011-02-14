@@ -64,7 +64,7 @@ mpReferenceGeometry(rpReferenceGeometry)
 
 KinematicChain::KinematicChain(const std::string& configFileName)
 :
-LoopedThread(50.0, 0.001, configFileName), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(configFileName),
 mpReferenceGeometry(new ReferenceGeometry(configFileName))
 {
   setWorkingMode(ANGLE);
@@ -232,11 +232,6 @@ void KinematicChain::setJointAngles(const Mat& angles)
 
 bool KinematicChain::setJointVelocity(unsigned index, double velocity)
 {
-  if(mCurrentWorkingMode != VELOCITY)
-  {
-    return false;
-  }
-
   if(index >= getNumberOfJoints())
   {
     cout << "Error: Trying to set velocity for joint " << index << "!" << endl;
@@ -254,11 +249,6 @@ bool KinematicChain::setJointVelocity(unsigned index, double velocity)
 
 bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
-  if(mCurrentWorkingMode != VELOCITY)
-  {
-    return false;
-  }
-
   if(velocities.size() != getNumberOfJoints())
   {
     cout << "Error: You provided an vector of velocities with the wrong size ("
@@ -282,12 +272,6 @@ bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 
 bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
-
-  if(mCurrentWorkingMode != VELOCITY)
-  {
-    return false;
-  }
-
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
     cout << "Error: You provided an matrix of velocities with the wrong size [("
@@ -310,36 +294,26 @@ bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 }
 
 
-void KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
+bool KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
-  if(mCurrentWorkingMode != ACCELERATION)
-  {
-    return;
-  }
-
   if(index >= getNumberOfJoints())
   {
     cout << "Error: Trying to set acceleration for joint " << index << "!" << endl;
-    return;
+    return false;
   }
 
   mJointAccelerations.at<double>(index,0) = acceleration;
-  return;
+  return false;
 }
 
 
-void KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
+bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
-  if(mCurrentWorkingMode != ACCELERATION)
-  {
-    return;
-  }
-
   if(accelerations.size() != getNumberOfJoints())
   {
     cout << "Error: You provided an matrix of accelerations with the wrong size ("
         << accelerations.size() << " != " << getNumberOfJoints() << ")!" << endl;
-    return;
+    return false;
   }
 
   for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
@@ -347,27 +321,22 @@ void KinematicChain::setJointAccelerations(const std::vector<double>& accelerati
     mJointAccelerations.at<double>(i,0) = accelerations[i];
   }
 
-  return;
+  return false;
 }
 
 
-void KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
+bool KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
-  if(mCurrentWorkingMode != ACCELERATION)
-  {
-    return;
-  }
-
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
     cout << "Error: You provided an matrix of accelerations with the wrong size [("
         << accelerations.size().height << "," << accelerations.size().width
         << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
-    return;
+    return false;
   }
 
   mJointAccelerations = accelerations;
-  return;
+  return false;
 }
 
 
@@ -418,9 +387,35 @@ void KinematicChain::step(double time)
 
 void KinematicChain::setWorkingMode(ActionType actionType)
 {
-  mCurrentWorkingMode = actionType;
   stop();
-  init();
+
+  Mat zeros = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+
+  // need to stop something?
+  switch(mCurrentWorkingMode)
+  {
+    case ACCELERATION:
+      setJointAccelerations(zeros);
+    case VELOCITY:
+      setJointVelocities(zeros);
+    case ANGLE:
+      break;
+  }
+
+  mCurrentWorkingMode = actionType;
+
+  // want to reset something?
+  switch(mCurrentWorkingMode)
+  {
+    case ACCELERATION:
+      mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+    case VELOCITY:
+      mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+    case ANGLE:
+      break;
+  }
+
+  return;
 }
 
 
@@ -479,15 +474,18 @@ void KinematicChain::start(Priority priority)
   case ANGLE:
     cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << endl;
     return;
-    break;
   case VELOCITY:
-    mJointAngles = getJointAnglesMatrix();
-    QThread::start(priority);
-    break;
   case ACCELERATION:
+    mJointAngles = getJointAnglesMatrix();
     QThread::start(priority);
     break;
   }
 
   return;
+}
+
+
+void KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
+{
+  mUseCurrentHardwareValues = useCurrentHardwareValues;
 }
