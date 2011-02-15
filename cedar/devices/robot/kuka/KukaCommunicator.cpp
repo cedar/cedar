@@ -51,7 +51,7 @@ using namespace cedar::dev::robot::kuka;
 //----------------------------------------------------------------------------------------------------------------------
 KukaCommunicator::KukaCommunicator(const string& configFileName)
 :
-cedar::aux::LoopedThread(0.012, 0.001, configFileName),
+cedar::aux::LoopedThread(configFileName),
 mCommandedJointPosition(LBR_MNJ),
 mMeasuredJointPosition(LBR_MNJ)
 {
