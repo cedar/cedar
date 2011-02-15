@@ -67,6 +67,8 @@ public:
   /*!@brief The constructor.
    *
    * @param configFileName Name of the coniguration file tha should be used
+   * In the configuration file, the parameter names are the ones for loopedThread as well as "ServerPort" (the port on the LBR
+   * side, 0 means default port) and "RemoteHost" (the remote host to contact to, "NULL" means auto detection)
    */
   KukaCommunicator(const std::string& configFileName);
 
