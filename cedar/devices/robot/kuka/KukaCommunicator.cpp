@@ -95,7 +95,7 @@ void KukaCommunicator::init()
   readOrDefaultConfiguration();
 
   //create a new Instance of the friRemote
-  if(_mRemoteHost != string("NULL"))
+  if (_mRemoteHost != string("NULL"))
   {
     mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
   }
@@ -135,6 +135,7 @@ void KukaCommunicator::copyFromFRI()
   mFriState = mpFriRemote->getState();
   mFriQuality = mpFriRemote->getQuality();
   mSampleTime = mpFriRemote->getSampleTime();
+  mPowerOn = mpFriRemote->isPowerOn();
   //Create a std::vector from the float-Array
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
   mMeasuredJointPosition.assign(pJointPos, pJointPos + LBR_MNJ);
