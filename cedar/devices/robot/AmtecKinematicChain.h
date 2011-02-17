@@ -88,8 +88,8 @@ protected:
 private:
   bool initDevice();
   bool calibrateModule(unsigned int module);
-  double getJointAngle(unsigned int index) const;
-  double getJointVelocity(unsigned int index) const;
+  double getJointAngle(unsigned int index);
+  double getJointVelocity(unsigned int index);
   void readParamsFromConfigFile();
   void setJointAngle(unsigned int index, double value);
   bool setJointVelocity(unsigned int index, double velocity);

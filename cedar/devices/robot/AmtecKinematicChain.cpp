@@ -149,7 +149,7 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 }
 
 
-double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint) const
+double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
 {
   if(!mpDevice)
   {
@@ -173,7 +173,7 @@ double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
 }
 
 
-double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joint) const
+double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joint)
 {
   if(!mpDevice)
   {
