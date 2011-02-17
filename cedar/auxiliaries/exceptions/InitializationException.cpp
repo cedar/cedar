@@ -22,55 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        InitializationException.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 19
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Date:        2011 01 24
 
-    Description: Namespace file for cedar::aux::exc.
+    Description: Implementation of the @em cedar::aux::exc::InitializationException class.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_EXC_NAMESPACE_H
-#define CEDAR_AUX_EXC_NAMESPACE_H
-
 // LOCAL INCLUDES
+#include "auxiliaries/exceptions/InitializationException.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+//! Constructor
+cedar::aux::exc::InitializationException::InitializationException()
 {
-  namespace aux
-  {
-    //!@brief Namespace for all exception classes.
-    namespace exc
-    {
-      class ExceptionBase;
-      //!@brief smart pointer for ExceptionBase
-      typedef boost::shared_ptr<ExceptionBase> ExceptionBasePtr;
-
-      class NullPointerException;
-      //!@brief smart pointer for NullPointerException
-      typedef boost::shared_ptr<NullPointerException> NullPointerExceptionPtr;
-
-      class IndexOutOfRangeException;
-      //!@brief smart pointer for IndexOutOfRangeException
-      typedef boost::shared_ptr<IndexOutOfRangeException> IndexOutOfRangePtr;
-
-      class InitializationException;
-      //!@brief smart pointer for InitializationException
-      typedef boost::shared_ptr<InitializationException> InitializationExceptionPtr;
-    }
-  }
+  // Sets the type name.
+  this->mType = "InitializationException";
 }
 
-#endif // CEDAR_AUX_EXC_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
