@@ -101,7 +101,7 @@ public:
    *
    * @param values std::vector with the new angles in rad
    */
-  void setJointAngles(const std::vector<double>& value);
+  void setJointAngles(const std::vector<double>& values);
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
@@ -123,8 +123,8 @@ public:
    * the get-Functions don't, though
    */
   float getSampleTime();
-  /* @brief check if the robot is powered
-
+  /*! @brief check if the robot is powered
+   *
    * This method does not call doDataExchange itself
    * this especially means the dead man switch is in the right position and the robot is in command mode
    * @return true, if power is on
