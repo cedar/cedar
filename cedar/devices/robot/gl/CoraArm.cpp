@@ -104,13 +104,16 @@ void gl::CoraArm::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
+    glTranslated(0, 0, -.135);
     drawLinkedModule(0.09);
     break;
   case 1:
+    glTranslated(0.0905, 0, .0);
     glRotated(90.0, 0.0, 1.0, 0.0);
     drawLinkedModule(0.09);
     break;
   case 2:
+    glTranslated(0.0, 0, -.0905);
     setMaterial(LIGHT_BLUE_METAL);
     drawBlock(0.09, 0.09, 0.09);
     setMaterial(BRASS);
@@ -156,6 +159,7 @@ void gl::CoraArm::drawSegment(unsigned int index)
     setMaterial(NO_MATERIAL);
     break;
   case 4:
+    glTranslated(0.002, 0, 0.0705);
     setMaterial(LIGHT_BLUE_METAL);
     drawBlock(0.07, 0.07, 0.07);
     setMaterial(BRASS);
@@ -221,6 +225,7 @@ void gl::CoraArm::drawSegment(unsigned int index)
     setMaterial(NO_MATERIAL);
     break;
   case 6:
+    glTranslated(0.0025, 0, 0);
     setMaterial(LIGHT_BLUE_METAL);
     glTranslated(.001, 0, 0);
     drawBlock(.119, 0.07, 0.09);
