@@ -33,7 +33,7 @@ using namespace std;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-KukaInterface::KukaInterface(const string& configFileName, const string& communicatorConfigFileName)
+KukaInterface::KukaInterface(const std::string& configFileName, const std::string& communicatorConfigFileName)
 :
 KinematicChain(configFileName)
 {

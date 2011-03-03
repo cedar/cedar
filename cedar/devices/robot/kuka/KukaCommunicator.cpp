@@ -49,7 +49,7 @@ using namespace cedar::dev::robot::kuka;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-KukaCommunicator::KukaCommunicator(const string& configFileName)
+KukaCommunicator::KukaCommunicator(const std::string& configFileName)
 :
 cedar::aux::LoopedThread(configFileName),
 mCommandedJointPosition(LBR_MNJ),
@@ -178,7 +178,7 @@ void KukaCommunicator::setJointAngle(unsigned index, double value)
   mCommandedJointPosition.at(index) = value;
   mLock.unlock();
 }
-void KukaCommunicator::setJointAngles(const std::vector<double>& value)
+void KukaCommunicator::setJointAngles(const std::vector<double>& values)
 {
   mLock.lockForWrite();
   mCommandedJointPosition = value;
