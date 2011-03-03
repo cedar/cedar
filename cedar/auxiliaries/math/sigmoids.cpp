@@ -71,6 +71,22 @@ cv::Mat cedar::aux::math::sigmoid(const cv::Mat& mat, const double beta, const d
 template cv::Mat cedar::aux::math::sigmoid<double>(const cv::Mat&, const double, const double);
 template cv::Mat cedar::aux::math::sigmoid<float>(const cv::Mat&, const double, const double);
 
+//same as cv::mat sigmoidAbs but does not create new memory for result
+template<typename T>
+void cedar::aux::math::sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0)
+{
+  for (int col = 0; col < mat.cols; col++)
+  {
+    for (int row = 0; row < mat.rows; row++)
+    {
+      result.at<T>(row,col) = sigmoid(mat.at<T>(row,col),beta,threshold);
+    }
+  }
+}
+template void cedar::aux::math::sigmoid<double>(const cv::Mat&, cv::Mat&, const double, const double);
+template void cedar::aux::math::sigmoid<float>(const cv::Mat&, cv::Mat&, const double, const double);
+
+
 template<typename T>
 cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0)
 {
@@ -86,6 +102,21 @@ cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, cons
 }
 template cv::Mat cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, const double, const double);
 template cv::Mat cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, const double, const double);
+//same as cv::mat sigmoidAbs but does not create new memory for result
+template<typename T>
+void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0)
+{
+  for (int col = 0; col < mat.cols; col++)
+  {
+    for (int row = 0; row < mat.rows; row++)
+    {
+      result.at<T>(row,col) = sigmoidAbs(mat.at<T>(row,col),beta,threshold);
+    }
+  }
+}
+
+template void cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, cv::Mat&, const double, const double);
+template void cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, cv::Mat&, const double, const double);
 
 std::vector<double> cedar::aux::math::sigmoid(const std::vector<double>& x, const double beta, const double threshold)
 {

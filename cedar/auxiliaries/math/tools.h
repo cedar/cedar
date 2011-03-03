@@ -68,7 +68,10 @@ namespace cedar
     {
       //! normalizes an angle to the representative interval (-pi, pi]
       double normalizeAngle(double value);
-
+      //! returns the value of the global maximum of a matrix
+      double max(const cv::Mat matrix);
+      //! returns the value of the global minimum of a matrix
+      double min(const cv::Mat matrix);
       //! writes the matrix into the shell properly organized by columns and rows
       //!\todo move write(cv::Mat) to aux::utilities
       //!\todo rework (template for copy & paste code)
