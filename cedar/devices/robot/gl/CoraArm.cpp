@@ -46,8 +46,6 @@
 using namespace cedar::dev::robot;
 using namespace cedar::dev::robot::gl;
 using namespace cedar::aux::gl;
-//using namespace std;
-//using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -55,7 +53,7 @@ using namespace cedar::aux::gl;
 
 gl::CoraArm::CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
-gl::AmtecArm(rpKinematicChainModel)
+gl::AmtecChain(rpKinematicChainModel)
 {
 
 }
