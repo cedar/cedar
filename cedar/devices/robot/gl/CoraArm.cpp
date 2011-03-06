@@ -55,7 +55,7 @@ using namespace cedar::aux::gl;
 
 gl::CoraArm::CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
-gl::CoraKinematicChain(rpKinematicChainModel)
+gl::AmtecArm(rpKinematicChainModel)
 {
 
 }
