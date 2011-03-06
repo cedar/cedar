@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
   // create gl visualization objects
   cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_cora_arm_model));
-  cedar::dev::robot::gl::KinematicChainPtr p_cora_head_visualization(new cedar::dev::robot::gl::KinematicChain(p_cora_head_model));
+  cedar::dev::robot::gl::KinematicChainPtr p_cora_head_visualization(new cedar::dev::robot::gl::CoraHead(p_cora_head_model));
 
   // create scene and viewer to display the arm
   ScenePtr p_scene(new cedar::aux::gl::Scene);
@@ -78,8 +78,8 @@ int main(int argc, char **argv)
   p_scene->drawFloor(true);
 
   cedar::aux::gl::ObjectPtr p_object;
-  p_object= p_cora_arm_visualization;
-  p_scene->addObject(p_object);
+//  p_object= p_cora_arm_visualization;
+//  p_scene->addObject(p_object);
   p_object= p_cora_head_visualization;
   p_scene->addObject(p_object);
 
@@ -101,8 +101,13 @@ int main(int argc, char **argv)
   p_cora_arm->setJointAcceleration(6, -.0011);
   p_cora_arm->setJointAcceleration(7, .005);
 
+  p_cora_head->setJointVelocity(0, .1);
+  p_cora_head->setJointVelocity(1, .1);
+
 //  p_cora_arm->start();
+//  p_cora_head->start();
   p_cora_arm_model->startTimer(50.0);
+  p_cora_head_model->startTimer(50.0);
   viewer.startTimer(50);
   a.exec();
 
