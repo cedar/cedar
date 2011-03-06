@@ -77,16 +77,27 @@ void gl::CoraHead::drawBase()
   mTransformationTranspose = mpKinematicChainModel->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
+  setMaterial(CHROME);
+  glTranslated(-.090 - .025, 0, .010 + .070);
+  drawBlock(.050, .050, .140); // this is the aluminium block
   setMaterial(DARK_BLUE_METAL);
-  // now we are under the body axis, ground level
-  glTranslated(-0.04, 0, 0.005);
-  drawBlock(0.2, 0.2, 0.01); // this is the shallow wide surface
-  glTranslated(0.025, 0.0, 0.075);
-  drawBlock(0.15, 0.09, 0.14); // this is the first, big block
-  glTranslated(0.015, 0, 0.115);
-  setMaterial(LIGHT_BLUE_METAL);
-  drawBlock(0.09, 0.09, 0.09); // this is the first power cube
+  glTranslated(-.025 - .010, 0, 0);
+  drawBlock(.020, .050, .140); // this is the small blue block
+  glTranslated(-.010 - .025, 0, .1625);
+  drawBlock(.050, .050, .465); // this is the tall pole
+  setMaterial(CHROME);
+  glTranslated(0, 0, .2325 + .004);
+  drawBlock(.050, .050, .008); // now comes the aluminium connector
+  glTranslated(0, 0, .004 + .013);
+  glRotated(45, 0, 0, 1);
+  drawBlock(.031, .031, .026);
+  glRotated(-45, 0, 0, 1);
+  glTranslated(0, 0, .013 + .023);
+  drawBlock(.050, .050, .046);
+  glTranslated(-.025 + .1175, 0, .023 + .005);
+  drawBlock(.235, .050, .010); // this is the long horizontal piece
   setMaterial(NO_MATERIAL);
+
 }
 
 void gl::CoraHead::drawSegment(unsigned int index)
@@ -102,13 +113,30 @@ void gl::CoraHead::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-    glTranslated(0, 0, -.135);
+//    setMaterial(DARK_BLUE_METAL);
+//    drawCone(-.004, 0, .025, .025, mResolution);
+//    glTranslated(0, 0, -.004);
+//    drawDisk(.017, .025, mResolution, mResolution, true);
+//    drawCone(-.013, 0, .017, .017, mResolution);
+//    glTranslated(0, 0, -.013);
+//    drawDisk(.017, .026, mResolution, mResolution);
+//    drawCone(-.0115, 0, .026, .026, mResolution);
+//    glTranslated(0, 0, -.0115 - .0595);
+//    drawBlock(.090, .070, .119);
+//    setMaterial(NO_MATERIAL);
+    setMaterial(DARK_BLUE_METAL);
+    drawCone(0, .004, .025, .025, mResolution);
+    glTranslated(0, 0, .004);
+    drawDisk(.017, .025, mResolution, mResolution);
+    drawCone(0, .013, .017, .017, mResolution);
+    glTranslated(0, 0, .013);
+    drawDisk(.017, .026, mResolution, mResolution, true);
+    drawCone(0, .0115, .026, .026, mResolution);
+    glTranslated(0, 0, .0115 + .0595);
+    drawBlock(.090, .070, .119);
+    setMaterial(NO_MATERIAL);
     break;
   case 1:
-    glTranslated(0.0905, 0, .0);
-    glRotated(90.0, 0.0, 1.0, 0.0);
-    break;
-  case 2:
     break;
   }
 }
