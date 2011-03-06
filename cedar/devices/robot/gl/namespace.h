@@ -59,13 +59,17 @@ namespace cedar
         //!@brief smart pointer for KinematicChain
         typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
 
-        class AmtecArm;
-        //!@brief smart pointer for AmtecArm
-        typedef boost::shared_ptr<AmtecArm> AmtecArmPtr;
+        class AmtecChain;
+        //!@brief smart pointer for AmtecChain
+        typedef boost::shared_ptr<AmtecChain> AmtecChainPtr;
 
         class CoraArm;
         //!@brief smart pointer for CoraArm
         typedef boost::shared_ptr<CoraArm> CoraArmPtr;
+
+        class CoraHead;
+        //!@brief smart pointer for CoraHead
+        typedef boost::shared_ptr<CoraHead> CoraHeadPtr;
       }
     }
   }

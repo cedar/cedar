@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AmtecArm.cpp
+    File:        AmtecChain.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "AmtecArm.h"
+#include "AmtecChain.h"
 #include "devices/robot/gl/namespace.h"
 
 // PROJECT INCLUDES
@@ -50,56 +50,56 @@ using namespace std;
 using namespace cv;
 
 
-const float cedar::dev::robot::gl::AmtecArm::mNoSpecular[3] = {0.0, 0.0, 0.0};
+const float cedar::dev::robot::gl::AmtecChain::mNoSpecular[3] = {0.0, 0.0, 0.0};
 
-const float cedar::dev::robot::gl::AmtecArm::mDarkBlueMetal_Ambient[3] = {0.2, 0.35, 0.7};
-const float cedar::dev::robot::gl::AmtecArm::mDarkBlueMetal_Diffuse[3] = {0.2, 0.35, 0.7};
-const float cedar::dev::robot::gl::AmtecArm::mDarkBlueMetal_Specular[3] = {0.1, 0.175, 0.35};
-const float cedar::dev::robot::gl::AmtecArm::mDarkBlueMetal_Shininess[1] = {1.0};
+const float cedar::dev::robot::gl::AmtecChain::mDarkBlueMetal_Ambient[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::AmtecChain::mDarkBlueMetal_Diffuse[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::AmtecChain::mDarkBlueMetal_Specular[3] = {0.1, 0.175, 0.35};
+const float cedar::dev::robot::gl::AmtecChain::mDarkBlueMetal_Shininess[1] = {1.0};
 
-const float cedar::dev::robot::gl::AmtecArm::mLightBlueMetal_Ambient[3] = {0.2, 0.35, 0.7};
-const float cedar::dev::robot::gl::AmtecArm::mLightBlueMetal_Diffuse[3] = {0.2, 0.35, 0.7};
-const float cedar::dev::robot::gl::AmtecArm::mLightBlueMetal_Specular[3] = {0.2, 0.35, 0.7};
-const float cedar::dev::robot::gl::AmtecArm::mLightBlueMetal_Shininess[1] = {1.0};
+const float cedar::dev::robot::gl::AmtecChain::mLightBlueMetal_Ambient[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::AmtecChain::mLightBlueMetal_Diffuse[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::AmtecChain::mLightBlueMetal_Specular[3] = {0.2, 0.35, 0.7};
+const float cedar::dev::robot::gl::AmtecChain::mLightBlueMetal_Shininess[1] = {1.0};
 
-const float cedar::dev::robot::gl::AmtecArm::mBrass_Ambient[3] = {0.329412, 0.223529, 0.027451};
-const float cedar::dev::robot::gl::AmtecArm::mBrass_Diffuse[3] = {0.780392, 0.568627, 0.113725};
-const float cedar::dev::robot::gl::AmtecArm::mBrass_Specular[3] = {0.992157, 0.941176, 0.807843};
-const float cedar::dev::robot::gl::AmtecArm::mBrass_Shininess[1] = {0.81794872};
+const float cedar::dev::robot::gl::AmtecChain::mBrass_Ambient[3] = {0.329412, 0.223529, 0.027451};
+const float cedar::dev::robot::gl::AmtecChain::mBrass_Diffuse[3] = {0.780392, 0.568627, 0.113725};
+const float cedar::dev::robot::gl::AmtecChain::mBrass_Specular[3] = {0.992157, 0.941176, 0.807843};
+const float cedar::dev::robot::gl::AmtecChain::mBrass_Shininess[1] = {0.81794872};
 
-const float cedar::dev::robot::gl::AmtecArm::mArtificialSkin_Ambient[3] = {0.2, 0.2, 0.2 };
-const float cedar::dev::robot::gl::AmtecArm::mArtificialSkin_Diffuse[3] = {0.01, 0.01, 0.01};
-const float cedar::dev::robot::gl::AmtecArm::mArtificialSkin_Specular[3] = {0.04, 0.04, 0.04};
-const float cedar::dev::robot::gl::AmtecArm::mArtificialSkin_Shininess[1] = {0.078125};
+const float cedar::dev::robot::gl::AmtecChain::mArtificialSkin_Ambient[3] = {0.2, 0.2, 0.2 };
+const float cedar::dev::robot::gl::AmtecChain::mArtificialSkin_Diffuse[3] = {0.01, 0.01, 0.01};
+const float cedar::dev::robot::gl::AmtecChain::mArtificialSkin_Specular[3] = {0.04, 0.04, 0.04};
+const float cedar::dev::robot::gl::AmtecChain::mArtificialSkin_Shininess[1] = {0.078125};
 
-const float cedar::dev::robot::gl::AmtecArm::mWhitePlastic_Ambient[3] = {0.05, 0.05, 0.05};
-const float cedar::dev::robot::gl::AmtecArm::mWhitePlastic_Diffuse[3] = {0.5, 0.5, 0.5 };
-const float cedar::dev::robot::gl::AmtecArm::mWhitePlastic_Specular[3] = {0.7, 0.7, 0.7 };
-const float cedar::dev::robot::gl::AmtecArm::mWhitePlastic_Shininess[1] = {0.078125};
+const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Ambient[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Diffuse[3] = {0.5, 0.5, 0.5 };
+const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Specular[3] = {0.7, 0.7, 0.7 };
+const float cedar::dev::robot::gl::AmtecChain::mWhitePlastic_Shininess[1] = {0.078125};
 
-const float cedar::dev::robot::gl::AmtecArm::mBlackMetal_Ambient[3] = {0.05, 0.05, 0.05};
-const float cedar::dev::robot::gl::AmtecArm::mBlackMetal_Diffuse[3] = {0.05, 0.05, 0.05};
-const float cedar::dev::robot::gl::AmtecArm::mBlackMetal_Specular[3] = {0.4 , 0.4 , 0.4};
-const float cedar::dev::robot::gl::AmtecArm::mBlackMetal_Shininess[1] = {0.678125};
+const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Ambient[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Diffuse[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Specular[3] = {0.4 , 0.4 , 0.4};
+const float cedar::dev::robot::gl::AmtecChain::mBlackMetal_Shininess[1] = {0.678125};
 
-const float cedar::dev::robot::gl::AmtecArm::mChrome_Ambient[3] = {0.05, 0.05, 0.05};
-const float cedar::dev::robot::gl::AmtecArm::mChrome_Diffuse[3] = {0.5, 0.5, 0.5 };
-const float cedar::dev::robot::gl::AmtecArm::mChrome_Specular[3] = {0.7, 0.7, 0.7 };
-const float cedar::dev::robot::gl::AmtecArm::mChrome_Shininess[1] = {0.078125};
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Ambient[3] = {0.05, 0.05, 0.05};
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Diffuse[3] = {0.5, 0.5, 0.5 };
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Specular[3] = {0.7, 0.7, 0.7 };
+const float cedar::dev::robot::gl::AmtecChain::mChrome_Shininess[1] = {0.078125};
 //! \todo disambiguate white plastic from chrome
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-AmtecArm::AmtecArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+AmtecChain::AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
 gl::KinematicChain(rpKinematicChainModel)
 {
 
 }
 
-AmtecArm::~AmtecArm()
+AmtecChain::~AmtecChain()
 {
 
 }
@@ -108,7 +108,7 @@ AmtecArm::~AmtecArm()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void AmtecArm::setMaterial(int material)
+void AmtecChain::setMaterial(int material)
 {
   switch (material)
   {
