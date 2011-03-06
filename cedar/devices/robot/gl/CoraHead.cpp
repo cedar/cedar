@@ -174,8 +174,9 @@ void gl::CoraHead::drawSegment(unsigned int index)
     drawBlock(.080, .030, .010);
     glTranslated(.035, 0, .005 + .040);
     drawBlock(.010, .030, .080);
-    glTranslated(.05, -.015, -.040 - .010);
+    glTranslated(.005, -.015, -.040 - .010);
     drawCameraHold();
+    glRotated(-90, 0, 1, 0);
 
     // left camera hold
     setMaterial(BLACK_METAL);
@@ -210,10 +211,15 @@ void gl::CoraHead::drawEndEffector()
   // move to object coordinates
   mTransformationTranspose = mpKinematicChainModel->calculateEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  glPushMatrix();
 
   // draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
-  drawSphere(.01, 20, 20);
+  glTranslated(0.061, .0, .0);
+  drawCamera();
+  glPopMatrix();
+  glTranslated(-0.061, .0, .0);
+  drawCamera();
 
 }
 
@@ -336,9 +342,9 @@ void gl::CoraHead::drawCameraHold()
 
 void gl::CoraHead::drawCamera()
 {
-  // we should be below the camera
   setMaterial(WHITE_PLASTIC);
-  glTranslated(0, .020, .030);
+  glRotated(90, 1, 0, 0);
+  glTranslated(0, .020, -.005);
   drawBlock(.060, .110, .060);
   glTranslated(0, .055, 0);
   setMaterial(BLACK_METAL);
@@ -349,4 +355,5 @@ void gl::CoraHead::drawCamera()
   drawDisk(0, .0185, mResolution, mResolution);
   glTranslated(0, 0, .0029);
   drawDisk(.0185, .0225, mResolution, mResolution);
+  setMaterial(NO_MATERIAL);
 }
