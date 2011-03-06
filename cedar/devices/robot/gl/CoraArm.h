@@ -39,12 +39,11 @@
 
 // LOCAL INCLUDES
 #include "devices/robot/gl/namespace.h"
-#include "devices/robot/gl/CoraKinematicChain.h"
+#include "devices/robot/gl/AmtecArm.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
 
 /*!@brief Visualization of the CoRA arm
  *
@@ -53,7 +52,7 @@
  * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
  * for that scene (cedar::aux::gl::Viewer).
  */
-class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::CoraKinematicChain
+class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::AmtecArm
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
