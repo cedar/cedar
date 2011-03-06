@@ -90,6 +90,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief draws the black metal hold of the camera
+  void drawCameraHold();
+
+  //!@brief draws a camera
+  void drawCamera();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

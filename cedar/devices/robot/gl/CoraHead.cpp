@@ -42,6 +42,7 @@
 #include "auxiliaries/gl/drawShapes.h"
 
 // SYSTEM INCLUDES
+#include <OpenGL/gl.h>
 
 using namespace cedar::dev::robot;
 using namespace cedar::dev::robot::gl;
@@ -113,17 +114,6 @@ void gl::CoraHead::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-//    setMaterial(DARK_BLUE_METAL);
-//    drawCone(-.004, 0, .025, .025, mResolution);
-//    glTranslated(0, 0, -.004);
-//    drawDisk(.017, .025, mResolution, mResolution, true);
-//    drawCone(-.013, 0, .017, .017, mResolution);
-//    glTranslated(0, 0, -.013);
-//    drawDisk(.017, .026, mResolution, mResolution);
-//    drawCone(-.0115, 0, .026, .026, mResolution);
-//    glTranslated(0, 0, -.0115 - .0595);
-//    drawBlock(.090, .070, .119);
-//    setMaterial(NO_MATERIAL);
     setMaterial(DARK_BLUE_METAL);
     drawCone(0, .004, .025, .025, mResolution);
     glTranslated(0, 0, .004);
@@ -137,11 +127,226 @@ void gl::CoraHead::drawSegment(unsigned int index)
     setMaterial(NO_MATERIAL);
     break;
   case 1:
+    setMaterial(DARK_BLUE_METAL);
+    glRotated(90, 0, 1, 0);
+    glTranslated(0, 0, -.055);
+    drawDisk(0, .035, mResolution, mResolution, true);
+    drawCone(0, .009, .035, .035, mResolution);
+    glTranslated(0, 0, .009);
+    drawDisk(0, .035, mResolution, mResolution);
+    glTranslated(0, 0, .001 + .090 + .001);
+    drawDisk(0, .035, mResolution, mResolution, true);
+    drawCone(0, .009, .035, .035, mResolution);
+    glTranslated(0, 0, .009);
+    drawDisk(0, .035, mResolution, mResolution);
+
+    glTranslated(-.032, 0, -.003 - .003);
+    drawBlock(.064, .070, .006);
+    glTranslated(0, 0, -.003 - .001 - .090 - .001 - .003);
+    drawBlock(.064, .070, .006);
+    glTranslated(-.032 - .003, 0, .003 + .001 + .045);
+    setMaterial(LIGHT_BLUE_METAL);
+    drawBlock(.006, .070, .104);
+    setMaterial(BLACK_METAL);
+    glTranslated(-.003 - .010, -.020 - .0075, -.020 - .0075);
+    drawBlock(.020, .015, .015);
+    glTranslated(0, .055, 0);
+    drawBlock(.020, .015, .015);
+    glTranslated(0, 0, .055);
+    drawBlock(.020, .015, .015);
+    glTranslated(0, -.055, 0);
+    drawBlock(.020, .015, .015);
+    glTranslated(-.010 - .004, .0075 + .020, -.0075 - .020);
+    drawBlock(.008, .070, .122);
+
+    // save this as origin, both cameras have to be drawn
+    glPushMatrix();
+    // right camera hold
+    glRotated(-90, 0, 1, 0);
+    glTranslated(.061, 0, -.004);
+    drawDisk(0, .035, mResolution, mResolution, true);
+    drawCone(0, .008, .035, .035, mResolution);
+    glTranslated(0, 0, .008);
+    drawDisk(0, .035, mResolution, mResolution);
+    glTranslated(0, 0, .015);
+    drawCone(-.015, .015, .0125, .0125, mResolution);
+    glTranslated(.025, 0, .015 + .005);
+    drawBlock(.080, .030, .010);
+    glTranslated(.035, 0, .005 + .040);
+    drawBlock(.010, .030, .080);
+    glTranslated(.05, -.015, -.040 - .010);
+    drawCameraHold();
+
+    // left camera hold
+    setMaterial(BLACK_METAL);
+    glPopMatrix();
+    glRotated(180, 1, 0, 0);
+    glRotated(-90, 0, 1, 0);
+    glTranslated(.061, 0, -.004);
+    drawDisk(0, .035, mResolution, mResolution, true);
+    drawCone(0, .008, .035, .035, mResolution);
+    glTranslated(0, 0, .008);
+    drawDisk(0, .035, mResolution, mResolution);
+    glTranslated(0, 0, .015);
+    drawCone(-.015, .015, .0125, .0125, mResolution);
+    glTranslated(.025, 0, .015 + .005);
+    drawBlock(.080, .030, .010);
+    glTranslated(.035, 0, .005 + .040);
+    drawBlock(.010, .030, .080);
+    glTranslated(.005, -.015, -.040 - .010);
+    drawCameraHold();
+
+    setMaterial(NO_MATERIAL);
     break;
   }
 }
 
 void gl::CoraHead::drawEndEffector()
 {
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
 
+  // move to object coordinates
+  mTransformationTranspose = mpKinematicChainModel->calculateEndEffectorTransformation().t();
+  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+
+  // draw the joint
+  glColor4d(mColorR, mColorG, mColorB, 0);
+  drawSphere(.01, 20, 20);
+
+}
+
+void gl::CoraHead::drawCameraHold()
+{
+  glPushMatrix();
+  setMaterial(BLACK_METAL);
+  glBegin(GL_QUADS);
+  // back face
+  glNormal3d(0.0, -1.0, 0.0);
+  glVertex3d(-.080, .00, .021);
+  glVertex3d(-.080, .00, .031);
+  glVertex3d(-.055, .00, .031);
+  glVertex3d(-.055, .00, .021);
+
+  glVertex3d(-.080, .00, .031);
+  glVertex3d(-.080, .00, .041);
+  glVertex3d(-.059, .00, .041);
+  glVertex3d(-.059, .00, .031);
+
+  glVertex3d(-.059, .00, .031);
+  glVertex3d(-.059, .00, .041);
+  glVertex3d(-.055, .00, .032);
+  glVertex3d(-.055, .00, .031);
+
+  glVertex3d(-.055, .00, .021);
+  glVertex3d(-.055, .00, .032);
+  glVertex3d(-.020, .00, .042);
+  glVertex3d(-.010, .00, .034);
+
+  glVertex3d(-.010, .00, .034);
+  glVertex3d(-.020, .00, .042);
+  glVertex3d(-.020, .00, .090);
+  glVertex3d(-.010, .00, .090);
+
+  // front face
+  glNormal3d(0.0, 1.0, 0.0);
+  glVertex3d(-.080, .030, .021);
+  glVertex3d(-.080, .030, .031);
+  glVertex3d(-.055, .030, .031);
+  glVertex3d(-.055, .030, .021);
+
+  glVertex3d(-.080, .030, .031);
+  glVertex3d(-.080, .030, .041);
+  glVertex3d(-.059, .030, .041);
+  glVertex3d(-.059, .030, .031);
+
+  glVertex3d(-.059, .030, .031);
+  glVertex3d(-.059, .030, .041);
+  glVertex3d(-.055, .030, .032);
+  glVertex3d(-.055, .030, .031);
+
+  glVertex3d(-.055, .030, .021);
+  glVertex3d(-.055, .030, .032);
+  glVertex3d(-.020, .030, .042);
+  glVertex3d(-.010, .030, .034);
+
+  glVertex3d(-.010, .030, .034);
+  glVertex3d(-.020, .030, .042);
+  glVertex3d(-.020, .030, .090);
+  glVertex3d(-.010, .030, .090);
+
+  // closure
+  glNormal3d(0.277539652, 0.0, -0.960714182);
+  glVertex3d(-.055, .00, .021);
+  glVertex3d(-.055, .030, .021);
+  glVertex3d(-.010, .030, .034);
+  glVertex3d(-.010, .00, .034);
+
+  glNormal3d(0.0, 0.0, -1.0);
+  glVertex3d(-.055, .00, .021);
+  glVertex3d(-.080, .00, .021);
+  glVertex3d(-.080, .030, .021);
+  glVertex3d(-.055, .030, .021);
+
+  glNormal3d(-1.0, 0.0, 0.0);
+  glVertex3d(-.080, .00, .021);
+  glVertex3d(-.080, .030, .021);
+  glVertex3d(-.080, .030, .041);
+  glVertex3d(-.080, .00, .041);
+
+  glNormal3d(0.0, 0.0, 1.0);
+  glVertex3d(-.080, .00, .041);
+  glVertex3d(-.080, .030, .041);
+  glVertex3d(-.059, .030, .041);
+  glVertex3d(-.059, .00, .041);
+
+  glNormal3d(0.406138466, 0.0, 0.913811548);
+  glVertex3d(-.059, .00, .041);
+  glVertex3d(-.059, .030, .041);
+  glVertex3d(-.055, .030, .032);
+  glVertex3d(-.055, .00, .032);
+
+  glNormal3d(-0.961523947, 0.0, 0.274721127);
+  glVertex3d(-.055, .00, .032);
+  glVertex3d(-.055, .030, .032);
+  glVertex3d(-.020, .030, .042);
+  glVertex3d(-.020, .00, .042);
+
+  glNormal3d(-1.0, 0.0, 0.0);
+  glVertex3d(-.020, .00, .042);
+  glVertex3d(-.020, .030, .042);
+  glVertex3d(-.020, .030, .090);
+  glVertex3d(-.020, .00, .090);
+
+  glNormal3d(0.0, 0.0, 1.0);
+  glVertex3d(-.020, .00, .090);
+  glVertex3d(-.020, .030, .090);
+  glVertex3d(-.010, .030, .090);
+  glVertex3d(-.010, .00, .090);
+  glEnd();
+  glPopMatrix();
+
+  glTranslated(-.065, .015, .040 + .004);
+
+
+  setMaterial(NO_MATERIAL);
+
+}
+
+void gl::CoraHead::drawCamera()
+{
+  // we should be below the camera
+  setMaterial(WHITE_PLASTIC);
+  glTranslated(0, .020, .030);
+  drawBlock(.060, .110, .060);
+  glTranslated(0, .055, 0);
+  setMaterial(BLACK_METAL);
+  glRotated(-90, 1, 0, 0);
+  drawCone(0, .003, .0185, .0185, mResolution);
+  drawCone(0, .003, .0225, .0225, mResolution);
+  glTranslated(0, 0, .0001);
+  drawDisk(0, .0185, mResolution, mResolution);
+  glTranslated(0, 0, .0029);
+  drawDisk(.0185, .0225, mResolution, mResolution);
 }
