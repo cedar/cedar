@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CoraKinematicChain.h
+    File:        AmtecChain.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_CORA_KINEMATIC_CHAIN_H
-#define CEDAR_DEV_ROBOT_GL_CORA_KINEMATIC_CHAIN_H
+#ifndef CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
+#define CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
 
 // LOCAL INCLUDES
 #include "devices/robot/gl/namespace.h"
@@ -46,14 +46,14 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Visualization of one of the CoRA arm
+/*!@brief Visualization of an arm built from blue Amtec power cubes
  *
- * This class provides a simple OpenGL visualization of the CoRA arm. It has to be provided with a pointer to an
- * instance of KinematicChainModel of the CoRA arm, used to get the transformations to the joint coordinate frames.
- * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
- * for that scene (cedar::aux::gl::Viewer).
+ * This class provides a simple OpenGL visualization of the an arm built from blue Amtec power cubes. It has to be
+ * provided with a pointer to an instance of KinematicChainModel of the CoRA arm, used to get the transformations to
+ * the joint coordinate frames. To actually display the arm, add an instance of this class to a scene
+ * (cedar::aux::gl::Scene) and create a viewer for that scene (cedar::aux::gl::Viewer).
  */
-class cedar::dev::robot::gl::CoraKinematicChain : public cedar::dev::robot::gl::KinematicChain
+class cedar::dev::robot::gl::AmtecChain : public cedar::dev::robot::gl::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,9 +64,9 @@ class cedar::dev::robot::gl::CoraKinematicChain : public cedar::dev::robot::gl::
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  CoraKinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
   //!@brief destructor
-  ~CoraKinematicChain();
+  ~AmtecChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -187,9 +187,9 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::robot::gl::CoraKinematicChain
+}; // class cedar::dev::robot::gl::AmtecChain
 
-#endif // CEDAR_DEV_ROBOT_GL_CORA_KINEMATIC_CHAIN_H
+#endif // CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
 
 
 
