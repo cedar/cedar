@@ -50,6 +50,10 @@
 #include "devices/robot/ReferenceGeometry.h"
 #include "devices/robot/Robot.h"
 #include "devices/robot/gl/KinematicChain.h"
+#include "devices/robot/gl/AmtecArm.h"
+#include "devices/robot/gl/CoraArm.h"
+
+
 
 // SYSTEM INCLUDES
 
