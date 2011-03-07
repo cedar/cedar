@@ -40,6 +40,7 @@
 #include "devices/robot/KinematicChainModel.h"
 #include "devices/robot/gl/CoraArm.h"
 #include "devices/robot/gl/CoraHead.h"
+#include "devices/robot/gui/KinematicChainWidget.h"
 #include "auxiliaries/gl/Scene.h"
 #include "auxiliaries/gui/Viewer.h"
 #include "auxiliaries/gui/SceneWidget.h"
@@ -92,20 +93,12 @@ int main(int argc, char **argv)
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_cora_arm->setJointAcceleration(0, .003);
-  p_cora_arm->setJointAcceleration(1, -.0045);
-  p_cora_arm->setJointAcceleration(2, -.0015);
-  p_cora_arm->setJointAcceleration(3, .0025);
-  p_cora_arm->setJointAcceleration(4, .001);
-  p_cora_arm->setJointAcceleration(5, -.0015);
-  p_cora_arm->setJointAcceleration(6, -.0011);
-  p_cora_arm->setJointAcceleration(7, .005);
+  // create widgets
+  KinematicChainWidget widget_arm(p_cora_arm);
+  KinematicChainWidget widget_head(p_cora_head);
+  widget_arm.show();
+  widget_head.show();
 
-  p_cora_head->setJointVelocity(0, .1);
-  p_cora_head->setJointVelocity(1, .1);
-
-//  p_cora_arm->start();
-//  p_cora_head->start();
   p_cora_arm_model->startTimer(50.0);
   p_cora_head_model->startTimer(50.0);
   viewer.startTimer(50);
