@@ -157,9 +157,12 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 
   for(unsigned int i = 0; i < mModules.size(); ++i)
   {
-    if(!calibrateModule(mModules[i]))
+    if(!isCalibrated(mModules[i]))
     {
-      return false;
+      if(!calibrateModule(mModules[i]))
+      {
+        return false;
+      }
     }
   }
 
@@ -325,4 +328,30 @@ void cedar::dev::robot::AmtecKinematicChain::readParamsFromConfigFile()
 
   readOrDefaultConfiguration();
   return;
+}
+
+
+bool cedar::dev::robot::AmtecKinematicChain::isCalibrated(unsigned int module)
+{
+  if(!mpDevice)
+  {
+    cout << "Trying to read calibration state but no device initialized!" << endl;
+    return false;
+  }
+
+  // read module state
+
+  unsigned long state = 0;
+
+  int ret_val = mpDevice->getModuleState(module, &state);
+
+  if(ret_val != CLD_OK)
+  {
+    cout << "Error reading state of Amtec module " << module << ": " << ret_val << endl;
+    return false;
+  }
+
+  bool is_home = (state & STATEID_MOD_HOME);
+
+  return is_home;
 }
