@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,51 +22,65 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BadConnectionException.h
+    File:        FriStatusWidget.h
 
     Maintainer:  Guido Knips
     Email:       guido.knips@ini.rub.de
-    Date:        2010 12 08
+    Date:        2011 01 25
 
-    Description: Header for the @em cedar::aux::exc::BadConnectionException class.
+    Description: Widget for showing FRI information
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
-#define CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
+#ifndef CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+#define CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
 
 // LOCAL INCLUDES
-#include "ExceptionBase.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
+#include "devices/robot/kuka/KukaInterface.h"
+#include "cedar/devices/robot/kuka/gui/ui_FriStatusWidget.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
-//none yet
+#include <Qt>
+#include <QObject>
 
-
-/*!@brief Exception thrown when a connection (i.e. a network connection) is too bad to continue*/
-class cedar::aux::exc::BadConnectionException : public cedar::aux::exc::ExceptionBase
+/*!@brief Widget that displays informations about the status of the KUKA-FRI
+ *
+ * This includes the status, the connection quality, the sample time and if the robot is powered
+ */
+class cedar::dev::robot::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
+                                                      private Ui_FriStatusWidget
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  BadConnectionException(void);
-
-  /*!@brief The destructor.
+  /*!@brief The constructor.
    *
-   * @remarks The destructor may not throw any exception.
+   * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
+   * @param parent parent widget
    */
-  virtual ~BadConnectionException(void) throw ();
+  FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
+
+  //!@brief Destructor
+  ~FriStatusWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //none yet
+  /*!@brief refreshes the displayed data*/
+  void timerEvent(QTimerEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -78,7 +92,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*!@brief initializes the class
+   */
+  void init();
+  /*!@brief updates the displayed information
+   */
+  void updateInformation();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -88,7 +107,8 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  bool mIsInit; //!<true, if object has been initialized
+  cedar::dev::robot::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -97,9 +117,11 @@ public:
   // none yet (hopefully never!)
 protected:
   // none yet
+
 private:
   // none yet
 
-}; //class BadConnectionException
+}; // class cedar::dev::robot::kuka::gui::FriStatusWidget
 
-#endif  //CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
+#endif // CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+
