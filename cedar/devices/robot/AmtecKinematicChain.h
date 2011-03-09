@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/Device/Device.h"
+#include <QMutex>
 
 
 /*!@brief Abstract description of the class.
@@ -107,6 +108,7 @@ private:
   std::string mInitString;
   int mInit;
   std::vector<int> mModules;
+  QMutex mCanBusMutex;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
