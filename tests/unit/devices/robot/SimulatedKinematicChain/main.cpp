@@ -57,6 +57,7 @@ int main()
   int errors = 0;
   
   // create instance of test class
+  log_file << "reading kinematic chain from conig file ..." << std::endl;
   ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("test.conf"));
   SimulatedKinematicChain test_arm(p_reference_geometry);
   
@@ -128,14 +129,3 @@ int main()
   }
   return errors;
 }
-
-
-
-
-
-
-
-
-
-
-
