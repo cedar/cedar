@@ -42,6 +42,7 @@
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/m5apiw32.h"
+#include <QMutexLocker>
 
 
 using namespace std;
@@ -118,6 +119,7 @@ cedar::dev::robot::AmtecKinematicChain::~AmtecKinematicChain()
 
 bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 {
+  QMutexLocker mutex_locker(&mCanBusMutex);
 
   if(!mpDevice)
   {
@@ -155,6 +157,8 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
     return false;
   }
 
+  mutex_locker.unlock();
+
   for(unsigned int i = 0; i < mModules.size(); ++i)
   {
     if(!isCalibrated(mModules[i]))
@@ -172,6 +176,8 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 
 double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
 {
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
   if(!mpDevice)
   {
     cout << "Error: No Amtec device!" << endl;
@@ -196,6 +202,8 @@ double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
 
 double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joint)
 {
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
   if(!mpDevice)
   {
     cout << "Error: No Amtec device!" << endl;
@@ -220,6 +228,8 @@ double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joi
 
 void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, double value)
 {
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
   if(!mpDevice)
   {
     cout << "Error: No Amtec device!" << endl;
@@ -242,6 +252,8 @@ void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, d
 
 bool cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
   if(!mpDevice)
   {
     cout << "Error: No Amtec device!" << endl;
@@ -267,6 +279,8 @@ bool cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index
 
 bool cedar::dev::robot::AmtecKinematicChain::calibrateModule(unsigned int module)
 {
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
   if(!mpDevice)
   {
     cout << "Trying to calibrate but no device initialized. This should never happen!" << endl;
@@ -333,6 +347,8 @@ void cedar::dev::robot::AmtecKinematicChain::readParamsFromConfigFile()
 
 bool cedar::dev::robot::AmtecKinematicChain::isCalibrated(unsigned int module)
 {
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
   if(!mpDevice)
   {
     cout << "Trying to read calibration state but no device initialized!" << endl;
