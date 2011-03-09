@@ -66,6 +66,31 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
     cout << "Error initializing the Amtec module!" << endl;
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
   }
+
+  //
+  // read module map from config
+  //
+
+  if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
+  {
+    cout << "AmtecKinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
+  }
+
+  readOrDefaultConfiguration();
+
+  //
+  // print module mapping to console
+  //
+
+  cout << "Mapping of joints to modules:" << endl;
+  cout << "amtecModuleMap = [ " << mModules[0];
+  for (unsigned int i = 1; i < mModules.size(); ++i)
+  {
+    cout << ", " << mModules[i];
+  }
+  cout << " ];" << endl;
+
+  return;
 }
 
 
@@ -82,6 +107,10 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& config
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
   }
 
+  //
+  // read module map from config
+  //
+
   if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
   {
     cout << "AmtecKinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
@@ -89,7 +118,10 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& config
 
   readOrDefaultConfiguration();
 
+  //
   // print module mapping to console
+  //
+
   cout << "Mapping of joints to modules:" << endl;
   cout << "amtecModuleMap = [ " << mModules[0];
   for (unsigned int i = 1; i < mModules.size(); ++i)
