@@ -75,7 +75,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  float getMaxAcceleration(unsigned int index);
+  void setMaxAcceleration(unsigned int index, float maxAcc);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

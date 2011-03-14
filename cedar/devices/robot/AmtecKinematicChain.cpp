@@ -67,29 +67,6 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
   }
 
-  //
-  // read module map from config
-  //
-
-  if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
-  {
-    cout << "AmtecKinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
-  }
-
-  readOrDefaultConfiguration();
-
-  //
-  // print module mapping to console
-  //
-
-  cout << "Mapping of joints to modules:" << endl;
-  cout << "amtecModuleMap = [ " << mModules[0];
-  for (unsigned int i = 1; i < mModules.size(); ++i)
-  {
-    cout << ", " << mModules[i];
-  }
-  cout << " ];" << endl;
-
   return;
 }
 
@@ -106,29 +83,6 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& config
     cout << "Error initializing the Amtec module!" << endl;
     CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
   }
-
-  //
-  // read module map from config
-  //
-
-  if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
-  {
-    cout << "AmtecKinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
-  }
-
-  readOrDefaultConfiguration();
-
-  //
-  // print module mapping to console
-  //
-
-  cout << "Mapping of joints to modules:" << endl;
-  cout << "amtecModuleMap = [ " << mModules[0];
-  for (unsigned int i = 1; i < mModules.size(); ++i)
-  {
-    cout << ", " << mModules[i];
-  }
-  cout << " ];" << endl;
 
   return;
 }
@@ -158,6 +112,10 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
     mpDevice = newDevice(mInitString.c_str());
   }
 
+  //
+  // init device itself
+  //
+
   int ret_val = mpDevice->init(mInitString.c_str());
 
   switch(ret_val)
@@ -172,6 +130,10 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
     cout << "Amtec Device: Unknown initialization error!" << endl;
     return false;
   }
+
+  //
+  // get default module map
+  //
 
   mpDevice->getModuleIdMap(mModules);
 
@@ -189,17 +151,64 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
     return false;
   }
 
+  //
+  // read module map from config
+  //
+
+  if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
+  {
+    cout << "AmtecKinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
+  }
+
+  readOrDefaultConfiguration();
+
+  //
+  // print module mapping to console
+  //
+
+  cout << "Mapping of joints to modules:" << endl;
+  cout << "amtecModuleMap = [ " << mModules[0];
+  for (unsigned int i = 1; i < mModules.size(); ++i)
+  {
+    cout << ", " << mModules[i];
+  }
+  cout << " ];" << endl;
+
+  //
+  // calibrate and configure the modules
+  //
+
   mutex_locker.unlock();
 
   for(unsigned int i = 0; i < mModules.size(); ++i)
   {
+//    mpDevice->setMaxAcc(mModules[i], 0.5);
+//    float value = 0.0;
+//    mpDevice->getMaxAcc(mModules[i], &value);
+//    cout << value << endl;
+
     if(!isCalibrated(mModules[i]))
     {
+
       if(!calibrateModule(mModules[i]))
       {
         return false;
       }
+
     }
+
+    // set position limits
+    mpDevice->setMinPos(mModules[i], mpReferenceGeometry->getJoint(i)->angleLimits.min);
+    mpDevice->setMaxPos(mModules[i], mpReferenceGeometry->getJoint(i)->angleLimits.max);
+
+    // set velocity limits
+    //float min_velocity = mpReferenceGeometry->getJoint(i)->velocityLimits.min;
+    //float max_velocity = mpReferenceGeometry->getJoint(i)->velocityLimits.max;
+//      float min_abs_vel = min<float>(std::abs(min_velocity), std::abs(max_velocity));
+//      mpDevice->setMaxVel(mModules[i], min_abs_vel);
+
+    mpDevice->setMaxAcc(mModules[i], 0.01);
+
   }
 
   return true;
@@ -402,4 +411,50 @@ bool cedar::dev::robot::AmtecKinematicChain::isCalibrated(unsigned int module)
   bool is_home = (state & STATEID_MOD_HOME);
 
   return is_home;
+}
+
+
+float cedar::dev::robot::AmtecKinematicChain::getMaxAcceleration(unsigned int index)
+{
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
+  if(!mpDevice)
+  {
+    cout << "Trying to read max acceleration but no device initialized!" << endl;
+    return 0.0;
+  }
+
+  if(index >= mModules.size())
+  {
+    cout << "Error: Trying to access the " << index << ". module while only "
+        << mModules.size() << " were found." << endl;
+    return 0.0;
+  }
+
+  float acc = 0.0;
+  mpDevice->getMaxAcc(mModules[index], &acc);
+
+  return acc;
+}
+
+
+void cedar::dev::robot::AmtecKinematicChain::setMaxAcceleration(unsigned int index, float maxAcc)
+{
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
+  if(!mpDevice)
+  {
+    cout << "Trying to set max acceleration but no device initialized!" << endl;
+    return;
+  }
+
+  if(index >= mModules.size())
+  {
+    cout << "Error: Trying to access the " << index << ". module while only "
+        << mModules.size() << " were found." << endl;
+    return;
+  }
+
+  mpDevice->setMaxAcc(mModules[index], maxAcc);
+  return;
 }
