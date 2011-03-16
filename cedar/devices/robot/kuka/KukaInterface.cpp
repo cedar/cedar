@@ -61,7 +61,7 @@ void KukaInterface::init()
   mIsInit = true;
 }
 
-double KukaInterface::getJointAngle(unsigned int index)const
+double KukaInterface::getJointAngle(unsigned int index)
 {
   //The index must be less than the number of angles
   if (index >= getNumberOfJoints() )
@@ -70,7 +70,7 @@ double KukaInterface::getJointAngle(unsigned int index)const
   }
   return mpCommunicator->getJointAngle(index);
 }
-vector<double> KukaInterface::getJointAngles() const
+vector<double> KukaInterface::getJointAngles()
 {
   return mpCommunicator->getJointAngles();
 }

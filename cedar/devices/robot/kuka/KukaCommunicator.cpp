@@ -138,7 +138,15 @@ void KukaCommunicator::copyFromFRI()
   mPowerOn = mpFriRemote->isPowerOn();
   //Create a std::vector from the float-Array
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
-  mMeasuredJointPosition.assign(pJointPos, pJointPos + LBR_MNJ);
+  for (unsigned i=0; i<LBR_MNJ; i++)
+  {
+    mMeasuredJointPosition[i] = pJointPos[i];
+  }
+  //if not in command mode or Power is not on, reset commanded position to measured position
+  if (mpFriRemote->getState() != FRI_STATE_CMD || !mpFriRemote->isPowerOn())
+  {
+    mCommandedJointPosition = mMeasuredJointPosition;
+  }
 }
 void KukaCommunicator::copyToFRI()
 {
@@ -146,7 +154,7 @@ void KukaCommunicator::copyToFRI()
   float commanded_joint[LBR_MNJ];
   for(unsigned i=0; i<LBR_MNJ; i++)
   {
-    commanded_joint[i] = mCommandedJointPosition[i];
+    commanded_joint[i] = float(mCommandedJointPosition[i]);
   }
   //do position controll only if you are able to move the robot
   if(mpFriRemote->getState() == FRI_STATE_CMD && mpFriRemote->isPowerOn())
@@ -181,7 +189,7 @@ void KukaCommunicator::setJointAngle(unsigned index, double value)
 void KukaCommunicator::setJointAngles(const std::vector<double>& values)
 {
   mLock.lockForWrite();
-  mCommandedJointPosition = value;
+  mCommandedJointPosition = values;
   mLock.lockForRead();
 }
 //----------------------------------------------------------------------------------------------------------------------
