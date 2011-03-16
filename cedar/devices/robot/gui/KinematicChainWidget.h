@@ -43,6 +43,7 @@
 // PROJECT INCLUDES
 
 #include "devices/robot/KinematicChain.h"
+#include "auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 
@@ -50,7 +51,10 @@
 #include <QtGui/QGridLayout>
 #include <QtGui/QWidget>
 
-class KinematicChainWidget : public QWidget
+class KinematicChainWidget
+  :
+  public QWidget,
+  public cedar::aux::ConfigurationInterface
 {
   //----------------------------------------------------------------------------
   // macros
@@ -65,11 +69,14 @@ class KinematicChainWidget : public QWidget
 public:
 
   KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent = 0, Qt::WindowFlags f = 0);
   ~KinematicChainWidget();
 
   //----------------------------------------------------------------------------
   // public methods
   //----------------------------------------------------------------------------
+
+public:
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -83,6 +90,11 @@ protected:
   // private methods
   //----------------------------------------------------------------------------
 
+private:
+
+  void initWindow();
+  void setActiveColumn(unsigned int c);
+
 private slots:
 
   void radioButtonAngleClicked();
@@ -90,10 +102,6 @@ private slots:
   void radioButtonAccelerationClicked();
   void updateJointValue();
   void updateSpinBoxes();
-
-private:
-
-  void setActiveColumn(unsigned int c);
 
   //----------------------------------------------------------------------------
   // members
@@ -114,6 +122,8 @@ private:
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
   QGridLayout *mpGridLayout;
   QTimer *mpTimer;
+  int mDecimals;
+  double mSingleStep;
 
   //----------------------------------------------------------------------------
   // parameters
