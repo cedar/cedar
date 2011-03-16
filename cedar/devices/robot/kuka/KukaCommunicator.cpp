@@ -140,7 +140,7 @@ void KukaCommunicator::copyFromFRI()
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
   for (unsigned i=0; i<LBR_MNJ; i++)
   {
-    mMeasuredJointPosition[i] = pJointPos[i];
+    mMeasuredJointPosition[i] = double(pJointPos[i]);
   }
   //if not in command mode or Power is not on, reset commanded position to measured position
   if (mpFriRemote->getState() != FRI_STATE_CMD || !mpFriRemote->isPowerOn())
