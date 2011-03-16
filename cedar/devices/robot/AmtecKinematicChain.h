@@ -49,9 +49,7 @@
 #include <QMutex>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief KinematicChain implementation for Amtec modules
  */
 class cedar::dev::robot::AmtecKinematicChain : public cedar::dev::robot::KinematicChain
 {
@@ -75,8 +73,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  /*!@brief returns the max. acceleration of a joint
+   *
+   * @param index
+   */
   float getMaxAcceleration(unsigned int index);
-  void setMaxAcceleration(unsigned int index, float maxAcc);
+
+  /*!@brief sets the max. acceleration of a joint
+   *
+   * Unfortunately, the Amtec modules seem to ignore this value while in
+   * velocity mode.
+   *
+   * @param index
+   * @param maxAcc
+   */
+void setMaxAcceleration(unsigned int index, float maxAcc);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
