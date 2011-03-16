@@ -61,13 +61,13 @@ public:
    *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
    *  @return joint angle for the given index
    */
-  virtual double getJointAngle(unsigned int index) const;
+  virtual double getJointAngle(unsigned int index);
   /*! @brief returns all joint angles
    *
    *  @return a vector filled with the joint angles
    *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
-  virtual std::vector<double> getJointAngles() const;
+  virtual std::vector<double> getJointAngles();
   /*! @brief set the angle for a specified joint
    *
    *  @param index  index of the joint
