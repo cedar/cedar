@@ -90,6 +90,11 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& config
 
 cedar::dev::robot::AmtecKinematicChain::~AmtecKinematicChain()
 {
+  for(unsigned int i = 0; i < mModules.size(); ++i)
+  {
+    setJointVelocity(i, 0.0);
+  }
+
   if(mpDevice)
   {
     delete mpDevice;
@@ -182,10 +187,6 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 
   for(unsigned int i = 0; i < mModules.size(); ++i)
   {
-//    mpDevice->setMaxAcc(mModules[i], 0.5);
-//    float value = 0.0;
-//    mpDevice->getMaxAcc(mModules[i], &value);
-//    cout << value << endl;
 
     if(!isCalibrated(mModules[i]))
     {
@@ -204,11 +205,6 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
     // set velocity limits
     //float min_velocity = mpReferenceGeometry->getJoint(i)->velocityLimits.min;
     //float max_velocity = mpReferenceGeometry->getJoint(i)->velocityLimits.max;
-//      float min_abs_vel = min<float>(std::abs(min_velocity), std::abs(max_velocity));
-//      mpDevice->setMaxVel(mModules[i], min_abs_vel);
-
-    mpDevice->setMaxAcc(mModules[i], 0.01);
-
   }
 
   return true;
