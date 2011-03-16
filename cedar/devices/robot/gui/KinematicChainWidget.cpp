@@ -63,55 +63,39 @@ KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicCha
 {
   // store a smart pointer to KinematicChain
   mpKinematicChain = kinematicChain;
+  mDecimals = 2;
+  mSingleStep = 0.01;
 
-  // Set up the model and configure the view...
-  setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
+  initWindow();
+  return;
+}
 
-  mpGridLayout = new QGridLayout();
-  QRadioButton *radioButtonAngle = new QRadioButton(QApplication::translate("KinematicChainWindow", "Angle [rad]"));
-  QRadioButton *radioButtonVelocity = new QRadioButton(QApplication::translate("KinematicChainWindow", "Velocity [rad/s]"));
-  QRadioButton *radioButtonAcceleration = new QRadioButton(QApplication::translate("KinematicChainWindow", "Acceleration [rad/s^2]"));
-  mpGridLayout->addWidget(radioButtonAngle, 0, 1);
-  mpGridLayout->addWidget(radioButtonVelocity, 0, 2);
-  mpGridLayout->addWidget(radioButtonAcceleration, 0, 3);
-  connect(radioButtonAngle, SIGNAL(clicked()), this, SLOT(radioButtonAngleClicked()));
-  connect(radioButtonVelocity, SIGNAL(clicked()), this, SLOT(radioButtonVelocityClicked()));
-  connect(radioButtonAcceleration, SIGNAL(clicked()), this, SLOT(radioButtonAccelerationClicked()));
 
-  mpGridLayout->setColumnStretch(0,1);
-  mpGridLayout->setColumnStretch(1,2);
-  mpGridLayout->setColumnStretch(2,2);
-  mpGridLayout->setColumnStretch(3,2);
+KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent, Qt::WindowFlags f)
+: ConfigurationInterface(configFileName)
+{
+  // store a smart pointer to KinematicChain
+  mpKinematicChain = kinematicChain;
+  mDecimals = 2;
+  mSingleStep = 0.01;
 
-  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+  //
+  // read configuration file
+  //
+
+  if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
   {
-    // add label
-    char labelText[10];
-    sprintf(labelText, "Joint %d", i);
-    QLabel *label = new QLabel(QApplication::translate("KinematicChainWindow", labelText));
-    mpGridLayout->addWidget(label, i+1, 0);
-
-    // add spinboxes
-    for(unsigned int j = 0; j < 3; ++j)
-    {
-      QDoubleSpinBox *doubleSpinBox = new QDoubleSpinBox();
-      doubleSpinBox->setRange(-999999.0, 999999.0);
-      doubleSpinBox->setValue(0.0);
-      doubleSpinBox->setSingleStep(0.1);
-      mpGridLayout->addWidget(doubleSpinBox, i+1, j+1);
-      connect(doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(updateJointValue(void)));
-    }
+    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << endl;
   }
 
-  radioButtonAngle->click();
-  setLayout(mpGridLayout);
-  setMaximumHeight(0);
+  if(addParameter(&mSingleStep, "kinematicChainWidgetSingleStep", 0.01) != CONFIG_SUCCESS)
+  {
+    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << endl;
+  }
 
-  // start a timer to update the interface
-  mpTimer = new QTimer();
-  connect(mpTimer, SIGNAL(timeout()), this, SLOT(updateSpinBoxes()));
-  mpTimer->start(mUpdateInterval);
+  readOrDefaultConfiguration();
 
+  initWindow();
   return;
 }
 
@@ -240,6 +224,60 @@ void KinematicChainWidget::updateJointValue()
   default:
     cout << "Error: I was not able to determine the corresponding working mode for this signal. This should never happen!" << endl;
   }
+
+  return;
+}
+
+
+void KinematicChainWidget::initWindow()
+{
+  setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
+
+  mpGridLayout = new QGridLayout();
+  QRadioButton *radioButtonAngle = new QRadioButton(QApplication::translate("KinematicChainWindow", "Angle [rad]"));
+  QRadioButton *radioButtonVelocity = new QRadioButton(QApplication::translate("KinematicChainWindow", "Velocity [rad/s]"));
+  QRadioButton *radioButtonAcceleration = new QRadioButton(QApplication::translate("KinematicChainWindow", "Acceleration [rad/s^2]"));
+  mpGridLayout->addWidget(radioButtonAngle, 0, 1);
+  mpGridLayout->addWidget(radioButtonVelocity, 0, 2);
+  mpGridLayout->addWidget(radioButtonAcceleration, 0, 3);
+  connect(radioButtonAngle, SIGNAL(clicked()), this, SLOT(radioButtonAngleClicked()));
+  connect(radioButtonVelocity, SIGNAL(clicked()), this, SLOT(radioButtonVelocityClicked()));
+  connect(radioButtonAcceleration, SIGNAL(clicked()), this, SLOT(radioButtonAccelerationClicked()));
+
+  mpGridLayout->setColumnStretch(0,1);
+  mpGridLayout->setColumnStretch(1,2);
+  mpGridLayout->setColumnStretch(2,2);
+  mpGridLayout->setColumnStretch(3,2);
+
+  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+  {
+    // add label
+    char labelText[10];
+    sprintf(labelText, "Joint %d", i);
+    QLabel *label = new QLabel(QApplication::translate("KinematicChainWindow", labelText));
+    mpGridLayout->addWidget(label, i+1, 0);
+
+    // add spinboxes
+    for(unsigned int j = 0; j < 3; ++j)
+    {
+      QDoubleSpinBox *doubleSpinBox = new QDoubleSpinBox();
+      doubleSpinBox->setRange(-999999.0, 999999.0);
+      doubleSpinBox->setValue(0.0);
+      doubleSpinBox->setDecimals(mDecimals);
+      doubleSpinBox->setSingleStep(mSingleStep);
+      mpGridLayout->addWidget(doubleSpinBox, i+1, j+1);
+      connect(doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(updateJointValue(void)));
+    }
+  }
+
+  radioButtonAngle->click();
+  setLayout(mpGridLayout);
+  setMaximumHeight(0);
+
+  // start a timer to update the interface
+  mpTimer = new QTimer();
+  connect(mpTimer, SIGNAL(timeout()), this, SLOT(updateSpinBoxes()));
+  mpTimer->start(mUpdateInterval);
 
   return;
 }
