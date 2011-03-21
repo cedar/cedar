@@ -37,6 +37,10 @@
 cedar_add_library(cedardev
   MOC_HEADERS
   robot/KinematicChainModel.h
+  robot/mobile/gui/EPuckControlWidget.h
+  robot/mobile/gui/KTeamPositionControllerWidget.h
+  robot/mobile/KTeamPositionController.h
+  com/gui/CommunicationWidget.h
   LINK_LIBRARIES
   cedaraux
 )

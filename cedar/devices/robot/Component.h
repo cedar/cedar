@@ -43,6 +43,7 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/Base.h"
+#include "devices/com/SerialCommunication.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -97,6 +98,9 @@ protected:
   std::string mCategoryName;
   //! pointer to the robot the component belongs to
   RobotPtr mpRobot;
+  //! pointer to the communication device
+  cedar::dev::com::Communication *mpeCommunication;
+
 private:
   // none yet
 
