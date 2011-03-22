@@ -22,37 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.cpp
+    File:        namespace.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.rub.de
+    Date:        2010 12 9
 
-    Description: Implementation of the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description: Namespace file for cedar::dev::robot::kuka.
 
     Credits:
 
 ======================================================================================================================*/
 
 
+#ifndef CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+#define CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//! Constructor
-cedar::aux::exc::IndexOutOfRangeException::IndexOutOfRangeException()
+namespace cedar
 {
-  // Sets the type name.
-  this->mType = "IndexOutOfRangeException";
+  namespace dev
+  {
+    /*! @brief Namespace for all robot interfaces. */
+    namespace robot
+    {
+      namespace kuka
+      {
+        class KukaInterface;
+        typedef boost::shared_ptr<KukaInterface> KukaInterfacePtr;
+      }
+    }
+  }
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+#endif // CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
