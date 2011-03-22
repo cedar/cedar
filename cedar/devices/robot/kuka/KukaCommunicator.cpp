@@ -66,6 +66,7 @@ KukaCommunicator::~KukaCommunicator()
   {
     //stop the looped Thread
     stop();
+    //TODO The following line is not true at this point...
     //If the script "kukain.src" is startet on the KUKA-LBR, the first boolean value means "Stop the FRI"
     //it won't throw an exception, because the index is 0 and therefore valid
     mpFriRemote->setToKRLBool(0, true);
@@ -114,7 +115,7 @@ void KukaCommunicator::init()
 void KukaCommunicator::step(double time)
 {
   //only, if properly initialized
-  if(mIsInit)
+  if (mIsInit)
   {
     //Lock the thread for read while copying the data
     mLock.lockForRead();
