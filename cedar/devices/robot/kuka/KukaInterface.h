@@ -98,10 +98,10 @@ public:
    * @return current Quality of the connection
    */
   FRI_QUALITY getFriQuality()const;
-  /*! @brief does Data exchange with the KUKA-LBR
-   *
-   * normally not necessary, the functions setJointAngle() and setJointAngles() do this by themselves.
-   * the get-Functions don't, though
+  /*! @brief returns sample time of the FRI
+
+   * The sample time is set on the FRI server. Each interval with the length of the sample time, data will be exchanged
+   * @return FRI sample time
    */
   float getSampleTime()const;
   /*! @brief check if the robot is powered

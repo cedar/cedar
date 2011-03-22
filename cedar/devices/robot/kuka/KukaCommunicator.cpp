@@ -51,7 +51,7 @@ using namespace cedar::dev::robot::kuka;
 //----------------------------------------------------------------------------------------------------------------------
 KukaCommunicator::KukaCommunicator(const std::string& configFileName)
 :
-cedar::aux::LoopedThread(configFileName),
+cedar::aux::LoopedThread(0,0),
 mCommandedJointPosition(LBR_MNJ),
 mMeasuredJointPosition(LBR_MNJ)
 {
@@ -156,12 +156,9 @@ void KukaCommunicator::copyToFRI()
   {
     commanded_joint[i] = float(mCommandedJointPosition[i]);
   }
-  //do position controll only if you are able to move the robot
-  if(mpFriRemote->getState() == FRI_STATE_CMD && mpFriRemote->isPowerOn())
-  {
-    //copy data, but don't do data exchange yet
-    mpFriRemote->doPositionControl(commanded_joint, false);
-  }
+
+  //copy position data, but don't do data exchange yet
+  mpFriRemote->doPositionControl(commanded_joint, false);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // angle control functions
