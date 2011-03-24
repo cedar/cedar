@@ -185,7 +185,7 @@ cv::Mat KinematicChain::getJointAccelerationsMatrix()
 }
 
 
-ActionType KinematicChain::getWorkingMode()
+KinematicChain::ActionType KinematicChain::getWorkingMode()
 {
   return mCurrentWorkingMode;
 }
