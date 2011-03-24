@@ -165,6 +165,12 @@ public:
    */
   cv::Mat getJointAccelerationsMatrix();
 
+  /*!@brief returns the mode in which the joints positions are set (angle/velocity/acceleration)
+   *
+   * @return current working mode
+   */
+  ActionType getWorkingMode();
+
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
@@ -272,7 +278,7 @@ public:
    *
    * @param actionType new working mode
    */
-  void setWorkingMode(ActionType actionType);
+  virtual void setWorkingMode(ActionType actionType);
 
   /*!@brief Controls if real hardware values are used when integrating velocity/acceleration.
    *
