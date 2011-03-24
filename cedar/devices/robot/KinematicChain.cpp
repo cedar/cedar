@@ -54,7 +54,7 @@ using namespace cv;
 //! constructor
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(50.5), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(12, 0.01), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
 mpReferenceGeometry(rpReferenceGeometry)
 {
   setWorkingMode(ANGLE);
@@ -182,6 +182,12 @@ std::vector<double> KinematicChain::getJointAccelerations()
 cv::Mat KinematicChain::getJointAccelerationsMatrix()
 {
   return mJointAccelerations.clone();
+}
+
+
+KinematicChain::ActionType KinematicChain::getWorkingMode()
+{
+  return mCurrentWorkingMode;
 }
 
 

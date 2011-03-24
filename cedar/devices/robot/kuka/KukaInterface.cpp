@@ -19,34 +19,37 @@
 #include "KukaInterface.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/exceptions/BadConnectionException.h"
 #include "auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // SYSTEM INCLUDES
-#ifdef DEBUG
-#include <iostream>
-#endif
 
 using namespace cedar::dev::robot::kuka;
 using namespace std;
-using namespace libconfig;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-KukaInterface::KukaInterface(const string& configFileName)
+KukaInterface::KukaInterface(const std::string& configFileName)
 :
-cedar::dev::robot::KinematicChain(configFileName)
+KinematicChain(configFileName),
+mCommandedJointPosition(LBR_MNJ),
+mMeasuredJointPosition(LBR_MNJ)
 {
   mIsInit = false;
   mpFriRemote = 0;
   init();
 }
-
 KukaInterface::~KukaInterface()
 {
   if(mIsInit)
   {
+    //stop the looped Thread
+    stop();
+    //TODO The following line is not true at this point, the script "kukain.src" is not ready yet!
+    //If the script "kukain.src" is startet on the KUKA-LBR, the first boolean value means "Stop the FRI"
+    //it won't throw an exception, because the index is 0 and therefore valid
+    mpFriRemote->setToKRLBool(0, true);
+    mpFriRemote->doDataExchange();
     //Free Memory
     if(mpFriRemote)
     {
@@ -55,13 +58,11 @@ KukaInterface::~KukaInterface()
   }
 }
 //----------------------------------------------------------------------------------------------------------------------
-// member functions
+// public member functions
 //----------------------------------------------------------------------------------------------------------------------
 void KukaInterface::init()
 {
   //The number of joints the KUKA LBR has
-  //TODO: mNumberOfJoints does not exist anymore - remove this
-  //KinematicChain::mNumberOfJoints = LBR_MNJ;
   //Load Parameters from the configuration file
   //ServerPort: 0 means, FRI will use the default Port
   addParameter(&_mServerPort, "ServerPort", 0);
@@ -70,8 +71,11 @@ void KukaInterface::init()
    */
   addParameter(&_mRemoteHost, "RemoteHost", "NULL");
 
+  //now read the configuration file
+  readOrDefaultConfiguration();
+
   //create a new Instance of the friRemote
-  if(_mRemoteHost != string("NULL"))
+  if (_mRemoteHost != string("NULL"))
   {
     mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
   }
@@ -79,179 +83,156 @@ void KukaInterface::init()
   {
     mpFriRemote = new friRemote(_mServerPort);
   }
+  //copy default values from the FRI
+  copyFromFRI();
+
+  //set step size and idle time for the looped thread
+  setStepSize(0);
+  setIdleTime(0);
+  //start the thread
+  start();
+
   mIsInit = true;
-
-  //try to initialize the command mode
-  initCommandMode();
 }
 
-double KukaInterface::getJointAngle(const unsigned int index)const
+
+double KukaInterface::getJointAngle(unsigned int index)
 {
-  //The index must be less than the number of angles
-  if (index >= getNumberOfJoints() )
+  mLock.lockForRead();
+  double a = mMeasuredJointPosition.at(index);
+  mLock.unlock();
+  return a;
+}
+
+
+void KukaInterface::setJointAngle(unsigned int index, double angle)
+{
+  mLock.lockForWrite();
+  mCommandedJointPosition.at(index) = angle;
+  mLock.unlock();
+}
+
+
+void KukaInterface::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
+{
+  KinematicChain::setWorkingMode(actionType);
+  this ->start();
+}
+/*
+ * Overwritten start function of KinematicChain
+ * the function inherited from KinematicChain does some things we do not want.
+ */
+void KukaInterface::start(Priority priority)
+{
+  if(isRunning())
   {
-    CEDAR_THROW(aux::exc::IndexOutOfRangeException, "KukaInterface: invalid joint index");
+    return;
   }
-  //Receive data from the Kuka LBR
-  mpFriRemote->doReceiveData();
-  //does not test if index is out of bounds yet
-  return (double)mpFriRemote->getMsrMsrJntPosition()[index];
+
+  QThread::start(priority);
 }
-vector<double> KukaInterface::getJointAngles() const
+//----------------------------------------------------------------------------------------------------------------------
+// private member functions
+//----------------------------------------------------------------------------------------------------------------------
+void KukaInterface::step(double time)
 {
-  //Receive data from the Kuka LBR
-  mpFriRemote->doReceiveData();
+  //if the thread has not been initialized, do nothing
+  if (mIsInit)
+  {
+    mLock.lockForWrite();
+    //float array for copying joint position to fri
+    float commanded_joint[LBR_MNJ];
+    //update joint angle and joint velocity if necessary
+    switch (getWorkingMode())
+    {
+      case ACCELERATION:
+        //increase speed for all joints
+        setJointVelocities(getJointVelocitiesMatrix() + getJointAccelerationsMatrix() * mpFriRemote->getSampleTime());
+      case VELOCITY:
+        //change position for all joints
+        for (unsigned i=0; i<LBR_MNJ; i++)
+        {
+          commanded_joint[i] = mMeasuredJointPosition.at(i) + getJointVelocity(i) * mpFriRemote->getSampleTime();
+        }
+        break;
+      case ANGLE:
+        //copy commanded joint position
+        for(unsigned i=0; i<LBR_MNJ; i++)
+        {
+          commanded_joint[i] = float(mCommandedJointPosition[i]);
+        }
+        break;
+      default:
+        cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << endl;
+    }
+    //copy position data, but don't do data exchange yet
+    mpFriRemote->doPositionControl(commanded_joint, false);
+    mLock.unlock();
+
+    //now do the data exchange
+    mpFriRemote->doDataExchange();
+
+    //lock and copy data back
+    mLock.lockForWrite();
+    copyFromFRI();
+    mLock.unlock();
+  }
+}
+
+
+void KukaInterface::copyFromFRI()
+{
+  mFriState = mpFriRemote->getState();
+  mFriQuality = mpFriRemote->getQuality();
+  mSampleTime = mpFriRemote->getSampleTime();
+  mPowerOn = mpFriRemote->isPowerOn();
   //Create a std::vector from the float-Array
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
-  return vector<double>(pJointPos, pJointPos + getNumberOfJoints());
-}
-cv::Mat KukaInterface::getJointAnglesMatrix() const
-{
-  //This may be inefficient, but heck, the bloody udp-communication is imho more slow than this
-  return cv::Mat(getJointAngles(), true);
-}
-void KukaInterface::setJointAngle(const unsigned int index, const double angle) throw()
-{
-  //The index must be less than the number of angles
-  if (index >= getNumberOfJoints() )
+  for (unsigned i=0; i<LBR_MNJ; i++)
   {
-    CEDAR_THROW(aux::exc::IndexOutOfRangeException, "KukaInterface: invalid joint index");
+    mMeasuredJointPosition[i] = double(pJointPos[i]);
   }
-  //If the KUKA/LBR is not in command mode, throw an Exception
-  commandModeTest();
-
-  //We want to move exactly one joint. Therefore, the other joints must have the same commanded Positions as before.
-  float *p_angles = mpFriRemote->getMsrCmdJntPosition();
-  p_angles[index] = float(angle);
-  mpFriRemote->doPositionControl(p_angles, true);
-}
-void KukaInterface::setJointAngles(const std::vector<double>& angles) throw()
-{
-  //If the KUKA/LBR is not in command mode, throw an Exception
-  commandModeTest();
-
-  //The FRI function is expecting a float array, so I have to allocate a temporary array.
-  float *p_angles = new float[getNumberOfJoints()];
-
-  for (unsigned i=0; i<getNumberOfJoints(); i++)
+  //if not in command mode or Power is not on, reset commanded position to measured position
+  if (mpFriRemote->getState() != FRI_STATE_CMD || !mpFriRemote->isPowerOn())
   {
-    p_angles[i] = float(angles[i]);
-  }
-
-  //Although the first parameter is not const, this FRI function copies the content and does not change
-  //Second Parameter defines if the Data should be transfered to the LBR right now.
-  mpFriRemote->doPositionControl(p_angles, true);
-
-  delete[] p_angles;
-}
-void KukaInterface::setJointAngles(const cv::Mat& angleMatrix) throw()
-{
-  //If the KUKA/LBR is not in command mode, throw an Exception
-  commandModeTest();
-
-  //The cv::Mat Matrix has a template method to return a specific type.
-  //I don't know if it works without problems, though
-  const float *p_angles = angleMatrix.ptr<float>();
-  //since the fri expects a non-constant array, I have to copy the array.
-  float *p_angles_copy = new float[getNumberOfJoints()];
-  for(unsigned i=0; i<getNumberOfJoints(); i++)
-  {
-    p_angles_copy[i] = p_angles[i];
-  }
-
-  //send the new joint positions to the arm
-  mpFriRemote->doPositionControl(p_angles_copy, true);
-
-  delete[] p_angles_copy;
-}
-
-void KukaInterface::initCommandMode()
-{
-  //how many times has doDataExchange() been called, before the command mode started?
-  unsigned counter = 0;
-
-  /* Do Handshakes to the remote host until the robot is in command mode*/
-  while (getFriState() != FRI_STATE_CMD)
-  {
-    mpFriRemote->setToKRLInt(0, 1);
-    mpFriRemote->doDataExchange();
-    counter++;
-  }
-  //Debug output: number of data exchanges before command mode
-  #ifdef DEBUG
-  cout << "KukaInterface::initCommandMode: " << counter << "data exchanges before command mode" << endl;
-  #endif
-}
-
-void KukaInterface::commandModeTest()const throw()
-{
-  if (getFriState() != FRI_STATE_CMD)
-    {
-      CEDAR_THROW(aux::exc::BadConnectionException,
-                  "KUKA LBR is not in command mode. This may mean the connection "\
-                  "is not good enough or command mode has been stopped by the robot"
-                 );
-    }
-}
-
-void KukaInterface::validateKRLIndex(int index)const throw(){
-  if (index >= FRI_USER_SIZE || index < 0)
-  {
-    CEDAR_THROW(aux::exc::IndexOutOfRangeException, "Index for received or outgoing data is >= FRI_USER_SIZE!");
+    mCommandedJointPosition = mMeasuredJointPosition;
   }
 }
-
 //----------------------------------------------------------------------------------------------------------------------
 // wrapped fri-functions
 //----------------------------------------------------------------------------------------------------------------------
-FRI_STATE KukaInterface::getFriState()const
+FRI_STATE KukaInterface::getFriState()
 {
-  return mpFriRemote->getState();
+  mLock.lockForRead();
+  FRI_STATE s = mFriState;
+  mLock.unlock();
+  return s;
 }
 
-FRI_QUALITY KukaInterface::getFriQuality()const
+
+FRI_QUALITY KukaInterface::getFriQuality()
 {
-  return mpFriRemote->getQuality();
+  mLock.lockForRead();
+  FRI_QUALITY q = mFriQuality;
+  mLock.unlock();
+  return q;
 }
-void KukaInterface::doDataExchange()
+
+
+float KukaInterface::getSampleTime()
 {
-  mpFriRemote->doDataExchange();
+  mLock.lockForRead();
+  float t = mSampleTime;
+  mLock.unlock();
+  return t;
 }
-float KukaInterface::getSampleTime()const
+
+
+bool KukaInterface::isPowerOn()
 {
-  return mpFriRemote->getSampleTime();
-}
-int KukaInterface::getIntFromKRL(int index)const throw()
-{
-  validateKRLIndex(index);
-  return mpFriRemote->getFrmKRLInt(index);
-}
-float KukaInterface::getFloatFromKRL(int index)const throw()
-{
-  validateKRLIndex(index);
-  return mpFriRemote->getFrmKRLReal(index);
-}
-bool KukaInterface::getBoolFromKRL(int index)const throw()
-{
-  validateKRLIndex(index);
-  return mpFriRemote->getFrmKRLBool(index);
-}
-void KukaInterface::setToKRL(int index, int value) throw()
-{
-  validateKRLIndex(index);
-  mpFriRemote->setToKRLInt(index, value);
-}
-void KukaInterface::setToKRL(int index, float value) throw()
-{
-  validateKRLIndex(index);
-  mpFriRemote->setToKRLReal(index, value);
-}
-void KukaInterface::setToKRL(int index, bool value) throw()
-{
-  validateKRLIndex(index);
-  mpFriRemote->setToKRLBool(index, value);
-}
-bool KukaInterface::isPowerOn()const{
-  return isPowerOn();
+  mLock.lockForRead();
+  bool on = mPowerOn;
+  mLock.unlock();
+  return on;
 }
 

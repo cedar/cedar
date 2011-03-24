@@ -26,7 +26,7 @@
 
     Maintainer:  Guido Knips
     Email:       guido.knips@ini.rub.de
-    Date:        2010 12 9
+    Date:        2011 01 25
 
     Description: Namespace file for cedar::dev::robot::kuka.
 
@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+#ifndef CEDAR_DEV_ROBOT_KUKA_GUI_NAMESPACE_H
+#define CEDAR_DEV_ROBOT_KUKA_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
 
@@ -54,13 +54,13 @@ namespace cedar
     {
       namespace kuka
       {
-        class KukaInterface;
-        typedef boost::shared_ptr<KukaInterface> KukaInterfacePtr;
-        class KukaCommunicator;
-        typedef boost::shared_ptr<KukaCommunicator> KukaCommunicatorPtr;
+        namespace gui
+        {
+          class FriStatusWidget;
+        }
       }
     }
   }
 }
 
-#endif // CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+#endif // CEDAR_DEV_ROBOT_KUKA_GUI_NAMESPACE_H
