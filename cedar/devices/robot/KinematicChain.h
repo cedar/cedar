@@ -165,6 +165,12 @@ public:
    */
   cv::Mat getJointAccelerationsMatrix();
 
+  /*!@brief returns the mode in which the joints positions are set (angle/velocity/acceleration)
+   *
+   * @return current working mode
+   */
+  ActionType getWorkingMode();
+
   /*!@brief set current state of a single joint angle
    *
    * @param index    specifies the joint
@@ -257,7 +263,6 @@ public:
    * this method, then you have to return true here. By returning true you
    * indicate to the KinematicChain base class that no integration is necessary.
    *
-   * @param accelerations    vector of new joint velocity values
    * @return true iff your subclass handles acceleration itself
    */
   bool setJointAccelerations(const std::vector<double>& accelerations);
@@ -272,7 +277,7 @@ public:
    *
    * @param actionType new working mode
    */
-  void setWorkingMode(ActionType actionType);
+  virtual void setWorkingMode(ActionType actionType);
 
   /*!@brief Controls if real hardware values are used when integrating velocity/acceleration.
    *
@@ -287,7 +292,7 @@ public:
   void useCurrentHardwareValues(bool useCurrentHardwareValues);
 
 
-  void start(Priority priority = InheritPriority);
+  virtual void start(Priority priority = InheritPriority);
 
 
   //----------------------------------------------------------------------------

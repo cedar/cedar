@@ -1,97 +1,118 @@
-/*----------------------------------------------------------------------------------------------------------------------
- ----- Institute:   Ruhr-Universitaet Bochum
-                    Institut fuer Neuroinformatik
+/*======================================================================================================================
 
- ----- File:        KukaInterface.cpp
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
 
- ----- Author:      Guido Knips
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
 
- ----- Email:       guido.knips@ini.rub.de
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
 
- ----- Date:        2010 11 23
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
- ----- Description: cedar-Interface for the KUKA LBR
+========================================================================================================================
 
- ----- Credits:
- ---------------------------------------------------------------------------------------------------------------------*/
-//Ready for some KukaIn?
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
+    File:        KukaCommunicator.h
 
-#ifndef CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H
-#define CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.rub.de
+    Date:        2011 01 28
 
-// LOCAL INCLUDES (includes from this project)
+    Description: loop-threaded communication class for steady communication with the kuka LBR
+
+    Credits:
+
+======================================================================================================================*/
+
+#ifndef CEDAR_DEV_ROBOT_KUKA_KUKA_COMMUNICATOR_H
+#define CEDAR_DEV_ROBOT_KUKA_KUKA_COMMUNICATOR_H
+
+// LOCAL INCLUDES
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "devices/robot/KinematicChain.h"
-#include "auxiliaries/ConfigurationInterface.h"
+#include "auxiliaries/LoopedThread.h"
 
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
 #include <QReadWriteLock>
+#include <vector>
+#include <string>
 
 
-/*!@brief cedar Interface for the KUKA LBR
-
- * This class wraps the KUKA Fast Research Interface (FRI)
+/*!@brief Abstract description of the class.
+ *
+ * More detailed description of the class.
  */
-class cedar::dev::robot::kuka::KukaInterface :  public cedar::dev::robot::KinematicChain
+class cedar::dev::robot::kuka::KukaCommunicator : public cedar::aux::LoopedThread
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Constructor that takes the name of the configuration file to use with the object.
+  /*!@brief The constructor.
    *
-   * @param configFileName    Name of the configuration file containing the parameters
+   * @param configFileName Name of the coniguration file tha should be used
+   * In the configuration file, the parameter names are the ones for loopedThread as well as "ServerPort" (the port on the LBR
+   * side, 0 means default port) and "RemoteHost" (the remote host to contact to, "NULL" means auto detection)
    */
-  KukaInterface(const std::string& configFileName);
+  KukaCommunicator(const std::string& configFileName);
 
-  /*!the Destructor*/
-  virtual ~KukaInterface();
+
+  //!@brief Destructor
+  virtual ~KukaCommunicator();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief returns angle for a specified joint
+  /*!@brief get the measured angle of a specific joint
    *
-   *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
-   *  @return joint angle for the given index
+   * @param index index to specify the joint
+   * @return angle of the specified joint in rad
    */
-  virtual double getJointAngle(unsigned int index);
-  /*! @brief returns all joint angles
+  double getJointAngle(unsigned index);
+  /*!@brief get a vector of all joint angles
    *
-   *  @return a vector filled with the joint angles
-   *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
+   * @return std::vector with all measured joint angles in rad
    */
-  virtual void setJointAngle(unsigned int index, double angle);
-  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
+  const std::vector<double> getJointAngles();
+  /*!@brief set a single joint position
    *
-   * this function restarts the looped thread
-   * @param actionType new working mode
+   * @param index index to specify the joint
+   * @param value value for the new joint angle in rad
    */
-  virtual void setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType);
-
-  /*!@brief starts the looped thread
+  void setJointAngle(unsigned index, double value);
+  /*!@brief set all joint angles
    *
-   * the KinematicChain class does some things in this function that are not needed
-   * @param priority thread priority
+   * @param values std::vector with the new angles in rad
    */
-  virtual void start(Priority priority = InheritPriority);
+  void setJointAngles(const std::vector<double>& values);
 
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
   /*! @brief returns the state of the Interface.
-   *
+
    * this can be FRI_STATE_OFF, FRI_STATE_MON and FRI_STATE_CMD
    * Commands can only be send if the state is FRI_STATE_CMD, which represents the command mode
    * @return current state of the interface
    */
   FRI_STATE getFriState();
   /*! @brief returns the quality of the connection.
-   *
    * this can range from FRI_QUALITY_UNACCEPTABLE to FRI_QUALITY_PERFECT
    * if the Quality is worse (means: less) than FRI_QUALITY_GOOD, command mode switches to monitor mode automatically
    * @return current Quality of the connection
@@ -105,6 +126,7 @@ public:
   float getSampleTime();
   /*! @brief check if the robot is powered
    *
+   * This method does not call doDataExchange itself
    * this especially means the dead man switch is in the right position and the robot is in command mode
    * @return true, if power is on
    */
@@ -120,20 +142,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*!@brief This method initializes the object.
-   *
-   * This method is called from all constructors of the class.
-   * @param commandMode establish command mode if true
-   */
-  void init();
-  /*!@brief every step is used to do communication between FRI and KUKA-RC
-   *
-   * if in velocity- or acceleration mode, every step will also change joint angles/velocity
-   * @parameter time is not used, since the thread steps at fast as possible, FRI sample time is used instead.
-   */
+  //!@brief every step is used to do communication between FRI and KUKA-RC
   void step(double time);
+  //!@brief is called by every constructor
+  void init();
   //!@brief copies data from the FRI to member variables for access from outside the loop thread
   void copyFromFRI();
+  //!@brief copies data to the FRI member variables
+  void copyToFRI();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -174,6 +190,8 @@ private:
   std::string _mRemoteHost;
   //!local server port
   int _mServerPort;
-};
 
-#endif /* CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H */
+}; // class cedar::dev::robot::kuka::KukaCommunicator
+
+#endif // CEDAR_DEV_ROBOT_KUKA_KUKA_COMMUNICATOR_H
+
