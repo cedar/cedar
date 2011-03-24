@@ -185,6 +185,12 @@ cv::Mat KinematicChain::getJointAccelerationsMatrix()
 }
 
 
+ActionType KinematicChain::getWorkingMode()
+{
+  return mCurrentWorkingMode;
+}
+
+
 void KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
   if(angles.size() != getNumberOfJoints())
