@@ -146,7 +146,7 @@ private:
   void step(double time);
   //!@brief is called by every constructor
   void init();
-  //!@brief copies data from the FRI to member variables for acces from outside the loop thread
+  //!@brief copies data from the FRI to member variables for access from outside the loop thread
   void copyFromFRI();
   //!@brief copies data to the FRI member variables
   void copyToFRI();
@@ -159,7 +159,7 @@ public:
 protected:
   // none yet
 private:
-  //true, if the object has ben initialized
+  //true, if the object has been initialized
   bool mIsInit;
   //KUKA Vendor-Interface, wrapped by this class
   friRemote *mpFriRemote;
@@ -175,7 +175,7 @@ private:
   FRI_QUALITY mFriQuality;
   //Sample Time of the FRI connection
   float mSampleTime;
-  //last known status if power is on on the Kuka RC
+  //last known status if power is on on the KUKA RC
   bool mPowerOn;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -22,7 +22,6 @@
 
 // LOCAL INCLUDES (includes from this project)
 #include "namespace.h"
-#include "KukaCommunicator.h"
 
 // PROJECT INCLUDES
 #include "devices/robot/KinematicChain.h"
@@ -30,6 +29,7 @@
 
 // SYSTEM INCLUDES
 #include <fri/friremote.h>
+#include <QReadWriteLock>
 
 
 /*!@brief cedar Interface for the KUKA LBR
@@ -45,9 +45,8 @@ public:
   /*!@brief Constructor that takes the name of the configuration file to use with the object.
    *
    * @param configFileName    Name of the configuration file containing the parameters
-   * @param communicatorConfigFileName  Name of the configuration file for the communicator member variable
    */
-  KukaInterface(const std::string& configFileName, const std::string& communicatorConfigFileName);
+  KukaInterface(const std::string& configFileName);
 
   /*!the Destructor*/
   virtual ~KukaInterface();
@@ -67,21 +66,21 @@ public:
    *  @return a vector filled with the joint angles
    *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
    */
-  virtual std::vector<double> getJointAngles();
-  /*! @brief set the angle for a specified joint
-   *
-   *  @param index  index of the joint
-   *  @param angle  angle to be set, in radian measure
-   *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
-   */
   virtual void setJointAngle(unsigned int index, double angle);
-  /*! @brief set the angle for all joints
+  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
    *
-   *  @param angles vector of angles to be set, in radian measure
-   *  \throws cedar::aux::exc::BadConnectionException if the robot is not in command mode
-   *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
+   * this function restarts the looped thread
+   * @param actionType new working mode
    */
-  virtual void setJointAngles(const std::vector<double>& angles);
+  virtual void setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType);
+
+  /*!@brief starts the looped thread
+   *
+   * the KinematicChain class does some things in this function that are not needed
+   * @param priority thread priority
+   */
+  virtual void start(Priority priority = InheritPriority);
+
   /*Wrapping of some FRI-Functions that are needed for ensuring connection quality*/
 
   /*! @brief returns the state of the Interface.
@@ -90,26 +89,26 @@ public:
    * Commands can only be send if the state is FRI_STATE_CMD, which represents the command mode
    * @return current state of the interface
    */
-  FRI_STATE getFriState()const;
+  FRI_STATE getFriState();
   /*! @brief returns the quality of the connection.
    *
    * this can range from FRI_QUALITY_UNACCEPTABLE to FRI_QUALITY_PERFECT
    * if the Quality is worse (means: less) than FRI_QUALITY_GOOD, command mode switches to monitor mode automatically
    * @return current Quality of the connection
    */
-  FRI_QUALITY getFriQuality()const;
+  FRI_QUALITY getFriQuality();
   /*! @brief returns sample time of the FRI
 
    * The sample time is set on the FRI server. Each interval with the length of the sample time, data will be exchanged
    * @return FRI sample time
    */
-  float getSampleTime()const;
+  float getSampleTime();
   /*! @brief check if the robot is powered
    *
    * this especially means the dead man switch is in the right position and the robot is in command mode
    * @return true, if power is on
    */
-  bool isPowerOn()const;
+  bool isPowerOn();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -127,6 +126,15 @@ private:
    * @param commandMode establish command mode if true
    */
   void init();
+  /*!@brief every step is used to do communication between FRI and KUKA-RC
+   *
+   * if in velocity- or acceleration mode, every step will also change joint angles/velocity
+   * @parameter time is not used, since the thread steps at fast as possible, FRI sample time is used instead.
+   */
+  void step(double time);
+  //!@brief copies data from the FRI to member variables for access from outside the loop thread
+  void copyFromFRI();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,10 +143,25 @@ public:
 protected:
   // none yet
 private:
-  //true, if the object has ben initialized
+  //true, if the object has been initialized
   bool mIsInit;
-  //KukaCommunicator, a looped thread that communicates steadily with the KUKA-RC and allows to send commands
-  cedar::dev::robot::kuka::KukaCommunicator *mpCommunicator;
+  //KUKA Vendor-Interface, wrapped by this class
+  friRemote *mpFriRemote;
+  //locker for read/write protection
+  QReadWriteLock mLock;
+  //last commanded joint position
+  std::vector<double> mCommandedJointPosition;
+  //last measured joint Position
+  std::vector<double> mMeasuredJointPosition;
+  //Copy of the FRI state
+  FRI_STATE mFriState;
+  //Copy of the current FRI quality
+  FRI_QUALITY mFriQuality;
+  //Sample Time of the FRI connection
+  float mSampleTime;
+  //last known status if power is on on the KUKA RC
+  bool mPowerOn;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -147,7 +170,10 @@ public:
 protected:
   // none yet
 private:
-  //none yet
+  //!IP Address of the remote host
+  std::string _mRemoteHost;
+  //!local server port
+  int _mServerPort;
 };
 
 #endif /* CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H */

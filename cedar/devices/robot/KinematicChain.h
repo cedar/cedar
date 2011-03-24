@@ -263,7 +263,6 @@ public:
    * this method, then you have to return true here. By returning true you
    * indicate to the KinematicChain base class that no integration is necessary.
    *
-   * @param accelerations    vector of new joint velocity values
    * @return true iff your subclass handles acceleration itself
    */
   bool setJointAccelerations(const std::vector<double>& accelerations);
@@ -293,7 +292,7 @@ public:
   void useCurrentHardwareValues(bool useCurrentHardwareValues);
 
 
-  void start(Priority priority = InheritPriority);
+  virtual void start(Priority priority = InheritPriority);
 
 
   //----------------------------------------------------------------------------
