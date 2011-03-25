@@ -46,7 +46,7 @@ KukaInterface::~KukaInterface()
     //stop the looped Thread
     stop();
     //TODO The following line is not true at this point, the script "kukain.src" is not ready yet!
-    //If the script "kukain.src" is startet on the KUKA-LBR, the first boolean value means "Stop the FRI"
+    //If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
     //it won't throw an exception, because the index is 0 and therefore valid
     mpFriRemote->setToKRLBool(0, true);
     mpFriRemote->doDataExchange();
@@ -67,7 +67,7 @@ void KukaInterface::init()
   //ServerPort: 0 means, FRI will use the default Port
   addParameter(&_mServerPort, "ServerPort", 0);
   /*RemoteHost: if the string is "NULL", the friRemote instance will be created with NULL,
-   * else it will interprete it as IP-Address
+   * else it will interpret it as IP-Address
    */
   addParameter(&_mRemoteHost, "RemoteHost", "NULL");
 
@@ -89,6 +89,7 @@ void KukaInterface::init()
   //set step size and idle time for the looped thread
   setStepSize(0);
   setIdleTime(0);
+  useFixedStepSize(false);
   //start the thread
   start();
 
@@ -142,28 +143,32 @@ void KukaInterface::step(double time)
     mLock.lockForWrite();
     //float array for copying joint position to fri
     float commanded_joint[LBR_MNJ];
-    //update joint angle and joint velocity if necessary
-    switch (getWorkingMode())
+    //update joint angle and joint velocity if necessary (and only if in command mode)
+    //this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
+    if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
     {
-      case ACCELERATION:
+      switch (getWorkingMode())
+      {
+        case ACCELERATION:
         //increase speed for all joints
         setJointVelocities(getJointVelocitiesMatrix() + getJointAccelerationsMatrix() * mpFriRemote->getSampleTime());
-      case VELOCITY:
-        //change position for all joints
-        for (unsigned i=0; i<LBR_MNJ; i++)
-        {
-          commanded_joint[i] = mMeasuredJointPosition.at(i) + getJointVelocity(i) * mpFriRemote->getSampleTime();
-        }
-        break;
-      case ANGLE:
-        //copy commanded joint position
-        for(unsigned i=0; i<LBR_MNJ; i++)
-        {
-          commanded_joint[i] = float(mCommandedJointPosition[i]);
-        }
-        break;
-      default:
-        cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << endl;
+        case VELOCITY:
+          //change position for all joints
+          for (unsigned i=0; i<LBR_MNJ; i++)
+          {
+            commanded_joint[i] = mMeasuredJointPosition.at(i) + getJointVelocity(i) * mpFriRemote->getSampleTime();
+          }
+          break;
+          case ANGLE:
+          //copy commanded joint position
+          for(unsigned i=0; i<LBR_MNJ; i++)
+          {
+            commanded_joint[i] = float(mCommandedJointPosition[i]);
+          }
+          break;
+        default:
+          cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << endl;
+      }
     }
     //copy position data, but don't do data exchange yet
     mpFriRemote->doPositionControl(commanded_joint, false);
