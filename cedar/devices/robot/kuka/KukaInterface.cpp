@@ -20,6 +20,7 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "devices/robot/ReferenceGeometry.h"
 
 // SYSTEM INCLUDES
 
@@ -72,7 +73,9 @@ void KukaInterface::init()
   addParameter(&_mRemoteHost, "RemoteHost", "NULL");
 
   //now read the configuration file
-  readOrDefaultConfiguration();
+  //readOrDefaultConfiguration();
+  _mServerPort = 0;
+  _mRemoteHost = "NULL";
 
   //create a new Instance of the friRemote
   if (_mRemoteHost != string("NULL"))
@@ -143,6 +146,12 @@ void KukaInterface::step(double time)
     mLock.lockForWrite();
     //float array for copying joint position to fri
     float commanded_joint[LBR_MNJ];
+    //initialize it with current measured position. This value will be overwritten in any case
+    //so this is just for safety
+    for (unsigned i=0; i<LBR_MNJ; i++)
+    {
+      commanded_joint[i] = mMeasuredJointPosition.at(i);
+    }
     //update joint angle and joint velocity if necessary (and only if in command mode)
     //this will leave commanded_joint uninitialized, however, in this case it won't be used by doPositionControl()
     if (mpFriRemote->isPowerOn() && mpFriRemote->getState() == FRI_STATE_CMD)
@@ -156,13 +165,17 @@ void KukaInterface::step(double time)
           //change position for all joints
           for (unsigned i=0; i<LBR_MNJ; i++)
           {
-            commanded_joint[i] = mMeasuredJointPosition.at(i) + getJointVelocity(i) * mpFriRemote->getSampleTime();
+            mCommandedJointPosition.at(i) += getJointVelocity(i) * mpFriRemote->getSampleTime();
           }
-          break;
-          case ANGLE:
-          //copy commanded joint position
+        case ANGLE:
           for(unsigned i=0; i<LBR_MNJ; i++)
           {
+            //if the joint position exceeds the one in the reference geometry, reset the angle
+            mCommandedJointPosition.at(i) = max<double>(mCommandedJointPosition.at(i),
+                                                        getReferenceGeometry()->getJoint(i)->angleLimits.min);
+            mCommandedJointPosition.at(i) = min<double>(mCommandedJointPosition.at(i),
+                                                        getReferenceGeometry()->getJoint(i)->angleLimits.max);
+            //copy commanded joint position
             commanded_joint[i] = float(mCommandedJointPosition[i]);
           }
           break;
@@ -170,12 +183,14 @@ void KukaInterface::step(double time)
           cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << endl;
       }
     }
-    //copy position data, but don't do data exchange yet
-    mpFriRemote->doPositionControl(commanded_joint, false);
+    else
+    {
+      counter = 0;
+    }
     mLock.unlock();
 
-    //now do the data exchange
-    mpFriRemote->doDataExchange();
+    //now copy position data and do the data exchange
+    mpFriRemote->doPositionControl(commanded_joint);
 
     //lock and copy data back
     mLock.lockForWrite();
