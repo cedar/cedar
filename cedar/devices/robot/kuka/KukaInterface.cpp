@@ -119,7 +119,11 @@ void KukaInterface::setJointAngle(unsigned int index, double angle)
 
 void KukaInterface::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
 {
+  //Set the desired working mode
   KinematicChain::setWorkingMode(actionType);
+  //Reset the commanded position to the measured joint position
+  mCommandedJointPosition = mMeasuredJointPosition;
+  //restart the thread, since it was stopped by KinematicChain::setWorkingMode()
   this ->start();
 }
 /*
@@ -182,10 +186,6 @@ void KukaInterface::step(double time)
         default:
           cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << endl;
       }
-    }
-    else
-    {
-      counter = 0;
     }
     mLock.unlock();
 
