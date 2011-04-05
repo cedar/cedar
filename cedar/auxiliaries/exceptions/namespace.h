@@ -71,6 +71,7 @@ namespace cedar
       typedef boost::shared_ptr<InitializationException> InitializationExceptionPtr;
       
       class BadConnectionException;
+      //!@brief smart pointer for BadConnectionException
       typedef boost::shared_ptr<BadConnectionException> BadConnectionPtr;
 
     }

@@ -64,12 +64,13 @@ public:
   /*! @brief returns all joint angles
    *
    *  @return a vector filled with the joint angles
-   *  \throws cedar::aux::exc::IndexOutOfRangeException if index is bigger than allowed
+   *  \throws std::out_of_range if index is out of range
    */
   virtual void setJointAngle(unsigned int index, double angle);
   /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
    *
    * this function restarts the looped thread
+   * \throws std::out_of_range if index is out of range
    * @param actionType new working mode
    */
   virtual void setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType);
