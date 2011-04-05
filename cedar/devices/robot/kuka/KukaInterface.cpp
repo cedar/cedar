@@ -102,18 +102,34 @@ void KukaInterface::init()
 
 double KukaInterface::getJointAngle(unsigned int index)
 {
-  mLock.lockForRead();
-  double a = mMeasuredJointPosition.at(index);
-  mLock.unlock();
+  try
+  {
+    mLock.lockForRead();
+    double a = mMeasuredJointPosition.at(index);
+    mLock.unlock();
+  }
+  catch (std::out_of_range e)
+  {
+    mLock.unlock();
+    //todo Fehlerbehandlung
+  }
   return a;
 }
 
 
 void KukaInterface::setJointAngle(unsigned int index, double angle)
 {
-  mLock.lockForWrite();
-  mCommandedJointPosition.at(index) = angle;
-  mLock.unlock();
+  try
+  {
+    mLock.lockForWrite();
+    mCommandedJointPosition.at(index) = angle;
+    mLock.unlock();
+  }
+  catch (std::out_of_range e)
+  {
+    mLock.unlock();
+    //todo Fehlerbehandlung
+  }
 }
 
 
