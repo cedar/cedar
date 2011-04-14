@@ -46,16 +46,6 @@ cedar_add_library(cedardev
 # this is used to include or exclude files, e.g. the Amtec related ones
 
 configure_file(
-	CMakeDefines.txt
-	"${CEDAR_HOME}/cedar/devices/robot/namespace.h"
-)
-
-configure_file(
-	CMakeDefines.txt
-	"${CEDAR_HOME}/cedar/devices/robot/AmtecKinematicChain.h"
-)
-
-configure_file(
-	CMakeDefines.txt
-	"${CEDAR_HOME}/cedar/devices/robot/AmtecKinematicChain.cpp"
+	CMakeDefines.h.in
+	"${CEDAR_HOME}/cedar/devices/robot/CMakeDefines.h"
 )

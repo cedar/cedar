@@ -38,6 +38,7 @@
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "CMakeDefines.h"
 
 // PROJECT INCLUDES
 

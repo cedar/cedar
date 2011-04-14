@@ -34,9 +34,12 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_USE_AMTEC
 #ifndef CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
 #define CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
+
+// MAKE AMTEC OPTIONAL
+#include "CMakeDefines.h"
+#ifdef CEDAR_USE_AMTEC
 
 // LOCAL INCLUDES
 #include "namespace.h"
