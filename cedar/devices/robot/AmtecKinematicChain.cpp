@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+// MAKE AMTEC OPTIONAL
+#include "CMakeDefines.h"
 #ifdef CEDAR_USE_AMTEC
 
 // LOCAL INCLUDES
