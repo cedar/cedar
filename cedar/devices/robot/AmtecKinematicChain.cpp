@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_USE_AMTEC
+
 // LOCAL INCLUDES
 #include "AmtecKinematicChain.h"
 
@@ -454,3 +456,5 @@ void cedar::dev::robot::AmtecKinematicChain::setMaxAcceleration(unsigned int ind
   mpDevice->setMaxAcc(mModules[index], maxAcc);
   return;
 }
+
+#endif // CEDAR_USE_AMTEC

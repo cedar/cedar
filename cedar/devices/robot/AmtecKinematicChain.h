@@ -34,6 +34,7 @@
 
 ======================================================================================================================*/
 
+#ifdef CEDAR_USE_AMTEC
 #ifndef CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
 #define CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
 
@@ -136,4 +137,4 @@ private:
 }; // class cedar::dev::robot::AmtecKinematicChain
 
 #endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
-
+#endif // CEDAR_USE_AMTEC
