@@ -57,3 +57,6 @@ cmake_install.cmake
 CMakeFiles
 test_*.py
 Makefile*
+
+syntax: regexp
+^cedar/devices/robot/CMakeDefines\.h$

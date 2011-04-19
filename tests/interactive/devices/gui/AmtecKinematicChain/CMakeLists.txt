@@ -1,1 +1,5 @@
-cedar_add_interactive_test("AmtecKinematicChain" main.cpp)
+if(CEDAR_USE_AMTEC)
+	cedar_add_interactive_test("AmtecKinematicChain" main.cpp)
+else(CEDAR_USE_AMTEC)
+	message("-- skipping AmtecKinematicChain")
+endif(CEDAR_USE_AMTEC)

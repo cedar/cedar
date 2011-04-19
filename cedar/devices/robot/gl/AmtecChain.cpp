@@ -168,10 +168,3 @@ void AmtecChain::setMaterial(int material)
     break;
   }
 }
-
-
-
-
-
-
-

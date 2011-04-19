@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_ROBOT_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "CMakeDefines.h"
 
 // PROJECT INCLUDES
 
@@ -68,9 +68,11 @@ namespace cedar
       //!@brief smart pointer for KinematicChainModel
       typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
 
+#ifdef CEDAR_USE_AMTEC
       class AmtecKinematicChain;
       //!@brief smart pointer for AmtecKinematicChainModel
       typedef boost::shared_ptr<AmtecKinematicChain> AmtecKinematicChainPtr;
+#endif // CEDAR_USE_AMTEC
 
       class SimulatedKinematicChain;
       //!@brief smart pointer for SimulatedKinematicChainModel
