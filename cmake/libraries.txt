@@ -73,6 +73,43 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QGLViewer)
 find_package(OpenGL)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
 
+##
+# Amtec device driver
+##
+
+option(CEDAR_USE_AMTEC "Include Amtec related classes and examples if possible." ON)
+
+message("-- Looking for amtecdevice")
+find_library(AMTEC_LIBRARY_DEVICE amtecdevice)
+if(AMTEC_LIBRARY_DEVICE)
+	message("-- Looking for amtecdevice - found")
+else(AMTEC_LIBRARY_DEVICE)
+	message("-- Looking for amtecdevice - not found")
+endif(AMTEC_LIBRARY_DEVICE)
+
+message("-- Looking for amtecutil")
+find_library(AMTEC_LIBRARY_UTIL amtecutil)
+if(AMTEC_LIBRARY_UTIL)
+	message("-- Looking for amtecutil - found")
+else(AMTEC_LIBRARY_UTIL)
+	message("-- Looking for amtecutil - not found")
+endif(AMTEC_LIBRARY_UTIL)
+
+message("-- Looking for ntcan")
+find_library(AMTEC_LIBRARY_NTCAN ntcan)
+if(AMTEC_LIBRARY_NTCAN)
+	message("-- Looking for ntcan - found")
+else(AMTEC_LIBRARY_NTCAN)
+	message("-- Looking for ntcan - not found")
+endif(AMTEC_LIBRARY_NTCAN)
+
+if(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${AMTEC_LIBRARY_DEVICE} ${AMTEC_LIBRARY_UTIL} ${AMTEC_LIBRARY_NTCAN})
+else(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+	message("-- Missing libraries: excluding Amtec dependent files.")
+	set(CEDAR_USE_AMTEC OFF)
+endif(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+
 
 ########################################################################################################################
 # cedar libraries

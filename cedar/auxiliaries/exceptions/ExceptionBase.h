@@ -64,7 +64,7 @@ class cedar::aux::exc::ExceptionBase : public std::exception
    *
    *           This macro assigns the correct filename, line and message to a newly generated exception.
    *           An example use would be:
-   *           RG_THROW(cedar::aux::exc::NullPointerException, "A pointer was null.");
+   *           CEDAR_THROW(cedar::aux::exc::NullPointerException, "A pointer was null.");
    *
    *  @remarks The type passed as \em Exception_type should inherit from \em cedar::aux::exc::ExceptionBase.
    *           Do not line-break the following macro(s), or the __LINE__ specification will be wrong!

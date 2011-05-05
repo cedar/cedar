@@ -22,39 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cedarDev.h
+    File:        InitializationException.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 26
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Date:        2011 01 24
 
-    Description: Header file that includes all headers of the devices library.
+    Description: Implementation of the @em cedar::aux::exc::InitializationException class.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_CEDAR_DEV_H
-#define CEDAR_CEDAR_DEV_H
-
 // LOCAL INCLUDES
+#include "auxiliaries/exceptions/InitializationException.h"
 
 // PROJECT INCLUDES
-#include "devices/robot/Component.h"
-#include "devices/robot/ComponentNotAvailableException.h"
-#include "devices/robot/KinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/namespace.h"
-#include "devices/robot/ReferenceGeometry.h"
-#include "devices/robot/Robot.h"
-#include "devices/robot/gl/KinematicChain.h"
-#include "devices/robot/gl/AmtecArm.h"
-#include "devices/robot/gl/CoraArm.h"
-
-
 
 // SYSTEM INCLUDES
 
-#endif // CEDAR_CEDAR_DEV_H
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+//! Constructor
+cedar::aux::exc::InitializationException::InitializationException()
+{
+  // Sets the type name.
+  this->mType = "InitializationException";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
