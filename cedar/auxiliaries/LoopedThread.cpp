@@ -50,7 +50,8 @@ using namespace boost::posix_time;
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime)
+cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime,const std::string& configFileName)
+:cedar::aux::ConfigurationInterface(configFileName)
 {
   mStop  = false;
   initStatistics();
