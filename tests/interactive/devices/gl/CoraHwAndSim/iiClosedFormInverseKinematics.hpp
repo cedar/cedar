@@ -108,6 +108,8 @@ public:
 		void InitVariables();
 		void InverseKinematics();
 
+		void printMatrix(cv::Mat& mat, const char* name);
+
 //		(HandCoord *Hand,
 //			ElbowCoord *Elbow,
 //			TaskCoord Task,
