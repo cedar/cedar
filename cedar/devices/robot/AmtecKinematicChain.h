@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,37 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CoraArm.h
+    File:        AmtecKinematicChain.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 12 14
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Date:        2011 01 18
 
-    Description: header for a class visualizing the arm of CoRA
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
-#define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+#ifndef CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
+#define CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
+
+// MAKE AMTEC OPTIONAL
+#include "CMakeDefines.h"
+#ifdef CEDAR_USE_AMTEC
 
 // LOCAL INCLUDES
-#include "devices/robot/gl/namespace.h"
-#include "devices/robot/gl/AmtecChain.h"
+#include "namespace.h"
+#include "ReferenceGeometry.h"
+#include "KinematicChain.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include "AmtecDeviceDriver/Device/Device.h"
+#include <QMutex>
 
-/*!@brief Visualization of the CoRA arm
- *
- * This class provides a simple OpenGL visualization of the CoRA arm. It has to be provided with a pointer to an
- * instance of KinematicChainModel of the CoRA arm, used to get the transformations to the joint coordinate frames.
- * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
- * for that scene (cedar::aux::gl::Viewer).
+
+/*!@brief KinematicChain implementation for Amtec modules
  */
-class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::AmtecChain
+class cedar::dev::robot::AmtecKinematicChain : public cedar::dev::robot::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,37 +66,52 @@ class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::AmtecChain
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
-  //!@brief destructor
-  ~CoraArm();
+  AmtecKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  //!@brief constructor
+  AmtecKinematicChain(const std::string& configFileName);
+
+  //!@brief Destructor
+  ~AmtecKinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+  /*!@brief returns the max. acceleration of a joint
+   *
+   * @param index
+   */
+  float getMaxAcceleration(unsigned int index);
+
+  /*!@brief sets the max. acceleration of a joint
+   *
+   * Unfortunately, the Amtec modules seem to ignore this value while in
+   * velocity mode.
+   *
+   * @param index
+   * @param maxAcc
+   */
+void setMaxAcceleration(unsigned int index, float maxAcc);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief draws the base
-  void drawBase();
-
-  //!@brief draws the segment attached to the specified joint
-  void drawSegment(unsigned int index);
-
-  //!@brief draws the end-effector
-  void drawEndEffector();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void drawLinkedModule(double size);
-
-  void drawTriangleLink(int link);
-
+  bool initDevice();
+  bool calibrateModule(unsigned int module);
+  double getJointAngle(unsigned int index);
+  double getJointVelocity(unsigned int index);
+  bool isCalibrated(unsigned int module);
+  void readParamsFromConfigFile();
+  void setJointAngle(unsigned int index, double value);
+  bool setJointVelocity(unsigned int index, double velocity);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -103,7 +121,11 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  CDevice *mpDevice;
+  std::string mInitString;
+  int mInit;
+  std::vector<int> mModules;
+  QMutex mCanBusMutex;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -112,11 +134,10 @@ public:
   // none yet (hopefully never!)
 protected:
   // none yet
-
 private:
   // none yet
 
-}; // class cedar::dev::robot::gl::CoraArm
+}; // class cedar::dev::robot::AmtecKinematicChain
 
-#endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
-
+#endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
+#endif // CEDAR_USE_AMTEC

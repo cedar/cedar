@@ -65,6 +65,10 @@ namespace cedar
       class IndexOutOfRangeException;
       //!@brief smart pointer for IndexOutOfRangeException
       typedef boost::shared_ptr<IndexOutOfRangeException> IndexOutOfRangePtr;
+
+      class InitializationException;
+      //!@brief smart pointer for InitializationException
+      typedef boost::shared_ptr<InitializationException> InitializationExceptionPtr;
     }
   }
 }

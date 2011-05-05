@@ -39,6 +39,8 @@
 #include "devices/robot/SimulatedKinematicChain.h"
 #include "devices/robot/KinematicChainModel.h"
 #include "devices/robot/gl/CoraArm.h"
+#include "devices/robot/gl/CoraHead.h"
+#include "devices/robot/gui/KinematicChainWidget.h"
 #include "auxiliaries/gl/Scene.h"
 #include "auxiliaries/gui/Viewer.h"
 #include "auxiliaries/gui/SceneWidget.h"
@@ -59,21 +61,27 @@ int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-  // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/Cora/cora_arm.conf")));
+  // create simulated kinematic chains
+  cedar::dev::robot::KinematicChainPtr p_cora_arm(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/Cora/cora_arm.conf")));
+  cedar::dev::robot::KinematicChainPtr p_cora_head(new SimulatedKinematicChain(std::string("../../../tests/interactive/devices/gl/Cora/cora_head.conf")));
 
-  // create model of simulated arm
-  KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
+  // create models calculation of the transformation
+  KinematicChainModelPtr p_cora_arm_model(new KinematicChainModel(p_cora_arm));
+  KinematicChainModelPtr p_cora_head_model(new KinematicChainModel(p_cora_head));
 
-  // create gl visualization object
-  cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_test_arm_model));
+  // create gl visualization objects
+  cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_cora_arm_model));
+  cedar::dev::robot::gl::KinematicChainPtr p_cora_head_visualization(new cedar::dev::robot::gl::CoraHead(p_cora_head_model));
 
   // create scene and viewer to display the arm
   ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
 
-  cedar::aux::gl::ObjectPtr p_object = p_test_arm_visualization;
+  cedar::aux::gl::ObjectPtr p_object;
+  p_object= p_cora_arm_visualization;
+  p_scene->addObject(p_object);
+  p_object= p_cora_head_visualization;
   p_scene->addObject(p_object);
 
   // create a simple viewer for the scene
@@ -85,21 +93,18 @@ int main(int argc, char **argv)
   SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
   p_scene_widget->show();
 
-  p_test_arm->setJointAcceleration(0, .003);
-  p_test_arm->setJointAcceleration(1, -.0045);
-  p_test_arm->setJointAcceleration(2, -.0015);
-  p_test_arm->setJointAcceleration(3, .0025);
-  p_test_arm->setJointAcceleration(4, .001);
-  p_test_arm->setJointAcceleration(5, -.0015);
-  p_test_arm->setJointAcceleration(6, -.0011);
-  p_test_arm->setJointAcceleration(7, .005);
+  // create widgets
+  KinematicChainWidget widget_arm(p_cora_arm);
+  KinematicChainWidget widget_head(p_cora_head);
+  widget_arm.show();
+  widget_head.show();
 
-  p_test_arm->start();
-  p_test_arm_model->startTimer(50.0);
+  p_cora_arm_model->startTimer(50.0);
+  p_cora_head_model->startTimer(50.0);
   viewer.startTimer(50);
   a.exec();
 
-  p_test_arm->stop();
+  p_cora_arm->stop();
   sleep(1);
 
   return 0;

@@ -22,39 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cedarDev.h
+    File:        KinematicChainWidget.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 26
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.rub.de
+    Date:        2011 01 06
 
-    Description: Header file that includes all headers of the devices library.
+    Description: Example for an @em cedar::dev::robot::KinematicChainWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_CEDAR_DEV_H
-#define CEDAR_CEDAR_DEV_H
-
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/Component.h"
-#include "devices/robot/ComponentNotAvailableException.h"
-#include "devices/robot/KinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/namespace.h"
-#include "devices/robot/ReferenceGeometry.h"
-#include "devices/robot/Robot.h"
-#include "devices/robot/gl/KinematicChain.h"
-#include "devices/robot/gl/AmtecArm.h"
-#include "devices/robot/gl/CoraArm.h"
 
-
+#include "devices/robot/gui/KinematicChainWidget.h"
+#include "devices/robot/AmtecKinematicChain.h"
 
 // SYSTEM INCLUDES
 
-#endif // CEDAR_CEDAR_DEV_H
+#include <iostream>
+#include <QtGui/QApplication>
+
+
+using namespace std;
+using namespace cedar::dev::robot;
+
+
+//------------------------------------------------------------------------------
+// methods
+//------------------------------------------------------------------------------
+
+int main(int argc, char *argv[]) {
+  try
+  {
+    KinematicChainPtr p_kinematic_chain(new AmtecKinematicChain("../../../tests/interactive/devices/gui/AmtecKinematicChain/cora_arm.conf"));
+    //p_kinematic_chain->useCurrentHardwareValues(true);
+    QApplication app(argc, argv);
+    KinematicChainWidget widget(p_kinematic_chain);
+    widget.show();
+    return app.exec();
+  }
+  catch(exception e)
+  {
+    cout << "Exception: " << e.what() << endl;
+  }
+}

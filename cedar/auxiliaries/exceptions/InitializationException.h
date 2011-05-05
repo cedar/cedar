@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,37 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CoraArm.h
+    File:        InitializationException.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 12 14
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Date:        2011 01 24
 
-    Description: header for a class visualizing the arm of CoRA
+    Description: Header for the @em cedar::aux::exc::InitializationException class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
-#define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+
+#ifndef CEDAR_AUX_EXC_INITIALIZATION_EXCEPTION_H
+#define CEDAR_AUX_EXC_INITIALIZATION_EXCEPTION_H
 
 // LOCAL INCLUDES
-#include "devices/robot/gl/namespace.h"
-#include "devices/robot/gl/AmtecChain.h"
+#include "auxiliaries/exceptions/namespace.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-/*!@brief Visualization of the CoRA arm
+
+/*!@brief A null pointer exception.
  *
- * This class provides a simple OpenGL visualization of the CoRA arm. It has to be provided with a pointer to an
- * instance of KinematicChainModel of the CoRA arm, used to get the transformations to the joint coordinate frames.
- * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
- * for that scene (cedar::aux::gl::Viewer).
+ * Incidentally, this exception should be thrown when a null-pointer is accessed.
  */
-class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::AmtecChain
+class cedar::aux::exc::InitializationException : public cedar::aux::exc::ExceptionBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -62,10 +61,8 @@ class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::AmtecChain
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
-  CoraArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
-  //!@brief destructor
-  ~CoraArm();
+  //!@brief The standard constructor.
+  InitializationException(void);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -77,23 +74,13 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief draws the base
-  void drawBase();
-
-  //!@brief draws the segment attached to the specified joint
-  void drawSegment(unsigned int index);
-
-  //!@brief draws the end-effector
-  void drawEndEffector();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void drawLinkedModule(double size);
-
-  void drawTriangleLink(int link);
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -112,11 +99,9 @@ public:
   // none yet (hopefully never!)
 protected:
   // none yet
-
 private:
   // none yet
 
-}; // class cedar::dev::robot::gl::CoraArm
+}; // class cedar::aux::exc::InitializationException
 
-#endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
-
+#endif // CEDAR_AUX_EXC_INITIALIZATION_EXCEPTION_H

@@ -51,15 +51,29 @@
 #include <string>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Interface for a chain of joints
  *
- * More detailed description of the class.
+ * This interface lets you to set angle, velocity and acceleration values for
+ * each joint of the kinematic chain. If your hardware (or driver) does not
+ * allow you to control velocities or accelerations directly, you can start the
+ * the KinematicChain as a thread to handle velocities and accelerations
+ * "manually".
  */
 class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
 {
   //----------------------------------------------------------------------------
   // macros
   //----------------------------------------------------------------------------
+
+  //----------------------------------------------------------------------------
+  // parameters
+  //----------------------------------------------------------------------------
+public:
+  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
+protected:
+  // none yet
+private:
+  // none yet
 
   //----------------------------------------------------------------------------
   // constructors and destructor
@@ -99,57 +113,57 @@ public:
    * @param index    specifies the joint
    * @return    joint angle value
    */
-  virtual double getJointAngle(unsigned int index) const = 0;
+  virtual double getJointAngle(unsigned int index) = 0;
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  virtual std::vector<double> getJointAngles() const = 0;
+  std::vector<double> getJointAngles();
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  virtual cv::Mat getJointAnglesMatrix() const = 0;
+  cv::Mat getJointAnglesMatrix();
 
   /*!@brief get current state of a single joint velocity
    *
    * @param index    specifies the joint
    * @return    joint velocity value
    */
-  virtual double getJointVelocity(unsigned int index) const;
+  virtual double getJointVelocity(unsigned int index);
 
   /*!@brief get current state of all joint velocities
    *
    * @return    vector of joint velocities
    */
-  virtual std::vector<double> getJointVelocities() const;
+  std::vector<double> getJointVelocities();
 
   /*!@brief get current state of all joint velocities
    *
    * @return    vector of joint velocities
    */
-  virtual cv::Mat getJointVelocitiesMatrix() const;
+  cv::Mat getJointVelocitiesMatrix();
 
   /*!@brief get current state of a single joint acceleration
    *
    * @param index    specifies the joint
    * @return    joint acceleration value
    */
-  virtual double getJointAcceleration(unsigned int index) const;
+  virtual double getJointAcceleration(unsigned int index);
 
   /*!@brief get current state of all joint accelerations
    *
    * @return    vector of joint accelerations
    */
-  virtual std::vector<double> getJointAccelerations() const;
+  std::vector<double> getJointAccelerations();
 
   /*!@brief get current state of all joint accelerations
    *
    * @return    vector of joint accelerations
    */
-  virtual cv::Mat getJointAccelerationsMatrix() const;
+  cv::Mat getJointAccelerationsMatrix();
 
   /*!@brief set current state of a single joint angle
    *
@@ -162,51 +176,119 @@ public:
    *
    * @param angleMatrix    vector of new joint angle values
    */
-  virtual void setJointAngles(const cv::Mat& angleMatrix) = 0;
+  void setJointAngles(const cv::Mat& angles);
 
   /*!@brief set current state of all joint angles
    *
    * @param angles    vector of new joint angle values
    */
-  virtual void setJointAngles(const std::vector<double>& angles) = 0;
+  void setJointAngles(const std::vector<double>& angles);
 
   /*!@brief set current state of a single joint velocity
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own velocity control you would probably like to
+   * override this method and return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
    * @param index    specifies the joint
    * @param velocity    new joint velocity value
+   * @return true iff your subclass handles velocity itself
    */
-  virtual void setJointVelocity(unsigned int index, double velocity);
+  virtual bool setJointVelocity(unsigned int index, double velocity);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own velocity control and you want to override this
+   * method, then you have to return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
+   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   *
    * @param velocities    vector of new joint velocity values
+   * @return true iff your subclass handles velocity itself
    */
-  virtual void setJointVelocities(const cv::Mat& velocities);
+  bool setJointVelocities(const cv::Mat& velocities);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own velocity control and you want to override this
+   * method, then you have to return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
+   * Note that it is sufficient to override setJointVelocity(unsigned int, double).
+   *
    * @param velocities    vector of new joint velocity values
+   * @return true iff your subclass handles velocity itself
    */
-  virtual void setJointVelocities(const std::vector<double>& velocities);
+  bool setJointVelocities(const std::vector<double>& velocities);
 
   /*!@brief set current state of a single joint acceleration
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own acceleration control you would probably like to
+   * override this method and return true here. By returning true you indicate
+   * to the KinematicChain base class that no integration is necessary.
+   *
    * @param index    specifies the joint
    * @param acceleration    new joint acceleration value
+   * @return true iff your subclass handles acceleration itself
    */
-  virtual void setJointAcceleration(unsigned int index, double acceleration);
+  virtual bool setJointAcceleration(unsigned int index, double acceleration);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own acceleration control and you want to override
+   * this method, then you have to return true here. By returning true you
+   * indicate to the KinematicChain base class that no integration is necessary.
+   *
    * @param accelerations    vector of new joint velocity values
+   * @return true iff your subclass handles acceleration itself
    */
-  virtual void setJointAccelerations(const cv::Mat& accelerations);
+  bool setJointAccelerations(const cv::Mat& accelerations);
 
   /*!@brief set current state of all joint velocities
    *
+   * The KinematicChain base class will always return false here. If your
+   * device actually has its own acceleration control and you want to override
+   * this method, then you have to return true here. By returning true you
+   * indicate to the KinematicChain base class that no integration is necessary.
+   *
    * @param accelerations    vector of new joint velocity values
+   * @return true iff your subclass handles acceleration itself
    */
-  virtual void setJointAccelerations(const std::vector<double>& accelerations);
+  bool setJointAccelerations(const std::vector<double>& accelerations);
+
+  /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
+   *
+   * Setting a working mode will also stop the KinematicChain to allow you to
+   * set new target values for each joint. You have to restart the
+   * KinematicChain afterwards if you want it to take care of velocities or
+   * accelerations. If your hardware lets you set these values directly you
+   * do not want to start the thread of KinematicChain.
+   *
+   * @param actionType new working mode
+   */
+  void setWorkingMode(ActionType actionType);
+
+  /*!@brief Controls if real hardware values are used when integrating velocity/acceleration.
+   *
+   * For hardware that does not support velocity or acceleration control you can
+   * start the KinematicChain as a thread to simulate this behavior. For such a
+   * simulation a vector of ideal angle/velocity values is kept. But if you
+   * trust your hardware to be fast and reliable enough, you can also integrate
+   * using the current hardware values.
+   *
+   * @param useCurrentHardwareValues
+   */
+  void useCurrentHardwareValues(bool useCurrentHardwareValues);
+
+
+  void start(Priority priority = InheritPriority);
+
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -218,16 +300,9 @@ protected:
   //----------------------------------------------------------------------------
 private:
   void step(double time);
-
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
-private:
-  enum ActionType { ANGLE, VELOCITY, ACCELERATION };
+  void init();
+  void applyAngleLimits(cv::Mat &angles);
+  void applyVelocityLimits(cv::Mat &velocities);
 
   //----------------------------------------------------------------------------
   // members
@@ -238,9 +313,11 @@ protected:
   //!@brief geometry in reference configuration
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
 private:
-  std::vector<double> mJointVelocities;
-  std::vector<double> mJointAccelerations;
-  std::vector<ActionType> mJointWorkingModes;
+  bool mUseCurrentHardwareValues;
+  cv::Mat mJointAngles;
+  cv::Mat mJointVelocities;
+  cv::Mat mJointAccelerations;
+  ActionType mCurrentWorkingMode;
 
 }; // class cedar::dev::robot::KinematicChain
 
