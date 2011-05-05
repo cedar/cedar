@@ -35,6 +35,7 @@
 
 // LOCAL INCLUDES
 #include "ForwardInverseWidget.h"
+#include "iiClosedFormInverseKinematics.hpp"
 
 // PROJECT INCLUDES
 #include "devices/robot/AmtecKinematicChain.h"
@@ -93,11 +94,31 @@ int main(int argc, char **argv)
   vector<cedar::dev::robot::KinematicChainPtr> kinematic_chains;
   kinematic_chains.push_back(p_cora_arm_sim);
   //kinematic_chains.push_back(p_cora_arm_hw);
-  //KinematicChainWidget widget_arm(kinematic_chains);
-  //widget_arm.show();
-
   ForwardInverseWidget output_widget(kinematic_chains, p_cora_arm_model);
   output_widget.show();
+
+  //p_cora_arm_sim->setJointAngle(0, 0.5);
+  //p_cora_arm_sim->setJointAngle(1, 0.5);
+  //p_cora_arm_model->update();
+  //cout << p_cora_arm_model->calculateEndEffectorPosition().at<double>(0, 0) << endl;
+  //cout << p_cora_arm_model->calculateEndEffectorPosition().at<double>(1, 0) << endl;
+  //cout << p_cora_arm_model->calculateEndEffectorPosition().at<double>(2, 0) << endl;
+  //cout << endl;
+
+  ClosedFormInverseKinematics ik;
+  ik.InitVariables();
+  ik.mTaskCoordinates.Pos.at<double>(0, 0) = 0;
+  ik.mTaskCoordinates.Pos.at<double>(1, 0) = 500;
+  ik.mTaskCoordinates.Pos.at<double>(2, 0) = 500;
+  ik.InverseKinematics();
+  cout << "Joint 0: " << ik.mJointAngle.at<double>(0, 0) << endl;
+  cout << "Joint 1: " << ik.mJointAngle.at<double>(1, 0) << endl;
+  cout << "Joint 2: " << ik.mJointAngle.at<double>(2, 0) << endl;
+  cout << "Joint 3: " << ik.mJointAngle.at<double>(3, 0) << endl;
+  cout << "Joint 4: " << ik.mJointAngle.at<double>(4, 0) << endl;
+  cout << "Joint 5: " << ik.mJointAngle.at<double>(5, 0) << endl;
+  cout << "Joint 6: " << ik.mJointAngle.at<double>(6, 0) << endl;
+  cout << "Joint 7: " << ik.mJointAngle.at<double>(7, 0) << endl;
 
   p_cora_arm_model->startTimer(50.0);
   viewer.startTimer(50);

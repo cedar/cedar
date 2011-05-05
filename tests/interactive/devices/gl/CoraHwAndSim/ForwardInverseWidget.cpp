@@ -61,9 +61,11 @@ ForwardInverseWidget::ForwardInverseWidget(const KinematicChainPtr &kinematicCha
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
+  mpKinematicChainModel = kinematicChainModel;
   mDecimals = 2;
   mSingleStep = 0.01;
   mpClosedFormInverseKinematics = new ClosedFormInverseKinematics();
+  mpClosedFormInverseKinematics->InitVariables();
 
   initWindow();
   return;
@@ -85,9 +87,11 @@ ForwardInverseWidget::ForwardInverseWidget(const vector<KinematicChainPtr> &kine
 
   // store smart pointers to KinematicChains
   mpKinematicChains = kinematicChains;
+  mpKinematicChainModel = kinematicChainModel;
   mDecimals = 2;
   mSingleStep = 0.01;
   mpClosedFormInverseKinematics = new ClosedFormInverseKinematics();
+  mpClosedFormInverseKinematics->InitVariables();
 
   initWindow();
   return;
@@ -162,13 +166,15 @@ void ForwardInverseWidget::updateSpinBoxes()
 
   // update x,y,z
 
+  mpKinematicChainModel->update();
+
   for(unsigned i = 0; i < 3; ++i)
   {
     QDoubleSpinBox *p_spin_box = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(i+1, 3)->widget());
 
     if(!p_spin_box->hasFocus())
     {
-//      p_spin_box->setValue(mpKinematicChainModel->getPosition().at<double>(i,0));
+      p_spin_box->setValue(mpKinematicChainModel->calculateEndEffectorPosition().at<double>(i,0));
     }
   }
 
@@ -212,9 +218,9 @@ void ForwardInverseWidget::updateJointValue()
     y = p_spin_box_y->value();
     z = p_spin_box_z->value();
 
-    mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(0, 0) = x;
-    mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(1, 0) = y;
-    mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(2, 0) = z;
+    mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(0, 0) = x * 1000;
+    mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(1, 0) = y * 1000;
+    mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(2, 0) = z * 1000;
     // TODO put EEF in moving direction or whatever
     mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(0, 0) = 0.0;
     mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(1, 0) = 0.0;
@@ -224,9 +230,22 @@ void ForwardInverseWidget::updateJointValue()
 
     for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
     {
+      double value = mpClosedFormInverseKinematics->mJointAngle.at<double>(i, 0);
+      if(value != value)
+      {
+      	cout << "Invalid values from inverse kinematics!" << endl;
+        return;
+      }
+    }
+
+    for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
+    {
       for(unsigned int j = 0; j < mpKinematicChains.size(); ++j)
       {
-        mpKinematicChains[j]->setJointAngle(i, mpClosedFormInverseKinematics->mJointAngle.at<double>(i, 0));
+        double value = mpClosedFormInverseKinematics->mJointAngle.at<double>(i, 0);
+        // this wonderful expression detects NaNs and replaces them by zero B-)
+        value = ( value != value ) ? 0.0 : value;
+        mpKinematicChains[j]->setJointAngle(i, value);
       }
     }
     break;
