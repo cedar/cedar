@@ -62,7 +62,7 @@ ForwardInverseWidget::ForwardInverseWidget(const KinematicChainPtr &kinematicCha
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
   mpKinematicChainModel = kinematicChainModel;
-  mDecimals = 2;
+  mDecimals = 3;
   mSingleStep = 0.01;
   mpClosedFormInverseKinematics = new ClosedFormInverseKinematics();
   mpClosedFormInverseKinematics->InitVariables();
@@ -88,7 +88,7 @@ ForwardInverseWidget::ForwardInverseWidget(const vector<KinematicChainPtr> &kine
   // store smart pointers to KinematicChains
   mpKinematicChains = kinematicChains;
   mpKinematicChainModel = kinematicChainModel;
-  mDecimals = 2;
+  mDecimals = 3;
   mSingleStep = 0.01;
   mpClosedFormInverseKinematics = new ClosedFormInverseKinematics();
   mpClosedFormInverseKinematics->InitVariables();

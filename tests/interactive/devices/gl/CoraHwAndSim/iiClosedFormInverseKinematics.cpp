@@ -55,22 +55,16 @@ void ClosedFormInverseKinematics::InitVariables()
 
   /* This should replaced by an configFile in odrder to handle flexible different robotarm configurations*/
   mTrunk    = Mat::zeros(3, 1, CV_64FC1);
-  mShoulder	= Mat::zeros(3, 1, CV_64FC1);
-  mUperArm	= Mat::zeros(3, 1, CV_64FC1);
-  mForeArm	= Mat::zeros(3, 1, CV_64FC1);
-  mEef		= Mat::zeros(3, 1, CV_64FC1);
+  mShoulder = Mat::zeros(3, 1, CV_64FC1);
+  mUperArm  = Mat::zeros(3, 1, CV_64FC1);
+  mForeArm  = Mat::zeros(3, 1, CV_64FC1);
+  mEef      = Mat::zeros(3, 1, CV_64FC1);
 
-  mTrunk.at<double>(2, 0)    = 400;//420;
+  mTrunk.at<double>(2, 0)    = 420.5;//400;
   mShoulder.at<double>(0, 0) = 225;
   mUperArm.at<double>(0, 0)	 = 325;
   mForeArm.at<double>(0, 0)	 = 310;
-  mEef.at<double>(0, 0)	     = 285;
-
-  //mTrunk.StdOutFormatted();
-  //mShoulder.StdOutFormatted();
-  //mUperArm.StdOutFormatted();
-  //mForeArm.StdOutFormatted();
-  //mEef.StdOutFormatted();
+  mEef.at<double>(0, 0)	     = 342.2;//285;
 
   /*Setting taskcoordiantes for testing*/
   /* Task coordinates
@@ -105,8 +99,6 @@ void ClosedFormInverseKinematics::Rx(double rotAngle, Mat* pRotMatX)
   (* pRotMatX ).at<double>(1,2) = -sin(rotAngle);
   (* pRotMatX ).at<double>(2,1) = sin(rotAngle);
   (* pRotMatX ).at<double>(2,2) = cos(rotAngle);
-  //printf("RotMatX\n");
-  //(* pRotMatX ).StdOutFormatted();
 
   return;
 }
@@ -123,9 +115,6 @@ void ClosedFormInverseKinematics::Ry(double rotAngle, Mat* pRotMatY)
   (* pRotMatY ).at<double>(2,0) = -sin(rotAngle);
   (* pRotMatY ).at<double>(2,2) = cos(rotAngle);
 
-  //printf("RotMatY\n");
-  //(* pRotMatY ).StdOutFormatted();
-
   return;
 }
 
@@ -141,8 +130,6 @@ void ClosedFormInverseKinematics::Rz(double rotAngle, Mat* pRotMatZ)
   (*pRotMatZ).at<double>(1,0) = sin(rotAngle);
   (*pRotMatZ).at<double>(1,1) = cos(rotAngle);
   (*pRotMatZ).at<double>(2,2) = 1;
-  //printf("RotMatX\n");
-  //(*pRotMatZ).StdOutFormatted();
 
   return;
 }
@@ -196,10 +183,7 @@ int ClosedFormInverseKinematics::TaskCoordinatesToArmGeometry()
   Mat p_m = Mat::zeros(3,1,CV_64FC1);// vector to middle of the redundancy circle
   //CvMAT p_w = CvMAT(3,1,CV_64FC1);// wrist vector
 
-
   mP_T = mCalculatedHandState.eefPos; // using the offset cleaned endeffctor postion
-
-
 
   /* calculate wrist position */
   Rz(phi_eef - trunk_ang,&rotZ);
