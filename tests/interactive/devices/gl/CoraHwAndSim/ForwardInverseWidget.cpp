@@ -124,9 +124,9 @@ void ForwardInverseWidget::setActiveColumn(unsigned int c)
     mpGridLayout->itemAtPosition(i+1, 1)->widget()->setEnabled(enabled);
   }
 
-  // enable/disable column with coordinates
+  // enable/disable column with task coordinates
   enabled = (c == 1) ? true : false;
-  for(unsigned int i = 0; i < 3; ++i)
+  for(unsigned int i = 0; i < 6; ++i)
   {
     mpGridLayout->itemAtPosition(i+1, 3)->widget()->setEnabled(enabled);
   }
@@ -164,7 +164,7 @@ void ForwardInverseWidget::updateSpinBoxes()
     }
   }
 
-  // update x,y,z
+  // update task coordinates
 
   mpKinematicChainModel->update();
 
@@ -174,8 +174,16 @@ void ForwardInverseWidget::updateSpinBoxes()
 
     if(!p_spin_box->hasFocus())
     {
-      p_spin_box->setValue(mpKinematicChainModel->calculateEndEffectorPosition().at<double>(i,0));
+      p_spin_box->setValue(mpKinematicChainModel->calculateEndEffectorPosition().at<double>(i, 0));
     }
+  }
+
+  // gamma
+  QDoubleSpinBox *p_spin_box = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(6, 3)->widget());
+
+  if(!p_spin_box->hasFocus())
+  {
+    p_spin_box->setValue(mpKinematicChains[0]->getJointAngle(7));
   }
 
   return;
@@ -189,10 +197,13 @@ void ForwardInverseWidget::updateJointValue()
   int row, column;
   int dummy1, dummy2;
   double value;
-  double x, y, z;
+  double x, y, z, phi, theta, gamma;
   QDoubleSpinBox *p_spin_box_x;
   QDoubleSpinBox *p_spin_box_y;
   QDoubleSpinBox *p_spin_box_z;
+  QDoubleSpinBox *p_spin_box_p;
+  QDoubleSpinBox *p_spin_box_t;
+  QDoubleSpinBox *p_spin_box_g;
 
   mpGridLayout->getItemPosition(index_sender, &row, &column, &dummy1, &dummy2);
 
@@ -209,28 +220,37 @@ void ForwardInverseWidget::updateJointValue()
 
   case 3:
 
-    // x, y, z
+    // x, y, z, phi, theta, gamma
     p_spin_box_x = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(1, 3)->widget());
     p_spin_box_y = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(2, 3)->widget());
     p_spin_box_z = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(3, 3)->widget());
+    p_spin_box_p = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(4, 3)->widget());
+    p_spin_box_t = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(5, 3)->widget());
+    p_spin_box_g = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(6, 3)->widget());
 
     x = p_spin_box_x->value();
     y = p_spin_box_y->value();
     z = p_spin_box_z->value();
+    phi = p_spin_box_p->value();
+    theta = p_spin_box_t->value();
+    gamma = p_spin_box_g->value();
 
     mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(0, 0) = x * 1000;
     mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(1, 0) = y * 1000;
     mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(2, 0) = z * 1000;
     // TODO put EEF in moving direction or whatever
-    mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(0, 0) = 0.0;
-    mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(1, 0) = 0.0;
+    mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(0, 0) = phi;
+    mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(1, 0) = theta;
+    mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(2, 0) = gamma;
     mpClosedFormInverseKinematics->mTaskCoordinates.redundancyAng = 0.0;
 
     mpClosedFormInverseKinematics->InverseKinematics();
 
+    // check if there's a NaN in the result
     for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
     {
       double value = mpClosedFormInverseKinematics->mJointAngle.at<double>(i, 0);
+      // value == NaN ?
       if(value != value)
       {
       	cout << "Invalid values from inverse kinematics!" << endl;
@@ -238,7 +258,8 @@ void ForwardInverseWidget::updateJointValue()
       }
     }
 
-    for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
+    // assign values to the joints
+    for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints()-1; ++i)
     {
       for(unsigned int j = 0; j < mpKinematicChains.size(); ++j)
       {
@@ -248,6 +269,13 @@ void ForwardInverseWidget::updateJointValue()
         mpKinematicChains[j]->setJointAngle(i, value);
       }
     }
+
+    // assign gamma
+    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+    {
+      mpKinematicChains[i]->setJointAngle(7, gamma);
+    }
+
     break;
 
   default:
@@ -287,13 +315,21 @@ void ForwardInverseWidget::initWindow()
     connect(doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(updateJointValue(void)));
   }
 
-  string string_xyz = string("xyz");
+  vector<string> labels;
+  labels.push_back(string("x"));
+  labels.push_back(string("y"));
+  labels.push_back(string("z"));
+  labels.push_back(string("phi"));
+  labels.push_back(string("theta"));
+  labels.push_back(string("gamma"));
+  //string string_xyz = string("xyz");
   QLabel *label;
 
-  for(unsigned int i = 0; i < 3; ++i)
+  for(unsigned int i = 0; i < 6; ++i)
   {
     // add label
-    label = new QLabel(QApplication::translate("KinematicChainWindow", string_xyz.substr(i, 1).c_str()));
+    //label = new QLabel(QApplication::translate("KinematicChainWindow", string_xyz.substr(i, 1).c_str()));
+    label = new QLabel(QApplication::translate("KinematicChainWindow", labels[i].c_str()));
     mpGridLayout->addWidget(label, i+1, 2);
 
     // add spinbox
