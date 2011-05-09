@@ -126,7 +126,7 @@ void ForwardInverseWidget::setActiveColumn(unsigned int c)
 
   // enable/disable column with task coordinates
   enabled = (c == 1) ? true : false;
-  for(unsigned int i = 0; i < 6; ++i)
+  for(unsigned int i = 0; i < 7; ++i)
   {
     mpGridLayout->itemAtPosition(i+1, 3)->widget()->setEnabled(enabled);
   }
@@ -178,6 +178,9 @@ void ForwardInverseWidget::updateSpinBoxes()
     }
   }
 
+  // phi, theta
+  // TODO calculate phi and theta
+
   // gamma
   QDoubleSpinBox *p_spin_box = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(6, 3)->widget());
 
@@ -185,6 +188,9 @@ void ForwardInverseWidget::updateSpinBoxes()
   {
     p_spin_box->setValue(mpKinematicChains[0]->getJointAngle(7));
   }
+
+  // arm
+  // TODO calculate redundancy angle
 
   return;
 }
@@ -197,13 +203,14 @@ void ForwardInverseWidget::updateJointValue()
   int row, column;
   int dummy1, dummy2;
   double value;
-  double x, y, z, phi, theta, gamma;
+  double x, y, z, phi, theta, gamma, arm;
   QDoubleSpinBox *p_spin_box_x;
   QDoubleSpinBox *p_spin_box_y;
   QDoubleSpinBox *p_spin_box_z;
   QDoubleSpinBox *p_spin_box_p;
   QDoubleSpinBox *p_spin_box_t;
   QDoubleSpinBox *p_spin_box_g;
+  QDoubleSpinBox *p_spin_box_a;
 
   mpGridLayout->getItemPosition(index_sender, &row, &column, &dummy1, &dummy2);
 
@@ -227,6 +234,7 @@ void ForwardInverseWidget::updateJointValue()
     p_spin_box_p = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(4, 3)->widget());
     p_spin_box_t = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(5, 3)->widget());
     p_spin_box_g = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(6, 3)->widget());
+    p_spin_box_a = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(7, 3)->widget());
 
     x = p_spin_box_x->value();
     y = p_spin_box_y->value();
@@ -234,6 +242,7 @@ void ForwardInverseWidget::updateJointValue()
     phi = p_spin_box_p->value();
     theta = p_spin_box_t->value();
     gamma = p_spin_box_g->value();
+    arm = p_spin_box_a->value();
 
     mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(0, 0) = x * 1000;
     mpClosedFormInverseKinematics->mTaskCoordinates.Pos.at<double>(1, 0) = y * 1000;
@@ -242,7 +251,7 @@ void ForwardInverseWidget::updateJointValue()
     mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(0, 0) = phi;
     mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(1, 0) = theta;
     mpClosedFormInverseKinematics->mTaskCoordinates.eefOrientationAngle.at<double>(2, 0) = gamma;
-    mpClosedFormInverseKinematics->mTaskCoordinates.redundancyAng = 0.0;
+    mpClosedFormInverseKinematics->mTaskCoordinates.redundancyAng = arm;
 
     mpClosedFormInverseKinematics->InverseKinematics();
 
@@ -291,8 +300,8 @@ void ForwardInverseWidget::initWindow()
   setWindowTitle(QApplication::translate("ForwardInverseWindow", "Cora arm"));
 
   mpGridLayout = new QGridLayout();
-  QRadioButton *radioButtonForward = new QRadioButton(QApplication::translate("ForwardInverseWindow", "forward"));
-  QRadioButton *radioButtonInverse = new QRadioButton(QApplication::translate("ForwardInverseWindow", "inverse"));
+  QRadioButton *radioButtonForward = new QRadioButton(QApplication::translate("ForwardInverseWindow", "forward [rad]"));
+  QRadioButton *radioButtonInverse = new QRadioButton(QApplication::translate("ForwardInverseWindow", "inverse [rad]"));
   mpGridLayout->addWidget(radioButtonForward, 0, 1);
   mpGridLayout->addWidget(radioButtonInverse, 0, 3);
   connect(radioButtonForward, SIGNAL(clicked()), this, SLOT(radioButtonForwardClicked()));
@@ -316,16 +325,17 @@ void ForwardInverseWidget::initWindow()
   }
 
   vector<string> labels;
-  labels.push_back(string("x"));
-  labels.push_back(string("y"));
-  labels.push_back(string("z"));
+  labels.push_back(string("x [m]"));
+  labels.push_back(string("y [m]"));
+  labels.push_back(string("z [m]"));
   labels.push_back(string("phi"));
   labels.push_back(string("theta"));
   labels.push_back(string("gamma"));
+  labels.push_back(string("elbow"));
   //string string_xyz = string("xyz");
   QLabel *label;
 
-  for(unsigned int i = 0; i < 6; ++i)
+  for(unsigned int i = 0; i < 7; ++i)
   {
     // add label
     //label = new QLabel(QApplication::translate("KinematicChainWindow", string_xyz.substr(i, 1).c_str()));
