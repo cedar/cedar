@@ -152,7 +152,7 @@ int ClosedFormInverseKinematics::TaskCoordinatesToArmGeometry()
   /* assign mJointAngle(0) with the calculated trunk angle*/
   mJointAngle.at<double>(0, 0) = trunk_ang;
 
-  double shoulder_gear = deg2rad(mTaskCoordinates.shoulderGear);
+  double shoulder_gear = mTaskCoordinates.shoulderGear;
 
   /*calculate the endeffector position with respect to the trunk orientation
    * and the shouldergear.*/
@@ -227,7 +227,7 @@ int ClosedFormInverseKinematics::TaskCoordinatesToArmGeometry()
 
 
 
-  Rx(deg2rad(mTaskCoordinates.redundancyAng) , &rotX); //first rotation
+  Rx(mTaskCoordinates.redundancyAng , &rotX); //first rotation
   Rz(theta_W , &rotY);	// secodn rotation
   Rx(phi_W   , &rotX2);	//third rotation
 
