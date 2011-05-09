@@ -174,8 +174,10 @@ int ClosedFormInverseKinematics::TaskCoordinatesToArmGeometry()
   /* Endeffector  orientation
    * we do this due to our own convention of angles determine the
    * orientation of robots hand. It is not necessary for the overall solution*/
-  double phi_eef	 = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(0, 0)) - M_PI_2;
-  double theta_eef = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(1, 0)) + M_PI;
+  //double phi_eef   = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(0, 0)) - M_PI_2;
+  //double theta_eef = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(1, 0)) + M_PI;
+  double phi_eef   = mTaskCoordinates.eefOrientationAngle.at<double>(0, 0) + M_PI;
+  double theta_eef = mTaskCoordinates.eefOrientationAngle.at<double>(1, 0) + M_PI;
 
   /* From this section the calculation are related to the attached technical report*/
 
@@ -257,8 +259,10 @@ double ClosedFormInverseKinematics::CalcTrunkAng()
 	/* Endeffector  orientation
 	 * we do this due to our own convention of angles determine the
 	 * orientation of robots hand. It is not necessary for the overall solution*/
-	double phi_eef	 = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(0, 0)) - M_PI_2;
-	double theta_eef = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(1, 0)) + M_PI;
+  //double phi_eef   = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(0, 0)) - M_PI_2;
+  //double theta_eef = deg2rad(mTaskCoordinates.eefOrientationAngle.at<double>(1, 0)) + M_PI;
+  double phi_eef   = mTaskCoordinates.eefOrientationAngle.at<double>(0, 0) + M_PI;
+  double theta_eef = mTaskCoordinates.eefOrientationAngle.at<double>(1, 0) + M_PI;
 
 	Rz(phi_eef,&rotZ);
 	Ry(theta_eef,&rotY);
@@ -287,8 +291,8 @@ void ClosedFormInverseKinematics::InverseKinematics()
 	mJointAngle.at<double>(1, 0) = atan2(mP_u.at<double>(2, 0), mP_u.at<double>(1, 0));
 	mJointAngle.at<double>(2, 0) = acos(mP_u.at<double>(0, 0) / mUperArm.at<double>(0, 0));
 
-  cout << "Angle 1 = " << mJointAngle.at<double>(1, 0) << endl;
-  cout << "Angle 2 = " << mJointAngle.at<double>(2, 0) << endl;
+  //cout << "Angle 1 = " << mJointAngle.at<double>(1, 0) << endl;
+  //cout << "Angle 2 = " << mJointAngle.at<double>(2, 0) << endl;
 
 /* calculate wrist position */
 
@@ -300,14 +304,12 @@ void ClosedFormInverseKinematics::InverseKinematics()
 
 	Mat TrafoElbowCS = rotZ * rotX;
 	mP_f = TrafoElbowCS * mP_f;
-	//printf(" InverseKinematics() \n\n");
-	//mP_f.StdOutFormatted();
 
 	mJointAngle.at<double>(3, 0) = atan2(mP_f.at<double>(2, 0), mP_f.at<double>(1, 0));
 	mJointAngle.at<double>(4, 0) = acos(mP_f.at<double>(0, 0) / mForeArm.at<double>(0, 0));
 
-	cout << "Angle 3 = " << mJointAngle.at<double>(3, 0) << endl;
-	cout << "Angle 4 = " << mJointAngle.at<double>(4, 0) << endl;
+	//cout << "Angle 3 = " << mJointAngle.at<double>(3, 0) << endl;
+	//cout << "Angle 4 = " << mJointAngle.at<double>(4, 0) << endl;
 
 	/*calculation of the angles 5 and 6*/
 	mP_h = mP_T - mP_W;
@@ -321,8 +323,8 @@ void ClosedFormInverseKinematics::InverseKinematics()
 	mJointAngle.at<double>(5, 0) = atan2(mP_h.at<double>(2, 0), mP_h.at<double>(1, 0));
 	mJointAngle.at<double>(6, 0) = acos(mP_h.at<double>(0, 0) / mEef.at<double>(0, 0));
 
-	cout << "Angle 5 = " << mJointAngle.at<double>(5, 0) << endl;
-	cout << "Angle 6 = " << mJointAngle.at<double>(6, 0) << endl;
+	//cout << "Angle 5 = " << mJointAngle.at<double>(5, 0) << endl;
+	//cout << "Angle 6 = " << mJointAngle.at<double>(6, 0) << endl;
 
 	/* calculation of the angle 7*/
 	Rx(-mJointAngle.at<double>(5, 0), &rotX);
@@ -332,7 +334,7 @@ void ClosedFormInverseKinematics::InverseKinematics()
 	mP_g =  TrafoEefCS * TrafoWristCS * TrafoElbowCS * mP_g;
 	mJointAngle.at<double>(7, 0) = atan2(mP_g.at<double>(2, 0), mP_g.at<double>(1, 0));
 
-	cout << "Angle 7 = " << mJointAngle.at<double>(7, 0) << endl;
+	//cout << "Angle 7 = " << mJointAngle.at<double>(7, 0) << endl;
 	return;
 }
 
