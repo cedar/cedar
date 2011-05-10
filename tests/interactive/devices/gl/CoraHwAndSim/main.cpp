@@ -58,13 +58,19 @@ using namespace cedar::dev::robot::gl;
 using namespace cedar::dev::robot;
 
 
+bool useHardware = true;
+
 int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
   // create kinematic chains
   cedar::dev::robot::KinematicChainPtr p_cora_arm_sim(new SimulatedKinematicChain(string("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")));
-  //cedar::dev::robot::KinematicChainPtr p_cora_arm_hw(new AmtecKinematicChain(string("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")));
+  cedar::dev::robot::KinematicChainPtr p_cora_arm_hw;
+  if(useHardware)
+  {
+    p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr(new AmtecKinematicChain(string("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")));
+  }
 
   // create models calculation of the transformation
   KinematicChainModelPtr p_cora_arm_model(new KinematicChainModel(p_cora_arm_sim));
@@ -93,7 +99,10 @@ int main(int argc, char **argv)
   // create control widgets
   vector<cedar::dev::robot::KinematicChainPtr> kinematic_chains;
   kinematic_chains.push_back(p_cora_arm_sim);
-  //kinematic_chains.push_back(p_cora_arm_hw);
+  if(useHardware)
+  {
+    kinematic_chains.push_back(p_cora_arm_hw);
+  }
   ForwardInverseWidget output_widget(kinematic_chains, p_cora_arm_model);
   output_widget.show();
 
