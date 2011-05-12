@@ -61,9 +61,9 @@ int main(int argc, char *argv[]) {
   {
     KinematicChainPtr p_kinematic_chain(new AmtecKinematicChain(config_file));
     ControlThread thread(p_kinematic_chain, config_file);
-    cout << "moving arm for 20s just by controling velocity..." << endl;
+    cout << "moving arm for 15s just by controling velocity..." << endl;
     thread.start();
-    thread.wait(20000);
+    thread.wait(15000);
     thread.stop();
   }
   catch(exception e)
