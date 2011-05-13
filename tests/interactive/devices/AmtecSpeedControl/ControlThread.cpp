@@ -60,8 +60,11 @@ ControlThread::ControlThread(const KinematicChainPtr &kinematicChain, const stri
 void ControlThread::step(double stepSize)
 {
   double current_pos = mpKinematicChain->getJointAngle(JOINT);
-  double rate_of_change = 0.5 * (TARGET - current_pos);
-  rate_of_change = min<double>(rate_of_change, 0.5);
+  double current_vel = mpKinematicChain->getJointVelocity(JOINT);
+
+  double rate_of_change = 1.0 * (TARGET - current_pos);
+  rate_of_change = min<double>(rate_of_change, current_vel + 0.4);
+
   cout << "setting speed " << rate_of_change << endl;
   mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
 }
