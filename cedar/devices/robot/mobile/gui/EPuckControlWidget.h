@@ -75,6 +75,7 @@ private:
 public:
   //!@brief Constructs the E-Puck-Control.
   //!@param peDrive Pointer to the E-Puck that shall be controlled.
+  //!@param parent Pointer to parent widget
   EPuckControlWidget(cedar::dev::robot::mobile::EPuckDrive *peDrive, QWidget *parent = 0);
 
   //!@brief Closes the control.
@@ -113,6 +114,7 @@ protected:
 private:
 
   /*!@brief The timer-event.
+   * @param event Pointer to event
    */
   void timerEvent(QTimerEvent *event);
 
