@@ -69,6 +69,7 @@ class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, p
   // parameters
   //----------------------------------------------------------------------------
 public:
+  //!@brief The different modes to operate the kinematic chain
   enum ActionType { ANGLE, VELOCITY, ACCELERATION };
 protected:
   // none yet
@@ -174,7 +175,7 @@ public:
 
   /*!@brief set current state of all joint angles
    *
-   * @param angles    vector of new joint angle values
+   * @param angles    Matrix of new joint angle values
    */
   void setJointAngles(const cv::Mat& angles);
 
@@ -287,6 +288,11 @@ public:
   void useCurrentHardwareValues(bool useCurrentHardwareValues);
 
 
+  /*!@brief Starts the kinematic chain as a thread
+   *
+   * If you want to use velocity or acceleration control but your hardware
+   * does not support this, start the thread to "simulate" these values.
+   */
   void start(Priority priority = InheritPriority);
 
 

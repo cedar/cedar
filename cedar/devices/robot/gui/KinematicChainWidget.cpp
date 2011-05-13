@@ -101,7 +101,7 @@ KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicCha
 }
 
 
-KinematicChainWidget::KinematicChainWidget(const vector<KinematicChainPtr> &kinematicChains, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   for(unsigned int i = 1; i < kinematicChains.size(); ++i)
   {
@@ -124,7 +124,7 @@ KinematicChainWidget::KinematicChainWidget(const vector<KinematicChainPtr> &kine
 }
 
 
-KinematicChainWidget::KinematicChainWidget(const vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags f)
+KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags f)
 : ConfigurationInterface(configFileName)
 {
   for(unsigned int i = 1; i < kinematicChains.size(); ++i)

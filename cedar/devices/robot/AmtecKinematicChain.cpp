@@ -75,7 +75,7 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
 }
 
 
-cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& configFileName) :
+cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const std::string& configFileName) :
     KinematicChain(configFileName)
 {
   mpDevice = 0;

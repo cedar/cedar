@@ -230,7 +230,7 @@ void KinematicChain::setJointAngles(const cv::Mat& angles)
 }
 
 
-bool KinematicChain::setJointVelocity(unsigned index, double velocity)
+bool KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
   if(index >= getNumberOfJoints())
   {
@@ -429,7 +429,7 @@ void KinematicChain::init()
 }
 
 
-void KinematicChain::applyAngleLimits(Mat &angles)
+void KinematicChain::applyAngleLimits(cv::Mat &angles)
 {
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
@@ -444,7 +444,7 @@ void KinematicChain::applyAngleLimits(Mat &angles)
 }
 
 
-void KinematicChain::applyVelocityLimits(Mat &velocities)
+void KinematicChain::applyVelocityLimits(cv::Mat &velocities)
 {
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
