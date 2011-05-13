@@ -76,6 +76,7 @@ public:
   //!@brief Constructs the GUI.
   //!@param peController Pointer to the controller used to control the robot.
   //!@param peModel Pointer to the model of the controlled robot.
+  //!@param parent Pointer to parent widget
   KTeamPositionControllerWidget(cedar::dev::robot::mobile::KTeamPositionController *peController,
                       cedar::dev::robot::mobile::MobileRobotModel *peModel,
                       QWidget *parent = 0);
@@ -108,6 +109,7 @@ protected:
 private:
 
   /*!@brief The timer-event.
+   * @param event pointer to event
    */
   void timerEvent(QTimerEvent *event);
 

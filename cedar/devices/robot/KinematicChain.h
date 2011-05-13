@@ -174,7 +174,7 @@ public:
 
   /*!@brief set current state of all joint angles
    *
-   * @param angleMatrix    vector of new joint angle values
+   * @param angles    vector of new joint angle values
    */
   void setJointAngles(const cv::Mat& angles);
 

@@ -207,7 +207,7 @@ void KinematicChain::setJointAngles(const std::vector<double>& angles)
 }
 
 
-void KinematicChain::setJointAngles(const Mat& angles)
+void KinematicChain::setJointAngles(const cv::Mat& angles)
 {
   if(angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
