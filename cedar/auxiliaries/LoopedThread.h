@@ -112,7 +112,7 @@ public:
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
    * @param configFileName an optional configuration file for reading and writing thread configurations
    */
-  LoopedThread(double stepSize = 1.0, double idleTime = 0.001,const std::string& configFileName = "");
+  LoopedThread(double stepSize = 1.0, double idleTime = 0.001, const std::string& configFileName = "");
 
   /*!@brief Constructor with configuration file parameter.
    *
@@ -125,7 +125,7 @@ public:
    *
    * @param configFileName an optional configuration file for reading and writing thread configurations
    */
-  LoopedThread(const std::string& configFileName );
+  LoopedThread(const std::string& configFileName);
 
   /*!@brief Constructor with configuration file parameter.
    *

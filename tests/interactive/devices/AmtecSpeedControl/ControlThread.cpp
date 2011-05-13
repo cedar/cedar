@@ -50,7 +50,7 @@ using namespace cedar::dev::robot;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-ControlThread::ControlThread(const KinematicChainPtr &kinematicChain, const string& configFileName) : LoopedThread(100, 0.01, configFileName)
+ControlThread::ControlThread(const KinematicChainPtr &kinematicChain, const std::string& configFileName) : LoopedThread(100, 0.01, configFileName)
 {
   mpKinematicChain = kinematicChain;
   return;

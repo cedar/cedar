@@ -70,7 +70,22 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 
+  /*!@brief Constructor
+   *
+   *@param kinematicChain the kinematic chain to control
+   *@param kinematicChainModel the model that calculates the forward kinematics
+   *@param parent QWidget parent
+   *@param f QWidget window flags
+   */
   ForwardInverseWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
+
+  /*!@brief Constructor
+   *
+   *@param kinematicChains vector of kinematic chains to control
+   *@param kinematicChainModel the model that calculates the forward kinematics
+   *@param parent QWidget parent
+   *@param f QWidget window flags
+   */
   ForwardInverseWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
 
   //!@brief Destructor
@@ -81,9 +96,6 @@ public:
 //--------------------------------------------------------------------------------------------------------------------
 
 public:
-
-  void initWindow();
-  void setActiveColumn(unsigned int c);
 
 //--------------------------------------------------------------------------------------------------------------------
 // protected methods
@@ -99,7 +111,8 @@ protected:
 
 private:
 
-  // none yet
+  void initWindow();
+  void setActiveColumn(unsigned int c);
 
 private slots:
 

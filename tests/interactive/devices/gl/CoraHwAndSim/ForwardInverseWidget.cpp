@@ -72,7 +72,7 @@ ForwardInverseWidget::ForwardInverseWidget(const KinematicChainPtr &kinematicCha
 }
 
 
-ForwardInverseWidget::ForwardInverseWidget(const vector<KinematicChainPtr> &kinematicChains, KinematicChainModelPtr &kinematicChainModel, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+ForwardInverseWidget::ForwardInverseWidget(const std::vector<KinematicChainPtr> &kinematicChains, KinematicChainModelPtr &kinematicChainModel, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   for(unsigned int i = 1; i < kinematicChains.size(); ++i)
   {

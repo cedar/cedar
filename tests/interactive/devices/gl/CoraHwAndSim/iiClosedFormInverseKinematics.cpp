@@ -89,7 +89,7 @@ void ClosedFormInverseKinematics::InitVariables()
 }
 
 
-void ClosedFormInverseKinematics::Rx(double rotAngle, Mat* pRotMatX)
+void ClosedFormInverseKinematics::Rx(double rotAngle, cv::Mat* pRotMatX)
 {
 
   (* pRotMatX ) = Mat::zeros(3, 3, CV_64FC1);
@@ -104,7 +104,7 @@ void ClosedFormInverseKinematics::Rx(double rotAngle, Mat* pRotMatX)
 }
 
 
-void ClosedFormInverseKinematics::Ry(double rotAngle, Mat* pRotMatY)
+void ClosedFormInverseKinematics::Ry(double rotAngle, cv::Mat* pRotMatY)
 {
 
   (* pRotMatY ) = Mat::zeros(3, 3, CV_64FC1);
@@ -119,7 +119,7 @@ void ClosedFormInverseKinematics::Ry(double rotAngle, Mat* pRotMatY)
 }
 
 
-void ClosedFormInverseKinematics::Rz(double rotAngle, Mat* pRotMatZ)
+void ClosedFormInverseKinematics::Rz(double rotAngle, cv::Mat* pRotMatZ)
 {
 
   (*pRotMatZ) = Mat::zeros(3, 3, CV_64FC1);
@@ -339,7 +339,7 @@ void ClosedFormInverseKinematics::InverseKinematics()
 }
 
 
-void ClosedFormInverseKinematics::printMatrix(Mat& mat, const char* name)
+void ClosedFormInverseKinematics::printMatrix(cv::Mat& mat, const char* name)
 {
   cout << name << ":" << endl;
 

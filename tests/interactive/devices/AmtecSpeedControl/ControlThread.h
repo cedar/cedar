@@ -52,7 +52,7 @@ const unsigned int JOINT = 4;
 const double TARGET = 1.5;
 
 
-/*!@brief
+/*!@brief Example of an thread controlling a joint by setting its velocity
  */
 class ControlThread : public cedar::aux::LoopedThread
 {
@@ -66,6 +66,11 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 
+  /*!@brief Constructor
+   *
+   *@param kinematicChain pointer to the chain
+   *@param configFileName path to a configuration file
+   */
   ControlThread(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName);
 
   //!@brief Destructor
