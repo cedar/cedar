@@ -264,6 +264,9 @@ public:
 protected:
   //!@brief desired length of a single step, in milliseconds
   boost::posix_time::time_duration mStepSize;
+  double _mStepSize;
+  double _mIdleTime;
+  double _mSimulatedTime;
 private:
   bool mStop;
   unsigned int mIdleTime; // in microseconds
