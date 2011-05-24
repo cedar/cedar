@@ -54,11 +54,11 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::comp::Computable::onTrigger(const cedar::aux::comp::Arguments& arguments)
+void cedar::aux::comp::Computable::triggered()
 {
-  this->compute(arguments);
+  this->compute(cedar::aux::comp::Arguments());
 
-  this->mFinished.trigger(arguments);
+  this->mFinished.trigger();
 }
 
 cedar::aux::comp::Trigger& cedar::aux::comp::Computable::getFinishedTrigger()
