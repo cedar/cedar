@@ -50,7 +50,7 @@
 
 class TriggerableTest : public cedar::aux::comp::Triggerable
 {
-  void onTrigger(const cedar::aux::comp::Arguments& arguments)
+  void triggered()
   {
     std::cout << "onTrigger called." << std::endl;
   }
