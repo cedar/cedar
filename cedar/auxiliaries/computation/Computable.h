@@ -73,7 +73,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void onTrigger(const cedar::aux::comp::Arguments& arguments);
+  void triggered();
 
   virtual void compute(const cedar::aux::comp::Arguments& arguments) = 0;
 

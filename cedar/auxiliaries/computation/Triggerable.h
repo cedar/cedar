@@ -66,7 +66,7 @@ class cedar::aux::comp::Triggerable : public cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //@brief The standard constructor.
-  // none
+  Triggerable();
 
   //!@brief Destructor
   virtual ~Triggerable();
@@ -75,7 +75,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual void onTrigger(const cedar::aux::comp::Arguments& arguments) = 0;
+  void onTrigger();
+
+  /*!
+   * @returns True, if the trigger signal was processed properly, false otherwise.
+   */
+  virtual bool triggered() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,7 +101,7 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  bool mTriggered;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

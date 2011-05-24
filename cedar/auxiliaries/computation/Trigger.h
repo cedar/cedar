@@ -75,7 +75,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void trigger(const cedar::aux::comp::Arguments& arguments = cedar::aux::comp::Arguments());
+  void trigger();
 
   void addListener(cedar::aux::comp::TriggerablePtr triggerable);
 

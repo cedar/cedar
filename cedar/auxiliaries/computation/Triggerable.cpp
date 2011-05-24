@@ -50,6 +50,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::comp::Triggerable::Triggerable()
+:
+mTriggered (false)
+{
+}
+
 cedar::aux::comp::Triggerable::~Triggerable()
 {
 }
@@ -57,3 +63,15 @@ cedar::aux::comp::Triggerable::~Triggerable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::comp::Triggerable::onTrigger()
+{
+  if (!mTriggered)
+  {
+    mTriggered = true;
+
+    this->triggered();
+
+    mTriggered = false;
+  }
+}
