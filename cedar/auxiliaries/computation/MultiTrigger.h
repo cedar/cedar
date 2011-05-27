@@ -52,9 +52,11 @@
 #include <vector>
 #include <map>
 
-/*!@brief Abstract description of the class.
+/*!@brief A trigger that merges multiple trigger signals into one.
  *
- * More detailed description of the class.
+ * This class maintains a list of incoming triggers. Everytime one of the incoming triggers receives a trigger signal,
+ * it is marked as triggered. Once all incoming triggers are marked thusly, the MultiTrigger sends a trigger signal to
+ * all its listeners.
  */
 class cedar::aux::comp::MultiTrigger : public Trigger
 {
@@ -79,6 +81,8 @@ public:
   void onTrigger(Trigger* sender);
 
   void notifyConnected(cedar::aux::comp::Trigger* trigger);
+
+  void notifyDisconnected(cedar::aux::comp::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

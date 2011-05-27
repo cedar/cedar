@@ -80,6 +80,10 @@ void cedar::aux::comp::Trigger::trigger()
   }
 }
 
+void cedar::aux::comp::Trigger::onTrigger(Trigger*)
+{
+}
+
 void cedar::aux::comp::Trigger::addListener(cedar::aux::comp::ProcessingStepPtr step)
 {
   std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator iter;
@@ -101,10 +105,6 @@ void cedar::aux::comp::Trigger::addTrigger(cedar::aux::comp::TriggerPtr trigger)
   }
 }
 
-void cedar::aux::comp::Trigger::notifyConnected(cedar::aux::comp::Trigger* trigger)
-{
-}
-
 void cedar::aux::comp::Trigger::removeListener(cedar::aux::comp::ProcessingStepPtr step)
 {
   std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator iter;
@@ -113,6 +113,25 @@ void cedar::aux::comp::Trigger::removeListener(cedar::aux::comp::ProcessingStepP
   {
     this->mListeners.erase(iter);
   }
+}
+
+void cedar::aux::comp::Trigger::removeTrigger(cedar::aux::comp::TriggerPtr trigger)
+{
+  std::vector<cedar::aux::comp::TriggerPtr>::iterator iter;
+  iter = this->find(trigger);
+  if (iter != this->mTriggers.end())
+  {
+    this->mTriggers.erase(iter);
+    trigger->notifyDisconnected(this);
+  }
+}
+
+void cedar::aux::comp::Trigger::notifyConnected(cedar::aux::comp::Trigger* trigger)
+{
+}
+
+void cedar::aux::comp::Trigger::notifyDisconnected(cedar::aux::comp::Trigger* trigger)
+{
 }
 
 std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator

@@ -102,3 +102,11 @@ void cedar::aux::comp::MultiTrigger::notifyConnected(cedar::aux::comp::Trigger* 
   mIncoming[trigger] = false;
 }
 
+void cedar::aux::comp::MultiTrigger::notifyDisconnected(cedar::aux::comp::Trigger* trigger)
+{
+  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(trigger);
+  if (iter != this->mIncoming.end())
+  {
+    this->mIncoming.erase(iter);
+  }
+}
