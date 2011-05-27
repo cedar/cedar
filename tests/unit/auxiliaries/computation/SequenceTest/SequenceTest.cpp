@@ -67,6 +67,7 @@ class ComputableTest : public cedar::aux::comp::ProcessingStep
 
     void compute(const cedar::aux::comp::Arguments& arguments)
     {
+      usleep(random() % 50000);
       meLock.lockForWrite();
       meSequenceBuffer.push_back(mSequenceId);
       meLock.unlock();
