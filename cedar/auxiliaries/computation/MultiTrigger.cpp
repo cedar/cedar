@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Computable.cpp
+    File:        MultiTrigger.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -31,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 05 27
 
     Description:
 
@@ -40,28 +40,65 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Computable.h"
+#include "auxiliaries/computation/MultiTrigger.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::comp::MultiTrigger::MultiTrigger()
+{
+}
+
+cedar::aux::comp::MultiTrigger::~MultiTrigger()
+{
+}
+
+
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::comp::Computable::triggered()
+void cedar::aux::comp::MultiTrigger::onTrigger(Trigger* sender)
 {
-  this->compute(cedar::aux::comp::Arguments());
+  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(sender);
 
-  this->mFinished.trigger();
+  if (iter != this->mIncoming.end())
+  {
+    iter->second = true;
+    this->checkCondition();
+  }
 }
 
-cedar::aux::comp::Trigger& cedar::aux::comp::Computable::getFinishedTrigger()
+void cedar::aux::comp::MultiTrigger::checkCondition()
 {
-  return this->mFinished;
+  // Check whether all incoming triggers have triggered the multitrigger
+  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  {
+    // if one is false, return and do nothing
+    if (!iter->second)
+    {
+      return;
+    }
+  }
+
+  // if we got here, all triggers have triggere
+  this->trigger();
+
+  // reset all triggers
+  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  {
+    iter->second = false;
+  }
 }
+
+void cedar::aux::comp::MultiTrigger::notifyConnected(cedar::aux::comp::Trigger* trigger)
+{
+  mIncoming[trigger] = false;
+}
+

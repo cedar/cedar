@@ -43,7 +43,8 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/computation/Computable.h"
+#include "auxiliaries/computation/MultiTrigger.h"
+#include "auxiliaries/computation/ProcessingStep.h"
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -53,7 +54,7 @@
 #include <string>
 #include <QReadWriteLock>
 
-class ComputableTest : public cedar::aux::comp::Computable
+class ComputableTest : public cedar::aux::comp::ProcessingStep
 {
   public:
     ComputableTest(unsigned int sequenceId, std::vector<unsigned int>& sequenceBuffer, QReadWriteLock& lock)
@@ -94,6 +95,8 @@ void testSequence(const std::string& sequenceString, unsigned int& errors)
 {
   using cedar::aux::comp::Trigger;
   using cedar::aux::comp::TriggerPtr;
+  using cedar::aux::comp::MultiTrigger;
+  using cedar::aux::comp::MultiTriggerPtr;
 
   QReadWriteLock lock;
   std::vector<unsigned int> sequence_buffer;
@@ -108,6 +111,8 @@ void testSequence(const std::string& sequenceString, unsigned int& errors)
   unsigned int num_steps = 0;
   for (size_t i = 0; i < sequenceString.size(); ++i)
   {
+    MultiTriggerPtr multi_trigger(new MultiTrigger());
+
     std::string chr = "";
     chr += sequenceString.at(i);
     int no_steps = atoi(chr.c_str());
@@ -125,12 +130,14 @@ void testSequence(const std::string& sequenceString, unsigned int& errors)
       steps.push_back(step);
       prev_trigger->addListener(step);
 
+      step->getFinishedTrigger()->addTrigger(multi_trigger);
+
       std::stringstream strstr;
       strstr << i;
       desired_sequence += strstr.str();
       ++num_steps;
     }
-    prev_trigger = TriggerPtr(new Trigger());
+    prev_trigger = multi_trigger;
   }
 
   log_file << "Triggering sequence " << sequenceString << "." << std::endl;
@@ -177,35 +184,6 @@ int main(int argc, char** argv)
   log_file << std::endl;
 
   testSequence("112311", errors);
-
-/*  log_file << "Creating computation chain." << std::endl;
-  std::vector<ComputableTestPtr> steps;
-  for (size_t i = 0; i < 4; ++i)
-  {
-    steps.push_back(ComputableTestPtr(new ComputableTest(i, sequence_buffer, lock)));
-  }*/
-
-/*
-  start_trigger->addListener(steps[0]);
-
-  steps[0]->getFinishedTrigger().addListener(steps[1]);
-  steps[0]->getFinishedTrigger().addListener(steps[2]);
-
-  log_file << "Executing computation chain." << std::endl;
-
-  start_trigger->trigger();
-
-  log_file << "Computation chain finished." << std::endl;
-  std::string sequence = "";
-
-  for (size_t i = 0; i < sequence_buffer.size(); ++i)
-  {
-    std::stringstream strstr;
-    strstr << sequence_buffer.at(i);
-    sequence += strstr.str();
-  }
-  log_file << "Generated sequence:" << sequence << std::endl;
-  */
 
   log_file << "Done. There were " << errors << " errors." << std::endl;
 

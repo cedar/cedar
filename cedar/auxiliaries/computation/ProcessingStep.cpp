@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Triggerable.cpp
+    File:        ProcessingStep.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -40,7 +40,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Triggerable.h"
+#include "auxiliaries/computation/ProcessingStep.h"
+#include "auxiliaries/computation/Arguments.h"
 
 // PROJECT INCLUDES
 
@@ -50,13 +51,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::Triggerable::Triggerable()
+cedar::aux::comp::ProcessingStep::ProcessingStep()
 :
-mTriggered (false)
-{
-}
-
-cedar::aux::comp::Triggerable::~Triggerable()
+mFinished(new cedar::aux::comp::Trigger())
 {
 }
 
@@ -64,14 +61,14 @@ cedar::aux::comp::Triggerable::~Triggerable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::comp::Triggerable::onTrigger()
+void cedar::aux::comp::ProcessingStep::onTrigger()
 {
-  if (!mTriggered)
-  {
-    mTriggered = true;
+  this->compute(cedar::aux::comp::Arguments());
 
-    this->triggered();
+  this->mFinished->trigger();
+}
 
-    mTriggered = false;
-  }
+cedar::aux::comp::TriggerPtr& cedar::aux::comp::ProcessingStep::getFinishedTrigger()
+{
+  return this->mFinished;
 }

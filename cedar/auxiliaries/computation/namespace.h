@@ -55,13 +55,13 @@ namespace cedar
     {
       class Arguments;
 
-      class Computable;
-      typedef boost::shared_ptr<Computable> ComputablePtr;
+      class ProcessingStep;
+      typedef boost::shared_ptr<ProcessingStep> ProcessingStepPtr;
 
       class LoopArguments;
 
-      class Triggerable;
-      typedef boost::shared_ptr<Triggerable> TriggerablePtr;
+      class MultiTrigger;
+      typedef boost::shared_ptr<MultiTrigger> MultiTriggerPtr;
 
       class Trigger;
       typedef boost::shared_ptr<Trigger> TriggerPtr;
