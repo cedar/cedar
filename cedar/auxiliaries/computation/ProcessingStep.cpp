@@ -53,7 +53,8 @@
 
 cedar::aux::comp::ProcessingStep::ProcessingStep()
 :
-mFinished(new cedar::aux::comp::Trigger())
+mFinished(new cedar::aux::comp::Trigger()),
+mBusy (false)
 {
 }
 
@@ -63,7 +64,12 @@ mFinished(new cedar::aux::comp::Trigger())
 
 void cedar::aux::comp::ProcessingStep::onTrigger()
 {
-  this->compute(cedar::aux::comp::Arguments());
+  if (!this->mBusy)
+  {
+    this->mBusy = true;
+    this->compute(cedar::aux::comp::Arguments());
+    this->mBusy = false;
+  }
 
   this->mFinished->trigger();
 }
