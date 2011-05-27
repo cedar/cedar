@@ -76,17 +76,21 @@ public:
 public:
   void trigger();
 
-  virtual void onTrigger(Trigger*) {};
+  virtual void onTrigger(Trigger*);
 
-  void addListener(cedar::aux::comp::ProcessingStepPtr triggerable);
+  void addListener(cedar::aux::comp::ProcessingStepPtr step);
 
   void addTrigger(cedar::aux::comp::TriggerPtr trigger);
 
-  void removeListener(cedar::aux::comp::ProcessingStepPtr triggerable);
+  void removeListener(cedar::aux::comp::ProcessingStepPtr step);
+
+  void removeTrigger(cedar::aux::comp::TriggerPtr trigger);
 
   const std::vector<cedar::aux::comp::ProcessingStepPtr>& getListeners() const;
 
   virtual void notifyConnected(cedar::aux::comp::Trigger* trigger);
+
+  virtual void notifyDisconnected(cedar::aux::comp::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
