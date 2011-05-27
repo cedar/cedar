@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 05 27
 
     Description:
 
@@ -38,24 +38,25 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_COMPUTABLE_H
-#define CEDAR_AUX_COMP_COMPUTABLE_H
+#ifndef CEDAR_AUX_COMP_MULTI_TRIGGER_H
+#define CEDAR_AUX_COMP_MULTI_TRIGGER_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/computation/namespace.h"
-#include "auxiliaries/computation/Triggerable.h"
 #include "auxiliaries/computation/Trigger.h"
+
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <vector>
+#include <map>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::Computable : public cedar::aux::comp::Triggerable
+class cedar::aux::comp::MultiTrigger : public Trigger
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,18 +67,18 @@ class cedar::aux::comp::Computable : public cedar::aux::comp::Triggerable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  MultiTrigger();
 
   //!@brief Destructor
+  virtual ~MultiTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void triggered();
+  void onTrigger(Trigger* sender);
 
-  virtual void compute(const cedar::aux::comp::Arguments& arguments) = 0;
-
-  cedar::aux::comp::Trigger& getFinishedTrigger();
+  void notifyConnected(cedar::aux::comp::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -90,16 +91,16 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   // none yet
-
+  void checkCondition();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
 protected:
-  cedar::aux::comp::Trigger mFinished;
+
 private:
-  // none yet
+  std::map<Trigger*, bool> mIncoming;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -112,7 +113,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::Computable
+}; // class cedar::aux::comp::Trigger
 
-#endif // CEDAR_AUX_COMP_COMPUTABLE_H
+#endif // CEDAR_AUX_COMP_TRIGGER_H
 

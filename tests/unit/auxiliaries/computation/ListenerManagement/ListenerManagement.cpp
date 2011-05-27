@@ -43,20 +43,21 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/computation/Trigger.h"
+#include "auxiliaries/computation/ProcessingStep.h"
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 
-class TriggerableTest : public cedar::aux::comp::Triggerable
+class StepTest : public cedar::aux::comp::ProcessingStep
 {
-  void triggered()
+  void compute(const cedar::aux::comp::Arguments&)
   {
-    std::cout << "onTrigger called." << std::endl;
+    std::cout << "compute called." << std::endl;
   }
 };
 
-typedef boost::shared_ptr<TriggerableTest> TriggerableTestPtr;
+typedef boost::shared_ptr<StepTest> StepTestPtr;
 
 int main(int argc, char** argv)
 {
@@ -70,17 +71,17 @@ int main(int argc, char** argv)
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  log_file << "Creating triggerable." << std::endl;
-  TriggerableTestPtr triggerable (new TriggerableTest());
+  log_file << "Creating step." << std::endl;
+  StepTestPtr step (new StepTest());
 
   log_file << "Creating trigger." << std::endl;
   TriggerPtr trigger (new Trigger());
 
-  log_file << "Adding triggerable." << std::endl;
-  trigger->addListener(triggerable);
+  log_file << "Adding step." << std::endl;
+  trigger->addListener(step);
 
-  log_file << "Adding triggerable again." << std::endl;
-  trigger->addListener(triggerable);
+  log_file << "Adding step again." << std::endl;
+  trigger->addListener(step);
 
   if (trigger->getListeners().size() != 1)
   {
@@ -88,17 +89,17 @@ int main(int argc, char** argv)
     log_file << "Error: same listener was added twice." << std::endl;
   }
 
-  log_file << "Removing triggerable." << std::endl;
-  trigger->removeListener(triggerable);
+  log_file << "Removing step." << std::endl;
+  trigger->removeListener(step);
   if (trigger->getListeners().size() != 0)
   {
     ++errors;
     log_file << "Error: listener was not removed correctly." << std::endl;
   }
 
-  log_file << "Adding a second triggerable." << std::endl;
-  trigger->addListener(triggerable);
-  trigger->addListener(TriggerableTestPtr(new TriggerableTest()));
+  log_file << "Adding a second step." << std::endl;
+  trigger->addListener(step);
+  trigger->addListener(StepTestPtr(new StepTest()));
   if (trigger->getListeners().size() != 2)
   {
     ++errors;

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Triggerable.h
+    File:        ProcessingStep.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,12 +38,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_TRIGGERABLE_H
-#define CEDAR_AUX_COMP_TRIGGERABLE_H
+#ifndef CEDAR_AUX_COMP_PROCESSING_STEP_H
+#define CEDAR_AUX_COMP_PROCESSING_STEP_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/computation/namespace.h"
-#include "auxiliaries/computation/Arguments.h"
+#include "auxiliaries/computation/Trigger.h"
 #include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::Triggerable : public cedar::aux::Base
+class cedar::aux::comp::ProcessingStep : public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,11 +65,10 @@ class cedar::aux::comp::Triggerable : public cedar::aux::Base
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //@brief The standard constructor.
-  Triggerable();
+  //!@brief The standard constructor.
+  ProcessingStep();
 
   //!@brief Destructor
-  virtual ~Triggerable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -77,15 +76,15 @@ public:
 public:
   void onTrigger();
 
-  /*!
-   * @returns True, if the trigger signal was processed properly, false otherwise.
-   */
-  virtual bool triggered() = 0;
+  virtual void compute(const cedar::aux::comp::Arguments& arguments) = 0;
+
+  cedar::aux::comp::TriggerPtr& getFinishedTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -99,9 +98,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  cedar::aux::comp::TriggerPtr mFinished;
 private:
-  bool mTriggered;
+  bool mBusy;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -114,7 +113,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::Triggerable
+}; // class cedar::aux::comp::ProcessingStep
 
-#endif // CEDAR_AUX_COMP_TRIGGERABLE_H
+#endif // CEDAR_AUX_COMP_PROCESSING_STEP_H
 

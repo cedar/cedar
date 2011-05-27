@@ -44,7 +44,6 @@
 // LOCAL INCLUDES
 #include "auxiliaries/computation/namespace.h"
 
-#include "auxiliaries/computation/Triggerable.h"
 
 // PROJECT INCLUDES
 
@@ -77,11 +76,17 @@ public:
 public:
   void trigger();
 
-  void addListener(cedar::aux::comp::TriggerablePtr triggerable);
+  virtual void onTrigger(Trigger*) {};
 
-  void removeListener(cedar::aux::comp::TriggerablePtr triggerable);
+  void addListener(cedar::aux::comp::ProcessingStepPtr triggerable);
 
-  const std::vector<cedar::aux::comp::TriggerablePtr>& getListeners() const;
+  void addTrigger(cedar::aux::comp::TriggerPtr trigger);
+
+  void removeListener(cedar::aux::comp::ProcessingStepPtr triggerable);
+
+  const std::vector<cedar::aux::comp::ProcessingStepPtr>& getListeners() const;
+
+  virtual void notifyConnected(cedar::aux::comp::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,9 +106,11 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  std::vector<cedar::aux::comp::TriggerablePtr> mListeners;
+  std::vector<cedar::aux::comp::ProcessingStepPtr> mListeners;
+  std::vector<cedar::aux::comp::TriggerPtr> mTriggers;
 private:
-  std::vector<cedar::aux::comp::TriggerablePtr>::iterator find(cedar::aux::comp::TriggerablePtr triggerable);
+  std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator find(cedar::aux::comp::ProcessingStepPtr triggerable);
+  std::vector<cedar::aux::comp::TriggerPtr>::iterator find(cedar::aux::comp::TriggerPtr triggerableT);
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
