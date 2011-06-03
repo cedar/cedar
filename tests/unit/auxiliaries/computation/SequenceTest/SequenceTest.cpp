@@ -57,8 +57,15 @@
 class ComputableTest : public cedar::aux::comp::ProcessingStep
 {
   public:
-    ComputableTest(unsigned int sequenceId, std::vector<unsigned int>& sequenceBuffer, QReadWriteLock& lock)
+    ComputableTest
+    (
+      unsigned int sequenceId,
+      std::vector<unsigned int>& sequenceBuffer,
+      QReadWriteLock& lock,
+      bool runInThread
+    )
     :
+    cedar::aux::comp::ProcessingStep(runInThread),
     mSequenceId (sequenceId),
     meSequenceBuffer (sequenceBuffer),
     meLock (lock)
@@ -67,6 +74,7 @@ class ComputableTest : public cedar::aux::comp::ProcessingStep
 
     void compute(const cedar::aux::comp::Arguments& arguments)
     {
+      //! @todo log these times and calculate the overall test time to check performance.
       usleep(random() % 50000);
       meLock.lockForWrite();
       meSequenceBuffer.push_back(mSequenceId);
@@ -80,6 +88,26 @@ class ComputableTest : public cedar::aux::comp::ProcessingStep
 
 typedef boost::shared_ptr<ComputableTest> ComputableTestPtr;
 
+class EndStopTest : public cedar::aux::comp::ProcessingStep
+{
+  public:
+    EndStopTest()
+    :
+    cedar::aux::comp::ProcessingStep(false),
+    mFinished (false)
+    {
+    }
+
+    void compute(const cedar::aux::comp::Arguments& arguments)
+    {
+      mFinished = true;
+    }
+
+    bool mFinished;
+};
+
+typedef boost::shared_ptr<EndStopTest> EndStopTestPtr;
+
 // =====================================================================================================================
 
 cedar::aux::LogFile log_file ("SequenceTest.log");
@@ -92,7 +120,7 @@ cedar::aux::LogFile log_file ("SequenceTest.log");
  * each number specifies the number of steps to execute in parallel before going to the next stage (i.e., the next
  * number).
  */
-void testSequence(const std::string& sequenceString, unsigned int& errors)
+void testSequence(const std::string& sequenceString, unsigned int& errors, bool runInThread)
 {
   using cedar::aux::comp::Trigger;
   using cedar::aux::comp::TriggerPtr;
@@ -104,11 +132,23 @@ void testSequence(const std::string& sequenceString, unsigned int& errors)
 
   log_file << "Creating computation chain for sequence string \"" << sequenceString << "\"." << std::endl;
 
+
+  log_file << "This test is ";
+
+  if (!runInThread)
+  {
+    log_file << "not ";
+  }
+  log_file << "threaded." << std::endl;
+
   TriggerPtr sequence_trigger(new Trigger());
 
   TriggerPtr prev_trigger = sequence_trigger;
   std::string desired_sequence = "";
 
+  /*
+   * Generate the sequence in the processing framework
+   */
   unsigned int num_steps = 0;
   for (size_t i = 0; i < sequenceString.size(); ++i)
   {
@@ -127,7 +167,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors)
 
     for (int no = 0; no < no_steps; ++no)
     {
-      ComputableTestPtr step (new ComputableTest(i, sequence_buffer, lock));
+      ComputableTestPtr step (new ComputableTest(i, sequence_buffer, lock, runInThread));
       steps.push_back(step);
       prev_trigger->addListener(step);
 
@@ -141,9 +181,32 @@ void testSequence(const std::string& sequenceString, unsigned int& errors)
     prev_trigger = multi_trigger;
   }
 
+  EndStopTestPtr stop_test(new EndStopTest());
+  prev_trigger->addListener(stop_test);
+
   log_file << "Triggering sequence " << sequenceString << "." << std::endl;
   sequence_trigger->trigger();
 
+  unsigned int wait_time_in_sec = 3;
+  unsigned int wait_iterations = 0;
+  unsigned int usec_wait_per_iteration = 1000;
+  while (!stop_test->mFinished && wait_iterations * usec_wait_per_iteration < 1000000 * wait_time_in_sec)
+  {
+    usleep(usec_wait_per_iteration);
+    ++wait_iterations;
+  }
+
+  if (!stop_test->mFinished)
+  {
+    log_file << "The test timed out." << std::endl;
+    ++errors;
+    return;
+  }
+
+
+  /*
+   * Test the sequence for correctness
+   */
   log_file << "Checking sequence " << sequenceString << "." << std::endl;
   unsigned int prev_stage_no = sequence_buffer.at(0);
   std::string sequence = "";
@@ -170,6 +233,10 @@ void testSequence(const std::string& sequenceString, unsigned int& errors)
     log_file << "Desired sequence is: " << desired_sequence << "." << std::endl;
     ++errors;
   }
+  else
+  {
+    log_file << "Generated sequence is ok! *thumbs up*" << std::endl;
+  }
 }
 
 
@@ -184,7 +251,9 @@ int main(int argc, char** argv)
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  testSequence("112311", errors);
+  testSequence("112319", errors, false);
+
+  testSequence("112319", errors, true);
 
   log_file << "Done. There were " << errors << " errors." << std::endl;
 
