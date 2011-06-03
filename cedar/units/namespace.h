@@ -58,9 +58,9 @@ namespace cedar
   namespace units
   {
     // because strings (as template arguments) must be constant at compile-time, this is used for the prefixes:
-    extern char const prefix_us[] = "µs" ;
-    extern char const prefix_ms[] = "ms" ;
-    extern char const prefix_s[] = "s" ;
+    extern char const prefix_us[] = "µs";
+    extern char const prefix_ms[] = "ms";
+    extern char const prefix_s[] = "s";
 
     class Time;
 

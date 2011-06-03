@@ -68,7 +68,7 @@ int main(int argc, char** argv)
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  cedar::units::Milliseconds ms (50);
+  cedar::units::Milliseconds ms(50);
 
   // ---- Conversion tests ---------------------------------------------------------------------------------------------
   log_file << "Conversion from milliseconds to microseconds ";
@@ -77,6 +77,7 @@ int main(int argc, char** argv)
   if (ms.getRawTime() != us.getRawTime())
   {
     log_file << "failed";
+    ++errors;
   }
   else
   {
@@ -89,6 +90,23 @@ int main(int argc, char** argv)
   log_file << "Testing stream operator & function argument passing ... ";
   testStreamOutput(cedar::units::Microseconds(12345));
   log_file << "succeeded." << std::endl;
+
+  // ---- operatir tests -----------------------------------------------------------------------------------------------
+  log_file << "Testing operators ... " << std::endl;
+  cedar::units::Milliseconds ms_once(50);
+  cedar::units::Milliseconds ms_twice = 2.0 * ms_once;
+
+  log_file << "Multiplication operator ... ";
+  if (2.0 * ms_once.getRawTime() != ms_twice.getRawTime())
+  {
+    log_file << "failed: twice " << ms_once.getRawTime() << " is " << ms_twice.getRawTime() << std::endl;
+    ++errors;
+  }
+  else
+  {
+    log_file << "succeeded." << std::endl;
+  }
+
 
   log_file << "Done. There were " << errors << " errors." << std::endl;
   return errors;
