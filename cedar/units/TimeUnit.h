@@ -36,7 +36,7 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_TIME_UNIT_H
+#ifndef CEDAR_UNITS_TIMzE_UNIT_H
 #define CEDAR_UNITS_TIME_UNIT_H
 
 // LOCAL INCLUDES
@@ -68,7 +68,7 @@ class cedar::units::TimeUnit : public Time
 //  template <int outFactor, const char* outSuffix>
   friend std::ostream& operator <<(std::ostream &stream, const TimeUnit& unit)
   {
-    stream << unit.mAmountInMicroSeconds << " " << suffix;
+    stream << unit.mAmountInMicroSeconds / static_cast<double>(factor) << " " << suffix;
     return stream;
   }
 
@@ -82,6 +82,15 @@ public:
   TimeUnit(double amount = 1.0)
   :
   Time(amount * static_cast<double>(factor))
+  {
+  }
+
+  /*!@brief Constructor that takes a base time object.
+   *
+   */
+  TimeUnit(const cedar::units::Time& time)
+  :
+  Time(time)
   {
   }
 
