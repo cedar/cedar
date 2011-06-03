@@ -56,7 +56,7 @@
  * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
  *       cedar::units::Milliseconds.
  */
-class cedar::units::Time
+class cedar::unit::Time
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -112,7 +112,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::units::Time
+}; // class cedar::unit::Time
 
 #endif // CEDAR_UNITS_TIME_H
 

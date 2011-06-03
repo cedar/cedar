@@ -22,13 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    File:        <filename>
+
+    Maintainer:  <first name> <last name>
+    Email:       <email address>
+    Date:        <creation date YYYY MM DD>
 
     Description:
 
@@ -36,120 +34,40 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_TIME_UNIT_H
-#define CEDAR_UNITS_TIME_UNIT_H
+#ifndef CEDAR_NEURON_H
+#define CEDAR_NEURON_H
 
 // LOCAL INCLUDES
-#include <units/namespace.h>
-#include "Time.h"
+#include "dynamics/Dynamics.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
- *
- * @todo Read units from strings.
  */
-template <unsigned int T_factor, const char* T_suffix>
-class cedar::unit::TimeUnit : public Time
+namespace cedar
+{
+class Neuron : public cedar::dyn::Dynamics
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-
-  friend std::ostream& operator <<(std::ostream &stream, const TimeUnit& unit)
-  {
-    stream << unit.mAmountInMicroSeconds / static_cast<double>(T_factor) << " " << T_suffix;
-    return stream;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief The standard constructor.
-   *
-   */
-  TimeUnit(double amount = 1.0)
-  :
-  Time(amount * static_cast<double>(T_factor))
-  {
-  }
-
-  /*!@brief Constructor that takes a base time object.
-   *
-   */
-  TimeUnit(const cedar::unit::Time& time)
-  :
-  Time(time)
-  {
-  }
+  //!@brief The standard constructor.
 
   //!@brief Destructor
-
+  ~Neuron();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-  template <unsigned int otherFactor, const char* otherSuffix>
-  operator TimeUnit<otherFactor, otherSuffix>()
-  {
-    return this->mAmountInMicroSeconds * static_cast<double>(otherFactor);
-  }
-
-  operator Time()
-  {
-    return Time(this->mAmountInMicroSeconds);
-  }
-
-  TimeUnit operator* (double factor)
-  {
-    return TimeUnit(Time(factor * this->mAmountInMicroSeconds));
-  }
-
-  friend TimeUnit operator*(double real, TimeUnit& time)
-  {
-    TimeUnit ret;
-    ret.mAmountInMicroSeconds = real * time.mAmountInMicroSeconds;
-    return ret;
-  }
-
-  void operator*= (double factor)
-  {
-    this->mAmountInMicroSeconds *= factor;
-  }
-
-  TimeUnit operator/ (double divisor)
-  {
-    return TimeUnit(Time(this->mAmountInMicroSeconds / divisor));
-  }
-
-  friend TimeUnit operator/(double real, TimeUnit& time)
-  {
-    TimeUnit ret;
-    ret.mAmountInMicroSeconds = real / time.mAmountInMicroSeconds;
-    return ret;
-  }
-
-  TimeUnit operator/= (double divisor)
-  {
-    this->mAmountInMicroSeconds /= divisor;
-  }
-
-  template <unsigned int otherFactor, const char* otherSuffix>
-  bool operator==(const TimeUnit<otherFactor, otherSuffix>& comp)
-  {
-    return this->mAmountInMicroSeconds == comp.mAmountInMicroSeconds;
-  }
-
 public:
   // none yet
 
@@ -157,7 +75,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -173,7 +91,7 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  double mActivity;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -186,7 +104,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::unit::TimeUnit
-
-#endif // CEDAR_UNITS_TIME_UNIT_H
+}; // class cedar::xxx
+}
+#endif // CEDAR_NEURON_H
 

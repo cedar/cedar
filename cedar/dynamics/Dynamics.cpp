@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Time.cpp
+    File:        <filename>
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "units/Time.h"
+#include "dynamics/Dynamics.h"
 
 // PROJECT INCLUDES
 
@@ -49,27 +49,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @todo explain why this constructor is protected.
- */
-cedar::unit::Time::Time(double amount)
-:
-mAmountInMicroSeconds (amount)
-{
-}
-
-cedar::unit::Time::~Time()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-/*!
- * @todo explain why this function should only be used for testing/debugging.
- */
-double cedar::unit::Time::getRawTime() const
+void cedar::dyn::Dynamics::compute(const cedar::aux::comp::Arguments& arguments)
 {
-  return this->mAmountInMicroSeconds;
+  this->eulerStep(cedar::unit::Milliseconds(1));
 }
