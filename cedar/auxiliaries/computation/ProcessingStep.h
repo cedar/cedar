@@ -49,13 +49,14 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QThread>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::ProcessingStep : public cedar::aux::Base
+class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,7 +67,7 @@ class cedar::aux::comp::ProcessingStep : public cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ProcessingStep();
+  ProcessingStep(bool runInThread = false);
 
   //!@brief Destructor
 
@@ -84,7 +85,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void run();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -101,6 +102,7 @@ protected:
   cedar::aux::comp::TriggerPtr mFinished;
 private:
   bool mBusy;
+  bool mRunInThread;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

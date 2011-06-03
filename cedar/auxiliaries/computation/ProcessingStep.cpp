@@ -51,10 +51,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::ProcessingStep::ProcessingStep()
+cedar::aux::comp::ProcessingStep::ProcessingStep(bool runInThread)
 :
 mFinished(new cedar::aux::comp::Trigger()),
-mBusy (false)
+mBusy(false),
+mRunInThread(runInThread)
 {
 }
 
@@ -66,11 +67,24 @@ void cedar::aux::comp::ProcessingStep::onTrigger()
 {
   if (!this->mBusy)
   {
-    this->mBusy = true;
-    this->compute(cedar::aux::comp::Arguments());
-    this->mBusy = false;
+    if (this->mRunInThread)
+    {
+      this->start();
+    }
+    else
+    {
+      this->run();
+    }
   }
+}
 
+void cedar::aux::comp::ProcessingStep::run()
+{
+  this->mBusy = true;
+
+  this->compute(cedar::aux::comp::Arguments());
+
+  this->mBusy = false;
   this->mFinished->trigger();
 }
 
