@@ -48,6 +48,17 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
+void testStreamOutput(cedar::units::Time time)
+{
+  std::cout << "Time output test: " << std::endl;
+  std::cout << cedar::units::Microseconds(time)
+            << " = "
+            << cedar::units::Milliseconds(time)
+            << " = "
+            << cedar::units::Seconds(time)
+            << std::endl;
+}
+
 int main(int argc, char** argv)
 {
   using namespace cedar::aux;
@@ -75,9 +86,8 @@ int main(int argc, char** argv)
 
 
   // ---- String tests -------------------------------------------------------------------------------------------------
-  log_file << "Testing stream operator ... ";
-  std::cout << "Time output test: ";
-  std::cout << ms << std::endl;
+  log_file << "Testing stream operator & function argument passing ... ";
+  testStreamOutput(cedar::units::Microseconds(12345));
   log_file << "succeeded." << std::endl;
 
   log_file << "Done. There were " << errors << " errors." << std::endl;
