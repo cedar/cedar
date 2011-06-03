@@ -55,7 +55,7 @@
  *
  * @todo Read units from strings.
  */
-template <unsigned int factor, const char* suffix>
+template <unsigned int T_factor, const char* T_suffix>
 class cedar::units::TimeUnit : public Time
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,10 +65,10 @@ class cedar::units::TimeUnit : public Time
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-//  template <int outFactor, const char* outSuffix>
+
   friend std::ostream& operator <<(std::ostream &stream, const TimeUnit& unit)
   {
-    stream << unit.mAmountInMicroSeconds / static_cast<double>(factor) << " " << suffix;
+    stream << unit.mAmountInMicroSeconds / static_cast<double>(T_factor) << " " << T_suffix;
     return stream;
   }
 
@@ -81,7 +81,7 @@ public:
    */
   TimeUnit(double amount = 1.0)
   :
-  Time(amount * static_cast<double>(factor))
+  Time(amount * static_cast<double>(T_factor))
   {
   }
 
@@ -109,6 +109,47 @@ public:
   {
     return Time(this->mAmountInMicroSeconds);
   }
+
+  TimeUnit operator* (double factor)
+  {
+    return TimeUnit(Time(factor * this->mAmountInMicroSeconds));
+  }
+
+  friend TimeUnit operator*(double real, TimeUnit& time)
+  {
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = real * time.mAmountInMicroSeconds;
+    return ret;
+  }
+
+  void operator*= (double factor)
+  {
+    this->mAmountInMicroSeconds *= factor;
+  }
+
+  TimeUnit operator/ (double divisor)
+  {
+    return TimeUnit(Time(this->mAmountInMicroSeconds / divisor));
+  }
+
+  friend TimeUnit operator/(double real, TimeUnit& time)
+  {
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = real / time.mAmountInMicroSeconds;
+    return ret;
+  }
+
+  TimeUnit operator/= (double divisor)
+  {
+    this->mAmountInMicroSeconds /= divisor;
+  }
+
+  template <unsigned int otherFactor, const char* otherSuffix>
+  bool operator==(const TimeUnit<otherFactor, otherSuffix>& comp)
+  {
+    return this->mAmountInMicroSeconds == comp.mAmountInMicroSeconds;
+  }
+
 public:
   // none yet
 
