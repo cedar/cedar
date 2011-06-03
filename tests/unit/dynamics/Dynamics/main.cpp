@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ListenerManagement.cpp
+    File:        main.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -42,71 +42,23 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedarUnits.h"
 #include "auxiliaries/LogFile.h"
+#include "Neuron.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 
-void testStreamOutput(cedar::unit::Time time)
-{
-  std::cout << "Time output test: " << std::endl;
-  std::cout << cedar::unit::Microseconds(time)
-            << " = "
-            << cedar::unit::Milliseconds(time)
-            << " = "
-            << cedar::unit::Seconds(time)
-            << std::endl;
-}
+using namespace cedar::aux;
 
 int main(int argc, char** argv)
 {
-  using namespace cedar::aux;
   unsigned int errors = 0;
 
   LogFile log_file("Time.log");
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  cedar::unit::Milliseconds ms(50);
-
-  // ---- Conversion tests ---------------------------------------------------------------------------------------------
-  log_file << "Conversion from milliseconds to microseconds ";
-
-  cedar::unit::Microseconds us = ms;
-  if (ms.getRawTime() != us.getRawTime())
-  {
-    log_file << "failed";
-    ++errors;
-  }
-  else
-  {
-    log_file << "succeeded";
-  }
-  log_file << ": ms ~ " << ms.getRawTime() << ", us ~ " << us.getRawTime() << std::endl;
-
-
-  // ---- String tests -------------------------------------------------------------------------------------------------
-  log_file << "Testing stream operator & function argument passing ... ";
-  testStreamOutput(cedar::unit::Microseconds(12345));
-  log_file << "succeeded." << std::endl;
-
-  // ---- operatir tests -----------------------------------------------------------------------------------------------
-  log_file << "Testing operators ... " << std::endl;
-  cedar::unit::Milliseconds ms_once(50);
-  cedar::unit::Milliseconds ms_twice = 2.0 * ms_once;
-
-  log_file << "Multiplication operator ... ";
-  if (2.0 * ms_once.getRawTime() != ms_twice.getRawTime())
-  {
-    log_file << "failed: twice " << ms_once.getRawTime() << " is " << ms_twice.getRawTime() << std::endl;
-    ++errors;
-  }
-  else
-  {
-    log_file << "succeeded." << std::endl;
-  }
-
+  cedar::Neuron neuron;
 
   log_file << "Done. There were " << errors << " errors." << std::endl;
   return errors;

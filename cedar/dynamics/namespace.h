@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Time.cpp
+    File:        namespace.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -32,44 +32,33 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 06 03
 
-    Description:
+    Description: Namespace file for cedar::dyn.
 
     Credits:
 
 ======================================================================================================================*/
 
+
+#ifndef CEDAR_DYN_NAMESPACE_H
+#define CEDAR_DYN_NAMESPACE_H
+
 // LOCAL INCLUDES
-#include "units/Time.h"
 
 // PROJECT INCLUDES
+#include "namespace.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @todo explain why this constructor is protected.
- */
-cedar::unit::Time::Time(double amount)
-:
-mAmountInMicroSeconds (amount)
+namespace cedar
 {
+  /*!@brief Namespace for all dyn classes. */
+  namespace dyn
+  {
+    class Dynamics;
+    typedef boost::shared_ptr<Dynamics> DynamicsPtr;
+  }
 }
 
-cedar::unit::Time::~Time()
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-/*!
- * @todo explain why this function should only be used for testing/debugging.
- */
-double cedar::unit::Time::getRawTime() const
-{
-  return this->mAmountInMicroSeconds;
-}
+#endif // CEDAR_DYN_NAMESPACE_H
