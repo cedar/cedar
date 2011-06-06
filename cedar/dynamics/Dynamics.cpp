@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "dynamics/Dynamics.h"
+#include "auxiliaries/computation/StepTime.h"
 
 // PROJECT INCLUDES
 
@@ -54,5 +55,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::dyn::Dynamics::compute(const cedar::aux::comp::Arguments& arguments)
 {
-  this->eulerStep(cedar::unit::Milliseconds(1));
+  try
+  {
+    const cedar::aux::comp::StepTime& step_time = dynamic_cast<const cedar::aux::comp::StepTime&>(arguments);
+    this->eulerStep(step_time.getStepTime());
+  }
+  catch (const std::bad_cast& e)
+  {
+#ifdef DEBUG
+    std::cout << "Bad arguments passed to dynamics. Expected StepTime." << std::endl;
+#endif
+  }
 }

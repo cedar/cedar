@@ -74,7 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void trigger();
+  void trigger(cedar::aux::comp::ArgumentsPtr arguments = cedar::aux::comp::ArgumentsPtr());
 
   virtual void onTrigger(Trigger*);
 

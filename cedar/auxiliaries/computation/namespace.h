@@ -54,6 +54,10 @@ namespace cedar
     namespace comp
     {
       class Arguments;
+      typedef boost::shared_ptr<Arguments> ArgumentsPtr;
+
+      class StepTime;
+      typedef boost::shared_ptr<StepTime> StepTimePtr;
 
       class ProcessingStep;
       typedef boost::shared_ptr<ProcessingStep> ProcessingStepPtr;

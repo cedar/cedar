@@ -68,10 +68,11 @@ cedar::aux::comp::Trigger::~Trigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::comp::Trigger::trigger()
+void cedar::aux::comp::Trigger::trigger(cedar::aux::comp::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
+    this->mListeners.at(i)->setNextArguments(arguments);
     this->mListeners.at(i)->onTrigger();
   }
   for (size_t i = 0; i < this->mTriggers.size(); ++i)

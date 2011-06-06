@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingStep.cpp
+    File:        StepTime.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -31,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 06
 
     Description:
 
@@ -40,22 +40,23 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/ProcessingStep.h"
-#include "auxiliaries/computation/Arguments.h"
+#include "StepTime.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::ProcessingStep::ProcessingStep(bool runInThread)
+cedar::aux::comp::StepTime::StepTime(const cedar::unit::Time& stepTime)
 :
-mFinished(new cedar::aux::comp::Trigger()),
-mBusy(false),
-mRunInThread(runInThread)
+mStepTime (stepTime)
+{
+}
+
+cedar::aux::comp::StepTime::~StepTime()
 {
 }
 
@@ -63,62 +64,7 @@ mRunInThread(runInThread)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::comp::ProcessingStep::onTrigger()
+const cedar::unit::Time& cedar::aux::comp::StepTime::getStepTime() const
 {
-  if (!this->mBusy)
-  {
-    if (this->mRunInThread)
-    {
-      this->start();
-    }
-    else
-    {
-      this->run();
-    }
-  }
-  else
-  {
-    std::cout << "I'm busy" << std::endl;
-  }
-}
-
-void cedar::aux::comp::ProcessingStep::run()
-{
-  this->mBusy = true;
-
-  // if no arguments have been set, create default ones.
-  if (this->mNextArguments.get() == NULL)
-  {
-    this->mNextArguments = cedar::aux::comp::ArgumentsPtr(new cedar::aux::comp::Arguments());
-  }
-
-  this->compute(*(this->mNextArguments.get()));
-
-  // remove the argumens, as they have been processed.
-  this->mNextArguments.reset();
-
-  this->mBusy = false;
-  this->mFinished->trigger();
-}
-
-cedar::aux::comp::TriggerPtr& cedar::aux::comp::ProcessingStep::getFinishedTrigger()
-{
-  return this->mFinished;
-}
-
-void cedar::aux::comp::ProcessingStep::setThreaded(bool isThreaded)
-{
-  this->mRunInThread = isThreaded;
-}
-
-void cedar::aux::comp::ProcessingStep::setNextArguments(cedar::aux::comp::ArgumentsPtr arguments)
-{
-#ifdef DEBUG
-  if (this->mArguments.get() != NULL)
-  {
-    std::cout << "Warning from ProcessingStep " << this->getName()
-              << ": Overwriting arguments." << std::endl;
-  }
-#endif // DEBUG
-  this->mNextArguments = arguments;
+  return this->mStepTime;
 }
