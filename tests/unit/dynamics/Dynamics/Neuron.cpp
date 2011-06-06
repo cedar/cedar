@@ -66,5 +66,5 @@ double cedar::Neuron::getActivity() const
 
 void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
 {
-  mActivity += cedar::unit::Seconds(time) / cedar::unit::Milliseconds(5.0) * (-mActivity + mRestingLevel);
+  mActivity += cedar::unit::Seconds(time) / cedar::unit::Milliseconds(50.0) * (-mActivity + mRestingLevel);
 }

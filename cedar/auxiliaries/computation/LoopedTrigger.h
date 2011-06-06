@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingStep.h
+    File:        LoopedTrigger.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 06
 
     Description:
 
@@ -38,25 +38,25 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_PROCESSING_STEP_H
-#define CEDAR_AUX_COMP_PROCESSING_STEP_H
+#ifndef CEDAR_AUX_COMP_LOOPED_TRIGGER_H
+#define CEDAR_AUX_COMP_LOOPED_TRIGGER_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/computation/namespace.h"
 #include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/Base.h"
+#include "auxiliaries/LoopedThread.h"
+
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QThread>
-
+#include <vector>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
+class cedar::aux::comp::LoopedTrigger : public cedar::aux::comp::Trigger, public cedar::aux::LoopedThread
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,27 +67,21 @@ class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ProcessingStep(bool runInThread = false);
+  LoopedTrigger();
 
   //!@brief Destructor
+  virtual ~LoopedTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void onTrigger();
-
-  virtual void compute(const cedar::aux::comp::Arguments& arguments) = 0;
-
-  cedar::aux::comp::TriggerPtr& getFinishedTrigger();
-
-  void setThreaded(bool isThreaded);
-
+  void step(double time);
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void run();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -101,10 +95,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  cedar::aux::comp::TriggerPtr mFinished;
+
 private:
-  bool mBusy;
-  bool mRunInThread;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -117,7 +110,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::ProcessingStep
+}; // class cedar::aux::comp::LoopedTrigger
 
-#endif // CEDAR_AUX_COMP_PROCESSING_STEP_H
+#endif // CEDAR_AUX_COMP_LOOPED_TRIGGER_H
 

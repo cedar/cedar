@@ -65,6 +65,9 @@ namespace cedar
 
       class Trigger;
       typedef boost::shared_ptr<Trigger> TriggerPtr;
+
+      class LoopedTrigger;
+      typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
     }
   }
 }
