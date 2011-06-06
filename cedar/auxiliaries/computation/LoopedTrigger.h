@@ -67,7 +67,7 @@ class cedar::aux::comp::LoopedTrigger : public cedar::aux::comp::Trigger, public
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger();
+  LoopedTrigger(double stepSize = 1.0);
 
   //!@brief Destructor
   virtual ~LoopedTrigger();

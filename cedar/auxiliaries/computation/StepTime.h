@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingStep.h
+    File:        StepTime.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 06
 
     Description:
 
@@ -38,25 +38,24 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_PROCESSING_STEP_H
-#define CEDAR_AUX_COMP_PROCESSING_STEP_H
+#ifndef CEDAR_AUX_COMP_STEP_TIME_H
+#define CEDAR_AUX_COMP_STEP_TIME_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/computation/namespace.h"
-#include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/Base.h"
+#include "auxiliaries/computation/Arguments.h"
+#include "units/Time.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QThread>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
+class cedar::aux::comp::StepTime : public cedar::aux::comp::Arguments
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,29 +66,22 @@ class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ProcessingStep(bool runInThread = false);
+  StepTime(const cedar::unit::Time& stepTime);
 
   //!@brief Destructor
+  virtual ~StepTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void onTrigger();
-
-  virtual void compute(const cedar::aux::comp::Arguments& arguments) = 0;
-
-  void setNextArguments(cedar::aux::comp::ArgumentsPtr arguments);
-
-  cedar::aux::comp::TriggerPtr& getFinishedTrigger();
-
-  void setThreaded(bool isThreaded);
+  const cedar::unit::Time& getStepTime() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void run();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -103,11 +95,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  cedar::aux::comp::TriggerPtr mFinished;
+  // none yet
 private:
-  bool mBusy;
-  bool mRunInThread;
-  ArgumentsPtr mNextArguments;
+  cedar::unit::Time mStepTime;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -120,7 +110,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::ProcessingStep
+}; // class cedar::aux::comp::StepTime
 
-#endif // CEDAR_AUX_COMP_PROCESSING_STEP_H
+#endif // CEDAR_AUX_COMP_STEP_TIME_H
 

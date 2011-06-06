@@ -73,10 +73,10 @@ int main(int argc, char** argv)
   }
 
   NeuronPtr p_neuron(new cedar::Neuron());
-  p_neuron->setThreaded(true);
+  p_neuron->setThreaded(false);
   NeuronPtr p_another_neuron(new cedar::Neuron());
   p_another_neuron->setThreaded(false);
-  cedar::aux::comp::LoopedTriggerPtr looped_trigger(new cedar::aux::comp::LoopedTrigger());
+  cedar::aux::comp::LoopedTriggerPtr looped_trigger(new cedar::aux::comp::LoopedTrigger(0.1));
   looped_trigger->addListener(p_neuron);
   looped_trigger->addListener(p_another_neuron);
   looped_trigger->start();

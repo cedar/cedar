@@ -41,6 +41,8 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/computation/LoopedTrigger.h"
+#include "auxiliaries/computation/StepTime.h"
+#include "units/TimeUnit.h"
 
 // PROJECT INCLUDES
 
@@ -51,9 +53,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::LoopedTrigger::LoopedTrigger()
+cedar::aux::comp::LoopedTrigger::LoopedTrigger(double stepSize)
 :
-cedar::aux::LoopedThread(1.0)
+cedar::aux::LoopedThread(stepSize)
 {
 }
 
@@ -64,8 +66,10 @@ cedar::aux::comp::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::comp::LoopedTrigger::step(double)
+void cedar::aux::comp::LoopedTrigger::step(double time)
 {
-  this->trigger();
+  cedar::aux::comp::ArgumentsPtr arguments (new cedar::aux::comp::StepTime(cedar::unit::Milliseconds(time)));
+
+  this->trigger(arguments);
   usleep(100);
 }
