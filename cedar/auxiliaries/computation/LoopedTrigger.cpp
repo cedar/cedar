@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingStep.cpp
+    File:        LoopedTrigger.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -31,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 06
 
     Description:
 
@@ -40,64 +40,32 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/ProcessingStep.h"
-#include "auxiliaries/computation/Arguments.h"
+#include "auxiliaries/computation/LoopedTrigger.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
+#include <algorithm>
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::ProcessingStep::ProcessingStep(bool runInThread)
+cedar::aux::comp::LoopedTrigger::LoopedTrigger()
 :
-mFinished(new cedar::aux::comp::Trigger()),
-mBusy(false),
-mRunInThread(runInThread)
+cedar::aux::LoopedThread(1.0)
+{
+}
+
+cedar::aux::comp::LoopedTrigger::~LoopedTrigger()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::comp::ProcessingStep::onTrigger()
+void cedar::aux::comp::LoopedTrigger::step(double)
 {
-  if (!this->mBusy)
-  {
-    if (this->mRunInThread)
-    {
-      this->start();
-    }
-    else
-    {
-      this->run();
-    }
-  }
-  else
-  {
-    std::cout << "I'm busy" << std::endl;
-  }
-}
-
-void cedar::aux::comp::ProcessingStep::run()
-{
-  this->mBusy = true;
-
-  this->compute(cedar::aux::comp::Arguments());
-
-  this->mBusy = false;
-  this->mFinished->trigger();
-}
-
-cedar::aux::comp::TriggerPtr& cedar::aux::comp::ProcessingStep::getFinishedTrigger()
-{
-  return this->mFinished;
-}
-
-void cedar::aux::comp::ProcessingStep::setThreaded(bool isThreaded)
-{
-  this->mRunInThread = isThreaded;
+  this->trigger();
+  usleep(100);
 }

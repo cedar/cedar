@@ -45,11 +45,14 @@
 #include "auxiliaries/LogFile.h"
 #include "auxiliaries/computation/Arguments.h"
 #include "Neuron.h"
+#include "auxiliaries/computation/LoopedTrigger.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 
 using namespace cedar::aux;
+
+typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
 
 int main(int argc, char** argv)
 {
@@ -69,6 +72,23 @@ int main(int argc, char** argv)
     }
   }
 
+  NeuronPtr p_neuron(new cedar::Neuron());
+  p_neuron->setThreaded(true);
+  NeuronPtr p_another_neuron(new cedar::Neuron());
+  p_another_neuron->setThreaded(false);
+  cedar::aux::comp::LoopedTriggerPtr looped_trigger(new cedar::aux::comp::LoopedTrigger());
+  looped_trigger->addListener(p_neuron);
+  looped_trigger->addListener(p_another_neuron);
+  looped_trigger->start();
+  for (unsigned int i = 0; i < 1000; i++)
+  {
+    if (i % 100 == 0)
+    {
+      log_file << p_neuron->getActivity() << " " << p_another_neuron->getActivity() << std::endl;
+    }
+    usleep(1000);
+  }
+  looped_trigger->stop();
 
   log_file << "Done. There were " << errors << " errors." << std::endl;
   return errors;
