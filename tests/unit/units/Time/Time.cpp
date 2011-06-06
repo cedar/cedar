@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <iostream>
+#include <cmath>
 
 void testStreamOutput(cedar::unit::Time time)
 {
@@ -91,7 +92,7 @@ int main(int argc, char** argv)
   testStreamOutput(cedar::unit::Microseconds(12345));
   log_file << "succeeded." << std::endl;
 
-  // ---- operatir tests -----------------------------------------------------------------------------------------------
+  // ---- operator tests -----------------------------------------------------------------------------------------------
   log_file << "Testing operators ... " << std::endl;
   cedar::unit::Milliseconds ms_once(50);
   cedar::unit::Milliseconds ms_twice = 2.0 * ms_once;
@@ -100,6 +101,30 @@ int main(int argc, char** argv)
   if (2.0 * ms_once.getRawTime() != ms_twice.getRawTime())
   {
     log_file << "failed: twice " << ms_once.getRawTime() << " is " << ms_twice.getRawTime() << std::endl;
+    ++errors;
+  }
+  else
+  {
+    log_file << "succeeded." << std::endl;
+  }
+
+  log_file << "Division operator time/time with milliseconds... ";
+  double division = ms_once/ms_twice;
+  if (fabs(division - 0.5) > 0.00001)
+  {
+    log_file << "failed: operator / returns " << division << " instead of 0.5" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    log_file << "succeeded." << std::endl;
+  }
+
+  log_file << "Division operator time/time with seconds/milliseconds... ";
+  division = cedar::unit::Seconds(0.05)/ms_twice;
+  if (fabs(division - 0.5) > 0.00001)
+  {
+    log_file << "failed: operator / returns " << division << " instead of 0.5" << std::endl;
     ++errors;
   }
   else

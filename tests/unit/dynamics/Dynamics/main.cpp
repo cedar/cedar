@@ -43,6 +43,7 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/LogFile.h"
+#include "auxiliaries/computation/Arguments.h"
 #include "Neuron.h"
 
 // SYSTEM INCLUDES
@@ -59,6 +60,15 @@ int main(int argc, char** argv)
   log_file << std::endl;
 
   cedar::Neuron neuron;
+  for (unsigned int i = 0; i < 1000; i++)
+  {
+    neuron.compute(cedar::aux::comp::Arguments());
+    if (i % 100 == 0)
+    {
+      log_file << neuron.getActivity() << std::endl;
+    }
+  }
+
 
   log_file << "Done. There were " << errors << " errors." << std::endl;
   return errors;

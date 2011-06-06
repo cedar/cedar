@@ -44,6 +44,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::Neuron::Neuron()
+:
+mActivity(0.0),
+mRestingLevel(1000.0)
+{
+
+}
+
 cedar::Neuron::~Neuron()
 {
 
@@ -51,7 +59,12 @@ cedar::Neuron::~Neuron()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+double cedar::Neuron::getActivity() const
+{
+  return this->mActivity;
+}
+
 void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
 {
-
+  mActivity += cedar::unit::Seconds(time) / cedar::unit::Milliseconds(5.0) * (-mActivity + mRestingLevel);
 }
