@@ -101,21 +101,24 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   template <unsigned int otherFactor, const char* otherSuffix>
   operator TimeUnit<otherFactor, otherSuffix>()
+  const
   {
     return this->mAmountInMicroSeconds * static_cast<double>(otherFactor);
   }
 
-  operator Time()
+  operator Time() const
   {
     return Time(this->mAmountInMicroSeconds);
   }
 
-  TimeUnit operator* (double factor)
+  TimeUnit operator* (double factor) const
   {
-    return TimeUnit(Time(factor * this->mAmountInMicroSeconds));
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = factor * this->mAmountInMicroSeconds;
+    return ret;
   }
 
-  friend TimeUnit operator*(double real, TimeUnit& time)
+  friend TimeUnit operator*(double real, const TimeUnit& time)
   {
     TimeUnit ret;
     ret.mAmountInMicroSeconds = real * time.mAmountInMicroSeconds;
@@ -127,12 +130,20 @@ public:
     this->mAmountInMicroSeconds *= factor;
   }
 
-  TimeUnit operator/ (double divisor)
+  TimeUnit operator/ (double divisor) const
   {
-    return TimeUnit(Time(this->mAmountInMicroSeconds / divisor));
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = this->mAmountInMicroSeconds / divisor;
+    return ret;
   }
 
-  friend TimeUnit operator/(double real, TimeUnit& time)
+  template<unsigned int otherFactor, const char* otherSuffix>
+  double operator/ (const TimeUnit<otherFactor, otherSuffix>& time) const
+  {
+    return this->mAmountInMicroSeconds / time.getRawTime();
+  }
+
+  friend TimeUnit operator/(double real, const TimeUnit& time)
   {
     TimeUnit ret;
     ret.mAmountInMicroSeconds = real / time.mAmountInMicroSeconds;
@@ -147,6 +158,7 @@ public:
   template <unsigned int otherFactor, const char* otherSuffix>
   bool operator==(const TimeUnit<otherFactor, otherSuffix>& comp)
   {
+    //! @todo better double comparison.
     return this->mAmountInMicroSeconds == comp.mAmountInMicroSeconds;
   }
 
