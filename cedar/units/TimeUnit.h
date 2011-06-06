@@ -103,12 +103,8 @@ public:
   operator TimeUnit<otherFactor, otherSuffix>()
   const
   {
-    return this->mAmountInMicroSeconds * static_cast<double>(otherFactor);
-  }
-
-  operator Time() const
-  {
-    return Time(this->mAmountInMicroSeconds);
+    double value = this->getRawTime() / otherFactor;
+    return TimeUnit<otherFactor, otherSuffix>(value);
   }
 
   TimeUnit operator* (double factor) const
