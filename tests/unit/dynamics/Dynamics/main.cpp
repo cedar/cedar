@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 {
   unsigned int errors = 0;
 
-  LogFile log_file("Time.log");
+  LogFile log_file("Dynamics.log");
   log_file.addTimeStamp();
   log_file << std::endl;
 
