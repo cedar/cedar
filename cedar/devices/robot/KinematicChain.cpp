@@ -24,8 +24,8 @@
 
     File:        KinematicChain.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 15
 
     Description: Chain of joints (e.g., a robotic arm).
@@ -190,7 +190,6 @@ KinematicChain::ActionType KinematicChain::getWorkingMode()
   return mCurrentWorkingMode;
 }
 
-
 void KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
   if(angles.size() != getNumberOfJoints())
@@ -237,7 +236,7 @@ void KinematicChain::setJointAngles(const cv::Mat& angles)
 }
 
 
-bool KinematicChain::setJointVelocity(unsigned index, double velocity)
+bool KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
   if(index >= getNumberOfJoints())
   {
@@ -436,7 +435,7 @@ void KinematicChain::init()
 }
 
 
-void KinematicChain::applyAngleLimits(Mat &angles)
+void KinematicChain::applyAngleLimits(cv::Mat &angles)
 {
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
@@ -451,7 +450,7 @@ void KinematicChain::applyAngleLimits(Mat &angles)
 }
 
 
-void KinematicChain::applyVelocityLimits(Mat &velocities)
+void KinematicChain::applyVelocityLimits(cv::Mat &velocities)
 {
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)

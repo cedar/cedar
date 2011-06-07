@@ -47,10 +47,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief A null pointer exception.
+/*!@brief Exception for initialization errors.
  *
- * Incidentally, this exception should be thrown when a null-pointer is accessed.
- */
+ * This exception should be thrown when an error occurs during initialization.
+  */
 class cedar::aux::exc::InitializationException : public cedar::aux::exc::ExceptionBase
 {
   //--------------------------------------------------------------------------------------------------------------------

@@ -24,8 +24,8 @@
 
     File:        KinematicChain.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
     Date:        2010 08 30
 
     Description: Chain of joints (e.g., a robotic arm).
@@ -69,6 +69,7 @@ class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, p
   // parameters
   //----------------------------------------------------------------------------
 public:
+  //!@brief The different modes to operate the kinematic chain
   enum ActionType { ANGLE, VELOCITY, ACCELERATION };
 protected:
   // none yet
@@ -180,7 +181,7 @@ public:
 
   /*!@brief set current state of all joint angles
    *
-   * @param angles    matrixs of new joint angle values
+   * @param angles    Matrix of new joint angle values
    */
   void setJointAngles(const cv::Mat& angles);
 
@@ -263,6 +264,7 @@ public:
    * this method, then you have to return true here. By returning true you
    * indicate to the KinematicChain base class that no integration is necessary.
    *
+   * @param accelerations    vector of new joint velocity values
    * @return true iff your subclass handles acceleration itself
    */
   bool setJointAccelerations(const std::vector<double>& accelerations);
@@ -292,6 +294,11 @@ public:
   void useCurrentHardwareValues(bool useCurrentHardwareValues);
 
 
+  /*!@brief Starts the kinematic chain as a thread
+   *
+   * If you want to use velocity or acceleration control but your hardware
+   * does not support this, start the thread to "simulate" these values.
+   */
   virtual void start(Priority priority = InheritPriority);
 
 
