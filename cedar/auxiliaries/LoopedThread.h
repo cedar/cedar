@@ -110,8 +110,9 @@ public:
    *
    * @param stepSize time window for each step function in milliseconds
    * @param idleTime idle time (in milliseconds) used in fast running mode (i.e. stepSize = 0)
+   * @param configFileName an optional configuration file for reading and writing thread configurations
    */
-  LoopedThread(double stepSize = 1.0, double idleTime = 0.001);
+  LoopedThread(double stepSize = 1.0, double idleTime = 0.001, const std::string& configFileName = "");
 
   /*!@brief Constructor with configuration file parameter.
    *
@@ -124,7 +125,7 @@ public:
    *
    * @param configFileName an optional configuration file for reading and writing thread configurations
    */
-  LoopedThread(const std::string& configFileName = "");
+  LoopedThread(const std::string& configFileName);
 
   /*!@brief Constructor with configuration file parameter.
    *
@@ -135,7 +136,7 @@ public:
    *
    * threadStepSize, threadIdleTime, threadUseFixedStepSize, threadSimulatedTime
    *
-   * @param configFileName an optional configuration file for reading and writing thread configurations
+   * @param pConfigFileName an optional configuration file for reading and writing thread configurations
    */
   LoopedThread(const char* pConfigFileName);
 
@@ -264,16 +265,22 @@ public:
 protected:
   //!@brief desired length of a single step, in milliseconds
   boost::posix_time::time_duration mStepSize;
+  //! parameter version of mStepSize
+  double _mStepSize;
+  //! parameter version of mIdleTime
+  double _mIdleTime;
+  //! parameter version of mSimulatedTime
+  double _mSimulatedTime;
 private:
   bool mStop;
-  unsigned int mIdleTime; // in microseconds
+  unsigned int mIdleTime; //!< in microseconds
   bool mUseFixedStepSize;
   boost::posix_time::time_duration mSimulatedTime;
   // gather some statistics
   unsigned long mNumberOfSteps;
   double mSumOfStepsTaken;
   double mMaxStepsTaken;
-  //remeber time stamps of last step
+  // remeber time stamps of last step
   boost::posix_time::ptime mLastTimeStepStart;
   boost::posix_time::ptime mLastTimeStepEnd;
 

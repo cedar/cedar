@@ -1,1 +1,1 @@
-cedar_add_interactive_test("kukain" main.cpp)
+cedar_add_interactive_test("KukaInterface" main.cpp)

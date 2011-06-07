@@ -50,7 +50,8 @@ using namespace boost::posix_time;
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
-cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime)
+cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime,const std::string& configFileName)
+:cedar::aux::ConfigurationInterface(configFileName)
 {
   mStop  = false;
   initStatistics();
@@ -288,20 +289,20 @@ bool cedar::aux::LoopedThread::stopRequested()
 
 void cedar::aux::LoopedThread::readParamsFromConfigFile()
 {
-  double step_size = 100.0;
-  double idle_time = 0.001;
-  double simulated_time = 0.0;
+  _mStepSize = 100.0;
+  _mIdleTime = 0.001;
+  _mSimulatedTime = 0.0;
 
   // mStepSize
 
-  if(addParameter(&step_size, "threadStepSize", 100.0) != CONFIG_SUCCESS)
+  if(addParameter(&_mStepSize, "threadStepSize", 100.0) != CONFIG_SUCCESS)
   {
     cout << "LoopedThread: Error reading parameter 'stepSize' from config file!" << endl;
   }
 
   // mIdleTime
 
-  if(addParameter(&idle_time, "threadIdleTime", 0.001) != CONFIG_SUCCESS)
+  if(addParameter(&_mIdleTime, "threadIdleTime", 0.001) != CONFIG_SUCCESS)
   {
     cout << "LoopedThread: Error reading parameter 'idleTime' from config file!" << endl;
   }
@@ -315,16 +316,16 @@ void cedar::aux::LoopedThread::readParamsFromConfigFile()
 
   // mSimulatedTime
 
-  if(addParameter(&simulated_time, "threadSimulatedTime", 0.0) != CONFIG_SUCCESS)
+  if(addParameter(&_mSimulatedTime, "threadSimulatedTime", 0.0) != CONFIG_SUCCESS)
   {
     cout << "LoopedThread: Error reading parameter 'simulatedTime' from config file!" << endl;
   }
 
   readOrDefaultConfiguration();
 
-  mStepSize = microseconds(static_cast<unsigned int>(1000 * step_size + 0.5));
-  mIdleTime = static_cast<unsigned int>(1000 * idle_time + 0.5);
-  mSimulatedTime = microseconds(static_cast<unsigned>(1000 * simulated_time + 0.5));
+  mStepSize = microseconds(static_cast<unsigned int>(1000 * _mStepSize + 0.5));
+  mIdleTime = static_cast<unsigned int>(1000 * _mIdleTime + 0.5);
+  mSimulatedTime = microseconds(static_cast<unsigned>(1000 * _mSimulatedTime + 0.5));
 
   return;
 }

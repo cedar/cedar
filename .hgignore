@@ -57,3 +57,7 @@ cmake_install.cmake
 CMakeFiles
 test_*.py
 Makefile*
+CMakeDefines.h
+build/*
+cedar/doc/*
+CTestTestfile.cmake

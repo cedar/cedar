@@ -34,6 +34,10 @@
 
 ======================================================================================================================*/
 
+// MAKE AMTEC OPTIONAL
+#include "CMakeDefines.h"
+#ifdef CEDAR_USE_AMTEC
+
 // LOCAL INCLUDES
 #include "AmtecKinematicChain.h"
 
@@ -71,7 +75,7 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
 }
 
 
-cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& configFileName) :
+cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const std::string& configFileName) :
     KinematicChain(configFileName)
 {
   mpDevice = 0;
@@ -454,3 +458,5 @@ void cedar::dev::robot::AmtecKinematicChain::setMaxAcceleration(unsigned int ind
   mpDevice->setMaxAcc(mModules[index], maxAcc);
   return;
 }
+
+#endif // CEDAR_USE_AMTEC
