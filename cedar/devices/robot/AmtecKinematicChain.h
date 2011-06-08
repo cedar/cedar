@@ -24,8 +24,8 @@
 
     File:        AmtecKinematicChain.h
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
     Date:        2011 01 18
 
     Description:
@@ -139,5 +139,5 @@ private:
 
 }; // class cedar::dev::robot::AmtecKinematicChain
 
-#endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
 #endif // CEDAR_USE_AMTEC
+#endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H

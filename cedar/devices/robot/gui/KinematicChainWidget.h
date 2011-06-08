@@ -51,6 +51,7 @@
 #include <QtGui/QGridLayout>
 #include <QtGui/QWidget>
 
+//!@brief A simple widget to access all the joints via GUI
 class KinematicChainWidget
   :
   public QWidget,
@@ -68,8 +69,37 @@ class KinematicChainWidget
 
 public:
 
+  /*!@brief Constructor
+   *
+   *@param kinematicChain pointer to a kinematic chain
+   *@param parent parent parameter of QWidget
+   *@param f WindowFlags for QWidget
+   */
   KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget *parent = 0, Qt::WindowFlags f = 0);
+
+  /*!@brief Constructor
+   *
+   *@param kinematicChain pointer to a kinematic chain
+   *@param configFileName path of a configuration file
+   *@param parent parent parameter of QWidget
+   *@param f WindowFlags for QWidget
+   */
   KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent = 0, Qt::WindowFlags f = 0);
+
+  /*!@brief Constructor taking a vector of kinematic chains
+   *
+   * If a vector of kinematic chains is given, the widgets writes the same
+   * values to all of them. It reads the values from the first kinematic chain.
+   */
+  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, QWidget *parent = 0, Qt::WindowFlags f = 0);
+
+  /*!@brief Constructor taking a vector of kinematic chains
+   *
+   * If a vector of kinematic chains is given, the widgets writes the same
+   * values to all of them. It reads the values from the first kinematic chain.
+   */
+  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent = 0, Qt::WindowFlags f = 0);
+
   ~KinematicChainWidget();
 
   //----------------------------------------------------------------------------
@@ -119,7 +149,7 @@ private:
 
   static const int mUpdateInterval = 100;
 
-  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
+  std::vector<cedar::dev::robot::KinematicChainPtr> mpKinematicChains;
   QGridLayout *mpGridLayout;
   QTimer *mpTimer;
   int mDecimals;

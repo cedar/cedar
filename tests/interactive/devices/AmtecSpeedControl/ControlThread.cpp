@@ -22,37 +22,50 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.cpp
+    File:        ControlThread.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Date:        2011 05 10
 
-    Description: Implementation of the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description: Example of speed control of an single joint.
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+
+#include "ControlThread.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+
+using namespace std;
+using namespace cedar::dev::robot;
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//! Constructor
-cedar::aux::exc::IndexOutOfRangeException::IndexOutOfRangeException()
+ControlThread::ControlThread(const KinematicChainPtr &kinematicChain, const std::string& configFileName) : LoopedThread(100, 0.01, configFileName)
 {
-  // Sets the type name.
-  this->mType = "IndexOutOfRangeException";
+  mpKinematicChain = kinematicChain;
+  return;
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
+
+void ControlThread::step(double stepSize)
+{
+  double current_pos = mpKinematicChain->getJointAngle(JOINT);
+  double current_vel = mpKinematicChain->getJointVelocity(JOINT);
+
+  double rate_of_change = 1.0 * (TARGET - current_pos);
+  rate_of_change = min<double>(rate_of_change, current_vel + 0.4);
+
+  cout << "setting speed " << rate_of_change << endl;
+  mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
+}
+

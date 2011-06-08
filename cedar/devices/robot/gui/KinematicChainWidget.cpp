@@ -40,6 +40,7 @@
 #include "devices/robot/gui/KinematicChainWidget.h"
 
 // PROJECT INCLUDES
+#include <auxiliaries/exceptions/InitializationException.h>
 
 // SYSTEM INCLUDES
 
@@ -62,7 +63,7 @@ using namespace cedar::dev::robot;
 KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicChain, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   // store a smart pointer to KinematicChain
-  mpKinematicChain = kinematicChain;
+  mpKinematicChains.push_back(kinematicChain);
   mDecimals = 2;
   mSingleStep = 0.01;
 
@@ -75,7 +76,70 @@ KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicCha
 : ConfigurationInterface(configFileName)
 {
   // store a smart pointer to KinematicChain
-  mpKinematicChain = kinematicChain;
+  mpKinematicChains.push_back(kinematicChain);
+  mDecimals = 2;
+  mSingleStep = 0.01;
+
+  //
+  // read configuration file
+  //
+
+  if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
+  {
+    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << endl;
+  }
+
+  if(addParameter(&mSingleStep, "kinematicChainWidgetSingleStep", 0.01) != CONFIG_SUCCESS)
+  {
+    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << endl;
+  }
+
+  readOrDefaultConfiguration();
+
+  initWindow();
+  return;
+}
+
+
+KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+{
+  for(unsigned int i = 1; i < kinematicChains.size(); ++i)
+  {
+    // ideally, the reference geometry behind all the chains should be the same
+    // here, at least we make sure that the number of joints is the same
+    if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
+    {
+      cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
+      CEDAR_THROW(cedar::aux::exc::InitializationException, "Kinematic chains do not have the same number of joints!");
+    }
+  }
+
+  // store smart pointers to KinematicChains
+  mpKinematicChains = kinematicChains;
+  mDecimals = 2;
+  mSingleStep = 0.01;
+
+  initWindow();
+  return;
+}
+
+
+KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags f)
+: ConfigurationInterface(configFileName)
+{
+  for(unsigned int i = 1; i < kinematicChains.size(); ++i)
+  {
+    // ideally, the reference geometry behind all the chains should be the same
+    // here, at least we make sure that the number of joints is the same
+    if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
+    {
+      cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
+      CEDAR_THROW(cedar::aux::exc::InitializationException, "Kinematic chains do not have the same number of joints!");
+    }
+  }
+
+  // store a smart pointer to KinematicChain
+  mpKinematicChains = kinematicChains;
   mDecimals = 2;
   mSingleStep = 0.01;
 
@@ -102,7 +166,10 @@ KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicCha
 
 KinematicChainWidget::~KinematicChainWidget()
 {
-  mpKinematicChain->stop();
+  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+  {
+    mpKinematicChains[i]->stop();
+  }
   mpTimer->stop();
   delete mpTimer;
 }
@@ -117,7 +184,7 @@ void KinematicChainWidget::setActiveColumn(unsigned int c)
   for(unsigned int i = 0; i < 3; ++i)
   {
     bool enabled = (i == c) ? true : false;
-    for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+    for(unsigned int j = 0; j < mpKinematicChains[0]->getNumberOfJoints(); ++j)
     {
       mpGridLayout->itemAtPosition(j+1, i+1)->widget()->setEnabled(enabled);
     }
@@ -128,8 +195,11 @@ void KinematicChainWidget::setActiveColumn(unsigned int c)
 void KinematicChainWidget::radioButtonAngleClicked()
 {
   setActiveColumn(0);
-  mpKinematicChain->stop();
-  mpKinematicChain->setWorkingMode(KinematicChain::ANGLE);
+  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+  {
+    mpKinematicChains[i]->stop();
+    mpKinematicChains[i]->setWorkingMode(KinematicChain::ANGLE);
+  }
   updateSpinBoxes();
 }
 
@@ -137,13 +207,17 @@ void KinematicChainWidget::radioButtonAngleClicked()
 void KinematicChainWidget::radioButtonVelocityClicked()
 {
   setActiveColumn(1);
-  mpKinematicChain->stop();
-  mpKinematicChain->setWorkingMode(KinematicChain::VELOCITY);
 
-  // here we check if velocity has to be integrated
-  if(!mpKinematicChain->setJointVelocity(0, 0.0))
+  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
   {
-    mpKinematicChain->start();
+    mpKinematicChains[i]->stop();
+    mpKinematicChains[i]->setWorkingMode(KinematicChain::VELOCITY);
+
+    // here we check if velocity has to be integrated
+    if(!mpKinematicChains[i]->setJointVelocity(0, 0.0))
+    {
+      mpKinematicChains[i]->start();
+    }
   }
 
   updateSpinBoxes();
@@ -153,13 +227,17 @@ void KinematicChainWidget::radioButtonVelocityClicked()
 void KinematicChainWidget::radioButtonAccelerationClicked()
 {
   setActiveColumn(2);
-  mpKinematicChain->stop();
-  mpKinematicChain->setWorkingMode(KinematicChain::ACCELERATION);
 
-  // here we check if acceleration has to be integrated
-  if(!mpKinematicChain->setJointAcceleration(0, 0.0))
+  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
   {
-    mpKinematicChain->start();
+    mpKinematicChains[i]->stop();
+    mpKinematicChains[i]->setWorkingMode(KinematicChain::ACCELERATION);
+
+    // here we check if acceleration has to be integrated
+    if(!mpKinematicChains[i]->setJointAcceleration(0, 0.0))
+    {
+      mpKinematicChains[i]->start();
+    }
   }
 
   updateSpinBoxes();
@@ -168,7 +246,7 @@ void KinematicChainWidget::radioButtonAccelerationClicked()
 
 void KinematicChainWidget::updateSpinBoxes()
 {
-  for(unsigned i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+  for(unsigned i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
   {
     QDoubleSpinBox *p_spin_box_angle = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(i+1, 1)->widget());
     QDoubleSpinBox *p_spin_box_velocity = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(i+1, 2)->widget());
@@ -176,17 +254,17 @@ void KinematicChainWidget::updateSpinBoxes()
 
     if(!p_spin_box_angle->hasFocus())
     {
-      p_spin_box_angle->setValue(mpKinematicChain->getJointAngle(i));
+      p_spin_box_angle->setValue(mpKinematicChains[0]->getJointAngle(i));
     }
 
     if(!p_spin_box_velocity->hasFocus())
     {
-      p_spin_box_velocity->setValue(mpKinematicChain->getJointVelocity(i));
+      p_spin_box_velocity->setValue(mpKinematicChains[0]->getJointVelocity(i));
     }
 
     if(!p_spin_box_acceleration->hasFocus())
     {
-      p_spin_box_acceleration->setValue(mpKinematicChain->getJointAcceleration(i));
+      p_spin_box_acceleration->setValue(mpKinematicChains[0]->getJointAcceleration(i));
     }
   }
 }
@@ -210,15 +288,24 @@ void KinematicChainWidget::updateJointValue()
   switch(mode)
   {
   case 0:
-    mpKinematicChain->setJointAngle(joint, value);
+    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+    {
+      mpKinematicChains[i]->setJointAngle(joint, value);
+    }
     break;
 
   case 1:
-    mpKinematicChain->setJointVelocity(joint, value);
+    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+    {
+      mpKinematicChains[i]->setJointVelocity(joint, value);
+    }
     break;
 
   case 2:
-    mpKinematicChain->setJointAcceleration(joint, value);
+    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+    {
+      mpKinematicChains[i]->setJointAcceleration(joint, value);
+    }
     break;
 
   default:
@@ -249,7 +336,7 @@ void KinematicChainWidget::initWindow()
   mpGridLayout->setColumnStretch(2,2);
   mpGridLayout->setColumnStretch(3,2);
 
-  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+  for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
   {
     // add label
     char labelText[10];

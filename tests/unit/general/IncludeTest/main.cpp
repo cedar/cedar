@@ -22,37 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.cpp
+    File:        main.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 05 12
 
-    Description: Implementation of the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description: Implements a unit test for include files (cedarDev.h and cedarAux.h).
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedarDev.h"
+#include "cedarAux.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//! Constructor
-cedar::aux::exc::IndexOutOfRangeException::IndexOutOfRangeException()
+int main()
 {
-  // Sets the type name.
-  this->mType = "IndexOutOfRangeException";
+  // this is empty on purpose
+  return 0;
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
