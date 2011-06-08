@@ -34,6 +34,7 @@
 #
 #=======================================================================================================================
 
+#TODO fix include of kuka/gui/FriStatusWidget if FRI is not installed
 cedar_add_library(cedardev
   MOC_HEADERS
   robot/KinematicChainModel.h

@@ -38,6 +38,10 @@
 #ifndef CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
 
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_FRI
+
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
@@ -56,11 +60,10 @@ namespace cedar
       {
         class KukaInterface;
         typedef boost::shared_ptr<KukaInterface> KukaInterfacePtr;
-        class KukaCommunicator;
-        typedef boost::shared_ptr<KukaCommunicator> KukaCommunicatorPtr;
       }
     }
   }
 }
 
+#endif // CEDAR_USE_KUKA_FRI
 #endif // CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H

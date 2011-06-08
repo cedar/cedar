@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -24,11 +24,11 @@
 
     File:        FriStatusWidget.h
 
-    Maintainer:  Guido Knips
-    Email:       guido.knips@ini.rub.de
-    Date:        2011 01 25
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Date:        2010 11 23
 
-    Description: Widget for showing FRI information
+    Description:
 
     Credits:
 
@@ -36,6 +36,10 @@
 
 #ifndef CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
 #define CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_FRI
 
 // LOCAL INCLUDES
 #include "namespace.h"
@@ -123,5 +127,6 @@ private:
 
 }; // class cedar::dev::robot::kuka::gui::FriStatusWidget
 
+#endif // CEDAR_USE_KUKA_FRI
 #endif // CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
 

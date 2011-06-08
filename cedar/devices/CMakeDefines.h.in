@@ -2,3 +2,4 @@
 // in the c++ source files
 
 #cmakedefine CEDAR_USE_AMTEC
+#cmakedefine CEDAR_USE_KUKA_LWR

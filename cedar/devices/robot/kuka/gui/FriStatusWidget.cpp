@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -24,15 +24,19 @@
 
     File:        FriStatusWidget.cpp
 
-    Maintainer:  Guido Knips
-    Email:       guido.knips@ini.rub.de
-    Date:        2011 01 25
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Date:        2010 11 23
 
-    Description: implementation of the widget that shows information about the status of the Kuka FRI
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
+
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_FRI
 
 // LOCAL INCLUDES
 #include "FriStatusWidget.h"
@@ -102,3 +106,5 @@ void FriStatusWidget::timerEvent(QTimerEvent* pEvent)
   //set the displayed data
   updateInformation();
 }
+
+#endif // CEDAR_USE_KUKA_FRI
