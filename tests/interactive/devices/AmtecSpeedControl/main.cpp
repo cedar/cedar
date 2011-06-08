@@ -22,37 +22,52 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.cpp
+    File:        KinematicChainWidget.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.rub.de
+    Date:        2011 01 06
 
-    Description: Implementation of the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description: Example for an @em cedar::dev::robot::KinematicChainWidget.
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+
+#include "ControlThread.h"
 
 // PROJECT INCLUDES
 
+#include "devices/robot/AmtecKinematicChain.h"
+
 // SYSTEM INCLUDES
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
 
-//! Constructor
-cedar::aux::exc::IndexOutOfRangeException::IndexOutOfRangeException()
-{
-  // Sets the type name.
-  this->mType = "IndexOutOfRangeException";
-}
+using namespace std;
+using namespace cedar::dev::robot;
 
-//----------------------------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
 // methods
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+int main(int argc, char *argv[]) {
+
+  string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
+
+  try
+  {
+    KinematicChainPtr p_kinematic_chain(new AmtecKinematicChain(config_file));
+    ControlThread thread(p_kinematic_chain, config_file);
+    cout << "moving arm for 15s just by controling velocity..." << endl;
+    thread.start();
+    thread.wait(15000);
+    thread.stop();
+  }
+  catch(exception e)
+  {
+    cout << "Exception: " << e.what() << endl;
+  }
+}

@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2010 11 29
+#   Maintainer:  Stephan Zibner
+#   Email:       stephan.zibner@ini.rub.de
+#   Date:        2011 05 12
 #
 #   Description:
 #
@@ -34,11 +34,5 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedaraux
-  MOC_HEADERS
-  Object.h
-  gl/Object.h
-  gui/BaseWidget.h
-  gui/Viewer.h
-  gui/SceneWidget.h
-)
+
+cedar_add_unit_test(IncludeTest main.cpp)

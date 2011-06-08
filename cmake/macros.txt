@@ -50,9 +50,12 @@ macro(cedar_add_unit_test)
 endmacro(cedar_add_unit_test)
 
 macro(cedar_add_interactive_test)
-  parse_arguments(interactiveTest "ARGUMENTS" "" ${ARGN})
+  parse_arguments(interactiveTest "MOC_HEADERS" "" ${ARGN})
   car(interactiveTestName ${interactiveTest_DEFAULT_ARGS})
   cdr(interactiveTestSources ${interactiveTest_DEFAULT_ARGS})
+
+  qt4_wrap_cpp(interactiveMocSources ${interactiveTest_MOC_HEADERS})
+  set(interactiveTestSources ${interactiveTestSources} ${interactiveMocSources})
 
   cedar_add_test(${interactiveTestName} ${interactiveTestSources} PREFIX "interactiveTest" DIRECTORY ${CEDAR_INTERACTIVE_TEST_DIR} ARGUMENTS interactiveTest_ARGUMENTS)
 endmacro(cedar_add_interactive_test)

@@ -24,8 +24,8 @@
 
     File:        AmtecKinematicChain.cpp
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
     Date:        2011 01 18
 
     Description:
@@ -75,7 +75,7 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
 }
 
 
-cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const string& configFileName) :
+cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const std::string& configFileName) :
     KinematicChain(configFileName)
 {
   mpDevice = 0;

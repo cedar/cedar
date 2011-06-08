@@ -74,6 +74,19 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} QGLViewer)
 find_package(OpenGL)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
 
+# libFRI
+option(CEDAR_USE_KUKA_LWR "Include Kuka Fast Research Interface for LWR if possible." ON)
+
+find_library(KUKA_FRI FRI)
+if(KUKA_FRI)
+	message("-- Looking for Kuka Fast Research Interface - found")
+	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} FRI)
+else(KUKA_FRI)
+	message("-- Looking for Kuka Fast Research Interface - not found")
+    set(CEDAR_USE_KUKA_LWR OFF)
+endif(KUKA_FRI)
+
+
 ##
 # Amtec device driver
 ##

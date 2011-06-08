@@ -22,139 +22,111 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckControlWidget.h
+    File:        FriStatusWidget.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Date:        2010 11 23
 
-    Description: Graphical User Interface for controlling the E-Puck.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_GUI_EPUCK_CONTROL_WIDGET_H
-#define CEDAR_DEV_ROBOT_MOBILE_GUI_EPUCK_CONTROL_WIDGET_H
+#ifndef CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+#define CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES
+#include "namespace.h"
 
 // PROJECT INCLUDES
-
-#include "devices/robot/mobile/EPuckDrive.h"
-#include "cedar/devices/robot/mobile/gui/ui_EPuckControlWidget.h"
-#include "devices/robot/mobile/gui/namespace.h"
+#include "devices/robot/kuka/KukaInterface.h"
+#include "cedar/devices/robot/kuka/gui/ui_FriStatusWidget.h"
 #include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
-
 #include <Qt>
+#include <QObject>
 
-/*!@brief Graphical User Interface for controlling the E-Puck.
+/*!@brief Widget that displays informations about the status of the KUKA-FRI
  *
- * Type the desired forward velocity and turning rate into the boxes. The wheel speed of the 2 differential-drive-wheels
- * is displayed as well as the encoder-values. The E-Puck starts driving with the specified velocity or changes its
- * velocity after pressing the 'Set Velocity'-button. Stop the E-Puck with 'Stop' and reset speed and encoder-values
- * with 'Reset'.
+ * This includes the status, the connection quality, the sample time and if the robot is powered
  */
-class cedar::dev::robot::mobile::gui::EPuckControlWidget
-: public cedar::aux::gui::BaseWidget, private Ui_EPuckControlWidget
+class cedar::dev::robot::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
+                                                      private Ui_FriStatusWidget
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
   Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructs the E-Puck-Control.
-  //!@param peDrive Pointer to the E-Puck that shall be controlled.
-  //!@param parent Pointer to parent widget
-  EPuckControlWidget(cedar::dev::robot::mobile::EPuckDrive *peDrive, QWidget *parent = 0);
+  /*!@brief The constructor.
+   *
+   * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
+   * @param parent parent widget
+   */
+  FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
 
-  //!@brief Closes the control.
-  virtual ~EPuckControlWidget();
+  //!@brief Destructor
+  ~FriStatusWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
-public slots:
-
-  /*!@brief Sets the velocity of the robot.
-   */
-  void drive();
-
-  /*!@brief Stops the robot.
-   */
-  void stop();
-
-  /*!@brief Stops the robot and resets the encoder-values.
-   */
-  void reset();
+public:
+  /*!@brief refreshes the displayed data*/
+  void timerEvent(QTimerEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
-  /*!@brief The timer-event.
-   * @param event Pointer to event
+  /*!@brief initializes the class
    */
-  void timerEvent(QTimerEvent *event);
-
-  /*!@brief Updates the displayed wheel-speeds and encoder-values and is called by timerEvent.
+  void init();
+  /*!@brief updates the displayed information
    */
-  void update();
+  void updateInformation();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   // none yet (hopefully never!)
-
 protected:
-
   // none yet
-
 private:
-
-  //!@brief Pointer to the controlled robot.
-  EPuckDrive *mpeDrive;
+  bool mIsInit; //!<true, if object has been initialized
+  cedar::dev::robot::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   // none yet
 
-}; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
+}; // class cedar::dev::robot::kuka::gui::FriStatusWidget
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_GUI_EPUCK_CONTROL_WIDGET_H
+#endif // CEDAR_USE_KUKA_FRI
+#endif // CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+

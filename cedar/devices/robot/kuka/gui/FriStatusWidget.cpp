@@ -22,37 +22,89 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.cpp
+    File:        FriStatusWidget.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Date:        2010 11 23
 
-    Description: Implementation of the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "FriStatusWidget.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <sstream>
+#ifdef DEBUG
+#include <iostream>
+#endif
+
+using namespace cedar::dev::robot::kuka::gui;
+using namespace cedar::dev::robot::kuka;
+using namespace std;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-//! Constructor
-cedar::aux::exc::IndexOutOfRangeException::IndexOutOfRangeException()
+FriStatusWidget::FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
 {
-  // Sets the type name.
-  this->mType = "IndexOutOfRangeException";
+  mIsInit = false;
+  mpKukaIn = pKukaIn;
+
+  setupUi(this);
+  init();
 }
 
+FriStatusWidget::~FriStatusWidget()
+{
+  //nothing yet
+}
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void FriStatusWidget::init()
+{
+  updateInformation();
+  mIsInit = true;
+}
+
+void FriStatusWidget::updateInformation()
+{
+  //Translations from status-/quality-values to text
+  string quality_names[] = { string("BAD (0)"), string("UNACCEPTABLE (1)"), string("GOOD (2)"), string("PERFECT (3)") };
+  string state_names[] = { string("OFF (0)"), string("Monitor Mode"), string("Command Mode") };
+  //set Text for Fri state and Fri quality
+  mpLabelStateData->setText(state_names[mpKukaIn->getFriState()].c_str());
+  mpLabelQualData->setText(quality_names[mpKukaIn->getFriQuality()].c_str());
+  //set text for power status
+  if (mpKukaIn->isPowerOn())
+  {
+    mpLabelPowerData->setText("ON");
+  }
+  else
+  {
+    mpLabelPowerData->setText("OFF");
+  }
+  //set text for sample time
+  stringstream s;
+  s <<mpKukaIn->getSampleTime()<<"s";
+  mpLabelSampleTimeData->setText(s.str().c_str());
+}
+
+void FriStatusWidget::timerEvent(QTimerEvent* pEvent)
+{
+  //set the displayed data
+  updateInformation();
+}
+
+#endif // CEDAR_USE_KUKA_FRI

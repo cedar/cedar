@@ -24,8 +24,8 @@
 
     File:        KinematicChain.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 15
 
     Description: Chain of joints (e.g., a robotic arm).
@@ -54,7 +54,7 @@ using namespace cv;
 //! constructor
 KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(50.5), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(12, 0.01), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
 mpReferenceGeometry(rpReferenceGeometry)
 {
   setWorkingMode(ANGLE);
@@ -185,6 +185,11 @@ cv::Mat KinematicChain::getJointAccelerationsMatrix()
 }
 
 
+KinematicChain::ActionType KinematicChain::getWorkingMode()
+{
+  return mCurrentWorkingMode;
+}
+
 void KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
   if(angles.size() != getNumberOfJoints())
@@ -207,7 +212,7 @@ void KinematicChain::setJointAngles(const std::vector<double>& angles)
 }
 
 
-void KinematicChain::setJointAngles(const Mat& angles)
+void KinematicChain::setJointAngles(const cv::Mat& angles)
 {
   if(angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
@@ -219,6 +224,7 @@ void KinematicChain::setJointAngles(const Mat& angles)
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
+    //TODO: use applyAngleLimits() ?
     double angle = angles.at<double>(i,0);
     angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
     angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
@@ -230,14 +236,14 @@ void KinematicChain::setJointAngles(const Mat& angles)
 }
 
 
-bool KinematicChain::setJointVelocity(unsigned index, double velocity)
+bool KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
   if(index >= getNumberOfJoints())
   {
     cout << "Error: Trying to set velocity for joint " << index << "!" << endl;
     return false;
   }
-
+  //TODO use applyVelocityLimits()?
   velocity = max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
   velocity = min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
 
@@ -429,7 +435,7 @@ void KinematicChain::init()
 }
 
 
-void KinematicChain::applyAngleLimits(Mat &angles)
+void KinematicChain::applyAngleLimits(cv::Mat &angles)
 {
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
@@ -444,7 +450,7 @@ void KinematicChain::applyAngleLimits(Mat &angles)
 }
 
 
-void KinematicChain::applyVelocityLimits(Mat &velocities)
+void KinematicChain::applyVelocityLimits(cv::Mat &velocities)
 {
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
