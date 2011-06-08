@@ -46,7 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 
 /*!@brief Provides the geometry of a rigid object

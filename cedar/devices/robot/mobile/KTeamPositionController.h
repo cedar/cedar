@@ -48,7 +48,7 @@
 // SYSTEM INCLUDES
 
 #include <math.h>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <QObject>
 
 /*!@brief This class provides a position-controller for KTeamDrives.

@@ -44,7 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 /*
  *  this file has very generic math functions that do not fall under some other category

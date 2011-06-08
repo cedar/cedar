@@ -49,7 +49,7 @@
 #include <vector>
 #include <string>
 #include <boost/smart_ptr.hpp>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 
 /*!@brief Encapsulates values that describe the physical properties of a kinematic chain.

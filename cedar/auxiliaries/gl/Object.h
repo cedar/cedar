@@ -50,7 +50,7 @@
 // SYSTEM INCLUDES
 #include <string>
 #include <vector>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <QObject>
 #include <QGLViewer/qglviewer.h>
 

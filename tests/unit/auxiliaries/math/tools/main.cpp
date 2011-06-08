@@ -42,7 +42,7 @@
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 using namespace cedar::aux;
 using namespace cedar::aux::math;

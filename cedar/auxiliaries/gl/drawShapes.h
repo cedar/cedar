@@ -43,7 +43,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 //!\todo add setColor function, so this is the only file that needs to include gl
 namespace cedar

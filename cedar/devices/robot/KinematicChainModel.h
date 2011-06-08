@@ -48,7 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <string>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
 #include <QObject>
 

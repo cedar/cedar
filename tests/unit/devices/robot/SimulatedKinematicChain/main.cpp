@@ -42,7 +42,7 @@
 
 // SYSTEM INCLUDES
 #include <vector>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 using namespace cedar::dev::robot;
 using namespace cedar::aux;

@@ -139,7 +139,12 @@ void cedar::aux::gl::drawCone(
                                bool wireFrame
                              )
 {
-  Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
+  
+  //opencv2: 
+  //error: "class cv::MatExpr" has no member named "clone"
+  //Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
+	
+  Mat line = (end-start)(Rect(0, 0, 1, 3));
   // if start = end do nothing
   if (norm(line) == 0)
   {

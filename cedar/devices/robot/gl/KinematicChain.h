@@ -44,7 +44,7 @@
 #include "devices/robot/KinematicChainModel.h"
 
 // SYSTEM INCLUDES
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 /*!@brief Visualization of a kinematic chain
  *

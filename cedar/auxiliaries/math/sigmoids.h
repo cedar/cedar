@@ -44,7 +44,7 @@
 // SYSTEM INCLUDES
 #include <math.h>
 #include <vector>
-#include <cv.h>
+#include <opencv2/opencv.hpp>
 
 /*
  *  different sigmoid functions for different data formats
