@@ -38,6 +38,10 @@
 #ifndef CEDAR_DEV_ROBOT_KUKA_GUI_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_KUKA_GUI_NAMESPACE_H
 
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_FRI
+
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
@@ -63,4 +67,5 @@ namespace cedar
   }
 }
 
+#endif // CEDAR_USE_KUKA_FRI
 #endif // CEDAR_DEV_ROBOT_KUKA_GUI_NAMESPACE_H

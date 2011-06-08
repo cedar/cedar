@@ -1,19 +1,42 @@
-/*----------------------------------------------------------------------------------------------------------------------
- ----- Institute:   Ruhr-Universitaet Bochum
-                    Institut fuer Neuroinformatik
+/*======================================================================================================================
 
- ----- File:        KukaInterface.cpp
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
- ----- Author:      Guido Knips
+    This file is part of cedar.
 
- ----- Email:       guido.knips@ini.rub.de
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
 
- ----- Date:        2010 11 23
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
 
- ----- Description:
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
- ----- Credits:
- ---------------------------------------------------------------------------------------------------------------------*/
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        KukaInterface.cpp
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Date:        2010 11 23
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_FRI
 
 // LOCAL INCLUDES
 #include "KukaInterface.h"
@@ -275,4 +298,6 @@ bool KukaInterface::isPowerOn()
   mLock.unlock();
   return on;
 }
+
+#endif // CEDAR_USE_KUKA_FRI
 

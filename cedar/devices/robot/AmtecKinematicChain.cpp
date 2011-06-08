@@ -24,8 +24,8 @@
 
     File:        AmtecKinematicChain.cpp
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
     Date:        2011 01 18
 
     Description:
