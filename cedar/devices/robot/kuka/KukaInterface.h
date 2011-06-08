@@ -39,7 +39,7 @@
 
 // MAKE FRI OPTIONAL
 #include "devices/robot/CMakeDefines.h"
-#ifdef CEDAR_USE_KUKA_FRI
+#ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES (includes from this project)
 #include "namespace.h"
