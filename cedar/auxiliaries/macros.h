@@ -38,6 +38,9 @@
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_MACROS_H
+#define CEDAR_MACROS_H
+
 #ifdef DEBUG
 #include <assert.h>
 
@@ -45,3 +48,6 @@
 #endif // DEBUG
 
 #define CEDAR_DEBUG_ASSERT(expr)
+
+#endif // CEDAR_MACROS_H
+
