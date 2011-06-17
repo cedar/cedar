@@ -22,7 +22,8 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Data.cpp
+
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,37 +31,53 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 06 17
 
-    Description: Namespace file for cedar::dyn.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DYN_NAMESPACE_H
-#define CEDAR_DYN_NAMESPACE_H
-
 // LOCAL INCLUDES
+#include "auxiliaries/computation/Data.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+cedar::aux::comp::Data::Data()
 {
-  /*!@brief Namespace for all dyn classes. */
-  namespace dyn
-  {
-    class Dynamics;
-    typedef boost::shared_ptr<Dynamics> DynamicsPtr;
-
-    template <typename T> class Activation;
-  }
 }
 
-#endif // CEDAR_DYN_NAMESPACE_H
+virtual cedar::aux::comp::Data::~Data()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+QReadWriteLock& cedar::aux::comp::Data::getLock()
+{
+  return this->mLock;
+}
+
+void cedar::aux::comp::Data::lockForRead()
+{
+  this->mLock.lockForRead();
+}
+
+void cedar::aux::comp::Data::lockForWrite()
+{
+  this->mLock.lockForWrite();
+}
+
+void cedar::aux::comp::Data::unlock()
+{
+  this->mLock.unlock();
+}

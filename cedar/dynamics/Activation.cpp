@@ -22,7 +22,8 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Activation.cpp
+
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,37 +31,25 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 06 06
 
-    Description: Namespace file for cedar::dyn.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DYN_NAMESPACE_H
-#define CEDAR_DYN_NAMESPACE_H
-
 // LOCAL INCLUDES
+#include "dynamics/Activation.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
-{
-  /*!@brief Namespace for all dyn classes. */
-  namespace dyn
-  {
-    class Dynamics;
-    typedef boost::shared_ptr<Dynamics> DynamicsPtr;
-
-    template <typename T> class Activation;
-  }
-}
-
-#endif // CEDAR_DYN_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

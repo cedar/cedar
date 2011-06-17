@@ -122,3 +122,85 @@ void cedar::aux::comp::ProcessingStep::setNextArguments(cedar::aux::comp::Argume
 #endif // DEBUG
   this->mNextArguments = arguments;
 }
+
+void cedar::aux::comp::ProcessingStep::addInput(cedar::aux::comp::DataPtr input)
+{
+  this->addData(DATA_ROLE_INPUT, input);
+}
+
+void cedar::aux::comp::ProcessingStep::addBuffer(cedar::aux::comp::DataPtr buffer)
+{
+  this->addData(DATA_ROLE_BUFFER, buffer);
+}
+
+void cedar::aux::comp::ProcessingStep::addOutput(cedar::aux::comp::DataPtr output)
+{
+  this->addData(DATA_ROLE_OUTPUT, output);
+}
+
+void cedar::aux::comp::ProcessingStep::addData(DataRole role, cedar::aux::comp::DataPtr data)
+{
+	//! @todo Check that the name doesn't exist yet
+  std::map<DataRole, std::vector<cedar::aux::comp::DataPtr> >::iterator vector_iter = this->mDataConnections.find(role);
+  if (vector_iter == this->mDataConnections.end())
+  {
+    this->mDataConnections[role] = std::vector<cedar::aux::comp::DataPtr>();
+    vector_iter = this->mDataConnections.find(role);
+  }
+  vector_iter->second.push_back(data);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getInputByName(const std::string& name) const
+{
+  return this->getDataByName(DATA_ROLE_INPUT, name);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getBufferByName(const std::string& name) const
+{
+  return this->getDataByName(DATA_ROLE_BUFFER, name);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getOutputByName(const std::string& name) const
+{
+  return this->getDataByName(DATA_ROLE_OUTPUT, name);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getDataByName(DataRole role, const std::string& name) const
+{
+  std::map<DataRole, std::vector<cedar::aux::comp::DataPtr> >::const_iterator vector_iter = this->mDataConnections.find(role);
+  if (vector_iter != this->mDataConnections.end())
+  {
+    const std::vector<cedar::aux::comp::DataPtr>& vector = vector_iter->second;
+    for (size_t i = 0; i < vector.size(); ++i)
+    {
+      if (vector.at(i)->getName() == name)
+      {
+        return vector.at(i);
+      }
+    }
+  }
+
+  //!@todo throw not found exception
+
+  return cedar::aux::comp::DataPtr();
+}
+
+
+
+void cedar::aux::comp::ProcessingStep::connect(
+                                                cedar::aux::comp::ProcessingStepPtr source,
+                                                const std::string& sourceName,
+                                                cedar::aux::comp::ProcessingStepPtr target,
+                                                const std::string& targetName
+                                              )
+{
+  try
+  {
+    target->addInput(source->getOutputByName(sourceName)); //!\todo output not found exception
+    source->getFinishedTrigger()->addListener(target); //!\todo conflict with smart ass pointers!
+  }
+  catch(...)
+  {
+    return;
+  }
+}

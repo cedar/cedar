@@ -53,25 +53,38 @@ namespace cedar
     /*!@brief Namespace for all math classes. */
     namespace comp
     {
+      enum DataRole
+      {
+        DATA_ROLE_INPUT,
+        DATA_ROLE_OUTPUT,
+        DATA_ROLE_BUFFER
+      };
+
       class Arguments;
       typedef boost::shared_ptr<Arguments> ArgumentsPtr;
 
-      class StepTime;
-      typedef boost::shared_ptr<StepTime> StepTimePtr;
+      class Data;
+      typedef boost::shared_ptr<Data> DataPtr;
 
-      class ProcessingStep;
-      typedef boost::shared_ptr<ProcessingStep> ProcessingStepPtr;
+      template <typename T> class DataT;
 
       class LoopArguments;
+
+      class LoopedTrigger;
+      typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
 
       class MultiTrigger;
       typedef boost::shared_ptr<MultiTrigger> MultiTriggerPtr;
 
+      class ProcessingStep;
+      typedef boost::shared_ptr<ProcessingStep> ProcessingStepPtr;
+
+      class StepTime;
+      typedef boost::shared_ptr<StepTime> StepTimePtr;
+
       class Trigger;
       typedef boost::shared_ptr<Trigger> TriggerPtr;
 
-      class LoopedTrigger;
-      typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
     }
   }
 }
