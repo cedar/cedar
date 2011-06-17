@@ -50,6 +50,7 @@
 
 // SYSTEM INCLUDES
 #include <QThread>
+#include <map>
 
 
 /*!@brief Abstract description of the class.
@@ -85,6 +86,23 @@ public:
 
   void setThreaded(bool isThreaded);
 
+  void addInput(cedar::aux::comp::DataPtr output);
+  void addBuffer(cedar::aux::comp::DataPtr output);
+  void addOutput(cedar::aux::comp::DataPtr output);
+  void addData(DataRole role, cedar::aux::comp::DataPtr output);
+
+  cedar::aux::comp::DataPtr getInputByName(const std::string& name) const;
+  cedar::aux::comp::DataPtr getBufferByName(const std::string& name) const;
+  cedar::aux::comp::DataPtr getOutputByName(const std::string& name) const;
+  cedar::aux::comp::DataPtr getDataByName(DataRole role, const std::string& name) const;
+
+  static void connect(
+                       cedar::aux::comp::ProcessingStepPtr source,
+                       const std::string& sourceName,
+                       cedar::aux::comp::ProcessingStepPtr target,
+                       const std::string& targetName
+                     );
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,7 +113,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,6 +121,7 @@ public:
   // none yet (hopefully never!)
 protected:
   cedar::aux::comp::TriggerPtr mFinished;
+  std::map<DataRole, std::vector<DataPtr> > mDataConnections;
 private:
   bool mBusy;
   bool mRunInThread;

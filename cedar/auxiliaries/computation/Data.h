@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Trigger.h
+    File:        Data.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 17
 
     Description:
 
@@ -38,23 +38,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_TRIGGER_H
-#define CEDAR_AUX_COMP_TRIGGER_H
+#ifndef CEDAR_AUX_COMP_DATA_H
+#define CEDAR_AUX_COMP_DATA_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/computation/namespace.h"
-
+#include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <QReadWriteLock>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::Trigger
+class cedar::aux::comp::Data : public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,32 +65,19 @@ class cedar::aux::comp::Trigger
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Trigger();
+  Data();
 
   //!@brief Destructor
-  virtual ~Trigger();
+  virtual ~Data();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void trigger(cedar::aux::comp::ArgumentsPtr arguments = cedar::aux::comp::ArgumentsPtr());
-
-  virtual void onTrigger(Trigger*);
-
-  void addListener(cedar::aux::comp::ProcessingStepPtr step);
-
-  void addTrigger(cedar::aux::comp::TriggerPtr trigger);
-
-  void removeListener(cedar::aux::comp::ProcessingStepPtr step);
-
-  void removeTrigger(cedar::aux::comp::TriggerPtr trigger);
-
-  const std::vector<cedar::aux::comp::ProcessingStepPtr>& getListeners() const;
-
-  virtual void notifyConnected(cedar::aux::comp::Trigger* trigger);
-
-  virtual void notifyDisconnected(cedar::aux::comp::Trigger* trigger);
+  QReadWriteLock& getLock();
+  void lockForRead();
+  void lockForWrite();
+  void unlock();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -110,11 +97,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  std::vector<cedar::aux::comp::ProcessingStepPtr> mListeners;
-  std::vector<cedar::aux::comp::TriggerPtr> mTriggers;
+  QReadWriteLock mLock;
+
 private:
-  std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator find(cedar::aux::comp::ProcessingStepPtr triggerable);
-  std::vector<cedar::aux::comp::TriggerPtr>::iterator find(cedar::aux::comp::TriggerPtr triggerableT);
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -127,7 +112,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::Trigger
+}; // class cedar::aux::comp::Data
 
-#endif // CEDAR_AUX_COMP_TRIGGER_H
+#endif // CEDAR_AUX_COMP_DATA_H
 
