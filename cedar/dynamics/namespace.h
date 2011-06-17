@@ -60,6 +60,8 @@ namespace cedar
     typedef boost::shared_ptr<Dynamics> DynamicsPtr;
 
     template <typename T> class Activation;
+    typedef Activation<double> DoubleActivation;
+    typedef boost::shared_ptr<DoubleActivation> DoubleActivationPtr;
   }
 }
 

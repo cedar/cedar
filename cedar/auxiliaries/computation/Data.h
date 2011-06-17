@@ -79,6 +79,18 @@ public:
   void lockForWrite();
   void unlock();
 
+  template <typename T>
+  T& getData()
+  {
+    return dynamic_cast<DataT<T>&>(*this).getData();
+  }
+  
+  template <typename T>
+  T& cast()
+  {
+    return dynamic_cast<T&>(*this);
+  }
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

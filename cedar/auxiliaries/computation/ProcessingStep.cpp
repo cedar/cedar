@@ -43,6 +43,8 @@
 #include "auxiliaries/computation/ProcessingStep.h"
 #include "auxiliaries/computation/Arguments.h"
 #include "auxiliaries/computation/Data.h"
+#include "auxiliaries/macros.h"
+#include "auxiliaries/computation/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -52,9 +54,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::ProcessingStep::ProcessingStep(bool runInThread)
+cedar::aux::comp::ProcessingStep::ProcessingStep(bool runInThread, bool autoConnectTriggers)
 :
 mFinished(new cedar::aux::comp::Trigger()),
+mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mRunInThread(runInThread)
 {
@@ -124,68 +127,109 @@ void cedar::aux::comp::ProcessingStep::setNextArguments(cedar::aux::comp::Argume
   this->mNextArguments = arguments;
 }
 
-void cedar::aux::comp::ProcessingStep::addInput(cedar::aux::comp::DataPtr input)
+void cedar::aux::comp::ProcessingStep::declareData(DataRole role, const std::string& name)
 {
-  this->addData(DATA_ROLE_INPUT, input);
-}
-
-void cedar::aux::comp::ProcessingStep::addBuffer(cedar::aux::comp::DataPtr buffer)
-{
-  this->addData(DATA_ROLE_BUFFER, buffer);
-}
-
-void cedar::aux::comp::ProcessingStep::addOutput(cedar::aux::comp::DataPtr output)
-{
-  this->addData(DATA_ROLE_OUTPUT, output);
-}
-
-void cedar::aux::comp::ProcessingStep::addData(DataRole role, cedar::aux::comp::DataPtr data)
-{
-	//! @todo Check that the name doesn't exist yet
-  std::map<DataRole, std::vector<cedar::aux::comp::DataPtr> >::iterator vector_iter = this->mDataConnections.find(role);
-  if (vector_iter == this->mDataConnections.end())
+  std::map<DataRole, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  if (iter == this->mDataConnections.end())
   {
-    this->mDataConnections[role] = std::vector<cedar::aux::comp::DataPtr>();
-    vector_iter = this->mDataConnections.find(role);
+    this->mDataConnections[role] = SlotMap();
+    iter = this->mDataConnections.find(role);
+
+    CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
   }
-  vector_iter->second.push_back(data);
-}
-
-cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getInputByName(const std::string& name) const
-{
-  return this->getDataByName(DATA_ROLE_INPUT, name);
-}
-
-cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getBufferByName(const std::string& name) const
-{
-  return this->getDataByName(DATA_ROLE_BUFFER, name);
-}
-
-cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getOutputByName(const std::string& name) const
-{
-  return this->getDataByName(DATA_ROLE_OUTPUT, name);
-}
-
-cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getDataByName(DataRole role, const std::string& name) const
-{
-  std::map<DataRole, std::vector<cedar::aux::comp::DataPtr> >::const_iterator vector_iter = this->mDataConnections.find(role);
-  if (vector_iter != this->mDataConnections.end())
+  SlotMap::iterator map_iter = iter->second.find(name);
+  if (map_iter != iter->second.end())
   {
-    const std::vector<cedar::aux::comp::DataPtr>& vector = vector_iter->second;
-    for (size_t i = 0; i < vector.size(); ++i)
-    {
-      if (vector.at(i)->getName() == name)
-      {
-        return vector.at(i);
-      }
-    }
+    CEDAR_THROW(cedar::aux::comp::DuplicateNameException,
+                "There is already a data-declaration with the name " + name + "."); //! @todo Add the name of the role
+    return;
   }
-
-  //!@todo throw not found exception
-
-  return cedar::aux::comp::DataPtr();
+  iter->second[name] = cedar::aux::comp::DataPtr();
 }
 
+void cedar::aux::comp::ProcessingStep::declareInput(const std::string& name)
+{
+  this->declareData(DATA_ROLE_INPUT, name);
+}
+
+void cedar::aux::comp::ProcessingStep::declareBuffer(const std::string& name)
+{
+  this->declareData(DATA_ROLE_BUFFER, name);
+}
+
+void cedar::aux::comp::ProcessingStep::declareOutput(const std::string& name)
+{
+  this->declareData(DATA_ROLE_OUTPUT, name);
+}
+
+
+void cedar::aux::comp::ProcessingStep::setData(DataRole role, const std::string& name, cedar::aux::comp::DataPtr data)
+{
+  std::map<DataRole, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  if (iter == this->mDataConnections.end())
+  {
+    CEDAR_THROW(cedar::aux::comp::InvalidRoleException,
+                "The requested role does not exist."); //! @todo Add the name of the role
+    return;
+  }
+  SlotMap::iterator map_iterator = iter->second.find(name);
+  if (map_iterator == iter->second.end())
+  {
+    CEDAR_THROW(cedar::aux::comp::InvalidNameException,
+                "The requested name does not exist."); //! @todo Add the name of the role
+    return;
+  }
+  map_iterator->second = data;
+}
+
+void cedar::aux::comp::ProcessingStep::setInput(const std::string& name, cedar::aux::comp::DataPtr data)
+{
+  this->setData(DATA_ROLE_INPUT, name, data);
+}
+
+void cedar::aux::comp::ProcessingStep::setBuffer(const std::string& name, cedar::aux::comp::DataPtr data)
+{
+  this->setData(DATA_ROLE_BUFFER, name, data);
+}
+
+void cedar::aux::comp::ProcessingStep::setOutput(const std::string& name, cedar::aux::comp::DataPtr data)
+{
+  this->setData(DATA_ROLE_OUTPUT, name, data);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getInput(const std::string& name)
+{
+  return this->getData(DATA_ROLE_INPUT, name);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getBuffer(const std::string& name)
+{
+  return this->getData(DATA_ROLE_BUFFER, name);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getOutput(const std::string& name)
+{
+  return this->getData(DATA_ROLE_OUTPUT, name);
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getData(DataRole role, const std::string& name)
+{
+  std::map<DataRole, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  if (iter == this->mDataConnections.end())
+  {
+    CEDAR_THROW(cedar::aux::comp::InvalidRoleException,
+                "The requested role does not exist."); //! @todo Add the name of the role
+    return cedar::aux::comp::DataPtr();
+  }
+  SlotMap::iterator map_iterator = iter->second.find(name);
+  if (map_iterator == iter->second.end())
+  {
+    CEDAR_THROW(cedar::aux::comp::InvalidNameException,
+                "The requested name does not exist."); //! @todo Add the name of the role
+    return cedar::aux::comp::DataPtr();
+  }
+  return map_iterator->second;
+}
 
 
 void cedar::aux::comp::ProcessingStep::connect(
@@ -195,13 +239,15 @@ void cedar::aux::comp::ProcessingStep::connect(
                                                 const std::string& targetName
                                               )
 {
-  try
+  target->setInput(targetName, source->getOutput(sourceName));
+  /*
+   * if the target is set to be auto-connected to triggers, do so. It makes sense to check this only for the target;
+   * the source is not relevant, because the target may need to be triggered by the source, even if the source may not
+   * want to be triggered. E.g., a dynamical system (not auto-connected) may trigger further processing during each
+   * iteration.
+   */
+  if (target->mAutoConnectTriggers)
   {
-    target->addInput(source->getOutputByName(sourceName)); //!\todo output not found exception
-    source->getFinishedTrigger()->addListener(target); //!\todo conflict with smart ass pointers!
-  }
-  catch(...)
-  {
-    return;
+    source->getFinishedTrigger()->addListener(target);
   }
 }

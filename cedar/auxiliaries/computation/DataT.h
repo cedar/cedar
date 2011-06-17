@@ -70,6 +70,11 @@ public:
   {
   }
 
+  DataT(const T& value)
+  {
+    this->mData = value;
+  }
+
   //!@brief Destructor
   virtual ~DataT()
   {
@@ -79,10 +84,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  QReadWriteLock& getLock()
-  {
-    return this->mLock;
-  }
 
   T& getData()
   {

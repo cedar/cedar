@@ -44,27 +44,53 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::Neuron::Neuron()
-:
-mActivity(0.0),
-mRestingLevel(1000.0)
-{
 
+cedar::Neuron::Neuron(double interactionWeight, double restingLevel)
+:
+mRestingLevel(restingLevel),
+mInteractionWeight (interactionWeight),
+mActivation(new cedar::dyn::DoubleActivation(0.0)),
+mOutput(new cedar::dyn::DoubleActivation(0.0))
+{
+  this->declareInput("input");
+  this->declareOutput("output");
+  this->setOutput("output", mOutput);
 }
 
 cedar::Neuron::~Neuron()
 {
-
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
 double cedar::Neuron::getActivity() const
 {
-  return this->mActivity;
+  return this->mActivation->getData();
 }
 
 void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
 {
-  mActivity += cedar::unit::Seconds(time) / cedar::unit::Milliseconds(50.0) * (-mActivity + mRestingLevel);
+  using cedar::unit::Seconds;
+  using cedar::unit::Milliseconds;
+
+  double& activation = mActivation->getData();
+  double input = 0;
+  cedar::aux::comp::DataPtr input_ptr = this->getInput("input");
+  if (input_ptr)
+  {
+    input += input_ptr->getData<double>();
+  }
+
+  // nonlinearity
+  double interaction = 0;
+  if (input >= 0)
+  {
+    interaction = input;
+  }
+
+  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + mRestingLevel + mInteractionWeight * interaction);
+
+  mOutput->getData() = activation;
 }

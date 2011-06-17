@@ -66,6 +66,7 @@ class cedar::dyn::Dynamics : public cedar::aux::comp::ProcessingStep
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  Dynamics();
 
   //!@brief Destructor
 
