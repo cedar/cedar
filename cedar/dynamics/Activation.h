@@ -69,6 +69,10 @@ public:
   {
   }
 
+  Activation(const T& value) : cedar::aux::comp::DataT<T>(value)
+  {
+  }
+
   //!@brief Destructor
   virtual ~Activation()
   {

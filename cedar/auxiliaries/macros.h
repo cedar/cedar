@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        macros.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,46 +30,18 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 06 17
 
-    Description:
+    Description: Header for several macros.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "auxiliaries/computation/StepTime.h"
-
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::dyn::Dynamics::Dynamics()
-:
-cedar::aux::comp::ProcessingStep(false, false)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dyn::Dynamics::compute(const cedar::aux::comp::Arguments& arguments)
-{
-  try
-  {
-    const cedar::aux::comp::StepTime& step_time = dynamic_cast<const cedar::aux::comp::StepTime&>(arguments);
-    this->eulerStep(step_time.getStepTime());
-  }
-  catch (const std::bad_cast& e)
-  {
 #ifdef DEBUG
-    //! @todo Exception.
-    std::cout << "Bad arguments passed to dynamics. Expected StepTime." << std::endl;
-#endif
-  }
-}
+#include <assert.h>
+
+#define CEDAR_DEBUG_ASSERT(expr) assert(expr)
+#endif // DEBUG
+
+#define CEDAR_DEBUG_ASSERT(expr)

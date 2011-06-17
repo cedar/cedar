@@ -85,6 +85,10 @@ namespace cedar
       class Trigger;
       typedef boost::shared_ptr<Trigger> TriggerPtr;
 
+      /* Exceptions */
+      class InvalidNameException;
+      class InvalidRoleException;
+      class DuplicateNameException;
     }
   }
 }

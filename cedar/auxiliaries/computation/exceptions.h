@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        exceptions.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,46 +30,46 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 06 17
 
-    Description:
+    Description: Header file for exceptions in the cedar::aux::comp namespace.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "auxiliaries/computation/StepTime.h"
+#ifndef CEDAR_AUX_COMP_EXCEPTIONS_H
+#define CEDAR_AUX_COMP_EXCEPTIONS_H
 
-// PROJECT INCLUDES
+#include "auxiliaries/computation/namespace.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
-// SYSTEM INCLUDES
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::dyn::Dynamics::Dynamics()
-:
-cedar::aux::comp::ProcessingStep(false, false)
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::aux::comp::InvalidNameException : public cedar::aux::exc::ExceptionBase
 {
-}
+  public:
+    InvalidNameException();
+}; // class cedar::aux::comp::InvalidNameException
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dyn::Dynamics::compute(const cedar::aux::comp::Arguments& arguments)
+
+
+/*!@brief An exception that occurs when a role is used as an index that is not known.
+ */
+class cedar::aux::comp::InvalidRoleException : public cedar::aux::exc::ExceptionBase
 {
-  try
-  {
-    const cedar::aux::comp::StepTime& step_time = dynamic_cast<const cedar::aux::comp::StepTime&>(arguments);
-    this->eulerStep(step_time.getStepTime());
-  }
-  catch (const std::bad_cast& e)
-  {
-#ifdef DEBUG
-    //! @todo Exception.
-    std::cout << "Bad arguments passed to dynamics. Expected StepTime." << std::endl;
-#endif
-  }
-}
+  public:
+    InvalidRoleException();
+}; // class cedar::aux::comp::InvalidRoleException
+
+
+
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::aux::comp::DuplicateNameException: public cedar::aux::exc::ExceptionBase
+{
+  public:
+    DuplicateNameException();
+}; // class cedar::aux::comp::DuplicateNameException
+
+#endif // CEDAR_AUX_COMP_EXCEPTIONS_H

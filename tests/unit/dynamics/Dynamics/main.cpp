@@ -46,6 +46,7 @@
 #include "auxiliaries/computation/Arguments.h"
 #include "Neuron.h"
 #include "auxiliaries/computation/LoopedTrigger.h"
+#include "auxiliaries/computation/StepTime.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -63,22 +64,26 @@ int main(int argc, char** argv)
   log_file << std::endl;
 
   cedar::Neuron neuron;
+  // simulated time
+  cedar::aux::comp::StepTime time(cedar::unit::Milliseconds(1.0));
   for (unsigned int i = 0; i < 1000; i++)
   {
-    neuron.compute(cedar::aux::comp::Arguments());
+    neuron.compute(time);
     if (i % 100 == 0)
     {
       log_file << neuron.getActivity() << std::endl;
     }
   }
 
-  NeuronPtr p_neuron(new cedar::Neuron());
+  NeuronPtr p_neuron(new cedar::Neuron(100.0, 0));
   p_neuron->setThreaded(false);
-  NeuronPtr p_another_neuron(new cedar::Neuron());
+  NeuronPtr p_another_neuron(new cedar::Neuron(-100.0, 100));
   p_another_neuron->setThreaded(false);
   cedar::aux::comp::LoopedTriggerPtr looped_trigger(new cedar::aux::comp::LoopedTrigger(0.1));
   looped_trigger->addListener(p_neuron);
   looped_trigger->addListener(p_another_neuron);
+  cedar::aux::comp::ProcessingStep::connect(p_neuron, "output", p_another_neuron, "input");
+  cedar::aux::comp::ProcessingStep::connect(p_another_neuron, "output", p_neuron, "input");
   looped_trigger->start();
   for (unsigned int i = 0; i < 1000; i++)
   {

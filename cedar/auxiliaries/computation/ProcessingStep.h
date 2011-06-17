@@ -68,7 +68,7 @@ class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ProcessingStep(bool runInThread = false);
+  ProcessingStep(bool runInThread = false, bool autoConnectTriggers = true);
 
   //!@brief Destructor
 
@@ -86,15 +86,20 @@ public:
 
   void setThreaded(bool isThreaded);
 
-  void addInput(cedar::aux::comp::DataPtr output);
-  void addBuffer(cedar::aux::comp::DataPtr output);
-  void addOutput(cedar::aux::comp::DataPtr output);
-  void addData(DataRole role, cedar::aux::comp::DataPtr output);
+  void declareData(DataRole role, const std::string& name);
+  void declareInput(const std::string& name);
+  void declareBuffer(const std::string& name);
+  void declareOutput(const std::string& name);
 
-  cedar::aux::comp::DataPtr getInputByName(const std::string& name) const;
-  cedar::aux::comp::DataPtr getBufferByName(const std::string& name) const;
-  cedar::aux::comp::DataPtr getOutputByName(const std::string& name) const;
-  cedar::aux::comp::DataPtr getDataByName(DataRole role, const std::string& name) const;
+  void setData(DataRole role, const std::string& name, cedar::aux::comp::DataPtr data);
+  void setInput(const std::string& name, cedar::aux::comp::DataPtr data);
+  void setBuffer(const std::string& name, cedar::aux::comp::DataPtr data);
+  void setOutput(const std::string& name, cedar::aux::comp::DataPtr data);
+
+  cedar::aux::comp::DataPtr getData(DataRole role, const std::string& name);
+  cedar::aux::comp::DataPtr getInput(const std::string& name);
+  cedar::aux::comp::DataPtr getBuffer(const std::string& name);
+  cedar::aux::comp::DataPtr getOutput(const std::string& name);
 
   static void connect(
                        cedar::aux::comp::ProcessingStepPtr source,
@@ -121,8 +126,15 @@ public:
   // none yet (hopefully never!)
 protected:
   cedar::aux::comp::TriggerPtr mFinished;
-  std::map<DataRole, std::vector<DataPtr> > mDataConnections;
+
+  typedef std::map<std::string, DataPtr> SlotMap;
+  std::map<DataRole, SlotMap > mDataConnections;
+
 private:
+  /*!@brief Whether the connect function should automatically connect the triggers as well.
+   */
+  const bool mAutoConnectTriggers;
+
   bool mBusy;
   bool mRunInThread;
   ArgumentsPtr mNextArguments;

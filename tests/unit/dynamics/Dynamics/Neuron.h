@@ -39,6 +39,7 @@
 
 // LOCAL INCLUDES
 #include "dynamics/Dynamics.h"
+#include "dynamics/Activation.h"
 
 // PROJECT INCLUDES
 
@@ -62,7 +63,7 @@ class Neuron : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Neuron();
+  Neuron(double interactionWeight = -1.0, double restingLevel = -1000.0);
   //!@brief Destructor
   ~Neuron();
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,8 +92,10 @@ public:
 protected:
   // none yet
 private:
-  double mActivity;
   double mRestingLevel;
+  double mInteractionWeight;
+  cedar::dyn::DoubleActivationPtr mActivation;
+  cedar::dyn::DoubleActivationPtr mOutput;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
