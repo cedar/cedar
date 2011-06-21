@@ -63,6 +63,14 @@ class cedar::aux::comp::InvalidRoleException : public cedar::aux::exc::Exception
 }; // class cedar::aux::comp::InvalidRoleException
 
 
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::aux::comp::InvalidArgumentsException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+  InvalidArgumentsException();
+}; // class cedar::aux::comp::InvalidArgumentsException
+
 
 /*!@brief An exception that occurs when a name is used as an index that is not known.
  */
