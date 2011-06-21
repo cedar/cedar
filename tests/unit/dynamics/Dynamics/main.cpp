@@ -63,28 +63,27 @@ int main(int argc, char** argv)
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  cedar::Neuron neuron;
-  // simulated time
-//  cedar::aux::comp::StepTime time(cedar::unit::Milliseconds(1.0));
-//  for (unsigned int i = 0; i < 1000; i++)
-//  {
-//    neuron.compute(time);
-//    if (i % 100 == 0)
-//    {
-//      log_file << neuron.getActivity() << std::endl;
-//    }
-//  }
-
+  // Instantiate neuron 1
   NeuronPtr p_neuron(new cedar::Neuron(100.0, 0));
   p_neuron->setThreaded(false);
+
+  // Instantiate neuron 2
   NeuronPtr p_another_neuron(new cedar::Neuron(-100.0, 100));
   p_another_neuron->setThreaded(false);
+
+  // Create trigger for the "main loop"
   cedar::aux::comp::LoopedTriggerPtr looped_trigger(new cedar::aux::comp::LoopedTrigger(0.1));
   looped_trigger->addListener(p_neuron);
   looped_trigger->addListener(p_another_neuron);
+
+  // connect the neurons to each other
   cedar::aux::comp::ProcessingStep::connect(p_neuron, "output", p_another_neuron, "input");
   cedar::aux::comp::ProcessingStep::connect(p_another_neuron, "output", p_neuron, "input");
+
+  // start the processing
   looped_trigger->start();
+
+  // preiodically read out activation values
   for (unsigned int i = 0; i < 1000; i++)
   {
     if (i % 100 == 0)
@@ -93,8 +92,11 @@ int main(int argc, char** argv)
     }
     usleep(1000);
   }
+
+  // stop the processing
   looped_trigger->stop();
 
+  // return
   log_file << "Done. There were " << errors << " errors." << std::endl;
   return errors;
 }
