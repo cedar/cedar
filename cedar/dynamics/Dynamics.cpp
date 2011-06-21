@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "dynamics/Dynamics.h"
 #include "auxiliaries/computation/StepTime.h"
+#include "auxiliaries/computation/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -67,9 +68,6 @@ void cedar::dyn::Dynamics::compute(const cedar::aux::comp::Arguments& arguments)
   }
   catch (const std::bad_cast& e)
   {
-#ifdef DEBUG
-    //! @todo Exception.
-    std::cout << "Bad arguments passed to dynamics. Expected StepTime." << std::endl;
-#endif
+    CEDAR_THROW(cedar::aux::comp::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
   }
 }

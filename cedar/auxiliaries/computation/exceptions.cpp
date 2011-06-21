@@ -60,3 +60,7 @@ cedar::aux::comp::MissingConnectionException::MissingConnectionException()
   this->mType = "MissingConnectionException";
 }
 
+cedar::aux::comp::InvalidArgumentsException::InvalidArgumentsException()
+{
+  this->mType = "InvalidArgumentsException";
+}

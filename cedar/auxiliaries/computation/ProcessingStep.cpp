@@ -133,7 +133,8 @@ void cedar::aux::comp::ProcessingStep::onTrigger()
   } // this->mMandatoryConnectionsAreSet
   else
   {
-    CEDAR_THROW(MissingConnectionException, "");
+    CEDAR_THROW(MissingConnectionException,
+                "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   }
 }
 
