@@ -59,7 +59,14 @@ cedar::aux::comp::ProcessingStep::ProcessingStep(bool runInThread, bool autoConn
 mFinished(new cedar::aux::comp::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
-mRunInThread(runInThread)
+mRunInThread(runInThread),
+mMandatoryConnectionsAreSet (true)
+{
+}
+
+cedar::aux::comp::ProcessingStep::DataEntry::DataEntry(bool isMandatory)
+:
+mMandatory (isMandatory)
 {
 }
 
@@ -67,22 +74,66 @@ mRunInThread(runInThread)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::comp::ProcessingStep::onTrigger()
+void cedar::aux::comp::ProcessingStep::DataEntry::setData(DataPtr data)
 {
-  if (!this->mBusy)
+  this->mData = data;
+}
+
+cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::DataEntry::getData()
+{
+  return this->mData;
+}
+
+bool cedar::aux::comp::ProcessingStep::DataEntry::isMandatory() const
+{
+  return this->mMandatory;
+}
+
+void cedar::aux::comp::ProcessingStep::checkMandatoryConnections()
+{
+  mMandatoryConnectionsAreSet = true;
+  for (std::map<DataRole, SlotMap>::iterator slot = this->mDataConnections.begin();
+       slot != this->mDataConnections.end();
+       ++slot)
   {
-    if (this->mRunInThread)
+    for (SlotMap::iterator iter = slot->second.begin();
+        iter != slot->second.end();
+         ++iter)
     {
-      this->start();
-    }
-    else
-    {
-      this->run();
+      if (iter->second.isMandatory() && iter->second.getData().get() == NULL)
+      {
+        this->mMandatoryConnectionsAreSet = false;
+        return;
+      }
     }
   }
+}
+
+void cedar::aux::comp::ProcessingStep::onTrigger()
+{
+  if (this->mMandatoryConnectionsAreSet)
+  {
+    if (!this->mBusy)
+    {
+      if (this->mRunInThread)
+      {
+        this->start();
+      }
+      else
+      {
+        this->run();
+      }
+    }
+#ifdef DEBUG
+    else
+    {
+      std::cout << "I'm busy" << std::endl;
+    }
+#endif // DEBUG
+  } // this->mMandatoryConnectionsAreSet
   else
   {
-    std::cout << "I'm busy" << std::endl;
+    CEDAR_THROW(MissingConnectionException, "");
   }
 }
 
@@ -127,7 +178,7 @@ void cedar::aux::comp::ProcessingStep::setNextArguments(cedar::aux::comp::Argume
   this->mNextArguments = arguments;
 }
 
-void cedar::aux::comp::ProcessingStep::declareData(DataRole role, const std::string& name)
+void cedar::aux::comp::ProcessingStep::declareData(DataRole role, const std::string& name, bool mandatory)
 {
   std::map<DataRole, SlotMap>::iterator iter = this->mDataConnections.find(role);
   if (iter == this->mDataConnections.end())
@@ -144,22 +195,24 @@ void cedar::aux::comp::ProcessingStep::declareData(DataRole role, const std::str
                 "There is already a data-declaration with the name " + name + "."); //! @todo Add the name of the role
     return;
   }
-  iter->second[name] = cedar::aux::comp::DataPtr();
+  iter->second[name] = DataEntry(mandatory);
+
+  this->checkMandatoryConnections();
 }
 
-void cedar::aux::comp::ProcessingStep::declareInput(const std::string& name)
+void cedar::aux::comp::ProcessingStep::declareInput(const std::string& name, bool mandatory)
 {
-  this->declareData(DATA_ROLE_INPUT, name);
+  this->declareData(DATA_ROLE_INPUT, name, mandatory);
 }
 
-void cedar::aux::comp::ProcessingStep::declareBuffer(const std::string& name)
+void cedar::aux::comp::ProcessingStep::declareBuffer(const std::string& name, bool mandatory)
 {
-  this->declareData(DATA_ROLE_BUFFER, name);
+  this->declareData(DATA_ROLE_BUFFER, name, mandatory);
 }
 
-void cedar::aux::comp::ProcessingStep::declareOutput(const std::string& name)
+void cedar::aux::comp::ProcessingStep::declareOutput(const std::string& name, bool mandatory)
 {
-  this->declareData(DATA_ROLE_OUTPUT, name);
+  this->declareData(DATA_ROLE_OUTPUT, name, mandatory);
 }
 
 
@@ -179,7 +232,8 @@ void cedar::aux::comp::ProcessingStep::setData(DataRole role, const std::string&
                 "The requested name does not exist."); //! @todo Add the name of the role
     return;
   }
-  map_iterator->second = data;
+  map_iterator->second.setData(data);
+  this->checkMandatoryConnections();
 }
 
 void cedar::aux::comp::ProcessingStep::setInput(const std::string& name, cedar::aux::comp::DataPtr data)
@@ -228,7 +282,7 @@ cedar::aux::comp::DataPtr cedar::aux::comp::ProcessingStep::getData(DataRole rol
                 "The requested name does not exist."); //! @todo Add the name of the role
     return cedar::aux::comp::DataPtr();
   }
-  return map_iterator->second;
+  return map_iterator->second.getData();
 }
 
 

@@ -76,12 +76,7 @@ void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
   using cedar::unit::Milliseconds;
 
   double& activation = mActivation->getData();
-  double input = 0;
-  cedar::aux::comp::DataPtr input_ptr = this->getInput("input");
-  if (input_ptr)
-  {
-    input += input_ptr->getData<double>();
-  }
+  double input = this->getInput("input")->getData<double>();
 
   // nonlinearity
   double interaction = 0;
@@ -90,7 +85,7 @@ void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
     interaction = input;
   }
 
-  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + mRestingLevel + mInteractionWeight * interaction);
+  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + mRestingLevel + mInteractionWeight * input);
 
   mOutput->getData() = activation;
 }

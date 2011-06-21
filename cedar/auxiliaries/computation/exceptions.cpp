@@ -54,3 +54,9 @@ cedar::aux::comp::DuplicateNameException::DuplicateNameException()
 {
   this->mType = "DuplicateNameException";
 }
+
+cedar::aux::comp::MissingConnectionException::MissingConnectionException()
+{
+  this->mType = "MissingConnectionException";
+}
+
