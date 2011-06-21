@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedTrigger.cpp
+    File:        MultiTrigger.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -31,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Date:        2011 05 27
 
     Description:
 
@@ -40,9 +40,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/LoopedTrigger.h"
-#include "auxiliaries/computation/StepTime.h"
-#include "units/TimeUnit.h"
+#include "processing/MultiTrigger.h"
 
 // PROJECT INCLUDES
 
@@ -53,23 +51,62 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::LoopedTrigger::LoopedTrigger(double stepSize)
-:
-cedar::aux::LoopedThread(stepSize)
+cedar::proc::MultiTrigger::MultiTrigger()
 {
 }
 
-cedar::aux::comp::LoopedTrigger::~LoopedTrigger()
+cedar::proc::MultiTrigger::~MultiTrigger()
 {
 }
+
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::comp::LoopedTrigger::step(double time)
+void cedar::proc::MultiTrigger::onTrigger(Trigger* sender)
 {
-  cedar::aux::comp::ArgumentsPtr arguments (new cedar::aux::comp::StepTime(cedar::unit::Milliseconds(time)));
+  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(sender);
 
-  this->trigger(arguments);
-  usleep(100);
+  if (iter != this->mIncoming.end())
+  {
+    iter->second = true;
+    this->checkCondition();
+  }
+}
+
+void cedar::proc::MultiTrigger::checkCondition()
+{
+  // Check whether all incoming triggers have triggered the multitrigger
+  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  {
+    // if one is false, return and do nothing
+    if (!iter->second)
+    {
+      return;
+    }
+  }
+
+  // if we got here, all triggers have triggere
+  this->trigger();
+
+  // reset all triggers
+  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  {
+    iter->second = false;
+  }
+}
+
+void cedar::proc::MultiTrigger::notifyConnected(cedar::proc::Trigger* trigger)
+{
+  mIncoming[trigger] = false;
+}
+
+void cedar::proc::MultiTrigger::notifyDisconnected(cedar::proc::Trigger* trigger)
+{
+  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(trigger);
+  if (iter != this->mIncoming.end())
+  {
+    this->mIncoming.erase(iter);
+  }
 }

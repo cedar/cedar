@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataT.cpp
+    File:        LoopedTrigger.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -31,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 06
 
     Description:
 
@@ -40,16 +40,36 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/DataT.h"
+#include "processing/LoopedTrigger.h"
+#include "processing/StepTime.h"
+#include "units/TimeUnit.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <algorithm>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
+:
+cedar::aux::LoopedThread(stepSize)
+{
+}
+
+cedar::proc::LoopedTrigger::~LoopedTrigger()
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+void cedar::proc::LoopedTrigger::step(double time)
+{
+  cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
+
+  this->trigger(arguments);
+  usleep(100);
+}

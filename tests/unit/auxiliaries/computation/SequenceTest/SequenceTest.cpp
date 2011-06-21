@@ -42,9 +42,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/computation/MultiTrigger.h"
-#include "auxiliaries/computation/ProcessingStep.h"
+#include "processing/Trigger.h"
+#include "processing/MultiTrigger.h"
+#include "processing/Step.h"
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -54,7 +54,7 @@
 #include <string>
 #include <QReadWriteLock>
 
-class ComputableTest : public cedar::aux::comp::ProcessingStep
+class ComputableTest : public cedar::proc::Step
 {
   public:
     ComputableTest
@@ -65,14 +65,14 @@ class ComputableTest : public cedar::aux::comp::ProcessingStep
       bool runInThread
     )
     :
-    cedar::aux::comp::ProcessingStep(runInThread),
+    cedar::proc::Step(runInThread),
     mSequenceId (sequenceId),
     meSequenceBuffer (sequenceBuffer),
     meLock (lock)
     {
     }
 
-    void compute(const cedar::aux::comp::Arguments& arguments)
+    void compute(const cedar::proc::Arguments& arguments)
     {
       //! @todo log these times and calculate the overall test time to check performance.
       usleep(random() % 50000);
@@ -88,17 +88,17 @@ class ComputableTest : public cedar::aux::comp::ProcessingStep
 
 typedef boost::shared_ptr<ComputableTest> ComputableTestPtr;
 
-class EndStopTest : public cedar::aux::comp::ProcessingStep
+class EndStopTest : public cedar::proc::Step
 {
   public:
     EndStopTest()
     :
-    cedar::aux::comp::ProcessingStep(false),
+    cedar::proc::Step(false),
     mFinished (false)
     {
     }
 
-    void compute(const cedar::aux::comp::Arguments& arguments)
+    void compute(const cedar::proc::Arguments& arguments)
     {
       mFinished = true;
     }
@@ -122,10 +122,10 @@ cedar::aux::LogFile log_file ("SequenceTest.log");
  */
 void testSequence(const std::string& sequenceString, unsigned int& errors, bool runInThread)
 {
-  using cedar::aux::comp::Trigger;
-  using cedar::aux::comp::TriggerPtr;
-  using cedar::aux::comp::MultiTrigger;
-  using cedar::aux::comp::MultiTriggerPtr;
+  using cedar::proc::Trigger;
+  using cedar::proc::TriggerPtr;
+  using cedar::proc::MultiTrigger;
+  using cedar::proc::MultiTriggerPtr;
 
   QReadWriteLock lock;
   std::vector<unsigned int> sequence_buffer;
@@ -243,8 +243,8 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
 int main(int argc, char** argv)
 {
   using cedar::aux::LogFile;
-  using cedar::aux::comp::Trigger;
-  using cedar::aux::comp::TriggerPtr;
+  using cedar::proc::Trigger;
+  using cedar::proc::TriggerPtr;
 
   unsigned int errors = 0;
 

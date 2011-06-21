@@ -40,8 +40,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/computation/ProcessingStep.h"
+#include "processing/Trigger.h"
+#include "processing/Step.h"
 
 // PROJECT INCLUDES
 
@@ -52,11 +52,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::Trigger::Trigger()
+cedar::proc::Trigger::Trigger()
 {
 }
 
-cedar::aux::comp::Trigger::~Trigger()
+cedar::proc::Trigger::~Trigger()
 {
   this->mListeners.clear();
   this->mTriggers.clear();
@@ -68,7 +68,7 @@ cedar::aux::comp::Trigger::~Trigger()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::comp::Trigger::trigger(cedar::aux::comp::ArgumentsPtr arguments)
+void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
@@ -81,13 +81,13 @@ void cedar::aux::comp::Trigger::trigger(cedar::aux::comp::ArgumentsPtr arguments
   }
 }
 
-void cedar::aux::comp::Trigger::onTrigger(Trigger*)
+void cedar::proc::Trigger::onTrigger(Trigger*)
 {
 }
 
-void cedar::aux::comp::Trigger::addListener(cedar::aux::comp::ProcessingStepPtr step)
+void cedar::proc::Trigger::addListener(cedar::proc::StepPtr step)
 {
-  std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator iter;
+  std::vector<cedar::proc::StepPtr>::iterator iter;
   iter = this->find(step);
   if (iter == this->mListeners.end())
   {
@@ -95,9 +95,9 @@ void cedar::aux::comp::Trigger::addListener(cedar::aux::comp::ProcessingStepPtr 
   }
 }
 
-void cedar::aux::comp::Trigger::addTrigger(cedar::aux::comp::TriggerPtr trigger)
+void cedar::proc::Trigger::addTrigger(cedar::proc::TriggerPtr trigger)
 {
-  std::vector<cedar::aux::comp::TriggerPtr>::iterator iter;
+  std::vector<cedar::proc::TriggerPtr>::iterator iter;
   iter = this->find(trigger);
   if (iter == this->mTriggers.end())
   {
@@ -106,9 +106,9 @@ void cedar::aux::comp::Trigger::addTrigger(cedar::aux::comp::TriggerPtr trigger)
   }
 }
 
-void cedar::aux::comp::Trigger::removeListener(cedar::aux::comp::ProcessingStepPtr step)
+void cedar::proc::Trigger::removeListener(cedar::proc::StepPtr step)
 {
-  std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator iter;
+  std::vector<cedar::proc::StepPtr>::iterator iter;
   iter = this->find(step);
   if (iter != this->mListeners.end())
   {
@@ -116,9 +116,9 @@ void cedar::aux::comp::Trigger::removeListener(cedar::aux::comp::ProcessingStepP
   }
 }
 
-void cedar::aux::comp::Trigger::removeTrigger(cedar::aux::comp::TriggerPtr trigger)
+void cedar::proc::Trigger::removeTrigger(cedar::proc::TriggerPtr trigger)
 {
-  std::vector<cedar::aux::comp::TriggerPtr>::iterator iter;
+  std::vector<cedar::proc::TriggerPtr>::iterator iter;
   iter = this->find(trigger);
   if (iter != this->mTriggers.end())
   {
@@ -127,26 +127,26 @@ void cedar::aux::comp::Trigger::removeTrigger(cedar::aux::comp::TriggerPtr trigg
   }
 }
 
-void cedar::aux::comp::Trigger::notifyConnected(cedar::aux::comp::Trigger* trigger)
+void cedar::proc::Trigger::notifyConnected(cedar::proc::Trigger* trigger)
 {
 }
 
-void cedar::aux::comp::Trigger::notifyDisconnected(cedar::aux::comp::Trigger* trigger)
+void cedar::proc::Trigger::notifyDisconnected(cedar::proc::Trigger* trigger)
 {
 }
 
-std::vector<cedar::aux::comp::ProcessingStepPtr>::iterator
-  cedar::aux::comp::Trigger::find(cedar::aux::comp::ProcessingStepPtr step)
+std::vector<cedar::proc::StepPtr>::iterator
+  cedar::proc::Trigger::find(cedar::proc::StepPtr step)
 {
   return std::find(this->mListeners.begin(), this->mListeners.end(), step);
 }
 
-std::vector<cedar::aux::comp::TriggerPtr>::iterator cedar::aux::comp::Trigger::find(cedar::aux::comp::TriggerPtr step)
+std::vector<cedar::proc::TriggerPtr>::iterator cedar::proc::Trigger::find(cedar::proc::TriggerPtr step)
 {
   return std::find(this->mTriggers.begin(), this->mTriggers.end(), step);
 }
 
-const std::vector<cedar::aux::comp::ProcessingStepPtr>& cedar::aux::comp::Trigger::getListeners() const
+const std::vector<cedar::proc::StepPtr>& cedar::proc::Trigger::getListeners() const
 {
   return this->mListeners;
 }

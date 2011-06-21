@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "dynamics/namespace.h"
-#include "auxiliaries/computation/ProcessingStep.h"
+#include "processing/Step.h"
 #include "units/TimeUnit.h"
 
 // PROJECT INCLUDES
@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::dyn::Dynamics : public cedar::aux::comp::ProcessingStep
+class cedar::dyn::Dynamics : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -74,7 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void compute(const cedar::aux::comp::Arguments& arguments);
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

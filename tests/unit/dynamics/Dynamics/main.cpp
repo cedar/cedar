@@ -43,10 +43,10 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/LogFile.h"
-#include "auxiliaries/computation/Arguments.h"
+#include "processing/Arguments.h"
 #include "Neuron.h"
-#include "auxiliaries/computation/LoopedTrigger.h"
-#include "auxiliaries/computation/StepTime.h"
+#include "processing/LoopedTrigger.h"
+#include "processing/StepTime.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -72,13 +72,13 @@ int main(int argc, char** argv)
   p_another_neuron->setThreaded(false);
 
   // Create trigger for the "main loop"
-  cedar::aux::comp::LoopedTriggerPtr looped_trigger(new cedar::aux::comp::LoopedTrigger(0.1));
+  cedar::proc::LoopedTriggerPtr looped_trigger(new cedar::proc::LoopedTrigger(0.1));
   looped_trigger->addListener(p_neuron);
   looped_trigger->addListener(p_another_neuron);
 
   // connect the neurons to each other
-  cedar::aux::comp::ProcessingStep::connect(p_neuron, "output", p_another_neuron, "input");
-  cedar::aux::comp::ProcessingStep::connect(p_another_neuron, "output", p_neuron, "input");
+  cedar::proc::Step::connect(p_neuron, "output", p_another_neuron, "input");
+  cedar::proc::Step::connect(p_another_neuron, "output", p_neuron, "input");
 
   // start the processing
   looped_trigger->start();
