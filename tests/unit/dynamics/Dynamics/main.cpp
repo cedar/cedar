@@ -65,15 +65,15 @@ int main(int argc, char** argv)
 
   cedar::Neuron neuron;
   // simulated time
-  cedar::aux::comp::StepTime time(cedar::unit::Milliseconds(1.0));
-  for (unsigned int i = 0; i < 1000; i++)
-  {
-    neuron.compute(time);
-    if (i % 100 == 0)
-    {
-      log_file << neuron.getActivity() << std::endl;
-    }
-  }
+//  cedar::aux::comp::StepTime time(cedar::unit::Milliseconds(1.0));
+//  for (unsigned int i = 0; i < 1000; i++)
+//  {
+//    neuron.compute(time);
+//    if (i % 100 == 0)
+//    {
+//      log_file << neuron.getActivity() << std::endl;
+//    }
+//  }
 
   NeuronPtr p_neuron(new cedar::Neuron(100.0, 0));
   p_neuron->setThreaded(false);

@@ -64,6 +64,25 @@ class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  struct DataEntry
+  {
+    public:
+      DataEntry(bool isMandatory = true);
+
+      void setData(DataPtr data);
+      DataPtr getData();
+
+      bool isMandatory() const;
+
+    private:
+      DataPtr mData;
+      bool mMandatory;
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -86,10 +105,10 @@ public:
 
   void setThreaded(bool isThreaded);
 
-  void declareData(DataRole role, const std::string& name);
-  void declareInput(const std::string& name);
-  void declareBuffer(const std::string& name);
-  void declareOutput(const std::string& name);
+  void declareData(DataRole role, const std::string& name, bool mandatory = true);
+  void declareInput(const std::string& name, bool mandatory = true);
+  void declareBuffer(const std::string& name, bool mandatory = true);
+  void declareOutput(const std::string& name, bool mandatory = true);
 
   void setData(DataRole role, const std::string& name, cedar::aux::comp::DataPtr data);
   void setInput(const std::string& name, cedar::aux::comp::DataPtr data);
@@ -118,6 +137,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void checkMandatoryConnections();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -127,8 +147,8 @@ public:
 protected:
   cedar::aux::comp::TriggerPtr mFinished;
 
-  typedef std::map<std::string, DataPtr> SlotMap;
-  std::map<DataRole, SlotMap > mDataConnections;
+  typedef std::map<std::string, DataEntry> SlotMap;
+  std::map<DataRole, SlotMap> mDataConnections;
 
 private:
   /*!@brief Whether the connect function should automatically connect the triggers as well.
@@ -138,6 +158,7 @@ private:
   bool mBusy;
   bool mRunInThread;
   ArgumentsPtr mNextArguments;
+  bool mMandatoryConnectionsAreSet;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

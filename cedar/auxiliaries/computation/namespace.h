@@ -89,6 +89,7 @@ namespace cedar
       class InvalidNameException;
       class InvalidRoleException;
       class DuplicateNameException;
+      class MissingConnectionException;
     }
   }
 }

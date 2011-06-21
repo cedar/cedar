@@ -72,4 +72,13 @@ class cedar::aux::comp::DuplicateNameException: public cedar::aux::exc::Exceptio
     DuplicateNameException();
 }; // class cedar::aux::comp::DuplicateNameException
 
+
+/*! @todo Describe
+ */
+class cedar::aux::comp::MissingConnectionException: public cedar::aux::exc::ExceptionBase
+{
+  public:
+    MissingConnectionException();
+}; // class cedar::aux::comp::MissingConnectionException
+
 #endif // CEDAR_AUX_COMP_EXCEPTIONS_H
