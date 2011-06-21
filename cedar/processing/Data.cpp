@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepTime.cpp
+    File:        Data.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -31,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Date:        2011 06 17
 
     Description:
 
@@ -40,7 +40,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "StepTime.h"
+#include "processing/Data.h"
 
 // PROJECT INCLUDES
 
@@ -50,13 +50,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::StepTime::StepTime(const cedar::unit::Time& stepTime)
-:
-mStepTime (stepTime)
+cedar::proc::Data::Data()
 {
 }
 
-cedar::aux::comp::StepTime::~StepTime()
+cedar::proc::Data::~Data()
 {
 }
 
@@ -64,7 +62,22 @@ cedar::aux::comp::StepTime::~StepTime()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const cedar::unit::Time& cedar::aux::comp::StepTime::getStepTime() const
+QReadWriteLock& cedar::proc::Data::getLock()
 {
-  return this->mStepTime;
+  return this->mLock;
+}
+
+void cedar::proc::Data::lockForRead()
+{
+  this->mLock.lockForRead();
+}
+
+void cedar::proc::Data::lockForWrite()
+{
+  this->mLock.lockForWrite();
+}
+
+void cedar::proc::Data::unlock()
+{
+  this->mLock.unlock();
 }

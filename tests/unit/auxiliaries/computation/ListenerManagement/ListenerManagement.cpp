@@ -42,16 +42,16 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/computation/ProcessingStep.h"
+#include "processing/Trigger.h"
+#include "processing/Step.h"
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 
-class StepTest : public cedar::aux::comp::ProcessingStep
+class StepTest : public cedar::proc::Step
 {
-  void compute(const cedar::aux::comp::Arguments&)
+  void compute(const cedar::proc::Arguments&)
   {
     std::cout << "compute called." << std::endl;
   }
@@ -62,8 +62,8 @@ typedef boost::shared_ptr<StepTest> StepTestPtr;
 int main(int argc, char** argv)
 {
   using cedar::aux::LogFile;
-  using cedar::aux::comp::Trigger;
-  using cedar::aux::comp::TriggerPtr;
+  using cedar::proc::Trigger;
+  using cedar::proc::TriggerPtr;
 
   unsigned int errors = 0;
 

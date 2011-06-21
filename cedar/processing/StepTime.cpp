@@ -22,7 +22,8 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        exceptions.cpp
+    File:        StepTime.cpp
+
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Date:        2011 06 06
 
     Description:
 
@@ -38,29 +39,32 @@
 
 ======================================================================================================================*/
 
-#include "exceptions.h"
+// LOCAL INCLUDES
+#include "StepTime.h"
 
-cedar::aux::comp::InvalidNameException::InvalidNameException()
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::StepTime::StepTime(const cedar::unit::Time& stepTime)
+:
+mStepTime (stepTime)
 {
-  this->mType = "InvalidNameException";
 }
 
-cedar::aux::comp::InvalidRoleException::InvalidRoleException()
+cedar::proc::StepTime::~StepTime()
 {
-  this->mType = "InvalidRoleException";
 }
 
-cedar::aux::comp::DuplicateNameException::DuplicateNameException()
-{
-  this->mType = "DuplicateNameException";
-}
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::comp::MissingConnectionException::MissingConnectionException()
+const cedar::unit::Time& cedar::proc::StepTime::getStepTime() const
 {
-  this->mType = "MissingConnectionException";
-}
-
-cedar::aux::comp::InvalidArgumentsException::InvalidArgumentsException()
-{
-  this->mType = "InvalidArgumentsException";
+  return this->mStepTime;
 }

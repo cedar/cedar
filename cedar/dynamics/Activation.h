@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "dynamics/namespace.h"
-#include "auxiliaries/computation/DataT.h"
+#include "processing/DataT.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,7 @@
  * More detailed description of the class.
  */
 template <typename T>
-class cedar::dyn::Activation : public cedar::aux::comp::DataT<T>
+class cedar::dyn::Activation : public cedar::proc::DataT<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,7 +69,7 @@ public:
   {
   }
 
-  Activation(const T& value) : cedar::aux::comp::DataT<T>(value)
+  Activation(const T& value) : cedar::proc::DataT<T>(value)
   {
   }
 

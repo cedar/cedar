@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        exceptions.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 06 17
 
     Description:
 
@@ -38,36 +38,29 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "processing/StepTime.h"
-#include "processing/exceptions.h"
+#include "exceptions.h"
 
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::dyn::Dynamics::Dynamics()
-:
-cedar::proc::Step(false, false)
+cedar::proc::InvalidNameException::InvalidNameException()
 {
+  this->mType = "InvalidNameException";
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dyn::Dynamics::compute(const cedar::proc::Arguments& arguments)
+cedar::proc::InvalidRoleException::InvalidRoleException()
 {
-  try
-  {
-    const cedar::proc::StepTime& step_time = dynamic_cast<const cedar::proc::StepTime&>(arguments);
-    this->eulerStep(step_time.getStepTime());
-  }
-  catch (const std::bad_cast& e)
-  {
-    CEDAR_THROW(cedar::proc::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
-  }
+  this->mType = "InvalidRoleException";
+}
+
+cedar::proc::DuplicateNameException::DuplicateNameException()
+{
+  this->mType = "DuplicateNameException";
+}
+
+cedar::proc::MissingConnectionException::MissingConnectionException()
+{
+  this->mType = "MissingConnectionException";
+}
+
+cedar::proc::InvalidArgumentsException::InvalidArgumentsException()
+{
+  this->mType = "InvalidArgumentsException";
 }

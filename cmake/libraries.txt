@@ -61,7 +61,8 @@ endif()
 # OpenCV
 set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
 find_package(OpenCV REQUIRED)
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
+#set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui)
 # message(STATUS "Found opencv libs ${OpenCV_LIBS}")
 
 # libconfig

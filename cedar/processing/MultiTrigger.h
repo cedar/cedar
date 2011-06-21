@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingStep.h
+    File:        Arguments.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 05 27
 
     Description:
 
@@ -38,127 +38,73 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_PROCESSING_STEP_H
-#define CEDAR_AUX_COMP_PROCESSING_STEP_H
+#ifndef CEDAR_PROC_MULTI_TRIGGER_H
+#define CEDAR_PROC_MULTI_TRIGGER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/namespace.h"
-#include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/Base.h"
+#include "processing/namespace.h"
+#include "processing/Trigger.h"
+
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QThread>
+#include <vector>
 #include <map>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief A trigger that merges multiple trigger signals into one.
  *
- * More detailed description of the class.
+ * This class maintains a list of incoming triggers. Everytime one of the incoming triggers receives a trigger signal,
+ * it is marked as triggered. Once all incoming triggers are marked thusly, the MultiTrigger sends a trigger signal to
+ * all its listeners.
  */
-class cedar::aux::comp::ProcessingStep : public cedar::aux::Base, public QThread
+class cedar::proc::MultiTrigger : public Trigger
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  struct DataEntry
-  {
-    public:
-      DataEntry(bool isMandatory = true);
-
-      void setData(DataPtr data);
-      DataPtr getData();
-
-      bool isMandatory() const;
-
-    private:
-      DataPtr mData;
-      bool mMandatory;
-  };
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ProcessingStep(bool runInThread = false, bool autoConnectTriggers = true);
+  MultiTrigger();
 
   //!@brief Destructor
+  virtual ~MultiTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void onTrigger();
+  void onTrigger(Trigger* sender);
 
-  virtual void compute(const cedar::aux::comp::Arguments& arguments) = 0;
+  void notifyConnected(cedar::proc::Trigger* trigger);
 
-  void setNextArguments(cedar::aux::comp::ArgumentsPtr arguments);
-
-  cedar::aux::comp::TriggerPtr& getFinishedTrigger();
-
-  void setThreaded(bool isThreaded);
-
-  void declareData(DataRole role, const std::string& name, bool mandatory = true);
-  void declareInput(const std::string& name, bool mandatory = true);
-  void declareBuffer(const std::string& name, bool mandatory = true);
-  void declareOutput(const std::string& name, bool mandatory = true);
-
-  void setData(DataRole role, const std::string& name, cedar::aux::comp::DataPtr data);
-  void setInput(const std::string& name, cedar::aux::comp::DataPtr data);
-  void setBuffer(const std::string& name, cedar::aux::comp::DataPtr data);
-  void setOutput(const std::string& name, cedar::aux::comp::DataPtr data);
-
-  cedar::aux::comp::DataPtr getData(DataRole role, const std::string& name);
-  cedar::aux::comp::DataPtr getInput(const std::string& name);
-  cedar::aux::comp::DataPtr getBuffer(const std::string& name);
-  cedar::aux::comp::DataPtr getOutput(const std::string& name);
-
-  static void connect(
-                       cedar::aux::comp::ProcessingStepPtr source,
-                       const std::string& sourceName,
-                       cedar::aux::comp::ProcessingStepPtr target,
-                       const std::string& targetName
-                     );
+  void notifyDisconnected(cedar::proc::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void run();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void checkMandatoryConnections();
-
+  // none yet
+  void checkCondition();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
 protected:
-  cedar::aux::comp::TriggerPtr mFinished;
-
-  typedef std::map<std::string, DataEntry> SlotMap;
-  std::map<DataRole, SlotMap> mDataConnections;
 
 private:
-  /*!@brief Whether the connect function should automatically connect the triggers as well.
-   */
-  const bool mAutoConnectTriggers;
-
-  bool mBusy;
-  bool mRunInThread;
-  ArgumentsPtr mNextArguments;
-  bool mMandatoryConnectionsAreSet;
+  std::map<Trigger*, bool> mIncoming;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -171,7 +117,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::ProcessingStep
+}; // class cedar::proc::Trigger
 
-#endif // CEDAR_AUX_COMP_PROCESSING_STEP_H
+#endif // CEDAR_PROC_TRIGGER_H
 

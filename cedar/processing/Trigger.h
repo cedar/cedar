@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataT.h
+    File:        Trigger.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,24 +38,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_DATA_T_H
-#define CEDAR_AUX_COMP_DATA_T_H
+#ifndef CEDAR_PROC_TRIGGER_H
+#define CEDAR_PROC_TRIGGER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/namespace.h"
-#include "auxiliaries/computation/Data.h"
+#include "processing/namespace.h"
+
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <vector>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-template <typename T>
-class cedar::aux::comp::DataT : public cedar::aux::comp::Data
+class cedar::proc::Trigger
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,29 +65,32 @@ class cedar::aux::comp::DataT : public cedar::aux::comp::Data
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataT()
-  {
-  }
-
-  DataT(const T& value)
-  {
-    this->mData = value;
-  }
+  Trigger();
 
   //!@brief Destructor
-  virtual ~DataT()
-  {
-  }
+  virtual ~Trigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  void trigger(cedar::proc::ArgumentsPtr arguments = cedar::proc::ArgumentsPtr());
 
-  T& getData()
-  {
-    return this->mData;
-  }
+  virtual void onTrigger(Trigger*);
+
+  void addListener(cedar::proc::StepPtr step);
+
+  void addTrigger(cedar::proc::TriggerPtr trigger);
+
+  void removeListener(cedar::proc::StepPtr step);
+
+  void removeTrigger(cedar::proc::TriggerPtr trigger);
+
+  const std::vector<cedar::proc::StepPtr>& getListeners() const;
+
+  virtual void notifyConnected(cedar::proc::Trigger* trigger);
+
+  virtual void notifyDisconnected(cedar::proc::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,9 +110,11 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  T mData;
-
+  std::vector<cedar::proc::StepPtr> mListeners;
+  std::vector<cedar::proc::TriggerPtr> mTriggers;
 private:
+  std::vector<cedar::proc::StepPtr>::iterator find(cedar::proc::StepPtr triggerable);
+  std::vector<cedar::proc::TriggerPtr>::iterator find(cedar::proc::TriggerPtr triggerableT);
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -123,7 +127,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::DataT
+}; // class cedar::proc::Trigger
 
-#endif // CEDAR_AUX_COMP_DATA_T_H
+#endif // CEDAR_PROC_TRIGGER_H
 

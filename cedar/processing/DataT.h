@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Arguments.h
+    File:        DataT.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,22 +38,24 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_ARGUMENTS_H
-#define CEDAR_AUX_COMP_ARGUMENTS_H
+#ifndef CEDAR_PROC_DATA_T_H
+#define CEDAR_PROC_DATA_T_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/namespace.h"
+#include "processing/namespace.h"
+#include "processing/Data.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <QReadWriteLock>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::Arguments
+template <typename T>
+class cedar::proc::DataT : public cedar::proc::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,15 +66,29 @@ class cedar::aux::comp::Arguments
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  DataT()
+  {
+  }
+
+  DataT(const T& value)
+  {
+    this->mData = value;
+  }
 
   //!@brief Destructor
-  virtual ~Arguments();
+  virtual ~DataT()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+
+  T& getData()
+  {
+    return this->mData;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,9 +108,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  T mData;
+
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -107,7 +123,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::Arguments
+}; // class cedar::proc::DataT
 
-#endif // CEDAR_AUX_COMP_ARGUMENTS_H
+#endif // CEDAR_PROC_DATA_T_H
 

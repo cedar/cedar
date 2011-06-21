@@ -22,8 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.cpp
-
+    File:        exceptions.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -33,51 +32,61 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 06 17
 
-    Description:
+    Description: Header file for exceptions in the cedar::aux::comp namespace.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "auxiliaries/computation/Data.h"
+#ifndef CEDAR_PROC_EXCEPTIONS_H
+#define CEDAR_PROC_EXCEPTIONS_H
 
-// PROJECT INCLUDES
+#include "processing/namespace.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
-// SYSTEM INCLUDES
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::comp::Data::Data()
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::proc::InvalidNameException : public cedar::aux::exc::ExceptionBase
 {
-}
+  public:
+    InvalidNameException();
+}; // class cedar::proc::InvalidNameException
 
-cedar::aux::comp::Data::~Data()
+
+
+/*!@brief An exception that occurs when a role is used as an index that is not known.
+ */
+class cedar::proc::InvalidRoleException : public cedar::aux::exc::ExceptionBase
 {
-}
+  public:
+    InvalidRoleException();
+}; // class cedar::proc::InvalidRoleException
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
-QReadWriteLock& cedar::aux::comp::Data::getLock()
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::proc::InvalidArgumentsException : public cedar::aux::exc::ExceptionBase
 {
-  return this->mLock;
-}
+  public:
+  InvalidArgumentsException();
+}; // class cedar::proc::InvalidArgumentsException
 
-void cedar::aux::comp::Data::lockForRead()
-{
-  this->mLock.lockForRead();
-}
 
-void cedar::aux::comp::Data::lockForWrite()
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::proc::DuplicateNameException: public cedar::aux::exc::ExceptionBase
 {
-  this->mLock.lockForWrite();
-}
+  public:
+    DuplicateNameException();
+}; // class cedar::proc::DuplicateNameException
 
-void cedar::aux::comp::Data::unlock()
+
+/*! @todo Describe
+ */
+class cedar::proc::MissingConnectionException: public cedar::aux::exc::ExceptionBase
 {
-  this->mLock.unlock();
-}
+  public:
+    MissingConnectionException();
+}; // class cedar::proc::MissingConnectionException
+
+#endif // CEDAR_PROC_EXCEPTIONS_H

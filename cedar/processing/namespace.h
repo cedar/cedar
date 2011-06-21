@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_COMP_NAMESPACE_H
-#define CEDAR_AUX_COMP_NAMESPACE_H
+#ifndef CEDAR_PROC_NAMESPACE_H
+#define CEDAR_PROC_NAMESPACE_H
 
 // LOCAL INCLUDES
 
@@ -48,51 +48,48 @@
 
 namespace cedar
 {
-  namespace aux
+  /*!@brief Namespace for all processing classes. */
+  namespace proc
   {
-    /*!@brief Namespace for all math classes. */
-    namespace comp
+    enum DataRole
     {
-      enum DataRole
-      {
-        DATA_ROLE_INPUT,
-        DATA_ROLE_OUTPUT,
-        DATA_ROLE_BUFFER
-      };
+      DATA_ROLE_INPUT,
+      DATA_ROLE_OUTPUT,
+      DATA_ROLE_BUFFER
+    };
 
-      class Arguments;
-      typedef boost::shared_ptr<Arguments> ArgumentsPtr;
+    class Arguments;
+    typedef boost::shared_ptr<Arguments> ArgumentsPtr;
 
-      class Data;
-      typedef boost::shared_ptr<Data> DataPtr;
+    class Data;
+    typedef boost::shared_ptr<Data> DataPtr;
 
-      template <typename T> class DataT;
+    template <typename T> class DataT;
 
-      class LoopArguments;
+    class LoopArguments;
 
-      class LoopedTrigger;
-      typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
+    class LoopedTrigger;
+    typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
 
-      class MultiTrigger;
-      typedef boost::shared_ptr<MultiTrigger> MultiTriggerPtr;
+    class MultiTrigger;
+    typedef boost::shared_ptr<MultiTrigger> MultiTriggerPtr;
 
-      class ProcessingStep;
-      typedef boost::shared_ptr<ProcessingStep> ProcessingStepPtr;
+    class Step;
+    typedef boost::shared_ptr<Step> StepPtr;
 
-      class StepTime;
-      typedef boost::shared_ptr<StepTime> StepTimePtr;
+    class StepTime;
+    typedef boost::shared_ptr<StepTime> StepTimePtr;
 
-      class Trigger;
-      typedef boost::shared_ptr<Trigger> TriggerPtr;
+    class Trigger;
+    typedef boost::shared_ptr<Trigger> TriggerPtr;
 
-      /* Exceptions */
-      class InvalidNameException;
-      class InvalidRoleException;
-      class InvalidArgumentsException;
-      class DuplicateNameException;
-      class MissingConnectionException;
-    }
+    /* Exceptions */
+    class InvalidNameException;
+    class InvalidRoleException;
+    class InvalidArgumentsException;
+    class DuplicateNameException;
+    class MissingConnectionException;
   }
 }
 
-#endif // CEDAR_AUX_COMP_NAMESPACE_H
+#endif // CEDAR_PROC_NAMESPACE_H

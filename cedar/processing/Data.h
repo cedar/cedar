@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedTrigger.h
+    File:        Data.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Date:        2011 06 17
 
     Description:
 
@@ -38,25 +38,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_LOOPED_TRIGGER_H
-#define CEDAR_AUX_COMP_LOOPED_TRIGGER_H
+#ifndef CEDAR_PROC_DATA_H
+#define CEDAR_PROC_DATA_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/namespace.h"
-#include "auxiliaries/computation/Trigger.h"
-#include "auxiliaries/LoopedThread.h"
-
+#include "processing/namespace.h"
+#include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <QReadWriteLock>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::LoopedTrigger : public cedar::aux::comp::Trigger, public cedar::aux::LoopedThread
+class cedar::proc::Data : public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,16 +65,32 @@ class cedar::aux::comp::LoopedTrigger : public cedar::aux::comp::Trigger, public
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0);
+  Data();
 
   //!@brief Destructor
-  virtual ~LoopedTrigger();
+  virtual ~Data();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void step(double time);
+  QReadWriteLock& getLock();
+  void lockForRead();
+  void lockForWrite();
+  void unlock();
+
+  template <typename T>
+  T& getData()
+  {
+    return dynamic_cast<DataT<T>&>(*this).getData();
+  }
+  
+  template <typename T>
+  T& cast()
+  {
+    return dynamic_cast<T&>(*this);
+  }
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,9 +109,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  QReadWriteLock mLock;
 
 private:
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -110,7 +124,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::LoopedTrigger
+}; // class cedar::proc::Data
 
-#endif // CEDAR_AUX_COMP_LOOPED_TRIGGER_H
+#endif // CEDAR_PROC_DATA_H
 

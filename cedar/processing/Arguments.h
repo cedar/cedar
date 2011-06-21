@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepTime.h
+    File:        Arguments.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Date:        2011 05 23
 
     Description:
 
@@ -38,13 +38,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_COMP_STEP_TIME_H
-#define CEDAR_AUX_COMP_STEP_TIME_H
+#ifndef CEDAR_PROC_ARGUMENTS_H
+#define CEDAR_PROC_ARGUMENTS_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/computation/namespace.h"
-#include "auxiliaries/computation/Arguments.h"
-#include "units/Time.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -55,7 +53,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::comp::StepTime : public cedar::aux::comp::Arguments
+class cedar::proc::Arguments
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,16 +64,15 @@ class cedar::aux::comp::StepTime : public cedar::aux::comp::Arguments
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepTime(const cedar::unit::Time& stepTime);
 
   //!@brief Destructor
-  virtual ~StepTime();
+  virtual ~Arguments();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const cedar::unit::Time& getStepTime() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,7 +94,7 @@ public:
 protected:
   // none yet
 private:
-  cedar::unit::Time mStepTime;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -110,7 +107,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::comp::StepTime
+}; // class cedar::proc::Arguments
 
-#endif // CEDAR_AUX_COMP_STEP_TIME_H
+#endif // CEDAR_PROC_ARGUMENTS_H
 
