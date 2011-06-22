@@ -69,8 +69,7 @@ namespace cedar
     //!@brief smart pointer for UserData
     typedef boost::shared_ptr<UserData> UserDataPtr;
 
-    template <typename T>
-    class IntervalData;
+    template <typename T> class IntervalData;
     //!@brief smart pointer for IntervalData<double>
     typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;
     //!@brief smart pointer for IntervalData<int>
@@ -83,6 +82,10 @@ namespace cedar
     class Object;
     //!@brief smart pointer for Object
     typedef boost::shared_ptr<Object> ObjectPtr;
+
+    typedef unsigned int EnumId;
+    class Enum;
+    template <typename T> class EnumBase;
 
     /*!@brief Template method that converts simple data types to a string.
      *
