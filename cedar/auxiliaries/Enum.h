@@ -47,29 +47,74 @@
 #include <vector>
 #include <string>
 
-//!\todo document Enum class
+/*!@brief A class representing entries in an enumeration.
+ */
 class cedar::aux::Enum
 {
-  public:
-    static const cedar::aux::EnumId UNDEFINED = 0xFFFF;
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
 
-    Enum();
-    Enum(const cedar::aux::EnumId id, const std::string& name, const std::string& prettyString = "");
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  Enum();
 
-    bool operator== (const Enum& other);
+  Enum(const cedar::aux::EnumId id, const std::string& name, const std::string& prettyString = "");
 
-    cedar::aux::EnumId id() const;
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  bool operator== (const Enum& other);
 
-    const std::string& name() const;
+  cedar::aux::EnumId id() const;
 
-    const std::string& prettyString() const;
+  const std::string& name() const;
 
-    operator cedar::aux::EnumId () const;
+  const std::string& prettyString() const;
 
-  private:
-    cedar::aux::EnumId mId;
-    std::string mName;
-    std::string mPrettyString;
-};
+  operator cedar::aux::EnumId () const;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  static const cedar::aux::EnumId UNDEFINED = 0xFFFF;
+protected:
+  // none yet
+private:
+  cedar::aux::EnumId mId;
+
+  std::string mName;
+
+  std::string mPrettyString;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::Enum
 
 #endif // CEDAR_AUX_ENUM_H
