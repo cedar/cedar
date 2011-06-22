@@ -48,71 +48,133 @@
 #include <vector>
 #include <string>
 
-//!\todo document EnumBase class
+/*!@brief A base class for making enums that are more flexible than the standard ones.
+ *
+ * To make an enum using this class, create a new class that has a static construct function. In the construct function,
+ * declare all the enum values belonging to your enum.
+ * @todo explain this better and add example code
+ */
 template <class T>
-class EnumBase
+class cedar::aux::EnumBase
 {
-  public:
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  EnumBase(const std::string& prefix = "")
+  :
+  mUndefined (Enum::UNDEFINED, prefix + "UNDEFINED")
+  {
+    T::construct();
+    this->def(mUndefined);
+  }
 
-    EnumBase(const std::string& prefix = "")
-    :
-    mUndefined (Enum::UNDEFINED, prefix + "UNDEFINED")
+  //!@brief Destructor
+  virtual ~EnumBase()
+  {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*! @brief Define a new enum value.
+   */
+  void def(const Enum& rEnum)
+  {
+    //! @todo check for duplicate values
+    this->mEnumFromId[rEnum.id()] = rEnum;
+    this->mEnumFromString[rEnum.name()] = rEnum;
+    this->mEnumList.push_back(rEnum);
+  }
+
+  /*! @brief Retrieve the enum value corresponding to id.
+   */
+  const Enum& get(EnumId id) const
+  {
+    std::map<EnumId, Enum>::const_iterator it;
+    it = this->mEnumFromId.find(id);
+    if (it != this->mEnumFromId.end())
     {
-      T::construct();
-      this->def(mUndefined);
+      return it->second;
     }
-
-    virtual ~EnumBase()
+    else
     {
+      return this->mUndefined;
     }
+  }
 
-    void def(const Enum& rEnum)
+  /*! @brief Retrieve the enum value corresponding to a string.
+   *
+   * @returns cedar::aux::Enum::UNDEFINED if there is no value corresponding to the string.
+   */
+  const Enum& get(const std::string& id) const
+  {
+    std::map<std::string, Enum>::const_iterator it;
+    it = this->mEnumFromString.find(id);
+    if (it != this->mEnumFromString.end())
     {
-      //! @todo check for duplicate values
-      this->mEnumFromId[rEnum.id()] = rEnum;
-      this->mEnumFromString[rEnum.name()] = rEnum;
-      this->mEnumList.push_back(rEnum);
+      return it->second;
     }
-
-    const Enum& get(EnumId id) const
+    else
     {
-      std::map<EnumId, Enum>::const_iterator it;
-      it = this->mEnumFromId.find(id);
-      if (it != this->mEnumFromId.end())
-      {
-        return it->second;
-      }
-      else
-      {
-        return this->mUndefined;
-      }
+      return this->mUndefined;
     }
+  }
 
-    const Enum& get(const std::string& id) const
-    {
-      std::map<std::string, Enum>::const_iterator it;
-      it = this->mEnumFromString.find(id);
-      if (it != this->mEnumFromString.end())
-      {
-        return it->second;
-      }
-      else
-      {
-        return this->mUndefined;
-      }
-    }
+  /*! @brief Returns a list containing all enum values in this class (including cedar::aux::Enum::UNDEFINED!).
+   */
+  const std::vector<Enum>& list() const
+  {
+    return this->mEnumList;
+  }
 
-    const std::vector<Enum>& list() const
-    {
-      return this->mEnumList;
-    }
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-  private:
-    std::map<EnumId, Enum> mEnumFromId;
-    std::map<std::string, Enum> mEnumFromString;
-    std::vector<Enum> mEnumList;
-    Enum mUndefined;
-};
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+private:
+  //! Map from EnumIds to enum values.
+  std::map<cedar::aux::EnumId, cedar::aux::Enum> mEnumFromId;
+
+  //! Map from strings to enum values.
+  std::map<std::string, cedar::aux::Enum> mEnumFromString;
+
+  //! List of all enums in this class.
+  std::vector<cedar::aux::Enum> mEnumList;
+
+  //! Value for undefined/invalid enums (needed for returning a reference).
+  cedar::aux::Enum mUndefined;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::EnumBase
 
 #endif // CEDAR_AUX_ENUM_BASE_H
