@@ -87,6 +87,15 @@ namespace cedar
     class Enum;
     template <typename T> class EnumBase;
 
+    class Arguments;
+
+    template <class T> class Factory;
+    template <class T, class T2> class FactoryDerived;
+
+    template <class T> class AbstractFactory;
+    template <class T, class T2> class AbstractFactoryDerived;
+
+
     /*!@brief Template method that converts simple data types to a string.
      *
      * @param[in] value The data value that will be converted to a string.
