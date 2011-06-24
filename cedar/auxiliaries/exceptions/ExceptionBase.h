@@ -90,7 +90,7 @@ public:
 public:
 
   //!@brief Compiles the exception info string.
-  virtual std::string exceptionInfo(void) const;
+  virtual const std::string& exceptionInfo() const;
 
   //!@brief Sets the message for the exception.
   void setMessage(const std::string& message);
@@ -137,6 +137,9 @@ private:
 
   //! Source-file that threw the exception.
   std::string mFileName;
+
+  //! Helper for converting the exception info to a const char* string.
+  mutable std::string mExceptionInfo;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

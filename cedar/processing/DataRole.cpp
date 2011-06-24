@@ -53,9 +53,9 @@ cedar::aux::EnumBase<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar:
 
 void cedar::proc::DataRole::construct()
 {
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT"));
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT"));
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER"));
+  mType.def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT", "Input"));
+  mType.def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT", "Output"));
+  mType.def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER", "Buffer"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
