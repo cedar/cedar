@@ -43,7 +43,7 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/LogFile.h"
-#include "processing/StepManager.h"
+#include "processing/Manager.h"
 #include "processing/Step.h"
 #include "processing/StepDeclaration.h"
 #include "processing/Arguments.h"
@@ -78,7 +78,7 @@ public:
 
 int main(int argc, char** argv)
 {
-  using cedar::proc::StepManager;
+  using cedar::proc::Manager;
   using cedar::proc::StepPtr;
 
   unsigned int errors = 0;
@@ -89,18 +89,18 @@ int main(int argc, char** argv)
 
   log_file << "Creating TestModule declaration ... ";
   cedar::proc::StepDeclarationPtr test_module_declaration (new cedar::proc::StepDeclarationT<TestModule>("TestModule"));
-  StepManager::getInstance().declareStepClass(test_module_declaration);
+  Manager::getInstance().declareStepClass(test_module_declaration);
   log_file << "done." << std::endl;
 
   log_file << "Reading Sample.json ... ";
-  StepManager::getInstance().readFile("Sample.json");
+  Manager::getInstance().readFile("Sample.json");
   log_file << "done." << std::endl;
 
   log_file << "Trying to call compute functions ... ";
-  StepPtr step_a = StepManager::getInstance().getStep("stepA");
+  StepPtr step_a = Manager::getInstance().getStep("stepA");
   step_a->compute(cedar::proc::Arguments());
 
-  StepPtr step_b = StepManager::getInstance().getStep("stepB");
+  StepPtr step_b = Manager::getInstance().getStep("stepB");
   step_b->compute(cedar::proc::Arguments());
   log_file << "done." << std::endl;
 

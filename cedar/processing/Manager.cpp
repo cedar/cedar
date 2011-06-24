@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/StepManager.h"
+#include "processing/Manager.h"
 #include "processing/Step.h"
 #include "processing/exceptions.h"
 
@@ -48,17 +48,17 @@
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 
-cedar::proc::StepManager cedar::proc::StepManager::mpManager;
+cedar::proc::Manager cedar::proc::Manager::mpManager;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::StepManager::StepManager()
+cedar::proc::Manager::Manager()
 {
 }
 
-cedar::proc::StepManager::~StepManager()
+cedar::proc::Manager::~Manager()
 {
 }
 
@@ -66,7 +66,7 @@ cedar::proc::StepManager::~StepManager()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::StepPtr cedar::proc::StepManager::allocateClass(const std::string& classId) const
+cedar::proc::StepPtr cedar::proc::Manager::allocateClass(const std::string& classId) const
 {
   std::map<std::string, StepDeclarationPtr>::const_iterator iter;
   iter = mDeclarations.find(classId);
@@ -81,7 +81,7 @@ cedar::proc::StepPtr cedar::proc::StepManager::allocateClass(const std::string& 
   }
 }
 
-void cedar::proc::StepManager::registerStep(cedar::proc::StepPtr step)
+void cedar::proc::Manager::registerStep(cedar::proc::StepPtr step)
 {
   if (this->mSteps.find(step->getName()) != this->mSteps.end())
   {
@@ -90,7 +90,7 @@ void cedar::proc::StepManager::registerStep(cedar::proc::StepPtr step)
   mSteps[step->getName()] = step;
 }
 
-void cedar::proc::StepManager::renameStep(const std::string& oldName,
+void cedar::proc::Manager::renameStep(const std::string& oldName,
                                           const std::string& newName)
 {
   cedar::proc::StepPtr step = this->getStep(oldName);
@@ -101,7 +101,7 @@ void cedar::proc::StepManager::renameStep(const std::string& oldName,
   step->setName(newName);
 }
 
-cedar::proc::StepPtr cedar::proc::StepManager::getStep(const std::string& name)
+cedar::proc::StepPtr cedar::proc::Manager::getStep(const std::string& name)
 {
   std::map<std::string, StepPtr>::iterator iter = this->mSteps.find(name);
   if (iter != this->mSteps.end())
@@ -116,12 +116,12 @@ cedar::proc::StepPtr cedar::proc::StepManager::getStep(const std::string& name)
 }
 
 
-cedar::proc::StepManager& cedar::proc::StepManager::getInstance()
+cedar::proc::Manager& cedar::proc::Manager::getInstance()
 {
-  return cedar::proc::StepManager::mpManager;
+  return cedar::proc::Manager::mpManager;
 }
 
-void cedar::proc::StepManager::declareStepClass(StepDeclarationPtr pStepDeclaration)
+void cedar::proc::Manager::declareStepClass(StepDeclarationPtr pStepDeclaration)
 {
   const std::string& class_id = pStepDeclaration->getClassId();
   if (this->mDeclarations.find(class_id) != this->mDeclarations.end())
@@ -132,14 +132,14 @@ void cedar::proc::StepManager::declareStepClass(StepDeclarationPtr pStepDeclarat
 }
 
 
-void cedar::proc::StepManager::readFile(const std::string& filename)
+void cedar::proc::Manager::readFile(const std::string& filename)
 {
   ConfigurationNode cfg;
   boost::property_tree::read_json(filename, cfg);
   this->readAll(cfg);
 }
 
-void cedar::proc::StepManager::readAll(const ConfigurationNode& root)
+void cedar::proc::Manager::readAll(const ConfigurationNode& root)
 {
   try
   {
@@ -162,14 +162,14 @@ void cedar::proc::StepManager::readAll(const ConfigurationNode& root)
   }
 }
 
-void cedar::proc::StepManager::readStep(const std::string& classId, const ConfigurationNode& root)
+void cedar::proc::Manager::readStep(const std::string& classId, const ConfigurationNode& root)
 {
   cedar::proc::StepPtr step = this->allocateClass(classId);
   step->readConfiguration(root);
   this->registerStep(step);
 }
 
-void cedar::proc::StepManager::readSteps(const ConfigurationNode& root)
+void cedar::proc::Manager::readSteps(const ConfigurationNode& root)
 {
   for (ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
@@ -179,7 +179,7 @@ void cedar::proc::StepManager::readSteps(const ConfigurationNode& root)
   }
 }
 
-void cedar::proc::StepManager::readConnection(const ConfigurationNode& root)
+void cedar::proc::Manager::readConnection(const ConfigurationNode& root)
 {
   std::string source = root.get<std::string>("source");
   std::string target = root.get<std::string>("target");
@@ -198,7 +198,7 @@ void cedar::proc::StepManager::readConnection(const ConfigurationNode& root)
                             );
 }
 
-void cedar::proc::StepManager::readConnections(const ConfigurationNode& root)
+void cedar::proc::Manager::readConnections(const ConfigurationNode& root)
 {
   for (ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
@@ -208,7 +208,7 @@ void cedar::proc::StepManager::readConnections(const ConfigurationNode& root)
   }
 }
 
-void cedar::proc::StepManager::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
+void cedar::proc::Manager::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
 {
   size_t dot_idx = instr.rfind('.');
   if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)

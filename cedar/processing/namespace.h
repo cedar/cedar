@@ -80,7 +80,7 @@ namespace cedar
     class Trigger;
     typedef boost::shared_ptr<Trigger> TriggerPtr;
 
-    class StepManager;
+    class Manager;
     class StepDeclaration;
     typedef boost::shared_ptr<StepDeclaration> StepDeclarationPtr;
     template <class DerivedClass> class StepDeclarationT;

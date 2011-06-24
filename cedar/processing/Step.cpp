@@ -44,7 +44,7 @@
 #include "processing/Data.h"
 #include "auxiliaries/macros.h"
 #include "processing/exceptions.h"
-#include "processing/StepManager.h"
+#include "processing/Manager.h"
 
 // PROJECT INCLUDES
 
@@ -59,8 +59,8 @@ cedar::proc::Step::Step(bool runInThread, bool autoConnectTriggers)
 mFinished(new cedar::proc::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
-mRunInThread(runInThread),
-mMandatoryConnectionsAreSet (true)
+mMandatoryConnectionsAreSet (true),
+mRunInThread(runInThread)
 {
 }
 
@@ -196,6 +196,7 @@ void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, 
 
     CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
   }
+
   SlotMap::iterator map_iter = iter->second.find(name);
   if (map_iter != iter->second.end())
   {
@@ -204,6 +205,14 @@ void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, 
                  + " data-declaration with the name " + name + ".");
     return;
   }
+
+  if (name.find('.') != std::string::npos)
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Buffer names may not contain the character \".\". \""
+                                                   + name + "\" in step \"" + this->getName()
+                                                   + "\" violates this rule.");
+  }
+
   iter->second[name] = DataEntry(mandatory);
 
   this->checkMandatoryConnections();
