@@ -110,7 +110,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
+}; // class cedar::Neuron
 }
 #endif // CEDAR_NEURON_H
 

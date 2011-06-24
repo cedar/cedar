@@ -157,9 +157,7 @@ private:
   /*!@brief Whether the connect function should automatically connect the triggers as well.
    */
   const bool mAutoConnectTriggers;
-
   bool mBusy;
-  bool mRunInThread;
   ArgumentsPtr mNextArguments;
   bool mMandatoryConnectionsAreSet;
 
@@ -172,7 +170,7 @@ protected:
   // none yet
 
 private:
-  // none yet
+  bool mRunInThread;
 
 }; // class cedar::proc::Step
 

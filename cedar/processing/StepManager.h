@@ -124,7 +124,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
+}; // class cedar::StepManager
 
 #endif // CEDAR_PROC_STEP_MANAGER_H
 
