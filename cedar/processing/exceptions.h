@@ -81,7 +81,8 @@ class cedar::proc::DuplicateNameException: public cedar::aux::exc::ExceptionBase
 }; // class cedar::proc::DuplicateNameException
 
 
-/*! @todo Describe
+/*!@brief An exception that is thrown, when a processing step would be executed while some mandatory connections are
+ *        still missing.
  */
 class cedar::proc::MissingConnectionException: public cedar::aux::exc::ExceptionBase
 {
