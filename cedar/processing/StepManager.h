@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        StepManager.h
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 06 24
 
     Description:
 
@@ -34,25 +38,24 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_NEURON_H
-#define CEDAR_NEURON_H
+#ifndef CEDAR_PROC_STEP_MANAGER_H
+#define CEDAR_PROC_STEP_MANAGER_H
 
 // LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "dynamics/Activation.h"
+#include "processing/namespace.h"
+#include "processing/StepDeclaration.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <map>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-namespace cedar
-{
-class Neuron : public cedar::dyn::Dynamics
+class cedar::proc::StepManager
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -62,29 +65,41 @@ class Neuron : public cedar::dyn::Dynamics
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Neuron(double interactionWeight = -1.0, double restingLevel = -1000.0);
+
   //!@brief Destructor
-  ~Neuron();
+  ~StepManager();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  double getActivity() const;
+  static StepManager& getInstance();
+  void declareStepClass(StepDeclarationPtr pStepDeclaration);
+  void readStep(const std::string& classId, const ConfigurationNode& root);
+  void readSteps(const ConfigurationNode& root);
+  void readConnection(const ConfigurationNode& root);
+  void readConnections(const ConfigurationNode& root);
+  void readAll(const ConfigurationNode& root);
+  void readFile(const std::string& filename);
 
-  void readConfiguration(const cedar::proc::ConfigurationNode& node);
+  void registerStep(cedar::proc::StepPtr step);
+  void renameStep(const std::string& oldName, const std::string& newName);
+  cedar::proc::StepPtr getStep(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Time& time);
+  StepPtr allocateClass(const std::string& classId) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief The standard constructor.
+  StepManager();
+
+  static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -94,10 +109,9 @@ public:
 protected:
   // none yet
 private:
-  double mRestingLevel;
-  double mInteractionWeight;
-  cedar::dyn::DoubleActivationPtr mActivation;
-  cedar::dyn::DoubleActivationPtr mOutput;
+  static StepManager mpManager;
+  std::map<std::string, StepDeclarationPtr> mDeclarations;
+  std::map<std::string, StepPtr> mSteps;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -111,6 +125,6 @@ private:
   // none yet
 
 }; // class cedar::xxx
-}
-#endif // CEDAR_NEURON_H
+
+#endif // CEDAR_PROC_STEP_MANAGER_H
 

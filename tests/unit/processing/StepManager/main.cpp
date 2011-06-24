@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 06 24
 
     Description:
 
@@ -43,65 +43,66 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/LogFile.h"
-#include "processing/Arguments.h"
-#include "Neuron.h"
-#include "processing/LoopedTrigger.h"
-#include "processing/Step.h"
-#include "processing/StepTime.h"
 #include "processing/StepManager.h"
+#include "processing/Step.h"
 #include "processing/StepDeclaration.h"
+#include "processing/Arguments.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 
 using namespace cedar::aux;
 
-typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
+class TestModule : public cedar::proc::Step
+{
+public:
+  TestModule()
+  {
+  }
+
+  void compute(const cedar::proc::Arguments& arguments)
+  {
+    std::cout << "processing " << this->getName() << " = " << this->_mMessage << std::endl;
+  }
+
+  void readConfiguration(const cedar::proc::ConfigurationNode& node)
+  {
+    this->cedar::proc::Step::readConfiguration(node);
+    _mMessage = node.get<std::string>("outputString", "defaultOutputString");
+  }
+
+  std::string _mMessage;
+};
+
+
 
 int main(int argc, char** argv)
 {
+  using cedar::proc::StepManager;
+  using cedar::proc::StepPtr;
+
   unsigned int errors = 0;
 
-  LogFile log_file("Dynamics.log");
+  LogFile log_file("StepManager.log");
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  log_file << "Generating StepDeclaration for Neuron ... ";
-  cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("Neuron"));
-  cedar::proc::StepManager::getInstance().declareStepClass(neuron_declaration);
+  log_file << "Creating TestModule declaration ... ";
+  cedar::proc::StepDeclarationPtr test_module_declaration (new cedar::proc::StepDeclarationT<TestModule>("TestModule"));
+  StepManager::getInstance().declareStepClass(test_module_declaration);
   log_file << "done." << std::endl;
 
-  log_file << "Reading Setup1.json ... ";
-  cedar::proc::StepManager::getInstance().readFile("Setup1.json");
+  log_file << "Reading Sample.json ... ";
+  StepManager::getInstance().readFile("Sample.json");
   log_file << "done." << std::endl;
 
-  // Create trigger for the "main loop"
-  NeuronPtr neuron_1
-    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::StepManager::getInstance().getStep("Neuron 1"));
-  NeuronPtr neuron_2
-    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::StepManager::getInstance().getStep("Neuron 2"));
-  cedar::proc::LoopedTriggerPtr looped_trigger(new cedar::proc::LoopedTrigger(0.1));
-  looped_trigger->addListener(neuron_1);
-  looped_trigger->addListener(neuron_2);
+  log_file << "Trying to call compute functions ... ";
+  StepPtr step_a = StepManager::getInstance().getStep("stepA");
+  step_a->compute(cedar::proc::Arguments());
 
-  // start the processing
-  looped_trigger->start();
-
-  // preiodically read out activation values
-  for (unsigned int i = 0; i < 1000; i++)
-  {
-    if (i % 10 == 0)
-    {
-      log_file << neuron_1->getActivity()
-               << " "
-               << neuron_2->getActivity()
-               << std::endl;
-    }
-    usleep(1000);
-  }
-
-  // stop the processing
-  looped_trigger->stop();
+  StepPtr step_b = StepManager::getInstance().getStep("stepB");
+  step_b->compute(cedar::proc::Arguments());
+  log_file << "done." << std::endl;
 
   // return
   log_file << "Done. There were " << errors << " errors." << std::endl;

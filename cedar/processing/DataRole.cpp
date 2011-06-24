@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,8 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Arguments.cpp
-
+    File:        DataRole.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -31,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 24
 
     Description:
 
@@ -40,20 +39,31 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Arguments.h"
+#include "processing/DataRole.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+cedar::aux::EnumBase<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Arguments::~Arguments()
+void cedar::proc::DataRole::construct()
 {
+  mType.def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT"));
+  mType.def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT"));
+  mType.def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+const cedar::aux::EnumBase<cedar::proc::DataRole>& cedar::proc::DataRole::type()
+{
+  return cedar::proc::DataRole::mType;
+}
+

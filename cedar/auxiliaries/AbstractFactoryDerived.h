@@ -51,7 +51,7 @@
  * More detailed description of the class.
  */
 template <typename BaseType, typename DerivedType>
-class cedar::aux::AbstractFactoryDerived
+class cedar::aux::AbstractFactoryDerived : public AbstractFactory<BaseType>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

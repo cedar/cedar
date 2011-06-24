@@ -65,6 +65,13 @@ cedar::Neuron::~Neuron()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::Neuron::readConfiguration(const cedar::proc::ConfigurationNode& node)
+{
+  this->cedar::proc::Step::readConfiguration(node);
+  this->mRestingLevel = node.get<double>("restingLevel", -1000.0);
+  this->mInteractionWeight = node.get<double>("interactionWeight", -1.0);
+}
+
 double cedar::Neuron::getActivity() const
 {
   return this->mActivation->getData();
@@ -82,7 +89,7 @@ void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
   double interaction = 0;
   if (input >= 0)
   {
-    interaction = input;
+    interaction = 1.0;
   }
 
   activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + mRestingLevel + mInteractionWeight * input);

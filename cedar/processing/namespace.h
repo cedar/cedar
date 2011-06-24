@@ -39,11 +39,13 @@
 #define CEDAR_PROC_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/AbstractFactory.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 
 namespace cedar
@@ -51,13 +53,6 @@ namespace cedar
   /*!@brief Namespace for all processing classes. */
   namespace proc
   {
-    enum DataRole
-    {
-      DATA_ROLE_INPUT,
-      DATA_ROLE_OUTPUT,
-      DATA_ROLE_BUFFER
-    };
-
     class Arguments;
     typedef boost::shared_ptr<Arguments> ArgumentsPtr;
 
@@ -65,6 +60,8 @@ namespace cedar
     typedef boost::shared_ptr<Data> DataPtr;
 
     template <typename T> class DataT;
+
+    class DataRole;
 
     class LoopArguments;
 
@@ -82,6 +79,15 @@ namespace cedar
 
     class Trigger;
     typedef boost::shared_ptr<Trigger> TriggerPtr;
+
+    class StepManager;
+    class StepDeclaration;
+    typedef boost::shared_ptr<StepDeclaration> StepDeclarationPtr;
+    template <class DerivedClass> class StepDeclarationT;
+
+    typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
+
+    typedef boost::property_tree::ptree ConfigurationNode;
 
     /* Exceptions */
     class InvalidNameException;
