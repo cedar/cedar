@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_MANAGER_H
-#define CEDAR_PROC_STEP_MANAGER_H
+#ifndef CEDAR_PROC_MANAGER_H
+#define CEDAR_PROC_MANAGER_H
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::StepManager
+class cedar::proc::Manager
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,13 +67,13 @@ class cedar::proc::StepManager
 public:
 
   //!@brief Destructor
-  ~StepManager();
+  ~Manager();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static StepManager& getInstance();
+  static Manager& getInstance();
   void declareStepClass(StepDeclarationPtr pStepDeclaration);
   void readStep(const std::string& classId, const ConfigurationNode& root);
   void readSteps(const ConfigurationNode& root);
@@ -97,7 +97,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief The standard constructor.
-  StepManager();
+  Manager();
 
   static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
 
@@ -109,7 +109,7 @@ public:
 protected:
   // none yet
 private:
-  static StepManager mpManager;
+  static Manager mpManager;
   std::map<std::string, StepDeclarationPtr> mDeclarations;
   std::map<std::string, StepPtr> mSteps;
 
@@ -124,7 +124,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::StepManager
+}; // class cedar::Manager
 
-#endif // CEDAR_PROC_STEP_MANAGER_H
+#endif // CEDAR_PROC_MANAGER_H
 

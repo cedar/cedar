@@ -48,7 +48,7 @@
 #include "processing/LoopedTrigger.h"
 #include "processing/Step.h"
 #include "processing/StepTime.h"
-#include "processing/StepManager.h"
+#include "processing/Manager.h"
 #include "processing/StepDeclaration.h"
 
 // SYSTEM INCLUDES
@@ -68,18 +68,18 @@ int main(int argc, char** argv)
 
   log_file << "Generating StepDeclaration for Neuron ... ";
   cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("Neuron"));
-  cedar::proc::StepManager::getInstance().declareStepClass(neuron_declaration);
+  cedar::proc::Manager::getInstance().declareStepClass(neuron_declaration);
   log_file << "done." << std::endl;
 
   log_file << "Reading Setup1.json ... ";
-  cedar::proc::StepManager::getInstance().readFile("Setup1.json");
+  cedar::proc::Manager::getInstance().readFile("Setup1.json");
   log_file << "done." << std::endl;
 
   // Create trigger for the "main loop"
   NeuronPtr neuron_1
-    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::StepManager::getInstance().getStep("Neuron 1"));
+    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::Manager::getInstance().getStep("Neuron 1"));
   NeuronPtr neuron_2
-    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::StepManager::getInstance().getStep("Neuron 2"));
+    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::Manager::getInstance().getStep("Neuron 2"));
   cedar::proc::LoopedTriggerPtr looped_trigger(new cedar::proc::LoopedTrigger(0.1));
   looped_trigger->addListener(neuron_1);
   looped_trigger->addListener(neuron_2);
