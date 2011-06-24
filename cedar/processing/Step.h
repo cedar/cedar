@@ -44,6 +44,7 @@
 // LOCAL INCLUDES
 #include "processing/namespace.h"
 #include "processing/Trigger.h"
+#include "processing/DataRole.h"
 #include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
@@ -105,20 +106,22 @@ public:
 
   void setThreaded(bool isThreaded);
 
-  void declareData(DataRole role, const std::string& name, bool mandatory = true);
+  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
   void declareInput(const std::string& name, bool mandatory = true);
   void declareBuffer(const std::string& name, bool mandatory = true);
   void declareOutput(const std::string& name, bool mandatory = true);
 
-  void setData(DataRole role, const std::string& name, cedar::proc::DataPtr data);
+  void setData(DataRole::Id role, const std::string& name, cedar::proc::DataPtr data);
   void setInput(const std::string& name, cedar::proc::DataPtr data);
   void setBuffer(const std::string& name, cedar::proc::DataPtr data);
   void setOutput(const std::string& name, cedar::proc::DataPtr data);
 
-  cedar::proc::DataPtr getData(DataRole role, const std::string& name);
+  cedar::proc::DataPtr getData(DataRole::Id role, const std::string& name);
   cedar::proc::DataPtr getInput(const std::string& name);
   cedar::proc::DataPtr getBuffer(const std::string& name);
   cedar::proc::DataPtr getOutput(const std::string& name);
+
+  virtual void readConfiguration(const cedar::proc::ConfigurationNode& node);
 
   static void connect(
                        cedar::proc::StepPtr source,
@@ -148,7 +151,7 @@ protected:
   cedar::proc::TriggerPtr mFinished;
 
   typedef std::map<std::string, DataEntry> SlotMap;
-  std::map<DataRole, SlotMap> mDataConnections;
+  std::map<DataRole::Id, SlotMap> mDataConnections;
 
 private:
   /*!@brief Whether the connect function should automatically connect the triggers as well.

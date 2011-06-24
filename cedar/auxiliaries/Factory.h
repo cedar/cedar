@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Arguments.h"
 
 // PROJECT INCLUDES
 
@@ -72,9 +71,9 @@ public:
    *
    * @returns A smart pointer to the newly allocated resource.
    */
-  virtual boost::shared_ptr<BaseType> allocate(const cedar::aux::Arguments& args) const
+  virtual boost::shared_ptr<BaseType> allocate() const
   {
-    return boost::shared_ptr<BaseType> (new BaseType(args));
+    return boost::shared_ptr<BaseType> (new BaseType());
   }
 
   //--------------------------------------------------------------------------------------------------------------------

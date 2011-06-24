@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Arguments.h
+    File:        DataRole.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 24
 
     Description:
 
@@ -38,11 +38,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ARGUMENTS_H
-#define CEDAR_AUX_ARGUMENTS_H
+#ifndef CEDAR_PROC_DATA_ROLE_H
+#define CEDAR_PROC_DATA_ROLE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "auxiliaries/EnumBase.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -53,11 +54,13 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::Arguments
+class cedar::proc::DataRole
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef cedar::aux::EnumId Id;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -66,13 +69,14 @@ public:
   //!@brief The standard constructor.
 
   //!@brief Destructor
-  virtual ~Arguments();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  static void construct();
+
+  static const cedar::aux::EnumBase<cedar::proc::DataRole>& type();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -90,11 +94,14 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (hopefully never!)
+  static const Id INPUT = 0;
+  static const Id OUTPUT = 1;
+  static const Id BUFFER = 2;
+
 protected:
   // none yet
 private:
-  // none yet
+  static cedar::aux::EnumBase<cedar::proc::DataRole> mType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -107,7 +114,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::Arguments
+}; // class cedar::proc::DataRole
 
-#endif // CEDAR_AUX_ARGUMENTS_H
+#endif // CEDAR_PROC_DATA_ROLE_H
 
