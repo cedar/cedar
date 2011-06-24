@@ -293,10 +293,10 @@ cedar::proc::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::st
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException,
-                "The requested " +
-                cedar::proc::DataRole::type().get(role).prettyString() +
-                + "name does not exist.");
+    CEDAR_THROW(cedar::proc::InvalidNameException, "The requested "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   + " name \"" + name + "\" does not exist in step \""
+                                                   + this->getName() + "\".");
     return cedar::proc::DataPtr();
   }
   return map_iterator->second.getData();
