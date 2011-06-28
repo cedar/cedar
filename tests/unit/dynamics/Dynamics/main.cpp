@@ -60,6 +60,9 @@ typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
 
 int main(int argc, char** argv)
 {
+  using cedar::proc::LoopedTrigger;
+  using cedar::proc::Manager;
+
   unsigned int errors = 0;
 
   LogFile log_file("Dynamics.log");
@@ -68,24 +71,19 @@ int main(int argc, char** argv)
 
   log_file << "Generating StepDeclaration for Neuron ... ";
   cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("Neuron"));
-  cedar::proc::Manager::getInstance().declareStepClass(neuron_declaration);
+  Manager::getInstance().declareStepClass(neuron_declaration);
   log_file << "done." << std::endl;
 
   log_file << "Reading Setup1.json ... ";
-  cedar::proc::Manager::getInstance().readFile("Setup1.json");
+  Manager::getInstance().readFile("Setup1.json");
   log_file << "done." << std::endl;
 
   // Create trigger for the "main loop"
-  NeuronPtr neuron_1
-    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::Manager::getInstance().getStep("Neuron 1"));
-  NeuronPtr neuron_2
-    = boost::dynamic_pointer_cast<cedar::Neuron>(cedar::proc::Manager::getInstance().getStep("Neuron 2"));
-  cedar::proc::LoopedTriggerPtr looped_trigger(new cedar::proc::LoopedTrigger(0.1));
-  looped_trigger->addListener(neuron_1);
-  looped_trigger->addListener(neuron_2);
+  NeuronPtr neuron_1 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().getStep("Neuron 1"));
+  NeuronPtr neuron_2 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().getStep("Neuron 2"));
 
   // start the processing
-  looped_trigger->start();
+  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().getTrigger("Main Trigger"))->start();
 
   // preiodically read out activation values
   for (unsigned int i = 0; i < 1000; i++)
@@ -101,7 +99,7 @@ int main(int argc, char** argv)
   }
 
   // stop the processing
-  looped_trigger->stop();
+  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().getTrigger("Main Trigger"))->stop();
 
   // return
   log_file << "Done. There were " << errors << " errors." << std::endl;

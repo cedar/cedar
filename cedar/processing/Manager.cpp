@@ -42,6 +42,9 @@
 #include "processing/Manager.h"
 #include "processing/Step.h"
 #include "processing/exceptions.h"
+#include "processing/TriggerDeclaration.h"
+#include "processing/Trigger.h"
+#include "processing/LoopedTrigger.h"
 
 // PROJECT INCLUDES
 
@@ -50,12 +53,29 @@
 
 cedar::proc::Manager cedar::proc::Manager::mpManager;
 
+//#define DEBUG_FILE_READING
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::Manager::Manager()
 {
+  /*!
+   *@todo find a better way to load declarations here; mostly, this can be a problem, if other modules want to declare
+   *      things as well.
+   *@todo Names?
+   */
+  TriggerDeclarationPtr trigger_declaration(new TriggerDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
+  this->declareTriggerClass(trigger_declaration);
+
+  TriggerDeclarationPtr looped_trigger_declaration(
+                                                     new TriggerDeclarationT<cedar::proc::LoopedTrigger>
+                                                     (
+                                                       "cedar.processing.LoopedTrigger"
+                                                     )
+                                                  );
+  this->declareTriggerClass(looped_trigger_declaration);
 }
 
 cedar::proc::Manager::~Manager()
@@ -69,15 +89,30 @@ cedar::proc::Manager::~Manager()
 cedar::proc::StepPtr cedar::proc::Manager::allocateClass(const std::string& classId) const
 {
   std::map<std::string, StepDeclarationPtr>::const_iterator iter;
-  iter = mDeclarations.find(classId);
+  iter = mStepDeclarations.find(classId);
 
-  if (iter != mDeclarations.end())
+  if (iter != mStepDeclarations.end())
   {
     return iter->second->getStepFactory()->allocate();
   }
   else
   {
     return cedar::proc::StepPtr();
+  }
+}
+
+cedar::proc::TriggerPtr cedar::proc::Manager::allocateTrigger(const std::string& classId) const
+{
+  std::map<std::string, TriggerDeclarationPtr>::const_iterator iter;
+  iter = mTriggerDeclarations.find(classId);
+
+  if (iter != mTriggerDeclarations.end())
+  {
+    return iter->second->getTriggerFactory()->allocate();
+  }
+  else
+  {
+    return cedar::proc::TriggerPtr();
   }
 }
 
@@ -88,6 +123,15 @@ void cedar::proc::Manager::registerStep(cedar::proc::StepPtr step)
     CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate step entry: " + step->getName());
   }
   mSteps[step->getName()] = step;
+}
+
+void cedar::proc::Manager::registerTrigger(cedar::proc::TriggerPtr trigger)
+{
+  if (this->mTriggers.find(trigger->getName()) != this->mTriggers.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate trigger entry: " + trigger->getName());
+  }
+  mTriggers[trigger->getName()] = trigger;
 }
 
 void cedar::proc::Manager::renameStep(const std::string& oldName,
@@ -115,6 +159,19 @@ cedar::proc::StepPtr cedar::proc::Manager::getStep(const std::string& name)
   }
 }
 
+cedar::proc::TriggerPtr cedar::proc::Manager::getTrigger(const std::string& name)
+{
+  std::map<std::string, TriggerPtr>::iterator iter = this->mTriggers.find(name);
+  if (iter != this->mTriggers.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown trigger: " + name);
+    return cedar::proc::TriggerPtr();
+  }
+}
 
 cedar::proc::Manager& cedar::proc::Manager::getInstance()
 {
@@ -124,16 +181,29 @@ cedar::proc::Manager& cedar::proc::Manager::getInstance()
 void cedar::proc::Manager::declareStepClass(StepDeclarationPtr pStepDeclaration)
 {
   const std::string& class_id = pStepDeclaration->getClassId();
-  if (this->mDeclarations.find(class_id) != this->mDeclarations.end())
+  if (this->mStepDeclarations.find(class_id) != this->mStepDeclarations.end())
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate class declaration: " + class_id);
   }
-  this->mDeclarations[class_id] = pStepDeclaration;
+  this->mStepDeclarations[class_id] = pStepDeclaration;
+}
+
+void cedar::proc::Manager::declareTriggerClass(TriggerDeclarationPtr pDeclaration)
+{
+  const std::string& class_id = pDeclaration->getClassId();
+  if (this->mTriggerDeclarations.find(class_id) != this->mTriggerDeclarations.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate trigger declaration: " + class_id);
+  }
+  this->mTriggerDeclarations[class_id] = pDeclaration;
 }
 
 
 void cedar::proc::Manager::readFile(const std::string& filename)
 {
+#ifdef DEBUG_FILE_READING
+  std::cout << "Reading configuration file " << filename << std::endl;
+#endif // DEBUG_FILE_READING
   ConfigurationNode cfg;
   boost::property_tree::read_json(filename, cfg);
   this->readAll(cfg);
@@ -149,21 +219,43 @@ void cedar::proc::Manager::readAll(const ConfigurationNode& root)
   catch (const boost::property_tree::ptree_bad_path&)
   {
     // no steps declared -- this is ok.
+#if defined DEBUG || defined DEBUG_FILE_READING
+    std::cout << "No steps present while reading configuration." << std::endl;
+#endif // defined DEBUG || defined DEBUG_FILE_READING
   }
 
   try
   {
     const ConfigurationNode& connections = root.get_child("connections");
-    this->readConnections(connections);
+    this->readDataConnections(connections);
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
     // no connections declared -- this is ok.
+#if defined DEBUG || defined DEBUG_FILE_READING
+    std::cout << "No data connections present while reading configuration." << std::endl;
+#endif // defined DEBUG || defined DEBUG_FILE_READING
+  }
+
+  try
+  {
+    const ConfigurationNode& triggers = root.get_child("triggers");
+    this->readTriggers(triggers);
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+#if defined DEBUG || defined DEBUG_FILE_READING
+    std::cout << "No triggers present while reading configuration." << std::endl;
+#endif // defined DEBUG || defined DEBUG_FILE_READING
   }
 }
 
 void cedar::proc::Manager::readStep(const std::string& classId, const ConfigurationNode& root)
 {
+#ifdef DEBUG_FILE_READING
+  std::cout << "Reading step of type " << classId << std::endl;
+#endif // DEBUG_FILE_READING
+
   cedar::proc::StepPtr step = this->allocateClass(classId);
   step->readConfiguration(root);
   this->registerStep(step);
@@ -171,6 +263,10 @@ void cedar::proc::Manager::readStep(const std::string& classId, const Configurat
 
 void cedar::proc::Manager::readSteps(const ConfigurationNode& root)
 {
+#ifdef DEBUG_FILE_READING
+  std::cout << "Reading steps." << std::endl;
+#endif // DEBUG_FILE_READING
+
   for (ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
@@ -179,10 +275,66 @@ void cedar::proc::Manager::readSteps(const ConfigurationNode& root)
   }
 }
 
-void cedar::proc::Manager::readConnection(const ConfigurationNode& root)
+void cedar::proc::Manager::readTrigger(const std::string& classId, const ConfigurationNode& root)
+{
+#ifdef DEBUG_FILE_READING
+  std::cout << "Reading trigger of type " << classId << std::endl;
+#endif // DEBUG_FILE_READING
+
+  cedar::proc::TriggerPtr trigger = this->allocateTrigger(classId);
+  trigger->readConfiguration(root);
+  this->registerTrigger(trigger);
+
+  // listeners
+  try
+  {
+    //!@todo Does this belong into cedar::proc::Trigger::readConfiguration?
+    const ConfigurationNode& listeners = root.get_child("listeners");
+
+    for (ConfigurationNode::const_iterator iter = listeners.begin();
+        iter != listeners.end();
+        ++iter)
+    {
+      std::string listener_name = iter->second.data();
+
+#ifdef DEBUG_FILE_READING
+  std::cout << "Adding listener " << listener_name << std::endl;
+#endif // DEBUG_FILE_READING
+
+      cedar::proc::StepPtr step = this->getStep(listener_name);
+      trigger->addListener(step);
+    }
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // no listeners declared -- this is ok.
+  }
+}
+
+void cedar::proc::Manager::readTriggers(const ConfigurationNode& root)
+{
+#ifdef DEBUG_FILE_READING
+  std::cout << "Reading triggers." << std::endl;
+#endif // DEBUG_FILE_READING
+
+  for (ConfigurationNode::const_iterator iter = root.begin();
+      iter != root.end();
+      ++iter)
+  {
+    this->readTrigger(iter->first, iter->second);
+  }
+}
+
+
+void cedar::proc::Manager::readDataConnection(const ConfigurationNode& root)
 {
   std::string source = root.get<std::string>("source");
   std::string target = root.get<std::string>("target");
+
+#ifdef DEBUG_FILE_READING
+  std::cout << "Connecting data: source = \"" << source
+            << "\", target = \"" << target << "\"" << std::endl;
+#endif // DEBUG_FILE_READING
 
   std::string source_step, source_data;
   std::string target_step, target_data;
@@ -198,13 +350,17 @@ void cedar::proc::Manager::readConnection(const ConfigurationNode& root)
                             );
 }
 
-void cedar::proc::Manager::readConnections(const ConfigurationNode& root)
+void cedar::proc::Manager::readDataConnections(const ConfigurationNode& root)
 {
+#ifdef DEBUG_FILE_READING
+  std::cout << "Reading data connections." << std::endl;
+#endif // DEBUG_FILE_READING
+
   for (ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {
-    this->readConnection(iter->second);
+    this->readDataConnection(iter->second);
   }
 }
 
