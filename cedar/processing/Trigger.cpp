@@ -151,3 +151,8 @@ const std::vector<cedar::proc::StepPtr>& cedar::proc::Trigger::getListeners() co
   return this->mListeners;
 }
 
+void cedar::proc::Trigger::readConfiguration(const cedar::proc::ConfigurationNode& node)
+{
+  this->setName(node.get<std::string>("name"));
+}
+

@@ -17,6 +17,15 @@
     }
   },
   
+  "triggers":
+  {
+  	"cedar.processing.LoopedTrigger":
+  	{
+  	  "name": "Main Trigger",
+  	  "listeners": ["Neuron 1", "Neuron 2"]
+  	}
+  },
+  
   "connections":
   [
     {

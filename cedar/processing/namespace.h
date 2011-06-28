@@ -81,11 +81,17 @@ namespace cedar
     typedef boost::shared_ptr<Trigger> TriggerPtr;
 
     class Manager;
+
     class StepDeclaration;
     typedef boost::shared_ptr<StepDeclaration> StepDeclarationPtr;
     template <class DerivedClass> class StepDeclarationT;
 
+    class TriggerDeclaration;
+    typedef boost::shared_ptr<TriggerDeclaration> TriggerDeclarationPtr;
+    template <class DerivedClass> class TriggerDeclarationT;
+
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
+    typedef boost::shared_ptr<cedar::aux::Factory<Trigger> > TriggerFactoryPtr;
 
     typedef boost::property_tree::ptree ConfigurationNode;
 

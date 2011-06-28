@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepManager.h
+    File:        TriggerDeclaration.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,102 +38,109 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_MANAGER_H
-#define CEDAR_PROC_MANAGER_H
+#ifndef CEDAR_PROC_TRIGGER_DECLARATION_H
+#define CEDAR_PROC_TRIGGER_DECLARATION_H
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
-#include "processing/StepDeclaration.h"
-#include "processing/TriggerDeclaration.h"
+#include "auxiliaries/Factory.h"
+#include "auxiliaries/FactoryDerived.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <map>
 
-
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
- */
-class cedar::proc::Manager
+class cedar::proc::TriggerDeclaration
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief Destructor
-  ~Manager();
+  TriggerDeclaration(cedar::proc::TriggerFactoryPtr classFactory, const std::string& classId)
+  :
+  mpClassFactory(classFactory),
+  mClassId(classId)
+  {
+  }
+
+  virtual ~TriggerDeclaration()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static Manager& getInstance();
-  void declareStepClass(StepDeclarationPtr pStepDeclaration);
-  void declareTriggerClass(TriggerDeclarationPtr pDeclaration);
-  void readStep(const std::string& classId, const ConfigurationNode& root);
-  void readSteps(const ConfigurationNode& root);
-  void readTrigger(const std::string& classId, const ConfigurationNode& root);
-  void readTriggers(const ConfigurationNode& root);
-  void readDataConnection(const ConfigurationNode& root);
-  void readDataConnections(const ConfigurationNode& root);
-  void readAll(const ConfigurationNode& root);
-  void readFile(const std::string& filename);
+  cedar::proc::TriggerFactoryPtr getTriggerFactory()
+  {
+    return this->mpClassFactory;
+  }
 
-  void registerStep(cedar::proc::StepPtr step);
-  void registerTrigger(cedar::proc::TriggerPtr trigger);
-  void renameStep(const std::string& oldName, const std::string& newName);
-  cedar::proc::StepPtr getStep(const std::string& name);
-  cedar::proc::TriggerPtr getTrigger(const std::string& name);
+  const std::string& getClassId()
+  {
+    return this->mClassId;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  StepPtr allocateClass(const std::string& classId) const;
-  TriggerPtr allocateTrigger(const std::string& classId) const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief The standard constructor.
-  Manager();
-
-  static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
+  cedar::proc::TriggerFactoryPtr mpClassFactory;
+  std::string mClassId;
 private:
-  static Manager mpManager;
-  std::map<std::string, StepDeclarationPtr> mStepDeclarations;
-  std::map<std::string, StepPtr> mSteps;
-
-  std::map<std::string, TriggerDeclarationPtr> mTriggerDeclarations;
-  std::map<std::string, TriggerPtr> mTriggers;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
+};
 
-}; // class cedar::Manager
 
-#endif // CEDAR_PROC_MANAGER_H
+/*!@brief Abstract description of the class with templates.
+ *
+ * More detailed description of the class with templates.
+ */
+template <class DerivedClass>
+class cedar::proc::TriggerDeclarationT : public TriggerDeclaration
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  TriggerDeclarationT(const std::string& classId)
+  :
+  TriggerDeclaration
+  (
+    cedar::proc::TriggerFactoryPtr(new cedar::aux::FactoryDerived<cedar::proc::Trigger, DerivedClass>()),
+    classId
+  )
+  {
+  }
+
+  //!@brief Destructor
+  ~TriggerDeclarationT()
+  {
+  }
+}; // class cedar::proc::TriggerDeclarationT
+
+#endif // CEDAR_PROC_TRIGGER_DECLARATION_H
 
