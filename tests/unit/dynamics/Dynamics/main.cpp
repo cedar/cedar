@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
   log_file << "Generating StepDeclaration for Neuron ... ";
   cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("Neuron"));
-  Manager::getInstance().declareStepClass(neuron_declaration);
+  Manager::getInstance().steps().declareClass(neuron_declaration);
   log_file << "done." << std::endl;
 
   log_file << "Reading Setup1.json ... ";
@@ -79,8 +79,8 @@ int main(int argc, char** argv)
   log_file << "done." << std::endl;
 
   // Create trigger for the "main loop"
-  NeuronPtr neuron_1 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().getStep("Neuron 1"));
-  NeuronPtr neuron_2 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().getStep("Neuron 2"));
+  NeuronPtr neuron_1 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().steps().get("Neuron 1"));
+  NeuronPtr neuron_2 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().steps().get("Neuron 2"));
 
   // start the processing
   boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().getTrigger("Main Trigger"))->start();

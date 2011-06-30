@@ -45,6 +45,7 @@
 #include "processing/TriggerDeclaration.h"
 #include "processing/Trigger.h"
 #include "processing/LoopedTrigger.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -86,19 +87,9 @@ cedar::proc::Manager::~Manager()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::StepPtr cedar::proc::Manager::allocateClass(const std::string& classId) const
+cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()
 {
-  std::map<std::string, StepDeclarationPtr>::const_iterator iter;
-  iter = mStepDeclarations.find(classId);
-
-  if (iter != mStepDeclarations.end())
-  {
-    return iter->second->getStepFactory()->allocate();
-  }
-  else
-  {
-    return cedar::proc::StepPtr();
-  }
+  return this->mStepRegistry;
 }
 
 cedar::proc::TriggerPtr cedar::proc::Manager::allocateTrigger(const std::string& classId) const
@@ -116,15 +107,6 @@ cedar::proc::TriggerPtr cedar::proc::Manager::allocateTrigger(const std::string&
   }
 }
 
-void cedar::proc::Manager::registerStep(cedar::proc::StepPtr step)
-{
-  if (this->mSteps.find(step->getName()) != this->mSteps.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate step entry: " + step->getName());
-  }
-  mSteps[step->getName()] = step;
-}
-
 void cedar::proc::Manager::registerTrigger(cedar::proc::TriggerPtr trigger)
 {
   if (this->mTriggers.find(trigger->getName()) != this->mTriggers.end())
@@ -132,31 +114,6 @@ void cedar::proc::Manager::registerTrigger(cedar::proc::TriggerPtr trigger)
     CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate trigger entry: " + trigger->getName());
   }
   mTriggers[trigger->getName()] = trigger;
-}
-
-void cedar::proc::Manager::renameStep(const std::string& oldName,
-                                          const std::string& newName)
-{
-  cedar::proc::StepPtr step = this->getStep(oldName);
-
-  mSteps.erase(mSteps.find(oldName));
-
-  mSteps[newName] = step;
-  step->setName(newName);
-}
-
-cedar::proc::StepPtr cedar::proc::Manager::getStep(const std::string& name)
-{
-  std::map<std::string, StepPtr>::iterator iter = this->mSteps.find(name);
-  if (iter != this->mSteps.end())
-  {
-    return iter->second;
-  }
-  else
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown step: " + name);
-    return cedar::proc::StepPtr();
-  }
 }
 
 cedar::proc::TriggerPtr cedar::proc::Manager::getTrigger(const std::string& name)
@@ -176,16 +133,6 @@ cedar::proc::TriggerPtr cedar::proc::Manager::getTrigger(const std::string& name
 cedar::proc::Manager& cedar::proc::Manager::getInstance()
 {
   return cedar::proc::Manager::mpManager;
-}
-
-void cedar::proc::Manager::declareStepClass(StepDeclarationPtr pStepDeclaration)
-{
-  const std::string& class_id = pStepDeclaration->getClassId();
-  if (this->mStepDeclarations.find(class_id) != this->mStepDeclarations.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate class declaration: " + class_id);
-  }
-  this->mStepDeclarations[class_id] = pStepDeclaration;
 }
 
 void cedar::proc::Manager::declareTriggerClass(TriggerDeclarationPtr pDeclaration)
@@ -256,9 +203,9 @@ void cedar::proc::Manager::readStep(const std::string& classId, const Configurat
   std::cout << "Reading step of type " << classId << std::endl;
 #endif // DEBUG_FILE_READING
 
-  cedar::proc::StepPtr step = this->allocateClass(classId);
+  cedar::proc::StepPtr step = this->steps().allocateClass(classId);
   step->readConfiguration(root);
-  this->registerStep(step);
+  this->steps().registerObject(step);
 }
 
 void cedar::proc::Manager::readSteps(const ConfigurationNode& root)
@@ -301,7 +248,7 @@ void cedar::proc::Manager::readTrigger(const std::string& classId, const Configu
   std::cout << "Adding listener " << listener_name << std::endl;
 #endif // DEBUG_FILE_READING
 
-      cedar::proc::StepPtr step = this->getStep(listener_name);
+      cedar::proc::StepPtr step = this->steps().get(listener_name);
       trigger->addListener(step);
     }
   }
@@ -343,9 +290,9 @@ void cedar::proc::Manager::readDataConnection(const ConfigurationNode& root)
   parseDataName(target, target_step, target_data);
 
   cedar::proc::Step::connect(
-                              this->getStep(source_step),
+                              this->steps().get(source_step),
                               source_data,
-                              this->getStep(target_step),
+                              this->steps().get(target_step),
                               target_data
                             );
 }

@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
+#include "processing/Registry.h"
 #include "processing/StepDeclaration.h"
 #include "processing/TriggerDeclaration.h"
 
@@ -50,6 +51,8 @@
 
 // SYSTEM INCLUDES
 #include <map>
+#include <set>
+#include <vector>
 
 
 /*!@brief Abstract description of the class.
@@ -59,8 +62,14 @@
 class cedar::proc::Manager
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef std::set<std::string> CategoryList;
+  typedef std::vector<StepDeclarationPtr> StepCategoryEntries;
+  typedef std::map<std::string, StepCategoryEntries> StepCategories;
+
+  typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -74,7 +83,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static Manager& getInstance();
-  void declareStepClass(StepDeclarationPtr pStepDeclaration);
   void declareTriggerClass(TriggerDeclarationPtr pDeclaration);
   void readStep(const std::string& classId, const ConfigurationNode& root);
   void readSteps(const ConfigurationNode& root);
@@ -85,17 +93,14 @@ public:
   void readAll(const ConfigurationNode& root);
   void readFile(const std::string& filename);
 
-  void registerStep(cedar::proc::StepPtr step);
   void registerTrigger(cedar::proc::TriggerPtr trigger);
-  void renameStep(const std::string& oldName, const std::string& newName);
-  cedar::proc::StepPtr getStep(const std::string& name);
   cedar::proc::TriggerPtr getTrigger(const std::string& name);
+  StepRegistry& steps();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  StepPtr allocateClass(const std::string& classId) const;
   TriggerPtr allocateTrigger(const std::string& classId) const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,8 +121,8 @@ protected:
   // none yet
 private:
   static Manager mpManager;
-  std::map<std::string, StepDeclarationPtr> mStepDeclarations;
-  std::map<std::string, StepPtr> mSteps;
+
+  StepRegistry mStepRegistry;
 
   std::map<std::string, TriggerDeclarationPtr> mTriggerDeclarations;
   std::map<std::string, TriggerPtr> mTriggers;
