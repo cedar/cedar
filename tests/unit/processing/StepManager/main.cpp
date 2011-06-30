@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
   log_file << "Creating TestModule declaration ... ";
   cedar::proc::StepDeclarationPtr test_module_declaration (new cedar::proc::StepDeclarationT<TestModule>("TestModule"));
-  Manager::getInstance().declareStepClass(test_module_declaration);
+  Manager::getInstance().steps().declareClass(test_module_declaration);
   log_file << "done." << std::endl;
 
   log_file << "Reading Sample.json ... ";
@@ -97,10 +97,10 @@ int main(int argc, char** argv)
   log_file << "done." << std::endl;
 
   log_file << "Trying to call compute functions ... ";
-  StepPtr step_a = Manager::getInstance().getStep("stepA");
+  StepPtr step_a = Manager::getInstance().steps().get("stepA");
   step_a->compute(cedar::proc::Arguments());
 
-  StepPtr step_b = Manager::getInstance().getStep("stepB");
+  StepPtr step_b = Manager::getInstance().steps().get("stepB");
   step_b->compute(cedar::proc::Arguments());
   log_file << "done." << std::endl;
 

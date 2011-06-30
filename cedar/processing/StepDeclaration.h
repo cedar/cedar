@@ -57,10 +57,15 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  StepDeclaration(cedar::proc::StepFactoryPtr classFactory, const std::string& classId)
+  StepDeclaration(
+                   cedar::proc::StepFactoryPtr classFactory,
+                   const std::string& classId,
+                   const std::string& category = "misc."
+                 )
   :
   mpClassFactory(classFactory),
-  mClassId(classId)
+  mClassId(classId),
+  mCategory (category)
   {
   }
 
@@ -72,7 +77,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::StepFactoryPtr getStepFactory()
+  cedar::proc::StepFactoryPtr getObjectFactory()
   {
     return this->mpClassFactory;
   }
@@ -81,6 +86,17 @@ public:
   {
     return this->mClassId;
   }
+
+  const std::string& getCategory()
+  {
+    return this->mCategory;
+  }
+
+  /*!
+   * @returns True, if the object passed as argument is an instance of the class represented by this declaration, false
+   *          otherwise.
+   */
+  virtual bool isObjectInstanceOf(cedar::proc::StepPtr) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,6 +116,7 @@ private:
 protected:
   cedar::proc::StepFactoryPtr mpClassFactory;
   std::string mClassId;
+  std::string mCategory;
 private:
   // none yet
 
@@ -130,12 +147,16 @@ class cedar::proc::StepDeclarationT : public StepDeclaration
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepDeclarationT(const std::string& classId)
+  StepDeclarationT(
+                    const std::string& classId,
+                    const std::string& category = "misc."
+                  )
   :
   StepDeclaration
   (
     cedar::proc::StepFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::proc::Step, DerivedClass>()),
-    classId
+    classId,
+    category
   )
   {
   }
@@ -143,6 +164,11 @@ public:
   //!@brief Destructor
   ~StepDeclarationT()
   {
+  }
+
+  bool isObjectInstanceOf(cedar::proc::StepPtr pointer)
+  {
+    return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
   }
 }; // class cedar::proc::StepDeclarationT
 

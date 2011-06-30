@@ -45,9 +45,11 @@
 #include <assert.h>
 
 #define CEDAR_DEBUG_ASSERT(expr) assert(expr)
-#endif // DEBUG
+#else
 
 #define CEDAR_DEBUG_ASSERT(expr)
+
+#endif // DEBUG
 
 #endif // CEDAR_MACROS_H
 
