@@ -68,7 +68,7 @@ cedar::proc::Manager::Manager()
    *@todo Names?
    */
   TriggerDeclarationPtr trigger_declaration(new TriggerDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
-  this->declareTriggerClass(trigger_declaration);
+  this->triggers().declareClass(trigger_declaration);
 
   TriggerDeclarationPtr looped_trigger_declaration(
                                                      new TriggerDeclarationT<cedar::proc::LoopedTrigger>
@@ -76,7 +76,7 @@ cedar::proc::Manager::Manager()
                                                        "cedar.processing.LoopedTrigger"
                                                      )
                                                   );
-  this->declareTriggerClass(looped_trigger_declaration);
+  this->triggers().declareClass(looped_trigger_declaration);
 }
 
 cedar::proc::Manager::~Manager()
@@ -92,59 +92,15 @@ cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()
   return this->mStepRegistry;
 }
 
-cedar::proc::TriggerPtr cedar::proc::Manager::allocateTrigger(const std::string& classId) const
+cedar::proc::Manager::TriggerRegistry& cedar::proc::Manager::triggers()
 {
-  std::map<std::string, TriggerDeclarationPtr>::const_iterator iter;
-  iter = mTriggerDeclarations.find(classId);
-
-  if (iter != mTriggerDeclarations.end())
-  {
-    return iter->second->getTriggerFactory()->allocate();
-  }
-  else
-  {
-    return cedar::proc::TriggerPtr();
-  }
-}
-
-void cedar::proc::Manager::registerTrigger(cedar::proc::TriggerPtr trigger)
-{
-  if (this->mTriggers.find(trigger->getName()) != this->mTriggers.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate trigger entry: " + trigger->getName());
-  }
-  mTriggers[trigger->getName()] = trigger;
-}
-
-cedar::proc::TriggerPtr cedar::proc::Manager::getTrigger(const std::string& name)
-{
-  std::map<std::string, TriggerPtr>::iterator iter = this->mTriggers.find(name);
-  if (iter != this->mTriggers.end())
-  {
-    return iter->second;
-  }
-  else
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown trigger: " + name);
-    return cedar::proc::TriggerPtr();
-  }
+  return this->mTriggerRegistry;
 }
 
 cedar::proc::Manager& cedar::proc::Manager::getInstance()
 {
   return cedar::proc::Manager::mpManager;
 }
-
-void cedar::proc::Manager::declareTriggerClass(TriggerDeclarationPtr pDeclaration)
-{
-  const std::string& class_id = pDeclaration->getClassId();
-  if (this->mTriggerDeclarations.find(class_id) != this->mTriggerDeclarations.end())
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate trigger declaration: " + class_id);
-  }
-  this->mTriggerDeclarations[class_id] = pDeclaration;
-}
-
 
 void cedar::proc::Manager::readFile(const std::string& filename)
 {
@@ -228,9 +184,9 @@ void cedar::proc::Manager::readTrigger(const std::string& classId, const Configu
   std::cout << "Reading trigger of type " << classId << std::endl;
 #endif // DEBUG_FILE_READING
 
-  cedar::proc::TriggerPtr trigger = this->allocateTrigger(classId);
+  cedar::proc::TriggerPtr trigger = this->triggers().allocateClass(classId);
   trigger->readConfiguration(root);
-  this->registerTrigger(trigger);
+  this->triggers().registerObject(trigger);
 
   // listeners
   try

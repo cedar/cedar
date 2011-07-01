@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   log_file << std::endl;
 
   log_file << "Generating StepDeclaration for Neuron ... ";
-  cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("Neuron"));
+  cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("cedar.Neuron"));
   Manager::getInstance().steps().declareClass(neuron_declaration);
   log_file << "done." << std::endl;
 
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
   NeuronPtr neuron_2 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().steps().get("Neuron 2"));
 
   // start the processing
-  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().getTrigger("Main Trigger"))->start();
+  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().triggers().get("Main Trigger"))->start();
 
   // preiodically read out activation values
   for (unsigned int i = 0; i < 1000; i++)
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
   }
 
   // stop the processing
-  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().getTrigger("Main Trigger"))->stop();
+  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().triggers().get("Main Trigger"))->stop();
 
   // return
   log_file << "Done. There were " << errors << " errors." << std::endl;

@@ -72,7 +72,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::TriggerFactoryPtr getTriggerFactory()
+  cedar::proc::TriggerFactoryPtr getObjectFactory()
   {
     return this->mpClassFactory;
   }
@@ -80,6 +80,11 @@ public:
   const std::string& getClassId()
   {
     return this->mClassId;
+  }
+
+  const std::string& getCategory()
+  {
+    return this->mCategory;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,6 +105,7 @@ private:
 protected:
   cedar::proc::TriggerFactoryPtr mpClassFactory;
   std::string mClassId;
+  std::string mCategory;
 private:
   // none yet
 
