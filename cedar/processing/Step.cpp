@@ -90,6 +90,13 @@ bool cedar::proc::Step::DataEntry::isMandatory() const
   return this->mMandatory;
 }
 
+void cedar::proc::Step::registerParameter(cedar::proc::ParameterBasePtr parameter)
+{
+  //! @todo check for duplicate names
+  //! @todo make sure there are no dots in the name; make a global function for name checks.
+  this->mParameters[parameter->getName()] = parameter;
+}
+
 void cedar::proc::Step::checkMandatoryConnections()
 {
   mMandatoryConnectionsAreSet = true;
@@ -114,6 +121,20 @@ void cedar::proc::Step::readConfiguration(const cedar::proc::ConfigurationNode& 
 {
   this->setName(node.get<std::string>("name"));
   this->setThreaded(node.get<bool>("threaded", false));
+
+  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
+  {
+    try
+    {
+      const cedar::proc::ConfigurationNode& value = node.get_child(iter->second->getName());
+      iter->second->setValue(value);
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+      //!@todo handle with default value/exception
+      std::cout << "Config node " << iter->second->getName() << " not found!" << std::endl;
+    }
+  }
 }
 
 void cedar::proc::Step::onTrigger()

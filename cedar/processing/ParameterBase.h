@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        ParameterBase.h
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 01
 
     Description:
 
@@ -34,12 +38,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_NEURON_H
-#define CEDAR_NEURON_H
+#ifndef CEDAR_PROC_PARAMETER_BASE_H
+#define CEDAR_PROC_PARAMETER_BASE_H
 
 // LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "dynamics/Activation.h"
+#include "processing/namespace.h"
+#include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
 
@@ -50,9 +54,7 @@
  *
  * More detailed description of the class.
  */
-namespace cedar
-{
-class Neuron : public cedar::dyn::Dynamics
+class cedar::proc::ParameterBase : public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,20 +65,32 @@ class Neuron : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Neuron(double interactionWeight = -1.0, double restingLevel = -1000.0);
+  ParameterBase(const std::string& name);
+
   //!@brief Destructor
-  ~Neuron();
+  virtual ~ParameterBase();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  double getActivity() const;
+
+  bool getReadAutomatically() const;
+  void setReadAutomatically(bool value);
+
+  bool getHasDefault() const;
+  void setHasDefault(bool value);
+
+  bool isConstant() const;
+  void setConstant(bool value);
+
+  void setValue(const cedar::proc::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Time& time);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -87,15 +101,17 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::DoubleParameterPtr mRestingLevel;
-  cedar::proc::DoubleParameterPtr mInteractionWeight;
-  cedar::dyn::DoubleActivationPtr mActivation;
-  cedar::dyn::DoubleActivationPtr mOutput;
+  //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
+  bool mAutoRead;
+
+  //! Whether a default value should be set if the
+  bool mHasDefault;
+
+  //! Whether this parameter can be changed during runtime.
+  bool mConstant;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -108,7 +124,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::Neuron
-}
-#endif // CEDAR_NEURON_H
+}; // class cedar::proc::ParameterBase
+
+#endif // CEDAR_PROC_PARAMETER_BASE_H
 

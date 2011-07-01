@@ -45,6 +45,7 @@
 #include "processing/namespace.h"
 #include "processing/Trigger.h"
 #include "processing/DataRole.h"
+#include "processing/ParameterBase.h"
 #include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
@@ -67,6 +68,8 @@ class cedar::proc::Step : public cedar::aux::Base, public QThread
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef std::map<std::string, ParameterBasePtr> ParameterMap;
 protected:
   struct DataEntry
   {
@@ -136,6 +139,8 @@ public:
 protected:
   void run();
 
+  void registerParameter(ParameterBasePtr parameter);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -160,6 +165,8 @@ private:
   bool mBusy;
   ArgumentsPtr mNextArguments;
   bool mMandatoryConnectionsAreSet;
+
+  ParameterMap mParameters;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
