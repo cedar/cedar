@@ -63,6 +63,13 @@ namespace cedar
 
     class DataRole;
 
+    class ParameterBase;
+    typedef boost::shared_ptr<ParameterBase> ParameterBasePtr;
+
+    template <typename T> class Parameter;
+    typedef Parameter<double> DoubleParameter;
+    typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
+
     class LoopArguments;
 
     class LoopedTrigger;
@@ -102,6 +109,7 @@ namespace cedar
     class InvalidArgumentsException;
     class DuplicateNameException;
     class MissingConnectionException;
+    class UnhandledTypeException;
   }
 }
 

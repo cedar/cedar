@@ -64,3 +64,8 @@ cedar::proc::InvalidArgumentsException::InvalidArgumentsException()
 {
   this->mType = "InvalidArgumentsException";
 }
+
+cedar::proc::UnhandledTypeException::UnhandledTypeException()
+{
+  this->mType = "UnhandledTypeException";
+}

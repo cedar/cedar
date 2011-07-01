@@ -70,7 +70,7 @@ int main(int argc, char** argv)
   log_file << std::endl;
 
   log_file << "Generating StepDeclaration for Neuron ... ";
-  cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("cedar.Neuron"));
+  cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("Neuron"));
   Manager::getInstance().steps().declareClass(neuron_declaration);
   log_file << "done." << std::endl;
 

@@ -194,6 +194,8 @@ protected:
     }
     else
     {
+      CEDAR_THROW(cedar::proc::InvalidNameException, "Cannot allocate object of class \""
+                                                     + classId + "\": class unknown.")
       return ObjectPointer();
     }
   }

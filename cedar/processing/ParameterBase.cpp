@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        ParameterBase.cpp
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 01
 
     Description:
 
@@ -35,7 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Neuron.h"
+#include "processing/ParameterBase.h"
+#include "processing/exceptions.h"
 #include "processing/Parameter.h"
 
 // PROJECT INCLUDES
@@ -46,22 +51,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::Neuron::Neuron(double interactionWeight, double restingLevel)
-:
-mRestingLevel(new cedar::proc::DoubleParameter("restingLevel", restingLevel)),
-mInteractionWeight(new cedar::proc::DoubleParameter("interactionWeight", interactionWeight)),
-mActivation(new cedar::dyn::DoubleActivation(0.0)),
-mOutput(new cedar::dyn::DoubleActivation(0.0))
+cedar::proc::ParameterBase::ParameterBase(const std::string& name)
 {
-  this->declareInput("input");
-  this->declareOutput("output");
-  this->setOutput("output", mOutput);
-
-  this->registerParameter(this->mRestingLevel);
-  this->registerParameter(this->mInteractionWeight);
+  this->setName(name);
 }
 
-cedar::Neuron::~Neuron()
+cedar::proc::ParameterBase::~ParameterBase()
 {
 }
 
@@ -69,29 +64,45 @@ cedar::Neuron::~Neuron()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::Neuron::getActivity() const
+bool cedar::proc::ParameterBase::getReadAutomatically() const
 {
-  return this->mActivation->getData();
+  return this->mAutoRead;
 }
 
-void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
+void cedar::proc::ParameterBase::setReadAutomatically(bool value)
 {
-  using cedar::unit::Seconds;
-  using cedar::unit::Milliseconds;
+  this->mAutoRead = value;
+}
 
-  double& activation = mActivation->getData();
-  double input = this->getInput("input")->getData<double>();
-  double resting_level = mRestingLevel->getValue();
-  double interaction_weight = mInteractionWeight->getValue();
+bool cedar::proc::ParameterBase::getHasDefault() const
+{
+  return this->mHasDefault;
+}
 
-  // nonlinearity
-  double interaction = 0;
-  if (input >= 0)
+void cedar::proc::ParameterBase::setHasDefault(bool value)
+{
+  this->mHasDefault = value;
+}
+
+bool cedar::proc::ParameterBase::isConstant() const
+{
+  return this->mConstant;
+}
+
+void cedar::proc::ParameterBase::setConstant(bool value)
+{
+  this->mConstant = value;
+}
+
+void cedar::proc::ParameterBase::setValue(const cedar::proc::ConfigurationNode& node)
+{
+  if (dynamic_cast<DoubleParameter*>(this))
   {
-    interaction = 1.0;
+    dynamic_cast<DoubleParameter*>(this)->setValue(node.get_value<double>());
   }
-
-  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + resting_level + interaction_weight * input);
-
-  mOutput->getData() = activation;
+  else
+  {
+    CEDAR_THROW(cedar::proc::UnhandledTypeException, "Cannot set parameter value: the type of the parameter "
+                                                     + this->getName() + "is not handled.");
+  }
 }

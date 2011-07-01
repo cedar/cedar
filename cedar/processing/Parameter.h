@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        Parameter.h
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 01
 
     Description:
 
@@ -34,12 +38,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_NEURON_H
-#define CEDAR_NEURON_H
+#ifndef CEDAR_PROC_PARAMETER_H
+#define CEDAR_PROC_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "dynamics/Activation.h"
+#include "processing/namespace.h"
+#include "processing/ParameterBase.h"
 
 // PROJECT INCLUDES
 
@@ -50,9 +54,8 @@
  *
  * More detailed description of the class.
  */
-namespace cedar
-{
-class Neuron : public cedar::dyn::Dynamics
+template <typename T>
+class cedar::proc::Parameter : public cedar::proc::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -62,21 +65,48 @@ class Neuron : public cedar::dyn::Dynamics
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Neuron(double interactionWeight = -1.0, double restingLevel = -1000.0);
+  //!@brief The constructor.
+  Parameter(const std::string& name, const T& value)
+  :
+  cedar::proc::ParameterBase(name),
+  mValue(value)
+  {
+  }
+
   //!@brief Destructor
-  ~Neuron();
+  ~Parameter()
+  {
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  double getActivity() const;
+  const T& getValue() const
+  {
+    return this->mValue;
+  }
+
+  void setValue(const T& value)
+  {
+    this->mValue = value;
+  }
+
+  const T& getMinimum() const
+  {
+    return this->mMinimum;
+  }
+
+  const T& getMaximum() const
+  {
+    return this->mMaximum;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Time& time);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -92,23 +122,28 @@ public:
 protected:
   // none yet
 private:
-  cedar::proc::DoubleParameterPtr mRestingLevel;
-  cedar::proc::DoubleParameterPtr mInteractionWeight;
-  cedar::dyn::DoubleActivationPtr mActivation;
-  cedar::dyn::DoubleActivationPtr mOutput;
+  //! The current parameter value.
+  T mValue;
+
+  //! The default value of the parameter. Ignored if mHasDefault is false.
+  T mDefault;
+
+  //! The minimum value, if applicable to the type.
+  T mMinimum;
+
+  //! The maximum value, if applicable to the type.
+  T mMaximum;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::Neuron
-}
-#endif // CEDAR_NEURON_H
+}; // class cedar::processing::Parameter
+
+#endif // CEDAR_PROC_PARAMETER_H
 
