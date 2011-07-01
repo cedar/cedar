@@ -194,7 +194,7 @@ protected:
     }
     else
     {
-      return cedar::proc::StepPtr();
+      return ObjectPointer();
     }
   }
 

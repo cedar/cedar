@@ -65,11 +65,8 @@ class cedar::proc::Manager
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::set<std::string> CategoryList;
-  typedef std::vector<StepDeclarationPtr> StepCategoryEntries;
-  typedef std::map<std::string, StepCategoryEntries> StepCategories;
-
   typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
+  typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -83,7 +80,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static Manager& getInstance();
-  void declareTriggerClass(TriggerDeclarationPtr pDeclaration);
   void readStep(const std::string& classId, const ConfigurationNode& root);
   void readSteps(const ConfigurationNode& root);
   void readTrigger(const std::string& classId, const ConfigurationNode& root);
@@ -93,15 +89,13 @@ public:
   void readAll(const ConfigurationNode& root);
   void readFile(const std::string& filename);
 
-  void registerTrigger(cedar::proc::TriggerPtr trigger);
-  cedar::proc::TriggerPtr getTrigger(const std::string& name);
   StepRegistry& steps();
+  TriggerRegistry& triggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  TriggerPtr allocateTrigger(const std::string& classId) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -123,9 +117,7 @@ private:
   static Manager mpManager;
 
   StepRegistry mStepRegistry;
-
-  std::map<std::string, TriggerDeclarationPtr> mTriggerDeclarations;
-  std::map<std::string, TriggerPtr> mTriggers;
+  TriggerRegistry mTriggerRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
