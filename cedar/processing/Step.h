@@ -59,7 +59,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Step : public cedar::aux::Base, public QThread
+class cedar::proc::Step : public QThread
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -136,6 +136,9 @@ public:
   const ParameterMap& getParameters() const;
   ParameterMap& getParameters();
 
+  void setName(const std::string& name);
+  const std::string& getName() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -170,6 +173,8 @@ private:
   bool mMandatoryConnectionsAreSet;
 
   ParameterMap mParameters;
+
+  StringParameterPtr mName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
