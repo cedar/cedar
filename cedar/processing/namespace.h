@@ -69,6 +69,8 @@ namespace cedar
     template <typename T> class Parameter;
     typedef Parameter<double> DoubleParameter;
     typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
+    typedef Parameter<std::string> StringParameter;
+    typedef boost::shared_ptr<StringParameter> StringParameterPtr;
 
     class LoopArguments;
 

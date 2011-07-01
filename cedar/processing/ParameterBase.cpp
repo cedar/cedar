@@ -100,6 +100,10 @@ void cedar::proc::ParameterBase::setValue(const cedar::proc::ConfigurationNode& 
   {
     dynamic_cast<DoubleParameter*>(this)->setValue(node.get_value<double>());
   }
+  else if (dynamic_cast<StringParameter*>(this))
+  {
+    dynamic_cast<StringParameter*>(this)->setValue(node.get_value<std::string>());
+  }
   else
   {
     CEDAR_THROW(cedar::proc::UnhandledTypeException, "Cannot set parameter value: the type of the parameter "

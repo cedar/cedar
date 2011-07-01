@@ -45,6 +45,7 @@
 #include "auxiliaries/macros.h"
 #include "processing/exceptions.h"
 #include "processing/Manager.h"
+#include "processing/Parameter.h"
 
 // PROJECT INCLUDES
 
@@ -60,8 +61,10 @@ mFinished(new cedar::proc::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mMandatoryConnectionsAreSet (true),
+mName (new cedar::proc::StringParameter("name", "")),
 mRunInThread(runInThread)
 {
+  this->registerParameter(mName);
 }
 
 cedar::proc::Step::DataEntry::DataEntry(bool isMandatory)
@@ -73,7 +76,6 @@ mMandatory (isMandatory)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 
 void cedar::proc::Step::DataEntry::setData(DataPtr data)
 {
@@ -88,6 +90,16 @@ cedar::proc::DataPtr cedar::proc::Step::DataEntry::getData()
 bool cedar::proc::Step::DataEntry::isMandatory() const
 {
   return this->mMandatory;
+}
+
+void cedar::proc::Step::setName(const std::string& name)
+{
+  this->mName->setValue(name);
+}
+
+const std::string& cedar::proc::Step::getName() const
+{
+  return this->mName->getValue();
 }
 
 const cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters() const
