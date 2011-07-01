@@ -90,6 +90,16 @@ bool cedar::proc::Step::DataEntry::isMandatory() const
   return this->mMandatory;
 }
 
+const cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters() const
+{
+  return this->mParameters;
+}
+
+cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters()
+{
+  return this->mParameters;
+}
+
 void cedar::proc::Step::registerParameter(cedar::proc::ParameterBasePtr parameter)
 {
   //! @todo check for duplicate names
