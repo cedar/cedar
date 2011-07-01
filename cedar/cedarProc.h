@@ -45,6 +45,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "processing/namespace.h"
 #include "processing/Manager.h"
 #include "processing/Step.h"
 
