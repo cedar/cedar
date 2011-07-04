@@ -84,7 +84,7 @@ public:
   bool isConstant() const;
   void setConstant(bool value);
 
-  void setValue(const cedar::proc::ConfigurationNode& node);
+  void set(const cedar::proc::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -116,8 +116,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 

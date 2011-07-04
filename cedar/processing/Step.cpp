@@ -94,12 +94,12 @@ bool cedar::proc::Step::DataEntry::isMandatory() const
 
 void cedar::proc::Step::setName(const std::string& name)
 {
-  this->mName->setValue(name);
+  this->mName->set(name);
 }
 
 const std::string& cedar::proc::Step::getName() const
 {
-  return this->mName->getValue();
+  return this->mName->get();
 }
 
 const cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters() const
@@ -149,7 +149,7 @@ void cedar::proc::Step::readConfiguration(const cedar::proc::ConfigurationNode& 
     try
     {
       const cedar::proc::ConfigurationNode& value = node.get_child(iter->second->getName());
-      iter->second->setValue(value);
+      iter->second->set(value);
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {

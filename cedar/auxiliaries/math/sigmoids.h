@@ -68,8 +68,8 @@ namespace cedar
       cv::Mat sigmoid(const cv::Mat& mat, const double beta, const double threshold = 0);
 
       //! an exponential-based sigmoid for a cv::Mat, that takes the result as an argument and does not allocate new memory
-        template<typename T>
-        void sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
+      template<typename T>
+      void sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
 
       //! an abs-based sigmoid for a cv::Mat
       template<typename T>

@@ -94,15 +94,15 @@ void cedar::proc::ParameterBase::setConstant(bool value)
   this->mConstant = value;
 }
 
-void cedar::proc::ParameterBase::setValue(const cedar::proc::ConfigurationNode& node)
+void cedar::proc::ParameterBase::set(const cedar::proc::ConfigurationNode& node)
 {
   if (dynamic_cast<DoubleParameter*>(this))
   {
-    dynamic_cast<DoubleParameter*>(this)->setValue(node.get_value<double>());
+    dynamic_cast<DoubleParameter*>(this)->set(node.get_value<double>());
   }
   else if (dynamic_cast<StringParameter*>(this))
   {
-    dynamic_cast<StringParameter*>(this)->setValue(node.get_value<std::string>());
+    dynamic_cast<StringParameter*>(this)->set(node.get_value<std::string>());
   }
   else
   {
