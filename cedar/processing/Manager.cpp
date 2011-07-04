@@ -47,6 +47,9 @@
 #include "processing/LoopedTrigger.h"
 #include "auxiliaries/macros.h"
 
+//! @todo find a better place for this
+#include "dynamics/fields/NeuralField.h"
+
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
@@ -77,6 +80,9 @@ cedar::proc::Manager::Manager()
                                                      )
                                                   );
   this->triggers().declareClass(looped_trigger_declaration);
+
+  StepDeclarationPtr field_decl(new StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
+  this->steps().declareClass(field_decl);
 }
 
 cedar::proc::Manager::~Manager()

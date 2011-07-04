@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
+#include <opencv2/opencv.hpp>
 
 
 namespace cedar
@@ -62,6 +63,14 @@ namespace cedar
     template <typename T> class Activation;
     typedef Activation<double> DoubleActivation;
     typedef boost::shared_ptr<DoubleActivation> DoubleActivationPtr;
+    typedef Activation<cv::Mat> MatActivation;
+    typedef boost::shared_ptr<MatActivation> MatActivationPtr;
+
+    class SpaceCode;
+    typedef boost::shared_ptr<SpaceCode> SpaceCodePtr;
+
+    class NeuralField;
+    typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;
   }
 }
 

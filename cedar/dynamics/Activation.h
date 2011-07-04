@@ -65,10 +65,6 @@ class cedar::dyn::Activation : public cedar::proc::DataT<T>
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Activation()
-  {
-  }
-
   Activation(const T& value) : cedar::proc::DataT<T>(value)
   {
   }
