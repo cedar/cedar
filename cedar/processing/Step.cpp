@@ -159,6 +159,11 @@ void cedar::proc::Step::readConfiguration(const cedar::proc::ConfigurationNode& 
   }
 }
 
+void cedar::proc::Step::onStart()
+{
+
+}
+
 void cedar::proc::Step::onTrigger()
 {
   if (this->mMandatoryConnectionsAreSet)
