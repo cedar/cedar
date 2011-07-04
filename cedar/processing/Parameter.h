@@ -66,10 +66,11 @@ class cedar::proc::Parameter : public cedar::proc::ParameterBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The constructor.
-  Parameter(const std::string& name, const T& value)
+  Parameter(const std::string& name, const T& defaultValue)
   :
   cedar::proc::ParameterBase(name),
-  mValue(value)
+  mValue(defaultValue),
+  mDefault(defaultValue)
   {
   }
 
@@ -82,12 +83,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const T& getValue() const
+  const T& get() const
   {
     return this->mValue;
   }
 
-  void setValue(const T& value)
+  void set(const T& value)
   {
     this->mValue = value;
   }
