@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralField.h
+    File:        AbsSigmoid.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,34 +30,30 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 04
+    Date:        2011 07 05
 
-    Description:
+    Description: Sigmoid functions
 
     Credits:
 
 ======================================================================================================================*/
-
-#ifndef CEDAR_DYN_NEURAL_FIELD_H
-#define CEDAR_DYN_NEURAL_FIELD_H
+#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
+#define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
 // LOCAL INCLUDES
-#include "dynamics/namespace.h"
-#include "dynamics/Dynamics.h"
+#include "auxiliaries/math/namespace.h"
+#include "auxiliaries/math/sigmoids.h"
 #include "auxiliaries/math/Sigmoid.h"
-#include "auxiliaries/math/AbsSigmoid.h"
-#include "auxiliaries/math/ExpSigmoid.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Abstract description of the sigmoid base class.
  *
- * More detailed description of the class.
+ * More detailed description of the sigmoid base class.
  */
-class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
+class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -68,22 +64,32 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NeuralField();
+  AbsSigmoid(double beta, double threshold = 0)
+  :
+  cedar::aux::math::Sigmoid(threshold),
+  mBeta(beta)
+  {
+  }
 
   //!@brief Destructor
+  virtual ~AbsSigmoid()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief
-  void onStart();
+  virtual double compute(double value)
+  {
+    return cedar::aux::math::sigmoidAbs(value, mBeta, mThreshold);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Time& time);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -95,8 +101,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::dyn::SpaceCodePtr mActivation;
-  cedar::aux::DoubleParameterPtr mRestingLevel;
+  double mBeta;
 private:
   // none yet
 
@@ -109,7 +114,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dyn::NeuralField
+};
 
-#endif // CEDAR_DYN_NEURAL_FIELD_H
 
+#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H

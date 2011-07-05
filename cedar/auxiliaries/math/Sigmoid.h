@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralField.h
+    File:        Sigmoid.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,34 +30,28 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 04
+    Date:        2011 07 05
 
-    Description:
+    Description: Sigmoid functions
 
     Credits:
 
 ======================================================================================================================*/
-
-#ifndef CEDAR_DYN_NEURAL_FIELD_H
-#define CEDAR_DYN_NEURAL_FIELD_H
+#ifndef CEDAR_AUX_MATH_SIGMOID_H
+#define CEDAR_AUX_MATH_SIGMOID_H
 
 // LOCAL INCLUDES
-#include "dynamics/namespace.h"
-#include "dynamics/Dynamics.h"
-#include "auxiliaries/math/Sigmoid.h"
-#include "auxiliaries/math/AbsSigmoid.h"
-#include "auxiliaries/math/ExpSigmoid.h"
+#include "auxiliaries/math/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Abstract description of the sigmoid base class.
  *
- * More detailed description of the class.
+ * More detailed description of the sigmoid base class.
  */
-class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
+class cedar::aux::math::Sigmoid
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -68,22 +62,47 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NeuralField();
+  Sigmoid(double threshold = 0.0)
+  :
+  mThreshold(threshold)
+  {
+  }
 
   //!@brief Destructor
+  virtual ~Sigmoid()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief
-  void onStart();
+  virtual double compute(double value) = 0;
+
+  virtual float compute(float value)
+  {
+    return static_cast<float>(compute(static_cast<double>(value)));
+  }
+
+  template<typename T>
+  cv::Mat compute(const cv::Mat& values)
+  {
+    cv::Mat result = values.clone();
+    for (int col = 0; col < values.cols; col++)
+    {
+      for (int row = 0; row < values.rows; row++)
+      {
+        result.at<T>(row,col) = static_cast<T>(compute(static_cast<double>(values.at<T>(row, col))));
+      }
+    }
+    return result;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Time& time);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -95,8 +114,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::dyn::SpaceCodePtr mActivation;
-  cedar::aux::DoubleParameterPtr mRestingLevel;
+  double mThreshold;
 private:
   // none yet
 
@@ -108,8 +126,7 @@ protected:
 
 private:
   // none yet
+};
 
-}; // class cedar::dyn::NeuralField
 
-#endif // CEDAR_DYN_NEURAL_FIELD_H
-
+#endif  // CEDAR_AUX_MATH_SIGMOID_H
