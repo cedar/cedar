@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cedarProc.h
+    File:        StepClassList.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,25 +30,48 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Date:        2011 07 05
 
-    Description: Header file that includes all headers of the processing library.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+// LOCAL INCLUDES
+#include "StepClassList.h"
 
-#ifndef CEDAR_CEDAR_PROC_H
-#define CEDAR_CEDAR_PROC_H
+// PROJECT INCLUDES
 
-// CLASSES
-#include "processing/namespace.h"
-#include "processing/Manager.h"
-#include "processing/Step.h"
+// SYSTEM INCLUDES
 
-// GUI CLASSES
-#include "processing/gui/StepClassList.h"
-#include "processing/gui/View.h"
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-#endif // CEDAR_CEDAR_PROC_H
+cedar::proc::gui::StepClassList::StepClassList(QWidget *pParent)
+:
+QListWidget(pParent)
+{
+  this->setViewMode(QListView::IconMode);
+}
+
+cedar::proc::gui::StepClassList::~StepClassList()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepRegistry::CategoryEntries& entries)
+{
+  using cedar::proc::Manager;
+  using cedar::proc::StepDeclarationPtr;
+
+  for (Manager::StepRegistry::CategoryEntries::const_iterator iter = entries.begin(); iter != entries.end(); ++iter)
+  {
+    const StepDeclarationPtr& class_id = *iter;
+    this->addItem(QString(class_id->getClassId().c_str()));
+  }
+}

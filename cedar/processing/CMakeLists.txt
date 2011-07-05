@@ -41,4 +41,9 @@
 cedar_add_library(cedarproc
   LINK_LIBRARIES
   cedaraux
-  cedarunits)
+  cedarunits
+  MOC_HEADERS
+  gui/Scene.h
+  gui/StepClassList.h
+  gui/View.h
+  )

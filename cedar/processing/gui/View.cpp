@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cedarProc.h
+    File:        ProcessingView.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,25 +30,45 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Date:        2011 07 05
 
-    Description: Header file that includes all headers of the processing library.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_CEDAR_PROC_H
-#define CEDAR_CEDAR_PROC_H
-
-// CLASSES
-#include "processing/namespace.h"
-#include "processing/Manager.h"
-#include "processing/Step.h"
-
-// GUI CLASSES
-#include "processing/gui/StepClassList.h"
+// LOCAL INCLUDES
 #include "processing/gui/View.h"
 
-#endif // CEDAR_CEDAR_PROC_H
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::View::View(QWidget *pParent)
+:
+QGraphicsView(pParent)
+{
+  this->mpScene = new cedar::proc::gui::Scene();
+  this->setScene(this->mpScene);
+  this->setInteractive(true);
+  this->setDragMode(QGraphicsView::RubberBandDrag);
+}
+
+cedar::proc::gui::View::~View()
+{
+  delete this->mpScene;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
+{
+  return this->mpScene;
+}

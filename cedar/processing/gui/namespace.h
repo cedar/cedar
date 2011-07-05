@@ -22,33 +22,44 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cedarProc.h
+    File:        namespace.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2011 07 05
 
-    Description: Header file that includes all headers of the processing library.
+    Description: Namespace file for cedar::proc::gui.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_CEDAR_PROC_H
-#define CEDAR_CEDAR_PROC_H
+#ifndef CEDAR_PROC_GUI_NAMESPACE_H
+#define CEDAR_PROC_GUI_NAMESPACE_H
 
-// CLASSES
-#include "processing/namespace.h"
-#include "processing/Manager.h"
-#include "processing/Step.h"
+// LOCAL INCLUDES
 
-// GUI CLASSES
-#include "processing/gui/StepClassList.h"
-#include "processing/gui/View.h"
+// PROJECT INCLUDES
 
-#endif // CEDAR_CEDAR_PROC_H
+// SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
+#include <boost/property_tree/ptree.hpp>
+
+
+namespace cedar
+{
+  /*!@brief Namespace for all processing classes. */
+  namespace proc
+  {
+    namespace gui
+    {
+      class StepItem;
+      class StepClassList;
+      class Scene;
+      class View;
+    }
+  }
+}
+
+#endif // CEDAR_PROC_GUI_NAMESPACE_H
