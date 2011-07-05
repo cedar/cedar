@@ -225,7 +225,7 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
 void cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
 {
 #ifdef DEBUG
-  if (this->mArguments.get() != NULL)
+  if (this->mNextArguments.get() != NULL)
   {
     std::cout << "Warning from ProcessingStep " << this->getName()
               << ": Overwriting arguments." << std::endl;

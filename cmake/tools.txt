@@ -22,29 +22,40 @@
 #   Institute:   Ruhr-Universitaet Bochum
 #                Institut fuer Neuroinformatik
 #
-#   File:        CMakeLists.txt
+#   File:        tools.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 06 21
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.rub.de
+#   Date:        2011 07 05
 #
-#   Description:
+#   Description: Setup of tools.
 #
 #   Credits:
 #
 #=======================================================================================================================
 
-cedar_add_library(cedarproc
-  LINK_LIBRARIES
-  cedaraux
-  cedarunits
-  MOC_HEADERS
-  gui/Scene.h
-  gui/StepClassList.h
-  gui/View.h
-  gui/Ide.h
-  )
+
+########################################################################################################################
+# cedar tools
+list(APPEND subdirectories ${CEDAR_TOOLS_DIR})
+list(LENGTH subdirectories numberOfSubdirectories)
+
+while (${numberOfSubdirectories} STRGREATER 0)
+  list(GET subdirectories 0 subdirectory)
+  list(REMOVE_AT subdirectories 0)
+
+  cedar_get_subdirectories(${subdirectory})
+
+  foreach(newSubdirectory ${returnedSubdirectories})
+
+    if (EXISTS "${newSubdirectory}/CMakeLists.txt")
+      add_subdirectory(${newSubdirectory})
+    endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
+
+    list(APPEND subdirectories ${newSubdirectory})
+  endforeach(newSubdirectory)
+
+  list(LENGTH subdirectories ${numberOfSubdirectories})
+endwhile (${numberOfSubdirectories} STRGREATER 0)
+
+

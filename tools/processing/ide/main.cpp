@@ -22,45 +22,34 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        main.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 07 05
 
-    Description: Namespace file for cedar::proc::gui.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+#include "processing/gui/Ide.h"
 
-#ifndef CEDAR_PROC_GUI_NAMESPACE_H
-#define CEDAR_PROC_GUI_NAMESPACE_H
+#include <QApplication>
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-
-
-namespace cedar
+int main(int argc, char** argv)
 {
-  /*!@brief Namespace for all processing classes. */
-  namespace proc
-  {
-    namespace gui
-    {
-      class Ide;
-      class StepItem;
-      class StepClassList;
-      class Scene;
-      class View;
-    }
-  }
-}
+  QApplication app (argc, argv);
 
-#endif // CEDAR_PROC_GUI_NAMESPACE_H
+  cedar::proc::gui::Ide ide;
+  ide.show();
+
+  app.exec();
+
+  return 0;
+}

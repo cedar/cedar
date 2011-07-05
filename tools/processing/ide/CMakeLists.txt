@@ -30,7 +30,7 @@
 #   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
 #                mathis.richter@ini.ruhr-uni-bochum.de,
 #                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 06 21
+#   Date:        2011 05 23
 #
 #   Description:
 #
@@ -38,13 +38,4 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedarproc
-  LINK_LIBRARIES
-  cedaraux
-  cedarunits
-  MOC_HEADERS
-  gui/Scene.h
-  gui/StepClassList.h
-  gui/View.h
-  gui/Ide.h
-  )
+cedar_add_tool(processingIde)
