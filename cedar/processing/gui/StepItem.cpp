@@ -58,8 +58,7 @@ mStep (step),
 mWidth (100),
 mHeight (50)
 {
-  cedar::proc::StepDeclarationPtr declaration = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
-  mClassId = declaration->getClassId();
+  this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 }
 
@@ -91,7 +90,7 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
   }
 
   painter->drawRect(bounds);
-  painter->drawText(QPointF(5, 15), this->mClassId.c_str());
+  painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());
   painter->drawText(QPointF(5, 25), this->mStep->getName().c_str());
 
   painter->restore(); // restore saved painter settings

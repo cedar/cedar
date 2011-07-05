@@ -101,11 +101,11 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 
   QListWidgetItem *item = tree->item(r);
 
-  //! @todo Exception handling
   if (item)
   {
-    QPointF mapped = pEvent->scenePos(); // this->mapToScene(pEvent->pos());
-    this->addProcessingStep(item->text().toStdString(), mapped);
+    QPointF mapped = pEvent->scenePos();
+    QString class_id = item->data(Qt::UserRole).toString();
+    this->addProcessingStep(class_id.toStdString(), mapped);
   }
 }
 
@@ -129,9 +129,17 @@ void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPoi
     name = tmp;
   }
 
-  cedar::proc::StepPtr step = Manager::getInstance().steps().createInstance(classId, name);
-  cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step);
-  this->addItem(p_drawer);
-  p_drawer->setPos(position);
-  this->update();
+  try
+  {
+    cedar::proc::StepPtr step = Manager::getInstance().steps().createInstance(classId, name);
+    cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step);
+    this->addItem(p_drawer);
+    p_drawer->setPos(position);
+    this->update();
+  }
+  catch(const cedar::aux::exc::ExceptionBase& e)
+  {
+    QString message(e.exceptionInfo().c_str());
+    emit exception(message);
+  }
 }

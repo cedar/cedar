@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <QLabel>
+#include <QMessageBox>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,6 +60,8 @@ cedar::proc::gui::Ide::Ide()
   this->resetStepList();
 
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
+  QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
+                   this, SLOT(exception(const QString&)));
 }
 
 
@@ -106,4 +109,11 @@ void cedar::proc::gui::Ide::sceneItemSelected()
       this->mpPropertyTable->setCellWidget(row, 0, p_label);
     }
   }
+}
+
+void cedar::proc::gui::Ide::exception(const QString& message)
+{
+  QMessageBox::critical(this,
+                        "An exception has occurred.",
+                        message);
 }

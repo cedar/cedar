@@ -72,6 +72,12 @@ void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepR
   for (Manager::StepRegistry::CategoryEntries::const_iterator iter = entries.begin(); iter != entries.end(); ++iter)
   {
     const StepDeclarationPtr& class_id = *iter;
-    this->addItem(QString(class_id->getClassId().c_str()));
+    QString label = class_id->getClassName().c_str();
+    label += " (";
+    label += class_id->getNamespaceName().c_str();
+    label += ")";
+    QListWidgetItem *p_item = new QListWidgetItem(label);
+    p_item->setData(Qt::UserRole, QVariant(class_id->getClassId().c_str()));
+    this->addItem(p_item);
   }
 }
