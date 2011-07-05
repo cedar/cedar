@@ -108,7 +108,7 @@ protected:
   qreal mHeight;
 
 private:
-  std::string mClassId;
+  cedar::proc::StepDeclarationPtr mClassId;
 
 }; // class StepItem
 

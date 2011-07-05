@@ -82,14 +82,46 @@ public:
     return this->mpClassFactory;
   }
 
-  const std::string& getClassId()
+  const std::string& getClassId() const
   {
     return this->mClassId;
   }
 
-  const std::string& getCategory()
+  const std::string& getCategory() const
   {
     return this->mCategory;
+  }
+
+  /*!
+   * @brief Returns the class name without the preceding namespace.
+   */
+  std::string getClassName() const
+  {
+    std::size_t index = this->getClassId().rfind('.');
+    if (index != std::string::npos)
+    {
+      return this->getClassId().substr(index + 1);
+    }
+    else
+    {
+      return this->getClassId();
+    }
+  }
+
+  /*!
+   * @brief Returns the namespace name without the class name.
+   */
+  std::string getNamespaceName() const
+  {
+    std::size_t index = this->getClassId().rfind('.');
+    if (index != std::string::npos)
+    {
+      return this->getClassId().substr(0, index);
+    }
+    else
+    {
+      return this->getClassId();
+    }
   }
 
   /*!
