@@ -42,7 +42,7 @@
 #define CEDAR_PROC_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
+#include "auxiliaries/namespace.h"
 #include "auxiliaries/ParameterBase.h"
 
 // PROJECT INCLUDES
@@ -55,7 +55,7 @@
  * More detailed description of the class.
  */
 template <typename T>
-class cedar::proc::Parameter : public cedar::proc::ParameterBase
+class cedar::aux::Parameter : public cedar::aux::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -68,7 +68,7 @@ public:
   //!@brief The constructor.
   Parameter(const std::string& name, const T& defaultValue)
   :
-  cedar::proc::ParameterBase(name),
+  cedar::aux::ParameterBase(name),
   mValue(defaultValue),
   mDefault(defaultValue)
   {
@@ -144,7 +144,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::processing::Parameter
+}; // class cedar::aux::Parameter
 
 #endif // CEDAR_PROC_PARAMETER_H
 

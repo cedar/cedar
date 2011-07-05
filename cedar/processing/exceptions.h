@@ -90,13 +90,4 @@ class cedar::proc::MissingConnectionException: public cedar::aux::exc::Exception
     MissingConnectionException();
 }; // class cedar::proc::MissingConnectionException
 
-
-/*!@brief Exception that occurs when a type is not handled.
- */
-class cedar::proc::UnhandledTypeException : public cedar::aux::exc::ExceptionBase
-{
-  public:
-  UnhandledTypeException();
-}; // class cedar::proc::UnhandledTypeException
-
 #endif // CEDAR_PROC_EXCEPTIONS_H

@@ -99,7 +99,7 @@ void cedar::proc::gui::Ide::sceneItemSelected()
     cedar::proc::Step::ParameterMap& parameters = p_drawer->getStep()->getParameters();
     for (Step::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
     {
-      cedar::proc::ParameterBasePtr& parameter = iter->second;
+      cedar::aux::ParameterBasePtr& parameter = iter->second;
       this->mpPropertyTable->insertRow(row);
       QLabel *p_label = new QLabel();
       p_label->setText(parameter->getName().c_str());

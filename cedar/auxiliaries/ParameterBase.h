@@ -42,7 +42,7 @@
 #define CEDAR_PROC_PARAMETER_BASE_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
+#include "auxiliaries/namespace.h"
 #include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
@@ -54,7 +54,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::ParameterBase : public cedar::aux::Base
+class cedar::aux::ParameterBase : public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -84,7 +84,7 @@ public:
   bool isConstant() const;
   void setConstant(bool value);
 
-  void set(const cedar::proc::ConfigurationNode& node);
+  void set(const cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -122,7 +122,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::ParameterBase
+}; // class cedar::aux::ParameterBase
 
 #endif // CEDAR_PROC_PARAMETER_BASE_H
 

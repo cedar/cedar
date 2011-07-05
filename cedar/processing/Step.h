@@ -69,7 +69,7 @@ class cedar::proc::Step : public QThread
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::map<std::string, ParameterBasePtr> ParameterMap;
+  typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
 protected:
   struct DataEntry
   {
@@ -127,7 +127,7 @@ public:
   cedar::proc::DataPtr getBuffer(const std::string& name);
   cedar::proc::DataPtr getOutput(const std::string& name);
 
-  virtual void readConfiguration(const cedar::proc::ConfigurationNode& node);
+  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   static void connect(
                        cedar::proc::StepPtr source,
@@ -148,7 +148,7 @@ public:
 protected:
   void run();
 
-  void registerParameter(ParameterBasePtr parameter);
+  void registerParameter(cedar::aux::ParameterBasePtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -177,7 +177,7 @@ private:
 
   ParameterMap mParameters;
 
-  StringParameterPtr mName;
+  cedar::aux::StringParameterPtr mName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

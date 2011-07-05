@@ -92,8 +92,8 @@ public:
 protected:
   // none yet
 private:
-  cedar::proc::DoubleParameterPtr mRestingLevel;
-  cedar::proc::DoubleParameterPtr mInteractionWeight;
+  cedar::aux::DoubleParameterPtr mRestingLevel;
+  cedar::aux::DoubleParameterPtr mInteractionWeight;
   cedar::dyn::DoubleActivationPtr mActivation;
   cedar::dyn::DoubleActivationPtr mOutput;
 

@@ -42,6 +42,7 @@
 #define CEDAR_PROC_MANAGER_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/namespace.h"
 #include "processing/namespace.h"
 #include "processing/Registry.h"
 #include "processing/StepDeclaration.h"
@@ -80,13 +81,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static Manager& getInstance();
-  void readStep(const std::string& classId, const ConfigurationNode& root);
-  void readSteps(const ConfigurationNode& root);
-  void readTrigger(const std::string& classId, const ConfigurationNode& root);
-  void readTriggers(const ConfigurationNode& root);
-  void readDataConnection(const ConfigurationNode& root);
-  void readDataConnections(const ConfigurationNode& root);
-  void readAll(const ConfigurationNode& root);
+  void readStep(const std::string& classId, const cedar::aux::ConfigurationNode& root);
+  void readSteps(const cedar::aux::ConfigurationNode& root);
+  void readTrigger(const std::string& classId, const cedar::aux::ConfigurationNode& root);
+  void readTriggers(const cedar::aux::ConfigurationNode& root);
+  void readDataConnection(const cedar::aux::ConfigurationNode& root);
+  void readDataConnections(const cedar::aux::ConfigurationNode& root);
+  void readAll(const cedar::aux::ConfigurationNode& root);
   void readFile(const std::string& filename);
 
   StepRegistry& steps();

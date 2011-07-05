@@ -113,16 +113,16 @@ void cedar::proc::Manager::readFile(const std::string& filename)
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading configuration file " << filename << std::endl;
 #endif // DEBUG_FILE_READING
-  ConfigurationNode cfg;
+  cedar::aux::ConfigurationNode cfg;
   boost::property_tree::read_json(filename, cfg);
   this->readAll(cfg);
 }
 
-void cedar::proc::Manager::readAll(const ConfigurationNode& root)
+void cedar::proc::Manager::readAll(const cedar::aux::ConfigurationNode& root)
 {
   try
   {
-    const ConfigurationNode& steps = root.get_child("steps");
+    const cedar::aux::ConfigurationNode& steps = root.get_child("steps");
     this->readSteps(steps);
   }
   catch (const boost::property_tree::ptree_bad_path&)
@@ -135,7 +135,7 @@ void cedar::proc::Manager::readAll(const ConfigurationNode& root)
 
   try
   {
-    const ConfigurationNode& connections = root.get_child("connections");
+    const cedar::aux::ConfigurationNode& connections = root.get_child("connections");
     this->readDataConnections(connections);
   }
   catch (const boost::property_tree::ptree_bad_path&)
@@ -148,7 +148,7 @@ void cedar::proc::Manager::readAll(const ConfigurationNode& root)
 
   try
   {
-    const ConfigurationNode& triggers = root.get_child("triggers");
+    const cedar::aux::ConfigurationNode& triggers = root.get_child("triggers");
     this->readTriggers(triggers);
   }
   catch (const boost::property_tree::ptree_bad_path&)
@@ -159,7 +159,7 @@ void cedar::proc::Manager::readAll(const ConfigurationNode& root)
   }
 }
 
-void cedar::proc::Manager::readStep(const std::string& classId, const ConfigurationNode& root)
+void cedar::proc::Manager::readStep(const std::string& classId, const cedar::aux::ConfigurationNode& root)
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading step of type " << classId << std::endl;
@@ -170,13 +170,13 @@ void cedar::proc::Manager::readStep(const std::string& classId, const Configurat
   this->steps().registerObject(step);
 }
 
-void cedar::proc::Manager::readSteps(const ConfigurationNode& root)
+void cedar::proc::Manager::readSteps(const cedar::aux::ConfigurationNode& root)
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading steps." << std::endl;
 #endif // DEBUG_FILE_READING
 
-  for (ConfigurationNode::const_iterator iter = root.begin();
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {
@@ -184,7 +184,7 @@ void cedar::proc::Manager::readSteps(const ConfigurationNode& root)
   }
 }
 
-void cedar::proc::Manager::readTrigger(const std::string& classId, const ConfigurationNode& root)
+void cedar::proc::Manager::readTrigger(const std::string& classId, const cedar::aux::ConfigurationNode& root)
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading trigger of type " << classId << std::endl;
@@ -198,9 +198,9 @@ void cedar::proc::Manager::readTrigger(const std::string& classId, const Configu
   try
   {
     //!@todo Does this belong into cedar::proc::Trigger::readConfiguration?
-    const ConfigurationNode& listeners = root.get_child("listeners");
+    const cedar::aux::ConfigurationNode& listeners = root.get_child("listeners");
 
-    for (ConfigurationNode::const_iterator iter = listeners.begin();
+    for (cedar::aux::ConfigurationNode::const_iterator iter = listeners.begin();
         iter != listeners.end();
         ++iter)
     {
@@ -220,13 +220,13 @@ void cedar::proc::Manager::readTrigger(const std::string& classId, const Configu
   }
 }
 
-void cedar::proc::Manager::readTriggers(const ConfigurationNode& root)
+void cedar::proc::Manager::readTriggers(const cedar::aux::ConfigurationNode& root)
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading triggers." << std::endl;
 #endif // DEBUG_FILE_READING
 
-  for (ConfigurationNode::const_iterator iter = root.begin();
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {
@@ -235,7 +235,7 @@ void cedar::proc::Manager::readTriggers(const ConfigurationNode& root)
 }
 
 
-void cedar::proc::Manager::readDataConnection(const ConfigurationNode& root)
+void cedar::proc::Manager::readDataConnection(const cedar::aux::ConfigurationNode& root)
 {
   std::string source = root.get<std::string>("source");
   std::string target = root.get<std::string>("target");
@@ -259,13 +259,13 @@ void cedar::proc::Manager::readDataConnection(const ConfigurationNode& root)
                             );
 }
 
-void cedar::proc::Manager::readDataConnections(const ConfigurationNode& root)
+void cedar::proc::Manager::readDataConnections(const cedar::aux::ConfigurationNode& root)
 {
 #ifdef DEBUG_FILE_READING
   std::cout << "Reading data connections." << std::endl;
 #endif // DEBUG_FILE_READING
 
-  for (ConfigurationNode::const_iterator iter = root.begin();
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
       iter != root.end();
       ++iter)
   {

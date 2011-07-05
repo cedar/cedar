@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/ParameterBase.h"
-#include "processing/exceptions.h"
+#include "auxiliaries/exceptions.h"
 #include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
@@ -51,12 +51,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::ParameterBase::ParameterBase(const std::string& name)
+cedar::aux::ParameterBase::ParameterBase(const std::string& name)
 {
   this->setName(name);
 }
 
-cedar::proc::ParameterBase::~ParameterBase()
+cedar::aux::ParameterBase::~ParameterBase()
 {
 }
 
@@ -64,37 +64,37 @@ cedar::proc::ParameterBase::~ParameterBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::proc::ParameterBase::getReadAutomatically() const
+bool cedar::aux::ParameterBase::getReadAutomatically() const
 {
   return this->mAutoRead;
 }
 
-void cedar::proc::ParameterBase::setReadAutomatically(bool value)
+void cedar::aux::ParameterBase::setReadAutomatically(bool value)
 {
   this->mAutoRead = value;
 }
 
-bool cedar::proc::ParameterBase::getHasDefault() const
+bool cedar::aux::ParameterBase::getHasDefault() const
 {
   return this->mHasDefault;
 }
 
-void cedar::proc::ParameterBase::setHasDefault(bool value)
+void cedar::aux::ParameterBase::setHasDefault(bool value)
 {
   this->mHasDefault = value;
 }
 
-bool cedar::proc::ParameterBase::isConstant() const
+bool cedar::aux::ParameterBase::isConstant() const
 {
   return this->mConstant;
 }
 
-void cedar::proc::ParameterBase::setConstant(bool value)
+void cedar::aux::ParameterBase::setConstant(bool value)
 {
   this->mConstant = value;
 }
 
-void cedar::proc::ParameterBase::set(const cedar::proc::ConfigurationNode& node)
+void cedar::aux::ParameterBase::set(const cedar::aux::ConfigurationNode& node)
 {
   if (dynamic_cast<DoubleParameter*>(this))
   {
@@ -106,7 +106,7 @@ void cedar::proc::ParameterBase::set(const cedar::proc::ConfigurationNode& node)
   }
   else
   {
-    CEDAR_THROW(cedar::proc::UnhandledTypeException, "Cannot set parameter value: the type of the parameter "
+    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot set parameter value: the type of the parameter "
                                                      + this->getName() + "is not handled.");
   }
 }
