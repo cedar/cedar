@@ -59,7 +59,11 @@
 #include "auxiliaries/gl/Torus.h"
 #include "auxiliaries/gl/Ellipse.h"
 #include "auxiliaries/gl/Chessboard.h"
-#include "cedar/auxiliaries/gui/ui_SceneWidget.h"
+#ifdef DEBUG
+  #include "cedar/auxiliaries/debug/gui/ui_SceneWidget.h"
+#else
+  #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
+#endif
 
 // SYSTEM INCLUDES
 #include <Qt>

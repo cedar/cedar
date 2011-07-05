@@ -58,6 +58,9 @@ include(${CEDAR_CMAKE_DIR}/libraries.txt)
 # setup of unit and interactive tests
 include(${CEDAR_CMAKE_DIR}/testing.txt)
 
+# setup of unit and interactive tests
+include(${CEDAR_CMAKE_DIR}/tools.txt)
+
 # setup of files that are installed (additionally to the libraries)
 include(${CEDAR_CMAKE_DIR}/install.txt)
 
