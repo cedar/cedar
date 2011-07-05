@@ -95,6 +95,15 @@ namespace cedar
     template <class T> class AbstractFactory;
     template <class T, class T2> class AbstractFactoryDerived;
 
+    class ParameterBase;
+    typedef boost::shared_ptr<ParameterBase> ParameterBasePtr;
+
+    template <typename T> class Parameter;
+    typedef Parameter<double> DoubleParameter;
+    typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
+    typedef Parameter<std::string> StringParameter;
+    typedef boost::shared_ptr<StringParameter> StringParameterPtr;
+
 
     /*!@brief Template method that converts simple data types to a string.
      *

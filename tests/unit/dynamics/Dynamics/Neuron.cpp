@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 #include "Neuron.h"
-#include "processing/Parameter.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 

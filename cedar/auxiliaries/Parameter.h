@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
-#include "processing/ParameterBase.h"
+#include "auxiliaries/ParameterBase.h"
 
 // PROJECT INCLUDES
 

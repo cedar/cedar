@@ -45,7 +45,7 @@
 #include "processing/namespace.h"
 #include "processing/Trigger.h"
 #include "processing/DataRole.h"
-#include "processing/ParameterBase.h"
+#include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES

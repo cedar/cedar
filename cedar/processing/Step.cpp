@@ -45,7 +45,7 @@
 #include "auxiliaries/macros.h"
 #include "processing/exceptions.h"
 #include "processing/Manager.h"
-#include "processing/Parameter.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 

@@ -39,9 +39,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/ParameterBase.h"
+#include "auxiliaries/ParameterBase.h"
 #include "processing/exceptions.h"
-#include "processing/Parameter.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 

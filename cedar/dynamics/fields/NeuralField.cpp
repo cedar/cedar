@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "dynamics/fields/NeuralField.h"
 #include "dynamics/SpaceCode.h"
-#include "processing/Parameter.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 
