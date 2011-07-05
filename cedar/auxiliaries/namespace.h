@@ -46,6 +46,7 @@
 // SYSTEM INCLUDES
 #include <sstream>
 #include <boost/smart_ptr.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 
 namespace cedar
@@ -104,6 +105,8 @@ namespace cedar
     typedef Parameter<std::string> StringParameter;
     typedef boost::shared_ptr<StringParameter> StringParameterPtr;
 
+    typedef boost::property_tree::ptree ConfigurationNode;
+
 
     /*!@brief Template method that converts simple data types to a string.
      *
@@ -116,6 +119,9 @@ namespace cedar
       streamOut << value;
       return streamOut.str();
     }
+
+    /*exceptions*/
+    class UnhandledTypeException;
   }
 }
 

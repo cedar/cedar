@@ -61,7 +61,7 @@ mFinished(new cedar::proc::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mMandatoryConnectionsAreSet (true),
-mName (new cedar::proc::StringParameter("name", "")),
+mName (new cedar::aux::StringParameter("name", "")),
 mRunInThread(runInThread)
 {
   this->registerParameter(mName);
@@ -112,7 +112,7 @@ cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters()
   return this->mParameters;
 }
 
-void cedar::proc::Step::registerParameter(cedar::proc::ParameterBasePtr parameter)
+void cedar::proc::Step::registerParameter(cedar::aux::ParameterBasePtr parameter)
 {
   //! @todo check for duplicate names
   //! @todo make sure there are no dots in the name; make a global function for name checks.
@@ -139,7 +139,7 @@ void cedar::proc::Step::checkMandatoryConnections()
   }
 }
 
-void cedar::proc::Step::readConfiguration(const cedar::proc::ConfigurationNode& node)
+void cedar::proc::Step::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->setName(node.get<std::string>("name"));
   this->setThreaded(node.get<bool>("threaded", false));
@@ -148,7 +148,7 @@ void cedar::proc::Step::readConfiguration(const cedar::proc::ConfigurationNode& 
   {
     try
     {
-      const cedar::proc::ConfigurationNode& value = node.get_child(iter->second->getName());
+      const cedar::aux::ConfigurationNode& value = node.get_child(iter->second->getName());
       iter->second->set(value);
     }
     catch (const boost::property_tree::ptree_bad_path&)

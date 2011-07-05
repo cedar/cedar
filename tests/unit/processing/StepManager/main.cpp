@@ -65,7 +65,7 @@ public:
     std::cout << "processing " << this->getName() << " = " << this->_mMessage << std::endl;
   }
 
-  void readConfiguration(const cedar::proc::ConfigurationNode& node)
+  void readConfiguration(const cedar::aux::ConfigurationNode& node)
   {
     this->cedar::proc::Step::readConfiguration(node);
     _mMessage = node.get<std::string>("outputString", "defaultOutputString");

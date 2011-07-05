@@ -93,7 +93,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   cedar::dyn::SpaceCodePtr mActivation;
-  cedar::proc::DoubleParameterPtr mRestingLevel;
+  cedar::aux::DoubleParameterPtr mRestingLevel;
 private:
   // none yet
 

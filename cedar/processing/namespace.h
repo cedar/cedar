@@ -45,7 +45,6 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 
 namespace cedar
@@ -62,15 +61,6 @@ namespace cedar
     template <typename T> class DataT;
 
     class DataRole;
-
-    class ParameterBase;
-    typedef boost::shared_ptr<ParameterBase> ParameterBasePtr;
-
-    template <typename T> class Parameter;
-    typedef Parameter<double> DoubleParameter;
-    typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
-    typedef Parameter<std::string> StringParameter;
-    typedef boost::shared_ptr<StringParameter> StringParameterPtr;
 
     class LoopArguments;
 
@@ -103,15 +93,12 @@ namespace cedar
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger> > TriggerFactoryPtr;
 
-    typedef boost::property_tree::ptree ConfigurationNode;
-
     /* Exceptions */
     class InvalidNameException;
     class InvalidRoleException;
     class InvalidArgumentsException;
     class DuplicateNameException;
     class MissingConnectionException;
-    class UnhandledTypeException;
   }
 }
 

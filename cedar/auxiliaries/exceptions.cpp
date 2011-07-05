@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralField.cpp
+    File:        exceptions.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 04
+    Date:        2011 06 17
 
     Description:
 
@@ -38,41 +38,9 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "dynamics/fields/NeuralField.h"
-#include "dynamics/SpaceCode.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/exceptions.h"
 
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-cedar::dyn::NeuralField::NeuralField()
-:
-mActivation(new cedar::dyn::SpaceCode(cv::Mat())),
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0))
+cedar::aux::UnhandledTypeException::UnhandledTypeException()
 {
-  this->registerParameter(mRestingLevel);
-
-  this->declareBuffer("activation");
-  this->setBuffer("activation", mActivation);
-}
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
-{
-  cv::Mat& u = this->mActivation->getData();
-  const double& h = mRestingLevel->get();
-
-  cv::Mat d_u = -u + h;
-  u += d_u;
-}
-
-void cedar::dyn::NeuralField::onStart()
-{
-
+  this->mType = "UnhandledTypeException";
 }
