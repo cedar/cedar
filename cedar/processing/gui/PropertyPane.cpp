@@ -39,6 +39,9 @@
 #include "processing/Step.h"
 #include "auxiliaries/namespace.h"
 #include "auxiliaries/Parameter.h"
+#include "auxiliaries/NumericParameter.h"
+#include "processing/gui/DoubleParameter.h"
+#include "processing/gui/StringParameter.h"
 
 // PROJECT INCLUDES
 
@@ -79,6 +82,10 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
     QLabel *p_label = new QLabel();
     p_label->setText(parameter->getName().c_str());
     this->setCellWidget(row, 0, p_label);
+
+    cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    p_widget->setParameter(parameter);
+    this->setCellWidget(row, 1, p_widget);
   }
 }
 
@@ -87,8 +94,8 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
 {
   if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
   {
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, QDoubleSpinBox>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, QLineEdit>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }

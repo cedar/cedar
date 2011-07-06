@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Factory.h
+    File:        NumericParameter.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 06
 
     Description:
 
@@ -34,25 +38,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_FACTORY_H
-#define CEDAR_AUX_FACTORY_H
+#ifndef CEDAR_PROC_NUMERIC_PARAMETER_H
+#define CEDAR_PROC_NUMERIC_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Factory for dynamically allocating objects of the type BaseType.
+/*!@brief Abstract description of the class.
  *
- * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
- *
- * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
+ * More detailed description of the class.
  */
-template <typename BaseType>
-class cedar::aux::Factory
+template <typename T>
+class cedar::aux::NumericParameter : public cedar::aux::Parameter<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -62,23 +64,35 @@ class cedar::aux::Factory
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The constructor.
+  NumericParameter(const std::string& name,
+                   const T& defaultValue,
+                   const T& minimum,
+                   const T& maximum)
+  :
+  cedar::aux::Parameter<T>(name, defaultValue),
+  mMinimum(minimum),
+  mMaximum(maximum)
+  {
+  }
+
+  //!@brief Destructor
+  ~NumericParameter()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Allocates a new resource of BaseType.
-   *
-   * @returns A smart pointer to the newly allocated resource.
-   */
-  virtual boost::shared_ptr<BaseType> allocate() const
+  const T& getMinimum() const
   {
-    return boost::shared_ptr<BaseType> (new BaseType());
+    return this->mMinimum;
   }
 
-  virtual BaseType* allocateRaw() const
+  const T& getMaximum() const
   {
-    return new BaseType();
+    return this->mMaximum;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,20 +115,22 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  //! The minimum value, if applicable to the type.
+  T mMinimum;
+
+  //! The maximum value, if applicable to the type.
+  T mMaximum;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Factory
+}; // class cedar::aux::Parameter
 
-#endif // CEDAR_AUX_FACTORY_H
+#endif // CEDAR_PROC_PARAMETER_H
 
