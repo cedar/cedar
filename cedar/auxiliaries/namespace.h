@@ -96,13 +96,14 @@ namespace cedar
     template <class T> class AbstractFactory;
     template <class T, class T2> class AbstractFactoryDerived;
 
-    template <class BaseType> class TypeBasedFactory;
+    template <class KeyBaseType, class ValueBaseType> class TypeBasedFactory;
 
     class ParameterBase;
     typedef boost::shared_ptr<ParameterBase> ParameterBasePtr;
 
     template <typename T> class Parameter;
-    typedef Parameter<double> DoubleParameter;
+    template <typename T> class NumericParameter;
+    typedef NumericParameter<double> DoubleParameter;
     typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
     typedef Parameter<std::string> StringParameter;
     typedef boost::shared_ptr<StringParameter> StringParameterPtr;

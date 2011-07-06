@@ -60,7 +60,7 @@ class cedar::proc::gui::PropertyPane : public QTableWidget
   Q_OBJECT
 
 private:
-  typedef cedar::aux::TypeBasedFactory<QWidget> DataWidgetTypes;
+  typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterBase, cedar::proc::gui::ParameterBase> DataWidgetTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

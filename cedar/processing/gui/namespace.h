@@ -60,6 +60,9 @@ namespace cedar
       class Scene;
       class View;
       class PropertyPane;
+      class ParameterBase;
+      class DoubleParameter;
+      class StringParameter;
     }
   }
 }

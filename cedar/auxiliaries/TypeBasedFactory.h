@@ -53,15 +53,15 @@
  *
  * More detailed description of the class.
  */
-template <class BaseType>
+template <class KeyBaseType, class ValueBaseType>
 class cedar::aux::TypeBasedFactory
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef boost::shared_ptr<BaseType> BaseTypePtr;
-  typedef boost::shared_ptr<cedar::aux::Factory<BaseType> > FactoryPtr;
+  typedef boost::shared_ptr<KeyBaseType> KeyBaseTypePtr;
+  typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType> > FactoryPtr;
 
 private:
   typedef std::pair<const std::type_info*, FactoryPtr> Pair;
@@ -83,21 +83,24 @@ public:
   void add()
   {
     const std::type_info* type = &typeid(Key);
-    FactoryPtr factory(new cedar::aux::FactoryDerived<BaseType, Value>());
+    FactoryPtr factory(new cedar::aux::FactoryDerived<ValueBaseType, Value>());
     mKeyTypes.push_back(Pair(type, factory));
   }
 
-  BaseTypePtr get(BaseTypePtr pointer)
+  FactoryPtr get(KeyBaseTypePtr pointer)
   {
     for(typename KeyTypes::iterator iter = this->mKeyTypes.begin(); iter != this->mKeyTypes.end(); ++iter)
     {
-      if (*(iter->first) == typeid(pointer.get()))
+      if (*(iter->first) == typeid(*pointer.get()))
       {
-        return iter->second->allocate();
+        return iter->second;
       }
     }
-    CEDAR_THROW(cedar::aux::UnknownTypeException, "Type of the base pointer is not handled in the TypeBasedFactory.");
-    return BaseTypePtr();
+    std::string message = "Type of the base pointer (";
+    message += typeid(pointer.get()).name();
+    message += ") is not handled in the TypeBasedFactory.";
+    CEDAR_THROW(cedar::aux::UnknownTypeException, message);
+    return FactoryPtr();
   }
 
   bool empty()

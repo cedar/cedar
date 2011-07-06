@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "dynamics/fields/NeuralField.h"
 #include "dynamics/SpaceCode.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 
@@ -53,7 +53,7 @@
 cedar::dyn::NeuralField::NeuralField()
 :
 mActivation(new cedar::dyn::SpaceCode(cv::Mat())),
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0))
+mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0))
 {
   this->registerParameter(mRestingLevel);
 

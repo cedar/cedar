@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        DoubleParameter.cpp
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 06
 
     Description:
 
@@ -35,33 +39,36 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Neuron.h"
+#include "processing/gui/DoubleParameter.h"
 #include "auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QHBoxLayout>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::Neuron::Neuron(double interactionWeight, double restingLevel)
+cedar::proc::gui::DoubleParameter::DoubleParameter(QWidget *pParent)
 :
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", restingLevel, -100, 0)),
-mInteractionWeight(new cedar::aux::DoubleParameter("interactionWeight", interactionWeight, -100, 100)),
-mActivation(new cedar::dyn::DoubleActivation(0.0)),
-mOutput(new cedar::dyn::DoubleActivation(0.0))
+cedar::proc::gui::ParameterBase(pParent)
 {
-  this->declareInput("input");
-  this->declareOutput("output");
-  this->setOutput("output", mOutput);
+  this->setLayout(new QHBoxLayout());
+  this->mpSpinbox = new QDoubleSpinBox();
+  this->layout()->setContentsMargins(0, 0, 0, 0);
+  this->layout()->addWidget(this->mpSpinbox);
+  this->mpSpinbox->setMinimum(-100.0);
+  this->mpSpinbox->setMaximum(+100.0);
 
-  this->registerParameter(this->mRestingLevel);
-  this->registerParameter(this->mInteractionWeight);
+  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
+  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
 }
 
-cedar::Neuron::~Neuron()
+//!@brief Destructor
+cedar::proc::gui::DoubleParameter::~DoubleParameter()
 {
 }
 
@@ -69,29 +76,19 @@ cedar::Neuron::~Neuron()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::Neuron::getActivity() const
+void cedar::proc::gui::DoubleParameter::parameterPointerChanged()
 {
-  return this->mActivation->getData();
+  cedar::aux::DoubleParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
+  this->mpSpinbox->setMinimum(parameter->getMinimum());
+  this->mpSpinbox->setMaximum(parameter->getMaximum());
+  this->mpSpinbox->setValue(parameter->get());
 }
 
-void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
+void cedar::proc::gui::DoubleParameter::valueChanged(double value)
 {
-  using cedar::unit::Seconds;
-  using cedar::unit::Milliseconds;
-
-  double& activation = mActivation->getData();
-  double input = this->getInput("input")->getData<double>();
-  double resting_level = mRestingLevel->get();
-  double interaction_weight = mInteractionWeight->get();
-
-  // nonlinearity
-  double interaction = 0;
-  if (input >= 0)
-  {
-    interaction = 1.0;
-  }
-
-  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + resting_level + interaction_weight * input);
-
-  mOutput->getData() = activation;
+  cedar::aux::DoubleParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
+  parameter->set(value);
 }
+
