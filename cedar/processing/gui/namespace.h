@@ -59,6 +59,7 @@ namespace cedar
       class StepClassList;
       class Scene;
       class View;
+      class PropertyPane;
     }
   }
 }

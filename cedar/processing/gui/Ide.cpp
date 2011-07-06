@@ -94,20 +94,11 @@ void cedar::proc::gui::Ide::sceneItemSelected()
 
   this->mpPropertyTable->clearContents();
   this->mpPropertyTable->setRowCount(0);
-  //!@ todo Handle the cases: 0 (!), multiple
+  //!@ todo Handle the cases: multiple
   if (selected_items.size() == 1)
   {
     cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]);
-    int row = this->mpPropertyTable->rowCount();
-    cedar::proc::Step::ParameterMap& parameters = p_drawer->getStep()->getParameters();
-    for (Step::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
-    {
-      cedar::aux::ParameterBasePtr& parameter = iter->second;
-      this->mpPropertyTable->insertRow(row);
-      QLabel *p_label = new QLabel();
-      p_label->setText(parameter->getName().c_str());
-      this->mpPropertyTable->setCellWidget(row, 0, p_label);
-    }
+    this->mpPropertyTable->display(p_drawer->getStep());
   }
 }
 
