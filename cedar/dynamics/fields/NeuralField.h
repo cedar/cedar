@@ -44,9 +44,6 @@
 // LOCAL INCLUDES
 #include "dynamics/namespace.h"
 #include "dynamics/Dynamics.h"
-#include "auxiliaries/math/Sigmoid.h"
-#include "auxiliaries/math/AbsSigmoid.h"
-#include "auxiliaries/math/ExpSigmoid.h"
 
 // PROJECT INCLUDES
 

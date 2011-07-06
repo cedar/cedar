@@ -39,6 +39,10 @@
 // PROJECT INCLUDES
 #include "auxiliaries/math/sigmoids.h"
 #include "auxiliaries/LogFile.h"
+#include "auxiliaries/math/Sigmoid.h"
+#include "auxiliaries/math/AbsSigmoid.h"
+#include "auxiliaries/math/ExpSigmoid.h"
+#include "auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
@@ -85,6 +89,23 @@ int main()
   // test sigmoidInterval()
   log_file << "test no " << test_number++ << std::endl;
   sigmoidInterval(5,1000,0);
+
+  // test sigmoid classes
+  cv::Mat my_values = cv::Mat::ones(1, 1, CV_32F);
+  cv::Mat my_values_double = cv::Mat::ones(1, 1, CV_64F);
+  cedar::aux::math::SigmoidPtr abs_sigmoid(new cedar::aux::math::AbsSigmoid(1000.0, 0));
+  cv::Mat sigmoid_my_values = abs_sigmoid->compute<float>(my_values);
+  cv::Mat sigmoid_my_values_double = abs_sigmoid->compute<double>(my_values_double);
+  cedar::aux::math::write(sigmoid_my_values);
+  cedar::aux::math::write(sigmoid_my_values_double);
+
+  my_values = cv::Mat::ones(1, 1, CV_32F);
+  my_values_double = cv::Mat::ones(1, 1, CV_64F);
+  cedar::aux::math::SigmoidPtr exp_sigmoid(new cedar::aux::math::ExpSigmoid(1000.0, 0));
+  sigmoid_my_values = exp_sigmoid->compute<float>(my_values);
+  sigmoid_my_values_double = exp_sigmoid->compute<double>(my_values_double);
+  cedar::aux::math::write(sigmoid_my_values);
+  cedar::aux::math::write(sigmoid_my_values_double);
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
