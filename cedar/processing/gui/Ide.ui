@@ -217,8 +217,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>121</width>
+          <height>325</height>
          </rect>
         </property>
         <attribute name="label">
@@ -246,7 +246,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QTableWidget" name="mpPropertyTable">
+      <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable">
        <attribute name="horizontalHeaderStretchLastSection">
         <bool>true</bool>
        </attribute>
@@ -352,6 +352,11 @@
    <class>cedar::proc::gui::View</class>
    <extends>QGraphicsView</extends>
    <header location="global">processing/gui/View.h</header>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::PropertyPane</class>
+   <extends>QTableWidget</extends>
+   <header>processing/gui/PropertyPane.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

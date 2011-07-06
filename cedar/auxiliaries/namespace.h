@@ -96,6 +96,8 @@ namespace cedar
     template <class T> class AbstractFactory;
     template <class T, class T2> class AbstractFactoryDerived;
 
+    template <class BaseType> class TypeBasedFactory;
+
     class ParameterBase;
     typedef boost::shared_ptr<ParameterBase> ParameterBasePtr;
 
@@ -122,6 +124,7 @@ namespace cedar
 
     /*exceptions*/
     class UnhandledTypeException;
+    class UnknownTypeException;
   }
 }
 
