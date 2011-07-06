@@ -86,6 +86,5 @@ void cedar::proc::gui::StringParameter::textEdited(const QString& text)
   cedar::aux::StringParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   parameter->set(text.toStdString());
-  std::cout << "String is now " << parameter->get() << std::endl;
 }
 
