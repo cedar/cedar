@@ -42,6 +42,8 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/namespace.h"
+#include "auxiliaries/Configurable.h"
+#include "auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 
@@ -51,7 +53,7 @@
  *
  * More detailed description of the sigmoid base class.
  */
-class cedar::aux::math::Sigmoid
+class cedar::aux::math::Sigmoid : public Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -62,10 +64,11 @@ class cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Sigmoid(double threshold = 0.0)
+  Sigmoid()
   :
-  mThreshold(threshold)
+  mThreshold(new DoubleParameter("threshold", 0.0, -1000.0, 1000.0))
   {
+    this->registerParameter(mThreshold);
   }
 
   //!@brief Destructor
@@ -77,13 +80,21 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief this function calculates the sigmoid function for a given double value.
+   * All inherited classes have to implement this function.
+   */
   virtual double compute(double value) = 0;
 
+  /*!@brief this function calculates the sigmoid function for a given float value.
+   * Included for backward-compatibility
+   */
   virtual float compute(float value)
   {
     return static_cast<float>(compute(static_cast<double>(value)));
   }
 
+  /*!@brief this function calculates the sigmoid function for a matrix.
+   */
   template<typename T>
   cv::Mat compute(const cv::Mat& values)
   {
@@ -114,7 +125,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  double mThreshold;
+  //!@brief threshold of the sigmoid
+  cedar::aux::DoubleParameterPtr mThreshold;
 private:
   // none yet
 
