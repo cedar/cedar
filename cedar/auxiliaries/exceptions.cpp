@@ -44,3 +44,8 @@ cedar::aux::UnhandledTypeException::UnhandledTypeException()
 {
   this->mType = "UnhandledTypeException";
 }
+
+cedar::aux::UnknownTypeException::UnknownTypeException()
+{
+  this->mType = "UnknownTypeException";
+}

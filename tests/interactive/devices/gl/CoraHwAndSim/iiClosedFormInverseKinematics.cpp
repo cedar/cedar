@@ -72,20 +72,6 @@ void ClosedFormInverseKinematics::InitVariables()
    * Angles in 	[deg]*/
   mTaskCoordinates.Pos = Mat::zeros(3, 1, CV_64FC1);
   mTaskCoordinates.eefOrientationAngle = Mat::zeros(3, 1, CV_64FC1);
-
-  //mTaskCoordinates.Pos(0) 				= 225;
-  //mTaskCoordinates.Pos(1) 				= 500;
-  //mTaskCoordinates.Pos(2) 				= 100;
-  //mTaskCoordinates.eefOrientationAngle	=	0;
-  //mTaskCoordinates.redundancyAng			=   180;
-  //mTaskCoordinates.shoulderGear 			= 	30;
-  //mTaskCoordinates.trunkAng				= 	0;
-
-
-  //TaskCoordinatesToArmGeometry();
-  //InverseKinematics();
-
-  return;
 }
 
 

@@ -49,7 +49,14 @@
 class cedar::aux::UnhandledTypeException : public cedar::aux::exc::ExceptionBase
 {
   public:
-  UnhandledTypeException();
+    UnhandledTypeException();
 }; // class cedar::aux::UnhandledTypeException
+
+
+class cedar::aux::UnknownTypeException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    UnknownTypeException();
+}; // class cedar::aux::UnknownTypeException
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

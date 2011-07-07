@@ -41,11 +41,15 @@
 // LOCAL INCLUDES
 #include "processing/gui/StepItem.h"
 #include "processing/Manager.h"
+#include "processing/Data.h"
+#include "processing/Step.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QPainter>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -58,8 +62,7 @@ mStep (step),
 mWidth (100),
 mHeight (50)
 {
-  cedar::proc::StepDeclarationPtr declaration = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
-  mClassId = declaration->getClassId();
+  this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 }
 
@@ -77,6 +80,34 @@ QRectF cedar::proc::gui::StepItem::boundingRect() const
   return QRectF(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
 }
 
+void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+  QMenu menu;
+  QMenu* p_data = menu.addMenu("data");
+
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+      enum_it != cedar::proc::DataRole::type().list().end();
+      ++enum_it)
+  {
+    try
+    {
+      const cedar::aux::Enum& e = *enum_it;
+      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
+      p_data->addSeparator();
+      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        p_data->addAction(iter->first.c_str());
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException& e)
+    {
+      // that's ok, a step may not have any data in a certain role.
+    }
+  }
+
+  /* QAction *a = */ menu.exec(event->screenPos());
+}
+
 void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   painter->save(); // save current painter settings
@@ -91,7 +122,7 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
   }
 
   painter->drawRect(bounds);
-  painter->drawText(QPointF(5, 15), this->mClassId.c_str());
+  painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());
   painter->drawText(QPointF(5, 25), this->mStep->getName().c_str());
 
   painter->restore(); // restore saved painter settings

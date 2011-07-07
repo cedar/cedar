@@ -71,7 +71,6 @@ class cedar::proc::Step : public QThread, public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-protected:
   struct DataEntry
   {
     public:
@@ -79,6 +78,7 @@ protected:
 
       void setData(DataPtr data);
       DataPtr getData();
+      boost::shared_ptr<const Data> getData() const;
 
       bool isMandatory() const;
 
@@ -86,6 +86,7 @@ protected:
       DataPtr mData;
       bool mMandatory;
   };
+  typedef std::map<std::string, DataEntry> SlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -128,6 +129,8 @@ public:
   cedar::proc::DataPtr getBuffer(const std::string& name);
   cedar::proc::DataPtr getOutput(const std::string& name);
 
+  const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
+
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   static void connect(
@@ -162,8 +165,6 @@ public:
   // none yet (hopefully never!)
 protected:
   cedar::proc::TriggerPtr mFinished;
-
-  typedef std::map<std::string, DataEntry> SlotMap;
   std::map<DataRole::Id, SlotMap> mDataConnections;
 
 private:

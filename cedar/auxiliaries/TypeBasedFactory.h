@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Factory.h
+    File:        TypeBasedFactory.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,51 +34,78 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_FACTORY_H
-#define CEDAR_AUX_FACTORY_H
+#ifndef CEDAR_AUX_TYPE_BASED_FACTORY_H
+#define CEDAR_AUX_TYPE_BASED_FACTORY_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
+#include "auxiliaries/FactoryDerived.h"
+#include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <vector>
+#include <typeinfo>
 
 
-/*!@brief Factory for dynamically allocating objects of the type BaseType.
+/*!@brief Abstract description of the class.
  *
- * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
- *
- * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
+ * More detailed description of the class.
  */
-template <typename BaseType>
-class cedar::aux::Factory
+template <class KeyBaseType, class ValueBaseType>
+class cedar::aux::TypeBasedFactory
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef boost::shared_ptr<KeyBaseType> KeyBaseTypePtr;
+  typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType> > FactoryPtr;
+
+private:
+  typedef std::pair<const std::type_info*, FactoryPtr> Pair;
+  typedef std::vector<Pair> KeyTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
+
+  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Allocates a new resource of BaseType.
-   *
-   * @returns A smart pointer to the newly allocated resource.
-   */
-  virtual boost::shared_ptr<BaseType> allocate() const
+  template <class Key, class Value>
+  void add()
   {
-    return boost::shared_ptr<BaseType> (new BaseType());
+    const std::type_info* type = &typeid(Key);
+    FactoryPtr factory(new cedar::aux::FactoryDerived<ValueBaseType, Value>());
+    mKeyTypes.push_back(Pair(type, factory));
   }
 
-  virtual BaseType* allocateRaw() const
+  FactoryPtr get(KeyBaseTypePtr pointer)
   {
-    return new BaseType();
+    for(typename KeyTypes::iterator iter = this->mKeyTypes.begin(); iter != this->mKeyTypes.end(); ++iter)
+    {
+      if (*(iter->first) == typeid(*pointer.get()))
+      {
+        return iter->second;
+      }
+    }
+    std::string message = "Type of the base pointer (";
+    message += typeid(pointer.get()).name();
+    message += ") is not handled in the TypeBasedFactory.";
+    CEDAR_THROW(cedar::aux::UnknownTypeException, message);
+    return FactoryPtr();
+  }
+
+  bool empty()
+  {
+    return this->mKeyTypes.empty();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -96,12 +123,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  KeyTypes mKeyTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -114,7 +139,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::Factory
+}; // class cedar::aux::TypeBasedFactory
 
-#endif // CEDAR_AUX_FACTORY_H
+#endif // CEDAR_XXX_XXX_H
 

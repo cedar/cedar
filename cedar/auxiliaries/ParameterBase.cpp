@@ -42,6 +42,7 @@
 #include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/Parameter.h"
+#include "auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 

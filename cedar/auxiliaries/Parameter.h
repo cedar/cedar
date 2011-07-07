@@ -93,16 +93,6 @@ public:
     this->mValue = value;
   }
 
-  const T& getMinimum() const
-  {
-    return this->mMinimum;
-  }
-
-  const T& getMaximum() const
-  {
-    return this->mMaximum;
-  }
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,12 +118,6 @@ private:
 
   //! The default value of the parameter. Ignored if mHasDefault is false.
   T mDefault;
-
-  //! The minimum value, if applicable to the type.
-  T mMinimum;
-
-  //! The maximum value, if applicable to the type.
-  T mMaximum;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
