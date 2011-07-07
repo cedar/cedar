@@ -38,18 +38,11 @@
 
 ======================================================================================================================*/
 
-#include "processing/gui/Ide.h"
-
-#include <QApplication>
+#include "processing/gui/IdeApplication.h"
 
 int main(int argc, char** argv)
 {
-  QApplication app (argc, argv);
+  cedar::proc::gui::IdeApplication app (argc, argv);
 
-  cedar::proc::gui::Ide ide;
-  ide.show();
-
-  app.exec();
-
-  return 0;
+  return app.exec();
 }
