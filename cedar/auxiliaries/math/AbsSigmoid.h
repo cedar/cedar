@@ -64,11 +64,12 @@ class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  AbsSigmoid(double beta, double threshold = 0)
+  AbsSigmoid()
   :
-  cedar::aux::math::Sigmoid(threshold),
-  mBeta(beta)
+  cedar::aux::math::Sigmoid(),
+  mBeta(new cedar::aux::DoubleParameter("beta", 10.0, -1000.0, 1000.0))
   {
+    this->registerParameter(mBeta);
   }
 
   //!@brief Destructor
@@ -80,9 +81,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
+   */
   virtual double compute(double value)
   {
-    return cedar::aux::math::sigmoidAbs(value, mBeta, mThreshold);
+    return cedar::aux::math::sigmoidAbs(value, mBeta->get(), mThreshold->get());
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,7 +104,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  double mBeta;
+  //!@brief steepness of the abs-sigmoid
+  cedar::aux::DoubleParameterPtr mBeta;
 private:
   // none yet
 

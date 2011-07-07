@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExpSigmoid.h
+    File:        HeavysideSigmoid.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -32,13 +32,13 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 07 05
 
-    Description: Sigmoid function
+    Description: Sigmoid functions
 
     Credits:
 
 ======================================================================================================================*/
-#ifndef CEDAR_AUX_MATH_EXP_SIGMOID_H
-#define CEDAR_AUX_MATH_EXP_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H
+#define CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/namespace.h"
@@ -53,7 +53,7 @@
  *
  * More detailed description of the sigmoid base class.
  */
-class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::HeavysideSigmoid : public cedar::aux::math::Sigmoid
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,16 +64,14 @@ class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExpSigmoid()
+  HeavysideSigmoid()
   :
-  cedar::aux::math::Sigmoid(),
-  mBeta(new cedar::aux::DoubleParameter("beta", 10.0, -1000.0, 1000.0))
+  cedar::aux::math::Sigmoid()
   {
-    this->registerParameter(mBeta);
   }
 
   //!@brief Destructor
-  virtual ~ExpSigmoid()
+  virtual ~HeavysideSigmoid()
   {
   }
 
@@ -81,11 +79,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the exp-based sigmoid function for a given double value.
+  /*!@brief this function calculates the Heavyside function for a given double value.
    */
   virtual double compute(double value)
   {
-    return cedar::aux::math::sigmoidExp(value, mBeta->get(), mThreshold->get());
+    return cedar::aux::math::sigmoidHeavyside(value, mThreshold->get());
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -104,8 +102,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the exp-sigmoid
-  cedar::aux::DoubleParameterPtr mBeta;
+  // none yet
+
 private:
   // none yet
 
@@ -121,4 +119,4 @@ private:
 };
 
 
-#endif  // CEDAR_AUX_MATH_EXP_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H

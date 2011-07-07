@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ExpSigmoid.h
+    File:        SigmoidDeclarationT.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,50 +30,46 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 06 24
 
-    Description: Sigmoid function
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
-#ifndef CEDAR_AUX_MATH_EXP_SIGMOID_H
-#define CEDAR_AUX_MATH_EXP_SIGMOID_H
+
+#ifndef CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
+#define CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/namespace.h"
-#include "auxiliaries/math/sigmoids.h"
-#include "auxiliaries/math/Sigmoid.h"
+#include "auxiliaries/AbstractFactory.h"
+#include "auxiliaries/AbstractFactoryDerived.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
- *
- * More detailed description of the sigmoid base class.
- */
-class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::SigmoidDeclaration
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
+public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief The standard constructor.
-  ExpSigmoid()
+  SigmoidDeclaration(
+                      cedar::aux::math::SigmoidFactoryPtr classFactory,
+                      const std::string& classId,
+                      const std::string& category = "misc."
+                    )
   :
-  cedar::aux::math::Sigmoid(),
-  mBeta(new cedar::aux::DoubleParameter("beta", 10.0, -1000.0, 1000.0))
+  mpClassFactory(classFactory),
+  mClassId(classId),
+  mCategory (category)
   {
-    this->registerParameter(mBeta);
   }
 
-  //!@brief Destructor
-  virtual ~ExpSigmoid()
+  virtual ~SigmoidDeclaration()
   {
   }
 
@@ -81,12 +77,58 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the exp-based sigmoid function for a given double value.
-   */
-  virtual double compute(double value)
+  cedar::aux::math::SigmoidFactoryPtr getObjectFactory()
   {
-    return cedar::aux::math::sigmoidExp(value, mBeta->get(), mThreshold->get());
+    return this->mpClassFactory;
   }
+
+  const std::string& getClassId() const
+  {
+    return this->mClassId;
+  }
+
+  const std::string& getCategory() const
+  {
+    return this->mCategory;
+  }
+
+  /*!
+   * @brief Returns the class name without the preceding namespace.
+   */
+  std::string getClassName() const
+  {
+    std::size_t index = this->getClassId().rfind('.');
+    if (index != std::string::npos)
+    {
+      return this->getClassId().substr(index + 1);
+    }
+    else
+    {
+      return this->getClassId();
+    }
+  }
+
+  /*!
+   * @brief Returns the namespace name without the class name.
+   */
+  std::string getNamespaceName() const
+  {
+    std::size_t index = this->getClassId().rfind('.');
+    if (index != std::string::npos)
+    {
+      return this->getClassId().substr(0, index);
+    }
+    else
+    {
+      return this->getClassId();
+    }
+  }
+
+  /*!
+   * @returns True, if the object passed as argument is an instance of the class represented by this declaration, false
+   *          otherwise.
+   */
+  virtual bool isObjectInstanceOf(cedar::aux::math::SigmoidPtr) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -104,8 +146,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief steepness of the exp-sigmoid
-  cedar::aux::DoubleParameterPtr mBeta;
+  cedar::aux::math::SigmoidFactoryPtr mpClassFactory;
+  std::string mClassId;
+  std::string mCategory;
 private:
   // none yet
 
@@ -117,8 +160,49 @@ protected:
 
 private:
   // none yet
-
 };
 
 
-#endif  // CEDAR_AUX_MATH_EXP_SIGMOID_H
+/*!@brief Abstract description of the class with templates.
+ *
+ * More detailed description of the class with templates.
+ */
+template <class DerivedClass>
+class cedar::aux::math::SigmoidDeclarationT : public cedar::aux::math::SigmoidDeclaration
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  //!@brief The standard constructor.
+  SigmoidDeclarationT(
+                    const std::string& classId,
+                    const std::string& category = "misc."
+                  )
+  :
+    SigmoidDeclaration
+  (
+    cedar::aux::math::SigmoidFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::aux::math::Sigmoid, DerivedClass>()),
+    classId,
+    category
+  )
+  {
+  }
+
+  //!@brief Destructor
+  ~SigmoidDeclarationT()
+  {
+  }
+
+  bool isObjectInstanceOf(cedar::aux::math::SigmoidPtr pointer)
+  {
+    return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
+  }
+}; // class cedar::aux::math::SigmoidDeclarationT
+
+#endif // CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
+
