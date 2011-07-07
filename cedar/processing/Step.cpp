@@ -87,9 +87,26 @@ cedar::proc::DataPtr cedar::proc::Step::DataEntry::getData()
   return this->mData;
 }
 
+boost::shared_ptr<const cedar::proc::Data> cedar::proc::Step::DataEntry::getData() const
+{
+  return this->mData;
+}
+
 bool cedar::proc::Step::DataEntry::isMandatory() const
 {
   return this->mMandatory;
+}
+
+const cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id role) const
+{
+  std::map<DataRole::Id, SlotMap>::const_iterator iter = this->mDataConnections.find(role);
+  if (iter == this->mDataConnections.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Role "
+                                                   + DataRole::type().get(role).name()
+                                                   + " not found in cedar::proc::Step::getData(DataRole::Id).");
+  }
+  return iter->second;
 }
 
 void cedar::proc::Step::setName(const std::string& name)
