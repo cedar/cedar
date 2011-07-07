@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Factory.h
+    File:        StringParameter.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 06
 
     Description:
 
@@ -34,52 +38,48 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_FACTORY_H
-#define CEDAR_AUX_FACTORY_H
+#ifndef CEDAR_PROC_GUI_STRING_PARAMETER_H
+#define CEDAR_PROC_GUI_STRING_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "processing/gui/namespace.h"
+#include "processing/gui/ParameterBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QLineEdit>
 
 
-/*!@brief Factory for dynamically allocating objects of the type BaseType.
+/*!@brief Abstract description of the class.
  *
- * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
- *
- * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
+ * More detailed description of the class.
  */
-template <typename BaseType>
-class cedar::aux::Factory
+class cedar::proc::gui::StringParameter : public cedar::proc::gui::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
+  StringParameter(QWidget *pParent = NULL);
+
+  //!@brief Destructor
+  virtual ~StringParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Allocates a new resource of BaseType.
-   *
-   * @returns A smart pointer to the newly allocated resource.
-   */
-  virtual boost::shared_ptr<BaseType> allocate() const
-  {
-    return boost::shared_ptr<BaseType> (new BaseType());
-  }
 
-  virtual BaseType* allocateRaw() const
-  {
-    return new BaseType();
-  }
+public slots:
+  void parameterPointerChanged();
+  void textEdited(const QString& text);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,25 +96,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  QLineEdit *mpEdit;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Factory
+}; // class cedar::proc::gui::StringParameter
 
-#endif // CEDAR_AUX_FACTORY_H
+#endif // CEDAR_PROC_GUI_STRING_PARAMETER_H
 

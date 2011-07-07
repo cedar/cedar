@@ -36,14 +36,8 @@
 
 #ifndef IICLOSEDFORMINVERSEKINEMATICS_HPP_
 #define IICLOSEDFORMINVERSEKINEMATICS_HPP_
-
-//#include <cvmat.hpp>
-//#include "hrOpenChainManipulator.h"
-//#include "hrOcmCalculator.h"
-
-#include "cv.h"
-//#include "math.h"
-
+//!@todo delete this file or completely revamp it to the bare minimum of cedar compliance
+#include <opencv2/opencv.hpp>
 
 inline double deg2rad(double deg)
 {

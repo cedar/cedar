@@ -80,6 +80,8 @@ public:
 
   cedar::proc::StepPtr getStep();
 
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,7 +110,7 @@ protected:
   qreal mHeight;
 
 private:
-  std::string mClassId;
+  cedar::proc::StepDeclarationPtr mClassId;
 
 }; // class StepItem
 

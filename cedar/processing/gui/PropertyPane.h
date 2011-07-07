@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Factory.h
+    File:        PropertyPane.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,52 +34,52 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_FACTORY_H
-#define CEDAR_AUX_FACTORY_H
+#ifndef CEDAR_PROC_PROPERTY_PANE_H
+#define CEDAR_PROC_PROPERTY_PANE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "processing/gui/namespace.h"
+#include "processing/namespace.h"
+#include "auxiliaries/TypeBasedFactory.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QTableWidget>
 
 
-/*!@brief Factory for dynamically allocating objects of the type BaseType.
+/*!@brief Abstract description of the class.
  *
- * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
- *
- * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
+ * More detailed description of the class.
  */
-template <typename BaseType>
-class cedar::aux::Factory
+class cedar::proc::gui::PropertyPane : public QTableWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
+private:
+  typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterBase, cedar::proc::gui::ParameterBase> DataWidgetTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
+  PropertyPane(QWidget *pParent = NULL);
+
+  //!@brief Destructor
+  ~PropertyPane();
+
+  //!@todo change from step to configuragle when the change is made in cedar::processing.
+  void display(cedar::proc::StepPtr pStep);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Allocates a new resource of BaseType.
-   *
-   * @returns A smart pointer to the newly allocated resource.
-   */
-  virtual boost::shared_ptr<BaseType> allocate() const
-  {
-    return boost::shared_ptr<BaseType> (new BaseType());
-  }
-
-  virtual BaseType* allocateRaw() const
-  {
-    return new BaseType();
-  }
+  DataWidgetTypes& dataWidgetTypes();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,25 +96,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  static DataWidgetTypes mDataWidgetTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Factory
+}; // class cedar::proc::gui::PropertyPane
 
-#endif // CEDAR_AUX_FACTORY_H
+#endif // CEDAR_PROC_PROPERTY_PANE_H
 

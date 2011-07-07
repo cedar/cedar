@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Factory.h
+    File:        ParameterBase.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 06
 
     Description:
 
@@ -34,52 +38,49 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_FACTORY_H
-#define CEDAR_AUX_FACTORY_H
+#ifndef CEDAR_PROC_GUI_PARAMETER_BASE_H
+#define CEDAR_PROC_GUI_PARAMETER_BASE_H
 
 // LOCAL INCLUDES
+#include "processing/gui/namespace.h"
 #include "auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QWidget>
 
 
-/*!@brief Factory for dynamically allocating objects of the type BaseType.
+/*!@brief Abstract description of the class.
  *
- * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
- *
- * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
+ * More detailed description of the class.
  */
-template <typename BaseType>
-class cedar::aux::Factory
+class cedar::proc::gui::ParameterBase : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
+  ParameterBase(QWidget *pParent = NULL);
+
+  //!@brief Destructor
+  virtual ~ParameterBase();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief Allocates a new resource of BaseType.
-   *
-   * @returns A smart pointer to the newly allocated resource.
-   */
-  virtual boost::shared_ptr<BaseType> allocate() const
-  {
-    return boost::shared_ptr<BaseType> (new BaseType());
-  }
+  void setParameter(cedar::aux::ParameterBasePtr pParameter);
+  cedar::aux::ParameterBasePtr getParameter();
 
-  virtual BaseType* allocateRaw() const
-  {
-    return new BaseType();
-  }
+signals:
+  void parameterPointerChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,25 +97,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  cedar::aux::ParameterBasePtr mParameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Factory
+}; // class cedar::proc::gui::ParameterBase
 
-#endif // CEDAR_AUX_FACTORY_H
+#endif // CEDAR_PROC_GUI_PARAMETER_BASE_H
 

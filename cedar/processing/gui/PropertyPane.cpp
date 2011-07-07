@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        PropertyPane.cpp
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 03 09
 
     Description:
 
@@ -35,33 +35,35 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Neuron.h"
+#include "processing/gui/PropertyPane.h"
+#include "processing/Step.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/NumericParameter.h"
+#include "processing/gui/DoubleParameter.h"
+#include "processing/gui/StringParameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QLabel>
+#include <QLineEdit>
+#include <QDoubleSpinBox>
+
+
+cedar::proc::gui::PropertyPane::DataWidgetTypes cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::Neuron::Neuron(double interactionWeight, double restingLevel)
+cedar::proc::gui::PropertyPane::PropertyPane(QWidget *pParent)
 :
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", restingLevel, -100, 0)),
-mInteractionWeight(new cedar::aux::DoubleParameter("interactionWeight", interactionWeight, -100, 100)),
-mActivation(new cedar::dyn::DoubleActivation(0.0)),
-mOutput(new cedar::dyn::DoubleActivation(0.0))
+QTableWidget(pParent)
 {
-  this->declareInput("input");
-  this->declareOutput("output");
-  this->setOutput("output", mOutput);
-
-  this->registerParameter(this->mRestingLevel);
-  this->registerParameter(this->mInteractionWeight);
 }
 
-cedar::Neuron::~Neuron()
+cedar::proc::gui::PropertyPane::~PropertyPane()
 {
 }
 
@@ -69,29 +71,31 @@ cedar::Neuron::~Neuron()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::Neuron::getActivity() const
+void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 {
-  return this->mActivation->getData();
+  int row = this->rowCount();
+  cedar::proc::Step::ParameterMap& parameters = pStep->getParameters();
+  for (Step::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
+  {
+    cedar::aux::ParameterBasePtr& parameter = iter->second;
+    this->insertRow(row);
+    QLabel *p_label = new QLabel();
+    p_label->setText(parameter->getName().c_str());
+    this->setCellWidget(row, 0, p_label);
+
+    cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    p_widget->setParameter(parameter);
+    this->setCellWidget(row, 1, p_widget);
+  }
 }
 
-void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
+
+cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane::dataWidgetTypes()
 {
-  using cedar::unit::Seconds;
-  using cedar::unit::Milliseconds;
-
-  double& activation = mActivation->getData();
-  double input = this->getInput("input")->getData<double>();
-  double resting_level = mRestingLevel->get();
-  double interaction_weight = mInteractionWeight->get();
-
-  // nonlinearity
-  double interaction = 0;
-  if (input >= 0)
+  if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
   {
-    interaction = 1.0;
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
   }
-
-  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + resting_level + interaction_weight * input);
-
-  mOutput->getData() = activation;
+  return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }
