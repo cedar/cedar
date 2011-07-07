@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Step.h
+    File:        Configurable.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 07 06
 
     Description:
 
@@ -38,122 +38,53 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_H
-#define CEDAR_PROC_STEP_H
+#ifndef CEDAR_AUX_CONFIGURABLE_H
+#define CEDAR_AUX_CONFIGURABLE_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Trigger.h"
-#include "processing/DataRole.h"
-#include "auxiliaries/ParameterBase.h"
-#include "auxiliaries/Base.h"
-#include "auxiliaries/Configurable.h"
-
+#include "auxiliaries/namespace.h"
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QThread>
 #include <map>
-
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::Step : public QThread, public cedar::aux::Configurable
+class cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // nested types
+  // macros and types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-protected:
-  struct DataEntry
-  {
-    public:
-      DataEntry(bool isMandatory = true);
-
-      void setData(DataPtr data);
-      DataPtr getData();
-
-      bool isMandatory() const;
-
-    private:
-      DataPtr mData;
-      bool mMandatory;
-  };
-
+  typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Step(bool runInThread = false, bool autoConnectTriggers = true);
-
+  Configurable();
   //!@brief Destructor
+  virtual ~Configurable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief check if everything is prepared to execute compute()
-  virtual void onStart();
-
-  void onTrigger();
-
-  virtual void compute(const cedar::proc::Arguments& arguments) = 0;
-
-  void setNextArguments(cedar::proc::ArgumentsPtr arguments);
-
-  cedar::proc::TriggerPtr& getFinishedTrigger();
-
-  void setThreaded(bool isThreaded);
-
-  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
-  void declareInput(const std::string& name, bool mandatory = true);
-  void declareBuffer(const std::string& name, bool mandatory = true);
-  void declareOutput(const std::string& name, bool mandatory = true);
-
-  void setData(DataRole::Id role, const std::string& name, cedar::proc::DataPtr data);
-  void setInput(const std::string& name, cedar::proc::DataPtr data);
-  void setBuffer(const std::string& name, cedar::proc::DataPtr data);
-  void setOutput(const std::string& name, cedar::proc::DataPtr data);
-
-  cedar::proc::DataPtr getData(DataRole::Id role, const std::string& name);
-  cedar::proc::DataPtr getInput(const std::string& name);
-  cedar::proc::DataPtr getBuffer(const std::string& name);
-  cedar::proc::DataPtr getOutput(const std::string& name);
-
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  static void connect(
-                       cedar::proc::StepPtr source,
-                       const std::string& sourceName,
-                       cedar::proc::StepPtr target,
-                       const std::string& targetName
-                     );
-
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
-
-  void setName(const std::string& name);
-  const std::string& getName() const;
+  void registerParameter(cedar::aux::ParameterBasePtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void run();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void checkMandatoryConnections();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -161,20 +92,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  cedar::proc::TriggerPtr mFinished;
-
-  typedef std::map<std::string, DataEntry> SlotMap;
-  std::map<DataRole::Id, SlotMap> mDataConnections;
-
+  // none yet
 private:
-  /*!@brief Whether the connect function should automatically connect the triggers as well.
-   */
-  const bool mAutoConnectTriggers;
-  bool mBusy;
-  ArgumentsPtr mNextArguments;
-  bool mMandatoryConnectionsAreSet;
-
-  cedar::aux::StringParameterPtr mName;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -182,12 +102,12 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  ParameterMap mParameters;
 
 private:
-  bool mRunInThread;
+  // none yet
 
-}; // class cedar::proc::Step
+}; // class cedar::aux::Configurable
 
-#endif // CEDAR_PROC_STEP_H
+#endif // CEDAR_AUX_CONFIGURABLE_H
 

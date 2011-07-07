@@ -112,13 +112,6 @@ cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters()
   return this->mParameters;
 }
 
-void cedar::proc::Step::registerParameter(cedar::aux::ParameterBasePtr parameter)
-{
-  //! @todo check for duplicate names
-  //! @todo make sure there are no dots in the name; make a global function for name checks.
-  this->mParameters[parameter->getName()] = parameter;
-}
-
 void cedar::proc::Step::checkMandatoryConnections()
 {
   mMandatoryConnectionsAreSet = true;
