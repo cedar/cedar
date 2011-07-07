@@ -22,32 +22,33 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        main.cpp
+    File:        cedarDyn.h
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
-    Date:        2011 05 12
+    Date:        2011 07 07
 
-    Description: Implements a unit test for include files (cedarDev.h and cedarAux.h).
+    Description: Header file that includes all headers of the dynamics library.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "cedarUnits.h"
-#include "cedarAux.h"
-#include "cedarProc.h"
-#include "cedarDev.h"
-#include "cedarDyn.h"
 
+#ifndef CEDAR_CEDAR_DYN_H
+#define CEDAR_CEDAR_DYN_H
+
+// LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "dynamics/namespace.h"
+#include "dynamics/Activation.h"
+#include "dynamics/Dynamics.h"
+#include "dynamics/SpaceCode.h"
+#include "dynamics/fields/NeuralField.h"
+
+
 
 // SYSTEM INCLUDES
 
-int main()
-{
-  // this is empty on purpose
-  return 0;
-}
+#endif // CEDAR_CEDAR_DYN_H
