@@ -22,60 +22,33 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        cedarDyn.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 11
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 07 07
 
-    Description: Namespace file for cedar::aux::math.
+    Description: Header file that includes all headers of the dynamics library.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_MATH_NAMESPACE_H
-#define CEDAR_AUX_MATH_NAMESPACE_H
+#ifndef CEDAR_CEDAR_DYN_H
+#define CEDAR_CEDAR_DYN_H
 
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "namespace.h"
-#include "auxiliaries/namespace.h"
+#include "dynamics/namespace.h"
+#include "dynamics/Activation.h"
+#include "dynamics/Dynamics.h"
+#include "dynamics/SpaceCode.h"
+#include "dynamics/fields/NeuralField.h"
+
+
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
-{
-  namespace aux
-  {
-    /*!@brief Namespace for all math classes. */
-    namespace math
-    {
-      template <typename T> struct Limits;
-
-      class Sigmoid;
-      typedef boost::shared_ptr<Sigmoid> SigmoidPtr;
-
-      class AbsSigmoid;
-      typedef boost::shared_ptr<AbsSigmoid> AbsSigmoidPtr;
-
-      class ExpSigmoid;
-      typedef boost::shared_ptr<ExpSigmoid> ExpSigmoidPtr;
-
-      class HeavysideSigmoid;
-      typedef boost::shared_ptr<HeavysideSigmoid> HeavysideSigmoidPtr;
-
-      class SigmoidDeclaration;
-      typedef boost::shared_ptr<SigmoidDeclaration> SigmoidDeclarationPtr;
-      template <class DerivedClass>
-      class SigmoidDeclarationT;
-
-      typedef boost::shared_ptr<cedar::aux::AbstractFactory<Sigmoid> > SigmoidFactoryPtr;
-    }
-  }
-}
-
-#endif // CEDAR_AUX_MATH_NAMESPACE_H
+#endif // CEDAR_CEDAR_DYN_H

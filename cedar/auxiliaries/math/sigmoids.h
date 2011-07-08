@@ -58,10 +58,19 @@ namespace cedar
     namespace math
     {
       //! an exponential-based sigmoid for a single double value
-      double sigmoid(const double x, const double beta, const double threshold = 0);
+      double sigmoid(const double x, const double beta, const double threshold = 0) __attribute__ ((deprecated));
+
+      //! an exponential-based sigmoid for a single double value
+      double sigmoidExp(const double x, const double beta, const double threshold = 0);
 
       //! an abs-based sigmoid for a single double value
       double sigmoidAbs(const double x, const double beta, const double threshold = 0);
+
+      //! Heavyside function for a single double value
+      double sigmoidHeavyside(const double x, const double threshold = 0);
+
+      //! a sigmoid that rises smoothly in an interval and is exactly zero resp. one outside that interval
+      double sigmoidInterval(const double value, const double t1, const double t2, const bool decreasing = false);
 
       //! an exponential-based sigmoid for a cv::Mat
       template<typename T>
@@ -75,16 +84,13 @@ namespace cedar
       template<typename T>
       cv::Mat sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0);
 
-      //! an abs-based sigmoid for a cv::Mat, that takes the result as an argument and does not allocat new memory
+      //! an abs-based sigmoid for a cv::Mat, that takes the result as an argument and does not allocate new memory
       template<typename T>
       void sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
 
       //! a sigmoid for a vector of doubles
       std::vector<double> sigmoid(const std::vector<double>& x, const double beta, const double threshold = 0);
-  
-      //! a sigmoid that rises smoothly in an interval and is exactly zero resp. one outside that interval
-      double sigmoidInterval(const double value, const double t1, const double t2, const bool decreasing = false);
     };
   };
 };
-#endif  // CEDAR_AUX_MATH_SIG_NAMESPACE_H
+#endif  // CEDAR_AUX_MATH_SIGMOIDS_H

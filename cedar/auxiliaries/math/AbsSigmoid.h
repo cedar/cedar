@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Step.h
+    File:        AbsSigmoid.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,165 +30,95 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 07 05
 
-    Description:
+    Description: Sigmoid functions
 
     Credits:
 
 ======================================================================================================================*/
-
-#ifndef CEDAR_PROC_STEP_H
-#define CEDAR_PROC_STEP_H
+#ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
+#define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Trigger.h"
-#include "processing/DataRole.h"
-#include "auxiliaries/ParameterBase.h"
-#include "auxiliaries/Base.h"
-#include "auxiliaries/Configurable.h"
+#include "auxiliaries/math/namespace.h"
+#include "auxiliaries/math/sigmoids.h"
+#include "auxiliaries/math/Sigmoid.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QThread>
-#include <map>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Abstract description of the sigmoid base class.
  *
- * More detailed description of the class.
+ * More detailed description of the sigmoid base class.
  */
-class cedar::proc::Step : public QThread, public cedar::aux::Configurable
+class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
-  // nested types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-
-  struct DataEntry
-  {
-    public:
-      DataEntry(bool isMandatory = true);
-
-      void setData(DataPtr data);
-      DataPtr getData();
-      boost::shared_ptr<const Data> getData() const;
-
-      bool isMandatory() const;
-
-    private:
-      DataPtr mData;
-      bool mMandatory;
-  };
-  typedef std::map<std::string, DataEntry> SlotMap;
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Step(bool runInThread = false, bool autoConnectTriggers = true);
+  AbsSigmoid()
+  :
+  cedar::aux::math::Sigmoid(),
+  mBeta(new cedar::aux::DoubleParameter("beta", 10.0, -1000.0, 1000.0))
+  {
+    this->registerParameter(mBeta);
+  }
 
   //!@brief Destructor
+  virtual ~AbsSigmoid()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief check if everything is prepared to execute compute()
-  virtual void onStart();
-
-  void onTrigger();
-
-  virtual void compute(const cedar::proc::Arguments& arguments) = 0;
-
-  void setNextArguments(cedar::proc::ArgumentsPtr arguments);
-
-  cedar::proc::TriggerPtr& getFinishedTrigger();
-
-  void setThreaded(bool isThreaded);
-
-  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
-  void declareInput(const std::string& name, bool mandatory = true);
-  void declareBuffer(const std::string& name, bool mandatory = true);
-  void declareOutput(const std::string& name, bool mandatory = true);
-
-  void setData(DataRole::Id role, const std::string& name, cedar::proc::DataPtr data);
-  void setInput(const std::string& name, cedar::proc::DataPtr data);
-  void setBuffer(const std::string& name, cedar::proc::DataPtr data);
-  void setOutput(const std::string& name, cedar::proc::DataPtr data);
-
-  cedar::proc::DataPtr getData(DataRole::Id role, const std::string& name);
-  cedar::proc::DataPtr getInput(const std::string& name);
-  cedar::proc::DataPtr getBuffer(const std::string& name);
-  cedar::proc::DataPtr getOutput(const std::string& name);
-
-  const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
-
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  static void connect(
-                       cedar::proc::StepPtr source,
-                       const std::string& sourceName,
-                       cedar::proc::StepPtr target,
-                       const std::string& targetName
-                     );
-
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
-
-  void setName(const std::string& name);
-  const std::string& getName() const;
+  /*!@brief this function calculates the abs-based sigmoid function for a given double value.
+   */
+  virtual double compute(double value)
+  {
+    return cedar::aux::math::sigmoidAbs(value, mBeta->get(), mThreshold->get());
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void run();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void checkMandatoryConnections();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  cedar::proc::TriggerPtr mFinished;
-  std::map<DataRole::Id, SlotMap> mDataConnections;
-
+  //!@brief steepness of the abs-sigmoid
+  cedar::aux::DoubleParameterPtr mBeta;
 private:
-  /*!@brief Whether the connect function should automatically connect the triggers as well.
-   */
-  const bool mAutoConnectTriggers;
-  bool mBusy;
-  ArgumentsPtr mNextArguments;
-  bool mMandatoryConnectionsAreSet;
-
-  cedar::aux::StringParameterPtr mName;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  bool mRunInThread;
+  // none yet
 
-}; // class cedar::proc::Step
+};
 
-#endif // CEDAR_PROC_STEP_H
 
+#endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H

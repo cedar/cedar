@@ -39,6 +39,12 @@
 // PROJECT INCLUDES
 #include "auxiliaries/math/sigmoids.h"
 #include "auxiliaries/LogFile.h"
+#include "auxiliaries/math/Sigmoid.h"
+#include "auxiliaries/math/AbsSigmoid.h"
+#include "auxiliaries/math/ExpSigmoid.h"
+#include "auxiliaries/math/HeavysideSigmoid.h"
+#include "auxiliaries/math/tools.h"
+#include "auxiliaries/math/SigmoidDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -57,7 +63,7 @@ int main()
 
   // test sigmoid(double, double, double)
   log_file << "test no " << test_number++ << std::endl;
-  if (sigmoid(5,1000,0) < 0.9)
+  if (sigmoidExp(5,1000,0) < 0.9)
   {
     log_file << "error in sigmoid(double, double, double)" << std::endl;
     errors++;
@@ -85,6 +91,39 @@ int main()
   // test sigmoidInterval()
   log_file << "test no " << test_number++ << std::endl;
   sigmoidInterval(5,1000,0);
+
+  // test sigmoid classes
+  log_file << "test no " << test_number++ << std::endl;
+  cv::Mat my_values = cv::Mat::ones(1, 1, CV_32F);
+  cv::Mat my_values_double = cv::Mat::ones(1, 1, CV_64F);
+  cedar::aux::math::SigmoidPtr abs_sigmoid(new cedar::aux::math::AbsSigmoid());
+  cv::Mat sigmoid_my_values = abs_sigmoid->compute<float>(my_values);
+  cv::Mat sigmoid_my_values_double = abs_sigmoid->compute<double>(my_values_double);
+  cedar::aux::math::write(sigmoid_my_values);
+  cedar::aux::math::write(sigmoid_my_values_double);
+
+  my_values = cv::Mat::ones(1, 1, CV_32F);
+  my_values_double = cv::Mat::ones(1, 1, CV_64F);
+  cedar::aux::math::SigmoidPtr exp_sigmoid(new cedar::aux::math::ExpSigmoid());
+  sigmoid_my_values = exp_sigmoid->compute<float>(my_values);
+  sigmoid_my_values_double = exp_sigmoid->compute<double>(my_values_double);
+  cedar::aux::math::write(sigmoid_my_values);
+  cedar::aux::math::write(sigmoid_my_values_double);
+
+  my_values = cv::Mat::ones(1, 1, CV_32F);
+  my_values_double = cv::Mat::ones(1, 1, CV_64F);
+  cedar::aux::math::SigmoidPtr heavyside_sigmoid(new cedar::aux::math::HeavysideSigmoid());
+  sigmoid_my_values = heavyside_sigmoid->compute<float>(my_values);
+  sigmoid_my_values_double = heavyside_sigmoid->compute<double>(my_values_double);
+  cedar::aux::math::write(sigmoid_my_values);
+  cedar::aux::math::write(sigmoid_my_values_double);
+
+  SigmoidDeclarationPtr sigmoid_declaration(new SigmoidDeclarationT<cedar::aux::math::AbsSigmoid>("cedar.aux.math.AbsSigmoid"));
+  cedar::aux::math::SigmoidPtr my_sigmoid = sigmoid_declaration->getObjectFactory()->allocate();
+  sigmoid_my_values = my_sigmoid->compute<float>(my_values);
+  sigmoid_my_values_double = my_sigmoid->compute<double>(my_values_double);
+  cedar::aux::math::write(sigmoid_my_values);
+  cedar::aux::math::write(sigmoid_my_values_double);
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

@@ -58,6 +58,10 @@ namespace cedar
     //!@brief smart pointer for Base
     typedef boost::shared_ptr<Base> BasePtr;
 
+    class Configurable;
+    //!@brief smart pointer for Configurable
+    typedef boost::shared_ptr<Configurable> ConfigurablePtr;
+
     class LoopedThread;
     //!@brief smart pointer for LoopedThread
     typedef boost::shared_ptr<LoopedThread> LoopedThreadPtr;
