@@ -93,10 +93,14 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     {
       const cedar::aux::Enum& e = *enum_it;
       const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
+      std::string label = e.prettyString() + "s";
+      QAction *p_label_action = p_data->addAction(label.c_str());
       p_data->addSeparator();
+      p_label_action->setEnabled(false);
       for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        p_data->addAction(iter->first.c_str());
+        QAction *p_action = p_data->addAction(iter->first.c_str());
+        p_action->setData(QString(iter->first.c_str()));
       }
     }
     catch (const cedar::proc::InvalidRoleException& e)
@@ -105,7 +109,15 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
   }
 
-  /* QAction *a = */ menu.exec(event->screenPos());
+  QAction *a = menu.exec(event->screenPos());
+
+  if (a == NULL)
+    return;
+
+  if (a->parentWidget() == p_data)
+  {
+    std::string data_name = a->data().toString().toStdString();
+  }
 }
 
 void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)

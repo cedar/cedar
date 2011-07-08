@@ -51,4 +51,5 @@ cedar_add_library(cedarproc
   gui/ParameterBase.h
   gui/DoubleParameter.h
   gui/StringParameter.h
+  gui/IdeApplication.h
   )

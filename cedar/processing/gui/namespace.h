@@ -55,6 +55,7 @@ namespace cedar
     namespace gui
     {
       class Ide;
+      class IdeApplication;
       class StepItem;
       class StepClassList;
       class Scene;
