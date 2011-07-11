@@ -265,7 +265,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
   return solutions;
 }
 
-std::vector<double> cedar::aux::math::solvePolynomial(const std::vector<double>& rCoefficients)
+std::vector<double> cedar::aux::math::solvePolynomial(const std::vector<double>& /*rCoefficients*/)
 {
   std::vector<double> solutions;
   return solutions;

@@ -58,7 +58,7 @@ using namespace cedar::aux;
 
 typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
   using cedar::proc::LoopedTrigger;
   using cedar::proc::Manager;
