@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingView.cpp
+    File:        TriggerConnection.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 07 11
 
     Description:
 
@@ -39,7 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/View.h"
+#include "processing/gui/TriggerConnection.h"
+#include "processing/gui/StepItem.h"
 
 // PROJECT INCLUDES
 
@@ -49,42 +50,40 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::View::View(QWidget *pParent)
+cedar::proc::gui::TriggerConnection::TriggerConnection(QGraphicsItem *pSource, QGraphicsItem *pTarget)
 :
-QGraphicsView(pParent)
+QGraphicsLineItem(pSource),
+mpSource(pSource),
+mpTarget(pTarget)
 {
-  this->mpScene = new cedar::proc::gui::Scene();
-  this->setScene(this->mpScene);
-  this->setInteractive(true);
-  this->setDragMode(QGraphicsView::RubberBandDrag);
+  //!@todo this is a somewhat ugly solution - find a better one!
+  if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
+  {
+    p_step->addIncomingTriggerConnection(this);
+  }
+  this->update();
 }
 
-cedar::proc::gui::View::~View()
+cedar::proc::gui::TriggerConnection::~TriggerConnection()
 {
-  delete this->mpScene;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
+void cedar::proc::gui::TriggerConnection::update()
 {
-  return this->mpScene;
-}
+  this->setZValue(-1.0);
+  QLineF line;
 
-void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
-{
-  switch (mode)
-  {
-    case cedar::proc::gui::Scene::MODE_CONNECT:
-    case cedar::proc::gui::Scene::MODE_CREATE_TRIGGER:
-      this->setDragMode(QGraphicsView::NoDrag);
-      break;
+  QPointF pos1(this->mpSource->boundingRect().width()/2.0, this->mpSource->boundingRect().height()/2.0);
+  line.setP1(pos1);
 
-    default:
-      this->setDragMode(QGraphicsView::RubberBandDrag);
-      break;
-  }
-  this->mpScene->setMode(mode, param);
+  QPointF pos2 = this->mpTarget->scenePos() - this->mpSource->scenePos();
+  pos2.rx() += this->mpTarget->boundingRect().width()/2.0;
+  pos2.ry() += this->mpTarget->boundingRect().height()/2.0;
+  line.setP2(pos2);
+
+  this->setLine(line);
 }

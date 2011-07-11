@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 27
+    Date:        2011 07 11
 
     Description:
 
@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/TriggerItem.h"
+#include "processing/gui/StepItem.h"
 #include "processing/Manager.h"
 #include "processing/Data.h"
 #include "processing/Trigger.h"
@@ -59,11 +60,14 @@
 cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 :
 mTrigger (trigger),
-mWidth (100),
+mWidth (120),
 mHeight (50)
 {
   this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(trigger);
-  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               | QGraphicsItem::ItemSendsGeometryChanges
+                               );
 }
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
@@ -107,4 +111,31 @@ void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionG
 cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
 {
   return this->mTrigger;
+}
+
+void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget)
+{
+  if (!this->getTrigger()->isListener(pTarget->getStep()))
+  {
+    this->getTrigger()->addListener(pTarget->getStep());
+    TriggerConnection *connection = new TriggerConnection(this, pTarget);
+    mConnectionInfos.push_back(connection);
+  }
+}
+
+QVariant cedar::proc::gui::TriggerItem::itemChange(GraphicsItemChange change, const QVariant & value)
+{
+  switch (change)
+  {
+    case QGraphicsItem::ItemPositionHasChanged:
+      for (size_t i = 0; i < this->mConnectionInfos.size(); ++i)
+      {
+        this->mConnectionInfos.at(i)->update();
+      }
+      break;
+
+    default:
+      break;
+  }
+  return QGraphicsItem::itemChange(change, value);
 }

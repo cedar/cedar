@@ -60,7 +60,9 @@
 cedar::proc::gui::Scene::Scene(QObject *pParent)
 :
 QGraphicsScene (pParent),
-mMode(MODE_SELECT)
+mMode(MODE_SELECT),
+mpNewConnectionIndicator(NULL),
+mpConnectionStart(NULL)
 {
 }
 
@@ -115,6 +117,41 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
   }
 }
 
+void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  switch (this->mMode)
+  {
+    default:
+    case MODE_SELECT:
+      QGraphicsScene::mousePressEvent(pMouseEvent);
+      break;
+
+    case MODE_CONNECT:
+      this->connectModeProcessMousePress(pMouseEvent);
+      break;
+
+    case MODE_CREATE_TRIGGER:
+      break;
+  }
+}
+
+void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  switch (this->mMode)
+  {
+    case MODE_CONNECT:
+      this->connectModeProcessMouseMove(pMouseEvent);
+      break;
+
+    default:
+    case MODE_SELECT:
+    case MODE_CREATE_TRIGGER:
+      QGraphicsScene::mouseMoveEvent(pMouseEvent);
+      break;
+  }
+}
+
+
 void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent)
 {
   switch (this->mMode)
@@ -122,6 +159,10 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     default:
     case MODE_SELECT:
       QGraphicsScene::mouseReleaseEvent(pMouseEvent);
+      break;
+
+    case MODE_CONNECT:
+      this->connectModeProcessMouseRelease(pMouseEvent);
       break;
 
     case MODE_CREATE_TRIGGER:
@@ -135,6 +176,87 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       }
       break;
   }
+}
+
+void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  if (mpNewConnectionIndicator != NULL)
+  {
+    delete mpNewConnectionIndicator;
+    mpNewConnectionIndicator = NULL;
+  }
+
+  QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
+
+  if (items.size() > 0)
+  {
+    // check if the start item is a connectable thing.
+    if (dynamic_cast<cedar::proc::gui::TriggerItem*>(items[0]))
+    {
+      mpConnectionStart = items[0];
+      QPointF pos = mpConnectionStart->scenePos();
+      pos.rx() += mpConnectionStart->boundingRect().width()/2.0;
+      pos.ry() += mpConnectionStart->boundingRect().height()/2.0;
+      QLineF line(pos, pos);
+      mpNewConnectionIndicator = this->addLine(line);
+      mpNewConnectionIndicator->setZValue(-1.0);
+    }
+  }
+}
+
+void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  if(mpNewConnectionIndicator != NULL)
+  {
+    QPointF p2 = pMouseEvent->scenePos();
+
+    // try to snap the target position of the line to a valid item, if one is found
+    QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
+    if (items.size() > 0)
+    {
+      if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart))
+      {
+        cedar::proc::gui::StepItem* target;
+        // Type of the source is a trigger, try to add target to the listeners
+        if (
+            (target = dynamic_cast<cedar::proc::gui::StepItem*>(items[0]))
+            && !source->getTrigger()->isListener(target->getStep()) )
+        {
+          p2 = items[0]->scenePos();
+          p2.rx() += items[0]->boundingRect().width()/2.0;
+          p2.ry() += items[0]->boundingRect().height()/2.0;
+        }
+      }
+    }
+
+    QLineF line = mpNewConnectionIndicator->line();
+    line.setP2(p2);
+    mpNewConnectionIndicator->setLine(line);
+  }
+}
+
+void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouseEvent * pMouseEvent)
+{
+  if (mpNewConnectionIndicator != NULL)
+  {
+    delete mpNewConnectionIndicator;
+    mpNewConnectionIndicator = NULL;
+  }
+
+  QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
+  if (items.size() > 0)
+  {
+    if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart))
+    {
+      // Type of the source is a trigger, try to add target to the listeners
+      if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(items[0]))
+      {
+        source->connectTo(p_step_item);
+      }
+    }
+  }
+
+  mpConnectionStart = NULL;
 }
 
 void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF position)

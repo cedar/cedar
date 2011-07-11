@@ -95,6 +95,11 @@ void cedar::proc::Trigger::addListener(cedar::proc::StepPtr step)
   }
 }
 
+bool cedar::proc::Trigger::isListener(cedar::proc::StepPtr step)
+{
+  return this->find(step) != this->mListeners.end();
+}
+
 void cedar::proc::Trigger::addTrigger(cedar::proc::TriggerPtr trigger)
 {
   std::vector<cedar::proc::TriggerPtr>::iterator iter;

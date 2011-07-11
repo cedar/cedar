@@ -44,6 +44,7 @@
 // LOCAL INCLUDES
 #include "processing/Trigger.h"
 #include "processing/gui/namespace.h"
+#include "processing/gui/TriggerConnection.h"
 
 // PROJECT INCLUDES
 
@@ -82,11 +83,13 @@ public:
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  void connectTo(cedar::proc::gui::StepItem *pTarget);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -111,6 +114,7 @@ protected:
 
 private:
   cedar::proc::TriggerDeclarationPtr mClassId;
+  std::vector<TriggerConnection*> mConnectionInfos;
 
 }; // class TriggerItem
 

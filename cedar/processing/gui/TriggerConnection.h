@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepItem.h
+    File:        TriggerConnection.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 07 11
 
     Description:
 
@@ -38,25 +38,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_ITEM_H
-#define CEDAR_PROC_STEP_ITEM_H
+#ifndef CEDAR_PROC_GUI_TRIGGER_CONNECTION_H
+#define CEDAR_PROC_GUI_TRIGGER_CONNECTION_H
 
 // LOCAL INCLUDES
-#include "processing/Step.h"
 #include "processing/gui/namespace.h"
-#include "processing/gui/TriggerConnection.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsItem>
+#include <QGraphicsLineItem>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::StepItem : public QGraphicsItem
+class cedar::proc::gui::TriggerConnection : public QGraphicsLineItem
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,28 +65,24 @@ class cedar::proc::gui::StepItem : public QGraphicsItem
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepItem(cedar::proc::StepPtr step);
+  TriggerConnection(QGraphicsItem *pSource, QGraphicsItem *pTarget);
 
   //!@brief Destructor
-  ~StepItem();
+  ~TriggerConnection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  QRectF boundingRect() const;
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-  cedar::proc::StepPtr getStep();
-
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-  void addIncomingTriggerConnection(TriggerConnection* pConnection);
+public slots:
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -99,23 +93,26 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::StepPtr mStep;
+  QGraphicsItem *mpSource;
+  QGraphicsItem *mpTarget;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  qreal mWidth;
-  qreal mHeight;
+  // none yet
 
 private:
-  cedar::proc::StepDeclarationPtr mClassId;
-  std::vector<TriggerConnection*> mIncomingTriggerConnections;
+  // none yet
 
-}; // class StepItem
+}; // class cedar::proc::gui::TriggerConnection
 
-#endif // CEDAR_PROC_STEP_ITEM_H
+#endif // CEDAR_PROC_GUI_TRIGGER_CONNECTION_H
 
