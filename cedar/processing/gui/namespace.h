@@ -65,6 +65,7 @@ namespace cedar
       class StringParameter;
       class Scene;
       class ToolBox;
+      class TriggerConnection;
       class TriggerItem;
       class View;
     }

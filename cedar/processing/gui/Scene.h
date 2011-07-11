@@ -65,7 +65,8 @@ public:
   enum MODE
   {
     MODE_SELECT,
-    MODE_CREATE_TRIGGER
+    MODE_CREATE_TRIGGER,
+    MODE_CONNECT
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -86,6 +87,8 @@ public:
   void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
   void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
+  void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent);
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
 
   void addProcessingStep(const std::string& classId, QPointF position);
@@ -109,7 +112,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
+  void connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
+  void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -121,6 +126,8 @@ protected:
 private:
   MODE mMode;
   QString mModeParam;
+  QGraphicsLineItem *mpNewConnectionIndicator;
+  QGraphicsItem *mpConnectionStart;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

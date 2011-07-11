@@ -59,11 +59,14 @@
 cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step)
 :
 mStep (step),
-mWidth (100),
+mWidth (120),
 mHeight (50)
 {
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
-  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               | QGraphicsItem::ItemSendsGeometryChanges
+                               );
 }
 
 cedar::proc::gui::StepItem::~StepItem()
@@ -143,4 +146,26 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 {
   return this->mStep;
+}
+
+void cedar::proc::gui::StepItem::addIncomingTriggerConnection(TriggerConnection* pConnection)
+{
+  this->mIncomingTriggerConnections.push_back(pConnection);
+}
+
+QVariant cedar::proc::gui::StepItem::itemChange(GraphicsItemChange change, const QVariant & value)
+{
+  switch (change)
+  {
+    case QGraphicsItem::ItemPositionHasChanged:
+      for (size_t i = 0; i < this->mIncomingTriggerConnections.size(); ++i)
+      {
+        this->mIncomingTriggerConnections.at(i)->update();
+      }
+      break;
+
+    default:
+      break;
+  }
+  return QGraphicsItem::itemChange(change, value);
 }
