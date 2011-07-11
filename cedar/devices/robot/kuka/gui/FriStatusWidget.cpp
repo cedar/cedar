@@ -57,6 +57,8 @@ using namespace std;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 FriStatusWidget::FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
+:
+cedar::aux::gui::BaseWidget("FriStatusWidget", parent)
 {
   mIsInit = false;
   mpKukaIn = pKukaIn;
@@ -101,7 +103,7 @@ void FriStatusWidget::updateInformation()
   mpLabelSampleTimeData->setText(s.str().c_str());
 }
 
-void FriStatusWidget::timerEvent(QTimerEvent* pEvent)
+void FriStatusWidget::timerEvent(QTimerEvent* /* pEvent */)
 {
   //set the displayed data
   updateInformation();

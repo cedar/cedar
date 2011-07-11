@@ -72,8 +72,10 @@ KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicCha
 }
 
 
-KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent, Qt::WindowFlags f)
-: ConfigurationInterface(configFileName)
+KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
+:
+QWidget(parent),
+ConfigurationInterface(configFileName)
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
@@ -124,8 +126,10 @@ KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> 
 }
 
 
-KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags f)
-: ConfigurationInterface(configFileName)
+KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
+:
+QWidget(parent),
+ConfigurationInterface(configFileName)
 {
   for(unsigned int i = 1; i < kinematicChains.size(); ++i)
   {

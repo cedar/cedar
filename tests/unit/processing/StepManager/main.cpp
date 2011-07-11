@@ -60,7 +60,7 @@ public:
   {
   }
 
-  void compute(const cedar::proc::Arguments& arguments)
+  void compute(const cedar::proc::Arguments& /* arguments */)
   {
     std::cout << "processing " << this->getName() << " = " << this->_mMessage << std::endl;
   }
@@ -76,7 +76,7 @@ public:
 
 
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
   using cedar::proc::Manager;
   using cedar::proc::StepPtr;

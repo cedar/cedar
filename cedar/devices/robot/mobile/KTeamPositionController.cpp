@@ -80,7 +80,7 @@ KTeamPositionController::~KTeamPositionController()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void KTeamPositionController::timerEvent(QTimerEvent *event)
+void KTeamPositionController::timerEvent(QTimerEvent * /* event */)
 {
   update();
 }

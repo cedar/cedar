@@ -124,7 +124,7 @@ void ReferenceGeometry::init()
   }
 }
 
-const unsigned int ReferenceGeometry::getNumberOfJoints() const
+unsigned int ReferenceGeometry::getNumberOfJoints() const
 {
   return _mJoints.size();
 }

@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Trigger : public cedar::aux::Base
+class cedar::proc::Trigger : public virtual cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

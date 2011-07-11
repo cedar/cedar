@@ -60,7 +60,7 @@ void testStreamOutput(cedar::unit::Time time)
             << std::endl;
 }
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
   using namespace cedar::aux;
   unsigned int errors = 0;

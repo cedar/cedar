@@ -51,6 +51,8 @@ using namespace cedar::dev::robot::mobile::gui;
 KTeamPositionControllerWidget::KTeamPositionControllerWidget(KTeamPositionController *peController,
                                            MobileRobotModel *peModel,
                                            QWidget *parent)
+:
+cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)
 {
   mpeController = peController;
   mpeModel = peModel;
@@ -73,7 +75,7 @@ void KTeamPositionControllerWidget::start()
   mpeController->setTarget(xTargetPosition->value(), yTargetPosition->value());
 }
 
-void KTeamPositionControllerWidget::timerEvent(QTimerEvent *event)
+void KTeamPositionControllerWidget::timerEvent(QTimerEvent * /* event */)
 {
   //display new values
   xRobotPosition->display(mpeModel->getPositionX());

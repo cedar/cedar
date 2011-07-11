@@ -127,11 +127,11 @@ void cedar::proc::Trigger::removeTrigger(cedar::proc::TriggerPtr trigger)
   }
 }
 
-void cedar::proc::Trigger::notifyConnected(cedar::proc::Trigger* trigger)
+void cedar::proc::Trigger::notifyConnected(cedar::proc::Trigger* /* trigger */)
 {
 }
 
-void cedar::proc::Trigger::notifyDisconnected(cedar::proc::Trigger* trigger)
+void cedar::proc::Trigger::notifyDisconnected(cedar::proc::Trigger* /* trigger */)
 {
 }
 

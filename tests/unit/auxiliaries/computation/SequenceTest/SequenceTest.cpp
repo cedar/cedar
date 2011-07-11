@@ -72,7 +72,7 @@ class ComputableTest : public cedar::proc::Step
     {
     }
 
-    void compute(const cedar::proc::Arguments& arguments)
+    void compute(const cedar::proc::Arguments& /* arguments */)
     {
       //! @todo log these times and calculate the overall test time to check performance.
       usleep(random() % 50000);
@@ -98,7 +98,7 @@ class EndStopTest : public cedar::proc::Step
     {
     }
 
-    void compute(const cedar::proc::Arguments& arguments)
+    void compute(const cedar::proc::Arguments& /* arguments */)
     {
       mFinished = true;
     }
@@ -240,7 +240,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
 }
 
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
   using cedar::aux::LogFile;
   using cedar::proc::Trigger;
