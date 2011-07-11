@@ -59,6 +59,8 @@ cedar::proc::gui::Ide::Ide()
   this->setupUi(this);
   this->resetStepList();
 
+  this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
+
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
                    this, SLOT(exception(const QString&)));
@@ -98,7 +100,10 @@ void cedar::proc::gui::Ide::sceneItemSelected()
   if (selected_items.size() == 1)
   {
     cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]);
-    this->mpPropertyTable->display(p_drawer->getStep());
+    if (p_drawer)
+    {
+      this->mpPropertyTable->display(p_drawer->getStep());
+    }
   }
 }
 

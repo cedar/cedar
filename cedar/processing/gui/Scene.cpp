@@ -42,6 +42,7 @@
 #include "processing/gui/Scene.h"
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/StepItem.h"
+#include "processing/gui/TriggerItem.h"
 
 // PROJECT INCLUDES
 
@@ -58,7 +59,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::gui::Scene::Scene(QObject *pParent)
 :
-QGraphicsScene (pParent)
+QGraphicsScene (pParent),
+mMode(MODE_SELECT)
 {
 }
 
@@ -70,8 +72,12 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Scene::setMode(MODE mode, const QString& param)
+{
+  this->mMode = mode;
+  this->mModeParam = param;
+}
 
-//void ProcessingScene::dragEnterEvent(QDragEnterEvent* pEvent)
 void cedar::proc::gui::Scene::dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   if (pEvent->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
@@ -106,6 +112,63 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     QPointF mapped = pEvent->scenePos();
     QString class_id = item->data(Qt::UserRole).toString();
     this->addProcessingStep(class_id.toStdString(), mapped);
+  }
+}
+
+void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  switch (this->mMode)
+  {
+    default:
+    case MODE_SELECT:
+      QGraphicsScene::mouseReleaseEvent(pMouseEvent);
+      break;
+
+    case MODE_CREATE_TRIGGER:
+      if (pMouseEvent->button() == Qt::LeftButton)
+      {
+        this->addTrigger(this->mModeParam.toStdString(), pMouseEvent->scenePos());
+      }
+      else
+      {
+        QGraphicsScene::mouseReleaseEvent(pMouseEvent);
+      }
+      break;
+  }
+}
+
+void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF position)
+{
+  using cedar::proc::Manager;
+  std::string name = "new trigger";
+
+  if (Manager::getInstance().triggers().testExists(name))
+  {
+    unsigned int new_id = 1;
+    std::string tmp;
+    do
+    {
+      std::stringstream str;
+      str << name << " " << new_id;
+      tmp = str.str();
+      ++new_id;
+    }
+    while (Manager::getInstance().triggers().testExists(tmp));
+    name = tmp;
+  }
+
+  try
+  {
+    cedar::proc::TriggerPtr trigger = Manager::getInstance().triggers().createInstance(classId, name);
+    cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
+    this->addItem(p_drawer);
+    p_drawer->setPos(position);
+    this->update();
+  }
+  catch(const cedar::aux::exc::ExceptionBase& e)
+  {
+    QString message(e.exceptionInfo().c_str());
+    emit exception(message);
   }
 }
 

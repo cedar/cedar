@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
+#include "processing/DeclarationBase.h"
 #include "auxiliaries/Factory.h"
 #include "auxiliaries/FactoryDerived.h"
 
@@ -50,7 +51,11 @@
 
 // SYSTEM INCLUDES
 
-class cedar::proc::TriggerDeclaration
+class cedar::proc::TriggerDeclaration : public cedar::proc::DeclarationBase
+                                            <
+                                              cedar::proc::Trigger,
+                                              cedar::aux::Factory<cedar::proc::Trigger>
+                                            >
 {
 public:
 
@@ -59,8 +64,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   TriggerDeclaration(cedar::proc::TriggerFactoryPtr classFactory, const std::string& classId)
   :
-  mpClassFactory(classFactory),
-  mClassId(classId)
+  DeclarationBase<cedar::proc::Trigger, cedar::aux::Factory<cedar::proc::Trigger> >
+  (
+    classFactory,
+    classId,
+    ""
+  )
   {
   }
 
@@ -72,21 +81,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::TriggerFactoryPtr getObjectFactory()
-  {
-    return this->mpClassFactory;
-  }
-
-  const std::string& getClassId()
-  {
-    return this->mClassId;
-  }
-
-  const std::string& getCategory()
-  {
-    return this->mCategory;
-  }
-
+  // none yet
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,9 +98,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::proc::TriggerFactoryPtr mpClassFactory;
-  std::string mClassId;
-  std::string mCategory;
+  // none yet
 private:
   // none yet
 
@@ -145,6 +138,15 @@ public:
   //!@brief Destructor
   ~TriggerDeclarationT()
   {
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  bool isObjectInstanceOf(cedar::proc::TriggerPtr pointer)
+  {
+    return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
   }
 }; // class cedar::proc::TriggerDeclarationT
 

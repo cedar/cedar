@@ -71,6 +71,7 @@ public:
 public:
    typedef boost::shared_ptr<T> ObjectPointer;
    typedef boost::shared_ptr<T_Declaration> DeclarationPointer;
+   typedef std::map<std::string, DeclarationPointer> Declarations;
 
    typedef std::set<std::string> CategoryList;
    typedef std::vector<DeclarationPointer> CategoryEntries;
@@ -177,6 +178,11 @@ public:
   bool testExists(const std::string& name) const
   {
     return this->mObjects.find(name) != this->mObjects.end();
+  }
+
+  const Declarations& declarations() const
+  {
+    return this->mDeclarations;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

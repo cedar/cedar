@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingView.cpp
+    File:        ToolBox.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 07 11
 
     Description:
 
@@ -39,51 +39,84 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/View.h"
+#include "processing/gui/ToolBox.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QVariant>
+#include <QVBoxLayout>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::View::View(QWidget *pParent)
+cedar::proc::gui::ToolBox::ToolBox(unsigned int columns, QWidget *pParent)
 :
-QGraphicsView(pParent)
+QWidget(pParent),
+mColumns(columns),
+mpSelectedButton(NULL)
 {
-  this->mpScene = new cedar::proc::gui::Scene();
-  this->setScene(this->mpScene);
-  this->setInteractive(true);
-  this->setDragMode(QGraphicsView::RubberBandDrag);
+  QVBoxLayout *p_outer_layout = new QVBoxLayout();
+  this->setLayout(p_outer_layout);
+  mpLayout = new QGridLayout();
+  p_outer_layout->addLayout(mpLayout);
+  p_outer_layout->addStretch();
 }
 
-cedar::proc::gui::View::~View()
+cedar::proc::gui::ToolBox::~ToolBox()
 {
-  delete this->mpScene;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
+void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::string& data, const std::string& tooltip)
 {
-  return this->mpScene;
+  QToolButton *button = new QToolButton();
+  button->setCheckable(true);
+  button->setAutoExclusive(true);
+  button->setText(icon.c_str());
+  button->setProperty("data", QVariant(QString(data.c_str())));
+  button->setToolTip(tooltip.c_str());
+  int num_children = mpLayout->count();
+  int row = (num_children + 1) / mColumns;
+  int col = (num_children + 1) % mColumns;
+  mpLayout->addWidget(button, row, col);
+
+  button->setFixedSize(32, 32);
+
+  QObject::connect(button, SIGNAL(toggled(bool)), this, SLOT(toolButtonToggled(bool)));
+
+  if (this->mpSelectedButton == NULL)
+  {
+    this->mpSelectedButton = button;
+    this->mpSelectedButton->setChecked(true);
+  }
 }
 
-void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
+std::string cedar::proc::gui::ToolBox::getCurrentItemData() const
 {
-  switch (mode)
+  if (this->mpSelectedButton != NULL)
   {
-    case cedar::proc::gui::Scene::MODE_CREATE_TRIGGER:
-      this->setDragMode(QGraphicsView::NoDrag);
-      break;
-
-    default:
-      this->setDragMode(QGraphicsView::RubberBandDrag);
-      break;
+    return "TODO";
   }
-  this->mpScene->setMode(mode, param);
+  else
+  {
+    return "";
+  }
+}
+
+void cedar::proc::gui::ToolBox::toolButtonToggled(bool checked)
+{
+  if (checked)
+  {
+    QToolButton *p_sender = dynamic_cast<QToolButton*>(QObject::sender());
+    CEDAR_DEBUG_ASSERT(p_sender != NULL);
+    this->mpSelectedButton = p_sender;
+    QString data = this->mpSelectedButton->property("data").toString();
+    emit selectionChanged(data);
+  }
 }
