@@ -43,13 +43,15 @@ cedar_add_library(cedarproc
   cedaraux
   cedarunits
   MOC_HEADERS
+  gui/ArchitectureToolBox.h
+  gui/DoubleParameter.h
+  gui/Ide.h
+  gui/IdeApplication.h
+  gui/ParameterBase.h
+  gui/PropertyPane.h
   gui/Scene.h
   gui/StepClassList.h
-  gui/View.h
-  gui/Ide.h
-  gui/PropertyPane.h
-  gui/ParameterBase.h
-  gui/DoubleParameter.h
   gui/StringParameter.h
-  gui/IdeApplication.h
+  gui/ToolBox.h
+  gui/View.h
   )

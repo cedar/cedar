@@ -57,9 +57,16 @@
 class cedar::proc::gui::Scene : public QGraphicsScene
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // macros & types
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+public:
+  enum MODE
+  {
+    MODE_SELECT,
+    MODE_CREATE_TRIGGER
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -79,7 +86,12 @@ public:
   void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
   void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+
   void addProcessingStep(const std::string& classId, QPointF position);
+  void addTrigger(const std::string& classId, QPointF position);
+
+  void setMode(MODE mode, const QString& param = "");
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -107,6 +119,8 @@ public:
 protected:
   // none yet
 private:
+  MODE mMode;
+  QString mModeParam;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

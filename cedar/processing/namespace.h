@@ -82,6 +82,8 @@ namespace cedar
     class Manager;
     template <class T, class T_Declaration> class Registry;
 
+    template <class BaseClass, class FactoryType> class DeclarationBase;
+
     class StepDeclaration;
     typedef boost::shared_ptr<StepDeclaration> StepDeclarationPtr;
     template <class DerivedClass> class StepDeclarationT;

@@ -54,16 +54,19 @@ namespace cedar
   {
     namespace gui
     {
+      class ArchitectureToolBox;
+      class DoubleParameter;
       class Ide;
       class IdeApplication;
+      class ParameterBase;
+      class PropertyPane;
       class StepItem;
       class StepClassList;
-      class Scene;
-      class View;
-      class PropertyPane;
-      class ParameterBase;
-      class DoubleParameter;
       class StringParameter;
+      class Scene;
+      class ToolBox;
+      class TriggerItem;
+      class View;
     }
   }
 }

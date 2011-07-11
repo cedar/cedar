@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingView.cpp
+    File:        StepItem.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 05 27
 
     Description:
 
@@ -39,51 +39,72 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/View.h"
+#include "processing/gui/TriggerItem.h"
+#include "processing/Manager.h"
+#include "processing/Data.h"
+#include "processing/Trigger.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QPainter>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::View::View(QWidget *pParent)
+cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 :
-QGraphicsView(pParent)
+mTrigger (trigger),
+mWidth (100),
+mHeight (50)
 {
-  this->mpScene = new cedar::proc::gui::Scene();
-  this->setScene(this->mpScene);
-  this->setInteractive(true);
-  this->setDragMode(QGraphicsView::RubberBandDrag);
+  this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(trigger);
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsMovable);
 }
 
-cedar::proc::gui::View::~View()
+cedar::proc::gui::TriggerItem::~TriggerItem()
 {
-  delete this->mpScene;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
+QRectF cedar::proc::gui::TriggerItem::boundingRect() const
 {
-  return this->mpScene;
+  //! @todo properly map the size to the scene coordinate system
+  return QRectF(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
 }
 
-void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
+void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /* event */)
 {
-  switch (mode)
-  {
-    case cedar::proc::gui::Scene::MODE_CREATE_TRIGGER:
-      this->setDragMode(QGraphicsView::NoDrag);
-      break;
+}
 
-    default:
-      this->setDragMode(QGraphicsView::RubberBandDrag);
-      break;
+void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+{
+  painter->save(); // save current painter settings
+
+  QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
+
+  //! @todo make drawing of steps pretty.
+
+  if (this->isSelected())
+  {
+    painter->setPen(QPen(Qt::DashLine));
   }
-  this->mpScene->setMode(mode, param);
+
+  painter->drawRect(bounds);
+  painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());
+  painter->drawText(QPointF(5, 25), this->mTrigger->getName().c_str());
+
+  painter->restore(); // restore saved painter settings
+}
+
+cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
+{
+  return this->mTrigger;
 }

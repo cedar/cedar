@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepDeclarationT.h
+    File:        TriggerItem.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Date:        2011 07 11
 
     Description:
 
@@ -38,48 +38,49 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_DECLARATION_H
-#define CEDAR_PROC_STEP_DECLARATION_H
+#ifndef CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#define CEDAR_PROC_GUI_TRIGGER_ITEM_H
 
 // LOCAL INCLUDES
-#include "processing/DeclarationBase.h"
-#include "processing/namespace.h"
-#include "auxiliaries/AbstractFactory.h"
-#include "auxiliaries/AbstractFactoryDerived.h"
+#include "processing/Trigger.h"
+#include "processing/gui/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QGraphicsItem>
 
-class cedar::proc::StepDeclaration : public cedar::proc::DeclarationBase
-                                            <
-                                              cedar::proc::Step,
-                                              cedar::aux::AbstractFactory<cedar::proc::Step>
-                                            >
+
+/*!@brief Abstract description of the class.
+ *
+ * More detailed description of the class.
+ */
+class cedar::proc::gui::TriggerItem : public QGraphicsItem
 {
-public:
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  StepDeclaration(
-                   cedar::proc::StepFactoryPtr classFactory,
-                   const std::string& classId,
-                   const std::string& category = "misc."
-                 )
-  :
-  DeclarationBase<cedar::proc::Step, cedar::aux::AbstractFactory<cedar::proc::Step> >(classFactory, classId, category)
-  {
-  }
+public:
+  //!@brief The standard constructor.
+  TriggerItem(cedar::proc::TriggerPtr trigger);
 
-  ~StepDeclaration()
-  {
-  }
+  //!@brief Destructor
+  ~TriggerItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  QRectF boundingRect() const;
+  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+
+  cedar::proc::TriggerPtr getTrigger();
+
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,59 +100,19 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  cedar::proc::TriggerPtr mTrigger;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  qreal mWidth;
+  qreal mHeight;
 
 private:
-  // none yet
-};
+  cedar::proc::TriggerDeclarationPtr mClassId;
 
+}; // class TriggerItem
 
-/*!@brief Abstract description of the class with templates.
- *
- * More detailed description of the class with templates.
- */
-template <class DerivedClass>
-class cedar::proc::StepDeclarationT : public StepDeclaration
-{
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // constructors and destructor
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief The standard constructor.
-  StepDeclarationT(
-                    const std::string& classId,
-                    const std::string& category = "misc."
-                  )
-  :
-  StepDeclaration
-  (
-    cedar::proc::StepFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::proc::Step, DerivedClass>()),
-    classId,
-    category
-  )
-  {
-  }
-
-  //!@brief Destructor
-  ~StepDeclarationT()
-  {
-  }
-
-  bool isObjectInstanceOf(cedar::proc::StepPtr pointer)
-  {
-    return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
-  }
-}; // class cedar::proc::StepDeclarationT
-
-#endif // CEDAR_PROC_STEP_DECLARATION_H
+#endif // CEDAR_PROC_GUI_TRIGGER_ITEM_H
 
