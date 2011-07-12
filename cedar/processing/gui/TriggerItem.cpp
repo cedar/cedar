@@ -59,9 +59,12 @@
 
 cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 :
-mTrigger (trigger),
-mWidth (120),
-mHeight (50)
+cedar::proc::gui::GraphicsBase(120, 50,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               ),
+mTrigger (trigger)
 {
   this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(trigger);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
@@ -78,11 +81,6 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-QRectF cedar::proc::gui::TriggerItem::boundingRect() const
-{
-  //! @todo properly map the size to the scene coordinate system
-  return QRectF(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
-}
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /* event */)
 {
@@ -95,11 +93,7 @@ void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionG
   QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
 
   //! @todo make drawing of steps pretty.
-
-  if (this->isSelected())
-  {
-    painter->setPen(QPen(Qt::DashLine));
-  }
+  painter->setPen(this->getOutlinePen());
 
   painter->drawRect(bounds);
   painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());

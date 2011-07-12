@@ -56,6 +56,7 @@ namespace cedar
     {
       class ArchitectureToolBox;
       class DoubleParameter;
+      class GraphicsBase;
       class Ide;
       class IdeApplication;
       class ParameterBase;

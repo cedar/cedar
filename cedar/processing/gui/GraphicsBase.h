@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepItem.h
+    File:        GraphicsBase.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 07 12
 
     Description:
 
@@ -38,56 +38,70 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_ITEM_H
-#define CEDAR_PROC_STEP_ITEM_H
+#ifndef CEDAR_XXX_XXX_H
+#define CEDAR_XXX_XXX_H
 
 // LOCAL INCLUDES
-#include "processing/Step.h"
 #include "processing/gui/namespace.h"
-#include "processing/gui/TriggerConnection.h"
-#include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QGraphicsItem>
+#include <QPen>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::StepItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::GraphicsBase : public QGraphicsItem
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // static constants
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef unsigned int GraphicsGroup;
+  const static GraphicsGroup GRAPHICS_GROUP_NONE = 0;
+  const static GraphicsGroup GRAPHICS_GROUP_STEP = 1 << 0;
+  const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
+  const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepItem(cedar::proc::StepPtr step);
+  GraphicsBase(qreal width, qreal height,
+               GraphicsGroup group = GRAPHICS_GROUP_UNKNOWN,
+               GraphicsGroup canConnectTo = GRAPHICS_GROUP_NONE);
 
   //!@brief Destructor
-  ~StepItem();
+  virtual ~GraphicsBase();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+  bool canConnectTo(GraphicsBase* pTarget) const;
 
-  cedar::proc::StepPtr getStep();
+  bool canConnect() const;
 
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-  void addIncomingTriggerConnection(TriggerConnection* pConnection);
+  QPointF getConnectionAnchorInScene() const;
+
+  virtual QPointF getConnectionAnchorRelative() const;
+
+  const GraphicsGroup& getGroup() const;
+
+  QRectF boundingRect() const;
+
+  QPen getOutlinePen() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -98,21 +112,27 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  // none yet
+  qreal mWidth;
+  qreal mHeight;
 private:
-  cedar::proc::StepPtr mStep;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
+  // none yet
 
 private:
-  cedar::proc::StepDeclarationPtr mClassId;
-  std::vector<TriggerConnection*> mIncomingTriggerConnections;
+  GraphicsGroup mGroup;
+  GraphicsGroup mAllowedConnectTargets;
 
-}; // class StepItem
+}; // class cedar::xxx
 
-#endif // CEDAR_PROC_STEP_ITEM_H
+#endif // CEDAR_XXX_XXX_H
 

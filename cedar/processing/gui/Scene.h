@@ -127,7 +127,7 @@ private:
   MODE mMode;
   QString mModeParam;
   QGraphicsLineItem *mpNewConnectionIndicator;
-  QGraphicsItem *mpConnectionStart;
+  cedar::proc::gui::GraphicsBase *mpConnectionStart;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
