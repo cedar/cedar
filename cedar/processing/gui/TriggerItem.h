@@ -45,18 +45,18 @@
 #include "processing/Trigger.h"
 #include "processing/gui/namespace.h"
 #include "processing/gui/TriggerConnection.h"
+#include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsItem>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::TriggerItem : public QGraphicsItem
+class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -76,7 +76,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  QRectF boundingRect() const;
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
   cedar::proc::TriggerPtr getTrigger();
@@ -109,8 +108,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  qreal mWidth;
-  qreal mHeight;
+  // none yet
 
 private:
   cedar::proc::TriggerDeclarationPtr mClassId;

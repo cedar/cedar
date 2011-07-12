@@ -58,9 +58,10 @@
 
 cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step)
 :
-mStep (step),
-mWidth (120),
-mHeight (50)
+cedar::proc::gui::GraphicsBase(120, 50,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
+mStep (step)
 {
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
@@ -76,12 +77,6 @@ cedar::proc::gui::StepItem::~StepItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-QRectF cedar::proc::gui::StepItem::boundingRect() const
-{
-  //! @todo properly map the size to the scene coordinate system
-  return QRectF(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
-}
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
@@ -130,11 +125,7 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
   QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
 
   //! @todo make drawing of steps pretty.
-
-  if (this->isSelected())
-  {
-    painter->setPen(QPen(Qt::DashLine));
-  }
+  painter->setPen(this->getOutlinePen());
 
   painter->drawRect(bounds);
   painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());

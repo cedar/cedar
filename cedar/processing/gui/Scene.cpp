@@ -191,13 +191,10 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
   if (items.size() > 0)
   {
     // check if the start item is a connectable thing.
-    if (dynamic_cast<cedar::proc::gui::TriggerItem*>(items[0]))
+    if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
+         && mpConnectionStart->canConnect())
     {
-      mpConnectionStart = items[0];
-      QPointF pos = mpConnectionStart->scenePos();
-      pos.rx() += mpConnectionStart->boundingRect().width()/2.0;
-      pos.ry() += mpConnectionStart->boundingRect().height()/2.0;
-      QLineF line(pos, pos);
+      QLineF line(mpConnectionStart->getConnectionAnchorInScene(), mpConnectionStart->getConnectionAnchorInScene());
       mpNewConnectionIndicator = this->addLine(line);
       mpNewConnectionIndicator->setZValue(-1.0);
     }
@@ -214,17 +211,16 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
     QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
     if (items.size() > 0)
     {
-      if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart))
+      cedar::proc::gui::GraphicsBase* target;
+      bool connected = false;
+      for (int i = 0; i < items.size() && !connected; ++i)
       {
-        cedar::proc::gui::StepItem* target;
-        // Type of the source is a trigger, try to add target to the listeners
-        if (
-            (target = dynamic_cast<cedar::proc::gui::StepItem*>(items[0]))
-            && !source->getTrigger()->isListener(target->getStep()) )
+        if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+             && mpConnectionStart->canConnectTo(target)
+            )
         {
-          p2 = items[0]->scenePos();
-          p2.rx() += items[0]->boundingRect().width()/2.0;
-          p2.ry() += items[0]->boundingRect().height()/2.0;
+          connected = true;
+          p2 = target->getConnectionAnchorInScene();
         }
       }
     }
@@ -246,14 +242,56 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
   QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
   if (items.size() > 0)
   {
-    if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart))
+    bool connected = false;
+    for (int i = 0; i < items.size() && !connected; ++i)
     {
-      // Type of the source is a trigger, try to add target to the listeners
-      if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(items[0]))
+      cedar::proc::gui::GraphicsBase *target;
+      if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
+           && mpConnectionStart->canConnectTo(target)
+          )
       {
-        source->connectTo(p_step_item);
+        connected = true;
+
+        switch (mpConnectionStart->getGroup())
+        {
+          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+          {
+            cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart);
+            CEDAR_DEBUG_ASSERT(source != NULL);
+
+            switch (target->getGroup())
+            {
+              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+                break; //!@todo: implement
+
+              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+              {
+                cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
+                source->connectTo(p_step_item);
+                break;
+              }
+
+              default:
+                CEDAR_DEBUG_ASSERT(false); // this should not happen
+                break;
+            } // switch (target->getGroup())
+
+          } // case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+
+          default:
+            break;
+        } // switch (mpConnectionStart->getGroup())
       }
     }
+
+//    if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart))
+//    {
+//      // Type of the source is a trigger, try to add target to the listeners
+//      if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(items[0]))
+//      {
+//        source->connectTo(p_step_item);
+//      }
+//    }
   }
 
   mpConnectionStart = NULL;
