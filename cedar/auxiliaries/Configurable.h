@@ -73,6 +73,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void registerParameter(cedar::aux::ParameterBasePtr parameter);
+  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -103,6 +105,7 @@ public:
   // none yet (hopefully never!)
 protected:
   ParameterMap mParameters;
+  StringParameterPtr mName;
 
 private:
   // none yet

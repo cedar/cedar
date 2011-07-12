@@ -61,10 +61,9 @@ mFinished(new cedar::proc::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mMandatoryConnectionsAreSet (true),
-mName (new cedar::aux::StringParameter("name", "")),
-mRunInThread(runInThread)
+mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
 {
-  this->registerParameter(mName);
+  this->registerParameter(mRunInThread);
 }
 
 cedar::proc::Step::DataEntry::DataEntry(bool isMandatory)
@@ -149,26 +148,6 @@ void cedar::proc::Step::checkMandatoryConnections()
   }
 }
 
-void cedar::proc::Step::readConfiguration(const cedar::aux::ConfigurationNode& node)
-{
-  this->setName(node.get<std::string>("name"));
-  this->setThreaded(node.get<bool>("threaded", false));
-
-  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
-  {
-    try
-    {
-      const cedar::aux::ConfigurationNode& value = node.get_child(iter->second->getName());
-      iter->second->set(value);
-    }
-    catch (const boost::property_tree::ptree_bad_path&)
-    {
-      //!@todo handle with default value/exception
-      std::cout << "Config node " << iter->second->getName() << " not found!" << std::endl;
-    }
-  }
-}
-
 void cedar::proc::Step::onStart()
 {
 
@@ -229,7 +208,7 @@ cedar::proc::TriggerPtr& cedar::proc::Step::getFinishedTrigger()
 
 void cedar::proc::Step::setThreaded(bool isThreaded)
 {
-  this->mRunInThread = isThreaded;
+  this->mRunInThread->set(isThreaded);
 }
 
 void cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
