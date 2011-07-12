@@ -69,7 +69,7 @@ class cedar::aux::exc::ExceptionBase : public std::exception
    *  @remarks The type passed as \em Exception_type should inherit from \em cedar::aux::exc::ExceptionBase.
    *           Do not line-break the following macro(s), or the __LINE__ specification will be wrong!
    */
-  #define CEDAR_THROW(Exception_type, message) Exception_type exception; exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception;
+  #define CEDAR_THROW(Exception_type, message) { Exception_type exception; exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
