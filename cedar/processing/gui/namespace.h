@@ -55,6 +55,7 @@ namespace cedar
     namespace gui
     {
       class ArchitectureToolBox;
+      class BoolParameter;
       class DoubleParameter;
       class GraphicsBase;
       class Ide;

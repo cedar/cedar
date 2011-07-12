@@ -107,7 +107,7 @@ cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
   return this->mTrigger;
 }
 
-void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget)
+void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget) //!@todo should get a GraphicsBase*
 {
   if (!this->getTrigger()->isListener(pTarget->getStep()))
   {

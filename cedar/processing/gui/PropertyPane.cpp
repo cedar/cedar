@@ -40,6 +40,7 @@
 #include "auxiliaries/namespace.h"
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/NumericParameter.h"
+#include "processing/gui/BoolParameter.h"
 #include "processing/gui/DoubleParameter.h"
 #include "processing/gui/StringParameter.h"
 
@@ -96,6 +97,7 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
   {
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }

@@ -44,6 +44,7 @@ cedar_add_library(cedarproc
   cedarunits
   MOC_HEADERS
   gui/ArchitectureToolBox.h
+  gui/BoolParameter.h
   gui/DoubleParameter.h
   gui/Ide.h
   gui/IdeApplication.h

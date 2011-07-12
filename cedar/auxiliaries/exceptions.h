@@ -59,4 +59,10 @@ class cedar::aux::UnknownTypeException : public cedar::aux::exc::ExceptionBase
     UnknownTypeException();
 }; // class cedar::aux::UnknownTypeException
 
+class cedar::aux::ParameterNotFoundException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    ParameterNotFoundException();
+}; // class cedar::aux::ParameterNotFoundException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

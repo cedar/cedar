@@ -111,6 +111,8 @@ namespace cedar
     typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
     typedef Parameter<std::string> StringParameter;
     typedef boost::shared_ptr<StringParameter> StringParameterPtr;
+    typedef Parameter<bool> BoolParameter;
+    typedef boost::shared_ptr<BoolParameter> BoolParameterPtr;
 
     typedef boost::property_tree::ptree ConfigurationNode;
 
@@ -130,6 +132,7 @@ namespace cedar
     /*exceptions*/
     class UnhandledTypeException;
     class UnknownTypeException;
+    class ParameterNotFoundException;
   }
 }
 

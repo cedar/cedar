@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralField.cpp
+    File:        BoolParameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 04
+    Date:        2011 07 12
 
     Description:
 
@@ -39,44 +39,52 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "dynamics/fields/NeuralField.h"
-#include "dynamics/SpaceCode.h"
-#include "auxiliaries/NumericParameter.h"
+#include "processing/gui/BoolParameter.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QHBoxLayout>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dyn::NeuralField::NeuralField()
-:
-mActivation(new cedar::dyn::SpaceCode(cv::Mat())),
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
-mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0))
-{
-  this->registerParameter(mRestingLevel);
-  this->registerParameter(mTau);
 
-  this->declareBuffer("activation");
-  this->setBuffer("activation", mActivation);
+cedar::proc::gui::BoolParameter::BoolParameter(QWidget *pParent)
+:
+cedar::proc::gui::ParameterBase(pParent)
+{
+  this->setLayout(new QHBoxLayout());
+  this->mpCheckBox = new QCheckBox();
+  this->layout()->setContentsMargins(0, 0, 0, 0);
+  this->layout()->addWidget(this->mpCheckBox);
+
+  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
+  QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 }
+
+//!@brief Destructor
+cedar::proc::gui::BoolParameter::~BoolParameter()
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
-{
-  cv::Mat& u = this->mActivation->getData();
-  const double& h = mRestingLevel->get();
-  const double& tau = mTau->get();
 
-  cv::Mat d_u = -u + h;
-  //!\todo deal with units, now: milliseconds
-  u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
+void cedar::proc::gui::BoolParameter::parameterPointerChanged()
+{
+  cedar::aux::BoolParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
+  this->mpCheckBox->setChecked(parameter->get());
 }
 
-void cedar::dyn::NeuralField::onStart()
+void cedar::proc::gui::BoolParameter::stateChanged(int state)
 {
-
+  cedar::aux::BoolParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
+  parameter->set(state == Qt::Checked);
 }
+

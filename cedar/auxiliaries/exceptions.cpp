@@ -49,3 +49,8 @@ cedar::aux::UnknownTypeException::UnknownTypeException()
 {
   this->mType = "UnknownTypeException";
 }
+
+cedar::aux::ParameterNotFoundException::ParameterNotFoundException()
+{
+  this->mType = "ParameterNotFoundException";
+}
