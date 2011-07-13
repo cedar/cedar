@@ -197,6 +197,19 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
       QLineF line(mpConnectionStart->getConnectionAnchorInScene(), mpConnectionStart->getConnectionAnchorInScene());
       mpNewConnectionIndicator = this->addLine(line);
       mpNewConnectionIndicator->setZValue(-1.0);
+
+      // Highlight all potential connection targets
+      QList<QGraphicsItem*> all_items = this->items();
+      for (int i = 0; i < all_items.size(); ++i)
+      {
+        if (cedar::proc::gui::GraphicsBase* item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(all_items.at(i)))
+        {
+          if (mpConnectionStart->canConnectTo(item))
+          {
+            item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET);
+          }
+        }
+      }
     }
   }
 }
@@ -283,15 +296,19 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
         } // switch (mpConnectionStart->getGroup())
       }
     }
+  }
 
-//    if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart))
-//    {
-//      // Type of the source is a trigger, try to add target to the listeners
-//      if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(items[0]))
-//      {
-//        source->connectTo(p_step_item);
-//      }
-//    }
+
+  QList<QGraphicsItem*> all_items = this->items();
+  for (int i = 0; i < all_items.size(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase* item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(all_items.at(i)))
+    {
+      if (item->getHighlightMode() == cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET)
+      {
+        item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+    }
   }
 
   mpConnectionStart = NULL;

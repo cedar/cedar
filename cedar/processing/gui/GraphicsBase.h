@@ -67,6 +67,12 @@ public:
   const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
   const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
 
+  enum HighlightMode
+  {
+    HIGHLIGHTMODE_NONE,
+    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,11 +103,15 @@ public:
 
   QPen getOutlinePen() const;
 
+  void setHighlightMode(HighlightMode mode);
+
+  HighlightMode getHighlightMode() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void paintFrame(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -118,7 +128,7 @@ protected:
   qreal mWidth;
   qreal mHeight;
 private:
-  // none yet
+  cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

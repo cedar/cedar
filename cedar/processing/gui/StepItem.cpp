@@ -118,16 +118,13 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   }
 }
 
-void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   painter->save(); // save current painter settings
 
-  QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
-
   //! @todo make drawing of steps pretty.
-  painter->setPen(this->getOutlinePen());
 
-  painter->drawRect(bounds);
+  this->paintFrame(painter, style, widget);
   painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());
   painter->drawText(QPointF(5, 25), this->mStep->getName().c_str());
 
