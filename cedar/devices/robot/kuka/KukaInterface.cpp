@@ -185,7 +185,7 @@ void KukaInterface::start(Priority priority)
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
 //----------------------------------------------------------------------------------------------------------------------
-void KukaInterface::step(double time)
+void KukaInterface::step(double)
 {
   //if the thread has not been initialized, do nothing
   if (mIsInit)
