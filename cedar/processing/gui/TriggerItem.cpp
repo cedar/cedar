@@ -86,16 +86,13 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 {
 }
 
-void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
   painter->save(); // save current painter settings
 
-  QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
+  this->paintFrame(painter, style, widget);
 
-  //! @todo make drawing of steps pretty.
-  painter->setPen(this->getOutlinePen());
-
-  painter->drawRect(bounds);
+  //! @todo make drawing pretty.
   painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());
   painter->drawText(QPointF(5, 25), this->mTrigger->getName().c_str());
 

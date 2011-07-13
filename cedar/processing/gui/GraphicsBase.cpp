@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QPainter>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,6 +58,7 @@ cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
 :
 mWidth(width),
 mHeight(height),
+mHighlightMode(HIGHLIGHTMODE_NONE),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
@@ -69,6 +71,17 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::GraphicsBase::HighlightMode cedar::proc::gui::GraphicsBase::getHighlightMode() const
+{
+  return this->mHighlightMode;
+}
+
+void cedar::proc::gui::GraphicsBase::setHighlightMode(cedar::proc::gui::GraphicsBase::HighlightMode mode)
+{
+  this->mHighlightMode = mode;
+  this->update();
+}
 
 QRectF cedar::proc::gui::GraphicsBase::boundingRect() const
 {
@@ -84,7 +97,7 @@ bool cedar::proc::gui::GraphicsBase::canConnect() const
 
 bool cedar::proc::gui::GraphicsBase::canConnectTo(GraphicsBase* pTarget) const
 {
-  return (this->mAllowedConnectTargets & pTarget->mGroup) != 0;
+  return (this->mAllowedConnectTargets & pTarget->mGroup) != 0 && pTarget != this;
 }
 
 QPointF cedar::proc::gui::GraphicsBase::getConnectionAnchorInScene() const
@@ -110,4 +123,35 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
     pen.setStyle(Qt::DashLine);
   }
   return pen;
+}
+
+
+void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
+{
+  painter->save();
+
+  QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
+
+  painter->setPen(this->getOutlinePen());
+  painter->drawRect(bounds);
+
+  if (this->mHighlightMode != HIGHLIGHTMODE_NONE)
+  {
+    QPen highlight_pen;
+    highlight_pen.setWidth(3);
+    switch (this->mHighlightMode)
+    {
+      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
+        highlight_pen.setColor(QColor(150, 200, 150));
+        break;
+      default:
+        break;
+    }
+
+    QRectF highlight_bounds(QPointF(1, 1), QSizeF(this->mWidth - 1, this->mHeight - 1));
+    painter->setPen(highlight_pen);
+    painter->drawRect(highlight_bounds);
+  }
+
+  painter->restore();
 }
