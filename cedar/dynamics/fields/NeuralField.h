@@ -94,6 +94,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   cedar::dyn::SpaceCodePtr mActivation;
+  cedar::dyn::SpaceCodePtr mSigmoidalActivation;
   cedar::aux::DoubleParameterPtr mRestingLevel;
   cedar::aux::DoubleParameterPtr mTau; //!\todo deal with units, now: milliseconds
   cedar::aux::math::SigmoidPtr mSigmoid;
