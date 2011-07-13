@@ -1,0 +1,102 @@
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Kernel.cpp
+
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 07 07
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+// LOCAL INCLUDES
+#include "auxiliaries/kernels/Kernel.h"
+#include "auxiliaries/NumericParameter.h"
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+#include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+cedar::aux::Kernel::Kernel()
+:
+cedar::aux::Configurable(),
+_mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1, 1000)),
+_mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", "dummy_matrix_file.yml"))
+{
+  mpReadWriteLockOutput = new QReadWriteLock();
+}
+
+cedar::aux::Kernel::~Kernel()
+{
+#ifdef DEBUG
+  std::cout << "> freeing data (Kernel)" << std::endl;
+#endif
+  if (mpReadWriteLockOutput)
+  {
+    delete mpReadWriteLockOutput;
+    mpReadWriteLockOutput = 0;
+  }
+}
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+QReadWriteLock* cedar::aux::Kernel::getReadWriteLock()
+{
+  return mpReadWriteLockOutput;
+}
+
+const cv::Mat& cedar::aux::Kernel::getKernel() const
+{
+  return mKernel;
+}
+
+void cedar::aux::Kernel::loadKernelFromFile()
+{
+  mpReadWriteLockOutput->lockForWrite();
+  cv::FileStorage fs(_mKernelMatrixFile->get(), cv::FileStorage::READ);
+  fs["kernel"] >> mKernel;
+  mpReadWriteLockOutput->unlock();
+}
+
+void cedar::aux::Kernel::saveKernelToFile() const
+{
+  mpReadWriteLockOutput->lockForRead();
+  cv::FileStorage fs(_mKernelMatrixFile->get(), cv::FileStorage::WRITE);
+  fs << "kernel" << mKernel;
+  mpReadWriteLockOutput->unlock();
+}
+
+unsigned int cedar::aux::Kernel::getDimensionality() const
+{
+  return _mDimensionality->get();
+}
