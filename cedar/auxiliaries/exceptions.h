@@ -65,4 +65,10 @@ class cedar::aux::ParameterNotFoundException : public cedar::aux::exc::Exception
     ParameterNotFoundException();
 }; // class cedar::aux::ParameterNotFoundException
 
+class cedar::aux::DuplicateNameException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    DuplicateNameException();
+}; // class cedar::aux::DuplicateNameException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

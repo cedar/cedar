@@ -68,6 +68,7 @@ class cedar::proc::Manager
 public:
   typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
   typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
+  typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -92,6 +93,12 @@ public:
 
   StepRegistry& steps();
   TriggerRegistry& triggers();
+  ThreadRegistry& threads();
+
+  void registerThread(cedar::aux::LoopedThreadPtr thread);
+
+  void startThreads();
+  void stopThreads();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -119,6 +126,7 @@ private:
 
   StepRegistry mStepRegistry;
   TriggerRegistry mTriggerRegistry;
+  ThreadRegistry mThreadRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -42,6 +42,8 @@
 #include "dynamics/fields/NeuralField.h"
 #include "dynamics/SpaceCode.h"
 #include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/math/Sigmoid.h"
+#include "auxiliaries/math/AbsSigmoid.h"
 
 // PROJECT INCLUDES
 
@@ -54,13 +56,16 @@ cedar::dyn::NeuralField::NeuralField()
 :
 mActivation(new cedar::dyn::SpaceCode(cv::Mat())),
 mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
-mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0))
+mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
+mSigmoid(new cedar::aux::math::AbsSigmoid())
 {
   this->registerParameter(mRestingLevel);
   this->registerParameter(mTau);
 
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
+
+  this->addConfigurableChild("sigmoid", this->mSigmoid);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

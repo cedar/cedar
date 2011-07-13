@@ -41,6 +41,7 @@
 #include "processing/namespace.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/macros.h"
+#include "auxiliaries/LoopedThread.h"
 
 // PROJECT INCLUDES
 

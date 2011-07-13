@@ -98,9 +98,36 @@ cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()
   return this->mStepRegistry;
 }
 
+void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)
+{
+  this->mThreadRegistry.insert(thread);
+}
+
+void cedar::proc::Manager::startThreads()
+{
+  for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
+  {
+    (*iter)->start();
+  }
+}
+
+void cedar::proc::Manager::stopThreads()
+{
+  //!@todo wait for all threads to stop
+  for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
+  {
+    (*iter)->stop();
+  }
+}
+
 cedar::proc::Manager::TriggerRegistry& cedar::proc::Manager::triggers()
 {
   return this->mTriggerRegistry;
+}
+
+cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
+{
+  return this->mThreadRegistry;
 }
 
 cedar::proc::Manager& cedar::proc::Manager::getInstance()

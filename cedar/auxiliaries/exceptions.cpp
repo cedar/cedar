@@ -54,3 +54,8 @@ cedar::aux::ParameterNotFoundException::ParameterNotFoundException()
 {
   this->mType = "ParameterNotFoundException";
 }
+
+cedar::aux::DuplicateNameException::DuplicateNameException()
+{
+  this->mType = "DuplicateNameException";
+}

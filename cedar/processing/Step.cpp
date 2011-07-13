@@ -118,16 +118,6 @@ const std::string& cedar::proc::Step::getName() const
   return this->mName->get();
 }
 
-const cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters() const
-{
-  return this->mParameters;
-}
-
-cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters()
-{
-  return this->mParameters;
-}
-
 void cedar::proc::Step::checkMandatoryConnections()
 {
   mMandatoryConnectionsAreSet = true;

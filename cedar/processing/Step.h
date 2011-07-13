@@ -137,10 +137,6 @@ public:
                        cedar::proc::StepPtr target,
                        const std::string& targetName
                      );
-
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
-
   void setName(const std::string& name);
   const std::string& getName() const;
 
