@@ -86,6 +86,12 @@ else(KUKA_FRI)
     set(CEDAR_USE_KUKA_LWR OFF)
 endif(KUKA_FRI)
 
+# YARP
+find_package(YARP REQUIRED)
+link_libraries(${YARP_LIBRARIES})
+include_directories(${YARP_INCLUDE_DIRS})
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${YARP_LIBRARIES})
+
 
 ##
 # Amtec device driver
