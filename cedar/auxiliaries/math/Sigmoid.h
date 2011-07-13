@@ -64,9 +64,9 @@ class cedar::aux::math::Sigmoid : public Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Sigmoid()
+  Sigmoid(double threshold = 0.0)
   :
-  mThreshold(new DoubleParameter("threshold", 0.0, -1000.0, 1000.0))
+  mThreshold(new DoubleParameter("threshold", threshold, -1000.0, 1000.0))
   {
     this->registerParameter(mThreshold);
   }
