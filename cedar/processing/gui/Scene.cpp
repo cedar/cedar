@@ -349,6 +349,7 @@ void cedar::proc::gui::Scene::groupModeProcessMouseMove(QGraphicsSceneMouseEvent
     QRectF rect(this->mGroupStart, this->mGroupEnd);
     mpGroupIndicator->setRect(rect.normalized());
 
+    // remove highlighting of previous items
     for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
     {
       if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
@@ -359,11 +360,15 @@ void cedar::proc::gui::Scene::groupModeProcessMouseMove(QGraphicsSceneMouseEvent
 
     mProspectiveGroupMembers = this->items(rect.normalized(), Qt::ContainsItemBoundingRect);
 
+    // highlight prospective group members
     for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
     {
       if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
       {
-        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+        if (ptr->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP)
+        {
+          ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+        }
       }
     }
   }
@@ -382,6 +387,7 @@ void cedar::proc::gui::Scene::groupModeProcessMouseRelease(QGraphicsSceneMouseEv
     p_group->setPos(rect.topLeft());
     this->addItem(p_group);
 
+    // remove highlighting from all prospective group members
     for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
     {
       if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
@@ -390,6 +396,17 @@ void cedar::proc::gui::Scene::groupModeProcessMouseRelease(QGraphicsSceneMouseEv
       }
     }
 
+    mProspectiveGroupMembers.clear();
+
+    // add stuff to the group
+    mProspectiveGroupMembers = this->items(rect.normalized(), Qt::ContainsItemBoundingRect);
+    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
+    {
+      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
+      {
+        p_group->addGroupItem(ptr);
+      }
+    }
     mProspectiveGroupMembers.clear();
   }
 }
