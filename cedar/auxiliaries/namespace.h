@@ -88,6 +88,10 @@ namespace cedar
     //!@brief smart pointer for Object
     typedef boost::shared_ptr<Object> ObjectPtr;
 
+    class Kernel;
+    //!@brief smart pointer for Kernel
+    typedef boost::shared_ptr<Kernel> KernelPtr;
+
     typedef unsigned int EnumId;
     class Enum;
     template <typename T> class EnumBase;
@@ -108,7 +112,9 @@ namespace cedar
     template <typename T> class Parameter;
     template <typename T> class NumericParameter;
     typedef NumericParameter<double> DoubleParameter;
+    typedef NumericParameter<unsigned int> UIntParameter;
     typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
+    typedef boost::shared_ptr<UIntParameter> UIntParameterPtr;
     typedef Parameter<std::string> StringParameter;
     typedef boost::shared_ptr<StringParameter> StringParameterPtr;
 
