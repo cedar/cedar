@@ -65,7 +65,7 @@ class cedar::aux::ParameterBase : public cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ParameterBase(const std::string& name);
+  ParameterBase(const std::string& name, bool hasDefault = true);
 
   //!@brief Destructor
   virtual ~ParameterBase();

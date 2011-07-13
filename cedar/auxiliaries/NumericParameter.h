@@ -76,6 +76,17 @@ public:
   {
   }
 
+  //!@brief The constructor.
+  NumericParameter(const std::string& name,
+                   const T& minimum,
+                   const T& maximum)
+  :
+  cedar::aux::Parameter<T>(name),
+  mMinimum(minimum),
+  mMaximum(maximum)
+  {
+  }
+
   //!@brief Destructor
   ~NumericParameter()
   {

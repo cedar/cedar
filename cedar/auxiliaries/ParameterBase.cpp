@@ -52,7 +52,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::ParameterBase::ParameterBase(const std::string& name)
+cedar::aux::ParameterBase::ParameterBase(const std::string& name, bool hasDefault)
+:
+mHasDefault(hasDefault)
 {
   this->setName(name);
 }
@@ -104,6 +106,10 @@ void cedar::aux::ParameterBase::set(const cedar::aux::ConfigurationNode& node)
   else if (dynamic_cast<StringParameter*>(this))
   {
     dynamic_cast<StringParameter*>(this)->set(node.get_value<std::string>());
+  }
+  else if (dynamic_cast<BoolParameter*>(this))
+  {
+    dynamic_cast<BoolParameter*>(this)->set(node.get_value<bool>());
   }
   else
   {

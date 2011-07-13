@@ -68,9 +68,15 @@ public:
   //!@brief The constructor.
   Parameter(const std::string& name, const T& defaultValue)
   :
-  cedar::aux::ParameterBase(name),
+  cedar::aux::ParameterBase(name, true),
   mValue(defaultValue),
   mDefault(defaultValue)
+  {
+  }
+
+  Parameter(const std::string& name)
+  :
+  cedar::aux::ParameterBase(name, false)
   {
   }
 
