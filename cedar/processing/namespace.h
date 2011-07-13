@@ -79,6 +79,9 @@ namespace cedar
     class Trigger;
     typedef boost::shared_ptr<Trigger> TriggerPtr;
 
+    class Group;
+    typedef boost::shared_ptr<Group> GroupPtr;
+
     class Manager;
     template <class T, class T_Declaration> class Registry;
 
