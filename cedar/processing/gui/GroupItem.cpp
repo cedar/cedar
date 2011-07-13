@@ -40,6 +40,8 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/GroupItem.h"
+#include "processing/gui/StepItem.h"
+#include "processing/Group.h"
 
 // PROJECT INCLUDES
 
@@ -53,7 +55,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::GroupItem::GroupItem(QSizeF size)
+cedar::proc::gui::GroupItem::GroupItem(QSizeF size, cedar::proc::GroupPtr group)
 :
 cedar::proc::gui::GraphicsBase(size.width(), size.height(),
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
@@ -63,6 +65,15 @@ cedar::proc::gui::GraphicsBase(size.width(), size.height(),
                                | QGraphicsItem::ItemIsMovable
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
+
+  if (!group)
+  {
+    mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
+  }
+  else
+  {
+    mGroup = group;
+  }
 }
 
 cedar::proc::gui::GroupItem::~GroupItem()
@@ -73,8 +84,34 @@ cedar::proc::gui::GroupItem::~GroupItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::GroupItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /* event */)
+void cedar::proc::gui::GroupItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
+  QMenu menu;
+  QAction *p_start = menu.addAction("start");
+  QAction *p_stop = menu.addAction("stop");
+
+  QAction *a = menu.exec(event->screenPos());
+
+  if (a == p_start)
+  {
+    this->mGroup->start();
+  }
+  else if (a == p_stop)
+  {
+    this->mGroup->stop();
+  }
+}
+
+void cedar::proc::gui::GroupItem::addGroupItem(cedar::proc::gui::GraphicsBase* item)
+{
+  if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+  {
+    //!@todo is this necessary, or is this an implementation error in the paint methods?
+    p_step->setPos(p_step->pos() - this->pos());
+    p_step->setParentItem(this);
+
+    mGroup->addStep(p_step->getStep());
+  }
 }
 
 void cedar::proc::gui::GroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)

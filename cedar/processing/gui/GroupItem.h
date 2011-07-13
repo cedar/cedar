@@ -44,6 +44,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
 #include "processing/gui/GraphicsBase.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -65,7 +66,7 @@ class cedar::proc::gui::GroupItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GroupItem(QSizeF size);
+  GroupItem(QSizeF size, cedar::proc::GroupPtr group = cedar::proc::GroupPtr());
 
   //!@brief Destructor
   ~GroupItem();
@@ -77,6 +78,8 @@ public:
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+
+  void addGroupItem(cedar::proc::gui::GraphicsBase* item);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,6 +99,7 @@ private:
 protected:
   // none yet
 private:
+  cedar::proc::GroupPtr mGroup;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
