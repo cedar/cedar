@@ -66,6 +66,7 @@ public:
   {
     MODE_SELECT,
     MODE_CREATE_TRIGGER,
+    MODE_GROUP,
     MODE_CONNECT
   };
 
@@ -112,9 +113,15 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /* connect mode */
   void connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
   void connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
   void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
+
+  /* group mode */
+  void groupModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
+  void groupModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
+  void groupModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -126,8 +133,16 @@ protected:
 private:
   MODE mMode;
   QString mModeParam;
+
+  /* connect mode related */
   QGraphicsLineItem *mpNewConnectionIndicator;
   cedar::proc::gui::GraphicsBase *mpConnectionStart;
+
+  /* group mode related */
+  QPointF mGroupStart;
+  QPointF mGroupEnd;
+  QGraphicsRectItem *mpGroupIndicator;
+  QList<QGraphicsItem*> mProspectiveGroupMembers;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

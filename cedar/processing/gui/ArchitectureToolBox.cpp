@@ -54,11 +54,12 @@
 
 cedar::proc::gui::ArchitectureToolBox::ArchitectureToolBox(QWidget *pParent)
 :
-cedar::proc::gui::ToolBox(5, pParent),
+cedar::proc::gui::ToolBox(4, pParent),
 mpView(NULL)
 {
   this->addItem("S", "mode.Select", "selection mode");
   this->addItem("C", "mode.Connect", "connection mode");
+  this->addItem("G", "mode.Group", "grouping mode");
   const cedar::proc::Manager::TriggerRegistry::Declarations& decls
            = cedar::proc::Manager::getInstance().triggers().declarations();
 
@@ -107,6 +108,10 @@ void cedar::proc::gui::ArchitectureToolBox::selectionChanged(QString data)
   else if (mode == "mode.Select")
   {
     mode_val = cedar::proc::gui::Scene::MODE_SELECT;
+  }
+  else if (mode == "mode.Group")
+  {
+    mode_val = cedar::proc::gui::Scene::MODE_GROUP;
   }
   else if (mode == "mode.Connect")
   {
