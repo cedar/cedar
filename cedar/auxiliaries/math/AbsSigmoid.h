@@ -64,10 +64,10 @@ class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  AbsSigmoid()
+  AbsSigmoid(double threshold = 0.0, double beta = 10.0)
   :
-  cedar::aux::math::Sigmoid(),
-  mBeta(new cedar::aux::DoubleParameter("beta", 10.0, -1000.0, 1000.0))
+  cedar::aux::math::Sigmoid(threshold),
+  mBeta(new cedar::aux::DoubleParameter("beta", beta, -1000.0, 1000.0))
   {
     this->registerParameter(mBeta);
   }

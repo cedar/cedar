@@ -85,6 +85,7 @@ public:
   void setConstant(bool value);
 
   void set(const cedar::aux::ConfigurationNode& node);
+  virtual void makeDefault() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,7 +108,7 @@ private:
   //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
   bool mAutoRead;
 
-  //! Whether a default value should be set if the
+  //! Whether a default value should be set
   bool mHasDefault;
 
   //! Whether this parameter can be changed during runtime.

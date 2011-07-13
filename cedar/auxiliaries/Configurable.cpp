@@ -83,7 +83,14 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
-      CEDAR_THROW(cedar::aux::ParameterNotFoundException, "Config node " + iter->second->getName() + " not found!");
+      if (! iter->second->getHasDefault())
+      {
+        CEDAR_THROW(cedar::aux::ParameterNotFoundException, "Config node " + iter->second->getName() + " not found!");
+      }
+      else
+      {
+        iter->second->makeDefault();
+      }
     }
   }
 }
