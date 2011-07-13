@@ -58,6 +58,7 @@ namespace cedar
       class BoolParameter;
       class DoubleParameter;
       class GraphicsBase;
+      class GroupItem;
       class Ide;
       class IdeApplication;
       class ParameterBase;
