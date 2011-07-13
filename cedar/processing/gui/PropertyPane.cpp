@@ -103,8 +103,8 @@ void cedar::proc::gui::PropertyPane::addHeadingRow(const std::string& label)
   p_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
   p_label->setText(label.c_str());
   p_label->setAutoFillBackground(true);
-  p_label->setBackgroundRole(QPalette::Text);
-  p_label->setForegroundRole(QPalette::Window);
+  p_label->setBackgroundRole(QPalette::Dark);
+  p_label->setForegroundRole(QPalette::Light);
   this->setCellWidget(row, 0, p_label);
   this->setSpan(row, 0, 1, 2);
 }
