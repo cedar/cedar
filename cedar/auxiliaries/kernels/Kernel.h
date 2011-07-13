@@ -77,6 +77,7 @@ class cedar::aux::Kernel : public cedar::aux::Configurable
 public:
   //!@brief The standard constructor.
   Kernel();
+  Kernel(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
   //!@brief Destructor
   virtual ~Kernel();
   //--------------------------------------------------------------------------------------------------------------------
