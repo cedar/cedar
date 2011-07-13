@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingView.cpp
+    File:        GroupItem.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 05 27
 
     Description:
 
@@ -39,60 +39,55 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/View.h"
+#include "processing/gui/GroupItem.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QResizeEvent>
+#include <QPainter>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::View::View(QWidget *pParent)
+cedar::proc::gui::GroupItem::GroupItem(QSizeF size)
 :
-QGraphicsView(pParent)
+cedar::proc::gui::GraphicsBase(size.width(), size.height(),
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE)
 {
-  this->mpScene = new cedar::proc::gui::Scene();
-  this->setScene(this->mpScene);
-  this->setInteractive(true);
-  this->setDragMode(QGraphicsView::RubberBandDrag);
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               | QGraphicsItem::ItemSendsGeometryChanges
+                               );
 }
 
-cedar::proc::gui::View::~View()
+cedar::proc::gui::GroupItem::~GroupItem()
 {
-  delete this->mpScene;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
+void cedar::proc::gui::GroupItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /* event */)
 {
-  return this->mpScene;
 }
 
-void cedar::proc::gui::View::resizeEvent(QResizeEvent * pEvent)
+void cedar::proc::gui::GroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
-  QWidget::resizeEvent(pEvent);
-  //!@todo fix the scene rect
+  painter->save(); // save current painter settings
+
+  this->paintFrame(painter, style, widget);
+
+  painter->restore(); // restore saved painter settings
 }
 
-void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
-{
-  switch (mode)
-  {
-    case cedar::proc::gui::Scene::MODE_CONNECT:
-    case cedar::proc::gui::Scene::MODE_CREATE_TRIGGER:
-    case cedar::proc::gui::Scene::MODE_GROUP:
-      this->setDragMode(QGraphicsView::NoDrag);
-      break;
 
-    default:
-      this->setDragMode(QGraphicsView::RubberBandDrag);
-      break;
-  }
-  this->mpScene->setMode(mode, param);
+QVariant cedar::proc::gui::GroupItem::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+  return QGraphicsItem::itemChange(change, value);
 }

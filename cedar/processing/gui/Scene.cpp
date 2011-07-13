@@ -43,6 +43,7 @@
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/StepItem.h"
 #include "processing/gui/TriggerItem.h"
+#include "processing/gui/GroupItem.h"
 
 // PROJECT INCLUDES
 
@@ -346,7 +347,25 @@ void cedar::proc::gui::Scene::groupModeProcessMouseMove(QGraphicsSceneMouseEvent
   {
     this->mGroupEnd = pMouseEvent->scenePos();
     QRectF rect(this->mGroupStart, this->mGroupEnd);
-    mpGroupIndicator->setRect(rect);
+    mpGroupIndicator->setRect(rect.normalized());
+
+    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
+    {
+      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
+      {
+        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+    }
+
+    mProspectiveGroupMembers = this->items(rect.normalized(), Qt::ContainsItemBoundingRect);
+
+    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
+    {
+      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
+      {
+        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
+      }
+    }
   }
 }
 
@@ -358,6 +377,20 @@ void cedar::proc::gui::Scene::groupModeProcessMouseRelease(QGraphicsSceneMouseEv
     QRectF rect(this->mGroupStart, this->mGroupEnd);
     delete mpGroupIndicator;
     mpGroupIndicator = NULL;
+
+    cedar::proc::gui::GroupItem *p_group = new cedar::proc::gui::GroupItem(rect.size());
+    p_group->setPos(rect.topLeft());
+    this->addItem(p_group);
+
+    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
+    {
+      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
+      {
+        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+      }
+    }
+
+    mProspectiveGroupMembers.clear();
   }
 }
 

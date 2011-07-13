@@ -142,8 +142,10 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
     switch (this->mHighlightMode)
     {
       case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
+      case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
         highlight_pen.setColor(QColor(150, 200, 150));
         break;
+
       default:
         break;
     }

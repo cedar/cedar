@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProcessingView.h
+    File:        GroupItem.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,54 +38,51 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_VIEW_H
-#define CEDAR_PROC_VIEW_H
+#ifndef CEDAR_PROC_GROUP_ITEM_H
+#define CEDAR_PROC_GROUP_ITEM_H
 
 // LOCAL INCLUDES
-#include "processing/gui/Scene.h"
 #include "processing/gui/namespace.h"
+#include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsView>
-#include <QGraphicsRectItem>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::View : public QGraphicsView
+class cedar::proc::gui::GroupItem : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  View(QWidget *pParent = NULL);
+  GroupItem(QSizeF size);
 
   //!@brief Destructor
-  ~View();
+  ~GroupItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::gui::Scene* getScene();
+  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-  void setMode(cedar::proc::gui::Scene::MODE mode, const QString& param = "");
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void resizeEvent(QResizeEvent *pEvent);
+  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -96,25 +93,18 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
 
 private:
-  // none yet
 
-}; // class ProcessingView
+}; // class StepItem
 
-#endif // CEDAR_PROC_VIEW_H
+#endif // CEDAR_PROC_GROUP_ITEM_H
 
