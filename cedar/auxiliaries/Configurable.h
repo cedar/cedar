@@ -59,6 +59,7 @@ class cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
+  typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,13 +75,16 @@ public:
 public:
   void registerParameter(cedar::aux::ParameterBasePtr parameter);
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  const Children& configurableChildren() const;
 
+  const ParameterMap& getParameters() const;
+  ParameterMap& getParameters();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -106,6 +110,7 @@ public:
 protected:
   ParameterMap mParameters;
   StringParameterPtr mName;
+  Children mChildren;
 
 private:
   // none yet

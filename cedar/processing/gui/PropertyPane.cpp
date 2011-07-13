@@ -43,6 +43,7 @@
 #include "processing/gui/BoolParameter.h"
 #include "processing/gui/DoubleParameter.h"
 #include "processing/gui/StringParameter.h"
+#include "processing/Manager.h"
 
 // PROJECT INCLUDES
 
@@ -50,6 +51,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDoubleSpinBox>
+#include <QApplication>
 
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes cedar::proc::gui::PropertyPane::mDataWidgetTypes;
@@ -74,22 +76,69 @@ cedar::proc::gui::PropertyPane::~PropertyPane()
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 {
-  int row = this->rowCount();
-  cedar::proc::Step::ParameterMap& parameters = pStep->getParameters();
-  for (Step::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
-  {
-    cedar::aux::ParameterBasePtr& parameter = iter->second;
-    this->insertRow(row);
-    QLabel *p_label = new QLabel();
-    p_label->setText(parameter->getName().c_str());
-    this->setCellWidget(row, 0, p_label);
+  std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
+  this->addLabelRow(label);
+  this->append(pStep->getParameters());
 
-    cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
-    p_widget->setParameter(parameter);
-    this->setCellWidget(row, 1, p_widget);
+  for (cedar::aux::Configurable::Children::const_iterator iter = pStep->configurableChildren().begin();
+       iter != pStep->configurableChildren().end();
+       ++iter)
+  {
+    this->addHeadingRow(iter->first);
+    this->append(iter->second->getParameters());
   }
 }
 
+void cedar::proc::gui::PropertyPane::addHeadingRow(const std::string& label)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  QLabel *p_label = new QLabel();
+
+  QFont font = p_label->font();
+  font.setBold(true);
+  font.setPointSize(font.pointSize() + 1);
+  p_label->setFont(font);
+
+  p_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  p_label->setText(label.c_str());
+  p_label->setAutoFillBackground(true);
+  p_label->setBackgroundRole(QPalette::Text);
+  p_label->setForegroundRole(QPalette::Window);
+  this->setCellWidget(row, 0, p_label);
+  this->setSpan(row, 0, 1, 2);
+}
+
+void cedar::proc::gui::PropertyPane::addLabelRow(const std::string& label)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  QLabel *p_label = new QLabel();
+  p_label->setText(label.c_str());
+  this->setCellWidget(row, 0, p_label);
+  this->setSpan(row, 0, 1, 2);
+}
+
+void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterMap& parameters)
+{
+  for (cedar::aux::Configurable::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
+  {
+    this->addPropertyRow(iter->second);
+  }
+}
+
+void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr parameter)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  QLabel *p_label = new QLabel();
+  p_label->setText(parameter->getName().c_str());
+  this->setCellWidget(row, 0, p_label);
+
+  cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+  p_widget->setParameter(parameter);
+  this->setCellWidget(row, 1, p_widget);
+}
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane::dataWidgetTypes()
 {

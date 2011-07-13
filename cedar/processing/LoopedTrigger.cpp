@@ -43,6 +43,7 @@
 #include "processing/LoopedTrigger.h"
 #include "processing/StepTime.h"
 #include "units/TimeUnit.h"
+#include "processing/Manager.h"
 
 // PROJECT INCLUDES
 

@@ -72,6 +72,16 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterBasePtr pa
   this->mParameters[parameter->getName()] = parameter;
 }
 
+const cedar::aux::Configurable::ParameterMap& cedar::aux::Configurable::getParameters() const
+{
+  return this->mParameters;
+}
+
+cedar::aux::Configurable::ParameterMap& cedar::aux::Configurable::getParameters()
+{
+  return this->mParameters;
+}
+
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
@@ -93,4 +103,19 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
       }
     }
   }
+}
+
+const cedar::aux::Configurable::Children& cedar::aux::Configurable::configurableChildren() const
+{
+  return this->mChildren;
+}
+
+void cedar::aux::Configurable::addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child)
+{
+  if (this->mChildren.find(name) != this->mChildren.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "There is already a configurable child with the name \""
+                                                    + name + "\".");
+  }
+  this->mChildren[name] = child;
 }

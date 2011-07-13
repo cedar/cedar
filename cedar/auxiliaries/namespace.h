@@ -130,6 +130,7 @@ namespace cedar
     }
 
     /*exceptions*/
+    class DuplicateNameException;
     class UnhandledTypeException;
     class UnknownTypeException;
     class ParameterNotFoundException;
