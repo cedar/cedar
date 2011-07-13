@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QResizeEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -73,12 +74,33 @@ cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
   return this->mpScene;
 }
 
+void cedar::proc::gui::View::resizeEvent(QResizeEvent *pEvent)
+{
+  QWidget::resizeEvent(pEvent);
+  qreal w = static_cast<qreal>(pEvent->size().width());
+  qreal h = static_cast<qreal>(pEvent->size().height());
+
+  QPointF top_left, bottom_right;
+  top_left = this->sceneRect().center() - QPointF(w, h)/2;
+  bottom_right = this->sceneRect().center() + QPointF(w, h)/2;
+
+  // restrict to the actual scene rectangle
+  QRectF bounds = this->mpScene->itemsBoundingRect();
+  top_left.rx() = std::max(top_left.rx(), bounds.left());
+  top_left.ry() = std::max(top_left.ry(), bounds.top());
+  bottom_right.rx() = std::max(bottom_right.rx(), bounds.right());
+  bottom_right.ry() = std::max(bottom_right.ry(), bounds.bottom());
+
+  this->setSceneRect(QRectF(top_left, bottom_right));
+}
+
 void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
 {
   switch (mode)
   {
     case cedar::proc::gui::Scene::MODE_CONNECT:
     case cedar::proc::gui::Scene::MODE_CREATE_TRIGGER:
+    case cedar::proc::gui::Scene::MODE_GROUP:
       this->setDragMode(QGraphicsView::NoDrag);
       break;
 

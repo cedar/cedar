@@ -82,8 +82,8 @@ void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::stri
   button->setProperty("data", QVariant(QString(data.c_str())));
   button->setToolTip(tooltip.c_str());
   int num_children = mpLayout->count();
-  int row = (num_children + 1) / mColumns;
-  int col = (num_children + 1) % mColumns;
+  int row = num_children / mColumns;
+  int col = num_children % mColumns;
   mpLayout->addWidget(button, row, col);
 
   button->setFixedSize(32, 32);

@@ -62,7 +62,8 @@ cedar::proc::gui::Scene::Scene(QObject *pParent)
 QGraphicsScene (pParent),
 mMode(MODE_SELECT),
 mpNewConnectionIndicator(NULL),
-mpConnectionStart(NULL)
+mpConnectionStart(NULL),
+mpGroupIndicator(NULL)
 {
 }
 
@@ -130,6 +131,10 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
       this->connectModeProcessMousePress(pMouseEvent);
       break;
 
+    case MODE_GROUP:
+      this->groupModeProcessMousePress(pMouseEvent);
+      break;
+
     case MODE_CREATE_TRIGGER:
       break;
   }
@@ -141,6 +146,10 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   {
     case MODE_CONNECT:
       this->connectModeProcessMouseMove(pMouseEvent);
+      break;
+
+    case MODE_GROUP:
+      this->groupModeProcessMouseMove(pMouseEvent);
       break;
 
     default:
@@ -163,6 +172,11 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 
     case MODE_CONNECT:
       this->connectModeProcessMouseRelease(pMouseEvent);
+      break;
+
+
+    case MODE_GROUP:
+      this->groupModeProcessMouseRelease(pMouseEvent);
       break;
 
     case MODE_CREATE_TRIGGER:
@@ -312,6 +326,39 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
   }
 
   mpConnectionStart = NULL;
+}
+
+void cedar::proc::gui::Scene::groupModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  this->mGroupStart = this->mGroupEnd = pMouseEvent->scenePos();
+  QRectF rect(this->mGroupStart, this->mGroupEnd);
+
+  if (mpGroupIndicator != NULL)
+  {
+    delete mpGroupIndicator;
+  }
+  mpGroupIndicator = this->addRect(rect);
+}
+
+void cedar::proc::gui::Scene::groupModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  if (mpGroupIndicator != NULL)
+  {
+    this->mGroupEnd = pMouseEvent->scenePos();
+    QRectF rect(this->mGroupStart, this->mGroupEnd);
+    mpGroupIndicator->setRect(rect);
+  }
+}
+
+void cedar::proc::gui::Scene::groupModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent)
+{
+  if (mpGroupIndicator != NULL)
+  {
+    this->mGroupEnd = pMouseEvent->scenePos();
+    QRectF rect(this->mGroupStart, this->mGroupEnd);
+    delete mpGroupIndicator;
+    mpGroupIndicator = NULL;
+  }
 }
 
 void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF position)
