@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
+#include <QMainWindow>
 
 
 /*!@brief Abstract description of the class.
@@ -75,7 +76,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Scene(QObject *pParent = NULL);
+  Scene(QObject *pParent = NULL, QMainWindow *pMainWindow = NULL);
 
   //!@brief Destructor
   ~Scene();
@@ -96,6 +97,8 @@ public:
   void addTrigger(const std::string& classId, QPointF position);
 
   void setMode(MODE mode, const QString& param = "");
+
+  void setMainWindow(QMainWindow *pMainWindow);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -144,6 +147,7 @@ private:
   QPointF mGroupEnd;
   QGraphicsRectItem *mpGroupIndicator;
   QList<QGraphicsItem*> mProspectiveGroupMembers;
+  QMainWindow *mpMainWindow;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

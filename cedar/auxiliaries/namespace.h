@@ -138,6 +138,7 @@ namespace cedar
     /*exceptions*/
     class DuplicateNameException;
     class UnhandledTypeException;
+    class UnhandledValueException;
     class UnknownTypeException;
     class ParameterNotFoundException;
     class UnknownNameException;

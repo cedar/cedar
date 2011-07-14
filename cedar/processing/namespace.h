@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
+#include <opencv2/opencv.hpp>
 
 
 namespace cedar
@@ -59,6 +60,8 @@ namespace cedar
     typedef boost::shared_ptr<Data> DataPtr;
 
     template <typename T> class DataT;
+
+    typedef DataT<cv::Mat> MatData;
 
     class DataRole;
 

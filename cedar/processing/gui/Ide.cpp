@@ -60,6 +60,7 @@ cedar::proc::gui::Ide::Ide()
   this->resetStepList();
 
   this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
+  this->mpProcessingDrawer->getScene()->setMainWindow(this);
 
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),

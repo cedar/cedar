@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepItem.h
+    File:        DataPlotter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 07 14
 
     Description:
 
@@ -38,57 +38,55 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_ITEM_H
-#define CEDAR_PROC_STEP_ITEM_H
+#ifndef CEDAR_PROC_GUI_DATA_PLOTTER_H
+#define CEDAR_PROC_GUI_DATA_PLOTTER_H
 
 // LOCAL INCLUDES
-#include "processing/Step.h"
 #include "processing/gui/namespace.h"
-#include "processing/gui/TriggerConnection.h"
-#include "processing/gui/GraphicsBase.h"
+#include "auxiliaries/TypeBasedFactory.h"
+#include "processing/Data.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QMainWindow>
+#include <QDockWidget>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::StepItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::DataPlotter : public QDockWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
+public:
+  typedef cedar::aux::TypeBasedFactory<cedar::proc::Data, QWidget> WidgetFactory;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepItem(cedar::proc::StepPtr step, QMainWindow* pMainWindow);
+  DataPlotter(const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~StepItem();
+  ~DataPlotter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-  cedar::proc::StepPtr getStep();
-
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-  void addIncomingTriggerConnection(TriggerConnection* pConnection);
+  void plot(cedar::proc::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -99,22 +97,27 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::StepPtr mStep;
+  static WidgetFactory mTypePlotters;
+
+  static WidgetFactory& getWidgetFactory();
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
+  // none yet
 
 private:
-  cedar::proc::StepDeclarationPtr mClassId;
-  std::vector<TriggerConnection*> mIncomingTriggerConnections;
-  QMainWindow* mpMainWindow;
+  // none yet
 
-}; // class StepItem
+}; // class cedar::proc::gui::DataPlotter
 
-#endif // CEDAR_PROC_STEP_ITEM_H
+#endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
 
