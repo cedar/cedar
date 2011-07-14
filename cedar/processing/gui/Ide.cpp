@@ -64,12 +64,19 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
                    this, SLOT(exception(const QString&)));
+  QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
+                   this, SLOT(architectureToolFinished()));
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::architectureToolFinished()
+{
+  this->mpArchitectureToolBox->selectMode("mode.Select");
+}
 
 void cedar::proc::gui::Ide::resetStepList()
 {

@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/StepItem.h"
+#include "processing/LoopedTrigger.h"
 #include "processing/Manager.h"
 #include "processing/Data.h"
 #include "processing/Trigger.h"
@@ -82,8 +83,25 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /* event */)
+void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
+  if (cedar::proc::LoopedTrigger* p_looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(this->mTrigger.get()))
+  {
+    QMenu menu;
+    QAction *p_start = menu.addAction("start");
+    QAction *p_stop = menu.addAction("stop");
+
+    QAction *a = menu.exec(event->screenPos());
+
+    if (a == p_start)
+    {
+      p_looped_trigger->start();
+    }
+    else if (a == p_stop)
+    {
+      p_looped_trigger->stop();
+    }
+  }
 }
 
 void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)

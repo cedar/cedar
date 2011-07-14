@@ -59,3 +59,8 @@ cedar::aux::DuplicateNameException::DuplicateNameException()
 {
   this->mType = "DuplicateNameException";
 }
+
+cedar::aux::UnknownNameException::UnknownNameException()
+{
+  this->mType = "UnknownNameException";
+}

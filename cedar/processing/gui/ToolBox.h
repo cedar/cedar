@@ -50,6 +50,7 @@
 #include <QWidget>
 #include <QGridLayout>
 #include <QToolButton>
+#include <map>
 
 
 /*!@brief Abstract description of the class.
@@ -80,6 +81,8 @@ public:
   void addItem(const std::string& icon, const std::string& data, const std::string& tooltip);
   std::string getCurrentItemData() const;
 
+  void selectMode(const std::string& mode);
+
 public slots:
   void toolButtonToggled(bool checked);
 
@@ -109,6 +112,7 @@ private:
   unsigned int mColumns;
   QGridLayout *mpLayout;
   QToolButton *mpSelectedButton;
+  std::map<std::string, QToolButton*> mButtons;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

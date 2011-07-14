@@ -191,6 +191,22 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       }
       break;
   }
+
+  switch (this->mMode)
+  {
+    case MODE_CONNECT:
+    default:
+      break;
+
+    case MODE_GROUP:
+    case MODE_CREATE_TRIGGER:
+      if ( pMouseEvent->button() == Qt::LeftButton && (pMouseEvent->modifiers() & Qt::ShiftModifier) == 0)
+      {
+        this->setMode(MODE_SELECT);
+        emit modeFinished();
+      }
+      break;
+  }
 }
 
 void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)

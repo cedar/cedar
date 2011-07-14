@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/ToolBox.h"
 #include "auxiliaries/macros.h"
+#include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -88,6 +89,9 @@ void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::stri
 
   button->setFixedSize(32, 32);
 
+  //!@todo check for duplicates
+  mButtons[data] = button;
+
   QObject::connect(button, SIGNAL(toggled(bool)), this, SLOT(toolButtonToggled(bool)));
 
   if (this->mpSelectedButton == NULL)
@@ -95,6 +99,15 @@ void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::stri
     this->mpSelectedButton = button;
     this->mpSelectedButton->setChecked(true);
   }
+}
+
+void cedar::proc::gui::ToolBox::selectMode(const std::string& mode)
+{
+  if (this->mButtons.find(mode) == this->mButtons.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "The button \"" + mode + "\" is not known.");
+  }
+  this->mButtons.find(mode)->second->setChecked(true);
 }
 
 std::string cedar::proc::gui::ToolBox::getCurrentItemData() const
