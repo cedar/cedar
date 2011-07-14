@@ -48,11 +48,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::Group::Group()
+cedar::proc::Group::Group(const std::string& name)
 :
 mGroupTrigger(new cedar::proc::LoopedTrigger())
 {
-
+  this->setName(name);
 }
 
 cedar::proc::Group::~Group()

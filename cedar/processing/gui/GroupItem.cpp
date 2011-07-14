@@ -42,6 +42,7 @@
 #include "processing/gui/GroupItem.h"
 #include "processing/gui/StepItem.h"
 #include "processing/Group.h"
+#include "processing/Manager.h"
 
 // PROJECT INCLUDES
 
@@ -68,7 +69,7 @@ cedar::proc::gui::GraphicsBase(size.width(), size.height(),
 
   if (!group)
   {
-    mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
+    mGroup = cedar::proc::Manager::getInstance().allocateGroup();
   }
   else
   {
