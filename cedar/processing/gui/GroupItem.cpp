@@ -1,0 +1,130 @@
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        GroupItem.cpp
+
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 05 27
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+// LOCAL INCLUDES
+#include "processing/gui/GroupItem.h"
+#include "processing/gui/StepItem.h"
+#include "processing/Group.h"
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+#include <QPainter>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
+#include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::GroupItem::GroupItem(QSizeF size, cedar::proc::GroupPtr group)
+:
+cedar::proc::gui::GraphicsBase(size.width(), size.height(),
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE)
+{
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               | QGraphicsItem::ItemSendsGeometryChanges
+                               );
+
+  if (!group)
+  {
+    mGroup = cedar::proc::GroupPtr(new cedar::proc::Group());
+  }
+  else
+  {
+    mGroup = group;
+  }
+}
+
+cedar::proc::gui::GroupItem::~GroupItem()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GroupItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
+{
+  QMenu menu;
+  QAction *p_start = menu.addAction("start");
+  QAction *p_stop = menu.addAction("stop");
+
+  QAction *a = menu.exec(event->screenPos());
+
+  if (a == p_start)
+  {
+    this->mGroup->start();
+  }
+  else if (a == p_stop)
+  {
+    this->mGroup->stop();
+  }
+}
+
+void cedar::proc::gui::GroupItem::addGroupItem(cedar::proc::gui::GraphicsBase* item)
+{
+  if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
+  {
+    //!@todo is this necessary, or is this an implementation error in the paint methods?
+    p_step->setPos(p_step->pos() - this->pos());
+    p_step->setParentItem(this);
+
+    mGroup->addStep(p_step->getStep());
+  }
+}
+
+void cedar::proc::gui::GroupItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
+{
+  painter->save(); // save current painter settings
+
+  this->paintFrame(painter, style, widget);
+
+  painter->restore(); // restore saved painter settings
+}
+
+
+QVariant cedar::proc::gui::GroupItem::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+  return QGraphicsItem::itemChange(change, value);
+}
