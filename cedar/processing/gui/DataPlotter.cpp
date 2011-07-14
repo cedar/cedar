@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralField.cpp
+    File:        DataPlotter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 04
+    Date:        2011 07 14
 
     Description:
 
@@ -39,54 +39,56 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "dynamics/fields/NeuralField.h"
-#include "dynamics/SpaceCode.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/math/Sigmoid.h"
-#include "auxiliaries/math/AbsSigmoid.h"
+#include "processing/gui/DataPlotter.h"
+#include "processing/DataT.h"
+#include "auxiliaries/gui/MatrixPlot.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
+#include <QVBoxLayout>
+
+cedar::proc::gui::DataPlotter::WidgetFactory cedar::proc::gui::DataPlotter::mTypePlotters;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dyn::NeuralField::NeuralField()
+
+cedar::proc::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat(10,10,CV_32F))),
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
-mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
-mSigmoid(new cedar::aux::math::AbsSigmoid())
+QDockWidget(title.c_str(), pParent)
 {
-  this->registerParameter(mRestingLevel);
-  this->registerParameter(mTau);
-
-  this->declareBuffer("activation");
-  this->setBuffer("activation", mActivation);
-
-  this->addConfigurableChild("sigmoid", this->mSigmoid);
+  this->setFloating(true);
+  this->layout()->setContentsMargins(0, 0, 0, 0);
 }
+
+cedar::proc::gui::DataPlotter::~DataPlotter()
+{
+}
+
+void cedar::proc::gui::DataPlotter::plot(cedar::proc::DataPtr data)
+{
+  //!@todo doesn't work this way -- related to the todo entry below.
+//  QWidget *p_widget = getWidgetFactory().get(data)->allocateRaw();
+
+  //!@todo find a better solution for this!
+  if (cedar::proc::MatData* mat_data = dynamic_cast<cedar::proc::MatData*>(data.get()))
+  {
+    cedar::aux::gui::MatrixPlot *p_plot = new cedar::aux::gui::MatrixPlot();
+    p_plot->display(mat_data->getData(), &mat_data->getLock());
+    this->setWidget(p_plot);
+  }
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
+
+cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::getWidgetFactory()
 {
-  cv::Mat& u = this->mActivation->getData();
-  const double& h = mRestingLevel->get();
-  const double& tau = mTau->get();
-
-  cv::Mat d_u = -u + h;
-  //!\todo deal with units, now: milliseconds
-  u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
-  cv::Mat rand (d_u.rows, d_u.cols, d_u.type());
-  cv::randn(rand, 0, 1);
-  u += rand * sqrt(cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau));
-  //std::cout << "field: " << u.at<float>(0,0) << std::endl;
-}
-
-void cedar::dyn::NeuralField::onStart()
-{
-
+  if (cedar::proc::gui::DataPlotter::mTypePlotters.empty())
+  {
+    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::proc::MatData, cedar::aux::gui::MatrixPlot>();
+  }
+  return cedar::proc::gui::DataPlotter::mTypePlotters;
 }

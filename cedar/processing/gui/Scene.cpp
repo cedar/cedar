@@ -58,13 +58,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::Scene::Scene(QObject *pParent)
+cedar::proc::gui::Scene::Scene(QObject *pParent, QMainWindow *pMainWindow)
 :
 QGraphicsScene (pParent),
 mMode(MODE_SELECT),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
-mpGroupIndicator(NULL)
+mpGroupIndicator(NULL),
+mpMainWindow(pMainWindow)
 {
 }
 
@@ -75,6 +76,11 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
+{
+  this->mpMainWindow = pMainWindow;
+}
 
 void cedar::proc::gui::Scene::setMode(MODE mode, const QString& param)
 {
@@ -485,7 +491,7 @@ void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPoi
   try
   {
     cedar::proc::StepPtr step = Manager::getInstance().steps().createInstance(classId, name);
-    cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step);
+    cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step, this->mpMainWindow);
     this->addItem(p_drawer);
     p_drawer->setPos(position);
     this->update();

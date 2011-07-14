@@ -64,3 +64,8 @@ cedar::aux::UnknownNameException::UnknownNameException()
 {
   this->mType = "UnknownNameException";
 }
+
+cedar::aux::UnhandledValueException::UnhandledValueException()
+{
+  this->mType = "UnhandledValueException";
+}

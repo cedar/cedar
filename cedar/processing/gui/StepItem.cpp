@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/StepItem.h"
 #include "processing/Manager.h"
+#include "processing/gui/DataPlotter.h"
 #include "processing/Data.h"
 #include "processing/Step.h"
 
@@ -56,12 +57,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step)
+cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step, QMainWindow* pMainWindow)
 :
 cedar::proc::gui::GraphicsBase(120, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
-mStep (step)
+mStep(step),
+mpMainWindow(pMainWindow)
 {
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
@@ -83,6 +85,8 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QMenu menu;
   QMenu* p_data = menu.addMenu("data");
 
+  std::map<QAction*, cedar::aux::Enum> action_type_map;
+
   for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
       enum_it != cedar::proc::DataRole::type().list().end();
       ++enum_it)
@@ -99,6 +103,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       {
         QAction *p_action = p_data->addAction(iter->first.c_str());
         p_action->setData(QString(iter->first.c_str()));
+        action_type_map[p_action] = e;
       }
     }
     catch (const cedar::proc::InvalidRoleException& e)
@@ -115,6 +120,15 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   if (a->parentWidget() == p_data)
   {
     std::string data_name = a->data().toString().toStdString();
+    const cedar::aux::Enum& e = action_type_map[a];
+    cedar::proc::DataPtr p_data = this->mStep->getData(e, data_name);
+
+    std::string title = this->mStep->getName();
+    title += "." + data_name;
+
+    cedar::proc::gui::DataPlotter *p_plotter = new cedar::proc::gui::DataPlotter(title, mpMainWindow);
+    p_plotter->plot(p_data);
+    p_plotter->show();
   }
 }
 

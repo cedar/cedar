@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepItem.h
+    File:        MatrixPlot.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 07 14
 
     Description:
 
@@ -38,83 +38,116 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_ITEM_H
-#define CEDAR_PROC_STEP_ITEM_H
+#ifndef CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
+#define CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
 
 // LOCAL INCLUDES
-#include "processing/Step.h"
-#include "processing/gui/namespace.h"
-#include "processing/gui/TriggerConnection.h"
-#include "processing/gui/GraphicsBase.h"
+#include "auxiliaries/gui/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QMainWindow>
+#include <QWidget>
+#include <QReadWriteLock>
+#include <QTimer>
+#include <opencv2/opencv.hpp>
+#include <qwtplot3d/qwt3d_gridplot.h>
+#include <qwtplot3d/qwt3d_function.h>
+#include <qwtplot3d/qwt3d_plot3d.h>
+#include <qwtplot3d/qwt3d_io.h>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::StepItem : public cedar::proc::gui::GraphicsBase
+class cedar::aux::gui::MatrixPlot2D : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  class Matrix2DFunction : public Qwt3D::Function
+  {
+  public:
+    Matrix2DFunction(Qwt3D::GridPlot* plot);
+    Matrix2DFunction(QReadWriteLock *pLock, Qwt3D::GridPlot* plot, const cv::Mat& matrix);
+    double operator()(double x, double y);
+    void updateMatrix(const cv::Mat& matrix);
+
+    void setLock(QReadWriteLock *lock);
+
+  private:
+    cv::Mat mMatrix;
+    QReadWriteLock *mpeLock;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepItem(cedar::proc::StepPtr step, QMainWindow* pMainWindow);
+  MatrixPlot2D(QWidget *pParent = NULL);
+
+  MatrixPlot2D(cv::Mat mat, QReadWriteLock *lock, QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~StepItem();
+  ~MatrixPlot2D();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+  void display(cv::Mat mat, QReadWriteLock *lock);
 
-  cedar::proc::StepPtr getStep();
-
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-  void addIncomingTriggerConnection(TriggerConnection* pConnection);
+public slots:
+  void updatePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::StepPtr mStep;
+  cv::Mat mMat;
+  QTimer* mpTimer;
+  QReadWriteLock *mpeLock;
+
+  Qwt3D::GridPlot *mpPlot;
+
+  Matrix2DFunction *mpFunction;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
+  // none yet
 
 private:
-  cedar::proc::StepDeclarationPtr mClassId;
-  std::vector<TriggerConnection*> mIncomingTriggerConnections;
-  QMainWindow* mpMainWindow;
+  // none yet
 
-}; // class StepItem
+}; // class cedar::aux::gui::MatrixPlot2D
 
-#endif // CEDAR_PROC_STEP_ITEM_H
+#endif // CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
 
