@@ -64,6 +64,8 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
                    this, SLOT(exception(const QString&)));
+  QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
+  QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()));
 }
 
 
@@ -112,4 +114,14 @@ void cedar::proc::gui::Ide::exception(const QString& message)
   QMessageBox::critical(this,
                         "An exception has occurred.",
                         message);
+}
+
+void cedar::proc::gui::Ide::startThreads()
+{
+  cedar::proc::Manager::getInstance().startThreads();
+}
+
+void cedar::proc::gui::Ide::stopThreads()
+{
+  cedar::proc::Manager::getInstance().stopThreads();
 }

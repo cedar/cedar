@@ -79,6 +79,8 @@ public:
 
   const ParameterMap& getParameters() const;
   ParameterMap& getParameters();
+  void setName(const std::string& name);
+  const std::string& getName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

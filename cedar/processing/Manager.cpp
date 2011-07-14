@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepManager.cpp
+    File:        Manager.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -45,6 +45,7 @@
 #include "processing/TriggerDeclaration.h"
 #include "processing/Trigger.h"
 #include "processing/LoopedTrigger.h"
+#include "processing/Group.h"
 #include "auxiliaries/macros.h"
 
 //! @todo find a better place for this
@@ -55,7 +56,7 @@
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 
-cedar::proc::Manager cedar::proc::Manager::mpManager;
+cedar::proc::Manager cedar::proc::Manager::mManager;
 
 //#define DEBUG_FILE_READING
 
@@ -109,12 +110,20 @@ void cedar::proc::Manager::startThreads()
   {
     (*iter)->start();
   }
+  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
+  {
+    (*iter)->start();
+  }
 }
 
 void cedar::proc::Manager::stopThreads()
 {
   //!@todo wait for all threads to stop
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
+  {
+    (*iter)->stop();
+  }
+  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
   {
     (*iter)->stop();
   }
@@ -130,9 +139,26 @@ cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
   return this->mThreadRegistry;
 }
 
+cedar::proc::Manager::GroupRegistry& cedar::proc::Manager::groups()
+{
+  return this->mGroupRegistry;
+}
+
+cedar::proc::GroupPtr cedar::proc::Manager::allocateGroup()
+{
+  GroupPtr new_group(new cedar::proc::Group("new group"));
+  this->mGroupRegistry.insert(new_group);
+  return new_group;
+}
+
+void cedar::proc::Manager::removeGroup(cedar::proc::GroupPtr group)
+{
+  this->mGroupRegistry.erase(group);
+}
+
 cedar::proc::Manager& cedar::proc::Manager::getInstance()
 {
-  return cedar::proc::Manager::mpManager;
+  return cedar::proc::Manager::mManager;
 }
 
 void cedar::proc::Manager::readFile(const std::string& filename)
