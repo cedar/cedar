@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NeuralField.h
+    File:        Kernel.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 04
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 07 07
 
     Description:
 
@@ -38,25 +34,39 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DYN_NEURAL_FIELD_H
-#define CEDAR_DYN_NEURAL_FIELD_H
+#ifndef CEDAR_AUX_KERNEL_KERNEL_H
+#define CEDAR_AUX_KERNEL_KERNEL_H
 
 // LOCAL INCLUDES
-#include "dynamics/namespace.h"
-#include "dynamics/Dynamics.h"
-#include "auxiliaries/math/namespace.h"
 #include "auxiliaries/kernel/namespace.h"
+#include "auxiliaries/Configurable.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
+#include <QReadWriteLock>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Meta class to derive from when implementing kernels.
  *
- * More detailed description of the class.
+ * This is the kernel meta class that provides a uniform interface for
+ * all implemented kernels. This class already provides the functionality of
+ * saving and loading a kernel matrix to and from a file. These two functions
+ * loadKernelFromFile() and saveKernelToFile() are declared virtual to allow for derived classes
+ * to implement their own save routine. This class also provides a simple implementation of a get
+ * function to get a reference to the internal kernel matrix. Without giving back a reference,
+ * the return value would be a copy of the internal matrix and therefore would not be affected
+ * by changes of the kernel configuration. The last provided function getReadWriteLock() returns a QReadWriteLock
+ * Kernel::mpReadWriteLockOutput, which protects the kernel data from being accessed while being updated.
+ *
+ * There is a set of purely virtual functions, which have to be implemented by all derived classes.
+ * The first one is doLocalInit(). This should contain all code that is necessary to create a new instance
+ * of a derived kernel. The second one is calculate(), which should contain all the code necessary to
+ * calculate an updated version of the kernel matrix once parameters of the kernel have changed.
+ *
  */
-class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
+class cedar::aux::kernel::Kernel : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,22 +77,49 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NeuralField();
-
+  Kernel();
+  Kernel(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
   //!@brief Destructor
-
+  virtual ~Kernel();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief
-  void onStart();
+  /*! virtual function that in the derived classes actually does the job of initializing
+   * the kernel from file
+   */
+  //!@todo deal with boost PropertyTree here
+  virtual void onInit() = 0;
+
+  /*!\brief load a kernel matrix from file determined by _mKernelMatrixFile*/
+  virtual void loadKernelFromFile();
+  /*!\brief save a kernel matrix to a file determined by _mKernelMatrixFile*/
+  virtual void saveKernelToFile() const;
+
+  /*! virtual function for accessing the kernel matrix, in the 1d case this is the default
+   * function to use, in the 2d case this function should return the combined 2d kernel
+   *\return the kernel matrix
+   */
+  virtual const cv::Mat& getKernel() const;
+  const cedar::proc::DataPtr getKernelRaw() const;
+
+  /*!\brief get access to the write lock when in an asynchronous mode
+   * \return pointer to the QReadWriteLock
+   */
+  QReadWriteLock* getReadWriteLock();
+
+  /*!\brief get the dimensionality of the kernel matrix
+   * \return dimensionality
+   */
+  unsigned int getDimensionality() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Time& time);
+  /*!\brief virtual function to calculate the kernel matrix
+   */
+  virtual void calculate() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -94,12 +131,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::dyn::SpaceCodePtr mActivation;
-  cedar::dyn::SpaceCodePtr mSigmoidalActivation;
-  cedar::aux::DoubleParameterPtr mRestingLevel;
-  cedar::aux::DoubleParameterPtr mTau; //!\todo deal with units, now: milliseconds
-  cedar::aux::math::SigmoidPtr mSigmoid;
-  cedar::aux::kernel::GaussPtr mKernel;
+  cedar::proc::DataPtr mKernel; //!< matrix containing the kernel
+  QReadWriteLock *mpReadWriteLockOutput;//!< read and write lock to protect the kernel when calculating its values
 private:
   // none yet
 
@@ -107,12 +140,13 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::aux::UIntParameterPtr _mDimensionality;
+  cedar::aux::StringParameterPtr _mKernelMatrixFile;
 
 private:
   // none yet
 
-}; // class cedar::dyn::NeuralField
+}; // class cedar::aux::kernel::Kernel
 
-#endif // CEDAR_DYN_NEURAL_FIELD_H
+#endif // CEDAR_AUX_KERNEL_KERNEL_H
 
