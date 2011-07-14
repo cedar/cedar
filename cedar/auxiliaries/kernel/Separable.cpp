@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Kernel.cpp
+    File:        Separable.cpp
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
@@ -35,8 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernels/Kernel.h"
-#include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/kernel/Separable.h"
 
 // PROJECT INCLUDES
 
@@ -46,66 +45,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::Kernel::Kernel()
-:
-_mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
-_mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", "dummy_matrix_file.yml"))
+cedar::aux::kernel::Separable::Separable()
 {
-  mpReadWriteLockOutput = new QReadWriteLock();
 }
 
-cedar::aux::Kernel::Kernel(unsigned int dimensionality, const std::string& kernelFile)
+cedar::aux::kernel::Separable::Separable(unsigned int dimensionality, const std::string& kernelFile)
 :
-cedar::aux::Configurable(),
-_mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
-_mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", kernelFile))
+cedar::aux::kernel::Kernel(dimensionality, kernelFile)
 {
-  mpReadWriteLockOutput = new QReadWriteLock();
-  _mDimensionality->set(dimensionality);
 }
 
-cedar::aux::Kernel::~Kernel()
+cedar::aux::kernel::Separable::~Separable()
 {
 #ifdef DEBUG
-  std::cout << "> freeing data (Kernel)" << std::endl;
+  std::cout << "> freeing data (Separable)" << std::endl;
 #endif
-  if (mpReadWriteLockOutput)
-  {
-    delete mpReadWriteLockOutput;
-    mpReadWriteLockOutput = 0;
-  }
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-QReadWriteLock* cedar::aux::Kernel::getReadWriteLock()
+const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimension) const
 {
-  return mpReadWriteLockOutput;
-}
-
-const cv::Mat& cedar::aux::Kernel::getKernel() const
-{
-  return mKernel;
-}
-
-void cedar::aux::Kernel::loadKernelFromFile()
-{
-  mpReadWriteLockOutput->lockForWrite();
-  cv::FileStorage fs(_mKernelMatrixFile->get(), cv::FileStorage::READ);
-  fs["kernel"] >> mKernel;
-  mpReadWriteLockOutput->unlock();
-}
-
-void cedar::aux::Kernel::saveKernelToFile() const
-{
-  mpReadWriteLockOutput->lockForRead();
-  cv::FileStorage fs(_mKernelMatrixFile->get(), cv::FileStorage::WRITE);
-  fs << "kernel" << mKernel;
-  mpReadWriteLockOutput->unlock();
-}
-
-unsigned int cedar::aux::Kernel::getDimensionality() const
-{
-  return _mDimensionality->get();
+  return mKernelParts.at(dimension);
 }

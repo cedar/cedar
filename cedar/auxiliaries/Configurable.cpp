@@ -53,9 +53,9 @@
 
 cedar::aux::Configurable::Configurable()
 :
-mName(new cedar::aux::StringParameter("name", ""))
+_mName(new cedar::aux::StringParameter("name", ""))
 {
-  this->registerParameter(mName);
+  this->registerParameter(_mName);
 }
 
 
@@ -122,10 +122,10 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
 
 void cedar::aux::Configurable::setName(const std::string& name)
 {
-  this->mName->set(name);
+  this->_mName->set(name);
 }
 
 const std::string& cedar::aux::Configurable::getName() const
 {
-  return this->mName->get();
+  return this->_mName->get();
 }

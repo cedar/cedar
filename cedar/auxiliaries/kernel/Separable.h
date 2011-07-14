@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Configurable.h
+    File:        Separable.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 07 14
 
     Description:
 
@@ -38,55 +34,46 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONFIGURABLE_H
-#define CEDAR_AUX_CONFIGURABLE_H
+#ifndef CEDAR_AUX_KERNEL_SEPARABLE_H
+#define CEDAR_AUX_KERNEL_SEPARABLE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "auxiliaries/kernel/namespace.h"
+#include "auxiliaries/kernel/Kernel.h"
+
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <map>
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Meta class to derive separable kernels when implementing kernels.
  */
-class cedar::aux::Configurable
+class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros and types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
-  typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Configurable();
+  Separable();
+  Separable(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
   //!@brief Destructor
-  virtual ~Configurable();
-
+  virtual ~Separable();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-  const Children& configurableChildren() const;
 
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
-  void setName(const std::string& name);
-  const std::string& getName() const;
-
+  /*!\brief this returns the one-dimensional part of a separable kernel for a specified dimension
+   * @param dim the desired dimension
+   */
+  virtual const cv::Mat& getKernelPart(unsigned int dimension) const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -97,27 +84,20 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
+  std::vector<cv::Mat> mKernelParts; //!< the separate parts of a separable kernel
 private:
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  ParameterMap mParameters;
-  StringParameterPtr _mName;
-  Children mChildren;
 
 private:
   // none yet
 
-}; // class cedar::aux::Configurable
+}; // class cedar::aux::kernel::Separable
 
-#endif // CEDAR_AUX_CONFIGURABLE_H
+#endif // CEDAR_AUX_KERNEL_SEPARABLE_H
 
