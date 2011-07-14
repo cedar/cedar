@@ -110,12 +110,12 @@ const cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id r
 
 void cedar::proc::Step::setName(const std::string& name)
 {
-  this->mName->set(name);
+  this->_mName->set(name);
 }
 
 const std::string& cedar::proc::Step::getName() const
 {
-  return this->mName->get();
+  return this->_mName->get();
 }
 
 void cedar::proc::Step::checkMandatoryConnections()

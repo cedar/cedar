@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Kernel.h
+    File:        Gauss.h
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
@@ -34,38 +34,22 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_KERNEL_H
-#define CEDAR_AUX_KERNEL_H
+#ifndef CEDAR_AUX_KERNEL_GAUSS_H
+#define CEDAR_AUX_KERNEL_GAUSS_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Configurable.h"
+#include "auxiliaries/kernel/namespace.h"
+#include "auxiliaries/kernel/Separable.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
-#include <QReadWriteLock>
 
-/*!@brief Meta class to derive from when implementing kernels.
- *
- * This is the kernel meta class that provides a uniform interface for
- * all implemented kernels. This class already provides the functionality of
- * saving and loading a kernel matrix to and from a file. These two functions
- * loadKernelFromFile() and saveKernelToFile() are declared virtual to allow for derived classes
- * to implement their own save routine. This class also provides a simple implementation of a get
- * function to get a reference to the internal kernel matrix. Without giving back a reference,
- * the return value would be a copy of the internal matrix and therefore would not be affected
- * by changes of the kernel configuration. The last provided function getReadWriteLock() returns a QReadWriteLock
- * Kernel::mpReadWriteLockOutput, which protects the kernel data from being accessed while being updated.
- *
- * There is a set of purely virtual functions, which have to be implemented by all derived classes.
- * The first one is doLocalInit(). This should contain all code that is necessary to create a new instance
- * of a derived kernel. The second one is calculate(), which should contain all the code necessary to
- * calculate an updated version of the kernel matrix once parameters of the kernel have changed.
+/*!@brief Gauss kernel class.
  *
  */
-class cedar::aux::Kernel : public cedar::aux::Configurable
+class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -76,10 +60,17 @@ class cedar::aux::Kernel : public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Kernel();
-  Kernel(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
+  Gauss();
+  Gauss(
+         double amplitude,
+         std::vector<double> sigmas,
+         std::vector<double> shifts,
+         double limit,
+         unsigned int dimensionality,
+         const std::string& kernelFile = "dummy_matrix_file.yml"
+       );
   //!@brief Destructor
-  virtual ~Kernel();
+  virtual ~Gauss();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,28 +79,25 @@ public:
    * the kernel from file
    */
   //!@todo deal with boost PropertyTree here
-  virtual void onInit() = 0;
+  virtual void onInit();
 
-  /*!\brief load a kernel matrix from file determined by _mKernelMatrixFile*/
-  virtual void loadKernelFromFile();
-  /*!\brief save a kernel matrix to a file determined by _mKernelMatrixFile*/
-  virtual void saveKernelToFile() const;
+  double getSigma(unsigned int dimension) const;
 
-  /*! virtual function for accessing the kernel matrix, in the 1d case this is the default
-   * function to use, in the 2d case this function should return the combined 2d kernel
-   *\return the kernel matrix
+  /*!\brief set the sigma of a chosen dimension and Gaussian
+   * \param dimension the dimension
+   * \param sigma the new \f$\sigma\f$
    */
-  virtual const cv::Mat& getKernel() const;
+  void setSigma(unsigned int dimension, double sigma);
 
-  /*!\brief get access to the write lock when in an asynchronous mode
-   * \return pointer to the QReadWriteLock
-   */
-  QReadWriteLock* getReadWriteLock();
+  double getShift(unsigned int dimension) const;
 
-  /*!\brief get the dimensionality of the kernel matrix
-   * \return dimensionality
-   */
-  unsigned int getDimensionality() const;
+  void setShift(unsigned int dimension, double shift);
+
+  double getAmplitude() const;
+
+  void setAmplitude(double amplitude);
+
+  unsigned int getWidth(unsigned int dim) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -117,7 +105,7 @@ public:
 protected:
   /*!\brief virtual function to calculate the kernel matrix
    */
-  virtual void calculate() = 0;
+  virtual void calculate();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -129,8 +117,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cv::Mat mKernel; //!< matrix containing the kernel
-  QReadWriteLock *mpReadWriteLockOutput;//!< read and write lock to protect the kernel when calculating its values
+  std::vector<unsigned int> mSizes; //!< sizes for kernel matrix
+  std::vector<unsigned int> mCenters; //!< matrix indices for kernel centers
 private:
   // none yet
 
@@ -138,13 +126,14 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::aux::UIntParameterPtr _mDimensionality;
-  cedar::aux::StringParameterPtr _mKernelMatrixFile;
-
+  cedar::aux::DoubleParameterPtr _mAmplitude; //!<
+  std::vector<double> _mSigmas; //!< index resemble dimension
+  std::vector<double> _mShifts; //!< index resembles dimension
+  cedar::aux::DoubleParameterPtr _mLimit; //!< variable that defines the precision of the numerical approximation at the borders
 private:
   // none yet
 
-}; // class cedar::aux::Kernel
+}; // class cedar::aux::kernel::Gauss
 
-#endif // CEDAR_AUX_KERNEL_H
+#endif // CEDAR_AUX_KERNEL_GAUSS_H
 
