@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
+#include "auxiliaries/Configurable.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Group
+class cedar::proc::Group : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,7 +66,7 @@ class cedar::proc::Group
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Group();
+  Group(const std::string& name);
 
   //!@brief Destructor
   virtual ~Group();

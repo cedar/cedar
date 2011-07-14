@@ -56,15 +56,18 @@
 cedar::dyn::NeuralField::NeuralField()
 :
 mActivation(new cedar::dyn::SpaceCode(cv::Mat(10,10,CV_32F))),
+mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat(10,10,CV_32F))),
 mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
 mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
-mSigmoid(new cedar::aux::math::AbsSigmoid())
+mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
 {
   this->registerParameter(mRestingLevel);
   this->registerParameter(mTau);
 
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
+  this->declareBuffer("sigmoid(activation)");
+  this->setBuffer("sigmoid(activation)", mSigmoidalActivation);
 
   this->addConfigurableChild("sigmoid", this->mSigmoid);
 }
@@ -74,16 +77,14 @@ mSigmoid(new cedar::aux::math::AbsSigmoid())
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();
+  cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   const double& h = mRestingLevel->get();
   const double& tau = mTau->get();
-
-  cv::Mat d_u = -u + h;
+  sigmoid_u = mSigmoid->compute<float>(u);
+  cv::Mat d_u = -u + h + sigmoid_u;
   //!\todo deal with units, now: milliseconds
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
-  cv::Mat rand (d_u.rows, d_u.cols, d_u.type());
-  cv::randn(rand, 0, 1);
-  u += rand * sqrt(cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau));
-  //std::cout << "field: " << u.at<float>(0,0) << std::endl;
+  std::cout << "field: " << u.at<float>(0,0) << std::endl;
 }
 
 void cedar::dyn::NeuralField::onStart()

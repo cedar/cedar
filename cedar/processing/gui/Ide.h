@@ -87,6 +87,9 @@ public slots:
   void exception(const QString& message);
 
   void architectureToolFinished();
+  
+  void startThreads();
+  void stopThreads();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
