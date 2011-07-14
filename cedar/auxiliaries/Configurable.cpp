@@ -119,3 +119,13 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
   }
   this->mChildren[name] = child;
 }
+
+void cedar::aux::Configurable::setName(const std::string& name)
+{
+  this->mName->set(name);
+}
+
+const std::string& cedar::aux::Configurable::getName() const
+{
+  return this->mName->get();
+}

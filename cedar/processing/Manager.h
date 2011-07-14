@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepManager.h
+    File:        Manager.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -69,6 +69,7 @@ public:
   typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
   typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
   typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
+  typedef std::set<cedar::proc::GroupPtr> GroupRegistry; //!<@todo Use a name instead?
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -94,8 +95,11 @@ public:
   StepRegistry& steps();
   TriggerRegistry& triggers();
   ThreadRegistry& threads();
+  GroupRegistry& groups();
 
   void registerThread(cedar::aux::LoopedThreadPtr thread);
+  GroupPtr allocateGroup();
+  void removeGroup(GroupPtr group);
 
   void startThreads();
   void stopThreads();
@@ -122,11 +126,12 @@ public:
 protected:
   // none yet
 private:
-  static Manager mpManager;
+  static Manager mManager;
 
   StepRegistry mStepRegistry;
   TriggerRegistry mTriggerRegistry;
   ThreadRegistry mThreadRegistry;
+  GroupRegistry mGroupRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
