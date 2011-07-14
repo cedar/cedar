@@ -456,6 +456,11 @@ void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF pos
   try
   {
     cedar::proc::TriggerPtr trigger = Manager::getInstance().triggers().createInstance(classId, name);
+    //!@todo is there a better solution?
+    if (cedar::aux::LoopedThreadPtr looped_thread = boost::shared_dynamic_cast<cedar::aux::LoopedThread>(trigger))
+    {
+      Manager::getInstance().registerThread(looped_thread);
+    }
     cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
     this->addItem(p_drawer);
     p_drawer->setPos(position);
