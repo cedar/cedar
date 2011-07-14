@@ -44,6 +44,7 @@
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/math/Sigmoid.h"
 #include "auxiliaries/math/AbsSigmoid.h"
+#include "auxiliaries/kernel/Gauss.h"
 
 // PROJECT INCLUDES
 
@@ -70,6 +71,16 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
   this->setBuffer("sigmoid(activation)", mSigmoidalActivation);
 
   this->addConfigurableChild("sigmoid", this->mSigmoid);
+
+  std::vector<double> sigmas;
+  std::vector<double> shifts;
+  sigmas.push_back(3.0);
+  shifts.push_back(0.0);
+  sigmas.push_back(3.0);
+  shifts.push_back(0.0);
+  mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 2));
+  this->declareBuffer("kernel");
+  this->setBuffer("kernel", mKernel->getKernelRaw());
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
