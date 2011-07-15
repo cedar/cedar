@@ -123,9 +123,9 @@ void cedar::aux::kernel::Gauss::calculate()
       {
         for (unsigned int j = 0; j < mSizes.at(dim); j++)
         {
-          // Gauss
+          //!\todo move Gauss function and filling up of matrix to some tool function
           mKernelParts.at(dim).at<float>(j, 0)
-              = exp(-powf(j - mCenters.at(dim), 2) / (2 * powf(_mSigmas.at(dim), 2)));
+              = exp(-std::pow(static_cast<int>(j) - mCenters.at(dim), 2) / (2 * std::pow(_mSigmas.at(dim), 2)));
         }
       }
       else // discrete case
@@ -150,13 +150,16 @@ void cedar::aux::kernel::Gauss::calculate()
     // now fill up the big kernel matrix
     int position[dimensionality];
     unsigned int max_index = 1;
+    unsigned int current_index;
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
       position[dim] = 0;
       max_index *= mSizes.at(dim);
     }
+    std::cout << "max_index " << max_index << std::endl;
     for (unsigned int i = 0; i < max_index; i++)
     {
+      current_index = i;
       float value = 1.0;
       for (unsigned int dim = 0; dim < dimensionality; dim++)
       {
@@ -177,6 +180,7 @@ void cedar::aux::kernel::Gauss::calculate()
         }
       }
     }
+    std::cout << "last i " << current_index << std::endl;
   }
   catch(std::out_of_range& error)
   {
