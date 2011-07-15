@@ -130,16 +130,19 @@ void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterM
 
 void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr parameter)
 {
-  int row = this->rowCount();
-  this->insertRow(row);
-  QLabel *p_label = new QLabel();
-  p_label->setText(parameter->getName().c_str());
-  this->setCellWidget(row, 0, p_label);
+  if (!parameter->isHidden())
+  {
+    int row = this->rowCount();
+    this->insertRow(row);
+    QLabel *p_label = new QLabel();
+    p_label->setText(parameter->getName().c_str());
+    this->setCellWidget(row, 0, p_label);
 
-  cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
-  p_widget->setParameter(parameter);
-  p_widget->setEnabled(!parameter->isConstant());
-  this->setCellWidget(row, 1, p_widget);
+    cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    p_widget->setParameter(parameter);
+    p_widget->setEnabled(!parameter->isConstant());
+    this->setCellWidget(row, 1, p_widget);
+  }
 }
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane::dataWidgetTypes()
