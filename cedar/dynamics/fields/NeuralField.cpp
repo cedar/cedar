@@ -56,8 +56,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::NeuralField::NeuralField()
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat(10,10,CV_32F))),
-mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat(10,10,CV_32F))),
+mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
+mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
 mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
 mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))

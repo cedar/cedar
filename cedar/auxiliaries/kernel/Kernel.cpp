@@ -71,6 +71,7 @@ _mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", kernelFil
   _mDimensionality->set(dimensionality);
   _mDimensionality->setConstant(true);
   this->registerParameter(_mDimensionality);
+  this->_mName->setHidden(true);
 }
 
 cedar::aux::kernel::Kernel::~Kernel()
