@@ -137,6 +137,7 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr
 
   cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
   p_widget->setParameter(parameter);
+  p_widget->setEnabled(!parameter->isConstant());
   this->setCellWidget(row, 1, p_widget);
 }
 

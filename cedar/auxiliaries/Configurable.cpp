@@ -56,6 +56,7 @@ cedar::aux::Configurable::Configurable()
 _mName(new cedar::aux::StringParameter("name", ""))
 {
   this->registerParameter(_mName);
+  _mName->setConstant(true);
 }
 
 
