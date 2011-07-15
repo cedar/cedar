@@ -67,8 +67,8 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
 
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
-  this->declareBuffer("sigmoid(activation)");
-  this->setBuffer("sigmoid(activation)", mSigmoidalActivation);
+  this->declareOutput("sigmoid(activation)");
+  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
   this->addConfigurableChild("sigmoid", this->mSigmoid);
 
