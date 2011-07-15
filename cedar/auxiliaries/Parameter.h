@@ -48,7 +48,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <iostream>
 
 /*!@brief Abstract description of the class.
  *
@@ -97,6 +97,7 @@ public:
   void set(const T& value)
   {
     this->mValue = value;
+    emit parameterChanged();
   }
 
   void makeDefault()
