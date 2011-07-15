@@ -54,11 +54,13 @@
 cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
                                              qreal height,
                                              GraphicsGroup group,
-                                             GraphicsGroup canConnectTo)
+                                             GraphicsGroup canConnectTo,
+                                             BaseShape shape)
 :
 mWidth(width),
 mHeight(height),
 mHighlightMode(HIGHLIGHTMODE_NONE),
+mShape(shape),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
@@ -85,9 +87,9 @@ void cedar::proc::gui::GraphicsBase::setHighlightMode(cedar::proc::gui::Graphics
 
 QRectF cedar::proc::gui::GraphicsBase::boundingRect() const
 {
-  qreal padding = static_cast<qreal>(0.0);
+  qreal padding = static_cast<qreal>(1.0);
   //! @todo properly map the size to the scene coordinate system
-  return QRectF(QPointF(0, 0), QSizeF(this->mWidth + padding, this->mHeight + padding));
+  return QRectF(QPointF(-padding, -padding), QSizeF(this->mWidth + padding, this->mHeight + padding));
 }
 
 bool cedar::proc::gui::GraphicsBase::canConnect() const
@@ -133,7 +135,16 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
 
   painter->setPen(this->getOutlinePen());
-  painter->drawRect(bounds);
+  switch (this->mShape)
+  {
+    case BASE_SHAPE_RECT:
+      painter->drawRect(bounds);
+      break;
+
+    case BASE_SHAPE_ROUND:
+      painter->drawEllipse(bounds);
+      break;
+  }
 
   if (this->mHighlightMode != HIGHLIGHTMODE_NONE)
   {
@@ -152,7 +163,16 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
 
     QRectF highlight_bounds(QPointF(1, 1), QSizeF(this->mWidth - 1, this->mHeight - 1));
     painter->setPen(highlight_pen);
-    painter->drawRect(highlight_bounds);
+    switch (this->mShape)
+    {
+      case BASE_SHAPE_RECT:
+        painter->drawRect(highlight_bounds);
+        break;
+
+      case BASE_SHAPE_ROUND:
+        painter->drawEllipse(highlight_bounds);
+        break;
+    }
   }
 
   painter->restore();

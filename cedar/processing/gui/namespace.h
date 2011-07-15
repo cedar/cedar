@@ -57,6 +57,7 @@ namespace cedar
       class ArchitectureToolBox;
       class BoolParameter;
       class DataPlotter;
+      class DataSlotItem;
       class DoubleParameter;
       class GraphicsBase;
       class GroupItem;
