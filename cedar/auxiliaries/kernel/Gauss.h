@@ -118,7 +118,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   std::vector<unsigned int> mSizes; //!< sizes for kernel matrix
-  std::vector<unsigned int> mCenters; //!< matrix indices for kernel centers
+  std::vector<int> mCenters; //!< matrix indices for kernel centers
 private:
   // none yet
 
