@@ -71,6 +71,7 @@ namespace cedar
       class ToolBox;
       class TriggerConnection;
       class TriggerItem;
+      class UIntParameter;
       class View;
     }
   }
