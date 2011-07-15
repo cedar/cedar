@@ -47,6 +47,7 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
+#include <QObject>
 
 /*!@brief Meta class to derive from when implementing kernels.
  *
@@ -66,12 +67,12 @@
  * calculate an updated version of the kernel matrix once parameters of the kernel have changed.
  *
  */
-class cedar::aux::kernel::Kernel : public cedar::aux::Configurable
+class cedar::aux::kernel::Kernel : public QObject, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,7 +90,7 @@ public:
    * the kernel from file
    */
   //!@todo deal with boost PropertyTree here
-  virtual void onInit() = 0;
+  virtual void onInit(){};
 
   /*!\brief load a kernel matrix from file determined by _mKernelMatrixFile*/
   virtual void loadKernelFromFile();
@@ -112,6 +113,10 @@ public:
    * \return dimensionality
    */
   unsigned int getDimensionality() const;
+
+public slots:
+  //!\todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
+  void updateKernel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

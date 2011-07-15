@@ -123,3 +123,8 @@ unsigned int cedar::aux::kernel::Kernel::getDimensionality() const
 {
   return _mDimensionality->get();
 }
+
+void cedar::aux::kernel::Kernel::updateKernel()
+{
+  this->calculate();
+}

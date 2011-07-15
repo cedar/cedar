@@ -56,6 +56,7 @@ _mLimit(new cedar::aux::DoubleParameter("limit", 0.0, 1.0))
 {
   this->registerParameter(_mAmplitude);
   this->registerParameter(_mLimit);
+  this->onInit();
 }
 
 cedar::aux::kernel::Gauss::Gauss(
@@ -78,7 +79,7 @@ _mLimit(new cedar::aux::DoubleParameter("limit", limit, 0.0, 1.0))
   this->mSizes.resize(dimensionality);
   this->_mSigmas = sigmas;
   this->_mShifts = shifts;
-  this->calculate();
+  this->onInit();
 }
 
 cedar::aux::kernel::Gauss::~Gauss()
@@ -94,6 +95,8 @@ cedar::aux::kernel::Gauss::~Gauss()
 void cedar::aux::kernel::Gauss::onInit()
 {
   calculate();
+  QObject::connect(_mAmplitude.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mLimit.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
 }
 
 void cedar::aux::kernel::Gauss::calculate()
@@ -154,16 +157,13 @@ void cedar::aux::kernel::Gauss::calculate()
     // now fill up the big kernel matrix
     int position[dimensionality];
     unsigned int max_index = 1;
-    unsigned int current_index;
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
       position[dim] = 0;
       max_index *= mSizes.at(dim);
     }
-    std::cout << "max_index " << max_index << std::endl;
     for (unsigned int i = 0; i < max_index; i++)
     {
-      current_index = i;
       float value = 1.0;
       for (unsigned int dim = 0; dim < dimensionality; dim++)
       {
@@ -184,7 +184,6 @@ void cedar::aux::kernel::Gauss::calculate()
         }
       }
     }
-    std::cout << "last i " << current_index << std::endl;
   }
   catch(std::out_of_range& error)
   {
@@ -207,7 +206,6 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
     std::cout << "Error in " << this->_mName->get()
               << " (cedar::aux::kernel::Gauss::setSigma): vector out of bounds " << std::endl;
   }
-  calculate();
 }
 
 double cedar::aux::kernel::Gauss::getSigma(unsigned int dimension) const
@@ -226,7 +224,6 @@ void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
     std::cout << "Error in " << this->_mName->get()
               << " (cedar::aux::kernel::Gauss::setShift): vector out of bounds " << std::endl;
   }
-  calculate();
 }
 
 double cedar::aux::kernel::Gauss::getShift(unsigned int dimension) const
@@ -237,7 +234,6 @@ double cedar::aux::kernel::Gauss::getShift(unsigned int dimension) const
 void cedar::aux::kernel::Gauss::setAmplitude(double amplitude)
 {
   _mAmplitude->set(amplitude);
-  calculate();
 }
 
 double cedar::aux::kernel::Gauss::getAmplitude() const
