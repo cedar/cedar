@@ -81,6 +81,7 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
   mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 2));
   this->declareBuffer("kernel");
   this->setBuffer("kernel", mKernel->getKernelRaw());
+  this->addConfigurableChild("lateral kernel", this->mKernel);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

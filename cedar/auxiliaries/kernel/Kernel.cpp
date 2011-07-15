@@ -55,6 +55,8 @@ _mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
 _mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", "dummy_matrix_file.yml"))
 {
   mpReadWriteLockOutput = new QReadWriteLock();
+  _mDimensionality->setConstant(true);
+  this->registerParameter(_mDimensionality);
 }
 
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality, const std::string& kernelFile)
@@ -66,6 +68,8 @@ _mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", kernelFil
 {
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->set(dimensionality);
+  _mDimensionality->setConstant(true);
+  this->registerParameter(_mDimensionality);
 }
 
 cedar::aux::kernel::Kernel::~Kernel()

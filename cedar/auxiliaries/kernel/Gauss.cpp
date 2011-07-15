@@ -52,8 +52,10 @@ cedar::aux::kernel::Gauss::Gauss()
 :
 cedar::aux::kernel::Separable(),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", -10000.0, 10000.0)),
-_mLimit(new cedar::aux::DoubleParameter("amplitude", 0.0, 1.0))
+_mLimit(new cedar::aux::DoubleParameter("limit", 0.0, 1.0))
 {
+  this->registerParameter(_mAmplitude);
+  this->registerParameter(_mLimit);
 }
 
 cedar::aux::kernel::Gauss::Gauss(
@@ -67,8 +69,10 @@ cedar::aux::kernel::Gauss::Gauss(
 :
 cedar::aux::kernel::Separable(dimensionality, kernelFile),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", amplitude, -10000.0, 10000.0)),
-_mLimit(new cedar::aux::DoubleParameter("amplitude", limit, 0.0, 1.0))
+_mLimit(new cedar::aux::DoubleParameter("limit", limit, 0.0, 1.0))
 {
+  this->registerParameter(_mAmplitude);
+  this->registerParameter(_mLimit);
   this->mCenters.resize(dimensionality);
   this->mKernelParts.resize(dimensionality);
   this->mSizes.resize(dimensionality);
