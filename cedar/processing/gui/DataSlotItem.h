@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GraphicsBase.h
+    File:        DataSlotItem.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 12
+    Date:        2011 07 15
 
     Description:
 
@@ -38,100 +38,51 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_XXX_XXX_H
-#define CEDAR_XXX_XXX_H
+#ifndef CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
+#define CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
+#include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsItem>
-#include <QPen>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::GraphicsBase : public QGraphicsItem
+class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // static constants
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef unsigned int GraphicsGroup;
-  const static GraphicsGroup GRAPHICS_GROUP_NONE = 0;
-  const static GraphicsGroup GRAPHICS_GROUP_STEP = 1 << 0;
-  const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
-  const static GraphicsGroup GRAPHICS_GROUP_GROUP = 1 << 2;
-  const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 3;
-  const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
-
-  enum HighlightMode
-  {
-    HIGHLIGHTMODE_NONE,
-    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET,
-    HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
-  };
-
-  enum BaseShape
-  {
-    BASE_SHAPE_RECT,
-    BASE_SHAPE_ROUND
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GraphicsBase(qreal width, qreal height,
-               GraphicsGroup group = GRAPHICS_GROUP_UNKNOWN,
-               GraphicsGroup canConnectTo = GRAPHICS_GROUP_NONE,
-               BaseShape shape = BASE_SHAPE_RECT);
+  DataSlotItem(cedar::proc::gui::StepItem *pParent);
 
   //!@brief Destructor
-  virtual ~GraphicsBase();
+  ~DataSlotItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool canConnectTo(GraphicsBase* pTarget) const;
+  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-  bool canConnect() const;
-
-  QPointF getConnectionAnchorInScene() const;
-
-  virtual QPointF getConnectionAnchorRelative() const;
-
-  const GraphicsGroup& getGroup() const;
-
-  QRectF boundingRect() const;
-
-  QPen getOutlinePen() const;
-
-  void setHighlightMode(HighlightMode mode);
-
-  HighlightMode getHighlightMode() const;
-
-  const qreal& width() const
-  {
-    return this->mWidth;
-  }
-
-  const qreal& height() const
-  {
-    return this->mHeight;
-  }
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void paintFrame(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -142,28 +93,18 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  qreal mWidth;
-  qreal mHeight;
+  // none yet
 private:
-  cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
-  BaseShape mShape;
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  GraphicsGroup mGroup;
-  GraphicsGroup mAllowedConnectTargets;
 
-}; // class cedar::xxx
+}; // class DataSlotItem
 
-#endif // CEDAR_XXX_XXX_H
+#endif // CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
 

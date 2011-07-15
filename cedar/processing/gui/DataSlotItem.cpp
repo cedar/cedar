@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataRole.cpp
+    File:        DataSlotItem.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Date:        2011 07 15
 
     Description:
 
@@ -39,35 +39,61 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "processing/gui/DataSlotItem.h"
+#include "processing/gui/StepItem.h"
 #include "processing/DataRole.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
-cedar::aux::EnumBase<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
-
-const cedar::proc::DataRole::Id cedar::proc::DataRole::INPUT;
-const cedar::proc::DataRole::Id cedar::proc::DataRole::OUTPUT;
-const cedar::proc::DataRole::Id cedar::proc::DataRole::BUFFER;
+#include <QPainter>
+#include <QGraphicsSceneContextMenuEvent>
+#include <QMenu>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::DataRole::construct()
+cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::StepItem *pParent)
+:
+cedar::proc::gui::GraphicsBase(10, 10,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM,
+                               cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
+                               )
 {
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT", "Input"));
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT", "Output"));
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER", "Buffer"));
+  this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges);
+  this->setParentItem(pParent);
+}
+
+cedar::proc::gui::DataSlotItem::~DataSlotItem()
+{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const cedar::aux::EnumBase<cedar::proc::DataRole>& cedar::proc::DataRole::type()
+
+void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)
 {
-  return cedar::proc::DataRole::mType;
 }
 
+void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
+{
+  painter->save(); // save current painter settings
+
+  this->paintFrame(painter, style, widget);
+
+  //! @todo make drawing pretty.
+
+  painter->restore(); // restore saved painter settings
+}
+
+
+
+QVariant cedar::proc::gui::DataSlotItem::itemChange(GraphicsItemChange change, const QVariant & value)
+{
+  return QGraphicsItem::itemChange(change, value);
+}

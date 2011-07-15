@@ -40,8 +40,9 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/StepItem.h"
-#include "processing/Manager.h"
 #include "processing/gui/DataPlotter.h"
+#include "processing/gui/DataSlotItem.h"
+#include "processing/Manager.h"
 #include "processing/Data.h"
 #include "processing/Step.h"
 
@@ -70,6 +71,7 @@ mpMainWindow(pMainWindow)
                                | QGraphicsItem::ItemIsMovable
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
+  this->addDataItems();
 }
 
 cedar::proc::gui::StepItem::~StepItem()
@@ -79,6 +81,57 @@ cedar::proc::gui::StepItem::~StepItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::StepItem::addDataItems()
+{
+  qreal data_size = 10.0; //!@todo don't hard-code the size of the data items
+  qreal padding = static_cast<qreal>(3);
+  std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
+  std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
+
+  add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -padding - data_size);
+  add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
+
+  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-padding - data_size, 0);
+  add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
+
+  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0); //!@todo don't hard-code the size of the data items
+  add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
+
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+      enum_it != cedar::proc::DataRole::type().list().end();
+      ++enum_it)
+  {
+    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
+      continue;
+
+    if (add_origins.find(*enum_it) == add_origins.end() || add_directions.find(*enum_it) == add_directions.end())
+    {
+      std::cout << "Warning: the data role " << enum_it->prettyString() << " is not implemented properly in "
+                   "StepItem::addDataItems. Skipping!" << std::endl;
+      continue;
+    }
+
+    const QPointF& origin = add_origins[*enum_it];
+    const QPointF& direction = add_directions[*enum_it];
+
+    try
+    {
+      qreal count = 0;
+      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(*enum_it);
+      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this);
+        p_item->setPos(origin + count * direction * (data_size + padding) );
+        count += static_cast<qreal>(1.0);
+      }
+    }
+    catch(const cedar::proc::InvalidRoleException&)
+    {
+      // ok -- a step may not have any data for this role.
+    }
+  }
+}
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
