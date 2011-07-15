@@ -96,6 +96,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       const cedar::aux::Enum& e = *enum_it;
       const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
       std::string label = e.prettyString() + "s";
+      p_data->addSeparator();
       QAction *p_label_action = p_data->addAction(label.c_str());
       p_data->addSeparator();
       p_label_action->setEnabled(false);
