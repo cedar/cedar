@@ -102,6 +102,8 @@ public:
 protected:
   // none yet
 private:
+  cedar::proc::DataPtr mData;
+
   static WidgetFactory mTypePlotters;
 
   static WidgetFactory& getWidgetFactory();

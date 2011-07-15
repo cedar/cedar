@@ -78,7 +78,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cv::Mat mat, QReadWriteLock *lock);
+  void display(cv::Mat* mat, QReadWriteLock *lock);
 
   static const Qwt3D::ColorVector& getStandardColorVector();
 
@@ -100,7 +100,7 @@ private:
 protected:
   // none yet
 private:
-  cv::Mat mMat;
+  cv::Mat* mpMat;
   QReadWriteLock *mpeLock;
   QWidget *mpCurrentPlotWidget;
 

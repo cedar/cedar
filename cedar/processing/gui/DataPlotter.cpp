@@ -68,14 +68,15 @@ cedar::proc::gui::DataPlotter::~DataPlotter()
 
 void cedar::proc::gui::DataPlotter::plot(cedar::proc::DataPtr data)
 {
-  //!@todo doesn't work this way -- related to the todo entry below.
+  mData = data;
+  //!@todo doesn't work this way -- related to the to-do entry below.
 //  QWidget *p_widget = getWidgetFactory().get(data)->allocateRaw();
 
   //!@todo find a better solution for this!
   if (cedar::proc::MatData* mat_data = dynamic_cast<cedar::proc::MatData*>(data.get()))
   {
     cedar::aux::gui::MatrixPlot *p_plot = new cedar::aux::gui::MatrixPlot();
-    p_plot->display(mat_data->getData(), &mat_data->getLock());
+    p_plot->display(&mat_data->getData(), &mat_data->getLock());
     this->setWidget(p_plot);
   }
 }

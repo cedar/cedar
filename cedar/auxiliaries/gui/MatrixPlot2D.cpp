@@ -56,15 +56,17 @@
 cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(QWidget *pParent)
 :
 QWidget(pParent),
+mpMat(NULL),
 mpeLock(NULL),
 mpFunction(NULL)
 {
   this->init();
 }
 
-cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cv::Mat mat, QReadWriteLock *lock, QWidget *pParent)
+cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cv::Mat* mat, QReadWriteLock *lock, QWidget *pParent)
 :
 QWidget(pParent),
+mpMat(mat),
 mpeLock(NULL),
 mpFunction(NULL)
 {
@@ -76,7 +78,7 @@ cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::Matrix2DFunction
                                                  (
                                                    QReadWriteLock *pLock,
                                                    Qwt3D::GridPlot* plot,
-                                                   const cv::Mat& matrix
+                                                   cv::Mat* matrix
                                                  )
 :
 Qwt3D::Function(plot),
@@ -106,15 +108,18 @@ cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::updateMatrix(const cv::Mat& matrix)
+void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::updateMatrix(cv::Mat* matrix)
 {
-  this->mpeLock->lockForRead();
-  int x_mesh = matrix.rows;
-  int y_mesh = matrix.cols;
-  this->setMesh(x_mesh, y_mesh);
-  this->setDomain(0, x_mesh - 1, 0, y_mesh - 1);
-  this->mMatrix = matrix.clone();
-  this->mpeLock->unlock();
+  if (this->mpeLock)
+  {
+    this->mpeLock->lockForRead();
+    int x_mesh = matrix->rows;
+    int y_mesh = matrix->cols;
+    this->setMesh(x_mesh, y_mesh);
+    this->setDomain(0, x_mesh - 1, 0, y_mesh - 1);
+    this->mMatrix = matrix->clone();
+    this->mpeLock->unlock();
+  }
 }
 
 void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::setLock(QReadWriteLock *lock)
@@ -124,16 +129,29 @@ void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::setLock(QReadWriteLock *lo
 
 double cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::operator()(double x, double y)
 {
+  int row = static_cast<int>(x);
+  int col = static_cast<int>(y);
   //!@todo properly map to some sort of bounds.
-  return this->mMatrix.at<float>((int)x,(int)y);
+  switch (this->mMatrix.type())
+  {
+    case CV_32F:
+      return static_cast<double>(this->mMatrix.at<float>(row, col));
+
+    case CV_64F:
+      return static_cast<double>(this->mMatrix.at<double>(row, col));
+
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled matrix type in MatrixPlot2D::Matrix2DFunction.");
+      return 0;
+  }
 }
 
-void cedar::aux::gui::MatrixPlot2D::display(cv::Mat mat, QReadWriteLock *lock)
+void cedar::aux::gui::MatrixPlot2D::display(cv::Mat* mat, QReadWriteLock *lock)
 {
-  this->mMat = mat;
+  this->mpMat = mat;
   this->mpeLock = lock;
   this->mpFunction->setLock(lock);
-  this->mpFunction->updateMatrix(this->mMat);
+  this->mpFunction->updateMatrix(this->mpMat);
   this->mpTimer->start();
 }
 
@@ -166,9 +184,9 @@ void cedar::aux::gui::MatrixPlot2D::init()
 
 void cedar::aux::gui::MatrixPlot2D::updatePlot()
 {
-  if (this->isVisible())
+  if (this->isVisible() && this->mpMat != NULL)
   {
-    this->mpFunction->updateMatrix(this->mMat);
+    this->mpFunction->updateMatrix(this->mpMat);
     this->mpFunction->create();
     this->mpPlot->updateData();
     this->mpPlot->updateNormals();
