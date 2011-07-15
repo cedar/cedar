@@ -87,6 +87,9 @@ public:
   void set(const cedar::aux::ConfigurationNode& node);
   virtual void makeDefault() = 0;
 
+  bool isHidden() const;
+  void setHidden(bool hide);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,6 +116,9 @@ private:
 
   //! Whether this parameter can be changed during runtime.
   bool mConstant;
+
+  //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
+  bool mIsHidden;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

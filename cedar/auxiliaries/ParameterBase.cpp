@@ -54,7 +54,8 @@
 
 cedar::aux::ParameterBase::ParameterBase(const std::string& name, bool hasDefault)
 :
-mHasDefault(hasDefault)
+mHasDefault(hasDefault),
+mIsHidden(false)
 {
   this->setName(name);
 }
@@ -66,6 +67,16 @@ cedar::aux::ParameterBase::~ParameterBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::ParameterBase::isHidden() const
+{
+  return this->mIsHidden;
+}
+
+void cedar::aux::ParameterBase::setHidden(bool hide)
+{
+  this->mIsHidden = hide;
+}
 
 bool cedar::aux::ParameterBase::getReadAutomatically() const
 {
