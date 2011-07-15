@@ -64,7 +64,6 @@ cedar::proc::gui::ParameterBase(pParent)
   this->mpSpinbox->setMaximum(+100.0);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
 }
 
 //!@brief Destructor
@@ -83,6 +82,7 @@ void cedar::proc::gui::DoubleParameter::parameterPointerChanged()
   this->mpSpinbox->setMinimum(parameter->getMinimum());
   this->mpSpinbox->setMaximum(parameter->getMaximum());
   this->mpSpinbox->setValue(parameter->get());
+  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
 }
 
 void cedar::proc::gui::DoubleParameter::valueChanged(double value)

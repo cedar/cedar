@@ -62,7 +62,6 @@ cedar::proc::gui::ParameterBase(pParent)
   this->layout()->addWidget(this->mpCheckBox);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-  QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 }
 
 //!@brief Destructor
@@ -79,6 +78,7 @@ void cedar::proc::gui::BoolParameter::parameterPointerChanged()
   cedar::aux::BoolParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
   this->mpCheckBox->setChecked(parameter->get());
+  QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 }
 
 void cedar::proc::gui::BoolParameter::stateChanged(int state)
