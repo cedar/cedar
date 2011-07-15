@@ -62,7 +62,6 @@ cedar::proc::gui::ParameterBase(pParent)
   this->layout()->addWidget(this->mpEdit);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-  QObject::connect(this->mpEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEdited(const QString&)));
 }
 
 //!@brief Destructor
@@ -79,6 +78,7 @@ void cedar::proc::gui::StringParameter::parameterPointerChanged()
   cedar::aux::StringParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
   this->mpEdit->setText(parameter->get().c_str());
+  QObject::connect(this->mpEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEdited(const QString&)));
 }
 
 void cedar::proc::gui::StringParameter::textEdited(const QString& text)

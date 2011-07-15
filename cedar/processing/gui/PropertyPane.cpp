@@ -42,6 +42,7 @@
 #include "auxiliaries/NumericParameter.h"
 #include "processing/gui/BoolParameter.h"
 #include "processing/gui/DoubleParameter.h"
+#include "processing/gui/UIntParameter.h"
 #include "processing/gui/StringParameter.h"
 #include "processing/Manager.h"
 
@@ -129,15 +130,19 @@ void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterM
 
 void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr parameter)
 {
-  int row = this->rowCount();
-  this->insertRow(row);
-  QLabel *p_label = new QLabel();
-  p_label->setText(parameter->getName().c_str());
-  this->setCellWidget(row, 0, p_label);
+  if (!parameter->isHidden())
+  {
+    int row = this->rowCount();
+    this->insertRow(row);
+    QLabel *p_label = new QLabel();
+    p_label->setText(parameter->getName().c_str());
+    this->setCellWidget(row, 0, p_label);
 
-  cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
-  p_widget->setParameter(parameter);
-  this->setCellWidget(row, 1, p_widget);
+    cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    p_widget->setParameter(parameter);
+    p_widget->setEnabled(!parameter->isConstant());
+    this->setCellWidget(row, 1, p_widget);
+  }
 }
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane::dataWidgetTypes()
@@ -145,6 +150,7 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
   if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
   {
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::proc::gui::UIntParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
   }

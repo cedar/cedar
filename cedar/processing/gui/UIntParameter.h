@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.h
+    File:        DoubleParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 01
+    Date:        2011 07 06
 
     Description:
 
@@ -38,57 +38,48 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PARAMETER_BASE_H
-#define CEDAR_PROC_PARAMETER_BASE_H
+#ifndef CEDAR_PROC_GUI_UINT_PARAMETER_H
+#define CEDAR_PROC_GUI_UINT_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
+#include "processing/gui/namespace.h"
+#include "processing/gui/ParameterBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QSpinBox>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::ParameterBase : public cedar::aux::Base
+class cedar::proc::gui::UIntParameter : public cedar::proc::gui::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ParameterBase(const std::string& name, bool hasDefault = true);
+  UIntParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~ParameterBase();
+  virtual ~UIntParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  bool getReadAutomatically() const;
-  void setReadAutomatically(bool value);
-
-  bool getHasDefault() const;
-  void setHasDefault(bool value);
-
-  bool isConstant() const;
-  void setConstant(bool value);
-
-  void set(const cedar::aux::ConfigurationNode& node);
-  virtual void makeDefault() = 0;
-
-  bool isHidden() const;
-  void setHidden(bool hide);
+public slots:
+  void parameterPointerChanged();
+  void valueChanged(int value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,17 +99,7 @@ private:
 protected:
   // none yet
 private:
-  //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
-  bool mAutoRead;
-
-  //! Whether a default value should be set
-  bool mHasDefault;
-
-  //! Whether this parameter can be changed during runtime.
-  bool mConstant;
-
-  //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
-  bool mIsHidden;
+  QSpinBox *mpSpinbox;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -129,7 +110,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::ParameterBase
+}; // class cedar::proc::gui::UIntParameter
 
-#endif // CEDAR_PROC_PARAMETER_BASE_H
+#endif // CEDAR_PROC_GUI_UINT_PARAMETER_H
 
