@@ -58,6 +58,7 @@ Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
 QWidget(pParent),
+mpMat(NULL),
 mpeLock(NULL),
 mpCurrentPlotWidget(NULL)
 {
@@ -74,9 +75,9 @@ cedar::aux::gui::MatrixPlot::~MatrixPlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::MatrixPlot::display(cv::Mat mat, QReadWriteLock *lock)
+void cedar::aux::gui::MatrixPlot::display(cv::Mat* mat, QReadWriteLock *lock)
 {
-  this->mMat = mat;
+  this->mpMat = mat;
   this->mpeLock = lock;
 
   if (this->mpCurrentPlotWidget)
@@ -85,17 +86,17 @@ void cedar::aux::gui::MatrixPlot::display(cv::Mat mat, QReadWriteLock *lock)
     this->mpCurrentPlotWidget = NULL;
   }
 
-  switch (this->mMat.dims)
+  switch (this->mpMat->dims)
   {
     case 2:
-      if ( (this->mMat.rows == 1 || this->mMat.cols == 1) && this->mMat.rows != this->mMat.cols)
+      if ( (this->mpMat->rows == 1 || this->mpMat->cols == 1) && this->mpMat->rows != this->mpMat->cols)
       {
         // TODO
-        std::cout << "vector plots aren't implemented yet; sorry :(" << std::endl;
+        std::cout << "cv::Mat vector plots aren't implemented yet; sorry :(" << std::endl;
       }
       else
       {
-        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mMat, this->mpeLock);
+        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mpMat, this->mpeLock);
         this->layout()->addWidget(this->mpCurrentPlotWidget);
       }
       break;

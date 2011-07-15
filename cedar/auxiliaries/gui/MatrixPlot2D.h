@@ -76,9 +76,9 @@ public:
   {
   public:
     Matrix2DFunction(Qwt3D::GridPlot* plot);
-    Matrix2DFunction(QReadWriteLock *pLock, Qwt3D::GridPlot* plot, const cv::Mat& matrix);
+    Matrix2DFunction(QReadWriteLock *pLock, Qwt3D::GridPlot* plot, cv::Mat* matrix);
     double operator()(double x, double y);
-    void updateMatrix(const cv::Mat& matrix);
+    void updateMatrix(cv::Mat* matrix);
 
     void setLock(QReadWriteLock *lock);
 
@@ -94,7 +94,7 @@ public:
   //!@brief The standard constructor.
   MatrixPlot2D(QWidget *pParent = NULL);
 
-  MatrixPlot2D(cv::Mat mat, QReadWriteLock *lock, QWidget *pParent = NULL);
+  MatrixPlot2D(cv::Mat* mat, QReadWriteLock *lock, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~MatrixPlot2D();
@@ -103,7 +103,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cv::Mat mat, QReadWriteLock *lock);
+  void display(cv::Mat* mat, QReadWriteLock *lock);
 
 public slots:
   void updatePlot();
@@ -128,7 +128,7 @@ public:
 protected:
   // none yet
 private:
-  cv::Mat mMat;
+  cv::Mat* mpMat;
   QTimer* mpTimer;
   QReadWriteLock *mpeLock;
 
