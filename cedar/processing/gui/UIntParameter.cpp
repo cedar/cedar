@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BoolParameter.cpp
+    File:        DoubleParameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 12
+    Date:        2011 07 06
 
     Description:
 
@@ -39,8 +39,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/BoolParameter.h"
-#include "auxiliaries/Parameter.h"
+#include "processing/gui/UIntParameter.h"
+#include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -52,20 +53,22 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::BoolParameter::BoolParameter(QWidget *pParent)
+cedar::proc::gui::UIntParameter::UIntParameter(QWidget *pParent)
 :
 cedar::proc::gui::ParameterBase(pParent)
 {
   this->setLayout(new QHBoxLayout());
-  this->mpCheckBox = new QCheckBox();
+  this->mpSpinbox = new QSpinBox();
   this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpCheckBox);
+  this->layout()->addWidget(this->mpSpinbox);
+  this->mpSpinbox->setMinimum(0.0);
+  this->mpSpinbox->setMaximum(100.0);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
 //!@brief Destructor
-cedar::proc::gui::BoolParameter::~BoolParameter()
+cedar::proc::gui::UIntParameter::~UIntParameter()
 {
 }
 
@@ -73,18 +76,18 @@ cedar::proc::gui::BoolParameter::~BoolParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::BoolParameter::parameterPointerChanged()
+void cedar::proc::gui::UIntParameter::parameterPointerChanged()
 {
-  cedar::aux::BoolParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
-  this->mpCheckBox->setChecked(parameter->get());
-  QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
+  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
+  this->mpSpinbox->setMinimum(parameter->getMinimum());
+  this->mpSpinbox->setMaximum(parameter->getMaximum());
+  this->mpSpinbox->setValue(parameter->get());
+  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
 }
 
-void cedar::proc::gui::BoolParameter::stateChanged(int state)
+void cedar::proc::gui::UIntParameter::valueChanged(int value)
 {
-  cedar::aux::BoolParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
-  parameter->set(state == Qt::Checked);
+  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
+  parameter->set(value);
 }
 

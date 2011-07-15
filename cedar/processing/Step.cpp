@@ -64,6 +64,7 @@ mMandatoryConnectionsAreSet (true),
 mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
 {
   this->registerParameter(mRunInThread);
+  this->_mName->setConstant(true);
 }
 
 cedar::proc::Step::DataEntry::DataEntry(bool isMandatory)
