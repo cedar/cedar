@@ -96,7 +96,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cv::Mat d_u = -u + h + sigmoid_u;
   //!\todo deal with units, now: milliseconds
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
-  std::cout << "field: " << u.at<float>(0,0) << std::endl;
+  //std::cout << "field: " << u.at<float>(0,0) << std::endl;
 }
 
 void cedar::dyn::NeuralField::onStart()
