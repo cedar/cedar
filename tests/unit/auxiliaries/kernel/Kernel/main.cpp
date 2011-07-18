@@ -63,15 +63,22 @@ int main()
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
   cedar::aux::kernel::GaussPtr gaussian_1d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 1));
+  log_file << "test no" << test_number++ << std::endl;
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
   cedar::aux::kernel::GaussPtr gaussian_2d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 2));
+  log_file << "test no" << test_number++ << std::endl;
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
   cedar::aux::kernel::GaussPtr gaussian_3d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 3));
+  log_file << "test no" << test_number++ << std::endl;
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
   cedar::aux::kernel::GaussPtr gaussian_4d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 4));
+  log_file << "test no" << test_number++ << std::endl;
+  sigmas.push_back(3.0);
+  shifts.push_back(0.0);
+  cedar::aux::kernel::GaussPtr gaussian_5d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 5));
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
