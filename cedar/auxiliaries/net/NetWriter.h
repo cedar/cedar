@@ -58,29 +58,36 @@ public:
 
 template <>
 class NetWriter<cv::Mat> : 
-                           public _NM_FULL_::cvMatHelper,
+                           public _NM_FULL_::cvMatHelper<cv::Mat>,
                            public _NM_FULL_::CollatedNetWriter<cv::Mat>
 {
 private:
 
 public:
   explicit NetWriter(std::string myPortName) 
-                      : _NM_FULL_::cvMatHelper(),
+                      : _NM_FULL_::cvMatHelper<cv::Mat>(),
                         _NM_FULL_::CollatedNetWriter<cv::Mat>(myPortName)
   {
 #ifdef DEBUG
-//  cout << "  NetWriter (cv::Mat) [CONSTRUCTOR]" << endl;
-#endif
-  }
-  
-  ~NetWriter()
-  {
-#ifdef DEBUG
-  cout << "  ~NetWriter (cv::Mat) [DESTRUCTOR]" << endl;
+  cout << "  NetWriter (cv::Mat) [CONSTRUCTOR]" << endl;
 #endif
   }
 };
 
+template <>
+class NetWriter< cv::Mat_<float> > : 
+                           public _NM_FULL_::cvMatHelper< cv::Mat_<float> >,
+                           public _NM_FULL_::CollatedNetWriter< cv::Mat_<float> >
+{
+private:
+
+public:
+  explicit NetWriter(std::string myPortName) 
+                      : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(),
+                        _NM_FULL_::CollatedNetWriter< cv::Mat_<float> >(myPortName)
+  {
+  }
+};
 
 } } } // end namespaces
 

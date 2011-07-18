@@ -2,6 +2,7 @@
 #define _NETT_COLLATED_TRAITS_H_
 
 #include "../namespace.h"
+#include <boost/static_assert.hpp>
 
 namespace _NM_CEDAR_ {
   namespace _NM_AUX_ {
@@ -12,7 +13,11 @@ template<class T>
 struct collated_traits
 {
   // default traits struct is empty
-  // TODO: this should not compile
+  // this should not compile
+  collated_traits()
+  {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+  }
 };
 
 

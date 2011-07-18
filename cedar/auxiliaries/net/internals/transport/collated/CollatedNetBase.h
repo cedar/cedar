@@ -44,7 +44,7 @@ public:
   CollatedNetBase() : dataPort()
   {
 #ifdef DEBUG
-//  cout << "  CollatedNetBase [CONSTRUCTOR]" << endl;
+  cout << "  CollatedNetBase [CONSTRUCTOR]" << endl;
 #endif
     dataPort.enableBackgroundWrite(true);
     // ... 

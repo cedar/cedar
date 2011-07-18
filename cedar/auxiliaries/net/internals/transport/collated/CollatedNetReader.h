@@ -14,8 +14,6 @@
 #include "../AbstractNetReader.h"
 #include <yarp/os/PortReaderBuffer.h>
 
-using namespace std;
-
 namespace _NM_CEDAR_ {
   namespace _NM_AUX_ {
     namespace _NM_NET_ {
@@ -31,7 +29,7 @@ private:
   PortReaderBuffer< CollatedNetPortable< T > > elemWrapper;
 
 public:
-  CollatedNetReader(string myPortName) : 
+  CollatedNetReader(std::string myPortName) : 
                                          CollatedNetBase<T>(),
                                          AbstractNetReader<T>(myPortName),
                                          elemWrapper()
@@ -48,9 +46,12 @@ public:
 
   ~CollatedNetReader()
   {
+#ifdef DEBUG
+    cout << "  ~CollatedNetReader [DESTRUCTOR] begin" << endl;
+#endif
     AbstractNetReader<T>::late_destruct();
 #ifdef DEBUG
-    cout << "  ~CollatedNetReader [DESTRUCTOR]" << endl;
+    cout << "  ~CollatedNetReader [DESTRUCTOR] end" << endl;
 #endif
   }
 
@@ -60,8 +61,14 @@ public:
     cv::Mat retMat;
     CollatedNetPortable< T > *pNetPortable;
 
+#ifdef DEBUG
+    cout << "  tryring reconnect" << endl;
+#endif
     if (!AbstractNetReader<T>::isConnected())
     {
+#ifdef DEBUG
+    cout << "  BLUBB tryring reconnect" << endl;
+#endif
       if (!AbstractNetReader<T>::reconnect())
       {
         // do something

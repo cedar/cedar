@@ -1,4 +1,0 @@
-//
-// openCV Spezialisierung fuer CollatedType
-// 
-

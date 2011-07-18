@@ -11,7 +11,8 @@ namespace _NM_CEDAR_ {
     namespace _NM_NET_ {
       namespace _NM_INTERNAL_ {
         template<> struct collated_traits<cv::Mat>;
-        class cvMatHelper;
+        template<> struct collated_traits< cv::Mat_<float> >;
+        template <typename CVT> class cvMatHelper;
         class cvMatNetHeader;
       }
     }
@@ -23,12 +24,18 @@ template<>
 struct _NM_FULL_::collated_traits<cv::Mat>
 {
   typedef cv::Mat                   data_type;
-  typedef _NM_FULL_::cvMatHelper    helper_type;
+  typedef _NM_FULL_::cvMatHelper<cv::Mat>    helper_type;
   typedef _NM_FULL_::cvMatNetHeader header_type;
 };
 
-//template<>
-//struct collated_traits<cv::Mat>;
+template<>
+struct _NM_FULL_::collated_traits< cv::Mat_<float> >
+{
+  typedef cv::Mat_<float>           data_type;
+  typedef _NM_FULL_::cvMatHelper< cv::Mat_<float> >    helper_type;
+  typedef _NM_FULL_::cvMatNetHeader header_type;
+};
+
 
 //} } } } // end namespaces 
      
