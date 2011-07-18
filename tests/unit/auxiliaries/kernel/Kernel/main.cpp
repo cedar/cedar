@@ -48,7 +48,7 @@ using namespace cedar::aux;
 
 int main()
 {
-  LogFile log_file("UnitTestSigmoids.log");
+  LogFile log_file("UnitTestKernels.log");
   log_file.addTimeStamp();
   log_file << std::endl;
   // the number of errors encountered in this test
@@ -62,7 +62,7 @@ int main()
   std::vector<double> shifts;
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
-//  cedar::aux::kernel::GaussPtr gaussian_1d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 1));
+  cedar::aux::kernel::GaussPtr gaussian_1d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 1));
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
   cedar::aux::kernel::GaussPtr gaussian_2d(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 2));
