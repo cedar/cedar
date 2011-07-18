@@ -70,6 +70,8 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
+  this->declareInput("input", false);
+
   this->addConfigurableChild("sigmoid", this->mSigmoid);
 
   std::vector<double> sigmas;
@@ -94,6 +96,15 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& tau = mTau->get();
   sigmoid_u = mSigmoid->compute<float>(u);
   cv::Mat d_u = -u + h + sigmoid_u;
+
+  /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
+   *       it when the connections change.
+   */
+  if (cedar::proc::DataPtr input = this->getInput("input"))
+  {
+    d_u += input->getData<cv::Mat>();
+  }
+
   //!\todo deal with units, now: milliseconds
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
   //std::cout << "field: " << u.at<float>(0,0) << std::endl;

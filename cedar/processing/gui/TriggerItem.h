@@ -44,7 +44,7 @@
 // LOCAL INCLUDES
 #include "processing/Trigger.h"
 #include "processing/gui/namespace.h"
-#include "processing/gui/TriggerConnection.h"
+#include "processing/gui/Connection.h"
 #include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
@@ -88,7 +88,6 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -112,7 +111,6 @@ protected:
 
 private:
   cedar::proc::TriggerDeclarationPtr mClassId;
-  std::vector<TriggerConnection*> mConnectionInfos;
 
 }; // class TriggerItem
 

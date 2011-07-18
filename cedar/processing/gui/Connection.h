@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerConnection.h
+    File:        Connection.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_TRIGGER_CONNECTION_H
-#define CEDAR_PROC_GUI_TRIGGER_CONNECTION_H
+#ifndef CEDAR_PROC_GUI_CONNECTION_H
+#define CEDAR_PROC_GUI_CONNECTION_H
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
@@ -54,7 +54,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::TriggerConnection : public QGraphicsLineItem
+class cedar::proc::gui::Connection : public QGraphicsLineItem
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,10 +65,10 @@ class cedar::proc::gui::TriggerConnection : public QGraphicsLineItem
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  TriggerConnection(QGraphicsItem *pSource, QGraphicsItem *pTarget);
+  Connection(cedar::proc::gui::GraphicsBase *pSource, cedar::proc::gui::GraphicsBase *pTarget);
 
   //!@brief Destructor
-  ~TriggerConnection();
+  ~Connection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -98,8 +98,8 @@ public:
 protected:
   // none yet
 private:
-  QGraphicsItem *mpSource;
-  QGraphicsItem *mpTarget;
+  cedar::proc::gui::GraphicsBase *mpSource;
+  cedar::proc::gui::GraphicsBase *mpTarget;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -114,5 +114,5 @@ private:
 
 }; // class cedar::proc::gui::TriggerConnection
 
-#endif // CEDAR_PROC_GUI_TRIGGER_CONNECTION_H
+#endif // CEDAR_PROC_GUI_CONNECTION_H
 

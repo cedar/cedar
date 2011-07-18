@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerConnection.cpp
+    File:        Connection.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/TriggerConnection.h"
+#include "processing/gui/Connection.h"
 #include "processing/gui/StepItem.h"
 
 // PROJECT INCLUDES
@@ -50,21 +50,18 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::TriggerConnection::TriggerConnection(QGraphicsItem *pSource, QGraphicsItem *pTarget)
+cedar::proc::gui::Connection::Connection(cedar::proc::gui::GraphicsBase *pSource, cedar::proc::gui::GraphicsBase *pTarget)
 :
 QGraphicsLineItem(pSource),
 mpSource(pSource),
 mpTarget(pTarget)
 {
-  //!@todo this is a somewhat ugly solution - find a better one!
-  if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
-  {
-    p_step->addIncomingTriggerConnection(this);
-  }
+  pSource->addConnection(this);
+  pTarget->addConnection(this);
   this->update();
 }
 
-cedar::proc::gui::TriggerConnection::~TriggerConnection()
+cedar::proc::gui::Connection::~Connection()
 {
 }
 
@@ -72,7 +69,7 @@ cedar::proc::gui::TriggerConnection::~TriggerConnection()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::TriggerConnection::update()
+void cedar::proc::gui::Connection::update()
 {
   this->setZValue(-1.0);
   QLineF line;

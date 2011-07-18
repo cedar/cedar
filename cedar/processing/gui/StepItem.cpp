@@ -69,7 +69,6 @@ mpMainWindow(pMainWindow)
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
-                               | QGraphicsItem::ItemSendsGeometryChanges
                                );
   this->addDataItems();
 }
@@ -118,10 +117,12 @@ void cedar::proc::gui::StepItem::addDataItems()
     try
     {
       qreal count = 0;
-      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(*enum_it);
-      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(*enum_it);
+      for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this);
+        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this,
+                                                                                    iter->second.getData(),
+                                                                                    iter->first);
         p_item->setPos(origin + count * direction * (data_size + padding) );
         count += static_cast<qreal>(1.0);
       }
@@ -204,24 +205,3 @@ cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
   return this->mStep;
 }
 
-void cedar::proc::gui::StepItem::addIncomingTriggerConnection(TriggerConnection* pConnection)
-{
-  this->mIncomingTriggerConnections.push_back(pConnection);
-}
-
-QVariant cedar::proc::gui::StepItem::itemChange(GraphicsItemChange change, const QVariant & value)
-{
-  switch (change)
-  {
-    case QGraphicsItem::ItemPositionHasChanged:
-      for (size_t i = 0; i < this->mIncomingTriggerConnections.size(); ++i)
-      {
-        this->mIncomingTriggerConnections.at(i)->update();
-      }
-      break;
-
-    default:
-      break;
-  }
-  return QGraphicsItem::itemChange(change, value);
-}

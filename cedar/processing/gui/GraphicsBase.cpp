@@ -64,6 +64,7 @@ mShape(shape),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
+  this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges);
 }
 
 cedar::proc::gui::GraphicsBase::~GraphicsBase()
@@ -73,6 +74,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
+{
+  this->mConnections.push_back(pConnection);
+}
 
 cedar::proc::gui::GraphicsBase::HighlightMode cedar::proc::gui::GraphicsBase::getHighlightMode() const
 {
@@ -176,4 +182,34 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   }
 
   painter->restore();
+}
+
+QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
+{
+  switch (change)
+  {
+    case QGraphicsItem::ItemPositionHasChanged:
+      this->updateConnections();
+      break;
+
+    default:
+      break;
+  }
+  return QGraphicsItem::itemChange(change, value);
+}
+
+void cedar::proc::gui::GraphicsBase::updateConnections()
+{
+  QList<QGraphicsItem*> children = this->childItems();
+  for (int i = 0; i < children.size(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase* child = dynamic_cast<cedar::proc::gui::GraphicsBase*>(children[i]))
+    {
+      child->updateConnections();
+    }
+  }
+  for (size_t i = 0; i < this->mConnections.size(); ++i)
+  {
+    this->mConnections.at(i)->update();
+  }
 }

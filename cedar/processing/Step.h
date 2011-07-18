@@ -129,6 +129,7 @@ public:
   cedar::proc::DataPtr getBuffer(const std::string& name);
   cedar::proc::DataPtr getOutput(const std::string& name);
 
+  cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role);
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
 
   static void connect(

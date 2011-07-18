@@ -42,6 +42,7 @@
 #include "processing/gui/Scene.h"
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/StepItem.h"
+#include "processing/gui/DataSlotItem.h"
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/GroupItem.h"
 
@@ -304,6 +305,24 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
 
         switch (mpConnectionStart->getGroup())
         {
+          case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
+          {
+            cedar::proc::gui::DataSlotItem *p_source = dynamic_cast<cedar::proc::gui::DataSlotItem *>(mpConnectionStart);
+            CEDAR_DEBUG_ASSERT(p_source != NULL);
+
+            switch (target->getGroup())
+            {
+              case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
+              {
+                cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem *>(target);
+                p_source->connectTo(p_data_target);
+                break;
+              } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
+            }
+
+            break;
+          } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
+
           case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
           {
             cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart);
@@ -312,14 +331,17 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
             switch (target->getGroup())
             {
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-                break; //!@todo: implement
+              {
+                //!@todo: implement
+                break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+              }
 
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
               {
                 cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
                 source->connectTo(p_step_item);
                 break;
-              }
+              } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 
               default:
                 CEDAR_DEBUG_ASSERT(false); // this should not happen

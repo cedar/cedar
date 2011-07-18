@@ -55,15 +55,18 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::StepItem *pParent)
+cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::StepItem *pParent,
+                                             cedar::proc::DataPtr data,
+                                             const std::string& dataName)
 :
 cedar::proc::gui::GraphicsBase(10, 10,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
-                               )
+                               ),
+mData(data),
+mDataName(dataName)
 {
-  this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges);
   this->setParentItem(pParent);
 }
 
@@ -76,8 +79,23 @@ cedar::proc::gui::DataSlotItem::~DataSlotItem()
 //----------------------------------------------------------------------------------------------------------------------
 
 
+void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
+{
+  cedar::proc::StepPtr source, target;
+  source = dynamic_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
+  target = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget->parentItem())->getStep();
+  cedar::proc::Step::connect(source, this->getName(), target, pTarget->getName());
+
+  new cedar::proc::gui::Connection(this, pTarget);
+}
+
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)
 {
+}
+
+const std::string& cedar::proc::gui::DataSlotItem::getName() const
+{
+  return this->mDataName;
 }
 
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
@@ -89,11 +107,4 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   //! @todo make drawing pretty.
 
   painter->restore(); // restore saved painter settings
-}
-
-
-
-QVariant cedar::proc::gui::DataSlotItem::itemChange(GraphicsItemChange change, const QVariant & value)
-{
-  return QGraphicsItem::itemChange(change, value);
 }

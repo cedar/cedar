@@ -44,7 +44,6 @@
 // LOCAL INCLUDES
 #include "processing/Step.h"
 #include "processing/gui/namespace.h"
-#include "processing/gui/TriggerConnection.h"
 #include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
@@ -82,13 +81,11 @@ public:
   cedar::proc::StepPtr getStep();
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-  void addIncomingTriggerConnection(TriggerConnection* pConnection);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -111,7 +108,6 @@ protected:
 
 private:
   cedar::proc::StepDeclarationPtr mClassId;
-  std::vector<TriggerConnection*> mIncomingTriggerConnections;
   QMainWindow* mpMainWindow;
 
 }; // class StepItem

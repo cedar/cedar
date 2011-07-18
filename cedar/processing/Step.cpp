@@ -97,6 +97,19 @@ bool cedar::proc::Step::DataEntry::isMandatory() const
   return this->mMandatory;
 }
 
+cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id role)
+{
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  if (iter == this->mDataConnections.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Role "
+                                                   + DataRole::type().get(role).name()
+                                                   + " not found in cedar::proc::Step::getData(DataRole::Id).");
+  }
+  return iter->second;
+}
+
+
 const cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id role) const
 {
   std::map<DataRole::Id, SlotMap>::const_iterator iter = this->mDataConnections.find(role);
@@ -279,7 +292,7 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
     CEDAR_THROW(cedar::proc::InvalidNameException,
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
-                " name does not exist.");
+                " name \"" + name + "\" does not exist.");
     return;
   }
   map_iterator->second.setData(data);

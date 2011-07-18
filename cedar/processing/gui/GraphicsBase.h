@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
+#include "processing/gui/Connection.h"
 
 // PROJECT INCLUDES
 
@@ -127,17 +128,21 @@ public:
     return this->mHeight;
   }
 
+  void addConnection(Connection* pConnection);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   void paintFrame(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
+  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void updateConnections();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -163,7 +168,9 @@ private:
   GraphicsGroup mGroup;
   GraphicsGroup mAllowedConnectTargets;
 
-}; // class cedar::xxx
+  std::vector<Connection*> mConnections;
+
+}; // class cedar::proc::gui::GraphicsBase
 
 #endif // CEDAR_XXX_XXX_H
 

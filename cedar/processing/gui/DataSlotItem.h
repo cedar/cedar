@@ -44,6 +44,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
 #include "processing/gui/GraphicsBase.h"
+#include "processing/Data.h"
 
 // PROJECT INCLUDES
 
@@ -65,7 +66,9 @@ class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlotItem(cedar::proc::gui::StepItem *pParent);
+  DataSlotItem(cedar::proc::gui::StepItem *pParent,
+               cedar::proc::DataPtr data,
+               const std::string& dataName);
 
   //!@brief Destructor
   ~DataSlotItem();
@@ -78,11 +81,15 @@ public:
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
+
+  const std::string& getName() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -96,6 +103,8 @@ private:
 protected:
   // none yet
 private:
+  cedar::proc::DataPtr mData;
+  const std::string& mDataName;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

@@ -127,24 +127,6 @@ void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarge
   if (!this->getTrigger()->isListener(pTarget->getStep()))
   {
     this->getTrigger()->addListener(pTarget->getStep());
-    TriggerConnection *connection = new TriggerConnection(this, pTarget);
-    mConnectionInfos.push_back(connection);
+    new Connection(this, pTarget);
   }
-}
-
-QVariant cedar::proc::gui::TriggerItem::itemChange(GraphicsItemChange change, const QVariant & value)
-{
-  switch (change)
-  {
-    case QGraphicsItem::ItemPositionHasChanged:
-      for (size_t i = 0; i < this->mConnectionInfos.size(); ++i)
-      {
-        this->mConnectionInfos.at(i)->update();
-      }
-      break;
-
-    default:
-      break;
-  }
-  return QGraphicsItem::itemChange(change, value);
 }

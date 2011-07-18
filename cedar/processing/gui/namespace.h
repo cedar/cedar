@@ -56,6 +56,7 @@ namespace cedar
     {
       class ArchitectureToolBox;
       class BoolParameter;
+      class Connection;
       class DataPlotter;
       class DataSlotItem;
       class DoubleParameter;
@@ -70,7 +71,6 @@ namespace cedar
       class StringParameter;
       class Scene;
       class ToolBox;
-      class TriggerConnection;
       class TriggerItem;
       class UIntParameter;
       class View;
