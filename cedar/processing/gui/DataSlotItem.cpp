@@ -42,6 +42,7 @@
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/StepItem.h"
 #include "processing/DataRole.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -57,14 +58,18 @@
 
 cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::StepItem *pParent,
                                              cedar::proc::DataPtr data,
-                                             const std::string& dataName)
+                                             const std::string& dataName,
+                                             cedar::proc::DataRole::Id role
+                                             )
 :
 cedar::proc::gui::GraphicsBase(10, 10,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                ),
+mpStep(pParent),
 mData(data),
+mRole(role),
 mDataName(dataName)
 {
   this->setParentItem(pParent);
@@ -78,6 +83,27 @@ cedar::proc::gui::DataSlotItem::~DataSlotItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::gui::DataSlotItem::canConnect() const
+{
+  return this->mRole == cedar::proc::DataRole::OUTPUT;
+}
+
+bool cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
+{
+  if (!this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget))
+    return false;
+
+  cedar::proc::gui::DataSlotItem *p_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
+  // should only be able to connect to DataSlotItems
+  CEDAR_DEBUG_ASSERT(p_target != NULL);
+
+  return
+      // don't connect outputs of the same step to itself
+      this->mpStep != p_target->mpStep &&
+      // the only way to connect is outputs to inputs
+      this->mRole == cedar::proc::DataRole::OUTPUT && p_target->mRole == cedar::proc::DataRole::INPUT
+      ;
+}
 
 void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
 {

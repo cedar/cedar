@@ -45,6 +45,7 @@
 #include "processing/gui/namespace.h"
 #include "processing/gui/GraphicsBase.h"
 #include "processing/Data.h"
+#include "processing/DataRole.h"
 
 // PROJECT INCLUDES
 
@@ -68,7 +69,8 @@ public:
   //!@brief The standard constructor.
   DataSlotItem(cedar::proc::gui::StepItem *pParent,
                cedar::proc::DataPtr data,
-               const std::string& dataName);
+               const std::string& dataName,
+               cedar::proc::DataRole::Id role);
 
   //!@brief Destructor
   ~DataSlotItem();
@@ -84,6 +86,9 @@ public:
   void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
 
   const std::string& getName() const;
+
+  bool canConnect() const;
+  bool canConnectTo(GraphicsBase* pTarget) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -103,7 +108,9 @@ private:
 protected:
   // none yet
 private:
+  cedar::proc::gui::StepItem *mpStep;
   cedar::proc::DataPtr mData;
+  cedar::proc::DataRole::Id mRole;
   const std::string& mDataName;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
