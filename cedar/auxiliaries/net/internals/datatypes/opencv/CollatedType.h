@@ -15,8 +15,8 @@ namespace _NM_CEDAR_ {
     namespace _NM_NET_ {
       namespace _NM_INTERNAL_ {
 
-//template <>
-//struct CollatedType<cv::Mat>;
+
+/////// cv::Mat
 
 template <> // for class template
 inline void* CollatedType<cv::Mat>::contentAt(int index, int iElemSize) 
@@ -37,6 +37,28 @@ inline cv::Mat CollatedType<cv::Mat>::late_init_data_from_header()
                     header.cols, 
                     header.cvMatType );
 }
+
+/////// cv::Mat_
+
+template <> // for class template
+inline void* CollatedType< cv::Mat_<float> >::contentAt(int index, int iElemSize) 
+                // specialization for class template
+{
+  return (void*)  &data( ( index % header.rows ),
+                         ( index 
+                             - ( index 
+                                 % header.rows) )
+                         / header.rows 
+                         );
+}
+
+template <>
+inline cv::Mat_<float> CollatedType< cv::Mat_<float> >::late_init_data_from_header()
+{
+  return cv::Mat_<float>( header.rows,
+                          header.cols );
+}
+
 
 } } } } // end namespaces
 

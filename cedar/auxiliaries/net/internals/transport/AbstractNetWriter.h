@@ -35,11 +35,6 @@ protected:
   void late_construct()
   {
     AbstractNetBase::late_construct();
-    check_for_nameserver();
-#ifdef DEBUG
-    connectTwo( getFullPortName(),
-                "DEBUG" );
-#endif
   }
 
   void late_destruct()
@@ -53,7 +48,7 @@ public:
                    : AbstractNetBase( WRITER_PORT_NAME(myPortName) )
   {
 #ifdef DEBUG
-//  cout << "  AbstractNetWriter [CONSTRUCTOR]" << endl;
+  cout << "  AbstractNetWriter [CONSTRUCTOR]" << endl;
 #endif
   }
 
@@ -65,7 +60,6 @@ public:
   }
 
   virtual void write(T t) = 0;
-  //virtual void commit(T t) = 0;
 };
 
 } } } }  // end namespaces

@@ -56,13 +56,25 @@ public:
 };
 
 template <>
-class NetBlockingReader<cv::Mat> : public _NM_FULL_::cvMatHelper,
+class NetBlockingReader<cv::Mat> : public _NM_FULL_::cvMatHelper<cv::Mat>,
                                    public _NM_FULL_::CollatedNetReader<cv::Mat, true> 
 {
 public:
   explicit NetBlockingReader(std::string myPortName) 
-                         : _NM_FULL_::cvMatHelper(), 
+                         : _NM_FULL_::cvMatHelper<cv::Mat>(), 
                            _NM_FULL_::CollatedNetReader<cv::Mat, true>(myPortName)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader< cv::Mat_<float> > : public _NM_FULL_::cvMatHelper< cv::Mat_<float> >,
+                                   public _NM_FULL_::CollatedNetReader< cv::Mat_<float> , true> 
+{
+public:
+  explicit NetBlockingReader(std::string myPortName) 
+                         : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(), 
+                           _NM_FULL_::CollatedNetReader< cv::Mat_<float> , true>(myPortName)
   {
   }
 };

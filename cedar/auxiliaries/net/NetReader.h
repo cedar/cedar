@@ -60,17 +60,29 @@ public:
 
 
 template <>
-class NetReader<cv::Mat> : public _NM_FULL_::cvMatHelper,
+class NetReader<cv::Mat> : public _NM_FULL_::cvMatHelper<cv::Mat>,
                            public _NM_FULL_::CollatedNetReader<cv::Mat, false> 
 {
 public:
   explicit NetReader(std::string myPortName) 
-                         : _NM_FULL_::cvMatHelper(), 
+                         : _NM_FULL_::cvMatHelper<cv::Mat>(), 
                            _NM_FULL_::CollatedNetReader<cv::Mat>(myPortName)
   {
   }
 };
 
+template <>
+class NetReader< cv::Mat_<float> > : 
+                           public _NM_FULL_::cvMatHelper< cv::Mat_<float> >,
+                           public _NM_FULL_::CollatedNetReader< cv::Mat_<float> , false> 
+{
+public:
+  explicit NetReader(std::string myPortName) 
+                         : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(), 
+                           _NM_FULL_::CollatedNetReader< cv::Mat_<float> >(myPortName)
+  {
+  }
+};
 
 
 } } } // end namespaces

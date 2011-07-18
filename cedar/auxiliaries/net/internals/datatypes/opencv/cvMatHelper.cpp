@@ -23,11 +23,7 @@ namespace _NM_CEDAR_ {
       namespace _NM_INTERNAL_ {
 
 
-/*class cvMatHelper : virtual protected InterfaceCollatedData<cv::Mat>
-{
-};*/
-
-void cvMatHelper::init_checkheader(HeaderType &header)
+template <typename CVT> void cvMatHelper<CVT>::init_checkheader(HeaderType &header)
 {
   // einmalig Header-Infos fuellen 
   mCheckHeader.magicNumber= yarp::os::NetInt32(MAGIC_NUMBER);
@@ -37,7 +33,7 @@ void cvMatHelper::init_checkheader(HeaderType &header)
   mCheckHeader.cvMatType= header.cvMatType;
 }
 
-void cvMatHelper::cvMatHelper::init_externalheader(cv::Mat &mat,
+template <typename CVT> void cvMatHelper<CVT>::cvMatHelper::init_externalheader(CVT &mat,
                                                    HeaderType &header)
 {
   header.cols= mat.cols;
@@ -46,7 +42,7 @@ void cvMatHelper::cvMatHelper::init_externalheader(cv::Mat &mat,
   header.cvMatType= mat.type();
 }
 
-bool cvMatHelper::check_collateddata_for_write(cv::Mat &mat,
+template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(CVT &mat,
                                                HeaderType &extheader)
 {
     if (!mCheckHeader.cols || !mCheckHeader.rows)
@@ -74,7 +70,7 @@ bool cvMatHelper::check_collateddata_for_write(cv::Mat &mat,
     }
 }
 
-bool cvMatHelper::check_collateddata_for_read(HeaderType &extheader)
+template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_read(HeaderType &extheader)
 {
    if (!mCheckHeader.cols || !mCheckHeader.rows)
     {
@@ -98,7 +94,7 @@ bool cvMatHelper::check_collateddata_for_read(HeaderType &extheader)
     }
 }
 
-cvMatHelper::cvMatHelper() : mCheckHeader()
+template <typename CVT> cvMatHelper<CVT>::cvMatHelper() : mCheckHeader()
 {
 #ifdef DEBUG
 //  cout << "  cvMatHelper [CONSTRUCTOR]" << endl;
@@ -107,12 +103,17 @@ cvMatHelper::cvMatHelper() : mCheckHeader()
     mCheckHeader.cols= 0;
 }
 
-cvMatHelper::~cvMatHelper()
+template <typename CVT> cvMatHelper<CVT>::~cvMatHelper()
 {
 #ifdef DEBUG
   cout << "  ~cvMatHelper [DESTRUCTOR]" << endl;
 #endif
 }
+
+// explicit instantiation DO NOT FORGET THIS!
+template struct _NM_FULL_::cvMatHelper<cv::Mat>;
+template struct _NM_FULL_::cvMatHelper< cv::Mat_<float> >;
+
 
 } } } } // end namespaces
 
