@@ -134,7 +134,7 @@ const std::string& cedar::proc::Step::getName() const
 
 void cedar::proc::Step::checkMandatoryConnections()
 {
-  mMandatoryConnectionsAreSet = true;
+  this->mMandatoryConnectionsAreSet = true;
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
        ++slot)
@@ -152,9 +152,92 @@ void cedar::proc::Step::checkMandatoryConnections()
   }
 }
 
+void cedar::proc::Step::lockAll()
+{
+  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
+       slot != this->mDataConnections.end();
+       ++slot)
+  {
+    this->lockAll(slot->first);
+  }
+}
+
+void cedar::proc::Step::unlockAll()
+{
+  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
+       slot != this->mDataConnections.end();
+       ++slot)
+  {
+    this->unlockAll(slot->first);
+  }
+}
+
+void cedar::proc::Step::lockAll(DataRole::Id role)
+{
+  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
+  if (slot == this->mDataConnections.end())
+  {
+    // ok, no slots to lock
+    return;
+  }
+
+  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
+  {
+    cedar::proc::DataPtr data = iter->second.getData();
+    if (data)
+    {
+      switch (role)
+      {
+        case cedar::proc::DataRole::INPUT:
+          data->lockForRead();
+          break;
+
+        case cedar::proc::DataRole::OUTPUT:
+        case cedar::proc::DataRole::BUFFER:
+          data->lockForWrite();
+          break;
+
+        default:
+          // should never happen unless a role is
+          CEDAR_THROW(cedar::proc::InvalidRoleException, "The given role is not implemented in cedar::proc::Step::lockAll.");
+      }
+    }
+  }
+}
+
+void cedar::proc::Step::unlockAll(DataRole::Id role)
+{
+  //!@todo add a timeout?
+  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
+  if (slot == this->mDataConnections.end())
+  {
+    // ok, no slots to lock
+    return;
+  }
+
+  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
+  {
+    cedar::proc::DataPtr data = iter->second.getData();
+
+    if (data)
+    {
+      switch (role)
+      {
+        default:
+        case cedar::proc::DataRole::INPUT:
+        case cedar::proc::DataRole::OUTPUT:
+        case cedar::proc::DataRole::BUFFER:
+          data->unlock();
+          break;
+      }
+    }
+  }
+}
+
+
 void cedar::proc::Step::onStart()
 {
-
+  // empty as a default implementation
 }
 
 void cedar::proc::Step::onTrigger()
@@ -181,7 +264,7 @@ void cedar::proc::Step::onTrigger()
   } // this->mMandatoryConnectionsAreSet
   else
   {
-    CEDAR_THROW(MissingConnectionException,
+    CEDAR_THROW(MissingConnectionException, //!@todo Add to the exception the names of the unset connections
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   }
 }
@@ -196,7 +279,12 @@ void cedar::proc::Step::run()
     this->mNextArguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
   }
 
+  //!@todo make the (un)locking optional?
+  this->lockAll();
+
   this->compute(*(this->mNextArguments.get()));
+
+  this->unlockAll();
 
   // remove the argumens, as they have been processed.
   this->mNextArguments.reset();

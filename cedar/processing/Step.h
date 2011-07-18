@@ -141,6 +141,11 @@ public:
   void setName(const std::string& name);
   const std::string& getName() const;
 
+  void lockAll();
+  void lockAll(DataRole::Id role);
+  void unlockAll();
+  void unlockAll(DataRole::Id role);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
