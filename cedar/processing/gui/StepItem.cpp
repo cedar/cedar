@@ -122,7 +122,8 @@ void cedar::proc::gui::StepItem::addDataItems()
       {
         cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this,
                                                                                     iter->second.getData(),
-                                                                                    iter->first);
+                                                                                    iter->first,
+                                                                                    (*enum_it));
         p_item->setPos(origin + count * direction * (data_size + padding) );
         count += static_cast<qreal>(1.0);
       }

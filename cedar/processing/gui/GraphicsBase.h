@@ -100,9 +100,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  bool canConnectTo(GraphicsBase* pTarget) const;
+  virtual bool canConnectTo(GraphicsBase* pTarget) const;
 
-  bool canConnect() const;
+  virtual bool canConnect() const;
 
   QPointF getConnectionAnchorInScene() const;
 
