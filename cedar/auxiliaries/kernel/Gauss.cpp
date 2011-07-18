@@ -152,7 +152,14 @@ void cedar::aux::kernel::Gauss::calculate()
     {
       sizes[i] = mSizes.at(i);
     }
-    mKernel->getData<cv::Mat>() = cv::Mat(static_cast<int>(dimensionality), sizes, CV_32F);
+    if (dimensionality == 1)
+    {
+      mKernel->getData<cv::Mat>() = cv::Mat(sizes[0], 1, CV_32F);
+    }
+    else
+    {
+      mKernel->getData<cv::Mat>() = cv::Mat(static_cast<int>(dimensionality), sizes, CV_32F);
+    }
     cv::Mat& kernel = mKernel->getData<cv::Mat>();
     // now fill up the big kernel matrix
     int position[dimensionality];
@@ -169,7 +176,14 @@ void cedar::aux::kernel::Gauss::calculate()
       {
         value *= mKernelParts.at(dim).at<float>(position[dim], 0);
       }
-      kernel.at<float>(position) = value;
+      if (dimensionality == 1)
+      {
+        kernel.at<float>(position[0], 1) = value;
+      }
+      else
+      {
+        kernel.at<float>(position) = value;
+      }
       // increment index
       position[0]++;
       for (unsigned int dim = 0; dim < dimensionality; dim++)
