@@ -97,6 +97,18 @@ bool cedar::proc::Step::DataEntry::isMandatory() const
   return this->mMandatory;
 }
 
+void cedar::proc::Step::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
+{
+  size_t dot_idx = instr.rfind('.');
+  if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for step. Path is: " + instr);
+  }
+
+  stepName = instr.substr(0, dot_idx);
+  dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
+}
+
 cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id role)
 {
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);

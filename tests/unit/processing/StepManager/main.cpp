@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 #include "auxiliaries/LogFile.h"
 #include "processing/Manager.h"
+#include "processing/Network.h"
 #include "processing/Step.h"
 #include "processing/StepDeclaration.h"
 #include "processing/Arguments.h"
@@ -93,7 +94,8 @@ int main(int /* argc */, char** /* argv */)
   log_file << "done." << std::endl;
 
   log_file << "Reading Sample.json ... ";
-  Manager::getInstance().readFile("Sample.json");
+  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  network->readFile("Sample.json");
   log_file << "done." << std::endl;
 
   log_file << "Trying to call compute functions ... ";
