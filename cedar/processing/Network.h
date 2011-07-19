@@ -47,6 +47,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <vector>
 
 
 /*!@brief Abstract description of the class.
@@ -56,8 +57,11 @@
 class cedar::proc::Network
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef std::vector<cedar::proc::StepPtr> StepVector;
+  typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -85,7 +89,7 @@ public:
 
   void readDataConnections(const cedar::aux::ConfigurationNode& root);
 
-  void readAll(const cedar::aux::ConfigurationNode& root);
+  void readFrom(const cedar::aux::ConfigurationNode& root);
 
   void readFile(const std::string& filename);
 
@@ -104,12 +108,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  StepVector mSteps;
+  TriggerVector mTriggers;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

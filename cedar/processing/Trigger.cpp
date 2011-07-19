@@ -42,6 +42,7 @@
 // LOCAL INCLUDES
 #include "processing/Trigger.h"
 #include "processing/Step.h"
+#include "processing/Manager.h"
 
 // PROJECT INCLUDES
 
@@ -158,6 +159,29 @@ const std::vector<cedar::proc::StepPtr>& cedar::proc::Trigger::getListeners() co
 
 void cedar::proc::Trigger::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  this->setName(node.get<std::string>("name"));
+  this->cedar::aux::Configurable::readConfiguration(node);
+  // listeners
+  try
+  {
+    const cedar::aux::ConfigurationNode& listeners = node.get_child("listeners");
+
+    for (cedar::aux::ConfigurationNode::const_iterator iter = listeners.begin();
+        iter != listeners.end();
+        ++iter)
+    {
+      std::string listener_name = iter->second.data();
+
+#ifdef DEBUG_FILE_READING
+  std::cout << "Adding listener " << listener_name << std::endl;
+#endif // DEBUG_FILE_READING
+
+      cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(listener_name);
+      this->addListener(step);
+    }
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // no listeners declared -- this is ok.
+  }
 }
 
