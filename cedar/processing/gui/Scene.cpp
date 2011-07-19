@@ -224,6 +224,12 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
     mpNewConnectionIndicator = NULL;
   }
 
+  if (pMouseEvent->button() != Qt::LeftButton)
+  {
+    QGraphicsScene::mousePressEvent(pMouseEvent);
+    return;
+  }
+
   QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
 
   if (items.size() > 0)
