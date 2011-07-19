@@ -127,9 +127,13 @@ void cedar::proc::gui::Ide::exception(const QString& message)
 void cedar::proc::gui::Ide::startThreads()
 {
   cedar::proc::Manager::getInstance().startThreads();
+  this->mpThreadsStartAll->setEnabled(false);
+  this->mpThreadsStopAll->setEnabled(true);
 }
 
 void cedar::proc::gui::Ide::stopThreads()
 {
   cedar::proc::Manager::getInstance().stopThreads();
+  this->mpThreadsStartAll->setEnabled(true);
+  this->mpThreadsStopAll->setEnabled(false);
 }
