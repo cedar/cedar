@@ -38,12 +38,12 @@
 #include "auxiliaries/kernel/Gauss.h"
 #include "auxiliaries/NumericParameter.h"
 #include "processing/DataT.h"
+#include "auxiliaries/math/functions.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
-#include <math.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -52,7 +52,7 @@ cedar::aux::kernel::Gauss::Gauss()
 :
 cedar::aux::kernel::Separable(),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", -10000.0, 10000.0)),
-_mLimit(new cedar::aux::DoubleParameter("limit", 0.0, 1.0))
+_mLimit(new cedar::aux::DoubleParameter("limit", 0.01, 1000.0))
 {
   this->registerParameter(_mAmplitude);
   this->registerParameter(_mLimit);
@@ -70,7 +70,7 @@ cedar::aux::kernel::Gauss::Gauss(
 :
 cedar::aux::kernel::Separable(dimensionality, kernelFile),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", amplitude, -10000.0, 10000.0)),
-_mLimit(new cedar::aux::DoubleParameter("limit", limit, 0.0, 1.0))
+_mLimit(new cedar::aux::DoubleParameter("limit", limit, 0.01, 1000.0))
 {
   this->registerParameter(_mAmplitude);
   this->registerParameter(_mLimit);
@@ -132,7 +132,7 @@ void cedar::aux::kernel::Gauss::calculate()
         {
           //!\todo move Gauss function and filling up of matrix to some tool function
           mKernelParts.at(dim).at<float>(j, 0)
-              = exp(-std::pow(static_cast<int>(j) - mCenters.at(dim), 2) / (2 * std::pow(_mSigmas.at(dim), 2)));
+              = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas.at(dim));
         }
       }
       else // discrete case
@@ -258,12 +258,16 @@ double cedar::aux::kernel::Gauss::getAmplitude() const
 unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
 {
   unsigned int tmp;
-  /* analytical solution for calculating the width of the sampled Gausssian, given a precision _mLimit
-   * simply solve the inverted Gaussian equation
+  /* size of kernel is determined by limit * sigma
    */
   if ((_mSigmas.at(dim) < 10000) && (_mSigmas.at(dim) > 0))
   {
-    tmp = 2 * round(sqrt(2 * powf(_mSigmas.at(dim), 2.0) * log(fabs(_mAmplitude->get()) / _mLimit->get()))) + 1;
+    tmp = static_cast<unsigned int>(ceil(_mLimit->get() * _mSigmas.at(dim)));
+    // check if kernel size is even and if so, make it odd
+    if (tmp % 2 == 0)
+    {
+      tmp++;
+    }
   }
   else
   {

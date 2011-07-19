@@ -50,6 +50,7 @@
 
 //! @todo find a better place for this
 #include "dynamics/fields/NeuralField.h"
+#include "processing/source/GaussInput.h"
 
 // PROJECT INCLUDES
 
@@ -84,6 +85,8 @@ cedar::proc::Manager::Manager()
 
   StepDeclarationPtr field_decl(new StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
   this->steps().declareClass(field_decl);
+  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
+  this->steps().declareClass(input_decl);
 }
 
 cedar::proc::Manager::~Manager()

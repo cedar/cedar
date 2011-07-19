@@ -80,7 +80,7 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
   shifts.push_back(0.0);
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
-  mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 0.001, 2));
+  mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 5.0, 2));
   this->declareBuffer("kernel");
   this->setBuffer("kernel", mKernel->getKernelRaw());
   this->addConfigurableChild("lateral kernel", this->mKernel);
