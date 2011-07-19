@@ -88,6 +88,9 @@ namespace cedar
     class Manager;
     template <class T, class T_Declaration> class Registry;
 
+    class Network;
+    typedef boost::shared_ptr<Network> NetworkPtr;
+
     template <class BaseClass, class FactoryType> class DeclarationBase;
 
     class StepDeclaration;
