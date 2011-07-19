@@ -48,6 +48,9 @@
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 
+// Define that helps to debug file reading.
+//#define DEBUG_FILE_READING
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,10 +74,10 @@ void cedar::proc::Network::readFile(const std::string& filename)
 #endif // DEBUG_FILE_READING
   cedar::aux::ConfigurationNode cfg;
   boost::property_tree::read_json(filename, cfg);
-  this->readAll(cfg);
+  this->readFrom(cfg);
 }
 
-void cedar::proc::Network::readAll(const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
 {
   try
   {
@@ -124,6 +127,7 @@ void cedar::proc::Network::readStep(const std::string& classId, const cedar::aux
   cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().allocateClass(classId);
   step->readConfiguration(root);
   cedar::proc::Manager::getInstance().steps().registerObject(step);
+  mSteps.push_back(step);
 }
 
 void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
@@ -149,31 +153,7 @@ void cedar::proc::Network::readTrigger(const std::string& classId, const cedar::
   cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().allocateClass(classId);
   trigger->readConfiguration(root);
   cedar::proc::Manager::getInstance().triggers().registerObject(trigger);
-
-  // listeners
-  try
-  {
-    //!@todo Does this belong into cedar::proc::Trigger::readConfiguration?
-    const cedar::aux::ConfigurationNode& listeners = root.get_child("listeners");
-
-    for (cedar::aux::ConfigurationNode::const_iterator iter = listeners.begin();
-        iter != listeners.end();
-        ++iter)
-    {
-      std::string listener_name = iter->second.data();
-
-#ifdef DEBUG_FILE_READING
-  std::cout << "Adding listener " << listener_name << std::endl;
-#endif // DEBUG_FILE_READING
-
-      cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(listener_name);
-      trigger->addListener(step);
-    }
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no listeners declared -- this is ok.
-  }
+  this->mTriggers.push_back(trigger);
 }
 
 void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& root)
