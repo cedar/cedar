@@ -91,6 +91,10 @@ public slots:
   void startThreads();
   void stopThreads();
 
+  void saveAs();
+
+  void resetTo(cedar::proc::gui::NetworkFilePtr network);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -112,6 +116,8 @@ protected:
   // none yet
 private:
   std::map<std::string, cedar::proc::gui::StepClassList*> mStepClassListWidgets;
+
+  cedar::proc::gui::NetworkFilePtr mNetwork;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

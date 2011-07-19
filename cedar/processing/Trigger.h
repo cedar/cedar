@@ -95,7 +95,8 @@ public:
 
   virtual void notifyDisconnected(cedar::proc::Trigger* trigger);
 
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  void saveConfiguration(cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -43,6 +43,7 @@
 #include "processing/gui/Scene.h"
 #include "processing/gui/StepItem.h"
 #include "processing/gui/StepClassList.h"
+#include "processing/gui/NetworkFile.h"
 #include "processing/Manager.h"
 
 // PROJECT INCLUDES
@@ -50,6 +51,7 @@
 // SYSTEM INCLUDES
 #include <QLabel>
 #include <QMessageBox>
+#include <QFileDialog>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -69,12 +71,22 @@ cedar::proc::gui::Ide::Ide()
                    this, SLOT(architectureToolFinished()));
   QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
   QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()));
+  QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
+
+  mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this->mpProcessingDrawer->getScene()));
+  this->resetTo(mNetwork);
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkFilePtr network)
+{
+  this->mpProcessingDrawer->getScene()->setNetwork(network);
+  //!@todo Implement me!
+}
 
 void cedar::proc::gui::Ide::architectureToolFinished()
 {
@@ -136,4 +148,18 @@ void cedar::proc::gui::Ide::stopThreads()
   cedar::proc::Manager::getInstance().stopThreads();
   this->mpThreadsStartAll->setEnabled(true);
   this->mpThreadsStopAll->setEnabled(false);
+}
+
+void cedar::proc::gui::Ide::saveAs()
+{
+  QString file = QFileDialog::getSaveFileName(this, // parent
+                                              "Select where to save", // caption
+                                              "", // initial directory; //!@todo save/restore with window settings
+                                              "json (*.json)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    this->mNetwork->save(file.toStdString());
+  }
 }

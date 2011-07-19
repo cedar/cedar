@@ -77,21 +77,26 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void readStep(const std::string& classId, const cedar::aux::ConfigurationNode& root);
-
   void readSteps(const cedar::aux::ConfigurationNode& root);
-
-  void readTrigger(const std::string& classId, const cedar::aux::ConfigurationNode& root);
+  void saveSteps(cedar::aux::ConfigurationNode& root);
 
   void readTriggers(const cedar::aux::ConfigurationNode& root);
+  void saveTriggers(cedar::aux::ConfigurationNode& root);
 
   void readDataConnection(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnection(cedar::aux::ConfigurationNode& root);
 
   void readDataConnections(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnections(cedar::aux::ConfigurationNode& root);
 
   void readFrom(const cedar::aux::ConfigurationNode& root);
+  void saveTo(cedar::aux::ConfigurationNode& root);
 
   void readFile(const std::string& filename);
+
+  void add(cedar::proc::StepPtr step);
+  void add(cedar::proc::TriggerPtr trigger);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
