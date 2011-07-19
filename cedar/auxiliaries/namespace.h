@@ -34,19 +34,17 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_NAMESPACE_H
 #define CEDAR_AUX_NAMESPACE_H
 
 // LOCAL INCLUDES
 
-// PROJECT INCLUDES
-#include "namespace.h"
-
 // SYSTEM INCLUDES
 #include <sstream>
 #include <boost/smart_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
+
+// PROJECT INCLUDES
 
 
 namespace cedar

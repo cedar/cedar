@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Configurable.h
+    File:        NetworkFile.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2011 07 19
 
     Description:
 
@@ -38,62 +38,61 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONFIGURABLE_H
-#define CEDAR_AUX_CONFIGURABLE_H
+#ifndef CEDAR_PROC_GUI_NETWORK_FILE_H
+#define CEDAR_PROC_GUI_NETWORK_FILE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "processing/gui/namespace.h"
+#include "processing/gui/Scene.h"
+#include "processing/Network.h"
+
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <map>
+
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::Configurable
+class cedar::proc::gui::NetworkFile
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros and types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
-  typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Configurable();
+  NetworkFile(cedar::proc::gui::Scene* pScene);
+
   //!@brief Destructor
-  virtual ~Configurable();
+  ~NetworkFile();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-  virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);
-  const Children& configurableChildren() const;
+  void save(const std::string& destination);
 
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
-  void setName(const std::string& name);
-  const std::string& getName() const;
+  cedar::proc::NetworkPtr network();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  cedar::proc::NetworkPtr mNetwork;
+  cedar::proc::gui::Scene* mpScene;
+
+  void saveScene(cedar::aux::ConfigurationNode root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -111,14 +110,12 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  ParameterMap mParameters;
-  StringParameterPtr _mName;
-  Children mChildren;
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Configurable
+}; // class cedar::proc::gui::NetworkFile
 
-#endif // CEDAR_AUX_CONFIGURABLE_H
+#endif // CEDAR_PROC_GUI_NETWORK_FILE_H
 

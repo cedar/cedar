@@ -47,9 +47,11 @@
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/string_path.hpp>
 
 // Define that helps to debug file reading.
 //#define DEBUG_FILE_READING
+#define DEBUG_FILE_WRITING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -67,6 +69,22 @@ cedar::proc::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Network::add(cedar::proc::StepPtr step)
+{
+#ifdef DEBUG_FILE_WRITING
+    std::cout << "Adding step " << step->getName() << " to network." << std::endl;
+#endif
+  this->mSteps.push_back(step);
+}
+
+void cedar::proc::Network::add(cedar::proc::TriggerPtr trigger)
+{
+#ifdef DEBUG_FILE_WRITING
+    std::cout << "Adding trigger " << trigger->getName() << " to network." << std::endl;
+#endif
+  this->mTriggers.push_back(trigger);
+}
+
 void cedar::proc::Network::readFile(const std::string& filename)
 {
 #ifdef DEBUG_FILE_READING
@@ -75,6 +93,18 @@ void cedar::proc::Network::readFile(const std::string& filename)
   cedar::aux::ConfigurationNode cfg;
   boost::property_tree::read_json(filename, cfg);
   this->readFrom(cfg);
+}
+
+void cedar::proc::Network::saveTo(cedar::aux::ConfigurationNode& root)
+{
+  cedar::aux::ConfigurationNode steps;
+  this->saveSteps(steps);
+  root.add_child("steps", steps);
+
+  cedar::aux::ConfigurationNode triggers;
+  this->saveTriggers(triggers);
+  root.add_child("triggers", triggers);
+  // TODO connections
 }
 
 void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
@@ -118,16 +148,21 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
   }
 }
 
-void cedar::proc::Network::readStep(const std::string& classId, const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::saveSteps(cedar::aux::ConfigurationNode& steps)
 {
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading step of type " << classId << std::endl;
-#endif // DEBUG_FILE_READING
+#ifdef DEBUG_FILE_WRITING
+    std::cout << "Saving " << this->mSteps.size() << " steps." << std::endl;
+#endif
 
-  cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().allocateClass(classId);
-  step->readConfiguration(root);
-  cedar::proc::Manager::getInstance().steps().registerObject(step);
-  mSteps.push_back(step);
+  for (size_t i = 0; i < this->mSteps.size(); ++i)
+  {
+    cedar::proc::StepPtr& step = this->mSteps.at(i);
+    cedar::proc::StepDeclarationPtr decl = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
+
+    cedar::aux::ConfigurationNode step_node;
+    step->saveConfiguration(step_node);
+    steps.push_back(cedar::aux::ConfigurationNode::value_type(decl->getClassId(), step_node));
+  }
 }
 
 void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
@@ -140,20 +175,35 @@ void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
       iter != root.end();
       ++iter)
   {
-    this->readStep(iter->first, iter->second);
+    const std::string class_id = iter->first;
+    const cedar::aux::ConfigurationNode& step_node = iter->second;
+
+  #ifdef DEBUG_FILE_READING
+    std::cout << "Reading step of type " << class_id << std::endl;
+  #endif // DEBUG_FILE_READING
+
+    cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().allocateClass(class_id);
+    step->readConfiguration(step_node);
+    cedar::proc::Manager::getInstance().steps().registerObject(step);
+    mSteps.push_back(step);
   }
 }
 
-void cedar::proc::Network::readTrigger(const std::string& classId, const cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::saveTriggers(cedar::aux::ConfigurationNode& triggers)
 {
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading trigger of type " << classId << std::endl;
-#endif // DEBUG_FILE_READING
+#ifdef DEBUG_FILE_WRITING
+    std::cout << "Saving " << this->mTriggers.size() << " triggers." << std::endl;
+#endif
 
-  cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().allocateClass(classId);
-  trigger->readConfiguration(root);
-  cedar::proc::Manager::getInstance().triggers().registerObject(trigger);
-  this->mTriggers.push_back(trigger);
+  for (size_t i = 0; i < this->mTriggers.size(); ++i)
+  {
+    cedar::proc::TriggerPtr& trigger = this->mTriggers.at(i);
+    cedar::proc::TriggerDeclarationPtr decl = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(trigger);
+
+    cedar::aux::ConfigurationNode trigger_node;
+    trigger->saveConfiguration(trigger_node);
+    triggers.push_back(cedar::aux::ConfigurationNode::value_type(decl->getClassId(), trigger_node));
+  }
 }
 
 void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& root)
@@ -166,8 +216,23 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
       iter != root.end();
       ++iter)
   {
-    this->readTrigger(iter->first, iter->second);
+    const std::string& class_id = iter->first;
+    const cedar::aux::ConfigurationNode& trigger_node = iter->second;
+
+#ifdef DEBUG_FILE_READING
+    std::cout << "Reading trigger of type " << class_id << std::endl;
+#endif // DEBUG_FILE_READING
+
+    cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().allocateClass(class_id);
+    trigger->readConfiguration(trigger_node);
+    cedar::proc::Manager::getInstance().triggers().registerObject(trigger);
+    this->mTriggers.push_back(trigger);
   }
+}
+
+void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& root)
+{
+  // FIXME
 }
 
 void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNode& root)
@@ -192,6 +257,11 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
                               cedar::proc::Manager::getInstance().steps().get(target_step),
                               target_data
                             );
+}
+
+void cedar::proc::Network::saveDataConnections(cedar::aux::ConfigurationNode& root)
+{
+  // FIXME
 }
 
 void cedar::proc::Network::readDataConnections(const cedar::aux::ConfigurationNode& root)

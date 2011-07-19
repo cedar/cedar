@@ -157,6 +157,20 @@ const std::vector<cedar::proc::StepPtr>& cedar::proc::Trigger::getListeners() co
   return this->mListeners;
 }
 
+void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::aux::Configurable::readConfiguration(node);
+
+  cedar::aux::ConfigurationNode listeners;
+  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  {
+    cedar::proc::StepPtr& step = this->mListeners.at(i);
+    cedar::aux::ConfigurationNode listener(step->getName());
+    listeners.push_back(cedar::aux::ConfigurationNode::value_type("", listener));
+  }
+  node.add_child("listeners", listeners);
+}
+
 void cedar::proc::Trigger::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::aux::Configurable::readConfiguration(node);

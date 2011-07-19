@@ -82,6 +82,14 @@ cedar::aux::Configurable::ParameterMap& cedar::aux::Configurable::getParameters(
   return this->mParameters;
 }
 
+void cedar::aux::Configurable::saveConfiguration(cedar::aux::ConfigurationNode& root)
+{
+  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
+  {
+    iter->second->putTo(root);
+  }
+}
+
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
