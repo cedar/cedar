@@ -51,6 +51,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::Data::Data()
+:
+mpeOwner(NULL)
 {
 }
 
@@ -80,4 +82,24 @@ void cedar::proc::Data::lockForWrite()
 void cedar::proc::Data::unlock()
 {
   this->mLock.unlock();
+}
+
+cedar::proc::Step* cedar::proc::Data::getOwner()
+{
+  return this->mpeOwner;
+}
+
+void cedar::proc::Data::setOwner(cedar::proc::Step* step)
+{
+  this->mpeOwner = step;
+}
+
+const std::string& cedar::proc::Data::connectedSlotName() const
+{
+  return this->mConnectedSlotName;
+}
+
+void cedar::proc::Data::connectedSlotName(const std::string& name)
+{
+  this->mConnectedSlotName = name;
 }
