@@ -50,6 +50,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <map>
 
 
 /*!@brief Abstract description of the class.
@@ -59,8 +60,11 @@
 class cedar::proc::gui::StepItem : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
+  typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -100,6 +104,7 @@ protected:
   // none yet
 private:
   cedar::proc::StepPtr mStep;
+  DataSlotMap mSlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

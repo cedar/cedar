@@ -63,7 +63,7 @@
     <addaction name="separator"/>
     <addaction name="mpActionSave"/>
     <addaction name="mpActionSaveAs"/>
-    <addaction name="actionLoad"/>
+    <addaction name="mpActionLoad"/>
     <addaction name="separator"/>
     <addaction name="mpActionExit"/>
    </widget>
@@ -179,8 +179,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>130</width>
-          <height>319</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -260,10 +260,7 @@
     <string>Save as ...</string>
    </property>
   </action>
-  <action name="actionLoad">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <action name="mpActionLoad">
    <property name="text">
     <string>Load</string>
    </property>

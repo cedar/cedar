@@ -76,8 +76,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void save(const std::string& destination);
+  void load(const std::string& source);
 
   cedar::proc::NetworkPtr network();
+
+  void addToScene();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,6 +96,7 @@ private:
   cedar::proc::gui::Scene* mpScene;
 
   void saveScene(cedar::aux::ConfigurationNode root);
+  void loadScene(cedar::aux::ConfigurationNode root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

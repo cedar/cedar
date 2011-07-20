@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -71,6 +72,8 @@ public:
     MODE_CONNECT
   };
 
+  typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,6 +97,7 @@ public:
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
 
   void addProcessingStep(const std::string& classId, QPointF position);
+  void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
   void addTrigger(const std::string& classId, QPointF position);
 
   void setMode(MODE mode, const QString& param = "");
@@ -101,6 +105,12 @@ public:
   void setMainWindow(QMainWindow *pMainWindow);
 
   void setNetwork(cedar::proc::gui::NetworkFilePtr network);
+
+  void reset();
+
+  const StepMap& stepMap() const;
+
+  cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -152,6 +162,8 @@ private:
   QGraphicsRectItem *mpGroupIndicator;
   QList<QGraphicsItem*> mProspectiveGroupMembers;
   QMainWindow *mpMainWindow;
+
+  StepMap mStepMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
