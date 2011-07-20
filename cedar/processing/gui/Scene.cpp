@@ -45,6 +45,7 @@
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/GroupItem.h"
+#include "processing/gui/NetworkFile.h"
 
 // PROJECT INCLUDES
 
@@ -77,6 +78,11 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkFilePtr network)
+{
+  this->mNetwork = network;
+}
 
 void cedar::proc::gui::Scene::setMainWindow(QMainWindow *pMainWindow)
 {
@@ -222,6 +228,12 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
   {
     delete mpNewConnectionIndicator;
     mpNewConnectionIndicator = NULL;
+  }
+
+  if (pMouseEvent->button() != Qt::LeftButton)
+  {
+    QGraphicsScene::mousePressEvent(pMouseEvent);
+    return;
   }
 
   QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
@@ -483,6 +495,12 @@ void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF pos
     {
       Manager::getInstance().registerThread(looped_thread);
     }
+
+    if (this->mNetwork)
+    {
+      this->mNetwork->network()->add(trigger);
+    }
+
     cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
     this->addItem(p_drawer);
     p_drawer->setPos(position);
@@ -518,6 +536,12 @@ void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPoi
   try
   {
     cedar::proc::StepPtr step = Manager::getInstance().steps().createInstance(classId, name);
+
+    if (this->mNetwork)
+    {
+      this->mNetwork->network()->add(step);
+    }
+
     cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step, this->mpMainWindow);
     this->addItem(p_drawer);
     p_drawer->setPos(position);

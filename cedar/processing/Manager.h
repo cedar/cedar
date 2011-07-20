@@ -83,14 +83,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static Manager& getInstance();
-  void readStep(const std::string& classId, const cedar::aux::ConfigurationNode& root);
-  void readSteps(const cedar::aux::ConfigurationNode& root);
-  void readTrigger(const std::string& classId, const cedar::aux::ConfigurationNode& root);
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
-  void readAll(const cedar::aux::ConfigurationNode& root);
-  void readFile(const std::string& filename);
 
   StepRegistry& steps();
   TriggerRegistry& triggers();
@@ -115,8 +107,6 @@ protected:
 private:
   //!@brief The standard constructor.
   Manager();
-
-  static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
