@@ -127,8 +127,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   cedar::aux::DoubleParameterPtr _mAmplitude; //!<
-  std::vector<double> _mSigmas; //!< index resemble dimension
-  std::vector<double> _mShifts; //!< index resembles dimension
+//  std::vector<double> _mSigmas; //!< index resemble dimension
+  cedar::aux::DoubleVectorParameterPtr _mSigmas; //!< index resemble dimension
+//  std::vector<double> _mShifts; //!< index resembles dimension
+  cedar::aux::DoubleVectorParameterPtr _mShifts; //!< index resemble dimension
   cedar::aux::DoubleParameterPtr _mLimit; //!< variable that defines the precision of the numerical approximation at the borders
 private:
   // none yet

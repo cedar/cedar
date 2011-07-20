@@ -40,6 +40,7 @@
 #include "processing/DataT.h"
 #include "auxiliaries/math/functions.h"
 #include "auxiliaries/exceptions.h"
+#include "auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 
@@ -54,10 +55,14 @@ cedar::aux::kernel::Gauss::Gauss()
 :
 cedar::aux::kernel::Separable(),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", -10000.0, 10000.0)),
+_mSigmas(new cedar::aux::DoubleVectorParameter("sigmas", 2, 3.0, 0.0, 10000)),
+_mShifts(new cedar::aux::DoubleVectorParameter("shifts", 2, 3.0, 0.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter("limit", 0.01, 1000.0))
 {
   this->registerParameter(_mAmplitude);
   this->registerParameter(_mLimit);
+  this->registerParameter(_mSigmas);
+  this->registerParameter(_mShifts);
   this->onInit();
 }
 
@@ -72,15 +77,17 @@ cedar::aux::kernel::Gauss::Gauss(
 :
 cedar::aux::kernel::Separable(dimensionality, kernelFile),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", amplitude, -10000.0, 10000.0)),
+_mSigmas(new cedar::aux::DoubleVectorParameter("sigmas", sigmas, 0.0, 10000)),
+_mShifts(new cedar::aux::DoubleVectorParameter("shifts", shifts, 0.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter("limit", limit, 0.01, 1000.0))
 {
   this->registerParameter(_mAmplitude);
   this->registerParameter(_mLimit);
+  this->registerParameter(_mSigmas);
+  this->registerParameter(_mShifts);
   this->mCenters.resize(dimensionality);
   this->mKernelParts.resize(dimensionality);
   this->mSizes.resize(dimensionality);
-  this->_mSigmas = sigmas;
-  this->_mShifts = shifts;
   this->onInit();
 }
 
@@ -116,7 +123,7 @@ void cedar::aux::kernel::Gauss::calculate()
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
       // estimate width
-      if (_mSigmas.at(dim) != 0)
+      if (_mSigmas->get().at(dim) != 0)
       {
         mSizes.at(dim) = getWidth(dim);
       }
@@ -124,17 +131,17 @@ void cedar::aux::kernel::Gauss::calculate()
       {
         mSizes.at(dim) = 1;
       }
-      mCenters.at(dim) = mSizes.at(dim) / 2 + _mShifts.at(dim);
+      mCenters.at(dim) = mSizes.at(dim) / 2 + _mShifts->get().at(dim);
       mKernelParts.at(dim) = cv::Mat::zeros(mSizes.at(dim), 1, CV_32FC1);
 
       // calculate kernel part
-      if (_mSigmas.at(dim) != 0)
+      if (_mSigmas->get().at(dim) != 0)
       {
         for (unsigned int j = 0; j < mSizes.at(dim); j++)
         {
           //!\todo move Gauss function and filling up of matrix to some tool function
           mKernelParts.at(dim).at<float>(j, 0)
-              = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas.at(dim));
+              = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas->get().at(dim));
         }
       }
       else // discrete case
@@ -221,7 +228,7 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
 {
   try
   {
-    _mSigmas.at(dimension) = sigma;
+    _mSigmas->get().at(dimension) = sigma;
   }
   catch(std::exception& e)
   {
@@ -232,14 +239,14 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
 
 double cedar::aux::kernel::Gauss::getSigma(unsigned int dimension) const
 {
-  return _mSigmas.at(dimension);
+  return _mSigmas->get().at(dimension);
 }
 
 void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
 {
   try
   {
-    _mShifts.at(dimension) = shift;
+    _mShifts->get().at(dimension) = shift;
   }
   catch(std::exception& e)
   {
@@ -250,7 +257,7 @@ void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
 
 double cedar::aux::kernel::Gauss::getShift(unsigned int dimension) const
 {
-  return _mShifts.at(dimension);
+  return _mShifts->get().at(dimension);
 }
 
 void cedar::aux::kernel::Gauss::setAmplitude(double amplitude)
@@ -268,7 +275,7 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
   unsigned int tmp;
   /* size of kernel is determined by limit * sigma
    */
-  tmp = static_cast<unsigned int>(ceil(_mLimit->get() * _mSigmas.at(dim)));
+  tmp = static_cast<unsigned int>(ceil(_mLimit->get() * _mSigmas->get().at(dim)));
   // check if kernel size is even and if so, make it odd
   if (tmp % 2 == 0)
   {

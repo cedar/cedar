@@ -76,7 +76,16 @@ public:
   VectorParameter(const std::string& name, const std::vector<T>& defaults)
   :
   cedar::aux::ParameterBase(name, true),
-  mDefaults(defaults)
+  mDefaults(defaults),
+  mSize(0)
+  {
+  }
+
+  VectorParameter(const std::string& name, size_t size, T defaultValue)
+  :
+  cedar::aux::ParameterBase(name, true),
+  mSize(size),
+  mDefaultValue(defaultValue)
   {
   }
 
@@ -95,7 +104,7 @@ public:
     cedar::aux::ConfigurationNode node = root.get_child(this->getName());
     for (cedar::aux::ConfigurationNode::iterator iter = node.begin(); iter != node.end(); ++iter)
     {
-      this->mValues.push_back(iter.get_value<T>());
+      this->mValues.push_back(iter->second.get_value<T>());
     }
   }
 
@@ -104,7 +113,7 @@ public:
     cedar::aux::ConfigurationNode vector_node;
     for (typename std::vector<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
     {
-      cedar::aux::ConfigurationNode node(*iter);
+      cedar::aux::ConfigurationNode node(cedar::aux::ConfigurationNode::data_type(*iter));
       vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", node));
     }
     root.put(this->getName(), vector_node);
@@ -118,6 +127,23 @@ public:
   std::vector<T>& get()
   {
     return this->mValues;
+  }
+
+  void makeDefault()
+  {
+    if (mSize == 0)
+    {
+
+      this->mValues = mDefaults;
+    }
+    else
+    {
+      mValues.clear();
+      for (size_t i = 0; i < mSize; i++)
+      {
+        mValues.push_back(mDefaultValue);
+      }
+    }
   }
 
 
@@ -143,6 +169,8 @@ protected:
 private:
   std::vector<T> mValues;
   std::vector<T> mDefaults;
+  size_t mSize;
+  T mDefaultValue;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -78,6 +78,20 @@ public:
   {
   }
 
+  NumericVectorParameter(
+                          const std::string& name,
+                          size_t defaultSize,
+                          T defaultValue,
+                          const T& minimum,
+                          const T& maximum
+                        )
+  :
+  cedar::aux::VectorParameter<T>(name, defaultSize, defaultValue),
+  mMinimum(minimum),
+  mMaximum(maximum)
+  {
+  }
+
   //!@brief The constructor.
   NumericVectorParameter(
                           const std::string& name,
