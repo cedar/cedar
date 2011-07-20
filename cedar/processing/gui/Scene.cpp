@@ -79,6 +79,17 @@ cedar::proc::gui::Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Scene::reset()
+{
+  this->mStepMap.clear();
+  this->clear();
+}
+
+const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
+{
+  return this->mStepMap;
+}
+
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkFilePtr network)
 {
   this->mNetwork = network;
@@ -547,14 +558,40 @@ void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPoi
       this->mNetwork->network()->add(step);
     }
 
-    cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step, this->mpMainWindow);
-    this->addItem(p_drawer);
-    p_drawer->setPos(position);
-    this->update();
+    this->addProcessingStep(step, position);
   }
   catch(const cedar::aux::exc::ExceptionBase& e)
   {
     QString message(e.exceptionInfo().c_str());
     emit exception(message);
   }
+}
+
+cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc::Step* step)
+{
+  StepMap::iterator iter = this->mStepMap.find(step);
+  if (iter == this->mStepMap.end())
+  {
+#ifdef DEBUG
+    std::cout << "Could not find step item for step \"" << step->getName() << "\"" << std::endl;
+#endif // DEBUG
+    return NULL;
+  }
+  else
+  {
+    return iter->second;
+  }
+}
+
+void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)
+{
+  cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step, this->mpMainWindow);
+  this->addItem(p_drawer);
+
+  // we assume that steps are only inserted once.
+  CEDAR_DEBUG_ASSERT(this->mStepMap.find(step.get()) == this->mStepMap.end());
+  this->mStepMap[step.get()] = p_drawer;
+
+  p_drawer->setPos(position);
+  this->update();
 }

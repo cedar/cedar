@@ -97,6 +97,10 @@ public:
   void add(cedar::proc::StepPtr step);
   void add(cedar::proc::TriggerPtr trigger);
 
+  const StepVector& steps() const;
+  StepVector& steps();
+  const TriggerVector& triggers() const;
+  TriggerVector& triggers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

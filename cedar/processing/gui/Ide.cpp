@@ -72,6 +72,7 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpThreadsStartAll, SIGNAL(triggered()), this, SLOT(startThreads()));
   QObject::connect(this->mpThreadsStopAll, SIGNAL(triggered()), this, SLOT(stopThreads()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
+  QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
 
   mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this->mpProcessingDrawer->getScene()));
   this->resetTo(mNetwork);
@@ -84,8 +85,10 @@ cedar::proc::gui::Ide::Ide()
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkFilePtr network)
 {
+  this->mNetwork = network;
+  this->mpProcessingDrawer->getScene()->reset();
   this->mpProcessingDrawer->getScene()->setNetwork(network);
-  //!@todo Implement me!
+  this->mNetwork->addToScene();
 }
 
 void cedar::proc::gui::Ide::architectureToolFinished()
@@ -161,5 +164,21 @@ void cedar::proc::gui::Ide::saveAs()
   if (!file.isEmpty())
   {
     this->mNetwork->save(file.toStdString());
+  }
+}
+
+void cedar::proc::gui::Ide::load()
+{
+  QString file = QFileDialog::getOpenFileName(this, // parent
+                                              "Select which file to load", // caption
+                                              "", // initial directory; //!@todo save/restore with window settings
+                                              "json (*.json)" // filter(s), separated by ';;'
+                                              );
+
+  if (!file.isEmpty())
+  {
+    cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this->mpProcessingDrawer->getScene()));
+    network->load(file.toStdString());
+    this->resetTo(network);
   }
 }

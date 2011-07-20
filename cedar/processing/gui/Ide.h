@@ -92,6 +92,7 @@ public slots:
   void stopThreads();
 
   void saveAs();
+  void load();
 
   void resetTo(cedar::proc::gui::NetworkFilePtr network);
 
