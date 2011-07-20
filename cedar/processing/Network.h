@@ -84,7 +84,7 @@ public:
   void saveTriggers(cedar::aux::ConfigurationNode& root);
 
   void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnection(cedar::aux::ConfigurationNode& root);
+  void saveDataConnection(cedar::aux::ConfigurationNode& root, cedar::proc::StepPtr& source);
 
   void readDataConnections(const cedar::aux::ConfigurationNode& root);
   void saveDataConnections(cedar::aux::ConfigurationNode& root);
