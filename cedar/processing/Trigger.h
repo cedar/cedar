@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
-#include "auxiliaries/Base.h"
+#include "auxiliaries/Configurable.h"
 
 
 // PROJECT INCLUDES
@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Trigger : public virtual cedar::aux::Base
+class cedar::proc::Trigger : public virtual cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -95,7 +95,8 @@ public:
 
   virtual void notifyDisconnected(cedar::proc::Trigger* trigger);
 
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  void saveConfiguration(cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -94,6 +94,11 @@ public:
     return this->mValue;
   }
 
+  void putTo(cedar::aux::ConfigurationNode& root)
+  {
+    root.put(this->getName(), this->mValue);
+  }
+
   void set(const T& value)
   {
     this->mValue = value;

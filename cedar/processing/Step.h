@@ -146,6 +146,8 @@ public:
   void unlockAll();
   void unlockAll(DataRole::Id role);
 
+  static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
