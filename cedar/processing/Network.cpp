@@ -42,6 +42,7 @@
 #include "processing/Network.h"
 #include "processing/Manager.h"
 #include "processing/Step.h"
+#include "processing/Data.h"
 
 // PROJECT INCLUDES
 
@@ -99,12 +100,18 @@ void cedar::proc::Network::saveTo(cedar::aux::ConfigurationNode& root)
 {
   cedar::aux::ConfigurationNode steps;
   this->saveSteps(steps);
-  root.add_child("steps", steps);
+  if (!steps.empty())
+    root.add_child("steps", steps);
 
   cedar::aux::ConfigurationNode triggers;
   this->saveTriggers(triggers);
-  root.add_child("triggers", triggers);
-  // TODO connections
+  if (!triggers.empty())
+    root.add_child("triggers", triggers);
+
+  cedar::aux::ConfigurationNode connections;
+  this->saveDataConnections(connections);
+  if (!connections.empty())
+    root.add_child("connections", connections);
 }
 
 void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
@@ -230,9 +237,29 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
   }
 }
 
-void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& connections, cedar::proc::StepPtr& source)
 {
-  // FIXME
+  cedar::proc::Step::SlotMap& inputs = source->getDataSlots(cedar::proc::DataRole::OUTPUT);
+  for (cedar::proc::Step::SlotMap::iterator iter = inputs.begin(); iter != inputs.end(); ++iter)
+  {
+    cedar::proc::DataPtr data = iter->second.getData();
+    const std::string& source_data_name = iter->first;
+    cedar::proc::Step* target = data->getOwner();
+    const std::string& target_data_name = data->connectedSlotName();
+
+    if (target_data_name.empty())
+    {
+      continue;
+    }
+
+    std::string source_str = source->getName() + "." + source_data_name;
+    std::string target_str = target->getName() + "." + target_data_name;
+
+    cedar::aux::ConfigurationNode connection;
+    connection.put("source", source_str);
+    connection.put("target", target_str);
+    connections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
+  }
 }
 
 void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNode& root)
@@ -261,7 +288,11 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
 
 void cedar::proc::Network::saveDataConnections(cedar::aux::ConfigurationNode& root)
 {
-  // FIXME
+  for (size_t i = 0; i < this->mSteps.size(); ++i)
+  {
+    cedar::proc::StepPtr& step = this->mSteps.at(i);
+    this->saveDataConnection(root, step);
+  }
 }
 
 void cedar::proc::Network::readDataConnections(const cedar::aux::ConfigurationNode& root)
