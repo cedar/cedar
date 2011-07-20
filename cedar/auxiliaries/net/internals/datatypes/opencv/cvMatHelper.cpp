@@ -110,27 +110,32 @@ template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(
 
 template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_read(HeaderType &extheader)
 {
-   if (!mCheckHeader.cols || !mCheckHeader.rows)
-    {
-       init_checkheader(extheader); // get info from header!
+  if (!mCheckHeader.cols || !mCheckHeader.rows)
+  {
+    init_checkheader(extheader); // get info from header!
 
-       return true;
+    if (mCheckHeader.magicNumber != extheader.magicNumber)
+    {                // ^--- was just set in init_checkheader()
+      return false;
     }
-    else
+ 
+    return true;
+  }
+  else
+  {
+    if (mCheckHeader.cols != extheader.cols
+        || mCheckHeader.rows != extheader.rows
+        || mCheckHeader.elemSize != extheader.elemSize
+        || mCheckHeader.cvMatType != extheader.cvMatType 
+        || mCheckHeader.magicNumber != extheader.magicNumber 
+      )
     {
-      if (mCheckHeader.cols != extheader.cols
-          || mCheckHeader.rows != extheader.rows
-          || mCheckHeader.elemSize != extheader.elemSize
-          || mCheckHeader.cvMatType != extheader.cvMatType 
-          || mCheckHeader.magicNumber != extheader.magicNumber 
-        )
-      {
-        // exceptions will not be thrown here
-        return false;
-      }
-
-      return true;
+      // exceptions will not be thrown here
+      return false;
     }
+
+    return true;
+  }
 }
 
 template <typename CVT> cvMatHelper<CVT>::cvMatHelper() : mCheckHeader()

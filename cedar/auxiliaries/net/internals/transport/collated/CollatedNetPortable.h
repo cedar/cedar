@@ -123,7 +123,7 @@ public:
   //!@brief YARP will call this read() and we will prepare the matrix and send it
   //
   // the content has to be placed into the reference given by content()
-  bool read(ConnectionReader& connection) 
+  bool read(yarp::os::ConnectionReader& connection) 
   {
     int iHeaderSize, iDataSize, iNumElements, iElemSize;
     int i;
@@ -193,7 +193,7 @@ public:
   //
   // the values of the (prepared) header where already checked in 
   // CollatedNetWriter::write()
-  bool write(ConnectionWriter& connection) 
+  bool write(yarp::os::ConnectionWriter& connection) 
   {
     int iHeaderSize, iDataSize, aiBlocks[2], iNumElements, iElemSize;
     int i;
