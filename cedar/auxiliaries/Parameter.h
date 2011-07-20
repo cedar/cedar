@@ -105,6 +105,11 @@ public:
     emit parameterChanged();
   }
 
+  void setTo(const cedar::aux::ConfigurationNode& node)
+  {
+    this->mValue = node.get_value<T>();
+  }
+
   void makeDefault()
   {
     this->set(mDefault);
