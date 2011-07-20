@@ -105,6 +105,8 @@ namespace cedar
 
     template <typename T> class Parameter;
     template <typename T> class NumericParameter;
+    template <typename T> class VectorParameter;
+    template <typename T> class NumericVectorParameter;
     typedef NumericParameter<double> DoubleParameter;
     typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
     typedef NumericParameter<unsigned int> UIntParameter;
@@ -113,6 +115,10 @@ namespace cedar
     typedef boost::shared_ptr<StringParameter> StringParameterPtr;
     typedef Parameter<bool> BoolParameter;
     typedef boost::shared_ptr<BoolParameter> BoolParameterPtr;
+    typedef VectorParameter<bool> BoolVectorParameter;
+    typedef boost::shared_ptr<BoolVectorParameter> BoolVectorParameterPtr;
+    typedef NumericVectorParameter<double> DoubleVectorParameter;
+    typedef boost::shared_ptr<DoubleVectorParameter> DoubleVectorParameterPtr;
 
     typedef boost::property_tree::ptree ConfigurationNode;
 
