@@ -51,9 +51,6 @@
 #include <stdlib.h>
 #include <iostream>
 
-using namespace std;
-using namespace yarp::os;
-
 namespace _NM_CEDAR_ {
   namespace _NM_AUX_ {
     namespace _NM_NET_ {
@@ -70,7 +67,7 @@ class SimpleNetReader : public AbstractNetReader<T>
   // members
   //---------------------------------------------------------------------------
 private:
-  BufferedPort< BinPortable<T> > BufferIn;
+  yarp::os::BufferedPort< yarp::os::BinPortable<T> > BufferIn;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -83,7 +80,7 @@ private:
   SimpleNetReader &operator=(const SimpleNetReader &S);
 
 public:
-  explicit SimpleNetReader(const string &myPortName) 
+  explicit SimpleNetReader(const std::string &myPortName) 
                                      : AbstractNetReader<T>(myPortName),
                                        BufferIn()
   {
@@ -132,7 +129,7 @@ public:
    */
   T read()
   {
-    BinPortable<T> *pBinIn;
+    yarp::os::BinPortable<T> *pBinIn;
 
     pBinIn= BufferIn.read( block ); // strict mode!
     if (pBinIn !=0)

@@ -73,7 +73,7 @@ class CollatedNetWriter :
   // members
   //---------------------------------------------------------------------------
 protected:
-  PortWriterBuffer< CollatedNetPortable< T > > mElemWrapper;
+  yarp::os::PortWriterBuffer< CollatedNetPortable< T > > mElemWrapper;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -113,7 +113,7 @@ public:
    * changed from the earlier trasmissions.
    *
    */
-  void write(const T &t) // may drop packets (non blocking)
+  void write(const T &t) 
   {
 #ifdef DEBUG
     cout << "  CollatedNetWriter [write()]" << endl;

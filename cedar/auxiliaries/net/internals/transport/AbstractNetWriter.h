@@ -48,9 +48,6 @@
 #include <stdlib.h>
 #include <iostream>
 
-
-using namespace std;
-
 namespace _NM_CEDAR_ {
   namespace _NM_AUX_ {
     namespace _NM_NET_ {
@@ -81,7 +78,7 @@ public:
 #define WRITER_PORT_NAME(x) ( (x) + PORT_DELIMINATOR + PORT_SUFFIX_OUT )
   //!@brief Use this constructor. Pass the user-defined port name as argument.
   //        The effective port name will be different.
-  explicit AbstractNetWriter(const string &myPortName)  
+  explicit AbstractNetWriter(const std::string &myPortName)  
                    : AbstractNetBase( WRITER_PORT_NAME(myPortName) )
   {
 #ifdef DEBUG

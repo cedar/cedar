@@ -50,9 +50,6 @@
 #include <stdlib.h>
 #include <iostream>
 
-using namespace std;
-using namespace yarp::os;
-
 namespace _NM_CEDAR_ {
   namespace _NM_AUX_ {
     namespace _NM_NET_ {
@@ -71,7 +68,7 @@ class AbstractNetReader : public AbstractNetBase
   // members
   //---------------------------------------------------------------------------
 private:
-  string mPortNameWriter;
+  std::string mPortNameWriter;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -90,7 +87,7 @@ public:
                                   + boost::lexical_cast<std::string>(getInstanceCounter()) \
                                   + ")" )
   //!@brief use this constructor. Parameter ist the user-defined port name
-  explicit AbstractNetReader(const string &myPortName) 
+  explicit AbstractNetReader(const std::string &myPortName) 
                    : AbstractNetBase( READER_PORT_NAME(myPortName) ),
                      mPortNameWriter()
   {
@@ -116,7 +113,7 @@ public:
   //---------------------------------------------------------------------------
 protected:
   //!@brief the (fully configured) name of the writer port for this reader
-  string getPortNameWriter()
+  std::string getPortNameWriter()
   {
     return mPortNameWriter;
   }

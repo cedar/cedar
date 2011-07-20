@@ -75,7 +75,7 @@ class CollatedNetReader : public CollatedNetBase<T>,
   // members
   //---------------------------------------------------------------------------
 private:
-  PortReaderBuffer< CollatedNetPortable< T > > mElemWrapper;
+  yarp::os::PortReaderBuffer< CollatedNetPortable< T > > mElemWrapper;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -165,10 +165,18 @@ public:
     else
     {
       retMat= pNetPortable->content();
-        // TODO: test received data
-//      CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
-//                   "matrix has wrong size - you wrote matrices of "
-//                   "different size/type before!" );
+
+      // verify matrix size (or generate the header for further checks)
+// TODO: continue here
+#if 0
+      if (!check_collateddata_for_read(mElemWrapper.prepare().header() ) )
+      {
+        CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
+                     "matrix has wrong size - you wrote matrices of "
+                     "different size/type before!" );
+        return;
+      }
+#endif
 
         // TODO: think about reference counter fuer Mat
       return retMat;
