@@ -76,6 +76,7 @@ _mCenterY(new cedar::aux::DoubleParameter("center_y", sizeY/2.0, -10000.0, 10000
   QObject::connect(_mSigma.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenterX.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenterY.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
+  this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
