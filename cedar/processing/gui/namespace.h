@@ -60,6 +60,7 @@ namespace cedar
       class DataPlotter;
       class DataSlotItem;
       class DoubleParameter;
+      class DoubleVectorParameter;
       class GraphicsBase;
       class GroupItem;
       class Ide;

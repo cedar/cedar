@@ -46,6 +46,7 @@ cedar_add_library(cedarproc
   gui/ArchitectureToolBox.h
   gui/BoolParameter.h
   gui/DoubleParameter.h
+  gui/DoubleVectorParameter.h
   gui/Ide.h
   gui/IdeApplication.h
   gui/DataPlotter.h

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VectorParameter.h
+    File:        DoubleVectorParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,116 +38,48 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_VECTOR_PARAMETER_H
-#define CEDAR_AUX_VECTOR_PARAMETER_H
+#ifndef CEDAR_PROC_GUI_DOUBLE_VECTOR_PARAMETER_H
+#define CEDAR_PROC_GUI_DOUBLE_VECTOR_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterBase.h"
+#include "processing/gui/namespace.h"
+#include "processing/gui/ParameterBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <QDoubleSpinBox>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-template <typename T>
-class cedar::aux::VectorParameter : public cedar::aux::ParameterBase
+class cedar::proc::gui::DoubleVectorParameter : public cedar::proc::gui::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VectorParameter(const std::string& name)
-  :
-  cedar::aux::ParameterBase(name, false)
-  {
-  }
-
-  VectorParameter(const std::string& name, const std::vector<T>& defaults)
-  :
-  cedar::aux::ParameterBase(name, true),
-  mDefaults(defaults),
-  mSize(0)
-  {
-    this->makeDefault();
-  }
-
-  VectorParameter(const std::string& name, size_t size, T defaultValue)
-  :
-  cedar::aux::ParameterBase(name, true),
-  mSize(size),
-  mDefaultValue(defaultValue)
-  {
-    this->makeDefault();
-  }
+  DoubleVectorParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~VectorParameter()
-  {
-  }
+  virtual ~DoubleVectorParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setTo(const cedar::aux::ConfigurationNode& root)
-  {
-    this->mValues.clear();
-    cedar::aux::ConfigurationNode node = root.get_child(this->getName());
-    for (cedar::aux::ConfigurationNode::iterator iter = node.begin(); iter != node.end(); ++iter)
-    {
-      this->mValues.push_back(iter->second.get_value<T>());
-    }
-  }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
-  {
-//    cedar::aux::ConfigurationNode vector_node;
-//    for (typename std::vector<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
-//    {
-//      cedar::aux::ConfigurationNode node(cedar::aux::ConfigurationNode::data_type(*iter));
-//      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", node));
-//    }
-//    root.put(this->getName(), vector_node);
-  }
-
-  const std::vector<T>& get() const
-  {
-    return this->mValues;
-  }
-
-  std::vector<T>& get()
-  {
-    return this->mValues;
-  }
-
-  void makeDefault()
-  {
-    if (mSize == 0)
-    {
-
-      this->mValues = mDefaults;
-    }
-    else
-    {
-      mValues.clear();
-      for (size_t i = 0; i < mSize; i++)
-      {
-        mValues.push_back(mDefaultValue);
-      }
-    }
-  }
-
+public slots:
+  void parameterPointerChanged();
+  void valueChanged(double value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -164,28 +96,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  std::vector<T> mValues;
-  std::vector<T> mDefaults;
-  size_t mSize;
-  T mDefaultValue;
+  std::vector<QDoubleSpinBox*> mSpinboxes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::VectorParameter
+}; // class cedar::proc::gui::DoubleVectorParameter
 
-#endif // CEDAR_AUX_VECTOR_PARAMETER_H
+#endif // CEDAR_PROC_GUI_DOUBLE_VECTOR_PARAMETER_H
 
