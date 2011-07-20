@@ -91,6 +91,15 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     QAction *p_start = menu.addAction("start");
     QAction *p_stop = menu.addAction("stop");
 
+    if (p_looped_trigger->isRunning())
+    {
+      p_start->setEnabled(false);
+    }
+    else
+    {
+      p_stop->setEnabled(false);
+    }
+
     QAction *a = menu.exec(event->screenPos());
 
     if (a == p_start)

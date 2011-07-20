@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Configurable.h
+    File:        Network.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2011 07 19
 
     Description:
 
@@ -38,56 +38,71 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONFIGURABLE_H
-#define CEDAR_AUX_CONFIGURABLE_H
+#ifndef CEDAR_PROC_NETWORK_H
+#define CEDAR_PROC_NETWORK_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "processing/namespace.h"
+
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <map>
+#include <vector>
+
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::Configurable
+class cedar::proc::Network
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros and types
+  // types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
-  typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
+private:
+  typedef std::vector<cedar::proc::StepPtr> StepVector;
+  typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Configurable();
+  Network();
+
   //!@brief Destructor
-  virtual ~Configurable();
+  ~Network();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-  virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);
-  const Children& configurableChildren() const;
+  void readSteps(const cedar::aux::ConfigurationNode& root);
+  void saveSteps(cedar::aux::ConfigurationNode& root);
 
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
-  void setName(const std::string& name);
-  const std::string& getName() const;
+  void readTriggers(const cedar::aux::ConfigurationNode& root);
+  void saveTriggers(cedar::aux::ConfigurationNode& root);
+
+  void readDataConnection(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnection(cedar::aux::ConfigurationNode& root);
+
+  void readDataConnections(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnections(cedar::aux::ConfigurationNode& root);
+
+  void readFrom(const cedar::aux::ConfigurationNode& root);
+  void saveTo(cedar::aux::ConfigurationNode& root);
+
+  void readFile(const std::string& filename);
+
+  void add(cedar::proc::StepPtr step);
+  void add(cedar::proc::TriggerPtr trigger);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -98,12 +113,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  StepVector mSteps;
+  TriggerVector mTriggers;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -111,14 +125,12 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  ParameterMap mParameters;
-  StringParameterPtr _mName;
-  Children mChildren;
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Configurable
+}; // class cedar::proc::Network
 
-#endif // CEDAR_AUX_CONFIGURABLE_H
+#endif // CEDAR_PROC_NETWORK_H
 
