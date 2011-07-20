@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.h
+    File:        NumericVectorParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 01
+    Date:        2011 07 20
 
     Description:
 
@@ -38,66 +38,84 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PARAMETER_BASE_H
-#define CEDAR_PROC_PARAMETER_BASE_H
+#ifndef CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
+#define CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
+#include "auxiliaries/VectorParameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QObject>
+
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::ParameterBase : public QObject, public cedar::aux::Base
+template <typename T>
+class cedar::aux::NumericVectorParameter : public cedar::aux::VectorParameter<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ParameterBase(const std::string& name, bool hasDefault = true);
+  //!@brief The constructor.
+  NumericVectorParameter(
+                          const std::string& name,
+                          const std::vector<T>& defaultValues,
+                          const T& minimum,
+                          const T& maximum
+                        )
+  :
+  cedar::aux::VectorParameter<T>(name, defaultValues),
+  mMinimum(minimum),
+  mMaximum(maximum)
+  {
+  }
+
+  //!@brief The constructor.
+  NumericVectorParameter(
+                          const std::string& name,
+                          const T& minimum,
+                          const T& maximum
+                        )
+  :
+  cedar::aux::VectorParameter<T>(name),
+  mMinimum(minimum),
+  mMaximum(maximum)
+  {
+  }
 
   //!@brief Destructor
-  virtual ~ParameterBase();
+  ~NumericVectorParameter()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  const T& getMinimum() const
+  {
+    return this->mMinimum;
+  }
 
-  bool getReadAutomatically() const;
-  void setReadAutomatically(bool value);
-
-  bool getHasDefault() const;
-  void setHasDefault(bool value);
-
-  bool isConstant() const;
-  void setConstant(bool value);
-
-  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
-  virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
-  virtual void makeDefault() = 0;
-
-  bool isHidden() const;
-  void setHidden(bool hide);
+  const T& getMaximum() const
+  {
+    return this->mMaximum;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-  signals:
-    void parameterChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,20 +125,16 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
-  bool mAutoRead;
+  //! The minimum value, if applicable to the type.
+  T mMinimum;
 
-  //! Whether a default value should be set
-  bool mHasDefault;
-
-  //! Whether this parameter can be changed during runtime.
-  bool mConstant;
-
-  //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
-  bool mIsHidden;
+  //! The maximum value, if applicable to the type.
+  T mMaximum;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -131,7 +145,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::ParameterBase
+}; // class cedar::aux::NumericVectorParameter
 
-#endif // CEDAR_PROC_PARAMETER_BASE_H
+#endif // CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
 

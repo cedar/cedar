@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.h
+    File:        VectorParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 01
+    Date:        2011 07 20
 
     Description:
 
@@ -38,66 +38,95 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PARAMETER_BASE_H
-#define CEDAR_PROC_PARAMETER_BASE_H
+#ifndef CEDAR_AUX_VECTOR_PARAMETER_H
+#define CEDAR_AUX_VECTOR_PARAMETER_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
+#include "auxiliaries/ParameterBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QObject>
+#include <vector>
+
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::ParameterBase : public QObject, public cedar::aux::Base
+template <typename T>
+class cedar::aux::VectorParameter : public cedar::aux::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ParameterBase(const std::string& name, bool hasDefault = true);
+  VectorParameter(const std::string& name)
+  :
+  cedar::aux::ParameterBase(name, false)
+  {
+  }
+
+  VectorParameter(const std::string& name, const std::vector<T>& defaults)
+  :
+  cedar::aux::ParameterBase(name, true),
+  mDefaults(defaults)
+  {
+  }
 
   //!@brief Destructor
-  virtual ~ParameterBase();
+  ~VectorParameter()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  void setTo(const cedar::aux::ConfigurationNode& root)
+  {
+    this->mValues.clear();
+    cedar::aux::ConfigurationNode node = root.get_child(this->getName());
+    for (cedar::aux::ConfigurationNode::iterator iter = node.begin(); iter != node.end(); ++iter)
+    {
+      this->mValues.push_back(iter.get_value<T>());
+    }
+  }
 
-  bool getReadAutomatically() const;
-  void setReadAutomatically(bool value);
+  void putTo(cedar::aux::ConfigurationNode& root)
+  {
+    cedar::aux::ConfigurationNode vector_node;
+    for (typename std::vector<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    {
+      cedar::aux::ConfigurationNode node(*iter);
+      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+    }
+    root.put(this->getName(), vector_node);
+  }
 
-  bool getHasDefault() const;
-  void setHasDefault(bool value);
+  const std::vector<T>& get() const
+  {
+    return this->mValues;
+  }
 
-  bool isConstant() const;
-  void setConstant(bool value);
+  std::vector<T>& get()
+  {
+    return this->mValues;
+  }
 
-  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
-  virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
-  virtual void makeDefault() = 0;
-
-  bool isHidden() const;
-  void setHidden(bool hide);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-  signals:
-    void parameterChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,31 +136,26 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
-  bool mAutoRead;
-
-  //! Whether a default value should be set
-  bool mHasDefault;
-
-  //! Whether this parameter can be changed during runtime.
-  bool mConstant;
-
-  //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
-  bool mIsHidden;
+  std::vector<T> mValues;
+  std::vector<T> mDefaults;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::ParameterBase
+}; // class cedar::aux::VectorParameter
 
-#endif // CEDAR_PROC_PARAMETER_BASE_H
+#endif // CEDAR_AUX_VECTOR_PARAMETER_H
 

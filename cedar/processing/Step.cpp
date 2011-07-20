@@ -386,6 +386,17 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
                 " does not exist.");
     return;
   }
+
+  // inputs come from a different step
+  if (role != cedar::proc::DataRole::INPUT)
+  {
+    data->setOwner(this);
+  }
+  else
+  {
+    data->connectedSlotName(name);
+  }
+
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
   {
