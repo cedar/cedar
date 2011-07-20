@@ -66,6 +66,7 @@ _mCenterY(new cedar::aux::DoubleParameter("center_y", sizeY/2.0, -10000.0, 10000
   this->registerParameter(_mAmplitude);
   this->registerParameter(_mDimensionality);
   _mDimensionality->set(2);
+  _mDimensionality->setConstant(true);
   this->registerParameter(_mSigma);
   this->registerParameter(_mCenterX);
   this->registerParameter(_mCenterY);
@@ -100,7 +101,9 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
     }
   }
   kernel_parts.at(0) *= _mAmplitude->get();
+  mOutput->lockForWrite();
   mOutput->getData() = kernel_parts.at(0) * kernel_parts.at(1).t();
+  mOutput->unlock();
 }
 
 void cedar::proc::source::GaussInput::updateMatrix()
