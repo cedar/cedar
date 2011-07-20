@@ -83,4 +83,10 @@ class cedar::aux::DuplicateNameException : public cedar::aux::exc::ExceptionBase
     DuplicateNameException();
 }; // class cedar::aux::DuplicateNameException
 
+class cedar::aux::RangeException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  RangeException();
+}; // class cedar::aux::RangeException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

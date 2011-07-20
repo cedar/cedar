@@ -136,6 +136,7 @@ namespace cedar
     class UnknownTypeException;
     class ParameterNotFoundException;
     class UnknownNameException;
+    class RangeException;
   }
 }
 

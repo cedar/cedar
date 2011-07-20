@@ -39,11 +39,13 @@
 #include "auxiliaries/NumericParameter.h"
 #include "processing/DataT.h"
 #include "auxiliaries/math/functions.h"
+#include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
+#include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -164,11 +166,17 @@ void cedar::aux::kernel::Gauss::calculate()
     // now fill up the big kernel matrix
     int position[dimensionality];
     unsigned int max_index = 1;
+    double max_index_d = 1.0;
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
       position[dim] = 0;
-      max_index *= mSizes.at(dim);
+      max_index_d *= mSizes.at(dim);
+      if (max_index_d > std::numeric_limits<unsigned int>::max()/100.0)
+      {
+        CEDAR_THROW(cedar::aux::RangeException, "cannot handle kernels of this size");
+      }
     }
+    max_index = static_cast<unsigned int>(max_index_d);
     for (unsigned int i = 0; i < max_index; i++)
     {
       float value = 1.0;

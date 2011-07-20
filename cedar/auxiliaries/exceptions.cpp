@@ -69,3 +69,8 @@ cedar::aux::UnhandledValueException::UnhandledValueException()
 {
   this->mType = "UnhandledValueException";
 }
+
+cedar::aux::RangeException::RangeException()
+{
+  this->mType = "RangeException";
+}
