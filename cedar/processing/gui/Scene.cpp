@@ -302,6 +302,11 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
     mpNewConnectionIndicator = NULL;
   }
 
+  if (mpConnectionStart == NULL)
+  {
+    return;
+  }
+
   QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
   if (items.size() > 0)
   {
