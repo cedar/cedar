@@ -97,7 +97,7 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     try
     {
       const cedar::aux::ConfigurationNode& value = node.get_child(iter->second->getName());
-      iter->second->set(value);
+      iter->second->setTo(value);
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {

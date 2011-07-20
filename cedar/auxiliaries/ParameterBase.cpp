@@ -108,23 +108,23 @@ void cedar::aux::ParameterBase::setConstant(bool value)
   this->mConstant = value;
 }
 
-void cedar::aux::ParameterBase::set(const cedar::aux::ConfigurationNode& node)
-{
-  if (dynamic_cast<DoubleParameter*>(this))
-  {
-    dynamic_cast<DoubleParameter*>(this)->set(node.get_value<double>());
-  }
-  else if (dynamic_cast<StringParameter*>(this))
-  {
-    dynamic_cast<StringParameter*>(this)->set(node.get_value<std::string>());
-  }
-  else if (dynamic_cast<BoolParameter*>(this))
-  {
-    dynamic_cast<BoolParameter*>(this)->set(node.get_value<bool>());
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot set parameter value: the type of the parameter "
-                                                     + this->getName() + "is not handled.");
-  }
-}
+//void cedar::aux::ParameterBase::set(const cedar::aux::ConfigurationNode& node)
+//{
+//  if (dynamic_cast<DoubleParameter*>(this))
+//  {
+//    dynamic_cast<DoubleParameter*>(this)->set(node.get_value<double>());
+//  }
+//  else if (dynamic_cast<StringParameter*>(this))
+//  {
+//    dynamic_cast<StringParameter*>(this)->set(node.get_value<std::string>());
+//  }
+//  else if (dynamic_cast<BoolParameter*>(this))
+//  {
+//    dynamic_cast<BoolParameter*>(this)->set(node.get_value<bool>());
+//  }
+//  else
+//  {
+//    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot set parameter value: the type of the parameter "
+//                                                     + this->getName() + "is not handled.");
+//  }
+//}

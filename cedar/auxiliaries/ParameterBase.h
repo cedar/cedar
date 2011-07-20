@@ -84,7 +84,7 @@ public:
   bool isConstant() const;
   void setConstant(bool value);
 
-  void set(const cedar::aux::ConfigurationNode& node);
+  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
   virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
   virtual void makeDefault() = 0;
 
