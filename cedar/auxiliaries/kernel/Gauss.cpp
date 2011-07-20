@@ -268,18 +268,11 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
   unsigned int tmp;
   /* size of kernel is determined by limit * sigma
    */
-  if ((_mSigmas.at(dim) < 10000) && (_mSigmas.at(dim) > 0))
+  tmp = static_cast<unsigned int>(ceil(_mLimit->get() * _mSigmas.at(dim)));
+  // check if kernel size is even and if so, make it odd
+  if (tmp % 2 == 0)
   {
-    tmp = static_cast<unsigned int>(ceil(_mLimit->get() * _mSigmas.at(dim)));
-    // check if kernel size is even and if so, make it odd
-    if (tmp % 2 == 0)
-    {
-      tmp++;
-    }
-  }
-  else
-  {
-    tmp = 1;
+    tmp++;
   }
   return tmp;
 }
