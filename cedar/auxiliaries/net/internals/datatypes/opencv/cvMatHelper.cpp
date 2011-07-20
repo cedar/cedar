@@ -1,18 +1,56 @@
+/*=============================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+===============================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        cvMatHelper.cpp
+
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Wed 20 Jul 2011 05:15:29 PM CEST
+
+    Description:
+
+    Credits:
+
+=============================================================================*/
+
+// LOCAL INCLUDES
 #include "cvMatHelper.h"
 
 #include "../interfaces/InterfaceCollatedData.h"
 #include "cvMatNetHeader.h"
 #include "../../transport/collated/header/MatrixNetHeaderAccessor.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-
+// PROJECT INCLUDES
 #include <opencv/cv.h>
 #include <yarp/os/NetInt32.h>
 #include <yarp/os/NetFloat64.h>
 
-using namespace std;
+// SYSTEM INCLUDES
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+
 
 
 #define MAGIC_NUMBER 0xabc
@@ -33,7 +71,7 @@ template <typename CVT> void cvMatHelper<CVT>::init_checkheader(HeaderType &head
   mCheckHeader.cvMatType= header.cvMatType;
 }
 
-template <typename CVT> void cvMatHelper<CVT>::cvMatHelper::init_externalheader(CVT &mat,
+template <typename CVT> void cvMatHelper<CVT>::cvMatHelper::init_externalheader(const CVT &mat,
                                                    HeaderType &header)
 {
   header.cols= mat.cols;
@@ -42,7 +80,8 @@ template <typename CVT> void cvMatHelper<CVT>::cvMatHelper::init_externalheader(
   header.cvMatType= mat.type();
 }
 
-template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(CVT &mat,
+template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(
+                                               const CVT &mat,
                                                HeaderType &extheader)
 {
     if (!mCheckHeader.cols || !mCheckHeader.rows)
@@ -59,8 +98,7 @@ template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(CVT 
           || mCheckHeader.elemSize != mat.elemSize() 
           || mCheckHeader.cvMatType != mat.type() )
       {
-        // TODO: Fehler, wenn falsche Groesse?
-        return false;
+        return false; // exceptions will not be thrown here
       }
       else
       {
@@ -75,7 +113,6 @@ template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_read(Heade
    if (!mCheckHeader.cols || !mCheckHeader.rows)
     {
        init_checkheader(extheader); // get info from header!
-       // TODO: Test magic number
 
        return true;
     }
@@ -84,9 +121,11 @@ template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_read(Heade
       if (mCheckHeader.cols != extheader.cols
           || mCheckHeader.rows != extheader.rows
           || mCheckHeader.elemSize != extheader.elemSize
-          || mCheckHeader.cvMatType != extheader.cvMatType )
+          || mCheckHeader.cvMatType != extheader.cvMatType 
+          || mCheckHeader.magicNumber != extheader.magicNumber 
+        )
       {
-        // TODO: Fehler, wenn falsche Groesse?
+        // exceptions will not be thrown here
         return false;
       }
 
@@ -106,9 +145,10 @@ template <typename CVT> cvMatHelper<CVT>::cvMatHelper() : mCheckHeader()
 template <typename CVT> cvMatHelper<CVT>::~cvMatHelper()
 {
 #ifdef DEBUG
-  cout << "  ~cvMatHelper [DESTRUCTOR]" << endl;
+//  cout << "  ~cvMatHelper [DESTRUCTOR]" << endl;
 #endif
 }
+
 
 // explicit instantiation DO NOT FORGET THIS!
 template struct _NM_FULL_::cvMatHelper<cv::Mat>;

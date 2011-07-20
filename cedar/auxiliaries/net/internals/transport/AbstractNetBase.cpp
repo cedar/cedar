@@ -1,10 +1,50 @@
+/*=============================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+===============================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        AbstractNetBase.cpp
+
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Tue 19 Jul 2011 02:57:06 PM CEST
+
+    Description:
+
+    Credits:
+
+=============================================================================*/
+
+// LOCAL INCLUDES
 #include "AbstractNetBase.h"
 #include "auxiliaries/net/exceptions/NetException.h"
 
+// PROJECT INCLUDES
 #include <yarp/conf/version.h>
 
+// SYSTEM INCLUDES
 #include <unistd.h>
 #include <sys/types.h>
+#include <signal.h>
 
 using namespace std;
 using namespace yarp::os;
@@ -14,10 +54,23 @@ namespace _NM_CEDAR_ {
     namespace _NM_NET_ {
       namespace _NM_INTERNAL_ {
 
-//Network AbstractNetBase::network; // static
+// constants:
+const std::string AbstractNetBase::PORT_PREFIX("/CEDAR"); // static
+const std::string AbstractNetBase::PORT_DELIMINATOR("/"); // static  
+const std::string AbstractNetBase::PORT_SUFFIX_OUT("out"); // static
+const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
+
+// static variables:
+
+// YARP-bug. dont be static: Network AbstractNetBase::mNetwork; // static
 int AbstractNetBase::mInstanceCounter; // static
 
-AbstractNetBase::AbstractNetBase(string myPortNameWithSuffix) : network(), mFullPortName(), mIsConnected(false)
+//-----------------------------------------------------------------------------
+// constructors and destructor
+//-----------------------------------------------------------------------------
+
+AbstractNetBase::AbstractNetBase(const string &myPortNameWithSuffix) 
+          : mNetwork(), mFullPortName(), mIsConnected(false)
 {
 #ifdef DEBUG
   cout << "  AbstractNetBase [CONSTRUCTOR]" << endl;
@@ -30,12 +83,28 @@ AbstractNetBase::AbstractNetBase(string myPortNameWithSuffix) : network(), mFull
 
 AbstractNetBase::~AbstractNetBase()
 {
-  mInstanceCounter--;
 #ifdef DEBUG
-cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
+  cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
 #endif
+  mInstanceCounter--;
+
+  // we need to kill the child-process that runs an (automatically
+  // started) YARP name server.
+  // else processes, that wait() for all children of this program
+  // will never resume
+  if (mServerPID)
+  {
+    kill( mServerPID, SIGKILL );
+#ifdef DEBUG
+  cout << "  killed name server with pid " << mServerPID << endl;
+#endif  
+  }
 }
 
+
+//-----------------------------------------------------------------------------
+// methods
+//-----------------------------------------------------------------------------
 int AbstractNetBase::getInstanceCounter()
 {
   return mInstanceCounter + 1;
@@ -50,7 +119,7 @@ bool AbstractNetBase::startNameServer()
 {
   pid_t pid;
 
-  pid= fork(); // NEW PROCESS!
+  pid= vfork(); // NEW PROCESS!
 
   if ( pid < 0 )
   {
@@ -60,9 +129,22 @@ bool AbstractNetBase::startNameServer()
   else if (pid == 0)
   {
     // FORKED CHILD ...
-    // this will block! and create a zombie process. this is intended.
-    if ( yarp::os::Network::runNameServer(0, 0) != 0 )
+    // this will block!  
+    //if ( yarp::os::Network::runNameServer(0, 0) != 0 ) // needs YARP v2.3.6
+    //system("yarp server"); // starts command in a shell
+
+#ifdef DEBUG
+    cout << "  executing yarp server" << endl;
+#endif
+    if (execlp("yarp", "yarp", "server", NULL) == -1)
     {
+      // this works with all yarp versions
+      // this does not create a zombie process. better!
+
+#ifdef DEBUG
+      cout << "  could not start yarp server!" << endl;
+#endif
+
     }
     exit(EXIT_SUCCESS);
   }
@@ -74,16 +156,17 @@ bool AbstractNetBase::startNameServer()
               //  between child and parent)
               // it works okay, as we will only land here ONCE.
 
+    mServerPID= pid; // remember child PID, see Destructor
     // PARENT ...
     return yarp::os::NetworkBase::checkNetwork();
   }
 
 }
 
-void AbstractNetBase::late_construct()
+void AbstractNetBase::lateConstruct()
 {
 #ifdef DEBUG
-  cout << "  AbstractNetBase [laste_construct()]" << endl;
+  cout << "  AbstractNetBase [lateConstruct()]" << endl;
 #endif
   // only call from the "non abstract" constructor class,
   // i.e. the final implementation class (derived fromt this class) 
@@ -116,60 +199,55 @@ void AbstractNetBase::late_construct()
           // implemented in a derived class
 }
 
-void AbstractNetBase::late_destruct()
+void AbstractNetBase::lateDestruct()
 {
 #ifdef DEBUG
-  cout << "  AbstractNetBase [late_destruct]" << endl;
+  cout << "  AbstractNetBase [lateDestruct]" << endl;
 #endif
-  close(); // see late_construct()
+  close(); // see lateConstruct()
   mIsConnected= false;
-#ifdef DEBUG
-  cout << "  AbstractNetBase [... exiting late_destruct]" << endl;
-#endif
 }
 
+// this connection may fail (without throwing an exception!)
 bool AbstractNetBase::connectTwo(const string &writerPort, const string &readerPort)
 {
 #ifdef DEBUG
-  cout << "  AbstractNetBase [connectTwo]" << endl;
+//  cout << "  AbstractNetBase [connectTwo]" << endl;
 #endif
 
   if (mIsConnected)
     return false;
 
-  if (!network.connect( writerPort.c_str(),
-                   readerPort.c_str(),
-                   0,
-                   true ) ) // 4. Argument: quiet = true
+  if (!mNetwork.connect( writerPort.c_str(),
+                         readerPort.c_str(),
+                         0,
+                         true ) ) // 4. Argument: quiet = true
   {
     mIsConnected= false;
 
-    // dont throw the exception here
-    // CEDAR_THROW( cedar::aux::exc::NetMissingRessourceException,
-    //              "YARP: cannot connect ports / no yarp server running?" );
+    // we need to fail here without throwing an exception
+    // exceptions will be thrown further up in the function stack
     
     return false;
   }
 
+#ifdef DEBUG
+  cout << "  connection OK" << endl;
+#endif
   mIsConnected= true;
   return true;
 }
 
+// this connection may fail (without throwing an exception!)
 bool AbstractNetBase::connectTo(const string &writerPort)
 {
 #ifdef DEBUG
-cout << "connect " <<  getFullPortName() << " to "  << writerPort  << endl;
+  cout << "connect " <<  getFullPortName() << " to "  << writerPort  << endl;
 #endif
   return connectTwo( writerPort,
                      getFullPortName() );
 
 }
-
-bool AbstractNetBase::isConnected()
-{
-  return mIsConnected;
-}
-
 
 } } } } // end namespaces
 
