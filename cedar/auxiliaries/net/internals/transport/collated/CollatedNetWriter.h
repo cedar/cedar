@@ -1,22 +1,58 @@
-#ifndef _NETT_COLLATED_NET_WRITER_
-#define _NETT_COLLATED_NET_WRITER_
+/*=============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
 
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+===============================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        CollatedNetWriter.h
+
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Wed 20 Jul 2011 04:15:50 PM CEST
+
+    Description:
+
+    Credits:
+
+=============================================================================*/
+
+#ifndef CEDAR_COLLATEDNETWRITER_H
+#define CEDAR_COLLATEDNETWRITER_H
+
+// LOCAL INCLUDES
 #include "../../namespace.h"
 #include "CollatedNetBase.h"
 #include "../../datatypes/CollatedType.h"
 #include "CollatedNetPortable.h"
 #include "../../../exceptions/NetException.h"
-
 #include "../AbstractNetWriter.h"
-#include <yarp/os/PortWriterBuffer.h>
 
+// PROJECT INCLUDES
+#include <yarp/os/PortWriterBuffer.h>
 #include <yarp/os/PortReport.h>
 
-using namespace std;
+// SYSTEM INCLUDES
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
 
 namespace _NM_CEDAR_ {
   namespace _NM_AUX_ {
@@ -24,54 +60,78 @@ namespace _NM_CEDAR_ {
       namespace _NM_INTERNAL_ {
 
 
+/*!@brief implementation of matrix-over-network writer
+ *
+ * 
+ */
 template <typename T>
 class CollatedNetWriter : 
                           public CollatedNetBase<T>,
                           public AbstractNetWriter<T>
 {
-private:
-  PortWriterBuffer< CollatedNetPortable< T > > elemWrapper;
+  //---------------------------------------------------------------------------
+  // members
+  //---------------------------------------------------------------------------
+protected:
+  PortWriterBuffer< CollatedNetPortable< T > > mElemWrapper;
 
+  //---------------------------------------------------------------------------
+  // constructors and destructor
+  //---------------------------------------------------------------------------
 public:
-  CollatedNetWriter(string myPortName) : 
+  //!@brief The standard constructor.
+  explicit CollatedNetWriter(std::string myPortName) : 
                                          CollatedNetBase<T>(),
                                          AbstractNetWriter<T>(myPortName),
-                                         elemWrapper()
+                                         mElemWrapper()
   {
 #ifdef DEBUG
-//  cout << "  CollatedNetWriter [CONSTRUCTOR]" << endl;
+    cout << "  CollatedNetWriter [CONSTRUCTOR]" << endl;
 #endif
-    AbstractNetWriter<T>::late_construct();
+    AbstractNetWriter<T>::lateConstruct();
 
-    elemWrapper.attach( CollatedNetBase<T>::dataPort );
+    mElemWrapper.attach( CollatedNetBase<T>::mDataPort );
   }
 
-  ~CollatedNetWriter()
+  //!@brief Destructor
+  ~CollatedNetWriter() // doesnt need to be virtual
   {
-    AbstractNetWriter<T>::late_destruct();
+    AbstractNetWriter<T>::lateDestruct();
 #ifdef DEBUG
-  cout << "  ~CollatedNetWriter [DESTRUCTOR]" << endl;
+    cout << "  ~CollatedNetWriter [DESTRUCTOR]" << endl;
 #endif
   }
 
+
+  //---------------------------------------------------------------------------
+  // public methods
+  //---------------------------------------------------------------------------
 public:
-  void write(T t) // may drop packets (non blocking)
+  /*!@brief implementation of writing a collated variable type
+   *
+   * will throw NetUnexpectedDataException if the matrix size/type
+   * changed from the earlier trasmissions.
+   *
+   */
+  void write(const T &t) // may drop packets (non blocking)
   {
-    // TODO: wenn keine connection/network
-    //       dann nichts machen
+#ifdef DEBUG
+    cout << "  CollatedNetWriter [write()]" << endl;
+#endif
 
-    // Matrixgroesse verifizieren
+    // verify matrix size (or generate the header for further checks)
     if (!check_collateddata_for_write(t,
-                                      elemWrapper.prepare().header() ) )
+                                      mElemWrapper.prepare().header() ) )
     {
-      // TODO: fehler verarbeiten oder irgenwas tun ...
-cout << "  FEHLER: Matrix mit unterschiedlicher Groesse" << endl;
+      CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
+                   "matrix has wrong size - you wrote matrices of "
+                   "different size/type before!" );
       return;
     }
 
-    // uebertragen ...
-    elemWrapper.prepare().content() = t;
-    elemWrapper.write(true); // TRUE IS IMPORTANT
+    // send it ...
+    mElemWrapper.prepare().content() = t;
+    mElemWrapper.write(true); // TRUE IS IMPORTANT
   }
 
 };

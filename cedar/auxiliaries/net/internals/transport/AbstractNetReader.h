@@ -1,14 +1,54 @@
-#ifndef _NETT_ABSTRACT_NET_READER_
-#define _NETT_ABSTRACT_NET_READER_
+/*=============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
 
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+===============================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        AbstractNetReader.h
+
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Tue 19 Jul 2011 04:46:11 PM CEST
+
+    Description:
+
+    Credits:
+
+=============================================================================*/
+
+#ifndef CEDAR_ABSTRACTNETREADER_H
+#define CEDAR_ABSTRACTNETREADER_H
+
+// LOCAL INCLUDES
 #include "../namespace.h"
 #include "AbstractNetBase.h"
 #include "auxiliaries/net/exceptions/NetException.h"
+
+// PROJECT INCLUDES
 #include <boost/lexical_cast.hpp>
+
+// SYSTEM INCLUDES
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
 
 using namespace std;
 using namespace yarp::os;
@@ -18,54 +58,44 @@ namespace _NM_CEDAR_ {
     namespace _NM_NET_ {
       namespace _NM_INTERNAL_ {
 
+/*!@brief Abstract Reader. function read() is virtual, handles basic connection
+ *
+ * Abstract Reader functionality (read datatype over network, RIIA)
+ * Most of AbstractNetReaders functionality resides in AbstractNetBase.
+ * read() is virtual and needs to be implemented in the child.
+ */
 template <typename T>
 class AbstractNetReader : public AbstractNetBase
 {
+  //---------------------------------------------------------------------------
+  // members
+  //---------------------------------------------------------------------------
 private:
   string mPortNameWriter;
 
+  //---------------------------------------------------------------------------
+  // constructors and destructor
+  //---------------------------------------------------------------------------
+
+private:
+  //!@brief The standard constructor. Dont use!
+  AbstractNetReader();
+  AbstractNetReader(const AbstractNetReader &A); // not copyable
+  AbstractNetReader &operator=(const AbstractNetReader &A);
+
+
 public:
-  bool reconnect()
-  {
-    return connectTo(mPortNameWriter); 
-  }
-
-protected:
-  void late_construct() // see AbstractNetBase
-  {
-    AbstractNetBase::late_construct();
-
-#if 0
-    // start by trying to connect to a existing writer
-    try
-    {
-      reconnect();
-    }
-    catch ( cedar::aux::exc::NetMissingRessourceException E )
-//    catch ( cedar::aux::exc::NetWaitingForWriterException &E )
-    {
-      // do nothin
-    }
-#endif
-    reconnect();
-  }
-
-  void late_destruct() // see AbstractNetBase
-  {
-    AbstractNetBase::late_destruct();
-  }
-
 #define READER_PORT_NAME(x) ( (x) + PORT_DELIMINATOR  \
                                   + PORT_SUFFIX_IN + "(" \
                                   + boost::lexical_cast<std::string>(getInstanceCounter()) \
                                   + ")" )
-public:
-  AbstractNetReader(string myPortName) 
+  //!@brief use this constructor. Parameter ist the user-defined port name
+  explicit AbstractNetReader(const string &myPortName) 
                    : AbstractNetBase( READER_PORT_NAME(myPortName) ),
                      mPortNameWriter()
   {
 #ifdef DEBUG
-  cout << "  AbstractNetReader [CONSTRUCTOR]" << endl;
+    cout << "  AbstractNetReader [CONSTRUCTOR]" << endl;
 #endif
     mPortNameWriter= PORT_PREFIX + PORT_DELIMINATOR
                        + myPortName
@@ -73,20 +103,50 @@ public:
                        + PORT_SUFFIX_OUT;
   }
 
-  ~AbstractNetReader()
+  //!@brief Destructor (virtual to be sure)
+  virtual ~AbstractNetReader()
   {
 #ifdef DEBUG
-  cout << "  ~AbstractNetReader [DESTRUCTOR]" << endl;
+    cout << "  ~AbstractNetReader [DESTRUCTOR]" << endl;
 #endif
   }
 
-  virtual T read() = 0;
-
+  //---------------------------------------------------------------------------
+  // protected methods
+  //---------------------------------------------------------------------------
 protected:
+  //!@brief the (fully configured) name of the writer port for this reader
   string getPortNameWriter()
   {
     return mPortNameWriter;
   }
+
+  void lateConstruct() // see AbstractNetBase
+  {
+    AbstractNetBase::lateConstruct();
+ 
+    reconnect(); // try connect at start to my writer
+                 // if not possible yet (no writer yet) this has no 
+                 // consequences.
+                 // We will try again in read()
+  }
+
+
+  //---------------------------------------------------------------------------
+  // public methods
+  //---------------------------------------------------------------------------
+public:
+  //!@brief (try) to connect to my writer. this operation may fail!
+  //
+  // returns TRUE for an established reconnection
+  bool reconnect()
+  {
+    return connectTo(mPortNameWriter); 
+  }
+
+  //!@brief virtual read() needs to be implemented in child
+  virtual T read() = 0;
+
 };
 
 } } } } // end namespaces

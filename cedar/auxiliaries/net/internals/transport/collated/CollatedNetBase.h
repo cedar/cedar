@@ -1,10 +1,43 @@
-#ifndef _NETT_COLLATED_NET_BASE_
-#define _NETT_COLLATED_NET_BASE_
+/*=============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
 
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+===============================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        CollatedNetBase.h
+
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Wed 20 Jul 2011 02:43:13 PM CEST
+
+    Description:
+
+    Credits:
+
+=============================================================================*/
+
+#ifndef CEDAR_COLLATEDNETBASE_H
+#define CEDAR_COLLATEDNETBASE_H
+
+// LOCAL INCLUDES
 #include "../../namespace.h"
 #include "../../datatypes/interfaces/InterfaceCollatedData.h"
 #include "../interfaces/InterfaceOpenable.h"
@@ -13,47 +46,67 @@
 #include "../../datatypes/CollatedType.h"
 #include "CollatedNetPortable.h"
 
-using namespace std;
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
 
 namespace _NM_CEDAR_ {
   namespace _NM_AUX_ {
     namespace _NM_NET_ {
       namespace _NM_INTERNAL_ {
 
+/*!@brief Abstract description of the class.
+ *
+ * More detailed description of the class.
+ */
 template <typename T> 
 class CollatedNetBase : virtual protected InterfaceOpenable,
                         virtual protected InterfaceCollatedData<T>
 {
+  //---------------------------------------------------------------------------
+  // members
+  //---------------------------------------------------------------------------
 protected:
-  yarp::os::Port dataPort;
+  yarp::os::Port mDataPort;
 
-protected:
-
+  //---------------------------------------------------------------------------
+  // constructors and destructor
+  //---------------------------------------------------------------------------
 public:
-  void open()
-  {
-    dataPort.open( getFullPortName().c_str() );
-  }
-
-  void close()
-  {
-    dataPort.close();
-  }
-
-public:
-  CollatedNetBase() : dataPort()
+  //!@brief The standard constructor.
+  CollatedNetBase() : mDataPort()
   {
 #ifdef DEBUG
   cout << "  CollatedNetBase [CONSTRUCTOR]" << endl;
 #endif
-    dataPort.enableBackgroundWrite(true);
-    // ... 
+    mDataPort.enableBackgroundWrite(true);
 
   }
 
+  //!@brief Destructor, virtual to be sure
   virtual ~CollatedNetBase()
   {
   }
+
+
+  //---------------------------------------------------------------------------
+  // public methods
+  //---------------------------------------------------------------------------
+public:
+  void open()
+  {
+    mDataPort.open( getFullPortName().c_str() );
+  }
+
+  void close()
+  {
+    mDataPort.close();
+  }
+
+
 };
 
 } } } }  // end namespaces
