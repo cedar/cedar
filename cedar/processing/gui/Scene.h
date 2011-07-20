@@ -100,6 +100,8 @@ public:
 
   void setMainWindow(QMainWindow *pMainWindow);
 
+  void setNetwork(cedar::proc::gui::NetworkFilePtr network);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -137,6 +139,8 @@ protected:
 private:
   MODE mMode;
   QString mModeParam;
+
+  cedar::proc::gui::NetworkFilePtr mNetwork;
 
   /* connect mode related */
   QGraphicsLineItem *mpNewConnectionIndicator;

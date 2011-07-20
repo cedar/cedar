@@ -64,6 +64,8 @@ namespace cedar
       class GroupItem;
       class Ide;
       class IdeApplication;
+      class NetworkFile;
+      typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
       class ParameterBase;
       class PropertyPane;
       class StepItem;

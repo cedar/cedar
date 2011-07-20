@@ -85,6 +85,7 @@ public:
   void setConstant(bool value);
 
   void set(const cedar::aux::ConfigurationNode& node);
+  virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
   virtual void makeDefault() = 0;
 
   bool isHidden() const;
