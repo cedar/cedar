@@ -42,8 +42,12 @@
 #include "processing/gui/NetworkFile.h"
 #include "processing/gui/Connection.h"
 #include "processing/gui/StepItem.h"
+#include "processing/gui/TriggerItem.h"
+#include "processing/gui/DataSlotItem.h"
 #include "processing/Step.h"
 #include "processing/Data.h"
+#include "processing/exceptions.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -72,8 +76,11 @@ cedar::proc::gui::NetworkFile::~NetworkFile()
 
 void cedar::proc::gui::NetworkFile::addToScene()
 {
+  // todo should connecting be moved into the step class?
+
+  /* restore steps  that don't have a gui description */
   std::vector<cedar::proc::StepPtr> steps_to_connect;
-  // add step-items for steps that don't have one yet (i.e., for which none was present in the configuration tree)
+  // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
   for (size_t i = 0; i < this->mNetwork->steps().size(); ++i)
   {
     cedar::proc::StepPtr& step = this->mNetwork->steps().at(i);
@@ -84,32 +91,75 @@ void cedar::proc::gui::NetworkFile::addToScene()
     }
   }
 
+  // Connect the steps that haven't been connected yet
   for (size_t i = 0; i < steps_to_connect.size(); ++i)
   {
-    cedar::proc::StepPtr& step = steps_to_connect.at(i);
-    cedar::proc::Step::SlotMap& slot_map = step->getDataSlots(cedar::proc::DataRole::INPUT);
-    for (cedar::proc::Step::SlotMap::iterator iter = slot_map.begin(); iter != slot_map.end(); ++iter)
+    try
     {
-      cedar::proc::Step *p_owner = iter->second.getData()->getOwner();
-      if (!p_owner)
+      cedar::proc::StepPtr& step = steps_to_connect.at(i);
+      cedar::proc::Step::SlotMap& slot_map = step->getDataSlots(cedar::proc::DataRole::INPUT);
+      for (cedar::proc::Step::SlotMap::iterator iter = slot_map.begin(); iter != slot_map.end(); ++iter)
       {
-        std::cout << "warning: during loading, the owner of a data connection was NULL." << std::endl;
-//          continue;
+        const cedar::proc::DataPtr& data = iter->second.getData();
+
+        cedar::proc::Step *p_owner = data->getOwner();
+        CEDAR_DEBUG_ASSERT(p_owner != NULL);
+
+        cedar::proc::gui::StepItem* p_source_step = this->mpScene->getStepItemFor(p_owner);
+        CEDAR_DEBUG_ASSERT(p_source_step != NULL);
+
+        cedar::proc::gui::DataSlotItem *p_source_slot = p_source_step->getSlotItem
+                                                                        (
+                                                                          cedar::proc::DataRole::OUTPUT,
+                                                                          data->connectedSlotName()
+                                                                        );
+        CEDAR_DEBUG_ASSERT(p_source_slot != NULL);
+
+        cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(step.get());
+        CEDAR_DEBUG_ASSERT(p_target_step != NULL);
+
+        cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step->getSlotItem
+                                                                        (
+                                                                          cedar::proc::DataRole::INPUT,
+                                                                          iter->first
+                                                                        );
+        CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
+
+        p_source_slot->connectTo(p_target_slot);
       }
-      cedar::proc::gui::StepItem* p_source = this->mpScene->getStepItemFor(p_owner);
-      if (!p_source)
-      {
-        std::cout << "warning: during loading, the source of a data connection was NULL." << std::endl;
-//          continue;
-      }
-      cedar::proc::gui::StepItem* p_target = this->mpScene->getStepItemFor(step.get());
-      if (!p_target)
-      {
-        std::cout << "warning: during loading, the target of a data connection was NULL." << std::endl;
-//          continue;
-      }
-      Connection *p_connection = new Connection(p_source, p_target);
-      this->mpScene->addItem(p_connection);
+    }
+    catch (const cedar::proc::InvalidRoleException&)
+    {
+      // ok -- some steps may not have inputs
+    }
+  }
+
+  /* restore triggers that don't have a gui description */
+  std::vector<cedar::proc::TriggerPtr> triggers_to_connect;
+  // add TriggerItems for Triggers that don't have one yet (i.e., for which none was present in the configuration tree)
+  for (size_t i = 0; i < this->mNetwork->triggers().size(); ++i)
+  {
+    cedar::proc::TriggerPtr& trigger = this->mNetwork->triggers().at(i);
+    if (this->mpScene->triggerMap().find(trigger.get()) == this->mpScene->triggerMap().end())
+    {
+      this->mpScene->addTrigger(trigger, QPointF(0, 0));
+      triggers_to_connect.push_back(trigger);
+    }
+  }
+
+  for (size_t i = 0; i < triggers_to_connect.size(); ++i)
+  {
+    cedar::proc::TriggerPtr& trigger = triggers_to_connect.at(i);
+    cedar::proc::gui::TriggerItem *p_trigger_item = this->mpScene->getTriggerItemFor(trigger.get());
+
+    std::cout << "Connecting " << trigger->getListeners().size() << " listeners." << std::endl;
+    for (size_t i = 0; i < trigger->getListeners().size(); ++i)
+    {
+      cedar::proc::StepPtr target = trigger->getListeners().at(i);
+      cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(target.get());
+      CEDAR_DEBUG_ASSERT(p_target_item);
+      std::cout << "Connecting  to " << target->getName() << std::endl;
+      p_trigger_item->connectTo(p_target_item);
     }
   }
 }

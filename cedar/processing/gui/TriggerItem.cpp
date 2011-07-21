@@ -136,6 +136,6 @@ void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarge
   if (!this->getTrigger()->isListener(pTarget->getStep()))
   {
     this->getTrigger()->addListener(pTarget->getStep());
-    new Connection(this, pTarget);
   }
+  new Connection(this, pTarget);
 }

@@ -82,12 +82,18 @@ cedar::proc::gui::Scene::~Scene()
 void cedar::proc::gui::Scene::reset()
 {
   this->mStepMap.clear();
+  this->mTriggerMap.clear();
   this->clear();
 }
 
 const cedar::proc::gui::Scene::StepMap& cedar::proc::gui::Scene::stepMap() const
 {
   return this->mStepMap;
+}
+
+const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap() const
+{
+  return this->mTriggerMap;
 }
 
 void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkFilePtr network)
@@ -125,6 +131,9 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   StepClassList *tree = dynamic_cast<StepClassList*>(pEvent->source());
+
+  if (!tree)
+    return;
 
   QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
   QDataStream stream(&itemData, QIODevice::ReadOnly);
@@ -517,16 +526,25 @@ void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF pos
       this->mNetwork->network()->add(trigger);
     }
 
-    cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
-    this->addItem(p_drawer);
-    p_drawer->setPos(position);
-    this->update();
+    this->addTrigger(trigger, position);
   }
   catch(const cedar::aux::exc::ExceptionBase& e)
   {
     QString message(e.exceptionInfo().c_str());
     emit exception(message);
   }
+}
+
+void cedar::proc::gui::Scene::addTrigger(cedar::proc::TriggerPtr trigger, QPointF position)
+{
+  cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
+  this->addItem(p_drawer);
+  p_drawer->setPos(position);
+
+  // we assume that triggers are only inserted once.
+  this->mTriggerMap[trigger.get()] = p_drawer;
+
+  this->update();
 }
 
 void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPointF position)
@@ -564,6 +582,22 @@ void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPoi
   {
     QString message(e.exceptionInfo().c_str());
     emit exception(message);
+  }
+}
+
+cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar::proc::Trigger* trigger)
+{
+  TriggerMap::iterator iter = this->mTriggerMap.find(trigger);
+  if (iter == this->mTriggerMap.end())
+  {
+#ifdef DEBUG
+    std::cout << "Could not find trigger item for trigger \"" << trigger->getName() << "\"" << std::endl;
+#endif // DEBUG
+    return NULL;
+  }
+  else
+  {
+    return iter->second;
   }
 }
 
