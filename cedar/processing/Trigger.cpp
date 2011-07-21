@@ -159,7 +159,7 @@ const std::vector<cedar::proc::StepPtr>& cedar::proc::Trigger::getListeners() co
 
 void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node)
 {
-  this->cedar::aux::Configurable::readConfiguration(node);
+  this->cedar::aux::Configurable::saveConfiguration(node);
 
   cedar::aux::ConfigurationNode listeners;
   for (size_t i = 0; i < this->mListeners.size(); ++i)
