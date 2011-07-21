@@ -167,14 +167,12 @@ public:
       retMat= pNetPortable->content();
 
       // verify matrix size (or generate the header for further checks)
-// TODO: continue here
-#if 0
-      if (!check_collateddata_for_read(mElemWrapper.prepare().header() ) )
+#if 1
+      if (!check_collateddata_for_read( pNetPortable->header() ) )
       {
         CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
                      "matrix has wrong size - you wrote matrices of "
                      "different size/type before!" );
-        return;
       }
 #endif
 

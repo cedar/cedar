@@ -68,7 +68,7 @@ protected:
 protected:
   virtual bool check_collateddata_for_write(const data_type &data,
                                             header_type &header) = 0;
-  virtual bool check_collateddata_for_read(header_type &header) = 0;
+  virtual bool check_collateddata_for_read(const header_type &header) = 0;
 };
 
 
