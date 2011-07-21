@@ -131,6 +131,12 @@ public:
     return this->mValues;
   }
 
+  void set(const std::vector<T>& values)
+  {
+    this->mValues = values;
+    emit parameterChanged();
+  }
+
   void makeDefault()
   {
     if (mSize == 0)
