@@ -89,4 +89,10 @@ public:
   RangeException();
 }; // class cedar::aux::RangeException
 
+class cedar::aux::NoDefaultException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  NoDefaultException();
+}; // class cedar::aux::NoDefaultException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

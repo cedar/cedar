@@ -119,6 +119,8 @@ namespace cedar
     typedef boost::shared_ptr<BoolVectorParameter> BoolVectorParameterPtr;
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     typedef boost::shared_ptr<DoubleVectorParameter> DoubleVectorParameterPtr;
+    typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+    typedef boost::shared_ptr<UIntVectorParameter> UIntVectorParameterPtr;
 
     typedef boost::property_tree::ptree ConfigurationNode;
 
@@ -143,6 +145,7 @@ namespace cedar
     class ParameterNotFoundException;
     class UnknownNameException;
     class RangeException;
+    class NoDefaultException;
   }
 }
 

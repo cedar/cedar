@@ -67,7 +67,7 @@ class cedar::proc::source::GaussInput : public cedar::proc::Step
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GaussInput(unsigned int sizeX = 10, unsigned int sizeY = 10);
+  GaussInput();
 
   //!@brief Destructor
 
@@ -79,7 +79,7 @@ public:
 
 public slots:
   void updateMatrix();
-
+  void updateDimensionality();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,8 +103,9 @@ private:
 protected:
   cedar::aux::DoubleParameterPtr _mAmplitude;
   cedar::aux::UIntParameterPtr _mDimensionality;
-  cedar::aux::DoubleParameterPtr _mSigma; //!\todo vector...
+  cedar::aux::DoubleVectorParameterPtr _mSigmas;
   cedar::aux::DoubleVectorParameterPtr _mCenters;
+  cedar::aux::UIntVectorParameterPtr _mSizes;
 
 private:
 
