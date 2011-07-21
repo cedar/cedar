@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_XXX_XXX_H
-#define CEDAR_XXX_XXX_H
+#ifndef CEDAR_PROC_GUI_GRAPHICS_BASE_H
+#define CEDAR_PROC_GUI_GRAPHICS_BASE_H
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
@@ -172,5 +172,5 @@ private:
 
 }; // class cedar::proc::gui::GraphicsBase
 
-#endif // CEDAR_XXX_XXX_H
+#endif // CEDAR_PROC_GUI_GRAPHICS_BASE_H
 
