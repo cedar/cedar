@@ -31,7 +31,8 @@ class NetWriter<int> : public _NM_FULL_::SimpleNetWriter<int>
 { 
   // dummy
 public:
-  explicit NetWriter(std::string s) : _NM_FULL_::SimpleNetWriter<int>(s)
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<int>(s)
   {
   }
 };
@@ -41,7 +42,8 @@ class NetWriter<float> : public _NM_FULL_::SimpleNetWriter<float>
 { 
   // dummy
 public:
-  explicit NetWriter(std::string s) : _NM_FULL_::SimpleNetWriter<float>(s)
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<float>(s)
   {
   }
 };
@@ -50,7 +52,8 @@ class NetWriter<double> : public _NM_FULL_::SimpleNetWriter<double>
 { 
   // dummy
 public:
-  explicit NetWriter(std::string s) : _NM_FULL_::SimpleNetWriter<double>(s)
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<double>(s)
   {
   }
 };
@@ -64,7 +67,7 @@ class NetWriter<cv::Mat> :
 private:
 
 public:
-  explicit NetWriter(std::string myPortName) 
+  explicit NetWriter(const std::string &myPortName) 
                       : _NM_FULL_::cvMatHelper<cv::Mat>(),
                         _NM_FULL_::CollatedNetWriter<cv::Mat>(myPortName)
   {
@@ -82,7 +85,7 @@ class NetWriter< cv::Mat_<float> > :
 private:
 
 public:
-  explicit NetWriter(std::string myPortName) 
+  explicit NetWriter(const std::string &myPortName) 
                       : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(),
                         _NM_FULL_::CollatedNetWriter< cv::Mat_<float> >(myPortName)
   {

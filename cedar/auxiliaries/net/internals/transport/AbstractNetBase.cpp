@@ -183,7 +183,6 @@ void AbstractNetBase::lateConstruct()
     // the first NetReader or NetWriter to be initialized will
     // start a new nameserver (if none was running)
 
-    //  YARP_VERSION >= "2.3.3"
 #if 1
     if (!startNameServer())  
 #endif      
