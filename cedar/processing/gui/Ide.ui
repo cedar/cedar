@@ -179,8 +179,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>130</width>
+          <height>319</height>
          </rect>
         </property>
         <attribute name="label">
@@ -262,7 +262,7 @@
   </action>
   <action name="mpActionLoad">
    <property name="text">
-    <string>Load</string>
+    <string>Load ...</string>
    </property>
   </action>
   <action name="mpActionExit">

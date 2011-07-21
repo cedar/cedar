@@ -44,6 +44,7 @@
 #include "processing/gui/StepItem.h"
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/DataSlotItem.h"
+#include "processing/gui/exceptions.h"
 #include "processing/Step.h"
 #include "processing/Data.h"
 #include "processing/exceptions.h"
@@ -59,10 +60,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::NetworkFile::NetworkFile(cedar::proc::gui::Scene* pScene)
+cedar::proc::gui::NetworkFile::NetworkFile(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene)
 :
 mNetwork(new cedar::proc::Network()),
-mpScene(pScene)
+mpScene(pScene),
+mpMainWindow(pMainWindow)
 {
 }
 
@@ -77,9 +79,16 @@ cedar::proc::gui::NetworkFile::~NetworkFile()
 void cedar::proc::gui::NetworkFile::addToScene()
 {
   // todo should connecting be moved into the step class?
+  std::vector<cedar::proc::StepPtr> steps_to_connect;
+
+  for (size_t i = 0; i < this->mpStepsToAdd.size(); ++i)
+  {
+    this->mpScene->addStepItem(this->mpStepsToAdd.at(i));
+    steps_to_connect.push_back(this->mpStepsToAdd.at(i)->getStep());
+  }
+  this->mpStepsToAdd.clear();
 
   /* restore steps  that don't have a gui description */
-  std::vector<cedar::proc::StepPtr> steps_to_connect;
   // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
   for (size_t i = 0; i < this->mNetwork->steps().size(); ++i)
   {
@@ -140,6 +149,14 @@ void cedar::proc::gui::NetworkFile::addToScene()
 
   /* restore triggers that don't have a gui description */
   std::vector<cedar::proc::TriggerPtr> triggers_to_connect;
+
+  for (size_t i = 0; i < this->mpTriggersToAdd.size(); ++i)
+  {
+    this->mpScene->addTriggerItem(this->mpTriggersToAdd.at(i));
+    triggers_to_connect.push_back(this->mpTriggersToAdd.at(i)->getTrigger());
+  }
+  this->mpTriggersToAdd.clear();
+
   // add TriggerItems for Triggers that don't have one yet (i.e., for which none was present in the configuration tree)
   for (size_t i = 0; i < this->mNetwork->triggers().size(); ++i)
   {
@@ -156,13 +173,11 @@ void cedar::proc::gui::NetworkFile::addToScene()
     cedar::proc::TriggerPtr& trigger = triggers_to_connect.at(i);
     cedar::proc::gui::TriggerItem *p_trigger_item = this->mpScene->getTriggerItemFor(trigger.get());
 
-    std::cout << "Connecting " << trigger->getListeners().size() << " listeners." << std::endl;
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
       cedar::proc::StepPtr target = trigger->getListeners().at(i);
       cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(target.get());
       CEDAR_DEBUG_ASSERT(p_target_item);
-      std::cout << "Connecting  to " << target->getName() << std::endl;
       p_trigger_item->connectTo(p_target_item);
     }
   }
@@ -180,31 +195,103 @@ void cedar::proc::gui::NetworkFile::save()
 
 void cedar::proc::gui::NetworkFile::save(const std::string& destination)
 {
+  this->mFileName = destination;
+
   cedar::aux::ConfigurationNode root;
 
   this->mNetwork->saveTo(root);
-  this->saveScene(root);
+
+  cedar::aux::ConfigurationNode scene;
+  this->saveScene(scene);
+  if (!scene.empty())
+    root.add_child("ui", scene);
 
   write_json(destination, root);
-  this->mFileName = destination;
 }
 
 void cedar::proc::gui::NetworkFile::load(const std::string& source)
 {
+  this->mFileName = source;
+
   cedar::aux::ConfigurationNode root;
   read_json(source, root);
 
   this->mNetwork->readFrom(root);
-  this->mFileName = source;
+  this->loadScene(root);
 }
 
-void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode /* root */)
+void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode& root)
 {
-  // TODO implement me
+  QList<QGraphicsItem *> items = this->mpScene->items();
+  for (int i = 0; i < items.size(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase* p_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items.at(i)))
+    {
+      cedar::aux::ConfigurationNode node;
+      switch (p_item->getGroup())
+      {
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+          node.put("type", "step");
+          break;
+
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+          node.put("type", "trigger");
+          break;
+
+        default:
+          continue;
+      }
+      p_item->saveConfiguration(node);
+      root.push_back(cedar::aux::ConfigurationNode::value_type("", node));
+    }
+  }
 }
 
 
-void cedar::proc::gui::NetworkFile::loadScene(cedar::aux::ConfigurationNode /* root */)
+void cedar::proc::gui::NetworkFile::loadScene(cedar::aux::ConfigurationNode& root)
 {
-  // TODO implement me
+  this->mpStepsToAdd.clear();
+  this->mpTriggersToAdd.clear();
+
+  cedar::aux::ConfigurationNode& ui = root.find("ui")->second;
+  for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
+  {
+    const std::string& type = iter->second.get<std::string>("type");
+
+    std::cout << "Reading ui item: " << type << std::endl;
+
+    if (type == "step")
+    {
+      try
+      {
+        cedar::proc::gui::StepItem *p_step = new cedar::proc::gui::StepItem(this->mpMainWindow);
+        p_step->readConfiguration(iter->second);
+        this->mpStepsToAdd.push_back(p_step);
+      }
+      catch (const cedar::proc::gui::InvalidStepNameException&)
+      {
+        //!@todo warn in the gui
+        std::cout << "Invalid step item found in " << this->mFileName << std::endl;
+      }
+    }
+    else if (type == "trigger")
+    {
+      try
+      {
+        cedar::proc::gui::TriggerItem *p_trigger = new cedar::proc::gui::TriggerItem();
+        p_trigger->readConfiguration(iter->second);
+        this->mpTriggersToAdd.push_back(p_trigger);
+      }
+      catch (const cedar::proc::gui::InvalidTriggerNameException&)
+      {
+        //!@todo warn in the gui
+        std::cout << "Invalid step trigger item found in " << this->mFileName << std::endl;
+      }
+    }
+    else
+    {
+      //!@todo properly warn the user about this in the UI rather than in the console.
+      std::cout << "Unknown ui item type: " << type << " in file " << this->mFileName << std::endl;
+    }
+  }
 }

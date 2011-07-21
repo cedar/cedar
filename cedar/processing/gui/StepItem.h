@@ -71,6 +71,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  StepItem(QMainWindow* pMainWindow);
+
   StepItem(cedar::proc::StepPtr step, QMainWindow* pMainWindow);
 
   //!@brief Destructor
@@ -88,6 +90,10 @@ public:
 
   cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,6 +106,7 @@ protected:
 private:
   void addDataItems();
 
+  void setStep(cedar::proc::StepPtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -67,6 +67,8 @@ class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  TriggerItem();
+
   TriggerItem(cedar::proc::TriggerPtr trigger);
 
   //!@brief Destructor
@@ -84,6 +86,10 @@ public:
 
   void connectTo(cedar::proc::gui::StepItem *pTarget);
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,7 +99,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setTrigger(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

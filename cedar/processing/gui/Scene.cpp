@@ -538,13 +538,17 @@ void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF pos
 void cedar::proc::gui::Scene::addTrigger(cedar::proc::TriggerPtr trigger, QPointF position)
 {
   cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
-  this->addItem(p_drawer);
+  this->addTriggerItem(p_drawer);
   p_drawer->setPos(position);
 
-  // we assume that triggers are only inserted once.
-  this->mTriggerMap[trigger.get()] = p_drawer;
-
   this->update();
+}
+
+void cedar::proc::gui::Scene::addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger)
+{
+  this->addItem(pTrigger);
+  // we assume that triggers are only inserted once.
+  this->mTriggerMap[pTrigger->getTrigger().get()] = pTrigger;
 }
 
 void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPointF position)
@@ -620,12 +624,17 @@ cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc:
 void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)
 {
   cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step, this->mpMainWindow);
-  this->addItem(p_drawer);
-
-  // we assume that steps are only inserted once.
-  CEDAR_DEBUG_ASSERT(this->mStepMap.find(step.get()) == this->mStepMap.end());
-  this->mStepMap[step.get()] = p_drawer;
+  this->addStepItem(p_drawer);
 
   p_drawer->setPos(position);
   this->update();
+}
+
+void cedar::proc::gui::Scene::addStepItem(cedar::proc::gui::StepItem *pStep)
+{
+  std::cout << "adding step item at: " << pStep->pos().x() << ", " << pStep->pos().y() << std::endl;
+  this->addItem(pStep);
+  // we assume that steps are only inserted once.
+  CEDAR_DEBUG_ASSERT(this->mStepMap.find(pStep->getStep().get()) == this->mStepMap.end());
+  this->mStepMap[pStep->getStep().get()] = pStep;
 }

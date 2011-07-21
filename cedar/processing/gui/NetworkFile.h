@@ -66,7 +66,7 @@ class cedar::proc::gui::NetworkFile
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NetworkFile(cedar::proc::gui::Scene* pScene);
+  NetworkFile(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene);
 
   //!@brief Destructor
   ~NetworkFile();
@@ -96,9 +96,13 @@ private:
   cedar::proc::NetworkPtr mNetwork;
   cedar::proc::gui::Scene* mpScene;
   std::string mFileName;
+  QMainWindow *mpMainWindow;
 
-  void saveScene(cedar::aux::ConfigurationNode root);
-  void loadScene(cedar::aux::ConfigurationNode root);
+  std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
+  std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
+
+  void saveScene(cedar::aux::ConfigurationNode& root);
+  void loadScene(cedar::aux::ConfigurationNode& root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

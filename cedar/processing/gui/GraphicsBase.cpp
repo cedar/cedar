@@ -39,13 +39,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "GraphicsBase.h"
+#include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QPainter>
 #include <iostream>
+#include <limits.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -57,13 +58,18 @@ cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
                                              GraphicsGroup canConnectTo,
                                              BaseShape shape)
 :
-mWidth(width),
-mHeight(height),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mShape(shape),
+mWidth(new cedar::aux::DoubleParameter("width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
+mHeight(new cedar::aux::DoubleParameter("height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
+  this->mWidth->set(width);
+  this->mHeight->set(height);
+  this->registerParameter(this->mWidth);
+  this->registerParameter(this->mHeight);
+
   this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges);
 }
 
@@ -74,6 +80,40 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+
+void cedar::proc::gui::GraphicsBase::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::aux::Configurable::readConfiguration(node);
+
+  qreal x = 0, y = 0;
+  try
+  {
+    x = node.get<qreal>("positionX");
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // ok, x not set
+  }
+  try
+  {
+    y = node.get<qreal>("positionY");
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // ok, y not set
+  }
+  std::cout << "Setting position to " << x << " , " << y << std::endl;
+  this->setPos(x, y);
+}
+
+void cedar::proc::gui::GraphicsBase::saveConfiguration(cedar::aux::ConfigurationNode& root)
+{
+  this->cedar::aux::Configurable::saveConfiguration(root);
+
+  root.put("positionX", this->pos().x());
+  root.put("positionY", this->pos().y());
+}
 
 void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
 {
@@ -95,7 +135,7 @@ QRectF cedar::proc::gui::GraphicsBase::boundingRect() const
 {
   qreal padding = static_cast<qreal>(1.0);
   //! @todo properly map the size to the scene coordinate system
-  return QRectF(QPointF(-padding, -padding), QSizeF(this->mWidth + padding, this->mHeight + padding));
+  return QRectF(QPointF(-padding, -padding), QSizeF(this->width() + padding, this->height() + padding));
 }
 
 bool cedar::proc::gui::GraphicsBase::canConnect() const
@@ -138,7 +178,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
 {
   painter->save();
 
-  QRectF bounds(QPointF(0, 0), QSizeF(this->mWidth, this->mHeight));
+  QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
 
   painter->setPen(this->getOutlinePen());
   switch (this->mShape)
@@ -167,7 +207,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
     }
 
-    QRectF highlight_bounds(QPointF(1, 1), QSizeF(this->mWidth - 1, this->mHeight - 1));
+    QRectF highlight_bounds(QPointF(1, 1), QSizeF(this->width() - 1, this->height() - 1));
     painter->setPen(highlight_pen);
     switch (this->mShape)
     {
