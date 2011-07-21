@@ -45,6 +45,7 @@
 #include "processing/gui/DoubleParameter.h"
 #include "processing/gui/DoubleVectorParameter.h"
 #include "processing/gui/UIntParameter.h"
+#include "processing/gui/UIntVectorParameter.h"
 #include "processing/gui/StringParameter.h"
 #include "processing/Manager.h"
 
@@ -144,6 +145,7 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr
     p_widget->setParameter(parameter);
     p_widget->setEnabled(!parameter->isConstant());
     this->setCellWidget(row, 1, p_widget);
+    this->resizeRowToContents(row);
   }
 }
 
@@ -156,6 +158,7 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleVectorParameter, cedar::proc::gui::DoubleVectorParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }

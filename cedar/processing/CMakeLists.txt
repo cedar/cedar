@@ -57,6 +57,7 @@ cedar_add_library(cedarproc
   gui/StringParameter.h
   gui/ToolBox.h
   gui/UIntParameter.h
+  gui/UIntVectorParameter.h
   gui/View.h
   source/GaussInput.h
   )

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleVectorParameter.cpp
+    File:        UIntVectorParameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 20
+    Date:        2011 07 21
 
     Description:
 
@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DoubleVectorParameter.h"
+#include "processing/gui/UIntVectorParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
 #include "auxiliaries/macros.h"
 
@@ -53,7 +53,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DoubleVectorParameter::DoubleVectorParameter(QWidget *pParent)
+cedar::proc::gui::UIntVectorParameter::UIntVectorParameter(QWidget *pParent)
 :
 cedar::proc::gui::ParameterBase(pParent)
 {
@@ -63,7 +63,7 @@ cedar::proc::gui::ParameterBase(pParent)
 }
 
 //!@brief Destructor
-cedar::proc::gui::DoubleVectorParameter::~DoubleVectorParameter()
+cedar::proc::gui::UIntVectorParameter::~UIntVectorParameter()
 {
 }
 
@@ -71,10 +71,10 @@ cedar::proc::gui::DoubleVectorParameter::~DoubleVectorParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::DoubleVectorParameter::parameterPointerChanged()
+void cedar::proc::gui::UIntVectorParameter::parameterPointerChanged()
 {
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
+  cedar::aux::UIntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
   // first, clear the old widgets
   for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
   {
@@ -86,25 +86,25 @@ void cedar::proc::gui::DoubleVectorParameter::parameterPointerChanged()
   this->mSpinboxes.clear();
   for (
         size_t i = 0;
-        i < boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter())->get().size();
+        i < boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter())->get().size();
         ++i
       )
   {
-    this->mSpinboxes.push_back(new QDoubleSpinBox());
+    this->mSpinboxes.push_back(new QSpinBox());
     this->layout()->addWidget(this->mSpinboxes.at(i));
     this->mSpinboxes.at(i)->setMinimumHeight(20);
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
     this->mSpinboxes.at(i)->setValue(parameter->get().at(i));
-    QObject::connect(this->mSpinboxes.at(i), SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
+    QObject::connect(this->mSpinboxes.at(i), SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
   }
 }
 
-void cedar::proc::gui::DoubleVectorParameter::valueChanged(double)
+void cedar::proc::gui::UIntVectorParameter::valueChanged(int)
 {
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-  std::vector<double> values = parameter->get();
+  cedar::aux::UIntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
+  std::vector<unsigned int> values = parameter->get();
   CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
   for (size_t i = 0; i < values.size(); ++i)
   {

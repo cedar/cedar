@@ -74,3 +74,8 @@ cedar::aux::RangeException::RangeException()
 {
   this->mType = "RangeException";
 }
+
+cedar::aux::NoDefaultException::NoDefaultException()
+{
+  this->mType = "NoDefaultException";
+}
