@@ -111,15 +111,17 @@ public:
     }
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root) // TODO
+  void putTo(cedar::aux::ConfigurationNode& root)
   {
-//    cedar::aux::ConfigurationNode vector_node;
-//    for (typename std::vector<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
-//    {
-//      cedar::aux::ConfigurationNode node(cedar::aux::ConfigurationNode::data_type(*iter));
-//      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", node));
-//    }
-//    root.put(this->getName(), vector_node);
+    cedar::aux::ConfigurationNode vector_node;
+    for (typename std::vector<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    {
+      T& value = *iter;
+      cedar::aux::ConfigurationNode value_node;
+      value_node.put_value(value);
+      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
   }
 
   const std::vector<T>& get() const

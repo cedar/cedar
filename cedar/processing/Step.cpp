@@ -383,7 +383,9 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
     CEDAR_THROW(cedar::proc::InvalidRoleException,
                 "The requested role " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
-                " does not exist.");
+                " does not exist in step \""
+                + this->getName() +
+                "\".");
     return;
   }
 
@@ -391,9 +393,6 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
   if (role != cedar::proc::DataRole::INPUT)
   {
     data->setOwner(this);
-  }
-  else
-  {
     data->connectedSlotName(name);
   }
 

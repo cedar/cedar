@@ -78,6 +78,10 @@ namespace cedar
       class UIntParameter;
       class UIntVectorParameter;
       class View;
+
+      /* Exceptions */
+      class InvalidStepNameException;
+      class InvalidTriggerNameException;
     }
   }
 }

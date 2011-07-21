@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -71,6 +72,9 @@ public:
     MODE_CONNECT
   };
 
+  typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+  typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,13 +98,25 @@ public:
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
 
   void addProcessingStep(const std::string& classId, QPointF position);
+  void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
+  void addStepItem(cedar::proc::gui::StepItem *pStep);
   void addTrigger(const std::string& classId, QPointF position);
+  void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
+  void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
 
   void setMode(MODE mode, const QString& param = "");
 
   void setMainWindow(QMainWindow *pMainWindow);
 
   void setNetwork(cedar::proc::gui::NetworkFilePtr network);
+
+  void reset();
+
+  const StepMap& stepMap() const;
+  const TriggerMap& triggerMap() const;
+
+  cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
+  cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -152,6 +168,9 @@ private:
   QGraphicsRectItem *mpGroupIndicator;
   QList<QGraphicsItem*> mProspectiveGroupMembers;
   QMainWindow *mpMainWindow;
+
+  StepMap mStepMap;
+  TriggerMap mTriggerMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
