@@ -44,6 +44,9 @@
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/math/functions.h"
 #include "processing/Arguments.h"
+#include "auxiliaries/macros.h"
+#include "auxiliaries/math/tools.h"
+#include "auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 
@@ -60,22 +63,20 @@ mOutput(new cedar::dyn::MatActivation(cv::Mat::zeros(10,10,CV_32F))),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", 1.0, -10000.0, 10000.0)),
 _mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
 _mSigma(new cedar::aux::DoubleParameter("sigma", 3.0, 0.01, 1000.0)),
-_mCenterX(new cedar::aux::DoubleParameter("center_x", sizeX/2.0, -10000.0, 10000.0)),
-_mCenterY(new cedar::aux::DoubleParameter("center_y", sizeY/2.0, -10000.0, 10000.0))
+_mCenters(new cedar::aux::DoubleVectorParameter("centers", 2, 3.0, -10000.0, 10000.0))
 {
   this->registerParameter(_mAmplitude);
   this->registerParameter(_mDimensionality);
   _mDimensionality->set(2);
   _mDimensionality->setConstant(true);
   this->registerParameter(_mSigma);
-  this->registerParameter(_mCenterX);
-  this->registerParameter(_mCenterY);
+  this->registerParameter(_mCenters);
+  _mCenters->makeDefault();
   this->declareOutput("Gauss input");
   this->setOutput("Gauss input", mOutput);
   QObject::connect(_mAmplitude.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigma.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mCenterX.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mCenterY.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mCenters.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
   this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,20 +86,14 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
 {
   std::vector<cv::Mat> kernel_parts;
   kernel_parts.resize(_mDimensionality->get());
-
-  for (unsigned dim = 0; dim < _mDimensionality->get(); dim++)
+  for (unsigned int dim = 0; dim < _mDimensionality->get(); ++dim)
   {
     kernel_parts.at(dim) = cv::Mat(10, 1, CV_32F);
-    for (int row = 0; row < kernel_parts.at(dim).rows; row++)
+    CEDAR_DEBUG_ASSERT(_mSigma->get() > 0.0);
+    for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
     {
-      if (dim == 0)
-      {
-        kernel_parts.at(dim).at<float>(row, 1) = cedar::aux::math::gauss(static_cast<int>(row) - _mCenterX->get(), _mSigma->get());
-      }
-      else
-      {
-        kernel_parts.at(dim).at<float>(row, 1) = cedar::aux::math::gauss(static_cast<int>(row) - _mCenterY->get(), _mSigma->get());
-      }
+      kernel_parts.at(dim).at<float>(row, 0)
+          = cedar::aux::math::gauss(static_cast<int>(row) - _mCenters->get().at(dim), _mSigma->get());
     }
   }
   kernel_parts.at(0) *= _mAmplitude->get();

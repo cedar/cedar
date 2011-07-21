@@ -104,8 +104,7 @@ protected:
   cedar::aux::DoubleParameterPtr _mAmplitude;
   cedar::aux::UIntParameterPtr _mDimensionality;
   cedar::aux::DoubleParameterPtr _mSigma; //!\todo vector...
-  cedar::aux::DoubleParameterPtr _mCenterX; //!\todo vector...
-  cedar::aux::DoubleParameterPtr _mCenterY; //!\todo vector...
+  cedar::aux::DoubleVectorParameterPtr _mCenters;
 
 private:
 

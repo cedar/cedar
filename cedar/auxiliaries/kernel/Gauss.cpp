@@ -133,7 +133,7 @@ void cedar::aux::kernel::Gauss::calculate()
       {
         mSizes.at(dim) = 1;
       }
-      mCenters.at(dim) = mSizes.at(dim) / 2 + _mShifts->get().at(dim);
+      mCenters.at(dim) = floor(mSizes.at(dim) / 2) + _mShifts->get().at(dim);
       mKernelParts.at(dim) = cv::Mat::zeros(mSizes.at(dim), 1, CV_32FC1);
 
       // calculate kernel part
