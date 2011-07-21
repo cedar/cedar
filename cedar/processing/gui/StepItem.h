@@ -50,6 +50,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <map>
 
 
 /*!@brief Abstract description of the class.
@@ -59,14 +60,19 @@
 class cedar::proc::gui::StepItem : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
+  typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  StepItem(QMainWindow* pMainWindow);
+
   StepItem(cedar::proc::StepPtr step, QMainWindow* pMainWindow);
 
   //!@brief Destructor
@@ -81,6 +87,13 @@ public:
   cedar::proc::StepPtr getStep();
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+
+  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,6 +106,8 @@ protected:
 private:
   void addDataItems();
 
+  void setStep(cedar::proc::StepPtr step);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,6 +115,7 @@ protected:
   // none yet
 private:
   cedar::proc::StepPtr mStep;
+  DataSlotMap mSlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

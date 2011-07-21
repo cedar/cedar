@@ -42,6 +42,7 @@
 #include "processing/gui/StepItem.h"
 #include "processing/gui/DataPlotter.h"
 #include "processing/gui/DataSlotItem.h"
+#include "processing/gui/exceptions.h"
 #include "processing/Manager.h"
 #include "processing/Data.h"
 #include "processing/Step.h"
@@ -63,14 +64,25 @@ cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step, QMainWindow* pMa
 cedar::proc::gui::GraphicsBase(120, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
-mStep(step),
 mpMainWindow(pMainWindow)
 {
+  this->setStep(step);
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
-  this->addDataItems();
+}
+
+cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
+:
+cedar::proc::gui::GraphicsBase(120, 50,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
+mpMainWindow(pMainWindow)
+{
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               );
 }
 
 cedar::proc::gui::StepItem::~StepItem()
@@ -80,6 +92,35 @@ cedar::proc::gui::StepItem::~StepItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
+{
+  this->mStep = step;
+  this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(this->mStep);
+
+  this->addDataItems();
+}
+
+void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  try
+  {
+    std::string step_name = node.get<std::string>("step");
+    cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(step_name);
+    this->setStep(step);
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    CEDAR_THROW(cedar::proc::gui::InvalidStepNameException, "Cannot read StepItem from file: no step name given.");
+  }
+}
+
+void cedar::proc::gui::StepItem::saveConfiguration(cedar::aux::ConfigurationNode& root)
+{
+  root.put("step", this->mStep->getName());
+  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
+}
 
 void cedar::proc::gui::StepItem::addDataItems()
 {
@@ -94,7 +135,7 @@ void cedar::proc::gui::StepItem::addDataItems()
   add_origins[cedar::proc::DataRole::INPUT] = QPointF(-padding - data_size, 0);
   add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
 
-  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0); //!@todo don't hard-code the size of the data items
+  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0);
   add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
 
   for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
@@ -104,12 +145,17 @@ void cedar::proc::gui::StepItem::addDataItems()
     if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
       continue;
 
+    // populate step item list
+    mSlotMap[*enum_it] = DataSlotNameMap();
+
+#ifdef DEBUG
     if (add_origins.find(*enum_it) == add_origins.end() || add_directions.find(*enum_it) == add_directions.end())
     {
       std::cout << "Warning: the data role " << enum_it->prettyString() << " is not implemented properly in "
                    "StepItem::addDataItems. Skipping!" << std::endl;
       continue;
     }
+#endif
 
     const QPointF& origin = add_origins[*enum_it];
     const QPointF& direction = add_directions[*enum_it];
@@ -125,6 +171,7 @@ void cedar::proc::gui::StepItem::addDataItems()
                                                                                     iter->first,
                                                                                     (*enum_it));
         p_item->setPos(origin + count * direction * (data_size + padding) );
+        mSlotMap[*enum_it][iter->first] = p_item;
         count += static_cast<qreal>(1.0);
       }
     }
@@ -133,6 +180,33 @@ void cedar::proc::gui::StepItem::addDataItems()
       // ok -- a step may not have any data for this role.
     }
   }
+}
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
+                                                              (
+                                                                cedar::proc::DataRole::Id role, const std::string& name
+                                                              )
+{
+  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "No slot items stored for role "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   );
+  }
+
+  DataSlotNameMap::iterator iter = role_map->second.find(name);
+  if (iter == role_map->second.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
+                                                   "\" found for role "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   + " in StepItem for step \"" + this->mStep->getName() + "\"."
+                                                   );
+  }
+
+  return iter->second;
 }
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

@@ -52,7 +52,7 @@
 
 // Define that helps to debug file reading.
 //#define DEBUG_FILE_READING
-#define DEBUG_FILE_WRITING
+//#define DEBUG_FILE_WRITING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -69,6 +69,26 @@ cedar::proc::Network::~Network()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::Network::StepVector& cedar::proc::Network::steps()
+{
+  return this->mSteps;
+}
+
+const cedar::proc::Network::StepVector& cedar::proc::Network::steps() const
+{
+  return this->mSteps;
+}
+
+const cedar::proc::Network::TriggerVector& cedar::proc::Network::triggers() const
+{
+  return this->mTriggers;
+}
+
+cedar::proc::Network::TriggerVector& cedar::proc::Network::triggers()
+{
+  return this->mTriggers;
+}
 
 void cedar::proc::Network::add(cedar::proc::StepPtr step)
 {
@@ -237,28 +257,40 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
   }
 }
 
-void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& connections, cedar::proc::StepPtr& source)
+void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& connections, cedar::proc::StepPtr& target)
 {
-  cedar::proc::Step::SlotMap& inputs = source->getDataSlots(cedar::proc::DataRole::OUTPUT);
-  for (cedar::proc::Step::SlotMap::iterator iter = inputs.begin(); iter != inputs.end(); ++iter)
+  try
   {
-    cedar::proc::DataPtr data = iter->second.getData();
-    const std::string& source_data_name = iter->first;
-    cedar::proc::Step* target = data->getOwner();
-    const std::string& target_data_name = data->connectedSlotName();
-
-    if (target_data_name.empty())
+    cedar::proc::Step::SlotMap& inputs = target->getDataSlots(cedar::proc::DataRole::INPUT);
+    for (cedar::proc::Step::SlotMap::iterator iter = inputs.begin(); iter != inputs.end(); ++iter)
     {
-      continue;
+      cedar::proc::DataPtr data = iter->second.getData();
+
+      // check if the data connection is set
+      if (!data)
+        continue;
+
+      const std::string& target_data_name = iter->first;
+      cedar::proc::Step* source = data->getOwner();
+      const std::string& source_data_name = data->connectedSlotName();
+
+      if (source_data_name.empty())
+      {
+        continue;
+      }
+
+      std::string source_str = source->getName() + "." + source_data_name;
+      std::string target_str = target->getName() + "." + target_data_name;
+
+      cedar::aux::ConfigurationNode connection;
+      connection.put("source", source_str);
+      connection.put("target", target_str);
+      connections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
     }
-
-    std::string source_str = source->getName() + "." + source_data_name;
-    std::string target_str = target->getName() + "." + target_data_name;
-
-    cedar::aux::ConfigurationNode connection;
-    connection.put("source", source_str);
-    connection.put("target", target_str);
-    connections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
+  }
+  catch (const cedar::proc::InvalidRoleException&)
+  {
+    // ok; step apparently has no inputs
   }
 }
 

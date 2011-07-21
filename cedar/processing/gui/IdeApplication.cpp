@@ -46,6 +46,8 @@
 
 // SYSTEM INCLUDES
 
+#define CATCH_EXCEPTIONS_IN_GUI
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,9 +80,14 @@ int cedar::proc::gui::IdeApplication::exec()
 
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {
+#ifdef CATCH_EXCEPTIONS_IN_GUI
   try
   {
+#endif // CATCH_EXCEPTIONS_IN_GUI
+
     return QApplication::notify(pReceiver,pEvent);
+
+#ifdef CATCH_EXCEPTIONS_IN_GUI
   }
   catch(const cedar::aux::exc::ExceptionBase& e)
   {
@@ -105,6 +112,7 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
         " name and restart the application.");
     emit exception(message);
   }
+#endif // CATCH_EXCEPTIONS_IN_GUI
   return false;
 }
 
