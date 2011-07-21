@@ -50,7 +50,12 @@
 using namespace cedar::aux::net;
 using namespace std;
 
-
+struct three_t 
+{
+  float r;
+  float g;
+  float b;
+};
 
 int main()
 {
@@ -109,6 +114,8 @@ int main()
   cv::Mat mat3= cv::Mat::zeros(16, 2, CV_64F);
   cv::Mat mat6= cv::Mat::zeros(SIZE, 2, CV_64F);
   cv::Mat mat7= cv::Mat::zeros(SIZE, 2, CV_64F);
+  cv::Mat mat8= cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
+  cv::Mat mat9= cv::Mat::zeros(20, 2, CV_32FC3); // multichannel
 
   for (int i=0; i < SIZE; i++)
   {
@@ -121,15 +128,25 @@ int main()
     mat2.at<TestType>(i,0)= -1;
     mat2.at<TestType>(i,1)= -1;
   }
+  // mat8 is a bit smaller, but has multi channels
+  for (int i=0; i < 20; i++)
+  {
+    struct three_t rgb= { 1, 2, i };
+
+    mat8.at<three_t>(i,0)= rgb;
+    mat8.at<three_t>(i,1)= rgb;
+  }
 
   try
   {
     // writing ...
     NetWriter<cv::Mat> myMatWriter(MYPORT);
+    NetWriter<cv::Mat> myMatWriter8(MYPORT"8");
 
     // ... reading
     NetBlockingReader<cv::Mat> myMatReader2(MYPORT);
     NetBlockingReader<cv::Mat> myMatReader3(MYPORT);
+    NetBlockingReader<cv::Mat> myMatReader8(MYPORT"8");
 
     myMatWriter.write(mat);
     mat2= myMatReader2.read();
@@ -154,8 +171,23 @@ int main()
       {
         // FAIL
         mat_errors++;
-        }
       }
+    }
+
+    myMatWriter8.write(mat8);
+    mat9= myMatReader8.read();
+
+    for (int i= 0; i < 20; i++)
+    {
+      struct three_t rgb;
+
+      rgb= mat9.at<three_t>(i,0);
+
+      if (rgb.b != i)
+      {
+        mat_errors++;
+      }
+    }
 
   } // end try
   catch (cedar::aux::exc::ExceptionBase &E)
