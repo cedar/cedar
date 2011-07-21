@@ -67,10 +67,11 @@ public:
   typedef cvMatNetHeader HeaderType;
 
 private:
-  HeaderType mCheckHeader;
+  HeaderType mCheckHeader; // local info about matrix-header, to compare
+                           // with future user inputs
 
   void init_externalheader(const CVT &mat, HeaderType &extheader);
-  void init_checkheader(HeaderType &extheader);
+  void init_checkheader(const HeaderType &extheader);
 
 
   //---------------------------------------------------------------------------
@@ -78,7 +79,7 @@ private:
   //---------------------------------------------------------------------------
 protected:
   bool check_collateddata_for_write(const CVT &mat, HeaderType &extheader);
-  bool check_collateddata_for_read(HeaderType &extheader);
+  bool check_collateddata_for_read(const HeaderType &extheader);
 
   //---------------------------------------------------------------------------
   // constructors and destructor
