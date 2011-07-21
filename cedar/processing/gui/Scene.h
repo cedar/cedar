@@ -73,6 +73,7 @@ public:
   };
 
   typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+  typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -99,6 +100,7 @@ public:
   void addProcessingStep(const std::string& classId, QPointF position);
   void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
   void addTrigger(const std::string& classId, QPointF position);
+  void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
 
   void setMode(MODE mode, const QString& param = "");
 
@@ -109,8 +111,10 @@ public:
   void reset();
 
   const StepMap& stepMap() const;
+  const TriggerMap& triggerMap() const;
 
   cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
+  cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -164,6 +168,7 @@ private:
   QMainWindow *mpMainWindow;
 
   StepMap mStepMap;
+  TriggerMap mTriggerMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
