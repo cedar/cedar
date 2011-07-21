@@ -22,66 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        exceptions.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 21
 
-    Description: Namespace file for cedar::proc::gui.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_PROC_GUI_EXCEPTIONS_H
+#define CEDAR_PROC_GUI_EXCEPTIONS_H
 
-#ifndef CEDAR_PROC_GUI_NAMESPACE_H
-#define CEDAR_PROC_GUI_NAMESPACE_H
+#include "processing/gui/namespace.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-
-
-namespace cedar
+/*!@brief TODO
+ */
+class cedar::proc::gui::InvalidStepNameException : public cedar::aux::exc::ExceptionBase
 {
-  /*!@brief Namespace for all processing classes. */
-  namespace proc
+public:
+  InvalidStepNameException()
   {
-    namespace gui
-    {
-      class ArchitectureToolBox;
-      class BoolParameter;
-      class Connection;
-      class DataPlotter;
-      class DataSlotItem;
-      class DoubleParameter;
-      class GraphicsBase;
-      class GroupItem;
-      class Ide;
-      class IdeApplication;
-      class NetworkFile;
-      typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
-      class ParameterBase;
-      class PropertyPane;
-      class StepItem;
-      class StepClassList;
-      class StringParameter;
-      class Scene;
-      class ToolBox;
-      class TriggerItem;
-      class UIntParameter;
-      class View;
-
-      /* Exceptions */
-      class InvalidStepNameException;
-      class InvalidTriggerNameException;
-    }
+    this->mType = "InvalidStepNameException";
   }
-}
+}; // class cedar::proc::InvalidStepNameException
 
-#endif // CEDAR_PROC_GUI_NAMESPACE_H
+/*!@brief TODO
+ */
+class cedar::proc::gui::InvalidTriggerNameException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  InvalidTriggerNameException()
+  {
+    this->mType = "InvalidTriggerNameException";
+  }
+}; // class cedar::proc::InvalidTriggerNameException
+
+#endif // CEDAR_PROC_GUI_EXCEPTIONS_H

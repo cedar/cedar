@@ -44,6 +44,8 @@
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
 #include "processing/gui/Connection.h"
+#include "auxiliaries/Configurable.h"
+#include "auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 
@@ -56,7 +58,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::GraphicsBase : public QGraphicsItem
+class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // static constants
@@ -118,17 +120,21 @@ public:
 
   HighlightMode getHighlightMode() const;
 
-  const qreal& width() const
+  qreal width() const
   {
-    return this->mWidth;
+    return static_cast<qreal>(this->mWidth->get());
   }
 
-  const qreal& height() const
+  qreal height() const
   {
-    return this->mHeight;
+    return static_cast<qreal>(this->mHeight->get());
   }
 
   void addConnection(Connection* pConnection);
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -147,11 +153,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  qreal mWidth;
-  qreal mHeight;
+  // none yet
 private:
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
   BaseShape mShape;
@@ -165,6 +168,9 @@ protected:
   // none yet
 
 private:
+  cedar::aux::DoubleParameterPtr mWidth;
+  cedar::aux::DoubleParameterPtr mHeight;
+
   GraphicsGroup mGroup;
   GraphicsGroup mAllowedConnectTargets;
 

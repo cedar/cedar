@@ -42,6 +42,7 @@
 #include "processing/gui/StepItem.h"
 #include "processing/gui/DataPlotter.h"
 #include "processing/gui/DataSlotItem.h"
+#include "processing/gui/exceptions.h"
 #include "processing/Manager.h"
 #include "processing/Data.h"
 #include "processing/Step.h"
@@ -63,14 +64,25 @@ cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step, QMainWindow* pMa
 cedar::proc::gui::GraphicsBase(120, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
-mStep(step),
 mpMainWindow(pMainWindow)
 {
+  this->setStep(step);
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
-  this->addDataItems();
+}
+
+cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
+:
+cedar::proc::gui::GraphicsBase(120, 50,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
+mpMainWindow(pMainWindow)
+{
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               );
 }
 
 cedar::proc::gui::StepItem::~StepItem()
@@ -80,6 +92,35 @@ cedar::proc::gui::StepItem::~StepItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
+{
+  this->mStep = step;
+  this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(this->mStep);
+
+  this->addDataItems();
+}
+
+void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  try
+  {
+    std::string step_name = node.get<std::string>("step");
+    cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(step_name);
+    this->setStep(step);
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    CEDAR_THROW(cedar::proc::gui::InvalidStepNameException, "Cannot read StepItem from file: no step name given.");
+  }
+}
+
+void cedar::proc::gui::StepItem::saveConfiguration(cedar::aux::ConfigurationNode& root)
+{
+  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
+  root.put("step", this->mStep->getName());
+}
 
 void cedar::proc::gui::StepItem::addDataItems()
 {

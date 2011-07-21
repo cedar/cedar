@@ -75,7 +75,7 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
 
-  mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this->mpProcessingDrawer->getScene()));
+  mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
   this->resetTo(mNetwork);
 }
 
@@ -184,7 +184,7 @@ void cedar::proc::gui::Ide::load()
 
   if (!file.isEmpty())
   {
-    cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this->mpProcessingDrawer->getScene()));
+    cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
     network->load(file.toStdString());
     this->mpActionSave->setEnabled(true);
     this->resetTo(network);

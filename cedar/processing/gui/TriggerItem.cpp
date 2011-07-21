@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/StepItem.h"
+#include "processing/gui/exceptions.h"
 #include "processing/LoopedTrigger.h"
 #include "processing/Manager.h"
 #include "processing/Data.h"
@@ -58,20 +59,34 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::gui::TriggerItem::TriggerItem()
+:
+cedar::proc::gui::GraphicsBase(120, 50,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               )
+{
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               | QGraphicsItem::ItemSendsGeometryChanges
+                               );
+}
+
+
 cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 :
 cedar::proc::gui::GraphicsBase(120, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
                                | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
-                               ),
-mTrigger (trigger)
+                               )
 {
-  this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(trigger);
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
+  this->setTrigger(trigger);
 }
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
@@ -81,6 +96,33 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
+{
+  this->mTrigger = trigger;
+  this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(mTrigger);
+}
+
+void cedar::proc::gui::TriggerItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  try
+  {
+    std::string trigger_name = node.get<std::string>("trigger");
+    cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().get(trigger_name);
+    this->setTrigger(trigger);
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    CEDAR_THROW(cedar::proc::gui::InvalidTriggerNameException, "Cannot read TriggerItem from file: no trigger name given.");
+  }
+}
+
+void cedar::proc::gui::TriggerItem::saveConfiguration(cedar::aux::ConfigurationNode& root)
+{
+  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
+  root.put("trigger", this->mTrigger->getName());
+}
 
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
