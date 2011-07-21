@@ -118,8 +118,8 @@ void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::Configurati
 
 void cedar::proc::gui::StepItem::saveConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
   root.put("step", this->mStep->getName());
+  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
 }
 
 void cedar::proc::gui::StepItem::addDataItems()

@@ -632,7 +632,6 @@ void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPoin
 
 void cedar::proc::gui::Scene::addStepItem(cedar::proc::gui::StepItem *pStep)
 {
-  std::cout << "adding step item at: " << pStep->pos().x() << ", " << pStep->pos().y() << std::endl;
   this->addItem(pStep);
   // we assume that steps are only inserted once.
   CEDAR_DEBUG_ASSERT(this->mStepMap.find(pStep->getStep().get()) == this->mStepMap.end());
