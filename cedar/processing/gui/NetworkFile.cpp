@@ -102,6 +102,10 @@ void cedar::proc::gui::NetworkFile::addToScene()
       {
         const cedar::proc::DataPtr& data = iter->second.getData();
 
+        // check if the data connection is set
+        if (!data)
+          continue;
+
         cedar::proc::Step *p_owner = data->getOwner();
         CEDAR_DEBUG_ASSERT(p_owner != NULL);
 
@@ -169,6 +173,11 @@ cedar::proc::NetworkPtr cedar::proc::gui::NetworkFile::network()
   return this->mNetwork;
 }
 
+void cedar::proc::gui::NetworkFile::save()
+{
+  this->save(this->mFileName);
+}
+
 void cedar::proc::gui::NetworkFile::save(const std::string& destination)
 {
   cedar::aux::ConfigurationNode root;
@@ -177,6 +186,7 @@ void cedar::proc::gui::NetworkFile::save(const std::string& destination)
   this->saveScene(root);
 
   write_json(destination, root);
+  this->mFileName = destination;
 }
 
 void cedar::proc::gui::NetworkFile::load(const std::string& source)
@@ -185,6 +195,7 @@ void cedar::proc::gui::NetworkFile::load(const std::string& source)
   read_json(source, root);
 
   this->mNetwork->readFrom(root);
+  this->mFileName = source;
 }
 
 void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode /* root */)

@@ -265,6 +265,11 @@ void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& con
     for (cedar::proc::Step::SlotMap::iterator iter = inputs.begin(); iter != inputs.end(); ++iter)
     {
       cedar::proc::DataPtr data = iter->second.getData();
+
+      // check if the data connection is set
+      if (!data)
+        continue;
+
       const std::string& target_data_name = iter->first;
       cedar::proc::Step* source = data->getOwner();
       const std::string& source_data_name = data->connectedSlotName();
