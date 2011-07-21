@@ -104,6 +104,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void display(cv::Mat* mat, QReadWriteLock *lock);
+  void resetPerspective();
+  void showGrid(bool show);
 
 public slots:
   void updatePlot();
@@ -112,7 +114,7 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void contextMenuEvent(QContextMenuEvent * pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -131,6 +133,7 @@ private:
   cv::Mat* mpMat;
   QTimer* mpTimer;
   QReadWriteLock *mpeLock;
+  bool mShowGridLines;
 
   Qwt3D::GridPlot *mpPlot;
 
