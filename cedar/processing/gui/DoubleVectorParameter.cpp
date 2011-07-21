@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/DoubleVectorParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -74,18 +75,23 @@ void cedar::proc::gui::DoubleVectorParameter::parameterPointerChanged()
 {
   cedar::aux::DoubleVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-  std::cout << "size " << boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter())->get().size() << std::endl;
+  // first, clear the old widgets
+  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
+  {
+    if (this->mSpinboxes.at(i))
+    {
+      delete this->mSpinboxes.at(i);
+    }
+  }
   this->mSpinboxes.clear();
-  for (size_t i = 0; i < boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter())->get().size(); i++)
+  for (
+        size_t i = 0;
+        i < boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter())->get().size();
+        ++i
+      )
   {
     this->mSpinboxes.push_back(new QDoubleSpinBox());
     this->layout()->addWidget(this->mSpinboxes.at(i));
-    this->mSpinboxes.at(i)->setMinimum(-100.0);
-    this->mSpinboxes.at(i)->setMaximum(+100.0);
-  }
-  std::cout << "step1 " << std::endl;
-  for (size_t i = 0; i < mSpinboxes.size(); i++)
-  {
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
     this->mSpinboxes.at(i)->setValue(parameter->get().at(i));
@@ -93,10 +99,16 @@ void cedar::proc::gui::DoubleVectorParameter::parameterPointerChanged()
   }
 }
 
-void cedar::proc::gui::DoubleVectorParameter::valueChanged(double value)
+void cedar::proc::gui::DoubleVectorParameter::valueChanged(double)
 {
   cedar::aux::DoubleVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-//  parameter->set(value);
+  std::vector<double> values = parameter->get();
+  CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
+  for (size_t i = 0; i < values.size(); ++i)
+  {
+    values.at(i) = this->mSpinboxes.at(i)->value();
+  }
+  parameter->set(values);
 }
 
