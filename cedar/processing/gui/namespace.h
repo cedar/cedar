@@ -77,6 +77,10 @@ namespace cedar
       class TriggerItem;
       class UIntParameter;
       class View;
+
+      /* Exceptions */
+      class InvalidStepNameException;
+      class InvalidTriggerNameException;
     }
   }
 }
