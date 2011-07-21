@@ -33,7 +33,8 @@ class NetReader<int> : public _NM_FULL_::SimpleNetReader<int, false>
 { 
   // dummy
 public:
-  explicit NetReader(std::string s) : _NM_FULL_::SimpleNetReader<int>(s)
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<int>(s)
   {
   }
 };
@@ -43,7 +44,8 @@ class NetReader<float> : public _NM_FULL_::SimpleNetReader<float, false>
 { 
   // dummy
 public:
-  explicit NetReader(std::string s) : _NM_FULL_::SimpleNetReader<float>(s)
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<float>(s)
   {
   }
 };
@@ -53,7 +55,8 @@ class NetReader<double> : public _NM_FULL_::SimpleNetReader<double, false>
 { 
   // dummy
 public:
-  explicit NetReader(std::string s) : _NM_FULL_::SimpleNetReader<double>(s)
+  explicit NetReader(const std::string &s)
+                        : _NM_FULL_::SimpleNetReader<double>(s)
   {
   }
 };
@@ -64,7 +67,7 @@ class NetReader<cv::Mat> : public _NM_FULL_::cvMatHelper<cv::Mat>,
                            public _NM_FULL_::CollatedNetReader<cv::Mat, false> 
 {
 public:
-  explicit NetReader(std::string myPortName) 
+  explicit NetReader(const std::string &myPortName) 
                          : _NM_FULL_::cvMatHelper<cv::Mat>(), 
                            _NM_FULL_::CollatedNetReader<cv::Mat>(myPortName)
   {
@@ -77,7 +80,7 @@ class NetReader< cv::Mat_<float> > :
                            public _NM_FULL_::CollatedNetReader< cv::Mat_<float> , false> 
 {
 public:
-  explicit NetReader(std::string myPortName) 
+  explicit NetReader(const std::string &myPortName) 
                          : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(), 
                            _NM_FULL_::CollatedNetReader< cv::Mat_<float> >(myPortName)
   {

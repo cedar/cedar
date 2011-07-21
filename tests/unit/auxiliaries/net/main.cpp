@@ -107,11 +107,16 @@ int main()
   cv::Mat mat= cv::Mat::eye(SIZE, 2, CV_64F);
   cv::Mat mat2= cv::Mat::zeros(SIZE, 2, CV_64F);
   cv::Mat mat3= cv::Mat::zeros(16, 2, CV_64F);
+  cv::Mat mat6= cv::Mat::zeros(SIZE, 2, CV_64F);
+  cv::Mat mat7= cv::Mat::zeros(SIZE, 2, CV_64F);
 
   for (int i=0; i < SIZE; i++)
   {
     mat.at<TestType>(i,0)= 300 + i;
     mat.at<TestType>(i,1)= SIZE + 500 + i;
+
+    mat6.at<TestType>(i,0)= i;
+    mat6.at<TestType>(i,1)= 100 + i;
 
     mat2.at<TestType>(i,0)= -1;
     mat2.at<TestType>(i,1)= -1;
@@ -130,6 +135,10 @@ int main()
     mat2= myMatReader2.read();
     mat3= myMatReader3.read();
 
+    // writing over same channel (mat6 is same size as mat)
+    myMatWriter.write(mat6);
+    mat7= myMatReader2.read(); 
+
     // test it
     for (int i=0; i < SIZE; i++)
     {
@@ -137,12 +146,16 @@ int main()
           || mat2.at<TestType>(i,1) != SIZE + 500 +i
           // auch mat3 testen ...
           || mat3.at<TestType>(i,0) != 300 + i
-          || mat3.at<TestType>(i,1) != SIZE + 500 +i)
+          || mat3.at<TestType>(i,1) != SIZE + 500 +i
+          // auch mat7 testen
+          || mat7.at<TestType>(i,0) != i
+          || mat7.at<TestType>(i,1) != 100 +i
+        )
       {
         // FAIL
         mat_errors++;
+        }
       }
-    }
 
   } // end try
   catch (cedar::aux::exc::ExceptionBase &E)

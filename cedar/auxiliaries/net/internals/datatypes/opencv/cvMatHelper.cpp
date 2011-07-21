@@ -121,8 +121,9 @@ template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(
     {
       // init the header data (from mat) that will be sent over the line
 
-      // this may simply not be neccessary, as it was already set
-      //init_externalheader(mat, extheader);
+      // we need this for different mat-variables that are passed
+      // to the same writer
+      init_externalheader(mat, extheader);
 
       return true;
     }

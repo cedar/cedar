@@ -114,7 +114,7 @@ public:
     return mNetType.data;
   }
 
-  //!@brief The generated header that will be transported
+  //!@brief The generated header that will be transported, reference
   header_type& header()
   {
     return mNetType.header;

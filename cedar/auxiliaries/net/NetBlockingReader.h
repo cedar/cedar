@@ -30,7 +30,8 @@ class NetBlockingReader<int> : public _NM_FULL_::SimpleNetReader<int, true>
 { 
   // dummy
 public:
-  explicit NetBlockingReader(std::string s) : _NM_FULL_::SimpleNetReader<int, true>(s)
+  explicit NetBlockingReader(const std::string &s) 
+                      : _NM_FULL_::SimpleNetReader<int, true>(s)
   {
   }
 };
@@ -40,7 +41,8 @@ class NetBlockingReader<float> : public _NM_FULL_::SimpleNetReader<float, true>
 { 
   // dummy
 public:
-  explicit NetBlockingReader(std::string s) : _NM_FULL_::SimpleNetReader<float, true>(s)
+  explicit NetBlockingReader(const std::string &s) 
+                       : _NM_FULL_::SimpleNetReader<float, true>(s)
   {
   }
 };
@@ -50,7 +52,8 @@ class NetBlockingReader<double> : public _NM_FULL_::SimpleNetReader<double, true
 { 
   // dummy
 public:
-  explicit NetBlockingReader(std::string s) : _NM_FULL_::SimpleNetReader<double, true>(s)
+  explicit NetBlockingReader(const std::string &s) 
+                       : _NM_FULL_::SimpleNetReader<double, true>(s)
   {
   }
 };
@@ -60,7 +63,7 @@ class NetBlockingReader<cv::Mat> : public _NM_FULL_::cvMatHelper<cv::Mat>,
                                    public _NM_FULL_::CollatedNetReader<cv::Mat, true> 
 {
 public:
-  explicit NetBlockingReader(std::string myPortName) 
+  explicit NetBlockingReader(const std::string &myPortName) 
                          : _NM_FULL_::cvMatHelper<cv::Mat>(), 
                            _NM_FULL_::CollatedNetReader<cv::Mat, true>(myPortName)
   {
@@ -68,11 +71,12 @@ public:
 };
 
 template <>
-class NetBlockingReader< cv::Mat_<float> > : public _NM_FULL_::cvMatHelper< cv::Mat_<float> >,
-                                   public _NM_FULL_::CollatedNetReader< cv::Mat_<float> , true> 
+class NetBlockingReader< cv::Mat_<float> > 
+                         : public _NM_FULL_::cvMatHelper< cv::Mat_<float> >,
+                           public _NM_FULL_::CollatedNetReader< cv::Mat_<float> , true> 
 {
 public:
-  explicit NetBlockingReader(std::string myPortName) 
+  explicit NetBlockingReader(const std::string &myPortName) 
                          : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(), 
                            _NM_FULL_::CollatedNetReader< cv::Mat_<float> , true>(myPortName)
   {

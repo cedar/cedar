@@ -166,6 +166,21 @@ public:
     {
       retMat= pNetPortable->content();
 
+      // thoughts on reference counters:
+      // 1.) YARP creates an instance of CollatedNetPortable in the background,
+      //     we get a pointer to that here
+      // 2.) ->content() gives us a reference to the data (e.g. cv::Mat)
+      //                 so no change there.
+      // 3.) retMat= ...; is a O(1) operation with cv::Mat and
+      //                  actually doesnt copy anything, but
+      //                  internally increases a reference counter
+      // 4.) return retMat; is another O(1) copy operation and
+      //                  and counter increase
+      // 5.) when pNetPortable is freed (by yarp)
+      //     and the local retMat is deleted
+      //     there is one reference left to the matrix data, which
+      //     is the one we returned to the user code. GOOD!
+
       // verify matrix size (or generate the header for further checks)
 #if 1
       if (!check_collateddata_for_read( pNetPortable->header() ) )
@@ -176,7 +191,6 @@ public:
       }
 #endif
 
-        // TODO: think about reference counter fuer Mat
       return retMat;
     }
   }
