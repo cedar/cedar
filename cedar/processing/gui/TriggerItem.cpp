@@ -120,8 +120,8 @@ void cedar::proc::gui::TriggerItem::readConfiguration(const cedar::aux::Configur
 
 void cedar::proc::gui::TriggerItem::saveConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
   root.put("trigger", this->mTrigger->getName());
+  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
 }
 
 

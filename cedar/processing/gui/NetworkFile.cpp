@@ -257,9 +257,6 @@ void cedar::proc::gui::NetworkFile::loadScene(cedar::aux::ConfigurationNode& roo
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
     const std::string& type = iter->second.get<std::string>("type");
-
-    std::cout << "Reading ui item: " << type << std::endl;
-
     if (type == "step")
     {
       try

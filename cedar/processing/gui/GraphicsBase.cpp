@@ -103,7 +103,6 @@ void cedar::proc::gui::GraphicsBase::readConfiguration(const cedar::aux::Configu
   {
     // ok, y not set
   }
-  std::cout << "Setting position to " << x << " , " << y << std::endl;
   this->setPos(x, y);
 }
 
