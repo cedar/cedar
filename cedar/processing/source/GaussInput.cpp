@@ -177,27 +177,9 @@ void cedar::proc::source::GaussInput::updateMatrix()
 
 void cedar::proc::source::GaussInput::updateDimensionality()
 {
-  int old_dimensionality = mOutput->getData().dims;
-  if (mOutput->getData().cols == 1) // check for special case of 1d matrix
-  {
-    old_dimensionality = 1;
-  }
   int new_dimensionality = static_cast<int>(_mDimensionality->get());
-  _mSigmas->get().resize(new_dimensionality);
-  _mCenters->get().resize(new_dimensionality);
-  _mSizes->get().resize(new_dimensionality);
-  if (new_dimensionality < old_dimensionality) // reduced dimensionality
-  {
-    // nothing to do here at the moment
-  }
-  else if (new_dimensionality > old_dimensionality) // higher dimensionality
-  {
-    for (int new_dim = old_dimensionality; new_dim < new_dimensionality; ++new_dim)
-    {
-      _mSigmas->get().at(new_dim) = _mSigmas->getDefaultValue();
-      _mCenters->get().at(new_dim) = _mCenters->getDefaultValue();
-      _mSizes->get().at(new_dim) = _mSizes->getDefaultValue();
-    }
-  }
+  _mSigmas->get().resize(new_dimensionality, _mSigmas->getDefaultValue());
+  _mCenters->get().resize(new_dimensionality, _mCenters->getDefaultValue());
+  _mSizes->get().resize(new_dimensionality, _mSizes->getDefaultValue());
   this->updateMatrix();
 }

@@ -129,32 +129,9 @@ void cedar::dyn::NeuralField::onStart()
 
 void cedar::dyn::NeuralField::updateDimensionality()
 {
-  int old_dimensionality;
   int new_dimensionality = static_cast<int>(_mDimensionality->get());
-  if (mActivation)
-  {
-    old_dimensionality = mActivation->getData().dims;
-    if (mActivation->getData().cols == 1) // check for special case of 1d matrix
-    {
-      old_dimensionality = 1;
-    }
-  }
-  else
-  {
-    old_dimensionality = new_dimensionality;
-  }
-  _mSizes->get().resize(new_dimensionality);
-  if (new_dimensionality < old_dimensionality) // reduced dimensionality
-  {
-    // nothing to do here at the moment
-  }
-  else if (new_dimensionality > old_dimensionality) // higher dimensionality
-  {
-    for (int new_dim = old_dimensionality; new_dim < new_dimensionality; ++new_dim)
-    {
-      _mSizes->get().at(new_dim) = _mSizes->getDefaultValue();
-    }
-  }
+  _mSizes->get().resize(new_dimensionality, _mSizes->getDefaultValue());
+
   int sizes[new_dimensionality];
   for (int dim = 0; dim < new_dimensionality; ++dim)
   {
