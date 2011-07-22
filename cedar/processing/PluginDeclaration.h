@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Ide.h
+    File:        PluginDeclaration.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
     Description:
 
@@ -38,66 +34,58 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_MAIN_WINDOW_H
-#define CEDAR_PROC_GUI_MAIN_WINDOW_H
+#ifndef CEDAR_PROC_PLUGIN_DECLARATION_H
+#define CEDAR_PROC_PLUGIN_DECLARATION_H
 
 // LOCAL INCLUDES
-#ifdef DEBUG
-  #include "cedar/processing/debug/gui/ui_Ide.h"
-#else
-  #include "cedar/processing/gui/ui_Ide.h"
-#endif
-#include "processing/gui/namespace.h"
+#include "processing/namespace.h"
+#include "processing/StepDeclaration.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QMainWindow>
-#include <map>
+#include <string>
+#include <vector>
 
+//--------------------------------------------------------------------------------------------------------------------
+// macros
+//--------------------------------------------------------------------------------------------------------------------
+
+#ifdef __cplusplus
+#   define CEDAR_BEGIN_PLUGIN_DECLARATION extern "C" {
+#   define CEDAR_END_PLUGIN_DECLARATION }
+#else
+#   define CEDAR_BEGIN_PLUGIN_DECLARATION
+#   define CEDAR_END_PLUGIN_DECLARATION
+#endif
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
+class cedar::proc::PluginDeclaration
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+public:
+  typedef std::vector<cedar::proc::StepDeclarationPtr> StepDeclarations;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Ide();
+  PluginDeclaration();
 
   //!@brief Destructor
+  ~PluginDeclaration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
-public slots:
-  void sceneItemSelected();
-
-  void exception(const QString& message);
-
-  void architectureToolFinished();
-  
-  void startThreads();
-  void stopThreads();
-
-  void save();
-  void saveAs();
-  void load();
-
-  void resetTo(cedar::proc::gui::NetworkFilePtr network);
-
-  void showLoadPluginDialog();
+  void add(cedar::proc::StepDeclarationPtr declaration);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -109,19 +97,15 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void resetStepList();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  std::map<std::string, cedar::proc::gui::StepClassList*> mStepClassListWidgets;
-
-  cedar::proc::gui::NetworkFilePtr mNetwork;
+  StepDeclarations mStepDeclarations;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -134,7 +118,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::MainWindow
+}; // class cedar::proc::PluginDeclaration
 
-#endif // CEDAR_PROC_GUI_MAIN_WINDOW_H
+#endif // CEDAR_PROC_PLUGIN_DECLARATION_H
 

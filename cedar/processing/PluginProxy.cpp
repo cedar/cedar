@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,69 +22,52 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        PluginProxy.cpp
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2011 07 05
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
-    Description: Namespace file for cedar::proc::gui.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_PROC_GUI_NAMESPACE_H
-#define CEDAR_PROC_GUI_NAMESPACE_H
-
 // LOCAL INCLUDES
+#include "processing/PluginProxy.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+cedar::proc::PluginProxy::PluginProxy()
 {
-  /*!@brief Namespace for all processing classes. */
-  namespace proc
-  {
-    namespace gui
-    {
-      class ArchitectureToolBox;
-      class BoolParameter;
-      class Connection;
-      class DataPlotter;
-      class DataSlotItem;
-      class DoubleParameter;
-      class DoubleVectorParameter;
-      class GraphicsBase;
-      class GroupItem;
-      class Ide;
-      class IdeApplication;
-      class NetworkFile;
-      typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
-      class ParameterBase;
-      class PluginLoadDialog;
-      class PropertyPane;
-      class StepItem;
-      class StepClassList;
-      class StringParameter;
-      class Scene;
-      class ToolBox;
-      class TriggerItem;
-      class UIntParameter;
-      class UIntVectorParameter;
-      class View;
-
-      /* Exceptions */
-      class InvalidStepNameException;
-      class InvalidTriggerNameException;
-    }
-  }
 }
 
-#endif // CEDAR_PROC_GUI_NAMESPACE_H
+cedar::proc::PluginProxy::PluginProxy(const std::string& file)
+{
+  this->load(file);
+}
+
+cedar::proc::PluginProxy::~PluginProxy()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::PluginProxy::load(const std::string& file)
+{
+  this->mFileName = file;
+}
+
+cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
+{
+  return this->mDeclaration;
+}

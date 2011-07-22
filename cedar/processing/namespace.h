@@ -104,6 +104,12 @@ namespace cedar
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger> > TriggerFactoryPtr;
 
+    class PluginProxy;
+    typedef boost::shared_ptr<PluginProxy> PluginProxyPtr;
+
+    class PluginDeclaration;
+    typedef boost::shared_ptr<PluginDeclaration> PluginDeclarationPtr;
+
     /* Exceptions */
     class InvalidNameException;
     class InvalidRoleException;
