@@ -36,20 +36,26 @@
 
 // LOCAL INCLUDES
 #include "processing/PluginProxy.h"
+#include "processing/exceptions.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <dlfcn.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::PluginProxy::PluginProxy()
+:
+mpLibHandle(NULL)
 {
 }
 
 cedar::proc::PluginProxy::PluginProxy(const std::string& file)
+:
+mpLibHandle(NULL)
 {
   this->load(file);
 }
@@ -65,6 +71,22 @@ cedar::proc::PluginProxy::~PluginProxy()
 void cedar::proc::PluginProxy::load(const std::string& file)
 {
   this->mFileName = file;
+
+  this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
+  if (!this->mpLibHandle)
+  {
+    CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: dlopen failed.");
+  }
+
+  PluginInterfaceMethod interface = NULL;
+  interface = (PluginInterfaceMethod) (dlsym(this->mpLibHandle, "pluginDeclaration"));
+  if (!interface)
+  {
+    CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
+  }
+
+  //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
+  this->mDeclaration = (*interface)();
 }
 
 cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()

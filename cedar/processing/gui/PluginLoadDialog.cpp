@@ -39,7 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "PluginLoadDialog.h"
+#include "processing/gui/PluginLoadDialog.h"
+#include "processing/PluginDeclaration.h"
 
 // PROJECT INCLUDES
 
@@ -87,6 +88,23 @@ void cedar::proc::gui::PluginLoadDialog::pluginFileChanged(const QString& file)
 
 void cedar::proc::gui::PluginLoadDialog::loadFile(const std::string& file)
 {
+  //!@todo handle plugin exceptions.
   mPlugin = cedar::proc::PluginProxyPtr(new cedar::proc::PluginProxy(file));
-  std::cout << "Loading file " << file << std::endl;
+
+  this->mpStepsList->clear();
+
+  cedar::proc::PluginDeclarationPtr declaration = this->mPlugin->getDeclaration();
+  if (declaration)
+  {
+    for (size_t i = 0; i < declaration->stepDeclarations().size(); ++i)
+    {
+      const std::string& classId = declaration->stepDeclarations().at(i)->getClassId();
+      this->mpStepsList->addItem(QString(classId.c_str()));
+    }
+  }
+}
+
+cedar::proc::PluginProxyPtr cedar::proc::gui::PluginLoadDialog::plugin()
+{
+  return this->mPlugin;
 }

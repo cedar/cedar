@@ -47,6 +47,8 @@
 #include "processing/LoopedTrigger.h"
 #include "processing/Group.h"
 #include "auxiliaries/macros.h"
+#include "processing/PluginProxy.h"
+#include "processing/PluginDeclaration.h"
 
 //! @todo find a better place for this
 #include "dynamics/fields/NeuralField.h"
@@ -93,6 +95,19 @@ cedar::proc::Manager::~Manager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
+{
+  cedar::proc::PluginDeclarationPtr decl = plugin->getDeclaration();
+  if (decl)
+  {
+    // load steps
+    for (size_t i = 0; i < decl->stepDeclarations().size(); ++i)
+    {
+      this->steps().declareClass(decl->stepDeclarations().at(i));
+    }
+  }
+}
 
 cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()
 {
