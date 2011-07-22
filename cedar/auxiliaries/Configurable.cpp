@@ -88,6 +88,13 @@ void cedar::aux::Configurable::saveConfiguration(cedar::aux::ConfigurationNode& 
   {
     iter->second->putTo(root);
   }
+
+  for (Children::iterator child = this->mChildren.begin(); child != this->mChildren.end(); ++child)
+  {
+    cedar::aux::ConfigurationNode child_node;
+    child->second->saveConfiguration(child_node);
+    root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
+  }
 }
 
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -109,6 +116,18 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
       {
         iter->second->makeDefault();
       }
+    }
+  }
+
+  for (Children::iterator child = this->mChildren.begin(); child != this->mChildren.end(); ++child)
+  {
+    try
+    {
+      const cedar::aux::ConfigurationNode& child_node = node.get_child(child->first);
+      child->second->readConfiguration(child_node);
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
     }
   }
 }
