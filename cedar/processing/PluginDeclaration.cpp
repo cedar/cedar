@@ -62,3 +62,9 @@ void cedar::proc::PluginDeclaration::add(cedar::proc::StepDeclarationPtr declara
 {
   this->mStepDeclarations.push_back(declaration);
 }
+
+const cedar::proc::PluginDeclaration::StepDeclarations& cedar::proc::PluginDeclaration::stepDeclarations() const
+{
+  return this->mStepDeclarations;
+}
+

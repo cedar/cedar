@@ -77,7 +77,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  cedar::proc::PluginProxyPtr plugin();
 
 public slots:
   void browseFile();

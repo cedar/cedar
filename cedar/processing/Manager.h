@@ -93,6 +93,8 @@ public:
   GroupPtr allocateGroup();
   void removeGroup(GroupPtr group);
 
+  void load(cedar::proc::PluginProxyPtr plugin);
+
   void startThreads();
   void stopThreads();
 

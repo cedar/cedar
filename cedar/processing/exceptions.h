@@ -90,4 +90,10 @@ class cedar::proc::MissingConnectionException: public cedar::aux::exc::Exception
     MissingConnectionException();
 }; // class cedar::proc::MissingConnectionException
 
+class cedar::proc::PluginException: public cedar::aux::exc::ExceptionBase
+{
+public:
+  PluginException();
+}; // class cedar::proc::PluginException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

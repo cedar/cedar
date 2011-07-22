@@ -55,6 +55,8 @@ class cedar::proc::PluginProxy
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::proc::PluginDeclarationPtr (*PluginInterfaceMethod)();
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -95,6 +97,9 @@ protected:
 private:
   cedar::proc::PluginDeclarationPtr mDeclaration;
   std::string mFileName;
+
+  //! Handle to the dynamically loaded library.
+  void *mpLibHandle;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

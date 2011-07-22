@@ -87,6 +87,8 @@ public:
 public:
   void add(cedar::proc::StepDeclarationPtr declaration);
 
+  const StepDeclarations& stepDeclarations() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
