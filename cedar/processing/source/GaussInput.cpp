@@ -78,7 +78,7 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   _mCenters->makeDefault();
   this->registerParameter(_mSizes);
   _mSizes->makeDefault();
-//  _mSizes->setConstant(true);
+  _mSizes->setConstant(true);
   this->declareOutput("Gauss input");
   this->setOutput("Gauss input", mOutput);
   QObject::connect(_mAmplitude.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));

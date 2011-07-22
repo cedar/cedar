@@ -114,6 +114,11 @@ public:
    */
   unsigned int getDimensionality() const;
 
+  /*!\brief sets the dimensionality of the kernel matrix
+   * \param dimensionality the new desired dimensionality
+   */
+  void setDimensionality(unsigned int dimensionality);
+
 public slots:
   //!\todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
   void updateKernel();
