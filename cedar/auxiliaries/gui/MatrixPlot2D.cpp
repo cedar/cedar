@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QMenu>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,6 +69,7 @@ cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cv::Mat* mat, QReadWriteLock *lock, 
 QWidget(pParent),
 mpMat(mat),
 mpeLock(NULL),
+mShowGridLines(false),
 mpFunction(NULL)
 {
   this->init();
@@ -165,6 +167,11 @@ void cedar::aux::gui::MatrixPlot2D::init()
   this->mpPlot = new Qwt3D::GridPlot(this);
   p_layout->addWidget(this->mpPlot);
 
+  //!@todo Add these as options to a right-click context menu for the plot.
+  this->mpPlot->setCoordinateStyle(Qwt3D::BOX);
+  this->resetPerspective();
+  this->showGrid(false);
+
   // setup plot style
   this->mpPlot->setCoordinateStyle(Qwt3D::BOX);
 
@@ -191,5 +198,53 @@ void cedar::aux::gui::MatrixPlot2D::updatePlot()
     this->mpPlot->updateData();
     this->mpPlot->updateNormals();
     this->mpPlot->updateGL();
+  }
+}
+
+void cedar::aux::gui::MatrixPlot2D::resetPerspective()
+{
+  this->mpPlot->setRotation(90, 0, -90);
+  this->mpPlot->setScale(1, 1, 5);
+  this->mpPlot->setShift(0.15, 0, 0);
+  this->mpPlot->setZoom(1.0);
+}
+
+void cedar::aux::gui::MatrixPlot2D::showGrid(bool show)
+{
+  this->mShowGridLines = show;
+  if (show)
+  {
+    this->mpPlot->setPlotStyle(Qwt3D::FILLEDMESH);
+    this->mpPlot->updateGL();
+  }
+  else
+  {
+    this->mpPlot->setPlotStyle(Qwt3D::FILLED);
+    this->mpPlot->updateGL();
+  }
+}
+
+void cedar::aux::gui::MatrixPlot2D::contextMenuEvent(QContextMenuEvent * pEvent)
+{
+  QMenu menu(this);
+
+  QAction *p_reset_perspective = menu.addAction("reset perspective");
+
+  QAction *p_show_grid = menu.addAction("show grid");
+  p_show_grid->setCheckable(true);
+  p_show_grid->setChecked(this->mShowGridLines);
+
+  QAction *p_action = menu.exec(pEvent->globalPos());
+
+  if (p_action != NULL)
+  {
+    if (p_action == p_reset_perspective)
+    {
+      this->resetPerspective();
+    }
+    else if (p_action == p_show_grid)
+    {
+      this->showGrid(!this->mShowGridLines);
+    }
   }
 }
