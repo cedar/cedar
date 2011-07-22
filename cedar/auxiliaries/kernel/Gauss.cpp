@@ -41,6 +41,7 @@
 #include "auxiliaries/math/functions.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/NumericVectorParameter.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -108,6 +109,7 @@ void cedar::aux::kernel::Gauss::onInit()
   QObject::connect(_mLimit.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
   QObject::connect(_mSigmas.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
   QObject::connect(_mShifts.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
 }
 
 void cedar::aux::kernel::Gauss::calculate()
@@ -115,7 +117,9 @@ void cedar::aux::kernel::Gauss::calculate()
   mpReadWriteLockOutput->lockForWrite();
   const unsigned int& dimensionality = _mDimensionality->get();
   const double& amplitude = _mAmplitude->get();
-
+  // sanity check
+  CEDAR_DEBUG_ASSERT(dimensionality == _mSigmas->get().size());
+  CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->get().size());
   try
   {
     mKernelParts.resize(dimensionality);
@@ -286,3 +290,35 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
   return tmp;
 }
 
+void cedar::aux::kernel::Gauss::updateDimensionality()
+{
+  int old_dimensionality;
+  int new_dimensionality = static_cast<int>(_mDimensionality->get());
+  if (mKernel)
+  {
+    old_dimensionality = mKernel->getData<cv::Mat>().dims;
+    if (mKernel->getData<cv::Mat>().cols == 1) // check for special case of 1d matrix
+    {
+      old_dimensionality = 1;
+    }
+  }
+  else
+  {
+    old_dimensionality = new_dimensionality;
+  }
+  _mSigmas->get().resize(new_dimensionality);
+  _mShifts->get().resize(new_dimensionality);
+  if (new_dimensionality < old_dimensionality) // reduced dimensionality
+  {
+    // nothing to do here at the moment
+  }
+  else if (new_dimensionality > old_dimensionality) // higher dimensionality
+  {
+    for (int new_dim = old_dimensionality; new_dim < new_dimensionality; ++new_dim)
+    {
+      _mSigmas->get().at(new_dim) = _mSigmas->getDefaultValue();
+      _mShifts->get().at(new_dim) = _mShifts->getDefaultValue();
+    }
+  }
+  this->updateKernel();
+}
