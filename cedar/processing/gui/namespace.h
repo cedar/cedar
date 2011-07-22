@@ -59,6 +59,7 @@ namespace cedar
       class Connection;
       class DataPlotter;
       class DataSlotItem;
+      class DirectoryParameter;
       class DoubleParameter;
       class DoubleVectorParameter;
       class GraphicsBase;

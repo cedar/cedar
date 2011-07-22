@@ -44,8 +44,6 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-// PROJECT INCLUDES
-
 
 namespace cedar
 {
@@ -121,6 +119,9 @@ namespace cedar
     typedef boost::shared_ptr<DoubleVectorParameter> DoubleVectorParameterPtr;
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
     typedef boost::shared_ptr<UIntVectorParameter> UIntVectorParameterPtr;
+    class DirectoryParameter;
+    typedef boost::shared_ptr<DirectoryParameter> DirectoryParameterPtr;
+
 
     typedef boost::property_tree::ptree ConfigurationNode;
 
