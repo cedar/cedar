@@ -75,7 +75,8 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)
   {
-    CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: dlopen failed.");
+    std::string dl_err = dlerror();
+    CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: dlopen failed. dlerror() returned " + dl_err);
   }
 
   PluginInterfaceMethod interface = NULL;

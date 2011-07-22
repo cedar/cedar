@@ -82,8 +82,6 @@ cedar::proc::Manager::Manager()
                                                   );
   this->triggers().declareClass(looped_trigger_declaration);
 
-  StepDeclarationPtr field_decl(new StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
-  this->steps().declareClass(field_decl);
   StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
   this->steps().declareClass(input_decl);
 }

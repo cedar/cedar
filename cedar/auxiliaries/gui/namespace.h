@@ -67,6 +67,8 @@ namespace cedar
 
       class MatrixPlot;
       class MatrixPlot2D;
+
+      class ImagePlot;
     }
   }
 }

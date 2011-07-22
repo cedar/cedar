@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        namespace.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
     Description: Namespace file for cedar::dyn.
 
@@ -38,42 +34,15 @@
 
 ======================================================================================================================*/
 
+#include "dynamics/namespace.h"
+#include "dynamics/fields/NeuralField.h"
+#include "processing/StepDeclaration.h"
+#include "processing/Manager.h"
 
-#ifndef CEDAR_DYN_NAMESPACE_H
-#define CEDAR_DYN_NAMESPACE_H
-
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-#include "namespace.h"
-
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <opencv2/opencv.hpp>
-
-
-namespace cedar
+void cedar::dyn::initialize()
 {
-  /*!@brief Namespace for all dyn classes. */
-  namespace dyn
-  {
-    class Dynamics;
-    typedef boost::shared_ptr<Dynamics> DynamicsPtr;
+  using cedar::proc::StepDeclarationPtr;
 
-    template <typename T> class Activation;
-    typedef Activation<double> DoubleActivation;
-    typedef boost::shared_ptr<DoubleActivation> DoubleActivationPtr;
-    typedef Activation<cv::Mat> MatActivation;
-    typedef boost::shared_ptr<MatActivation> MatActivationPtr;
-
-    class SpaceCode;
-    typedef boost::shared_ptr<SpaceCode> SpaceCodePtr;
-
-    class NeuralField;
-    typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;
-
-    void initialize();
-  }
+  StepDeclarationPtr field_decl(new cedar::proc::StepDeclarationT<NeuralField>("cedar.dynamics.NeuralField", "Fields"));
+  cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
 }
-
-#endif // CEDAR_DYN_NAMESPACE_H
