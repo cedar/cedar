@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Ide.h
+    File:        PluginLoadDialog.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
     Description:
 
@@ -38,29 +34,30 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_MAIN_WINDOW_H
-#define CEDAR_PROC_GUI_MAIN_WINDOW_H
+#ifndef CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
+#define CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
 
 // LOCAL INCLUDES
 #ifdef DEBUG
-  #include "cedar/processing/debug/gui/ui_Ide.h"
+  #include "cedar/processing/debug/gui/ui_PluginLoadDialog.h"
 #else
-  #include "cedar/processing/gui/ui_Ide.h"
+  #include "cedar/processing/gui/ui_PluginLoadDialog.h"
 #endif
+
 #include "processing/gui/namespace.h"
+#include "processing/PluginProxy.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QMainWindow>
-#include <map>
+#include <QDialog>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
+class cedar::proc::gui::PluginLoadDialog : public QDialog, public Ui_PluginLoadDialog
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -72,7 +69,7 @@ class cedar::proc::gui::Ide : public QMainWindow, public Ui_Ide
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Ide();
+  PluginLoadDialog(QWidget *pParent = NULL);
 
   //!@brief Destructor
 
@@ -81,23 +78,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet
+
 public slots:
-  void sceneItemSelected();
-
-  void exception(const QString& message);
-
-  void architectureToolFinished();
-  
-  void startThreads();
-  void stopThreads();
-
-  void save();
-  void saveAs();
-  void load();
-
-  void resetTo(cedar::proc::gui::NetworkFilePtr network);
-
-  void showLoadPluginDialog();
+  void browseFile();
+  void pluginFileChanged(const QString& file);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -109,7 +93,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void resetStepList();
+  void loadFile(const std::string& file);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -119,9 +103,7 @@ public:
 protected:
   // none yet
 private:
-  std::map<std::string, cedar::proc::gui::StepClassList*> mStepClassListWidgets;
-
-  cedar::proc::gui::NetworkFilePtr mNetwork;
+  cedar::proc::PluginProxyPtr mPlugin;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -134,7 +116,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::MainWindow
+}; // class cedar::PluginLoadDialog
 
-#endif // CEDAR_PROC_GUI_MAIN_WINDOW_H
+#endif // CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
 
