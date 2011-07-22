@@ -80,6 +80,8 @@ cedar::proc::gui::PropertyPane::~PropertyPane()
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 {
+  this->clearContents();
+  this->setRowCount(0);
   std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
   this->addLabelRow(label);
   this->append(pStep->getParameters());
@@ -91,6 +93,7 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
     this->addHeadingRow(iter->first);
     this->append(iter->second->getParameters());
   }
+  mDisplayedStep = pStep;
 }
 
 void cedar::proc::gui::PropertyPane::addHeadingRow(const std::string& label)
@@ -142,6 +145,7 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr
     this->setCellWidget(row, 0, p_label);
 
     cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    p_widget->setParent(this);
     p_widget->setParameter(parameter);
     p_widget->setEnabled(!parameter->isConstant());
     this->setCellWidget(row, 1, p_widget);
@@ -161,4 +165,12 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
+}
+
+void cedar::proc::gui::PropertyPane::redraw()
+{
+  if (mDisplayedStep)
+  {
+    this->display(mDisplayedStep);
+  }
 }
