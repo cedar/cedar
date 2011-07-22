@@ -120,8 +120,6 @@ void cedar::proc::gui::Ide::sceneItemSelected()
   using cedar::proc::Step;
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
 
-  this->mpPropertyTable->clearContents();
-  this->mpPropertyTable->setRowCount(0);
   //!@ todo Handle the cases: multiple
   if (selected_items.size() == 1)
   {

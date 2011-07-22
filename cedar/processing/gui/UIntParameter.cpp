@@ -83,6 +83,7 @@ void cedar::proc::gui::UIntParameter::parameterPointerChanged()
   this->mpSpinbox->setMaximum(parameter->getMaximum());
   this->mpSpinbox->setValue(parameter->get());
   QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
+  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this->parent(), SLOT(redraw()));
 }
 
 void cedar::proc::gui::UIntParameter::valueChanged(int value)

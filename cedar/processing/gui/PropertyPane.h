@@ -82,6 +82,9 @@ public:
 public:
   DataWidgetTypes& dataWidgetTypes();
 
+public slots:
+  void redraw();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,6 +110,7 @@ protected:
   // none yet
 private:
   static DataWidgetTypes mDataWidgetTypes;
+  cedar::proc::StepPtr mDisplayedStep;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
