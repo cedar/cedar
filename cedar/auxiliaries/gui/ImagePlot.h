@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotter.h
+    File:        ImagePlot.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
     Description:
 
@@ -38,88 +34,87 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_DATA_PLOTTER_H
-#define CEDAR_PROC_GUI_DATA_PLOTTER_H
+#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
+#define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "auxiliaries/TypeBasedFactory.h"
-#include "processing/Data.h"
+#include "auxiliaries/gui/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QDockWidget>
+#include <QLabel>
+#include <QTimer>
+#include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
+#include <qwtplot3d/qwt3d_types.h>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::DataPlotter : public QDockWidget
+class cedar::aux::gui::ImagePlot : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
 
-public:
-  typedef cedar::aux::TypeBasedFactory<cedar::proc::Data, QWidget> WidgetFactory;
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataPlotter(const std::string& title, QWidget *pParent = NULL);
+  ImagePlot(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~DataPlotter();
+  ~ImagePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void plot(cedar::proc::DataPtr data);
+  void display(cv::Mat* mat, QReadWriteLock *lock);
 
-  static WidgetFactory& getWidgetFactory();
+public slots:
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  // to make sure the image aspect ratio is kept correct
+  void resizeEvent(QResizeEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void resizePixmap();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::DataPtr mData;
-
-  static WidgetFactory mTypePlotters;
+  QLabel *mpImageDisplay;
+  cv::Mat *mpMat;
+  QReadWriteLock *mpLock;
+  QTimer *mpTimer;
+  QImage mImage;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::gui::DataPlotter
+}; // class cedar::aux::gui::ImagePlot
 
-#endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
+#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
 

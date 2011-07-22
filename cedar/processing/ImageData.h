@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotter.h
+    File:        ImageData.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
+    Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Date:        2011 07 22
 
     Description:
 
@@ -38,51 +34,52 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_DATA_PLOTTER_H
-#define CEDAR_PROC_GUI_DATA_PLOTTER_H
+#ifndef CEDAR_PROC_IMAGE_DATA_H
+#define CEDAR_PROC_IMAGE_DATA_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "auxiliaries/TypeBasedFactory.h"
+#include "processing/namespace.h"
 #include "processing/Data.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QDockWidget>
-
+#include <opencv2/opencv.hpp>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::DataPlotter : public QDockWidget
+class cedar::proc::ImageData : public cedar::proc::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
-public:
-  typedef cedar::aux::TypeBasedFactory<cedar::proc::Data, QWidget> WidgetFactory;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataPlotter(const std::string& title, QWidget *pParent = NULL);
+  ImageData(const cv::Mat& value)
+  :
+  mData(value)
+  {
+  }
 
   //!@brief Destructor
-  ~DataPlotter();
+  virtual ~ImageData()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  void plot(cedar::proc::DataPtr data);
 
-  static WidgetFactory& getWidgetFactory();
+  cv::Mat& getData()
+  {
+    return this->mData;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,27 +96,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
-private:
-  cedar::proc::DataPtr mData;
 
-  static WidgetFactory mTypePlotters;
+private:
+  cv::Mat mData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::gui::DataPlotter
+}; // class cedar::proc::ImageData
 
-#endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
+#endif // CEDAR_PROC_IMAGE_DATA_H
 

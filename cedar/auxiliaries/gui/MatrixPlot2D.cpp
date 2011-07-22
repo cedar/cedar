@@ -180,7 +180,7 @@ void cedar::aux::gui::MatrixPlot2D::init()
 
   // setup the timer
   this->mpTimer = new QTimer(this);
-  connect(this->mpTimer, SIGNAL(timeout()), this, SLOT(updatePlot()));
+  QObject::connect(this->mpTimer, SIGNAL(timeout()), this, SLOT(updatePlot()));
 
   // apply the standard color vector
   Qwt3D::StandardColor col;

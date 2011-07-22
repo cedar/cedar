@@ -62,6 +62,7 @@ namespace cedar
     template <typename T> class DataT;
 
     typedef DataT<cv::Mat> MatData;
+    typedef boost::shared_ptr<MatData> MatDataPtr;
 
     class DataRole;
 
@@ -109,6 +110,9 @@ namespace cedar
 
     class PluginDeclaration;
     typedef boost::shared_ptr<PluginDeclaration> PluginDeclarationPtr;
+
+    class ImageData;
+    typedef boost::shared_ptr<ImageData> ImageDataPtr;
 
     /* Exceptions */
     class InvalidNameException;
