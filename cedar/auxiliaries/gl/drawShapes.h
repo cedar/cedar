@@ -39,6 +39,7 @@
 #define CEDAR_AUX_GL_DRAW_SHAPES_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
@@ -57,7 +58,7 @@ namespace cedar
        * @param G    G value of RGB color
        * @param B    B value of RGB color
        */
-      void setColor(double R, double G, double B);
+      CEDAR_AUX_LIB_EXPORT void setColor(double R, double G, double B);
 
       /*!@brief  draws a rectangular block in the current coordinate frame
        * @param length    extension in x-direction of current coordinate frame
@@ -65,7 +66,7 @@ namespace cedar
        * @param height    extension in z-direction of current coordinate frame
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */
-      void drawBlock(double length, double width, double height, bool wireFrame=false);
+      CEDAR_AUX_LIB_EXPORT void drawBlock(double length, double width, double height, bool wireFrame=false);
       
       /*!@brief  draws a cone in direction of the z-axis of the current coordinate frame
        * @param floor    distance from the floor to the xy-plane along the z-axis
@@ -75,6 +76,7 @@ namespace cedar
        * @param slices    number of vertical cuts used to approximate the cone walls
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */
+      CEDAR_AUX_LIB_EXPORT
       void drawCone(
                      double floor,
                      double ceiling,
@@ -127,6 +129,7 @@ namespace cedar
        * @param stacks    number of latitudinal cuts used to approximate the sphere walls
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */
+      CEDAR_AUX_LIB_EXPORT
       void drawSphere(
                        const  double radius,
                        int slices,
@@ -142,6 +145,7 @@ namespace cedar
        * @param invert    turns the disk so it is visible from below instead of from above
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */
+      CEDAR_AUX_LIB_EXPORT
       void drawDisk(
                      double innerRadius,
                      double outerRadius,
@@ -157,6 +161,7 @@ namespace cedar
        * @param height    extension in z-direction of current coordinate frame, from origin to tip of the pyramid
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */ 
+      CEDAR_AUX_LIB_EXPORT
       void drawPyramid(
                         double length,
                         double width,
@@ -169,6 +174,7 @@ namespace cedar
        * @param height    extension of the prism in z-direction of the current frame
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */ 
+      CEDAR_AUX_LIB_EXPORT
       void drawPrism(double width, double height, bool wireFrame=false );
       
       /*!@brief  draws a torus around a circle in the xy-plane of the current frame
@@ -178,6 +184,7 @@ namespace cedar
        * @param stacks    number of trapezoid plates used to approximate cylinder cut between two slices
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */ 
+      CEDAR_AUX_LIB_EXPORT
       void drawTorus(
                       double radius,
                       double thickness,
@@ -194,6 +201,7 @@ namespace cedar
        * @param stacks    number of trapezoid plates used to approximate cylinder cut between two slices
        * @param wireFrame    decides whether to draw full surfaces or only a wire frame
        */ 
+      CEDAR_AUX_LIB_EXPORT
       void drawEllipse(
                         double a,
                         double b,
@@ -206,6 +214,7 @@ namespace cedar
       /*!@brief draws axes of the current coordinate frame
        * @param length    length of each arrow in direction of the base vectors
        */
+      CEDAR_AUX_LIB_EXPORT
       void drawAxes(double length);
     };
   };

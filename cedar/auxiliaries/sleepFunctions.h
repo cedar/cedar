@@ -22,44 +22,33 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        sleepFunctions.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 24
 
-    Description:  Namespace file for cedar::dev::com::gui.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
-#define CEDAR_DEV_COM_GUI_NAMESPACE_H
+#ifndef CEDAR_AUX_SLEEP_FUNCTIONS_H
+#define CEDAR_AUX_SLEEP_FUNCTIONS_H
 
-// LOCAL INCLUDES
-#include "devices/lib.h"
-
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-
-#include <boost/smart_ptr.hpp>
+#include "units/Time.h"
+#include "units/TimeUnit.h"
+#include "auxiliaries/lib.h"
 
 namespace cedar
 {
-  namespace dev
+  namespace aux
   {
-    namespace com
-    {
-      namespace gui
-      {
-      class CEDAR_DEV_LIB_EXPORT CommunicationWidget;
-      //!@brief smart pointer for CommunicationWidget
-      typedef boost::shared_ptr<CommunicationWidget> CommunicationWidgetPtr;
-      }
-    }
+    CEDAR_AUX_LIB_EXPORT void sleep(cedar::unit::Time time);
+    CEDAR_AUX_LIB_EXPORT void usleep(unsigned int microseconds);
+    CEDAR_AUX_LIB_EXPORT void sleep(unsigned int seconds);
   }
 }
 
-#endif // CEDAR_DEV_COM_GUI_NAMESPACE_H
+#endif // CEDAR_AUX_SLEEP_FUNCTIONS_H

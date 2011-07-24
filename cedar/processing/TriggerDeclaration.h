@@ -42,6 +42,7 @@
 #define CEDAR_PROC_TRIGGER_DECLARATION_H
 
 // LOCAL INCLUDES
+#include "processing/Trigger.h"
 #include "processing/namespace.h"
 #include "auxiliaries/Factory.h"
 #include "auxiliaries/FactoryDerived.h"

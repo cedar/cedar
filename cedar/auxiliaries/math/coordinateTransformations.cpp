@@ -37,6 +37,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/coordinateTransformations.h"
+#include "auxiliaries/math/constants.h"
 
 // PROJECT INCLUDES
 
@@ -50,7 +51,7 @@ void cartesianToPolar(const double x, const double y, double& rho, double& theta
   theta = atan2(y,x);
   if (theta < 0)
   {
-    theta = 2*M_PI + theta;
+    theta = 2*cedar::aux::math::pi + theta;
   }
   rho = sqrt(x*x+y*y);
 }
@@ -64,8 +65,8 @@ void cedar::aux::math::sphericalToCartesian(const cv::Mat& spherical, cv::Mat& c
   cartesian.at<T>(2, 0) = spherical.at<T>(0, 0) * cos(spherical.at<T>(1, 0));
 }
 
-template void cedar::aux::math::sphericalToCartesian<double>(const cv::Mat&, cv::Mat&);
-template void cedar::aux::math::sphericalToCartesian<float>(const cv::Mat&, cv::Mat&);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sphericalToCartesian<double>(const cv::Mat&, cv::Mat&);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sphericalToCartesian<float>(const cv::Mat&, cv::Mat&);
 
 template<typename T>
 cv::Mat cedar::aux::math::sphericalToCartesian(const cv::Mat& spherical)
@@ -75,8 +76,8 @@ cv::Mat cedar::aux::math::sphericalToCartesian(const cv::Mat& spherical)
   return result;
 }
 
-template cv::Mat cedar::aux::math::sphericalToCartesian<double>(const cv::Mat&);
-template cv::Mat cedar::aux::math::sphericalToCartesian<float>(const cv::Mat&);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sphericalToCartesian<double>(const cv::Mat&);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sphericalToCartesian<float>(const cv::Mat&);
 
 template<typename T>
 void cedar::aux::math::cartesianToSpherical(const cv::Mat& cartesian, cv::Mat& spherical)
@@ -97,8 +98,8 @@ void cedar::aux::math::cartesianToSpherical(const cv::Mat& cartesian, cv::Mat& s
   spherical.at<T>(2, 0) = atan2(cartesian.at<T>(1, 0), cartesian.at<T>(0, 0));
 }
 
-template void cedar::aux::math::cartesianToSpherical<double>(const cv::Mat&, cv::Mat&);
-template void cedar::aux::math::cartesianToSpherical<float>(const cv::Mat&, cv::Mat&);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::cartesianToSpherical<double>(const cv::Mat&, cv::Mat&);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::cartesianToSpherical<float>(const cv::Mat&, cv::Mat&);
 //
 //void timeDerivativeSphericalToCartesian(CvMAT& timeDerivativeSpherical,
 //                                             CvMAT& pointSpherical,

@@ -24,13 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp,
-#                Mathis Richter,
-#                Stephan Zibner
-#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-#                mathis.richter@ini.ruhr-uni-bochum.de,
-#                stephan.zibner@ini.ruhr-uni-bochum.de
-#   Date:        2011 06 03
+#   Maintainer:  Stephan Zibner
+#   Email:       stephan.zibner@rub.de
+#   Date:        2010 10 21
 #
 #   Description:
 #
@@ -38,6 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedardyn
-                  LINK_LIBRARIES
-                  cedarproc)
+cedar_add_unit_test(SleepFunctions
+  main.cpp
+)

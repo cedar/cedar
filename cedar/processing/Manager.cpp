@@ -47,8 +47,6 @@
 #include "processing/LoopedTrigger.h"
 #include "auxiliaries/macros.h"
 
-//! @todo find a better place for this
-#include "dynamics/fields/NeuralField.h"
 
 // PROJECT INCLUDES
 
@@ -69,6 +67,7 @@ cedar::proc::Manager::Manager()
    *@todo find a better way to load declarations here; mostly, this can be a problem, if other modules want to declare
    *      things as well.
    *@todo Names?
+   *@todo Make this into a (standard) plugin?
    */
   TriggerDeclarationPtr trigger_declaration(new TriggerDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
   this->triggers().declareClass(trigger_declaration);
@@ -80,9 +79,6 @@ cedar::proc::Manager::Manager()
                                                      )
                                                   );
   this->triggers().declareClass(looped_trigger_declaration);
-
-  StepDeclarationPtr field_decl(new StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
-  this->steps().declareClass(field_decl);
 }
 
 cedar::proc::Manager::~Manager()

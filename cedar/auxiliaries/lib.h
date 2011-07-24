@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,44 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        macros.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 16
 
-    Description:  Namespace file for cedar::dev::com::gui.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
-#define CEDAR_DEV_COM_GUI_NAMESPACE_H
+#ifndef CEDAR_AUX_LIB_H
+#define CEDAR_AUX_LIB_H
 
-// LOCAL INCLUDES
-#include "devices/lib.h"
+#ifdef MSVC
 
-// PROJECT INCLUDES
+#pragma warning(disable: 4251)
 
-// SYSTEM INCLUDES
+# ifdef CEDAR_LIB_EXPORTS_CEDARAUX
+#   define CEDAR_AUX_LIB_EXPORT __declspec( dllexport )
+# else // CEDAR_LIB_EXPORTS_CEDARAUX
+#   define CEDAR_AUX_LIB_EXPORT __declspec( dllimport )
+# endif // CEDAR_LIB_EXPORTS_CEDARAUX
 
-#include <boost/smart_ptr.hpp>
+#else // MSVC
 
-namespace cedar
-{
-  namespace dev
-  {
-    namespace com
-    {
-      namespace gui
-      {
-      class CEDAR_DEV_LIB_EXPORT CommunicationWidget;
-      //!@brief smart pointer for CommunicationWidget
-      typedef boost::shared_ptr<CommunicationWidget> CommunicationWidgetPtr;
-      }
-    }
-  }
-}
+# define CEDAR_AUX_LIB_EXPORT
 
-#endif // CEDAR_DEV_COM_GUI_NAMESPACE_H
+#endif // MSVC
+
+#endif // CEDAR_AUX_LIB_H

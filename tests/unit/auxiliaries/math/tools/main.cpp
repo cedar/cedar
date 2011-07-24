@@ -39,6 +39,7 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/math/tools.h"
+#include "auxiliaries/math/constants.h"
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -77,17 +78,17 @@ int main()
      errors++;
    }
   log_file << "test no" << test_number++ << std::endl;
-  if (normalizeAngle(5.9) <= -M_PI || normalizeAngle(5.9) > M_PI)
+  if (normalizeAngle(5.9) <= -cedar::aux::math::pi || normalizeAngle(5.9) > cedar::aux::math::pi)
   {
     log_file << "error in normalizeAngle(double)" << std::endl;
     errors++;
   }
-  if (normalizeAngle(-M_PI) <= -M_PI || normalizeAngle(-M_PI) > M_PI)
+  if (normalizeAngle(-cedar::aux::math::pi) <= -cedar::aux::math::pi || normalizeAngle(-cedar::aux::math::pi) > cedar::aux::math::pi)
   {
     log_file << "error in normalizeAngle(double)" << std::endl;
     errors++;
   }
-  if (normalizeAngle(10000) <= -M_PI || normalizeAngle(10000) > M_PI)
+  if (normalizeAngle(10000) <= -cedar::aux::math::pi || normalizeAngle(10000) > cedar::aux::math::pi)
   {
     log_file << "error in normalizeAngle(double)" << std::endl;
     errors++;

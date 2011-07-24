@@ -42,6 +42,7 @@
 // SYSTEM INCLUDES
 #include <string>
 
+//!@todo remove these using directives -- they create ambiguities on windows.
 using namespace cedar::aux;
 using namespace cedar::aux::gl;
 using namespace std;
@@ -56,8 +57,8 @@ int main()
 
   // test constructors
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Ellipse testEllipse(p_object);
-  Ellipse ellipse(p_object, 1, 2, 0.1);
+  cedar::aux::gl::Ellipse testEllipse(p_object);
+  cedar::aux::gl::Ellipse ellipse(p_object, 1, 2, 0.1);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

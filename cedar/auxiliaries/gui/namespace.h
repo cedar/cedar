@@ -39,6 +39,7 @@
 #define CEDAR_AUX_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 #include "namespace.h"
@@ -53,15 +54,15 @@ namespace cedar
     //!@brief Namespace for widget classes.
     namespace gui
     {
-      class BaseWidget;
+      class CEDAR_AUX_LIB_EXPORT BaseWidget;
       //!@brief smart pointer for BaseWidget
       typedef boost::shared_ptr<BaseWidget> BaseWidgetPtr;
 
-      class SceneWidget;
+      class CEDAR_AUX_LIB_EXPORT SceneWidget;
       //!@brief smart pointer for SceneWidget
       typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
 
-      class Viewer;
+      class CEDAR_AUX_LIB_EXPORT Viewer;
       //!@brief smart pointer for Viewer
       typedef boost::shared_ptr<Viewer> ViewerPtr;
 

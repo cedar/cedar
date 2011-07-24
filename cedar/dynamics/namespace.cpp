@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,44 +22,34 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        namespace.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 16
 
-    Description:  Namespace file for cedar::dev::com::gui.
+    Description: Namespace file for cedar::dyn.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
-#define CEDAR_DEV_COM_GUI_NAMESPACE_H
+#include "dynamics/namespace.h"
 
-// LOCAL INCLUDES
-#include "devices/lib.h"
+#include "dynamics/fields/NeuralField.h"
+#include "processing/Manager.h"
+#include "processing/StepDeclaration.h"
 
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-
-#include <boost/smart_ptr.hpp>
-
-namespace cedar
+//!@todo this should be a (standard) plugin
+void cedar::dyn::initialize()
 {
-  namespace dev
-  {
-    namespace com
-    {
-      namespace gui
-      {
-      class CEDAR_DEV_LIB_EXPORT CommunicationWidget;
-      //!@brief smart pointer for CommunicationWidget
-      typedef boost::shared_ptr<CommunicationWidget> CommunicationWidgetPtr;
-      }
-    }
-  }
+  using cedar::proc::StepDeclarationPtr;
+
+  StepDeclarationPtr field_decl(new cedar::proc::StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
+  cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
 }
 
-#endif // CEDAR_DEV_COM_GUI_NAMESPACE_H

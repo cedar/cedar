@@ -50,6 +50,7 @@
 #include "processing/StepTime.h"
 #include "processing/Manager.h"
 #include "processing/StepDeclaration.h"
+#include "auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -95,7 +96,7 @@ int main(int argc, char** argv)
                << neuron_2->getActivity()
                << std::endl;
     }
-    usleep(1000);
+    cedar::aux::sleep(cedar::unit::Milliseconds(1));
   }
 
   // stop the processing

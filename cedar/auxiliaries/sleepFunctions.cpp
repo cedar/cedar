@@ -22,44 +22,56 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        sleepFunctions.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 24
 
-    Description:  Namespace file for cedar::dev::com::gui.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
-#define CEDAR_DEV_COM_GUI_NAMESPACE_H
+#include "auxiliaries/sleepFunctions.h"
+#include "auxiliaries/macros.h"
 
-// LOCAL INCLUDES
-#include "devices/lib.h"
+#ifdef WINDOWS
+#include <Windows.h>
+#endif // WINDOWS
 
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-
-#include <boost/smart_ptr.hpp>
-
-namespace cedar
+void cedar::aux::sleep(cedar::unit::Time time)
 {
-  namespace dev
-  {
-    namespace com
-    {
-      namespace gui
-      {
-      class CEDAR_DEV_LIB_EXPORT CommunicationWidget;
-      //!@brief smart pointer for CommunicationWidget
-      typedef boost::shared_ptr<CommunicationWidget> CommunicationWidgetPtr;
-      }
-    }
-  }
+  cedar::unit::Microseconds us(time);
+  cedar::aux::usleep(static_cast<unsigned int>(us.getRawTime()));
 }
 
-#endif // CEDAR_DEV_COM_GUI_NAMESPACE_H
+#include <iostream>
+void cedar::aux::usleep(unsigned int microseconds)
+{
+#ifdef WINDOWS
+
+#ifdef MSVC
+#pragma message("Warning: Windows can only sleep for milliseconds. Anything lower will be ignored!")
+#elif defined GCC
+#warning "Warning: Windows can only sleep for milliseconds. Anything lower will be ignored!"
+#endif // MSVC/GCC
+
+  Sleep(static_cast<DWORD>(microseconds/1000));
+
+#else // WINDOWS
+
+#   error Implement me!
+
+#endif // WINDOWS
+}
+
+void cedar::aux::sleep(unsigned int seconds)
+{
+#ifdef WINDOWS
+  Sleep(1000 * static_cast<DWORD>(seconds));
+#else
+#   error Implement me!
+#endif
+}

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,44 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        algebraTools.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2011 07 14
 
-    Description:  Namespace file for cedar::dev::com::gui.
+    Description: Mathematical constants.
 
-    Credits:
+    Credits:     
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_NAMESPACE_H
-#define CEDAR_DEV_COM_GUI_NAMESPACE_H
+#ifndef CEDAR_AUX_MATH_CONSTANTS_H
+#define CEDAR_AUX_MATH_CONSTANTS_H
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-#include <boost/smart_ptr.hpp>
-
 namespace cedar
 {
-  namespace dev
+  namespace aux
   {
-    namespace com
+    namespace math
     {
-      namespace gui
-      {
-      class CEDAR_DEV_LIB_EXPORT CommunicationWidget;
-      //!@brief smart pointer for CommunicationWidget
-      typedef boost::shared_ptr<CommunicationWidget> CommunicationWidgetPtr;
-      }
-    }
-  }
-}
-
-#endif // CEDAR_DEV_COM_GUI_NAMESPACE_H
+      const double pi = 3.14159265358979323846;
+    };
+  };
+};
+#endif // CEDAR_AUX_MATH_ALGEBRA_TOOLS_H

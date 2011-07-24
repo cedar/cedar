@@ -43,7 +43,7 @@
 
 // PROJECT INCLUDES
 #include "auxiliaries/Base.h"
-#include "devices/com/SerialCommunication.h"
+#include "devices/com/Communication.h"
 
 // SYSTEM INCLUDES
 #include <vector>

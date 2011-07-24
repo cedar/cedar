@@ -37,6 +37,8 @@
 // LOCAL INCLUDES
 
 #include "EPuckDrive.h"
+#include "auxiliaries/math/constants.h"
+#include "auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 
@@ -120,7 +122,7 @@ int EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
   }
 
   //calculate distance per pulse and maximal wheel speed
-  mDistancePerPulse = 2 * M_PI * _mWheelRadius / _mPulsesPerRevolution;
+  mDistancePerPulse = 2 * cedar::aux::math::pi * _mWheelRadius / _mPulsesPerRevolution;
   mMaximalWheelSpeed = _mMaximalNumberPulsesPerSecond * mDistancePerPulse;
 
   mpeCommunication = peCommunication;
@@ -356,8 +358,8 @@ int EPuckDrive::setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed)
 
   //round the wheel speeds (the E-Puck only accepts integers)
   //convert from m/s into Pulses/s (which the E-Puck expects)
-  leftWheelSpeed = round (leftWheelSpeed / mDistancePerPulse);
-  rightWheelSpeed = round (rightWheelSpeed / mDistancePerPulse);
+  leftWheelSpeed = cedar::aux::math::round (leftWheelSpeed / mDistancePerPulse);
+  rightWheelSpeed = cedar::aux::math::round (rightWheelSpeed / mDistancePerPulse);
 
   //check if the speed to set exceeds the maximum speed
   if (leftWheelSpeed > _mMaximalNumberPulsesPerSecond)

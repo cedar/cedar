@@ -44,6 +44,7 @@
 #include "auxiliaries/gl/Scene.h"
 #include "auxiliaries/gui/Viewer.h"
 #include "auxiliaries/gui/SceneWidget.h"
+#include "auxiliaries/sleepFunctions.h"
 
 
 // SYSTEM INCLUDES
@@ -105,7 +106,7 @@ int main(int argc, char **argv)
   a.exec();
 
   p_cora_arm->stop();
-  sleep(1);
+  cedar::aux::sleep(cedar::unit::Seconds(1));
 
   return 0;
 }

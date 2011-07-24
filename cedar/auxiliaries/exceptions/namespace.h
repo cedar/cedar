@@ -39,6 +39,7 @@
 #define CEDAR_AUX_EXC_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 #include "namespace.h"
@@ -54,23 +55,23 @@ namespace cedar
     //!@brief Namespace for all exception classes.
     namespace exc
     {
-      class ExceptionBase;
+      class CEDAR_AUX_LIB_EXPORT ExceptionBase;
       //!@brief smart pointer for ExceptionBase
       typedef boost::shared_ptr<ExceptionBase> ExceptionBasePtr;
 
-      class NullPointerException;
+      class CEDAR_AUX_LIB_EXPORT NullPointerException;
       //!@brief smart pointer for NullPointerException
       typedef boost::shared_ptr<NullPointerException> NullPointerExceptionPtr;
 
-      class IndexOutOfRangeException;
+      class CEDAR_AUX_LIB_EXPORT IndexOutOfRangeException;
       //!@brief smart pointer for IndexOutOfRangeException
       typedef boost::shared_ptr<IndexOutOfRangeException> IndexOutOfRangePtr;
 
-      class InitializationException;
+      class CEDAR_AUX_LIB_EXPORT InitializationException;
       //!@brief smart pointer for InitializationException
       typedef boost::shared_ptr<InitializationException> InitializationExceptionPtr;
       
-      class BadConnectionException;
+      class CEDAR_AUX_LIB_EXPORT BadConnectionException;
       //!@brief smart pointer for BadConnectionException
       typedef boost::shared_ptr<BadConnectionException> BadConnectionPtr;
 

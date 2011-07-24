@@ -92,6 +92,7 @@ namespace cedar
        */
       template<typename T>
       void wedgeTwist(const cv::Mat& rTwist, cv::Mat& rResult);
+
       /*! wedge operator for twists
        * maps coordinate vector of a twist to the matrix representation
        * @param rTwist    coordinate vector, use 6 rows, 1 column, axis (row 4-6) must be normed

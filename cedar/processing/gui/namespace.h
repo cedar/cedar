@@ -39,6 +39,7 @@
 #define CEDAR_PROC_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "processing/lib.h"
 
 // PROJECT INCLUDES
 
@@ -54,16 +55,16 @@ namespace cedar
   {
     namespace gui
     {
-      class Ide;
-      class IdeApplication;
-      class StepItem;
-      class StepClassList;
-      class Scene;
-      class View;
-      class PropertyPane;
-      class ParameterBase;
-      class DoubleParameter;
-      class StringParameter;
+      class CEDAR_PROC_LIB_EXPORT Ide;
+      class CEDAR_PROC_LIB_EXPORT IdeApplication;
+      class CEDAR_PROC_LIB_EXPORT StepItem;
+      class CEDAR_PROC_LIB_EXPORT StepClassList;
+      class CEDAR_PROC_LIB_EXPORT Scene;
+      class CEDAR_PROC_LIB_EXPORT View;
+      class CEDAR_PROC_LIB_EXPORT PropertyPane;
+      class CEDAR_PROC_LIB_EXPORT ParameterBase;
+      class CEDAR_PROC_LIB_EXPORT DoubleParameter;
+      class CEDAR_PROC_LIB_EXPORT StringParameter;
     }
   }
 }
