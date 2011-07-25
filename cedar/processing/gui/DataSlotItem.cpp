@@ -57,7 +57,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::StepItem *pParent,
-                                             cedar::proc::DataPtr data,
+                                             cedar::aux::DataPtr data,
                                              const std::string& dataName,
                                              cedar::proc::DataRole::Id role
                                              )

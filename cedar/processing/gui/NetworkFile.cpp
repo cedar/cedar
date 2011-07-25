@@ -48,7 +48,7 @@
 #include "processing/gui/exceptions.h"
 #include "processing/Step.h"
 #include "processing/Group.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/macros.h"
 
@@ -119,13 +119,13 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
       cedar::proc::Step::SlotMap& slot_map = step->getDataSlots(cedar::proc::DataRole::INPUT);
       for (cedar::proc::Step::SlotMap::iterator iter = slot_map.begin(); iter != slot_map.end(); ++iter)
       {
-        const cedar::proc::DataPtr& data = iter->second.getData();
+        const cedar::aux::DataPtr& data = iter->second.getData();
 
         // check if the data connection is set
         if (!data)
           continue;
 
-        cedar::proc::Step *p_owner = data->getOwner();
+        cedar::proc::Step *p_owner = dynamic_cast<cedar::proc::Step*>(data->getOwner());
         CEDAR_DEBUG_ASSERT(p_owner != NULL);
 
         cedar::proc::gui::StepItem* p_source_step = this->mpScene->getStepItemFor(p_owner);

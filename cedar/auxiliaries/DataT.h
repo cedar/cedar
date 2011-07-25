@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.h
+    File:        DataT.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Date:        2011 05 23
 
     Description:
 
@@ -38,12 +38,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_H
-#define CEDAR_PROC_DATA_H
+#ifndef CEDAR_AUX_DATA_T_H
+#define CEDAR_AUX_DATA_T_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "auxiliaries/Base.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,8 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Data : public cedar::aux::Base
+template <typename T>
+class cedar::aux::DataT : public cedar::aux::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,37 +66,29 @@ class cedar::proc::Data : public cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Data();
+  DataT()
+  {
+  }
+
+  DataT(const T& value)
+  {
+    this->mData = value;
+  }
 
   //!@brief Destructor
-  virtual ~Data();
+  virtual ~DataT()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  QReadWriteLock& getLock();
-  void lockForRead();
-  void lockForWrite();
-  void unlock();
 
-  template <typename T>
   T& getData()
   {
-    return dynamic_cast<DataT<T>&>(*this).getData();
+    return this->mData;
   }
-  
-  template <typename T>
-  T& cast()
-  {
-    return dynamic_cast<T&>(*this);
-  }
-  
-  cedar::proc::Step* getOwner();
-  void setOwner(cedar::proc::Step* step);
-
-  const std::string& connectedSlotName() const;
-  void connectedSlotName(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -115,11 +108,9 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  QReadWriteLock mLock;
+  T mData;
 
 private:
-  cedar::proc::Step* mpeOwner;
-  std::string mConnectedSlotName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -132,7 +123,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::Data
+}; // class cedar::aux::DataT
 
-#endif // CEDAR_PROC_DATA_H
+#endif // CEDAR_AUX_DATA_T_H
 

@@ -45,7 +45,6 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-#include <opencv2/opencv.hpp>
 
 
 namespace cedar
@@ -55,14 +54,6 @@ namespace cedar
   {
     class Arguments;
     typedef boost::shared_ptr<Arguments> ArgumentsPtr;
-
-    class Data;
-    typedef boost::shared_ptr<Data> DataPtr;
-
-    template <typename T> class DataT;
-
-    typedef DataT<cv::Mat> MatData;
-    typedef boost::shared_ptr<MatData> MatDataPtr;
 
     class DataRole;
 
@@ -110,9 +101,6 @@ namespace cedar
 
     class PluginDeclaration;
     typedef boost::shared_ptr<PluginDeclaration> PluginDeclarationPtr;
-
-    class ImageData;
-    typedef boost::shared_ptr<ImageData> ImageDataPtr;
 
     /* Exceptions */
     class InvalidNameException;
