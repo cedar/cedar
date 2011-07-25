@@ -27,12 +27,100 @@ class NetWriter
 
 
 template <>
+class NetWriter<char> : public _NM_FULL_::SimpleNetWriter<char>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<char>(s)
+  {
+  }
+};
+
+template <>
+class NetWriter<unsigned char> : public _NM_FULL_::SimpleNetWriter<unsigned char>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<unsigned char>(s)
+  {
+  }
+};
+
+template <>
+class NetWriter<short> : public _NM_FULL_::SimpleNetWriter<short>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<short>(s)
+  {
+  }
+};
+
+template <>
+class NetWriter<unsigned short> : public _NM_FULL_::SimpleNetWriter<unsigned short>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<unsigned short>(s)
+  {
+  }
+};
+
+template <>
+class NetWriter<unsigned int> : public _NM_FULL_::SimpleNetWriter<unsigned int>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<unsigned int>(s)
+  {
+  }
+};
+
+template <>
 class NetWriter<int> : public _NM_FULL_::SimpleNetWriter<int>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
                            : _NM_FULL_::SimpleNetWriter<int>(s)
+  {
+  }
+};
+
+template <>
+class NetWriter<long> : public _NM_FULL_::SimpleNetWriter<long>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<long>(s)
+  {
+  }
+};
+
+template <>
+class NetWriter<unsigned long> : public _NM_FULL_::SimpleNetWriter<unsigned long>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<unsigned long>(s)
+  {
+  }
+};
+
+template <>
+class NetWriter<bool> : public _NM_FULL_::SimpleNetWriter<bool>
+{ 
+  // dummy
+public:
+  explicit NetWriter(const std::string &s) 
+                           : _NM_FULL_::SimpleNetWriter<bool>(s)
   {
   }
 };
@@ -47,6 +135,7 @@ public:
   {
   }
 };
+
 template <>
 class NetWriter<double> : public _NM_FULL_::SimpleNetWriter<double>
 { 

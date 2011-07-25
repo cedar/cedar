@@ -29,12 +29,100 @@ class NetReader
 
 // spezialisierungs-template!
 template <>
+class NetReader<char> : public _NM_FULL_::SimpleNetReader<char, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<char>(s)
+  {
+  }
+};
+
+template <>
+class NetReader<unsigned char> : public _NM_FULL_::SimpleNetReader<unsigned char, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned char>(s)
+  {
+  }
+};
+
+template <>
+class NetReader<short> : public _NM_FULL_::SimpleNetReader<short, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<short>(s)
+  {
+  }
+};
+
+template <>
+class NetReader<unsigned short> : public _NM_FULL_::SimpleNetReader<unsigned short, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned short>(s)
+  {
+  }
+};
+
+template <>
 class NetReader<int> : public _NM_FULL_::SimpleNetReader<int, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
                            : _NM_FULL_::SimpleNetReader<int>(s)
+  {
+  }
+};
+
+template <>
+class NetReader<unsigned int> : public _NM_FULL_::SimpleNetReader<unsigned int, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned int>(s)
+  {
+  }
+};
+
+template <>
+class NetReader<long> : public _NM_FULL_::SimpleNetReader<long, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<long>(s)
+  {
+  }
+};
+
+template <>
+class NetReader<unsigned long> : public _NM_FULL_::SimpleNetReader<unsigned long, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned long>(s)
+  {
+  }
+};
+
+template <>
+class NetReader<bool> : public _NM_FULL_::SimpleNetReader<bool, false>
+{ 
+  // dummy
+public:
+  explicit NetReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<bool>(s)
   {
   }
 };
