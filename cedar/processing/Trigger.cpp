@@ -162,6 +162,11 @@ const std::vector<cedar::proc::StepPtr>& cedar::proc::Trigger::getListeners() co
   return this->mListeners;
 }
 
+const std::vector<cedar::proc::TriggerPtr>& cedar::proc::Trigger::getTriggerListeners() const
+{
+  return this->mTriggers;
+}
+
 void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node)
 {
   this->cedar::aux::Configurable::saveConfiguration(node);
@@ -173,7 +178,18 @@ void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node
     cedar::aux::ConfigurationNode listener(step->getName());
     listeners.push_back(cedar::aux::ConfigurationNode::value_type("", listener));
   }
-  node.add_child("listeners", listeners);
+  if (!listeners.empty())
+    node.add_child("listeners", listeners);
+
+  cedar::aux::ConfigurationNode trigger_listeners;
+  for (size_t i = 0; i < this->mTriggers.size(); ++i)
+  {
+    cedar::proc::TriggerPtr& trigger = this->mTriggers.at(i);
+    cedar::aux::ConfigurationNode trigger_listener(trigger->getName());
+    trigger_listeners.push_back(cedar::aux::ConfigurationNode::value_type("", trigger_listener));
+  }
+  if (!trigger_listeners.empty())
+    node.add_child("triggerListeners", trigger_listeners);
 }
 
 void cedar::proc::Trigger::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -201,6 +217,30 @@ void cedar::proc::Trigger::readConfiguration(const cedar::aux::ConfigurationNode
   catch (const boost::property_tree::ptree_bad_path&)
   {
     // no listeners declared -- this is ok.
+  }
+
+  // trigger listeners
+  try
+  {
+    const cedar::aux::ConfigurationNode& trigger_listeners = node.get_child("triggerListeners");
+
+    for (cedar::aux::ConfigurationNode::const_iterator iter = trigger_listeners.begin();
+        iter != trigger_listeners.end();
+        ++iter)
+    {
+      std::string listener_name = iter->second.data();
+
+#ifdef DEBUG_FILE_READING
+  std::cout << "Adding trigger listener " << listener_name << std::endl;
+#endif // DEBUG_FILE_READING
+
+      cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().get(listener_name);
+      this->addTrigger(trigger);
+    }
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // no trigger listeners declared -- this is ok.
   }
 }
 

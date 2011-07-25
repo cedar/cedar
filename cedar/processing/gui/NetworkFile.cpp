@@ -193,6 +193,14 @@ void cedar::proc::gui::NetworkFile::addTriggersToScene()
       CEDAR_DEBUG_ASSERT(p_target_item);
       p_trigger_item->connectTo(p_target_item);
     }
+
+    for (size_t i = 0; i < trigger->getTriggerListeners().size(); ++i)
+    {
+      cedar::proc::TriggerPtr target = trigger->getTriggerListeners().at(i);
+      cedar::proc::gui::TriggerItem *p_target_item = this->mpScene->getTriggerItemFor(target.get());
+      CEDAR_DEBUG_ASSERT(p_target_item);
+      p_trigger_item->connectTo(p_target_item);
+    }
   }
 }
 
