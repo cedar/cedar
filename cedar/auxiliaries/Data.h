@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataT.h
+    File:        Data.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 17
 
     Description:
 
@@ -38,12 +38,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_T_H
-#define CEDAR_PROC_DATA_T_H
+#ifndef CEDAR_AUX_DATA_H
+#define CEDAR_AUX_DATA_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Data.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
 
@@ -54,8 +54,7 @@
  *
  * More detailed description of the class.
  */
-template <typename T>
-class cedar::proc::DataT : public cedar::proc::Data
+class cedar::aux::Data : public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,29 +65,37 @@ class cedar::proc::DataT : public cedar::proc::Data
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataT()
-  {
-  }
-
-  DataT(const T& value)
-  {
-    this->mData = value;
-  }
+  Data();
 
   //!@brief Destructor
-  virtual ~DataT()
-  {
-  }
+  virtual ~Data();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  QReadWriteLock& getLock();
+  void lockForRead();
+  void lockForWrite();
+  void unlock();
 
+  template <typename T>
   T& getData()
   {
-    return this->mData;
+    return dynamic_cast<DataT<T>&>(*this).getData();
   }
+  
+  template <typename T>
+  T& cast()
+  {
+    return dynamic_cast<T&>(*this);
+  }
+  
+  cedar::aux::Configurable* getOwner();
+  void setOwner(cedar::aux::Configurable* step);
+
+  const std::string& connectedSlotName() const;
+  void connectedSlotName(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,9 +115,11 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  T mData;
+  QReadWriteLock mLock;
 
 private:
+  cedar::aux::Configurable* mpeOwner; //!@todo This should be a base*, however, right now Base can't be used with Base*.
+  std::string mConnectedSlotName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -123,7 +132,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::DataT
+}; // class cedar::aux::Data
 
-#endif // CEDAR_PROC_DATA_T_H
+#endif // CEDAR_AUX_DATA_H
 

@@ -62,6 +62,7 @@ class cedar::proc::Network
 private:
   typedef std::vector<cedar::proc::StepPtr> StepVector;
   typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
+  typedef std::vector<cedar::proc::GroupPtr> GroupVector;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -83,6 +84,9 @@ public:
   void readTriggers(const cedar::aux::ConfigurationNode& root);
   void saveTriggers(cedar::aux::ConfigurationNode& root);
 
+  void readGroups(const cedar::aux::ConfigurationNode& root);
+  void saveGroups(cedar::aux::ConfigurationNode& root);
+
   void readDataConnection(const cedar::aux::ConfigurationNode& root);
   void saveDataConnection(cedar::aux::ConfigurationNode& root, cedar::proc::StepPtr& source);
 
@@ -96,11 +100,14 @@ public:
 
   void add(cedar::proc::StepPtr step);
   void add(cedar::proc::TriggerPtr trigger);
+  void add(cedar::proc::GroupPtr group);
 
   const StepVector& steps() const;
   StepVector& steps();
   const TriggerVector& triggers() const;
   TriggerVector& triggers();
+  const GroupVector& groups() const;
+  GroupVector& groups();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -122,6 +129,7 @@ protected:
 private:
   StepVector mSteps;
   TriggerVector mTriggers;
+  GroupVector mGroups;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

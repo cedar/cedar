@@ -49,7 +49,6 @@
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
-#include <QTimer>
 #include <opencv2/opencv.hpp>
 #include <qwtplot3d/qwt3d_gridplot.h>
 #include <qwtplot3d/qwt3d_function.h>
@@ -106,9 +105,7 @@ public:
   void display(cv::Mat* mat, QReadWriteLock *lock);
   void resetPerspective();
   void showGrid(bool show);
-
-public slots:
-  void updatePlot();
+  void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -131,7 +128,6 @@ protected:
   // none yet
 private:
   cv::Mat* mpMat;
-  QTimer* mpTimer;
   QReadWriteLock *mpeLock;
   bool mShowGridLines;
 

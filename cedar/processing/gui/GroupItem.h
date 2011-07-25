@@ -49,6 +49,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QGraphicsItemGroup>
 
 
 /*!@brief Abstract description of the class.
@@ -66,7 +67,7 @@ class cedar::proc::gui::GroupItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GroupItem(QSizeF size, cedar::proc::GroupPtr group = cedar::proc::GroupPtr());
+  GroupItem(QSizeF size = QSizeF(10, 10), cedar::proc::GroupPtr group = cedar::proc::GroupPtr());
 
   //!@brief Destructor
   ~GroupItem();
@@ -79,7 +80,15 @@ public:
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-  void addGroupItem(cedar::proc::gui::GraphicsBase* item);
+  void addGroupItem(cedar::proc::gui::GraphicsBase* item, bool transformCoordinates = true);
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+
+  cedar::proc::GroupPtr getGroup();
+
+  void updateChildConnections();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,7 +100,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setGroup(cedar::proc::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

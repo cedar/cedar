@@ -100,7 +100,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
    *       it when the connections change.
    */
-  if (cedar::proc::DataPtr input = this->getInput("input"))
+  if (cedar::aux::DataPtr input = this->getInput("input"))
   {
     d_u += input->getData<cv::Mat>();
   }
