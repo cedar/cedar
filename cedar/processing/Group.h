@@ -58,8 +58,11 @@
 class cedar::proc::Group : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef std::set<StepPtr> ChildSteps;
+  typedef std::set<GroupPtr> ChildGroups;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -82,6 +85,11 @@ public:
   void start();
   void stop();
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+
+  ChildSteps& steps();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,8 +107,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   cedar::proc::LoopedTriggerPtr mGroupTrigger;
-  std::set<StepPtr> mSteps;
-  std::set<GroupPtr> mGroups;
+  ChildSteps mSteps;
+  ChildGroups mGroups;
 private:
   // none yet
 

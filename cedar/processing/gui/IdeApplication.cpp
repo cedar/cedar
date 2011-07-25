@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/IdeApplication.h"
+#include "dynamics/namespace.h"
 #include "auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
@@ -57,7 +58,10 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL)
 {
+  cedar::dyn::initialize();
+
   this->mpIde = new cedar::proc::gui::Ide();
+
 
   QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
 }

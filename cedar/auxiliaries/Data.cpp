@@ -40,7 +40,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
@@ -50,13 +50,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::Data::Data()
+cedar::aux::Data::Data()
 :
 mpeOwner(NULL)
 {
 }
 
-cedar::proc::Data::~Data()
+cedar::aux::Data::~Data()
 {
 }
 
@@ -64,42 +64,42 @@ cedar::proc::Data::~Data()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-QReadWriteLock& cedar::proc::Data::getLock()
+QReadWriteLock& cedar::aux::Data::getLock()
 {
   return this->mLock;
 }
 
-void cedar::proc::Data::lockForRead()
+void cedar::aux::Data::lockForRead()
 {
   this->mLock.lockForRead();
 }
 
-void cedar::proc::Data::lockForWrite()
+void cedar::aux::Data::lockForWrite()
 {
   this->mLock.lockForWrite();
 }
 
-void cedar::proc::Data::unlock()
+void cedar::aux::Data::unlock()
 {
   this->mLock.unlock();
 }
 
-cedar::proc::Step* cedar::proc::Data::getOwner()
+cedar::aux::Configurable* cedar::aux::Data::getOwner()
 {
   return this->mpeOwner;
 }
 
-void cedar::proc::Data::setOwner(cedar::proc::Step* step)
+void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
 {
   this->mpeOwner = step;
 }
 
-const std::string& cedar::proc::Data::connectedSlotName() const
+const std::string& cedar::aux::Data::connectedSlotName() const
 {
   return this->mConnectedSlotName;
 }
 
-void cedar::proc::Data::connectedSlotName(const std::string& name)
+void cedar::aux::Data::connectedSlotName(const std::string& name)
 {
   this->mConnectedSlotName = name;
 }

@@ -72,6 +72,7 @@
      <string>Plugins</string>
     </property>
     <addaction name="actionManage"/>
+    <addaction name="mpActionLoadPlugin"/>
    </widget>
    <widget class="QMenu" name="menuSimulation">
     <property name="title">
@@ -179,8 +180,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>130</width>
-          <height>319</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -321,6 +322,11 @@
    </property>
    <property name="text">
     <string>Log</string>
+   </property>
+  </action>
+  <action name="mpActionLoadPlugin">
+   <property name="text">
+    <string>Load plugin ...</string>
    </property>
   </action>
  </widget>

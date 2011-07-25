@@ -44,6 +44,7 @@
 #include "processing/gui/StepItem.h"
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/NetworkFile.h"
+#include "processing/gui/PluginLoadDialog.h"
 #include "processing/Manager.h"
 
 // PROJECT INCLUDES
@@ -74,6 +75,7 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionSave, SIGNAL(triggered()), this, SLOT(save()));
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
+  QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
 
   mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
   this->resetTo(mNetwork);
@@ -83,6 +85,20 @@ cedar::proc::gui::Ide::Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showLoadPluginDialog()
+{
+  cedar::proc::gui::PluginLoadDialog* p_dialog = new cedar::proc::gui::PluginLoadDialog(this);
+  int res = p_dialog->exec();
+
+  if (res == QDialog::Accepted)
+  {
+    cedar::proc::Manager::getInstance().load(p_dialog->plugin());
+    this->resetStepList();
+  }
+
+  delete p_dialog;
+}
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkFilePtr network)
 {
@@ -101,16 +117,24 @@ void cedar::proc::gui::Ide::resetStepList()
 {
   using cedar::proc::Manager;
 
-  this->mpCategoryList->clear();
+//  this->mpCategoryList->clear();
 
   for (Manager::StepRegistry::CategoryList::const_iterator iter = Manager::getInstance().steps().getCategories().begin();
        iter != Manager::getInstance().steps().getCategories().end();
        ++iter)
   {
     const std::string& category_name = *iter;
-    cedar::proc::gui::StepClassList *p_tab = new cedar::proc::gui::StepClassList();
-    this->mpCategoryList->addTab(p_tab, QString(category_name.c_str()));
-    mStepClassListWidgets[category_name] = p_tab;
+    cedar::proc::gui::StepClassList *p_tab;
+    if (mStepClassListWidgets.find(category_name) == mStepClassListWidgets.end())
+    {
+      p_tab = new cedar::proc::gui::StepClassList();
+      this->mpCategoryList->addTab(p_tab, QString(category_name.c_str()));
+      mStepClassListWidgets[category_name] = p_tab;
+    }
+    else
+    {
+      p_tab = mStepClassListWidgets[category_name];
+    }
     p_tab->showList(Manager::getInstance().steps().getCategoryEntries(category_name));
   }
 }

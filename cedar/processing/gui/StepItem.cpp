@@ -44,7 +44,7 @@
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/exceptions.h"
 #include "processing/Manager.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 #include "processing/Step.h"
 
 // PROJECT INCLUDES
@@ -252,7 +252,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   {
     std::string data_name = a->data().toString().toStdString();
     const cedar::aux::Enum& e = action_type_map[a];
-    cedar::proc::DataPtr p_data = this->mStep->getData(e, data_name);
+    cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
 
     std::string title = this->mStep->getName();
     title += "." + data_name;

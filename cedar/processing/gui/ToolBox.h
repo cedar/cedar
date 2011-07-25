@@ -56,6 +56,8 @@
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
+ *
+ * @todo Calculate the number of columns based on the widget size and a provided button width.
  */
 class cedar::proc::gui::ToolBox : public QWidget
 {
@@ -79,6 +81,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void addItem(const std::string& icon, const std::string& data, const std::string& tooltip);
+  void addStringItem(const std::string& icon, const std::string& data, const std::string& tooltip);
   std::string getCurrentItemData() const;
 
   void selectMode(const std::string& mode);

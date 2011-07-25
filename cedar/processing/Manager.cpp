@@ -42,11 +42,15 @@
 #include "processing/Manager.h"
 #include "processing/Step.h"
 #include "processing/exceptions.h"
+#include "auxiliaries/exceptions.h"
 #include "processing/TriggerDeclaration.h"
 #include "processing/Trigger.h"
 #include "processing/LoopedTrigger.h"
+#include "processing/MultiTrigger.h"
 #include "processing/Group.h"
 #include "auxiliaries/macros.h"
+#include "processing/PluginProxy.h"
+#include "processing/PluginDeclaration.h"
 
 //! @todo find a better place for this
 #include "dynamics/fields/NeuralField.h"
@@ -70,7 +74,12 @@ cedar::proc::Manager::Manager()
    *@todo Names?
    */
   TriggerDeclarationPtr trigger_declaration(new TriggerDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
+  trigger_declaration->setIconPath(":/triggers/trigger.png");
   this->triggers().declareClass(trigger_declaration);
+
+  TriggerDeclarationPtr multi_trigger_declaration(new TriggerDeclarationT<cedar::proc::MultiTrigger>("cedar.processing.MultiTrigger"));
+  multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.png");
+  this->triggers().declareClass(multi_trigger_declaration);
 
   TriggerDeclarationPtr looped_trigger_declaration(
                                                      new TriggerDeclarationT<cedar::proc::LoopedTrigger>
@@ -78,10 +87,9 @@ cedar::proc::Manager::Manager()
                                                        "cedar.processing.LoopedTrigger"
                                                      )
                                                   );
+  looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.png");
   this->triggers().declareClass(looped_trigger_declaration);
 
-  StepDeclarationPtr field_decl(new StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
-  this->steps().declareClass(field_decl);
   StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
   this->steps().declareClass(input_decl);
 }
@@ -93,6 +101,32 @@ cedar::proc::Manager::~Manager()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
+{
+  cedar::proc::PluginDeclarationPtr decl = plugin->getDeclaration();
+  if (decl)
+  {
+    // load steps
+    for (size_t i = 0; i < decl->stepDeclarations().size(); ++i)
+    {
+      this->steps().declareClass(decl->stepDeclarations().at(i));
+    }
+  }
+}
+
+cedar::proc::GroupPtr cedar::proc::Manager::getGroup(const std::string& name)
+{
+  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
+  {
+    if ((*iter)->getName() == name)
+    {
+      return *iter;
+    }
+  }
+  CEDAR_THROW(cedar::aux::UnknownNameException, "There is no group here by the name " + name + ".");
+  return cedar::proc::GroupPtr();
+}
 
 cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()
 {

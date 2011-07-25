@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.h
+    File:        PluginProxy.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
     Description:
 
@@ -38,64 +34,48 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_H
-#define CEDAR_PROC_DATA_H
+#ifndef CEDAR_PROC_PLUGIN_PROXY_H
+#define CEDAR_PROC_PLUGIN_PROXY_H
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
-#include "auxiliaries/Base.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <string>
+
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::Data : public cedar::aux::Base
+class cedar::proc::PluginProxy
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  typedef cedar::proc::PluginDeclarationPtr (*PluginInterfaceMethod)();
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Data();
+  PluginProxy();
+  PluginProxy(const std::string& file);
 
   //!@brief Destructor
-  virtual ~Data();
+  ~PluginProxy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  QReadWriteLock& getLock();
-  void lockForRead();
-  void lockForWrite();
-  void unlock();
+  void load(const std::string& file);
 
-  template <typename T>
-  T& getData()
-  {
-    return dynamic_cast<DataT<T>&>(*this).getData();
-  }
-  
-  template <typename T>
-  T& cast()
-  {
-    return dynamic_cast<T&>(*this);
-  }
-  
-  cedar::proc::Step* getOwner();
-  void setOwner(cedar::proc::Step* step);
-
-  const std::string& connectedSlotName() const;
-  void connectedSlotName(const std::string& name);
+  cedar::proc::PluginDeclarationPtr getDeclaration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -112,14 +92,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  QReadWriteLock mLock;
-
+  // none yet
 private:
-  cedar::proc::Step* mpeOwner;
-  std::string mConnectedSlotName;
+  cedar::proc::PluginDeclarationPtr mDeclaration;
+  std::string mFileName;
+
+  //! Handle to the dynamically loaded library.
+  void *mpLibHandle;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -132,7 +112,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::Data
+}; // class cedar::proc::PluginProxy
 
-#endif // CEDAR_PROC_DATA_H
+#endif // CEDAR_PROC_PLUGIN_PROXY_H
 

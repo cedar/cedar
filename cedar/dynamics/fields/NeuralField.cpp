@@ -67,7 +67,7 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
 {
   this->registerParameter(mRestingLevel);
   this->registerParameter(mTau);
-  _mDimensionality->set(3);
+  _mDimensionality->set(2);
   this->registerParameter(_mDimensionality);
   _mSizes->makeDefault();
   _mSizes->setConstant(true);
@@ -112,7 +112,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
    *       it when the connections change.
    */
-  if (cedar::proc::DataPtr input = this->getInput("input"))
+  if (cedar::aux::DataPtr input = this->getInput("input"))
   {
     d_u += input->getData<cv::Mat>();
   }
