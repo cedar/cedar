@@ -43,7 +43,7 @@
 #include "processing/Manager.h"
 #include "processing/Step.h"
 #include "processing/Group.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
@@ -326,14 +326,15 @@ void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& con
     cedar::proc::Step::SlotMap& inputs = target->getDataSlots(cedar::proc::DataRole::INPUT);
     for (cedar::proc::Step::SlotMap::iterator iter = inputs.begin(); iter != inputs.end(); ++iter)
     {
-      cedar::proc::DataPtr data = iter->second.getData();
+      cedar::aux::DataPtr data = iter->second.getData();
 
       // check if the data connection is set
       if (!data)
         continue;
 
       const std::string& target_data_name = iter->first;
-      cedar::proc::Step* source = data->getOwner();
+      cedar::proc::Step* source = dynamic_cast<cedar::proc::Step*>(data->getOwner());
+      CEDAR_DEBUG_ASSERT(source != NULL);
       const std::string& source_data_name = data->connectedSlotName();
 
       if (source_data_name.empty())

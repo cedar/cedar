@@ -102,7 +102,7 @@ public:
    *\return the kernel matrix
    */
   virtual const cv::Mat& getKernel() const;
-  const cedar::proc::DataPtr getKernelRaw() const;
+  const cedar::aux::DataPtr getKernelRaw() const;
 
   /*!\brief get access to the write lock when in an asynchronous mode
    * \return pointer to the QReadWriteLock
@@ -136,7 +136,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::proc::DataPtr mKernel; //!< matrix containing the kernel
+  cedar::aux::DataPtr mKernel; //!< matrix containing the kernel
   QReadWriteLock *mpReadWriteLockOutput;//!< read and write lock to protect the kernel when calculating its values
 private:
   // none yet

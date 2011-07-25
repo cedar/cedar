@@ -40,8 +40,8 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/DataPlotter.h"
-#include "processing/DataT.h"
-#include "processing/ImageData.h"
+#include "auxiliaries/DataT.h"
+#include "auxiliaries/ImageData.h"
 #include "auxiliaries/gui/MatrixPlot.h"
 #include "auxiliaries/gui/ImagePlot.h"
 
@@ -72,7 +72,7 @@ cedar::proc::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::DataPlotter::plot(cedar::proc::DataPtr data)
+void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
 {
   mData = data;
   //!@todo doesn't work this way -- related to the to-do entry below.
@@ -80,13 +80,13 @@ void cedar::proc::gui::DataPlotter::plot(cedar::proc::DataPtr data)
 //  p_widget->plot(data);
 
   //!@todo find a better solution for this!
-  if (cedar::proc::MatData* mat_data = dynamic_cast<cedar::proc::MatData*>(data.get()))
+  if (cedar::aux::MatData* mat_data = dynamic_cast<cedar::aux::MatData*>(data.get()))
   {
     cedar::aux::gui::MatrixPlot *p_plot = new cedar::aux::gui::MatrixPlot();
     p_plot->display(&mat_data->getData(), &mat_data->getLock());
     this->setWidget(p_plot);
   }
-  else if (cedar::proc::ImageData* img_data = dynamic_cast<cedar::proc::ImageData*>(data.get()))
+  else if (cedar::aux::ImageData* img_data = dynamic_cast<cedar::aux::ImageData*>(data.get()))
   {
     cedar::aux::gui::ImagePlot *p_plot = new cedar::aux::gui::ImagePlot();
     p_plot->display(&img_data->getData(), &img_data->getLock());
@@ -102,7 +102,7 @@ cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::get
 {
   if (cedar::proc::gui::DataPlotter::mTypePlotters.empty())
   {
-    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::proc::MatData, QWidget>();
+    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
   }
   return cedar::proc::gui::DataPlotter::mTypePlotters;
 }

@@ -44,7 +44,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
 #include "processing/gui/GraphicsBase.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 #include "processing/DataRole.h"
 
 // PROJECT INCLUDES
@@ -68,7 +68,7 @@ class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
 public:
   //!@brief The standard constructor.
   DataSlotItem(cedar::proc::gui::StepItem *pParent,
-               cedar::proc::DataPtr data,
+               cedar::aux::DataPtr data,
                const std::string& dataName,
                cedar::proc::DataRole::Id role);
 
@@ -109,7 +109,7 @@ protected:
   // none yet
 private:
   cedar::proc::gui::StepItem *mpStep;
-  cedar::proc::DataPtr mData;
+  cedar::aux::DataPtr mData;
   cedar::proc::DataRole::Id mRole;
   const std::string& mDataName;
   //--------------------------------------------------------------------------------------------------------------------

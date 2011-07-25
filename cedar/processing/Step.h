@@ -76,14 +76,14 @@ public:
     public:
       DataEntry(bool isMandatory = true);
 
-      void setData(DataPtr data);
-      DataPtr getData();
-      boost::shared_ptr<const Data> getData() const;
+      void setData(cedar::aux::DataPtr data);
+      cedar::aux::DataPtr getData();
+      boost::shared_ptr<const cedar::aux::Data> getData() const;
 
       bool isMandatory() const;
 
     private:
-      DataPtr mData;
+      cedar::aux::DataPtr mData;
       bool mMandatory;
   };
   typedef std::map<std::string, DataEntry> SlotMap;
@@ -119,15 +119,15 @@ public:
   void declareBuffer(const std::string& name, bool mandatory = true);
   void declareOutput(const std::string& name, bool mandatory = true);
 
-  void setData(DataRole::Id role, const std::string& name, cedar::proc::DataPtr data);
-  void setInput(const std::string& name, cedar::proc::DataPtr data);
-  void setBuffer(const std::string& name, cedar::proc::DataPtr data);
-  void setOutput(const std::string& name, cedar::proc::DataPtr data);
+  void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
+  void setInput(const std::string& name, cedar::aux::DataPtr data);
+  void setBuffer(const std::string& name, cedar::aux::DataPtr data);
+  void setOutput(const std::string& name, cedar::aux::DataPtr data);
 
-  cedar::proc::DataPtr getData(DataRole::Id role, const std::string& name);
-  cedar::proc::DataPtr getInput(const std::string& name);
-  cedar::proc::DataPtr getBuffer(const std::string& name);
-  cedar::proc::DataPtr getOutput(const std::string& name);
+  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
+  cedar::aux::DataPtr getInput(const std::string& name);
+  cedar::aux::DataPtr getBuffer(const std::string& name);
+  cedar::aux::DataPtr getOutput(const std::string& name);
 
   cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role);
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;

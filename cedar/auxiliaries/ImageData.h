@@ -34,12 +34,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_IMAGE_DATA_H
-#define CEDAR_PROC_IMAGE_DATA_H
+#ifndef CEDAR_AUX_IMAGE_DATA_H
+#define CEDAR_AUX_IMAGE_DATA_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Data.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
@@ -50,7 +50,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::ImageData : public cedar::proc::Data
+class cedar::aux::ImageData : public cedar::aux::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -110,7 +110,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::ImageData
+}; // class cedar::aux::ImageData
 
-#endif // CEDAR_PROC_IMAGE_DATA_H
+#endif // CEDAR_AUX_IMAGE_DATA_H
 

@@ -44,7 +44,7 @@
 #include "processing/gui/exceptions.h"
 #include "processing/LoopedTrigger.h"
 #include "processing/Manager.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 #include "processing/Trigger.h"
 
 // PROJECT INCLUDES

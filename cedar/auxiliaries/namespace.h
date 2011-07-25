@@ -43,6 +43,7 @@
 #include <sstream>
 #include <boost/smart_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <opencv2/opencv.hpp>
 
 
 namespace cedar
@@ -138,7 +139,20 @@ namespace cedar
       return streamOut.str();
     }
 
-    /*exceptions*/
+
+    /* data */
+    class Data;
+    typedef boost::shared_ptr<Data> DataPtr;
+
+    template <typename T> class DataT;
+
+    typedef DataT<cv::Mat> MatData;
+    typedef boost::shared_ptr<MatData> MatDataPtr;
+
+    class ImageData;
+    typedef boost::shared_ptr<ImageData> ImageDataPtr;
+
+    /* exceptions */
     class DuplicateNameException;
     class UnhandledTypeException;
     class UnhandledValueException;
