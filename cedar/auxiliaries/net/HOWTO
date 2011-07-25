@@ -39,7 +39,7 @@ As you can see the NetReaders and NetWriters are template classes. They
 can only be used with variable types for which support has been programmed
 in. These are at the moment:
 
-  - int, float, double
+  - int, char, short, long (all also unsigned), float, double, bool
   - cv::Mat
   - cv::Mat_<float> 
   - ... more to be added at your request ...

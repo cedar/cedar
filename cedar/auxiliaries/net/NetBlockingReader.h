@@ -26,12 +26,100 @@ class NetBlockingReader
 
 
 template <>
-class NetBlockingReader<int> : public _NM_FULL_::SimpleNetReader<int, true>
+class NetBlockingReader<char> : public _NM_FULL_::SimpleNetReader<char, false>
 { 
   // dummy
 public:
   explicit NetBlockingReader(const std::string &s) 
-                      : _NM_FULL_::SimpleNetReader<int, true>(s)
+                           : _NM_FULL_::SimpleNetReader<char>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<unsigned char> : public _NM_FULL_::SimpleNetReader<unsigned char, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned char>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<short> : public _NM_FULL_::SimpleNetReader<short, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<short>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<unsigned short> : public _NM_FULL_::SimpleNetReader<unsigned short, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned short>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<int> : public _NM_FULL_::SimpleNetReader<int, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<int>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<unsigned int> : public _NM_FULL_::SimpleNetReader<unsigned int, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned int>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<long> : public _NM_FULL_::SimpleNetReader<long, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<long>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<unsigned long> : public _NM_FULL_::SimpleNetReader<unsigned long, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<unsigned long>(s)
+  {
+  }
+};
+
+template <>
+class NetBlockingReader<bool> : public _NM_FULL_::SimpleNetReader<bool, false>
+{ 
+  // dummy
+public:
+  explicit NetBlockingReader(const std::string &s) 
+                           : _NM_FULL_::SimpleNetReader<bool>(s)
   {
   }
 };
