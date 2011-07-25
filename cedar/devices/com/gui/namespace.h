@@ -38,6 +38,7 @@
 #define CEDAR_DEV_COM_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -53,7 +54,7 @@ namespace cedar
     {
       namespace gui
       {
-      class CommunicationWidget;
+      class CEDAR_DEV_LIB_EXPORT CommunicationWidget;
       //!@brief smart pointer for CommunicationWidget
       typedef boost::shared_ptr<CommunicationWidget> CommunicationWidgetPtr;
       }

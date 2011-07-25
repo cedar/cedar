@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/AbstractFactory.h"
+#include "processing/lib.h"
 
 // PROJECT INCLUDES
 
@@ -53,10 +54,12 @@ namespace cedar
   /*!@brief Namespace for all processing classes. */
   namespace proc
   {
-    class Arguments;
+    class CEDAR_PROC_LIB_EXPORT Arguments;
     typedef boost::shared_ptr<Arguments> ArgumentsPtr;
 
-    class Data;
+    class CEDAR_PROC_LIB_EXPORT DataRole;
+
+    class CEDAR_PROC_LIB_EXPORT Data;
     typedef boost::shared_ptr<Data> DataPtr;
 
     template <typename T> class DataT;
@@ -64,41 +67,41 @@ namespace cedar
     typedef DataT<cv::Mat> MatData;
     typedef boost::shared_ptr<MatData> MatDataPtr;
 
-    class DataRole;
+    class CEDAR_PROC_LIB_EXPORT LoopArguments;
 
-    class LoopArguments;
-
-    class LoopedTrigger;
+    class CEDAR_PROC_LIB_EXPORT LoopedTrigger;
     typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
 
-    class MultiTrigger;
+    class CEDAR_PROC_LIB_EXPORT MultiTrigger;
     typedef boost::shared_ptr<MultiTrigger> MultiTriggerPtr;
 
-    class Step;
+    class CEDAR_PROC_LIB_EXPORT Step;
     typedef boost::shared_ptr<Step> StepPtr;
 
-    class StepTime;
+    class CEDAR_PROC_LIB_EXPORT StepTime;
     typedef boost::shared_ptr<StepTime> StepTimePtr;
 
-    class Trigger;
+    class CEDAR_PROC_LIB_EXPORT Trigger;
     typedef boost::shared_ptr<Trigger> TriggerPtr;
 
-    class Group;
+    class CEDAR_PROC_LIB_EXPORT Group;
     typedef boost::shared_ptr<Group> GroupPtr;
 
-    class Manager;
     template <class T, class T_Declaration> class Registry;
+    
+    class CEDAR_PROC_LIB_EXPORT Manager;
+    typedef boost::shared_ptr<Manager> ManagerPtr;
 
-    class Network;
+    class CEDAR_PROC_LIB_EXPORT Network;
     typedef boost::shared_ptr<Network> NetworkPtr;
 
     template <class BaseClass, class FactoryType> class DeclarationBase;
-
-    class StepDeclaration;
+    
+    class CEDAR_PROC_LIB_EXPORT StepDeclaration;
     typedef boost::shared_ptr<StepDeclaration> StepDeclarationPtr;
     template <class DerivedClass> class StepDeclarationT;
 
-    class TriggerDeclaration;
+    class CEDAR_PROC_LIB_EXPORT TriggerDeclaration;
     typedef boost::shared_ptr<TriggerDeclaration> TriggerDeclarationPtr;
     template <class DerivedClass> class TriggerDeclarationT;
 
@@ -115,11 +118,11 @@ namespace cedar
     typedef boost::shared_ptr<ImageData> ImageDataPtr;
 
     /* Exceptions */
-    class InvalidNameException;
-    class InvalidRoleException;
-    class InvalidArgumentsException;
-    class DuplicateNameException;
-    class MissingConnectionException;
+    class CEDAR_PROC_LIB_EXPORT InvalidNameException;
+    class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
+    class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
+    class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
+    class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class PluginException;
   }
 }

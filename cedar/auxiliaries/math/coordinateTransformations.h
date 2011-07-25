@@ -38,6 +38,7 @@
 #define CEDAR_AUX_MATH_COORDNIATE_TRANSFORMATIONS_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
@@ -56,7 +57,7 @@ namespace cedar
        * @param rho    polar coordinate radius
        * @param theta    polar coordinate angle
        */
-      void cartesianToPolar(const double x, const double y, double& rho, double& theta);
+      CEDAR_AUX_LIB_EXPORT void cartesianToPolar(const double x, const double y, double& rho, double& theta);
 
       /*! spherical --> cartesian coordinates for points of 3-dimensional space
        * spherical coordinate explanation:

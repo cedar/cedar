@@ -41,6 +41,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 using namespace cedar::dev::robot::mobile;
 

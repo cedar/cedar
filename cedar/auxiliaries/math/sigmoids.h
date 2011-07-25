@@ -38,6 +38,8 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/namespace.h"
+#include "auxiliaries/lib.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -58,13 +60,13 @@ namespace cedar
     namespace math
     {
       //! an exponential-based sigmoid for a single double value
-      double sigmoid(const double x, const double beta, const double threshold = 0) __attribute__ ((deprecated));
+      CEDAR_AUX_LIB_EXPORT CEDAR_DECLARE_DEPRECATED(double sigmoid(const double x, const double beta, const double threshold = 0));
 
       //! an exponential-based sigmoid for a single double value
       double sigmoidExp(const double x, const double beta, const double threshold = 0);
 
       //! an abs-based sigmoid for a single double value
-      double sigmoidAbs(const double x, const double beta, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT double sigmoidAbs(const double x, const double beta, const double threshold = 0);
 
       //! Heavyside function for a single double value
       double sigmoidHeavyside(const double x, const double threshold = 0);
@@ -74,22 +76,22 @@ namespace cedar
 
       //! an exponential-based sigmoid for a cv::Mat
       template<typename T>
-      cv::Mat sigmoid(const cv::Mat& mat, const double beta, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT cv::Mat sigmoid(const cv::Mat& mat, const double beta, const double threshold = 0);
 
       //! an exponential-based sigmoid for a cv::Mat, that takes the result as an argument and does not allocate new memory
       template<typename T>
-      void sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT void sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
 
       //! an abs-based sigmoid for a cv::Mat
       template<typename T>
-      cv::Mat sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT cv::Mat sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0);
 
       //! an abs-based sigmoid for a cv::Mat, that takes the result as an argument and does not allocate new memory
       template<typename T>
-      void sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT void sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0);
 
       //! a sigmoid for a vector of doubles
-      std::vector<double> sigmoid(const std::vector<double>& x, const double beta, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT std::vector<double> sigmoid(const std::vector<double>& x, const double beta, const double threshold = 0);
     };
   };
 };

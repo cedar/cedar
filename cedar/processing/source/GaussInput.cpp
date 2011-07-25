@@ -109,23 +109,23 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
   }
   kernel_parts.at(0) *= _mAmplitude->get();
   // assemble the input
-  int sizes[dimensionality];
+  std::vector<int> sizes(static_cast<size_t>(dimensionality));
   for (unsigned int i = 0; i < dimensionality; i++)
   {
     sizes[i] = sizes_uint.at(i);
   }
   if (dimensionality == 1)
   {
-    mOutput->getData() = cv::Mat(sizes[0], 1, CV_32F);
+    mOutput->getData() = cv::Mat(sizes.at(0), 1, CV_32F);
   }
   else
   {
-    mOutput->getData() = cv::Mat(static_cast<int>(dimensionality), sizes, CV_32F);
+    mOutput->getData() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
   }
   mOutput->lockForWrite();
   cv::Mat& kernel = mOutput->getData();
   // now fill up the big kernel matrix
-  int position[dimensionality];
+  std::vector<int> position(static_cast<size_t>(dimensionality));
   unsigned int max_index = 1;
   double max_index_d = 1.0;
   for (unsigned int dim = 0; dim < dimensionality; dim++)
@@ -143,7 +143,7 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
     float value = 1.0;
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
-      value *= kernel_parts.at(dim).at<float>(position[dim], 0);
+      value *= kernel_parts.at(dim).at<float>(position.at(dim), 0);
     }
     if (dimensionality == 1)
     {
@@ -151,7 +151,7 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
     }
     else
     {
-      kernel.at<float>(position) = value;
+      kernel.at<float>(&position.at(0)) = value;
     }
     // increment index
     position[0]++;

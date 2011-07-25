@@ -38,6 +38,7 @@
 // PROJECT INCLUDES
 #include "devices/robot/SimulatedKinematicChain.h"
 #include "auxiliaries/math/tools.h"
+#include "auxiliaries/math/constants.h"
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -67,12 +68,12 @@ int main()
   log_file << "test: single angle functions" << std::endl;
   test_arm.setJointAngle(0, 1);
   test_arm.setJointAngle(1, 2.0);
-  test_arm.setJointAngle(2, M_PI/2);
-  test_arm.setJointAngle(3, sqrt(2));
+  test_arm.setJointAngle(2, cedar::aux::math::pi/2);
+  test_arm.setJointAngle(3, sqrt(2.0));
   if (
       !IsZero(test_arm.getJointAngle(0) - 1.0)
       || !IsZero(test_arm.getJointAngle(1) - 2.0)
-      || !IsZero(test_arm.getJointAngle(2) - M_PI/2.0)
+      || !IsZero(test_arm.getJointAngle(2) - cedar::aux::math::pi/2.0)
       || !IsZero(test_arm.getJointAngle(3) - sqrt(2.0))
       )
   {

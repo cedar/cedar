@@ -42,6 +42,7 @@
 
 // SYSTEM INCLUDES
 
+
 using namespace cedar::dev::com;
 
 #define clear_my(var, mask)    var &= (~(mask))
@@ -158,9 +159,9 @@ int SerialCommunication::init()
 
   setEndOfCommandString(_mEndOfCommandString); // sets end-of-command-string
 
+#ifndef WIN32
   // initialize communication on Linux
-
-  if(_mOS == "Linux")
+  if(_mOS == "Linux") //!@todo Switch this to a #ifdef block?
   {
     mFileDescriptor = open(_mDevicePath.c_str(), O_RDWR | O_NOCTTY);
 
@@ -292,10 +293,14 @@ int SerialCommunication::init()
     std::cout << "SerialCommunication: Port '" << _mDevicePath << "' initialized\n";
   }
   return 1;
+#else // WIN32
+  return 0;
+#endif // WIN32
 }
 
 int SerialCommunication::send(const std::string command)
 {
+#ifndef WIN32
   if (!mInitialized)
   {
     if (_mDebug)
@@ -334,12 +339,14 @@ int SerialCommunication::send(const std::string command)
 
   usleep(_mLatency); // Delay following operations
   return 1;
-
+#else // WIN32
+  return 0;
+#endif // WIN32
 }
 
 int SerialCommunication::receive(std::string &answer)
 {
-
+#ifndef WIN32
   if (!mInitialized)
   {
     if (_mDebug)
@@ -421,6 +428,9 @@ int SerialCommunication::receive(std::string &answer)
               << e << " Byte(s) read from '" << _mDevicePath << "')\n" << "Receiving-Time: " << mTime << " ms\n";
   }
   return e;
+#else
+  return 0;
+#endif // WIN32
 }
 
 void SerialCommunication::setEndOfCommandString(std::string eocString)
@@ -430,6 +440,7 @@ void SerialCommunication::setEndOfCommandString(std::string eocString)
 
 void SerialCommunication::close()
 {
+#ifndef WIN32
   int s = ::close(mFileDescriptor);
   if (_mDebug)
   {
@@ -442,4 +453,6 @@ void SerialCommunication::close()
       std::cout << "Serial Communication: Error Closing Port '" << _mDevicePath << "'\n";
     }
   }
+#endif WIN32
 }
+

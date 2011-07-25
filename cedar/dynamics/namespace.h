@@ -43,9 +43,9 @@
 #define CEDAR_DYN_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "dynamics/lib.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -57,7 +57,7 @@ namespace cedar
   /*!@brief Namespace for all dyn classes. */
   namespace dyn
   {
-    class Dynamics;
+    class CEDAR_DYN_LIB_EXPORT Dynamics;
     typedef boost::shared_ptr<Dynamics> DynamicsPtr;
 
     template <typename T> class Activation;
@@ -66,13 +66,13 @@ namespace cedar
     typedef Activation<cv::Mat> MatActivation;
     typedef boost::shared_ptr<MatActivation> MatActivationPtr;
 
-    class SpaceCode;
+    class CEDAR_DYN_LIB_EXPORT SpaceCode;
     typedef boost::shared_ptr<SpaceCode> SpaceCodePtr;
 
-    class NeuralField;
+    class CEDAR_DYN_LIB_EXPORT NeuralField;
     typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;
 
-    void initialize();
+    CEDAR_DYN_LIB_EXPORT void initialize();
   }
 }
 

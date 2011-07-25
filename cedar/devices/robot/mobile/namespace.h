@@ -39,6 +39,7 @@
 #define CEDAR_DEV_ROBOT_MOBILE_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -54,31 +55,31 @@ namespace cedar
     {
       namespace mobile
       {
-        class MobileRobot;
+        class CEDAR_DEV_LIB_EXPORT MobileRobot;
         //!@brief smart pointer for MobileRobot
         typedef boost::shared_ptr<MobileRobot> MobileRobotPtr;
 
-        class DifferentialDrive;
+        class CEDAR_DEV_LIB_EXPORT DifferentialDrive;
         //!@brief smart pointer for DifferentialDrive
         typedef boost::shared_ptr<DifferentialDrive> DifferentialDrivePtr;
 
-        class KTeamDrive;
+        class CEDAR_DEV_LIB_EXPORT KTeamDrive;
         //!@brief smart pointer for KTeamDrive
         typedef boost::shared_ptr<KTeamDrive> KTeamDrivePtr;
 
-        class EPuckDrive;
+        class CEDAR_DEV_LIB_EXPORT EPuckDrive;
         //!@brief smart pointer for EPuckDrive
         typedef boost::shared_ptr<EPuckDrive> EPuckDrivePtr;
 
-        class MobileRobotModel;
+        class CEDAR_DEV_LIB_EXPORT MobileRobotModel;
         //!@brief smart pointer for MobileRobotModel
         typedef boost::shared_ptr<MobileRobotModel> MobileRobotModelPtr;
 
-        class KTeamDriveModel;
+        class CEDAR_DEV_LIB_EXPORT KTeamDriveModel;
         //!@brief smart pointer for KTeamDriveModel
         typedef boost::shared_ptr<KTeamDriveModel> KTeamDriveModelPtr;
 
-        class KTeamPositionController;
+        class CEDAR_DEV_LIB_EXPORT KTeamPositionController;
         //!@brief smart pointer for KTeamPositionController
         typedef boost::shared_ptr<KTeamPositionController> KTeamPositionControllerPtr;
       }

@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 
+//!@todo Remove these using namespaces; under windows, they cause ambiguities!
 using namespace cedar::aux::gl;
 using namespace cedar::aux::gui;
 using namespace std;
@@ -216,7 +217,7 @@ void SceneWidget::setThickness(double value)
 		}
 		else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
 		{
-			((Ellipse*)mpActiveObject.get())->setThickness(value);
+			((cedar::aux::gl::Ellipse*)mpActiveObject.get())->setThickness(value);
 		}
 	}
 }
@@ -239,7 +240,7 @@ void SceneWidget::setLength(double value)
 		}
 		else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
 		{
-			((Ellipse*)mpActiveObject.get())->setLength(value);
+			((cedar::aux::gl::Ellipse*)mpActiveObject.get())->setLength(value);
 		}
 	}
 }
@@ -262,7 +263,7 @@ void SceneWidget::setWidth(double value)
 		}
 		else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
 		{
-			((Ellipse*)mpActiveObject.get())->setWidth(value);
+			((cedar::aux::gl::Ellipse*)mpActiveObject.get())->setWidth(value);
 		}
 	}
 }
@@ -356,7 +357,7 @@ void SceneWidget::createObject()
   }
   else if(mpComboBoxType->currentText().compare("Ellipse") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new Ellipse(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Ellipse(p_object));
   }
   else if(mpComboBoxType->currentText().compare("Prism") == 0)
   {
@@ -505,9 +506,9 @@ void SceneWidget::updateWidgetObjectParameters()
     mpDoubleSpinBoxThickness->setEnabled(true);
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
-    mpDoubleSpinBoxThickness->setValue(((Ellipse*)mpActiveObject.get())->thickness());
-    mpDoubleSpinBoxLength->setValue(((Ellipse*)mpActiveObject.get())->length());
-    mpDoubleSpinBoxWidth->setValue(((Ellipse*)mpActiveObject.get())->width());
+    mpDoubleSpinBoxThickness->setValue(((cedar::aux::gl::Ellipse*)mpActiveObject.get())->thickness());
+    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Ellipse*)mpActiveObject.get())->length());
+    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Ellipse*)mpActiveObject.get())->width());
   }
 
   mSwitchingSelectedObject = false;

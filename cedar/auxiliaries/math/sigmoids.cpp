@@ -37,11 +37,13 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/sigmoids.h"
+#include "auxiliaries/math/constants.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+//!@todo should the template functions be moved to the header?
 
 using namespace std;
 
@@ -80,8 +82,8 @@ cv::Mat cedar::aux::math::sigmoid(const cv::Mat& mat, const double beta, const d
   }
   return result;
 }
-template cv::Mat cedar::aux::math::sigmoid<double>(const cv::Mat&, const double, const double);
-template cv::Mat cedar::aux::math::sigmoid<float>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoid<double>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoid<float>(const cv::Mat&, const double, const double);
 
 //same as cv::mat sigmoidAbs but does not create new memory for result
 template<typename T>
@@ -95,8 +97,8 @@ void cedar::aux::math::sigmoid(const cv::Mat& mat, cv::Mat& result, const double
     }
   }
 }
-template void cedar::aux::math::sigmoid<double>(const cv::Mat&, cv::Mat&, const double, const double);
-template void cedar::aux::math::sigmoid<float>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoid<double>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoid<float>(const cv::Mat&, cv::Mat&, const double, const double);
 
 
 template<typename T>
@@ -112,8 +114,8 @@ cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, cons
   }
   return result;
 }
-template cv::Mat cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, const double, const double);
-template cv::Mat cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, const double, const double);
 //same as cv::mat sigmoidAbs but does not create new memory for result
 template<typename T>
 void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold)
@@ -127,8 +129,8 @@ void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const dou
   }
 }
 
-template void cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, cv::Mat&, const double, const double);
-template void cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, cv::Mat&, const double, const double);
 
 std::vector<double> cedar::aux::math::sigmoid(const std::vector<double>& x, const double beta, const double threshold)
 {
@@ -157,6 +159,6 @@ double cedar::aux::math::sigmoidInterval(const double value, const double t1, co
   }
   else
   {
-    return 0.5 * (-cos((value - t1) / (t2 - t1) * M_PI) + 1);
+    return 0.5 * (-cos((value - t1) / (t2 - t1) * cedar::aux::math::pi) + 1);
   }
 }

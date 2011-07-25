@@ -41,6 +41,7 @@
 #include "auxiliaries/math/screwCalculus.h"
 #include "auxiliaries/math/tools.h"
 #include "auxiliaries/LogFile.h"
+#include "auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -413,7 +414,7 @@ int main()
   vec6_double.at<double>(3, 0) = vec3_double.at<double>(0, 0);
   vec6_double.at<double>(4, 0) = vec3_double.at<double>(1, 0);
   vec6_double.at<double>(5, 0) = vec3_double.at<double>(2, 0);
-  expTwist<double>(vec6_double, M_PI, mat44_double);
+  expTwist<double>(vec6_double, cedar::aux::math::pi, mat44_double);
   if (!
        (
         IsZero(mat44_double.at<double>(0, 0) - -0.85714285714285676)
@@ -438,7 +439,7 @@ int main()
     errors++;
     log_file << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(mat44_double - expTwist<double>(vec6_double, M_PI))))
+  if (!IsZero(norm(mat44_double - expTwist<double>(vec6_double, cedar::aux::math::pi))))
   {
     errors++;
     log_file << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << endl;
@@ -451,7 +452,7 @@ int main()
   vec6_float.at<float>(3, 0) = vec3_float.at<float>(0, 0);
   vec6_float.at<float>(4, 0) = vec3_float.at<float>(1, 0);
   vec6_float.at<float>(5, 0) = vec3_float.at<float>(2, 0);
-  expTwist<float>(vec6_float, M_PI, mat44_float);
+  expTwist<float>(vec6_float, cedar::aux::math::pi, mat44_float);
   if (!
        (
         IsZero(mat44_float.at<float>(0, 0) - -0.85714285714285676)
@@ -476,7 +477,7 @@ int main()
     errors++;
     log_file << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(mat44_float - expTwist<float>(vec6_float, M_PI))))
+  if (!IsZero(norm(mat44_float - expTwist<float>(vec6_float, cedar::aux::math::pi))))
   {
     errors++;
     log_file << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << endl;

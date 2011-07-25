@@ -38,4 +38,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedardyn)
+cedar_add_library(cedardyn
+                  LINK_LIBRARIES
+                  cedarproc)

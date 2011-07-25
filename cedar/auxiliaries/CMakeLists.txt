@@ -47,4 +47,6 @@ cedar_add_library(cedaraux
   ParameterBase.h
   kernel/Kernel.h
   kernel/Gauss.h
+  LINK_LIBRARIES
+  cedarunits
 )

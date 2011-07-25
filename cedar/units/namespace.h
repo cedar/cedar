@@ -43,9 +43,9 @@
 #define CEDAR_UNITS_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "units/lib.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -58,11 +58,11 @@ namespace cedar
   namespace unit
   {
     // because strings (as template arguments) must be constant at compile-time, this is used for the prefixes:
-    extern const char prefix_us[];
-    extern const char prefix_ms[];
-    extern const char prefix_s[];
+    extern CEDAR_UNITS_LIB_EXPORT const char prefix_us[];
+    extern CEDAR_UNITS_LIB_EXPORT const char prefix_ms[];
+    extern CEDAR_UNITS_LIB_EXPORT const char prefix_s[];
 
-    class Time;
+    class CEDAR_UNITS_LIB_EXPORT Time;
 
     /*! @todo This should probably be UnitBase and inherit from a class that is a template argument as well; that way,
      *        it can be used for units other than time as well.

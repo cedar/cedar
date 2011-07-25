@@ -41,7 +41,11 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#ifdef LINUX
 #include <dlfcn.h>
+#elif defined WINDOWS
+//TODO implement
+#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -71,7 +75,8 @@ cedar::proc::PluginProxy::~PluginProxy()
 void cedar::proc::PluginProxy::load(const std::string& file)
 {
   this->mFileName = file;
-
+  
+#ifdef LINUX
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)
   {
@@ -88,6 +93,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
 
   //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
   this->mDeclaration = (*interface)();
+#endif // LINUX
 }
 
 cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
