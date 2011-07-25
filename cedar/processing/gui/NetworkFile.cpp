@@ -211,6 +211,7 @@ void cedar::proc::gui::NetworkFile::addGroupsToScene()
       // move the step item into the group's coordinate system
       p_item->setParentItem(p_group);
     }
+    p_group->updateChildConnections();
   }
   this->mpGroupsToAdd.clear();
 }

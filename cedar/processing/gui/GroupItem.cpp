@@ -128,12 +128,14 @@ void cedar::proc::gui::GroupItem::contextMenuEvent(QGraphicsSceneContextMenuEven
   }
 }
 
-void cedar::proc::gui::GroupItem::addGroupItem(cedar::proc::gui::GraphicsBase* item)
+void cedar::proc::gui::GroupItem::addGroupItem(cedar::proc::gui::GraphicsBase* item, bool transformCoordinates)
 {
   if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(item))
   {
-    //!@todo is this necessary, or is this an implementation error in the paint methods?
-    p_step->setPos(p_step->pos() - this->pos());
+    if (transformCoordinates)
+    {
+      p_step->setPos(p_step->pos() - this->pos());
+    }
     p_step->setParentItem(this);
 
     mGroup->addStep(p_step->getStep());
@@ -150,7 +152,28 @@ void cedar::proc::gui::GroupItem::paint(QPainter* painter, const QStyleOptionGra
 }
 
 
+void cedar::proc::gui::GroupItem::updateChildConnections()
+{
+  QList<QGraphicsItem *> children = this->childItems();
+  for (int i = 0; i < children.size(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase *p_item = dynamic_cast<cedar::proc::gui::GraphicsBase *>(children.at(i)))
+    {
+      p_item->updateConnections();
+    }
+  }
+}
+
 QVariant cedar::proc::gui::GroupItem::itemChange(GraphicsItemChange change, const QVariant& value)
 {
+  switch (change)
+  {
+    case QGraphicsItem::ItemPositionHasChanged:
+      this->updateChildConnections();
+      break;
+
+    default:
+      break;
+  }
   return QGraphicsItem::itemChange(change, value);
 }
