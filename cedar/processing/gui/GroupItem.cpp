@@ -85,6 +85,31 @@ cedar::proc::gui::GroupItem::~GroupItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GroupItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
+  std::string group_name = node.get<std::string>("group");
+  cedar::proc::GroupPtr group = cedar::proc::Manager::getInstance().getGroup(group_name);
+  this->setGroup(group);
+}
+
+void cedar::proc::gui::GroupItem::saveConfiguration(cedar::aux::ConfigurationNode& root)
+{
+  CEDAR_DEBUG_ASSERT(this->mGroup);
+  root.put("group", this->mGroup->getName());
+  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
+}
+
+void cedar::proc::gui::GroupItem::setGroup(cedar::proc::GroupPtr group)
+{
+  this->mGroup = group;
+}
+
+cedar::proc::GroupPtr cedar::proc::gui::GroupItem::getGroup()
+{
+  return this->mGroup;
+}
+
 void cedar::proc::gui::GroupItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
   QMenu menu;

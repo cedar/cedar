@@ -66,7 +66,7 @@ class cedar::proc::gui::GroupItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GroupItem(QSizeF size, cedar::proc::GroupPtr group = cedar::proc::GroupPtr());
+  GroupItem(QSizeF size = QSizeF(10, 10), cedar::proc::GroupPtr group = cedar::proc::GroupPtr());
 
   //!@brief Destructor
   ~GroupItem();
@@ -81,6 +81,12 @@ public:
 
   void addGroupItem(cedar::proc::gui::GraphicsBase* item);
 
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+
+  cedar::proc::GroupPtr getGroup();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -91,7 +97,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setGroup(cedar::proc::GroupPtr group);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
