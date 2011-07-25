@@ -44,7 +44,6 @@
 
 // SYSTEM INCLUDES
 #include <QLabel>
-#include <QTimer>
 #include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
 #include <qwtplot3d/qwt3d_types.h>
@@ -76,9 +75,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void display(cv::Mat* mat, QReadWriteLock *lock);
-
-public slots:
-  void update();
+  void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,8 +99,8 @@ private:
   QLabel *mpImageDisplay;
   cv::Mat *mpMat;
   QReadWriteLock *mpLock;
-  QTimer *mpTimer;
   QImage mImage;
+  int mTimerId;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

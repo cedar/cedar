@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/gui/ImagePlot.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -55,7 +56,8 @@ cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
 QWidget(pParent),
 mpMat(NULL),
-mpLock(NULL)
+mpLock(NULL),
+mTimerId(0)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
@@ -65,22 +67,17 @@ mpLock(NULL)
   mpImageDisplay = new QLabel("no image loaded");
   p_layout->addWidget(mpImageDisplay);
   mpImageDisplay->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-
-  this->mpTimer= new QTimer(this);
-  QObject::connect(this->mpTimer, SIGNAL(timeout()), this, SLOT(update()));
 }
 
 cedar::aux::gui::ImagePlot::~ImagePlot()
 {
-  this->mpTimer->stop();
-  delete this->mpTimer;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::ImagePlot::update()
+void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
 {
   this->mpLock->lockForRead();
   QImage::Format format;
@@ -119,13 +116,14 @@ void cedar::aux::gui::ImagePlot::update()
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
-
   this->mpLock->unlock();
 }
 
 void cedar::aux::gui::ImagePlot::display(cv::Mat* mat, QReadWriteLock *lock)
 {
-  this->mpTimer->stop();
+  if (mTimerId != 0)
+    this->killTimer(mTimerId);
+
   this->mpMat = mat;
   this->mpLock = lock;
 
@@ -134,7 +132,8 @@ void cedar::aux::gui::ImagePlot::display(cv::Mat* mat, QReadWriteLock *lock)
   if (!this->mpMat->empty())
   {
     mpImageDisplay->setText("");
-    this->mpTimer->start();
+    this->mTimerId = this->startTimer(30);
+    CEDAR_DEBUG_ASSERT(mTimerId != 0);
   }
 }
 
