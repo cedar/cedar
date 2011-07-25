@@ -42,6 +42,7 @@
 #include "processing/Manager.h"
 #include "processing/Step.h"
 #include "processing/exceptions.h"
+#include "auxiliaries/exceptions.h"
 #include "processing/TriggerDeclaration.h"
 #include "processing/Trigger.h"
 #include "processing/LoopedTrigger.h"
@@ -105,6 +106,19 @@ void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
       this->steps().declareClass(decl->stepDeclarations().at(i));
     }
   }
+}
+
+cedar::proc::GroupPtr cedar::proc::Manager::getGroup(const std::string& name)
+{
+  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
+  {
+    if ((*iter)->getName() == name)
+    {
+      return *iter;
+    }
+  }
+  CEDAR_THROW(cedar::aux::UnknownNameException, "There is no group here by the name " + name + ".");
+  return cedar::proc::GroupPtr();
 }
 
 cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()

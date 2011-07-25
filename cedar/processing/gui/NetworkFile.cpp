@@ -43,9 +43,11 @@
 #include "processing/gui/Connection.h"
 #include "processing/gui/StepItem.h"
 #include "processing/gui/TriggerItem.h"
+#include "processing/gui/GroupItem.h"
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/exceptions.h"
 #include "processing/Step.h"
+#include "processing/Group.h"
 #include "processing/Data.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/macros.h"
@@ -77,6 +79,14 @@ cedar::proc::gui::NetworkFile::~NetworkFile()
 //----------------------------------------------------------------------------------------------------------------------
 
 void cedar::proc::gui::NetworkFile::addToScene()
+{
+  //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.
+  this->addStepsToScene();
+  this->addTriggersToScene();
+  this->addGroupsToScene();
+}
+
+void cedar::proc::gui::NetworkFile::addStepsToScene()
 {
   // todo should connecting be moved into the step class?
   std::vector<cedar::proc::StepPtr> steps_to_connect;
@@ -146,7 +156,10 @@ void cedar::proc::gui::NetworkFile::addToScene()
       // ok -- some steps may not have inputs
     }
   }
+}
 
+void cedar::proc::gui::NetworkFile::addTriggersToScene()
+{
   /* restore triggers that don't have a gui description */
   std::vector<cedar::proc::TriggerPtr> triggers_to_connect;
 
@@ -181,6 +194,25 @@ void cedar::proc::gui::NetworkFile::addToScene()
       p_trigger_item->connectTo(p_target_item);
     }
   }
+}
+
+void cedar::proc::gui::NetworkFile::addGroupsToScene()
+{
+  //!@todo add groups that don't have an associated ui item too
+  for (size_t i = 0; i < this->mpGroupsToAdd.size(); ++i)
+  {
+    cedar::proc::gui::GroupItem *p_group = this->mpGroupsToAdd.at(i);
+    this->mpScene->addItem(p_group);
+    cedar::proc::Group::ChildSteps& steps = p_group->getGroup()->steps();
+    for (cedar::proc::Group::ChildSteps::iterator i = steps.begin(); i != steps.end(); ++i)
+    {
+      cedar::proc::StepPtr child = *i;
+      cedar::proc::gui::StepItem *p_item = this->mpScene->getStepItemFor(child.get());
+      // move the step item into the group's coordinate system
+      p_item->setParentItem(p_group);
+    }
+  }
+  this->mpGroupsToAdd.clear();
 }
 
 cedar::proc::NetworkPtr cedar::proc::gui::NetworkFile::network()
@@ -238,6 +270,10 @@ void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode& roo
           node.put("type", "trigger");
           break;
 
+        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
+          node.put("type", "group");
+          break;
+
         default:
           continue;
       }
@@ -282,8 +318,14 @@ void cedar::proc::gui::NetworkFile::loadScene(cedar::aux::ConfigurationNode& roo
       catch (const cedar::proc::gui::InvalidTriggerNameException&)
       {
         //!@todo warn in the gui
-        std::cout << "Invalid step trigger item found in " << this->mFileName << std::endl;
+        std::cout << "Invalid trigger item found in " << this->mFileName << std::endl;
       }
+    }
+    else if (type == "group")
+    {
+      cedar::proc::gui::GroupItem *p_group = new cedar::proc::gui::GroupItem();
+      p_group->readConfiguration(iter->second);
+      this->mpGroupsToAdd.push_back(p_group);
     }
     else
     {
