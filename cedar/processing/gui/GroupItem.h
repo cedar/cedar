@@ -49,6 +49,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QGraphicsItemGroup>
 
 
 /*!@brief Abstract description of the class.
@@ -79,13 +80,15 @@ public:
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-  void addGroupItem(cedar::proc::gui::GraphicsBase* item);
+  void addGroupItem(cedar::proc::gui::GraphicsBase* item, bool transformCoordinates = true);
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   void saveConfiguration(cedar::aux::ConfigurationNode& root);
 
   cedar::proc::GroupPtr getGroup();
+
+  void updateChildConnections();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
