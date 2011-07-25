@@ -90,8 +90,12 @@ public:
   GroupRegistry& groups();
 
   void registerThread(cedar::aux::LoopedThreadPtr thread);
-  GroupPtr allocateGroup();
-  void removeGroup(GroupPtr group);
+  cedar::proc::GroupPtr allocateGroup();
+  void removeGroup(cedar::proc::GroupPtr group);
+
+  cedar::proc::GroupPtr getGroup(const std::string& name);
+
+  void load(cedar::proc::PluginProxyPtr plugin);
 
   void startThreads();
   void stopThreads();

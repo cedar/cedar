@@ -43,6 +43,7 @@ cedar_add_library(cedaraux
   gui/SceneWidget.h
   gui/MatrixPlot.h
   gui/MatrixPlot2D.h
+  gui/ImagePlot.h
   ParameterBase.h
   kernel/Kernel.h
   kernel/Gauss.h

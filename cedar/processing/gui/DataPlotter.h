@@ -44,7 +44,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
 #include "auxiliaries/TypeBasedFactory.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
@@ -64,7 +64,7 @@ class cedar::proc::gui::DataPlotter : public QDockWidget
   Q_OBJECT
 
 public:
-  typedef cedar::aux::TypeBasedFactory<cedar::proc::Data, QWidget> WidgetFactory;
+  typedef cedar::aux::TypeBasedFactory<cedar::aux::Data, QWidget> WidgetFactory;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -80,7 +80,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void plot(cedar::proc::DataPtr data);
+  void plot(cedar::aux::DataPtr data);
+
+  static WidgetFactory& getWidgetFactory();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,11 +104,9 @@ public:
 protected:
   // none yet
 private:
-  cedar::proc::DataPtr mData;
+  cedar::aux::DataPtr mData;
 
   static WidgetFactory mTypePlotters;
-
-  static WidgetFactory& getWidgetFactory();
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

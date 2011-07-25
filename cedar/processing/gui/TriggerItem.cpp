@@ -44,7 +44,7 @@
 #include "processing/gui/exceptions.h"
 #include "processing/LoopedTrigger.h"
 #include "processing/Manager.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 #include "processing/Trigger.h"
 
 // PROJECT INCLUDES
@@ -173,11 +173,28 @@ cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
   return this->mTrigger;
 }
 
-void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget) //!@todo should get a GraphicsBase*
+void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget)
 {
   if (!this->getTrigger()->isListener(pTarget->getStep()))
   {
     this->getTrigger()->addListener(pTarget->getStep());
   }
+  /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
+   *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
+   *       this function.
+   */
+  new Connection(this, pTarget);
+}
+
+void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::TriggerItem *pTarget)
+{
+  if (!this->getTrigger()->isListener(pTarget->getTrigger()))
+  {
+    this->getTrigger()->addTrigger(pTarget->getTrigger());
+  }
+  /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
+   *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
+   *       this function.
+   */
   new Connection(this, pTarget);
 }

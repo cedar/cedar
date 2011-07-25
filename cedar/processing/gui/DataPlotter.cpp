@@ -40,8 +40,10 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/DataPlotter.h"
-#include "processing/DataT.h"
+#include "auxiliaries/DataT.h"
+#include "auxiliaries/ImageData.h"
 #include "auxiliaries/gui/MatrixPlot.h"
+#include "auxiliaries/gui/ImagePlot.h"
 
 // PROJECT INCLUDES
 
@@ -66,30 +68,41 @@ cedar::proc::gui::DataPlotter::~DataPlotter()
 {
 }
 
-void cedar::proc::gui::DataPlotter::plot(cedar::proc::DataPtr data)
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
 {
   mData = data;
   //!@todo doesn't work this way -- related to the to-do entry below.
-//  QWidget *p_widget = getWidgetFactory().get(data)->allocateRaw();
+//  PlotWidgetInterface *p_widget = getWidgetFactory().get(data)->allocateRaw();
+//  p_widget->plot(data);
 
   //!@todo find a better solution for this!
-  if (cedar::proc::MatData* mat_data = dynamic_cast<cedar::proc::MatData*>(data.get()))
+  if (cedar::aux::MatData* mat_data = dynamic_cast<cedar::aux::MatData*>(data.get()))
   {
     cedar::aux::gui::MatrixPlot *p_plot = new cedar::aux::gui::MatrixPlot();
     p_plot->display(&mat_data->getData(), &mat_data->getLock());
     this->setWidget(p_plot);
   }
+  else if (cedar::aux::ImageData* img_data = dynamic_cast<cedar::aux::ImageData*>(data.get()))
+  {
+    cedar::aux::gui::ImagePlot *p_plot = new cedar::aux::gui::ImagePlot();
+    p_plot->display(&img_data->getData(), &img_data->getLock());
+    this->setWidget(p_plot);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::proc::gui::DataPlotter::plot.");
+  }
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::getWidgetFactory()
 {
   if (cedar::proc::gui::DataPlotter::mTypePlotters.empty())
   {
-    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::proc::MatData, cedar::aux::gui::MatrixPlot>();
+    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
   }
   return cedar::proc::gui::DataPlotter::mTypePlotters;
 }

@@ -47,6 +47,8 @@
 #include "processing/gui/UIntParameter.h"
 #include "processing/gui/UIntVectorParameter.h"
 #include "processing/gui/StringParameter.h"
+#include "auxiliaries/DirectoryParameter.h"
+#include "processing/gui/DirectoryParameter.h"
 #include "processing/Manager.h"
 
 // PROJECT INCLUDES
@@ -163,6 +165,7 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleVectorParameter, cedar::proc::gui::DoubleVectorParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DirectoryParameter, cedar::proc::gui::DirectoryParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }

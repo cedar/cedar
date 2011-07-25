@@ -71,6 +71,8 @@ namespace cedar
 
     class NeuralField;
     typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;
+
+    void initialize();
   }
 }
 

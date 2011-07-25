@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/Step.h"
 #include "processing/Arguments.h"
-#include "processing/Data.h"
+#include "auxiliaries/Data.h"
 #include "auxiliaries/macros.h"
 #include "processing/exceptions.h"
 #include "processing/Manager.h"
@@ -77,17 +77,17 @@ mMandatory (isMandatory)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::Step::DataEntry::setData(DataPtr data)
+void cedar::proc::Step::DataEntry::setData(cedar::aux::DataPtr data)
 {
   this->mData = data;
 }
 
-cedar::proc::DataPtr cedar::proc::Step::DataEntry::getData()
+cedar::aux::DataPtr cedar::proc::Step::DataEntry::getData()
 {
   return this->mData;
 }
 
-boost::shared_ptr<const cedar::proc::Data> cedar::proc::Step::DataEntry::getData() const
+boost::shared_ptr<const cedar::aux::Data> cedar::proc::Step::DataEntry::getData() const
 {
   return this->mData;
 }
@@ -195,7 +195,7 @@ void cedar::proc::Step::lockAll(DataRole::Id role)
 
   for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
   {
-    cedar::proc::DataPtr data = iter->second.getData();
+    cedar::aux::DataPtr data = iter->second.getData();
     if (data)
     {
       switch (role)
@@ -229,7 +229,7 @@ void cedar::proc::Step::unlockAll(DataRole::Id role)
 
   for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
   {
-    cedar::proc::DataPtr data = iter->second.getData();
+    cedar::aux::DataPtr data = iter->second.getData();
 
     if (data)
     {
@@ -375,7 +375,7 @@ void cedar::proc::Step::declareOutput(const std::string& name, bool mandatory)
 }
 
 
-void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, cedar::proc::DataPtr data)
+void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data)
 {
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
   if (iter == this->mDataConnections.end())
@@ -409,37 +409,37 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
   this->checkMandatoryConnections();
 }
 
-void cedar::proc::Step::setInput(const std::string& name, cedar::proc::DataPtr data)
+void cedar::proc::Step::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
 }
 
-void cedar::proc::Step::setBuffer(const std::string& name, cedar::proc::DataPtr data)
+void cedar::proc::Step::setBuffer(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::BUFFER, name, data);
 }
 
-void cedar::proc::Step::setOutput(const std::string& name, cedar::proc::DataPtr data)
+void cedar::proc::Step::setOutput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::OUTPUT, name, data);
 }
 
-cedar::proc::DataPtr cedar::proc::Step::getInput(const std::string& name)
+cedar::aux::DataPtr cedar::proc::Step::getInput(const std::string& name)
 {
   return this->getData(DataRole::INPUT, name);
 }
 
-cedar::proc::DataPtr cedar::proc::Step::getBuffer(const std::string& name)
+cedar::aux::DataPtr cedar::proc::Step::getBuffer(const std::string& name)
 {
   return this->getData(DataRole::BUFFER, name);
 }
 
-cedar::proc::DataPtr cedar::proc::Step::getOutput(const std::string& name)
+cedar::aux::DataPtr cedar::proc::Step::getOutput(const std::string& name)
 {
   return this->getData(DataRole::OUTPUT, name);
 }
 
-cedar::proc::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::string& name)
+cedar::aux::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::string& name)
 {
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
   if (iter == this->mDataConnections.end())
@@ -448,7 +448,7 @@ cedar::proc::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::st
                 "The requested role " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
                 + " does not exist.");
-    return cedar::proc::DataPtr();
+    return cedar::aux::DataPtr();
   }
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
@@ -457,7 +457,7 @@ cedar::proc::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::st
                                                    + cedar::proc::DataRole::type().get(role).prettyString()
                                                    + " name \"" + name + "\" does not exist in step \""
                                                    + this->getName() + "\".");
-    return cedar::proc::DataPtr();
+    return cedar::aux::DataPtr();
   }
   return map_iterator->second.getData();
 }

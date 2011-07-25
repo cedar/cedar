@@ -37,8 +37,8 @@
 // LOCAL INCLUDES
 #include "auxiliaries/kernel/Kernel.h"
 #include "auxiliaries/NumericParameter.h"
-#include "processing/Data.h"
-#include "processing/DataT.h"
+#include "auxiliaries/Data.h"
+#include "auxiliaries/DataT.h"
 
 // PROJECT INCLUDES
 
@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::kernel::Kernel::Kernel()
 :
-mKernel(new cedar::proc::DataT<cv::Mat>()),
+mKernel(new cedar::aux::DataT<cv::Mat>()),
 _mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
 _mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", "dummy_matrix_file.yml"))
 {
@@ -63,7 +63,7 @@ _mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", "dummy_ma
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality, const std::string& kernelFile)
 :
 cedar::aux::Configurable(),
-mKernel(new cedar::proc::DataT<cv::Mat>()),
+mKernel(new cedar::aux::DataT<cv::Mat>()),
 _mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
 _mKernelMatrixFile(new cedar::aux::StringParameter("kernelMatrixFile", kernelFile))
 {
@@ -99,7 +99,7 @@ const cv::Mat& cedar::aux::kernel::Kernel::getKernel() const
   return mKernel->getData<cv::Mat>();
 }
 
-const cedar::proc::DataPtr cedar::aux::kernel::Kernel::getKernelRaw() const
+const cedar::aux::DataPtr cedar::aux::kernel::Kernel::getKernelRaw() const
 {
   return this->mKernel;
 }

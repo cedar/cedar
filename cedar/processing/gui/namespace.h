@@ -59,15 +59,18 @@ namespace cedar
       class Connection;
       class DataPlotter;
       class DataSlotItem;
+      class DirectoryParameter;
       class DoubleParameter;
       class DoubleVectorParameter;
       class GraphicsBase;
       class GroupItem;
       class Ide;
       class IdeApplication;
+      class MatrixPlotInterface;
       class NetworkFile;
       typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
       class ParameterBase;
+      class PluginLoadDialog;
       class PropertyPane;
       class StepItem;
       class StepClassList;

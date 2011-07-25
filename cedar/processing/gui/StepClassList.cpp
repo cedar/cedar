@@ -69,6 +69,8 @@ void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepR
   using cedar::proc::Manager;
   using cedar::proc::StepDeclarationPtr;
 
+  this->clear();
+
   for (Manager::StepRegistry::CategoryEntries::const_iterator iter = entries.begin(); iter != entries.end(); ++iter)
   {
     const StepDeclarationPtr& class_id = *iter;

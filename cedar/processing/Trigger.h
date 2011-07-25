@@ -88,8 +88,10 @@ public:
   void removeTrigger(cedar::proc::TriggerPtr trigger);
 
   bool isListener(cedar::proc::StepPtr step);
+  bool isListener(cedar::proc::TriggerPtr trigger);
 
   const std::vector<cedar::proc::StepPtr>& getListeners() const;
+  const std::vector<cedar::proc::TriggerPtr>& getTriggerListeners() const;
 
   virtual void notifyConnected(cedar::proc::Trigger* trigger);
 

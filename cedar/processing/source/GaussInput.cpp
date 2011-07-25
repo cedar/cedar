@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/source/GaussInput.h"
 #include "dynamics/Activation.h"
-#include "processing/DataT.h"
+#include "auxiliaries/DataT.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/math/functions.h"
 #include "processing/Arguments.h"
