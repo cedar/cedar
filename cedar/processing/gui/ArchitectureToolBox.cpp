@@ -57,9 +57,9 @@ cedar::proc::gui::ArchitectureToolBox::ArchitectureToolBox(QWidget *pParent)
 cedar::proc::gui::ToolBox(4, pParent),
 mpView(NULL)
 {
-  this->addItem("S", "mode.Select", "selection mode");
-  this->addItem("C", "mode.Connect", "connection mode");
-  this->addItem("G", "mode.Group", "grouping mode");
+  this->addItem(":/modeicons/select.png", "mode.Select", "selection mode");
+  this->addItem(":/modeicons/connect.png", "mode.Connect", "connection mode");
+  this->addItem(":/modeicons/group.png", "mode.Group", "grouping mode");
   const cedar::proc::Manager::TriggerRegistry::Declarations& decls
            = cedar::proc::Manager::getInstance().triggers().declarations();
 
@@ -68,7 +68,16 @@ mpView(NULL)
        ++iter)
   {
     TriggerDeclarationPtr decl = iter->second;
-    this->addItem("T", "mode.CreateTrigger:" + decl->getClassId(), "create trigger of type " + decl->getClassId());
+    std::string mode_str = "mode.CreateTrigger:" + decl->getClassId();
+    std::string tool_tip = "create trigger of type " + decl->getClassId();
+    if (decl->getIconPath().empty())
+    {
+      this->addStringItem("T", mode_str, tool_tip);
+    }
+    else
+    {
+      this->addItem(decl->getIconPath(), mode_str, tool_tip);
+    }
   }
 
   QObject::connect(this, SIGNAL(selectionChanged(QString)), this, SLOT(selectionChanged(QString)));
