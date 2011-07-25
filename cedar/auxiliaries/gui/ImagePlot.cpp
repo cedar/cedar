@@ -60,12 +60,11 @@ mpLock(NULL)
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
+  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
   mpImageDisplay = new QLabel("no image loaded");
   p_layout->addWidget(mpImageDisplay);
   mpImageDisplay->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-  mpImageDisplay->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
 
   this->mpTimer= new QTimer(this);
   QObject::connect(this->mpTimer, SIGNAL(timeout()), this, SLOT(update()));
@@ -116,7 +115,7 @@ void cedar::aux::gui::ImagePlot::update()
                     this->mpMat->rows,
                     this->mpMat->step,
                     format
-                  );
+                  ).rgbSwapped();
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
@@ -139,20 +138,24 @@ void cedar::aux::gui::ImagePlot::display(cv::Mat* mat, QReadWriteLock *lock)
   }
 }
 
-void cedar::aux::gui::ImagePlot::resizeEvent(QResizeEvent * /*event */)
+void cedar::aux::gui::ImagePlot::resizeEvent(QResizeEvent * /*pEvent*/)
 {
   this->resizePixmap();
 }
 
 void cedar::aux::gui::ImagePlot::resizePixmap()
 {
-  QPixmap pixmap = QPixmap::fromImage(this->mImage);
-  QSize scaled_size = pixmap.size();
+  QSize scaled_size = this->mImage.size();
   scaled_size.scale(this->mpImageDisplay->size(), Qt::KeepAspectRatio);
-  if (!this->mpImageDisplay->pixmap() || scaled_size != this->mpImageDisplay->pixmap()->size())
+  if ( (!this->mpImageDisplay->pixmap()
+        || scaled_size != this->mpImageDisplay->pixmap()->size()
+        )
+        && !this->mImage.isNull()
+      )
   {
-    this->mpImageDisplay->setPixmap(pixmap.scaled(this->mpImageDisplay->size(),
-                                                  Qt::KeepAspectRatio,
-                                                  Qt::SmoothTransformation));
+    QImage scaled_image = this->mImage.scaled(this->mpImageDisplay->size(),
+                                              Qt::KeepAspectRatio,
+                                              Qt::SmoothTransformation);
+    this->mpImageDisplay->setPixmap(QPixmap::fromImage(scaled_image));
   }
 }
