@@ -46,6 +46,7 @@
 #include "processing/TriggerDeclaration.h"
 #include "processing/Trigger.h"
 #include "processing/LoopedTrigger.h"
+#include "processing/MultiTrigger.h"
 #include "processing/Group.h"
 #include "auxiliaries/macros.h"
 #include "processing/PluginProxy.h"
@@ -73,7 +74,12 @@ cedar::proc::Manager::Manager()
    *@todo Names?
    */
   TriggerDeclarationPtr trigger_declaration(new TriggerDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
+  trigger_declaration->setIconPath(":/triggers/trigger.png");
   this->triggers().declareClass(trigger_declaration);
+
+  TriggerDeclarationPtr multi_trigger_declaration(new TriggerDeclarationT<cedar::proc::MultiTrigger>("cedar.processing.MultiTrigger"));
+  multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.png");
+  this->triggers().declareClass(multi_trigger_declaration);
 
   TriggerDeclarationPtr looped_trigger_declaration(
                                                      new TriggerDeclarationT<cedar::proc::LoopedTrigger>
@@ -81,6 +87,7 @@ cedar::proc::Manager::Manager()
                                                        "cedar.processing.LoopedTrigger"
                                                      )
                                                   );
+  looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.png");
   this->triggers().declareClass(looped_trigger_declaration);
 
   StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
