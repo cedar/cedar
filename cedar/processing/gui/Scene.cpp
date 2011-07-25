@@ -340,8 +340,10 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
       {
         connected = true;
 
+        //!@todo a virtual connectTo method in cedar::proc::gui::GraphicsBase might be a better choice.
         switch (mpConnectionStart->getGroup())
         {
+          // source item is a data item
           case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
           {
             cedar::proc::gui::DataSlotItem *p_source = dynamic_cast<cedar::proc::gui::DataSlotItem *>(mpConnectionStart);
@@ -360,6 +362,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
             break;
           } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
 
+          // source item is a trigger
           case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
           {
             cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(mpConnectionStart);
@@ -369,7 +372,8 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
             {
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
               {
-                //!@todo: implement
+                cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
+                source->connectTo(p_trigger);
                 break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
               }
 
