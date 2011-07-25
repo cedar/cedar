@@ -91,6 +91,7 @@ cedar::proc::Manager::Manager()
   this->triggers().declareClass(looped_trigger_declaration);
 
   StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
+  input_decl->setIconPath(":/steps/gauss_input.png");
   this->steps().declareClass(input_decl);
 }
 
