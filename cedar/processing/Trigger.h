@@ -91,6 +91,7 @@ public:
   bool isListener(cedar::proc::TriggerPtr trigger);
 
   const std::vector<cedar::proc::StepPtr>& getListeners() const;
+  const std::vector<cedar::proc::TriggerPtr>& getTriggerListeners() const;
 
   virtual void notifyConnected(cedar::proc::Trigger* trigger);
 
