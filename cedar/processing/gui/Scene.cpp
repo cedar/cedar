@@ -637,3 +637,11 @@ void cedar::proc::gui::Scene::addStepItem(cedar::proc::gui::StepItem *pStep)
   CEDAR_DEBUG_ASSERT(this->mStepMap.find(pStep->getStep().get()) == this->mStepMap.end());
   this->mStepMap[pStep->getStep().get()] = pStep;
 }
+
+void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem *pStep)
+{
+  // we assume that steps are only inserted once.
+  CEDAR_DEBUG_ASSERT(this->mStepMap.find(pStep->getStep().get()) != this->mStepMap.end());
+  this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
+  delete pStep;
+}

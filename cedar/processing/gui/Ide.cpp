@@ -118,6 +118,7 @@ void cedar::proc::gui::Ide::resetStepList()
 void cedar::proc::gui::Ide::sceneItemSelected()
 {
   using cedar::proc::Step;
+  using cedar::proc::Manager;
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
 
   //!@ todo Handle the cases: multiple
@@ -127,6 +128,27 @@ void cedar::proc::gui::Ide::sceneItemSelected()
     if (p_drawer)
     {
       this->mpPropertyTable->display(p_drawer->getStep());
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::deleteStep()
+{
+  using cedar::proc::Step;
+  using cedar::proc::Manager;
+  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+
+  for (int i = 0; i < selected_items.size(); ++i)
+  {
+    cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[i]);
+    if (p_drawer)
+    {
+      // delete one step at a time
+      p_drawer->hide();
+      this->mNetwork->network()->remove(p_drawer->getStep()); //TODO
+      Manager::getInstance().steps().removeObject(p_drawer->getStep()->getName());
+      this->mpPropertyTable->resetPointer();
+      this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
     }
   }
 }
@@ -188,3 +210,19 @@ void cedar::proc::gui::Ide::load()
     this->resetTo(network);
   }
 }
+
+void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
+{
+  switch (pEvent->key())
+  {
+    case Qt::Key_Delete:
+    {
+      this->deleteStep();
+      break;
+    }
+    // If the key is not handled by this widget, pass it on to the base widget.
+    default:
+      break;
+  }
+}
+

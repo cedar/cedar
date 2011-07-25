@@ -174,3 +174,10 @@ void cedar::proc::gui::PropertyPane::redraw()
     this->display(mDisplayedStep);
   }
 }
+
+void cedar::proc::gui::PropertyPane::resetPointer()
+{
+  this->mDisplayedStep.reset();
+  this->clearContents();
+  this->setRowCount(0);
+}
