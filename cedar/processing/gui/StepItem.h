@@ -44,29 +44,36 @@
 // LOCAL INCLUDES
 #include "processing/Step.h"
 #include "processing/gui/namespace.h"
+#include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsItem>
+#include <QMainWindow>
+#include <map>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::StepItem : public QGraphicsItem
+class cedar::proc::gui::StepItem : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
+  typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepItem(cedar::proc::StepPtr step);
+  StepItem(QMainWindow* pMainWindow);
+
+  StepItem(cedar::proc::StepPtr step, QMainWindow* pMainWindow);
 
   //!@brief Destructor
   ~StepItem();
@@ -75,12 +82,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  QRectF boundingRect() const;
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
   cedar::proc::StepPtr getStep();
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+
+  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  void saveConfiguration(cedar::aux::ConfigurationNode& root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -92,7 +104,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void addDataItems();
+
+  void setStep(cedar::proc::StepPtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -101,16 +115,16 @@ protected:
   // none yet
 private:
   cedar::proc::StepPtr mStep;
+  DataSlotMap mSlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  qreal mWidth;
-  qreal mHeight;
 
 private:
   cedar::proc::StepDeclarationPtr mClassId;
+  QMainWindow* mpMainWindow;
 
 }; // class StepItem
 

@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
+#include <opencv2/opencv.hpp>
 
 
 namespace cedar
@@ -56,12 +57,15 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT Arguments;
     typedef boost::shared_ptr<Arguments> ArgumentsPtr;
 
+    class CEDAR_PROC_LIB_EXPORT DataRole;
+
     class CEDAR_PROC_LIB_EXPORT Data;
     typedef boost::shared_ptr<Data> DataPtr;
 
     template <typename T> class DataT;
 
-    class CEDAR_PROC_LIB_EXPORT DataRole;
+    typedef DataT<cv::Mat> MatData;
+    typedef boost::shared_ptr<MatData> MatDataPtr;
 
     class CEDAR_PROC_LIB_EXPORT LoopArguments;
 
@@ -80,9 +84,19 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT Trigger;
     typedef boost::shared_ptr<Trigger> TriggerPtr;
 
-    class CEDAR_PROC_LIB_EXPORT Manager;
-    template <class T, class T_Declaration> class Registry;
+    class CEDAR_PROC_LIB_EXPORT Group;
+    typedef boost::shared_ptr<Group> GroupPtr;
 
+    template <class T, class T_Declaration> class Registry;
+    
+    class CEDAR_PROC_LIB_EXPORT Manager;
+    typedef boost::shared_ptr<Manager> ManagerPtr;
+
+    class CEDAR_PROC_LIB_EXPORT Network;
+    typedef boost::shared_ptr<Network> NetworkPtr;
+
+    template <class BaseClass, class FactoryType> class DeclarationBase;
+    
     class CEDAR_PROC_LIB_EXPORT StepDeclaration;
     typedef boost::shared_ptr<StepDeclaration> StepDeclarationPtr;
     template <class DerivedClass> class StepDeclarationT;
@@ -94,12 +108,22 @@ namespace cedar
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger> > TriggerFactoryPtr;
 
+    class PluginProxy;
+    typedef boost::shared_ptr<PluginProxy> PluginProxyPtr;
+
+    class PluginDeclaration;
+    typedef boost::shared_ptr<PluginDeclaration> PluginDeclarationPtr;
+
+    class ImageData;
+    typedef boost::shared_ptr<ImageData> ImageDataPtr;
+
     /* Exceptions */
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
+    class PluginException;
   }
 }
 

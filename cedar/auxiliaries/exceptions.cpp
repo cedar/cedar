@@ -49,3 +49,33 @@ cedar::aux::UnknownTypeException::UnknownTypeException()
 {
   this->mType = "UnknownTypeException";
 }
+
+cedar::aux::ParameterNotFoundException::ParameterNotFoundException()
+{
+  this->mType = "ParameterNotFoundException";
+}
+
+cedar::aux::DuplicateNameException::DuplicateNameException()
+{
+  this->mType = "DuplicateNameException";
+}
+
+cedar::aux::UnknownNameException::UnknownNameException()
+{
+  this->mType = "UnknownNameException";
+}
+
+cedar::aux::UnhandledValueException::UnhandledValueException()
+{
+  this->mType = "UnhandledValueException";
+}
+
+cedar::aux::RangeException::RangeException()
+{
+  this->mType = "RangeException";
+}
+
+cedar::aux::NoDefaultException::NoDefaultException()
+{
+  this->mType = "NoDefaultException";
+}

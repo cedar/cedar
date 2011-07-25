@@ -49,6 +49,7 @@
 #include "processing/Step.h"
 #include "processing/StepTime.h"
 #include "processing/Manager.h"
+#include "processing/Network.h"
 #include "processing/StepDeclaration.h"
 #include "auxiliaries/sleepFunctions.h"
 
@@ -59,7 +60,7 @@ using namespace cedar::aux;
 
 typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
 
-int main(int argc, char** argv)
+int main(int /* argc */, char** /* argv */)
 {
   using cedar::proc::LoopedTrigger;
   using cedar::proc::Manager;
@@ -76,7 +77,8 @@ int main(int argc, char** argv)
   log_file << "done." << std::endl;
 
   log_file << "Reading Setup1.json ... ";
-  Manager::getInstance().readFile("Setup1.json");
+  cedar::proc::NetworkPtr network(new cedar::proc::Network());
+  network->readFile("Setup1.json");
   log_file << "done." << std::endl;
 
   // Create trigger for the "main loop"

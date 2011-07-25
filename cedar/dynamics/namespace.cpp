@@ -24,13 +24,9 @@
 
     File:        namespace.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 16
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
     Description: Namespace file for cedar::dyn.
 
@@ -39,17 +35,14 @@
 ======================================================================================================================*/
 
 #include "dynamics/namespace.h"
-
 #include "dynamics/fields/NeuralField.h"
-#include "processing/Manager.h"
 #include "processing/StepDeclaration.h"
+#include "processing/Manager.h"
 
-//!@todo this should be a (standard) plugin
 void cedar::dyn::initialize()
 {
   using cedar::proc::StepDeclarationPtr;
 
-  StepDeclarationPtr field_decl(new cedar::proc::StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
+  StepDeclarationPtr field_decl(new cedar::proc::StepDeclarationT<NeuralField>("cedar.dynamics.NeuralField", "Fields"));
   cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
 }
-

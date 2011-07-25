@@ -61,10 +61,10 @@ mFinished(new cedar::proc::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mMandatoryConnectionsAreSet (true),
-mName (new cedar::aux::StringParameter("name", "")),
-mRunInThread(runInThread)
+mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
 {
-  this->registerParameter(mName);
+  this->registerParameter(mRunInThread);
+  this->_mName->setConstant(true);
 }
 
 cedar::proc::Step::DataEntry::DataEntry(bool isMandatory)
@@ -97,6 +97,31 @@ bool cedar::proc::Step::DataEntry::isMandatory() const
   return this->mMandatory;
 }
 
+void cedar::proc::Step::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
+{
+  size_t dot_idx = instr.rfind('.');
+  if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for step. Path is: " + instr);
+  }
+
+  stepName = instr.substr(0, dot_idx);
+  dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
+}
+
+cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id role)
+{
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  if (iter == this->mDataConnections.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Role "
+                                                   + DataRole::type().get(role).name()
+                                                   + " not found in cedar::proc::Step::getData(DataRole::Id).");
+  }
+  return iter->second;
+}
+
+
 const cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id role) const
 {
   std::map<DataRole::Id, SlotMap>::const_iterator iter = this->mDataConnections.find(role);
@@ -111,34 +136,17 @@ const cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id r
 
 void cedar::proc::Step::setName(const std::string& name)
 {
-  this->mName->set(name);
+  this->_mName->set(name);
 }
 
 const std::string& cedar::proc::Step::getName() const
 {
-  return this->mName->get();
-}
-
-const cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters() const
-{
-  return this->mParameters;
-}
-
-cedar::proc::Step::ParameterMap& cedar::proc::Step::getParameters()
-{
-  return this->mParameters;
-}
-
-void cedar::proc::Step::registerParameter(cedar::aux::ParameterBasePtr parameter)
-{
-  //! @todo check for duplicate names
-  //! @todo make sure there are no dots in the name; make a global function for name checks.
-  this->mParameters[parameter->getName()] = parameter;
+  return this->_mName->get();
 }
 
 void cedar::proc::Step::checkMandatoryConnections()
 {
-  mMandatoryConnectionsAreSet = true;
+  this->mMandatoryConnectionsAreSet = true;
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
        ++slot)
@@ -156,29 +164,92 @@ void cedar::proc::Step::checkMandatoryConnections()
   }
 }
 
-void cedar::proc::Step::readConfiguration(const cedar::aux::ConfigurationNode& node)
+void cedar::proc::Step::lockAll()
 {
-  this->setName(node.get<std::string>("name"));
-  this->setThreaded(node.get<bool>("threaded", false));
-
-  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
+  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
+       slot != this->mDataConnections.end();
+       ++slot)
   {
-    try
+    this->lockAll(slot->first);
+  }
+}
+
+void cedar::proc::Step::unlockAll()
+{
+  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
+       slot != this->mDataConnections.end();
+       ++slot)
+  {
+    this->unlockAll(slot->first);
+  }
+}
+
+void cedar::proc::Step::lockAll(DataRole::Id role)
+{
+  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
+  if (slot == this->mDataConnections.end())
+  {
+    // ok, no slots to lock
+    return;
+  }
+
+  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
+  {
+    cedar::proc::DataPtr data = iter->second.getData();
+    if (data)
     {
-      const cedar::aux::ConfigurationNode& value = node.get_child(iter->second->getName());
-      iter->second->set(value);
-    }
-    catch (const boost::property_tree::ptree_bad_path&)
-    {
-      //!@todo handle with default value/exception
-      std::cout << "Config node " << iter->second->getName() << " not found!" << std::endl;
+      switch (role)
+      {
+        case cedar::proc::DataRole::INPUT:
+          data->lockForRead();
+          break;
+
+        case cedar::proc::DataRole::OUTPUT:
+        case cedar::proc::DataRole::BUFFER:
+          data->lockForWrite();
+          break;
+
+        default:
+          // should never happen unless a role is
+          CEDAR_THROW(cedar::proc::InvalidRoleException, "The given role is not implemented in cedar::proc::Step::lockAll.");
+      }
     }
   }
 }
 
+void cedar::proc::Step::unlockAll(DataRole::Id role)
+{
+  //!@todo add a timeout?
+  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
+  if (slot == this->mDataConnections.end())
+  {
+    // ok, no slots to lock
+    return;
+  }
+
+  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
+  {
+    cedar::proc::DataPtr data = iter->second.getData();
+
+    if (data)
+    {
+      switch (role)
+      {
+        default:
+        case cedar::proc::DataRole::INPUT:
+        case cedar::proc::DataRole::OUTPUT:
+        case cedar::proc::DataRole::BUFFER:
+          data->unlock();
+          break;
+      }
+    }
+  }
+}
+
+
 void cedar::proc::Step::onStart()
 {
-
+  // empty as a default implementation
 }
 
 void cedar::proc::Step::onTrigger()
@@ -205,7 +276,7 @@ void cedar::proc::Step::onTrigger()
   } // this->mMandatoryConnectionsAreSet
   else
   {
-    CEDAR_THROW(MissingConnectionException,
+    CEDAR_THROW(MissingConnectionException, //!@todo Add to the exception the names of the unset connections
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   }
 }
@@ -220,7 +291,12 @@ void cedar::proc::Step::run()
     this->mNextArguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
   }
 
+  //!@todo make the (un)locking optional?
+  this->lockAll();
+
   this->compute(*(this->mNextArguments.get()));
+
+  this->unlockAll();
 
   // remove the argumens, as they have been processed.
   this->mNextArguments.reset();
@@ -236,7 +312,7 @@ cedar::proc::TriggerPtr& cedar::proc::Step::getFinishedTrigger()
 
 void cedar::proc::Step::setThreaded(bool isThreaded)
 {
-  this->mRunInThread = isThreaded;
+  this->mRunInThread->set(isThreaded);
 }
 
 void cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
@@ -307,16 +383,26 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
     CEDAR_THROW(cedar::proc::InvalidRoleException,
                 "The requested role " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
-                " does not exist.");
+                " does not exist in step \""
+                + this->getName() +
+                "\".");
     return;
   }
+
+  // inputs come from a different step
+  if (role != cedar::proc::DataRole::INPUT)
+  {
+    data->setOwner(this);
+    data->connectedSlotName(name);
+  }
+
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
   {
     CEDAR_THROW(cedar::proc::InvalidNameException,
                 "The requested " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
-                " name does not exist.");
+                " name \"" + name + "\" does not exist.");
     return;
   }
   map_iterator->second.setData(data);

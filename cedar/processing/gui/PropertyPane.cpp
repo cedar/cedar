@@ -40,8 +40,16 @@
 #include "auxiliaries/namespace.h"
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/NumericVectorParameter.h"
+#include "processing/gui/BoolParameter.h"
 #include "processing/gui/DoubleParameter.h"
+#include "processing/gui/DoubleVectorParameter.h"
+#include "processing/gui/UIntParameter.h"
+#include "processing/gui/UIntVectorParameter.h"
 #include "processing/gui/StringParameter.h"
+#include "auxiliaries/DirectoryParameter.h"
+#include "processing/gui/DirectoryParameter.h"
+#include "processing/Manager.h"
 
 // PROJECT INCLUDES
 
@@ -49,6 +57,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDoubleSpinBox>
+#include <QApplication>
 
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes cedar::proc::gui::PropertyPane::mDataWidgetTypes;
@@ -73,11 +82,62 @@ cedar::proc::gui::PropertyPane::~PropertyPane()
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 {
-  int row = this->rowCount();
-  cedar::proc::Step::ParameterMap& parameters = pStep->getParameters();
-  for (Step::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
+  std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
+  this->addLabelRow(label);
+  this->append(pStep->getParameters());
+
+  for (cedar::aux::Configurable::Children::const_iterator iter = pStep->configurableChildren().begin();
+       iter != pStep->configurableChildren().end();
+       ++iter)
   {
-    cedar::aux::ParameterBasePtr& parameter = iter->second;
+    this->addHeadingRow(iter->first);
+    this->append(iter->second->getParameters());
+  }
+}
+
+void cedar::proc::gui::PropertyPane::addHeadingRow(const std::string& label)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  QLabel *p_label = new QLabel();
+
+  QFont font = p_label->font();
+  font.setBold(true);
+  font.setPointSize(font.pointSize() + 1);
+  p_label->setFont(font);
+
+  p_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  p_label->setText(label.c_str());
+  p_label->setAutoFillBackground(true);
+  p_label->setBackgroundRole(QPalette::Dark);
+  p_label->setForegroundRole(QPalette::Light);
+  this->setCellWidget(row, 0, p_label);
+  this->setSpan(row, 0, 1, 2);
+}
+
+void cedar::proc::gui::PropertyPane::addLabelRow(const std::string& label)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  QLabel *p_label = new QLabel();
+  p_label->setText(label.c_str());
+  this->setCellWidget(row, 0, p_label);
+  this->setSpan(row, 0, 1, 2);
+}
+
+void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterMap& parameters)
+{
+  for (cedar::aux::Configurable::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
+  {
+    this->addPropertyRow(iter->second);
+  }
+}
+
+void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr parameter)
+{
+  if (!parameter->isHidden())
+  {
+    int row = this->rowCount();
     this->insertRow(row);
     QLabel *p_label = new QLabel();
     p_label->setText(parameter->getName().c_str());
@@ -85,17 +145,23 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 
     cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
     p_widget->setParameter(parameter);
+    p_widget->setEnabled(!parameter->isConstant());
     this->setCellWidget(row, 1, p_widget);
+    this->resizeRowToContents(row);
   }
 }
-
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane::dataWidgetTypes()
 {
   if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
   {
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::proc::gui::UIntParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleVectorParameter, cedar::proc::gui::DoubleVectorParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DirectoryParameter, cedar::proc::gui::DirectoryParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }

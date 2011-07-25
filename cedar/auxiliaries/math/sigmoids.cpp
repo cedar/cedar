@@ -49,12 +49,24 @@ using namespace std;
 
 double cedar::aux::math::sigmoid(const double x, const double beta, const double threshold)
 {
+  return sigmoidExp(x, beta, threshold);
+}
+
+double cedar::aux::math::sigmoidExp(const double x, const double beta, const double threshold)
+{
   return 1 / (1 + exp(-beta * (x - threshold)));
 }
 
 double cedar::aux::math::sigmoidAbs(const double x, const double beta, const double threshold)
 {
   return 0.5 * (1. + beta * (x - threshold) / (1. + beta * fabs(x - threshold)));
+}
+
+double cedar::aux::math::sigmoidHeavyside(const double x, const double threshold)
+{
+  if (x < threshold)
+    return 0.0;
+  return 1.0;
 }
 
 template<typename T>
@@ -65,7 +77,7 @@ cv::Mat cedar::aux::math::sigmoid(const cv::Mat& mat, const double beta, const d
   {
     for (int row = 0; row < mat.rows; row++)
     {
-      result.at<T>(row,col) = sigmoid(mat.at<T>(row,col),beta,threshold);
+      result.at<T>(row,col) = sigmoidExp(mat.at<T>(row,col),beta,threshold);
     }
   }
   return result;
@@ -81,7 +93,7 @@ void cedar::aux::math::sigmoid(const cv::Mat& mat, cv::Mat& result, const double
   {
     for (int row = 0; row < mat.rows; row++)
     {
-      result.at<T>(row,col) = sigmoid(mat.at<T>(row,col),beta,threshold);
+      result.at<T>(row,col) = sigmoidExp(mat.at<T>(row,col),beta,threshold);
     }
   }
 }
@@ -126,8 +138,7 @@ std::vector<double> cedar::aux::math::sigmoid(const std::vector<double>& x, cons
   buffer.resize(x.size());
   for (unsigned int i = 0; i < x.size(); i++)
   {
-//    buffer[i] = 1 / (1 + exp(-beta * (x[i] - threshold)));
-    buffer[i] = sigmoid(x[i], beta, threshold);
+    buffer[i] = sigmoidExp(x[i], beta, threshold);
   }
   return buffer;
 }

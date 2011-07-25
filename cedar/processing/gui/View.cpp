@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QResizeEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -71,4 +72,27 @@ cedar::proc::gui::View::~View()
 cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
 {
   return this->mpScene;
+}
+
+void cedar::proc::gui::View::resizeEvent(QResizeEvent * pEvent)
+{
+  QWidget::resizeEvent(pEvent);
+  //!@todo fix the scene rect
+}
+
+void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
+{
+  switch (mode)
+  {
+    case cedar::proc::gui::Scene::MODE_CONNECT:
+    case cedar::proc::gui::Scene::MODE_CREATE_TRIGGER:
+    case cedar::proc::gui::Scene::MODE_GROUP:
+      this->setDragMode(QGraphicsView::NoDrag);
+      break;
+
+    default:
+      this->setDragMode(QGraphicsView::RubberBandDrag);
+      break;
+  }
+  this->mpScene->setMode(mode, param);
 }

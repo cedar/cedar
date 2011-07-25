@@ -52,7 +52,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::ParameterBase::ParameterBase(const std::string& name)
+cedar::aux::ParameterBase::ParameterBase(const std::string& name, bool hasDefault)
+:
+mHasDefault(hasDefault),
+mIsHidden(false)
 {
   this->setName(name);
 }
@@ -64,6 +67,16 @@ cedar::aux::ParameterBase::~ParameterBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::ParameterBase::isHidden() const
+{
+  return this->mIsHidden;
+}
+
+void cedar::aux::ParameterBase::setHidden(bool hide)
+{
+  this->mIsHidden = hide;
+}
 
 bool cedar::aux::ParameterBase::getReadAutomatically() const
 {
@@ -93,21 +106,4 @@ bool cedar::aux::ParameterBase::isConstant() const
 void cedar::aux::ParameterBase::setConstant(bool value)
 {
   this->mConstant = value;
-}
-
-void cedar::aux::ParameterBase::set(const cedar::aux::ConfigurationNode& node)
-{
-  if (dynamic_cast<DoubleParameter*>(this))
-  {
-    dynamic_cast<DoubleParameter*>(this)->set(node.get_value<double>());
-  }
-  else if (dynamic_cast<StringParameter*>(this))
-  {
-    dynamic_cast<StringParameter*>(this)->set(node.get_value<std::string>());
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot set parameter value: the type of the parameter "
-                                                     + this->getName() + "is not handled.");
-  }
 }

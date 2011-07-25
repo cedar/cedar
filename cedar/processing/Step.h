@@ -47,6 +47,7 @@
 #include "processing/DataRole.h"
 #include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/Base.h"
+#include "auxiliaries/Configurable.h"
 
 // PROJECT INCLUDES
 
@@ -59,7 +60,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Step : public QThread
+class cedar::proc::Step : public QThread, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,7 +70,7 @@ class cedar::proc::Step : public QThread
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
+
   struct DataEntry
   {
     public:
@@ -128,9 +129,8 @@ public:
   cedar::proc::DataPtr getBuffer(const std::string& name);
   cedar::proc::DataPtr getOutput(const std::string& name);
 
+  cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role);
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
-
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   static void connect(
                        cedar::proc::StepPtr source,
@@ -138,20 +138,21 @@ public:
                        cedar::proc::StepPtr target,
                        const std::string& targetName
                      );
-
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
-
   void setName(const std::string& name);
   const std::string& getName() const;
+
+  void lockAll();
+  void lockAll(DataRole::Id role);
+  void unlockAll();
+  void unlockAll(DataRole::Id role);
+
+  static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   void run();
-
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -176,10 +177,6 @@ private:
   ArgumentsPtr mNextArguments;
   bool mMandatoryConnectionsAreSet;
 
-  ParameterMap mParameters;
-
-  cedar::aux::StringParameterPtr mName;
-
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -189,7 +186,7 @@ protected:
   // none yet
 
 private:
-  bool mRunInThread;
+  cedar::aux::BoolParameterPtr mRunInThread;
 
 }; // class cedar::proc::Step
 

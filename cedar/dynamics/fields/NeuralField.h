@@ -44,6 +44,8 @@
 // LOCAL INCLUDES
 #include "dynamics/namespace.h"
 #include "dynamics/Dynamics.h"
+#include "auxiliaries/math/namespace.h"
+#include "auxiliaries/kernel/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -93,7 +95,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   cedar::dyn::SpaceCodePtr mActivation;
+  cedar::dyn::SpaceCodePtr mSigmoidalActivation;
   cedar::aux::DoubleParameterPtr mRestingLevel;
+  cedar::aux::DoubleParameterPtr mTau; //!\todo deal with units, now: milliseconds
+  cedar::aux::math::SigmoidPtr mSigmoid;
+  cedar::aux::kernel::GaussPtr mKernel;
 private:
   // none yet
 

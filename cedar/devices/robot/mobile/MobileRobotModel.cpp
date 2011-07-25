@@ -97,7 +97,7 @@ void MobileRobotModel::setOrientation(double orientation)
   setOrientationQuaternion(orientation_mat);
 }
 
-void MobileRobotModel::timerEvent(QTimerEvent *event)
+void MobileRobotModel::timerEvent(QTimerEvent * /* event */)
 {
   update();
 }

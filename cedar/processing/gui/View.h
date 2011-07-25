@@ -49,6 +49,7 @@
 
 // SYSTEM INCLUDES
 #include <QGraphicsView>
+#include <QGraphicsRectItem>
 
 
 /*!@brief Abstract description of the class.
@@ -78,11 +79,13 @@ public:
 public:
   cedar::proc::gui::Scene* getScene();
 
+  void setMode(cedar::proc::gui::Scene::MODE mode, const QString& param = "");
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void resizeEvent(QResizeEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

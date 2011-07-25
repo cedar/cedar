@@ -41,6 +41,7 @@
 #include "processing/namespace.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/macros.h"
+#include "auxiliaries/LoopedThread.h"
 
 // PROJECT INCLUDES
 
@@ -64,6 +65,7 @@ class cedar::proc::Registry
   //--------------------------------------------------------------------------------------------------------------------
 public:
   friend class cedar::proc::Manager;
+  friend class cedar::proc::Network;
 
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
@@ -71,6 +73,7 @@ public:
 public:
    typedef boost::shared_ptr<T> ObjectPointer;
    typedef boost::shared_ptr<T_Declaration> DeclarationPointer;
+   typedef std::map<std::string, DeclarationPointer> Declarations;
 
    typedef std::set<std::string> CategoryList;
    typedef std::vector<DeclarationPointer> CategoryEntries;
@@ -177,6 +180,11 @@ public:
   bool testExists(const std::string& name) const
   {
     return this->mObjects.find(name) != this->mObjects.end();
+  }
+
+  const Declarations& declarations() const
+  {
+    return this->mDeclarations;
   }
 
   //--------------------------------------------------------------------------------------------------------------------

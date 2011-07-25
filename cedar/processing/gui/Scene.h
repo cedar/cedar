@@ -43,11 +43,13 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
+#include <QMainWindow>
 
 
 /*!@brief Abstract description of the class.
@@ -57,16 +59,28 @@
 class cedar::proc::gui::Scene : public QGraphicsScene
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // macros & types
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+public:
+  enum MODE
+  {
+    MODE_SELECT,
+    MODE_CREATE_TRIGGER,
+    MODE_GROUP,
+    MODE_CONNECT
+  };
+
+  typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+  typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Scene(QObject *pParent = NULL);
+  Scene(QObject *pParent = NULL, QMainWindow *pMainWindow = NULL);
 
   //!@brief Destructor
   ~Scene();
@@ -79,13 +93,37 @@ public:
   void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
   void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
 
+  void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
+
   void addProcessingStep(const std::string& classId, QPointF position);
+  void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
+  void addStepItem(cedar::proc::gui::StepItem *pStep);
+  void addTrigger(const std::string& classId, QPointF position);
+  void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
+  void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
+
+  void setMode(MODE mode, const QString& param = "");
+
+  void setMainWindow(QMainWindow *pMainWindow);
+
+  void setNetwork(cedar::proc::gui::NetworkFilePtr network);
+
+  void reset();
+
+  const StepMap& stepMap() const;
+  const TriggerMap& triggerMap() const;
+
+  cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
+  cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
   signals:
     void exception(const QString& message);
+    void modeFinished();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,7 +135,15 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /* connect mode */
+  void connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
+  void connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
+  void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
+
+  /* group mode */
+  void groupModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
+  void groupModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
+  void groupModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -107,6 +153,24 @@ public:
 protected:
   // none yet
 private:
+  MODE mMode;
+  QString mModeParam;
+
+  cedar::proc::gui::NetworkFilePtr mNetwork;
+
+  /* connect mode related */
+  QGraphicsLineItem *mpNewConnectionIndicator;
+  cedar::proc::gui::GraphicsBase *mpConnectionStart;
+
+  /* group mode related */
+  QPointF mGroupStart;
+  QPointF mGroupEnd;
+  QGraphicsRectItem *mpGroupIndicator;
+  QList<QGraphicsItem*> mProspectiveGroupMembers;
+  QMainWindow *mpMainWindow;
+
+  StepMap mStepMap;
+  TriggerMap mTriggerMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

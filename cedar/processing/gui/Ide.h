@@ -86,6 +86,19 @@ public slots:
 
   void exception(const QString& message);
 
+  void architectureToolFinished();
+  
+  void startThreads();
+  void stopThreads();
+
+  void save();
+  void saveAs();
+  void load();
+
+  void resetTo(cedar::proc::gui::NetworkFilePtr network);
+
+  void showLoadPluginDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,6 +120,8 @@ protected:
   // none yet
 private:
   std::map<std::string, cedar::proc::gui::StepClassList*> mStepClassListWidgets;
+
+  cedar::proc::gui::NetworkFilePtr mNetwork;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

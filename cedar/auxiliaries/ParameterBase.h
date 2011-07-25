@@ -48,24 +48,24 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <QObject>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::ParameterBase : public cedar::aux::Base
+class cedar::aux::ParameterBase : public QObject, public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ParameterBase(const std::string& name);
+  ParameterBase(const std::string& name, bool hasDefault = true);
 
   //!@brief Destructor
   virtual ~ParameterBase();
@@ -84,14 +84,20 @@ public:
   bool isConstant() const;
   void setConstant(bool value);
 
-  void set(const cedar::aux::ConfigurationNode& node);
+  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
+  virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
+  virtual void makeDefault() = 0;
+
+  bool isHidden() const;
+  void setHidden(bool hide);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
+  signals:
+    void parameterChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,11 +113,14 @@ private:
   //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
   bool mAutoRead;
 
-  //! Whether a default value should be set if the
+  //! Whether a default value should be set
   bool mHasDefault;
 
   //! Whether this parameter can be changed during runtime.
   bool mConstant;
+
+  //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
+  bool mIsHidden;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

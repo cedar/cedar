@@ -91,6 +91,12 @@ public:
     return dynamic_cast<T&>(*this);
   }
   
+  cedar::proc::Step* getOwner();
+  void setOwner(cedar::proc::Step* step);
+
+  const std::string& connectedSlotName() const;
+  void connectedSlotName(const std::string& name);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -112,6 +118,8 @@ protected:
   QReadWriteLock mLock;
 
 private:
+  cedar::proc::Step* mpeOwner;
+  std::string mConnectedSlotName;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

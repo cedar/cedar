@@ -42,9 +42,10 @@
 
 // PROJECT INCLUDES
 #include "namespace.h"
+#include "auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-
+#include <boost/smart_ptr.hpp>
 
 namespace cedar
 {
@@ -54,6 +55,25 @@ namespace cedar
     namespace math
     {
       template <typename T> struct Limits;
+
+      class Sigmoid;
+      typedef boost::shared_ptr<Sigmoid> SigmoidPtr;
+
+      class AbsSigmoid;
+      typedef boost::shared_ptr<AbsSigmoid> AbsSigmoidPtr;
+
+      class ExpSigmoid;
+      typedef boost::shared_ptr<ExpSigmoid> ExpSigmoidPtr;
+
+      class HeavysideSigmoid;
+      typedef boost::shared_ptr<HeavysideSigmoid> HeavysideSigmoidPtr;
+
+      class SigmoidDeclaration;
+      typedef boost::shared_ptr<SigmoidDeclaration> SigmoidDeclarationPtr;
+      template <class DerivedClass>
+      class SigmoidDeclarationT;
+
+      typedef boost::shared_ptr<cedar::aux::AbstractFactory<Sigmoid> > SigmoidFactoryPtr;
     }
   }
 }

@@ -41,6 +41,12 @@ cedar_add_library(cedaraux
   gui/BaseWidget.h
   gui/Viewer.h
   gui/SceneWidget.h
+  gui/MatrixPlot.h
+  gui/MatrixPlot2D.h
+  gui/ImagePlot.h
+  ParameterBase.h
+  kernel/Kernel.h
+  kernel/Gauss.h
   LINK_LIBRARIES
   cedarunits
 )

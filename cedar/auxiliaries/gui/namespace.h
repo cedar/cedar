@@ -66,6 +66,10 @@ namespace cedar
       //!@brief smart pointer for Viewer
       typedef boost::shared_ptr<Viewer> ViewerPtr;
 
+      class MatrixPlot;
+      class MatrixPlot2D;
+
+      class ImagePlot;
     }
   }
 }

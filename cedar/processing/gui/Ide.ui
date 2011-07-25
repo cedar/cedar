@@ -59,26 +59,27 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew"/>
+    <addaction name="mpActionNew"/>
     <addaction name="separator"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
-    <addaction name="actionLoad"/>
+    <addaction name="mpActionSave"/>
+    <addaction name="mpActionSaveAs"/>
+    <addaction name="mpActionLoad"/>
     <addaction name="separator"/>
-    <addaction name="actionExit"/>
+    <addaction name="mpActionExit"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
     <property name="title">
      <string>Plugins</string>
     </property>
     <addaction name="actionManage"/>
+    <addaction name="mpActionLoadPlugin"/>
    </widget>
    <widget class="QMenu" name="menuSimulation">
     <property name="title">
      <string>Simulation</string>
     </property>
-    <addaction name="actionStart"/>
-    <addaction name="actionStop"/>
+    <addaction name="mpThreadsStartAll"/>
+    <addaction name="mpThreadsStopAll"/>
    </widget>
    <widget class="QMenu" name="menuWindows">
     <property name="title">
@@ -157,11 +158,11 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QToolBox" name="toolBox_2">
+      <widget class="QToolBox" name="mpToolBox">
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="page_3">
+       <widget class="cedar::proc::gui::ArchitectureToolBox" name="mpArchitectureToolBox">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -173,52 +174,14 @@
         <attribute name="label">
          <string>Architecture tools</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QToolButton" name="toolButton">
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="1">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
        </widget>
        <widget class="QWidget" name="page_4">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>130</width>
-          <height>319</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -277,42 +240,54 @@
     </layout>
    </widget>
   </widget>
-  <action name="actionNew">
+  <action name="mpActionNew">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>New</string>
    </property>
   </action>
-  <action name="actionSave">
+  <action name="mpActionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
   </action>
-  <action name="actionSave_as">
+  <action name="mpActionSaveAs">
    <property name="text">
     <string>Save as ...</string>
    </property>
   </action>
-  <action name="actionLoad">
+  <action name="mpActionLoad">
    <property name="text">
-    <string>Load</string>
+    <string>Load ...</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="mpActionExit">
    <property name="text">
     <string>Exit</string>
    </property>
   </action>
   <action name="actionManage">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Manage ...</string>
    </property>
   </action>
-  <action name="actionStart">
+  <action name="mpThreadsStartAll">
    <property name="text">
     <string>Start</string>
    </property>
   </action>
-  <action name="actionStop">
+  <action name="mpThreadsStopAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Stop</string>
    </property>
@@ -349,6 +324,11 @@
     <string>Log</string>
    </property>
   </action>
+  <action name="mpActionLoadPlugin">
+   <property name="text">
+    <string>Load plugin ...</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -360,6 +340,12 @@
    <class>cedar::proc::gui::PropertyPane</class>
    <extends>QTableWidget</extends>
    <header>processing/gui/PropertyPane.h</header>
+  </customwidget>
+  <customwidget>
+   <class>cedar::proc::gui::ArchitectureToolBox</class>
+   <extends>QWidget</extends>
+   <header>processing/gui/ArchitectureToolBox.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
@@ -489,6 +475,22 @@
     <hint type="destinationlabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mpActionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>Ide</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>493</x>
+     <y>380</y>
     </hint>
    </hints>
   </connection>

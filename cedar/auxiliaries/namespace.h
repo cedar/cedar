@@ -34,16 +34,12 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_NAMESPACE_H
 #define CEDAR_AUX_NAMESPACE_H
 
 // LOCAL INCLUDES
 
-// PROJECT INCLUDES
-#include "namespace.h"
 #include "auxiliaries/lib.h"
-
 // SYSTEM INCLUDES
 #include <sstream>
 #include <boost/smart_ptr.hpp>
@@ -58,6 +54,10 @@ namespace cedar
     class CEDAR_AUX_LIB_EXPORT Base;
     //!@brief smart pointer for Base
     typedef boost::shared_ptr<Base> BasePtr;
+
+    class CEDAR_AUX_LIB_EXPORT Configurable;
+    //!@brief smart pointer for Configurable
+    typedef boost::shared_ptr<Configurable> ConfigurablePtr;
 
     class CEDAR_AUX_LIB_EXPORT LoopedThread;
     //!@brief smart pointer for LoopedThread
@@ -104,10 +104,25 @@ namespace cedar
 
     template <typename T> class Parameter;
     template <typename T> class NumericParameter;
+    template <typename T> class VectorParameter;
+    template <typename T> class NumericVectorParameter;
     typedef NumericParameter<double> DoubleParameter;
     typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
+    typedef NumericParameter<unsigned int> UIntParameter;
+    typedef boost::shared_ptr<UIntParameter> UIntParameterPtr;
     typedef Parameter<std::string> StringParameter;
     typedef boost::shared_ptr<StringParameter> StringParameterPtr;
+    typedef Parameter<bool> BoolParameter;
+    typedef boost::shared_ptr<BoolParameter> BoolParameterPtr;
+    typedef VectorParameter<bool> BoolVectorParameter;
+    typedef boost::shared_ptr<BoolVectorParameter> BoolVectorParameterPtr;
+    typedef NumericVectorParameter<double> DoubleVectorParameter;
+    typedef boost::shared_ptr<DoubleVectorParameter> DoubleVectorParameterPtr;
+    typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+    typedef boost::shared_ptr<UIntVectorParameter> UIntVectorParameterPtr;
+    class DirectoryParameter;
+    typedef boost::shared_ptr<DirectoryParameter> DirectoryParameterPtr;
+
 
     typedef boost::property_tree::ptree ConfigurationNode;
 
@@ -125,8 +140,15 @@ namespace cedar
     }
 
     /*exceptions*/
-    class CEDAR_AUX_LIB_EXPORT UnhandledTypeException;
+    class CEDAR_AUX_LIB_EXPORT DuplicateNameException;
     class CEDAR_AUX_LIB_EXPORT UnknownTypeException;
+    class CEDAR_AUX_LIB_EXPORT UnhandledTypeException;
+    class CEDAR_AUX_LIB_EXPORT UnhandledValueException;
+    class CEDAR_AUX_LIB_EXPORT UnknownTypeException;
+    class CEDAR_AUX_LIB_EXPORT ParameterNotFoundException;
+    class CEDAR_AUX_LIB_EXPORT UnknownNameException;
+    class CEDAR_AUX_LIB_EXPORT RangeException;
+    class CEDAR_AUX_LIB_EXPORT NoDefaultException;
   }
 }
 

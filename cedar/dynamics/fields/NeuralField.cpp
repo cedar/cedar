@@ -42,23 +42,48 @@
 #include "dynamics/fields/NeuralField.h"
 #include "dynamics/SpaceCode.h"
 #include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/math/Sigmoid.h"
+#include "auxiliaries/math/AbsSigmoid.h"
+#include "auxiliaries/kernel/Gauss.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::dyn::NeuralField::NeuralField()
 :
-mActivation(new cedar::dyn::SpaceCode(cv::Mat())),
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0))
+mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
+mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
+mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
+mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
+mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
 {
   this->registerParameter(mRestingLevel);
+  this->registerParameter(mTau);
 
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
+  this->declareOutput("sigmoid(activation)");
+  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
+
+  this->declareInput("input", false);
+
+  this->addConfigurableChild("sigmoid", this->mSigmoid);
+
+  std::vector<double> sigmas;
+  std::vector<double> shifts;
+  sigmas.push_back(3.0);
+  shifts.push_back(0.0);
+  sigmas.push_back(3.0);
+  shifts.push_back(0.0);
+  mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 5.0, 2));
+  this->declareBuffer("kernel");
+  this->setBuffer("kernel", mKernel->getKernelRaw());
+  this->addConfigurableChild("lateral kernel", this->mKernel);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -66,10 +91,23 @@ mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0))
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();
+  cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   const double& h = mRestingLevel->get();
+  const double& tau = mTau->get();
+  sigmoid_u = mSigmoid->compute<float>(u);
+  cv::Mat d_u = -u + h + sigmoid_u;
 
-  cv::Mat d_u = -u + h;
-  u += d_u;
+  /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
+   *       it when the connections change.
+   */
+  if (cedar::proc::DataPtr input = this->getInput("input"))
+  {
+    d_u += input->getData<cv::Mat>();
+  }
+
+  //!\todo deal with units, now: milliseconds
+  u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
+  //std::cout << "field: " << u.at<float>(0,0) << std::endl;
 }
 
 void cedar::dyn::NeuralField::onStart()

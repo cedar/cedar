@@ -52,11 +52,47 @@ class cedar::aux::UnhandledTypeException : public cedar::aux::exc::ExceptionBase
     UnhandledTypeException();
 }; // class cedar::aux::UnhandledTypeException
 
+class cedar::aux::UnhandledValueException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    UnhandledValueException();
+}; // class cedar::aux::UnhandledValueException
+
 
 class cedar::aux::UnknownTypeException : public cedar::aux::exc::ExceptionBase
 {
   public:
     UnknownTypeException();
 }; // class cedar::aux::UnknownTypeException
+
+class cedar::aux::UnknownNameException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    UnknownNameException();
+}; // class cedar::aux::UnknownNameException
+
+class cedar::aux::ParameterNotFoundException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    ParameterNotFoundException();
+}; // class cedar::aux::ParameterNotFoundException
+
+class cedar::aux::DuplicateNameException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    DuplicateNameException();
+}; // class cedar::aux::DuplicateNameException
+
+class cedar::aux::RangeException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  RangeException();
+}; // class cedar::aux::RangeException
+
+class cedar::aux::NoDefaultException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  NoDefaultException();
+}; // class cedar::aux::NoDefaultException
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

@@ -48,7 +48,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <iostream>
 
 /*!@brief Abstract description of the class.
  *
@@ -68,9 +68,15 @@ public:
   //!@brief The constructor.
   Parameter(const std::string& name, const T& defaultValue)
   :
-  cedar::aux::ParameterBase(name),
+  cedar::aux::ParameterBase(name, true),
   mValue(defaultValue),
   mDefault(defaultValue)
+  {
+  }
+
+  Parameter(const std::string& name)
+  :
+  cedar::aux::ParameterBase(name, false)
   {
   }
 
@@ -88,9 +94,25 @@ public:
     return this->mValue;
   }
 
+  void putTo(cedar::aux::ConfigurationNode& root)
+  {
+    root.put(this->getName(), this->mValue);
+  }
+
   void set(const T& value)
   {
     this->mValue = value;
+    emit parameterChanged();
+  }
+
+  void setTo(const cedar::aux::ConfigurationNode& node)
+  {
+    this->mValue = node.get_value<T>();
+  }
+
+  void makeDefault()
+  {
+    this->set(mDefault);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

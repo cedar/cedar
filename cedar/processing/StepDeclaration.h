@@ -42,6 +42,7 @@
 #define CEDAR_PROC_STEP_DECLARATION_H
 
 // LOCAL INCLUDES
+#include "processing/DeclarationBase.h"
 #include "processing/namespace.h"
 #include "auxiliaries/AbstractFactory.h"
 #include "auxiliaries/AbstractFactoryDerived.h"
@@ -50,7 +51,11 @@
 
 // SYSTEM INCLUDES
 
-class cedar::proc::StepDeclaration
+class cedar::proc::StepDeclaration : public cedar::proc::DeclarationBase
+                                            <
+                                              cedar::proc::Step,
+                                              cedar::aux::AbstractFactory<cedar::proc::Step>
+                                            >
 {
 public:
 
@@ -63,13 +68,11 @@ public:
                    const std::string& category = "misc."
                  )
   :
-  mpClassFactory(classFactory),
-  mClassId(classId),
-  mCategory (category)
+  DeclarationBase<cedar::proc::Step, cedar::aux::AbstractFactory<cedar::proc::Step> >(classFactory, classId, category)
   {
   }
 
-  virtual ~StepDeclaration()
+  ~StepDeclaration()
   {
   }
 
@@ -77,58 +80,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::StepFactoryPtr getObjectFactory()
-  {
-    return this->mpClassFactory;
-  }
-
-  const std::string& getClassId() const
-  {
-    return this->mClassId;
-  }
-
-  const std::string& getCategory() const
-  {
-    return this->mCategory;
-  }
-
-  /*!
-   * @brief Returns the class name without the preceding namespace.
-   */
-  std::string getClassName() const
-  {
-    std::size_t index = this->getClassId().rfind('.');
-    if (index != std::string::npos)
-    {
-      return this->getClassId().substr(index + 1);
-    }
-    else
-    {
-      return this->getClassId();
-    }
-  }
-
-  /*!
-   * @brief Returns the namespace name without the class name.
-   */
-  std::string getNamespaceName() const
-  {
-    std::size_t index = this->getClassId().rfind('.');
-    if (index != std::string::npos)
-    {
-      return this->getClassId().substr(0, index);
-    }
-    else
-    {
-      return this->getClassId();
-    }
-  }
-
-  /*!
-   * @returns True, if the object passed as argument is an instance of the class represented by this declaration, false
-   *          otherwise.
-   */
-  virtual bool isObjectInstanceOf(cedar::proc::StepPtr) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -146,9 +97,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::proc::StepFactoryPtr mpClassFactory;
-  std::string mClassId;
-  std::string mCategory;
+  // none yet
 private:
   // none yet
 

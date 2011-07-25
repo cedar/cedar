@@ -41,6 +41,7 @@
 #include "processing/gui/namespace.h"
 #include "processing/namespace.h"
 #include "auxiliaries/TypeBasedFactory.h"
+#include "processing/Step.h"
 
 // PROJECT INCLUDES
 
@@ -91,7 +92,13 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void append(cedar::proc::Step::ParameterMap& parameters);
+
+  void addHeadingRow(const std::string& label);
+
+  void addLabelRow(const std::string& label);
+
+  void addPropertyRow(cedar::aux::ParameterBasePtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

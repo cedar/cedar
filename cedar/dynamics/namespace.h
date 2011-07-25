@@ -72,7 +72,7 @@ namespace cedar
     class CEDAR_DYN_LIB_EXPORT NeuralField;
     typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;
 
-    void CEDAR_DYN_LIB_EXPORT initialize();
+    CEDAR_DYN_LIB_EXPORT void initialize();
   }
 }
 

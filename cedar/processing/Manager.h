@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepManager.h
+    File:        Manager.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -68,6 +68,8 @@ class cedar::proc::Manager
 public:
   typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
   typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
+  typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
+  typedef std::set<cedar::proc::GroupPtr> GroupRegistry; //!<@todo Use a name instead?
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -81,17 +83,20 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static Manager& getInstance();
-  void readStep(const std::string& classId, const cedar::aux::ConfigurationNode& root);
-  void readSteps(const cedar::aux::ConfigurationNode& root);
-  void readTrigger(const std::string& classId, const cedar::aux::ConfigurationNode& root);
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
-  void readAll(const cedar::aux::ConfigurationNode& root);
-  void readFile(const std::string& filename);
 
   StepRegistry& steps();
   TriggerRegistry& triggers();
+  ThreadRegistry& threads();
+  GroupRegistry& groups();
+
+  void registerThread(cedar::aux::LoopedThreadPtr thread);
+  GroupPtr allocateGroup();
+  void removeGroup(GroupPtr group);
+
+  void load(cedar::proc::PluginProxyPtr plugin);
+
+  void startThreads();
+  void stopThreads();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -105,8 +110,6 @@ private:
   //!@brief The standard constructor.
   Manager();
 
-  static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,10 +118,12 @@ public:
 protected:
   // none yet
 private:
-  static Manager mpManager;
+  static Manager mManager;
 
   StepRegistry mStepRegistry;
   TriggerRegistry mTriggerRegistry;
+  ThreadRegistry mThreadRegistry;
+  GroupRegistry mGroupRegistry;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

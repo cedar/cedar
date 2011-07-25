@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepManager.cpp
+    File:        Manager.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -45,17 +45,18 @@
 #include "processing/TriggerDeclaration.h"
 #include "processing/Trigger.h"
 #include "processing/LoopedTrigger.h"
+#include "processing/Group.h"
 #include "auxiliaries/macros.h"
+#include "processing/PluginProxy.h"
+#include "processing/PluginDeclaration.h"
 
+#include "processing/source/GaussInput.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <boost/property_tree/json_parser.hpp>
 
-cedar::proc::Manager cedar::proc::Manager::mpManager;
-
-//#define DEBUG_FILE_READING
+cedar::proc::Manager cedar::proc::Manager::mManager;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -79,6 +80,8 @@ cedar::proc::Manager::Manager()
                                                      )
                                                   );
   this->triggers().declareClass(looped_trigger_declaration);
+  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
+  this->steps().declareClass(input_decl);
 }
 
 cedar::proc::Manager::~Manager()
@@ -89,9 +92,52 @@ cedar::proc::Manager::~Manager()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
+{
+  cedar::proc::PluginDeclarationPtr decl = plugin->getDeclaration();
+  if (decl)
+  {
+    // load steps
+    for (size_t i = 0; i < decl->stepDeclarations().size(); ++i)
+    {
+      this->steps().declareClass(decl->stepDeclarations().at(i));
+    }
+  }
+}
+
 cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()
 {
   return this->mStepRegistry;
+}
+
+void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)
+{
+  this->mThreadRegistry.insert(thread);
+}
+
+void cedar::proc::Manager::startThreads()
+{
+  for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
+  {
+    (*iter)->start();
+  }
+  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
+  {
+    (*iter)->start();
+  }
+}
+
+void cedar::proc::Manager::stopThreads()
+{
+  //!@todo wait for all threads to stop
+  for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
+  {
+    (*iter)->stop();
+  }
+  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
+  {
+    (*iter)->stop();
+  }
 }
 
 cedar::proc::Manager::TriggerRegistry& cedar::proc::Manager::triggers()
@@ -99,184 +145,29 @@ cedar::proc::Manager::TriggerRegistry& cedar::proc::Manager::triggers()
   return this->mTriggerRegistry;
 }
 
+cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
+{
+  return this->mThreadRegistry;
+}
+
+cedar::proc::Manager::GroupRegistry& cedar::proc::Manager::groups()
+{
+  return this->mGroupRegistry;
+}
+
+cedar::proc::GroupPtr cedar::proc::Manager::allocateGroup()
+{
+  GroupPtr new_group(new cedar::proc::Group("new group"));
+  this->mGroupRegistry.insert(new_group);
+  return new_group;
+}
+
+void cedar::proc::Manager::removeGroup(cedar::proc::GroupPtr group)
+{
+  this->mGroupRegistry.erase(group);
+}
+
 cedar::proc::Manager& cedar::proc::Manager::getInstance()
 {
-  return cedar::proc::Manager::mpManager;
-}
-
-void cedar::proc::Manager::readFile(const std::string& filename)
-{
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading configuration file " << filename << std::endl;
-#endif // DEBUG_FILE_READING
-  cedar::aux::ConfigurationNode cfg;
-  boost::property_tree::read_json(filename, cfg);
-  this->readAll(cfg);
-}
-
-void cedar::proc::Manager::readAll(const cedar::aux::ConfigurationNode& root)
-{
-  try
-  {
-    const cedar::aux::ConfigurationNode& steps = root.get_child("steps");
-    this->readSteps(steps);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no steps declared -- this is ok.
-#if defined DEBUG || defined DEBUG_FILE_READING
-    std::cout << "No steps present while reading configuration." << std::endl;
-#endif // defined DEBUG || defined DEBUG_FILE_READING
-  }
-
-  try
-  {
-    const cedar::aux::ConfigurationNode& connections = root.get_child("connections");
-    this->readDataConnections(connections);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no connections declared -- this is ok.
-#if defined DEBUG || defined DEBUG_FILE_READING
-    std::cout << "No data connections present while reading configuration." << std::endl;
-#endif // defined DEBUG || defined DEBUG_FILE_READING
-  }
-
-  try
-  {
-    const cedar::aux::ConfigurationNode& triggers = root.get_child("triggers");
-    this->readTriggers(triggers);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-#if defined DEBUG || defined DEBUG_FILE_READING
-    std::cout << "No triggers present while reading configuration." << std::endl;
-#endif // defined DEBUG || defined DEBUG_FILE_READING
-  }
-}
-
-void cedar::proc::Manager::readStep(const std::string& classId, const cedar::aux::ConfigurationNode& root)
-{
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading step of type " << classId << std::endl;
-#endif // DEBUG_FILE_READING
-
-  cedar::proc::StepPtr step = this->steps().allocateClass(classId);
-  step->readConfiguration(root);
-  this->steps().registerObject(step);
-}
-
-void cedar::proc::Manager::readSteps(const cedar::aux::ConfigurationNode& root)
-{
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading steps." << std::endl;
-#endif // DEBUG_FILE_READING
-
-  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-      iter != root.end();
-      ++iter)
-  {
-    this->readStep(iter->first, iter->second);
-  }
-}
-
-void cedar::proc::Manager::readTrigger(const std::string& classId, const cedar::aux::ConfigurationNode& root)
-{
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading trigger of type " << classId << std::endl;
-#endif // DEBUG_FILE_READING
-
-  cedar::proc::TriggerPtr trigger = this->triggers().allocateClass(classId);
-  trigger->readConfiguration(root);
-  this->triggers().registerObject(trigger);
-
-  // listeners
-  try
-  {
-    //!@todo Does this belong into cedar::proc::Trigger::readConfiguration?
-    const cedar::aux::ConfigurationNode& listeners = root.get_child("listeners");
-
-    for (cedar::aux::ConfigurationNode::const_iterator iter = listeners.begin();
-        iter != listeners.end();
-        ++iter)
-    {
-      std::string listener_name = iter->second.data();
-
-#ifdef DEBUG_FILE_READING
-  std::cout << "Adding listener " << listener_name << std::endl;
-#endif // DEBUG_FILE_READING
-
-      cedar::proc::StepPtr step = this->steps().get(listener_name);
-      trigger->addListener(step);
-    }
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no listeners declared -- this is ok.
-  }
-}
-
-void cedar::proc::Manager::readTriggers(const cedar::aux::ConfigurationNode& root)
-{
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading triggers." << std::endl;
-#endif // DEBUG_FILE_READING
-
-  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-      iter != root.end();
-      ++iter)
-  {
-    this->readTrigger(iter->first, iter->second);
-  }
-}
-
-
-void cedar::proc::Manager::readDataConnection(const cedar::aux::ConfigurationNode& root)
-{
-  std::string source = root.get<std::string>("source");
-  std::string target = root.get<std::string>("target");
-
-#ifdef DEBUG_FILE_READING
-  std::cout << "Connecting data: source = \"" << source
-            << "\", target = \"" << target << "\"" << std::endl;
-#endif // DEBUG_FILE_READING
-
-  std::string source_step, source_data;
-  std::string target_step, target_data;
-
-  parseDataName(source, source_step, source_data);
-  parseDataName(target, target_step, target_data);
-
-  cedar::proc::Step::connect(
-                              this->steps().get(source_step),
-                              source_data,
-                              this->steps().get(target_step),
-                              target_data
-                            );
-}
-
-void cedar::proc::Manager::readDataConnections(const cedar::aux::ConfigurationNode& root)
-{
-#ifdef DEBUG_FILE_READING
-  std::cout << "Reading data connections." << std::endl;
-#endif // DEBUG_FILE_READING
-
-  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-      iter != root.end();
-      ++iter)
-  {
-    this->readDataConnection(iter->second);
-  }
-}
-
-void cedar::proc::Manager::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
-{
-  size_t dot_idx = instr.rfind('.');
-  if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for step. Path is: " + instr);
-  }
-
-  stepName = instr.substr(0, dot_idx);
-  dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
+  return cedar::proc::Manager::mManager;
 }

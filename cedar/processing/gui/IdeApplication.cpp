@@ -40,11 +40,14 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/IdeApplication.h"
+#include "dynamics/namespace.h"
 #include "auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+
+#define CATCH_EXCEPTIONS_IN_GUI
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -55,7 +58,10 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL)
 {
+  cedar::dyn::initialize();
+
   this->mpIde = new cedar::proc::gui::Ide();
+
 
   QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
 }
@@ -78,9 +84,14 @@ int cedar::proc::gui::IdeApplication::exec()
 
 bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent)
 {
+#ifdef CATCH_EXCEPTIONS_IN_GUI
   try
   {
+#endif // CATCH_EXCEPTIONS_IN_GUI
+
     return QApplication::notify(pReceiver,pEvent);
+
+#ifdef CATCH_EXCEPTIONS_IN_GUI
   }
   catch(const cedar::aux::exc::ExceptionBase& e)
   {
@@ -105,6 +116,7 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
         " name and restart the application.");
     emit exception(message);
   }
+#endif // CATCH_EXCEPTIONS_IN_GUI
   return false;
 }
 

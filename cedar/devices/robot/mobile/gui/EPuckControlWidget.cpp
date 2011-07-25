@@ -49,6 +49,8 @@ using namespace cedar::dev::robot::mobile::gui;
 //----------------------------------------------------------------------------------------------------------------------
 
 EPuckControlWidget::EPuckControlWidget(cedar::dev::robot::mobile::EPuckDrive *peDrive, QWidget *parent)
+:
+cedar::aux::gui::BaseWidget("EPuckControlWidget", parent)
 {
   mpeDrive = peDrive;
   setupUi(this);
@@ -84,7 +86,7 @@ void EPuckControlWidget::reset()
   mpeDrive->reset();
 }
 
-void EPuckControlWidget::timerEvent(QTimerEvent *event)
+void EPuckControlWidget::timerEvent(QTimerEvent * /* event */)
 {
   int left_encoder;
   int right_encoder;
