@@ -193,6 +193,7 @@ endmacro(cedar_get_subdirectories)
 # cedar_add_library(
 #                     library_name
 #                     [MOC_HEADERS header1 header2 ...]
+#                     [RESOURCES resource1 resource2 ...]
 #                     [LINK_LIBRARIES lib1 lib2 ...]
 #                   )
 # library_name   name of the new library
@@ -201,7 +202,7 @@ endmacro(cedar_get_subdirectories)
 #
 # see http://www.cmake.org/Wiki/CMakeMacroParseArguments for a description of the parsing
 macro(cedar_add_library)
-  parse_arguments(library "MOC_HEADERS;LINK_LIBRARIES" "" ${ARGN})
+  parse_arguments(library "MOC_HEADERS;RESOURCES;LINK_LIBRARIES" "" ${ARGN})
   car(libraryName ${library_DEFAULT_ARGS})
 
   # find files
@@ -210,6 +211,9 @@ macro(cedar_add_library)
   # create moc files from those headers that contain the Q_OBJECT macro
   qt4_wrap_cpp(generatedMocSourceFiles ${library_MOC_HEADERS})
   set(sourceFiles ${sourceFiles} ${generatedMocSourceFiles})
+
+  # generate rules for building source files from the resources
+  QT4_ADD_RESOURCES(recourceCompilerSrcs ${library_RESOURCES})
 
   # create ui headers from ui files
   cedar_qt4_wrap_ui(generatedUiHeaders ${uiFiles})
@@ -228,7 +232,7 @@ macro(cedar_add_library)
 
   # add the library and link it to all relevant cedar and third party libraries
   set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
-  add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles})
+  add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
   
   if (MSVC)
     string(TOUPPER "${libraryName}" CAP_LIB_NAME)

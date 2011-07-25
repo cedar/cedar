@@ -1,0 +1,11 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>modeicons/select.png</file>
+     <file>modeicons/connect.png</file>
+     <file>modeicons/group.png</file>
+     <file>triggers/trigger.png</file>
+     <file>triggers/looped_trigger.png</file>
+     <file>triggers/multi_trigger.png</file>
+     <file>steps/gauss_input.png</file>
+ </qresource>
+ </RCC>

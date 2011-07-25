@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataT.cpp
+    File:        Data.cpp
 
 
     Maintainer:  Oliver Lomp,
@@ -31,7 +31,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 17
 
     Description:
 
@@ -40,7 +40,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/DataT.h"
+#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
@@ -50,6 +50,56 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::aux::Data::Data()
+:
+mpeOwner(NULL)
+{
+}
+
+cedar::aux::Data::~Data()
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+QReadWriteLock& cedar::aux::Data::getLock()
+{
+  return this->mLock;
+}
+
+void cedar::aux::Data::lockForRead()
+{
+  this->mLock.lockForRead();
+}
+
+void cedar::aux::Data::lockForWrite()
+{
+  this->mLock.lockForWrite();
+}
+
+void cedar::aux::Data::unlock()
+{
+  this->mLock.unlock();
+}
+
+cedar::aux::Configurable* cedar::aux::Data::getOwner()
+{
+  return this->mpeOwner;
+}
+
+void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
+{
+  this->mpeOwner = step;
+}
+
+const std::string& cedar::aux::Data::connectedSlotName() const
+{
+  return this->mConnectedSlotName;
+}
+
+void cedar::aux::Data::connectedSlotName(const std::string& name)
+{
+  this->mConnectedSlotName = name;
+}

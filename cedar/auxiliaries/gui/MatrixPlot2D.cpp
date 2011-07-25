@@ -102,13 +102,12 @@ cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
   {
     delete mpFunction;
   }
-
-  delete mpTimer;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
 
 void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::updateMatrix(cv::Mat* matrix)
 {
@@ -148,13 +147,14 @@ double cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::operator()(double x, dou
   }
 }
 
+
 void cedar::aux::gui::MatrixPlot2D::display(cv::Mat* mat, QReadWriteLock *lock)
 {
   this->mpMat = mat;
   this->mpeLock = lock;
   this->mpFunction->setLock(lock);
   this->mpFunction->updateMatrix(this->mpMat);
-  this->mpTimer->start();
+  this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::MatrixPlot2D::init()
@@ -172,15 +172,8 @@ void cedar::aux::gui::MatrixPlot2D::init()
   this->resetPerspective();
   this->showGrid(false);
 
-  // setup plot style
-  this->mpPlot->setCoordinateStyle(Qwt3D::BOX);
-
   // create the function for displaying the matrix
   this->mpFunction = new Matrix2DFunction(this->mpPlot);
-
-  // setup the timer
-  this->mpTimer = new QTimer(this);
-  QObject::connect(this->mpTimer, SIGNAL(timeout()), this, SLOT(updatePlot()));
 
   // apply the standard color vector
   Qwt3D::StandardColor col;
@@ -189,7 +182,7 @@ void cedar::aux::gui::MatrixPlot2D::init()
   this->mpPlot->updateGL();
 }
 
-void cedar::aux::gui::MatrixPlot2D::updatePlot()
+void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (this->isVisible() && this->mpMat != NULL)
   {

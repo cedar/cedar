@@ -79,6 +79,33 @@ void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::stri
   QToolButton *button = new QToolButton();
   button->setCheckable(true);
   button->setAutoExclusive(true);
+  button->setIcon(QIcon(icon.c_str()));
+  button->setProperty("data", QVariant(QString(data.c_str())));
+  button->setToolTip(tooltip.c_str());
+  int num_children = mpLayout->count();
+  int row = num_children / mColumns;
+  int col = num_children % mColumns;
+  mpLayout->addWidget(button, row, col);
+
+  button->setFixedSize(32, 32);
+
+  //!@todo check for duplicates
+  mButtons[data] = button;
+
+  QObject::connect(button, SIGNAL(toggled(bool)), this, SLOT(toolButtonToggled(bool)));
+
+  if (this->mpSelectedButton == NULL)
+  {
+    this->mpSelectedButton = button;
+    this->mpSelectedButton->setChecked(true);
+  }
+}
+
+void cedar::proc::gui::ToolBox::addStringItem(const std::string& icon, const std::string& data, const std::string& tooltip)
+{
+  QToolButton *button = new QToolButton();
+  button->setCheckable(true);
+  button->setAutoExclusive(true);
   button->setText(icon.c_str());
   button->setProperty("data", QVariant(QString(data.c_str())));
   button->setToolTip(tooltip.c_str());

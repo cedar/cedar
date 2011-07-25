@@ -37,7 +37,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/kernel/Gauss.h"
 #include "auxiliaries/NumericParameter.h"
-#include "processing/DataT.h"
+#include "auxiliaries/DataT.h"
 #include "auxiliaries/math/functions.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/NumericVectorParameter.h"

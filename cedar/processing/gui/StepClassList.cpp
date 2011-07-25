@@ -64,6 +64,7 @@ cedar::proc::gui::StepClassList::~StepClassList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+#include <iostream>
 void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepRegistry::CategoryEntries& entries)
 {
   using cedar::proc::Manager;
@@ -79,6 +80,13 @@ void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepR
     label += class_id->getNamespaceName().c_str();
     label += ")";
     QListWidgetItem *p_item = new QListWidgetItem(label);
+
+    if (!class_id->getIconPath().empty())
+    {
+      QIcon icon(class_id->getIconPath().c_str());
+      p_item->setIcon(icon);
+    }
+
     p_item->setData(Qt::UserRole, QVariant(class_id->getClassId().c_str()));
     this->addItem(p_item);
   }

@@ -62,4 +62,6 @@ cedar_add_library(cedarproc
   gui/DirectoryParameter.h
   gui/View.h
   source/GaussInput.h
+  RESOURCES
+  gui/icons/icons.qrc
   )
