@@ -555,6 +555,14 @@ void cedar::proc::gui::Scene::addTriggerItem(cedar::proc::gui::TriggerItem *pTri
   this->mTriggerMap[pTrigger->getTrigger().get()] = pTrigger;
 }
 
+void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger)
+{
+  // we assume that triggers are only inserted once.
+  CEDAR_DEBUG_ASSERT(this->mTriggerMap.find(pTrigger->getTrigger().get()) != this->mTriggerMap.end());
+  this->mTriggerMap.erase(mTriggerMap.find(pTrigger->getTrigger().get()));
+  delete pTrigger;
+}
+
 void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPointF position)
 {
   using cedar::proc::Manager;

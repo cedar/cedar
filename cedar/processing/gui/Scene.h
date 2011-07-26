@@ -104,6 +104,7 @@ public:
   void addTrigger(const std::string& classId, QPointF position);
   void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
   void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
+  void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
 
   void setMode(MODE mode, const QString& param = "");
 
