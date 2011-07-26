@@ -72,6 +72,7 @@ namespace cedar
       class ParameterBase;
       class PluginLoadDialog;
       class PropertyPane;
+      class Settings;
       class StepItem;
       class StepClassList;
       class StringParameter;
