@@ -44,7 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <set>
 
 
 /*!@brief Abstract description of the class.
@@ -75,6 +75,10 @@ public:
 
   void load();
   void save();
+
+  const std::set<std::string>& pluginsToLoad();
+  void addPluginToLoad(const std::string& path);
+  void removePluginToLoad(const std::string& path);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

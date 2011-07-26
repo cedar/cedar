@@ -81,6 +81,10 @@ cedar::proc::gui::Settings::~Settings()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::gui::Settings& cedar::proc::gui::Settings::instance()
+{
+  return cedar::proc::gui::Settings::mInstance;
+}
 
 void cedar::proc::gui::Settings::load()
 {
@@ -109,3 +113,23 @@ void cedar::proc::gui::Settings::save()
     std::cout << "Error saving framework gui settings: " << e.what() << std::endl;
   }
 }
+
+const std::set<std::string>& cedar::proc::gui::Settings::pluginsToLoad()
+{
+  return this->mPluginsToLoad->get();
+}
+
+void cedar::proc::gui::Settings::addPluginToLoad(const std::string& path)
+{
+  this->mPluginsToLoad->insert(path);
+}
+
+void cedar::proc::gui::Settings::removePluginToLoad(const std::string& path)
+{
+  std::set<std::string>::iterator pos = this->mPluginsToLoad->get().find(path);
+  if (pos != this->mPluginsToLoad->get().end())
+  {
+    this->mPluginsToLoad->get().erase(pos);
+  }
+}
+

@@ -45,6 +45,7 @@
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/NetworkFile.h"
 #include "processing/gui/PluginLoadDialog.h"
+#include "processing/gui/PluginManagerDialog.h"
 #include "processing/Manager.h"
 
 // PROJECT INCLUDES
@@ -76,6 +77,7 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
   QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
+  QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
 
   mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
   this->resetTo(mNetwork);
@@ -97,6 +99,13 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
     this->resetStepList();
   }
 
+  delete p_dialog;
+}
+
+void cedar::proc::gui::Ide::showManagePluginsDialog()
+{
+  cedar::proc::gui::PluginManagerDialog* p_dialog = new cedar::proc::gui::PluginManagerDialog(this);
+  p_dialog->exec();
   delete p_dialog;
 }
 
