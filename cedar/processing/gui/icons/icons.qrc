@@ -6,6 +6,7 @@
      <file>triggers/trigger.png</file>
      <file>triggers/looped_trigger.png</file>
      <file>triggers/multi_trigger.png</file>
+     <file>steps/no_icon.png</file>
      <file>steps/gauss_input.png</file>
  </qresource>
  </RCC>
