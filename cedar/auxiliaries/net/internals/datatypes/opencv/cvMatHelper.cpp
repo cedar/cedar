@@ -54,10 +54,10 @@
 
 #define MAGIC_NUMBER 0xabc
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
-      namespace _NM_INTERNAL_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
+      namespace detail {
 
 // save local copy of the header information. (will be compared later on with
 // user input)
@@ -191,8 +191,8 @@ template <typename CVT> cvMatHelper<CVT>::~cvMatHelper()
 
 
 // explicit instantiation DO NOT FORGET THIS!
-template struct _NM_FULL_::cvMatHelper<cv::Mat>;
-template struct _NM_FULL_::cvMatHelper< cv::Mat_<float> >;
+template struct cedar::aux::net::detail::cvMatHelper<cv::Mat>;
+template struct cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >;
 
 
 } } } } // end namespaces

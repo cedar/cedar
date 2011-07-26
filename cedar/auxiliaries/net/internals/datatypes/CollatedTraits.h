@@ -47,10 +47,10 @@
 
 
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
-      namespace _NM_INTERNAL_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
+      namespace detail {
 
 
 /*!@brief traits struct for a 'collated data type' i.e. a matrix type

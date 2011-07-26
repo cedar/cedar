@@ -9,9 +9,9 @@
 #include "internals/transport/collated/CollatedNetWriter.h"
 #include "internals/datatypes/opencv/cvMatHelper.h"
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
 
 // this template cannot be instantiated if there is not a
 // valid specialization
@@ -27,122 +27,122 @@ class NetWriter
 
 
 template <>
-class NetWriter<char> : public _NM_FULL_::SimpleNetWriter<char>
+class NetWriter<char> : public cedar::aux::net::detail::SimpleNetWriter<char>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<char>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<char>(s)
   {
   }
 };
 
 template <>
-class NetWriter<unsigned char> : public _NM_FULL_::SimpleNetWriter<unsigned char>
+class NetWriter<unsigned char> : public cedar::aux::net::detail::SimpleNetWriter<unsigned char>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<unsigned char>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<unsigned char>(s)
   {
   }
 };
 
 template <>
-class NetWriter<short> : public _NM_FULL_::SimpleNetWriter<short>
+class NetWriter<short> : public cedar::aux::net::detail::SimpleNetWriter<short>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<short>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<short>(s)
   {
   }
 };
 
 template <>
-class NetWriter<unsigned short> : public _NM_FULL_::SimpleNetWriter<unsigned short>
+class NetWriter<unsigned short> : public cedar::aux::net::detail::SimpleNetWriter<unsigned short>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<unsigned short>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<unsigned short>(s)
   {
   }
 };
 
 template <>
-class NetWriter<unsigned int> : public _NM_FULL_::SimpleNetWriter<unsigned int>
+class NetWriter<unsigned int> : public cedar::aux::net::detail::SimpleNetWriter<unsigned int>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<unsigned int>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<unsigned int>(s)
   {
   }
 };
 
 template <>
-class NetWriter<int> : public _NM_FULL_::SimpleNetWriter<int>
+class NetWriter<int> : public cedar::aux::net::detail::SimpleNetWriter<int>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<int>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<int>(s)
   {
   }
 };
 
 template <>
-class NetWriter<long> : public _NM_FULL_::SimpleNetWriter<long>
+class NetWriter<long> : public cedar::aux::net::detail::SimpleNetWriter<long>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<long>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<long>(s)
   {
   }
 };
 
 template <>
-class NetWriter<unsigned long> : public _NM_FULL_::SimpleNetWriter<unsigned long>
+class NetWriter<unsigned long> : public cedar::aux::net::detail::SimpleNetWriter<unsigned long>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<unsigned long>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<unsigned long>(s)
   {
   }
 };
 
 template <>
-class NetWriter<bool> : public _NM_FULL_::SimpleNetWriter<bool>
+class NetWriter<bool> : public cedar::aux::net::detail::SimpleNetWriter<bool>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<bool>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<bool>(s)
   {
   }
 };
 
 template <>
-class NetWriter<float> : public _NM_FULL_::SimpleNetWriter<float>
+class NetWriter<float> : public cedar::aux::net::detail::SimpleNetWriter<float>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<float>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<float>(s)
   {
   }
 };
 
 template <>
-class NetWriter<double> : public _NM_FULL_::SimpleNetWriter<double>
+class NetWriter<double> : public cedar::aux::net::detail::SimpleNetWriter<double>
 { 
   // dummy
 public:
   explicit NetWriter(const std::string &s) 
-                           : _NM_FULL_::SimpleNetWriter<double>(s)
+                           : cedar::aux::net::detail::SimpleNetWriter<double>(s)
   {
   }
 };
@@ -150,15 +150,15 @@ public:
 
 template <>
 class NetWriter<cv::Mat> : 
-                           public _NM_FULL_::cvMatHelper<cv::Mat>,
-                           public _NM_FULL_::CollatedNetWriter<cv::Mat>
+                           public cedar::aux::net::detail::cvMatHelper<cv::Mat>,
+                           public cedar::aux::net::detail::CollatedNetWriter<cv::Mat>
 {
 private:
 
 public:
   explicit NetWriter(const std::string &myPortName) 
-                      : _NM_FULL_::cvMatHelper<cv::Mat>(),
-                        _NM_FULL_::CollatedNetWriter<cv::Mat>(myPortName)
+                      : cedar::aux::net::detail::cvMatHelper<cv::Mat>(),
+                        cedar::aux::net::detail::CollatedNetWriter<cv::Mat>(myPortName)
   {
 #ifdef DEBUG
   cout << "  NetWriter (cv::Mat) [CONSTRUCTOR]" << endl;
@@ -168,15 +168,15 @@ public:
 
 template <>
 class NetWriter< cv::Mat_<float> > : 
-                           public _NM_FULL_::cvMatHelper< cv::Mat_<float> >,
-                           public _NM_FULL_::CollatedNetWriter< cv::Mat_<float> >
+                           public cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >,
+                           public cedar::aux::net::detail::CollatedNetWriter< cv::Mat_<float> >
 {
 private:
 
 public:
   explicit NetWriter(const std::string &myPortName) 
-                      : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(),
-                        _NM_FULL_::CollatedNetWriter< cv::Mat_<float> >(myPortName)
+                      : cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >(),
+                        cedar::aux::net::detail::CollatedNetWriter< cv::Mat_<float> >(myPortName)
   {
   }
 };

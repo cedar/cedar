@@ -7,11 +7,11 @@
 
 #include <opencv/cv.h>
 
-using namespace _NM_FULL_;
+using namespace cedar::aux::net::detail;
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
 
 template class NetBlockingReader<int>;
 template class NetBlockingReader<float>;

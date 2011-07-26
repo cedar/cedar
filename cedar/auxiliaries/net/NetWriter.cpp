@@ -9,9 +9,9 @@
 
 
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
 
 // explicit instatiation:
 template class NetWriter<int>;
