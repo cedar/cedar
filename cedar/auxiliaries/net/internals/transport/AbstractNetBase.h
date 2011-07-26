@@ -52,10 +52,10 @@
 #include <iostream>
 #include <sys/types.h>
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
-      namespace _NM_INTERNAL_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
+      namespace detail {
 
 /*!@brief Shared functionality between AbstractWriter and Reader
  *

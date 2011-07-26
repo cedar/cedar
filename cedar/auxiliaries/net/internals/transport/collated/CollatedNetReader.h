@@ -53,10 +53,10 @@
 #include <stdlib.h>
 #include <iostream>
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
-      namespace _NM_INTERNAL_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
+      namespace detail {
 
 
 /*!@brief implements reading (RIAA) of a complex data type (header + matrix)

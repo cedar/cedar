@@ -44,6 +44,6 @@
 
 
 // explicit instantiation
-template struct _NM_FULL_::collated_traits<cv::Mat>;
-template struct _NM_FULL_::collated_traits< cv::Mat_<float> >;
+template struct cedar::aux::net::detail::collated_traits<cv::Mat>;
+template struct cedar::aux::net::detail::collated_traits< cv::Mat_<float> >;
 

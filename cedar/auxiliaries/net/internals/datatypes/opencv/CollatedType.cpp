@@ -45,7 +45,7 @@
 
 
 //////////// explicit instatiation
-template struct _NM_FULL_::CollatedType<cv::Mat>;
-template struct _NM_FULL_::CollatedType< cv::Mat_<float> >;
+template struct cedar::aux::net::detail::CollatedType<cv::Mat>;
+template struct cedar::aux::net::detail::CollatedType< cv::Mat_<float> >;
 
 

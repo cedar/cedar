@@ -10,9 +10,9 @@
 #include "internals/datatypes/opencv/cvMatHelper.h"
 #include <opencv/cv.h>
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
 
 
 // this template cannot be instantiated if there is not a
@@ -29,148 +29,148 @@ class NetReader
 
 // spezialisierungs-template!
 template <>
-class NetReader<char> : public _NM_FULL_::SimpleNetReader<char, false>
+class NetReader<char> : public cedar::aux::net::detail::SimpleNetReader<char, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<char>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<char>(s)
   {
   }
 };
 
 template <>
-class NetReader<unsigned char> : public _NM_FULL_::SimpleNetReader<unsigned char, false>
+class NetReader<unsigned char> : public cedar::aux::net::detail::SimpleNetReader<unsigned char, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<unsigned char>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned char>(s)
   {
   }
 };
 
 template <>
-class NetReader<short> : public _NM_FULL_::SimpleNetReader<short, false>
+class NetReader<short> : public cedar::aux::net::detail::SimpleNetReader<short, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<short>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<short>(s)
   {
   }
 };
 
 template <>
-class NetReader<unsigned short> : public _NM_FULL_::SimpleNetReader<unsigned short, false>
+class NetReader<unsigned short> : public cedar::aux::net::detail::SimpleNetReader<unsigned short, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<unsigned short>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned short>(s)
   {
   }
 };
 
 template <>
-class NetReader<int> : public _NM_FULL_::SimpleNetReader<int, false>
+class NetReader<int> : public cedar::aux::net::detail::SimpleNetReader<int, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<int>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<int>(s)
   {
   }
 };
 
 template <>
-class NetReader<unsigned int> : public _NM_FULL_::SimpleNetReader<unsigned int, false>
+class NetReader<unsigned int> : public cedar::aux::net::detail::SimpleNetReader<unsigned int, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<unsigned int>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned int>(s)
   {
   }
 };
 
 template <>
-class NetReader<long> : public _NM_FULL_::SimpleNetReader<long, false>
+class NetReader<long> : public cedar::aux::net::detail::SimpleNetReader<long, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<long>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<long>(s)
   {
   }
 };
 
 template <>
-class NetReader<unsigned long> : public _NM_FULL_::SimpleNetReader<unsigned long, false>
+class NetReader<unsigned long> : public cedar::aux::net::detail::SimpleNetReader<unsigned long, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<unsigned long>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<unsigned long>(s)
   {
   }
 };
 
 template <>
-class NetReader<bool> : public _NM_FULL_::SimpleNetReader<bool, false>
+class NetReader<bool> : public cedar::aux::net::detail::SimpleNetReader<bool, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<bool>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<bool>(s)
   {
   }
 };
 
 template <>
-class NetReader<float> : public _NM_FULL_::SimpleNetReader<float, false>
+class NetReader<float> : public cedar::aux::net::detail::SimpleNetReader<float, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s) 
-                           : _NM_FULL_::SimpleNetReader<float>(s)
+                           : cedar::aux::net::detail::SimpleNetReader<float>(s)
   {
   }
 };
 
 template <>
-class NetReader<double> : public _NM_FULL_::SimpleNetReader<double, false>
+class NetReader<double> : public cedar::aux::net::detail::SimpleNetReader<double, false>
 { 
   // dummy
 public:
   explicit NetReader(const std::string &s)
-                        : _NM_FULL_::SimpleNetReader<double>(s)
+                        : cedar::aux::net::detail::SimpleNetReader<double>(s)
   {
   }
 };
 
 
 template <>
-class NetReader<cv::Mat> : public _NM_FULL_::cvMatHelper<cv::Mat>,
-                           public _NM_FULL_::CollatedNetReader<cv::Mat, false> 
+class NetReader<cv::Mat> : public cedar::aux::net::detail::cvMatHelper<cv::Mat>,
+                           public cedar::aux::net::detail::CollatedNetReader<cv::Mat, false> 
 {
 public:
   explicit NetReader(const std::string &myPortName) 
-                         : _NM_FULL_::cvMatHelper<cv::Mat>(), 
-                           _NM_FULL_::CollatedNetReader<cv::Mat>(myPortName)
+                         : cedar::aux::net::detail::cvMatHelper<cv::Mat>(), 
+                           cedar::aux::net::detail::CollatedNetReader<cv::Mat>(myPortName)
   {
   }
 };
 
 template <>
 class NetReader< cv::Mat_<float> > : 
-                           public _NM_FULL_::cvMatHelper< cv::Mat_<float> >,
-                           public _NM_FULL_::CollatedNetReader< cv::Mat_<float> , false> 
+                           public cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >,
+                           public cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> , false> 
 {
 public:
   explicit NetReader(const std::string &myPortName) 
-                         : _NM_FULL_::cvMatHelper< cv::Mat_<float> >(), 
-                           _NM_FULL_::CollatedNetReader< cv::Mat_<float> >(myPortName)
+                         : cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >(), 
+                           cedar::aux::net::detail::CollatedNetReader< cv::Mat_<float> >(myPortName)
   {
   }
 };

@@ -49,10 +49,10 @@
 using namespace std;
 using namespace yarp::os;
 
-namespace _NM_CEDAR_ {
-  namespace _NM_AUX_ {
-    namespace _NM_NET_ {
-      namespace _NM_INTERNAL_ {
+namespace cedar {
+  namespace aux {
+    namespace net {
+      namespace detail {
 
 // constants:
 const std::string AbstractNetBase::PORT_PREFIX("/CEDAR"); // static
