@@ -63,7 +63,7 @@ const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
 // static variables:
 
 // YARP-bug. dont be static: Network AbstractNetBase::mNetwork; // static
-int AbstractNetBase::mInstanceCounter; // static
+
 
 //-----------------------------------------------------------------------------
 // constructors and destructor
@@ -77,8 +77,6 @@ AbstractNetBase::AbstractNetBase(const string &myPortNameWithSuffix)
 #endif
   mFullPortName= PORT_PREFIX + PORT_DELIMINATOR
                  + myPortNameWithSuffix;
-
-  mInstanceCounter++;
 }
 
 AbstractNetBase::~AbstractNetBase()
@@ -86,8 +84,6 @@ AbstractNetBase::~AbstractNetBase()
 #ifdef DEBUG
   cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
 #endif
-  mInstanceCounter--;
-
   // we need to kill the child-process that runs an (automatically
   // started) YARP name server.
   // else processes, that wait() for all children of this program
@@ -105,11 +101,6 @@ AbstractNetBase::~AbstractNetBase()
 //-----------------------------------------------------------------------------
 // methods
 //-----------------------------------------------------------------------------
-int AbstractNetBase::getInstanceCounter()
-{
-  return mInstanceCounter + 1;
-}
-
 string AbstractNetBase::getFullPortName()
 {
   return mFullPortName;

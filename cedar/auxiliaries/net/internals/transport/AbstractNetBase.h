@@ -86,8 +86,6 @@ private:
   static const std::string PORT_SUFFIX_OUT;
   static const std::string PORT_SUFFIX_IN;
 
-  static int mInstanceCounter; // atm only used by NetReader
-
 
   //---------------------------------------------------------------------------
   // parameters
@@ -124,7 +122,9 @@ public:
   //---------------------------------------------------------------------------
 protected:
   //!@brief static counter (e.g. of Reader instances)
-  int getInstanceCounter();
+  int getReaderCounter();
+  //!@brief increase the static counter
+  void increaseReaderCounter();
   //!@brief the (full) name of the used YARP port. (!= user defined name)
   std::string getFullPortName();
   //!@brief will be called outside of constructor (C++ doesnt allow the
@@ -153,7 +153,6 @@ inline bool AbstractNetBase::isConnected()
 {
   return mIsConnected;
 }
-
 
 } } } } // end namespaces
 

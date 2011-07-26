@@ -66,7 +66,7 @@ The NetWriter/Reader classes internally rename your 'channels', adding
 prefixes and suffixes to administer the different dispersed readers that
 listen to a YARP port.
 
-YARP does internally resolve port naming conflicts. (js: TODO!)
+YARP does internally resolve port naming conflicts (of Readers).
 
 
 Question: What different types of readers are there:
@@ -87,14 +87,14 @@ catch and react to in your code:
 #include <cedar/auxiliaries/net/exceptions/NetException.h>
 
   NetUnexpectedDataException: Will be thrown when there was no data
-      on the channel (and if the reader is not a blocking one)
+      on the channel (for the non-blocking NetReader)
       OR some transmission error occurred. It signals you that the
       return value of read() is unuseable.
       You will want to catch this to write robust code.
 
   NetWaitingForWriterException: Will be thrown if you read the
       reader class before the (remote) writer class was instantiated
-      (instantiation connects the ports).
+      (i.e. we cannot connect channels/ports yet).
       You will want to catch this to implement a polling behaviour to 
       wait for the writer channel.
 
