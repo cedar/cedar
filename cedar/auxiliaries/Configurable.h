@@ -75,7 +75,9 @@ public:
 public:
   void registerParameter(cedar::aux::ParameterBasePtr parameter);
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  void readJson(const std::string& filename);
   virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);
+  void saveJson(const std::string& filename);
   const Children& configurableChildren() const;
 
   const ParameterMap& getParameters() const;

@@ -51,7 +51,7 @@ else (${CMAKE_BUILD_STATIC_LIBS})
 endif (${CMAKE_BUILD_STATIC_LIBS})
 
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.40.0 COMPONENTS system date_time)
+find_package(Boost 1.40.0 COMPONENTS system date_time filesystem)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
 
 if(Boost_FOUND)
