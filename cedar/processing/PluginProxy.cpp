@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 #include <dlfcn.h>
+#include <boost/filesystem.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -69,9 +70,47 @@ cedar::proc::PluginProxy::~PluginProxy()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file)
+{
+  std::string searched_locs;
+
+  searched_locs += file + "\n";
+  if (boost::filesystem::exists(file))
+  {
+    return file;
+  }
+
+  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
+  searched_locs += settings.getPluginWorkspace() + "/" + file;
+  if (boost::filesystem::exists(settings.getPluginWorkspace() + "/" + file))
+  {
+    return settings.getPluginWorkspace() + "/" + file;
+  }
+
+  std::string ret_path;
+  std::set<std::string>::const_iterator path = settings.getPluginDirectories().begin();
+  std::set<std::string>::const_iterator path_end = settings.getPluginDirectories().end();
+  do
+  {
+    ret_path = (*path);
+    if (path->size() > 0 && path->at(path->size() - 1) != '/')
+    {
+      ret_path += '/';
+    }
+    ret_path += file;
+    searched_locs += ret_path + "\n";
+    ++path;
+  }
+  while (!boost::filesystem::exists(ret_path) && path != path_end);
+
+  CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: file not found. Searched locations: " + searched_locs);
+
+  return "";
+}
+
 void cedar::proc::PluginProxy::load(const std::string& file)
 {
-  this->mFileName = file;
+  this->mFileName = this->findPluginFile(file);
 
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)

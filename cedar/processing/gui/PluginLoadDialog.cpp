@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/PluginLoadDialog.h"
 #include "processing/PluginDeclaration.h"
+#include "processing/Manager.h"
 #include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
@@ -48,6 +49,8 @@
 // SYSTEM INCLUDES
 #include <QFileDialog>
 #include <QLineEdit>
+#include <set>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -60,6 +63,13 @@ QDialog(pParent)
 
   CEDAR_DEBUG_ASSERT(this->mpFileNameEdit->lineEdit() != NULL);
   this->mpFileNameEdit->lineEdit()->setReadOnly(true);
+
+  this->mpFileNameEdit->addItem("");
+  const std::set<std::string>& known_plugins = cedar::proc::Manager::getInstance().settings().getKnownPlugins();
+  for (std::set<std::string>::const_iterator iter = known_plugins.begin(); iter != known_plugins.end(); ++iter)
+  {
+    this->mpFileNameEdit->addItem(iter->c_str());
+  }
 
   QObject::connect(this->mpBrowseButton, SIGNAL(clicked()), this, SLOT(browseFile()));
   QObject::connect(this->mpFileNameEdit, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(pluginFileChanged(const QString&)));

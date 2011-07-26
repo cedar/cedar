@@ -120,6 +120,21 @@ void cedar::proc::FrameworkSettings::addKnownPlugin(const std::string& file)
   this->mKnownPlugins->insert(modified_path);
 }
 
+const std::set<std::string>& cedar::proc::FrameworkSettings::getKnownPlugins()
+{
+  return this->mKnownPlugins->get();
+}
+
+const std::set<std::string>& cedar::proc::FrameworkSettings::getPluginDirectories()
+{
+  return this->mPluginIncludeDirectories->get();
+}
+
+std::string cedar::proc::FrameworkSettings::getPluginWorkspace() const
+{
+  return this->mPluginWorkspace->get().absolutePath().toStdString();
+}
+
 void cedar::proc::FrameworkSettings::load()
 {
   std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingFramework";

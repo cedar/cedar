@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <set>
 
 
 /*!@brief Abstract description of the class.
@@ -74,6 +75,11 @@ public:
   void save();
 
   void addKnownPlugin(const std::string& file);
+  const std::set<std::string>& getKnownPlugins();
+
+  const std::set<std::string>& getPluginDirectories();
+
+  std::string getPluginWorkspace() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
