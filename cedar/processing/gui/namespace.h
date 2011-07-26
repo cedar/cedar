@@ -71,6 +71,7 @@ namespace cedar
       typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
       class ParameterBase;
       class PluginLoadDialog;
+      class PluginManagerDialog;
       class PropertyPane;
       class Settings;
       class StepItem;
