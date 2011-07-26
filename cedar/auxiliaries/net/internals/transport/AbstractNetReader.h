@@ -44,6 +44,7 @@
 
 // PROJECT INCLUDES
 #include <boost/lexical_cast.hpp>
+#include <yarp/os/Network.h>
 
 // SYSTEM INCLUDES
 #include <stdio.h>
@@ -69,6 +70,8 @@ class AbstractNetReader : public AbstractNetBase
   //---------------------------------------------------------------------------
 private:
   std::string mPortNameWriter;
+  static int mReaderCounter; 
+
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -84,7 +87,7 @@ private:
 public:
 #define READER_PORT_NAME(x) ( (x) + PORT_DELIMINATOR  \
                                   + PORT_SUFFIX_IN + "(" \
-                                  + boost::lexical_cast<std::string>(getInstanceCounter()) \
+                                  + boost::lexical_cast<std::string>(getReaderCounter()) \
                                   + ")" )
   //!@brief use this constructor. Parameter ist the user-defined port name
   explicit AbstractNetReader(const std::string &myPortName) 
@@ -94,10 +97,20 @@ public:
 #ifdef DEBUG
     cout << "  AbstractNetReader [CONSTRUCTOR]" << endl;
 #endif
-    mPortNameWriter= PORT_PREFIX + PORT_DELIMINATOR
+
+    // ersten freien Readerport im Netzwerk finden
+    do
+    {
+      mPortNameWriter= PORT_PREFIX + PORT_DELIMINATOR
                        + myPortName
                        + PORT_DELIMINATOR
                        + PORT_SUFFIX_OUT;
+
+      increaseReaderCounter();
+
+    } while( !yarp::os::Network::exists( mPortNameWriter.c_str(),
+                                         true ) // param: true = quiet
+           );
   }
 
   //!@brief Destructor (virtual to be sure)
@@ -112,6 +125,16 @@ public:
   // protected methods
   //---------------------------------------------------------------------------
 protected:
+  int getReaderCounter()
+  {
+    return mReaderCounter + 1;
+  }
+
+  void increaseReaderCounter()
+  {
+    mReaderCounter++;
+  }
+
   //!@brief the (fully configured) name of the writer port for this reader
   std::string getPortNameWriter()
   {
@@ -145,6 +168,9 @@ public:
   virtual T read() = 0;
 
 };
+
+template <class T>
+int AbstractNetReader<T>::mReaderCounter; // static variable initialization
 
 } } } } // end namespaces
 
