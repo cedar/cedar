@@ -42,10 +42,12 @@
 #include "Ide.h"
 #include "processing/gui/Scene.h"
 #include "processing/gui/StepItem.h"
+#include "processing/gui/TriggerItem.h"
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/NetworkFile.h"
 #include "processing/gui/PluginLoadDialog.h"
 #include "processing/Manager.h"
+#include "processing/LoopedTrigger.h"
 
 // PROJECT INCLUDES
 
@@ -156,7 +158,7 @@ void cedar::proc::gui::Ide::sceneItemSelected()
   }
 }
 
-void cedar::proc::gui::Ide::deleteStep()
+void cedar::proc::gui::Ide::deleteElements()
 {
   using cedar::proc::Step;
   using cedar::proc::Manager;
@@ -164,15 +166,34 @@ void cedar::proc::gui::Ide::deleteStep()
 
   for (int i = 0; i < selected_items.size(); ++i)
   {
+    // delete steps
     cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[i]);
     if (p_drawer)
     {
       // delete one step at a time
       p_drawer->hide();
-      this->mNetwork->network()->remove(p_drawer->getStep()); //TODO
+      this->mNetwork->network()->remove(p_drawer->getStep());
       Manager::getInstance().steps().removeObject(p_drawer->getStep()->getName());
       this->mpPropertyTable->resetPointer();
       this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
+      continue;
+    }
+    // delete triggers
+    cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected_items[i]);
+    if (p_trigger_drawer)
+    {
+      // delete one step at a time
+      p_trigger_drawer->hide();
+      this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
+      Manager::getInstance().triggers().removeObject(p_trigger_drawer->getTrigger()->getName());
+      cedar::proc::LoopedTriggerPtr looped_trigger
+        = boost::shared_dynamic_cast<cedar::proc::LoopedTrigger>(p_trigger_drawer->getTrigger());
+      if (looped_trigger)
+      {
+        Manager::getInstance().threads().erase(looped_trigger);
+      }
+      this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
+      continue;
     }
   }
 }
@@ -241,7 +262,7 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
   {
     case Qt::Key_Delete:
     {
-      this->deleteStep();
+      this->deleteElements();
       break;
     }
     // If the key is not handled by this widget, pass it on to the base widget.
