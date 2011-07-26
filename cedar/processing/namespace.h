@@ -57,6 +57,8 @@ namespace cedar
 
     class DataRole;
 
+    class FrameworkSettings;
+
     class LoopArguments;
 
     class LoopedTrigger;

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PluginProxy.cpp
+    File:        System.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2011 07 26
 
     Description:
 
@@ -35,67 +35,29 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/PluginProxy.h"
-#include "processing/Manager.h"
-#include "processing/exceptions.h"
+#include "auxiliaries/System.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <dlfcn.h>
+#include <stdlib.h>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::PluginProxy::PluginProxy()
-:
-mpLibHandle(NULL)
-{
-}
-
-cedar::proc::PluginProxy::PluginProxy(const std::string& file)
-:
-mpLibHandle(NULL)
-{
-  this->load(file);
-}
-
-cedar::proc::PluginProxy::~PluginProxy()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::PluginProxy::load(const std::string& file)
+std::string cedar::aux::System::getUserHomeDirectory()
 {
-  this->mFileName = file;
-
-  this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
-  if (!this->mpLibHandle)
-  {
-    std::string dl_err = dlerror();
-    CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: dlopen failed. dlerror() returned " + dl_err);
-  }
-
-
-  PluginInterfaceMethod interface = NULL;
-  interface = (PluginInterfaceMethod) (dlsym(this->mpLibHandle, "pluginDeclaration"));
-  if (!interface)
-  {
-    CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
-  }
-
-  //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
-  this->mDeclaration = (*interface)();
-
-  // Finally, if nothing failed, add the plugin to the list of known plugins.
-  cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
+  std::string homedir = getenv("HOME");
+  return homedir;
 }
 
-cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
+std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-  return this->mDeclaration;
+  return cedar::aux::System::getUserHomeDirectory();
 }

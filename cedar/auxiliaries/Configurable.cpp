@@ -43,9 +43,13 @@
 #include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/exceptions.h"
+
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/filesystem.hpp>
+#include <string>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -65,6 +69,30 @@ cedar::aux::Configurable::~Configurable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::Configurable::readJson(const std::string& filename)
+{
+  cedar::aux::ConfigurationNode configuration;
+  boost::property_tree::read_json(filename, configuration);
+  this->readConfiguration(configuration);
+}
+
+void cedar::aux::Configurable::saveJson(const std::string& filename)
+{
+  std::string dir = filename;
+
+  size_t index;
+  if ( (index = dir.rfind("/")) != std::string::npos )
+  {
+    dir = dir.substr(0, index);
+  }
+  boost::filesystem::create_directory(dir);
+
+  cedar::aux::ConfigurationNode configuration;
+  this->saveConfiguration(configuration);
+  boost::property_tree::write_json(filename, configuration);
+}
+
 void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterBasePtr parameter)
 {
   //! @todo check for duplicate names
@@ -105,12 +133,29 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     {
       const cedar::aux::ConfigurationNode& value = node.get_child(iter->second->getName());
       iter->second->setTo(value);
+//      std::cout << node.get<std::string>(iter->second->getName()) << std::endl;
     }
-    catch (const boost::property_tree::ptree_bad_path&)
+    catch (const boost::property_tree::ptree_bad_path& e)
     {
       if (! iter->second->getHasDefault())
       {
-        CEDAR_THROW(cedar::aux::ParameterNotFoundException, "Config node " + iter->second->getName() + " not found!");
+        std::string error_message;
+        error_message = "Config node " + iter->second->getName() + " not found. Node names are:";
+
+        for (cedar::aux::ConfigurationNode::const_iterator node_iter = node.begin();
+             node_iter != node.end();
+             ++node_iter)
+        {
+          error_message += " " + node_iter->first;
+          if (node_iter->first == iter->second->getName())
+          {
+            std::cout << "this is identical" << std::endl;
+          }
+        }
+        error_message += ". Boost message: ";
+        error_message += e.what();
+
+        CEDAR_THROW(cedar::aux::ParameterNotFoundException, error_message);
       }
       else
       {

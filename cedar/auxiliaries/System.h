@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Parameter.h
+    File:        System.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 01
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 26
 
     Description:
 
@@ -38,24 +34,21 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PARAMETER_H
-#define CEDAR_PROC_PARAMETER_H
+#ifndef CEDAR_AUX_SYSTEM_H
+#define CEDAR_AUX_SYSTEM_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
+#include <string>
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+
+/*!@brief Wrapper for some functions that depend on the operating system.
  */
-template <typename T>
-class cedar::aux::Parameter : public cedar::aux::ParameterBase
+class cedar::aux::System
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,66 +58,13 @@ class cedar::aux::Parameter : public cedar::aux::ParameterBase
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  Parameter(const std::string& name, const T& defaultValue)
-  :
-  cedar::aux::ParameterBase(name, true),
-  mValue(defaultValue),
-  mDefault(defaultValue)
-  {
-  }
-
-  Parameter(const std::string& name)
-  :
-  cedar::aux::ParameterBase(name, false)
-  {
-  }
-
-  //!@brief Destructor
-  ~Parameter()
-  {
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const T& get() const
-  {
-    return this->mValue;
-  }
-
-  void putTo(cedar::aux::ConfigurationNode& root)
-  {
-    root.put(this->getName(), this->mValue);
-  }
-
-  void set(const T& value)
-  {
-    this->mValue = value;
-    emit parameterChanged();
-  }
-
-  void setTo(const cedar::aux::ConfigurationNode& node)
-  {
-#ifdef DEBUG
-    try
-    {
-#endif
-      this->mValue = node.get_value<T>();
-#ifdef DEBUG
-    }
-    catch (const boost::property_tree::ptree_bad_path& e)
-    {
-      std::cout << "Error while setting parameter to value: " << e.what() << std::endl;
-    }
-#endif
-  }
-
-  void makeDefault()
-  {
-    this->set(mDefault);
-  }
+  static std::string getUserHomeDirectory();
+  static std::string getUserApplicationDataDirectory();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -146,22 +86,20 @@ public:
 protected:
   // none yet
 private:
-  //! The current parameter value.
-  T mValue;
-
-  //! The default value of the parameter. Ignored if mHasDefault is false.
-  T mDefault;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::Parameter
+}; // class cedar::xxx
 
-#endif // CEDAR_PROC_PARAMETER_H
+#endif // CEDAR_AUX_SYSTEM_H
 

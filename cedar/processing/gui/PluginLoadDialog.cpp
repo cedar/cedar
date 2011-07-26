@@ -41,11 +41,13 @@
 // LOCAL INCLUDES
 #include "processing/gui/PluginLoadDialog.h"
 #include "processing/PluginDeclaration.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QFileDialog>
+#include <QLineEdit>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -56,8 +58,12 @@ QDialog(pParent)
 {
   this->setupUi(this);
 
+  CEDAR_DEBUG_ASSERT(this->mpFileNameEdit->lineEdit() != NULL);
+  this->mpFileNameEdit->lineEdit()->setReadOnly(true);
+
   QObject::connect(this->mpBrowseButton, SIGNAL(clicked()), this, SLOT(browseFile()));
-  QObject::connect(this->mpFileNameEdit, SIGNAL(textChanged(const QString&)), this, SLOT(pluginFileChanged(const QString&)));
+  QObject::connect(this->mpFileNameEdit, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(pluginFileChanged(const QString&)));
+  QObject::connect(this->mpFileNameEdit, SIGNAL(editTextChanged(const QString&)), this, SLOT(pluginFileChanged(const QString&)));
 }
 
 
@@ -77,7 +83,8 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
                               );
   if (!file.isEmpty())
   {
-    this->mpFileNameEdit->setText(file);
+    CEDAR_DEBUG_ASSERT(this->mpFileNameEdit->lineEdit() != NULL);
+    this->mpFileNameEdit->lineEdit()->setText(file);
   }
 }
 
