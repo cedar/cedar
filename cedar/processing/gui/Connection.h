@@ -74,6 +74,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  cedar::proc::gui::GraphicsBase* getSource();
+  cedar::proc::gui::GraphicsBase* getTarget();
 
 public slots:
   void update();
