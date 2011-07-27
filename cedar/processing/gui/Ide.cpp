@@ -41,11 +41,13 @@
 // LOCAL INCLUDES
 #include "Ide.h"
 #include "processing/gui/Scene.h"
+#include "processing/gui/Settings.h"
 #include "processing/gui/StepItem.h"
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/NetworkFile.h"
 #include "processing/gui/PluginLoadDialog.h"
 #include "processing/gui/PluginManagerDialog.h"
+#include "processing/exceptions.h"
 #include "processing/Manager.h"
 
 // PROJECT INCLUDES
@@ -61,6 +63,7 @@
 cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
+  this->loadDefaultPlugins();
   this->resetStepList();
 
   this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
@@ -87,6 +90,32 @@ cedar::proc::gui::Ide::Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::loadDefaultPlugins()
+{
+  const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
+  for (std::set<std::string>::iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
+  {
+    try
+    {
+      cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
+      cedar::proc::Manager::getInstance().load(plugin);
+      QString message = "Loaded default plugin ";
+      message += iter->c_str();
+      message += ".";
+      this->message(message);
+    }
+    catch (const cedar::proc::PluginException& e)
+    {
+      QString message = "Error loading default plugin ";
+      message += iter->c_str();
+      message += ": ";
+      message += e.exceptionInfo().c_str();
+
+      this->error(message);
+    }
+  }
+}
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()
 {
@@ -172,6 +201,18 @@ void cedar::proc::gui::Ide::exception(const QString& message)
                         "An exception has occurred.",
                         message);
 }
+
+void cedar::proc::gui::Ide::error(const QString& message)
+{
+  //!@todo Colors!
+  this->mpLog->append("Error: " + message + "\n");
+}
+
+void cedar::proc::gui::Ide::message(const QString& message)
+{
+  this->mpLog->append(message + "\n");
+}
+
 
 void cedar::proc::gui::Ide::startThreads()
 {

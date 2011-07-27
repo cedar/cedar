@@ -85,6 +85,8 @@ public slots:
   void sceneItemSelected();
 
   void exception(const QString& message);
+  void error(const QString& message);
+  void message(const QString& message);
 
   void architectureToolFinished();
   
@@ -101,6 +103,7 @@ public slots:
 
   void showManagePluginsDialog();
 
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -112,6 +115,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void resetStepList();
+  void loadDefaultPlugins();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
