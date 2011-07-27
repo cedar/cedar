@@ -108,7 +108,8 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void deleteElements();
+  void deleteElements(QList<QGraphicsItem*>& items);
+  void deleteSelectedElements();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
