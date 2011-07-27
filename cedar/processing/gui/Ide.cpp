@@ -107,7 +107,7 @@ void cedar::proc::gui::Ide::loadDefaultPlugins()
       message += ".";
       this->message(message);
     }
-    catch (const cedar::proc::PluginException& e)
+    catch (const cedar::aux::exc::ExceptionBase& e)
     {
       QString message = "Error loading default plugin ";
       message += iter->c_str();

@@ -97,6 +97,11 @@ bool cedar::proc::Step::DataEntry::isMandatory() const
   return this->mMandatory;
 }
 
+void cedar::proc::Step::inputConnectionChanged(const std::string& /*inputName*/)
+{
+  // default: empty. This should be overwritten in all subclasses in order to react to, e.g., a new matrix size.
+}
+
 void cedar::proc::Step::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
 {
   size_t dot_idx = instr.rfind('.');
@@ -407,6 +412,11 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
   }
   map_iterator->second.setData(data);
   this->checkMandatoryConnections();
+
+  if (role == cedar::proc::DataRole::INPUT)
+  {
+    this->inputConnectionChanged(name);
+  }
 }
 
 void cedar::proc::Step::setInput(const std::string& name, cedar::aux::DataPtr data)
