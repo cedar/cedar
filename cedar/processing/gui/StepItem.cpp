@@ -61,10 +61,11 @@
 
 cedar::proc::gui::StepItem::StepItem(cedar::proc::StepPtr step, QMainWindow* pMainWindow)
 :
-cedar::proc::gui::GraphicsBase(120, 50,
+cedar::proc::gui::GraphicsBase(160, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
-mpMainWindow(pMainWindow)
+mpMainWindow(pMainWindow),
+mStepIcon(":/steps/no_icon.png")
 {
   this->setStep(step);
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
@@ -75,10 +76,11 @@ mpMainWindow(pMainWindow)
 
 cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
 :
-cedar::proc::gui::GraphicsBase(120, 50,
+cedar::proc::gui::GraphicsBase(160, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
-mpMainWindow(pMainWindow)
+mpMainWindow(pMainWindow),
+mStepIcon(":/steps/no_icon.png")
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
@@ -97,6 +99,12 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
   this->mStep = step;
   this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(this->mStep);
+
+  this->mStepIcon = QIcon(this->mClassId->getIconPath().c_str());
+  if (this->mStepIcon.isNull())
+  {
+    this->mStepIcon = QIcon(":/steps/no_icon.png");
+  }
 
   this->addDataItems();
 }
@@ -213,6 +221,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 {
   QMenu menu;
   QMenu* p_data = menu.addMenu("data");
+  menu.addSeparator();
   QAction *p_delete_action = menu.addAction("delete");
 
   std::map<QAction*, cedar::aux::Enum> action_type_map;
@@ -273,9 +282,13 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 
   //! @todo make drawing of steps pretty.
 
+  qreal padding = 5;
+  qreal icon_dim = 40;
+
   this->paintFrame(painter, style, widget);
-  painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());
-  painter->drawText(QPointF(5, 25), this->mStep->getName().c_str());
+  this->mStepIcon.paint(painter, padding, padding, icon_dim, icon_dim);
+  painter->drawText(QPointF(2 * padding + icon_dim, 15), this->mClassId->getClassName().c_str());
+  painter->drawText(QPointF(2 * padding + icon_dim, 25), this->mStep->getName().c_str());
 
   painter->restore(); // restore saved painter settings
 }
