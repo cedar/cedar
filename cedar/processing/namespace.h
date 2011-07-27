@@ -99,10 +99,10 @@ namespace cedar
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger> > TriggerFactoryPtr;
 
-    class PluginProxy;
+    class CEDAR_PROC_LIB_EXPORT PluginProxy;
     typedef boost::shared_ptr<PluginProxy> PluginProxyPtr;
 
-    class PluginDeclaration;
+    class CEDAR_PROC_LIB_EXPORT PluginDeclaration;
     typedef boost::shared_ptr<PluginDeclaration> PluginDeclarationPtr;
 
     /* Exceptions */
@@ -111,7 +111,7 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
-    class PluginException;
+    class CEDAR_PROC_LIB_EXPORT PluginException;
   }
 }
 

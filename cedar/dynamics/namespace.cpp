@@ -39,10 +39,20 @@
 #include "processing/StepDeclaration.h"
 #include "processing/Manager.h"
 
+#ifdef GCC
 void cedar::dyn::initialize()
+#elif defined MSVC // workaround for circular linking
+cedar::proc::PluginDeclarationPtr pluginDeclaration()
+#endif
 {
   using cedar::proc::StepDeclarationPtr;
 
-  StepDeclarationPtr field_decl(new cedar::proc::StepDeclarationT<NeuralField>("cedar.dynamics.NeuralField", "Fields"));
+  StepDeclarationPtr field_decl(new cedar::proc::StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields"));
   cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
+
+#ifdef MSVC
+  cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
+  plugin->add(field_decl);
+  return plugin;
+#endif
 }

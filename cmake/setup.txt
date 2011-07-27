@@ -97,7 +97,8 @@ if (UNIX)
 endif (UNIX)
 
 if (WIN32)
-  add_definitions(-DWINDOWS -D__WINDOWS__ -DWIN32 -D__WIN32__)  
+  add_definitions(-DWINDOWS -D__WINDOWS__ -DWIN32 -D__WIN32__)
+  set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
 endif (WIN32)
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)

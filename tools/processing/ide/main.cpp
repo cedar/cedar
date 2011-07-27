@@ -45,8 +45,5 @@ int main(int argc, char** argv)
 {
   cedar::proc::gui::IdeApplication app (argc, argv);
 
-  //!@todo replace with plugin code.
-  cedar::dyn::initialize();
-
   return app.exec();
 }

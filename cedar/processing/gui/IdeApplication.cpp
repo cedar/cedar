@@ -58,7 +58,9 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL)
 {
+#ifndef MSVC
   cedar::dyn::initialize();
+#endif // MSVC
 
   this->mpIde = new cedar::proc::gui::Ide();
 

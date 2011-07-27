@@ -77,7 +77,7 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
+void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
   this->mpLock->lockForRead();
   QImage::Format format;
