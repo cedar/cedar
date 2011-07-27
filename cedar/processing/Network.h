@@ -99,7 +99,9 @@ public:
   void readFile(const std::string& filename);
 
   void add(cedar::proc::StepPtr step);
+  void remove(cedar::proc::StepPtr step);
   void add(cedar::proc::TriggerPtr trigger);
+  void remove(cedar::proc::TriggerPtr trigger);
   void add(cedar::proc::GroupPtr group);
 
   const StepVector& steps() const;

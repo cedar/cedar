@@ -100,12 +100,11 @@ public:
   cv::Mat compute(const cv::Mat& values)
   {
     cv::Mat result = values.clone();
-    for (int col = 0; col < values.cols; col++)
+    cv::MatConstIterator_<T> iter_src = values.begin<T>();
+    cv::MatIterator_<T> iter_dest = result.begin<T>();
+    for ( ; iter_src != values.end<T>(); ++iter_src, ++iter_dest)
     {
-      for (int row = 0; row < values.rows; row++)
-      {
-        result.at<T>(row,col) = static_cast<T>(compute(static_cast<double>(values.at<T>(row, col))));
-      }
+      *iter_dest = static_cast<T>(compute(static_cast<double>(*iter_src)));
     }
     return result;
   }

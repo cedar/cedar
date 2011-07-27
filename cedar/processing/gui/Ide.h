@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QKeyEvent>
 #include <map>
 
 
@@ -80,7 +81,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void keyPressEvent(QKeyEvent* pEvent);
 public slots:
   void sceneItemSelected();
 
@@ -103,12 +104,11 @@ public slots:
 
   void showManagePluginsDialog();
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void deleteElements();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
