@@ -142,7 +142,7 @@ namespace cedar
 
 
     /* data */
-    class Data;
+    class CEDAR_AUX_LIB_EXPORT Data;
     typedef boost::shared_ptr<Data> DataPtr;
 
     template <typename T> class DataT;

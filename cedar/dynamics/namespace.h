@@ -44,6 +44,9 @@
 
 // LOCAL INCLUDES
 #include "dynamics/lib.h"
+#ifdef WINDOWS
+#include "processing/PluginDeclaration.h"
+#endif // WINDOWS
 
 // PROJECT INCLUDES
 
@@ -72,8 +75,19 @@ namespace cedar
     class CEDAR_DYN_LIB_EXPORT NeuralField;
     typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;
 
+#ifdef GCC
+    // for msvc, this is replaced by the plugin stuff below, currently as a workaround.
     CEDAR_DYN_LIB_EXPORT void initialize();
+#endif // GCC
   }
 }
+
+#ifdef MSVC // workaround for circular linking
+CEDAR_BEGIN_PLUGIN_DECLARATION
+
+cedar::proc::PluginDeclarationPtr pluginDeclaration();
+
+CEDAR_END_PLUGIN_DECLARATION
+#endif // MSVC
 
 #endif // CEDAR_DYN_NAMESPACE_H
