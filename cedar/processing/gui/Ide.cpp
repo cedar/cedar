@@ -196,16 +196,20 @@ void cedar::proc::gui::Ide::sceneItemSelected()
   }
 }
 
-void cedar::proc::gui::Ide::deleteElements()
+void cedar::proc::gui::Ide::deleteSelectedElements()
 {
   using cedar::proc::Step;
   using cedar::proc::Manager;
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+  this->deleteElements(selected_items);
+}
 
-  for (int i = 0; i < selected_items.size(); ++i)
+void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
   {
     // delete steps
-    cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[i]);
+    cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(items[i]);
     if (p_drawer)
     {
       // delete one step at a time
@@ -217,7 +221,7 @@ void cedar::proc::gui::Ide::deleteElements()
       continue;
     }
     // delete triggers
-    cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected_items[i]);
+    cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(items[i]);
     if (p_trigger_drawer)
     {
       // delete one step at a time
@@ -312,11 +316,12 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
   {
     case Qt::Key_Delete:
     {
-      this->deleteElements();
+      this->deleteSelectedElements();
       break;
     }
     // If the key is not handled by this widget, pass it on to the base widget.
     default:
+      this->QMainWindow::keyPressEvent(pEvent);
       break;
   }
 }
