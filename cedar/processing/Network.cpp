@@ -50,6 +50,7 @@
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/string_path.hpp>
+#include <algorithm>
 
 // Define that helps to debug file reading.
 //#define DEBUG_FILE_READING
@@ -109,12 +110,34 @@ void cedar::proc::Network::add(cedar::proc::StepPtr step)
   this->mSteps.push_back(step);
 }
 
+void cedar::proc::Network::remove(cedar::proc::StepPtr step)
+{
+  std::vector<StepPtr>::iterator it;
+  // iterator to vector element:
+  it = std::find (this->mSteps.begin(), this->mSteps.end(), step);
+  if (it != this->mSteps.end())
+  {
+    mSteps.erase(it);
+  }
+}
+
 void cedar::proc::Network::add(cedar::proc::TriggerPtr trigger)
 {
 #ifdef DEBUG_FILE_WRITING
     std::cout << "Adding trigger " << trigger->getName() << " to network." << std::endl;
 #endif
   this->mTriggers.push_back(trigger);
+}
+
+void cedar::proc::Network::remove(cedar::proc::TriggerPtr trigger)
+{
+  std::vector<TriggerPtr>::iterator it;
+  // iterator to vector element:
+  it = std::find (this->mTriggers.begin(), this->mTriggers.end(), trigger);
+  if (it != this->mTriggers.end())
+  {
+    mTriggers.erase(it);
+  }
 }
 
 void cedar::proc::Network::add(cedar::proc::GroupPtr group)

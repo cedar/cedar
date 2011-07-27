@@ -106,6 +106,7 @@ protected slots:
   /*!\brief virtual function to calculate the kernel matrix
    */
   void calculate();
+  void updateDimensionality();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

@@ -213,6 +213,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 {
   QMenu menu;
   QMenu* p_data = menu.addMenu("data");
+  QAction *p_delete_action = menu.addAction("delete");
 
   std::map<QAction*, cedar::aux::Enum> action_type_map;
 
@@ -259,6 +260,10 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     cedar::proc::gui::DataPlotter *p_plotter = new cedar::proc::gui::DataPlotter(title, mpMainWindow);
     p_plotter->plot(p_data);
     p_plotter->show();
+  }
+  else if (a == p_delete_action)
+  {
+    //!@todo
   }
 }
 

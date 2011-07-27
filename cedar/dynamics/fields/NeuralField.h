@@ -61,7 +61,7 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -78,6 +78,8 @@ public:
   //!\brief
   void onStart();
 
+public slots:
+  void updateDimensionality();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,6 +102,8 @@ protected:
   cedar::aux::DoubleParameterPtr mTau; //!\todo deal with units, now: milliseconds
   cedar::aux::math::SigmoidPtr mSigmoid;
   cedar::aux::kernel::GaussPtr mKernel;
+  cedar::aux::UIntParameterPtr _mDimensionality; //!\todo not the only class needing this - think about parent class
+  cedar::aux::UIntVectorParameterPtr _mSizes;
 private:
   // none yet
 
