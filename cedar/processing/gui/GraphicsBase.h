@@ -132,6 +132,10 @@ public:
 
   void addConnection(Connection* pConnection);
 
+  void removeConnection(Connection* pConnection);
+
+  void removeAllConnections();
+
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   void saveConfiguration(cedar::aux::ConfigurationNode& root);

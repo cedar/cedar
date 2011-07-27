@@ -84,3 +84,12 @@ void cedar::proc::gui::Connection::update()
 
   this->setLine(line);
 }
+
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getSource()
+{
+  return this->mpSource;
+}
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getTarget()
+{
+  return this->mpTarget;
+}

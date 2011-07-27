@@ -209,6 +209,21 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
   return iter->second;
 }
 
+cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlotItems(
+                                                                             cedar::proc::DataRole::Id role
+                                                                           )
+{
+  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   );
+  }
+  return role_map->second;
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   QMenu menu;

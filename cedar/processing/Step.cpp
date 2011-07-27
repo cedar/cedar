@@ -409,6 +409,44 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
   this->checkMandatoryConnections();
 }
 
+void cedar::proc::Step::freeData(DataRole::Id role, const std::string& name)
+{
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  if (iter == this->mDataConnections.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException,
+                "The requested role " +
+                cedar::proc::DataRole::type().get(role).prettyString() +
+                " does not exist in step \""
+                + this->getName() +
+                "\".");
+    return;
+  }
+
+//  // inputs come from a different step
+//  if (role != cedar::proc::DataRole::INPUT)
+//  {
+//    data->setOwner(this);
+//    data->connectedSlotName(name);
+//  }
+
+  SlotMap::iterator map_iterator = iter->second.find(name);
+  if (map_iterator != iter->second.end())
+  {
+    map_iterator->second.getData()->connectedSlotName("");
+    map_iterator->second.setData(cedar::aux::DataPtr());
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException,
+                "The requested " +
+                cedar::proc::DataRole::type().get(role).prettyString() +
+                " name \"" + name + "\" does not exist.");
+    return;
+  }
+  this->checkMandatoryConnections();
+}
+
 void cedar::proc::Step::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
@@ -422,6 +460,21 @@ void cedar::proc::Step::setBuffer(const std::string& name, cedar::aux::DataPtr d
 void cedar::proc::Step::setOutput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::OUTPUT, name, data);
+}
+
+void cedar::proc::Step::freeInput(const std::string& name)
+{
+  this->freeData(DataRole::INPUT, name);
+}
+
+void cedar::proc::Step::freeBuffer(const std::string& name)
+{
+  this->freeData(DataRole::BUFFER, name);
+}
+
+void cedar::proc::Step::freeOutput(const std::string& name)
+{
+  this->freeData(DataRole::OUTPUT, name);
 }
 
 cedar::aux::DataPtr cedar::proc::Step::getInput(const std::string& name)
@@ -481,4 +534,15 @@ void cedar::proc::Step::connect(
   {
     source->getFinishedTrigger()->addListener(target);
   }
+}
+
+void cedar::proc::Step::disconnect(
+                                    cedar::proc::StepPtr source,
+                                    const std::string& sourceName,
+                                    cedar::proc::StepPtr target,
+                                    const std::string& targetName
+                                  )
+{
+  target->freeInput(targetName);
+  source->getFinishedTrigger()->removeListener(target);
 }
