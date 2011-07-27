@@ -80,7 +80,7 @@ cedar::proc::gui::PropertyPane::~PropertyPane()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::PropertyPane::reset()
+void cedar::proc::gui::PropertyPane::resetContents()
 {
   this->clearContents();
   this->setRowCount(0);
@@ -88,7 +88,7 @@ void cedar::proc::gui::PropertyPane::reset()
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 {
-  this->reset();
+  this->resetContents();
 
   std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
   this->addLabelRow(label);

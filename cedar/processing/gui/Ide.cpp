@@ -184,12 +184,15 @@ void cedar::proc::gui::Ide::sceneItemSelected()
   using cedar::proc::Step;
   using cedar::proc::Manager;
 
-  this->mpPropertyTable->reset();
 
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
 
   //!@ todo Handle the cases: multiple
-  if (selected_items.size() == 1)
+  if (selected_items.size() == 0)
+  {
+    this->mpPropertyTable->resetContents();
+  }
+  else if (selected_items.size() == 1)
   {
     cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]);
     if (p_drawer)
