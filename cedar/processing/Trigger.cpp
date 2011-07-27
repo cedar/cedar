@@ -59,6 +59,9 @@ cedar::proc::Trigger::Trigger()
 
 cedar::proc::Trigger::~Trigger()
 {
+#ifdef DEBUG
+  std::cout << "> freeing data (Trigger)" << std::endl;
+#endif
   this->mListeners.clear();
   this->mTriggers.clear();
 }

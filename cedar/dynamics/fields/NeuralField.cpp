@@ -42,6 +42,7 @@
 #include "dynamics/fields/NeuralField.h"
 #include "dynamics/SpaceCode.h"
 #include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/NumericVectorParameter.h"
 #include "auxiliaries/math/Sigmoid.h"
 #include "auxiliaries/math/AbsSigmoid.h"
 #include "auxiliaries/kernel/Gauss.h"
@@ -60,15 +61,21 @@ mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
 mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
-mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
+mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
+_mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
+_mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
 {
   this->registerParameter(mRestingLevel);
   this->registerParameter(mTau);
-
+  _mDimensionality->set(2);
+  this->registerParameter(_mDimensionality);
+  _mSizes->makeDefault();
+  _mSizes->setConstant(true);
+  this->registerParameter(_mSizes);
   this->declareBuffer("activation");
-  this->setBuffer("activation", mActivation);
+//  this->setBuffer("activation", mActivation);
   this->declareOutput("sigmoid(activation)");
-  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
+//  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
   this->declareInput("input", false);
 
@@ -84,6 +91,11 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
   this->declareBuffer("kernel");
   this->setBuffer("kernel", mKernel->getKernelRaw());
   this->addConfigurableChild("lateral kernel", this->mKernel);
+
+  QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
+
+  // now check the dimensionality and sizes of all matrices
+  this->updateDimensionality();
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -113,4 +125,34 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 void cedar::dyn::NeuralField::onStart()
 {
 
+}
+
+void cedar::dyn::NeuralField::updateDimensionality()
+{
+  int new_dimensionality = static_cast<int>(_mDimensionality->get());
+  _mSizes->get().resize(new_dimensionality, _mSizes->getDefaultValue());
+
+  int sizes[new_dimensionality];
+  for (int dim = 0; dim < new_dimensionality; ++dim)
+  {
+    sizes[dim] = _mSizes->get().at(dim);
+  }
+  this->lockAll();
+  if (new_dimensionality == 1)
+  {
+    mActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat(sizes[0],1,CV_32F)));
+    mActivation->getData() = mRestingLevel->get();
+    mSigmoidalActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat::zeros(sizes[0],1,CV_32F)));
+  }
+  else
+  {
+    mActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat(new_dimensionality,sizes,CV_32F)));
+    mActivation->getData() = mRestingLevel->get();
+    mSigmoidalActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat(new_dimensionality,sizes,CV_32F)));
+    mSigmoidalActivation->getData() = 0.0;
+  }
+  this->setBuffer("activation", mActivation);
+  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
+  this->mKernel->setDimensionality(new_dimensionality);
+  this->unlockAll();
 }

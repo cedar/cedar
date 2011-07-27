@@ -100,9 +100,11 @@ public:
   void addProcessingStep(const std::string& classId, QPointF position);
   void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
   void addStepItem(cedar::proc::gui::StepItem *pStep);
+  void removeStepItem(cedar::proc::gui::StepItem *pStep);
   void addTrigger(const std::string& classId, QPointF position);
   void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
   void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
+  void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
 
   void setMode(MODE mode, const QString& param = "");
 

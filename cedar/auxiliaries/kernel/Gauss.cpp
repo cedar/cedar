@@ -41,6 +41,7 @@
 #include "auxiliaries/math/functions.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/NumericVectorParameter.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -108,6 +109,7 @@ void cedar::aux::kernel::Gauss::onInit()
   QObject::connect(_mLimit.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
   QObject::connect(_mSigmas.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
   QObject::connect(_mShifts.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
 }
 
 void cedar::aux::kernel::Gauss::calculate()
@@ -115,12 +117,14 @@ void cedar::aux::kernel::Gauss::calculate()
   mpReadWriteLockOutput->lockForWrite();
   const unsigned int& dimensionality = _mDimensionality->get();
   const double& amplitude = _mAmplitude->get();
-
+  // sanity check
+  CEDAR_DEBUG_ASSERT(dimensionality == _mSigmas->get().size());
+  CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->get().size());
   try
   {
     mKernelParts.resize(dimensionality);
     mCenters.resize(dimensionality);
-
+    mSizes.resize(dimensionality);
     // calculate the kernel parts for every dimension
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
@@ -286,3 +290,10 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
   return tmp;
 }
 
+void cedar::aux::kernel::Gauss::updateDimensionality()
+{
+  int new_dimensionality = static_cast<int>(_mDimensionality->get());
+  _mSigmas->get().resize(new_dimensionality, _mSigmas->getDefaultValue());
+  _mShifts->get().resize(new_dimensionality, _mShifts->getDefaultValue());
+  this->updateKernel();
+}

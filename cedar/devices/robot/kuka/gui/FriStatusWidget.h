@@ -46,7 +46,11 @@
 
 // PROJECT INCLUDES
 #include "devices/robot/kuka/KukaInterface.h"
+#ifdef DEBUG
+#include "cedar/devices/debug/robot/kuka/gui/ui_FriStatusWidget.h"
+#else
 #include "cedar/devices/robot/kuka/gui/ui_FriStatusWidget.h"
+#endif
 #include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES

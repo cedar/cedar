@@ -76,11 +76,19 @@ public:
   //!@todo change from step to configuragle when the change is made in cedar::processing.
   void display(cedar::proc::StepPtr pStep);
 
+  void resetContents();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   DataWidgetTypes& dataWidgetTypes();
+
+public slots:
+  void redraw();
+
+  void resetPointer();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,6 +115,7 @@ protected:
   // none yet
 private:
   static DataWidgetTypes mDataWidgetTypes;
+  cedar::proc::StepPtr mDisplayedStep;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

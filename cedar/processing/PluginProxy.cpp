@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include "processing/PluginProxy.h"
+#include "processing/Manager.h"
 #include "processing/exceptions.h"
 
 // PROJECT INCLUDES
@@ -46,6 +47,9 @@
 #elif defined WINDOWS
 //TODO implement
 #endif
+
+#include <boost/filesystem.hpp>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -72,9 +76,47 @@ cedar::proc::PluginProxy::~PluginProxy()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file)
+{
+  std::string searched_locs;
+
+  searched_locs += file + "\n";
+  if (boost::filesystem::exists(file))
+  {
+    return file;
+  }
+
+  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
+  searched_locs += settings.getPluginWorkspace() + "/" + file;
+  if (boost::filesystem::exists(settings.getPluginWorkspace() + "/" + file))
+  {
+    return settings.getPluginWorkspace() + "/" + file;
+  }
+
+  std::string ret_path;
+  std::set<std::string>::const_iterator path = settings.getPluginDirectories().begin();
+  std::set<std::string>::const_iterator path_end = settings.getPluginDirectories().end();
+  do
+  {
+    ret_path = (*path);
+    if (path->size() > 0 && path->at(path->size() - 1) != '/')
+    {
+      ret_path += '/';
+    }
+    ret_path += file;
+    searched_locs += ret_path + "\n";
+    ++path;
+  }
+  while (!boost::filesystem::exists(ret_path) && path != path_end);
+
+  CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: file not found. Searched locations: " + searched_locs);
+
+  return "";
+}
+
 void cedar::proc::PluginProxy::load(const std::string& file)
 {
-  this->mFileName = file;
+  this->mFileName = this->findPluginFile(file);
   
 #ifdef LINUX
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
@@ -83,6 +125,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     std::string dl_err = dlerror();
     CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: dlopen failed. dlerror() returned " + dl_err);
   }
+
 
   PluginInterfaceMethod interface = NULL;
   interface = (PluginInterfaceMethod) (dlsym(this->mpLibHandle, "pluginDeclaration"));
@@ -94,6 +137,8 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
   this->mDeclaration = (*interface)();
 #endif // LINUX
+  // Finally, if nothing failed, add the plugin to the list of known plugins.
+  cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
 }
 
 cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()

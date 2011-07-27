@@ -60,6 +60,8 @@ namespace cedar
 
     class CEDAR_PROC_LIB_EXPORT LoopArguments;
 
+    class CEDAR_PROC_LIB_EXPORT FrameworkSettings;
+
     class CEDAR_PROC_LIB_EXPORT LoopedTrigger;
     typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
 

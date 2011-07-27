@@ -86,6 +86,8 @@ namespace cedar
     //!@brief smart pointer for Object
     typedef boost::shared_ptr<Object> ObjectPtr;
 
+    class System;
+
     typedef unsigned int EnumId;
     class CEDAR_AUX_LIB_EXPORT Enum;
     template <typename T> class EnumBase;
@@ -117,6 +119,8 @@ namespace cedar
     typedef boost::shared_ptr<BoolParameter> BoolParameterPtr;
     typedef VectorParameter<bool> BoolVectorParameter;
     typedef boost::shared_ptr<BoolVectorParameter> BoolVectorParameterPtr;
+    typedef VectorParameter<std::string> StringVectorParameter;
+    typedef boost::shared_ptr<StringVectorParameter> StringVectorParameterPtr;
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     typedef boost::shared_ptr<DoubleVectorParameter> DoubleVectorParameterPtr;
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
@@ -124,6 +128,9 @@ namespace cedar
     class DirectoryParameter;
     typedef boost::shared_ptr<DirectoryParameter> DirectoryParameterPtr;
 
+    template <typename T> class SetParameter;
+    typedef SetParameter<std::string> StringSetParameter;
+    typedef boost::shared_ptr<StringSetParameter> StringSetParameterPtr;
 
     typedef boost::property_tree::ptree ConfigurationNode;
 

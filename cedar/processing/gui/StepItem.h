@@ -50,6 +50,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QIcon>
 #include <map>
 
 
@@ -94,6 +95,11 @@ public:
 
   void saveConfiguration(cedar::aux::ConfigurationNode& root);
 
+  void resetPointer()
+  {
+    mStep.reset();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -125,6 +131,7 @@ protected:
 private:
   cedar::proc::StepDeclarationPtr mClassId;
   QMainWindow* mpMainWindow;
+  QIcon mStepIcon;
 
 }; // class StepItem
 

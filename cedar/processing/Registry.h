@@ -107,6 +107,13 @@ public:
     object->setName(newName);
   }
 
+  void removeObject(const std::string& name)
+  {
+    ObjectPointer object = this->get(name);
+
+    mObjects.erase(mObjects.find(name));
+  }
+
   ObjectPointer get(const std::string& name)
   {
     typename std::map<std::string, ObjectPointer>::iterator iter = this->mObjects.find(name);

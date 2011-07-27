@@ -54,6 +54,9 @@ cedar::proc::gui::StepClassList::StepClassList(QWidget *pParent)
 QListWidget(pParent)
 {
   this->setViewMode(QListView::IconMode);
+  this->setMovement(QListView::Static);
+  this->setDragEnabled(true);
+  this->setIconSize(QSize(40, 40));
 }
 
 cedar::proc::gui::StepClassList::~StepClassList()
@@ -64,7 +67,6 @@ cedar::proc::gui::StepClassList::~StepClassList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-#include <iostream>
 void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepRegistry::CategoryEntries& entries)
 {
   using cedar::proc::Manager;
@@ -76,16 +78,22 @@ void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepR
   {
     const StepDeclarationPtr& class_id = *iter;
     QString label = class_id->getClassName().c_str();
-    label += " (";
+    label += "\n(";
     label += class_id->getNamespaceName().c_str();
     label += ")";
     QListWidgetItem *p_item = new QListWidgetItem(label);
+    p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
+    QIcon icon;
     if (!class_id->getIconPath().empty())
     {
-      QIcon icon(class_id->getIconPath().c_str());
-      p_item->setIcon(icon);
+      icon = QIcon(class_id->getIconPath().c_str());
     }
+    else
+    {
+      icon = QIcon(":/steps/no_icon.png");
+    }
+    p_item->setIcon(icon);
 
     p_item->setData(Qt::UserRole, QVariant(class_id->getClassId().c_str()));
     this->addItem(p_item);
