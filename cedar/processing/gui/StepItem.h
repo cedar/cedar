@@ -50,6 +50,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QIcon>
 #include <map>
 
 
@@ -130,6 +131,7 @@ protected:
 private:
   cedar::proc::StepDeclarationPtr mClassId;
   QMainWindow* mpMainWindow;
+  QIcon mStepIcon;
 
 }; // class StepItem
 
