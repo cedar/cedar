@@ -120,9 +120,13 @@ public:
   void declareOutput(const std::string& name, bool mandatory = true);
 
   void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
+  void freeData(DataRole::Id role, const std::string& name);
   void setInput(const std::string& name, cedar::aux::DataPtr data);
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
+  void freeInput(const std::string& name);
+  void freeBuffer(const std::string& name);
+  void freeOutput(const std::string& name);
 
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
   cedar::aux::DataPtr getInput(const std::string& name);
@@ -138,6 +142,12 @@ public:
                        cedar::proc::StepPtr target,
                        const std::string& targetName
                      );
+  static void disconnect(
+                          cedar::proc::StepPtr source,
+                          const std::string& sourceName,
+                          cedar::proc::StepPtr target,
+                          const std::string& targetName
+                        );
   void setName(const std::string& name);
   const std::string& getName() const;
 

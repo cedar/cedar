@@ -115,6 +115,14 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
   new cedar::proc::gui::Connection(this, pTarget);
 }
 
+void cedar::proc::gui::DataSlotItem::disconnectFrom(cedar::proc::gui::DataSlotItem *pTarget)
+{
+  cedar::proc::StepPtr source, target;
+  source = dynamic_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
+  target = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget->parentItem())->getStep();
+  cedar::proc::Step::connect(source, this->getName(), target, pTarget->getName());
+}
+
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)
 {
 }
