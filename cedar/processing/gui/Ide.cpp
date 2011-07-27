@@ -183,6 +183,9 @@ void cedar::proc::gui::Ide::sceneItemSelected()
 {
   using cedar::proc::Step;
   using cedar::proc::Manager;
+
+  this->mpPropertyTable->reset();
+
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
 
   //!@ todo Handle the cases: multiple

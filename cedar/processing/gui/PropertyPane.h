@@ -76,6 +76,8 @@ public:
   //!@todo change from step to configuragle when the change is made in cedar::processing.
   void display(cedar::proc::StepPtr pStep);
 
+  void reset();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
