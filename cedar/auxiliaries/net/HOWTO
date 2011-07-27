@@ -8,7 +8,7 @@ I want to write data over the network:
 #include <cedar/auxiliaries/net/NetWriter.h>
 
   cv::Mat mat= ...; // we will send this matrix over the network
-  NetWriter<cv::Mat> writer("mychannel"); // this is our reader class
+  NetWriter<cv::Mat> writer("mychannel"); // this is our writer class
 
   // ...
 
@@ -21,7 +21,7 @@ I want to read the same data from the network:
 #include <cedar/auxiliaries/net/NetBlockingReader.h>
   
   cv::Mat mat;
-  NetBlockingReader<cv::Mat> reader("mychannel");
+  NetReader<cv::Mat> reader("mychannel");
 
   mat= reader.read();
 
@@ -100,7 +100,7 @@ catch and react to in your code:
 
 Both reader and writer will throw:
 
-  NetMissingForRessourceException: Which will typically be thrown if 
+  NetMissingRessourceException: Which will typically be thrown if 
       YARP could not be initialized properly.
 
 A COMPLETE EXAMPLE:
@@ -114,8 +114,7 @@ A COMPLETE EXAMPLE:
   // instantiate reader class
   try 
   {
-    NetBlockingReader<cv::Mat> reader("mychannel");
-      // note: this is a blocking reader
+    NetReader<cv::Mat> reader("mychannel");
   }
   catch (NetMissingRessourceException &E)
   {
@@ -130,7 +129,7 @@ A COMPLETE EXAMPLE:
   {
     try
     {
-      mat= reader.read(); // note: we use a blocking reader
+      mat= reader.read(); // note: we don't use a blocking reader
     }
     catch (NetWaitingForWriterException &E) 
     {
@@ -141,7 +140,9 @@ A COMPLETE EXAMPLE:
     catch (NetUnexpectedDataException &E)
     {
       // invalid or corrupted data, ignore
-      continue;
+      // OR no new valid data yet
+      
+      break; // mat is unuseable, mark it as such somehow in your code
     }
     catch (NetMissingRessourceException &E)
     {
@@ -149,7 +150,7 @@ A COMPLETE EXAMPLE:
       exit(1);
     }
 
-    break; // mat holds the result
+    break; // mat holds the valid new result
   }
 
 
