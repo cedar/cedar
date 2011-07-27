@@ -40,6 +40,9 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/GraphicsBase.h"
+#include "processing/gui/StepItem.h"
+#include "processing/gui/TriggerItem.h"
+#include "processing/gui/DataSlotItem.h"
 
 // PROJECT INCLUDES
 
@@ -117,6 +120,58 @@ void cedar::proc::gui::GraphicsBase::saveConfiguration(cedar::aux::Configuration
 void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
 {
   this->mConnections.push_back(pConnection);
+}
+
+void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connection* pConnection)
+{
+  std::vector<Connection*>::iterator delete_this_later;
+  for (std::vector<Connection*>::iterator it = mConnections.begin(); it != mConnections.end(); it++)
+  {
+    if (*it == pConnection)
+    {
+      delete_this_later = it;
+    }
+    break;
+  }
+  mConnections.erase(delete_this_later);
+}
+
+void cedar::proc::gui::GraphicsBase::removeAllConnections()
+{
+  std::vector<Connection*> delete_later;
+  if (dynamic_cast<cedar::proc::gui::StepItem*>(this))
+  {
+//    cedar::proc::gui::StepItem::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::StepItem*>(this)->getSlotItems();
+//    for (cedar::proc::gui::StepItem::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
+//    {
+//      it->second->get
+//    }
+  }
+  for (std::vector<Connection*>::iterator it = mConnections.begin(); it != mConnections.end(); ++it)
+  {
+    std::cout << 1 << std::endl;
+    if (dynamic_cast<cedar::proc::gui::TriggerItem*>((*it)->getSource()))
+    {
+      dynamic_cast<cedar::proc::gui::TriggerItem*>((*it)->getSource())->disconnectFrom(
+          dynamic_cast<cedar::proc::gui::StepItem*>((*it)->getTarget()));
+    }
+    else if (dynamic_cast<cedar::proc::gui::DataSlotItem*>((*it)->getSource()))
+    {
+      std::cout << 7 << std::endl;
+      dynamic_cast<cedar::proc::gui::DataSlotItem*>((*it)->getSource())->disconnectFrom(
+          dynamic_cast<cedar::proc::gui::DataSlotItem*>((*it)->getTarget()));
+    }
+    (*it)->getSource()->removeConnection(*it);
+    // delete own connections later
+    delete_later.push_back(*it);
+    delete *it;
+  }
+  // delete all own connections
+  for (size_t i = 0; i < delete_later.size(); ++i)
+  {
+    this->removeConnection(delete_later.at(i));
+  }
+  this->mConnections.clear();
 }
 
 cedar::proc::gui::GraphicsBase::HighlightMode cedar::proc::gui::GraphicsBase::getHighlightMode() const

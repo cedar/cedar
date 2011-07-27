@@ -186,6 +186,14 @@ void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarge
   new Connection(this, pTarget);
 }
 
+void cedar::proc::gui::TriggerItem::disconnectFrom(cedar::proc::gui::StepItem *pTarget)
+{
+  if (this->getTrigger()->isListener(pTarget->getStep()))
+  {
+    this->getTrigger()->removeListener(pTarget->getStep());
+  }
+}
+
 void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::TriggerItem *pTarget)
 {
   if (!this->getTrigger()->isListener(pTarget->getTrigger()))

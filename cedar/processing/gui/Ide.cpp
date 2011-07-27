@@ -214,6 +214,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
     {
       // delete one step at a time
       p_drawer->hide();
+      p_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_drawer->getStep());
       Manager::getInstance().steps().removeObject(p_drawer->getStep()->getName());
       this->mpPropertyTable->resetPointer();
@@ -226,6 +227,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
     {
       // delete one step at a time
       p_trigger_drawer->hide();
+      p_trigger_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
       Manager::getInstance().triggers().removeObject(p_trigger_drawer->getTrigger()->getName());
       cedar::proc::LoopedTriggerPtr looped_trigger
