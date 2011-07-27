@@ -101,6 +101,11 @@ cedar::proc::Manager::~Manager()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::FrameworkSettings& cedar::proc::Manager::settings()
+{
+  return this->mSettings;
+}
+
 void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
 {
   cedar::proc::PluginDeclarationPtr decl = plugin->getDeclaration();

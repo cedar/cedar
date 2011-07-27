@@ -73,7 +73,9 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT ParameterBase;
       class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
+      class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
       class CEDAR_PROC_LIB_EXPORT Scene;
+      class Settings;
       class CEDAR_PROC_LIB_EXPORT StepClassList;
       class CEDAR_PROC_LIB_EXPORT StepItem;
       class CEDAR_PROC_LIB_EXPORT StringParameter;

@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleParameter.cpp
+    File:        System.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 26
 
     Description:
 
@@ -39,56 +35,29 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/UIntParameter.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/namespace.h"
+#include "auxiliaries/System.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QHBoxLayout>
-#include <iostream>
+#include <stdlib.h>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::UIntParameter::UIntParameter(QWidget *pParent)
-:
-cedar::proc::gui::ParameterBase(pParent)
-{
-  this->setLayout(new QHBoxLayout());
-  this->mpSpinbox = new QSpinBox();
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpSpinbox);
-  this->mpSpinbox->setMinimum(0.0);
-  this->mpSpinbox->setMaximum(100.0);
-
-  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
-}
-
-//!@brief Destructor
-cedar::proc::gui::UIntParameter::~UIntParameter()
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::UIntParameter::parameterPointerChanged()
+std::string cedar::aux::System::getUserHomeDirectory()
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
-  this->mpSpinbox->setMinimum(parameter->getMinimum());
-  this->mpSpinbox->setMaximum(parameter->getMaximum());
-  this->mpSpinbox->setValue(parameter->get());
-  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
-  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this->parent(), SLOT(redraw()));
+  std::string homedir = getenv("HOME");
+  return homedir;
 }
 
-void cedar::proc::gui::UIntParameter::valueChanged(int value)
+std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
-  parameter->set(value);
+  return cedar::aux::System::getUserHomeDirectory();
 }
-

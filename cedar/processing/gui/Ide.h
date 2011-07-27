@@ -53,6 +53,7 @@
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
+#include <QKeyEvent>
 #include <map>
 
 
@@ -80,11 +81,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  void keyPressEvent(QKeyEvent* pEvent);
 public slots:
   void sceneItemSelected();
 
   void exception(const QString& message);
+  void error(const QString& message);
+  void message(const QString& message);
 
   void architectureToolFinished();
   
@@ -99,17 +102,21 @@ public slots:
 
   void showLoadPluginDialog();
 
+  void showManagePluginsDialog();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void deleteElements(QList<QGraphicsItem*>& items);
+  void deleteSelectedElements();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void resetStepList();
+  void loadDefaultPlugins();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Network.h
+    File:        System.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 26
 
     Description:
 
@@ -38,78 +34,37 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_NETWORK_H
-#define CEDAR_PROC_NETWORK_H
+#ifndef CEDAR_AUX_SYSTEM_H
+#define CEDAR_AUX_SYSTEM_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
+#include "auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <string>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Wrapper for some functions that depend on the operating system.
  */
-class cedar::proc::Network
+class cedar::aux::System
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef std::vector<cedar::proc::StepPtr> StepVector;
-  typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
-  typedef std::vector<cedar::proc::GroupPtr> GroupVector;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Network();
-
-  //!@brief Destructor
-  ~Network();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void readSteps(const cedar::aux::ConfigurationNode& root);
-  void saveSteps(cedar::aux::ConfigurationNode& root);
-
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
-  void saveTriggers(cedar::aux::ConfigurationNode& root);
-
-  void readGroups(const cedar::aux::ConfigurationNode& root);
-  void saveGroups(cedar::aux::ConfigurationNode& root);
-
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnection(cedar::aux::ConfigurationNode& root, cedar::proc::StepPtr& source);
-
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnections(cedar::aux::ConfigurationNode& root);
-
-  void readFrom(const cedar::aux::ConfigurationNode& root);
-  void saveTo(cedar::aux::ConfigurationNode& root);
-
-  void readFile(const std::string& filename);
-
-  void add(cedar::proc::StepPtr step);
-  void remove(cedar::proc::StepPtr step);
-  void add(cedar::proc::TriggerPtr trigger);
-  void remove(cedar::proc::TriggerPtr trigger);
-  void add(cedar::proc::GroupPtr group);
-
-  const StepVector& steps() const;
-  StepVector& steps();
-  const TriggerVector& triggers() const;
-  TriggerVector& triggers();
-  const GroupVector& groups() const;
-  GroupVector& groups();
+  static std::string getUserHomeDirectory();
+  static std::string getUserApplicationDataDirectory();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -126,12 +81,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  StepVector mSteps;
-  TriggerVector mTriggers;
-  GroupVector mGroups;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -144,7 +99,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::Network
+}; // class cedar::xxx
 
-#endif // CEDAR_PROC_NETWORK_H
+#endif // CEDAR_AUX_SYSTEM_H
 

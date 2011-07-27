@@ -108,6 +108,9 @@ public:
 
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
+  //!@brief Method that is called whenever an input is connected to the step.
+  virtual void inputConnectionChanged(const std::string& inputName);
+
   void setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
   cedar::proc::TriggerPtr& getFinishedTrigger();

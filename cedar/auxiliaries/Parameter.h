@@ -107,7 +107,18 @@ public:
 
   void setTo(const cedar::aux::ConfigurationNode& node)
   {
-    this->mValue = node.get_value<T>();
+#ifdef DEBUG
+    try
+    {
+#endif
+      this->mValue = node.get_value<T>();
+#ifdef DEBUG
+    }
+    catch (const boost::property_tree::ptree_bad_path& e)
+    {
+      std::cout << "Error while setting parameter to value: " << e.what() << std::endl;
+    }
+#endif
   }
 
   void makeDefault()

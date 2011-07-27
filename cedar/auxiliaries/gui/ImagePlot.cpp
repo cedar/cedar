@@ -80,12 +80,38 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
   this->mpLock->lockForRead();
-  QImage::Format format;
   switch(this->mpMat->type())
   {
+    case CV_8U:
+      this->mImage = QImage
+      (
+        this->mpMat->cols,
+        this->mpMat->rows,
+        QImage::Format_RGB888
+      );
+
+      for (int row = 0; row < this->mpMat->rows; ++row)
+      {
+        for (int column = 0; column < this->mpMat->cols; ++column)
+        {
+          uint8_t grey = this->mpMat->at<uint8_t>(row, column);
+          uint rgb = grey + (grey << 8) + (grey << 16);
+          this->mImage.setPixel(column, row, rgb);
+        }
+      }
+
+      break;
+
     case CV_8UC3:
     {
-      format = QImage::Format_RGB888;
+      this->mImage = QImage
+                      (
+                        this->mpMat->data,
+                        this->mpMat->cols,
+                        this->mpMat->rows,
+                        this->mpMat->step,
+                        QImage::Format_RGB888
+                      ).rgbSwapped();
       break;
     }
 
@@ -105,14 +131,6 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
       std::cout << "Unhandled cv::Mat type " << this->mpMat->type()
                 << " in cedar::aux::gui::ImagePlot::update()." << std::endl;
   }
-  this->mImage = QImage
-                  (
-                    this->mpMat->data,
-                    this->mpMat->cols,
-                    this->mpMat->rows,
-                    this->mpMat->step,
-                    format
-                  ).rgbSwapped();
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
@@ -132,7 +150,7 @@ void cedar::aux::gui::ImagePlot::display(cv::Mat* mat, QReadWriteLock *lock)
   if (!this->mpMat->empty())
   {
     mpImageDisplay->setText("");
-    this->mTimerId = this->startTimer(30);
+    this->mTimerId = this->startTimer(70);
     CEDAR_DEBUG_ASSERT(mTimerId != 0);
   }
 }

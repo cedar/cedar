@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_VECTOR_PARAMETER_H
-#define CEDAR_AUX_VECTOR_PARAMETER_H
+#ifndef CEDAR_AUX_SET_PARAMETER_H
+#define CEDAR_AUX_SET_PARAMETER_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
@@ -49,7 +49,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
+#include <set>
 
 
 /*!@brief Abstract description of the class.
@@ -57,7 +57,7 @@
  * More detailed description of the class.
  */
 template <typename T>
-class cedar::aux::VectorParameter : public cedar::aux::ParameterBase
+class cedar::aux::SetParameter : public cedar::aux::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -68,32 +68,22 @@ class cedar::aux::VectorParameter : public cedar::aux::ParameterBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VectorParameter(const std::string& name)
+  SetParameter(const std::string& name)
   :
   cedar::aux::ParameterBase(name, false)
   {
   }
 
-  VectorParameter(const std::string& name, const std::vector<T>& defaults)
+  SetParameter(const std::string& name, const std::set<T>& defaults)
   :
   cedar::aux::ParameterBase(name, true),
-  mDefaults(defaults),
-  mSize(0)
-  {
-    this->makeDefault();
-  }
-
-  VectorParameter(const std::string& name, size_t size, T defaultValue)
-  :
-  cedar::aux::ParameterBase(name, true),
-  mSize(size),
-  mDefaultValue(defaultValue)
+  mDefaults(defaults)
   {
     this->makeDefault();
   }
 
   //!@brief Destructor
-  ~VectorParameter()
+  ~SetParameter()
   {
   }
 
@@ -106,66 +96,38 @@ public:
     this->mValues.clear();
     for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
     {
-      this->mValues.push_back(iter->second.get_value<T>());
+      this->mValues.insert(iter->second.get_value<T>());
     }
   }
 
   void putTo(cedar::aux::ConfigurationNode& root)
   {
     cedar::aux::ConfigurationNode vector_node;
-    for (typename std::vector<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    for (typename std::set<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
     {
-      T& value = *iter;
       cedar::aux::ConfigurationNode value_node;
-      value_node.put_value(value);
+      value_node.put_value(*iter);
       vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
     }
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
   }
 
-  const std::vector<T>& get() const
+  const std::set<T>& get() const
   {
     return this->mValues;
   }
 
-  std::vector<T>& get()
+  std::set<T>& get()
   {
     return this->mValues;
   }
 
-  T getDefaultValue()
+  const std::set<T>& getDefaultValues() const
   {
-    if (this->mSize == 0) // there is only a default vector, see if it is of size > 0
-    {
-      if (mDefaults.size() > 0)
-      {
-        return mDefaults.at(0);
-      }
-      else
-      {
-        CEDAR_THROW(cedar::aux::NoDefaultException, "the parameter " + this->getName() + " has no default value");
-      }
-    }
-    else // return single default value
-    {
-      return this->mDefaultValue;
-    }
-  }
-
-  const std::vector<T>& getDefaultValues() const
-  {
-    if (this->mSize != 0) // there is only a default dimensionality and one value, construct vector
-    {
-      mDefaults.clear();
-      for (size_t i = 0; i < this->mSize; ++i)
-      {
-        mDefaults.push_back(this->mDefaultValue);
-      }
-    }
     return this->mDefaults;
   }
 
-  void set(const std::vector<T>& values)
+  void set(const std::set<T>& values)
   {
     this->mValues = values;
     emit parameterChanged();
@@ -173,21 +135,13 @@ public:
 
   void makeDefault()
   {
-    if (mSize == 0)
-    {
-
-      this->mValues = mDefaults;
-    }
-    else
-    {
-      mValues.clear();
-      for (size_t i = 0; i < mSize; i++)
-      {
-        mValues.push_back(mDefaultValue);
-      }
-    }
+    this->mValues = mDefaults;
   }
 
+  void insert(const T& value)
+  {
+    this->mValues.insert(value);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -209,10 +163,8 @@ public:
 protected:
   // none yet
 private:
-  std::vector<T> mValues;
-  std::vector<T> mDefaults;
-  size_t mSize;
-  T mDefaultValue;
+  std::set<T> mValues;
+  std::set<T> mDefaults;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -227,5 +179,5 @@ private:
 
 }; // class cedar::aux::VectorParameter
 
-#endif // CEDAR_AUX_VECTOR_PARAMETER_H
+#endif // CEDAR_AUX_SET_PARAMETER_H
 

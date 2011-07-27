@@ -41,11 +41,16 @@
 // LOCAL INCLUDES
 #include "Ide.h"
 #include "processing/gui/Scene.h"
+#include "processing/gui/Settings.h"
 #include "processing/gui/StepItem.h"
+#include "processing/gui/TriggerItem.h"
 #include "processing/gui/StepClassList.h"
 #include "processing/gui/NetworkFile.h"
 #include "processing/gui/PluginLoadDialog.h"
+#include "processing/gui/PluginManagerDialog.h"
+#include "processing/exceptions.h"
 #include "processing/Manager.h"
+#include "processing/LoopedTrigger.h"
 
 // PROJECT INCLUDES
 
@@ -60,6 +65,7 @@
 cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
+  this->loadDefaultPlugins();
   this->resetStepList();
 
   this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
@@ -76,6 +82,7 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionSaveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
   QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
+  QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
 
   mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
   this->resetTo(mNetwork);
@@ -85,6 +92,32 @@ cedar::proc::gui::Ide::Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::loadDefaultPlugins()
+{
+  const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
+  for (std::set<std::string>::iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
+  {
+    try
+    {
+      cedar::proc::PluginProxyPtr plugin(new cedar::proc::PluginProxy(*iter));
+      cedar::proc::Manager::getInstance().load(plugin);
+      QString message = "Loaded default plugin ";
+      message += iter->c_str();
+      message += ".";
+      this->message(message);
+    }
+    catch (const cedar::aux::exc::ExceptionBase& e)
+    {
+      QString message = "Error loading default plugin ";
+      message += iter->c_str();
+      message += ": ";
+      message += e.exceptionInfo().c_str();
+
+      this->error(message);
+    }
+  }
+}
 
 void cedar::proc::gui::Ide::showLoadPluginDialog()
 {
@@ -97,6 +130,13 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
     this->resetStepList();
   }
 
+  delete p_dialog;
+}
+
+void cedar::proc::gui::Ide::showManagePluginsDialog()
+{
+  cedar::proc::gui::PluginManagerDialog* p_dialog = new cedar::proc::gui::PluginManagerDialog(this);
+  p_dialog->exec();
   delete p_dialog;
 }
 
@@ -142,17 +182,66 @@ void cedar::proc::gui::Ide::resetStepList()
 void cedar::proc::gui::Ide::sceneItemSelected()
 {
   using cedar::proc::Step;
+  using cedar::proc::Manager;
+
+
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
 
-  this->mpPropertyTable->clearContents();
-  this->mpPropertyTable->setRowCount(0);
   //!@ todo Handle the cases: multiple
-  if (selected_items.size() == 1)
+  if (selected_items.size() == 0)
+  {
+    this->mpPropertyTable->resetContents();
+  }
+  else if (selected_items.size() == 1)
   {
     cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]);
     if (p_drawer)
     {
       this->mpPropertyTable->display(p_drawer->getStep());
+    }
+  }
+}
+
+void cedar::proc::gui::Ide::deleteSelectedElements()
+{
+  using cedar::proc::Step;
+  using cedar::proc::Manager;
+  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
+  this->deleteElements(selected_items);
+}
+
+void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
+{
+  for (int i = 0; i < items.size(); ++i)
+  {
+    // delete steps
+    cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(items[i]);
+    if (p_drawer)
+    {
+      // delete one step at a time
+      p_drawer->hide();
+      this->mNetwork->network()->remove(p_drawer->getStep());
+      Manager::getInstance().steps().removeObject(p_drawer->getStep()->getName());
+      this->mpPropertyTable->resetPointer();
+      this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
+      continue;
+    }
+    // delete triggers
+    cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(items[i]);
+    if (p_trigger_drawer)
+    {
+      // delete one step at a time
+      p_trigger_drawer->hide();
+      this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
+      Manager::getInstance().triggers().removeObject(p_trigger_drawer->getTrigger()->getName());
+      cedar::proc::LoopedTriggerPtr looped_trigger
+        = boost::shared_dynamic_cast<cedar::proc::LoopedTrigger>(p_trigger_drawer->getTrigger());
+      if (looped_trigger)
+      {
+        Manager::getInstance().threads().erase(looped_trigger);
+      }
+      this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
+      continue;
     }
   }
 }
@@ -163,6 +252,18 @@ void cedar::proc::gui::Ide::exception(const QString& message)
                         "An exception has occurred.",
                         message);
 }
+
+void cedar::proc::gui::Ide::error(const QString& message)
+{
+  //!@todo Colors!
+  this->mpLog->append("Error: " + message + "\n");
+}
+
+void cedar::proc::gui::Ide::message(const QString& message)
+{
+  this->mpLog->append(message + "\n");
+}
+
 
 void cedar::proc::gui::Ide::startThreads()
 {
@@ -214,3 +315,20 @@ void cedar::proc::gui::Ide::load()
     this->resetTo(network);
   }
 }
+
+void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
+{
+  switch (pEvent->key())
+  {
+    case Qt::Key_Delete:
+    {
+      this->deleteSelectedElements();
+      break;
+    }
+    // If the key is not handled by this widget, pass it on to the base widget.
+    default:
+      this->QMainWindow::keyPressEvent(pEvent);
+      break;
+  }
+}
+

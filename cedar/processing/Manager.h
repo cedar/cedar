@@ -47,6 +47,7 @@
 #include "processing/Registry.h"
 #include "processing/StepDeclaration.h"
 #include "processing/TriggerDeclaration.h"
+#include "processing/FrameworkSettings.h"
 
 // PROJECT INCLUDES
 
@@ -83,6 +84,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   static Manager& getInstance();
+  cedar::proc::FrameworkSettings& settings();
 
   StepRegistry& steps();
   TriggerRegistry& triggers();
@@ -126,6 +128,8 @@ private:
   TriggerRegistry mTriggerRegistry;
   ThreadRegistry mThreadRegistry;
   GroupRegistry mGroupRegistry;
+
+  cedar::proc::FrameworkSettings mSettings;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

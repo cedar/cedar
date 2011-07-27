@@ -15,8 +15,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="gauss_input.svg"
-   inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/gauss_input.png"
+   sodipodi:docname="no_icon.svg"
+   inkscape:export-filename="/home/lompolbx/workspace/src/cedar.fieldFramework/cedar/processing/gui/icons/steps/no_icon.png"
    inkscape:export-xdpi="9"
    inkscape:export-ydpi="9">
   <sodipodi:namedview
@@ -26,14 +26,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="49.440289"
-     inkscape:cy="146.44071"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="177.41221"
+     inkscape:cy="164.35575"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1007"
+     inkscape:window-width="2048"
+     inkscape:window-height="1077"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="1"
@@ -41,45 +41,6 @@
      inkscape:guide-bbox="true" />
   <defs
      id="defs4">
-    <marker
-       style="overflow:visible"
-       id="TriangleOutM"
-       refX="0.0"
-       refY="0.0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM">
-      <path
-         transform="scale(0.4)"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
-         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
-         id="path4501" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="TriangleInM"
-       refX="0.0"
-       refY="0.0"
-       orient="auto"
-       inkscape:stockid="TriangleInM">
-      <path
-         transform="scale(-0.4)"
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
-         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
-         id="path4492" />
-    </marker>
-    <marker
-       inkscape:stockid="Arrow1Sstart"
-       orient="auto"
-       refY="0.0"
-       refX="0.0"
-       id="Arrow1Sstart"
-       style="overflow:visible">
-      <path
-         id="path3903"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;marker-start:none"
-         transform="scale(0.2) translate(6,0)" />
-    </marker>
     <marker
        style="overflow:visible"
        id="TriangleOutS"
@@ -261,110 +222,6 @@
          d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
          id="path5583" />
     </marker>
-    <marker
-       inkscape:stockid="Arrow1Sstartn"
-       orient="auto"
-       refY="0.0"
-       refX="0.0"
-       id="Arrow1Sstartn"
-       style="overflow:visible">
-      <path
-         id="path4595"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         transform="scale(0.2) translate(6,0)" />
-    </marker>
-    <marker
-       inkscape:stockid="Arrow1SendF"
-       orient="auto"
-       refY="0.0"
-       refX="0.0"
-       id="Arrow1SendF"
-       style="overflow:visible;">
-      <path
-         id="path4598"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         transform="scale(0.2) rotate(180) translate(6,0)" />
-    </marker>
-    <marker
-       inkscape:stockid="Arrow1Sstartk"
-       orient="auto"
-       refY="0.0"
-       refX="0.0"
-       id="Arrow1Sstartk"
-       style="overflow:visible">
-      <path
-         id="path4601"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         transform="scale(0.2) translate(6,0)" />
-    </marker>
-    <marker
-       inkscape:stockid="Arrow1Send7"
-       orient="auto"
-       refY="0.0"
-       refX="0.0"
-       id="Arrow1Send7"
-       style="overflow:visible;">
-      <path
-         id="path4604"
-         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         transform="scale(0.2) rotate(180) translate(6,0)" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="TriangleInMK"
-       refX="0.0"
-       refY="0.0"
-       orient="auto"
-       inkscape:stockid="TriangleInMK">
-      <path
-         transform="scale(-0.4)"
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
-         id="path5095" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="TriangleOutMv"
-       refX="0.0"
-       refY="0.0"
-       orient="auto"
-       inkscape:stockid="TriangleOutMv">
-      <path
-         transform="scale(0.4)"
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
-         id="path5098" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="TriangleInMj"
-       refX="0.0"
-       refY="0.0"
-       orient="auto"
-       inkscape:stockid="TriangleInMj">
-      <path
-         transform="scale(-0.4)"
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
-         id="path5101" />
-    </marker>
-    <marker
-       style="overflow:visible"
-       id="TriangleOutM9"
-       refX="0.0"
-       refY="0.0"
-       orient="auto"
-       inkscape:stockid="TriangleOutM9">
-      <path
-         transform="scale(0.4)"
-         style="marker-start:none;stroke:#c30000;stroke-width:1.0pt;fill:#c30000;fill-rule:evenodd"
-         d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
-         id="path5104" />
-    </marker>
   </defs>
   <metadata
      id="metadata7">
@@ -374,7 +231,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -384,23 +241,14 @@
      id="layer1"
      transform="translate(0,-652.3622)">
     <path
-       sodipodi:nodetypes="ccc"
-       d="M 8.5274516,1029.8577 C 170.6559,1029.877 133.8049,692.39368 200,691.9198 c 66.19509,0.47388 29.3441,337.9569 191.47255,337.9379"
-       style="fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="path2835" />
+       style="fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="M 68.21875 36.78125 L 68.21875 363.21875 L 331.78125 363.21875 L 331.78125 98.1875 L 270.375 36.78125 L 68.21875 36.78125 z "
+       transform="translate(0,652.3622)"
+       id="rect2844" />
     <path
-       style="stroke-linejoin:miter;marker-end:url(#TriangleOutM9);stroke-opacity:1;marker-start:url(#TriangleInMj);stroke:#c30000;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-width:5;marker-mid:none;fill:none"
-       d="m 155.65903,894.62437 87.96766,0"
-       id="path3645"
-       sodipodi:nodetypes="cc" />
-    <path
-       sodipodi:nodetypes="cc"
-       id="path4739"
-       d="m 200,1030.4787 0,-314.02859"
-       style="stroke-linejoin:miter;marker-end:url(#TriangleOutMv);stroke-opacity:1;marker-start:url(#TriangleInMK);stroke:#c30000;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-width:5;marker-mid:none;fill:none" />
-    <path
-       id="path4741"
-       d="M 289.00094,779.74086 361.03109,707.7107"
-       style="fill:none;stroke:#9f9f9f;stroke-width:38.29450989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#TriangleOutS1)" />
+       style="fill:none;stroke:#000000;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="M 263.5625 36.78125 L 263.5625 104.28125 L 331.78125 104.28125 L 331.78125 98.1875 L 270.375 36.78125 L 263.5625 36.78125 z "
+       transform="translate(0,652.3622)"
+       id="rect3678" />
   </g>
 </svg>

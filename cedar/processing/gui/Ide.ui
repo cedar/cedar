@@ -52,7 +52,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -71,7 +71,7 @@
     <property name="title">
      <string>Plugins</string>
     </property>
-    <addaction name="actionManage"/>
+    <addaction name="mpActionManagePlugins"/>
     <addaction name="mpActionLoadPlugin"/>
    </widget>
    <widget class="QMenu" name="menuSimulation">
@@ -137,7 +137,11 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QTextEdit" name="textEdit"/>
+      <widget class="QTextEdit" name="mpLog">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -167,8 +171,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>130</width>
-          <height>319</height>
+          <width>121</width>
+          <height>325</height>
          </rect>
         </property>
         <attribute name="label">
@@ -180,8 +184,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>121</width>
+          <height>325</height>
          </rect>
         </property>
         <attribute name="label">
@@ -271,10 +275,7 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionManage">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <action name="mpActionManagePlugins">
    <property name="text">
     <string>Manage ...</string>
    </property>
