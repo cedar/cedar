@@ -217,6 +217,21 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
   return iter->second;
 }
 
+cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlotItems(
+                                                                             cedar::proc::DataRole::Id role
+                                                                           )
+{
+  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   );
+  }
+  return role_map->second;
+}
+
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   QMenu menu;
@@ -296,5 +311,23 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 {
   return this->mStep;
+}
+
+void cedar::proc::gui::StepItem::disconnect()
+{
+  // go through all DataSlots and remove connections
+  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
+  {
+    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
+    if (id == cedar::aux::Enum::UNDEFINED)
+    {
+      continue;
+    }
+    cedar::proc::gui::StepItem::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::StepItem*>(this)->getSlotItems(id);
+    for (cedar::proc::gui::StepItem::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
+    {
+      it->second->removeAllConnections();
+    }
+  }
 }
 
