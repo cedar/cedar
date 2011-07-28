@@ -22,15 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GraphicsBase.h
-
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
                  Stephan Zibner
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 12
+    Date:        2011 07 28
 
     Description:
 
@@ -38,152 +36,91 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_GRAPHICS_BASE_H
-#define CEDAR_PROC_GUI_GRAPHICS_BASE_H
+#ifndef CEDAR_PROC_CONNECTION_H
+#define CEDAR_PROC_CONNECTION_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/NumericParameter.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsItem>
-#include <QPen>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable
+class cedar::proc::Connection
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // static constants
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef unsigned int GraphicsGroup;
-  const static GraphicsGroup GRAPHICS_GROUP_NONE = 0;
-  const static GraphicsGroup GRAPHICS_GROUP_STEP = 1 << 0;
-  const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
-  const static GraphicsGroup GRAPHICS_GROUP_GROUP = 1 << 2;
-  const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 3;
-  const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
-
-  enum HighlightMode
-  {
-    HIGHLIGHTMODE_NONE,
-    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET,
-    HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
-  };
-
-  enum BaseShape
-  {
-    BASE_SHAPE_RECT,
-    BASE_SHAPE_ROUND
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GraphicsBase(qreal width, qreal height,
-               GraphicsGroup group = GRAPHICS_GROUP_UNKNOWN,
-               GraphicsGroup canConnectTo = GRAPHICS_GROUP_NONE,
-               BaseShape shape = BASE_SHAPE_RECT);
-
+  Connection(
+              cedar::proc::StepPtr source,
+              const std::string& sourceName,
+              cedar::proc::StepPtr target,
+              const std::string& targetName
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::StepPtr target
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::TriggerPtr target
+            );
   //!@brief Destructor
-  virtual ~GraphicsBase();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual bool canConnectTo(GraphicsBase* pTarget) const;
-
-  virtual bool canConnect() const;
-
-  QPointF getConnectionAnchorInScene() const;
-
-  virtual QPointF getConnectionAnchorRelative() const;
-
-  const GraphicsGroup& getGroup() const;
-
-  QRectF boundingRect() const;
-
-  QPen getOutlinePen() const;
-
-  void setHighlightMode(HighlightMode mode);
-
-  HighlightMode getHighlightMode() const;
-
-  qreal width() const
-  {
-    return static_cast<qreal>(this->mWidth->get());
-  }
-
-  qreal height() const
-  {
-    return static_cast<qreal>(this->mHeight->get());
-  }
-
-  void addConnection(Connection* pConnection);
-
-  void removeConnection(Connection* pConnection);
-
-  void removeAllConnections();
-
-  virtual void disconnect() = 0;
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
-
-  void updateConnections();
+  bool contains(cedar::proc::StepPtr step);
+  bool contains(cedar::proc::TriggerPtr trigger);
+  void deleteConnection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void paintFrame(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::proc::TriggerPtr mTrigger;
+  cedar::proc::TriggerPtr mTargetTrigger;
+  cedar::proc::StepPtr mSource;
+  std::string mSourceName;
+  cedar::proc::StepPtr mTarget;
+  std::string mTargetName;
 private:
-  cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
-  BaseShape mShape;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  cedar::aux::DoubleParameterPtr mWidth;
-  cedar::aux::DoubleParameterPtr mHeight;
+  // none yet
 
-  GraphicsGroup mGroup;
-  GraphicsGroup mAllowedConnectTargets;
+}; // class cedar::proc::Connection
 
-  std::vector<Connection*> mConnections;
-
-}; // class cedar::proc::gui::GraphicsBase
-
-#endif // CEDAR_PROC_GUI_GRAPHICS_BASE_H
+#endif // CEDAR_PROC_CONNECTION_H
 

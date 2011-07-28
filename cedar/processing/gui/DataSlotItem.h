@@ -85,6 +85,8 @@ public:
 
   void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
 
+  void disconnect();
+
   const std::string& getName() const;
 
   bool canConnect() const;
