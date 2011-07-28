@@ -70,6 +70,14 @@ cedar::aux::Configurable::~Configurable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::Configurable::configurationLoaded()
+{
+  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
+  {
+    iter->second->emitChangedSignal();
+  }
+}
+
 void cedar::aux::Configurable::readJson(const std::string& filename)
 {
   cedar::aux::ConfigurationNode configuration;
@@ -133,7 +141,6 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     {
       const cedar::aux::ConfigurationNode& value = node.get_child(iter->second->getName());
       iter->second->setTo(value);
-//      std::cout << node.get<std::string>(iter->second->getName()) << std::endl;
     }
     catch (const boost::property_tree::ptree_bad_path& e)
     {
@@ -173,8 +180,11 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     }
     catch (const boost::property_tree::ptree_bad_path&)
     {
+      // no node present for the child
     }
   }
+
+  this->configurationLoaded();
 }
 
 const cedar::aux::Configurable::Children& cedar::aux::Configurable::configurableChildren() const
