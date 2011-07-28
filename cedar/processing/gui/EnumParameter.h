@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataRole.h
+    File:        EnumParameter.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
     Description:
 
@@ -38,48 +34,48 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_ROLE_H
-#define CEDAR_PROC_DATA_ROLE_H
+#ifndef CEDAR_PROC_GUI_ENUM_PARAMETER_H
+#define CEDAR_PROC_GUI_ENUM_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/EnumType.h"
-#include "processing/namespace.h"
+#include "processing/gui/namespace.h"
+#include "processing/gui/ParameterBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QComboBox>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::DataRole
+class cedar::proc::gui::EnumParameter : public cedar::proc::gui::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::aux::EnumId Id;
-public:
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  EnumParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
+  virtual ~EnumParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static void construct();
 
-  static const cedar::aux::EnumBase& type();
-  static const cedar::proc::DataRole::TypePtr& typePtr();
+public slots:
+  void parameterPointerChanged();
+  void currentIndexChanged(const QString& text);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,28 +92,20 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  static const Id INPUT = 0;
-  static const Id OUTPUT = 1;
-  static const Id BUFFER = 2;
-
 protected:
   // none yet
 private:
-  static cedar::aux::EnumType<cedar::proc::DataRole> mType;
+  QComboBox *mpEdit;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::DataRole
+}; // class cedar::proc::gui::EnumParameter
 
-#endif // CEDAR_PROC_DATA_ROLE_H
-
+#endif // CEDAR_PROC_GUI_ENUM_PARAMETER_H

@@ -62,6 +62,7 @@ namespace cedar
       class DirectoryParameter;
       class DoubleParameter;
       class DoubleVectorParameter;
+      class EnumParameter;
       class GraphicsBase;
       class GroupItem;
       class Ide;

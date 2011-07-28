@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,102 +22,71 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataRole.h
+    File:        EnumType.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
-    Description:
+    Description: Type class for enums.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_ROLE_H
-#define CEDAR_PROC_DATA_ROLE_H
+#ifndef CEDAR_AUX_ENUM_TYPE_H
+#define CEDAR_AUX_ENUM_TYPE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/EnumType.h"
-#include "processing/namespace.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/EnumBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <map>
+#include <vector>
+#include <string>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief A base class for making enums that are more flexible than the standard ones.
  *
- * More detailed description of the class.
+ * To make an enum using this class, create a new class that has a static construct function. In the construct function,
+ * declare all the enum values belonging to your enum.
+ * @todo explain this better and add example code
  */
-class cedar::proc::DataRole
+template <class T>
+class cedar::aux::EnumType
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::aux::EnumId Id;
-public:
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-
-  //!@brief Destructor
+  EnumType(const std::string& prefix = "")
+  :
+  mType(new cedar::aux::EnumBase(prefix))
+  {
+    T::construct();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static void construct();
-
-  static const cedar::aux::EnumBase& type();
-  static const cedar::proc::DataRole::TypePtr& typePtr();
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+  boost::shared_ptr<cedar::aux::EnumBase>& type()
+  {
+    return this->mType;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
-  // private methods
+  // private members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  boost::shared_ptr<cedar::aux::EnumBase> mType;
+}; // class cedar::aux::EnumType
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  static const Id INPUT = 0;
-  static const Id OUTPUT = 1;
-  static const Id BUFFER = 2;
-
-protected:
-  // none yet
-private:
-  static cedar::aux::EnumType<cedar::proc::DataRole> mType;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
-}; // class cedar::proc::DataRole
-
-#endif // CEDAR_PROC_DATA_ROLE_H
-
+#endif // CEDAR_AUX_ENUM_TYPE_H

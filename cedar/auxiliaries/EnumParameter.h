@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataRole.h
+    File:        EnumParameter.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
     Description:
 
@@ -38,48 +34,61 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_ROLE_H
-#define CEDAR_PROC_DATA_ROLE_H
+#ifndef CEDAR_AUX_ENUM_PARAMETER_H
+#define CEDAR_AUX_ENUM_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/EnumType.h"
-#include "processing/namespace.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/exceptions.h"
+#include "auxiliaries/EnumBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <set>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::DataRole
+class cedar::aux::EnumParameter : public cedar::aux::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::aux::EnumId Id;
-public:
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  EnumParameter(const std::string& name,
+                boost::shared_ptr<cedar::aux::EnumBase> enumBase);
 
-  //!@brief Destructor
+  EnumParameter(const std::string& name,
+                boost::shared_ptr<cedar::aux::EnumBase> enumBase,
+                cedar::aux::EnumId defaultValue);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static void construct();
+  void setTo(const cedar::aux::ConfigurationNode& root);
 
-  static const cedar::aux::EnumBase& type();
-  static const cedar::proc::DataRole::TypePtr& typePtr();
+  void putTo(cedar::aux::ConfigurationNode& root);
+
+  void makeDefault();
+
+  cedar::aux::Enum get() const;
+
+  void set(const std::string& enumId);
+
+  const cedar::aux::EnumBase& getEnumDeclaration()
+  {
+    return *(this->mEnumDeclaration);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,14 +106,14 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static const Id INPUT = 0;
-  static const Id OUTPUT = 1;
-  static const Id BUFFER = 2;
-
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  static cedar::aux::EnumType<cedar::proc::DataRole> mType;
+  cedar::aux::EnumId mValue;
+  cedar::aux::EnumId mDefault;
+
+  boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -117,7 +126,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::DataRole
+}; // class cedar::aux::VectorParameter
 
-#endif // CEDAR_PROC_DATA_ROLE_H
+#endif // CEDAR_AUX_ENUM_PARAMETER_H
 

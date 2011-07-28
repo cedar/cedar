@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataRole.cpp
+    File:        EnumParameter.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
     Description:
 
@@ -39,39 +35,60 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/DataRole.h"
+#include "auxiliaries/EnumParameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-cedar::aux::EnumType<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
-
-const cedar::proc::DataRole::Id cedar::proc::DataRole::INPUT;
-const cedar::proc::DataRole::Id cedar::proc::DataRole::OUTPUT;
-const cedar::proc::DataRole::Id cedar::proc::DataRole::BUFFER;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::DataRole::construct()
+cedar::aux::EnumParameter::EnumParameter(const std::string& name,
+                                         boost::shared_ptr<cedar::aux::EnumBase> enumBase)
+:
+cedar::aux::ParameterBase(name, false),
+mEnumDeclaration(enumBase)
 {
-  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT", "Input"));
-  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT", "Output"));
-  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER", "Buffer"));
+}
+
+cedar::aux::EnumParameter::EnumParameter(const std::string& name,
+                                         boost::shared_ptr<cedar::aux::EnumBase> enumBase,
+                                         cedar::aux::EnumId defaultValue)
+:
+cedar::aux::ParameterBase(name, true),
+mDefault(defaultValue),
+mEnumDeclaration(enumBase)
+{
+  this->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const cedar::aux::EnumBase& cedar::proc::DataRole::type()
+cedar::aux::Enum cedar::aux::EnumParameter::get() const
 {
-  return *cedar::proc::DataRole::mType.type();
+  return mEnumDeclaration->get(this->mValue);
 }
 
-const cedar::proc::DataRole::TypePtr& cedar::proc::DataRole::typePtr()
+void cedar::aux::EnumParameter::set(const std::string& enumId)
 {
-  return cedar::proc::DataRole::mType.type();
+  this->mValue = this->mEnumDeclaration->get(enumId);
+}
+
+void cedar::aux::EnumParameter::setTo(const cedar::aux::ConfigurationNode& root)
+{
+  this->mValue = mEnumDeclaration->get(root.get_value<std::string>());
+}
+
+void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
+{
+  root.put(this->getName(), this->get().name());
+}
+
+void cedar::aux::EnumParameter::makeDefault()
+{
+  this->mValue = this->mDefault;
 }
