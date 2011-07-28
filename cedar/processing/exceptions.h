@@ -62,6 +62,14 @@ class cedar::proc::InvalidRoleException : public cedar::aux::exc::ExceptionBase
     InvalidRoleException();
 }; // class cedar::proc::InvalidRoleException
 
+/*!@brief An exception that occurs when a category is used as an index that is not known.
+ */
+class cedar::proc::InvalidCategoryException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    InvalidCategoryException();
+}; // class cedar::proc::InvalidCategoryException
+
 
 /*!@brief An exception that occurs when a name is used as an index that is not known.
  */

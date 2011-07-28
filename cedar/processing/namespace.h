@@ -110,6 +110,7 @@ namespace cedar
     /* Exceptions */
     class InvalidNameException;
     class InvalidRoleException;
+    class InvalidCategoryException;
     class InvalidArgumentsException;
     class DuplicateNameException;
     class MissingConnectionException;
