@@ -85,7 +85,7 @@ public:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
   void connectTo(cedar::proc::gui::StepItem *pTarget);
-  void disconnectFrom(cedar::proc::gui::StepItem *pTarget);
+  void disconnect();
   void connectTo(cedar::proc::gui::TriggerItem *pTarget);
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
