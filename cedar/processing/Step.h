@@ -117,15 +117,8 @@ public:
 
   void setThreaded(bool isThreaded);
 
-  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
-  void declareInput(const std::string& name, bool mandatory = true);
-  void declareBuffer(const std::string& name, bool mandatory = true);
-  void declareOutput(const std::string& name, bool mandatory = true);
-
-  void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
   void setInput(const std::string& name, cedar::aux::DataPtr data);
-  void setBuffer(const std::string& name, cedar::aux::DataPtr data);
-  void setOutput(const std::string& name, cedar::aux::DataPtr data);
+  void freeInput(const std::string& name);
 
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
   cedar::aux::DataPtr getInput(const std::string& name);
@@ -141,6 +134,12 @@ public:
                        cedar::proc::StepPtr target,
                        const std::string& targetName
                      );
+  static void disconnect(
+                          cedar::proc::StepPtr source,
+                          const std::string& sourceName,
+                          cedar::proc::StepPtr target,
+                          const std::string& targetName
+                        );
   void setName(const std::string& name);
   const std::string& getName() const;
 
@@ -156,12 +155,22 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   void run();
+  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  void declareInput(const std::string& name, bool mandatory = true);
+  void declareBuffer(const std::string& name, bool mandatory = true);
+  void declareOutput(const std::string& name, bool mandatory = true);
+  void setBuffer(const std::string& name, cedar::aux::DataPtr data);
+  void setOutput(const std::string& name, cedar::aux::DataPtr data);
+  void freeBuffer(const std::string& name);
+  void freeOutput(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void checkMandatoryConnections();
+  void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
+  void freeData(DataRole::Id role, const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -40,6 +40,9 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/GraphicsBase.h"
+#include "processing/gui/StepItem.h"
+#include "processing/gui/TriggerItem.h"
+#include "processing/gui/DataSlotItem.h"
 
 // PROJECT INCLUDES
 
@@ -120,6 +123,51 @@ void cedar::proc::gui::GraphicsBase::saveConfiguration(cedar::aux::Configuration
 void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection* pConnection)
 {
   this->mConnections.push_back(pConnection);
+}
+
+void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connection* pConnection)
+{
+  std::vector<Connection*>::iterator it;
+  for (it = mConnections.begin(); it != mConnections.end(); it++)
+  {
+    if (*it == pConnection)
+    {
+      break;
+    }
+  }
+  // found something, delete it now!
+  if (it != mConnections.end())
+  {
+    mConnections.erase(it);
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::removeAllConnections()
+{
+  // first, disconnect the underlying structures
+  this->disconnect();
+  // then, delete the graphical representation of the connections
+  std::vector<cedar::proc::gui::Connection*> delete_later;
+  for (std::vector<cedar::proc::gui::Connection*>::iterator it = mConnections.begin(); it != mConnections.end(); ++it)
+  {
+    if ((*it)->getSource() == this)
+    {
+      (*it)->getTarget()->removeConnection(*it);
+    }
+    else if ((*it)->getTarget() == this)
+    {
+      (*it)->getSource()->removeConnection(*it);
+    }
+    // delete own connections later
+    delete_later.push_back(*it);
+    delete *it;
+  }
+  // delete all own connections
+  for (size_t i = 0; i < delete_later.size(); ++i)
+  {
+    this->removeConnection(delete_later.at(i));
+  }
+  this->mConnections.clear();
 }
 
 cedar::proc::gui::GraphicsBase::HighlightMode cedar::proc::gui::GraphicsBase::getHighlightMode() const

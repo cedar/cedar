@@ -43,6 +43,7 @@
 #include "processing/gui/StepItem.h"
 #include "processing/DataRole.h"
 #include "auxiliaries/macros.h"
+#include "processing/Manager.h"
 
 // PROJECT INCLUDES
 
@@ -51,6 +52,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <iostream>
+#include <QGraphicsScene>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -116,9 +118,16 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
   cedar::proc::StepPtr source, target;
   source = dynamic_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
   target = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget->parentItem())->getStep();
-  cedar::proc::Step::connect(source, this->getName(), target, pTarget->getName());
+  cedar::proc::Manager::getInstance().connect(source, this->getName(), target, pTarget->getName());
 
-  new cedar::proc::gui::Connection(this, pTarget);
+  this->scene()->addItem(new cedar::proc::gui::Connection(this, pTarget));
+}
+
+void cedar::proc::gui::DataSlotItem::disconnect()
+{
+  cedar::proc::StepPtr parent;
+  parent = dynamic_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
+  cedar::proc::Manager::getInstance().disconnect(parent);
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)
