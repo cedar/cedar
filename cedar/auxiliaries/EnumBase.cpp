@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,56 +22,79 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataRole.cpp
+    File:        EnumBase.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 05 27
 
-    Description:
+    Description: Base class for enums.
 
     Credits:
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/DataRole.h"
+#include "auxiliaries/EnumBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-cedar::aux::EnumType<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
-
-const cedar::proc::DataRole::Id cedar::proc::DataRole::INPUT;
-const cedar::proc::DataRole::Id cedar::proc::DataRole::OUTPUT;
-const cedar::proc::DataRole::Id cedar::proc::DataRole::BUFFER;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::DataRole::construct()
+cedar::aux::EnumBase::EnumBase(const std::string& prefix)
+:
+mUndefined (Enum::UNDEFINED, prefix + "UNDEFINED")
 {
-  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT", "Input"));
-  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT", "Output"));
-  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER", "Buffer"));
+  this->def(mUndefined);
+}
+
+cedar::aux::EnumBase::~EnumBase()
+{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const cedar::aux::EnumBase& cedar::proc::DataRole::type()
+void cedar::aux::EnumBase::def(const cedar::aux::Enum& rEnum)
 {
-  return *cedar::proc::DataRole::mType.type();
+  //! @todo check for duplicate values
+  this->mEnumFromId[rEnum.id()] = rEnum;
+  this->mEnumFromString[rEnum.name()] = rEnum;
+  if (rEnum != cedar::aux::Enum::UNDEFINED)
+  {
+    this->mEnumList.push_back(rEnum);
+  }
 }
 
-const cedar::proc::DataRole::TypePtr& cedar::proc::DataRole::typePtr()
+const cedar::aux::Enum& cedar::aux::EnumBase::get(const cedar::aux::EnumId id) const
 {
-  return cedar::proc::DataRole::mType.type();
+  std::map<cedar::aux::EnumId, cedar::aux::Enum>::const_iterator it;
+  it = this->mEnumFromId.find(id);
+  if (it != this->mEnumFromId.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    return this->mUndefined;
+  }
+}
+
+const cedar::aux::Enum& cedar::aux::EnumBase::get(const std::string& id) const
+{
+  std::map<std::string, cedar::aux::Enum>::const_iterator it;
+  it = this->mEnumFromString.find(id);
+  if (it != this->mEnumFromString.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    return this->mUndefined;
+  }
 }

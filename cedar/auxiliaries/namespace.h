@@ -89,7 +89,8 @@ namespace cedar
 
     typedef unsigned int EnumId;
     class Enum;
-    template <typename T> class EnumBase;
+    class EnumBase;
+    template <class T> class EnumType;
 
     class Arguments;
 
@@ -126,6 +127,8 @@ namespace cedar
     typedef boost::shared_ptr<UIntVectorParameter> UIntVectorParameterPtr;
     class DirectoryParameter;
     typedef boost::shared_ptr<DirectoryParameter> DirectoryParameterPtr;
+    class EnumParameter;
+    typedef boost::shared_ptr<EnumParameter> EnumParameterPtr;
 
     template <typename T> class SetParameter;
     typedef SetParameter<std::string> StringSetParameter;

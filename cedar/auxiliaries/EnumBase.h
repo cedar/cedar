@@ -54,7 +54,6 @@
  * declare all the enum values belonging to your enum.
  * @todo explain this better and add example code
  */
-template <class T>
 class cedar::aux::EnumBase
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,18 +65,10 @@ class cedar::aux::EnumBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  EnumBase(const std::string& prefix = "")
-  :
-  mUndefined (Enum::UNDEFINED, prefix + "UNDEFINED")
-  {
-    T::construct();
-    this->def(mUndefined);
-  }
+  EnumBase(const std::string& prefix = "");
 
   //!@brief Destructor
-  virtual ~EnumBase()
-  {
-  }
+  virtual ~EnumBase();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -85,47 +76,17 @@ public:
 public:
   /*! @brief Define a new enum value.
    */
-  void def(const Enum& rEnum)
-  {
-    //! @todo check for duplicate values
-    this->mEnumFromId[rEnum.id()] = rEnum;
-    this->mEnumFromString[rEnum.name()] = rEnum;
-    this->mEnumList.push_back(rEnum);
-  }
+  void def(const Enum& rEnum);
 
   /*! @brief Retrieve the enum value corresponding to id.
    */
-  const Enum& get(EnumId id) const
-  {
-    std::map<EnumId, Enum>::const_iterator it;
-    it = this->mEnumFromId.find(id);
-    if (it != this->mEnumFromId.end())
-    {
-      return it->second;
-    }
-    else
-    {
-      return this->mUndefined;
-    }
-  }
+  const Enum& get(EnumId id) const;
 
   /*! @brief Retrieve the enum value corresponding to a string.
    *
    * @returns cedar::aux::Enum::UNDEFINED if there is no value corresponding to the string.
    */
-  const Enum& get(const std::string& id) const
-  {
-    std::map<std::string, Enum>::const_iterator it;
-    it = this->mEnumFromString.find(id);
-    if (it != this->mEnumFromString.end())
-    {
-      return it->second;
-    }
-    else
-    {
-      return this->mUndefined;
-    }
-  }
+  const Enum& get(const std::string& id) const;
 
   /*! @brief Returns a list containing all enum values in this class (including cedar::aux::Enum::UNDEFINED!).
    */
