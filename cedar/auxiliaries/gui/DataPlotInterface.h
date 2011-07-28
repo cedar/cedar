@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ImagePlot.h
+    File:        DataPlotInterface.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2011 07 28
 
     Description:
 
@@ -34,84 +34,78 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
-#define CEDAR_AUX_GUI_IMAGE_PLOT_H
+#ifndef CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
+#define CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/gui/DataPlotInterface.h"
+#include "auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QLabel>
-#include <QReadWriteLock>
-#include <opencv2/opencv.hpp>
-#include <qwtplot3d/qwt3d_types.h>
-
+#include <QWidget>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::gui::ImagePlot : public DataPlotInterface
+class cedar::aux::gui::DataPlotInterface : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImagePlot(QWidget *pParent = NULL);
+  DataPlotInterface(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~ImagePlot();
+  virtual ~DataPlotInterface();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cedar::aux::DataPtr data);
-  void timerEvent(QTimerEvent *pEvent);
+  virtual void display(cedar::aux::DataPtr data) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // to make sure the image aspect ratio is kept correct
-  void resizeEvent(QResizeEvent *event);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void resizePixmap();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  QLabel *mpImageDisplay;
-  cedar::aux::ImageDataPtr mData;
-  QImage mImage;
-  int mTimerId;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::gui::ImagePlot
+}; // class cedar::aux::gui::DataPlotInterface
 
-#endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
+#endif // CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
 

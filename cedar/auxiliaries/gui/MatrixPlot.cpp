@@ -41,7 +41,9 @@
 // LOCAL INCLUDES
 #include "auxiliaries/gui/MatrixPlot.h"
 #include "auxiliaries/gui/MatrixPlot2D.h"
+#include "auxiliaries/gui/exceptions.h"
 #include "auxiliaries/exceptions.h"
+#include "auxiliaries/DataT.h"
 
 // PROJECT INCLUDES
 
@@ -57,9 +59,7 @@ Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
-QWidget(pParent),
-mpMat(NULL),
-mpeLock(NULL),
+cedar::aux::gui::DataPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -75,10 +75,14 @@ cedar::aux::gui::MatrixPlot::~MatrixPlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::MatrixPlot::display(cv::Mat* mat, QReadWriteLock *lock)
+void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
 {
-  this->mpMat = mat;
-  this->mpeLock = lock;
+  this->mData= boost::shared_dynamic_cast<cedar::aux::MatData>(data);
+  if (!this->mData)
+  {
+    CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
+  }
 
   if (this->mpCurrentPlotWidget)
   {
@@ -86,17 +90,19 @@ void cedar::aux::gui::MatrixPlot::display(cv::Mat* mat, QReadWriteLock *lock)
     this->mpCurrentPlotWidget = NULL;
   }
 
-  switch (this->mpMat->dims)
+  cv::Mat& mat = this->mData->getData();
+
+  switch (mat.dims)
   {
     case 2:
-      if ( (this->mpMat->rows == 1 || this->mpMat->cols == 1) && this->mpMat->rows != this->mpMat->cols)
+      if ( (mat.rows == 1 || mat.cols == 1) && mat.rows != mat.cols)
       {
         // TODO
         std::cout << "cv::Mat vector plots aren't implemented yet; sorry :(" << std::endl;
       }
       else
       {
-        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mpMat, this->mpeLock);
+        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData);
         this->layout()->addWidget(this->mpCurrentPlotWidget);
       }
       break;
