@@ -79,32 +79,34 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
 {
-  this->mData->lockForRead();
   cv::Mat& mat = this->mData->getData();
   switch(mat.type())
   {
-    case CV_8U:
+    case CV_8UC1:
+    {
+      cv::Mat converted;
+      std::vector<cv::Mat> merge_vec;
+      merge_vec.push_back(mat);
+      merge_vec.push_back(mat);
+      merge_vec.push_back(mat);
+      this->mData->lockForRead();
+      cv::merge(merge_vec, converted);
+      this->mData->unlock();
+      CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
       this->mImage = QImage
       (
-        mat.cols,
-        mat.rows,
+        converted.data,
+        converted.cols,
+        converted.rows,
+        converted.step,
         QImage::Format_RGB888
-      );
-
-      for (int row = 0; row < mat.rows; ++row)
-      {
-        for (int column = 0; column < mat.cols; ++column)
-        {
-          uint8_t grey = mat.at<uint8_t>(row, column);
-          uint rgb = grey + (grey << 8) + (grey << 16);
-          this->mImage.setPixel(column, row, rgb);
-        }
-      }
-
+      ).rgbSwapped();
       break;
+    }
 
     case CV_8UC3:
     {
+      this->mData->lockForRead();
       this->mImage = QImage
                       (
                         mat.data,
@@ -114,28 +116,16 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
                         QImage::Format_RGB888
                       ).rgbSwapped();
       break;
+      this->mData->unlock();
     }
 
-    case CV_32F:
-      std::cout << "Unhandled cv::Mat type CV_32F in cedar::aux::gui::ImagePlot::update()." << std::endl;
-      break;
-
-    case CV_32FC3:
-      std::cout << "Unhandled cv::Mat type CV_32FC3 in cedar::aux::gui::ImagePlot::update()." << std::endl;
-      break;
-
-    case CV_64F:
-      std::cout << "Unhandled cv::Mat type CV_64F in cedar::aux::gui::ImagePlot::update()." << std::endl;
-      break;
-
     default:
-      std::cout << "Unhandled cv::Mat type " << mat.type()
-                << " in cedar::aux::gui::ImagePlot::update()." << std::endl;
+      std::cout << "Unhandled matrix type " << mat.type() << " in cedar::aux::gui::ImagePlot::timerEvent." << std::endl;
+      break;
   }
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
-  this->mData->unlock();
 }
 
 void cedar::aux::gui::ImagePlot::display(cedar::aux::DataPtr data)
