@@ -212,6 +212,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
     cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(items[i]);
     if (p_drawer)
     {
+      //!\todo move this to destructor
       // delete one step at a time
       p_drawer->hide();
       p_drawer->removeAllConnections();
