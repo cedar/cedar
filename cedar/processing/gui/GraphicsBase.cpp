@@ -124,16 +124,20 @@ void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection*
 
 void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connection* pConnection)
 {
-  std::vector<Connection*>::iterator delete_this_later;
-  for (std::vector<Connection*>::iterator it = mConnections.begin(); it != mConnections.end(); it++)
+  std::vector<Connection*>::iterator it;
+  for (it = mConnections.begin(); it != mConnections.end(); it++)
   {
+    std::cout << 1 << std::endl;
     if (*it == pConnection)
     {
-      delete_this_later = it;
+      break;
     }
-    break;
   }
-  mConnections.erase(delete_this_later);
+  // found something, delete it now!
+  if (it != mConnections.end())
+  {
+    mConnections.erase(it);
+  }
 }
 
 void cedar::proc::gui::GraphicsBase::removeAllConnections()
