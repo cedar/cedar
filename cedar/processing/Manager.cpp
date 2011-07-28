@@ -51,6 +51,7 @@
 #include "auxiliaries/macros.h"
 #include "processing/PluginProxy.h"
 #include "processing/PluginDeclaration.h"
+#include "processing/Connection.h"
 
 //! @todo find a better place for this
 #include "dynamics/fields/NeuralField.h"
@@ -209,7 +210,7 @@ void cedar::proc::Manager::connect(
                                     const std::string& targetName
                                   )
 {
-  mConnections.push_back(new cedar::proc::Step::Connection(source,sourceName, target,targetName));
+  mConnections.push_back(new cedar::proc::Connection(source,sourceName, target,targetName));
   std::cout << "Manager::connect" << std::endl;
 }
 
@@ -218,7 +219,7 @@ void cedar::proc::Manager::connect(
                                     cedar::proc::StepPtr target
                                   )
 {
-  mConnections.push_back(new cedar::proc::Step::Connection(trigger, target));
+  mConnections.push_back(new cedar::proc::Connection(trigger, target));
   std::cout << "Manager::triggerConnect" << std::endl;
 }
 
@@ -227,13 +228,13 @@ void cedar::proc::Manager::connect(
                                     cedar::proc::TriggerPtr target
                                   )
 {
-  mConnections.push_back(new cedar::proc::Step::Connection(trigger, target));
+  mConnections.push_back(new cedar::proc::Connection(trigger, target));
   std::cout << "Manager::triggerConnect" << std::endl;
 }
 
 void cedar::proc::Manager::disconnect(cedar::proc::StepPtr deletedStep)
 {
-  std::vector<cedar::proc::Step::Connection*> to_delete;
+  std::vector<cedar::proc::Connection*> to_delete;
   // find entries containing the deleted step
   for (size_t i = 0; i < mConnections.size(); ++i)
   {
@@ -253,7 +254,7 @@ void cedar::proc::Manager::disconnect(cedar::proc::StepPtr deletedStep)
 
 void cedar::proc::Manager::disconnect(cedar::proc::TriggerPtr deletedTrigger)
 {
-  std::vector<cedar::proc::Step::Connection*> to_delete;
+  std::vector<cedar::proc::Connection*> to_delete;
   // find entries containing the deleted step
   for (size_t i = 0; i < mConnections.size(); ++i)
   {
@@ -271,9 +272,9 @@ void cedar::proc::Manager::disconnect(cedar::proc::TriggerPtr deletedTrigger)
   std::cout << "Manager::disconnect" << std::endl;
 }
 
-void cedar::proc::Manager::deleteConnection(cedar::proc::Step::Connection* connection)
+void cedar::proc::Manager::deleteConnection(cedar::proc::Connection* connection)
 {
-  std::vector<cedar::proc::Step::Connection*>::iterator it = std::find(mConnections.begin(), mConnections.end(), connection);
+  std::vector<cedar::proc::Connection*>::iterator it = std::find(mConnections.begin(), mConnections.end(), connection);
   if (it != mConnections.end())
   {
     mConnections.erase(it);

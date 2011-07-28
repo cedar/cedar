@@ -22,15 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Manager.h
-
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
                  Stephan Zibner
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Date:        2011 07 28
 
     Description:
 
@@ -38,130 +36,91 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_MANAGER_H
-#define CEDAR_PROC_MANAGER_H
+#ifndef CEDAR_PROC_CONNECTION_H
+#define CEDAR_PROC_CONNECTION_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
 #include "processing/namespace.h"
-#include "processing/Registry.h"
-#include "processing/StepDeclaration.h"
-#include "processing/TriggerDeclaration.h"
-#include "processing/FrameworkSettings.h"
-#include "processing/Step.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <map>
-#include <set>
-#include <vector>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::Manager
+class cedar::proc::Connection
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
-  typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
-  typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
-  typedef std::set<cedar::proc::GroupPtr> GroupRegistry; //!<@todo Use a name instead?
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
+  Connection(
+              cedar::proc::StepPtr source,
+              const std::string& sourceName,
+              cedar::proc::StepPtr target,
+              const std::string& targetName
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::StepPtr target
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::TriggerPtr target
+            );
   //!@brief Destructor
-  ~Manager();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static Manager& getInstance();
-  cedar::proc::FrameworkSettings& settings();
-
-  StepRegistry& steps();
-  TriggerRegistry& triggers();
-  ThreadRegistry& threads();
-  GroupRegistry& groups();
-
-  void registerThread(cedar::aux::LoopedThreadPtr thread);
-  cedar::proc::GroupPtr allocateGroup();
-  void removeGroup(cedar::proc::GroupPtr group);
-
-  cedar::proc::GroupPtr getGroup(const std::string& name);
-
-  void load(cedar::proc::PluginProxyPtr plugin);
-
-  void startThreads();
-  void stopThreads();
-  void connect(
-                cedar::proc::StepPtr source,
-                const std::string& sourceName,
-                cedar::proc::StepPtr target,
-                const std::string& targetName
-              );
-  void connect(
-                cedar::proc::TriggerPtr trigger,
-                cedar::proc::StepPtr target
-              );
-  void connect(
-                cedar::proc::TriggerPtr trigger,
-                cedar::proc::TriggerPtr target
-              );
-  void disconnect(cedar::proc::StepPtr deletedStep);
-  void disconnect(cedar::proc::TriggerPtr deletedTrigger);
+  bool contains(cedar::proc::StepPtr step);
+  bool contains(cedar::proc::TriggerPtr trigger);
+  void deleteConnection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief The standard constructor.
-  Manager();
-  void deleteConnection(cedar::proc::Connection* connection);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
+  cedar::proc::TriggerPtr mTrigger;
+  cedar::proc::TriggerPtr mTargetTrigger;
+  cedar::proc::StepPtr mSource;
+  std::string mSourceName;
+  cedar::proc::StepPtr mTarget;
+  std::string mTargetName;
 private:
-  static Manager mManager;
-
-  StepRegistry mStepRegistry;
-  TriggerRegistry mTriggerRegistry;
-  ThreadRegistry mThreadRegistry;
-  GroupRegistry mGroupRegistry;
-
-  cedar::proc::FrameworkSettings mSettings;
-  std::vector<cedar::proc::Connection*> mConnections;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::Manager
+}; // class cedar::proc::Connection
 
-#endif // CEDAR_PROC_MANAGER_H
+#endif // CEDAR_PROC_CONNECTION_H
 
