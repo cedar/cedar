@@ -298,6 +298,10 @@ void cedar::proc::gui::NetworkFile::loadScene(cedar::aux::ConfigurationNode& roo
   this->mpStepsToAdd.clear();
   this->mpTriggersToAdd.clear();
 
+  if (root.find("ui") == root.not_found())
+  {
+    return;
+  }
   cedar::aux::ConfigurationNode& ui = root.find("ui")->second;
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
