@@ -53,6 +53,7 @@
 #include <QPainter>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+#include <QGraphicsDropShadowEffect>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,6 +73,11 @@ mStepIcon(":/steps/no_icon.png")
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
@@ -85,6 +91,11 @@ mStepIcon(":/steps/no_icon.png")
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 cedar::proc::gui::StepItem::~StepItem()

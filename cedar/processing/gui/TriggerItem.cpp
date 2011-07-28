@@ -54,6 +54,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QGraphicsScene>
+#include <QGraphicsDropShadowEffect>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,6 +73,11 @@ cedar::proc::gui::GraphicsBase(120, 50,
                                | QGraphicsItem::ItemIsMovable
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 
@@ -88,6 +94,11 @@ cedar::proc::gui::GraphicsBase(120, 50,
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
   this->setTrigger(trigger);
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
