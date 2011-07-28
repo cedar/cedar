@@ -48,6 +48,7 @@
 #include "processing/StepDeclaration.h"
 #include "processing/TriggerDeclaration.h"
 #include "processing/FrameworkSettings.h"
+#include "processing/Step.h"
 
 // PROJECT INCLUDES
 
@@ -101,6 +102,22 @@ public:
 
   void startThreads();
   void stopThreads();
+  void connect(
+                cedar::proc::StepPtr source,
+                const std::string& sourceName,
+                cedar::proc::StepPtr target,
+                const std::string& targetName
+              );
+  void connect(
+                cedar::proc::TriggerPtr trigger,
+                cedar::proc::StepPtr target
+              );
+  void connect(
+                cedar::proc::TriggerPtr trigger,
+                cedar::proc::TriggerPtr target
+              );
+  void disconnect(cedar::proc::StepPtr deletedStep);
+  void disconnect(cedar::proc::TriggerPtr deletedTrigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -113,6 +130,7 @@ protected:
 private:
   //!@brief The standard constructor.
   Manager();
+  void deleteConnection(cedar::proc::Connection* connection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -130,6 +148,7 @@ private:
   GroupRegistry mGroupRegistry;
 
   cedar::proc::FrameworkSettings mSettings;
+  std::vector<cedar::proc::Connection*> mConnections;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

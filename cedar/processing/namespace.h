@@ -85,6 +85,9 @@ namespace cedar
     class Network;
     typedef boost::shared_ptr<Network> NetworkPtr;
 
+    class Connection;
+    typedef boost::shared_ptr<Connection> ConnectionPtr;
+
     template <class BaseClass, class FactoryType> class DeclarationBase;
 
     class StepDeclaration;

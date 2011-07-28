@@ -22,15 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataSlotItem.h
-
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
                  Stephan Zibner
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 15
+    Date:        2011 07 28
 
     Description:
 
@@ -38,14 +36,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
-#define CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
+#ifndef CEDAR_PROC_CONNECTION_H
+#define CEDAR_PROC_CONNECTION_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/GraphicsBase.h"
-#include "auxiliaries/Data.h"
-#include "processing/DataRole.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -56,7 +51,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::Connection
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,30 +62,29 @@ class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlotItem(cedar::proc::gui::StepItem *pParent,
-               cedar::aux::DataPtr data,
-               const std::string& dataName,
-               cedar::proc::DataRole::Id role);
-
+  Connection(
+              cedar::proc::StepPtr source,
+              const std::string& sourceName,
+              cedar::proc::StepPtr target,
+              const std::string& targetName
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::StepPtr target
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::TriggerPtr target
+            );
   //!@brief Destructor
-  ~DataSlotItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-
-  void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
-
-  void disconnect();
-
-  const std::string& getName() const;
-
-  bool canConnect() const;
-  bool canConnectTo(GraphicsBase* pTarget) const;
+  bool contains(cedar::proc::StepPtr step);
+  bool contains(cedar::proc::TriggerPtr trigger);
+  void deleteConnection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,12 +102,15 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::proc::TriggerPtr mTrigger;
+  cedar::proc::TriggerPtr mTargetTrigger;
+  cedar::proc::StepPtr mSource;
+  std::string mSourceName;
+  cedar::proc::StepPtr mTarget;
+  std::string mTargetName;
 private:
-  cedar::proc::gui::StepItem *mpStep;
-  cedar::aux::DataPtr mData;
-  cedar::proc::DataRole::Id mRole;
-  const std::string& mDataName;
+  // none yet
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,8 +118,9 @@ protected:
   // none yet
 
 private:
+  // none yet
 
-}; // class DataSlotItem
+}; // class cedar::proc::Connection
 
-#endif // CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
+#endif // CEDAR_PROC_CONNECTION_H
 

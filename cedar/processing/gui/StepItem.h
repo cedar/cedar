@@ -90,6 +90,7 @@ public:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
   cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+  cedar::proc::gui::StepItem::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
@@ -99,6 +100,8 @@ public:
   {
     mStep.reset();
   }
+
+  void disconnect();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
