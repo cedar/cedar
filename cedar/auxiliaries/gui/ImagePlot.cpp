@@ -41,6 +41,8 @@
 // LOCAL INCLUDES
 #include "auxiliaries/gui/ImagePlot.h"
 #include "auxiliaries/macros.h"
+#include "auxiliaries/gui/exceptions.h"
+#include "auxiliaries/ImageData.h"
 
 // PROJECT INCLUDES
 
@@ -54,9 +56,7 @@
 
 cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
-QWidget(pParent),
-mpMat(NULL),
-mpLock(NULL),
+cedar::aux::gui::DataPlotInterface(pParent),
 mTimerId(0)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -79,22 +79,23 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
 {
-  this->mpLock->lockForRead();
-  switch(this->mpMat->type())
+  this->mData->lockForRead();
+  cv::Mat& mat = this->mData->getData();
+  switch(mat.type())
   {
     case CV_8U:
       this->mImage = QImage
       (
-        this->mpMat->cols,
-        this->mpMat->rows,
+        mat.cols,
+        mat.rows,
         QImage::Format_RGB888
       );
 
-      for (int row = 0; row < this->mpMat->rows; ++row)
+      for (int row = 0; row < mat.rows; ++row)
       {
-        for (int column = 0; column < this->mpMat->cols; ++column)
+        for (int column = 0; column < mat.cols; ++column)
         {
-          uint8_t grey = this->mpMat->at<uint8_t>(row, column);
+          uint8_t grey = mat.at<uint8_t>(row, column);
           uint rgb = grey + (grey << 8) + (grey << 16);
           this->mImage.setPixel(column, row, rgb);
         }
@@ -106,10 +107,10 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
     {
       this->mImage = QImage
                       (
-                        this->mpMat->data,
-                        this->mpMat->cols,
-                        this->mpMat->rows,
-                        this->mpMat->step,
+                        mat.data,
+                        mat.cols,
+                        mat.rows,
+                        mat.step,
                         QImage::Format_RGB888
                       ).rgbSwapped();
       break;
@@ -128,26 +129,30 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
       break;
 
     default:
-      std::cout << "Unhandled cv::Mat type " << this->mpMat->type()
+      std::cout << "Unhandled cv::Mat type " << mat.type()
                 << " in cedar::aux::gui::ImagePlot::update()." << std::endl;
   }
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
-  this->mpLock->unlock();
+  this->mData->unlock();
 }
 
-void cedar::aux::gui::ImagePlot::display(cv::Mat* mat, QReadWriteLock *lock)
+void cedar::aux::gui::ImagePlot::display(cedar::aux::DataPtr data)
 {
   if (mTimerId != 0)
     this->killTimer(mTimerId);
 
-  this->mpMat = mat;
-  this->mpLock = lock;
+  this->mData = boost::shared_dynamic_cast<cedar::aux::ImageData>(data);
+  if (!this->mData)
+  {
+    CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
+                "Cannot cast to cedar::aux::ImageData in cedar::aux::gui::ImagePlot::display.");
+  }
 
   mpImageDisplay->setText("no image loaded");
 
-  if (!this->mpMat->empty())
+  if (!this->mData->getData().empty())
   {
     mpImageDisplay->setText("");
     this->mTimerId = this->startTimer(70);

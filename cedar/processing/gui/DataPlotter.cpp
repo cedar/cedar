@@ -80,22 +80,22 @@ void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
 //  p_widget->plot(data);
 
   //!@todo find a better solution for this!
-  if (cedar::aux::MatData* mat_data = dynamic_cast<cedar::aux::MatData*>(data.get()))
+  cedar::aux::gui::DataPlotInterface *p_plot = NULL;
+  if (dynamic_cast<cedar::aux::MatData*>(data.get()))
   {
-    cedar::aux::gui::MatrixPlot *p_plot = new cedar::aux::gui::MatrixPlot();
-    p_plot->display(&mat_data->getData(), &mat_data->getLock());
-    this->setWidget(p_plot);
+    p_plot = new cedar::aux::gui::MatrixPlot();
   }
-  else if (cedar::aux::ImageData* img_data = dynamic_cast<cedar::aux::ImageData*>(data.get()))
+  else if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
   {
-    cedar::aux::gui::ImagePlot *p_plot = new cedar::aux::gui::ImagePlot();
-    p_plot->display(&img_data->getData(), &img_data->getLock());
-    this->setWidget(p_plot);
+    p_plot = new cedar::aux::gui::ImagePlot();
   }
   else
   {
     CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::proc::gui::DataPlotter::plot.");
   }
+
+  p_plot->display(data);
+  this->setWidget(p_plot);
 }
 
 cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::getWidgetFactory()

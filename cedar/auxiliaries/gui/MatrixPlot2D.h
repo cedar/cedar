@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/gui/namespace.h"
+#include "auxiliaries/gui/DataPlotInterface.h"
 
 // PROJECT INCLUDES
 
@@ -60,7 +61,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::gui::MatrixPlot2D : public QWidget
+class cedar::aux::gui::MatrixPlot2D : public DataPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -75,15 +76,14 @@ public:
   {
   public:
     Matrix2DFunction(Qwt3D::GridPlot* plot);
-    Matrix2DFunction(QReadWriteLock *pLock, Qwt3D::GridPlot* plot, cv::Mat* matrix);
+    Matrix2DFunction(cedar::aux::MatDataPtr matData, Qwt3D::GridPlot* plot);
     double operator()(double x, double y);
-    void updateMatrix(cv::Mat* matrix);
-
-    void setLock(QReadWriteLock *lock);
+    void updateMatrix();
+    void setMatData(cedar::aux::MatDataPtr matData);
 
   private:
-    cv::Mat mMatrix;
-    QReadWriteLock *mpeLock;
+    cedar::aux::MatDataPtr mMatData;
+    cv::Mat mInternalMat;
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,7 +93,7 @@ public:
   //!@brief The standard constructor.
   MatrixPlot2D(QWidget *pParent = NULL);
 
-  MatrixPlot2D(cv::Mat* mat, QReadWriteLock *lock, QWidget *pParent = NULL);
+  MatrixPlot2D(cedar::aux::DataPtr matData, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~MatrixPlot2D();
@@ -102,7 +102,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cv::Mat* mat, QReadWriteLock *lock);
+  void display(cedar::aux::DataPtr matData);
   void resetPerspective();
   void showGrid(bool show);
   void timerEvent(QTimerEvent *pEvent);
@@ -127,8 +127,7 @@ public:
 protected:
   // none yet
 private:
-  cv::Mat* mpMat;
-  QReadWriteLock *mpeLock;
+  cedar::aux::MatDataPtr mMatData;
   bool mShowGridLines;
 
   Qwt3D::GridPlot *mpPlot;

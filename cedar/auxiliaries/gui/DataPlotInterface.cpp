@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,61 +22,39 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        <filename>
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2010 11 25
+    Maintainer:  <first name> <last name>
+    Email:       <email address>
+    Date:        <creation date YYYY MM DD>
 
-    Description: Namespace file for cedar::aux::gui.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_GUI_NAMESPACE_H
-#define CEDAR_AUX_GUI_NAMESPACE_H
-
 // LOCAL INCLUDES
+#include "auxiliaries/gui/DataPlotInterface.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::gui::DataPlotInterface::DataPlotInterface(QWidget *pParent)
+:
+QWidget(pParent)
 {
-  namespace aux
-  {
-    //!@brief Namespace for widget classes.
-    namespace gui
-    {
-      class BaseWidget;
-      //!@brief smart pointer for BaseWidget
-      typedef boost::shared_ptr<BaseWidget> BaseWidgetPtr;
-
-      class SceneWidget;
-      //!@brief smart pointer for SceneWidget
-      typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
-
-      class Viewer;
-      //!@brief smart pointer for Viewer
-      typedef boost::shared_ptr<Viewer> ViewerPtr;
-
-      /* Plot widgets */
-      class DataPlotInterface;
-
-      class MatrixPlot;
-      class MatrixPlot2D;
-
-      class ImagePlot;
-
-      /* Exceptions */
-      class InvalidPlotData;
-    }
-  }
 }
 
-#endif // CEDAR_AUX_GUI_NAMESPACE_H
+cedar::aux::gui::DataPlotInterface::~DataPlotInterface()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
