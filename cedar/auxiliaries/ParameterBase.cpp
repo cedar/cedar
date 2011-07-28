@@ -68,6 +68,11 @@ cedar::aux::ParameterBase::~ParameterBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::ParameterBase::emitChangedSignal()
+{
+  emit parameterChanged();
+}
+
 bool cedar::aux::ParameterBase::isHidden() const
 {
   return this->mIsHidden;

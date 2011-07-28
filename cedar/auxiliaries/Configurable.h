@@ -91,6 +91,8 @@ public:
 protected:
   void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
 
+  virtual void configurationLoaded();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
