@@ -52,7 +52,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -171,8 +171,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>325</height>
+          <width>130</width>
+          <height>319</height>
          </rect>
         </property>
         <attribute name="label">
@@ -184,8 +184,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>121</width>
-          <height>325</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -258,6 +258,9 @@
    </property>
    <property name="text">
     <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="mpActionSaveAs">
