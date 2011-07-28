@@ -60,11 +60,14 @@ cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
 :
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mShape(shape),
+mDrawBackground(true),
 mWidth(new cedar::aux::DoubleParameter("width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mHeight(new cedar::aux::DoubleParameter("height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
+  this->setZValue(1.0);
+
   this->mWidth->set(width);
   this->mHeight->set(height);
   this->registerParameter(this->mWidth);
@@ -183,10 +186,22 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   switch (this->mShape)
   {
     case BASE_SHAPE_RECT:
+      if (mDrawBackground)
+      {
+        painter->fillRect(bounds, Qt::white);
+      }
       painter->drawRect(bounds);
       break;
 
     case BASE_SHAPE_ROUND:
+      if (mDrawBackground)
+      {
+        painter->save();
+        painter->setPen(QPen(Qt::NoPen));
+        painter->setBrush(Qt::white);
+        painter->drawEllipse(bounds);
+        painter->restore();
+      }
       painter->drawEllipse(bounds);
       break;
   }

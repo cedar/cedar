@@ -159,6 +159,7 @@ protected:
 private:
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
   BaseShape mShape;
+  bool mDrawBackground;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

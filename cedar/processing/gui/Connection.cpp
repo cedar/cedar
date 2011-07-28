@@ -56,6 +56,7 @@ QGraphicsLineItem(pSource),
 mpSource(pSource),
 mpTarget(pTarget)
 {
+  this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent);
   pSource->addConnection(this);
   pTarget->addConnection(this);
   this->update();
@@ -71,7 +72,7 @@ cedar::proc::gui::Connection::~Connection()
 
 void cedar::proc::gui::Connection::update()
 {
-  this->setZValue(-1.0);
+  this->setZValue(0.0);
   QLineF line;
 
   QPointF pos1(this->mpSource->boundingRect().width()/2.0, this->mpSource->boundingRect().height()/2.0);
