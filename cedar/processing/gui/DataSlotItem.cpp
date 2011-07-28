@@ -73,6 +73,12 @@ mRole(role),
 mDataName(dataName)
 {
   this->setParentItem(pParent);
+
+  QString tool_tip;
+  tool_tip += cedar::proc::DataRole::type().get(role).prettyString().c_str();
+  tool_tip += ": ";
+  tool_tip += dataName.c_str();
+  this->setToolTip(tool_tip);
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
