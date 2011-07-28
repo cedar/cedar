@@ -217,6 +217,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_drawer->getStep());
       Manager::getInstance().steps().removeObject(p_drawer->getStep()->getName());
+      Manager::getInstance().disconnect(p_drawer->getStep());
       this->mpPropertyTable->resetPointer();
       this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
       continue;

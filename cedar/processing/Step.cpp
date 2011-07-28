@@ -73,9 +73,97 @@ mMandatory (isMandatory)
 {
 }
 
+cedar::proc::Step::Connection::Connection(
+                                           cedar::proc::StepPtr source,
+                                           const std::string& sourceName,
+                                           cedar::proc::StepPtr target,
+                                           const std::string& targetName
+                                         )
+:
+mSource(source),
+mSourceName(sourceName),
+mTarget(target),
+mTargetName(targetName)
+{
+  cedar::proc::Step::connect(source, sourceName, target, targetName);
+}
+
+cedar::proc::Step::Connection::Connection(
+                                           cedar::proc::TriggerPtr source,
+                                           cedar::proc::StepPtr target
+                                         )
+:
+mTrigger(source),
+mTarget(target)
+{
+  if (!mTrigger->isListener(mTarget))
+  {
+    mTrigger->addListener(mTarget);
+  }
+//  cedar::proc::Step::connect(source, sourceName, target, targetName);
+}
+
+cedar::proc::Step::Connection::Connection(
+                                           cedar::proc::TriggerPtr source,
+                                           cedar::proc::TriggerPtr target
+                                         )
+:
+mTrigger(source),
+mTargetTrigger(target)
+{
+  if (!mTrigger->isListener(mTargetTrigger))
+  {
+    mTrigger->addTrigger(mTargetTrigger);
+  }
+//  cedar::proc::Step::connect(source, sourceName, target, targetName);
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::Step::Connection::contains(cedar::proc::StepPtr step)
+{
+  return (mSource == step || mTarget == step);
+}
+
+bool cedar::proc::Step::Connection::contains(cedar::proc::TriggerPtr trigger)
+{
+  return (mTrigger == trigger || mTargetTrigger == trigger);
+}
+
+void cedar::proc::Step::Connection::deleteConnection()
+{
+  if (mSource)
+  {
+    std::cout << "deleting the following connection: "
+              << mSource->getName() << "::" << mSourceName
+              << " to "
+              << mTarget->getName() << "::" << mTargetName << std::endl;
+    mTarget->freeInput(mTargetName);
+    mSource->getFinishedTrigger()->removeListener(mTarget);
+  }
+  else if (mTrigger && mTarget)
+  {
+    std::cout << "deleting the following trigger connection: "
+              << mTrigger->getName()
+              << " to "
+              << mTarget->getName() << std::endl;
+    mTrigger->removeListener(mTarget);
+  }
+  else if (mTrigger && mTargetTrigger)
+  {
+    std::cout << "deleting the following trigger connection: "
+              << mTrigger->getName()
+              << " to "
+              << mTargetTrigger->getName() << std::endl;
+    mTrigger->removeTrigger(mTargetTrigger);
+  }
+  else
+  {
+    std::cout << "nothing removed" << std::endl;
+  }
+}
 
 void cedar::proc::Step::DataEntry::setData(cedar::aux::DataPtr data)
 {

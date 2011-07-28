@@ -138,30 +138,20 @@ void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connecti
 
 void cedar::proc::gui::GraphicsBase::removeAllConnections()
 {
-  std::vector<Connection*> delete_later;
-  if (dynamic_cast<cedar::proc::gui::StepItem*>(this))
+  // first, disconnect the underlying structures
+  this->disconnect();
+  // then, delete the graphical representation of the connections
+  std::vector<cedar::proc::gui::Connection*> delete_later;
+  for (std::vector<cedar::proc::gui::Connection*>::iterator it = mConnections.begin(); it != mConnections.end(); ++it)
   {
-//    cedar::proc::gui::StepItem::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::StepItem*>(this)->getSlotItems();
-//    for (cedar::proc::gui::StepItem::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
-//    {
-//      it->second->get
-//    }
-  }
-  for (std::vector<Connection*>::iterator it = mConnections.begin(); it != mConnections.end(); ++it)
-  {
-    std::cout << 1 << std::endl;
-    if (dynamic_cast<cedar::proc::gui::TriggerItem*>((*it)->getSource()))
+    if ((*it)->getSource() == this)
     {
-      dynamic_cast<cedar::proc::gui::TriggerItem*>((*it)->getSource())->disconnectFrom(
-          dynamic_cast<cedar::proc::gui::StepItem*>((*it)->getTarget()));
+      (*it)->getTarget()->removeConnection(*it);
     }
-    else if (dynamic_cast<cedar::proc::gui::DataSlotItem*>((*it)->getSource()))
+    else if ((*it)->getTarget() == this)
     {
-      std::cout << 7 << std::endl;
-      dynamic_cast<cedar::proc::gui::DataSlotItem*>((*it)->getSource())->disconnectFrom(
-          dynamic_cast<cedar::proc::gui::DataSlotItem*>((*it)->getTarget()));
+      (*it)->getSource()->removeConnection(*it);
     }
-    (*it)->getSource()->removeConnection(*it);
     // delete own connections later
     delete_later.push_back(*it);
     delete *it;

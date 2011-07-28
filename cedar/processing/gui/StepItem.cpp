@@ -300,3 +300,21 @@ cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
   return this->mStep;
 }
 
+void cedar::proc::gui::StepItem::disconnect()
+{
+  // go through all DataSlots and remove connections
+  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
+  {
+    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
+    if (id == cedar::aux::Enum::UNDEFINED)
+    {
+      continue;
+    }
+    cedar::proc::gui::StepItem::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::StepItem*>(this)->getSlotItems(id);
+    for (cedar::proc::gui::StepItem::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
+    {
+      it->second->removeAllConnections();
+    }
+  }
+}
+

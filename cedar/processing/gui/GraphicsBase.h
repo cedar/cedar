@@ -136,6 +136,8 @@ public:
 
   void removeAllConnections();
 
+  virtual void disconnect() = 0;
+
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   void saveConfiguration(cedar::aux::ConfigurationNode& root);
