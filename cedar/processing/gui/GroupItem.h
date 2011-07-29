@@ -90,7 +90,7 @@ public:
 
   void updateChildConnections();
 
-  void disconnect(){}; //!\todo implement
+  void disconnect(){}; //!\todo implement deleting all children elements inside this group
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

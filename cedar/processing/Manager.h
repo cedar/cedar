@@ -116,13 +116,15 @@ public:
                 cedar::proc::TriggerPtr trigger,
                 cedar::proc::TriggerPtr target
               );
-  void disconnect(cedar::proc::StepPtr deletedStep);
-  void disconnect(cedar::proc::TriggerPtr deletedTrigger);
+  void removeStep(cedar::proc::StepPtr step);
+  void removeTrigger(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  void disconnect(cedar::proc::StepPtr deletedStep);
+  void disconnect(cedar::proc::TriggerPtr deletedTrigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
