@@ -91,3 +91,13 @@ cedar::aux::ConstDataPtr cedar::proc::DataSlot::getData() const
 {
   return this->mData;
 }
+
+cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const
+{
+  return this->mRole;
+}
+
+const std::string& cedar::proc::DataSlot::getName() const
+{
+  return this->mName;
+}
