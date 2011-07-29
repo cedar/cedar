@@ -157,7 +157,7 @@ namespace cedar
     template <typename T> class DataT;
 
     typedef DataT<cv::Mat> MatData;
-    typedef boost::shared_ptr<MatData> MatDataPtr;
+    CEDAR_GENERATE_POINTER_TYPES(MatData);
 
     class ImageData;
     typedef boost::shared_ptr<ImageData> ImageDataPtr;

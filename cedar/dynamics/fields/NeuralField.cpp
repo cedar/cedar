@@ -110,10 +110,13 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 {
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data);
-    if (!input)
+    if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
     {
-      return cedar::proc::DataSlot::VALIDITY_ERROR;
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+    else if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    {
+      return cedar::proc::DataSlot::VALIDITY_WARNING;
     }
   }
   return this->cedar::proc::Step::determineInputValidity(slot, data);
