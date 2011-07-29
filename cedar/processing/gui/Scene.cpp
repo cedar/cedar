@@ -274,10 +274,7 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
       {
         if (cedar::proc::gui::GraphicsBase* item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(all_items.at(i)))
         {
-          if (mpConnectionStart->canConnectTo(item))
-          {
-            item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET);
-          }
+          item->highlightConnectionTarget(mpConnectionStart);
         }
       }
     }
@@ -299,7 +296,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
       for (int i = 0; i < items.size() && !connected; ++i)
       {
         if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-             && mpConnectionStart->canConnectTo(target)
+             && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::GraphicsBase::CONNECT_NO
             )
         {
           connected = true;
@@ -335,7 +332,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
     {
       cedar::proc::gui::GraphicsBase *target;
       if ( (target = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[i]))
-           && mpConnectionStart->canConnectTo(target)
+           && mpConnectionStart->canConnectTo(target) != cedar::proc::gui::GraphicsBase::CONNECT_NO
           )
       {
         connected = true;
@@ -404,9 +401,16 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
   {
     if (cedar::proc::gui::GraphicsBase* item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(all_items.at(i)))
     {
-      if (item->getHighlightMode() == cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET)
+      switch (item->getHighlightMode())
       {
-        item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+        case cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
+        case cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
+        case cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
+          item->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+          break;
+
+        default:
+          break;
       }
     }
   }

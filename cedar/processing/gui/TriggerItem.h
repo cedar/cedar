@@ -92,6 +92,8 @@ public:
 
   void saveConfiguration(cedar::aux::ConfigurationNode& root);
 
+  cedar::proc::gui::GraphicsBase::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

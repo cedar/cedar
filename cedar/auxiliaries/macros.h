@@ -56,6 +56,10 @@
 
 #endif // DEBUG
 
+#define CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME) \
+  typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
+  typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
+
 /*! @def     CEDAR_DECLARE_CLASS(CLASS_NAME)
  *
  *  @brief   Automatically declares a class and its corresponding smart pointer types within a namespace block.
@@ -70,8 +74,7 @@
  */
 #define CEDAR_DECLARE_CLASS(CLASS_NAME) \
   class CLASS_NAME; \
-  typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
-  typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
+  CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
 
 #endif // CEDAR_MACROS_H
 
