@@ -64,7 +64,7 @@
  *
  *  @brief   Automatically declares a class and its corresponding smart pointer types within a namespace block.
  *
- *  @example calling namespace foo { CEDAR_DECLARE_CLASS(Bar); } expands to
+ *  @remarks calling namespace foo { CEDAR_DECLARE_CLASS(Bar); } expands to
  *           namespace foo
  *           {
  *             class Bar;

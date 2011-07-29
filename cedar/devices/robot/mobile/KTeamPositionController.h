@@ -95,7 +95,7 @@ public:
   /*!@brief The get-function of the target-position.
    *@return Vektor with x- and y-coordinate [both in m]  of the target.
    */
-  cv::Mat getTarget();
+  cv::Mat getTarget() const;
 
   /*!@brief The set-function of the factor of the turning rate dynamics.
    *@param factorTurningRate The factor to be set.
@@ -126,28 +126,28 @@ private:
    *@param distance The distance from the target.
    *@return The turning rate calculated by the controller.
    */
-  double calculateTurningRate(double orientation, double distance);
+  double calculateTurningRate(double orientation, double distance) const;
 
   /*!@brief Dynamics of the forward velocity.
    *@param orientation The current orientation.
    *@param distance The distance from the target.
    *@return The forward velocity calculated by the controller.
    */
-  double calculateForwardVelocity(double orientation, double distance);
+  double calculateForwardVelocity(double orientation, double distance) const;
 
   /*!@brief Calculation of the distance from the target.
    *@param robotPosition Position of the robot.
    *@param targetPosition Position of the target.
    *@return The distance between robot and its target.
    */
-  double getDistance(cv::Mat robotPosition, cv::Mat targetPosition);
+  double getDistance(cv::Mat robotPosition, cv::Mat targetPosition) const;
 
   /*!@brief Calculation of the angle between the robot and the target.
    *@param robotPosition Position of the robot.
    *@param targetPosition Position of the target.
    *@return The angle between robot and its target.
    */
-  double getAngle(cv::Mat robotPosition, cv::Mat targetPosition);
+  double getAngle(cv::Mat robotPosition, cv::Mat targetPosition) const;
 
   /*!@brief Updates the controller output.
    *

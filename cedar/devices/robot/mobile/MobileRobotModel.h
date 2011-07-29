@@ -73,7 +73,7 @@ public:
   MobileRobotModel();
 
   //!@brief Destructs the model of the robot's kinematics.
-  virtual ~MobileRobotModel() = 0;
+  virtual ~MobileRobotModel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -84,12 +84,12 @@ public:
   /*!@brief The get-function of the robot's current position.
    *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
    */
-  cv::Mat getPosition();
+  cv::Mat getPosition() const;
 
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].
    */
-  double getOrientation();
+  double getOrientation() const;
 
   /*!@brief The set-function of the robot's position.
    *@param xPosition Position of the robot on the x-axis to be set [in m].

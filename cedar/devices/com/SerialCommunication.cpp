@@ -73,47 +73,47 @@ SerialCommunication::~SerialCommunication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool SerialCommunication::isInitialized()
+bool SerialCommunication::isInitialized() const
 {
   return mInitialized;
 }
 
-int SerialCommunication::getFileDescriptor()
+int SerialCommunication::getFileDescriptor() const
 {
   return mFileDescriptor;
 }
 
-std::string SerialCommunication::getName()
+const std::string& SerialCommunication::getName() const
 {
   return _mName;
 }
 
-std::string SerialCommunication::getDevicePath()
+const std::string& SerialCommunication::getDevicePath() const
 {
   return _mDevicePath;
 }
 
-std::string SerialCommunication::getEndOfCommandString()
+const std::string& SerialCommunication::getEndOfCommandString() const
 {
   return _mEndOfCommandString;
 }
 
-int SerialCommunication::getCFlag()
+int SerialCommunication::getCFlag() const
 {
   return _mCFlag;
 }
 
-unsigned int SerialCommunication::getBaudrate()
+unsigned int SerialCommunication::getBaudrate() const
 {
   return _mBaudrate;
 }
 
-unsigned int SerialCommunication::getTimeOut()
+unsigned int SerialCommunication::getTimeOut() const
 {
   return _mTimeOut;
 }
 
-unsigned int SerialCommunication::getLatency()
+unsigned int SerialCommunication::getLatency() const
 {
   return _mLatency;
 }
@@ -294,7 +294,7 @@ int SerialCommunication::init()
   return 1;
 }
 
-int SerialCommunication::send(const std::string command)
+int SerialCommunication::send(const std::string& command)
 {
   if (!mInitialized)
   {
@@ -337,7 +337,7 @@ int SerialCommunication::send(const std::string command)
 
 }
 
-int SerialCommunication::receive(std::string &answer)
+int SerialCommunication::receive(std::string& answer)
 {
 
   if (!mInitialized)
@@ -423,7 +423,7 @@ int SerialCommunication::receive(std::string &answer)
   return e;
 }
 
-void SerialCommunication::setEndOfCommandString(std::string eocString)
+void SerialCommunication::setEndOfCommandString(const std::string& eocString)
 {
   _mEndOfCommandString = eocString;
 }

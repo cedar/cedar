@@ -149,9 +149,7 @@ namespace cedar
       streamOut << value;
       return streamOut.str();
     }
-
-
-    /* data */
+    //!@brief class declaration of Data
     CEDAR_DECLARE_CLASS(Data);
 
     template <typename T> class DataT;

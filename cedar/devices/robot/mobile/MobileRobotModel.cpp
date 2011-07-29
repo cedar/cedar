@@ -62,7 +62,7 @@ MobileRobotModel::~MobileRobotModel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat MobileRobotModel::getPosition()
+cv::Mat MobileRobotModel::getPosition() const
 {
   //construct the matrix to return
   cv::Mat position = cv::Mat(2,1,CV_64FC1);
@@ -73,7 +73,7 @@ cv::Mat MobileRobotModel::getPosition()
   return position;
 }
 
-double MobileRobotModel::getOrientation()
+double MobileRobotModel::getOrientation() const
 {
   //calculates the orientation from the quaternion stored in Object.h.
   return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));

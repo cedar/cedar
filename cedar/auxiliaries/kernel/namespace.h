@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "namespace.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -54,17 +55,11 @@ namespace cedar
   /*!@brief Namespace for all kernel classes. */
     namespace kernel
     {
-      class Kernel;
-      //!@brief smart pointer for Kernel
-      typedef boost::shared_ptr<Kernel> KernelPtr;
+      CEDAR_DECLARE_CLASS(Kernel);
 
-      class Separable;
-      //!@brief smart pointer for Separable
-      typedef boost::shared_ptr<Separable> SeparablePtr;
+      CEDAR_DECLARE_CLASS(Separable);
 
-      class Gauss;
-      //!@brief smart pointer for Gauss
-      typedef boost::shared_ptr<Gauss> GaussPtr;
+      CEDAR_DECLARE_CLASS(Gauss);
     }
   }
 }

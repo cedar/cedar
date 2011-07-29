@@ -81,7 +81,7 @@ public:
 public:
   /*!@brief this function calculates the Heavyside function for a given double value.
    */
-  virtual double compute(double value)
+  virtual double compute(double value) const
   {
     return cedar::aux::math::sigmoidHeavyside(value, mThreshold->get());
   }
