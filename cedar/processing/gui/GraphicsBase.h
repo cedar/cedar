@@ -136,7 +136,8 @@ public:
 
   void removeAllConnections();
 
-  virtual void disconnect() = 0;
+  //!\brief overwrite this function if your customized graphics item needs to disconnect some children items
+  virtual void disconnect();
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
