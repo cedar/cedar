@@ -38,6 +38,11 @@
 
 ======================================================================================================================*/
 
+/*!@file  macros.h
+ *
+ * @brief File containing multiple global macros for cedar.
+ */
+
 #ifndef CEDAR_MACROS_H
 #define CEDAR_MACROS_H
 
@@ -50,6 +55,23 @@
 #define CEDAR_DEBUG_ASSERT(expr)
 
 #endif // DEBUG
+
+/*! @def     CEDAR_DECLARE_CLASS(CLASS_NAME)
+ *
+ *  @brief   Automatically declares a class and its corresponding smart pointer types within a namespace block.
+ *
+ *  @example calling namespace foo { CEDAR_DECLARE_CLASS(Bar); } expands to
+ *           namespace foo
+ *           {
+ *             class Bar;
+ *             typedef boost::shared_ptr<Bar> BarPtr;
+ *             typedef boost::shared_ptr<const Bar> ConstBarPtr;
+ *           }
+ */
+#define CEDAR_DECLARE_CLASS(CLASS_NAME) \
+  class CLASS_NAME; \
+  typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
+  typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
 
 #endif // CEDAR_MACROS_H
 

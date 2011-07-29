@@ -61,9 +61,9 @@ cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
                                              GraphicsGroup canConnectTo,
                                              BaseShape shape)
 :
+mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mShape(shape),
-mDrawBackground(true),
 mWidth(new cedar::aux::DoubleParameter("width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mHeight(new cedar::aux::DoubleParameter("height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mGroup(group),

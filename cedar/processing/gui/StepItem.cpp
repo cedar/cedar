@@ -43,6 +43,7 @@
 #include "processing/gui/DataPlotter.h"
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/exceptions.h"
+#include "processing/DataSlot.h"
 #include "processing/Manager.h"
 #include "auxiliaries/Data.h"
 #include "processing/Step.h"
@@ -186,7 +187,7 @@ void cedar::proc::gui::StepItem::addDataItems()
       for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this,
-                                                                                    iter->second.getData(),
+                                                                                    iter->second->getData(),
                                                                                     iter->first,
                                                                                     (*enum_it));
         p_item->setPos(origin + count * direction * (data_size + padding) );
