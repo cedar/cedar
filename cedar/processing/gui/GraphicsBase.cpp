@@ -87,6 +87,27 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource)
+{
+  switch (pConnectionSource->canConnectTo(this))
+  {
+    case cedar::proc::gui::GraphicsBase::CONNECT_YES:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET);
+      break;
+
+    case cedar::proc::gui::GraphicsBase::CONNECT_WARNING:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING);
+      break;
+
+    case cedar::proc::gui::GraphicsBase::CONNECT_ERROR:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR);
+      break;
+
+    case cedar::proc::gui::GraphicsBase::CONNECT_NO:
+    default:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+  }
+}
 
 void cedar::proc::gui::GraphicsBase::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
@@ -193,9 +214,20 @@ bool cedar::proc::gui::GraphicsBase::canConnect() const
   return this->mAllowedConnectTargets != GRAPHICS_GROUP_NONE;
 }
 
-bool cedar::proc::gui::GraphicsBase::canConnectTo(GraphicsBase* pTarget) const
+cedar::proc::gui::GraphicsBase::ConnectValidity cedar::proc::gui::GraphicsBase::canConnectTo(GraphicsBase* pTarget) const
 {
-  return (this->mAllowedConnectTargets & pTarget->mGroup) != 0 && pTarget != this;
+  if ((this->mAllowedConnectTargets & pTarget->mGroup) != 0)
+  {
+    if (pTarget == this)
+    {
+      return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+    }
+    else
+    {
+      return cedar::proc::gui::GraphicsBase::CONNECT_YES;
+    }
+  }
+  return cedar::proc::gui::GraphicsBase::CONNECT_NO;
 }
 
 QPointF cedar::proc::gui::GraphicsBase::getConnectionAnchorInScene() const
@@ -270,6 +302,14 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         highlight_pen.setColor(QColor(150, 200, 150));
         break;
 
+      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
+        highlight_pen.setColor(QColor(200, 150, 150));
+        break;
+
+      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
+        highlight_pen.setColor(QColor(200, 200, 150));
+        break;
+
       default:
         break;
     }
@@ -279,7 +319,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
     switch (this->mShape)
     {
       case BASE_SHAPE_RECT:
-        painter->drawRect(highlight_bounds);
+        painter->drawRoundedRect(highlight_bounds, roundedness, roundedness);
         break;
 
       case BASE_SHAPE_ROUND:

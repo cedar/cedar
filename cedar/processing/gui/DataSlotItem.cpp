@@ -88,27 +88,58 @@ cedar::proc::gui::DataSlotItem::~DataSlotItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::ConstDataSlotPtr cedar::proc::gui::DataSlotItem::getSlot() const
+{
+  return this->mSlot;
+}
+
 bool cedar::proc::gui::DataSlotItem::canConnect() const
 {
   return this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT;
 }
 
-bool cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
+cedar::proc::gui::GraphicsBase::ConnectValidity
+  cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
 {
-  if (!this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget))
-    return false;
+  if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::GraphicsBase::CONNECT_NO)
+  {
+    return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+  }
 
   cedar::proc::gui::DataSlotItem *p_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
   // should only be able to connect to DataSlotItems
   CEDAR_DEBUG_ASSERT(p_target != NULL);
 
-  return
-      // don't connect outputs of the same step to itself
-      this->mpStep != p_target->mpStep
-      // the only way to connect is outputs to inputs
-      && this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT
-      && p_target->mSlot->getRole() == cedar::proc::DataRole::INPUT
-      ;
+  if (p_target->getSlot()->getData())
+  {
+    return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+  }
+
+  // a step cannot connect to itself
+  if (this->mpStep == p_target->mpStep)
+  {
+    return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+  }
+
+  if (this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT
+      && p_target->mSlot->getRole() == cedar::proc::DataRole::INPUT)
+  {
+    switch (p_target->mpStep->getStep()->getInputValidity(p_target->mSlot))
+    {
+      case cedar::proc::DataSlot::VALIDITY_ERROR:
+        return cedar::proc::gui::GraphicsBase::CONNECT_ERROR;
+        break;
+
+      case cedar::proc::DataSlot::VALIDITY_WARNING:
+        return cedar::proc::gui::GraphicsBase::CONNECT_WARNING;
+        break;
+
+      default:
+        return cedar::proc::gui::GraphicsBase::CONNECT_YES;
+    }
+  }
+
+  return cedar::proc::gui::GraphicsBase::CONNECT_NO;
 }
 
 void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
