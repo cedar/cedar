@@ -97,9 +97,25 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   // now check the dimensionality and sizes of all matrices
   this->updateDimensionality();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+
+cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity(cedar::proc::ConstDataSlotPtr slot) const
+{
+  if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
+  {
+    cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(slot->getData());
+    if (!input)
+    {
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    }
+  }
+  return this->cedar::proc::Step::determineInputValidity(slot);
+}
+
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();

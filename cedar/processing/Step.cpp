@@ -78,6 +78,28 @@ void cedar::proc::Step::inputConnectionChanged(const std::string& /*inputName*/)
   // default: empty. This should be overwritten in all subclasses in order to react to, e.g., a new matrix size.
 }
 
+cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(cedar::proc::DataSlotPtr slot)
+{
+  if (slot->getValidlity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
+  {
+    cedar::proc::DataSlot::VALIDITY validity = this->determineInputValidity(slot);
+    slot->setValidity(validity);
+  }
+  return slot->getValidlity();
+}
+
+cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(const std::string& slot_name)
+{
+  return this->getInputValidity(this->getSlot(cedar::proc::DataRole::INPUT, slot_name));
+}
+
+cedar::proc::DataSlot::VALIDITY cedar::proc::Step::determineInputValidity(cedar::proc::ConstDataSlotPtr /* slot */) const
+{
+  // default: just validate. This should be overwritten in all subclasses in order to react to, e.g., a matrix size of a wrong size.
+  return cedar::proc::DataSlot::VALIDITY_VALID;
+}
+
+
 void cedar::proc::Step::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
 {
   size_t dot_idx = instr.rfind('.');

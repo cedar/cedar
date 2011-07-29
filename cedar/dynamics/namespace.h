@@ -43,6 +43,7 @@
 #define CEDAR_DYN_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 #include "namespace.h"
@@ -66,8 +67,7 @@ namespace cedar
     typedef Activation<cv::Mat> MatActivation;
     typedef boost::shared_ptr<MatActivation> MatActivationPtr;
 
-    class SpaceCode;
-    typedef boost::shared_ptr<SpaceCode> SpaceCodePtr;
+    CEDAR_DECLARE_CLASS(SpaceCode);
 
     class NeuralField;
     typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;

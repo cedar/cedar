@@ -78,6 +78,8 @@ public:
   //!\brief
   void onStart();
 
+  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr slot) const;
+
 public slots:
   void updateDimensionality();
   //--------------------------------------------------------------------------------------------------------------------
