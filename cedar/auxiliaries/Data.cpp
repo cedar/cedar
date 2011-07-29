@@ -84,7 +84,7 @@ void cedar::aux::Data::unlock()
   this->mLock.unlock();
 }
 
-cedar::aux::Configurable* cedar::aux::Data::getOwner()
+cedar::aux::Configurable* cedar::aux::Data::getOwner() const
 {
   return this->mpeOwner;
 }

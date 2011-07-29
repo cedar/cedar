@@ -307,7 +307,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
 
       case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
-        highlight_pen.setColor(QColor(200, 200, 150));
+        highlight_pen.setColor(QColor(200, 200, 75));
         break;
 
       default:

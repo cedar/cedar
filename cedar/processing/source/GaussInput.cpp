@@ -61,7 +61,7 @@
 cedar::proc::source::GaussInput::GaussInput()
 :
 cedar::proc::Step(),
-mOutput(new cedar::dyn::MatActivation(cv::Mat())),
+mOutput(new cedar::aux::MatData(cv::Mat())),
 _mAmplitude(new cedar::aux::DoubleParameter("amplitude", 1.0, -10000.0, 10000.0)),
 _mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
 _mSigmas(new cedar::aux::DoubleVectorParameter("sigma", 2, 3.0, 0.01, 1000.0)),

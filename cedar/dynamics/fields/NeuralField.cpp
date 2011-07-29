@@ -43,6 +43,7 @@
 #include "dynamics/SpaceCode.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
+#include "auxiliaries/DataT.h"
 #include "auxiliaries/math/Sigmoid.h"
 #include "auxiliaries/math/AbsSigmoid.h"
 #include "auxiliaries/kernel/Gauss.h"
@@ -108,16 +109,22 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
                                                            cedar::aux::DataPtr data
                                                          ) const
 {
+  if (!data)
+  {
+    std::cout << "Data is null." << std::endl;
+  }
+
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
   {
-    if (cedar::dyn::ConstSpaceCodePtr input = boost::shared_dynamic_cast<const cedar::dyn::SpaceCode>(data))
+    if (cedar::dyn::SpaceCodePtr input = boost::shared_dynamic_cast<cedar::dyn::SpaceCode>(data))
     {
       return cedar::proc::DataSlot::VALIDITY_VALID;
     }
-    else if (cedar::aux::ConstMatDataPtr input = boost::shared_dynamic_cast<const cedar::aux::MatData>(data))
+    else if (cedar::aux::MatDataPtr input = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
     {
       return cedar::proc::DataSlot::VALIDITY_WARNING;
     }
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
   return this->cedar::proc::Step::determineInputValidity(slot, data);
 }

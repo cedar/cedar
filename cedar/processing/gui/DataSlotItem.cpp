@@ -124,7 +124,7 @@ cedar::proc::gui::GraphicsBase::ConnectValidity
   if (this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT
       && p_target->mSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
-    switch (p_target->mpStep->getStep()->getInputValidity(p_target->mSlot))
+    switch (p_target->mpStep->getStep()->determineInputValidity(p_target->mSlot, this->mSlot->getData()))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         return cedar::proc::gui::GraphicsBase::CONNECT_ERROR;

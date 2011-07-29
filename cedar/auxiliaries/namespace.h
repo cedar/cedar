@@ -159,8 +159,7 @@ namespace cedar
     typedef DataT<cv::Mat> MatData;
     CEDAR_GENERATE_POINTER_TYPES(MatData);
 
-    class ImageData;
-    typedef boost::shared_ptr<ImageData> ImageDataPtr;
+    CEDAR_DECLARE_CLASS(ImageData);
 
     /* exceptions */
     class DuplicateNameException;

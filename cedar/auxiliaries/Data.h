@@ -91,7 +91,7 @@ public:
     return dynamic_cast<T&>(*this);
   }
   
-  cedar::aux::Configurable* getOwner();
+  cedar::aux::Configurable* getOwner() const;
   void setOwner(cedar::aux::Configurable* step);
 
   const std::string& connectedSlotName() const;
