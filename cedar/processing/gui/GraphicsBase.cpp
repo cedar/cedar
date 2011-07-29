@@ -320,3 +320,8 @@ void cedar::proc::gui::GraphicsBase::updateConnections()
     this->mConnections.at(i)->update();
   }
 }
+
+void cedar::proc::gui::GraphicsBase::disconnect()
+{
+
+}
