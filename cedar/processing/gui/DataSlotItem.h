@@ -87,7 +87,7 @@ public:
   cedar::proc::ConstDataSlotPtr getSlot() const;
 
   bool canConnect() const;
-  cedar::proc::gui::GraphicsBase::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+  cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

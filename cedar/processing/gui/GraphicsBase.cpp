@@ -51,6 +51,10 @@
 #include <iostream>
 #include <limits.h>
 
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(150, 200, 150);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(200, 200, 75);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(200, 150, 150);
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,19 +95,19 @@ void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui:
 {
   switch (pConnectionSource->canConnectTo(this))
   {
-    case cedar::proc::gui::GraphicsBase::CONNECT_YES:
+    case cedar::proc::gui::CONNECT_YES:
       this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET);
       break;
 
-    case cedar::proc::gui::GraphicsBase::CONNECT_WARNING:
+    case cedar::proc::gui::CONNECT_WARNING:
       this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING);
       break;
 
-    case cedar::proc::gui::GraphicsBase::CONNECT_ERROR:
+    case cedar::proc::gui::CONNECT_ERROR:
       this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR);
       break;
 
-    case cedar::proc::gui::GraphicsBase::CONNECT_NO:
+    case cedar::proc::gui::CONNECT_NO:
     default:
       this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
   }
@@ -214,20 +218,20 @@ bool cedar::proc::gui::GraphicsBase::canConnect() const
   return this->mAllowedConnectTargets != GRAPHICS_GROUP_NONE;
 }
 
-cedar::proc::gui::GraphicsBase::ConnectValidity cedar::proc::gui::GraphicsBase::canConnectTo(GraphicsBase* pTarget) const
+cedar::proc::gui::ConnectValidity cedar::proc::gui::GraphicsBase::canConnectTo(GraphicsBase* pTarget) const
 {
   if ((this->mAllowedConnectTargets & pTarget->mGroup) != 0)
   {
     if (pTarget == this)
     {
-      return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+      return cedar::proc::gui::CONNECT_NO;
     }
     else
     {
-      return cedar::proc::gui::GraphicsBase::CONNECT_YES;
+      return cedar::proc::gui::CONNECT_YES;
     }
   }
-  return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+  return cedar::proc::gui::CONNECT_NO;
 }
 
 QPointF cedar::proc::gui::GraphicsBase::getConnectionAnchorInScene() const
@@ -299,15 +303,15 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
     {
       case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
       case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
-        highlight_pen.setColor(QColor(150, 200, 150));
+        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
         break;
 
       case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
-        highlight_pen.setColor(QColor(200, 150, 150));
+        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
         break;
 
       case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
-        highlight_pen.setColor(QColor(200, 200, 75));
+        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
         break;
 
       default:
@@ -330,6 +334,26 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
 
   painter->restore();
 }
+
+const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity validity)
+{
+  switch (validity)
+  {
+    case cedar::proc::gui::CONNECT_YES:
+      return mValidityColorValid;
+
+    case cedar::proc::gui::CONNECT_NO:
+    case cedar::proc::gui::CONNECT_ERROR:
+      return mValidityColorError;
+
+    case cedar::proc::gui::CONNECT_WARNING:
+      return mValidityColorWarning;
+
+    default:
+      return mValidityColorError;
+  }
+}
+
 
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {

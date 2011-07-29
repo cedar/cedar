@@ -87,14 +87,6 @@ public:
     BASE_SHAPE_ROUND
   };
 
-  enum ConnectValidity
-  {
-    CONNECT_YES,
-    CONNECT_ERROR,
-    CONNECT_WARNING,
-    CONNECT_NO
-  };
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -113,7 +105,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual cedar::proc::gui::GraphicsBase::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+  virtual cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
   virtual bool canConnect() const;
 
@@ -175,6 +167,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  static const QColor mValidityColorValid;
+  static const QColor mValidityColorWarning;
+  static const QColor mValidityColorError;
+
+  static const QColor& getValidityColor(cedar::proc::gui::ConnectValidity validity);
 protected:
   bool mDrawBackground;
 private:

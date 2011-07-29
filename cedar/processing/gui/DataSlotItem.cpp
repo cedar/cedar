@@ -98,12 +98,11 @@ bool cedar::proc::gui::DataSlotItem::canConnect() const
   return this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT;
 }
 
-cedar::proc::gui::GraphicsBase::ConnectValidity
-  cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
+cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
 {
-  if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::GraphicsBase::CONNECT_NO)
+  if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::CONNECT_NO)
   {
-    return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+    return cedar::proc::gui::CONNECT_NO;
   }
 
   cedar::proc::gui::DataSlotItem *p_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
@@ -112,13 +111,13 @@ cedar::proc::gui::GraphicsBase::ConnectValidity
 
   if (p_target->getSlot()->getData())
   {
-    return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+    return cedar::proc::gui::CONNECT_NO;
   }
 
   // a step cannot connect to itself
   if (this->mpStep == p_target->mpStep)
   {
-    return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+    return cedar::proc::gui::CONNECT_NO;
   }
 
   if (this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT
@@ -127,29 +126,34 @@ cedar::proc::gui::GraphicsBase::ConnectValidity
     switch (p_target->mpStep->getStep()->determineInputValidity(p_target->mSlot, this->mSlot->getData()))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
-        return cedar::proc::gui::GraphicsBase::CONNECT_ERROR;
+        return cedar::proc::gui::CONNECT_ERROR;
         break;
 
       case cedar::proc::DataSlot::VALIDITY_WARNING:
-        return cedar::proc::gui::GraphicsBase::CONNECT_WARNING;
+        return cedar::proc::gui::CONNECT_WARNING;
         break;
 
       default:
-        return cedar::proc::gui::GraphicsBase::CONNECT_YES;
+        return cedar::proc::gui::CONNECT_YES;
     }
   }
 
-  return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+  return cedar::proc::gui::CONNECT_NO;
 }
 
 void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
 {
-  cedar::proc::StepPtr source, target;
-  source = dynamic_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
-  target = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget->parentItem())->getStep();
-  cedar::proc::Manager::getInstance().connect(source, this->getName(), target, pTarget->getName());
-
-  this->scene()->addItem(new cedar::proc::gui::Connection(this, pTarget));
+  cedar::proc::gui::ConnectValidity validity = this->canConnectTo(pTarget);
+  if (validity != cedar::proc::gui::CONNECT_NO)
+  {
+    cedar::proc::StepPtr source, target;
+    source = dynamic_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
+    target = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget->parentItem())->getStep();
+    cedar::proc::Manager::getInstance().connect(source, this->getName(), target, pTarget->getName());
+    cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
+    p_connection->setValidity(validity);
+    this->scene()->addItem(p_connection);
+  }
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)
