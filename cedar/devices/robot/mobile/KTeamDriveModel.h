@@ -85,7 +85,7 @@ public:
   /*!@brief Get-function of the initialization-status.
    * @return true if model is initialized, else false.
    */
-  bool isInitialized();
+  bool isInitialized() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

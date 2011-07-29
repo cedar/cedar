@@ -57,7 +57,8 @@
  *fail. The data of the E-Puck is read from a configuration file.
  */
 class cedar::dev::robot::mobile::EPuckDrive
-: public cedar::dev::robot::mobile::KTeamDrive, public cedar::aux::ConfigurationInterface
+:
+public cedar::dev::robot::mobile::KTeamDrive, public cedar::aux::ConfigurationInterface
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,7 +75,7 @@ public:
    *@param peCommunication Pointer to the communication-device to be used (has to be initialized)
    *@param config Path and name of the config-file to be used.
    */
-  EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, std::string config);
+  EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, const std::string& config);
 
   //!@brief Destructs the object.
   ~EPuckDrive();
@@ -94,7 +95,7 @@ public:
   /*!@brief The get-function of the initialization status.
    *@return true if EPuckDrive is initialized, else false.
    */
-  bool isInitialized();
+  bool isInitialized() const;
 
   /*!@brief The get-function of the left and right encoder value.
    *@param leftEncoder Variable the left encoder value shall be stored in.

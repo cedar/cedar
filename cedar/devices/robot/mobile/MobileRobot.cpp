@@ -62,32 +62,32 @@ using namespace cedar::dev::robot::mobile;
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-  std::vector<double> MobileRobot::getVelocity()
+  const std::vector<double>& MobileRobot::getVelocity() const
   {
     return mVelocity;
   }
 
-  double MobileRobot::getForwardVelocity()
+  double MobileRobot::getForwardVelocity() const
   {
     return mVelocity[0];
   }
 
-  double MobileRobot::getTurningRate()
+  double MobileRobot::getTurningRate() const
   {
     return mVelocity[1];
   }
 
-int MobileRobot::stop()
-{
-  int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
-  if (s == 0 && _mDebug) //setting velocity failed
+  int MobileRobot::stop()
   {
-    std::cout << "MobileRobot: Error Stopping Robot\n";
+    int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
+    if (s == 0 && _mDebug) //setting velocity failed
+    {
+      std::cout << "MobileRobot: Error Stopping Robot\n";
+      }
+    else if (_mDebug)
+    {
+      std::cout << "MobileRobot: Stopping Robot Successful\n";
     }
-  else if (_mDebug)
-  {
-    std::cout << "MobileRobot: Stopping Robot Successful\n";
-  }
 
-  return s;
-}
+    return s;
+  }
