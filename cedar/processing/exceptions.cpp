@@ -74,3 +74,8 @@ cedar::proc::PluginException::PluginException()
 {
   this->mType = "PluginException";
 }
+
+cedar::proc::ParseException::ParseException()
+{
+  this->mType = "ParseException";
+}
