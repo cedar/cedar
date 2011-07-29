@@ -104,4 +104,10 @@ public:
   PluginException();
 }; // class cedar::proc::PluginException
 
+class cedar::proc::ParseException: public cedar::aux::exc::ExceptionBase
+{
+public:
+  ParseException();
+}; // class cedar::proc::ParseException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

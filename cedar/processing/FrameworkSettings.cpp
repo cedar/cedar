@@ -39,6 +39,7 @@
 #include "auxiliaries/SetParameter.h"
 #include "auxiliaries/DirectoryParameter.h"
 #include "auxiliaries/System.h"
+#include "processing/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -88,12 +89,31 @@ cedar::aux::Configurable()
                         );
   plugin_group->registerParameter(this->mKnownPlugins);
 
-  this->load();
+  try
+  {
+    this->load();
+  }
+  catch(cedar::proc::ParseException& exc)
+  {
+    //!\todo pass a log message to somewhere
+#ifdef DEBUG
+    std::cout << "error loading framework settings, a new file will be generated" << std::endl;
+#endif
+  }
 }
 
 cedar::proc::FrameworkSettings::~FrameworkSettings()
 {
-  this->save();
+  try
+  {
+    this->save();
+  }
+  catch(cedar::proc::ParseException& exc)
+  {
+    //!\todo pass a log message to somewhere
+    std::cout << "error saving framework settings, please check file permissions in "
+              << cedar::aux::System::getUserApplicationDataDirectory() << "/.cedar" << std::endl;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,8 +164,7 @@ void cedar::proc::FrameworkSettings::load()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    //!@todo proper signaling(?) of this message to the gui.
-    std::cout << "Error reading framework settings: " << e.what() << std::endl;
+    CEDAR_THROW(cedar::proc::ParseException, "Error reading framework settings: " + std::string(e.what()));
   }
 }
 
@@ -158,7 +177,6 @@ void cedar::proc::FrameworkSettings::save()
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {
-    //!@todo proper signaling(?) of this message to the gui.
-    std::cout << "Error saving framework settings: " << e.what() << std::endl;
+    CEDAR_THROW(cedar::proc::ParseException, "Error saving framework settings: " + std::string(e.what()));
   }
 }

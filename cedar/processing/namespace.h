@@ -118,6 +118,7 @@ namespace cedar
     class DuplicateNameException;
     class MissingConnectionException;
     class PluginException;
+    class ParseException;
   }
 }
 
