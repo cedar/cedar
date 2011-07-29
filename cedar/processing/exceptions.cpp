@@ -65,6 +65,11 @@ cedar::proc::MissingConnectionException::MissingConnectionException()
   this->mType = "MissingConnectionException";
 }
 
+cedar::proc::MissingDeclarationException::MissingDeclarationException()
+{
+  this->mType = "MissingDeclarationException";
+}
+
 cedar::proc::InvalidArgumentsException::InvalidArgumentsException()
 {
   this->mType = "InvalidArgumentsException";
