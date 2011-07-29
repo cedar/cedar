@@ -72,7 +72,7 @@ const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
 AbstractNetBase::AbstractNetBase(const string &myPortNameWithSuffix) 
           : mNetwork(), mFullPortName(), mIsConnected(false)
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  AbstractNetBase [CONSTRUCTOR]" << endl;
 #endif
   mFullPortName= PORT_PREFIX + PORT_DELIMINATOR
@@ -81,7 +81,7 @@ AbstractNetBase::AbstractNetBase(const string &myPortNameWithSuffix)
 
 AbstractNetBase::~AbstractNetBase()
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
 #endif
   // we need to kill the child-process that runs an (automatically
@@ -91,7 +91,7 @@ AbstractNetBase::~AbstractNetBase()
   if (mServerPID)
   {
     kill( mServerPID, SIGKILL );
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  killed name server with pid " << mServerPID << endl;
 #endif  
   }
@@ -124,7 +124,7 @@ bool AbstractNetBase::startNameServer()
     //if ( yarp::os::Network::runNameServer(0, 0) != 0 ) // needs YARP v2.3.6
     //system("yarp server"); // starts command in a shell
 
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  executing yarp server" << endl;
 #endif
     if (execlp("yarp", "yarp", "server", NULL) == -1)
@@ -132,7 +132,7 @@ bool AbstractNetBase::startNameServer()
       // this works with all yarp versions
       // this does not create a zombie process. better!
 
-#ifdef DEBUG
+#ifdef DEBUG_NETT
       cout << "  could not start yarp server!" << endl;
 #endif
 
@@ -156,7 +156,7 @@ bool AbstractNetBase::startNameServer()
 
 void AbstractNetBase::lateConstruct()
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  AbstractNetBase [lateConstruct()]" << endl;
 #endif
   // only call from the "non abstract" constructor class,
@@ -191,7 +191,7 @@ void AbstractNetBase::lateConstruct()
 
 void AbstractNetBase::lateDestruct()
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  AbstractNetBase [lateDestruct]" << endl;
 #endif
   close(); // see lateConstruct()
@@ -201,7 +201,7 @@ void AbstractNetBase::lateDestruct()
 // this connection may fail (without throwing an exception!)
 bool AbstractNetBase::connectTwo(const string &writerPort, const string &readerPort)
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
 //  cout << "  AbstractNetBase [connectTwo]" << endl;
 #endif
 
@@ -221,7 +221,7 @@ bool AbstractNetBase::connectTwo(const string &writerPort, const string &readerP
     return false;
   }
 
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  connection OK" << endl;
 #endif
   mIsConnected= true;
@@ -231,7 +231,7 @@ bool AbstractNetBase::connectTwo(const string &writerPort, const string &readerP
 // this connection may fail (without throwing an exception!)
 bool AbstractNetBase::connectTo(const string &writerPort)
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "connect " <<  getFullPortName() << " to "  << writerPort  << endl;
 #endif
   return connectTwo( writerPort,

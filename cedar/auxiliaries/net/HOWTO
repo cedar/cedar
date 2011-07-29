@@ -5,7 +5,7 @@ SIMPLE USE CASES:
 I want to write data over the network:
 --------------------------------------
 
-#include <cedar/auxiliaries/net/NetWriter.h>
+#include <auxiliaries/net/NetWriter.h>
 
   cv::Mat mat= ...; // we will send this matrix over the network
   NetWriter<cv::Mat> writer("mychannel"); // this is our writer class
@@ -18,7 +18,7 @@ I want to write data over the network:
 I want to read the same data from the network:
 ----------------------------------------------
 
-#include <cedar/auxiliaries/net/NetBlockingReader.h>
+#include <auxiliaries/net/NetBlockingReader.h>
   
   cv::Mat mat;
   NetReader<cv::Mat> reader("mychannel");
@@ -84,7 +84,7 @@ Question: What about exceptions:
 The readers may throw the following exceptions which you may want to
 catch and react to in your code:
 
-#include <cedar/auxiliaries/net/exceptions/NetException.h>
+#include <auxiliaries/net/exceptions/NetException.h>
 
   NetUnexpectedDataException: Will be thrown when there was no data
       on the channel (for the non-blocking NetReader)
@@ -106,8 +106,8 @@ Both reader and writer will throw:
 A COMPLETE EXAMPLE:
 ===================
 
-#include <cedar/auxiliaries/net/NetWriter.h>
-#include <cedar/auxiliaries/net/NetBlockingReader.h>
+#include <auxiliaries/net/NetWriter.h>
+#include <auxiliaries/net/NetBlockingReader.h>
 
   // ...
 

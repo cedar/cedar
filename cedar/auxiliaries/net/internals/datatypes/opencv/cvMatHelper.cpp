@@ -175,7 +175,7 @@ template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_read(
 
 template <typename CVT> cvMatHelper<CVT>::cvMatHelper() : mCheckHeader()
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
 //  cout << "  cvMatHelper [CONSTRUCTOR]" << endl;
 #endif
     mCheckHeader.rows= 0;
@@ -184,7 +184,7 @@ template <typename CVT> cvMatHelper<CVT>::cvMatHelper() : mCheckHeader()
 
 template <typename CVT> cvMatHelper<CVT>::~cvMatHelper()
 {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
 //  cout << "  ~cvMatHelper [DESTRUCTOR]" << endl;
 #endif
 }

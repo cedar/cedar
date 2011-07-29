@@ -81,7 +81,7 @@ public:
   explicit AbstractNetWriter(const std::string &myPortName)  
                    : AbstractNetBase( WRITER_PORT_NAME(myPortName) )
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  AbstractNetWriter [CONSTRUCTOR]" << endl;
 #endif
   }
@@ -89,7 +89,7 @@ public:
   //!@brief Destructor virtual (to be sure)
   virtual ~AbstractNetWriter()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  ~AbstractNetWriter [DESTRUCTOR]" << endl;
 #endif
   }

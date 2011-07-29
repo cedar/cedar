@@ -95,7 +95,7 @@ public:
   ~SimpleNetReader()
   {
     AbstractNetReader<T>::lateDestruct();
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  ~SimpleNetReader [DESTRUCTOR]" << endl;
 #endif
   }
