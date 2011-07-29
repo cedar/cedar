@@ -39,11 +39,11 @@
 #define CEDAR_DEV_ROBOT_MOBILE_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
 #include <boost/smart_ptr.hpp>
 
 namespace cedar
@@ -54,33 +54,19 @@ namespace cedar
     {
       namespace mobile
       {
-        class MobileRobot;
-        //!@brief smart pointer for MobileRobot
-        typedef boost::shared_ptr<MobileRobot> MobileRobotPtr;
+        CEDAR_DECLARE_CLASS(MobileRobot);
 
-        class DifferentialDrive;
-        //!@brief smart pointer for DifferentialDrive
-        typedef boost::shared_ptr<DifferentialDrive> DifferentialDrivePtr;
+        CEDAR_DECLARE_CLASS(DifferentialDrive);
 
-        class KTeamDrive;
-        //!@brief smart pointer for KTeamDrive
-        typedef boost::shared_ptr<KTeamDrive> KTeamDrivePtr;
+        CEDAR_DECLARE_CLASS(KTeamDrive);
 
-        class EPuckDrive;
-        //!@brief smart pointer for EPuckDrive
-        typedef boost::shared_ptr<EPuckDrive> EPuckDrivePtr;
+        CEDAR_DECLARE_CLASS(EPuckDrive);
 
-        class MobileRobotModel;
-        //!@brief smart pointer for MobileRobotModel
-        typedef boost::shared_ptr<MobileRobotModel> MobileRobotModelPtr;
+        CEDAR_DECLARE_CLASS(MobileRobotModel);
 
-        class KTeamDriveModel;
-        //!@brief smart pointer for KTeamDriveModel
-        typedef boost::shared_ptr<KTeamDriveModel> KTeamDriveModelPtr;
+        CEDAR_DECLARE_CLASS(KTeamDriveModel);
 
-        class KTeamPositionController;
-        //!@brief smart pointer for KTeamPositionController
-        typedef boost::shared_ptr<KTeamPositionController> KTeamPositionControllerPtr;
+        CEDAR_DECLARE_CLASS(KTeamPositionController);
       }
     }
   }

@@ -91,58 +91,58 @@ public:
 
   //!@brief The get-function of the initialization-status.
   //!@return true if initialized, else false
-  bool isInitialized();
+  bool isInitialized() const;
 
   //!@brief The get-function of the File Descriptor.
   //!@return File Descriptor of the communication.
-  int getFileDescriptor();
+  int getFileDescriptor() const;
 
   //!@brief The get-function of the communication's name.
   //!@return Name of the communication.
-  std::string getName();
+  const std::string& getName() const;
 
   //!@brief The get-function of the device's path.
   //!@return Path of the Serial Port.
-  std::string getDevicePath();
+  const std::string& getDevicePath() const;
 
   //!@brief The get-function of the End-of-Command-String.
   //!@return The End-Of-Command-String.
-  std::string getEndOfCommandString();
+  const std::string& getEndOfCommandString() const;
 
   //!@brief The get-function of the C-Flag.
   //!@return The Country-Flag.
-  int getCFlag();
+  int getCFlag() const;
 
   //!@brief The get-function of the current Baud Rate.
   //!@return The Baud Rate used by the Serial Port (in Bit/s).
-  unsigned int getBaudrate();
+  unsigned int getBaudrate() const;
 
   //!@brief The get-function of the time-out value.
   //!@return Time in microsecs until current read-/write-operation times out.
-  unsigned int getTimeOut();
+  unsigned int getTimeOut() const;
 
   //!@brief The get-function of the latency.
   //!@return Delay of next operation after send (in microsecs).
-  unsigned int getLatency();
+  unsigned int getLatency() const;
 
   /*!@brief Sends a string to the device.
    *@param command The string to be sent.
    *@return Returns 1 if sending was successful and 0 in case of an error.
    */
-  int send(const std::string command);
+  int send(const std::string& command);
 
   /*!@brief Receives a string from the device.
    *@param answer Variable the received string shall be stored in.
    *@return Returns number of received bytes on success and 0 in case of an error.
    */
-  int receive(std::string &answer);
+  int receive(std::string& answer);
 
   /*!@brief Specifies the new End-Of-Command-String.
    *@param eocString New End-Of-Command-String.
    *
    *The End-Of-Command-String is also read from the configuration-file when the communication is initialized.
    */
-  void setEndOfCommandString(std::string eocString);
+  void setEndOfCommandString(const std::string& eocString);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

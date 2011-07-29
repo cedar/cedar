@@ -71,7 +71,7 @@ public:
   Communication();
 
   //!@brief Ends the communication with the device.
-  virtual ~Communication () = 0;
+  virtual ~Communication ();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -83,13 +83,13 @@ public:
    *@param command The string to be sent.
    *@return 1 if sending was successful and 0 in case of an error.
    */
-  virtual int send(const std::string command) = 0;
+  virtual int send(const std::string& command) = 0;
 
   /*!@brief Receives a string from the device.
    *@param answer Variable the received string shall be stored in.
    *@return number of received bytes on success and 0 in case of an error.
    */
-  virtual int receive(std::string &answer) = 0;
+  virtual int receive(std::string& answer) = 0;
 
   /*!@brief Locks the channel for reading or writing.
    *
@@ -141,16 +141,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-
   // none yet (hopefully never!)
 
 protected:
-
   // none yet
 
-
 private:
-
   // none yet
 
 }; // class cedar::dev::com::Communication
