@@ -67,7 +67,7 @@ public:
   MobileRobot();
 
   //!@brief Destructs the object.
-  virtual ~MobileRobot() = 0;
+  virtual ~MobileRobot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -77,15 +77,15 @@ public:
 
   //!@brief The get-function of both forward velocity and turning rate.
   //!@return 2-dimensional vector with mForwardVelocity [in m/s] as 1st and mTurningRate in [rad/s] as 2nd element.
-  std::vector<double> getVelocity();
+  const std::vector<double>& getVelocity() const;
 
   //!@brief The get-function of the forward velocity.
   //!@return Forward Velocity [in m/s]
-  double getForwardVelocity();
+  double getForwardVelocity() const;
 
   //!@brief The get-function of the turning rate.
   //!@return Turning Rate [in rad/s]
-  double getTurningRate();
+  double getTurningRate() const;
 
   /*!@brief Sets both forward velocity and turning rate.
    *@param forwardVelocity The forward velocity to be set [in m/s].

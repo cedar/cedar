@@ -43,10 +43,10 @@
 #define CEDAR_DYN_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "namespace.h"
 #include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -58,8 +58,7 @@ namespace cedar
   /*!@brief Namespace for all dyn classes. */
   namespace dyn
   {
-    class Dynamics;
-    typedef boost::shared_ptr<Dynamics> DynamicsPtr;
+    CEDAR_DECLARE_CLASS(Dynamics);
 
     template <typename T> class Activation;
     typedef Activation<double> DoubleActivation;
