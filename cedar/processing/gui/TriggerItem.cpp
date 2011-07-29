@@ -188,10 +188,6 @@ cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
 void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget)
 {
   cedar::proc::Manager::getInstance().connect(this->getTrigger(), pTarget->getStep());
-//  if (!this->getTrigger()->isListener(pTarget->getStep()))
-//  {
-//    this->getTrigger()->addListener(pTarget->getStep());
-//  }
   /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
    *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
    *       this function.
@@ -199,18 +195,9 @@ void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarge
   this->scene()->addItem(new Connection(this, pTarget));
 }
 
-void cedar::proc::gui::TriggerItem::disconnect()
-{
-  cedar::proc::Manager::getInstance().disconnect(this->getTrigger());
-}
-
 void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::TriggerItem *pTarget)
 {
   cedar::proc::Manager::getInstance().connect(this->getTrigger(), pTarget->getTrigger());
-//  if (!this->getTrigger()->isListener(pTarget->getTrigger()))
-//  {
-//    this->getTrigger()->addTrigger(pTarget->getTrigger());
-//  }
   /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
    *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
    *       this function.

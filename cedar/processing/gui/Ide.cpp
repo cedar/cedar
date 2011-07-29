@@ -218,8 +218,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_drawer->hide();
       p_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_drawer->getStep());
-      Manager::getInstance().steps().removeObject(p_drawer->getStep()->getName());
-      Manager::getInstance().disconnect(p_drawer->getStep());
+      Manager::getInstance().removeStep(p_drawer->getStep());
       this->mpPropertyTable->resetPointer();
       this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
       continue;
@@ -232,13 +231,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_trigger_drawer->hide();
       p_trigger_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
-      Manager::getInstance().triggers().removeObject(p_trigger_drawer->getTrigger()->getName());
-      cedar::proc::LoopedTriggerPtr looped_trigger
-        = boost::shared_dynamic_cast<cedar::proc::LoopedTrigger>(p_trigger_drawer->getTrigger());
-      if (looped_trigger)
-      {
-        Manager::getInstance().threads().erase(looped_trigger);
-      }
+      Manager::getInstance().removeTrigger(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
       continue;
     }
