@@ -58,6 +58,11 @@ mpTarget(pTarget)
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent);
   pSource->addConnection(this);
   pTarget->addConnection(this);
+
+  QPen pen = this->pen();
+  pen.setWidthF(2.5);
+  this->setPen(pen);
+
   this->update();
 }
 

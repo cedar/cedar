@@ -58,6 +58,11 @@ QGraphicsView(pParent)
   this->setScene(this->mpScene);
   this->setInteractive(true);
   this->setDragMode(QGraphicsView::RubberBandDrag);
+  this->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  this->setRenderHints(this->renderHints() | QPainter::Antialiasing
+                                           | QPainter::SmoothPixmapTransform
+                                           | QPainter::HighQualityAntialiasing
+                                           );
 }
 
 cedar::proc::gui::View::~View()

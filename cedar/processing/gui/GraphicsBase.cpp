@@ -229,6 +229,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   painter->save();
 
   QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
+  qreal roundedness = 4;
 
   painter->setPen(this->getOutlinePen());
   switch (this->mShape)
@@ -236,9 +237,13 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
     case BASE_SHAPE_RECT:
       if (mDrawBackground)
       {
-        painter->fillRect(bounds, Qt::white);
+        painter->save();
+        painter->setPen(QPen(Qt::NoPen));
+        painter->setBrush(Qt::white);
+        painter->drawRoundedRect(bounds, roundedness, roundedness);
+        painter->restore();
       }
-      painter->drawRect(bounds);
+      painter->drawRoundedRect(bounds, roundedness, roundedness);
       break;
 
     case BASE_SHAPE_ROUND:
