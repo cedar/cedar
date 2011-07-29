@@ -98,6 +98,14 @@ class cedar::proc::MissingConnectionException: public cedar::aux::exc::Exception
     MissingConnectionException();
 }; // class cedar::proc::MissingConnectionException
 
+/*!@brief An exception that is thrown, when a registry cannot find the declaration to which an object belongs
+ */
+class cedar::proc::MissingDeclarationException: public cedar::aux::exc::ExceptionBase
+{
+  public:
+  MissingDeclarationException();
+}; // class cedar::proc::MissingDeclarationException
+
 class cedar::proc::PluginException: public cedar::aux::exc::ExceptionBase
 {
 public:
