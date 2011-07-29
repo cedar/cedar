@@ -88,6 +88,15 @@ namespace cedar
       /* Exceptions */
       class InvalidStepNameException;
       class InvalidTriggerNameException;
+
+      /* enums */
+      enum ConnectValidity
+      {
+        CONNECT_YES,
+        CONNECT_ERROR,
+        CONNECT_WARNING,
+        CONNECT_NO
+      };
     }
   }
 }

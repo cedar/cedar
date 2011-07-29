@@ -74,6 +74,13 @@ cedar::proc::gui::Connection::~Connection()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity validity)
+{
+  QPen pen = this->pen();
+  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
+  this->setPen(pen);
+}
+
 void cedar::proc::gui::Connection::update()
 {
   this->setZValue(-1.0);
