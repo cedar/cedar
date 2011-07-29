@@ -87,7 +87,11 @@ public:
   cedar::aux::DataPtr getData();
   cedar::aux::ConstDataPtr getData() const;
 
+  cedar::proc::DataRole::Id getRole() const;
+
   void setData(cedar::aux::DataPtr data);
+
+  const std::string& getName() const;
 
   bool isMandatory() const;
 

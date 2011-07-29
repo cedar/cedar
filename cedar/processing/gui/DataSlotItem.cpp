@@ -41,9 +41,10 @@
 // LOCAL INCLUDES
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/StepItem.h"
+#include "processing/DataSlot.h"
 #include "processing/DataRole.h"
-#include "auxiliaries/macros.h"
 #include "processing/Manager.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -59,9 +60,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::StepItem *pParent,
-                                             cedar::aux::DataPtr data,
-                                             const std::string& dataName,
-                                             cedar::proc::DataRole::Id role
+                                             cedar::proc::DataSlotPtr slot
                                              )
 :
 cedar::proc::gui::GraphicsBase(10, 10,
@@ -70,16 +69,14 @@ cedar::proc::gui::GraphicsBase(10, 10,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                ),
 mpStep(pParent),
-mData(data),
-mRole(role),
-mDataName(dataName)
+mSlot(slot)
 {
   this->setParentItem(pParent);
 
   QString tool_tip;
-  tool_tip += cedar::proc::DataRole::type().get(role).prettyString().c_str();
+  tool_tip += cedar::proc::DataRole::type().get(mSlot->getRole()).prettyString().c_str();
   tool_tip += ": ";
-  tool_tip += dataName.c_str();
+  tool_tip += mSlot->getName().c_str();
   this->setToolTip(tool_tip);
 }
 
@@ -93,7 +90,7 @@ cedar::proc::gui::DataSlotItem::~DataSlotItem()
 
 bool cedar::proc::gui::DataSlotItem::canConnect() const
 {
-  return this->mRole == cedar::proc::DataRole::OUTPUT;
+  return this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT;
 }
 
 bool cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
@@ -107,9 +104,10 @@ bool cedar::proc::gui::DataSlotItem::canConnectTo(GraphicsBase* pTarget) const
 
   return
       // don't connect outputs of the same step to itself
-      this->mpStep != p_target->mpStep &&
+      this->mpStep != p_target->mpStep
       // the only way to connect is outputs to inputs
-      this->mRole == cedar::proc::DataRole::OUTPUT && p_target->mRole == cedar::proc::DataRole::INPUT
+      && this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT
+      && p_target->mSlot->getRole() == cedar::proc::DataRole::INPUT
       ;
 }
 
@@ -136,7 +134,7 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
 
 const std::string& cedar::proc::gui::DataSlotItem::getName() const
 {
-  return this->mDataName;
+  return this->mSlot->getName();
 }
 
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
