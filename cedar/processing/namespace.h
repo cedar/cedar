@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/AbstractFactory.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -57,8 +58,7 @@ namespace cedar
 
     class DataRole;
 
-    class DataSlot;
-    typedef boost::shared_ptr<DataSlot> DataSlotPtr;
+    CEDAR_DECLARE_CLASS(DataSlot);
 
     class FrameworkSettings;
 

@@ -45,6 +45,7 @@
 #include "processing/namespace.h"
 #include "processing/Trigger.h"
 #include "processing/DataRole.h"
+#include "processing/DataSlot.h"
 #include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/Base.h"
 #include "auxiliaries/Configurable.h"
@@ -94,6 +95,15 @@ public:
 
   //!@brief Method that is called whenever an input is connected to the step.
   virtual void inputConnectionChanged(const std::string& inputName);
+
+  cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
+  cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slot_name);
+
+  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                          (
+                                            cedar::proc::ConstDataSlotPtr slot,
+                                            cedar::aux::DataPtr data
+                                          ) const;
 
   void setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
@@ -160,6 +170,8 @@ private:
   void checkMandatoryConnections();
   void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
   void freeData(DataRole::Id role, const std::string& name);
+
+  bool allInputsValid();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

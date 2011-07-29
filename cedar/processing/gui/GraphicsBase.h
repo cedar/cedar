@@ -76,6 +76,8 @@ public:
   {
     HIGHLIGHTMODE_NONE,
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET,
+    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING,
+    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR,
     HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
   };
 
@@ -84,6 +86,15 @@ public:
     BASE_SHAPE_RECT,
     BASE_SHAPE_ROUND
   };
+
+  enum ConnectValidity
+  {
+    CONNECT_YES,
+    CONNECT_ERROR,
+    CONNECT_WARNING,
+    CONNECT_NO
+  };
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -102,7 +113,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual bool canConnectTo(GraphicsBase* pTarget) const;
+  virtual cedar::proc::gui::GraphicsBase::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
   virtual bool canConnect() const;
 
@@ -115,6 +126,9 @@ public:
   QRectF boundingRect() const;
 
   QPen getOutlinePen() const;
+
+  //!@brief This method highlights this item according to how it can connect to the source.
+  void highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource);
 
   void setHighlightMode(HighlightMode mode);
 
