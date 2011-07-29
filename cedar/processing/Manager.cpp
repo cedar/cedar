@@ -275,3 +275,20 @@ void cedar::proc::Manager::deleteConnection(cedar::proc::Connection* connection)
     mConnections.erase(it);
   }
 }
+
+void cedar::proc::Manager::removeStep(cedar::proc::StepPtr step)
+{
+  this->steps().removeObject(step->getName());
+  this->disconnect(step);
+}
+
+void cedar::proc::Manager::removeTrigger(cedar::proc::TriggerPtr trigger)
+{
+  this->triggers().removeObject(trigger->getName());
+  this->disconnect(trigger);
+  cedar::proc::LoopedTriggerPtr looped_trigger = boost::shared_dynamic_cast<cedar::proc::LoopedTrigger>(trigger);
+  if (looped_trigger)
+  {
+    this->threads().erase(looped_trigger);
+  }
+}
