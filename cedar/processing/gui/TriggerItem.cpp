@@ -109,6 +109,33 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::gui::GraphicsBase::ConnectValidity
+  cedar::proc::gui::TriggerItem::canConnectTo(GraphicsBase* pTarget) const
+{
+  if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::GraphicsBase::CONNECT_NO)
+  {
+    return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+  }
+
+  if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
+  {
+    if(this->mTrigger->isListener(p_step_item->getStep()))
+    {
+      return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+    }
+  }
+
+  if (cedar::proc::gui::TriggerItem *p_trigger_item = dynamic_cast<cedar::proc::gui::TriggerItem*>(pTarget))
+  {
+    if(this->mTrigger->isListener(p_trigger_item->getTrigger()))
+    {
+      return cedar::proc::gui::GraphicsBase::CONNECT_NO;
+    }
+  }
+
+  return cedar::proc::gui::GraphicsBase::CONNECT_YES;
+}
+
 void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->mTrigger = trigger;

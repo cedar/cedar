@@ -99,6 +99,12 @@ public:
   cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slot_name);
 
+  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                          (
+                                            cedar::proc::ConstDataSlotPtr slot,
+                                            cedar::aux::DataPtr data
+                                          ) const;
+
   void setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
   cedar::proc::TriggerPtr& getFinishedTrigger();
@@ -156,7 +162,6 @@ protected:
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
   void freeBuffer(const std::string& name);
   void freeOutput(const std::string& name);
-  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr slot) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -165,6 +170,8 @@ private:
   void checkMandatoryConnections();
   void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
   void freeData(DataRole::Id role, const std::string& name);
+
+  bool allInputsValid();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -82,7 +82,8 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(cedar::proc:
 {
   if (slot->getValidlity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
   {
-    cedar::proc::DataSlot::VALIDITY validity = this->determineInputValidity(slot);
+    cedar::aux::DataPtr data = slot->getData();
+    cedar::proc::DataSlot::VALIDITY validity = this->determineInputValidity(slot, data);
     slot->setValidity(validity);
   }
   return slot->getValidlity();
@@ -93,7 +94,12 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(const std::s
   return this->getInputValidity(this->getSlot(cedar::proc::DataRole::INPUT, slot_name));
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::Step::determineInputValidity(cedar::proc::ConstDataSlotPtr /* slot */) const
+cedar::proc::DataSlot::VALIDITY cedar::proc::Step::determineInputValidity
+                                                   (
+                                                     cedar::proc::ConstDataSlotPtr,
+                                                     cedar::aux::DataPtr
+                                                   )
+                                                   const
 {
   // default: just validate. This should be overwritten in all subclasses in order to react to, e.g., a matrix size of a wrong size.
   return cedar::proc::DataSlot::VALIDITY_VALID;
@@ -284,8 +290,35 @@ void cedar::proc::Step::onTrigger()
   }
 }
 
+bool cedar::proc::Step::allInputsValid()
+{
+  std::map<DataRole::Id, SlotMap>::iterator slot_map_iter = this->mDataConnections.find(cedar::proc::DataRole::INPUT);
+  if (slot_map_iter == mDataConnections.end())
+  {
+    // there are no inputs, so the inputs are valid
+    return true;
+  }
+
+  SlotMap& slot_map = slot_map_iter->second;
+
+  for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
+  {
+    if (slot->second->getValidlity() == cedar::proc::DataSlot::VALIDITY_ERROR)
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 void cedar::proc::Step::run()
 {
+  if (!this->allInputsValid())
+  {
+    return;
+  }
+
   this->mBusy = true;
 
   // if no arguments have been set, create default ones.

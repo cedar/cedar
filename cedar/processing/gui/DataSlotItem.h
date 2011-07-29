@@ -84,8 +84,10 @@ public:
 
   const std::string& getName() const;
 
+  cedar::proc::ConstDataSlotPtr getSlot() const;
+
   bool canConnect() const;
-  bool canConnectTo(GraphicsBase* pTarget) const;
+  cedar::proc::gui::GraphicsBase::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
