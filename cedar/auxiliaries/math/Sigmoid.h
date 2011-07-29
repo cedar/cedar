@@ -84,12 +84,12 @@ public:
   /*!@brief this function calculates the sigmoid function for a given double value.
    * All inherited classes have to implement this function.
    */
-  virtual double compute(double value) = 0;
+  virtual double compute(double value) const = 0;
 
   /*!@brief this function calculates the sigmoid function for a given float value.
    * Included for backward-compatibility
    */
-  virtual float compute(float value)
+  virtual float compute(float value) const
   {
     return static_cast<float>(compute(static_cast<double>(value)));
   }

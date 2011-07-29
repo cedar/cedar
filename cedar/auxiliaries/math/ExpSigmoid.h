@@ -83,7 +83,7 @@ public:
 public:
   /*!@brief this function calculates the exp-based sigmoid function for a given double value.
    */
-  virtual double compute(double value)
+  virtual double compute(double value) const
   {
     return cedar::aux::math::sigmoidExp(value, mBeta->get(), mThreshold->get());
   }
