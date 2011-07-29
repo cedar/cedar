@@ -86,7 +86,7 @@ public:
                                      : AbstractNetWriter<T>(myPortName),
                                        BufferOut()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  SimpleNetWriter [CONSTRUCTOR]" << endl;
 #endif
     AbstractNetWriter<T>::lateConstruct();
@@ -100,7 +100,7 @@ public:
   ~SimpleNetWriter()
   {
     AbstractNetWriter<T>::lateDestruct();
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  ~SimpleNetWriter [DESTRUCTOR]" << endl;
 #endif
   }

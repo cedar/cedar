@@ -85,7 +85,7 @@ public:
                                          AbstractNetWriter<T>(myPortName),
                                          mElemWrapper()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  CollatedNetWriter [CONSTRUCTOR]" << endl;
 #endif
     AbstractNetWriter<T>::lateConstruct();
@@ -97,7 +97,7 @@ public:
   ~CollatedNetWriter() // doesnt need to be virtual
   {
     AbstractNetWriter<T>::lateDestruct();
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  ~CollatedNetWriter [DESTRUCTOR]" << endl;
 #endif
   }
@@ -115,7 +115,7 @@ public:
    */
   void write(const T &t) 
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  CollatedNetWriter [write()]" << endl;
 #endif
 

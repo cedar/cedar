@@ -79,7 +79,7 @@ public:
   //!@brief The standard constructor.
   CollatedNetBase() : mDataPort()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  CollatedNetBase [CONSTRUCTOR]" << endl;
 #endif
     mDataPort.enableBackgroundWrite(true);

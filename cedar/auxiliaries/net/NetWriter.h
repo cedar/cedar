@@ -160,7 +160,7 @@ public:
                       : cedar::aux::net::detail::cvMatHelper<cv::Mat>(),
                         cedar::aux::net::detail::CollatedNetWriter<cv::Mat>(myPortName)
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
   cout << "  NetWriter (cv::Mat) [CONSTRUCTOR]" << endl;
 #endif
   }

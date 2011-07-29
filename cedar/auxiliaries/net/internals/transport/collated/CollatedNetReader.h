@@ -93,7 +93,7 @@ public:
                                          AbstractNetReader<T>(myPortName),
                                          mElemWrapper()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  CollatedNetReader [CONSTRUCTOR]" << endl;
 #endif
     mElemWrapper.setStrict(false); // false= drop old messages, when new
@@ -110,11 +110,11 @@ public:
   // no need for virtual here, as pointers of this will never be passed around
   ~CollatedNetReader()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  ~CollatedNetReader [DESTRUCTOR] begin" << endl;
 #endif
     AbstractNetReader<T>::lateDestruct();
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  ~CollatedNetReader [DESTRUCTOR] end" << endl;
 #endif
   }
@@ -141,7 +141,7 @@ public:
 
     if (!AbstractNetReader<T>::isConnected())
     {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
       cout << "  tryring reconnect" << endl;
 #endif
 

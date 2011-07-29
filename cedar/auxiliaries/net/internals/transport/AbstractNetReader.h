@@ -94,7 +94,7 @@ public:
                    : AbstractNetBase( READER_PORT_NAME(myPortName) ),
                      mPortNameWriter()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  AbstractNetReader [CONSTRUCTOR]" << endl;
 #endif
 
@@ -116,7 +116,7 @@ public:
   //!@brief Destructor (virtual to be sure)
   virtual ~AbstractNetReader()
   {
-#ifdef DEBUG
+#ifdef DEBUG_NETT
     cout << "  ~AbstractNetReader [DESTRUCTOR]" << endl;
 #endif
   }
