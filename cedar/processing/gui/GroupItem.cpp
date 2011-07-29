@@ -67,6 +67,8 @@ cedar::proc::gui::GraphicsBase(size.width(), size.height(),
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
 
+  mDrawBackground = false;
+
   if (!group)
   {
     mGroup = cedar::proc::Manager::getInstance().allocateGroup();

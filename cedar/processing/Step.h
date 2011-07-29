@@ -70,23 +70,7 @@ class cedar::proc::Step : public QThread, public cedar::aux::Configurable
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  struct DataEntry
-  {
-    public:
-      DataEntry(bool isMandatory = true);
-
-      void setData(cedar::aux::DataPtr data);
-      cedar::aux::DataPtr getData();
-      boost::shared_ptr<const cedar::aux::Data> getData() const;
-
-      bool isMandatory() const;
-
-    private:
-      cedar::aux::DataPtr mData;
-      bool mMandatory;
-  };
-  typedef std::map<std::string, DataEntry> SlotMap;
+  typedef std::map<std::string, cedar::proc::DataSlotPtr> SlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -127,6 +111,11 @@ public:
 
   cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role);
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
+
+  cedar::proc::DataSlotPtr getInputSlot(const std::string& name);
+  cedar::proc::DataSlotPtr getBufferSlot(const std::string& name);
+  cedar::proc::DataSlotPtr getOutputSlot(const std::string& name);
+  cedar::proc::DataSlotPtr getSlot(DataRole::Id role, const std::string& name);
 
   static void connect(
                        cedar::proc::StepPtr source,

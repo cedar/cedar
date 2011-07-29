@@ -57,6 +57,9 @@ namespace cedar
 
     class DataRole;
 
+    class DataSlot;
+    typedef boost::shared_ptr<DataSlot> DataSlotPtr;
+
     class FrameworkSettings;
 
     class LoopArguments;

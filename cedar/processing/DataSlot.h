@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GraphicsBase.h
+    File:        DataSlot.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 12
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 29
 
     Description:
 
@@ -38,51 +34,40 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_GRAPHICS_BASE_H
-#define CEDAR_PROC_GUI_GRAPHICS_BASE_H
+#ifndef CEDAR_PROC_DATA_SLOT_H
+#define CEDAR_PROC_DATA_SLOT_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/NumericParameter.h"
+#include "processing/namespace.h"
+#include "processing/DataRole.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsItem>
-#include <QPen>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::GraphicsBase : public QGraphicsItem, public cedar::aux::Configurable
+class cedar::proc::DataSlot
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // static constants
+  // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef unsigned int GraphicsGroup;
-  const static GraphicsGroup GRAPHICS_GROUP_NONE = 0;
-  const static GraphicsGroup GRAPHICS_GROUP_STEP = 1 << 0;
-  const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
-  const static GraphicsGroup GRAPHICS_GROUP_GROUP = 1 << 2;
-  const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 3;
-  const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
-
-  enum HighlightMode
+  /*! Enum describing the validity of the data connected to this slot.
+   */
+  enum VALIDITY
   {
-    HIGHLIGHTMODE_NONE,
-    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET,
-    HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
-  };
-
-  enum BaseShape
-  {
-    BASE_SHAPE_RECT,
-    BASE_SHAPE_ROUND
+    //! The data is valid.
+    VALIDITY_VALID,
+    //! The data may not be valid, but the step using it can be computed nonetheless.
+    VALIDITY_WARNING,
+    //! The data is erroneous, computing the corresponding step may explode things.
+    VALIDITY_ERROR,
+    //! The validity is unknown and needs to be determined before execution.
+    VALIDITY_UNKNOWN
   };
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -90,101 +75,63 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GraphicsBase(qreal width, qreal height,
-               GraphicsGroup group = GRAPHICS_GROUP_UNKNOWN,
-               GraphicsGroup canConnectTo = GRAPHICS_GROUP_NONE,
-               BaseShape shape = BASE_SHAPE_RECT);
+  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
 
   //!@brief Destructor
-  virtual ~GraphicsBase();
+  virtual ~DataSlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual bool canConnectTo(GraphicsBase* pTarget) const;
+  cedar::aux::DataPtr getData();
+  cedar::aux::ConstDataPtr getData() const;
 
-  virtual bool canConnect() const;
+  cedar::proc::DataRole::Id getRole() const;
 
-  QPointF getConnectionAnchorInScene() const;
+  void setData(cedar::aux::DataPtr data);
 
-  virtual QPointF getConnectionAnchorRelative() const;
+  const std::string& getName() const;
 
-  const GraphicsGroup& getGroup() const;
+  bool isMandatory() const;
 
-  QRectF boundingRect() const;
-
-  QPen getOutlinePen() const;
-
-  void setHighlightMode(HighlightMode mode);
-
-  HighlightMode getHighlightMode() const;
-
-  qreal width() const
-  {
-    return static_cast<qreal>(this->mWidth->get());
-  }
-
-  qreal height() const
-  {
-    return static_cast<qreal>(this->mHeight->get());
-  }
-
-  void addConnection(Connection* pConnection);
-
-  void removeConnection(Connection* pConnection);
-
-  void removeAllConnections();
-
-  //!\brief overwrite this function if your customized graphics item needs to disconnect some children items
-  virtual void disconnect();
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
-
-  void updateConnections();
+  VALIDITY getValidlity() const;
+  void setValidity(VALIDITY validity);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void paintFrame(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  bool mDrawBackground;
+  // none yet
 private:
-  cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
-  BaseShape mShape;
+  cedar::aux::DataPtr mData;
+  bool mMandatory;
+  VALIDITY mValidity;
+  std::string mName;
+  cedar::proc::DataRole::Id mRole;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  cedar::aux::DoubleParameterPtr mWidth;
-  cedar::aux::DoubleParameterPtr mHeight;
+  // none yet
 
-  GraphicsGroup mGroup;
-  GraphicsGroup mAllowedConnectTargets;
+}; // class cedar::proc::DataSlot
 
-  std::vector<Connection*> mConnections;
-
-}; // class cedar::proc::gui::GraphicsBase
-
-#endif // CEDAR_PROC_GUI_GRAPHICS_BASE_H
+#endif // CEDAR_PROC_DATA_SLOT_H
 

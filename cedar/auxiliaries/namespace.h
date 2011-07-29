@@ -38,6 +38,7 @@
 #define CEDAR_AUX_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/macros.h"
 
 // SYSTEM INCLUDES
 #include <sstream>
@@ -151,8 +152,7 @@ namespace cedar
 
 
     /* data */
-    class Data;
-    typedef boost::shared_ptr<Data> DataPtr;
+    CEDAR_DECLARE_CLASS(Data);
 
     template <typename T> class DataT;
 
