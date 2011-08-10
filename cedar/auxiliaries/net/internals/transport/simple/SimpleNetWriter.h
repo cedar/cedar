@@ -113,16 +113,18 @@ public:
   //---------------------------------------------------------------------------
 protected:
   //!@brief open the port. called by AbstractNetBase
-  void open()
+  bool open()
   {
-    BufferOut.open( AbstractNetBase::getFullPortName().c_str() ); 
+    return BufferOut.open( AbstractNetBase::getFullPortName().c_str() ); 
   }
 
   //!@brief close the port. called by AbstractNetBase
-  void close()
+  bool close()
   {
     if (!BufferOut.isClosed())
-      BufferOut.close();
+      BufferOut.close(); // is void
+
+    return true;
   }
  
   //---------------------------------------------------------------------------

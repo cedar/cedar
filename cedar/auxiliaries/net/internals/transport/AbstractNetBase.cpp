@@ -187,12 +187,15 @@ void AbstractNetBase::lateConstruct()
       CEDAR_THROW( cedar::aux::exc::NetMissingRessourceException,
                    "YARP: no yarp name server found and cannot auto "
                           "start one" );
-
     }
   }
 
-  open(); // open with the virtual function open() 
-          // implemented in a derived class
+  if (!open()) // open with the virtual function open() 
+  {            // implemented in a derived class
+      CEDAR_THROW( cedar::aux::exc::NetMissingRessourceException,
+                   "YARP could not open the port" );
+  
+  }
 }
 
 void AbstractNetBase::lateDestruct()
@@ -201,6 +204,7 @@ void AbstractNetBase::lateDestruct()
   cout << "  AbstractNetBase [lateDestruct]" << endl;
 #endif
   close(); // see lateConstruct()
+           // dont use the returnvalue here and dont throw an exception
   mIsConnected= false;
 }
 

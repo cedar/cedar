@@ -59,9 +59,9 @@ class InterfaceOpenable
 {
 protected:
   /*!@brief open the port (called at RIAA object creation) */
-  virtual void open() = 0;
+  virtual bool open() = 0;
   /*!@brief close the port (called at RIAA object destruction) */
-  virtual void close() = 0;
+  virtual bool close() = 0;
   /*!@brief port name (not the user-given one, the full configured one) */
   virtual std::string getFullPortName() = 0;
 };
