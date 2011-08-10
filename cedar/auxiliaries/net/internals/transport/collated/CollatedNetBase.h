@@ -96,14 +96,15 @@ public:
   // public methods
   //---------------------------------------------------------------------------
 public:
-  void open()
+  bool open()
   {
-    mDataPort.open( getFullPortName().c_str() );
+    return mDataPort.open( getFullPortName().c_str() );
   }
 
-  void close()
+  bool close()
   {
-    mDataPort.close();
+    mDataPort.close(); // returns void
+    return true;
   }
 
 
