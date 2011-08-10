@@ -52,7 +52,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -171,8 +171,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>130</width>
-          <height>319</height>
+          <width>136</width>
+          <height>342</height>
          </rect>
         </property>
         <attribute name="label">
@@ -222,12 +222,6 @@
        </attribute>
        <attribute name="verticalHeaderVisible">
         <bool>false</bool>
-       </attribute>
-       <attribute name="verticalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="horizontalHeaderStretchLastSection">
-        <bool>true</bool>
        </attribute>
        <column>
         <property name="text">

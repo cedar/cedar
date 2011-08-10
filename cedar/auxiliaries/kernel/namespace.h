@@ -54,17 +54,9 @@ namespace cedar
   /*!@brief Namespace for all kernel classes. */
     namespace kernel
     {
-      class CEDAR_AUX_LIB_EXPORT Kernel;
-      //!@brief smart pointer for Kernel
-      typedef boost::shared_ptr<Kernel> KernelPtr;
-
-      class CEDAR_AUX_LIB_EXPORT Separable;
-      //!@brief smart pointer for Separable
-      typedef boost::shared_ptr<Separable> SeparablePtr;
-
-      class CEDAR_AUX_LIB_EXPORT Gauss;
-      //!@brief smart pointer for Gauss
-      typedef boost::shared_ptr<Gauss> GaussPtr;
+      CEDAR_DECLARE_AUX_CLASS(Kernel);
+      CEDAR_DECLARE_AUX_CLASS(Separable);
+      CEDAR_DECLARE_AUX_CLASS(Gauss);
     }
   }
 }

@@ -234,8 +234,11 @@ macro(cedar_add_library)
   set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
   
+  string(TOUPPER "${libraryName}" CAP_LIB_NAME)
+  string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
+  configure_file("${CEDAR_SOURCE_DIR}/lib.h.in" "${CMAKE_CURRENT_SOURCE_DIR}/lib.h")
+  
   if (MSVC)
-    string(TOUPPER "${libraryName}" CAP_LIB_NAME)
     set(LIB_EXPORTS "CEDAR_LIB_EXPORTS_${CAP_LIB_NAME}")
     set_target_properties(${libraryName} PROPERTIES COMPILE_FLAGS -D${LIB_EXPORTS})
   endif (MSVC)
