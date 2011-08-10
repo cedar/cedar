@@ -262,12 +262,20 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       std::string label = e.prettyString() + "s";
       p_data->addSeparator();
       QAction *p_label_action = p_data->addAction(label.c_str());
+      QFont font = p_label_action->font();
+      font.setBold(true);
+      p_label_action->setFont(font);
       p_data->addSeparator();
       p_label_action->setEnabled(false);
       for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         QAction *p_action = p_data->addAction(iter->first.c_str());
         p_action->setData(QString(iter->first.c_str()));
+        if (iter->second->getData().get() == NULL)
+        {
+          p_action->setText("[unconnected] " + p_action->text());
+          p_action->setEnabled(false);
+        }
         action_type_map[p_action] = e;
       }
     }
