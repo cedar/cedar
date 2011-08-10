@@ -43,6 +43,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/gui/namespace.h"
+#include "auxiliaries/gui/DataPlotInterface.h"
 
 // PROJECT INCLUDES
 
@@ -57,7 +58,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::gui::MatrixPlot : public QWidget
+class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::DataPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -78,7 +79,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cv::Mat* mat, QReadWriteLock *lock);
+  void display(cedar::aux::DataPtr data);
 
   static const Qwt3D::ColorVector& getStandardColorVector();
 
@@ -100,8 +101,7 @@ private:
 protected:
   // none yet
 private:
-  cv::Mat* mpMat;
-  QReadWriteLock *mpeLock;
+  cedar::aux::MatDataPtr mData;
   QWidget *mpCurrentPlotWidget;
 
   static Qwt3D::ColorVector mStandardColorVector;

@@ -63,6 +63,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT DirectoryParameter;
       class CEDAR_PROC_LIB_EXPORT DoubleParameter;
       class CEDAR_PROC_LIB_EXPORT DoubleVectorParameter;
+      class EnumParameter;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
       class CEDAR_PROC_LIB_EXPORT GroupItem;
       class CEDAR_PROC_LIB_EXPORT Ide;
@@ -88,6 +89,15 @@ namespace cedar
       /* Exceptions */
       class CEDAR_PROC_LIB_EXPORT InvalidStepNameException;
       class CEDAR_PROC_LIB_EXPORT InvalidTriggerNameException;
+
+      /* enums */
+      enum ConnectValidity
+      {
+        CONNECT_YES,
+        CONNECT_ERROR,
+        CONNECT_WARNING,
+        CONNECT_NO
+      };
     }
   }
 }

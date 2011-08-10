@@ -74,6 +74,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  cedar::proc::gui::GraphicsBase* getSource();
+  cedar::proc::gui::GraphicsBase* getTarget();
+
+  void setValidity(cedar::proc::gui::ConnectValidity validity);
 
 public slots:
   void update();

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,16 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.cpp
+    File:        EnumParameter.cpp
 
-
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
     Description:
 
@@ -40,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/Data.h"
+#include "auxiliaries/EnumParameter.h"
 
 // PROJECT INCLUDES
 
@@ -50,56 +45,50 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Data::Data()
+cedar::aux::EnumParameter::EnumParameter(const std::string& name,
+                                         boost::shared_ptr<cedar::aux::EnumBase> enumBase)
 :
-mpeOwner(NULL)
+cedar::aux::ParameterBase(name, false),
+mEnumDeclaration(enumBase)
 {
 }
 
-cedar::aux::Data::~Data()
+cedar::aux::EnumParameter::EnumParameter(const std::string& name,
+                                         boost::shared_ptr<cedar::aux::EnumBase> enumBase,
+                                         cedar::aux::EnumId defaultValue)
+:
+cedar::aux::ParameterBase(name, true),
+mDefault(defaultValue),
+mEnumDeclaration(enumBase)
 {
+  this->makeDefault();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-QReadWriteLock& cedar::aux::Data::getLock()
+cedar::aux::Enum cedar::aux::EnumParameter::get() const
 {
-  return this->mLock;
+  return mEnumDeclaration->get(this->mValue);
 }
 
-void cedar::aux::Data::lockForRead()
+void cedar::aux::EnumParameter::set(const std::string& enumId)
 {
-  this->mLock.lockForRead();
+  this->mValue = this->mEnumDeclaration->get(enumId);
 }
 
-void cedar::aux::Data::lockForWrite()
+void cedar::aux::EnumParameter::setTo(const cedar::aux::ConfigurationNode& root)
 {
-  this->mLock.lockForWrite();
+  this->mValue = mEnumDeclaration->get(root.get_value<std::string>());
 }
 
-void cedar::aux::Data::unlock()
+void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
 {
-  this->mLock.unlock();
+  root.put(this->getName(), this->get().name());
 }
 
-cedar::aux::Configurable* cedar::aux::Data::getOwner() const
+void cedar::aux::EnumParameter::makeDefault()
 {
-  return this->mpeOwner;
-}
-
-void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
-{
-  this->mpeOwner = step;
-}
-
-const std::string& cedar::aux::Data::connectedSlotName() const
-{
-  return this->mConnectedSlotName;
-}
-
-void cedar::aux::Data::connectedSlotName(const std::string& name)
-{
-  this->mConnectedSlotName = name;
+  this->mValue = this->mDefault;
 }

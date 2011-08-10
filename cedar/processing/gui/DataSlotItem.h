@@ -67,10 +67,7 @@ class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlotItem(cedar::proc::gui::StepItem *pParent,
-               cedar::aux::DataPtr data,
-               const std::string& dataName,
-               cedar::proc::DataRole::Id role);
+  DataSlotItem(cedar::proc::gui::StepItem *pParent, cedar::proc::DataSlotPtr slot);
 
   //!@brief Destructor
   ~DataSlotItem();
@@ -87,8 +84,10 @@ public:
 
   const std::string& getName() const;
 
+  cedar::proc::ConstDataSlotPtr getSlot() const;
+
   bool canConnect() const;
-  bool canConnectTo(GraphicsBase* pTarget) const;
+  cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -109,9 +108,7 @@ protected:
   // none yet
 private:
   cedar::proc::gui::StepItem *mpStep;
-  cedar::aux::DataPtr mData;
-  cedar::proc::DataRole::Id mRole;
-  const std::string& mDataName;
+  cedar::proc::DataSlotPtr mSlot;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

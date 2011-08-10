@@ -42,6 +42,7 @@
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/NumericVectorParameter.h"
 #include "auxiliaries/macros.h"
+#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 
@@ -145,7 +146,7 @@ void cedar::aux::kernel::Gauss::calculate()
       {
         for (unsigned int j = 0; j < mSizes.at(dim); j++)
         {
-          //!\todo move Gauss function and filling up of matrix to some tool function
+          //!\todo move filling up of matrix to some tool function
           mKernelParts.at(dim).at<float>(j, 0)
               = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas->get().at(dim));
         }
@@ -224,8 +225,10 @@ void cedar::aux::kernel::Gauss::calculate()
   {
     std::cerr << "> Error (kernel::Gauss) :" << error.what() << " in calculate().\n"
         << "  Check your configuration files." << std::endl;
-    // set matrices to semi-meaningful sizes to prevent further crashes
-    // todo
+    CEDAR_THROW(
+                 cedar::aux::exc::IndexOutOfRangeException,
+                 "kernel::Gauss has encountered inconsistent vector sizes, check your configuration file"
+               );
   }
   mpReadWriteLockOutput->unlock();
 }

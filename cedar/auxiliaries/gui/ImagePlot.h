@@ -39,6 +39,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/gui/namespace.h"
+#include "auxiliaries/gui/DataPlotInterface.h"
 
 // PROJECT INCLUDES
 
@@ -53,7 +54,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::gui::ImagePlot : public QWidget
+class cedar::aux::gui::ImagePlot : public DataPlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -74,7 +75,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void display(cv::Mat* mat, QReadWriteLock *lock);
+  void display(cedar::aux::DataPtr data);
   void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,8 +98,7 @@ protected:
   // none yet
 private:
   QLabel *mpImageDisplay;
-  cv::Mat *mpMat;
-  QReadWriteLock *mpLock;
+  cedar::aux::ImageDataPtr mData;
   QImage mImage;
   int mTimerId;
 

@@ -38,6 +38,7 @@
 #define CEDAR_AUX_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/macros.h"
 
 #include "auxiliaries/lib.h"
 // SYSTEM INCLUDES
@@ -90,7 +91,8 @@ namespace cedar
 
     typedef unsigned int EnumId;
     class CEDAR_AUX_LIB_EXPORT Enum;
-    template <typename T> class EnumBase;
+    class EnumBase;
+    template <class T> class EnumType;
 
     class CEDAR_AUX_LIB_EXPORT Arguments;
 
@@ -127,6 +129,8 @@ namespace cedar
     typedef boost::shared_ptr<UIntVectorParameter> UIntVectorParameterPtr;
     class DirectoryParameter;
     typedef boost::shared_ptr<DirectoryParameter> DirectoryParameterPtr;
+    class EnumParameter;
+    typedef boost::shared_ptr<EnumParameter> EnumParameterPtr;
 
     template <typename T> class SetParameter;
     typedef SetParameter<std::string> StringSetParameter;
@@ -149,16 +153,14 @@ namespace cedar
 
 
     /* data */
-    class CEDAR_AUX_LIB_EXPORT Data;
-    typedef boost::shared_ptr<Data> DataPtr;
+    CEDAR_DECLARE_CLASS(Data);
 
     template <typename T> class DataT;
 
     typedef DataT<cv::Mat> MatData;
-    typedef boost::shared_ptr<MatData> MatDataPtr;
+    CEDAR_GENERATE_POINTER_TYPES(MatData);
 
-    class ImageData;
-    typedef boost::shared_ptr<ImageData> ImageDataPtr;
+    CEDAR_DECLARE_CLASS(ImageData);
 
     /* exceptions */
     class CEDAR_AUX_LIB_EXPORT DuplicateNameException;

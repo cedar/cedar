@@ -53,6 +53,8 @@
 #include <QPainter>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+#include <QGraphicsScene>
+#include <QGraphicsDropShadowEffect>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,6 +73,11 @@ cedar::proc::gui::GraphicsBase(120, 50,
                                | QGraphicsItem::ItemIsMovable
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 
@@ -87,6 +94,11 @@ cedar::proc::gui::GraphicsBase(120, 50,
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
   this->setTrigger(trigger);
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
@@ -96,6 +108,33 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::ConnectValidity
+  cedar::proc::gui::TriggerItem::canConnectTo(GraphicsBase* pTarget) const
+{
+  if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::CONNECT_NO)
+  {
+    return cedar::proc::gui::CONNECT_NO;
+  }
+
+  if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
+  {
+    if(this->mTrigger->isListener(p_step_item->getStep()))
+    {
+      return cedar::proc::gui::CONNECT_NO;
+    }
+  }
+
+  if (cedar::proc::gui::TriggerItem *p_trigger_item = dynamic_cast<cedar::proc::gui::TriggerItem*>(pTarget))
+  {
+    if(this->mTrigger->isListener(p_trigger_item->getTrigger()))
+    {
+      return cedar::proc::gui::CONNECT_NO;
+    }
+  }
+
+  return cedar::proc::gui::CONNECT_YES;
+}
 
 void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
@@ -175,26 +214,20 @@ cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
 
 void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget)
 {
-  if (!this->getTrigger()->isListener(pTarget->getStep()))
-  {
-    this->getTrigger()->addListener(pTarget->getStep());
-  }
+  cedar::proc::Manager::getInstance().connect(this->getTrigger(), pTarget->getStep());
   /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
    *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
    *       this function.
    */
-  new Connection(this, pTarget);
+  this->scene()->addItem(new Connection(this, pTarget));
 }
 
 void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::TriggerItem *pTarget)
 {
-  if (!this->getTrigger()->isListener(pTarget->getTrigger()))
-  {
-    this->getTrigger()->addTrigger(pTarget->getTrigger());
-  }
+  cedar::proc::Manager::getInstance().connect(this->getTrigger(), pTarget->getTrigger());
   /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
    *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
    *       this function.
    */
-  new Connection(this, pTarget);
+  this->scene()->addItem(new Connection(this, pTarget));
 }

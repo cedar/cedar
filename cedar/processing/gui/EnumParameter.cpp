@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotter.cpp
+    File:        EnumParameter.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 14
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
     Description:
 
@@ -39,32 +35,34 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DataPlotter.h"
-#include "auxiliaries/DataT.h"
-#include "auxiliaries/ImageData.h"
-#include "auxiliaries/gui/MatrixPlot.h"
-#include "auxiliaries/gui/ImagePlot.h"
+#include "processing/gui/EnumParameter.h"
+#include "auxiliaries/EnumParameter.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QVBoxLayout>
-
-cedar::proc::gui::DataPlotter::WidgetFactory cedar::proc::gui::DataPlotter::mTypePlotters;
+#include <QHBoxLayout>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
+cedar::proc::gui::EnumParameter::EnumParameter(QWidget *pParent)
 :
-QDockWidget(title.c_str(), pParent)
+cedar::proc::gui::ParameterBase(pParent)
 {
-  this->setFloating(true);
+  this->setLayout(new QHBoxLayout());
+  this->mpEdit = new QComboBox();
   this->layout()->setContentsMargins(0, 0, 0, 0);
+  this->layout()->addWidget(this->mpEdit);
+
+  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
-cedar::proc::gui::DataPlotter::~DataPlotter()
+//!@brief Destructor
+cedar::proc::gui::EnumParameter::~EnumParameter()
 {
 }
 
@@ -72,37 +70,38 @@ cedar::proc::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
+void cedar::proc::gui::EnumParameter::parameterPointerChanged()
 {
-  mData = data;
-  //!@todo doesn't work this way -- related to the to-do entry below.
-//  PlotWidgetInterface *p_widget = getWidgetFactory().get(data)->allocateRaw();
-//  p_widget->plot(data);
+  cedar::aux::EnumParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
 
-  //!@todo find a better solution for this!
-  cedar::aux::gui::DataPlotInterface *p_plot = NULL;
-  if (dynamic_cast<cedar::aux::MatData*>(data.get()))
+  this->mpEdit->clear();
+  int select_index = -1;
+  for (size_t i = 0; i < parameter->getEnumDeclaration().list().size(); ++i)
   {
-    p_plot = new cedar::aux::gui::MatrixPlot();
+    const cedar::aux::Enum& enum_val = parameter->getEnumDeclaration().list().at(i);
+    if (enum_val == parameter->get())
+    {
+      select_index = static_cast<int>(i);
+    }
+    this->mpEdit->addItem(enum_val.prettyString().c_str(), QVariant(QString(enum_val.name().c_str())));
   }
-  else if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
+  if(select_index != -1)
   {
-    p_plot = new cedar::aux::gui::ImagePlot();
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::proc::gui::DataPlotter::plot.");
+    this->mpEdit->setCurrentIndex(select_index);
   }
 
-  p_plot->display(data);
-  this->setWidget(p_plot);
+  QObject::connect(this->mpEdit, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentIndexChanged(const QString&)));
 }
 
-cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::getWidgetFactory()
+void cedar::proc::gui::EnumParameter::currentIndexChanged(const QString&)
 {
-  if (cedar::proc::gui::DataPlotter::mTypePlotters.empty())
+  if (this->mpEdit->currentIndex() != -1)
   {
-    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
+    cedar::aux::EnumParameterPtr parameter;
+    parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
+    QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
+    parameter->set(value.toStdString());
   }
-  return cedar::proc::gui::DataPlotter::mTypePlotters;
 }
+

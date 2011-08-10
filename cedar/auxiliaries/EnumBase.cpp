@@ -22,25 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.cpp
+    File:        EnumBase.cpp
 
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 05 27
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
-
-    Description:
+    Description: Base class for enums.
 
     Credits:
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/Data.h"
+#include "auxiliaries/EnumBase.h"
 
 // PROJECT INCLUDES
 
@@ -50,13 +45,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Data::Data()
+cedar::aux::EnumBase::EnumBase(const std::string& prefix)
 :
-mpeOwner(NULL)
+mUndefined (Enum::UNDEFINED, prefix + "UNDEFINED")
 {
+  this->def(mUndefined);
 }
 
-cedar::aux::Data::~Data()
+cedar::aux::EnumBase::~EnumBase()
 {
 }
 
@@ -64,42 +60,41 @@ cedar::aux::Data::~Data()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-QReadWriteLock& cedar::aux::Data::getLock()
+void cedar::aux::EnumBase::def(const cedar::aux::Enum& rEnum)
 {
-  return this->mLock;
+  //! @todo check for duplicate values
+  this->mEnumFromId[rEnum.id()] = rEnum;
+  this->mEnumFromString[rEnum.name()] = rEnum;
+  if (rEnum != cedar::aux::Enum::UNDEFINED)
+  {
+    this->mEnumList.push_back(rEnum);
+  }
 }
 
-void cedar::aux::Data::lockForRead()
+const cedar::aux::Enum& cedar::aux::EnumBase::get(const cedar::aux::EnumId id) const
 {
-  this->mLock.lockForRead();
+  std::map<cedar::aux::EnumId, cedar::aux::Enum>::const_iterator it;
+  it = this->mEnumFromId.find(id);
+  if (it != this->mEnumFromId.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    return this->mUndefined;
+  }
 }
 
-void cedar::aux::Data::lockForWrite()
+const cedar::aux::Enum& cedar::aux::EnumBase::get(const std::string& id) const
 {
-  this->mLock.lockForWrite();
-}
-
-void cedar::aux::Data::unlock()
-{
-  this->mLock.unlock();
-}
-
-cedar::aux::Configurable* cedar::aux::Data::getOwner() const
-{
-  return this->mpeOwner;
-}
-
-void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
-{
-  this->mpeOwner = step;
-}
-
-const std::string& cedar::aux::Data::connectedSlotName() const
-{
-  return this->mConnectedSlotName;
-}
-
-void cedar::aux::Data::connectedSlotName(const std::string& name)
-{
-  this->mConnectedSlotName = name;
+  std::map<std::string, cedar::aux::Enum>::const_iterator it;
+  it = this->mEnumFromString.find(id);
+  if (it != this->mEnumFromString.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    return this->mUndefined;
+  }
 }

@@ -50,6 +50,11 @@ cedar::proc::InvalidRoleException::InvalidRoleException()
   this->mType = "InvalidRoleException";
 }
 
+cedar::proc::InvalidCategoryException::InvalidCategoryException()
+{
+  this->mType = "InvalidCategoryException";
+}
+
 cedar::proc::DuplicateNameException::DuplicateNameException()
 {
   this->mType = "DuplicateNameException";

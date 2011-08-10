@@ -40,6 +40,9 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/GraphicsBase.h"
+#include "processing/gui/StepItem.h"
+#include "processing/gui/TriggerItem.h"
+#include "processing/gui/DataSlotItem.h"
 
 // PROJECT INCLUDES
 
@@ -47,6 +50,10 @@
 #include <QPainter>
 #include <iostream>
 #include <limits.h>
+
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(150, 200, 150);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(200, 200, 75);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(200, 150, 150);
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -58,6 +65,7 @@ cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
                                              GraphicsGroup canConnectTo,
                                              BaseShape shape)
 :
+mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mShape(shape),
 mWidth(new cedar::aux::DoubleParameter("width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
@@ -65,6 +73,8 @@ mHeight(new cedar::aux::DoubleParameter("height", 50.0, -std::numeric_limits<qre
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
+  this->setZValue(1.0);
+
   this->mWidth->set(width);
   this->mHeight->set(height);
   this->registerParameter(this->mWidth);
@@ -81,6 +91,27 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource)
+{
+  switch (pConnectionSource->canConnectTo(this))
+  {
+    case cedar::proc::gui::CONNECT_YES:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET);
+      break;
+
+    case cedar::proc::gui::CONNECT_WARNING:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING);
+      break;
+
+    case cedar::proc::gui::CONNECT_ERROR:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR);
+      break;
+
+    case cedar::proc::gui::CONNECT_NO:
+    default:
+      this->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
+  }
+}
 
 void cedar::proc::gui::GraphicsBase::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
@@ -119,6 +150,51 @@ void cedar::proc::gui::GraphicsBase::addConnection(cedar::proc::gui::Connection*
   this->mConnections.push_back(pConnection);
 }
 
+void cedar::proc::gui::GraphicsBase::removeConnection(cedar::proc::gui::Connection* pConnection)
+{
+  std::vector<Connection*>::iterator it;
+  for (it = mConnections.begin(); it != mConnections.end(); it++)
+  {
+    if (*it == pConnection)
+    {
+      break;
+    }
+  }
+  // found something, delete it now!
+  if (it != mConnections.end())
+  {
+    mConnections.erase(it);
+  }
+}
+
+void cedar::proc::gui::GraphicsBase::removeAllConnections()
+{
+  // first, disconnect the underlying structures
+  this->disconnect();
+  // then, delete the graphical representation of the connections
+  std::vector<cedar::proc::gui::Connection*> delete_later;
+  for (std::vector<cedar::proc::gui::Connection*>::iterator it = mConnections.begin(); it != mConnections.end(); ++it)
+  {
+    if ((*it)->getSource() == this)
+    {
+      (*it)->getTarget()->removeConnection(*it);
+    }
+    else if ((*it)->getTarget() == this)
+    {
+      (*it)->getSource()->removeConnection(*it);
+    }
+    // delete own connections later
+    delete_later.push_back(*it);
+    delete *it;
+  }
+  // delete all own connections
+  for (size_t i = 0; i < delete_later.size(); ++i)
+  {
+    this->removeConnection(delete_later.at(i));
+  }
+  this->mConnections.clear();
+}
+
 cedar::proc::gui::GraphicsBase::HighlightMode cedar::proc::gui::GraphicsBase::getHighlightMode() const
 {
   return this->mHighlightMode;
@@ -142,9 +218,20 @@ bool cedar::proc::gui::GraphicsBase::canConnect() const
   return this->mAllowedConnectTargets != GRAPHICS_GROUP_NONE;
 }
 
-bool cedar::proc::gui::GraphicsBase::canConnectTo(GraphicsBase* pTarget) const
+cedar::proc::gui::ConnectValidity cedar::proc::gui::GraphicsBase::canConnectTo(GraphicsBase* pTarget) const
 {
-  return (this->mAllowedConnectTargets & pTarget->mGroup) != 0 && pTarget != this;
+  if ((this->mAllowedConnectTargets & pTarget->mGroup) != 0)
+  {
+    if (pTarget == this)
+    {
+      return cedar::proc::gui::CONNECT_NO;
+    }
+    else
+    {
+      return cedar::proc::gui::CONNECT_YES;
+    }
+  }
+  return cedar::proc::gui::CONNECT_NO;
 }
 
 QPointF cedar::proc::gui::GraphicsBase::getConnectionAnchorInScene() const
@@ -178,15 +265,32 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   painter->save();
 
   QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
+  qreal roundedness = 4;
 
   painter->setPen(this->getOutlinePen());
   switch (this->mShape)
   {
     case BASE_SHAPE_RECT:
-      painter->drawRect(bounds);
+      if (mDrawBackground)
+      {
+        painter->save();
+        painter->setPen(QPen(Qt::NoPen));
+        painter->setBrush(Qt::white);
+        painter->drawRoundedRect(bounds, roundedness, roundedness);
+        painter->restore();
+      }
+      painter->drawRoundedRect(bounds, roundedness, roundedness);
       break;
 
     case BASE_SHAPE_ROUND:
+      if (mDrawBackground)
+      {
+        painter->save();
+        painter->setPen(QPen(Qt::NoPen));
+        painter->setBrush(Qt::white);
+        painter->drawEllipse(bounds);
+        painter->restore();
+      }
       painter->drawEllipse(bounds);
       break;
   }
@@ -199,7 +303,15 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
     {
       case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
       case HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER:
-        highlight_pen.setColor(QColor(150, 200, 150));
+        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
+        break;
+
+      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR:
+        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorError);
+        break;
+
+      case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING:
+        highlight_pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorWarning);
         break;
 
       default:
@@ -211,7 +323,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
     switch (this->mShape)
     {
       case BASE_SHAPE_RECT:
-        painter->drawRect(highlight_bounds);
+        painter->drawRoundedRect(highlight_bounds, roundedness, roundedness);
         break;
 
       case BASE_SHAPE_ROUND:
@@ -222,6 +334,26 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
 
   painter->restore();
 }
+
+const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity validity)
+{
+  switch (validity)
+  {
+    case cedar::proc::gui::CONNECT_YES:
+      return mValidityColorValid;
+
+    case cedar::proc::gui::CONNECT_NO:
+    case cedar::proc::gui::CONNECT_ERROR:
+      return mValidityColorError;
+
+    case cedar::proc::gui::CONNECT_WARNING:
+      return mValidityColorWarning;
+
+    default:
+      return mValidityColorError;
+  }
+}
+
 
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
@@ -251,4 +383,9 @@ void cedar::proc::gui::GraphicsBase::updateConnections()
   {
     this->mConnections.at(i)->update();
   }
+}
+
+void cedar::proc::gui::GraphicsBase::disconnect()
+{
+
 }

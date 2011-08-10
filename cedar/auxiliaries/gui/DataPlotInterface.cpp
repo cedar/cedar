@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,16 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.cpp
+    File:        <filename>
 
-
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  <first name> <last name>
+    Email:       <email address>
+    Date:        <creation date YYYY MM DD>
 
     Description:
 
@@ -40,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/Data.h"
+#include "auxiliaries/gui/DataPlotInterface.h"
 
 // PROJECT INCLUDES
 
@@ -50,56 +45,16 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Data::Data()
+cedar::aux::gui::DataPlotInterface::DataPlotInterface(QWidget *pParent)
 :
-mpeOwner(NULL)
+QWidget(pParent)
 {
 }
 
-cedar::aux::Data::~Data()
+cedar::aux::gui::DataPlotInterface::~DataPlotInterface()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-QReadWriteLock& cedar::aux::Data::getLock()
-{
-  return this->mLock;
-}
-
-void cedar::aux::Data::lockForRead()
-{
-  this->mLock.lockForRead();
-}
-
-void cedar::aux::Data::lockForWrite()
-{
-  this->mLock.lockForWrite();
-}
-
-void cedar::aux::Data::unlock()
-{
-  this->mLock.unlock();
-}
-
-cedar::aux::Configurable* cedar::aux::Data::getOwner() const
-{
-  return this->mpeOwner;
-}
-
-void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
-{
-  this->mpeOwner = step;
-}
-
-const std::string& cedar::aux::Data::connectedSlotName() const
-{
-  return this->mConnectedSlotName;
-}
-
-void cedar::aux::Data::connectedSlotName(const std::string& name)
-{
-  this->mConnectedSlotName = name;
-}

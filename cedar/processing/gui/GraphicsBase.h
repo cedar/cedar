@@ -76,6 +76,8 @@ public:
   {
     HIGHLIGHTMODE_NONE,
     HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET,
+    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_WARNING,
+    HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET_WITH_ERROR,
     HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER
   };
 
@@ -84,6 +86,7 @@ public:
     BASE_SHAPE_RECT,
     BASE_SHAPE_ROUND
   };
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -102,7 +105,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual bool canConnectTo(GraphicsBase* pTarget) const;
+  virtual cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
   virtual bool canConnect() const;
 
@@ -115,6 +118,9 @@ public:
   QRectF boundingRect() const;
 
   QPen getOutlinePen() const;
+
+  //!@brief This method highlights this item according to how it can connect to the source.
+  void highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource);
 
   void setHighlightMode(HighlightMode mode);
 
@@ -131,6 +137,13 @@ public:
   }
 
   void addConnection(Connection* pConnection);
+
+  void removeConnection(Connection* pConnection);
+
+  void removeAllConnections();
+
+  //!\brief overwrite this function if your customized graphics item needs to disconnect some children items
+  virtual void disconnect();
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
@@ -154,8 +167,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  static const QColor mValidityColorValid;
+  static const QColor mValidityColorWarning;
+  static const QColor mValidityColorError;
+
+  static const QColor& getValidityColor(cedar::proc::gui::ConnectValidity validity);
 protected:
-  // none yet
+  bool mDrawBackground;
 private:
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
   BaseShape mShape;

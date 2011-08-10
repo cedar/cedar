@@ -22,94 +22,71 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GaussInput.h
+    File:        EnumType.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
-    Description:
+    Description: Type class for enums.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCE_GAUSS_INPUT_H
-#define CEDAR_PROC_SOURCE_GAUSS_INPUT_H
+#ifndef CEDAR_AUX_ENUM_TYPE_H
+#define CEDAR_AUX_ENUM_TYPE_H
 
 // LOCAL INCLUDES
-#include "processing/source/namespace.h"
-#include "processing/namespace.h"
-#include "dynamics/namespace.h"
-#include "processing/Step.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/EnumBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <map>
+#include <vector>
+#include <string>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief A base class for making enums that are more flexible than the standard ones.
  *
- * More detailed description of the class.
+ * To make an enum using this class, create a new class that has a static construct function. In the construct function,
+ * declare all the enum values belonging to your enum.
+ * @todo explain this better and add example code
  */
-class cedar::proc::source::GaussInput : public cedar::proc::Step
+template <class T>
+class cedar::aux::EnumType
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  GaussInput();
-
-  //!@brief Destructor
+  EnumType(const std::string& prefix = "")
+  :
+  mType(new cedar::aux::EnumBase(prefix))
+  {
+    T::construct();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void compute(const cedar::proc::Arguments& arguments);
-
-public slots:
-  void updateMatrix();
-  void updateDimensionality();
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
+  boost::shared_ptr<cedar::aux::EnumBase>& type()
+  {
+    return this->mType;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
-  // private methods
+  // private members
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  boost::shared_ptr<cedar::aux::EnumBase> mType;
+}; // class cedar::aux::EnumType
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  cedar::aux::MatDataPtr mOutput;
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  cedar::aux::DoubleParameterPtr _mAmplitude;
-  cedar::aux::UIntParameterPtr _mDimensionality;
-  cedar::aux::DoubleVectorParameterPtr _mSigmas;
-  cedar::aux::DoubleVectorParameterPtr _mCenters;
-  cedar::aux::UIntVectorParameterPtr _mSizes;
-
-private:
-
-}; // class cedar::proc::source::GaussInput
-
-#endif // CEDAR_PROC_SOURCE_GAUSS_INPUT_H
-
+#endif // CEDAR_AUX_ENUM_TYPE_H

@@ -22,62 +22,33 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        exceptions.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2010 11 25
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
-    Description: Namespace file for cedar::aux::gui.
+    Description: Header file for exceptions in the cedar::aux::gui namespace.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_GUI_EXCEPTIONS_H
+#define CEDAR_AUX_GUI_EXCEPTIONS_H
 
-#ifndef CEDAR_AUX_GUI_NAMESPACE_H
-#define CEDAR_AUX_GUI_NAMESPACE_H
+#include "auxiliaries/gui/namespace.h"
+#include "auxiliaries/exceptions/ExceptionBase.h"
 
-// LOCAL INCLUDES
-#include "auxiliaries/lib.h"
-
-// PROJECT INCLUDES
-#include "namespace.h"
-
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-
-namespace cedar
+/*!@brief Exception that occurs when a type is not handled.
+ */
+class cedar::aux::gui::InvalidPlotData : public cedar::aux::exc::ExceptionBase
 {
-  namespace aux
+public:
+  InvalidPlotData()
   {
-    //!@brief Namespace for widget classes.
-    namespace gui
-    {
-      class CEDAR_AUX_LIB_EXPORT BaseWidget;
-      //!@brief smart pointer for BaseWidget
-      typedef boost::shared_ptr<BaseWidget> BaseWidgetPtr;
-
-      class CEDAR_AUX_LIB_EXPORT SceneWidget;
-      //!@brief smart pointer for SceneWidget
-      typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
-
-      class CEDAR_AUX_LIB_EXPORT Viewer;
-      //!@brief smart pointer for Viewer
-      typedef boost::shared_ptr<Viewer> ViewerPtr;
-
-      /* Plot widgets */
-      class DataPlotInterface;
-
-      class CEDAR_AUX_LIB_EXPORT MatrixPlot;
-      class CEDAR_AUX_LIB_EXPORT MatrixPlot2D;
-
-      class CEDAR_AUX_LIB_EXPORT ImagePlot;
-
-      /* Exceptions */
-      class InvalidPlotData;
-    }
+    this->mType = "InvalidPlotData";
   }
-}
+}; // class cedar::aux::InvalidPlotData
 
-#endif // CEDAR_AUX_GUI_NAMESPACE_H
+#endif // CEDAR_AUX_GUI_EXCEPTIONS_H

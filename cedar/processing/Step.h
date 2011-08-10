@@ -45,6 +45,7 @@
 #include "processing/namespace.h"
 #include "processing/Trigger.h"
 #include "processing/DataRole.h"
+#include "processing/DataSlot.h"
 #include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/Base.h"
 #include "auxiliaries/Configurable.h"
@@ -70,23 +71,7 @@ class cedar::proc::Step : public QThread, public cedar::aux::Configurable
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  struct DataEntry
-  {
-    public:
-      DataEntry(bool isMandatory = true);
-
-      void setData(cedar::aux::DataPtr data);
-      cedar::aux::DataPtr getData();
-      boost::shared_ptr<const cedar::aux::Data> getData() const;
-
-      bool isMandatory() const;
-
-    private:
-      cedar::aux::DataPtr mData;
-      bool mMandatory;
-  };
-  typedef std::map<std::string, DataEntry> SlotMap;
+  typedef std::map<std::string, cedar::proc::DataSlotPtr> SlotMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -111,21 +96,23 @@ public:
   //!@brief Method that is called whenever an input is connected to the step.
   virtual void inputConnectionChanged(const std::string& inputName);
 
+  cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
+  cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slot_name);
+
+  virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                          (
+                                            cedar::proc::ConstDataSlotPtr slot,
+                                            cedar::aux::DataPtr data
+                                          ) const;
+
   void setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
   cedar::proc::TriggerPtr& getFinishedTrigger();
 
   void setThreaded(bool isThreaded);
 
-  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
-  void declareInput(const std::string& name, bool mandatory = true);
-  void declareBuffer(const std::string& name, bool mandatory = true);
-  void declareOutput(const std::string& name, bool mandatory = true);
-
-  void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
   void setInput(const std::string& name, cedar::aux::DataPtr data);
-  void setBuffer(const std::string& name, cedar::aux::DataPtr data);
-  void setOutput(const std::string& name, cedar::aux::DataPtr data);
+  void freeInput(const std::string& name);
 
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
   cedar::aux::DataPtr getInput(const std::string& name);
@@ -135,12 +122,23 @@ public:
   cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role);
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
 
+  cedar::proc::DataSlotPtr getInputSlot(const std::string& name);
+  cedar::proc::DataSlotPtr getBufferSlot(const std::string& name);
+  cedar::proc::DataSlotPtr getOutputSlot(const std::string& name);
+  cedar::proc::DataSlotPtr getSlot(DataRole::Id role, const std::string& name);
+
   static void connect(
                        cedar::proc::StepPtr source,
                        const std::string& sourceName,
                        cedar::proc::StepPtr target,
                        const std::string& targetName
                      );
+  static void disconnect(
+                          cedar::proc::StepPtr source,
+                          const std::string& sourceName,
+                          cedar::proc::StepPtr target,
+                          const std::string& targetName
+                        );
   void setName(const std::string& name);
   const std::string& getName() const;
 
@@ -156,12 +154,24 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   void run();
+  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+  void declareInput(const std::string& name, bool mandatory = true);
+  void declareBuffer(const std::string& name, bool mandatory = true);
+  void declareOutput(const std::string& name, bool mandatory = true);
+  void setBuffer(const std::string& name, cedar::aux::DataPtr data);
+  void setOutput(const std::string& name, cedar::aux::DataPtr data);
+  void freeBuffer(const std::string& name);
+  void freeOutput(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void checkMandatoryConnections();
+  void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
+  void freeData(DataRole::Id role, const std::string& name);
+
+  bool allInputsValid();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -42,6 +42,7 @@
 #include "processing/Network.h"
 #include "processing/Manager.h"
 #include "processing/Step.h"
+#include "processing/DataSlot.h"
 #include "processing/Group.h"
 #include "auxiliaries/Data.h"
 
@@ -349,7 +350,7 @@ void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& con
     cedar::proc::Step::SlotMap& inputs = target->getDataSlots(cedar::proc::DataRole::INPUT);
     for (cedar::proc::Step::SlotMap::iterator iter = inputs.begin(); iter != inputs.end(); ++iter)
     {
-      cedar::aux::DataPtr data = iter->second.getData();
+      cedar::aux::DataPtr data = iter->second->getData();
 
       // check if the data connection is set
       if (!data)

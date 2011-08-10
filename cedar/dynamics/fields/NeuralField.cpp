@@ -43,6 +43,7 @@
 #include "dynamics/SpaceCode.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
+#include "auxiliaries/DataT.h"
 #include "auxiliaries/math/Sigmoid.h"
 #include "auxiliaries/math/AbsSigmoid.h"
 #include "auxiliaries/kernel/Gauss.h"
@@ -97,9 +98,37 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   // now check the dimensionality and sizes of all matrices
   this->updateDimensionality();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
+                                                         (
+                                                           cedar::proc::ConstDataSlotPtr slot,
+                                                           cedar::aux::DataPtr data
+                                                         ) const
+{
+  if (!data)
+  {
+    std::cout << "Data is null." << std::endl;
+  }
+
+  if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
+  {
+    if (cedar::dyn::SpaceCodePtr input = boost::shared_dynamic_cast<cedar::dyn::SpaceCode>(data))
+    {
+      return cedar::proc::DataSlot::VALIDITY_VALID;
+    }
+    else if (cedar::aux::MatDataPtr input = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+    {
+      return cedar::proc::DataSlot::VALIDITY_WARNING;
+    }
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
+  return this->cedar::proc::Step::determineInputValidity(slot, data);
+}
+
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();

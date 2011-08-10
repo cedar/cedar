@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,16 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Data.cpp
+    File:        DataSlot.cpp
 
-
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 17
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 29
 
     Description:
 
@@ -40,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/Data.h"
+#include "processing/DataSlot.h"
 
 // PROJECT INCLUDES
 
@@ -50,13 +45,16 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Data::Data()
+cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
 :
-mpeOwner(NULL)
+mMandatory(isMandatory),
+mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
+mName(name),
+mRole(role)
 {
 }
 
-cedar::aux::Data::~Data()
+cedar::proc::DataSlot::~DataSlot()
 {
 }
 
@@ -64,42 +62,42 @@ cedar::aux::Data::~Data()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-QReadWriteLock& cedar::aux::Data::getLock()
+cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
 {
-  return this->mLock;
+  return this->mValidity;
 }
 
-void cedar::aux::Data::lockForRead()
+void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
 {
-  this->mLock.lockForRead();
+  this->mValidity = validity;
 }
 
-void cedar::aux::Data::lockForWrite()
+bool cedar::proc::DataSlot::isMandatory() const
 {
-  this->mLock.lockForWrite();
+  return this->mMandatory;
 }
 
-void cedar::aux::Data::unlock()
+void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
 {
-  this->mLock.unlock();
+  this->mData = data;
 }
 
-cedar::aux::Configurable* cedar::aux::Data::getOwner() const
+cedar::aux::DataPtr cedar::proc::DataSlot::getData()
 {
-  return this->mpeOwner;
+  return this->mData;
 }
 
-void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
+cedar::aux::ConstDataPtr cedar::proc::DataSlot::getData() const
 {
-  this->mpeOwner = step;
+  return this->mData;
 }
 
-const std::string& cedar::aux::Data::connectedSlotName() const
+cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const
 {
-  return this->mConnectedSlotName;
+  return this->mRole;
 }
 
-void cedar::aux::Data::connectedSlotName(const std::string& name)
+const std::string& cedar::proc::DataSlot::getName() const
 {
-  this->mConnectedSlotName = name;
+  return this->mName;
 }

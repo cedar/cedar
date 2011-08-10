@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/AbstractFactory.h"
 #include "processing/lib.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 
@@ -58,6 +59,8 @@ namespace cedar
 
     class CEDAR_PROC_LIB_EXPORT DataRole;
 
+    CEDAR_DECLARE_CLASS(DataSlot);
+    
     class CEDAR_PROC_LIB_EXPORT LoopArguments;
 
     class CEDAR_PROC_LIB_EXPORT FrameworkSettings;
@@ -88,6 +91,9 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT Network;
     typedef boost::shared_ptr<Network> NetworkPtr;
 
+    class Connection;
+    typedef boost::shared_ptr<Connection> ConnectionPtr;
+
     template <class BaseClass, class FactoryType> class DeclarationBase;
     
     class CEDAR_PROC_LIB_EXPORT StepDeclaration;
@@ -111,6 +117,7 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
+    class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class CEDAR_PROC_LIB_EXPORT PluginException;

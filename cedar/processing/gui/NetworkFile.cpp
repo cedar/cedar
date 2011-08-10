@@ -48,6 +48,7 @@
 #include "processing/gui/exceptions.h"
 #include "processing/Step.h"
 #include "processing/Group.h"
+#include "processing/DataSlot.h"
 #include "auxiliaries/Data.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/macros.h"
@@ -119,7 +120,7 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
       cedar::proc::Step::SlotMap& slot_map = step->getDataSlots(cedar::proc::DataRole::INPUT);
       for (cedar::proc::Step::SlotMap::iterator iter = slot_map.begin(); iter != slot_map.end(); ++iter)
       {
-        const cedar::aux::DataPtr& data = iter->second.getData();
+        const cedar::aux::DataPtr& data = iter->second->getData();
 
         // check if the data connection is set
         if (!data)
@@ -298,6 +299,10 @@ void cedar::proc::gui::NetworkFile::loadScene(cedar::aux::ConfigurationNode& roo
   this->mpStepsToAdd.clear();
   this->mpTriggersToAdd.clear();
 
+  if (root.find("ui") == root.not_found())
+  {
+    return;
+  }
   cedar::aux::ConfigurationNode& ui = root.find("ui")->second;
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {

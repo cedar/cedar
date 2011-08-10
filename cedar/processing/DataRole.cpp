@@ -45,7 +45,7 @@
 
 // SYSTEM INCLUDES
 
-cedar::aux::EnumBase<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
+cedar::aux::EnumType<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
 
 #ifndef MSVC
 const cedar::proc::DataRole::Id cedar::proc::DataRole::INPUT;
@@ -59,17 +59,21 @@ const cedar::proc::DataRole::Id cedar::proc::DataRole::BUFFER;
 
 void cedar::proc::DataRole::construct()
 {
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT", "Input"));
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT", "Output"));
-  mType.def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER", "Buffer"));
+  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::INPUT, "INPUT", "Input"));
+  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::OUTPUT, "OUTPUT", "Output"));
+  mType.type()->def(cedar::aux::Enum(cedar::proc::DataRole::BUFFER, "BUFFER", "Buffer"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const cedar::aux::EnumBase<cedar::proc::DataRole>& cedar::proc::DataRole::type()
+const cedar::aux::EnumBase& cedar::proc::DataRole::type()
 {
-  return cedar::proc::DataRole::mType;
+  return *cedar::proc::DataRole::mType.type();
 }
 
+const cedar::proc::DataRole::TypePtr& cedar::proc::DataRole::typePtr()
+{
+  return cedar::proc::DataRole::mType.type();
+}

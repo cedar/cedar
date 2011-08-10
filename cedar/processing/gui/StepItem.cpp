@@ -43,6 +43,7 @@
 #include "processing/gui/DataPlotter.h"
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/exceptions.h"
+#include "processing/DataSlot.h"
 #include "processing/Manager.h"
 #include "auxiliaries/Data.h"
 #include "processing/Step.h"
@@ -53,6 +54,7 @@
 #include <QPainter>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
+#include <QGraphicsDropShadowEffect>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -72,6 +74,11 @@ mStepIcon(":/steps/no_icon.png")
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
@@ -85,6 +92,11 @@ mStepIcon(":/steps/no_icon.png")
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
+
+  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+  p_effect->setBlurRadius(5.0);
+  p_effect->setOffset(3.0, 3.0);
+  this->setGraphicsEffect(p_effect);
 }
 
 cedar::proc::gui::StepItem::~StepItem()
@@ -174,12 +186,10 @@ void cedar::proc::gui::StepItem::addDataItems()
       cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(*enum_it);
       for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this,
-                                                                                    iter->second.getData(),
-                                                                                    iter->first,
-                                                                                    (*enum_it));
+        cedar::proc::DataSlotPtr slot = iter->second;
+        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
         p_item->setPos(origin + count * direction * (data_size + padding) );
-        mSlotMap[*enum_it][iter->first] = p_item;
+        mSlotMap[slot->getRole()][slot->getName()] = p_item;
         count += static_cast<qreal>(1.0);
       }
     }
@@ -215,6 +225,21 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::StepItem::getSlotItem
   }
 
   return iter->second;
+}
+
+cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlotItems(
+                                                                             cedar::proc::DataRole::Id role
+                                                                           )
+{
+  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   );
+  }
+  return role_map->second;
 }
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -296,5 +321,23 @@ void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGrap
 cedar::proc::StepPtr cedar::proc::gui::StepItem::getStep()
 {
   return this->mStep;
+}
+
+void cedar::proc::gui::StepItem::disconnect()
+{
+  // go through all DataSlots and remove connections
+  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
+  {
+    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
+    if (id == cedar::aux::Enum::UNDEFINED)
+    {
+      continue;
+    }
+    cedar::proc::gui::StepItem::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::StepItem*>(this)->getSlotItems(id);
+    for (cedar::proc::gui::StepItem::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
+    {
+      it->second->removeAllConnections();
+    }
+  }
 }
 

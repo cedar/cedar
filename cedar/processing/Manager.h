@@ -48,6 +48,7 @@
 #include "processing/StepDeclaration.h"
 #include "processing/TriggerDeclaration.h"
 #include "processing/FrameworkSettings.h"
+#include "processing/Step.h"
 
 // PROJECT INCLUDES
 
@@ -83,12 +84,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!\brief get the singleton instance of Manager
   static Manager& getInstance();
   cedar::proc::FrameworkSettings& settings();
 
+  //!\brief access to step registry
   StepRegistry& steps();
+  //!\brief access to trigger registry
   TriggerRegistry& triggers();
+  //!\brief access to thread registry
   ThreadRegistry& threads();
+  //!\brief access to group registry
   GroupRegistry& groups();
 
   void registerThread(cedar::aux::LoopedThreadPtr thread);
@@ -101,11 +107,33 @@ public:
 
   void startThreads();
   void stopThreads();
+  void connect(
+                cedar::proc::StepPtr source,
+                const std::string& sourceName,
+                cedar::proc::StepPtr target,
+                const std::string& targetName
+              );
+  void connect(
+                cedar::proc::TriggerPtr trigger,
+                cedar::proc::StepPtr target
+              );
+  void connect(
+                cedar::proc::TriggerPtr trigger,
+                cedar::proc::TriggerPtr target
+              );
+  //!\ remove and disconnect a step
+  void removeStep(cedar::proc::StepPtr step);
+  //!\ remove and disconnect a trigger
+  void removeTrigger(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!\brief this function disconnects all incoming and outgoing connections of a single step
+  void disconnect(cedar::proc::StepPtr deletedStep);
+  //!\brief this function disconnects all incoming and outgoing connections of a single trigger
+  void disconnect(cedar::proc::TriggerPtr deletedTrigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -113,6 +141,9 @@ protected:
 private:
   //!@brief The standard constructor.
   Manager();
+  /*!\brief this deletes a single connection from the mConnections vector. Afterwards, previously obtained iterators
+   * will become invalid, so watch out.*/
+  void deleteConnection(cedar::proc::Connection* connection);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -122,14 +153,20 @@ public:
 protected:
   // none yet
 private:
+  //! the manager singleton instance
   static Manager mManager;
 
+  //! a registry for all managed steps
   StepRegistry mStepRegistry;
+  //! a registry for all managed triggers
   TriggerRegistry mTriggerRegistry;
+  //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
+  //! a registry for all managed groups
   GroupRegistry mGroupRegistry;
 
   cedar::proc::FrameworkSettings mSettings;
+  std::vector<cedar::proc::Connection*> mConnections;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

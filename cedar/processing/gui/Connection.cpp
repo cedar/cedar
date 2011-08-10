@@ -52,12 +52,17 @@
 
 cedar::proc::gui::Connection::Connection(cedar::proc::gui::GraphicsBase *pSource, cedar::proc::gui::GraphicsBase *pTarget)
 :
-QGraphicsLineItem(pSource),
 mpSource(pSource),
 mpTarget(pTarget)
 {
+  this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent);
   pSource->addConnection(this);
   pTarget->addConnection(this);
+
+  QPen pen = this->pen();
+  pen.setWidthF(2.5);
+  this->setPen(pen);
+
   this->update();
 }
 
@@ -69,18 +74,36 @@ cedar::proc::gui::Connection::~Connection()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity validity)
+{
+  QPen pen = this->pen();
+  pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
+  this->setPen(pen);
+}
+
 void cedar::proc::gui::Connection::update()
 {
   this->setZValue(-1.0);
   QLineF line;
 
-  QPointF pos1(this->mpSource->boundingRect().width()/2.0, this->mpSource->boundingRect().height()/2.0);
+  //QPointF pos1(this->mpSource->boundingRect().width()/2.0, this->mpSource->boundingRect().height()/2.0);
+  QPointF pos1(this->mpSource->getConnectionAnchorInScene());
   line.setP1(pos1);
 
-  QPointF pos2 = this->mpTarget->scenePos() - this->mpSource->scenePos();
+  /*QPointF pos2 = this->mpTarget->scenePos() - this->mpSource->scenePos();
   pos2.rx() += this->mpTarget->boundingRect().width()/2.0;
-  pos2.ry() += this->mpTarget->boundingRect().height()/2.0;
+  pos2.ry() += this->mpTarget->boundingRect().height()/2.0;*/
+  QPointF pos2(this->mpTarget->getConnectionAnchorInScene());
   line.setP2(pos2);
 
   this->setLine(line);
+}
+
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getSource()
+{
+  return this->mpSource;
+}
+cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getTarget()
+{
+  return this->mpTarget;
 }

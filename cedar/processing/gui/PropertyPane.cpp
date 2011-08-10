@@ -41,12 +41,14 @@
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
+#include "auxiliaries/EnumParameter.h"
 #include "processing/gui/BoolParameter.h"
 #include "processing/gui/DoubleParameter.h"
 #include "processing/gui/DoubleVectorParameter.h"
 #include "processing/gui/UIntParameter.h"
 #include "processing/gui/UIntVectorParameter.h"
 #include "processing/gui/StringParameter.h"
+#include "processing/gui/EnumParameter.h"
 #include "auxiliaries/DirectoryParameter.h"
 #include "processing/gui/DirectoryParameter.h"
 #include "processing/Manager.h"
@@ -172,6 +174,7 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleVectorParameter, cedar::proc::gui::DoubleVectorParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DirectoryParameter, cedar::proc::gui::DirectoryParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::proc::gui::EnumParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }

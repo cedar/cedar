@@ -44,6 +44,7 @@
 
 // LOCAL INCLUDES
 #include "dynamics/lib.h"
+#include "auxiliaries/macros.h"
 #ifdef WINDOWS
 #include "processing/PluginDeclaration.h"
 #endif // WINDOWS
@@ -65,15 +66,13 @@ namespace cedar
 
     template <typename T> class Activation;
     typedef Activation<double> DoubleActivation;
-    typedef boost::shared_ptr<DoubleActivation> DoubleActivationPtr;
+    CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
     typedef Activation<cv::Mat> MatActivation;
-    typedef boost::shared_ptr<MatActivation> MatActivationPtr;
+    CEDAR_GENERATE_POINTER_TYPES(MatActivation);
 
-    class CEDAR_DYN_LIB_EXPORT SpaceCode;
-    typedef boost::shared_ptr<SpaceCode> SpaceCodePtr;
+    CEDAR_DECLARE_CLASS(SpaceCode);
 
-    class CEDAR_DYN_LIB_EXPORT NeuralField;
-    typedef boost::shared_ptr<NeuralField> NeuralFieldPtr;
+    CEDAR_DECLARE_CLASS(NeuralField);
 
 #ifdef GCC
     // for msvc, this is replaced by the plugin stuff below, currently as a workaround.

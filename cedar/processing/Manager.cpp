@@ -51,12 +51,14 @@
 #include "auxiliaries/macros.h"
 #include "processing/PluginProxy.h"
 #include "processing/PluginDeclaration.h"
+#include "processing/Connection.h"
 
 #include "processing/source/GaussInput.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <algorithm>
 
 cedar::proc::Manager cedar::proc::Manager::mManager;
 
@@ -197,4 +199,94 @@ void cedar::proc::Manager::removeGroup(cedar::proc::GroupPtr group)
 cedar::proc::Manager& cedar::proc::Manager::getInstance()
 {
   return cedar::proc::Manager::mManager;
+}
+
+void cedar::proc::Manager::connect(
+                                    cedar::proc::StepPtr source,
+                                    const std::string& sourceName,
+                                    cedar::proc::StepPtr target,
+                                    const std::string& targetName
+                                  )
+{
+  mConnections.push_back(new cedar::proc::Connection(source,sourceName, target,targetName));
+}
+
+void cedar::proc::Manager::connect(
+                                    cedar::proc::TriggerPtr trigger,
+                                    cedar::proc::StepPtr target
+                                  )
+{
+  mConnections.push_back(new cedar::proc::Connection(trigger, target));
+}
+
+void cedar::proc::Manager::connect(
+                                    cedar::proc::TriggerPtr trigger,
+                                    cedar::proc::TriggerPtr target
+                                  )
+{
+  mConnections.push_back(new cedar::proc::Connection(trigger, target));
+}
+
+void cedar::proc::Manager::disconnect(cedar::proc::StepPtr deletedStep)
+{
+  std::vector<cedar::proc::Connection*> to_delete;
+  // find entries containing the deleted step
+  for (size_t i = 0; i < mConnections.size(); ++i)
+  {
+    if (mConnections.at(i)->contains(deletedStep))
+    {
+      to_delete.push_back(mConnections.at(i));
+      mConnections.at(i)->deleteConnection();
+    }
+  }
+  // delete all entries
+  for (size_t i = 0; i < to_delete.size(); ++i)
+  {
+    this->deleteConnection(to_delete.at(i));
+  }
+}
+
+void cedar::proc::Manager::disconnect(cedar::proc::TriggerPtr deletedTrigger)
+{
+  std::vector<cedar::proc::Connection*> to_delete;
+  // find entries containing the deleted step
+  for (size_t i = 0; i < mConnections.size(); ++i)
+  {
+    if (mConnections.at(i)->contains(deletedTrigger))
+    {
+      to_delete.push_back(mConnections.at(i));
+      mConnections.at(i)->deleteConnection();
+    }
+  }
+  // delete all entries
+  for (size_t i = 0; i < to_delete.size(); ++i)
+  {
+    this->deleteConnection(to_delete.at(i));
+  }
+}
+
+void cedar::proc::Manager::deleteConnection(cedar::proc::Connection* connection)
+{
+  std::vector<cedar::proc::Connection*>::iterator it = std::find(mConnections.begin(), mConnections.end(), connection);
+  if (it != mConnections.end())
+  {
+    mConnections.erase(it);
+  }
+}
+
+void cedar::proc::Manager::removeStep(cedar::proc::StepPtr step)
+{
+  this->steps().removeObject(step->getName());
+  this->disconnect(step);
+}
+
+void cedar::proc::Manager::removeTrigger(cedar::proc::TriggerPtr trigger)
+{
+  this->triggers().removeObject(trigger->getName());
+  this->disconnect(trigger);
+  cedar::proc::LoopedTriggerPtr looped_trigger = boost::shared_dynamic_cast<cedar::proc::LoopedTrigger>(trigger);
+  if (looped_trigger)
+  {
+    this->threads().erase(looped_trigger);
+  }
 }

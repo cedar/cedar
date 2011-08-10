@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerItem.h
+    File:        DataPlotInterface.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
     Description:
 
@@ -38,25 +34,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_TRIGGER_ITEM_H
-#define CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#ifndef CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
+#define CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
-#include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "processing/gui/GraphicsBase.h"
+#include "auxiliaries/gui/namespace.h"
+#include "auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <QWidget>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
+class cedar::aux::gui::DataPlotInterface : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,62 +61,51 @@ class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  TriggerItem();
-
-  TriggerItem(cedar::proc::TriggerPtr trigger);
+  DataPlotInterface(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~TriggerItem();
+  virtual ~DataPlotInterface();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-  cedar::proc::TriggerPtr getTrigger();
-
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-
-  void connectTo(cedar::proc::gui::StepItem *pTarget);
-
-  void connectTo(cedar::proc::gui::TriggerItem *pTarget);
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
-
-  cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+  virtual void display(cedar::aux::DataPtr data) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setTrigger(cedar::proc::TriggerPtr trigger);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::TriggerPtr mTrigger;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  cedar::proc::TriggerDeclarationPtr mClassId;
+  // none yet
 
-}; // class TriggerItem
+}; // class cedar::aux::gui::DataPlotInterface
 
-#endif // CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#endif // CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
 

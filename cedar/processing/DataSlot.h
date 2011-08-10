@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerItem.h
+    File:        DataSlot.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 29
 
     Description:
 
@@ -38,14 +34,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_TRIGGER_ITEM_H
-#define CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#ifndef CEDAR_PROC_DATA_SLOT_H
+#define CEDAR_PROC_DATA_SLOT_H
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
-#include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "processing/gui/GraphicsBase.h"
+#include "processing/namespace.h"
+#include "processing/DataRole.h"
 
 // PROJECT INCLUDES
 
@@ -56,54 +50,65 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::DataSlot
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*! Enum describing the validity of the data connected to this slot.
+   */
+  enum VALIDITY
+  {
+    //! The data is valid.
+    VALIDITY_VALID,
+    //! The data may not be valid, but the step using it can be computed nonetheless.
+    VALIDITY_WARNING,
+    //! The data is erroneous, computing the corresponding step may explode things.
+    VALIDITY_ERROR,
+    //! The validity is unknown and needs to be determined before execution.
+    VALIDITY_UNKNOWN
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  TriggerItem();
-
-  TriggerItem(cedar::proc::TriggerPtr trigger);
+  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
 
   //!@brief Destructor
-  ~TriggerItem();
+  virtual ~DataSlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+  cedar::aux::DataPtr getData();
+  cedar::aux::ConstDataPtr getData() const;
 
-  cedar::proc::TriggerPtr getTrigger();
+  cedar::proc::DataRole::Id getRole() const;
 
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+  void setData(cedar::aux::DataPtr data);
 
-  void connectTo(cedar::proc::gui::StepItem *pTarget);
+  const std::string& getName() const;
 
-  void connectTo(cedar::proc::gui::TriggerItem *pTarget);
+  bool isMandatory() const;
 
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
-
-  cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+  VALIDITY getValidlity() const;
+  void setValidity(VALIDITY validity);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setTrigger(cedar::proc::TriggerPtr trigger);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -111,7 +116,11 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::TriggerPtr mTrigger;
+  cedar::aux::DataPtr mData;
+  bool mMandatory;
+  VALIDITY mValidity;
+  std::string mName;
+  cedar::proc::DataRole::Id mRole;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -120,9 +129,9 @@ protected:
   // none yet
 
 private:
-  cedar::proc::TriggerDeclarationPtr mClassId;
+  // none yet
 
-}; // class TriggerItem
+}; // class cedar::proc::DataSlot
 
-#endif // CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#endif // CEDAR_PROC_DATA_SLOT_H
 

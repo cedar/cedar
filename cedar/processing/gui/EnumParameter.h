@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerItem.h
+    File:        EnumParameter.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 28
 
     Description:
 
@@ -38,72 +34,60 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_TRIGGER_ITEM_H
-#define CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#ifndef CEDAR_PROC_GUI_ENUM_PARAMETER_H
+#define CEDAR_PROC_GUI_ENUM_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
 #include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "processing/gui/GraphicsBase.h"
+#include "processing/gui/ParameterBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QComboBox>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::EnumParameter : public cedar::proc::gui::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  TriggerItem();
-
-  TriggerItem(cedar::proc::TriggerPtr trigger);
+  EnumParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~TriggerItem();
+  virtual ~EnumParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-  cedar::proc::TriggerPtr getTrigger();
-
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-
-  void connectTo(cedar::proc::gui::StepItem *pTarget);
-
-  void connectTo(cedar::proc::gui::TriggerItem *pTarget);
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
-
-  cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+public slots:
+  void parameterPointerChanged();
+  void currentIndexChanged(const QString& text);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setTrigger(cedar::proc::TriggerPtr trigger);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -111,7 +95,7 @@ private:
 protected:
   // none yet
 private:
-  cedar::proc::TriggerPtr mTrigger;
+  QComboBox *mpEdit;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -120,9 +104,8 @@ protected:
   // none yet
 
 private:
-  cedar::proc::TriggerDeclarationPtr mClassId;
+  // none yet
 
-}; // class TriggerItem
+}; // class cedar::proc::gui::EnumParameter
 
-#endif // CEDAR_PROC_GUI_TRIGGER_ITEM_H
-
+#endif // CEDAR_PROC_GUI_ENUM_PARAMETER_H

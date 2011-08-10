@@ -165,8 +165,15 @@ public:
 
   const CategoryEntries& getCategoryEntries(const std::string& category) const
   {
-    //! @todo Exception when category is not present
-    return this->mDeclarationsByCategory.find(category)->second;
+    typename Categories::const_iterator it = this->mDeclarationsByCategory.find(category);
+    if (it != this->mDeclarationsByCategory.end())
+    {
+      return this->mDeclarationsByCategory.find(category)->second;
+    }
+    else
+    {
+      CEDAR_THROW(cedar::proc::InvalidCategoryException, category + " is not a valid category");
+    }
   }
 
   DeclarationPointer getDeclarationOf(ObjectPointer object)

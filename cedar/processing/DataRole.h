@@ -42,7 +42,7 @@
 #define CEDAR_PROC_DATA_ROLE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/EnumBase.h"
+#include "auxiliaries/EnumType.h"
 #include "processing/namespace.h"
 
 // PROJECT INCLUDES
@@ -61,6 +61,8 @@ class cedar::proc::DataRole
   //--------------------------------------------------------------------------------------------------------------------
 public:
   typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -76,7 +78,8 @@ public:
 public:
   static void construct();
 
-  static const cedar::aux::EnumBase<cedar::proc::DataRole>& type();
+  static const cedar::aux::EnumBase& type();
+  static const cedar::proc::DataRole::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,7 +104,7 @@ public:
 protected:
   // none yet
 private:
-  static cedar::aux::EnumBase<cedar::proc::DataRole> mType;
+  static cedar::aux::EnumType<cedar::proc::DataRole> mType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

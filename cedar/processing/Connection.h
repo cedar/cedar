@@ -22,15 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerItem.h
-
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
                  Stephan Zibner
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Date:        2011 07 28
 
     Description:
 
@@ -38,14 +36,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_TRIGGER_ITEM_H
-#define CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#ifndef CEDAR_PROC_CONNECTION_H
+#define CEDAR_PROC_CONNECTION_H
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
-#include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "processing/gui/GraphicsBase.h"
+#include "processing/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -56,7 +51,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::Connection
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,51 +62,54 @@ class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  TriggerItem();
-
-  TriggerItem(cedar::proc::TriggerPtr trigger);
-
+  Connection(
+              cedar::proc::StepPtr source,
+              const std::string& sourceName,
+              cedar::proc::StepPtr target,
+              const std::string& targetName
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::StepPtr target
+            );
+  Connection(
+              cedar::proc::TriggerPtr source,
+              cedar::proc::TriggerPtr target
+            );
   //!@brief Destructor
-  ~TriggerItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
-
-  cedar::proc::TriggerPtr getTrigger();
-
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-
-  void connectTo(cedar::proc::gui::StepItem *pTarget);
-
-  void connectTo(cedar::proc::gui::TriggerItem *pTarget);
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
-
-  cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+  bool contains(cedar::proc::StepPtr step);
+  bool contains(cedar::proc::TriggerPtr trigger);
+  void deleteConnection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setTrigger(cedar::proc::TriggerPtr trigger);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-private:
   cedar::proc::TriggerPtr mTrigger;
+  cedar::proc::TriggerPtr mTargetTrigger;
+  cedar::proc::StepPtr mSource;
+  std::string mSourceName;
+  cedar::proc::StepPtr mTarget;
+  std::string mTargetName;
+private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -120,9 +118,9 @@ protected:
   // none yet
 
 private:
-  cedar::proc::TriggerDeclarationPtr mClassId;
+  // none yet
 
-}; // class TriggerItem
+}; // class cedar::proc::Connection
 
-#endif // CEDAR_PROC_GUI_TRIGGER_ITEM_H
+#endif // CEDAR_PROC_CONNECTION_H
 
