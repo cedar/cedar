@@ -81,19 +81,15 @@
     <addaction name="mpThreadsStartAll"/>
     <addaction name="mpThreadsStopAll"/>
    </widget>
-   <widget class="QMenu" name="menuWindows">
+   <widget class="QMenu" name="mpMenuWindows">
     <property name="title">
      <string>Windows</string>
     </property>
-    <addaction name="mpActionShowHideItems"/>
-    <addaction name="mpActionShowHideTools"/>
-    <addaction name="mpActionShowHideProperties"/>
-    <addaction name="mpActionShowHideLog"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuPlugins"/>
    <addaction name="menuSimulation"/>
-   <addaction name="menuWindows"/>
+   <addaction name="mpMenuWindows"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="mpItemsWidget">
@@ -171,7 +167,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>136</width>
+          <width>93</width>
           <height>342</height>
          </rect>
         </property>
@@ -184,8 +180,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>93</width>
+          <height>342</height>
          </rect>
         </property>
         <attribute name="label">
@@ -348,134 +344,6 @@
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>mpActionShowHideItems</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>mpItemsWidget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>493</x>
-     <y>77</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mpItemsWidget</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>mpActionShowHideItems</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>493</x>
-     <y>77</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mpActionShowHideLog</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>mpLogWidget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>493</x>
-     <y>630</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mpLogWidget</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>mpActionShowHideLog</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>493</x>
-     <y>630</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mpActionShowHideProperties</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>mpPropertiesWidget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>859</x>
-     <y>326</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mpPropertiesWidget</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>mpActionShowHideProperties</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>859</x>
-     <y>326</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mpActionShowHideTools</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>mpToolsWidget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>39</x>
-     <y>326</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mpToolsWidget</sender>
-   <signal>visibilityChanged(bool)</signal>
-   <receiver>mpActionShowHideTools</receiver>
-   <slot>setChecked(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>39</x>
-     <y>326</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>mpActionExit</sender>
    <signal>triggered()</signal>

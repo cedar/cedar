@@ -71,6 +71,11 @@ cedar::proc::gui::Ide::Ide()
   this->mpArchitectureToolBox->setView(this->mpProcessingDrawer);
   this->mpProcessingDrawer->getScene()->setMainWindow(this);
 
+  mpMenuWindows->addAction(this->mpItemsWidget->toggleViewAction());
+  mpMenuWindows->addAction(this->mpToolsWidget->toggleViewAction());
+  mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
+  mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
+
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
                    this, SLOT(exception(const QString&)));
