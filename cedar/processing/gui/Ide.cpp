@@ -124,7 +124,7 @@ void cedar::proc::gui::Ide::showLoadPluginDialog()
   cedar::proc::gui::PluginLoadDialog* p_dialog = new cedar::proc::gui::PluginLoadDialog(this);
   int res = p_dialog->exec();
 
-  if (res == QDialog::Accepted)
+  if (res == QDialog::Accepted && p_dialog->plugin())
   {
     cedar::proc::Manager::getInstance().load(p_dialog->plugin());
     this->resetStepList();

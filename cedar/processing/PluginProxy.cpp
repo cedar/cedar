@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include "processing/PluginProxy.h"
+#include "processing/PluginDeclaration.h"
 #include "processing/Manager.h"
 #include "processing/exceptions.h"
 
@@ -45,7 +46,8 @@
 #ifdef LINUX
 #include <dlfcn.h>
 #elif defined WINDOWS
-//TODO implement
+#include <Windows.h>
+#include <strsafe.h>
 #endif
 
 #include <boost/filesystem.hpp>
@@ -118,6 +120,8 @@ void cedar::proc::PluginProxy::load(const std::string& file)
 {
   this->mFileName = this->findPluginFile(file);
   
+  // OS-Dependent code for loading the plugin.
+  PluginInterfaceMethod p_interface = NULL;
 #ifdef LINUX
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)
@@ -127,16 +131,32 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
 
-  PluginInterfaceMethod interface = NULL;
   interface = (PluginInterfaceMethod) (dlsym(this->mpLibHandle, "pluginDeclaration"));
-  if (!interface)
+  if (!p_interface)
   {
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");
   }
 
   //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
-  this->mDeclaration = (*interface)();
-#endif // LINUX
+#elif defined WINDOWS
+  this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
+  if (!this->mpLibHandle)
+  {
+    //!@todo use GetLastError to read out the error string
+    CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: LoadLibraryEx failed: " + this->getLastError());
+  }
+  
+  p_interface = (PluginInterfaceMethod) (GetProcAddress(this->mpLibHandle, TEXT("pluginDeclaration")));
+  if (!p_interface)
+  {
+    //!@todo use GetLastError to read out the error string
+    CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
+  }
+#endif // LINUX / WINDOWS
+  
+  this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
+  (*p_interface)(this->mDeclaration);
+
   // Finally, if nothing failed, add the plugin to the list of known plugins.
   cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
 }
@@ -145,3 +165,28 @@ cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
 {
   return this->mDeclaration;
 }
+
+#ifdef WINDOWS
+
+std::string cedar::proc::PluginProxy::getLastError()
+{
+  LPVOID lpMsgBuf;
+  DWORD dw = GetLastError(); 
+
+  FormatMessage(
+      FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+      FORMAT_MESSAGE_FROM_SYSTEM |
+      FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL,
+      dw,
+      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+      (LPTSTR) &lpMsgBuf,
+      0, NULL );
+  
+  std::string error((char*)lpMsgBuf);
+
+  LocalFree(lpMsgBuf);
+  return error;
+}
+
+#endif //def WINDOWS
