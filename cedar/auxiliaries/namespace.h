@@ -40,6 +40,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/macros.h"
 
+#include "auxiliaries/lib.h"
 // SYSTEM INCLUDES
 #include <sstream>
 #include <boost/smart_ptr.hpp>
@@ -52,23 +53,23 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
-    class Base;
+    class CEDAR_AUX_LIB_EXPORT Base;
     //!@brief smart pointer for Base
     typedef boost::shared_ptr<Base> BasePtr;
 
-    class Configurable;
+    class CEDAR_AUX_LIB_EXPORT Configurable;
     //!@brief smart pointer for Configurable
     typedef boost::shared_ptr<Configurable> ConfigurablePtr;
 
-    class LoopedThread;
+    class CEDAR_AUX_LIB_EXPORT LoopedThread;
     //!@brief smart pointer for LoopedThread
     typedef boost::shared_ptr<LoopedThread> LoopedThreadPtr;
 
-    class ConfigurationInterface;
+    class CEDAR_AUX_LIB_EXPORT ConfigurationInterface;
     //!@brief smart pointer for ConfigurationInterface
     typedef boost::shared_ptr<ConfigurationInterface> ConfigurationInterfacePtr;
 
-    class UserData;
+    class CEDAR_AUX_LIB_EXPORT UserData;
     //!@brief smart pointer for UserData
     typedef boost::shared_ptr<UserData> UserDataPtr;
 
@@ -78,22 +79,22 @@ namespace cedar
     //!@brief smart pointer for IntervalData<int>
     typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
 
-    class LogFile;
+    class CEDAR_AUX_LIB_EXPORT LogFile;
     //!@brief smart pointer for LogFile
     typedef boost::shared_ptr<LogFile> LogFilePtr;
 
-    class Object;
+    class CEDAR_AUX_LIB_EXPORT Object;
     //!@brief smart pointer for Object
     typedef boost::shared_ptr<Object> ObjectPtr;
 
-    class System;
+    class CEDAR_AUX_LIB_EXPORT System;
 
     typedef unsigned int EnumId;
-    class Enum;
+    class CEDAR_AUX_LIB_EXPORT Enum;
     class EnumBase;
     template <class T> class EnumType;
 
-    class Arguments;
+    class CEDAR_AUX_LIB_EXPORT Arguments;
 
     template <class T> class Factory;
     template <class T, class T2> class FactoryDerived;
@@ -103,7 +104,7 @@ namespace cedar
 
     template <class KeyBaseType, class ValueBaseType> class TypeBasedFactory;
 
-    class ParameterBase;
+    class CEDAR_AUX_LIB_EXPORT ParameterBase;
     typedef boost::shared_ptr<ParameterBase> ParameterBasePtr;
 
     template <typename T> class Parameter;
@@ -162,14 +163,15 @@ namespace cedar
     CEDAR_DECLARE_CLASS(ImageData);
 
     /* exceptions */
-    class DuplicateNameException;
-    class UnhandledTypeException;
-    class UnhandledValueException;
-    class UnknownTypeException;
-    class ParameterNotFoundException;
-    class UnknownNameException;
-    class RangeException;
-    class NoDefaultException;
+    class CEDAR_AUX_LIB_EXPORT DuplicateNameException;
+    class CEDAR_AUX_LIB_EXPORT UnknownTypeException;
+    class CEDAR_AUX_LIB_EXPORT UnhandledTypeException;
+    class CEDAR_AUX_LIB_EXPORT UnhandledValueException;
+    class CEDAR_AUX_LIB_EXPORT UnknownTypeException;
+    class CEDAR_AUX_LIB_EXPORT ParameterNotFoundException;
+    class CEDAR_AUX_LIB_EXPORT UnknownNameException;
+    class CEDAR_AUX_LIB_EXPORT RangeException;
+    class CEDAR_AUX_LIB_EXPORT NoDefaultException;
   }
 }
 

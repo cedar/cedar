@@ -46,10 +46,12 @@
 #include "processing/MultiTrigger.h"
 #include "processing/Step.h"
 #include "auxiliaries/LogFile.h"
+#include "auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <sstream>
+#include <stdlib.h>
 #include <vector>
 #include <string>
 #include <QReadWriteLock>
@@ -75,7 +77,7 @@ class ComputableTest : public cedar::proc::Step
     void compute(const cedar::proc::Arguments& /* arguments */)
     {
       //! @todo log these times and calculate the overall test time to check performance.
-      usleep(random() % 50000);
+      cedar::aux::usleep(rand() % 50000);
       meLock.lockForWrite();
       meSequenceBuffer.push_back(mSequenceId);
       meLock.unlock();
@@ -192,7 +194,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   unsigned int usec_wait_per_iteration = 1000;
   while (!stop_test->mFinished && wait_iterations * usec_wait_per_iteration < 1000000 * wait_time_in_sec)
   {
-    usleep(usec_wait_per_iteration);
+    cedar::aux::usleep(usec_wait_per_iteration);
     ++wait_iterations;
   }
 

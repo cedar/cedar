@@ -76,5 +76,13 @@
   class CLASS_NAME; \
   CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
 
+#ifdef MSVC
+#define CEDAR_DECLARE_DEPRECATED(x) __declspec(deprecated) x
+#elif defined GCC
+#define CEDAR_DECLARE_DEPRECATED(x) x __attribute__ ((deprecated))
+#else
+#error CEDAR_DECLARE_DEPRECATED is not implemented for this compiler.
+#endif
+
 #endif // CEDAR_MACROS_H
 

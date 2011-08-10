@@ -40,7 +40,16 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#ifdef LINUX
 #include <stdlib.h>
+#endif
+
+#ifdef WINDOWS
+#include <Shlobj.h>
+#include <comutil.h>
+
+#pragma comment(lib, "comsuppw")
+#endif
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,11 +62,47 @@
 
 std::string cedar::aux::System::getUserHomeDirectory()
 {
+#ifdef LINUX
   std::string homedir = getenv("HOME");
   return homedir;
+#elif defined WINDOWS
+  LPWSTR path = NULL;
+  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_CREATE, 0, &path)))
+  {
+    _bstr_t bstr_path(path);
+    std::string ret(static_cast<char*>(bstr_path));
+    CoTaskMemFree(path);
+    return ret;
+  }
+  else
+  {
+    //!@todo handle errors
+  }
+  return "";
+#else
+#error Implement me for this OS!
+#endif
 }
 
 std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
+#ifdef LINUX
   return cedar::aux::System::getUserHomeDirectory();
+#elif defined WINDOWS
+  LPWSTR path = NULL;
+  if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, 0, &path)))
+  {
+    _bstr_t bstr_path(path);
+    std::string ret(static_cast<char*>(bstr_path));
+    CoTaskMemFree(path);
+    return ret;
+  }
+  else
+  {
+    //!@todo handle errors
+  }
+  return "";
+#else
+#error Implement me for this OS!
+#endif
 }

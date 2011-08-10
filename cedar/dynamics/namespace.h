@@ -43,10 +43,13 @@
 #define CEDAR_DYN_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "dynamics/lib.h"
 #include "auxiliaries/macros.h"
+#ifdef WINDOWS
+#include "processing/PluginDeclaration.h"
+#endif // WINDOWS
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -58,7 +61,7 @@ namespace cedar
   /*!@brief Namespace for all dyn classes. */
   namespace dyn
   {
-    class Dynamics;
+    class CEDAR_DYN_LIB_EXPORT Dynamics;
     typedef boost::shared_ptr<Dynamics> DynamicsPtr;
 
     template <typename T> class Activation;
@@ -71,8 +74,19 @@ namespace cedar
 
     CEDAR_DECLARE_CLASS(NeuralField);
 
-    void initialize();
+#ifdef GCC
+    // for msvc, this is replaced by the plugin stuff below, currently as a workaround.
+    CEDAR_DYN_LIB_EXPORT void initialize();
+#endif // GCC
   }
 }
+
+#ifdef MSVC // workaround for circular linking
+CEDAR_BEGIN_PLUGIN_DECLARATION
+
+CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin);
+
+CEDAR_END_PLUGIN_DECLARATION
+#endif // MSVC
 
 #endif // CEDAR_DYN_NAMESPACE_H

@@ -36,6 +36,7 @@
 
 #ifndef CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
 #define CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
+//!@todo Serial communication needs implementation for windows.
 
 // LOCAL INCLUDES
 
@@ -47,9 +48,14 @@
 
 // SYSTEM INCLUDES
 
-#include <termios.h>
-#include <errno.h>
-#include <fcntl.h>
+#ifndef WIN32
+  #include <termios.h>
+  #include <errno.h>
+  #include <fcntl.h>
+#else
+  // some dummy types for windows.
+  struct termios {};
+#endif // WIN32
 #include <QTime>
 
 /*!@brief This class provides a string-based communication with an external device using a Serial Port.

@@ -38,6 +38,7 @@
 #define CEDAR_DEV_COM_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -50,11 +51,11 @@ namespace cedar
   {
     namespace com
     {
-      class Communication;
+      class CEDAR_DEV_LIB_EXPORT Communication;
       //!@brief smart pointer for Communication
       typedef boost::shared_ptr<Communication> CommunicationPtr;
 
-      class SerialCommunication;
+      class CEDAR_DEV_LIB_EXPORT SerialCommunication;
       //!@brief smart pointer for SerialCommunication
       typedef boost::shared_ptr<SerialCommunication> SerialCommunicationPtr;
     }

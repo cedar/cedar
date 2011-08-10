@@ -49,6 +49,7 @@
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
+#include <stdint.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -77,7 +78,7 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent */*pEvent*/)
+void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
   cv::Mat& mat = this->mData->getData();
   switch(mat.type())

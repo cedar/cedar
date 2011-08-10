@@ -39,6 +39,7 @@
 #define KINEMATICCHAINWIDGET_H_
 
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -52,7 +53,8 @@
 #include <QtGui/QWidget>
 
 //!@brief A simple widget to access all the joints via GUI
-class KinematicChainWidget
+//!@todo Move this into the right namespace.
+class CEDAR_DEV_LIB_EXPORT KinematicChainWidget
   :
   public QWidget,
   public cedar::aux::ConfigurationInterface

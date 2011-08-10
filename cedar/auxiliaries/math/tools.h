@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/namespace.h"
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
@@ -67,16 +68,22 @@ namespace cedar
     namespace math
     {
       //! normalizes an angle to the representative interval (-pi, pi]
-      double normalizeAngle(double value);
+      CEDAR_AUX_LIB_EXPORT double normalizeAngle(double value);
       //! returns the value of the global maximum of a matrix
-      double max(const cv::Mat matrix);
+      CEDAR_AUX_LIB_EXPORT double max(const cv::Mat matrix);
       //! returns the value of the global minimum of a matrix
-      double min(const cv::Mat matrix);
+      CEDAR_AUX_LIB_EXPORT double min(const cv::Mat matrix);
       //! writes the matrix into the shell properly organized by columns and rows
       //!\todo move write(cv::Mat) to aux::utilities
       //!\todo rework (template for copy & paste code)
       //!\todo add log file capability
-      void write(cv::Mat matrix);
+      CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix);
+
+      template <typename T>
+      T round(T val)
+      {
+        return std::floor(val + static_cast<T>(0.5));
+      }
     };
   };
 };

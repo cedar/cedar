@@ -138,7 +138,7 @@ void cedar::aux::kernel::Gauss::calculate()
       {
         mSizes.at(dim) = 1;
       }
-      mCenters.at(dim) = floor(mSizes.at(dim) / 2) + _mShifts->get().at(dim);
+      mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->get().at(dim);
       mKernelParts.at(dim) = cv::Mat::zeros(mSizes.at(dim), 1, CV_32FC1);
 
       // calculate kernel part
@@ -163,8 +163,8 @@ void cedar::aux::kernel::Gauss::calculate()
       }
     }
     // assemble the kernel
-    int sizes[dimensionality];
-    for (unsigned int i = 0; i < mSizes.size(); i++)
+    std::vector<int> sizes(static_cast<size_t>(dimensionality));
+    for (size_t i = 0; i < mSizes.size(); i++)
     {
       sizes[i] = mSizes.at(i);
     }
@@ -174,11 +174,11 @@ void cedar::aux::kernel::Gauss::calculate()
     }
     else
     {
-      mKernel->getData<cv::Mat>() = cv::Mat(static_cast<int>(dimensionality), sizes, CV_32F);
+      mKernel->getData<cv::Mat>() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
     }
     cv::Mat& kernel = mKernel->getData<cv::Mat>();
     // now fill up the big kernel matrix
-    int position[dimensionality];
+    std::vector<int> position(static_cast<size_t>(dimensionality));
     unsigned int max_index = 1;
     double max_index_d = 1.0;
     for (unsigned int dim = 0; dim < dimensionality; dim++)
@@ -204,7 +204,7 @@ void cedar::aux::kernel::Gauss::calculate()
       }
       else
       {
-        kernel.at<float>(position) = value;
+        kernel.at<float>(&position.at(0)) = value;
       }
       // increment index
       position[0]++;

@@ -39,6 +39,7 @@
 ======================================================================================================================*/
 
 #include "processing/gui/IdeApplication.h"
+#include "dynamics/namespace.h"
 
 int main(int argc, char** argv)
 {

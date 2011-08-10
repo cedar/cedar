@@ -51,13 +51,18 @@
 // macros
 //--------------------------------------------------------------------------------------------------------------------
 
-#ifdef __cplusplus
+//#ifdef GCC
+# ifdef __cplusplus
 #   define CEDAR_BEGIN_PLUGIN_DECLARATION extern "C" {
 #   define CEDAR_END_PLUGIN_DECLARATION }
-#else
+# else
 #   define CEDAR_BEGIN_PLUGIN_DECLARATION
 #   define CEDAR_END_PLUGIN_DECLARATION
-#endif
+# endif
+/*#else // GCC
+# define CEDAR_BEGIN_PLUGIN_DECLARATION
+# define CEDAR_END_PLUGIN_DECLARATION
+#endif*/
 
 /*!@brief Abstract description of the class.
  *

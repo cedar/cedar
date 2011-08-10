@@ -45,6 +45,10 @@
 // SYSTEM INCLUDES
 #include <string>
 
+#ifdef WINDOWS
+#include <Windows.h>
+#endif
+
 
 /*!@brief Abstract description of the class.
  *
@@ -56,7 +60,13 @@ class cedar::proc::PluginProxy
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
+//#ifdef LINUX
+  typedef void (*PluginInterfaceMethod)(cedar::proc::PluginDeclarationPtr);
+/*#elif defined WINDOWS
   typedef cedar::proc::PluginDeclarationPtr (*PluginInterfaceMethod)();
+#else
+#error Implement me for your OS!
+#endif*/
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -89,6 +99,10 @@ protected:
 private:
   std::string findPluginFile(const std::string& file);
 
+#ifdef WINDOWS
+  std::string getLastError();
+#endif
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,7 +113,13 @@ private:
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
+#ifdef LINUX
   void *mpLibHandle;
+#elif defined WINDOWS
+  HMODULE mpLibHandle;
+#else
+#error Implement me for your os!
+#endif
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

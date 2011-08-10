@@ -39,6 +39,7 @@
 #define CEDAR_DEV_ROBOT_MOBILE_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -56,11 +57,11 @@ namespace cedar
       {
         namespace gui
         {
-          class EPuckControlWidget;
+          class CEDAR_DEV_LIB_EXPORT EPuckControlWidget;
           //!@brief smart pointer for EPuckControlWidget
           typedef boost::shared_ptr<EPuckControlWidget> EPuckControlWidgetPtr;
 
-          class KTeamPositionControllerWidget;
+          class CEDAR_DEV_LIB_EXPORT KTeamPositionControllerWidget;
           //!@brief smart pointer for KTeamPositionControllerWidget
           typedef boost::shared_ptr<KTeamPositionControllerWidget> KTeamPositionControllerWidgetPtr;
         }

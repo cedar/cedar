@@ -82,12 +82,24 @@ include_directories(${CEDAR_SOURCE_DIR} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 ########################################################################################################################
 # add preprocessor definitions 
 
-add_definitions(-Wall -Wextra)
+if (CMAKE_COMPILER_IS_GNUCC)
+  add_definitions(-Wall -Wextra)
+  add_definitions(-DGNUCC -D__GNUCC__ -D__GCC__ -DGCC)
+elseif (MSVC)
+  add_definitions(-W2)
+  add_definitions(-DMSVC)
+endif (CMAKE_COMPILER_IS_GNUCC)
+
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
 if (UNIX)
   add_definitions(-DLINUX -D__LINUX__)  
 endif (UNIX)
+
+if (WIN32)
+  add_definitions(-DWINDOWS -D__WINDOWS__ -DWIN32 -D__WIN32__)
+  set(CMAKE_DEBUG_POSTFIX "d") # TODO for linux too?
+endif (WIN32)
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)
 if (buildTypeLower MATCHES debug)

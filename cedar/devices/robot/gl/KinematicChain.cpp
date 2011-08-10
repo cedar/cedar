@@ -41,7 +41,11 @@
 #include "auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include <OpenGL/gl.h>
+#ifdef WIN32
+  #include <gl/GL.h>
+#else // WIN32
+  #include <OpenGL/gl.h>
+#endif // WIN32
 
 using namespace cedar::dev::robot;
 using namespace cedar::dev::robot::gl;
@@ -104,9 +108,9 @@ void gl::KinematicChain::drawBase()
   glColor4d(mColorR, mColorG, mColorB, 0);
   drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  glTranslatef(0.0, 0.0, 0.005);
+  glTranslatef(0.0f, 0.0f, 0.005f);
   drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-  glTranslatef(0.0, 0.0, -0.01);
+  glTranslatef(0.0f, 0.0f, -0.01f);
   drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
 }
 

@@ -42,6 +42,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/tools.h"
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
@@ -59,28 +60,37 @@ namespace cedar
        * @param rCoefficients    coefficients of polynomial, beginning at x^0 to x^2
        * @return    vector of solutions/zeroes
        */
-      std::vector<double> solveQuadric(const std::vector<double>& rCoefficients);
+      CEDAR_AUX_LIB_EXPORT std::vector<double> solveQuadric(const std::vector<double>& rCoefficients);
 
       /*! returns the zeroes of a cubic polynomial (degree 3)
        * coefficients are given in increasing order, i.e. constant first
        * @param rCoefficients    coefficients of polynomial, beginning at x^0 to x^3
        * @return    vector of solutions/zeroes
        */
-      std::vector<double> solveCubic(const std::vector<double>& rCoefficients);
+      CEDAR_AUX_LIB_EXPORT std::vector<double> solveCubic(const std::vector<double>& rCoefficients);
 
       /*! returns the zeroes of a quartic polynomial (degree 4)
        * coefficients are given in increasing order, i.e. constant first
        * @param rCoefficients    coefficients of polynomial, beginning at x^0 to x^4
        * @return    vector of solutions/zeroes
        */
-      std::vector<double> solveQuartic(const std::vector<double>& rCoefficients);
+      CEDAR_AUX_LIB_EXPORT std::vector<double> solveQuartic(const std::vector<double>& rCoefficients);
 
       /*! returns the zeroes of a quadratic polynomial (degree n<=4)
        * coefficients are given in increasing order, i.e. constant first
        * @param rCoefficients    coefficients of polynomial, beginning from x^0 to x^n
        * @return    vector of solutions
        */
-      std::vector<double> solvePolynomial(const std::vector<double>& rCoefficients);
+      CEDAR_AUX_LIB_EXPORT std::vector<double> solvePolynomial(const std::vector<double>& rCoefficients);
+
+      inline double fast_cuberoot(double in)
+      {
+#ifdef MSVC
+        return std::pow(in, 1.0/3.0);
+#else // MSVC
+        return cbrt(in);
+#endif // MSVC
+      }
     };
   };
 };

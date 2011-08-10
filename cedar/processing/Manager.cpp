@@ -53,8 +53,6 @@
 #include "processing/PluginDeclaration.h"
 #include "processing/Connection.h"
 
-//! @todo find a better place for this
-#include "dynamics/fields/NeuralField.h"
 #include "processing/source/GaussInput.h"
 
 // PROJECT INCLUDES
@@ -74,6 +72,7 @@ cedar::proc::Manager::Manager()
    *@todo find a better way to load declarations here; mostly, this can be a problem, if other modules want to declare
    *      things as well.
    *@todo Names?
+   *@todo Make this into a (standard) plugin?
    */
   TriggerDeclarationPtr trigger_declaration(new TriggerDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
   trigger_declaration->setIconPath(":/triggers/trigger.png");
@@ -91,7 +90,6 @@ cedar::proc::Manager::Manager()
                                                   );
   looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.png");
   this->triggers().declareClass(looped_trigger_declaration);
-
   StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
   input_decl->setIconPath(":/steps/gauss_input.png");
   this->steps().declareClass(input_decl);

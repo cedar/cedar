@@ -48,7 +48,7 @@ using namespace cedar::dev::robot::mobile::gui;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-EPuckControlWidget::EPuckControlWidget(EPuckDrive *peDrive, QWidget *parent)
+EPuckControlWidget::EPuckControlWidget(cedar::dev::robot::mobile::EPuckDrive *peDrive, QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("EPuckControlWidget", parent)
 {

@@ -118,11 +118,11 @@ int main()
   // second color
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: second color" << std::endl;
-  chessboard.setSecondColor(0.3, 1, sqrt(2)/2);
+  chessboard.setSecondColor(0.3, 1, sqrt(2.0)/2);
   if (
       chessboard.secondColorR() != 0.3
       || chessboard.secondColorG() != 1.0
-      || chessboard.secondColorB() != sqrt(2)/2
+      || chessboard.secondColorB() != sqrt(2.0)/2
       )
   {
     errors++;

@@ -48,9 +48,9 @@ using namespace cedar::dev::robot::mobile::gui;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-KTeamPositionControllerWidget::KTeamPositionControllerWidget(KTeamPositionController *peController,
-                                           MobileRobotModel *peModel,
-                                           QWidget *parent)
+KTeamPositionControllerWidget::KTeamPositionControllerWidget(cedar::dev::robot::mobile::KTeamPositionController *peController,
+                                                             cedar::dev::robot::mobile::MobileRobotModel *peModel,
+                                                             QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)
 {

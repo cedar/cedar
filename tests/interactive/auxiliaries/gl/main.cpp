@@ -52,6 +52,7 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 
+//!@todo remove these using namespaces -- when compiling with windows, they lead to ambiguous symbols!
 using namespace std;
 using namespace cedar::aux::gl;
 using namespace cedar::aux::gui;
@@ -126,7 +127,7 @@ int main(int argc, char **argv)
   cedar::aux::ObjectPtr p_ellipse_object(new cedar::aux::Object());
   p_ellipse_object->setPosition(-7.5, -3, 3);
   p_ellipse_object->setName(std::string("Elfriede la Ellipse"));
-  ObjectPtr p_ellipse(new Ellipse(p_ellipse_object, 1, 2, 0.3, 1, 1, 0));
+  ObjectPtr p_ellipse(new cedar::aux::gl::Ellipse(p_ellipse_object, 1, 2, 0.3, 1, 1, 0));
   p_scene->addObject(p_ellipse);
 
   // create a chessboard visualization and add it to the scene

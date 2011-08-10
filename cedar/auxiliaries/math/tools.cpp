@@ -37,6 +37,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/math/tools.h"
+#include "auxiliaries/math/constants.h"
 
 // PROJECT INCLUDES
 
@@ -48,13 +49,13 @@ using namespace std;
 
 double cedar::aux::math::normalizeAngle(double value)
 {
-  while (value <= -M_PI)
+  while (value <= -cedar::aux::math::pi)
   {
-    value += 2 * M_PI;
+    value += 2 * cedar::aux::math::pi;
   }
-  while (value > M_PI)
+  while (value > cedar::aux::math::pi)
   {
-    value -= 2 * M_PI;
+    value -= 2 * cedar::aux::math::pi;
   }
   return value;
 }

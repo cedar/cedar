@@ -39,6 +39,8 @@
 #=======================================================================================================================
 
 cedar_add_library(cedardyn
-  MOC_HEADERS
-  fields/NeuralField.h
-)
+                  LINK_LIBRARIES
+                  cedarproc
+                  MOC_HEADERS
+                  fields/NeuralField.h
+                  )

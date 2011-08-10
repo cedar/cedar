@@ -39,6 +39,7 @@
 #define CEDAR_PROC_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "processing/lib.h"
 
 // PROJECT INCLUDES
 
@@ -54,40 +55,40 @@ namespace cedar
   {
     namespace gui
     {
-      class ArchitectureToolBox;
-      class BoolParameter;
-      class Connection;
-      class DataPlotter;
-      class DataSlotItem;
-      class DirectoryParameter;
-      class DoubleParameter;
-      class DoubleVectorParameter;
+      class CEDAR_PROC_LIB_EXPORT ArchitectureToolBox;
+      class CEDAR_PROC_LIB_EXPORT BoolParameter;
+      class CEDAR_PROC_LIB_EXPORT Connection;
+      class CEDAR_PROC_LIB_EXPORT DataPlotter;
+      class CEDAR_PROC_LIB_EXPORT DataSlotItem;
+      class CEDAR_PROC_LIB_EXPORT DirectoryParameter;
+      class CEDAR_PROC_LIB_EXPORT DoubleParameter;
+      class CEDAR_PROC_LIB_EXPORT DoubleVectorParameter;
       class EnumParameter;
-      class GraphicsBase;
-      class GroupItem;
-      class Ide;
-      class IdeApplication;
-      class MatrixPlotInterface;
-      class NetworkFile;
+      class CEDAR_PROC_LIB_EXPORT GraphicsBase;
+      class CEDAR_PROC_LIB_EXPORT GroupItem;
+      class CEDAR_PROC_LIB_EXPORT Ide;
+      class CEDAR_PROC_LIB_EXPORT IdeApplication;
+      class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
+      class CEDAR_PROC_LIB_EXPORT NetworkFile;
       typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
-      class ParameterBase;
-      class PluginLoadDialog;
-      class PluginManagerDialog;
-      class PropertyPane;
+      class CEDAR_PROC_LIB_EXPORT ParameterBase;
+      class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
+      class CEDAR_PROC_LIB_EXPORT PropertyPane;
+      class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
+      class CEDAR_PROC_LIB_EXPORT Scene;
       class Settings;
-      class StepItem;
-      class StepClassList;
-      class StringParameter;
-      class Scene;
-      class ToolBox;
-      class TriggerItem;
-      class UIntParameter;
-      class UIntVectorParameter;
-      class View;
+      class CEDAR_PROC_LIB_EXPORT StepClassList;
+      class CEDAR_PROC_LIB_EXPORT StepItem;
+      class CEDAR_PROC_LIB_EXPORT StringParameter;
+      class CEDAR_PROC_LIB_EXPORT ToolBox;
+      class CEDAR_PROC_LIB_EXPORT TriggerItem;
+      class CEDAR_PROC_LIB_EXPORT View;
+      class CEDAR_PROC_LIB_EXPORT UIntParameter;
+      class CEDAR_PROC_LIB_EXPORT UIntVectorParameter;
 
       /* Exceptions */
-      class InvalidStepNameException;
-      class InvalidTriggerNameException;
+      class CEDAR_PROC_LIB_EXPORT InvalidStepNameException;
+      class CEDAR_PROC_LIB_EXPORT InvalidTriggerNameException;
 
       /* enums */
       enum ConnectValidity

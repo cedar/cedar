@@ -47,9 +47,11 @@
 
 cedar::aux::EnumType<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
 
+#ifndef MSVC
 const cedar::proc::DataRole::Id cedar::proc::DataRole::INPUT;
 const cedar::proc::DataRole::Id cedar::proc::DataRole::OUTPUT;
 const cedar::proc::DataRole::Id cedar::proc::DataRole::BUFFER;
+#endif // MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

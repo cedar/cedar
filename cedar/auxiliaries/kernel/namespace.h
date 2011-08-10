@@ -39,7 +39,7 @@
 #define CEDAR_AUX_KERNEL_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -54,15 +54,15 @@ namespace cedar
   /*!@brief Namespace for all kernel classes. */
     namespace kernel
     {
-      class Kernel;
+      class CEDAR_AUX_LIB_EXPORT Kernel;
       //!@brief smart pointer for Kernel
       typedef boost::shared_ptr<Kernel> KernelPtr;
 
-      class Separable;
+      class CEDAR_AUX_LIB_EXPORT Separable;
       //!@brief smart pointer for Separable
       typedef boost::shared_ptr<Separable> SeparablePtr;
 
-      class Gauss;
+      class CEDAR_AUX_LIB_EXPORT Gauss;
       //!@brief smart pointer for Gauss
       typedef boost::shared_ptr<Gauss> GaussPtr;
     }

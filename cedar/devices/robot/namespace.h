@@ -39,6 +39,7 @@
 
 // LOCAL INCLUDES
 #include "CMakeDefines.h"
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -52,37 +53,37 @@ namespace cedar
     /*! @brief Namespace for all robot interfaces. */
     namespace robot
     {
-      class Component;
+      class CEDAR_DEV_LIB_EXPORT Component;
       //!@brief smart pointer for Component
       typedef boost::shared_ptr<Component> ComponentPtr;
 
-      class Robot;
+      class CEDAR_DEV_LIB_EXPORT Robot;
       //!@brief smart pointer for Robot
       typedef boost::shared_ptr<Robot> RobotPtr;
 
-      class KinematicChain;
+      class CEDAR_DEV_LIB_EXPORT KinematicChain;
       //!@brief smart pointer for KinematicChain
       typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
 
-      class KinematicChainModel;
+      class CEDAR_DEV_LIB_EXPORT KinematicChainModel;
       //!@brief smart pointer for KinematicChainModel
       typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
 
 #ifdef CEDAR_USE_AMTEC
-      class AmtecKinematicChain;
+      class CEDAR_DEV_LIB_EXPORT AmtecKinematicChain;
       //!@brief smart pointer for AmtecKinematicChainModel
       typedef boost::shared_ptr<AmtecKinematicChain> AmtecKinematicChainPtr;
 #endif // CEDAR_USE_AMTEC
 
-      class SimulatedKinematicChain;
+      class CEDAR_DEV_LIB_EXPORT SimulatedKinematicChain;
       //!@brief smart pointer for SimulatedKinematicChainModel
       typedef boost::shared_ptr<SimulatedKinematicChain> SimulatedKinematicChainPtr;
       
-      class ReferenceGeometry;
+      class CEDAR_DEV_LIB_EXPORT ReferenceGeometry;
       //!@brief smart pointer for ReferenceGeometry
       typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
 
-      class ComponentNotAvailableException;
+      class CEDAR_DEV_LIB_EXPORT ComponentNotAvailableException;
       //!@brief smart pointer for ComponentNotAvailableException
       typedef boost::shared_ptr<ComponentNotAvailableException> ComponentNotAvailableExceptionPtr;
     }
