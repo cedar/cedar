@@ -39,9 +39,10 @@
 #define CEDAR_PROC_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/AbstractFactory.h"
 #include "processing/lib.h"
 #include "auxiliaries/macros.h"
+
+#include "auxiliaries/AbstractFactory.h"
 
 // PROJECT INCLUDES
 
@@ -59,7 +60,7 @@ namespace cedar
 
     class CEDAR_PROC_LIB_EXPORT DataRole;
 
-    CEDAR_DECLARE_CLASS(DataSlot);
+    CEDAR_DECLARE_PROC_CLASS(DataSlot);
     
     class CEDAR_PROC_LIB_EXPORT LoopArguments;
 

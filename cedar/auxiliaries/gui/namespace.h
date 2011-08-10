@@ -54,30 +54,24 @@ namespace cedar
     //!@brief Namespace for widget classes.
     namespace gui
     {
-      class CEDAR_AUX_LIB_EXPORT BaseWidget;
-      //!@brief smart pointer for BaseWidget
-      typedef boost::shared_ptr<BaseWidget> BaseWidgetPtr;
-
-      class CEDAR_AUX_LIB_EXPORT SceneWidget;
-      //!@brief smart pointer for SceneWidget
-      typedef boost::shared_ptr<SceneWidget> SceneWidgetPtr;
-
-      class CEDAR_AUX_LIB_EXPORT Viewer;
-      //!@brief smart pointer for Viewer
-      typedef boost::shared_ptr<Viewer> ViewerPtr;
+      CEDAR_DECLARE_AUX_CLASS(BaseWidget);
+      CEDAR_DECLARE_AUX_CLASS(SceneWidget);
+      CEDAR_DECLARE_AUX_CLASS(Viewer);
 
       /* Plot widgets */
-      class DataPlotInterface;
+      CEDAR_DECLARE_AUX_CLASS(DataPlotInterface);
 
-      class CEDAR_AUX_LIB_EXPORT MatrixPlot;
-      class CEDAR_AUX_LIB_EXPORT MatrixPlot2D;
-
-      class CEDAR_AUX_LIB_EXPORT ImagePlot;
+      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
+      CEDAR_DECLARE_AUX_CLASS(MatrixPlot2D);
+      CEDAR_DECLARE_AUX_CLASS(ImagePlot);
 
       /* Exceptions */
       class InvalidPlotData;
     }
   }
 }
+
+// to prevent redefinitions
+#undef CEDAR_CLASS_PREFIX
 
 #endif // CEDAR_AUX_GUI_NAMESPACE_H

@@ -38,9 +38,13 @@
 #define CEDAR_AUX_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/lib.h"
+#if defined CEDAR_CLASS_PREFIX
+  #undef CEDAR_CLASS_PREFIX
+#endif // defined CEDAR_CLASS_PREFIX
+#define CEDAR_CLASS_PREFIX CEDAR_AUX_LIB_EXPORT
 #include "auxiliaries/macros.h"
 
-#include "auxiliaries/lib.h"
 // SYSTEM INCLUDES
 #include <sstream>
 #include <boost/smart_ptr.hpp>
@@ -53,25 +57,11 @@ namespace cedar
   /*!@brief Namespace for all aux classes. */
   namespace aux
   {
-    class CEDAR_AUX_LIB_EXPORT Base;
-    //!@brief smart pointer for Base
-    typedef boost::shared_ptr<Base> BasePtr;
-
-    class CEDAR_AUX_LIB_EXPORT Configurable;
-    //!@brief smart pointer for Configurable
-    typedef boost::shared_ptr<Configurable> ConfigurablePtr;
-
-    class CEDAR_AUX_LIB_EXPORT LoopedThread;
-    //!@brief smart pointer for LoopedThread
-    typedef boost::shared_ptr<LoopedThread> LoopedThreadPtr;
-
-    class CEDAR_AUX_LIB_EXPORT ConfigurationInterface;
-    //!@brief smart pointer for ConfigurationInterface
-    typedef boost::shared_ptr<ConfigurationInterface> ConfigurationInterfacePtr;
-
-    class CEDAR_AUX_LIB_EXPORT UserData;
-    //!@brief smart pointer for UserData
-    typedef boost::shared_ptr<UserData> UserDataPtr;
+    CEDAR_DECLARE_AUX_CLASS(Base);
+    CEDAR_DECLARE_AUX_CLASS(Configurable);
+    CEDAR_DECLARE_AUX_CLASS(LoopedThread);
+    CEDAR_DECLARE_AUX_CLASS(ConfigurationInterface);
+    CEDAR_DECLARE_AUX_CLASS(UserData);
 
     template <typename T> class IntervalData;
     //!@brief smart pointer for IntervalData<double>
@@ -79,22 +69,16 @@ namespace cedar
     //!@brief smart pointer for IntervalData<int>
     typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
 
-    class CEDAR_AUX_LIB_EXPORT LogFile;
-    //!@brief smart pointer for LogFile
-    typedef boost::shared_ptr<LogFile> LogFilePtr;
-
-    class CEDAR_AUX_LIB_EXPORT Object;
-    //!@brief smart pointer for Object
-    typedef boost::shared_ptr<Object> ObjectPtr;
-
-    class CEDAR_AUX_LIB_EXPORT System;
+    CEDAR_DECLARE_AUX_CLASS(LogFile);
+    CEDAR_DECLARE_AUX_CLASS(Object);
+    CEDAR_DECLARE_AUX_CLASS(System);
 
     typedef unsigned int EnumId;
-    class CEDAR_AUX_LIB_EXPORT Enum;
-    class EnumBase;
+    CEDAR_DECLARE_AUX_CLASS(Enum);
+    CEDAR_DECLARE_AUX_CLASS(EnumBase);
     template <class T> class EnumType;
 
-    class CEDAR_AUX_LIB_EXPORT Arguments;
+    CEDAR_DECLARE_AUX_CLASS(Arguments);
 
     template <class T> class Factory;
     template <class T, class T2> class FactoryDerived;
@@ -129,8 +113,7 @@ namespace cedar
     typedef boost::shared_ptr<UIntVectorParameter> UIntVectorParameterPtr;
     class DirectoryParameter;
     typedef boost::shared_ptr<DirectoryParameter> DirectoryParameterPtr;
-    class EnumParameter;
-    typedef boost::shared_ptr<EnumParameter> EnumParameterPtr;
+    CEDAR_DECLARE_AUX_CLASS(EnumParameter);
 
     template <typename T> class SetParameter;
     typedef SetParameter<std::string> StringSetParameter;
@@ -153,25 +136,25 @@ namespace cedar
 
 
     /* data */
-    CEDAR_DECLARE_CLASS(Data);
+    CEDAR_DECLARE_AUX_CLASS(Data);
 
     template <typename T> class DataT;
 
     typedef DataT<cv::Mat> MatData;
     CEDAR_GENERATE_POINTER_TYPES(MatData);
 
-    CEDAR_DECLARE_CLASS(ImageData);
+    CEDAR_DECLARE_AUX_CLASS(ImageData);
 
     /* exceptions */
-    class CEDAR_AUX_LIB_EXPORT DuplicateNameException;
-    class CEDAR_AUX_LIB_EXPORT UnknownTypeException;
-    class CEDAR_AUX_LIB_EXPORT UnhandledTypeException;
-    class CEDAR_AUX_LIB_EXPORT UnhandledValueException;
-    class CEDAR_AUX_LIB_EXPORT UnknownTypeException;
-    class CEDAR_AUX_LIB_EXPORT ParameterNotFoundException;
-    class CEDAR_AUX_LIB_EXPORT UnknownNameException;
-    class CEDAR_AUX_LIB_EXPORT RangeException;
-    class CEDAR_AUX_LIB_EXPORT NoDefaultException;
+    CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
+    CEDAR_DECLARE_AUX_CLASS(RangeException);
+    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
   }
 }
 

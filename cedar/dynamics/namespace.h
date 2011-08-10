@@ -61,8 +61,7 @@ namespace cedar
   /*!@brief Namespace for all dyn classes. */
   namespace dyn
   {
-    class CEDAR_DYN_LIB_EXPORT Dynamics;
-    typedef boost::shared_ptr<Dynamics> DynamicsPtr;
+    CEDAR_DECLARE_DYN_CLASS(Dynamics);
 
     template <typename T> class Activation;
     typedef Activation<double> DoubleActivation;
@@ -70,9 +69,9 @@ namespace cedar
     typedef Activation<cv::Mat> MatActivation;
     CEDAR_GENERATE_POINTER_TYPES(MatActivation);
 
-    CEDAR_DECLARE_CLASS(SpaceCode);
+    CEDAR_DECLARE_DYN_CLASS(SpaceCode);
 
-    CEDAR_DECLARE_CLASS(NeuralField);
+    CEDAR_DECLARE_DYN_CLASS(NeuralField);
 
 #ifdef GCC
     // for msvc, this is replaced by the plugin stuff below, currently as a workaround.

@@ -55,7 +55,8 @@
 cedar::aux::ParameterBase::ParameterBase(const std::string& name, bool hasDefault)
 :
 mHasDefault(hasDefault),
-mIsHidden(false)
+mIsHidden(false),
+mConstant(false)
 {
   this->setName(name);
 }

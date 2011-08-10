@@ -64,7 +64,7 @@
  *
  *  @brief   Automatically declares a class and its corresponding smart pointer types within a namespace block.
  *
- *  @example calling namespace foo { CEDAR_DECLARE_CLASS(Bar); } expands to
+ *           Calling namespace foo { CEDAR_DECLARE_CLASS(Bar); } expands to
  *           namespace foo
  *           {
  *             class Bar;
@@ -72,8 +72,13 @@
  *             typedef boost::shared_ptr<const Bar> ConstBarPtr;
  *           }
  */
+
 #define CEDAR_DECLARE_CLASS(CLASS_NAME) \
   class CLASS_NAME; \
+  CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
+
+#define CEDAR_DECLARE_CLASS_PREFIXED(PREFIX, CLASS_NAME) \
+  class PREFIX CLASS_NAME; \
   CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
 
 #ifdef MSVC
