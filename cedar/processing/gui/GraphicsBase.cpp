@@ -51,9 +51,9 @@
 #include <iostream>
 #include <limits.h>
 
-const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(150, 200, 150);
-const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(200, 200, 75);
-const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(200, 150, 150);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
+const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
