@@ -85,7 +85,7 @@ namespace cedar
 #ifdef MSVC // workaround for circular linking
 CEDAR_BEGIN_PLUGIN_DECLARATION
 
-cedar::proc::PluginDeclarationPtr pluginDeclaration();
+CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin);
 
 CEDAR_END_PLUGIN_DECLARATION
 #endif // MSVC

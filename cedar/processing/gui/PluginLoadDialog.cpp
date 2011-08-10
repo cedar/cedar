@@ -83,7 +83,11 @@ QDialog(pParent)
 
 void cedar::proc::gui::PluginLoadDialog::browseFile()
 {
+#ifdef LINUX
   QString filter = "Plugins (*.so)";
+#elif defined WINDOWS
+  QString filter = "Plugins (*.dll)";
+#endif
   QString file = QFileDialog::getOpenFileName
                               (
                                 this, // parent = 0,

@@ -86,7 +86,7 @@ namespace cedar
     //!@brief smart pointer for Object
     typedef boost::shared_ptr<Object> ObjectPtr;
 
-    class System;
+    class CEDAR_AUX_LIB_EXPORT System;
 
     typedef unsigned int EnumId;
     class CEDAR_AUX_LIB_EXPORT Enum;
