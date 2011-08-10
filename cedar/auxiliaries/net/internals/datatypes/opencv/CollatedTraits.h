@@ -28,7 +28,7 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 04:43:49 PM CEST
 
-    Description:
+    Description: collated_traits in the opencv specialization
 
     Credits:
 

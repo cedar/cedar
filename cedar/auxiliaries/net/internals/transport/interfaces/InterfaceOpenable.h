@@ -28,7 +28,8 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Tue 19 Jul 2011 05:07:37 PM CEST
 
-    Description:
+    Description: Make sure that the Collated/Simple-type classes 
+                 basically behave the same way.
 
     Credits:
 

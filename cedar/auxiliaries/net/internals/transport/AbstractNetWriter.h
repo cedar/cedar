@@ -28,7 +28,13 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Tue 19 Jul 2011 03:15:20 PM CEST
 
-    Description:
+    Description: Part of the functionality a Writer class should have.
+                 What is missing is the datatype (simple/primitiv vs
+                 collated/matrix)-dependant functionality.
+                 We are mainly concerned with initiating connections, here.
+                 This class inherits from AbstractNetWriter and will be
+                 extended in either SimpleNetWriter or CollatedNetWriter,
+                 adding the datatype-dependant operations.
 
     Credits:
 

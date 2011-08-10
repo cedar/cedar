@@ -28,7 +28,8 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 05:14:19 PM CEST
 
-    Description:
+    Description: collated_traits in the opencv specialization.
+                 this file holds some explicit instantiations.
 
     Credits:
 

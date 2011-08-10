@@ -28,7 +28,10 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Mon 18 Jul 2011 05:58:54 PM CEST
 
-    Description:
+    Description: Shared code between the AbstractNetReader and -Writer.
+                 Also, note that this class is not template-based, but
+                 the classes extending it (AbstractNetWriter, AbstractNetReader)
+                 are.
 
     Credits:
 

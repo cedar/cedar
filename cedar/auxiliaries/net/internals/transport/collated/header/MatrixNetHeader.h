@@ -28,7 +28,9 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 02:37:21 PM CEST
 
-    Description:
+    Description: Header (part of the transported information that contains
+                 the structure information of the data proper) for
+                 matrices. ie rows, columns
 
     Credits:
 

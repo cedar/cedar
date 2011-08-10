@@ -28,7 +28,9 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 05:14:51 PM CEST
 
-    Description:
+    Description: openCV specialization for CollatedType.
+                 This tells us how to acces an openCV-type.
+                 This file holds explicit instantiations.
 
     Credits:
 

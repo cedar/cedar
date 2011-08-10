@@ -28,7 +28,10 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 05:13:06 PM CEST
 
-    Description:
+    Description: extend the MatrixNetHeader to hold information abaout
+                 the matrix type.
+                 We need this, because cv::Mat is vastly configurable
+                 at runtime
 
     Credits:
 

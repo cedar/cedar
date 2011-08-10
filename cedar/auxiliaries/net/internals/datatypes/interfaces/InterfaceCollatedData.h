@@ -28,7 +28,8 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 04:41:29 PM CEST
 
-    Description:
+    Description: the transport part of the NetTransporter framework
+                 needs this interface to be implemented
 
     Credits:
 

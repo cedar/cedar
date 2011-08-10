@@ -28,7 +28,9 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Tue 19 Jul 2011 05:10:54 PM CEST
 
-    Description:
+    Description: To transport a primitiv type (int, short, etc.) we
+                 rely on yarp::os::BinPortable.
+                 This class implements the user-accessible read() function.
 
     Credits:
 

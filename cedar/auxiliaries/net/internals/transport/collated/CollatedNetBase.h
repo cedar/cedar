@@ -28,7 +28,7 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 02:43:13 PM CEST
 
-    Description:
+    Description: Shared code between the CollatedNetWriter and -Reader.
 
     Credits:
 

@@ -28,7 +28,8 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 05:15:29 PM CEST
 
-    Description:
+    Description: Helper class for openCV matrices. Implements some checks 
+                 we need to conform to the InterfaceCollatedData 
 
     Credits:
 

@@ -28,7 +28,14 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 02:49:00 PM CEST
 
-    Description:
+    Description: This class is deeply intertwined with the way YARP
+                 uses its yarp::os::BufferedReader/Writer classes.
+                 This works analogously to yarp::os::BinPortable -
+                 we inherit from yarp::os::Portable.
+                 CollatedNetPortable is templetized around the data type
+                 you want to transport, these read() and write() functions
+                 will be called by YARP.
+                 Here we prepare the data for its network transport.
 
     Credits:
 
