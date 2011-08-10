@@ -64,6 +64,27 @@ mpFunction(NULL)
   this->init();
 }
 
+
+cedar::aux::gui::MatrixPlot2D::Perspective::Perspective(const std::string& name,
+                                                        double rotationX, double rotationY, double rotationZ,
+                                                        double scaleX, double scaleY, double scaleZ,
+                                                        double shiftX, double shiftY, double shiftZ,
+                                                        double zoom)
+:
+mName(name),
+mZoom(zoom)
+{
+  mRotation[0] = rotationX;
+  mRotation[1] = rotationY;
+  mRotation[2] = rotationZ;
+  mScale[0]    = scaleX;
+  mScale[1]    = scaleY;
+  mScale[2]    = scaleZ;
+  mShift[0]    = shiftX;
+  mShift[1]    = shiftY;
+  mShift[2]    = shiftZ;
+}
+
 cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cedar::aux::DataPtr matData, QWidget *pParent)
 :
 cedar::aux::gui::DataPlotInterface(pParent),
@@ -104,6 +125,13 @@ cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::MatrixPlot2D::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
+{
+  pPlot->setRotation(mRotation[0], mRotation[1], mRotation[2]);
+  pPlot->setScale(mScale[0], mScale[1], mScale[2]);
+  pPlot->setShift(mShift[0], mShift[1], mShift[2]);
+  pPlot->setZoom(mZoom);
+}
 
 void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::updateMatrix()
 {
@@ -160,6 +188,19 @@ void cedar::aux::gui::MatrixPlot2D::display(cedar::aux::DataPtr data)
 
 void cedar::aux::gui::MatrixPlot2D::init()
 {
+  this->mPerspectives.push_back(Perspective("default",
+                                            90, 0, -90,
+                                            1, 1, 5,
+                                            0.15, 0, 0,
+                                            1.0
+                                            ));
+
+  this->mPerspectives.push_back(Perspective("view 2",
+                                            45, 0, 45,
+                                            1, 1, 5,
+                                            0.15, 0, 0,
+                                            1.0
+                                            ));
   // create a new layout for the widget
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
@@ -195,12 +236,11 @@ void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
   }
 }
 
-void cedar::aux::gui::MatrixPlot2D::resetPerspective()
+void cedar::aux::gui::MatrixPlot2D::resetPerspective(size_t perspectiveIndex)
 {
-  this->mpPlot->setRotation(90, 0, -90);
-  this->mpPlot->setScale(1, 1, 5);
-  this->mpPlot->setShift(0.15, 0, 0);
-  this->mpPlot->setZoom(1.0);
+  CEDAR_ASSERT(perspectiveIndex < this->mPerspectives.size());
+  Perspective& perspective = this->mPerspectives.at(perspectiveIndex);
+  perspective.applyTo(this->mpPlot);
 }
 
 void cedar::aux::gui::MatrixPlot2D::showGrid(bool show)
@@ -224,6 +264,15 @@ void cedar::aux::gui::MatrixPlot2D::contextMenuEvent(QContextMenuEvent * pEvent)
 
   QAction *p_reset_perspective = menu.addAction("reset perspective");
 
+  QMenu* p_perspectives = menu.addMenu("set perspective");
+  for (size_t i = 0; i < this->mPerspectives.size(); ++i)
+  {
+    QAction *p_action = p_perspectives->addAction(this->mPerspectives.at(i).getName().c_str());
+    p_action->setData(QVariant(i));
+  }
+
+  menu.addSeparator();
+
   QAction *p_show_grid = menu.addAction("show grid");
   p_show_grid->setCheckable(true);
   p_show_grid->setChecked(this->mShowGridLines);
@@ -235,6 +284,11 @@ void cedar::aux::gui::MatrixPlot2D::contextMenuEvent(QContextMenuEvent * pEvent)
     if (p_action == p_reset_perspective)
     {
       this->resetPerspective();
+    }
+    else if (p_action->parentWidget() == p_perspectives)
+    {
+      size_t index = static_cast<size_t>(p_action->data().toUInt());
+      this->resetPerspective(index);
     }
     else if (p_action == p_show_grid)
     {

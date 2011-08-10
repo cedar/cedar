@@ -86,6 +86,31 @@ public:
     cv::Mat mInternalMat;
   };
 
+private:
+  class Perspective
+  {
+    public:
+      Perspective(const std::string& name = "perspective",
+                  double rotationX = 0, double rotationY = 0, double rotationZ = 0,
+                  double scaleX = 1, double scaleY = 1, double scaleZ = 1,
+                  double shiftX = 0, double shiftY = 0, double shiftZ = 0,
+                  double zoom = 1);
+
+      void applyTo(Qwt3D::Plot3D* pPlot);
+
+      const std::string& getName() const
+      {
+        return this->mName;
+      }
+
+    private:
+      std::string mName;
+      double mRotation[3];
+      double mScale[3];
+      double mShift[3];
+      double mZoom;
+  };
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,7 +128,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void display(cedar::aux::DataPtr matData);
-  void resetPerspective();
   void showGrid(bool show);
   void timerEvent(QTimerEvent *pEvent);
 
@@ -118,6 +142,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void init();
+  void resetPerspective(size_t perspectiveIndex = 0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -133,6 +158,7 @@ private:
   Qwt3D::GridPlot *mpPlot;
 
   Matrix2DFunction *mpFunction;
+  std::vector<Perspective> mPerspectives;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
