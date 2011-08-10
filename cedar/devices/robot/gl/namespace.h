@@ -56,21 +56,10 @@ namespace cedar
       //!@brief Namespace for widget classes.
       namespace gl
       {
-        class CEDAR_DEV_LIB_EXPORT KinematicChain;
-        //!@brief smart pointer for KinematicChain
-        typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
-
-        class CEDAR_DEV_LIB_EXPORT AmtecChain;
-        //!@brief smart pointer for AmtecChain
-        typedef boost::shared_ptr<AmtecChain> AmtecChainPtr;
-
-        class CEDAR_DEV_LIB_EXPORT CoraArm;
-        //!@brief smart pointer for CoraArm
-        typedef boost::shared_ptr<CoraArm> CoraArmPtr;
-
-        class CEDAR_DEV_LIB_EXPORT CoraHead;
-        //!@brief smart pointer for CoraHead
-        typedef boost::shared_ptr<CoraHead> CoraHeadPtr;
+        CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+        CEDAR_DECLARE_DEV_CLASS(AmtecChain);
+        CEDAR_DECLARE_DEV_CLASS(CoraArm);
+        CEDAR_DECLARE_DEV_CLASS(CoraHead);
       }
     }
   }

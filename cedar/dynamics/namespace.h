@@ -70,7 +70,6 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES(MatActivation);
 
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
-
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
 
 #ifdef GCC

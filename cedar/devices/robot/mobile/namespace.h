@@ -55,33 +55,13 @@ namespace cedar
     {
       namespace mobile
       {
-        class CEDAR_DEV_LIB_EXPORT MobileRobot;
-        //!@brief smart pointer for MobileRobot
-        typedef boost::shared_ptr<MobileRobot> MobileRobotPtr;
-
-        class CEDAR_DEV_LIB_EXPORT DifferentialDrive;
-        //!@brief smart pointer for DifferentialDrive
-        typedef boost::shared_ptr<DifferentialDrive> DifferentialDrivePtr;
-
-        class CEDAR_DEV_LIB_EXPORT KTeamDrive;
-        //!@brief smart pointer for KTeamDrive
-        typedef boost::shared_ptr<KTeamDrive> KTeamDrivePtr;
-
-        class CEDAR_DEV_LIB_EXPORT EPuckDrive;
-        //!@brief smart pointer for EPuckDrive
-        typedef boost::shared_ptr<EPuckDrive> EPuckDrivePtr;
-
-        class CEDAR_DEV_LIB_EXPORT MobileRobotModel;
-        //!@brief smart pointer for MobileRobotModel
-        typedef boost::shared_ptr<MobileRobotModel> MobileRobotModelPtr;
-
-        class CEDAR_DEV_LIB_EXPORT KTeamDriveModel;
-        //!@brief smart pointer for KTeamDriveModel
-        typedef boost::shared_ptr<KTeamDriveModel> KTeamDriveModelPtr;
-
-        class CEDAR_DEV_LIB_EXPORT KTeamPositionController;
-        //!@brief smart pointer for KTeamPositionController
-        typedef boost::shared_ptr<KTeamPositionController> KTeamPositionControllerPtr;
+        CEDAR_DECLARE_DEV_CLASS(MobileRobot);
+        CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
+        CEDAR_DECLARE_DEV_CLASS(KTeamDrive);
+        CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
+        CEDAR_DECLARE_DEV_CLASS(MobileRobotModel);
+        CEDAR_DECLARE_DEV_CLASS(KTeamDriveModel);
+        CEDAR_DECLARE_DEV_CLASS(KTeamPositionController);
       }
     }
   }
