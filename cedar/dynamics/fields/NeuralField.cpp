@@ -118,11 +118,25 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
   {
     if (cedar::dyn::SpaceCodePtr input = boost::shared_dynamic_cast<cedar::dyn::SpaceCode>(data))
     {
-      return cedar::proc::DataSlot::VALIDITY_VALID;
+      if (!this->isMatrixCompatibleInput(input->getData()))
+      {
+        return cedar::proc::DataSlot::VALIDITY_ERROR;
+      }
+      else
+      {
+        return cedar::proc::DataSlot::VALIDITY_VALID;
+      }
     }
     else if (cedar::aux::MatDataPtr input = boost::shared_dynamic_cast<cedar::aux::MatData>(data))
     {
-      return cedar::proc::DataSlot::VALIDITY_WARNING;
+      if (!this->isMatrixCompatibleInput(input->getData()))
+      {
+        return cedar::proc::DataSlot::VALIDITY_ERROR;
+      }
+      else
+      {
+        return cedar::proc::DataSlot::VALIDITY_WARNING;
+      }
     }
     return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
@@ -149,6 +163,34 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   //!\todo deal with units, now: milliseconds
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
   //std::cout << "field: " << u.at<float>(0,0) << std::endl;
+}
+
+bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const
+{
+  // special case due to opencv's strange handling of 1d-matrices
+  if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
+  {
+    // if this field is set to more dimensions than the input (in this case 1), they are not compatible
+    if (this->_mDimensionality->get() != 1)
+      return false;
+
+    CEDAR_DEBUG_ASSERT(this->_mSizes->get().size() == 1);
+
+    // if the dimensions are both 1, rows or cols must be the same as the field size
+    if (this->_mSizes->get().at(0) != matrix.rows && this->_mSizes->get().at(0) != matrix.cols)
+      return false;
+  }
+  else
+  {
+    if (this->_mDimensionality->get() != matrix.dims)
+      return false;
+    for (unsigned int dim = 0; dim < this->_mSizes->get().size(); ++dim)
+    {
+      if (matrix.size[static_cast<int>(dim)] != this->_mSizes->get().at(dim))
+        return false;
+    }
+  }
+  return true;
 }
 
 void cedar::dyn::NeuralField::onStart()
