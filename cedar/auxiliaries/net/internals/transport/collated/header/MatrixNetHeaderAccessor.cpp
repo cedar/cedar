@@ -28,7 +28,10 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 02:41:42 PM CEST
 
-    Description:
+    Description: static function to get information out of the
+                 matrix headers (that are transported over the network)
+                 We implement this seperately to keep the actual 
+                 transported class (struct) as small as possible.
 
     Credits:
 

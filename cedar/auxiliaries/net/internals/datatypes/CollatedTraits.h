@@ -28,7 +28,8 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 04:30:14 PM CEST
 
-    Description:
+    Description: traits class for the transferable data type.
+                 Specialize this.
 
     Credits:
 

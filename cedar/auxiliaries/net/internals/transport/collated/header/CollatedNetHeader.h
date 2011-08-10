@@ -28,7 +28,9 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 02:32:04 PM CEST
 
-    Description:
+    Description: this doesnt do much. Even before we think about 
+                 what a matrix header contains, we want to have some
+                 primitive way to check for corruption.
 
     Credits:
 

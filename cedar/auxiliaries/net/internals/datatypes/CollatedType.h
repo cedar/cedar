@@ -28,7 +28,9 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 04:32:21 PM CEST
 
-    Description:
+    Description: CollatedType provides template specializations to access
+                 the transferred type (which will be a 'collated type'
+                 == matrix header + matrix body)
 
     Credits:
 
@@ -42,6 +44,7 @@
 #include "CollatedTraits.h"
 
 // PROJECT INCLUDES
+#include <boost/static_assert.hpp>
 
 // SYSTEM INCLUDES
 
@@ -93,12 +96,15 @@ public:
   // inline as it will be called in inner loop
   inline void* contentAt(int index, int iElemSize)
   {
-    // this should not compile
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+    // this will not compile, need to specialize
     return NULL;
   }
 
   inline T late_init_data_from_header()
   {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+    // this will not compile, need to specialize
     return 0;
   }
 

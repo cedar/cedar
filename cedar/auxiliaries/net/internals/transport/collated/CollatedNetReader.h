@@ -28,7 +28,13 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Tue 19 Jul 2011 05:44:27 PM CEST
 
-    Description:
+    Description: Implementation for the user-accessible reading
+                 of a matrix-like type. 
+                 We use a yarp::os::Portable-derived type 
+                 called 'CollatedNetPortable' and YARP will handle
+                 the passing of data between us an it.
+                 Here we check for consistency before passing
+                 the data to the user.
 
     Credits:
 
