@@ -53,39 +53,16 @@ namespace cedar
     /*! @brief Namespace for all robot interfaces. */
     namespace robot
     {
-      class CEDAR_DEV_LIB_EXPORT Component;
-      //!@brief smart pointer for Component
-      typedef boost::shared_ptr<Component> ComponentPtr;
-
-      class CEDAR_DEV_LIB_EXPORT Robot;
-      //!@brief smart pointer for Robot
-      typedef boost::shared_ptr<Robot> RobotPtr;
-
-      class CEDAR_DEV_LIB_EXPORT KinematicChain;
-      //!@brief smart pointer for KinematicChain
-      typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
-
-      class CEDAR_DEV_LIB_EXPORT KinematicChainModel;
-      //!@brief smart pointer for KinematicChainModel
-      typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
-
+      CEDAR_DECLARE_DEV_CLASS(Component);
+      CEDAR_DECLARE_DEV_CLASS(Robot);
+      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+      CEDAR_DECLARE_DEV_CLASS(KinematicChainModel);
 #ifdef CEDAR_USE_AMTEC
-      class CEDAR_DEV_LIB_EXPORT AmtecKinematicChain;
-      //!@brief smart pointer for AmtecKinematicChainModel
-      typedef boost::shared_ptr<AmtecKinematicChain> AmtecKinematicChainPtr;
+      CEDAR_DECLARE_DEV_CLASS(AmtecKinematicChain);
 #endif // CEDAR_USE_AMTEC
-
-      class CEDAR_DEV_LIB_EXPORT SimulatedKinematicChain;
-      //!@brief smart pointer for SimulatedKinematicChainModel
-      typedef boost::shared_ptr<SimulatedKinematicChain> SimulatedKinematicChainPtr;
-      
-      class CEDAR_DEV_LIB_EXPORT ReferenceGeometry;
-      //!@brief smart pointer for ReferenceGeometry
-      typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
-
-      class CEDAR_DEV_LIB_EXPORT ComponentNotAvailableException;
-      //!@brief smart pointer for ComponentNotAvailableException
-      typedef boost::shared_ptr<ComponentNotAvailableException> ComponentNotAvailableExceptionPtr;
+      CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+      CEDAR_DECLARE_DEV_CLASS(ReferenceGeometry);
+      CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
     }
   }
 }

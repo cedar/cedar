@@ -58,8 +58,7 @@ namespace cedar
     {
       namespace kuka
       {
-        class KukaInterface;
-        typedef boost::shared_ptr<KukaInterface> KukaInterfacePtr;
+        CEDAR_DECLARE_DEV_CLASS(KukaInterface);
       }
     }
   }

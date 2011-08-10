@@ -55,64 +55,37 @@ namespace cedar
   /*!@brief Namespace for all processing classes. */
   namespace proc
   {
-    class CEDAR_PROC_LIB_EXPORT Arguments;
-    typedef boost::shared_ptr<Arguments> ArgumentsPtr;
-
-    class CEDAR_PROC_LIB_EXPORT DataRole;
-
+    CEDAR_DECLARE_PROC_CLASS(Arguments);
+    CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
-    
-    class CEDAR_PROC_LIB_EXPORT LoopArguments;
-
-    class CEDAR_PROC_LIB_EXPORT FrameworkSettings;
-
-    class CEDAR_PROC_LIB_EXPORT LoopedTrigger;
-    typedef boost::shared_ptr<LoopedTrigger> LoopedTriggerPtr;
-
-    class CEDAR_PROC_LIB_EXPORT MultiTrigger;
-    typedef boost::shared_ptr<MultiTrigger> MultiTriggerPtr;
-
-    class CEDAR_PROC_LIB_EXPORT Step;
-    typedef boost::shared_ptr<Step> StepPtr;
-
-    class CEDAR_PROC_LIB_EXPORT StepTime;
-    typedef boost::shared_ptr<StepTime> StepTimePtr;
-
-    class CEDAR_PROC_LIB_EXPORT Trigger;
-    typedef boost::shared_ptr<Trigger> TriggerPtr;
-
-    class CEDAR_PROC_LIB_EXPORT Group;
-    typedef boost::shared_ptr<Group> GroupPtr;
-
+    CEDAR_DECLARE_PROC_CLASS(LoopArguments);
+    CEDAR_DECLARE_PROC_CLASS(FrameworkSettings);
+    CEDAR_DECLARE_PROC_CLASS(LoopedTrigger);
+    CEDAR_DECLARE_PROC_CLASS(MultiTrigger);
+    CEDAR_DECLARE_PROC_CLASS(Step);
+    CEDAR_DECLARE_PROC_CLASS(StepTime);
+    CEDAR_DECLARE_PROC_CLASS(Trigger);
+    CEDAR_DECLARE_PROC_CLASS(Group);
     template <class T, class T_Declaration> class Registry;
     
-    class CEDAR_PROC_LIB_EXPORT Manager;
-    typedef boost::shared_ptr<Manager> ManagerPtr;
-
-    class CEDAR_PROC_LIB_EXPORT Network;
-    typedef boost::shared_ptr<Network> NetworkPtr;
-
+    CEDAR_DECLARE_PROC_CLASS(Manager);
+    CEDAR_DECLARE_PROC_CLASS(Network);
     class Connection;
     typedef boost::shared_ptr<Connection> ConnectionPtr;
 
     template <class BaseClass, class FactoryType> class DeclarationBase;
     
-    class CEDAR_PROC_LIB_EXPORT StepDeclaration;
-    typedef boost::shared_ptr<StepDeclaration> StepDeclarationPtr;
+    CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
     template <class DerivedClass> class StepDeclarationT;
 
-    class CEDAR_PROC_LIB_EXPORT TriggerDeclaration;
-    typedef boost::shared_ptr<TriggerDeclaration> TriggerDeclarationPtr;
+    CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     template <class DerivedClass> class TriggerDeclarationT;
 
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger> > TriggerFactoryPtr;
 
-    class CEDAR_PROC_LIB_EXPORT PluginProxy;
-    typedef boost::shared_ptr<PluginProxy> PluginProxyPtr;
-
-    class CEDAR_PROC_LIB_EXPORT PluginDeclaration;
-    typedef boost::shared_ptr<PluginDeclaration> PluginDeclarationPtr;
+    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
+    CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
 
     /* Exceptions */
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;

@@ -57,13 +57,8 @@ namespace cedar
       {
         namespace gui
         {
-          class CEDAR_DEV_LIB_EXPORT EPuckControlWidget;
-          //!@brief smart pointer for EPuckControlWidget
-          typedef boost::shared_ptr<EPuckControlWidget> EPuckControlWidgetPtr;
-
-          class CEDAR_DEV_LIB_EXPORT KTeamPositionControllerWidget;
-          //!@brief smart pointer for KTeamPositionControllerWidget
-          typedef boost::shared_ptr<KTeamPositionControllerWidget> KTeamPositionControllerWidgetPtr;
+          CEDAR_DECLARE_DEV_CLASS(EPuckControlWidget);
+          CEDAR_DECLARE_DEV_CLASS(KTeamPositionControllerWidget);
         }
       }
     }

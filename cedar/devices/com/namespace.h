@@ -51,13 +51,8 @@ namespace cedar
   {
     namespace com
     {
-      class CEDAR_DEV_LIB_EXPORT Communication;
-      //!@brief smart pointer for Communication
-      typedef boost::shared_ptr<Communication> CommunicationPtr;
-
-      class CEDAR_DEV_LIB_EXPORT SerialCommunication;
-      //!@brief smart pointer for SerialCommunication
-      typedef boost::shared_ptr<SerialCommunication> SerialCommunicationPtr;
+      CEDAR_DECLARE_DEV_CLASS(Communication);
+      CEDAR_DECLARE_DEV_CLASS(SerialCommunication);
     }
   }
 }

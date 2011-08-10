@@ -54,9 +54,7 @@ namespace cedar
     {
       namespace gui
       {
-      class CEDAR_DEV_LIB_EXPORT CommunicationWidget;
-      //!@brief smart pointer for CommunicationWidget
-      typedef boost::shared_ptr<CommunicationWidget> CommunicationWidgetPtr;
+        CEDAR_DECLARE_DEV_CLASS(CommunicationWidget);
       }
     }
   }
