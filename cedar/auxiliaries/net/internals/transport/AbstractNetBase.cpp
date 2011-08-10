@@ -77,6 +77,9 @@ AbstractNetBase::AbstractNetBase(const string &myPortNameWithSuffix)
 {
 #ifdef DEBUG_NETT
   cout << "  AbstractNetBase [CONSTRUCTOR]" << endl;
+#else
+  // if we are not in DEBUG-mode
+  mNetwork.setVerbosity(-1); // tells YARP to inhibit messages
 #endif
   mFullPortName= PORT_PREFIX + PORT_DELIMINATOR
                  + myPortNameWithSuffix;
