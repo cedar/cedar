@@ -263,31 +263,35 @@ void cedar::proc::Step::onStart()
 
 void cedar::proc::Step::onTrigger()
 {
-  if (this->mMandatoryConnectionsAreSet)
+  //!@todo signal to the gui/user somehow when a step becomes inactive due to erroneous connections
+  if (this->allInputsValid())
   {
-    if (!this->mBusy)
-    {
-      if (this->mRunInThread)
-      {
-        this->start();
-      }
-      else
-      {
-        this->run();
-      }
-    }
-#ifdef DEBUG
-    else
-    {
-      std::cout << "I'm busy" << std::endl;
-    }
-#endif // DEBUG
-  } // this->mMandatoryConnectionsAreSet
-  else
+    return;
+  }
+
+  if (!this->mMandatoryConnectionsAreSet)
   {
     CEDAR_THROW(MissingConnectionException, //!@todo Add to the exception the names of the unset connections
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
+  } // this->mMandatoryConnectionsAreSet
+
+  if (!this->mBusy)
+  {
+    if (this->mRunInThread)
+    {
+      this->start();
+    }
+    else
+    {
+      this->run();
+    }
   }
+#ifdef DEBUG
+  else
+  {
+    std::cout << "I'm busy" << std::endl;
+  }
+#endif // DEBUG
 }
 
 bool cedar::proc::Step::allInputsValid()
@@ -303,9 +307,17 @@ bool cedar::proc::Step::allInputsValid()
 
   for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
   {
-    if (slot->second->getValidlity() == cedar::proc::DataSlot::VALIDITY_ERROR)
+    switch(slot->second->getValidlity())
     {
-      return false;
+      case cedar::proc::DataSlot::VALIDITY_ERROR:
+        return false;
+
+      case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
+        if(this->getInputValidity(slot->second) == cedar::proc::DataSlot::VALIDITY_ERROR)
+          return false;
+
+      default:
+        break;
     }
   }
 
