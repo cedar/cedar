@@ -37,6 +37,8 @@
 ########################################################################################################################
 # third party libraries
 
+string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)
+
 # Qt
 find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
 include(${QT_USE_FILE})
@@ -62,7 +64,13 @@ endif()
 set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
 find_package(OpenCV REQUIRED)
 #set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OpenCV_LIBS})
-set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui)
+if (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
+  message("-- using opencv debug and release libraries.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized opencv_core opencv_highgui debug opencv_cored opencv_highguid)
+else()
+  message("-- using opencv release libraries.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui)
+endif()
 # message(STATUS "Found opencv libs ${OpenCV_LIBS}")
 
 # libconfig
