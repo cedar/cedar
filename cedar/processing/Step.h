@@ -160,6 +160,7 @@ public:
   static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
   
   State getState() const;
+  const std::string& getStateAnnotation() const;
 
 signals:
   void stateChanged();
@@ -187,7 +188,7 @@ private:
   void freeData(DataRole::Id role, const std::string& name);
 
   bool allInputsValid();
-  void setState(cedar::proc::Step::State newState);
+  void setState(cedar::proc::Step::State newState, const std::string& annotation);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -206,6 +207,7 @@ private:
   ArgumentsPtr mNextArguments;
   bool mMandatoryConnectionsAreSet;
   State mState;
+  std::string mStateAnnotation;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

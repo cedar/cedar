@@ -74,17 +74,22 @@ mState(cedar::proc::Step::STATE_NONE)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+const std::string& cedar::proc::Step::getStateAnnotation() const
+{
+  return this->mStateAnnotation;
+}
 
 cedar::proc::Step::State cedar::proc::Step::getState() const
 {
   return this->mState;
 }
 
-void cedar::proc::Step::setState(cedar::proc::Step::State newState)
+void cedar::proc::Step::setState(cedar::proc::Step::State newState, const std::string& annotation)
 {
-  if (newState != this->mState)
+  if (newState != this->mState || annotation != this->mStateAnnotation)
   {
     this->mState = newState;
+    this->mStateAnnotation = annotation;
     emit stateChanged();
   }
 }
@@ -279,7 +284,7 @@ void cedar::proc::Step::onStart()
 
 void cedar::proc::Step::onStop()
 {
-  this->setState(cedar::proc::Step::STATE_NONE);
+  this->setState(cedar::proc::Step::STATE_NONE, "");
 }
 
 void cedar::proc::Step::onTrigger()
@@ -287,20 +292,20 @@ void cedar::proc::Step::onTrigger()
   //!@todo signal to the gui/user somehow when a step becomes inactive due to erroneous connections
   if (!this->allInputsValid())
   {
-    this->setState(cedar::proc::Step::STATE_NOT_RUNNING);
+    this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
     return;
   }
 
   if (!this->mMandatoryConnectionsAreSet)
   {
-    this->setState(cedar::proc::Step::STATE_NOT_RUNNING);
+    this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Unconnected mandatory inputs prevent the step from running.");
     CEDAR_THROW(MissingConnectionException, //!@todo Add to the exception the names of the unset connections
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   } // this->mMandatoryConnectionsAreSet
 
   if (!this->mBusy)
   {
-    this->setState(cedar::proc::Step::STATE_RUNNING);
+    this->setState(cedar::proc::Step::STATE_RUNNING, "");
     if (this->mRunInThread)
     {
       this->start();
