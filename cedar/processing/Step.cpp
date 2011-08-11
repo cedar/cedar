@@ -62,7 +62,8 @@ mFinished(new cedar::proc::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mMandatoryConnectionsAreSet (true),
-mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
+mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread)),
+mState(cedar::proc::Step::STATE_NONE)
 {
   this->registerParameter(mRunInThread);
   this->_mName->setConstant(true);
@@ -72,6 +73,21 @@ mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+
+cedar::proc::Step::State cedar::proc::Step::getState() const
+{
+  return this->mState;
+}
+
+void cedar::proc::Step::setState(cedar::proc::Step::State newState)
+{
+  if (newState != this->mState)
+  {
+    this->mState = newState;
+    emit stateChanged();
+  }
+}
 
 void cedar::proc::Step::inputConnectionChanged(const std::string& /*inputName*/)
 {
@@ -261,22 +277,30 @@ void cedar::proc::Step::onStart()
   // empty as a default implementation
 }
 
+void cedar::proc::Step::onStop()
+{
+  this->setState(cedar::proc::Step::STATE_NONE);
+}
+
 void cedar::proc::Step::onTrigger()
 {
   //!@todo signal to the gui/user somehow when a step becomes inactive due to erroneous connections
   if (!this->allInputsValid())
   {
+    this->setState(cedar::proc::Step::STATE_NOT_RUNNING);
     return;
   }
 
   if (!this->mMandatoryConnectionsAreSet)
   {
+    this->setState(cedar::proc::Step::STATE_NOT_RUNNING);
     CEDAR_THROW(MissingConnectionException, //!@todo Add to the exception the names of the unset connections
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   } // this->mMandatoryConnectionsAreSet
 
   if (!this->mBusy)
   {
+    this->setState(cedar::proc::Step::STATE_RUNNING);
     if (this->mRunInThread)
     {
       this->start();

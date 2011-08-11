@@ -159,6 +159,9 @@ public:
 
   void updateConnections();
 
+  void setOutlineColor(const QColor& color);
+  void setFillColor(const QColor& color);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -179,13 +182,19 @@ public:
   static const QColor mValidityColorValid;
   static const QColor mValidityColorWarning;
   static const QColor mValidityColorError;
+  
+  static const QColor mDefaultOutlineColor;
+  static const QColor mDefaultFillColor;
 
   static const QColor& getValidityColor(cedar::proc::gui::ConnectValidity validity);
+
 protected:
   bool mDrawBackground;
 private:
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
   BaseShape mShape;
+  QColor mOutlineColor;
+  QColor mFillColor;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -55,6 +55,9 @@ const QColor cedar::proc::gui::GraphicsBase::mValidityColorValid(170, 218, 24);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorWarning(255, 207, 40);
 const QColor cedar::proc::gui::GraphicsBase::mValidityColorError(206, 0, 11);
 
+const QColor cedar::proc::gui::GraphicsBase::mDefaultOutlineColor(Qt::black);
+const QColor cedar::proc::gui::GraphicsBase::mDefaultFillColor(Qt::white);
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,6 +71,8 @@ cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
 mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mShape(shape),
+mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
+mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mWidth(new cedar::aux::DoubleParameter("width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mHeight(new cedar::aux::DoubleParameter("height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mGroup(group),
@@ -91,6 +96,16 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
+{
+  this->mOutlineColor = color;
+}
+
+void cedar::proc::gui::GraphicsBase::setFillColor(const QColor& color)
+{
+  this->mFillColor = color;
+}
 
 void cedar::proc::gui::GraphicsBase::highlightConnectionTarget(cedar::proc::gui::GraphicsBase *pConnectionSource)
 {
@@ -257,6 +272,7 @@ QPen cedar::proc::gui::GraphicsBase::getOutlinePen() const
   {
     pen.setStyle(Qt::DashLine);
   }
+  pen.setColor(this->mOutlineColor);
   return pen;
 }
 
@@ -268,6 +284,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   QRectF bounds(QPointF(0, 0), QSizeF(this->width(), this->height()));
   qreal roundedness = 4;
 
+  // draw the base shape
   painter->setPen(this->getOutlinePen());
   switch (this->mShape)
   {
@@ -276,7 +293,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
       {
         painter->save();
         painter->setPen(QPen(Qt::NoPen));
-        painter->setBrush(Qt::white);
+        painter->setBrush(this->mFillColor);
         painter->drawRoundedRect(bounds, roundedness, roundedness);
         painter->restore();
       }
@@ -288,7 +305,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
       {
         painter->save();
         painter->setPen(QPen(Qt::NoPen));
-        painter->setBrush(Qt::white);
+        painter->setBrush(this->mFillColor);
         painter->drawEllipse(bounds);
         painter->restore();
       }
@@ -296,10 +313,12 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
       break;
   }
 
+  // draw the highlight
   if (this->mHighlightMode != HIGHLIGHTMODE_NONE)
   {
+    // determine what pen to use for highlighting
     QPen highlight_pen;
-    highlight_pen.setWidth(3);
+    highlight_pen.setWidthF(2);
     switch (this->mHighlightMode)
     {
       case HIGHLIGHTMODE_POTENTIAL_CONNECTION_TARGET:
@@ -319,6 +338,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
     }
 
+    // draw the shape using the hightlight pen
     QRectF highlight_bounds(QPointF(1, 1), QSizeF(this->width() - 1, this->height() - 1));
     painter->setPen(highlight_pen);
     switch (this->mShape)
