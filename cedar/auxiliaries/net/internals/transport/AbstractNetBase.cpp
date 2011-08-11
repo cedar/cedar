@@ -49,6 +49,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <stdio.h>
 
 using namespace std;
 using namespace yarp::os;
@@ -138,9 +139,16 @@ bool AbstractNetBase::startNameServer()
     // clean YARPs local "nameserver config file", which effectively
     // serves as cache and just makes problems for us, when the nameserver
     // changes
-
     yarp::os::impl::NameConfig nc;
     nc.toFile(true); // clean configfile
+
+    // swallow the output of the following yarp server command
+    // (this redirect stdout of this process to /dev/null)
+    int fh;
+    ::fflush(stdout);
+    fh = ::open("/dev/null", O_WRONLY);
+    ::dup2(fh, 1);
+    ::close(fh);
 
     if (execlp("yarp", "yarp", "server", NULL) == -1)
     {
