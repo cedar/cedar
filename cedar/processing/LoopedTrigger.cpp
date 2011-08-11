@@ -67,6 +67,25 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::LoopedTrigger::startTrigger()
+{
+  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  {
+    this->mListeners.at(i)->onStart();
+  }
+  this->start();
+}
+
+void cedar::proc::LoopedTrigger::stopTrigger()
+{
+  this->stop();
+  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  {
+    this->mListeners.at(i)->onStop();
+  }
+}
+
 void cedar::proc::LoopedTrigger::step(double time)
 {
   cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));

@@ -185,11 +185,11 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 
     if (a == p_start)
     {
-      p_looped_trigger->start();
+      p_looped_trigger->startTrigger();
     }
     else if (a == p_stop)
     {
-      p_looped_trigger->stop();
+      p_looped_trigger->stopTrigger();
     }
   }
 }
