@@ -63,37 +63,36 @@
 
 cedar::proc::gui::TriggerItem::TriggerItem()
 :
-cedar::proc::gui::GraphicsBase(120, 50,
+cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
-  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
-                               | QGraphicsItem::ItemIsMovable
-                               | QGraphicsItem::ItemSendsGeometryChanges
-                               );
-
-  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
-  p_effect->setBlurRadius(5.0);
-  p_effect->setOffset(3.0, 3.0);
-  this->setGraphicsEffect(p_effect);
+  this->construct();
 }
 
 
 cedar::proc::gui::TriggerItem::TriggerItem(cedar::proc::TriggerPtr trigger)
 :
-cedar::proc::gui::GraphicsBase(120, 50,
+cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
-                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+                               | cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER,
+                               cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
+{
+  this->setTrigger(trigger);
+  this->construct();
+}
+
+void cedar::proc::gui::TriggerItem::construct()
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
-  this->setTrigger(trigger);
 
   QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
   p_effect->setBlurRadius(5.0);
@@ -140,6 +139,9 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->mTrigger = trigger;
   this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(mTrigger);
+  
+  std::string tool_tip = this->mTrigger->getName() + " (" + this->mClassId->getClassName() + ")";
+  this->setToolTip(tool_tip.c_str());
 }
 
 void cedar::proc::gui::TriggerItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
@@ -199,11 +201,7 @@ void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionG
   painter->save(); // save current painter settings
 
   this->paintFrame(painter, style, widget);
-
-  //! @todo make drawing pretty.
-  painter->drawText(QPointF(5, 15), this->mClassId->getClassName().c_str());
-  painter->drawText(QPointF(5, 25), this->mTrigger->getName().c_str());
-
+  
   painter->restore(); // restore saved painter settings
 }
 
