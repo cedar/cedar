@@ -43,18 +43,19 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
+#include "processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsLineItem>
+#include <QGraphicsPathItem>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::Connection : public QGraphicsLineItem
+class cedar::proc::gui::Connection : public QGraphicsPathItem
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -78,6 +79,8 @@ public:
   cedar::proc::gui::GraphicsBase* getTarget();
 
   void setValidity(cedar::proc::gui::ConnectValidity validity);
+
+  void paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*);
 
 public slots:
   void update();
