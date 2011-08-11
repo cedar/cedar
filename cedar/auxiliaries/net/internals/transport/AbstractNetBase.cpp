@@ -43,6 +43,7 @@
 
 // PROJECT INCLUDES
 #include <yarp/conf/version.h>
+#include <yarp/os/impl/NameConfig.h>
 
 // SYSTEM INCLUDES
 #include <unistd.h>
@@ -133,6 +134,14 @@ bool AbstractNetBase::startNameServer()
 #ifdef DEBUG_NETT
     cout << "  executing yarp server" << endl;
 #endif
+
+    // clean YARPs local "nameserver config file", which effectively
+    // serves as cache and just makes problems for us, when the nameserver
+    // changes
+
+    yarp::os::impl::NameConfig nc;
+    nc.toFile(true); // clean configfile
+
     if (execlp("yarp", "yarp", "server", NULL) == -1)
     {
       // this works with all yarp versions
@@ -147,7 +156,7 @@ bool AbstractNetBase::startNameServer()
   }
   else
   {
-    sleep(2); // ugly, but no better idea for now. we need to wait for the
+    sleep(1); // ugly, but no better idea for now. we need to wait for the
               // child process to start the name server.
               // (fork doesnt guarantee the order of execution
               //  between child and parent)
