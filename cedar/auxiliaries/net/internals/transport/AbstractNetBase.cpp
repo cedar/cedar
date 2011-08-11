@@ -147,7 +147,7 @@ bool AbstractNetBase::startNameServer()
   }
   else
   {
-    sleep(1); // ugly, but no better idea for now. we need to wait for the
+    sleep(2); // ugly, but no better idea for now. we need to wait for the
               // child process to start the name server.
               // (fork doesnt guarantee the order of execution
               //  between child and parent)

@@ -90,7 +90,7 @@ inline cv::Mat CollatedType<cv::Mat>::late_init_data_from_header()
 
 
 template <>
-inline void* CollatedType< cv::Mat_<float> >::contentAt(int index, int iElemSize) 
+inline void* CollatedType< cv::Mat_<float> >::contentAt(int index, int __attribute__((unused)) iElemSize) 
                 // specialization for class template
 {
   return (void*)  &data( ( index % header.rows ),
