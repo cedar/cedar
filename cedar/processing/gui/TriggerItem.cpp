@@ -45,6 +45,7 @@
 #include "processing/LoopedTrigger.h"
 #include "processing/Manager.h"
 #include "auxiliaries/Data.h"
+#include "auxiliaries/utilities.h"
 #include "processing/Trigger.h"
 
 // PROJECT INCLUDES
@@ -108,9 +109,58 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::TriggerItem::disconnect(cedar::proc::gui::GraphicsBase* pListener)
+{
+  switch (pListener->getGroup())
+  {
+    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+    {
+      cedar::proc::gui::StepItem *p_step = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pListener);
+      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_step->getStep()));
+      this->getTrigger()->removeListener(p_step->getStep());
+      break;
+    }
+
+    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+    {
+      cedar::proc::gui::TriggerItem *p_trigger = cedar::aux::asserted_cast<cedar::proc::gui::TriggerItem*>(pListener);
+      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_trigger->getTrigger()));
+      this->getTrigger()->removeTrigger(p_trigger->getTrigger());
+      break;
+    }
+
+    default:
+      // should never happen: triggers can only be connected to steps and other triggers.
+      CEDAR_DEBUG_ASSERT(false);
+      break;
+  }
+}
+
+void cedar::proc::gui::TriggerItem::isDocked(bool docked)
+{
+  if (docked)
+  {
+    this->setFlags(static_cast<QGraphicsItem::GraphicsItemFlags>(this->flags() - QGraphicsItem::ItemIsSelectable
+                                                                               - QGraphicsItem::ItemIsMovable)
+                                 );
+  }
+  else
+  {
+    this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                                 | QGraphicsItem::ItemIsMovable
+                                 );
+  }
+}
+
 cedar::proc::gui::ConnectValidity
   cedar::proc::gui::TriggerItem::canConnectTo(GraphicsBase* pTarget) const
 {
+  // a trigger cannot connect to its parent
+  if (pTarget == this->parentItem())
+  {
+    return cedar::proc::gui::CONNECT_NO;
+  }
+
   if (this->cedar::proc::gui::GraphicsBase::canConnectTo(pTarget) == cedar::proc::gui::CONNECT_NO)
   {
     return cedar::proc::gui::CONNECT_NO;
@@ -164,7 +214,6 @@ void cedar::proc::gui::TriggerItem::saveConfiguration(cedar::aux::ConfigurationN
   root.put("trigger", this->mTrigger->getName());
   this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
 }
-
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {

@@ -164,6 +164,9 @@ public:
   State getState() const;
   const std::string& getStateAnnotation() const;
 
+  size_t getTriggerCount() const;
+  cedar::proc::TriggerPtr getTrigger(size_t index);
+
 signals:
   void stateChanged();
 
@@ -180,6 +183,8 @@ protected:
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
   void freeBuffer(const std::string& name);
   void freeOutput(const std::string& name);
+
+  void addTrigger(cedar::proc::TriggerPtr& trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -211,6 +216,7 @@ private:
   bool mMandatoryConnectionsAreSet;
   State mState;
   std::string mStateAnnotation;
+  std::vector<cedar::proc::TriggerPtr> mTriggers;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

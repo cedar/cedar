@@ -136,6 +136,9 @@ public:
     return static_cast<qreal>(this->mHeight->get());
   }
 
+  void setHeight(qreal height);
+  void setWidth(qreal width);
+
   void addConnection(Connection* pConnection);
 
   /*! @brief Removes the connection from the list of connections managed by this graphics item.

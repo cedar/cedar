@@ -97,6 +97,18 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
+{
+  this->mHeight->set(static_cast<double>(height));
+  this->update();
+}
+
+void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
+{
+  this->mWidth->set(static_cast<double>(width));
+  this->update();
+}
+
 void cedar::proc::gui::GraphicsBase::setOutlineColor(const QColor& color)
 {
   this->mOutlineColor = color;
@@ -406,7 +418,7 @@ void cedar::proc::gui::GraphicsBase::updateConnections()
   }
 }
 
-void cedar::proc::gui::GraphicsBase::disconnect(cedar::proc::gui::GraphicsBase* pTarget)
+void cedar::proc::gui::GraphicsBase::disconnect(cedar::proc::gui::GraphicsBase*)
 {
 }
 

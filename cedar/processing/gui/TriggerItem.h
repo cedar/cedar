@@ -83,6 +83,9 @@ private:
 public:
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
+  //!@breif Let the trigger know whether it is docked (usually to a step).
+  void isDocked(bool docked);
+
   cedar::proc::TriggerPtr getTrigger();
 
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
@@ -96,6 +99,8 @@ public:
   void saveConfiguration(cedar::aux::ConfigurationNode& root);
 
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
+
+  void disconnect(cedar::proc::gui::GraphicsBase* pListener);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
