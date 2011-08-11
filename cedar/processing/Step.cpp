@@ -61,6 +61,7 @@ cedar::proc::Step::Step(bool runInThread, bool autoConnectTriggers)
 mFinished(new cedar::proc::Trigger()),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
+mpArgumentsLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet (true),
 mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread)),
 mState(cedar::proc::Step::STATE_NONE)
@@ -69,6 +70,13 @@ mState(cedar::proc::Step::STATE_NONE)
   this->_mName->setConstant(true);
 }
 
+cedar::proc::Step::~Step()
+{
+  if (mpArgumentsLock != NULL)
+  {
+    delete mpArgumentsLock;
+  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -359,15 +367,22 @@ void cedar::proc::Step::run()
   this->mBusy = true;
 
   // if no arguments have been set, create default ones.
+  this->mpArgumentsLock->lockForRead();
   if (this->mNextArguments.get() == NULL)
   {
+    this->mpArgumentsLock->unlock();
+    this->mpArgumentsLock->lockForWrite();
     this->mNextArguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
   }
+  this->mpArgumentsLock->unlock();
 
   //!@todo make the (un)locking optional?
   this->lockAll();
 
+  //!@todo this blocks writing of new arguments and thus (potentially) incoming trigger signals. Is this what we want?
+  this->mpArgumentsLock->lockForRead();
   this->compute(*(this->mNextArguments.get()));
+  this->mpArgumentsLock->unlock();
 
   this->unlockAll();
 
@@ -390,6 +405,7 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
 
 void cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
 {
+  mpArgumentsLock->lockForWrite();
 #ifdef DEBUG
   if (this->mNextArguments.get() != NULL)
   {
@@ -398,6 +414,7 @@ void cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
   }
 #endif // DEBUG
   this->mNextArguments = arguments;
+  mpArgumentsLock->unlock();
 }
 
 void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, bool mandatory)
