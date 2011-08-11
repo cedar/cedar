@@ -62,6 +62,23 @@ cedar::proc::DataSlot::~DataSlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+/*!
+ * @remarks Set to an empty string ("") to disable the text and use the name instead.
+ */
+void cedar::proc::DataSlot::setText(const std::string& text)
+{
+  this->mText = text;
+}
+
+//!@brief Returns the text to display to the user.
+const std::string& cedar::proc::DataSlot::getText() const
+{
+  if (this->mText.empty())
+    return this->mName;
+  else
+    return this->mText;
+}
+
 cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
 {
   return this->mValidity;

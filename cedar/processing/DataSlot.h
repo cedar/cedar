@@ -93,6 +93,11 @@ public:
 
   const std::string& getName() const;
 
+  void setText(const std::string& text);
+
+  //!@brief Returns the text to display to the user.
+  const std::string& getText() const;
+
   bool isMandatory() const;
 
   VALIDITY getValidlity() const;
@@ -119,7 +124,14 @@ private:
   cedar::aux::DataPtr mData;
   bool mMandatory;
   VALIDITY mValidity;
+
+  //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
   std::string mName;
+
+  //! Text of the slot, i.e., the text that is displayed to the user (ignored if empty).
+  std::string mText;
+
+  //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
 
   //--------------------------------------------------------------------------------------------------------------------

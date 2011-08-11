@@ -310,7 +310,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
       p_label_action->setEnabled(false);
       for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
-        QAction *p_action = p_data->addAction(iter->first.c_str());
+        QAction *p_action = p_data->addAction(iter->second->getText().c_str());
         p_action->setData(QString(iter->first.c_str()));
         if (iter->second->getData().get() == NULL)
         {
@@ -337,8 +337,9 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     const cedar::aux::Enum& e = action_type_map[a];
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
 
-    std::string title = this->mStep->getName();
-    title += "." + data_name;
+    std::string title = this->mStep->getSlot(e, data_name)->getText();
+    title += " (" + this->mStep->getName();
+    title += "." + data_name + ")";
 
     cedar::proc::gui::DataPlotter *p_plotter = new cedar::proc::gui::DataPlotter(title, mpMainWindow);
     p_plotter->plot(p_data);
