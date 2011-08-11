@@ -118,6 +118,7 @@ void cedar::proc::gui::StepItem::stepStateChanged()
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
       this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
+  this->setToolTip(this->mStep->getStateAnnotation().c_str());
   this->update();
 }
 
