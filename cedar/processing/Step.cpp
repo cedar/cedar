@@ -58,7 +58,7 @@
 
 cedar::proc::Step::Step(bool runInThread, bool autoConnectTriggers)
 :
-mFinished(new cedar::proc::Trigger()),
+mFinished(new cedar::proc::Trigger("processingDone")),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),

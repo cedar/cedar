@@ -66,7 +66,7 @@ class cedar::proc::Trigger : public virtual cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Trigger();
+  Trigger(const std::string& name = "");
 
   //!@brief Destructor
   virtual ~Trigger();

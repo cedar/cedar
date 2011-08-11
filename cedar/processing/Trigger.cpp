@@ -53,8 +53,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::Trigger::Trigger()
+cedar::proc::Trigger::Trigger(const std::string& name)
 {
+  this->setName(name);
 }
 
 cedar::proc::Trigger::~Trigger()
