@@ -373,6 +373,9 @@ void cedar::proc::Step::run()
     this->mpArgumentsLock->unlock();
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
+#ifdef DEBUG
+    std::cout << "processing::Step [debug]> Warning: using default arguments for step " << this->getName() << "." << std::endl;
+#endif // DEBUG
   }
   this->mpArgumentsLock->unlock();
 
