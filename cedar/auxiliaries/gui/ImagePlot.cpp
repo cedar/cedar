@@ -120,9 +120,18 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
       this->mData->unlock();
     }
 
+    case CV_32FC1:
+      this->mpImageDisplay->setText("Cannot display CV_32FC1 matrix.");
+      return;
+
+    case CV_32FC3:
+      this->mpImageDisplay->setText("Cannot display CV_32FC3 matrix.");
+      return;
+
     default:
-      std::cout << "Unhandled matrix type " << mat.type() << " in cedar::aux::gui::ImagePlot::timerEvent." << std::endl;
-      break;
+      QString text = QString("Unhandled matrix type %1.").arg(mat.type());
+      this->mpImageDisplay->setText(text);
+      return;
   }
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
