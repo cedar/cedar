@@ -45,6 +45,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QPainter>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -55,7 +56,7 @@ cedar::proc::gui::Connection::Connection(cedar::proc::gui::GraphicsBase *pSource
 mpSource(pSource),
 mpTarget(pTarget)
 {
-  this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent);
+  this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
   pSource->addConnection(this);
   pTarget->addConnection(this);
 
@@ -84,25 +85,42 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
 void cedar::proc::gui::Connection::update()
 {
   this->setZValue(-1.0);
-  QLineF line;
+  QPainterPath path(this->mpSource->getConnectionAnchorInScene());
+  path.lineTo(this->mpTarget->getConnectionAnchorInScene());
 
-  //QPointF pos1(this->mpSource->boundingRect().width()/2.0, this->mpSource->boundingRect().height()/2.0);
-  QPointF pos1(this->mpSource->getConnectionAnchorInScene());
-  line.setP1(pos1);
+  this->setPath(path);
+}
 
-  /*QPointF pos2 = this->mpTarget->scenePos() - this->mpSource->scenePos();
-  pos2.rx() += this->mpTarget->boundingRect().width()/2.0;
-  pos2.ry() += this->mpTarget->boundingRect().height()/2.0;*/
-  QPointF pos2(this->mpTarget->getConnectionAnchorInScene());
-  line.setP2(pos2);
+void cedar::proc::gui::Connection::paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*)
+{
+  pPainter->save();
 
-  this->setLine(line);
+  if (this->isSelected())
+  {
+    QPen pen = this->pen();
+    pen.setColor(Qt::black);
+    pen.setStyle(Qt::DashLine);
+    pPainter->setPen(pen);
+    pPainter->drawPath(this->path());
+
+    pen = this->pen();
+    pen.setWidthF(1.5);
+    pPainter->setPen(pen);
+    pPainter->drawPath(this->path());
+  }
+  else
+  {
+    pPainter->setPen(this->pen());
+    pPainter->drawPath(this->path());
+  }
+  pPainter->restore();
 }
 
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getSource()
 {
   return this->mpSource;
 }
+
 cedar::proc::gui::GraphicsBase* cedar::proc::gui::Connection::getTarget()
 {
   return this->mpTarget;
