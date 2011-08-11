@@ -215,8 +215,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
   for (int i = 0; i < items.size(); ++i)
   {
     // delete steps
-    cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(items[i]);
-    if (p_drawer)
+    if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(items[i]))
     {
       //!\todo move this to destructor
       // delete one step at a time
@@ -226,11 +225,9 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       Manager::getInstance().removeStep(p_drawer->getStep());
       this->mpPropertyTable->resetPointer();
       this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
-      continue;
     }
     // delete triggers
-    cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(items[i]);
-    if (p_trigger_drawer)
+    else if (cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(items[i]))
     {
       // delete one step at a time
       p_trigger_drawer->hide();
@@ -238,7 +235,13 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
       Manager::getInstance().removeTrigger(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
-      continue;
+    }
+    // delete connections
+    else if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+    {
+      p_connection->disconnect();
+      //!@todo: should only be this:
+      delete p_connection;
     }
   }
 }

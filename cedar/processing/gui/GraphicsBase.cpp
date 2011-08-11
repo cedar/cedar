@@ -85,6 +85,7 @@ mAllowedConnectTargets(canConnectTo)
 
 cedar::proc::gui::GraphicsBase::~GraphicsBase()
 {
+  this->disconnect();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -385,7 +386,10 @@ void cedar::proc::gui::GraphicsBase::updateConnections()
   }
 }
 
+void cedar::proc::gui::GraphicsBase::disconnect(cedar::proc::gui::GraphicsBase* pTarget)
+{
+}
+
 void cedar::proc::gui::GraphicsBase::disconnect()
 {
-
 }

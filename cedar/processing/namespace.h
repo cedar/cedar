@@ -88,11 +88,12 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
 
     /* Exceptions */
+    class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
+    class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
-    class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
   }

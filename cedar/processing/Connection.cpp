@@ -96,6 +96,27 @@ mTargetTrigger(target)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::StepPtr cedar::proc::Connection::getSource()
+{
+  return this->mSource;
+}
+
+const std::string& cedar::proc::Connection::getSourceName() const
+{
+  return this->mSourceName;
+}
+
+cedar::proc::StepPtr cedar::proc::Connection::getTarget()
+{
+  return this->mTarget;
+}
+
+const std::string& cedar::proc::Connection::getTargetName() const
+{
+  return this->mTargetName;
+}
+
 bool cedar::proc::Connection::contains(cedar::proc::StepPtr step)
 {
   return (mSource == step || mTarget == step);

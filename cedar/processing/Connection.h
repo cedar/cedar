@@ -85,6 +85,11 @@ public:
   bool contains(cedar::proc::StepPtr step);
   bool contains(cedar::proc::TriggerPtr trigger);
   void deleteConnection();
+  
+  cedar::proc::StepPtr getSource();
+  const std::string& getSourceName() const;
+  cedar::proc::StepPtr getTarget();
+  const std::string& getTargetName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

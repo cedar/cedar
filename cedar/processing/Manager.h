@@ -113,6 +113,12 @@ public:
                 cedar::proc::StepPtr target,
                 const std::string& targetName
               );
+  void disconnect(
+                   cedar::proc::StepPtr source,
+                   const std::string& sourceName,
+                   cedar::proc::StepPtr target,
+                   const std::string& targetName
+                 );
   void connect(
                 cedar::proc::TriggerPtr trigger,
                 cedar::proc::StepPtr target

@@ -111,7 +111,10 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 {
   if (!data)
   {
-    std::cout << "Data is null." << std::endl;
+    if (slot->isMandatory())
+      return cedar::proc::DataSlot::VALIDITY_ERROR;
+    else
+      return cedar::proc::DataSlot::VALIDITY_VALID;
   }
 
   if (slot->getRole() == cedar::proc::DataRole::INPUT && slot->getName() == "input")
