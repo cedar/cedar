@@ -97,6 +97,8 @@ public:
   //!\brief check if everything is prepared to execute compute()
   virtual void onStart();
 
+  virtual void onStop();
+
   void onTrigger();
 
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
@@ -156,6 +158,11 @@ public:
   void unlockAll(DataRole::Id role);
 
   static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
+  
+  State getState() const;
+
+signals:
+  void stateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -180,6 +187,7 @@ private:
   void freeData(DataRole::Id role, const std::string& name);
 
   bool allInputsValid();
+  void setState(cedar::proc::Step::State newState);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -197,6 +205,7 @@ private:
   bool mBusy;
   ArgumentsPtr mNextArguments;
   bool mMandatoryConnectionsAreSet;
+  State mState;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

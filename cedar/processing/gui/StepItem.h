@@ -51,6 +51,7 @@
 // SYSTEM INCLUDES
 #include <QMainWindow>
 #include <QIcon>
+#include <QObject>
 #include <map>
 
 
@@ -58,8 +59,10 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::StepItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::StepItem : public QObject, public cedar::proc::gui::GraphicsBase
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -78,6 +81,9 @@ public:
 
   //!@brief Destructor
   ~StepItem();
+
+private:
+  void construct();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -102,6 +108,9 @@ public:
   }
 
   void disconnect();
+
+public slots:
+  void stepStateChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

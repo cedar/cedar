@@ -70,15 +70,8 @@ mpMainWindow(pMainWindow),
 mStepIcon(":/steps/no_icon.png")
 {
   this->setStep(step);
-  this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
-  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
-                               | QGraphicsItem::ItemIsMovable
-                               );
-
-  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
-  p_effect->setBlurRadius(5.0);
-  p_effect->setOffset(3.0, 3.0);
-  this->setGraphicsEffect(p_effect);
+  
+  this->construct();
 }
 
 cedar::proc::gui::StepItem::StepItem(QMainWindow* pMainWindow)
@@ -88,6 +81,11 @@ cedar::proc::gui::GraphicsBase(160, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
 mpMainWindow(pMainWindow),
 mStepIcon(":/steps/no_icon.png")
+{
+  this->construct();
+}
+
+void cedar::proc::gui::StepItem::construct()
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
@@ -107,6 +105,22 @@ cedar::proc::gui::StepItem::~StepItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::StepItem::stepStateChanged()
+{
+  switch (this->mStep->getState())
+  {
+    case cedar::proc::Step::STATE_NOT_RUNNING:
+      this->setOutlineColor(Qt::darkGray);
+      this->setFillColor(QColor(235, 235, 235));
+      break;
+
+    default:
+      this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
+      this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
+  }
+  this->update();
+}
+
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
   this->mStep = step;
@@ -119,6 +133,8 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   }
 
   this->addDataItems();
+
+  QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
 }
 
 void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
