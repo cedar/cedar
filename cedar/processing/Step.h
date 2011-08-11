@@ -54,6 +54,7 @@
 
 // SYSTEM INCLUDES
 #include <QThread>
+#include <QReadWriteLock>
 #include <map>
 
 
@@ -89,6 +90,7 @@ public:
   Step(bool runInThread = false, bool autoConnectTriggers = true);
 
   //!@brief Destructor
+  virtual ~Step();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -204,6 +206,7 @@ private:
    */
   const bool mAutoConnectTriggers;
   bool mBusy;
+  QReadWriteLock* mpArgumentsLock;
   ArgumentsPtr mNextArguments;
   bool mMandatoryConnectionsAreSet;
   State mState;
