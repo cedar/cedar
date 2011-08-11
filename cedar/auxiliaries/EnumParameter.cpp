@@ -76,11 +76,13 @@ cedar::aux::Enum cedar::aux::EnumParameter::get() const
 void cedar::aux::EnumParameter::set(const std::string& enumId)
 {
   this->mValue = this->mEnumDeclaration->get(enumId);
+  emit parameterChanged();
 }
 
 void cedar::aux::EnumParameter::setTo(const cedar::aux::ConfigurationNode& root)
 {
   this->mValue = mEnumDeclaration->get(root.get_value<std::string>());
+  emit parameterChanged();
 }
 
 void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
@@ -91,4 +93,5 @@ void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
 void cedar::aux::EnumParameter::makeDefault()
 {
   this->mValue = this->mDefault;
+  emit parameterChanged();
 }
