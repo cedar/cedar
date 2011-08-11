@@ -46,6 +46,8 @@
 
 // SYSTEM INCLUDES
 #include <QPainter>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

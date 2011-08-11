@@ -123,6 +123,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void addDataItems();
+  void addTriggerItems();
 
   void setStep(cedar::proc::StepPtr step);
 
@@ -134,6 +135,7 @@ protected:
 private:
   cedar::proc::StepPtr mStep;
   DataSlotMap mSlotMap;
+  std::vector<cedar::proc::gui::TriggerItem*> mTriggers;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

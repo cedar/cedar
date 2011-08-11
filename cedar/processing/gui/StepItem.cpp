@@ -42,6 +42,7 @@
 #include "processing/gui/StepItem.h"
 #include "processing/gui/DataPlotter.h"
 #include "processing/gui/DataSlotItem.h"
+#include "processing/gui/TriggerItem.h"
 #include "processing/gui/exceptions.h"
 #include "processing/DataSlot.h"
 #include "processing/Manager.h"
@@ -134,6 +135,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   }
 
   this->addDataItems();
+  this->addTriggerItems();
 
   QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
 }
@@ -157,6 +159,28 @@ void cedar::proc::gui::StepItem::saveConfiguration(cedar::aux::ConfigurationNode
 {
   root.put("step", this->mStep->getName());
   this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
+}
+
+void cedar::proc::gui::StepItem::addTriggerItems()
+{
+  CEDAR_DEBUG_ASSERT(this->mStep);
+
+  qreal padding = static_cast<qreal>(3);
+  QPointF origin(0, this->height() + padding);
+  qreal trigger_size = 10.0;
+  mTriggers.clear();
+
+  for (size_t i = 0; i < this->mStep->getTriggerCount(); ++i)
+  {
+    cedar::proc::TriggerPtr trigger = this->mStep->getTrigger(i);
+    cedar::proc::gui::TriggerItem* p_trigger_item = new cedar::proc::gui::TriggerItem(trigger);
+    p_trigger_item->setParentItem(this);
+    p_trigger_item->setPos(origin + QPointF(0, 1) * static_cast<qreal>(i) * (trigger_size + padding));
+    p_trigger_item->isDocked(true);
+    p_trigger_item->setWidth(trigger_size);
+    p_trigger_item->setHeight(trigger_size);
+    this->mTriggers.push_back(p_trigger_item);
+  }
 }
 
 void cedar::proc::gui::StepItem::addDataItems()
@@ -363,5 +387,12 @@ void cedar::proc::gui::StepItem::disconnect()
     {
       it->second->removeAllConnections();
     }
+  }
+
+  // go through all triggers and remove their connections as well
+  for (size_t i = 0; i < this->mTriggers.size(); ++i)
+  {
+    cedar::proc::gui::TriggerItem* p_trigger = this->mTriggers.at(i);
+    p_trigger->removeAllConnections();
   }
 }

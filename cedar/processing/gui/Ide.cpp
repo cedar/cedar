@@ -212,8 +212,26 @@ void cedar::proc::gui::Ide::deleteSelectedElements()
 
 void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
 {
+  /* remove connnections first -- otherwise they might get deleted multiple times because
+     they get deleted by a step and are still in the list of items.
+   */
   for (int i = 0; i < items.size(); ++i)
   {
+    // delete connections
+    if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+    {
+      //!@todo: The disconnect call should be in the Connection destructor and deleting the connection should suffice
+      p_connection->disconnect();
+      delete p_connection;
+      items[i] = NULL;
+    }
+  }
+  for (int i = 0; i < items.size(); ++i)
+  {
+    // item was deleted previously
+    if (items[i] == NULL)
+      continue;
+
     // delete steps
     if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(items[i]))
     {
@@ -235,13 +253,6 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
       Manager::getInstance().removeTrigger(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
-    }
-    // delete connections
-    else if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
-    {
-      p_connection->disconnect();
-      //!@todo: should only be this:
-      delete p_connection;
     }
   }
 }

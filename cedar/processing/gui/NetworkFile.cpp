@@ -277,6 +277,11 @@ void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode& roo
           break;
 
         case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+          if (p_item->parentItem() != NULL)
+          {
+            // only top-level triggers are saved; the ones docked to steps (e.g.) need no saving
+            continue;
+          }
           node.put("type", "trigger");
           break;
 

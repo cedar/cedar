@@ -66,6 +66,7 @@ mMandatoryConnectionsAreSet (true),
 mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread)),
 mState(cedar::proc::Step::STATE_NONE)
 {
+  this->addTrigger(mFinished);
   this->registerParameter(mRunInThread);
   this->_mName->setConstant(true);
 }
@@ -81,6 +82,22 @@ cedar::proc::Step::~Step()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+size_t cedar::proc::Step::getTriggerCount() const
+{
+  return this->mTriggers.size();
+}
+
+cedar::proc::TriggerPtr cedar::proc::Step::getTrigger(size_t index)
+{
+  CEDAR_ASSERT(index < this->getTriggerCount());
+  return this->mTriggers.at(index);
+}
+
+void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr& trigger)
+{
+  this->mTriggers.push_back(trigger);
+}
 
 const std::string& cedar::proc::Step::getStateAnnotation() const
 {
