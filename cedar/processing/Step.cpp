@@ -264,7 +264,7 @@ void cedar::proc::Step::onStart()
 void cedar::proc::Step::onTrigger()
 {
   //!@todo signal to the gui/user somehow when a step becomes inactive due to erroneous connections
-  if (this->allInputsValid())
+  if (!this->allInputsValid())
   {
     return;
   }
@@ -307,14 +307,10 @@ bool cedar::proc::Step::allInputsValid()
 
   for (SlotMap::iterator slot = slot_map.begin(); slot != slot_map.end(); ++slot)
   {
-    switch(slot->second->getValidlity())
+    switch(this->getInputValidity(slot->second))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         return false;
-
-      case cedar::proc::DataSlot::VALIDITY_UNKNOWN:
-        if(this->getInputValidity(slot->second) == cedar::proc::DataSlot::VALIDITY_ERROR)
-          return false;
 
       default:
         break;
@@ -526,8 +522,9 @@ void cedar::proc::Step::freeData(DataRole::Id role, const std::string& name)
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator != iter->second.end())
   {
-    map_iterator->second->getData()->connectedSlotName("");
-    map_iterator->second->setData(cedar::aux::DataPtr());
+    cedar::proc::DataSlotPtr& slot = map_iterator->second;
+    slot->getData()->connectedSlotName("");
+    slot->setData(cedar::aux::DataPtr());
   }
   else
   {

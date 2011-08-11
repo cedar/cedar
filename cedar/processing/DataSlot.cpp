@@ -79,6 +79,12 @@ bool cedar::proc::DataSlot::isMandatory() const
 
 void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
 {
+  // reset validity when the data changes.
+  if (this->mRole == cedar::proc::DataRole::INPUT)
+  {
+    this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  }
+
   this->mData = data;
 }
 

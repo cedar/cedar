@@ -348,4 +348,3 @@ void cedar::proc::gui::StepItem::disconnect()
     }
   }
 }
-

@@ -138,12 +138,20 @@ public:
 
   void addConnection(Connection* pConnection);
 
+  /*! @brief Removes the connection from the list of connections managed by this graphics item.
+   *
+   *         This means that the start and end positions of the connection are no longer updated when this
+   *         item is moved around.
+   */
   void removeConnection(Connection* pConnection);
 
   void removeAllConnections();
 
   //!\brief overwrite this function if your customized graphics item needs to disconnect some children items
   virtual void disconnect();
+
+  //!\brief overwrite this function if your customized graphics item needs to disconnect a children items
+  virtual void disconnect(cedar::proc::gui::GraphicsBase* pTarget);
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 

@@ -71,9 +71,19 @@ cedar::proc::gui::Connection::~Connection()
 {
 }
 
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Connection::disconnect()
+{
+  this->mpSource->disconnect(this->mpTarget);
+  this->mpSource->removeConnection(this);
+  this->mpSource = NULL;
+  this->mpTarget->removeConnection(this);
+  this->mpTarget = NULL;
+}
 
 void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity validity)
 {

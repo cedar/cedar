@@ -104,4 +104,13 @@ public:
   PluginException();
 }; // class cedar::proc::PluginException
 
+class cedar::proc::ConnectionNotFoundException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  ConnectionNotFoundException()
+  {
+    this->mType = "ConnectionNotFoundException";
+  }
+}; // class cedar::proc::ConnectionNotFoundException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

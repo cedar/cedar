@@ -81,6 +81,7 @@ public:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
   void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
+  void disconnect(cedar::proc::gui::GraphicsBase* pTarget);
 
   const std::string& getName() const;
 

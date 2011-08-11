@@ -82,6 +82,9 @@ public:
 
   void paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*);
 
+  //! @brief Removes the underlying connection in the processing framework.
+  void disconnect();
+
 public slots:
   void update();
 

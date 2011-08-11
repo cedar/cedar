@@ -211,6 +211,38 @@ void cedar::proc::Manager::connect(
   mConnections.push_back(new cedar::proc::Connection(source,sourceName, target,targetName));
 }
 
+void cedar::proc::Manager::disconnect(
+                                       cedar::proc::StepPtr source,
+                                       const std::string& sourceName,
+                                       cedar::proc::StepPtr target,
+                                       const std::string& targetName
+                                     )
+{
+  // get the iterator of the connection
+  cedar::proc::Connection* p_connection;
+  std::vector<cedar::proc::Connection*>::iterator iter = this->mConnections.begin();
+  while (iter != this->mConnections.end())
+  {
+    p_connection = *iter;
+    if (p_connection->getSource() == source && p_connection->getTarget() == target
+        && p_connection->getSourceName() == sourceName && p_connection->getTargetName() == targetName)
+    {
+      break;
+    }
+    iter++;
+  }
+
+  if (iter == this->mConnections.end())
+  {
+    //!@todo really an exception, or is it just ok because nothing needs to be disconnected?
+    CEDAR_THROW(cedar::proc::ConnectionNotFoundException, "The connection is not present.");
+  }
+
+  p_connection->deleteConnection();
+  delete p_connection;
+  this->mConnections.erase(iter);
+}
+
 void cedar::proc::Manager::connect(
                                     cedar::proc::TriggerPtr trigger,
                                     cedar::proc::StepPtr target
