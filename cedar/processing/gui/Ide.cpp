@@ -115,6 +115,8 @@ void cedar::proc::gui::Ide::storeSettings()
   cedar::proc::gui::Settings::instance().toolsSettings()->getFrom(this->mpToolsWidget);
   cedar::proc::gui::Settings::instance().propertiesSettings()->getFrom(this->mpPropertiesWidget);
   cedar::proc::gui::Settings::instance().stepsSettings()->getFrom(this->mpItemsWidget);
+
+  cedar::proc::gui::Settings::instance().storeMainWindow(this);
 }
 
 void cedar::proc::gui::Ide::restoreSettings()
@@ -123,6 +125,8 @@ void cedar::proc::gui::Ide::restoreSettings()
   cedar::proc::gui::Settings::instance().toolsSettings()->setTo(this->mpToolsWidget);
   cedar::proc::gui::Settings::instance().propertiesSettings()->setTo(this->mpPropertiesWidget);
   cedar::proc::gui::Settings::instance().stepsSettings()->setTo(this->mpItemsWidget);
+
+  cedar::proc::gui::Settings::instance().restoreMainWindow(this);
 }
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
