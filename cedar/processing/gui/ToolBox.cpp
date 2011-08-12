@@ -48,6 +48,9 @@
 // SYSTEM INCLUDES
 #include <QVariant>
 #include <QVBoxLayout>
+#include <QLayoutItem>
+#include <QResizeEvent>
+#include <QSpacerItem>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -57,12 +60,16 @@ cedar::proc::gui::ToolBox::ToolBox(unsigned int columns, QWidget *pParent)
 :
 QWidget(pParent),
 mColumns(columns),
+mButtonSize(32),
 mpSelectedButton(NULL)
 {
   QVBoxLayout *p_outer_layout = new QVBoxLayout();
+  p_outer_layout->setContentsMargins(3, 3, 3, 3);
   this->setLayout(p_outer_layout);
-  mpLayout = new QGridLayout();
-  p_outer_layout->addLayout(mpLayout);
+
+  this->mpLayout = new QGridLayout();
+  p_outer_layout->addLayout(this->mpLayout, 1);
+
   p_outer_layout->addStretch();
 }
 
@@ -73,6 +80,43 @@ cedar::proc::gui::ToolBox::~ToolBox()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::ToolBox::resizeEvent(QResizeEvent *pEvent)
+{
+  QSize size = pEvent->size();
+  QRect rect = this->mpLayout->contentsRect();
+  int effective_area = rect.width();
+  int per_item_width = static_cast<int>(mButtonSize) + this->mpLayout->spacing();
+  this->mColumns = effective_area / per_item_width;
+
+  if (this->mColumns == 0)
+  {
+    this->mColumns = 1;
+  }
+
+  this->relayout();
+}
+
+void cedar::proc::gui::ToolBox::relayout()
+{
+  QList<QWidget*> widgets;
+  while (this->mpLayout->count() > 0)
+  {
+    QWidget *p_item = this->mpLayout->takeAt(0)->widget();
+    if (p_item != NULL)
+    {
+      widgets.append(p_item);
+    }
+  }
+
+  for (int i = 0; i < widgets.size(); ++i)
+  {
+    QWidget *p_child = widgets.at(i);
+    int row = i / mColumns;
+    int col = i % mColumns;
+    this->mpLayout->addWidget(p_child, row, col);
+  }
+}
 
 void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::string& data, const std::string& tooltip)
 {
@@ -87,7 +131,8 @@ void cedar::proc::gui::ToolBox::addItem(const std::string& icon, const std::stri
   int col = num_children % mColumns;
   mpLayout->addWidget(button, row, col);
 
-  button->setFixedSize(32, 32);
+  button->setMaximumSize(static_cast<int>(mButtonSize), static_cast<int>(mButtonSize));
+  button->setMinimumHeight(static_cast<int>(mButtonSize));
 
   //!@todo check for duplicates
   mButtons[data] = button;
