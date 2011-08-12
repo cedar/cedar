@@ -50,9 +50,19 @@ Question: How does the transport work?
 
 The NetWriter/Readers use the YARP library internally, but are designed
 to transparently wrap around YARP, so you don't need to worry about YARP.
+
 Note, that if you don't have a 'yarp server' started yourself the 
-NetWriter/Reader classes will start a yarp server themselves (allthough
-this may cause some delay in your code).
+NetWriter/Reader classes will start a yarp server themselves, but
+this is discouraged.
+Allthough letting the NetReader/Writers start the yarp server 
+automatically seems pratical, be aware of the disadvantages:
+- this may cause some delay in your code (when the server is started)
+- the server is started in a separate process which will be terminated,
+  when that instace of the NetWriter/Reader isdeleted. 
+  This will disconnect everybody on the network using that nameserver.
+- starting a yarp server manually after one was started automatically
+  by the NetReader/Writer classes may confuse later instantiated
+  NetReaders/Writers on which namerserver to connect to.
 
 At the moment, we use TCP/IP as network protocoll. Even locally.
 
@@ -108,6 +118,10 @@ A COMPLETE EXAMPLE:
 
 #include <auxiliaries/net/NetWriter.h>
 #include <auxiliaries/net/NetBlockingReader.h>
+#include <auxiliaries/net/exceptions/NetException.h>
+
+using namespace cedar::aux::net;
+using namespace cedar::aux::exc;
 
   // ...
 
