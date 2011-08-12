@@ -96,13 +96,13 @@ signals:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void resizeEvent(QResizeEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void relayout();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -113,6 +113,7 @@ protected:
   // none yet
 private:
   unsigned int mColumns;
+  unsigned int mButtonSize;
   QGridLayout *mpLayout;
   QToolButton *mpSelectedButton;
   std::map<std::string, QToolButton*> mButtons;
