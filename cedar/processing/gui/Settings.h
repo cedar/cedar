@@ -101,6 +101,9 @@ public:
   DockSettingsPtr propertiesSettings();
   DockSettingsPtr stepsSettings();
 
+  void storeMainWindow(QMainWindow *pWindow);
+  void restoreMainWindow(QMainWindow *pWindow);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +138,9 @@ private:
   DockSettingsPtr mSteps;
   DockSettingsPtr mTools;
   DockSettingsPtr mProperties;
+  
+  cedar::aux::StringParameterPtr mMainWindowGeometry;
+  cedar::aux::StringParameterPtr mMainWindowState;
 
 }; // class cedar::proc::gui::Settings
 

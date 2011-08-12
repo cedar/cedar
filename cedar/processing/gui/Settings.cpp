@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
+#include <QMainWindow>
 
 cedar::proc::gui::Settings cedar::proc::gui::Settings::mInstance;
 
@@ -58,8 +59,13 @@ cedar::aux::Configurable(),
 mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
-mProperties(new cedar::proc::gui::Settings::DockSettings())
+mProperties(new cedar::proc::gui::Settings::DockSettings()),
+mMainWindowState(new cedar::aux::StringParameter("mainWindowState", "")),
+mMainWindowGeometry(new cedar::aux::StringParameter("mainWindowGeometry", ""))
 {
+  this->registerParameter(mMainWindowState);
+  this->registerParameter(mMainWindowGeometry);
+
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
   this->addConfigurableChild("plugins", plugins);
 
@@ -102,6 +108,16 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Settings::storeMainWindow(QMainWindow *pWindow)
+{
+  //!@todo implement.
+}
+
+void cedar::proc::gui::Settings::restoreMainWindow(QMainWindow *pWindow)
+{
+  //!@todo implement.
+}
 
 void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
 {
