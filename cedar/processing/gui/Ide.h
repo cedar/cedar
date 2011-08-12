@@ -76,6 +76,7 @@ public:
   Ide();
 
   //!@brief Destructor
+  ~Ide();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -110,6 +111,7 @@ public slots:
 protected:
   void deleteElements(QList<QGraphicsItem*>& items);
   void deleteSelectedElements();
+  void closeEvent(QCloseEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -117,6 +119,9 @@ protected:
 private:
   void resetStepList();
   void loadDefaultPlugins();
+
+  void storeSettings();
+  void restoreSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
