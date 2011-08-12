@@ -46,6 +46,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -68,6 +69,8 @@ void cedar::dyn::Dynamics::compute(const cedar::proc::Arguments& arguments)
   }
   catch (const std::bad_cast& e)
   {
-    CEDAR_THROW(cedar::proc::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
+    //!@todo: Fix this. For now, it is disabled because it causes too many (unnecessary) crashes.
+    // CEDAR_THROW(cedar::proc::InvalidArgumentsException, "Bad arguments passed to dynamics. Expected StepTime.");
+    std::cout << "Warning: Bad arguments passed to dynamics. Expected StepTime. Skipping compute call." << std::endl;
   }
 }
