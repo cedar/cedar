@@ -91,12 +91,39 @@ cedar::proc::gui::Ide::Ide()
 
   mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
   this->resetTo(mNetwork);
+
+  this->restoreSettings();
 }
 
+cedar::proc::gui::Ide::~Ide()
+{
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
+{
+  this->storeSettings();
+  pEvent->accept();
+}
+
+void cedar::proc::gui::Ide::storeSettings()
+{
+  cedar::proc::gui::Settings::instance().logSettings()->getFrom(this->mpLogWidget);
+  cedar::proc::gui::Settings::instance().toolsSettings()->getFrom(this->mpToolsWidget);
+  cedar::proc::gui::Settings::instance().propertiesSettings()->getFrom(this->mpPropertiesWidget);
+  cedar::proc::gui::Settings::instance().stepsSettings()->getFrom(this->mpItemsWidget);
+}
+
+void cedar::proc::gui::Ide::restoreSettings()
+{
+  cedar::proc::gui::Settings::instance().logSettings()->setTo(this->mpLogWidget);
+  cedar::proc::gui::Settings::instance().toolsSettings()->setTo(this->mpToolsWidget);
+  cedar::proc::gui::Settings::instance().propertiesSettings()->setTo(this->mpPropertiesWidget);
+  cedar::proc::gui::Settings::instance().stepsSettings()->setTo(this->mpItemsWidget);
+}
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {

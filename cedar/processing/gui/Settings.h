@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QDockWidget>
 #include <set>
 
 
@@ -54,8 +55,23 @@
 class cedar::proc::gui::Settings : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  class DockSettings : public cedar::aux::Configurable
+  {
+    public:
+      DockSettings();
+
+      void getFrom(QDockWidget *pDock);
+      void setTo(QDockWidget *pDock);
+
+    private:
+      cedar::aux::BoolParameterPtr mVisible;
+      cedar::aux::BoolParameterPtr mFloating;
+  };
+
+  typedef boost::shared_ptr<DockSettings> DockSettingsPtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -79,6 +95,11 @@ public:
   const std::set<std::string>& pluginsToLoad();
   void addPluginToLoad(const std::string& path);
   void removePluginToLoad(const std::string& path);
+
+  DockSettingsPtr logSettings();
+  DockSettingsPtr toolsSettings();
+  DockSettingsPtr propertiesSettings();
+  DockSettingsPtr stepsSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,8 +128,14 @@ protected:
   // none yet
 
 private:
-  //!< List of plugins that should be loaded on startup.
+  //! List of plugins that should be loaded on startup.
   cedar::aux::StringSetParameterPtr mPluginsToLoad;
+
+  DockSettingsPtr mLog;
+  DockSettingsPtr mSteps;
+  DockSettingsPtr mTools;
+  DockSettingsPtr mProperties;
+
 }; // class cedar::proc::gui::Settings
 
 #endif // CEDAR_PROC_GUI_SETTINGS_H

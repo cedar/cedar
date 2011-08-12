@@ -38,6 +38,7 @@
 #include "processing/gui/Settings.h"
 #include "auxiliaries/Configurable.h"
 #include "auxiliaries/SetParameter.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/System.h"
 
 // PROJECT INCLUDES
@@ -53,7 +54,11 @@ cedar::proc::gui::Settings cedar::proc::gui::Settings::mInstance;
 
 cedar::proc::gui::Settings::Settings()
 :
-cedar::aux::Configurable()
+cedar::aux::Configurable(),
+mLog(new cedar::proc::gui::Settings::DockSettings()),
+mSteps(new cedar::proc::gui::Settings::DockSettings()),
+mTools(new cedar::proc::gui::Settings::DockSettings()),
+mProperties(new cedar::proc::gui::Settings::DockSettings())
 {
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
   this->addConfigurableChild("plugins", plugins);
@@ -69,7 +74,24 @@ cedar::aux::Configurable()
                    );
   plugins->registerParameter(mPluginsToLoad);
 
+  cedar::aux::ConfigurablePtr ui_settings(new cedar::aux::Configurable());
+  this->addConfigurableChild("ui", ui_settings);
+  
+  ui_settings->addConfigurableChild("log", mLog);
+  ui_settings->addConfigurableChild("steps", mSteps);
+  ui_settings->addConfigurableChild("tools", mTools);
+  ui_settings->addConfigurableChild("properties", mProperties);
+
   this->load();
+}
+
+cedar::proc::gui::Settings::DockSettings::DockSettings()
+:
+mVisible(new cedar::aux::BoolParameter("visible", true)),
+mFloating(new cedar::aux::BoolParameter("floating", false))
+{
+  this->registerParameter(this->mVisible);
+  this->registerParameter(this->mFloating);
 }
 
 cedar::proc::gui::Settings::~Settings()
@@ -80,6 +102,39 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
+{
+  this->mVisible->set(pDock->isVisible());
+  this->mFloating->set(pDock->isFloating());
+}
+
+void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
+{
+  pDock->setVisible(this->mVisible->get());
+  pDock->setFloating(this->mFloating->get());
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSettings()
+{
+  return this->mLog;
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::toolsSettings()
+{
+  return this->mTools;
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::propertiesSettings()
+{
+  return this->mProperties;
+}
+
+cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::stepsSettings()
+{
+  return this->mSteps;
+}
+
 
 cedar::proc::gui::Settings& cedar::proc::gui::Settings::instance()
 {

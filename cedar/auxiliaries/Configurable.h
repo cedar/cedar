@@ -85,11 +85,12 @@ public:
   void setName(const std::string& name);
   const std::string& getName() const;
 
+  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
 
   virtual void configurationLoaded();
 
