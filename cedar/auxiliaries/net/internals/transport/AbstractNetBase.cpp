@@ -44,6 +44,8 @@
 // PROJECT INCLUDES
 #include <yarp/conf/version.h>
 #include <yarp/os/impl/NameConfig.h>
+#include <yarp/os/impl/NameClient.h>
+
 
 // SYSTEM INCLUDES
 #include <unistd.h>
@@ -120,6 +122,12 @@ bool AbstractNetBase::startNameServer()
 
   pid= vfork(); // NEW PROCESS!
 
+  // (1) clean YARPs local "nameserver config file", which effectively
+  // serves as cache and just makes problems for us, when the nameserver
+  // changes. see (2)
+  yarp::os::impl::NameConfig nc;
+  nc.toFile(true); // clean configfile
+ 
   if ( pid < 0 )
   {
     // ERROR
@@ -136,12 +144,7 @@ bool AbstractNetBase::startNameServer()
     cout << "  executing yarp server" << endl;
 #endif
 
-    // clean YARPs local "nameserver config file", which effectively
-    // serves as cache and just makes problems for us, when the nameserver
-    // changes
-    yarp::os::impl::NameConfig nc;
-    nc.toFile(true); // clean configfile
-
+#if 1
     // swallow the output of the following yarp server command
     // (this redirect stdout of this process to /dev/null)
     int fh;
@@ -149,6 +152,7 @@ bool AbstractNetBase::startNameServer()
     fh = ::open("/dev/null", O_WRONLY);
     ::dup2(fh, 1);
     ::close(fh);
+#endif
 
     if (execlp("yarp", "yarp", "server", NULL) == -1)
     {
@@ -169,6 +173,12 @@ bool AbstractNetBase::startNameServer()
               // (fork doesnt guarantee the order of execution
               //  between child and parent)
               // it works okay, as we will only land here ONCE.
+
+    // (2) Yarp: this seems to be necessary so that we dont fail
+    //       the first time we look for the nameserver. see (1)
+    yarp::os::impl::NameClient& client = 
+               yarp::os::impl::NameClient::getNameClient();
+    client.updateAddress();
 
     mServerPID= pid; // remember child PID, see Destructor
     // PARENT ...
