@@ -22,59 +22,32 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        plugin.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 08 15
 
-    Description: Namespace file for cedar::dyn.
+    Description: This is the plugin file describing the cedar::dyn plugin.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DYN_NAMESPACE_H
-#define CEDAR_DYN_NAMESPACE_H
+#ifndef CEDAR_DYN_PLUGIN_H
+#define CEDAR_DYN_PLUGIN_H
 
 // LOCAL INCLUDES
 #include "dynamics/lib.h"
-
 #include "processing/PluginDeclaration.h"
 
-// PROJECT INCLUDES
+#ifdef MSVC // workaround for circular linking
+//!@todo Do this for GCC/linux as well?
+CEDAR_BEGIN_PLUGIN_DECLARATION
 
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <opencv2/opencv.hpp>
+CEDAR_DYN_LIB_EXPORT void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin);
 
+CEDAR_END_PLUGIN_DECLARATION
+#endif // MSVC
 
-namespace cedar
-{
-  /*!@brief Namespace for all dyn classes. */
-  namespace dyn
-  {
-    CEDAR_DECLARE_DYN_CLASS(Dynamics);
-
-    template <typename T> class Activation;
-    typedef Activation<double> DoubleActivation;
-    CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
-    typedef Activation<cv::Mat> MatActivation;
-    CEDAR_GENERATE_POINTER_TYPES(MatActivation);
-
-    CEDAR_DECLARE_DYN_CLASS(SpaceCode);
-    CEDAR_DECLARE_DYN_CLASS(NeuralField);
-
-#ifdef GCC
-    // for msvc, this is replaced by the plugin stuff below, currently as a workaround.
-    CEDAR_DYN_LIB_EXPORT void initialize();
-#endif // GCC
-  }
-}
-
-#endif // CEDAR_DYN_NAMESPACE_H
+#endif // CEDAR_DYN_PLUGIN_H

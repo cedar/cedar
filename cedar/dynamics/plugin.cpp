@@ -22,18 +22,19 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.cpp
+    File:        plugin.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2011 08 15
 
-    Description: Namespace file for cedar::dyn.
+    Description: This is the plugin file describing the cedar::dyn plugin.
 
     Credits:
 
 ======================================================================================================================*/
 
+#include "dynamics/plugin.h"
 #include "dynamics/namespace.h"
 #include "dynamics/fields/NeuralField.h"
 #include "processing/StepDeclaration.h"
