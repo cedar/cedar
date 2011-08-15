@@ -328,7 +328,8 @@ void cedar::proc::Step::onTrigger()
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   } // this->mMandatoryConnectionsAreSet
 
-  if (!this->mBusy)
+  //!@todo Should busy be a part of STATE_*?
+  if (!this->mBusy && this->mState != cedar::proc::Step::STATE_EXCEPTION)
   {
     this->setState(cedar::proc::Step::STATE_RUNNING, "");
     if (this->mRunInThread)
@@ -376,6 +377,7 @@ bool cedar::proc::Step::allInputsValid()
 
 void cedar::proc::Step::run()
 {
+  // the step is not executed when it has invalid inputs or it is in a state of an unhandled exception.
   if (!this->allInputsValid())
   {
     return;
@@ -401,7 +403,22 @@ void cedar::proc::Step::run()
 
   //!@todo this blocks writing of new arguments and thus (potentially) incoming trigger signals. Is this what we want?
   this->mpArgumentsLock->lockForRead();
-  this->compute(*(this->mNextArguments.get()));
+  try
+  {
+    this->compute(*(this->mNextArguments.get()));
+  }
+  catch(const cedar::aux::exc::ExceptionBase& e)
+  {
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
+  }
+  catch(const std::exception& e)
+  {
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
+  }
+  catch(...)
+  {
+    this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
+  }
   this->mpArgumentsLock->unlock();
 
   this->unlockAll();

@@ -79,7 +79,8 @@ public:
   {
     STATE_NONE,
     STATE_NOT_RUNNING,
-    STATE_RUNNING
+    STATE_RUNNING,
+    STATE_EXCEPTION
   };
 
   //--------------------------------------------------------------------------------------------------------------------

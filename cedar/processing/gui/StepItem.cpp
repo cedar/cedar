@@ -110,6 +110,7 @@ void cedar::proc::gui::StepItem::stepStateChanged()
 {
   switch (this->mStep->getState())
   {
+    case cedar::proc::Step::STATE_EXCEPTION:
     case cedar::proc::Step::STATE_NOT_RUNNING:
       this->setOutlineColor(Qt::darkGray);
       this->setFillColor(QColor(235, 235, 235));
@@ -119,7 +120,14 @@ void cedar::proc::gui::StepItem::stepStateChanged()
       this->setOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor);
       this->setFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor);
   }
-  this->setToolTip(this->mStep->getStateAnnotation().c_str());
+  // append <font>s to make this a rich text, thus automatically word-wrapping the tool tip.
+  const std::string& annotation = this->mStep->getStateAnnotation();
+  QString tool_tip = "";
+  if (!annotation.empty())
+  {
+    tool_tip = QString("<FONT COLOR=BLACK>") + annotation.c_str() + QString("</FONT>");
+  }
+  this->setToolTip(tool_tip);
   this->update();
 }
 
