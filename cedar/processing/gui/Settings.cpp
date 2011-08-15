@@ -111,12 +111,30 @@ cedar::proc::gui::Settings::~Settings()
 
 void cedar::proc::gui::Settings::storeMainWindow(QMainWindow *pWindow)
 {
-  //!@todo implement.
+  QByteArray window_state = pWindow->saveState();
+  QByteArray window_state_hex = window_state.toHex();
+  mMainWindowState->set(window_state_hex.constData());
+  
+  QByteArray window_geometry = pWindow->saveGeometry();
+  QByteArray window_geometry_hex = window_geometry.toHex();
+  mMainWindowGeometry->set(window_geometry_hex.constData());
 }
 
 void cedar::proc::gui::Settings::restoreMainWindow(QMainWindow *pWindow)
 {
-  //!@todo implement.
+  QByteArray window_state_hex(mMainWindowState->get().c_str());
+  QByteArray window_state = QByteArray::fromHex(window_state_hex);
+  if (!pWindow->restoreState(window_state))
+  {
+    std::cout << "Could not restore state of the main window." << std::endl;
+  }
+  
+  QByteArray window_geometry_hex(mMainWindowGeometry->get().c_str());
+  QByteArray window_geometry = QByteArray::fromHex(window_geometry_hex);
+  if (!pWindow->restoreGeometry(window_geometry))
+  {
+    std::cout << "Could not restore geometry of the main window." << std::endl;
+  }
 }
 
 void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
