@@ -68,6 +68,7 @@ mTimerId(0)
   mpImageDisplay = new QLabel("no image loaded");
   p_layout->addWidget(mpImageDisplay);
   mpImageDisplay->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  mpImageDisplay->setWordWrap(true);
 }
 
 cedar::aux::gui::ImagePlot::~ImagePlot()
