@@ -60,8 +60,8 @@ mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
-mMainWindowState(new cedar::aux::StringParameter("mainWindowState", "")),
-mMainWindowGeometry(new cedar::aux::StringParameter("mainWindowGeometry", ""))
+mMainWindowGeometry(new cedar::aux::StringParameter("mainWindowGeometry", "")),
+mMainWindowState(new cedar::aux::StringParameter("mainWindowState", ""))
 {
   this->registerParameter(mMainWindowState);
   this->registerParameter(mMainWindowGeometry);

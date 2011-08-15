@@ -268,7 +268,7 @@ void cedar::aux::gui::MatrixPlot2D::contextMenuEvent(QContextMenuEvent * pEvent)
   for (size_t i = 0; i < this->mPerspectives.size(); ++i)
   {
     QAction *p_action = p_perspectives->addAction(this->mPerspectives.at(i).getName().c_str());
-    p_action->setData(QVariant(i));
+    p_action->setData(QVariant(static_cast<uint>(i)));
   }
 
   menu.addSeparator();
