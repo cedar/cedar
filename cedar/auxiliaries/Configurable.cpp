@@ -60,12 +60,14 @@ cedar::aux::Configurable::Configurable()
 _mName(new cedar::aux::StringParameter("name", ""))
 {
   this->registerParameter(_mName);
+  this->_mName->setHidden(true);
 }
 
 
 cedar::aux::Configurable::~Configurable()
 {
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
