@@ -49,6 +49,8 @@
 #include "processing/Step.h"
 #include "processing/Group.h"
 #include "processing/DataSlot.h"
+#include "processing/Connection.h"
+#include "processing/Manager.h"
 #include "auxiliaries/Data.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/macros.h"
@@ -117,44 +119,53 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
     try
     {
       cedar::proc::StepPtr& step = steps_to_connect.at(i);
-      cedar::proc::Step::SlotMap& slot_map = step->getDataSlots(cedar::proc::DataRole::INPUT);
+
+      cedar::proc::gui::StepItem* p_source_step = this->mpScene->getStepItemFor(step.get());
+      CEDAR_DEBUG_ASSERT(p_source_step != NULL);
+
+      // get the input map
+      cedar::proc::Step::SlotMap& slot_map = step->getDataSlots(cedar::proc::DataRole::OUTPUT);
       for (cedar::proc::Step::SlotMap::iterator iter = slot_map.begin(); iter != slot_map.end(); ++iter)
       {
-        const cedar::aux::DataPtr& data = iter->second->getData();
-
-        // check if the data connection is set
-        if (!data)
-          continue;
-
-        cedar::proc::Step *p_owner = dynamic_cast<cedar::proc::Step*>(data->getOwner());
-        CEDAR_DEBUG_ASSERT(p_owner != NULL);
-
-        cedar::proc::gui::StepItem* p_source_step = this->mpScene->getStepItemFor(p_owner);
-        CEDAR_DEBUG_ASSERT(p_source_step != NULL);
-
+        const std::string& slot_name = iter->first;
         cedar::proc::gui::DataSlotItem *p_source_slot = p_source_step->getSlotItem
                                                                         (
                                                                           cedar::proc::DataRole::OUTPUT,
-                                                                          data->connectedSlotName()
+                                                                          slot_name
                                                                         );
         CEDAR_DEBUG_ASSERT(p_source_slot != NULL);
 
-        cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(step.get());
-        CEDAR_DEBUG_ASSERT(p_target_step != NULL);
+        std::vector<cedar::proc::Connection*> connections;
+        cedar::proc::Manager::getInstance().getConnections(step, slot_name, connections);
 
-        cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step->getSlotItem
-                                                                        (
-                                                                          cedar::proc::DataRole::INPUT,
-                                                                          iter->first
-                                                                        );
-        CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
+//        std::cout << "Step " << step->getName() << " has " << connections.size() << std::endl;
 
-        p_source_slot->connectTo(p_target_slot);
+        for(size_t c = 0; c < connections.size(); ++c)
+        {
+          cedar::proc::Connection* p_con = connections.at(c);
+
+          cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(p_con->getTarget().get());
+          CEDAR_DEBUG_ASSERT(p_target_step != NULL);
+
+          cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step->getSlotItem
+                                                                          (
+                                                                            cedar::proc::DataRole::INPUT,
+                                                                            p_con->getTargetName()
+                                                                          );
+          CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
+
+//          std::cout << "connecting " << step->getName() << "." << p_source_slot->getName() << " to "
+//                    << p_con->getTargetName() << "." << p_target_slot->getName() << std::endl;
+
+          cedar::proc::gui::Connection *p_ui_con = new cedar::proc::gui::Connection(p_source_slot, p_target_slot);
+          this->mpScene->addItem(p_ui_con);
+        }
       }
     }
     catch (const cedar::proc::InvalidRoleException&)
     {
       // ok -- some steps may not have inputs
+      std::cout << "Step " << steps_to_connect.at(i)->getName() << " has no outputs." << std::endl;
     }
   }
 }

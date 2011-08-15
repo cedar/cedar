@@ -621,6 +621,7 @@ cedar::proc::gui::TriggerItem* cedar::proc::gui::Scene::getTriggerItemFor(cedar:
   }
 }
 
+//!@todo Shouldn't this be const pointers?
 cedar::proc::gui::StepItem* cedar::proc::gui::Scene::getStepItemFor(cedar::proc::Step* step)
 {
   StepMap::iterator iter = this->mStepMap.find(step);

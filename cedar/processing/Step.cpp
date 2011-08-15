@@ -689,6 +689,7 @@ cedar::aux::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::str
 }
 
 
+//!@todo this function is semantically redundant with the Manager::connect method -- one of them should go.
 void cedar::proc::Step::connect(
                                  cedar::proc::StepPtr source,
                                  const std::string& sourceName,
