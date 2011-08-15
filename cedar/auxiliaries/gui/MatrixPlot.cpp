@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/gui/MatrixPlot.h"
+#include "auxiliaries/gui/MatrixPlot1D.h"
 #include "auxiliaries/gui/MatrixPlot2D.h"
 #include "auxiliaries/gui/exceptions.h"
 #include "auxiliaries/exceptions.h"
@@ -97,8 +98,8 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
     case 2:
       if ( (mat.rows == 1 || mat.cols == 1) && mat.rows != mat.cols)
       {
-        // TODO
-        std::cout << "cv::Mat vector plots aren't implemented yet; sorry :(" << std::endl;
+        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData);
+        this->layout()->addWidget(this->mpCurrentPlotWidget);
       }
       else
       {

@@ -42,6 +42,7 @@ cedar_add_library(cedaraux
   gui/Viewer.h
   gui/SceneWidget.h
   gui/MatrixPlot.h
+  gui/MatrixPlot1D.h
   gui/MatrixPlot2D.h
   gui/ImagePlot.h
   ParameterBase.h
