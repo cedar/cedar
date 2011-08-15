@@ -38,7 +38,9 @@
 #include "auxiliaries/macros.h"
 
 #ifdef WINDOWS
-#include <Windows.h>
+  #include <Windows.h>
+#else
+  #include <unistd.h>
 #endif // WINDOWS
 
 void cedar::aux::sleep(cedar::unit::Time time)
@@ -62,7 +64,7 @@ void cedar::aux::usleep(unsigned int microseconds)
 
 #else // WINDOWS
 
-#   error Implement me!
+  usleep(microseconds);
 
 #endif // WINDOWS
 }
@@ -72,6 +74,6 @@ void cedar::aux::sleep(unsigned int seconds)
 #ifdef WINDOWS
   Sleep(1000 * static_cast<DWORD>(seconds));
 #else
-#   error Implement me!
+  sleep(seconds);
 #endif
 }

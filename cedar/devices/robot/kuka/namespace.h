@@ -43,6 +43,7 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 

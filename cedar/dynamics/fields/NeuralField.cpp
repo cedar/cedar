@@ -180,16 +180,17 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
     CEDAR_DEBUG_ASSERT(this->_mSizes->get().size() == 1);
 
     // if the dimensions are both 1, rows or cols must be the same as the field size
-    if (this->_mSizes->get().at(0) != matrix.rows && this->_mSizes->get().at(0) != matrix.cols)
+    if (static_cast<int>(this->_mSizes->get().at(0)) != matrix.rows
+        && static_cast<int>(this->_mSizes->get().at(0)) != matrix.cols)
       return false;
   }
   else
   {
-    if (this->_mDimensionality->get() != matrix.dims)
+    if (static_cast<int>(this->_mDimensionality->get()) != matrix.dims)
       return false;
     for (unsigned int dim = 0; dim < this->_mSizes->get().size(); ++dim)
     {
-      if (matrix.size[static_cast<int>(dim)] != this->_mSizes->get().at(dim))
+      if (matrix.size[static_cast<int>(dim)] != static_cast<int>(this->_mSizes->get().at(dim)))
         return false;
     }
   }

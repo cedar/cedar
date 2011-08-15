@@ -453,6 +453,6 @@ void SerialCommunication::close()
       std::cout << "Serial Communication: Error Closing Port '" << _mDevicePath << "'\n";
     }
   }
-#endif WIN32
+#endif // WIN32
 }
 
