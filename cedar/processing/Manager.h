@@ -127,6 +127,13 @@ public:
                 cedar::proc::TriggerPtr trigger,
                 cedar::proc::TriggerPtr target
               );
+
+  void getConnections(
+                       cedar::proc::StepPtr source,
+                       const std::string& sourceDataName,
+                       std::vector<cedar::proc::Connection*>& connections //!@todo should be const pointers?
+                     );
+
   //!\ remove and disconnect a step
   void removeStep(cedar::proc::StepPtr step);
   //!\ remove and disconnect a trigger

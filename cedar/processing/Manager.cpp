@@ -217,6 +217,23 @@ cedar::proc::Manager& cedar::proc::Manager::getInstance()
   return cedar::proc::Manager::mManager;
 }
 
+void cedar::proc::Manager::getConnections(
+                                           cedar::proc::StepPtr source,
+                                           const std::string& sourceDataName,
+                                           std::vector<cedar::proc::Connection*>& connections
+                                         )
+{
+  connections.clear();
+  for (size_t i = 0; i < this->mConnections.size(); ++i)
+  {
+    cedar::proc::Connection *p_con = this->mConnections.at(i);
+    if (p_con->getSource() == source && p_con->getSourceName() == sourceDataName)
+    {
+      connections.push_back(p_con);
+    }
+  }
+}
+
 void cedar::proc::Manager::connect(
                                     cedar::proc::StepPtr source,
                                     const std::string& sourceName,

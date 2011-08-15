@@ -397,12 +397,12 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
   cedar::proc::Step::parseDataName(source, source_step, source_data);
   cedar::proc::Step::parseDataName(target, target_step, target_data);
 
-  cedar::proc::Step::connect(
-                              cedar::proc::Manager::getInstance().steps().get(source_step),
-                              source_data,
-                              cedar::proc::Manager::getInstance().steps().get(target_step),
-                              target_data
-                            );
+  cedar::proc::Manager::getInstance().connect(
+                                               cedar::proc::Manager::getInstance().steps().get(source_step),
+                                               source_data,
+                                               cedar::proc::Manager::getInstance().steps().get(target_step),
+                                               target_data
+                                             );
 }
 
 void cedar::proc::Network::saveDataConnections(cedar::aux::ConfigurationNode& root)
