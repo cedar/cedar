@@ -63,8 +63,8 @@ mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet (true),
-mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread)),
-mState(cedar::proc::Step::STATE_NONE)
+mState(cedar::proc::Step::STATE_NONE),
+mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
 {
   this->addTrigger(mFinished);
   this->registerParameter(mRunInThread);

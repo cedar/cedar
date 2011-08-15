@@ -63,17 +63,17 @@ DifferentialDrive::~DifferentialDrive()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double DifferentialDrive::getWheelDistance()
+double DifferentialDrive::getWheelDistance() const
 {
   return _mWheelDistance;
 }
 
-double DifferentialDrive::getWheelRadius()
+double DifferentialDrive::getWheelRadius() const
 {
   return _mWheelRadius;
 }
 
-std::vector<double> DifferentialDrive::getWheelSpeed()
+const std::vector<double>& DifferentialDrive::getWheelSpeed() const
 {
   return mWheelSpeed;
 }
@@ -152,7 +152,7 @@ int DifferentialDrive::setTurningRate(double turningRate)
   return s;
 }
 
-double DifferentialDrive::getMaximalWheelSpeed()
+double DifferentialDrive::getMaximalWheelSpeed() const
 {
   return mMaximalWheelSpeed;
 }

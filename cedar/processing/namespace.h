@@ -40,8 +40,6 @@
 
 // LOCAL INCLUDES
 #include "processing/lib.h"
-#include "auxiliaries/macros.h"
-
 #include "auxiliaries/AbstractFactory.h"
 
 // PROJECT INCLUDES
@@ -95,6 +93,8 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;
     class CEDAR_PROC_LIB_EXPORT MissingConnectionException;
+    class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
+    class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
   }
 }

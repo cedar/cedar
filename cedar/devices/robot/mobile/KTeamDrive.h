@@ -78,27 +78,27 @@ public:
   /*!@brief The get-function of the number of pulses per wheel-revolution.
    *@return Number of Pulses per Revolution.
    */
-  double getPulsesPerRevolution();
+  double getPulsesPerRevolution() const;
 
   /*!@brief The get-function of the maximal encoder value.
    *@return The maximal encoder value.
    */
-  int getMaximalEncoderValue();
+  int getMaximalEncoderValue() const;
 
   /*!@brief The get-function of the minimal encoder value.
    *@return The minimal encoder value.
    */
-  int getMinimalEncoderValue();
+  int getMinimalEncoderValue() const;
 
   /*!@brief The get-function of the distance one wheel moves each pulse.
    *@return The distance one wheel moves each pulse [in m].
    */
-  double getDistancePerPulse();
+  double getDistancePerPulse() const;
 
   /*!@brief The get-function of the maximum possible number of pulses per second.
    *@return The maximal number of pulses per second.
    */
-  int getMaximalNumberPulsesPerSecond();
+  int getMaximalNumberPulsesPerSecond() const;
 
   /*!@brief The get-function of left and right encoder values.
    *@param leftEncoder Variable the left encoder value shall be stored in.

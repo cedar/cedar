@@ -42,18 +42,17 @@
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot::mobile;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-  KTeamDriveModel::KTeamDriveModel(cedar::dev::robot::mobile::KTeamDrive *peDrive)
+  cedar::dev::robot::mobile::KTeamDriveModel::KTeamDriveModel(cedar::dev::robot::mobile::KTeamDrive *peDrive)
   {
     mInitialized = false;
     init(peDrive);
   }
-  KTeamDriveModel::~KTeamDriveModel()
+
+  cedar::dev::robot::mobile::KTeamDriveModel::~KTeamDriveModel()
   {
 
   }
@@ -62,9 +61,9 @@ using namespace cedar::dev::robot::mobile;
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int KTeamDriveModel::init(cedar::dev::robot::mobile::KTeamDrive *peDrive)
+int cedar::dev::robot::mobile::KTeamDriveModel::init(cedar::dev::robot::mobile::KTeamDrive *peDrive)
 {
-  if(mInitialized)
+  if(this->isInitialized())
   {
     if(mDebug)
     {
@@ -99,7 +98,12 @@ int KTeamDriveModel::init(cedar::dev::robot::mobile::KTeamDrive *peDrive)
   return 1;
 }
 
-void KTeamDriveModel::update()
+bool cedar::dev::robot::mobile::KTeamDriveModel::isInitialized() const
+{
+  return this->mInitialized;
+}
+
+void cedar::dev::robot::mobile::KTeamDriveModel::update()
 {
   //get new encoder-values
   int left_encoder;
@@ -139,7 +143,7 @@ void KTeamDriveModel::update()
   }
 }
 
-void KTeamDriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
+void cedar::dev::robot::mobile::KTeamDriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
 {
   //calculate the moved distance since last update
   double ds = calculateDifferencePosition(leftEncoder, mOldEncoder.at<int>(0,0),
@@ -158,15 +162,23 @@ void KTeamDriveModel::calculatePositionAndOrientation(int leftEncoder, int right
   setOrientation(new_orientation);
 }
 
-double KTeamDriveModel::calculateDifferencePosition(int newLeftEncoder, int oldLeftEncoder,
-                                                    int newRightEncoder, int oldRightEncoder)
+double cedar::dev::robot::mobile::KTeamDriveModel::calculateDifferencePosition(
+                                                                                int newLeftEncoder,
+                                                                                int oldLeftEncoder,
+                                                                                int newRightEncoder,
+                                                                                int oldRightEncoder
+                                                                              )
 {
   return ((newRightEncoder - oldRightEncoder)
           + (newLeftEncoder - oldLeftEncoder)) * mpeDrive->getDistancePerPulse() / 2;
 }
 
-double KTeamDriveModel::calculateDifferenceOrientation(int newLeftEncoder, int oldLeftEncoder,
-                                                       int newRightEncoder, int oldRightEncoder)
+double cedar::dev::robot::mobile::KTeamDriveModel::calculateDifferenceOrientation(
+                                                                                   int newLeftEncoder,
+                                                                                   int oldLeftEncoder,
+                                                                                   int newRightEncoder,
+                                                                                   int oldRightEncoder
+                                                                                 )
 {
   return ((newRightEncoder - oldRightEncoder) - (newLeftEncoder - oldLeftEncoder))
           * mpeDrive->getDistancePerPulse() / mpeDrive->getWheelDistance();

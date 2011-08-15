@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
+#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
 

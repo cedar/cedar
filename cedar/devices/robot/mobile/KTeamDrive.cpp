@@ -63,27 +63,27 @@ KTeamDrive::~KTeamDrive()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double KTeamDrive::getPulsesPerRevolution()
+double KTeamDrive::getPulsesPerRevolution() const
 {
   return _mPulsesPerRevolution;
 }
 
-int KTeamDrive::getMaximalEncoderValue()
+int KTeamDrive::getMaximalEncoderValue() const
 {
   return _mMaximalEncoderValue;
 }
 
-int KTeamDrive::getMinimalEncoderValue()
+int KTeamDrive::getMinimalEncoderValue() const
 {
   return _mMinimalEncoderValue;
 }
 
-double KTeamDrive::getDistancePerPulse()
+double KTeamDrive::getDistancePerPulse() const
 {
   return mDistancePerPulse;
 }
 
-int KTeamDrive::getMaximalNumberPulsesPerSecond()
+int KTeamDrive::getMaximalNumberPulsesPerSecond() const
 {
   return _mMaximalNumberPulsesPerSecond;
 }

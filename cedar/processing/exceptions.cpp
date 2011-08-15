@@ -65,6 +65,11 @@ cedar::proc::MissingConnectionException::MissingConnectionException()
   this->mType = "MissingConnectionException";
 }
 
+cedar::proc::MissingDeclarationException::MissingDeclarationException()
+{
+  this->mType = "MissingDeclarationException";
+}
+
 cedar::proc::InvalidArgumentsException::InvalidArgumentsException()
 {
   this->mType = "InvalidArgumentsException";
@@ -73,4 +78,9 @@ cedar::proc::InvalidArgumentsException::InvalidArgumentsException()
 cedar::proc::PluginException::PluginException()
 {
   this->mType = "PluginException";
+}
+
+cedar::proc::ParseException::ParseException()
+{
+  this->mType = "ParseException";
 }

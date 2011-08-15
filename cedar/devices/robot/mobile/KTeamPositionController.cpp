@@ -113,29 +113,29 @@ void KTeamPositionController::update()
   }
 }
 
-double KTeamPositionController::calculateTurningRate(double orientation, double distance)
+double KTeamPositionController::calculateTurningRate(double orientation, double distance) const
 {
   return mFactorTurningRate * distance * sin(orientation - getAngle(mpeModel->getPosition(), mTarget));
 }
 
-double KTeamPositionController::calculateForwardVelocity(double orientation, double distance)
+double KTeamPositionController::calculateForwardVelocity(double orientation, double distance) const
 {
   return mFactorVelocity * distance * (- cos(orientation - getAngle(mpeModel->getPosition(), mTarget)));
 }
 
-double KTeamPositionController::getDistance(cv::Mat robotPosition, cv::Mat targetPosition)
+double KTeamPositionController::getDistance(cv::Mat robotPosition, cv::Mat targetPosition) const
 {
   return sqrt(pow(targetPosition.at<double>(0,0) - robotPosition.at<double>(0,0),2)
               + pow(targetPosition.at<double>(1,0) - robotPosition.at<double>(1,0),2));
 }
 
-double KTeamPositionController::getAngle(cv::Mat robotPosition, cv::Mat targetPosition)
+double KTeamPositionController::getAngle(cv::Mat robotPosition, cv::Mat targetPosition) const
 {
   return atan2(targetPosition.at<double>(1,0) - robotPosition.at<double>(1,0),
                  targetPosition.at<double>(0,0) - robotPosition.at<double>(0,0));
 }
 
-cv::Mat KTeamPositionController::getTarget()
+cv::Mat KTeamPositionController::getTarget() const
 {
   return mTarget;
 }
