@@ -44,7 +44,6 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
 #include <boost/smart_ptr.hpp>
 
 namespace cedar

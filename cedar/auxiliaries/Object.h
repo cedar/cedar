@@ -78,19 +78,19 @@ public:
   cv::Mat getPosition();
 
   //!@brief returns x-position of the object frame origin in world frame
-  double getPositionX();
+  double getPositionX() const;
 
   //!@brief returns y-position of the object frame origin in world frame
-  double getPositionY();
+  double getPositionY() const;
 
   //!@brief returns z-position of the object frame origin in world frame
-  double getPositionZ();
+  double getPositionZ() const;
 
   //!@brief returns object frame orientation as a unit quaternion
-  double getOrientationQuaternion(unsigned int component);
+  double getOrientationQuaternion(unsigned int component) const;
 
   //!@brief returns object frame orientation as a unit quaternion
-  cv::Mat getOrientationQuaternion();
+  cv::Mat getOrientationQuaternion() const;
 
   //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
   cv::Mat getTransformation();

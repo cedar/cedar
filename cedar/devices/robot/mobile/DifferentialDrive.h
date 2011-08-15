@@ -66,7 +66,7 @@ public:
   DifferentialDrive();
 
   //!@brief Destructs the object.
-  virtual ~DifferentialDrive() = 0;
+  virtual ~DifferentialDrive();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -75,19 +75,19 @@ public:
 
   //!@brief The get-function of the distance between the 2 wheels.
   //!@return Distance between the wheels [in m]
-  double getWheelDistance();
+  double getWheelDistance() const;
 
   //!@brief The get-function of the wheel's radius.
   //!@return The wheel's radius [in m]
-  double getWheelRadius();
+  double getWheelRadius() const;
 
   //!@brief The get-function of the maximal wheel speed.
   //!@return The maximal wheel speed [in m/s]
-  double getMaximalWheelSpeed();
+  double getMaximalWheelSpeed() const;
 
   //!@brief The get-function of the current wheel speed.
   //!@return Vector including the wheel speed of the left (1st element) and right wheel (2nd element) [both in m/s]
-  std::vector<double> getWheelSpeed();
+  const std::vector<double>& getWheelSpeed() const;
 
   /*!@brief The set-function of the left and right wheel speed.
    *@param leftWheelSpeed The wheel speed of the left wheel to be set [in m/s].

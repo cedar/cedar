@@ -39,10 +39,6 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/lib.h"
-#if defined CEDAR_CLASS_PREFIX
-  #undef CEDAR_CLASS_PREFIX
-#endif // defined CEDAR_CLASS_PREFIX
-#define CEDAR_CLASS_PREFIX CEDAR_AUX_LIB_EXPORT
 #include "auxiliaries/macros.h"
 
 // SYSTEM INCLUDES
@@ -133,9 +129,7 @@ namespace cedar
       streamOut << value;
       return streamOut.str();
     }
-
-
-    /* data */
+    //!@brief class declaration of Data
     CEDAR_DECLARE_AUX_CLASS(Data);
 
     template <typename T> class DataT;

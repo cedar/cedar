@@ -50,7 +50,7 @@ using namespace cedar::dev::robot::mobile;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-EPuckDrive::EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, std::string config)
+EPuckDrive::EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, const std::string& config)
 : cedar::aux::ConfigurationInterface(config)
 {
   mInitialized = false;
@@ -154,7 +154,7 @@ int EPuckDrive::init(cedar::dev::com::SerialCommunication *peCommunication)
   }
 }
 
-bool EPuckDrive::isInitialized()
+bool EPuckDrive::isInitialized() const
 {
   return mInitialized;
 }

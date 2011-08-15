@@ -84,17 +84,20 @@ public:
   /*!@brief this function calculates the sigmoid function for a given double value.
    * All inherited classes have to implement this function.
    */
-  virtual double compute(double value) = 0;
+  virtual double compute(double value) const = 0;
 
   /*!@brief this function calculates the sigmoid function for a given float value.
    * Included for backward-compatibility
    */
-  virtual float compute(float value)
+  virtual float compute(float value) const
   {
     return static_cast<float>(compute(static_cast<double>(value)));
   }
 
-  /*!@brief this function calculates the sigmoid function for a matrix.
+  /*!@brief this function calculates the sigmoid function for an n-dimensional matrix.
+   *
+   * @todo write a non-templated function, which checks the type flag of cv::Mat and calls the correct templated compute
+   * function
    */
   template<typename T>
   cv::Mat compute(const cv::Mat& values)

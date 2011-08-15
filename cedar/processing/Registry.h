@@ -187,8 +187,8 @@ public:
         return iter->second;
       }
     }
-    //! @todo Throw Exception.
-    return DeclarationPointer();
+    // if this point is reached, no declaration was found - throw
+    CEDAR_THROW(cedar::proc::MissingDeclarationException, "cannot find a declaration that fits the given object");
   }
 
   bool testExists(const std::string& name) const
@@ -214,12 +214,9 @@ protected:
     {
       return iter->second->getObjectFactory()->allocate();
     }
-    else
-    {
-      CEDAR_THROW(cedar::proc::InvalidNameException, "Cannot allocate object of class \""
-                                                     + classId + "\": class unknown.")
-      return ObjectPointer();
-    }
+    // if this point is reached, no factory could be found for the given class id - throw
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Cannot allocate object of class \""
+                                                   + classId + "\": class unknown.")
   }
 
   //--------------------------------------------------------------------------------------------------------------------
