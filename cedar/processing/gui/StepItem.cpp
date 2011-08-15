@@ -291,6 +291,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QAction *p_delete_action = menu.addAction("delete");
 
   std::map<QAction*, cedar::aux::Enum> action_type_map;
+  bool has_data = false;
 
   for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
       enum_it != cedar::proc::DataRole::type().list().end();
@@ -318,12 +319,19 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
           p_action->setEnabled(false);
         }
         action_type_map[p_action] = e;
+        has_data = true;
       }
     }
     catch (const cedar::proc::InvalidRoleException& e)
     {
       // that's ok, a step may not have any data in a certain role.
     }
+  }
+
+  if (!has_data)
+  {
+    QAction *p_action = p_data->addAction("no data");
+    p_action->setEnabled(false);
   }
 
   QAction *a = menu.exec(event->screenPos());
