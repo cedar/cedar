@@ -93,7 +93,7 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
 if (UNIX)
-  add_definitions(-DLINUX -D__LINUX__)  
+  add_definitions(-DLINUX -D__LINUX__)
 endif (UNIX)
 
 if (WIN32)
