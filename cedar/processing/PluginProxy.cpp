@@ -89,27 +89,31 @@ std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file)
   }
 
   cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
-  searched_locs += settings.getPluginWorkspace() + "/" + file;
-  if (boost::filesystem::exists(settings.getPluginWorkspace() + "/" + file))
+  std::string loc = settings.getPluginWorkspace() + "/" + file;
+  searched_locs += loc;
+  if (boost::filesystem::exists(loc))
   {
-    return settings.getPluginWorkspace() + "/" + file;
+    return loc;
   }
 
   std::string ret_path;
   std::set<std::string>::const_iterator path = settings.getPluginDirectories().begin();
   std::set<std::string>::const_iterator path_end = settings.getPluginDirectories().end();
-  do
+  if (path != path_end)
   {
-    ret_path = (*path);
-    if (path->size() > 0 && path->at(path->size() - 1) != '/')
+    do
     {
-      ret_path += '/';
+      ret_path = (*path);
+      if (path->size() > 0 && path->at(path->size() - 1) != '/')
+      {
+        ret_path += '/';
+      }
+      ret_path += file;
+      searched_locs += ret_path + "\n";
+      ++path;
     }
-    ret_path += file;
-    searched_locs += ret_path + "\n";
-    ++path;
+    while (!boost::filesystem::exists(ret_path) && path != path_end);
   }
-  while (!boost::filesystem::exists(ret_path) && path != path_end);
 
   CEDAR_THROW(cedar::proc::PluginException, "Could not load plugin: file not found. Searched locations: " + searched_locs);
 
