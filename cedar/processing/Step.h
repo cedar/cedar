@@ -140,6 +140,11 @@ public:
   cedar::proc::DataSlotPtr getOutputSlot(const std::string& name);
   cedar::proc::DataSlotPtr getSlot(DataRole::Id role, const std::string& name);
 
+  cedar::proc::ConstDataSlotPtr getInputSlot(const std::string& name) const;
+  cedar::proc::ConstDataSlotPtr getBufferSlot(const std::string& name) const;
+  cedar::proc::ConstDataSlotPtr getOutputSlot(const std::string& name) const;
+  cedar::proc::ConstDataSlotPtr getSlot(DataRole::Id role, const std::string& name) const;
+
   static void connect(
                        cedar::proc::StepPtr source,
                        const std::string& sourceName,

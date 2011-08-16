@@ -91,7 +91,7 @@ void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepR
     }
     else
     {
-      icon = QIcon(":/steps/no_icon.png");
+      icon = QIcon(":/steps/no_icon.svg");
     }
     p_item->setIcon(icon);
 

@@ -129,8 +129,26 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(cedar::proc:
   if (slot->getValidlity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
   {
     cedar::aux::DataPtr data = slot->getData();
-    cedar::proc::DataSlot::VALIDITY validity = this->determineInputValidity(slot, data);
+
+    cedar::proc::DataSlot::VALIDITY validity;
+
+    if (!data)
+    {
+      if (slot->isMandatory())
+      {
+        validity = cedar::proc::DataSlot::VALIDITY_ERROR;
+      }
+      else
+      {
+        validity = cedar::proc::DataSlot::VALIDITY_VALID;
+      }
+    }
+    else
+    {
+      validity = this->determineInputValidity(slot, data);
+    }
     slot->setValidity(validity);
+
   }
   return slot->getValidlity();
 }
@@ -527,7 +545,38 @@ cedar::proc::DataSlotPtr cedar::proc::Step::getSlot(cedar::proc::DataRole::Id ro
   return slot_iter->second;
 }
 
+cedar::proc::ConstDataSlotPtr cedar::proc::Step::getSlot(cedar::proc::DataRole::Id role, const std::string& name) const
+{
+  std::map<DataRole::Id, SlotMap>::const_iterator slot_map_iter = this->mDataConnections.find(role);
+  if (slot_map_iter == this->mDataConnections.end())
+  {
+    std::string message = "Role not found in cedar::proc::Step::getSlot(";
+    message += cedar::proc::DataRole::type().get(role).name();
+    message += ", \"";
+    message += name;
+    message += "\").";
+    CEDAR_THROW(cedar::proc::InvalidRoleException, message);
+  }
+  const SlotMap& slot_map = slot_map_iter->second;
+  SlotMap::const_iterator slot_iter = slot_map.find(name);
+  if (slot_iter == slot_map.end())
+  {
+    std::string message = "Slot name not found in cedar::proc::Step::getSlot(";
+    message += cedar::proc::DataRole::type().get(role).name();
+    message += ", \"";
+    message += name;
+    message += "\").";
+    CEDAR_THROW(cedar::proc::InvalidNameException, message);
+  }
+  return slot_iter->second;
+}
+
 cedar::proc::DataSlotPtr cedar::proc::Step::getInputSlot(const std::string& name)
+{
+  return this->getSlot(cedar::proc::DataRole::INPUT, name);
+}
+
+cedar::proc::ConstDataSlotPtr cedar::proc::Step::getInputSlot(const std::string& name) const
 {
   return this->getSlot(cedar::proc::DataRole::INPUT, name);
 }
@@ -537,7 +586,17 @@ cedar::proc::DataSlotPtr cedar::proc::Step::getBufferSlot(const std::string& nam
   return this->getSlot(cedar::proc::DataRole::BUFFER, name);
 }
 
+cedar::proc::ConstDataSlotPtr cedar::proc::Step::getBufferSlot(const std::string& name) const
+{
+  return this->getSlot(cedar::proc::DataRole::BUFFER, name);
+}
+
 cedar::proc::DataSlotPtr cedar::proc::Step::getOutputSlot(const std::string& name)
+{
+  return this->getSlot(cedar::proc::DataRole::OUTPUT, name);
+}
+
+cedar::proc::ConstDataSlotPtr cedar::proc::Step::getOutputSlot(const std::string& name) const
 {
   return this->getSlot(cedar::proc::DataRole::OUTPUT, name);
 }

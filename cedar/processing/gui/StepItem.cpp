@@ -68,7 +68,7 @@ cedar::proc::gui::GraphicsBase(160, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
 mpMainWindow(pMainWindow),
-mStepIcon(":/steps/no_icon.png")
+mStepIcon(":/steps/no_icon.svg")
 {
   this->setStep(step);
   
@@ -81,7 +81,7 @@ cedar::proc::gui::GraphicsBase(160, 50,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP,
                                cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NONE),
 mpMainWindow(pMainWindow),
-mStepIcon(":/steps/no_icon.png")
+mStepIcon(":/steps/no_icon.svg")
 {
   this->construct();
 }
@@ -139,7 +139,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->mStepIcon = QIcon(this->mClassId->getIconPath().c_str());
   if (this->mStepIcon.isNull())
   {
-    this->mStepIcon = QIcon(":/steps/no_icon.png");
+    this->mStepIcon = QIcon(":/steps/no_icon.svg");
   }
 
   this->addDataItems();

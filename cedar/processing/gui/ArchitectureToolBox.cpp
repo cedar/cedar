@@ -57,9 +57,9 @@ cedar::proc::gui::ArchitectureToolBox::ArchitectureToolBox(QWidget *pParent)
 cedar::proc::gui::ToolBox(4, pParent),
 mpView(NULL)
 {
-  this->addItem(":/modeicons/select.png", "mode.Select", "selection mode");
-  this->addItem(":/modeicons/connect.png", "mode.Connect", "connection mode");
-  this->addItem(":/modeicons/group.png", "mode.Group", "grouping mode");
+  this->addItem(":/modeicons/select.svg", "mode.Select", "selection mode");
+  this->addItem(":/modeicons/connect.svg", "mode.Connect", "connection mode");
+  this->addItem(":/modeicons/group.svg", "mode.Group", "grouping mode");
   const cedar::proc::Manager::TriggerRegistry::Declarations& decls
            = cedar::proc::Manager::getInstance().triggers().declarations();
 
