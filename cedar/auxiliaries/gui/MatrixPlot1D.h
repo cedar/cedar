@@ -50,6 +50,8 @@
 // SYSTEM INCLUDES
 #include <QWidget>
 #include <QReadWriteLock>
+#include <qwt/qwt_plot.h>
+#include <qwt/qwt_plot_curve.h>
 #include <opencv2/opencv.hpp>
 
 
@@ -107,6 +109,10 @@ protected:
   // none yet
 private:
   cedar::aux::MatDataPtr mMatData;
+  QwtPlot *mpPlot;
+  QwtPlotCurve *mpCurve;
+  std::vector<double> mpXValues;
+  std::vector<double> mpYValues;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

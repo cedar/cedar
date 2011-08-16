@@ -47,6 +47,8 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QVBoxLayout>
+#include <QPalette>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,17 +88,81 @@ void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
                 "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot1D::display.");
   }
-  //!@todo implement
-  std::cout << "Sorry -- the matrixplot1d isn't implemented yet. That makes me a sad panda!" << std::endl;
+  if (this->mpCurve != NULL)
+  {
+    delete this->mpCurve;
+  }
+  this->mpCurve = new QwtPlotCurve("data");
+
+  data->lockForRead();
+  const cv::Mat& mat = this->mMatData->getData();
+  size_t num = static_cast<size_t>(mat.rows);
+  if (num == 1)
+  {
+    num = static_cast<size_t>(mat.cols);
+  }
+  data->unlock();
+  mpXValues.resize(num);
+  mpYValues.resize(num);
+
+  for (size_t i = 0; i < num; ++i)
+  {
+    mpXValues.at(i) = static_cast<double>(i);
+  }
+
+  this->mpCurve->setData(&this->mpXValues.at(0),
+                         &this->mpYValues.at(0),
+                         num);
+
+  this->mpCurve->attach(this->mpPlot);
+
+
   this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::MatrixPlot1D::init()
 {
-  //TODO
+  mpCurve = NULL;
+
+  QPalette palette = this->palette();
+  palette.setColor(QPalette::Window, Qt::white);
+  this->setPalette(palette);
+
+  QVBoxLayout *p_layout = new QVBoxLayout();
+  this->setLayout(p_layout);
+
+  mpPlot = new QwtPlot(this);
+  this->layout()->addWidget(mpPlot);
 }
 
 void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
 {
-  //TODO
+  const cv::Mat& mat = this->mMatData->getData();
+  this->mMatData->lockForRead();
+
+  CEDAR_DEBUG_ASSERT(mpXValues.size() == mpYValues.size());
+
+  for (size_t i = 0; i < mpXValues.size(); ++i)
+  {
+    switch (mat.type())
+    {
+      case CV_32F:
+        mpYValues.at(i) = mat.at<float>(static_cast<int>(i));
+        break;
+
+      case CV_64F:
+        mpYValues.at(i) = mat.at<double>(static_cast<int>(i));
+        break;
+
+      default:
+        std::cout << "Unhandled matrix type " << mat.type() << " in cedar::aux::gui::MatrixPlot1D::timerEvent"
+                  << std::endl;
+    }
+  }
+  this->mMatData->unlock();
+
+  this->mpCurve->setData(&this->mpXValues.at(0),
+                         &this->mpYValues.at(0),
+                         static_cast<int>(this->mpXValues.size()));
+  this->mpPlot->replot();
 }
