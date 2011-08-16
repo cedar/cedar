@@ -143,9 +143,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="252.54006"
-     inkscape:cy="69.392862"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="265.92566"
+     inkscape:cy="129.7909"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -164,7 +164,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -173,12 +173,17 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-652.3622)">
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:30;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-mid:none;marker-end:url(#Arrow2Send)"
-       d="m 185,225.25 c -2.76683,8.94768 -4.28125,18.45595 -4.28125,28.3125 0,52.86154 42.85721,95.71875 95.71875,95.71875 52.86154,0 95.71875,-42.85721 95.71875,-95.71875 0,-48.01376 -43.23042,-72.73689 -81.46875,-94.625"
-       transform="translate(0,652.3622)"
-       id="path2831"
-       sodipodi:nodetypes="csssc" />
+    <g
+       id="g2833">
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:30;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+         d="m 285.125,790.83095 -14.90625,26.03125 13.03125,7.46875 c 19.12109,10.94516 38.43416,22.20915 52.125,35.3125 13.69084,13.10335 21.78125,26.77625 21.78125,46.28125 0,44.75409 -35.96466,80.71875 -80.71875,80.71875 -44.75409,0 -80.71875,-35.96466 -80.71875,-80.71875 0,-8.32009 1.28782,-16.31678 3.625,-23.875 l 4.40625,-14.34375 -28.65625,-8.84375 -4.4375,14.3125 c -3.19648,10.33714 -4.9375,21.35699 -4.9375,32.75 0,60.96899 49.74976,110.7188 110.71875,110.7188 60.96899,0 110.71875,-49.74981 110.71875,-110.7188 0,-28.50876 -13.5473,-51.20382 -31.03125,-67.9375 -17.48395,-16.73368 -38.88276,-28.7758 -58,-39.71875 l -13,-7.4375 z"
+         id="path2831" />
+      <path
+         d="m 322.78727,871.50449 -67.37724,-80.232 103.30407,17.46817 c -24.23946,10.72367 -38.67119,36.11798 -35.92683,62.76383 z"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         id="path2839" />
+    </g>
     <path
        sodipodi:type="arc"
        style="fill:url(#radialGradient3600);fill-opacity:1;stroke:#000000;stroke-width:5.80900002;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
