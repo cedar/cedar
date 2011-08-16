@@ -133,7 +133,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
      inkscape:cx="184.95499"
-     inkscape:cy="218.67458"
+     inkscape:cy="217.24601"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -150,7 +150,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -167,7 +167,7 @@
        sodipodi:cy="278.21429"
        sodipodi:rx="94.64286"
        sodipodi:ry="94.64286"
-       d="m 296.42858,278.21429 a 94.64286,94.64286 0 1 1 -189.28572,0 94.64286,94.64286 0 1 1 189.28572,0 z"
+       d="m 296.42858,278.21429 c 0,52.26981 -42.37305,94.64286 -94.64286,94.64286 -52.26981,0 -94.64286,-42.37305 -94.64286,-94.64286 0,-52.2698 42.37305,-94.64286 94.64286,-94.64286 52.26981,0 94.64286,42.37306 94.64286,94.64286 z"
        transform="translate(-1.7857208,505.93363)" />
     <text
        xml:space="preserve"
@@ -179,10 +179,16 @@
          id="tspan3604"
          x="156.78571"
          y="840.93365">T</tspan></text>
-    <path
-       style="fill:none;stroke:#000000;stroke-width:30;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2Send)"
-       d="m 198.21428,880.21934 0,108.57143"
-       id="path3606"
-       sodipodi:nodetypes="cc" />
+    <g
+       id="g2831">
+      <path
+         style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:30;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Bitstream Charter;-inkscape-font-specification:Bitstream Charter"
+         d="m 183.21875,880.21875 0,108.5625 30,0 0,-108.5625 -30,0 z"
+         id="path3606" />
+      <path
+         d="m 234.5179,931.02348 -36.1595,98.33292 -36.15949,-98.33293 c 21.34855,15.70949 50.55707,15.61897 72.31899,10e-6 z"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         id="path2837" />
+    </g>
   </g>
 </svg>
