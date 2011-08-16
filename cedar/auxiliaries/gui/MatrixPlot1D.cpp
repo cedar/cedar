@@ -47,8 +47,10 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QPalette>
+#include <QMenu>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,6 +95,7 @@ void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
     delete this->mpCurve;
   }
   this->mpCurve = new QwtPlotCurve("data");
+  this->setPlotStyle(this->mpCurve);
 
   data->lockForRead();
   const cv::Mat& mat = this->mMatData->getData();
@@ -134,6 +137,33 @@ void cedar::aux::gui::MatrixPlot1D::init()
   mpPlot = new QwtPlot(this);
   this->layout()->addWidget(mpPlot);
 }
+
+void cedar::aux::gui::MatrixPlot1D::setPlotStyle(QwtPlotCurve *pCurve)
+{
+  QPen pen = pCurve->pen();
+  pen.setWidthF(2);
+  pCurve->setPen(pen);
+}
+
+void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
+{
+  QMenu menu(this);
+  QAction *p_antialiasing = menu.addAction("antialiasing");
+  p_antialiasing->setCheckable(true);
+  p_antialiasing->setChecked(this->mpCurve->testRenderHint(QwtPlotItem::RenderAntialiased));
+
+  QAction *p_action = menu.exec(pEvent->globalPos());
+  if (p_action == NULL)
+  {
+    return;
+  }
+
+  if (p_action == p_antialiasing)
+  {
+    this->mpCurve->setRenderHint(QwtPlotItem::RenderAntialiased, p_action->isChecked());
+  }
+}
+
 
 void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
 {
