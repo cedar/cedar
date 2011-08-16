@@ -60,7 +60,7 @@ namespace cedar
     template <typename TOut, typename TIn>
     TOut asserted_cast(TIn pIn)
     {
-      CEDAR_DEBUG_ASSERT(dynamic_cast<TOut>(pIn) != NULL);
+      CEDAR_DEBUG_ASSERT(dynamic_cast<TOut>(pIn) != 0);
       return static_cast<TOut>(pIn);
     }
   }
