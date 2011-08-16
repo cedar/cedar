@@ -79,12 +79,12 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   _mCenters->makeDefault();
   this->registerParameter(_mSizes);
   _mSizes->makeDefault();
-  _mSizes->setConstant(true);
   this->declareOutput("Gauss input");
   this->setOutput("Gauss input", mOutput);
   QObject::connect(_mAmplitude.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mSigmas.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mCenters.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mSizes.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
   QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
   this->updateMatrix();
 }
@@ -98,9 +98,9 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
   const std::vector<double>& sigmas = _mSigmas->get();
   const std::vector<unsigned int>& sizes_uint = _mSizes->get();
   kernel_parts.resize(dimensionality);
-  for (unsigned int dim = 0; dim < dimensionality; ++dim)
+  for (size_t dim = 0; dim < dimensionality; ++dim)
   {
-    kernel_parts.at(dim) = cv::Mat(10, 1, CV_32F);
+    kernel_parts.at(dim) = cv::Mat(static_cast<int>(sizes_uint.at(dim)), 1, CV_32F);
     CEDAR_DEBUG_ASSERT(sigmas.at(dim) > 0.0);
     for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
     {
@@ -117,7 +117,7 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
   }
   if (dimensionality == 1)
   {
-    mOutput->getData() = cv::Mat(sizes.at(0), 1, CV_32F);
+    mOutput->getData() = cv::Mat(static_cast<int>(sizes.at(0)), 1, CV_32F);
   }
   else
   {
