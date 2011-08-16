@@ -71,7 +71,7 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   _mDimensionality->set(2);
   this->registerParameter(_mDimensionality);
   _mSizes->makeDefault();
-  _mSizes->setConstant(true);
+  QObject::connect(_mSizes.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
   this->registerParameter(_mSizes);
   this->declareBuffer("activation");
 //  this->setBuffer("activation", mActivation);

@@ -91,7 +91,13 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
 void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
+{
+  this->updateMatrix();
+}
+
+void cedar::proc::source::GaussInput::updateMatrix()
 {
   std::vector<cv::Mat> kernel_parts;
   const unsigned int& dimensionality = _mDimensionality->get();
@@ -169,11 +175,6 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
     }
   }
   mOutput->unlock();
-}
-
-void cedar::proc::source::GaussInput::updateMatrix()
-{
-  this->compute(cedar::proc::Arguments());
 }
 
 void cedar::proc::source::GaussInput::updateDimensionality()
