@@ -52,12 +52,14 @@
 
 cedar::aux::Data::Data()
 :
+mpLock(new QReadWriteLock()),
 mpeOwner(NULL)
 {
 }
 
 cedar::aux::Data::~Data()
 {
+  delete mpLock;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,22 +68,7 @@ cedar::aux::Data::~Data()
 
 QReadWriteLock& cedar::aux::Data::getLock()
 {
-  return this->mLock;
-}
-
-void cedar::aux::Data::lockForRead()
-{
-  this->mLock.lockForRead();
-}
-
-void cedar::aux::Data::lockForWrite()
-{
-  this->mLock.lockForWrite();
-}
-
-void cedar::aux::Data::unlock()
-{
-  this->mLock.unlock();
+  return *this->mpLock;
 }
 
 cedar::aux::Configurable* cedar::aux::Data::getOwner() const
