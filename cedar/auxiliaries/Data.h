@@ -75,9 +75,21 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   QReadWriteLock& getLock();
-  void lockForRead();
-  void lockForWrite();
-  void unlock();
+
+  inline void lockForRead()
+  {
+    this->mpLock->lockForRead();
+  }
+
+  inline void lockForWrite()
+  {
+    this->mpLock->lockForWrite();
+  }
+
+  inline void unlock()
+  {
+    this->mpLock->unlock();
+  }
 
   template <typename T>
   T& getData()
@@ -115,7 +127,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  QReadWriteLock mLock;
+  QReadWriteLock *mpLock;
 
 private:
   cedar::aux::Configurable* mpeOwner; //!@todo This should be a base*, however, right now Base can't be used with Base*.

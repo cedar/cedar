@@ -207,21 +207,13 @@ void cedar::dyn::NeuralField::updateDimensionality()
   this->lockAll();
   if (new_dimensionality == 1)
   {
-    mActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat(sizes[0],1,CV_32F)));
-    mActivation->lockForWrite();
-    mActivation->getData() = cv::Mat(sizes[0],1,CV_32F);
-    mActivation->getData() = mRestingLevel->get();
-    mSigmoidalActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat::zeros(sizes[0],1,CV_32F)));
-    mSigmoidalActivation->lockForWrite();
+    mActivation->getData() = cv::Mat(sizes[0],1,CV_32F, cv::Scalar(mRestingLevel->get()));
+    mSigmoidalActivation->getData() = cv::Mat(sizes[0],1,CV_32F, cv::Scalar(0));
   }
   else
   {
-    mActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat(new_dimensionality,&sizes.at(0),CV_32F)));
-    mActivation->lockForWrite();
-    mActivation->getData() = mRestingLevel->get();
-    mSigmoidalActivation = cedar::dyn::SpaceCodePtr(new cedar::dyn::SpaceCode(cv::Mat(new_dimensionality,&sizes.at(0),CV_32F)));
-    mSigmoidalActivation->lockForWrite();
-    mSigmoidalActivation->getData() = 0.0;
+    mActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0),CV_32F, cv::Scalar(mRestingLevel->get()));
+    mSigmoidalActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0),CV_32F, cv::Scalar(0));
   }
   this->setBuffer("activation", mActivation);
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
