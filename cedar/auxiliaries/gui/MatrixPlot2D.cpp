@@ -158,6 +158,9 @@ double cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::operator()(double x, dou
   cv::Mat& mat = this->mMatData->getData();
   switch (mat.type())
   {
+    case CV_8U:
+      return static_cast<double>(mat.at<uint8_t>(row, col));
+
     case CV_32F:
       return static_cast<double>(mat.at<float>(row, col));
 
