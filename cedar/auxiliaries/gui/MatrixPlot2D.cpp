@@ -58,8 +58,7 @@
 
 cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
-mpFunction(NULL)
+cedar::aux::gui::DataPlotInterface(pParent)
 {
   this->init();
 }
@@ -89,41 +88,67 @@ cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cedar::aux::DataPtr matData, QWidget
 :
 cedar::aux::gui::DataPlotInterface(pParent),
 mShowGridLines(false),
-mpFunction(NULL)
+mppArrayData(NULL)
 {
   this->init();
   this->display(matData);
 }
 
-cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::Matrix2DFunction
-                                                 (
-                                                   cedar::aux::MatDataPtr matData,
-                                                   Qwt3D::GridPlot* plot
-                                                 )
-:
-Qwt3D::Function(plot),
-mMatData(matData)
-{
-  this->updateMatrix();
-}
-
-cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::Matrix2DFunction(Qwt3D::GridPlot* plot)
-:
-Qwt3D::Function(plot)
-{
-}
-
 cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
 {
-  if (mpFunction != NULL)
-  {
-    delete mpFunction;
-  }
+  this->deleteArrayData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gui::MatrixPlot2D::deleteArrayData()
+{
+  if (mppArrayData != NULL)
+  {
+    for (size_t i = 0; i < mDataRows; ++i)
+    {
+      delete[] mppArrayData[i];
+    }
+    mppArrayData = NULL;
+  }
+}
+
+void cedar::aux::gui::MatrixPlot2D::updateArrayData()
+{
+  cv::Mat data;
+  this->mMatData->lockForRead();
+  this->mMatData->getData().convertTo(data, CV_64F);
+  this->mMatData->unlock();
+
+  if (static_cast<size_t>(data.rows) != mDataRows || static_cast<size_t>(data.cols) != mDataCols)
+  {
+    this->deleteArrayData();
+  }
+
+  if (!mppArrayData)
+  {
+    mDataRows = static_cast<size_t>(data.rows);
+    mDataCols = static_cast<size_t>(data.cols);
+    mppArrayData = new Qwt3D::Triple*[mDataRows];
+    for (size_t i = 0; i < mDataRows; ++i)
+    {
+      mppArrayData[i] = new Qwt3D::Triple[mDataCols];
+    }
+  }
+
+  for (size_t i = 0; i < mDataRows; ++i)
+  {
+    for (size_t j = 0; j < mDataCols; ++j)
+    {
+      Qwt3D::Triple& val = mppArrayData[i][j];
+      val.x = static_cast<double>(i);
+      val.y = static_cast<double>(j);
+      val.z = data.at<double>(i, j);
+    }
+  }
+}
 
 void cedar::aux::gui::MatrixPlot2D::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
 {
@@ -132,48 +157,6 @@ void cedar::aux::gui::MatrixPlot2D::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
   pPlot->setShift(mShift[0], mShift[1], mShift[2]);
   pPlot->setZoom(mZoom);
 }
-
-void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::updateMatrix()
-{
-  this->mMatData->lockForRead();
-  this->mInternalMat = this->mMatData->getData().clone();
-  this->mMatData->unlock();
-
-  int x_mesh = this->mInternalMat.rows;
-  int y_mesh = this->mInternalMat.cols;
-  this->setMesh(x_mesh, y_mesh);
-  this->setDomain(0, x_mesh - 1, 0, y_mesh - 1);
-}
-
-void cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::setMatData(cedar::aux::MatDataPtr matData)
-{
-  this->mMatData = matData;
-}
-
-double cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::operator()(double x, double y)
-{
-  //!@todo properly map to some sort of bounds.
-  int row = static_cast<int>(x);
-  int col = static_cast<int>(y);
-  cv::Mat& mat = this->mMatData->getData();
-  switch (mat.type())
-  {
-    case CV_8U:
-      return static_cast<double>(mat.at<uint8_t>(row, col));
-
-    case CV_32F:
-      return static_cast<double>(mat.at<float>(row, col));
-
-    case CV_64F:
-      return static_cast<double>(mat.at<double>(row, col));
-
-    default:
-      CEDAR_THROW(cedar::aux::UnhandledTypeException,
-                  "Unhandled matrix type in cedar::aux::gui::MatrixPlot2D::Matrix2DFunction::operator().");
-      return 0;
-  }
-}
-
 
 void cedar::aux::gui::MatrixPlot2D::display(cedar::aux::DataPtr data)
 {
@@ -185,7 +168,6 @@ void cedar::aux::gui::MatrixPlot2D::display(cedar::aux::DataPtr data)
                 "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot2D::display.");
   }
 
-  this->mpFunction->setMatData(this->mMatData);
   this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
@@ -212,13 +194,10 @@ void cedar::aux::gui::MatrixPlot2D::init()
   this->mpPlot = new Qwt3D::GridPlot(this);
   p_layout->addWidget(this->mpPlot);
 
-  //!@todo Add these as options to a right-click context menu for the plot.
+  //!@todo Add this as an option to a right-click context menu for the plot.
   this->mpPlot->setCoordinateStyle(Qwt3D::BOX);
   this->resetPerspective();
   this->showGrid(false);
-
-  // create the function for displaying the matrix
-  this->mpFunction = new Matrix2DFunction(this->mpPlot);
 
   // apply the standard color vector
   Qwt3D::StandardColor col;
@@ -231,10 +210,9 @@ void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
 {
   if (this->isVisible() && this->mMatData)
   {
-    this->mpFunction->updateMatrix();
-    this->mpFunction->create();
-    this->mpPlot->updateData();
-    this->mpPlot->updateNormals();
+    this->updateArrayData();
+    CEDAR_DEBUG_ASSERT(this->mppArrayData != NULL);
+    this->mpPlot->createDataset(this->mppArrayData, mDataRows, mDataCols);
     this->mpPlot->updateGL();
   }
 }
