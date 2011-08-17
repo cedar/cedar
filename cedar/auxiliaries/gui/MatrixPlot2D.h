@@ -71,21 +71,6 @@ class cedar::aux::gui::MatrixPlot2D : public DataPlotInterface
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  class Matrix2DFunction : public Qwt3D::Function
-  {
-  public:
-    Matrix2DFunction(Qwt3D::GridPlot* plot);
-    Matrix2DFunction(cedar::aux::MatDataPtr matData, Qwt3D::GridPlot* plot);
-    double operator()(double x, double y);
-    void updateMatrix();
-    void setMatData(cedar::aux::MatDataPtr matData);
-
-  private:
-    cedar::aux::MatDataPtr mMatData;
-    cv::Mat mInternalMat;
-  };
-
 private:
   class Perspective
   {
@@ -143,6 +128,8 @@ protected:
 private:
   void init();
   void resetPerspective(size_t perspectiveIndex = 0);
+  void deleteArrayData();
+  void updateArrayData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -157,8 +144,11 @@ private:
 
   Qwt3D::GridPlot *mpPlot;
 
-  Matrix2DFunction *mpFunction;
   std::vector<Perspective> mPerspectives;
+
+  size_t mDataRows;
+  size_t mDataCols;
+  Qwt3D::Triple** mppArrayData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
