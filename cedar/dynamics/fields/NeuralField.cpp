@@ -91,6 +91,7 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 5.0, 2));
   this->declareBuffer("kernel");
   this->setBuffer("kernel", mKernel->getKernelRaw());
+  this->mKernel->hideDimensionality(true);
   this->addConfigurableChild("lateral kernel", this->mKernel);
 
   QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));

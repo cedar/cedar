@@ -119,6 +119,10 @@ public:
    */
   void setDimensionality(unsigned int dimensionality);
 
+  /*!\brief Hides the dimensionality parameter.
+   */
+  void hideDimensionality(bool hide);
+
 public slots:
   //!\todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
   void updateKernel();
