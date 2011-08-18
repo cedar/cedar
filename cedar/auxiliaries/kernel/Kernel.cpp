@@ -89,6 +89,11 @@ cedar::aux::kernel::Kernel::~Kernel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
+{
+  _mDimensionality->setHidden(hide);
+}
+
 QReadWriteLock* cedar::aux::kernel::Kernel::getReadWriteLock()
 {
   return mpReadWriteLockOutput;
