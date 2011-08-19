@@ -187,6 +187,27 @@ bool AbstractNetBase::startNameServer()
 
 }
 
+bool AbstractNetBase::checkNameServer()
+{
+  // look for existing name server
+  bool found= true;
+
+  found= yarp::os::NetworkBase::checkNetwork();
+
+  if (!found)
+  {
+    // check if requested
+
+    if (!startNameServer())  
+    {
+      CEDAR_THROW( cedar::aux::exc::NetMissingRessourceException,
+                   "YARP: no yarp name server found and cannot auto "
+                          "start one" );
+    }
+  }
+  return true;
+}
+
 void AbstractNetBase::lateConstruct()
 {
 #ifdef DEBUG_NETT
@@ -197,25 +218,6 @@ void AbstractNetBase::lateConstruct()
   // not from this class(!) as we want to call virtual functions
   // and this ist forbidden from inside a base-class constructor
 
-  // look for existing name server
-  bool found= true;
-
-  found= yarp::os::NetworkBase::checkNetwork();
-
-  if (!found)
-  {
-    // the first NetReader or NetWriter to be initialized will
-    // start a new nameserver (if none was running)
-
-#if 1
-    if (!startNameServer())  
-#endif      
-    {
-      CEDAR_THROW( cedar::aux::exc::NetMissingRessourceException,
-                   "YARP: no yarp name server found and cannot auto "
-                          "start one" );
-    }
-  }
 
   if (!open()) // open with the virtual function open() 
   {            // implemented in a derived class
