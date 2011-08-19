@@ -146,8 +146,10 @@ protected:
   // private methods
   //---------------------------------------------------------------------------
 private:
-  //!@brief helper function to start an (external YARP name server)
+  //!@brief helper function to start an (external YARP) name server
   bool startNameServer();
+  //!@brief helper function to check and start an (external YARP) name server 
+  bool checkNameServer();
 
 }; // class end
 
