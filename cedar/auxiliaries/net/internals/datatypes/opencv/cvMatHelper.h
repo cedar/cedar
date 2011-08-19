@@ -57,6 +57,7 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+//!@brief a helper class which implements InterfacCollatedData for opencv types
 template <typename CVT>
 class cvMatHelper  : virtual protected InterfaceCollatedData<CVT>
 {
@@ -71,7 +72,9 @@ private:
   HeaderType mCheckHeader; // local info about matrix-header, to compare
                            // with future user inputs
 
+  //!@brief prepare (init) the external data, which will be sent
   void init_externalheader(const CVT &mat, HeaderType &extheader);
+  //!@brief prepare (init) the local copy of the header for comparisons
   void init_checkheader(const HeaderType &extheader);
 
 
@@ -79,7 +82,9 @@ private:
   // protected methods
   //---------------------------------------------------------------------------
 protected:
+  //!@brief check the data before writing it (opencv implementation)
   bool check_collateddata_for_write(const CVT &mat, HeaderType &extheader);
+  //!@brief check the data before reading it (opencv implementation)
   bool check_collateddata_for_read(const HeaderType &extheader);
 
   //---------------------------------------------------------------------------
