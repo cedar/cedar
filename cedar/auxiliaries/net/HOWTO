@@ -67,6 +67,17 @@ automatically seems pratical, be aware of the disadvantages:
 At the moment, we use TCP/IP as network protocoll. Even locally.
 
 
+Question: When does my data leave the machine/arrive?
+-----------------------------------------------------
+
+The NetWriter and NetReader are internally buffered, which means that
+the read() and write() functions may(!) return before the data has actually
+left the machine or may be buffered until you call read() to get the data.
+
+The readers especially only have a buffer-size of one and will only
+hold the newest arrived data.
+
+
 Question: The 'channel's I define are not the ones I see YARP using
 -------------------------------------------------------------------
 You have to pass a 'channel'-name-string to the constructors of the

@@ -76,7 +76,7 @@ const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
 // constructors and destructor
 //-----------------------------------------------------------------------------
 
-AbstractNetBase::AbstractNetBase(const string &myPortNameWithSuffix) 
+AbstractNetBase::AbstractNetBase(const std::string &myPortNameWithSuffix) 
           : mNetwork(), mFullPortName(), mIsConnected(false)
 {
 #ifdef DEBUG_NETT
@@ -236,7 +236,7 @@ void AbstractNetBase::lateDestruct()
 }
 
 // this connection may fail (without throwing an exception!)
-bool AbstractNetBase::connectTwo(const string &writerPort, const string &readerPort)
+bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::string &readerPort)
 {
 #ifdef DEBUG_NETT
 //  cout << "  AbstractNetBase [connectTwo]" << endl;
@@ -266,7 +266,7 @@ bool AbstractNetBase::connectTwo(const string &writerPort, const string &readerP
 }
 
 // this connection may fail (without throwing an exception!)
-bool AbstractNetBase::connectTo(const string &writerPort)
+bool AbstractNetBase::connectTo(const std::string &writerPort)
 {
 #ifdef DEBUG_NETT
   cout << "connect " <<  getFullPortName() << " to "  << writerPort  << endl;

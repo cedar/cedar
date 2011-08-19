@@ -80,13 +80,13 @@ template <typename CVT> void cvMatHelper<CVT>::init_checkheader(
 // init the *external* header from the matrix, that will be sent over the line
 template <typename CVT> void cvMatHelper<CVT>::cvMatHelper::init_externalheader(
                                                    const CVT &mat,
-                                                   HeaderType &header)
+                                                   HeaderType &extheader)
 {
-  header.cols= mat.cols;
-  header.rows= mat.rows;
-  header.elemSize= mat.elemSize();
-  header.cvMatType= mat.type();
-  header.magicNumber= CONST_MAGIC_NUMBER;
+  extheader.cols= mat.cols;
+  extheader.rows= mat.rows;
+  extheader.elemSize= mat.elemSize();
+  extheader.cvMatType= mat.type();
+  extheader.magicNumber= CONST_MAGIC_NUMBER;
 }
 
 // check the data before we write it over the network.

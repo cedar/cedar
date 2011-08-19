@@ -63,6 +63,7 @@ namespace cedar {
 
 //////////////// OPENCV SPECIALIZATION of our traits class
 
+//!@brief collated_traits implementation for cv::Mat
 template<>
 struct cedar::aux::net::detail::collated_traits<cv::Mat>
 {
@@ -71,6 +72,7 @@ struct cedar::aux::net::detail::collated_traits<cv::Mat>
   typedef cedar::aux::net::detail::cvMatNetHeader header_type;
 };
 
+//!@brief collated_traits implementation for cv::Mat_<float> 
 template<>
 struct cedar::aux::net::detail::collated_traits< cv::Mat_<float> >
 {
