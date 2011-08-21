@@ -102,12 +102,22 @@ cedar::proc::StepPtr cedar::proc::Connection::getSource()
   return this->mSource;
 }
 
+cedar::proc::ConstStepPtr cedar::proc::Connection::getSource() const
+{
+  return this->mSource;
+}
+
 const std::string& cedar::proc::Connection::getSourceName() const
 {
   return this->mSourceName;
 }
 
 cedar::proc::StepPtr cedar::proc::Connection::getTarget()
+{
+  return this->mTarget;
+}
+
+cedar::proc::ConstStepPtr cedar::proc::Connection::getTarget() const
 {
   return this->mTarget;
 }

@@ -44,6 +44,7 @@
 #include "processing/Step.h"
 #include "processing/DataSlot.h"
 #include "processing/Group.h"
+#include "processing/Connection.h"
 #include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
@@ -343,42 +344,16 @@ void cedar::proc::Network::readGroups(const cedar::aux::ConfigurationNode& root)
   }
 }
 
-void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& connections, cedar::proc::StepPtr& target)
+void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::Connection* pConnection)
 {
-  try
-  {
-    cedar::proc::Step::SlotMap& inputs = target->getDataSlots(cedar::proc::DataRole::INPUT);
-    for (cedar::proc::Step::SlotMap::iterator iter = inputs.begin(); iter != inputs.end(); ++iter)
-    {
-      cedar::aux::DataPtr data = iter->second->getData();
+  //!@todo move this code to the connection class?
+  std::string source_str = pConnection->getSource()->getName() + "." + pConnection->getSourceName();
+  std::string target_str = pConnection->getTarget()->getName() + "." + pConnection->getTargetName();
 
-      // check if the data connection is set
-      if (!data)
-        continue;
-
-      const std::string& target_data_name = iter->first;
-      cedar::proc::Step* source = dynamic_cast<cedar::proc::Step*>(data->getOwner());
-      CEDAR_DEBUG_ASSERT(source != NULL);
-      const std::string& source_data_name = data->connectedSlotName();
-
-      if (source_data_name.empty())
-      {
-        continue;
-      }
-
-      std::string source_str = source->getName() + "." + source_data_name;
-      std::string target_str = target->getName() + "." + target_data_name;
-
-      cedar::aux::ConfigurationNode connection;
-      connection.put("source", source_str);
-      connection.put("target", target_str);
-      connections.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
-    }
-  }
-  catch (const cedar::proc::InvalidRoleException&)
-  {
-    // ok; step apparently has no inputs
-  }
+  cedar::aux::ConfigurationNode connection;
+  connection.put("source", source_str);
+  connection.put("target", target_str);
+  root.push_back(cedar::aux::ConfigurationNode::value_type("", connection));
 }
 
 void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNode& root)
@@ -407,10 +382,10 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
 
 void cedar::proc::Network::saveDataConnections(cedar::aux::ConfigurationNode& root)
 {
-  for (size_t i = 0; i < this->mSteps.size(); ++i)
+  const std::vector<cedar::proc::Connection*>& connections = cedar::proc::Manager::getInstance().getConnections();
+  for (std::vector<cedar::proc::Connection*>::const_iterator iter = connections.begin(); iter != connections.end(); ++iter)
   {
-    cedar::proc::StepPtr& step = this->mSteps.at(i);
-    this->saveDataConnection(root, step);
+    this->saveDataConnection(root, *iter);
   }
 }
 
