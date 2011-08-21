@@ -94,7 +94,7 @@ void cedar::proc::gui::DirectoryParameter::parameterPointerChanged()
   this->mpEdit->setText(parameter->get().absolutePath());
   this->mpEdit->setReadOnly(true);
 
-  QObject::connect(parameter.get(), SIGNAL(parameterChanged()), this, SLOT(parameterValueChanged()));
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
 }
 
 void cedar::proc::gui::DirectoryParameter::parameterValueChanged()

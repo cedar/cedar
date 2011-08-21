@@ -130,7 +130,7 @@ public:
   void set(const std::set<T>& values)
   {
     this->mValues = values;
-    emit parameterChanged();
+    emit valueChanged();
   }
 
   void makeDefault()

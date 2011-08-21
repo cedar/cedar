@@ -71,7 +71,7 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   _mDimensionality->set(2);
   this->registerParameter(_mDimensionality);
   _mSizes->makeDefault();
-  QObject::connect(_mSizes.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   this->registerParameter(_mSizes);
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
@@ -94,7 +94,7 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   this->mKernel->hideDimensionality(true);
   this->addConfigurableChild("lateral kernel", this->mKernel);
 
-  QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
+  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
 
   // now check the dimensionality and sizes of all matrices
   this->updateDimensionality();

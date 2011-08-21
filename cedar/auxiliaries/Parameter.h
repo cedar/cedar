@@ -102,7 +102,7 @@ public:
   void set(const T& value)
   {
     this->mValue = value;
-    emit parameterChanged();
+    emit valueChanged();
   }
 
   void setTo(const cedar::aux::ConfigurationNode& node)

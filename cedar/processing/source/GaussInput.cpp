@@ -81,11 +81,11 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   _mSizes->makeDefault();
   this->declareOutput("Gauss input");
   this->setOutput("Gauss input", mOutput);
-  QObject::connect(_mAmplitude.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mSigmas.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mCenters.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mSizes.get(), SIGNAL(parameterChanged()), this, SLOT(updateMatrix()));
-  QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
+  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mCenters.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateMatrix()));
+  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   this->updateMatrix();
 }
 //----------------------------------------------------------------------------------------------------------------------
