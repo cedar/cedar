@@ -71,7 +71,7 @@ cedar::aux::ParameterBase::~ParameterBase()
 
 void cedar::aux::ParameterBase::emitChangedSignal()
 {
-  emit parameterChanged();
+  emit valueChanged();
 }
 
 bool cedar::aux::ParameterBase::isHidden() const

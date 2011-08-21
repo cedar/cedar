@@ -168,7 +168,7 @@ public:
   void set(const std::vector<T>& values)
   {
     this->mValues = values;
-    emit parameterChanged();
+    emit valueChanged();
   }
 
   void makeDefault()

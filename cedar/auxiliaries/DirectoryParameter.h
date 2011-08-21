@@ -96,13 +96,13 @@ public:
   void set(const std::string& value)
   {
     this->mValue.setPath(QString(value.c_str()));
-    emit parameterChanged();
+    emit valueChanged();
   }
 
   void set(const QDir& value)
   {
     this->mValue = value;
-    emit parameterChanged();
+    emit valueChanged();
   }
 
   void makeDefault()

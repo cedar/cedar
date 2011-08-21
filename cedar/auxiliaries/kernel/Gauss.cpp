@@ -106,11 +106,11 @@ cedar::aux::kernel::Gauss::~Gauss()
 void cedar::aux::kernel::Gauss::onInit()
 {
   calculate();
-  QObject::connect(_mAmplitude.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mLimit.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mSigmas.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mShifts.get(), SIGNAL(parameterChanged()), this, SLOT(updateKernel()));
-  QObject::connect(_mDimensionality.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
+  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mLimit.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mShifts.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
 }
 
 void cedar::aux::kernel::Gauss::calculate()
