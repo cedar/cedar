@@ -120,6 +120,9 @@ public:
   cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
   cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
 
+  bool getSnapToGrid() const;
+  void setSnapToGrid(bool snap);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -173,6 +176,8 @@ private:
 
   StepMap mStepMap;
   TriggerMap mTriggerMap;
+
+  bool mSnapToGrid;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

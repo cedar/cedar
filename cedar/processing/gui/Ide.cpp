@@ -88,8 +88,10 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
   QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
+  QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
 
   mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
+
   this->resetTo(mNetwork);
 
   this->restoreSettings();
@@ -102,6 +104,22 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::toggleGrid(bool triggered)
+{
+  this->mpProcessingDrawer->getScene()->setSnapToGrid(triggered);
+
+  if (triggered)
+  {
+    QBrush grid(Qt::CrossPattern);
+    grid.setColor(QColor(230, 230, 230));
+    this->mpProcessingDrawer->getScene()->setBackgroundBrush(grid);
+  }
+  else
+  {
+    this->mpProcessingDrawer->getScene()->setBackgroundBrush(Qt::white);
+  }
+}
 
 void cedar::proc::gui::Ide::closeEvent(QCloseEvent *pEvent)
 {

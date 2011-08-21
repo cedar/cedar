@@ -67,7 +67,8 @@ mMode(MODE_SELECT),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
 mpGroupIndicator(NULL),
-mpMainWindow(pMainWindow)
+mpMainWindow(pMainWindow),
+mSnapToGrid(false)
 {
 }
 
@@ -78,6 +79,16 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Scene::getSnapToGrid() const
+{
+  return this->mSnapToGrid;
+}
+
+void cedar::proc::gui::Scene::setSnapToGrid(bool snap)
+{
+  this->mSnapToGrid = snap;
+}
 
 void cedar::proc::gui::Scene::reset()
 {

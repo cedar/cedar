@@ -83,6 +83,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   void keyPressEvent(QKeyEvent* pEvent);
+
 public slots:
   void sceneItemSelected();
 
@@ -104,6 +105,8 @@ public slots:
   void showLoadPluginDialog();
 
   void showManagePluginsDialog();
+
+  void toggleGrid(bool toggled);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
