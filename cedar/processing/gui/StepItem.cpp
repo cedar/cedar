@@ -131,6 +131,11 @@ void cedar::proc::gui::StepItem::stepStateChanged()
   this->update();
 }
 
+void cedar::proc::gui::StepItem::redraw()
+{
+  this->update();
+}
+
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
   this->mStep = step;
@@ -146,6 +151,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addTriggerItems();
 
   QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
+  QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 }
 
 void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)

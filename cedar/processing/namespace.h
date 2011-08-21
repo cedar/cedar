@@ -64,7 +64,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(StepTime);
     CEDAR_DECLARE_PROC_CLASS(Trigger);
     CEDAR_DECLARE_PROC_CLASS(Group);
-    template <class T, class T_Declaration> class Registry;
     
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
@@ -85,10 +84,17 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
 
+    template <class T, class T_Declaration> class Registry;
+    typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
+    CEDAR_GENERATE_POINTER_TYPES(StepRegistry);
+    typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
+    CEDAR_GENERATE_POINTER_TYPES(TriggerRegistry);
+
     /* Exceptions */
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;
+    class CEDAR_PROC_LIB_EXPORT InvalidObjectException;
     class CEDAR_PROC_LIB_EXPORT InvalidRoleException;
     class CEDAR_PROC_LIB_EXPORT InvalidArgumentsException;
     class CEDAR_PROC_LIB_EXPORT InvalidCategoryException;

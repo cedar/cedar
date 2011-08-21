@@ -74,6 +74,7 @@ public:
    typedef boost::shared_ptr<T> ObjectPointer;
    typedef boost::shared_ptr<T_Declaration> DeclarationPointer;
    typedef std::map<std::string, DeclarationPointer> Declarations;
+   typedef std::map<std::string, ObjectPointer> ObjectStorage;
 
    typedef std::set<std::string> CategoryList;
    typedef std::vector<DeclarationPointer> CategoryEntries;
@@ -95,6 +96,7 @@ public:
       CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate object entry: " + object->getName());
     }
     mObjects[object->getName()] = object;
+    object->setRegistry(this);
   }
 
   void renameObject(const std::string& oldName, const std::string& newName)
@@ -107,6 +109,28 @@ public:
     object->setName(newName);
   }
 
+  void updateObjectName(T* object)
+  {
+    for (typename ObjectStorage::const_iterator iter = this->mObjects.begin(); iter != this->mObjects.end(); ++iter)
+    {
+      if (iter->second.get() == object)
+      {
+        std::string old_name = iter->first;
+        ObjectPointer object_ptr = iter->second;
+        
+        if (this->mObjects.find(object->getName()) != this->mObjects.end())
+        {
+          CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate object name: " + object->getName());
+        }
+
+        this->mObjects.erase(iter);
+        mObjects[object->getName()] = object_ptr;
+        return;
+      }
+    }
+    CEDAR_THROW(cedar::proc::InvalidObjectException, "Object not found in registry. Current object name: " + object->getName());
+  }
+
   void removeObject(const std::string& name)
   {
     ObjectPointer object = this->get(name);
@@ -116,7 +140,7 @@ public:
 
   ObjectPointer get(const std::string& name)
   {
-    typename std::map<std::string, ObjectPointer>::iterator iter = this->mObjects.find(name);
+    typename ObjectStorage::iterator iter = this->mObjects.find(name);
     if (iter != this->mObjects.end())
     {
       return iter->second;
@@ -245,7 +269,7 @@ protected:
 
 private:
   std::map<std::string, DeclarationPointer> mDeclarations;
-  std::map<std::string, ObjectPointer> mObjects;
+  ObjectStorage mObjects;
 
   CategoryList mCategories;
   Categories mDeclarationsByCategory;

@@ -67,14 +67,14 @@ cedar::proc::gui::StepClassList::~StepClassList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::StepClassList::showList(const cedar::proc::Manager::StepRegistry::CategoryEntries& entries)
+void cedar::proc::gui::StepClassList::showList(const cedar::proc::StepRegistry::CategoryEntries& entries)
 {
   using cedar::proc::Manager;
   using cedar::proc::StepDeclarationPtr;
 
   this->clear();
 
-  for (Manager::StepRegistry::CategoryEntries::const_iterator iter = entries.begin(); iter != entries.end(); ++iter)
+  for (cedar::proc::StepRegistry::CategoryEntries::const_iterator iter = entries.begin(); iter != entries.end(); ++iter)
   {
     const StepDeclarationPtr& class_id = *iter;
     QString label = class_id->getClassName().c_str();

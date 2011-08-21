@@ -67,6 +67,9 @@ cedar::proc::Manager cedar::proc::Manager::mManager;
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::Manager::Manager()
+:
+mStepRegistry(new cedar::proc::StepRegistry()),
+mTriggerRegistry(new cedar::proc::TriggerRegistry())
 {
   /*!
    *@todo find a better way to load declarations here; mostly, this can be a problem, if other modules want to declare
@@ -134,9 +137,9 @@ cedar::proc::GroupPtr cedar::proc::Manager::getGroup(const std::string& name)
   return cedar::proc::GroupPtr();
 }
 
-cedar::proc::Manager::StepRegistry& cedar::proc::Manager::steps()
+cedar::proc::StepRegistry& cedar::proc::Manager::steps()
 {
-  return this->mStepRegistry;
+  return *this->mStepRegistry;
 }
 
 void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)
@@ -185,9 +188,9 @@ void cedar::proc::Manager::stopThreads()
   }
 }
 
-cedar::proc::Manager::TriggerRegistry& cedar::proc::Manager::triggers()
+cedar::proc::TriggerRegistry& cedar::proc::Manager::triggers()
 {
-  return this->mTriggerRegistry;
+  return *this->mTriggerRegistry;
 }
 
 cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()

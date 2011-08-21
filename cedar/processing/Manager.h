@@ -56,6 +56,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <QObject>
 
 
 /*!@brief Abstract description of the class.
@@ -68,8 +69,6 @@ class cedar::proc::Manager
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
-  typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
   typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
   typedef std::set<cedar::proc::GroupPtr> GroupRegistry; //!<@todo Use a name instead?
 
@@ -175,9 +174,9 @@ private:
   static Manager mManager;
 
   //! a registry for all managed steps
-  StepRegistry mStepRegistry;
+  StepRegistryPtr mStepRegistry;
   //! a registry for all managed triggers
-  TriggerRegistry mTriggerRegistry;
+  TriggerRegistryPtr mTriggerRegistry;
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
   //! a registry for all managed groups

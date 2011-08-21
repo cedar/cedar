@@ -45,6 +45,11 @@ cedar::proc::InvalidNameException::InvalidNameException()
   this->mType = "InvalidNameException";
 }
 
+cedar::proc::InvalidObjectException::InvalidObjectException()
+{
+  this->mType = "InvalidObjectException";
+}
+
 cedar::proc::InvalidRoleException::InvalidRoleException()
 {
   this->mType = "InvalidRoleException";

@@ -76,7 +76,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void showList(const cedar::proc::Manager::StepRegistry::CategoryEntries& entries);
+  void showList(const cedar::proc::StepRegistry::CategoryEntries& entries);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

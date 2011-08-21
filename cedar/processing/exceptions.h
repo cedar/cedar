@@ -52,7 +52,11 @@ class cedar::proc::InvalidNameException : public cedar::aux::exc::ExceptionBase
     InvalidNameException();
 }; // class cedar::proc::InvalidNameException
 
-
+class cedar::proc::InvalidObjectException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    InvalidObjectException();
+}; // class cedar::proc::InvalidObjectException
 
 /*!@brief An exception that occurs when a role is used as an index that is not known.
  */

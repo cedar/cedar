@@ -173,8 +173,14 @@ public:
   size_t getTriggerCount() const;
   cedar::proc::TriggerPtr getTrigger(size_t index);
 
+  void setRegistry(cedar::proc::StepRegistry* pRegistry);
+
+public slots:
+  void onNameChanged();
+
 signals:
   void stateChanged();
+  void nameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -223,6 +229,9 @@ private:
   State mState;
   std::string mStateAnnotation;
   std::vector<cedar::proc::TriggerPtr> mTriggers;
+
+  //! Registry managing the step.
+  cedar::proc::StepRegistry* mRegisteredAt;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
