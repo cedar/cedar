@@ -55,12 +55,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Configurable::Configurable()
+cedar::aux::Configurable::Configurable(bool nameVisible)
 :
 _mName(new cedar::aux::StringParameter("name", ""))
 {
   this->registerParameter(_mName);
-  this->_mName->setHidden(true);
+  this->_mName->setHidden(!nameVisible);
 }
 
 

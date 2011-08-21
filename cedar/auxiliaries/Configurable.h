@@ -65,7 +65,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Configurable();
+  Configurable(bool nameVisible = true);
   //!@brief Destructor
   virtual ~Configurable();
 

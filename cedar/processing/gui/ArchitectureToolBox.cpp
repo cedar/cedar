@@ -60,10 +60,10 @@ mpView(NULL)
   this->addItem(":/modeicons/select.svg", "mode.Select", "selection mode");
   this->addItem(":/modeicons/connect.svg", "mode.Connect", "connection mode");
   this->addItem(":/modeicons/group.svg", "mode.Group", "grouping mode");
-  const cedar::proc::Manager::TriggerRegistry::Declarations& decls
+  const cedar::proc::TriggerRegistry::Declarations& decls
            = cedar::proc::Manager::getInstance().triggers().declarations();
 
-  for (cedar::proc::Manager::TriggerRegistry::Declarations::const_iterator iter = decls.begin();
+  for (cedar::proc::TriggerRegistry::Declarations::const_iterator iter = decls.begin();
        iter != decls.end();
        ++iter)
   {

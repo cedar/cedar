@@ -213,7 +213,7 @@ void cedar::proc::gui::Ide::resetStepList()
 
 //  this->mpCategoryList->clear();
 
-  for (Manager::StepRegistry::CategoryList::const_iterator iter = Manager::getInstance().steps().getCategories().begin();
+  for (cedar::proc::StepRegistry::CategoryList::const_iterator iter = Manager::getInstance().steps().getCategories().begin();
        iter != Manager::getInstance().steps().getCategories().end();
        ++iter)
   {

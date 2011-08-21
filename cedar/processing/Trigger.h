@@ -100,6 +100,8 @@ public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
   void saveConfiguration(cedar::aux::ConfigurationNode& node);
 
+  void setRegistry(cedar::proc::TriggerRegistry* pRegistry);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,6 +125,9 @@ protected:
 private:
   std::vector<cedar::proc::StepPtr>::iterator find(cedar::proc::StepPtr triggerable);
   std::vector<cedar::proc::TriggerPtr>::iterator find(cedar::proc::TriggerPtr triggerableT);
+
+  //! Registry managing the trigger.
+  cedar::proc::TriggerRegistry* mRegisteredAt;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

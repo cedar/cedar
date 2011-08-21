@@ -111,6 +111,7 @@ public:
 
 public slots:
   void stepStateChanged();
+  void redraw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -64,11 +64,13 @@ mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet (true),
 mState(cedar::proc::Step::STATE_NONE),
+mRegisteredAt(NULL),
 mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
 {
   this->addTrigger(mFinished);
   this->registerParameter(mRunInThread);
-  this->_mName->setConstant(true);
+
+  QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
 cedar::proc::Step::~Step()
@@ -82,6 +84,20 @@ cedar::proc::Step::~Step()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Step::onNameChanged()
+{
+  if (this->mRegisteredAt != NULL)
+  {
+    this->mRegisteredAt->updateObjectName(this);
+    emit nameChanged();
+  }
+}
+
+void cedar::proc::Step::setRegistry(cedar::proc::StepRegistry* pRegistry)
+{
+  this->mRegisteredAt = pRegistry;
+}
 
 size_t cedar::proc::Step::getTriggerCount() const
 {

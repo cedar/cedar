@@ -54,6 +54,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::Trigger::Trigger(const std::string& name)
+:
+mRegisteredAt(NULL)
 {
   this->setName(name);
 }
@@ -72,6 +74,11 @@ cedar::proc::Trigger::~Trigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Trigger::setRegistry(cedar::proc::TriggerRegistry* pRegistry)
+{
+  this->mRegisteredAt = pRegistry;
+}
 
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
