@@ -87,8 +87,10 @@ public:
   void deleteConnection();
   
   cedar::proc::StepPtr getSource();
+  cedar::proc::ConstStepPtr getSource() const;
   const std::string& getSourceName() const;
   cedar::proc::StepPtr getTarget();
+  cedar::proc::ConstStepPtr getTarget() const;
   const std::string& getTargetName() const;
 
   //--------------------------------------------------------------------------------------------------------------------

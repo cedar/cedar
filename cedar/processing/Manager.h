@@ -134,6 +134,11 @@ public:
                        std::vector<cedar::proc::Connection*>& connections //!@todo should be const pointers?
                      );
 
+  const std::vector<cedar::proc::Connection*>& getConnections() const
+  {
+    return this->mConnections;
+  }
+
   //!\ remove and disconnect a step
   void removeStep(cedar::proc::StepPtr step);
   //!\ remove and disconnect a trigger

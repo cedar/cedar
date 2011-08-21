@@ -74,9 +74,9 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   QObject::connect(_mSizes.get(), SIGNAL(parameterChanged()), this, SLOT(updateDimensionality()));
   this->registerParameter(_mSizes);
   this->declareBuffer("activation");
-//  this->setBuffer("activation", mActivation);
+  this->setBuffer("activation", mActivation);
   this->declareOutput("sigmoid(activation)");
-//  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
+  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
   this->declareInput("input", false);
 
@@ -216,8 +216,6 @@ void cedar::dyn::NeuralField::updateDimensionality()
     mActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0),CV_32F, cv::Scalar(mRestingLevel->get()));
     mSigmoidalActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0),CV_32F, cv::Scalar(0));
   }
-  this->setBuffer("activation", mActivation);
-  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
   this->mKernel->setDimensionality(new_dimensionality);
   this->unlockAll();
 }
