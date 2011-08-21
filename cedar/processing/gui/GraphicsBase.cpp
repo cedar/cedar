@@ -43,6 +43,9 @@
 #include "processing/gui/StepItem.h"
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/DataSlotItem.h"
+#include "auxiliaries/math/functions.h"
+#include "auxiliaries/utilities.h"
+#include "processing/gui/Scene.h"
 
 // PROJECT INCLUDES
 
@@ -390,11 +393,26 @@ const QColor& cedar::proc::gui::GraphicsBase::getValidityColor(ConnectValidity v
 
 QVariant cedar::proc::gui::GraphicsBase::itemChange(GraphicsItemChange change, const QVariant & value)
 {
+  qreal grid_size = 8.0;
   switch (change)
   {
+    case QGraphicsItem::ItemPositionChange:
+    {
+      QPointF new_pos = value.toPointF();
+      if (this->scene() && cedar::aux::asserted_cast<cedar::proc::gui::Scene*>(this->scene())->getSnapToGrid())
+      {
+        new_pos.rx() = cedar::aux::math::round(new_pos.x() / grid_size) * grid_size;
+        new_pos.ry() = cedar::aux::math::round(new_pos.y() / grid_size) * grid_size;
+      }
+
+      return new_pos;
+    }
+
     case QGraphicsItem::ItemPositionHasChanged:
+    {
       this->updateConnections();
       break;
+    }
 
     default:
       break;

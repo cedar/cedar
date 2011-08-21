@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <math.h>
+#include <stdint.h>
 
 /*
  *  todo
@@ -59,6 +60,20 @@ namespace cedar
       inline double gauss(double x, double sigma)
       {
         return exp(-pow(x, 2) / (2 * pow(sigma, 2)));
+      }
+
+      /*!@brief Rounds a number to the closest integer.
+       */
+      inline double round(double val)
+      {
+        return static_cast<double>(static_cast<int64_t>(val + 0.5));
+      }
+
+      /*!@brief Rounds a number to the closest integer.
+       */
+      inline float round(float val)
+      {
+        return static_cast<float>(static_cast<int32_t>(val + 0.5));
       }
     };
   };
