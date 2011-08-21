@@ -141,6 +141,7 @@ void cedar::proc::gui::GroupItem::addGroupItem(cedar::proc::gui::GraphicsBase* i
     p_step->setParentItem(this);
 
     mGroup->addStep(p_step->getStep());
+    p_step->updateConnections();
   }
 }
 
