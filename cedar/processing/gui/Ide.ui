@@ -251,6 +251,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="mpActionShowHideGrid"/>
+   <addaction name="mpActionSave"/>
   </widget>
   <action name="mpActionNew">
    <property name="enabled">
@@ -263,6 +264,10 @@
   <action name="mpActionSave">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons/icons.qrc">
+     <normaloff>:/toolbaricons/save.svg</normaloff>:/toolbaricons/save.svg</iconset>
    </property>
    <property name="text">
     <string>Save</string>
