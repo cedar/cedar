@@ -119,7 +119,7 @@
   </widget>
   <widget class="QDockWidget" name="mpLogWidget">
    <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
+    <set>QDockWidget::DockWidgetFeatureMask</set>
    </property>
    <property name="windowTitle">
     <string>Log</string>
@@ -168,7 +168,7 @@
           <x>0</x>
           <y>0</y>
           <width>130</width>
-          <height>279</height>
+          <height>365</height>
          </rect>
         </property>
         <attribute name="label">
@@ -181,7 +181,7 @@
           <x>0</x>
           <y>0</y>
           <width>130</width>
-          <height>279</height>
+          <height>365</height>
          </rect>
         </property>
         <attribute name="label">

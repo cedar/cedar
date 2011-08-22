@@ -92,6 +92,9 @@ cedar::proc::gui::Ide::Ide()
 
   mNetwork = cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
 
+  this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+  this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
   this->resetTo(mNetwork);
 
   this->restoreSettings();
