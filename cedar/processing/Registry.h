@@ -123,7 +123,7 @@ public:
           CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate object name: " + object->getName());
         }
 
-        this->mObjects.erase(iter);
+        this->mObjects.erase(this->mObjects.find(old_name));
         mObjects[object->getName()] = object_ptr;
         return;
       }
