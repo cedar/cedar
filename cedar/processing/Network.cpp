@@ -347,6 +347,19 @@ void cedar::proc::Network::readGroups(const cedar::aux::ConfigurationNode& root)
 void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::Connection* pConnection)
 {
   //!@todo move this code to the connection class?
+
+  if (!pConnection->getSource())
+  {
+    // this happens when the source is a trigger
+    CEDAR_DEBUG_ASSERT(pConnection->getSourceTrigger().get() != NULL);
+    return;
+  }
+  if (!pConnection->getTarget())
+  {
+    // this happens when the target is a trigger
+    CEDAR_DEBUG_ASSERT(pConnection->getTargetTrigger().get() != NULL);
+    return;
+  }
   std::string source_str = pConnection->getSource()->getName() + "." + pConnection->getSourceName();
   std::string target_str = pConnection->getTarget()->getName() + "." + pConnection->getTargetName();
 

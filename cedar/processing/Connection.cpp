@@ -97,6 +97,16 @@ mTargetTrigger(target)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::ConstTriggerPtr cedar::proc::Connection::getSourceTrigger() const
+{
+  return this->mTrigger;
+}
+
+cedar::proc::ConstTriggerPtr cedar::proc::Connection::getTargetTrigger() const
+{
+  return this->mTargetTrigger;
+}
+
 cedar::proc::StepPtr cedar::proc::Connection::getSource()
 {
   return this->mSource;

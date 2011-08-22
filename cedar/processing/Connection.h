@@ -93,6 +93,9 @@ public:
   cedar::proc::ConstStepPtr getTarget() const;
   const std::string& getTargetName() const;
 
+  cedar::proc::ConstTriggerPtr getSourceTrigger() const;
+  cedar::proc::ConstTriggerPtr getTargetTrigger() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
