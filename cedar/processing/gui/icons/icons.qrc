@@ -1,12 +1,13 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource>
-     <file>modeicons/select.svg</file>
-     <file>modeicons/connect.svg</file>
-     <file>modeicons/group.svg</file>
-     <file>triggers/trigger.svg</file>
-     <file>triggers/looped_trigger.svg</file>
-     <file>triggers/multi_trigger.svg</file>
-     <file>steps/no_icon.svg</file>
-     <file>steps/gauss_input.svg</file>
- </qresource>
- </RCC>
+<RCC>
+    <qresource prefix="/">
+        <file>modeicons/select.svg</file>
+        <file>modeicons/connect.svg</file>
+        <file>modeicons/group.svg</file>
+        <file>triggers/trigger.svg</file>
+        <file>triggers/looped_trigger.svg</file>
+        <file>triggers/multi_trigger.svg</file>
+        <file>steps/no_icon.svg</file>
+        <file>steps/gauss_input.svg</file>
+        <file>toolbaricons/grid.svg</file>
+    </qresource>
+</RCC>
