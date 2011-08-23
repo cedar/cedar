@@ -63,7 +63,16 @@ mpTarget(pTarget)
   pTarget->addConnection(this);
 
   QPen pen = this->pen();
-  pen.setWidthF(2.5);
+  if (pSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
+      || pTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER)
+  {
+    pen.setWidthF(1.5);
+    pen.setColor(QColor(180, 180, 180));
+  }
+  else
+  {
+    pen.setWidthF(2.5);
+  }
   this->setPen(pen);
 
   this->update();
