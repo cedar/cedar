@@ -249,7 +249,7 @@
 			 * 		This value doesn't indicate, if the thread is running or not.
 			 * 	\see LoopedThread::start(), LoopedThread::stop()
 			 */
-      double getFPS() const;
+      double getFps() const;
 
 			/*! \brief Set the framerate of the loopedthread speed for grabbing
 			 *  \remarks
@@ -258,7 +258,7 @@
 			 * 		This is done in this function, but keep it in mind.
 			 * 	\see LoopedThread::start(), LoopedThread::stop()
 			 */
-			void setFPS(double fps);
+			void setFps(double fps);
 
 
 

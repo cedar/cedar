@@ -193,14 +193,13 @@
 
 
             /*! \brief This passes the arguments directly to the corresponding capture
-             *   \param channel This is the index of the source you want parameter value.<br>
-                     In the mono case you do not need to supply this value. Default is 0.<br>
-                     In the stereo case it may be 0 or 1.
+						 * 	 \remarks	With this Method, it is possible to get Information on any channel.	
+						 *   \param channel This is the index of the source you want parameter value.<br>
              *   \param propId This is any supported property-Id<br>
              *     If property-id is not supported or unknown, return value will be 0.
              *   \remarks see OpenCV documentation for VideoCapture::get() for details
-                   */
-             double getAviParam(int propId,unsigned int channel=0);
+             */
+             double getAviParam(unsigned int channel,int propId);
 
              /*! \brief Get fps for the given camera
               *  \remarks
