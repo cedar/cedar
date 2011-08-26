@@ -93,20 +93,22 @@ VideoGrabber::~VideoGrabber()
 bool VideoGrabber::onInit()
 {
 
+	//local and/or stored Parameters are already initialized
+
+#if defined SHOW_INIT_INFORMATION_VIDEOGRABBER
   std::cout << "AviGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
-
-  std::cout << "Capture from avi:\n  - " << mSourceFileName.at(0) << "\n";
-  //@todo: for-loop
-  if (mSourceFileName.size()>1)
+  for(unsigned int i=0; i<mNumCams;++i)
   {
-    std::cout << "  - " << mSourceFileName.at(1) << "\n";
+     std::cout << "Channel "<< i<<": capture from: " << mSourceFileName.at(i) << "\n";
   }
+  std::cout << std::flush;
+#endif
 
+  mImageMatVector.clear();
+  mCaptureVector.clear();
 
-  //open capture one by one
-  //VideoCapture* capture;
-  //cv::Mat* frame;
-
+	//----------------------------------------
+  //open capture one by one, and create storage (cv::Mat) for it
   for(unsigned int i=0; i<mNumCams;++i)
   {
     VideoCapture capture(mSourceFileName.at(i));
@@ -123,14 +125,15 @@ bool VideoGrabber::onInit()
     else
     {
       std::cout << "ERROR: Grabbing failed (Channel "<< i << ")." << std::endl;
-      //TODO: undo the already initialized grabbers ???
       return false;
+      //throws an initialization-exception, so programm will terminate
     }
 
 
   }
   // all grabbers successfully initialized
 
+	//----------------------------------------
   // search for the smallest avi-file
   //unsigned int smallest=100000; //2000sec = 33h at 50Hz framerate
   unsigned int smallest= UINT_MAX;
@@ -144,6 +147,7 @@ bool VideoGrabber::onInit()
   //rewind
   //setPositionAbs(0);
 
+	//----------------------------------------
   //check for equal FPS
   double fps = mCaptureVector.at(0).get(CV_CAP_PROP_FPS);
 	if ( mNumCams > 1 ) //remove
@@ -156,17 +160,19 @@ bool VideoGrabber::onInit()
 		  {
 			 std::cout << "ERROR: Different framerate in channel 0 and channel "<< i << "." << std::endl;
 			 return false;
+			 //throws an initialization-exception, so programm will terminate
 		  }
 
 	  }
 
 	}
 
+	//----------------------------------------
   //set stepsize for LoopedThread 
-	setFPS(fps*_mSpeedFactor);
+  setFps(fps*_mSpeedFactor);
 
-  #if defined DEBUG_OUT
-        std::cout << "AviGrabber: Initialize... finished" << std::endl;
+  #if defined DEBUG_VIDEOGRABBER
+        std::cout << "[AviGrabber::onInit] Initialize... finished" << std::endl;
   # endif
 
   return true;
@@ -198,7 +204,7 @@ bool VideoGrabber::onGrab()
                   (mCaptureVector.at(i))>> mImageMatVector.at(i);
               }
 
-              #if defined GRABBER_DEBUG
+              #if defined DEBUG_VIDEOGRABBER
                 std::cout << "Video restart\n";
               #endif
 
@@ -233,13 +239,13 @@ std::string VideoGrabber::getPhysicalSourceInformation(unsigned int channel) con
 
 
 // ----------------------------------------------------------------------------------------------------
-void    VideoGrabber::setSpeedFactor(double speedFactor)
+void VideoGrabber::setSpeedFactor(double speedFactor)
 {
   _mSpeedFactor = speedFactor;
   double fps = mCaptureVector.at(0).get(CV_CAP_PROP_FPS);
 
   //will restart the thread if running
-  setFPS(fps*_mSpeedFactor);
+  setFps(fps*_mSpeedFactor);
 }
 
 // ----------------------------------------------------------------------------------------------------
@@ -265,10 +271,10 @@ void VideoGrabber::setPositionRel(double newPositionRel)
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::setPositionRel");
   }
 
-  int max_pos = mFramesCount-1;
+  double max_pos = static_cast<double>(mFramesCount-1);
 
   //newPositionRel = [0..1]
-  int new_pos_abs = max_pos * newPositionRel;
+  double new_pos_abs = max_pos * newPositionRel;
 
   if (new_pos_abs > max_pos)
     new_pos_abs=max_pos;
@@ -284,7 +290,11 @@ void VideoGrabber::setPositionRel(double newPositionRel)
   double new_pos_abs = (act_pos_abs / (act_pos_rel*100)) *newPositionRel;
   int    np = static_cast<int> (new_pos_abs);
   */
-
+  #if defined DEBUG_VIDEOGRABBER
+        std::cout << "[AviGrabber::setPositionRel] new position wanted (relative 0..1): "<<newPositionRel << std::endl;
+        std::cout << "[AviGrabber::setPositionRel] position set to frame: "<<new_pos_abs << std::endl;
+        
+  # endif
   for(unsigned int i = 0; i < mNumCams; ++i)
   {
       mCaptureVector.at(i).set(CV_CAP_PROP_POS_FRAMES,new_pos_abs);
@@ -293,20 +303,32 @@ void VideoGrabber::setPositionRel(double newPositionRel)
 
 
 // ----------------------------------------------------------------------------------------------------
-double    VideoGrabber::getPositionRel()
+double VideoGrabber::getPositionRel()
 {
-  return  mCaptureVector.at(0).get(CV_CAP_PROP_POS_AVI_RATIO); //from 0..1;
+	//the shortest file defines the length of the avi
+	//it is possible, that the first file isn't the shortest
+	//so we use absolute positions instead of relative
+  //return  mCaptureVector.at(0).get(CV_CAP_PROP_POS_AVI_RATIO); //from 0..1;
+  
+  double pos_abs = static_cast<double>(getPositionAbs());
+  double count = static_cast<double>(mFramesCount) ;
+  return pos_abs / count;
 }
 
 // ----------------------------------------------------------------------------------------------------
-void            VideoGrabber::setPositionAbs(unsigned int newPositionAbs)
+void VideoGrabber::setPositionAbs(unsigned int newPositionAbs)
 {
 
-  if (newPositionAbs > mFramesCount || newPositionAbs < 0)
+  if (newPositionAbs > (mFramesCount-1) || newPositionAbs < 0)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::setPositionRel");
   }
 
+  #if defined DEBUG_VIDEOGRABBER
+        std::cout << "[AviGrabber::setPositionAbs] current position: "<<getPositionAbs() << std::endl;
+        std::cout << "[AviGrabber::setPositionAbs] position set to frame: "<<newPositionAbs << std::endl;
+  # endif
+  
   for(unsigned int i = 0; i < mNumCams; ++i)
   {
       (mCaptureVector.at(i)).set(CV_CAP_PROP_POS_FRAMES,newPositionAbs);
@@ -314,36 +336,40 @@ void            VideoGrabber::setPositionAbs(unsigned int newPositionAbs)
 }
 
 // ----------------------------------------------------------------------------------------------------
-unsigned int    VideoGrabber::getPositionAbs()
+unsigned int VideoGrabber::getPositionAbs()
 {
   //the position in all avi's should be the same
-  //we use the first capture-device,
+  //we use the first capture-device
   return (mCaptureVector.at(0)).get(CV_CAP_PROP_POS_FRAMES);
 }
 
 // ----------------------------------------------------------------------------------------------------
-unsigned int    VideoGrabber::getFrameCount()
+unsigned int VideoGrabber::getFrameCount()
 {
   return mFramesCount;
 }
 
 
 // ----------------------------------------------------------------------------------------------------
-double VideoGrabber::getAviParam(int propId,unsigned int channel)
+double VideoGrabber::getAviParam(unsigned int channel,int propId)
 {
+	if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::getAviParam");
+  }
   return mCaptureVector.at(channel).get(propId);
 }
 
   // ----------------------------------------------------------------------------------------------------
 double VideoGrabber::getAviParamFps (unsigned int channel)
 {
-  return getAviParam(CV_CAP_PROP_FPS,channel);
+  return getAviParam(channel,CV_CAP_PROP_FPS);
 }
 
   // ----------------------------------------------------------------------------------------------------
 double VideoGrabber::getAviParamFourcc (unsigned int channel)
 {
-  return getAviParam(CV_CAP_PROP_FOURCC,channel);
+  return getAviParam(channel,CV_CAP_PROP_FOURCC);
 }
 
 

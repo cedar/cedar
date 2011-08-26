@@ -42,7 +42,9 @@
 //------------------------------------------------------------------------
 // defines for displaying init-informations
 //------------------------------------------------------------------------
-#define SHOW_INIT_INFORMATION_AVIGRABBER
+#define SHOW_INIT_INFORMATION_VIDEOGRABBER
+#define SHOW_INIT_INFORMATION_NETGRABBER
+#define SHOW_INIT_INFORMATION_PICTUREGRABBER
 
 
 
@@ -54,7 +56,7 @@
 //#define DEBUG_GRABBER_STEP
 
 //#define DEBUG_NETGRABBER
-//#define DEBUG_AVIGRABBER
+//#define DEBUG_VIDEOGRABBER
 //#define DEBUG_PICTUREGRABBER
 
 #endif
