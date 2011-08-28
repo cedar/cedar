@@ -197,13 +197,8 @@ bool NetGrabber::onDeclareParameters()
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string NetGrabber::getPhysicalSourceInformation(unsigned int channel) const
+std::string NetGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
 {
-    if (channel >= mNumCams)
-    {
-      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"NetGrabber::getPhysicalSourceInformation");
-    }	
-    
 	//TODO: gather information of used yarp-server too
 	return mYarpChannels.at(channel);
 }

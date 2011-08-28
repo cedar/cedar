@@ -88,7 +88,7 @@ PictureGrabber::~PictureGrabber()
 bool PictureGrabber::onInit()
 {
   
-  //local and/or stored Parameters are already initialized
+  //local and/or stored parameters are already initialized
 
 #if defined SHOW_INIT_INFORMATION_PICTUREGRABBER
   std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
@@ -141,12 +141,8 @@ bool PictureGrabber::onDeclareParameters()
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string PictureGrabber::getPhysicalSourceInformation(unsigned int channel) const
+std::string PictureGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
 {
-    if (channel >= mNumCams)
-    {
-      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::getPhysicalSourceInformation");
-    }	
 	return mSourceFileName.at(channel);
 }
 //----------------------------------------------------------------------------------------------------
@@ -166,8 +162,11 @@ bool PictureGrabber::setPictureFileName(unsigned int channel, const std::string&
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::setPictureFileName");
   }	
 
-  mSourceFileName.at(channel) = FileName;
-  mImageMatVector.at(channel) = cv::imread(FileName);
+  //lock image-matrix while writing  
+  mpReadWriteLock->lockForWrite();
+    mSourceFileName.at(channel) = FileName;
+    mImageMatVector.at(channel) = cv::imread(FileName);
+  mpReadWriteLock->unlock();
 
   if (mImageMatVector.at(channel).empty())
   {

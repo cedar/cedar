@@ -253,7 +253,15 @@ QReadWriteLock* GrabberInterface::getReadWriteLockPointer() const
     return mpReadWriteLock;
 }
 
-
+//----------------------------------------------------------------------------------------------------
+std::string GrabberInterface::getPhysicalSourceInformation(unsigned int channel) const
+{
+    if (channel >= mNumCams)
+    {
+      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getPhysicalSourceInformation");
+    }	
+	return onGetPhysicalSourceInformation(channel);
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------

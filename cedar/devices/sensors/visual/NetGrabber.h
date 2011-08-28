@@ -122,8 +122,7 @@
             bool    onInit  ();
             bool    onGrab  ();
             bool    onDeclareParameters   ();
-        public:
-            std::string getPhysicalSourceInformation(unsigned int channel) const;
+            std::string onGetPhysicalSourceInformation(unsigned int channel) const;
 
 
     } ;
