@@ -227,12 +227,8 @@ bool VideoGrabber::onGrab()
 
 
 // ----------------------------------------------------------------------------------------------------
-std::string VideoGrabber::getPhysicalSourceInformation(unsigned int channel) const
+std::string VideoGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
 {
-    if (channel >= mNumCams)
-    {
-      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::getPhysicalSourceInformation");
-    }
   return mSourceFileName.at(channel);
 }
 
