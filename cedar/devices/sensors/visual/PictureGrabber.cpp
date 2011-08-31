@@ -1,0 +1,177 @@
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        ConfigurationInterface.h
+
+    Maintainer:  Georg Hartinger
+    Email:       georg.hartinger@rub.de
+    Date:        2011 01 08
+
+    Description: Grabber to grab from pictures.
+
+    Credits:
+
+======================================================================================================================*/
+
+
+// LOCAL INCLUDES
+#include "PictureGrabber.h"
+
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+
+
+#include <auxiliaries/exceptions/IndexOutOfRangeException.h>
+
+using namespace cv;
+using namespace cedar::dev::sensors::visual;
+
+
+//----------------------------------------------------------------------------------------------------
+// Constructor for single-file grabber
+PictureGrabber::PictureGrabber(std::string grabberName,
+                       std::string configFileName,
+                       std::string pictureFileName)
+    :   GrabberInterface(configFileName)
+{
+    mSourceFileName.push_back(pictureFileName);
+    doInit(grabberName, mSourceFileName.size());
+
+}
+
+
+
+//----------------------------------------------------------------------------------------------------
+// Constructor for stereo-file grabber
+PictureGrabber::PictureGrabber(std::string grabberName,
+           std::string configFileName,
+           std::string pictureFileName0,
+           std::string pictureFileName1)
+:   GrabberInterface(configFileName)
+{
+  mSourceFileName.push_back(pictureFileName0);
+  mSourceFileName.push_back(pictureFileName1);
+  doInit(grabberName, mSourceFileName.size());
+}
+
+//----------------------------------------------------------------------------------------------------
+PictureGrabber::~PictureGrabber()
+{
+  //std::cout<<"VideoGrabber::Destructor\n";
+  //VideoCaptures are released automatically within the Vector mCaptureVector
+} 
+
+
+//----------------------------------------------------------------------------------------------------
+bool PictureGrabber::onInit()
+{
+#if defined DEBUG_OUT
+  std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
+
+  std::cout << "Capture from picture:\n  - " << mSourceFileName.at(0) << "\n";
+  //@todo for-loop
+  if (mSourceFileName.size()>1)
+  {
+    std::cout << "  - " << mSourceFileName.at(1) << "\n";
+  }
+#endif
+
+  for(unsigned int i=0; i<mNumCams;++i)
+  {
+    cv::Mat frame = cv::imread(mSourceFileName.at(i));
+
+    if (!frame.empty())
+    {
+      mImageMatVector.push_back(frame);
+    }
+    else
+    {
+      std::cout << "ERROR: Grabbing failed (Channel "<< i << "): \""<< mSourceFileName.at(i)<<"\"." << std::endl;
+      //@TODO: undo the already initialized grabbers ???
+      return false;
+    }
+
+
+  }
+  // all grabbers successfully initialized
+
+  double fps = 25;
+  _mStepSize = 1000. / fps; //set stepsize in ms: 1000ms/frames_per_second
+
+  #if defined DEBUG_OUT
+        std::cout << "PictureGrabber: Initialize... finished" << std::endl;
+  # endif
+
+  return true;
+} // onInit()
+
+
+//----------------------------------------------------------------------------------------------------
+bool PictureGrabber::onDeclareParameters()
+{
+	return true;
+}
+
+//----------------------------------------------------------------------------------------------------
+std::string PictureGrabber::getPhysicalSourceInformation(unsigned int channel) const
+{
+    if (channel >= mNumCams)
+    {
+      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::getPhysicalSourceInformation");
+    }	
+	return mSourceFileName.at(channel);
+}
+//----------------------------------------------------------------------------------------------------
+bool PictureGrabber::onGrab()
+{
+  //@todo: check if matrizes are ok!!
+   return true;
+} // onGrab()
+
+
+
+//----------------------------------------------------------------------------------------------------
+bool PictureGrabber::setPictureFileName(unsigned int channel, const std::string& FileName )
+{
+  if (channel>mNumCams-1)
+  {
+    //@todo: error-handling
+    return false;
+  }
+
+  mSourceFileName.at(channel) = FileName;
+  mImageMatVector.at(channel) = cv::imread(FileName);
+
+  if (mImageMatVector.at(channel).empty())
+  {
+    //@todo: error-handling
+    return false;
+  }
+
+  return true;
+
+}
+
