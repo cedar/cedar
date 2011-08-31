@@ -39,6 +39,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_GRABBER_INTERFACE_H
 
 // LOCAL INCLUDES
+#include "defines.h"
 #include "namespace.h"
 #include "auxiliaries/LoopedThread.h"
 #include "exceptions/GrabberRecordingException.h"
@@ -208,14 +209,14 @@
             
             /*! \brief Get information about the used device, i.e. the filename or the mount-point
                  \remarks
-                     Usefull if you are using multiple-channels and you want to check the sources.
-                     Have to be overrided in derived class to supply correct informations
+                      You have to implement this method in the derived class. Set the informations
+                      about the channels there.
                  \param channel
                      This is the index of the source you want the name of the source from.<br>
                      In the mono case you do not need to supply this value. Default is 0.<br>
                      In the stereo case it may be 0 or 1.
              */
-            virtual std::string  getPhysicalSourceInformation(unsigned int channel=0) const = 0; 
+            virtual std::string  onGetPhysicalSourceInformation(unsigned int channel=0) const = 0; 
             
            
 
@@ -243,13 +244,25 @@
              */
              CvSize  getSize (unsigned int channel = 0) const;
 
+      /*! \brief Get information about the used device, i.e. the filename or the mount-point
+           \remarks
+               Usefull if you are using multiple-channels and you want to check the sources.
+               Have to be overrided in derived class to supply correct informations
+           \param channel
+               This is the index of the source you want the name of the source from.<br>
+               In the mono case you do not need to supply this value. Default is 0.<br>
+               In the stereo case it may be 0 or 1.
+           \see onGetPhysicalSourceInformation
+       */
+      virtual std::string  getPhysicalSourceInformation(unsigned int channel=0) const; 
+
 
 			/*! \brief Get the framerate of the loopedthread speed for grabbing
 			 *  \remarks
 			 * 		This value doesn't indicate, if the thread is running or not.
 			 * 	\see LoopedThread::start(), LoopedThread::stop()
 			 */
-      double getFPS() const;
+      double getFps() const;
 
 			/*! \brief Set the framerate of the loopedthread speed for grabbing
 			 *  \remarks
@@ -258,7 +271,7 @@
 			 * 		This is done in this function, but keep it in mind.
 			 * 	\see LoopedThread::start(), LoopedThread::stop()
 			 */
-			void setFPS(double fps);
+			void setFps(double fps);
 
 
 

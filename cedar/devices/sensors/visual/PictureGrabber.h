@@ -128,10 +128,11 @@ class cedar::dev::sensors::visual::PictureGrabber : public GrabberInterface
             bool    onInit();
             bool    onGrab();
 
-            bool  onDeclareParameters   ();
-            std::string getPhysicalSourceInformation(unsigned int channel) const;
+            bool    onDeclareParameters   ();
 	
-	private:
+	    std::string onGetPhysicalSourceInformation(unsigned int channel) const;
+	
+
 
 };
 
