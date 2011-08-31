@@ -61,3 +61,4 @@ CMakeDefines.h
 build/*
 cedar/doc/*
 CTestTestfile.cmake
+*.iproj3
