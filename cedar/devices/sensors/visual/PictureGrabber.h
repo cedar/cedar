@@ -69,9 +69,8 @@ class cedar::dev::sensors::visual::PictureGrabber : public GrabberInterface
              *  \param configFileName	Filename for the configuration
              * 	\param pictureFileName	Filename to grab from
              */
-            PictureGrabber(std::string grabberName,
-                       std::string configFileName,
-                       std::string pictureFileName);
+            PictureGrabber(std::string configFileName,
+                           std::string pictureFileName);
 
 
             /*! \brief Constructor for a stereo-file grabber 
@@ -80,8 +79,7 @@ class cedar::dev::sensors::visual::PictureGrabber : public GrabberInterface
              * 	\param pictureFileName0	Filename to grab from for channel 0
              * 	\param pictureFileName1	Filename to grab from for channel 1
              */
-            PictureGrabber(std::string grabberName,
-                       std::string configFileName,
+            PictureGrabber(std::string configFileName,
                        std::string pictureFileName0,
                        std::string pictureFileName1);
 
@@ -114,7 +112,7 @@ class cedar::dev::sensors::visual::PictureGrabber : public GrabberInterface
 			 *  \param channel which should be changed (default is 0).
 			 *  \param FileName of the newly used picture.
 			 */ 	
-			bool setPictureFileName(unsigned int channel, const std::string& FileName );
+			bool setSourceFile(unsigned int channel, const std::string& FileName );
 
 
 
@@ -130,7 +128,7 @@ class cedar::dev::sensors::visual::PictureGrabber : public GrabberInterface
 
             bool    onDeclareParameters   ();
 	
-	    std::string onGetPhysicalSourceInformation(unsigned int channel) const;
+            std::string onGetSourceInfo(unsigned int channel) const;
 	
 
 

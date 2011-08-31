@@ -58,7 +58,7 @@ namespace cedar
       //! \brief Namespace for all visual sensors like cameras or camera-dummies (i.e. avi-file, picture)
       namespace visual
       {
-        /** obsolete */
+        // /** obsolete */
         //class GrabberManager;
 
         //! @brief The common interface for all grabber \see GrabberInterface */
@@ -83,6 +83,13 @@ namespace cedar
         class PictureGrabber;
         //! @brief smart pointer for PictureGrabber
         typedef boost::shared_ptr<PictureGrabber> PictureGrabberPtr;
+        
+        
+        //! @brief A grabber to grab from a Cameras \see CameraGrabber */
+        class CameraGrabber;
+        //! @brief smart pointer for PictureGrabber
+        typedef boost::shared_ptr<CameraGrabber> CameraGrabberPtr;
+        
 
       }
     }

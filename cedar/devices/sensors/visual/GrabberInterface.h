@@ -76,8 +76,16 @@
 
         \remarks
             Initialize in the constructor of a derived class the filenames or camera-device-names.
-            At the end of the constructor call doInit with grabbername and the number of channels you use.
-            To get an example look at the VideoGrabber-class.
+            At the end of the constructor call doInit with the number of channels you use.
+            To get an example look at the VideoGrabber-class. <br><br>
+
+         USAGE:
+           - to set a name: getName, setName form cedar::base
+           - to conrol the grabbing-thread
+                   QThread::isRunning(), cedar::aux::LoopedThread::start() and stop();
+                   setFps(), getFps()
+
+
     */
 
     class cedar::dev::sensors::visual::GrabberInterface : public cedar::aux::LoopedThread
@@ -164,7 +172,7 @@
              *  \see onInit, declareParameter
              *
              */
-            void doInit(std::string& grabberName, unsigned int numCams);
+            void doInit(unsigned int numCams);
 
             /*! @brief  Periodically call of grab()
              *  \remarks For details have a look at cedar::aux::LoopedThread
@@ -216,7 +224,7 @@
                      In the mono case you do not need to supply this value. Default is 0.<br>
                      In the stereo case it may be 0 or 1.
              */
-            virtual std::string  onGetPhysicalSourceInformation(unsigned int channel=0) const = 0; 
+            virtual std::string  onGetSourceInfo(unsigned int channel=0) const = 0;
             
            
 
@@ -254,7 +262,7 @@
                In the stereo case it may be 0 or 1.
            \see onGetPhysicalSourceInformation
        */
-      virtual std::string  getPhysicalSourceInformation(unsigned int channel=0) const; 
+      virtual std::string  getSourceInfo(unsigned int channel=0) const;
 
 
 			/*! \brief Get the framerate of the loopedthread speed for grabbing

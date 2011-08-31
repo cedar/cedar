@@ -41,7 +41,6 @@
 // PROJECT INCLUDES
 #include <auxiliaries/net/NetReader.h>
 #include <auxiliaries/net/exceptions/NetException.h>
-
 #include <auxiliaries/exceptions/IndexOutOfRangeException.h>
 
 // SYSTEM INCLUDES
@@ -51,28 +50,26 @@ using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for single-channel grabber
-NetGrabber::NetGrabber(std::string grabberName,
-                       std::string configFileName,
+NetGrabber::NetGrabber(std::string configFileName,
                        std::string YarpChannel)
     :   GrabberInterface(configFileName)
 {
     mYarpChannels.push_back(YarpChannel);
-    doInit(grabberName,mYarpChannels.size());
+    doInit(mYarpChannels.size());
 }
 
 
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for stereo-channel grabber
-NetGrabber::NetGrabber(std::string grabberName,
-           std::string configFileName,
+NetGrabber::NetGrabber(std::string configFileName,
            std::string YarpChannel0,
            std::string YarpChannel1)
 :   GrabberInterface( configFileName)
 {
   mYarpChannels.push_back(YarpChannel0);
   mYarpChannels.push_back(YarpChannel1);
-  doInit(grabberName, mYarpChannels.size());
+  doInit( mYarpChannels.size());
 
 }
 
@@ -193,11 +190,14 @@ bool NetGrabber::onInit()
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onDeclareParameters()
 {
-	return true;
+  //set the default grabbername
+ // bool result = cedar::aux::ConfigurationInterface::addParameter(&_mName, "NetGrabber", true) == CONFIG_SUCCESS;
+  //return result;
+  return true;
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string NetGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
+std::string NetGrabber::onGetSourceInfo(unsigned int channel) const
 {
 	//TODO: gather information of used yarp-server too
 	return mYarpChannels.at(channel);

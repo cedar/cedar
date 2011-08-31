@@ -45,8 +45,7 @@
 #define SHOW_INIT_INFORMATION_VIDEOGRABBER
 #define SHOW_INIT_INFORMATION_NETGRABBER
 #define SHOW_INIT_INFORMATION_PICTUREGRABBER
-
-
+#define SHOW_INIT_INFORMATION_CAMERAGRABBER
 
 //------------------------------------------------------------------------
 // defines for debugging
@@ -58,6 +57,7 @@
 //#define DEBUG_NETGRABBER
 //#define DEBUG_VIDEOGRABBER
 //#define DEBUG_PICTUREGRABBER
+//#define DEBUG_CAMERAGRABBER
 
 #endif
 

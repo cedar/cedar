@@ -67,8 +67,7 @@
              *  \param configFileName	Filename for the configuration
              * 	\param aviFileName		Filename to grab from
              */
-            VideoGrabber(std::string grabberName,
-                       std::string configFileName,
+            VideoGrabber(std::string configFileName,
                        std::string aviFileName);
 
 
@@ -78,8 +77,7 @@
              * 	\param aviFileName0		Filename to grab from for channel 0
              * 	\param aviFileName1		Filename to grab from for channel 1
              */
-            VideoGrabber(std::string grabberName,
-                       std::string configFileName,
+            VideoGrabber(std::string configFileName,
                        std::string aviFileName0,
                        std::string aviFileName1);
 
@@ -231,7 +229,7 @@
 
             bool  onDeclareParameters();
             
-            std::string onGetPhysicalSourceInformation(unsigned int channel) const;
+            std::string onGetSourceInfo(unsigned int channel) const;
 
 
     } ;

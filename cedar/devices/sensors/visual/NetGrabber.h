@@ -68,8 +68,7 @@
              *  \param configFileName	Filename for the configuration
              * 	\param YarpChannel		Channel to grab from
              */
-            NetGrabber(std::string grabberName,
-                       std::string configFileName,
+            NetGrabber(std::string configFileName,
                        std::string YarpChannel);
 
 
@@ -79,8 +78,7 @@
              * 	\param YarpChannel0		Channel 0 to grab from
              * 	\param YarpChannel1		Channel 0 to grab from
              */
-            NetGrabber(std::string grabberName,
-                       std::string configFileName,
+            NetGrabber(std::string configFileName,
                        std::string YarpChannel0,
                        std::string YarpChannel1);
 
@@ -122,7 +120,7 @@
             bool    onInit  ();
             bool    onGrab  ();
             bool    onDeclareParameters   ();
-            std::string onGetPhysicalSourceInformation(unsigned int channel) const;
+            std::string onGetSourceInfo(unsigned int channel) const;
 
 
     } ;

@@ -51,13 +51,12 @@ using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for single-file grabber
-PictureGrabber::PictureGrabber(std::string grabberName,
-                       std::string configFileName,
+PictureGrabber::PictureGrabber(std::string configFileName,
                        std::string pictureFileName)
     :   GrabberInterface(configFileName)
 {
     mSourceFileName.push_back(pictureFileName);
-    doInit(grabberName, mSourceFileName.size());
+    doInit(mSourceFileName.size());
 
 }
 
@@ -65,15 +64,14 @@ PictureGrabber::PictureGrabber(std::string grabberName,
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for stereo-file grabber
-PictureGrabber::PictureGrabber(std::string grabberName,
-           std::string configFileName,
+PictureGrabber::PictureGrabber(std::string configFileName,
            std::string pictureFileName0,
            std::string pictureFileName1)
 :   GrabberInterface(configFileName)
 {
   mSourceFileName.push_back(pictureFileName0);
   mSourceFileName.push_back(pictureFileName1);
-  doInit(grabberName, mSourceFileName.size());
+  doInit(mSourceFileName.size());
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -137,11 +135,14 @@ bool PictureGrabber::onInit()
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::onDeclareParameters()
 {
-	return true;
+  //set the default grabbername
+  //bool result = cedar::aux::ConfigurationInterface::addParameter(&_mName, "PictureGrabber", true) == CONFIG_SUCCESS;
+  //return result;
+  return true;
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string PictureGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
+std::string PictureGrabber::onGetSourceInfo(unsigned int channel) const
 {
 	return mSourceFileName.at(channel);
 }
@@ -155,7 +156,7 @@ bool PictureGrabber::onGrab()
 
 
 //----------------------------------------------------------------------------------------------------
-bool PictureGrabber::setPictureFileName(unsigned int channel, const std::string& FileName )
+bool PictureGrabber::setSourceFile(unsigned int channel, const std::string& FileName )
 {
   if (channel >= mNumCams)
   {
@@ -170,7 +171,7 @@ bool PictureGrabber::setPictureFileName(unsigned int channel, const std::string&
 
   if (mImageMatVector.at(channel).empty())
   {
-    CEDAR_THROW(cedar::aux::exc::InitializationException,"PictureGrabber::setPictureFileName");
+    CEDAR_THROW(cedar::aux::exc::InitializationException,"PictureGrabber::setSourceFile");
   }
 
   return true;

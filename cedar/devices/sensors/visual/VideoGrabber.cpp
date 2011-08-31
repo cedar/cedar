@@ -28,7 +28,7 @@
     Email:       georg.hartinger@rub.de
     Date:        2011 08 01
 
-    Description: Header for the @em cedar::Grabber class.
+    Description: This is the @em cedar::dev::sensors::visual::VideoGrabber class.
 
     Credits:
 
@@ -48,21 +48,19 @@ using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for single-file grabber
-VideoGrabber::VideoGrabber(std::string grabberName,
-                       std::string configFileName,
+VideoGrabber::VideoGrabber(std::string configFileName,
                        std::string aviFileName)
     :   GrabberInterface(configFileName)
 {
     mSourceFileName.push_back(aviFileName);
 
-    doInit(grabberName, mSourceFileName.size());
+    doInit(mSourceFileName.size());
 }
 
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for stereo-file grabber
-VideoGrabber::VideoGrabber(std::string grabberName,
-           std::string configFileName,
+VideoGrabber::VideoGrabber(std::string configFileName,
            std::string aviFileName0,
            std::string aviFileName1)
 :   GrabberInterface(configFileName)
@@ -70,15 +68,16 @@ VideoGrabber::VideoGrabber(std::string grabberName,
   mSourceFileName.push_back(aviFileName0);
   mSourceFileName.push_back(aviFileName1);
 
-  doInit(grabberName,mSourceFileName.size());
+  doInit(mSourceFileName.size());
 }
 
 //----------------------------------------------------------------------------------------------------
 bool VideoGrabber::onDeclareParameters()
 {
-  bool result1 = addParameter(&_mLoop, "Loop", true) == CONFIG_SUCCESS;
-  bool result2 = addParameter(&_mSpeedFactor, "SpeedFactor", 1) == CONFIG_SUCCESS;
-  return result1 && result2;
+  bool result1 = addParameter(&_mLoop, "loop", true) == CONFIG_SUCCESS;
+  bool result2 = addParameter(&_mSpeedFactor, "speedFactor", 1) == CONFIG_SUCCESS;
+  //bool result3 = addParameter(&_mName, "VideoGrabber", true) == CONFIG_SUCCESS;
+  return result1 && result2 ;//&& result3;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -227,7 +226,7 @@ bool VideoGrabber::onGrab()
 
 
 // ----------------------------------------------------------------------------------------------------
-std::string VideoGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
+std::string VideoGrabber::onGetSourceInfo(unsigned int channel) const
 {
   return mSourceFileName.at(channel);
 }

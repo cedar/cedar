@@ -41,13 +41,19 @@
 
 //*! \brief Single include file for the grabber classes
 
+// LOCAL INCLUDES
 #include "visual/namespace.h"
 #include "visual/GrabberInterface.h"
 #include "visual/VideoGrabber.h"
 #include "visual/PictureGrabber.h"
 #include "visual/NetGrabber.h"
+#include "visual/CameraGrabber.h"
 
-//grabbermanager isn't used anymore
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+
 
 
 #endif

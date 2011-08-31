@@ -333,6 +333,7 @@ void cedar::aux::LoopedThread::readParamsFromConfigFile()
 void cedar::aux::LoopedThread::setStepSize(double stepSize)
 {
   mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
+  _mStepSize = stepSize;
 }
 
 void cedar::aux::LoopedThread::setIdleTime(double idleTime)

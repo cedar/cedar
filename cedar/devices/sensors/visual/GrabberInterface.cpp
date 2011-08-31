@@ -88,7 +88,7 @@ GrabberInterface::~GrabberInterface()
 
 
 //----------------------------------------------------------------------------------------------------------------------
-void GrabberInterface::doInit(std::string& grabberName,unsigned int numCams)
+void GrabberInterface::doInit(unsigned int numCams)
 {
   //-----------------------------
   //restore configuration from configfile
@@ -109,9 +109,6 @@ void GrabberInterface::doInit(std::string& grabberName,unsigned int numCams)
   }
 
   cedar::aux::ConfigurationInterface::readOrDefaultConfiguration();
-
-  //the new grabber name should be used, overwrite the restored name
-  cedar::aux::ConfigurationInterface::_mName = grabberName;
 
   //initialize the snapshot and recording names with default values
   //depends on no. of cameras
@@ -163,7 +160,7 @@ void GrabberInterface::setFps(double fps)
 	
 	
 	//TODO: check if it was saved in configfile without modified _mStepSize
-	LoopedThread::_mStepSize = milliseconds;  //set param for configuration file
+	//LoopedThread::_mStepSize = milliseconds;  //set param for configuration file
 	LoopedThread::setStepSize(milliseconds);  //change speed in thread
 	
 	
@@ -254,13 +251,13 @@ QReadWriteLock* GrabberInterface::getReadWriteLockPointer() const
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string GrabberInterface::getPhysicalSourceInformation(unsigned int channel) const
+std::string GrabberInterface::getSourceInfo(unsigned int channel) const
 {
     if (channel >= mNumCams)
     {
       CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getPhysicalSourceInformation");
     }	
-	return onGetPhysicalSourceInformation(channel);
+	return onGetSourceInfo(channel);
 }
 
 
