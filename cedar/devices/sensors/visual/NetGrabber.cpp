@@ -90,15 +90,17 @@ NetGrabber::~NetGrabber()
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onInit()
 {
-
+#if defined SHOW_INIT_INFORMATION_NETGRABBER
   //-------------------------------------------------
   std::cout << "\n\nYarpGrabber.onInit()\n";
   std::cout << "YarpGrabber: Initialize Grabber with " << mNumCams << " channels ..." << std::endl;
-  std::cout << "Capture from channel:\n  - " << mYarpChannels.at(0) << "\n";
-  if (mYarpChannels.size()>1)
+
+ for(unsigned int i=0; i<mNumCams;++i)
   {
-    std::cout << "  - " << mYarpChannels.at(1) << "\n";
+    std::cout << "Channel "<< i <<": capture from yarpchannel: " << mYarpChannels.at(i) << "\n";
   }
+  std::cout << std::flush;
+#endif
 
   mImageMatVector.clear();
   mYarpReaderVector.clear();
@@ -178,7 +180,11 @@ bool NetGrabber::onInit()
     std::cout << "YarpGrabber: Initialize... finished" << std::endl;
 # endif
 
-    //set fps
+    //TODO
+    //set fps 
+    //until now, it is set to default value of loopedThread
+    //maybe read fps and check against default value from loopedthread
+    //to decide if it was load from config-file 
 
   return true;
 } // onInit()
@@ -188,17 +194,11 @@ bool NetGrabber::onInit()
 bool NetGrabber::onDeclareParameters()
 {
 	return true;
-
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string NetGrabber::getPhysicalSourceInformation(unsigned int channel) const
+std::string NetGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
 {
-    if (channel >= mNumCams)
-    {
-      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"NetGrabber::getPhysicalSourceInformation");
-    }	
-    
 	//TODO: gather information of used yarp-server too
 	return mYarpChannels.at(channel);
 }
@@ -213,10 +213,11 @@ bool NetGrabber::onGrab()
     {
         //nonblocking version of netreader
 
-        try
-        {
+       // on exception leave programm, so we don't catch it here
+       // try
+       // {
           mImageMatVector.at(i) = mYarpReaderVector.at(i)->read() ;
-        }
+       /* }
         catch (cedar::aux::exc::NetUnexpectedDataException &E)
         {
 
@@ -229,7 +230,8 @@ bool NetGrabber::onGrab()
           //result = false;
 
         }
-
+        */
+        
         if(mImageMatVector.at(i).empty())
         {
           result = false;

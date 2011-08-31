@@ -39,7 +39,6 @@
 #define CEDAR_DEV_SENSORS_VISUAL_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "defines.h"
 
 // PROJECT INCLUDES
 

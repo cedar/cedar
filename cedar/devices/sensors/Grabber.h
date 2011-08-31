@@ -47,7 +47,7 @@
 #include "visual/PictureGrabber.h"
 #include "visual/NetGrabber.h"
 
-//grabbermanager isn't needed anymore
+//grabbermanager isn't used anymore
 
 
 #endif

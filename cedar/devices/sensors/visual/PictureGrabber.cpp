@@ -38,7 +38,6 @@
 // LOCAL INCLUDES
 #include "PictureGrabber.h"
 
-
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
@@ -88,16 +87,19 @@ PictureGrabber::~PictureGrabber()
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::onInit()
 {
-#if defined DEBUG_OUT
-  std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
+  
+  //local and/or stored parameters are already initialized
 
-  std::cout << "Capture from picture:\n  - " << mSourceFileName.at(0) << "\n";
-  //@todo for-loop
-  if (mSourceFileName.size()>1)
+#if defined SHOW_INIT_INFORMATION_PICTUREGRABBER
+  std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
+  for(unsigned int i=0; i<mNumCams;++i)
   {
-    std::cout << "  - " << mSourceFileName.at(1) << "\n";
+     std::cout << "Channel "<< i<<": capture from Picture: " << mSourceFileName.at(i) << "\n";
   }
+  std::cout << std::flush;
 #endif
+
+  mImageMatVector.clear();
 
   for(unsigned int i=0; i<mNumCams;++i)
   {
@@ -110,23 +112,26 @@ bool PictureGrabber::onInit()
     else
     {
       std::cout << "ERROR: Grabbing failed (Channel "<< i << "): \""<< mSourceFileName.at(i)<<"\"." << std::endl;
-      //@TODO: undo the already initialized grabbers ???
       return false;
+      //exception thrown in GrabberInterface
     }
 
 
   }
   // all grabbers successfully initialized
 
-  double fps = 25;
-  _mStepSize = 1000. / fps; //set stepsize in ms: 1000ms/frames_per_second
+  //TODO
+  //set fps 
+  //until now, it is set to default value of loopedThread
+  //maybe read fps and check against default value from loopedthread
+  //to decide if it was load from config-file 
 
-  #if defined DEBUG_OUT
-        std::cout << "PictureGrabber: Initialize... finished" << std::endl;
+  #if defined DEBUG_PICTUREGRABBER
+        std::cout << "[PictureGrabber::onInit] finished" << std::endl;
   # endif
 
   return true;
-} // onInit()
+} 
 
 
 //----------------------------------------------------------------------------------------------------
@@ -136,12 +141,8 @@ bool PictureGrabber::onDeclareParameters()
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string PictureGrabber::getPhysicalSourceInformation(unsigned int channel) const
+std::string PictureGrabber::onGetPhysicalSourceInformation(unsigned int channel) const
 {
-    if (channel >= mNumCams)
-    {
-      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::getPhysicalSourceInformation");
-    }	
 	return mSourceFileName.at(channel);
 }
 //----------------------------------------------------------------------------------------------------
@@ -149,26 +150,27 @@ bool PictureGrabber::onGrab()
 {
   //@todo: check if matrizes are ok!!
    return true;
-} // onGrab()
+}
 
 
 
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::setPictureFileName(unsigned int channel, const std::string& FileName )
 {
-  if (channel>mNumCams-1)
+  if (channel >= mNumCams)
   {
-    //@todo: error-handling
-    return false;
-  }
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::setPictureFileName");
+  }	
 
-  mSourceFileName.at(channel) = FileName;
-  mImageMatVector.at(channel) = cv::imread(FileName);
+  //lock image-matrix while writing  
+  mpReadWriteLock->lockForWrite();
+    mSourceFileName.at(channel) = FileName;
+    mImageMatVector.at(channel) = cv::imread(FileName);
+  mpReadWriteLock->unlock();
 
   if (mImageMatVector.at(channel).empty())
   {
-    //@todo: error-handling
-    return false;
+    CEDAR_THROW(cedar::aux::exc::InitializationException,"PictureGrabber::setPictureFileName");
   }
 
   return true;

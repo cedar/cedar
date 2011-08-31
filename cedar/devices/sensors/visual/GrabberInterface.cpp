@@ -134,28 +134,50 @@ unsigned int GrabberInterface::getNumCams() const
 } 
 
 //----------------------------------------------------------------------------------------------------------------------
-double GrabberInterface::getFPS() const
+double GrabberInterface::getFps() const
 {
-	unsigned int fps = 1000 / LoopedThread::_mStepSize;
+	//unsigned int fps = round(1000 / LoopedThread::_mStepSize);
+	double fps = 1000. / LoopedThread::_mStepSize;
     return fps;
 } 
 
 
 //----------------------------------------------------------------------------------------------------------------------
-void GrabberInterface::setFPS(double fps)
+void GrabberInterface::setFps(double fps)
 {
 	bool wasRunning = QThread::isRunning();
 	
 	if (wasRunning) LoopedThread::stop();
 	
-	 //in ms: 1000ms/frames_per_second
+	 //cycle time in ms: 1000ms/frames_per_second
 	double milliseconds = 1000. / fps;
+	
+#if defined DEBUG_GRABBER_INTERFACE
+	if (wasRunning) 
+		std::cout <<"[GrabberInterface::setFps] grabberthread stopped"<< std::endl;
+		
+	std::cout <<"[GrabberInterface::setFps] new fps "<< fps << std::endl;
+	std::cout <<"[GrabberInterface::setFps] stepsize[in milliseconds]: "<< milliseconds << std::endl;
+	
+ #endif
+	
 	
 	//TODO: check if it was saved in configfile without modified _mStepSize
 	LoopedThread::_mStepSize = milliseconds;  //set param for configuration file
 	LoopedThread::setStepSize(milliseconds);  //change speed in thread
 	
+	
 	if (wasRunning) LoopedThread::start();
+	
+#if defined DEBUG_GRABBER_INTERFACE
+	if (QThread::isRunning()) 
+		std::cout <<"[GrabberInterface::setFps]: grabberthread running"<< std::endl;
+		
+	std::cout <<"[GrabberInterface::setFps]: getFps "<< getFps() << std::endl;
+	std::cout <<"[GrabberInterface::setFps]: stepsize[in milliseconds]: "<< milliseconds << std::endl;
+	
+ #endif
+
 } 
 
 
@@ -231,7 +253,15 @@ QReadWriteLock* GrabberInterface::getReadWriteLockPointer() const
     return mpReadWriteLock;
 }
 
-
+//----------------------------------------------------------------------------------------------------
+std::string GrabberInterface::getPhysicalSourceInformation(unsigned int channel) const
+{
+    if (channel >= mNumCams)
+    {
+      CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getPhysicalSourceInformation");
+    }	
+	return onGetPhysicalSourceInformation(channel);
+}
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -469,7 +499,7 @@ bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
 
   //write the video-file with the actual grabbing-speed
   //this is independet from speed of an avi-file or the camera
-  //double fps = getFPS();
+  //double fps = getFps();
   
   
   //if there is already any
