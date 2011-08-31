@@ -55,7 +55,9 @@ Note, that if you will need an additional 'yarp server' started. It is
 adviseable to have just one dedicated 'yarp server' running for your local
 network, as conflicts may appera otherwise.
 
-At the moment, we use TCP/IP as network protocoll. Even locally.
+At the moment, we use mcast as network protocoll. Even for machine-local
+transport. Note: Mcast ist a stateless protocoll, so messages may be lost.
+This is a intentional trade-off.
 
 
 Question: When does my data leave the machine/arrive?
