@@ -12,4 +12,6 @@ concern himself with the mode of transport of the data (YARP).
 Detected runtime problems will be passed by using the C++ exception
 mechanism.
 
+We will go for low latency before correctness (for example we use stateless
+transport protocols), if not otherwise explicitly stated.
 
