@@ -249,7 +249,7 @@ bool AbstractNetBase::connectTwo(const std::string &writerPort, const std::strin
 
   if (!mNetwork.connect( writerPort.c_str(),
                          readerPort.c_str(),
-                         0,
+                         "mcast",
                          true ) ) // 4. Argument: quiet = true
   {
     mIsConnected= false;
