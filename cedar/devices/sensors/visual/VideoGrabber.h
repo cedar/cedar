@@ -47,193 +47,253 @@
 
 
 
-// ------------------------------------------------------------------------------------------------------------------
-
-/*! \class VideoGrabber
- * 	\brief This grabber grabs images from avi-files
+/*! \class cedar::dev::sensors::visual::VideoGrabber
+ *  \brief This grabber grabs images from video-files
+ *  \remarks This grabber will grab from all video-files known by OpenCV and/or ffmpeg
+ *		Please look at their documentation for supported types (i.e. mpg, avi, ogg,...)
  */
- 
-    class cedar::dev::sensors::visual::VideoGrabber : public GrabberInterface
-    {
+
+class cedar::dev::sensors::visual::VideoGrabber
+  : public GrabberInterface
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*!	\brief  Constructor for a single-file grabber
+   *	\param grabberName		The name for this grabber
+   *	\param configFileName	Filename for the configuration
+   *  \param aviFileName		Filename to grab from
+   */
+  VideoGrabber(
+               std::string configFileName,
+               std::string aviFileName
+              );
+
+
+  /*!	\brief Constructor for a stereo-file grabber
+   *  \param grabberName	The name for this grabber
+   *	\param configFileName	Filename for the configuration
+   *  \param aviFileName0	Filename to grab from for channel 0
+   *  \param aviFileName1	Filename to grab from for channel 1
+   */
+  VideoGrabber(
+               std::string configFileName,
+               std::string aviFileName0,
+               std::string aviFileName1
+              );
+
+  //!@brief Destructor
+  ~VideoGrabber();
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+ /*! \brief Turn looping on or off (i.e. restart on end) */
+  void setLoop(
+               bool loop = true
+              );
+
+
+
+  /*! \brief set the factor for grabbing speed
+   *  \remarks the speed stored in the AVI-File will be multiplied with this factor.<br>
+   *		Effective FPS should be SpeedFactor*AVI-Speed<br>
+   *  \remarks
+   *		The grabberthread have to be restarted to take effect.<br>
+   *		This is done internally (by calling setFPS), but keep that in mind.
+   *  \see
+   *		setFPS
+   */
+  void setSpeedFactor(
+                      double speedFactor
+                     );
+
+
+
+  /*! \brief Get the factor for grabbing speed
+   *  \remarks the speed stored in the AVI-File will be multiplied with this factor
+   *		so effective FPS should be _mSpeedFactor*AVI-Speed
+   */
+  double getSpeedFactor();
+
+
+
+  /*! \brief Set postion in the AVI-Files relative
+   *  \param newPositionRel New position in the range is from 0..1
+   *  \remarks
+   *		Range is from 0..1<br>
+   *		For absolute positioning use setPositionAbs()
+   */
+  void setPositionRel(
+                      double newPositionRel
+                     );
+
+
+
+  /*! \brief Return the actual position relative to the file size.
+   *  \return Range is from 0..1
+   */
+  double getPositionRel();
+
+
+
+  /*! \brief Set the position in the avi-files absolute
+   *  \param newPositionAbs New position in the range is from 0..FrameCount
+   *  \remarks
+   *      For relative positioning use setPostionRel()
+   */
+  void setPositionAbs(
+                      unsigned int newPositionAbs
+                     );
+
+
+
+  /*! \brief Return the position in the file, i.e. the framenumber.
+   *  \return Range is from 0..FrameCount
+   */
+  unsigned int getPositionAbs();
+
+
+
+  /*! \brief Get the count of frames in the AVI
+   *  \remarks
+   *		In the case of a stereo grabber and different length
+   *		the shortest avi-file determine the length
+   */
+  unsigned int getFrameCount();
+
+
+
+  /*! \brief This passes the arguments directly to the corresponding capture
+   *  \remarks With this Method, it is possible to get Information on any channel.
+   *  \param channel This is the index of the source you want parameter value.< br >
+   *  \param propId This is any supported property - Id<br>
+   *	If property - id is not supported or unknown, return value will be 0.
+   *  \remarks see OpenCV documentation for VideoCapture::get() details
+   */
+  double getSourceProperty(
+                           unsigned int channel,
+                           int          propId
+                          );
+
+
+
+  /*! \brief Get fps for the given camera
+   *  \remarks
+   *    Default channel is 0
+   */
+  double getSourceFps(
+                      unsigned int channel = 0
+                     );
+
+
+
+  /*! \brief Get fourcc for the given camera
+   *  \remarks
+   *    Default channel is 0
+   */
+  double getSourceEncoding(
+                           unsigned int channel = 0
+                          );
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+
+  //------------------------------------------------------------------------
+  //From GrabberInterface
+  //------------------------------------------------------------------------
+
+  bool onInit();
+
+
+
+  /*! \brief Grab on all available files
+   *  \remarks
+   *      The shortest file determine the end
+   *      In case of looping through the files, the shortest file define the restart moment
+   */
+  bool onGrab();
+
+  bool onDeclareParameters();
+  std::string onGetSourceInfo(
+                              unsigned int channel
+                             ) const;
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
   
+  /*! \brief The filenames
+   */
+  std::vector<std::string> mSourceFileName;
 
-      //------------------------------------------------------------------------
-      // Init 
-      //------------------------------------------------------------------------
-       public:
+  /*! \brief Indicates if looping is on
+   */
+  bool _mLoop;
 
-            /*! \brief  Constructor for a single-file grabber 
-             * 	\param grabberName 		The name for this grabber
-             *  \param configFileName	Filename for the configuration
-             * 	\param aviFileName		Filename to grab from
-             */
-            VideoGrabber(std::string configFileName,
-                       std::string aviFileName);
+  /*! \brief Factor for grabbing speed
+   *  \remarks the speed stored in the AVI-File will be multiplied with this factor
+   *    so effective FPS should be _mSpeedFactor*AVI-Speed
+   */
+  double _mSpeedFactor;
 
+  /*! \brief Count of frames of the shortest file
+   *  \remarks
+   *		Used for scrolling in the avi-file
+   *  \see
+   *		setPositionRel, getPositionRel, setPositionAbs, setPositionRel
+   */
+  unsigned int mFramesCount;
 
-            /*! \brief Constructor for a stereo-file grabber 
-             * 	\param grabberName 		The name for this grabber
-             *  \param configFileName	Filename for the configuration
-             * 	\param aviFileName0		Filename to grab from for channel 0
-             * 	\param aviFileName1		Filename to grab from for channel 1
-             */
-            VideoGrabber(std::string configFileName,
-                       std::string aviFileName0,
-                       std::string aviFileName1);
-
-            /*! \brief Destructor */
-            ~VideoGrabber();
-
-      
-		//------------------------------------------------------------------------
-		// Internal
-		//------------------------------------------------------------------------
-
-		protected:
-        
-            /*! \brief The filenames
-             *
-             */
-            std::vector<std::string> mSourceFileName;
-
-            /*! \brief Indicates if looping is on
-             */
-            bool        _mLoop;
-
-            /*! \brief Factor for grabbing speed
-             *
-             *  \remarks the speed stored in the AVI-File will be multiplied with this factor
-             *    so effective FPS should be _mSpeedFactor*AVI-Speed
-             */
-            double      _mSpeedFactor;
-
-            /*! \brief Count of frames of the shortest file
-             *  \remarks
-             *     Used for scrolling in the avi-file
-             *  \see
-             *    setPositionRel, getPositionRel, setPositionAbs, setPositionRel
-             */
-            unsigned int mFramesCount;
-
-           /*! \brief This vector contains the needed captures.
-            *   One for every avi-file.
-                \see
-                    mImageMatVector
-            */
-            std::vector<cv::VideoCapture> mCaptureVector;
-
-
-      //------------------------------------------------------------------------
-      // Methods
-      //------------------------------------------------------------------------
-
-		public:
- 
-            /*! \brief Turn looping on or off (i.e. restart on end) */
-            void    setLoop(bool loop = true);
-
-            /*! \brief set the factor for grabbing speed
-             *
-             *  \remarks the speed stored in the AVI-File will be multiplied with this factor.<br>
-             *   Effective FPS should be SpeedFactor*AVI-Speed<br>
-             *
-             *  \remarks
-             *    The grabberthread have to be restarted to take effect.<br>
-             *    This is done internally (by calling setFPS), but keep that in mind.
-             *  \see
-             *    setFPS
-             */
-            void    setSpeedFactor(double speedFactor);
-
-
-            /*! \brief Get the factor for grabbing speed
-             *
-             *  \remarks the speed stored in the AVI-File will be multiplied with this factor
-             *    so effective FPS should be _mSpeedFactor*AVI-Speed
-             */
-            double  getSpeedFactor();
-            
-            /*! \brief Set postion in the AVI-Files relative
-             *  \param newPositionRel New position in the range is from 0..1
-             *  \remarks
-             *    Range is from 0..1<br>
-             *    For absolute positioning use setPositionAbs()
-             */
-            void      setPositionRel(double newPositionRel);
-
-
-            /*! \brief Return the actual position relative to the file size.
-             *  \return Range is from 0..1
-             */
-           double    getPositionRel()   ;
-
-
-            /*! \brief Set the position in the avi-files absolute
-             *  \param newPositionAbs New position in the range is from 0..FrameCount
-             *  \remarks
-             *      For relative positioning use setPostionRel()
-             */
-            void  setPositionAbs(unsigned int newPositionAbs);
-
-
-            /*! \brief Return the position in the file, i.e. the framenumber.
-             *  \return Range is from 0..FrameCount 
-             */
-            unsigned int    getPositionAbs()   ;
-
-            /*! \brief Get the count of frames in the AVI
-             *  \remarks
-             *    In the case of a stereo grabber and different length
-             *    the shortest avi-file determine the length
-             */
-            unsigned int    getFrameCount() ;
+  /*! \brief This vector contains the needed captures.
+   *		One for every avi-file.
+   *   \see
+   *       mImageMatVector
+   */
+  std::vector<cv::VideoCapture> mCaptureVector;
 
 
 
-            /*! \brief This passes the arguments directly to the corresponding capture
-						 * 	 \remarks	With this Method, it is possible to get Information on any channel.	
-						 *   \param channel This is the index of the source you want parameter value.<br>
-             *   \param propId This is any supported property-Id<br>
-             *     If property-id is not supported or unknown, return value will be 0.
-             *   \remarks see OpenCV documentation for VideoCapture::get() for details
-             */
-             double getAviParam(unsigned int channel,int propId);
+private:
+  // none yet
 
-             /*! \brief Get fps for the given camera
-              *  \remarks
-              *    Default channel is 0
-              */
-             double getAviParamFps (unsigned int channel=0) ;
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+  // none yet
 
-             /*! \brief Get fourcc for the given camera
-              *  \remarks
-              *    Default channel is 0
-              */
-             double getAviParamFourcc (unsigned int channel=0);
+private:
+  // none yet
 
+}; // class cedar::dev::sensors::visual::VideoGrabber
 
-        protected:
-
-		  //------------------------------------------------------------------------
-		  // From GrabberInterface
-		  //------------------------------------------------------------------------
-
-            bool    onInit();
-            
-            /*! \brief Grab on all available files
-             *  \remarks
-             *      The shortest file determine the end
-             *      In case of looping through the files, the shortest file define the restart moment
-             */
-            bool    onGrab();
-
-            bool  onDeclareParameters();
-            
-            std::string onGetSourceInfo(unsigned int channel) const;
-
-
-    } ;
+#endif // CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 
 
 
-#endif
+
+

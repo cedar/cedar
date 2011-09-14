@@ -39,16 +39,21 @@
 #define CEDAR_DEV_SENSORS_VISUAL_DEFINES_H
 
 
+//Enable the CTRL-C handler?
+//#define ENABLE_CTRL_C_HANDLER
+
+
 //------------------------------------------------------------------------
-// defines for displaying init-informations
+// show informations on initialization?
 //------------------------------------------------------------------------
 #define SHOW_INIT_INFORMATION_VIDEOGRABBER
 #define SHOW_INIT_INFORMATION_NETGRABBER
 #define SHOW_INIT_INFORMATION_PICTUREGRABBER
 #define SHOW_INIT_INFORMATION_CAMERAGRABBER
 
+
 //------------------------------------------------------------------------
-// defines for debugging
+// debug output?
 //------------------------------------------------------------------------
 
 //#define DEBUG_GRABBER_INTERFACE

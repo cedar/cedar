@@ -28,7 +28,7 @@
     Email:       georg.hartinger@rub.de
     Date:        2011 08 01
 
-    Description: Namespace  for the @em cedar::devices::sensors::visual.
+    Description: Namespace for @em cedar::devices::sensors::visual.
 
     Credits:
 
@@ -98,4 +98,4 @@ namespace cedar
 
 
 
-#endif /* NAMESPACE_H_ */
+#endif /* CEDAR_DEV_SENSORS_VISUAL_NAMESPACE_H */

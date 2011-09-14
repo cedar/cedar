@@ -45,93 +45,144 @@
 
 // SYSTEM INCLUDES
 
-
-
-
-
-
-/*! \class PictureGrabber
- * 	\brief This grabber grabs images from a picture-file
+/*! \class cedar::dev::sensors::visual::PictureGrabber
+ *  \brief This grabber grabs images from a picture-file
+ *  \remarks This functionality is implemented by using the OpenCV classes
+ *		cv::ImRead. See their documentation for details about
+ *		supported image types.
  */
 
 
 
-class cedar::dev::sensors::visual::PictureGrabber : public GrabberInterface
+class cedar::dev::sensors::visual::PictureGrabber
+  : public GrabberInterface
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
 
-     //------------------------------------------------------------------------
-      // Init 
-      //------------------------------------------------------------------------
-       public:
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
 
-            /*! \brief  Constructor for a single-file grabber 
-             * 	\param grabberName 		The name for this grabber
-             *  \param configFileName	Filename for the configuration
-             * 	\param pictureFileName	Filename to grab from
-             */
-            PictureGrabber(std::string configFileName,
-                           std::string pictureFileName);
-
-
-            /*! \brief Constructor for a stereo-file grabber 
-             * 	\param grabberName 		The name for this grabber
-             *  \param configFileName	Filename for the configuration
-             * 	\param pictureFileName0	Filename to grab from for channel 0
-             * 	\param pictureFileName1	Filename to grab from for channel 1
-             */
-            PictureGrabber(std::string configFileName,
-                       std::string pictureFileName0,
-                       std::string pictureFileName1);
-
-            /*! \brief Destructor */
-            ~PictureGrabber();
-
-      
-		//------------------------------------------------------------------------
-		// Members
-		//------------------------------------------------------------------------
-
-		protected:
-        
-            /*! \brief The filenames
-             *
-             */
-            std::vector<std::string> mSourceFileName;
+  /*! \brief  Constructor for a single-file grabber
+   *  \param grabberName              The name for this grabber
+   *  \param configFileName	Filename for the configuration
+   *  \param pictureFileName	Filename to grab from
+   */
+  PictureGrabber(
+                 std::string configFileName,
+                 std::string pictureFileName
+                );
 
 
+  /*! \brief Constructor for a stereo-file grabber
+   *  \param grabberName		The name for this grabber
+   *  \param configFileName		Filename for the configuration
+   *  \param pictureFileName0	Filename to grab from for channel 0
+   *  \param pictureFileName1	Filename to grab from for channel 1
+   */
+  PictureGrabber(
+                 std::string configFileName,
+                 std::string pictureFileName0,
+                 std::string pictureFileName1
+                );
 
-      //------------------------------------------------------------------------
-      // Methods
-      //------------------------------------------------------------------------
-		public:
-		
-			/*! \brief Set a new picture to grab from
-			 *  \remarks
-			 *      Supported image-types depend on operating system and installed libs. <br>
-			 * 		  For details look at the OpenCV-documentation (Section "imread").
-			 *  \param channel which should be changed (default is 0).
-			 *  \param FileName of the newly used picture.
-			 */ 	
-			bool setSourceFile(unsigned int channel, const std::string& FileName );
+  /*! \brief Destructor */
+  ~PictureGrabber();
 
 
 
 
 
-		  //------------------------------------------------------------------------
-		  // From GrabberInterface
-		  //------------------------------------------------------------------------
-        protected:
-        
-            bool    onInit();
-            bool    onGrab();
 
-            bool    onDeclareParameters   ();
-	
-            std::string onGetSourceInfo(unsigned int channel) const;
-	
+  //------------------------------------------------------------------------
+  //Members
+  //------------------------------------------------------------------------
+
+protected:
 
 
-};
 
-#endif
+
+
+  //------------------------------------------------------------------------
+  //Methods
+  //------------------------------------------------------------------------
+
+public:
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*! \brief Set a new picture to grab from
+   *  \remarks
+   *	Supported image-types depend on operating system and installed libs. <br>
+   *	For details look at the OpenCV-documentation (Section "imread").
+   *  \param channel which should be changed (default is 0).
+   *  \param FileName of the newly used picture.
+   */
+  bool setSourceFile(
+                     unsigned int       channel,
+                     const std::string& FileName
+                    );
+
+
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+
+  //From GrabberInterface
+
+  bool onInit();
+  bool onGrab();
+  bool onDeclareParameters();
+  std::string onGetSourceInfo(
+                              unsigned int channel
+                             ) const;
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+  
+protected:
+  // none yet
+
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+
+  //! \brief The filenames
+  std::vector<std::string> mSourceFileName;
+
+private:
+  // none yet
+
+
+
+			     
+}; //class cedar::dev::sensors::visual::PictureGrabber
+
+#endif //CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H

@@ -48,82 +48,122 @@
 // SYSTEM INCLUDES
 
 
-
-
-/*! \class NetGrabber
- * 	\brief This grabber grabs images from a yarp-server located somewhere in the network 
+/*! \class cedar::dev::sensors::visual::NetGrabber
+ *	\brief This grabber grabs images from a yarp-server located somewhere in the network
+ *  \remarks This functionality is implemented by using the
+ *		cedar::aux::net::NetWriter and
+ *		cedar::aux::net::NetReader classes.
  */
 
-    class cedar::dev::sensors::visual::NetGrabber : public GrabberInterface
-    {
+class cedar::dev::sensors::visual::NetGrabber
+  : public GrabberInterface
+{
+//--------------------------------------------------------------------------------------------------------------------
+//macros
+//--------------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------------------
+//constructors and destructor
+//--------------------------------------------------------------------------------------------------------------------
+
+public:
+
+  /*! \brief  Constructor for a single channel grabber
+   *  \param grabberName	The name for thist grabber
+   *  \param configFileName	Filename for the configuration
+   *  \param YarpChannel	Channel to grab from
+   */
+  NetGrabber(
+             std::string configFileName,
+             std::string YarpChannel
+            );
+
+
+  /*! \brief  Constructor for a stereo channel grabber
+   *  \param grabberName	The name for thist grabber
+   *  \param configFileName	Filename for the configuration
+   *  \param YarpChannel0	Channel 0 to grab from
+   *  \param YarpChannel1	Channel 0 to grab from
+   */
+  NetGrabber(
+             std::string configFileName,
+             std::string YarpChannel0,
+             std::string YarpChannel1
+            );
+
+  //!@brief Destructor
+  ~NetGrabber();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //public methods
+  //--------------------------------------------------------------------------------------------------------------------
+
+public:
+  //none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+
+protected:
+
+  //------------------------------------------------------------------------
+  //From GrabberInterface
+  //------------------------------------------------------------------------
+  bool onInit();
+  bool onGrab();
+  bool onDeclareParameters();
+  std::string onGetSourceInfo(
+                              unsigned int channel
+                             ) const;
+
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //private methods
+  //--------------------------------------------------------------------------------------------------------------------
+
+private:
+  //none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //members
+  //--------------------------------------------------------------------------------------------------------------------
+
+public:
+  //none yet (hopefully never!)
+
+protected:
+
+
+  /*! \brief The yarp channels
+   *
+   */
+  std::vector<std::string> mYarpChannels;
+
+  /*! \brief This vector contains the needed Yarp Reads.
+   *		One for every channel.
+   *   \see
+   *       mImageMatVector
+   */
+  std::vector<cedar::aux::net::NetReader<cv::Mat>*> mYarpReaderVector;
+
+private:
+  //none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  //parameters
+  //--------------------------------------------------------------------------------------------------------------------
+
+public:
+  //none yet (hopefully never!)
+
+protected:
+  //none yet
+
+private:
+  //none yet
   
-
-      //------------------------------------------------------------------------
-      // Init and de-init
-      //------------------------------------------------------------------------
-       public:
-
-            /*! \brief  Constructor for a single channel grabber 
-             * 	\param grabberName 		The name for thist grabber
-             *  \param configFileName	Filename for the configuration
-             * 	\param YarpChannel		Channel to grab from
-             */
-            NetGrabber(std::string configFileName,
-                       std::string YarpChannel);
-
-
-            /*! \brief  Constructor for a stereo channel grabber 
-             * 	\param grabberName 		The name for thist grabber
-             *  \param configFileName	Filename for the configuration
-             * 	\param YarpChannel0		Channel 0 to grab from
-             * 	\param YarpChannel1		Channel 0 to grab from
-             */
-            NetGrabber(std::string configFileName,
-                       std::string YarpChannel0,
-                       std::string YarpChannel1);
-
-            /*! \brief Destructor */
-            ~NetGrabber();
-
-      //------------------------------------------------------------------------
-      // Internal
-      //------------------------------------------------------------------------
-
-		protected:
-        
-            /*! \brief The yarp channels
-             *
-             */
-            std::vector<std::string> mYarpChannels;
-
-            /*! \brief This vector contains the needed Yarp Reads.
-             *   One for every channel.
-                 \see
-                     mImageMatVector
-             */
-             std::vector<cedar::aux::net::NetReader<cv::Mat>*> mYarpReaderVector;
-
-            
-
-      //------------------------------------------------------------------------
-      // Methods
-      //------------------------------------------------------------------------
-
-
-
-      //------------------------------------------------------------------------
-      // From GrabberInterface
-      //------------------------------------------------------------------------
-
-        protected:
-
-            bool    onInit  ();
-            bool    onGrab  ();
-            bool    onDeclareParameters   ();
-            std::string onGetSourceInfo(unsigned int channel) const;
-
-
-    } ;
-
+}; //class cedar::dev::sensors::visual::NetGrabber
 
 #endif
