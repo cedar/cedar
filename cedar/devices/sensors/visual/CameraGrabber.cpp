@@ -45,38 +45,48 @@
 using namespace cv;
 using namespace cedar::dev::sensors::visual;
 
+//----------------------------------------------------------------------------------------------------------------------
+//constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------------------------------------
-// Constructor for single-file grabber
-CameraGrabber::CameraGrabber(std::string configFileName,
-                       unsigned int Camera0)
-    :   GrabberInterface(configFileName)
+//Constructor for single-file grabber
+CameraGrabber::CameraGrabber(
+                             std::string  configFileName,
+                             unsigned int Camera0
+                            )
+  : GrabberInterface(configFileName)
 {
-    mCameraId.push_back(Camera0);
-
-    doInit(mCameraId.size());
+  mCameraId.push_back(Camera0);
+  doInit(mCameraId.size(),"CameraGrabber");
 }
 
 
 //----------------------------------------------------------------------------------------------------
-// Constructor for stereo-file grabber
-CameraGrabber::CameraGrabber(std::string configFileName,
-           unsigned int Camera0,
-           unsigned int Camera1)
-:   GrabberInterface(configFileName)
+//Constructor for stereo-file grabber
+CameraGrabber::CameraGrabber(
+                             std::string  configFileName,
+                             unsigned int Camera0,
+                             unsigned int Camera1
+                            )
+  : GrabberInterface(configFileName)
 {
   mCameraId.push_back(Camera0);
   mCameraId.push_back(Camera1);
 
-  doInit(mCameraId.size());
+  doInit(mCameraId.size(),"CameraGrabber");
 }
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//methods
+//----------------------------------------------------------------------------------------------------------------------
+
 
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::onDeclareParameters()
 {
-  //set the default grabbername
-  //bool result = cedar::aux::ConfigurationInterface::addParameter(&_mName, "CameraGrabber", true) == CONFIG_SUCCESS;
-  //return result;
   return true;
 }
 
@@ -94,21 +104,22 @@ bool CameraGrabber::onInit()
 
   //local and/or stored Parameters are already initialized
 
-#if defined SHOW_INIT_INFORMATION_CAMERAGRABBER
-  std::cout << "CameraGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
-  for(unsigned int i=0; i<mNumCams;++i)
-  {
-     std::cout << "Channel "<< i<<": capture from: camera " << mCameraId.at(i) << "\n";
-  }
-  std::cout << std::flush;
-#endif
+  #if defined SHOW_INIT_INFORMATION_CAMERAGRABBER
+    std::cout << "CameraGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
+
+    for (unsigned int i = 0; i < mNumCams; ++i)
+    {
+      std::cout << "Channel " << i << ": capture from: camera " << mCameraId.at(i) << "\n";
+    }
+    std::cout << std::flush;
+  #endif
 
   mImageMatVector.clear();
   mCaptureVector.clear();
 
   //----------------------------------------
   //open capture one by one, and create storage (cv::Mat) for it
-  for(unsigned int i=0; i<mNumCams;++i)
+  for (unsigned int i = 0; i < mNumCams; ++i)
   {
     VideoCapture capture(mCameraId.at(i));
 
@@ -123,27 +134,25 @@ bool CameraGrabber::onInit()
     }
     else
     {
-      std::cout << "ERROR: Grabbing failed (Channel "<< i << ")." << std::endl;
+      std::cout << "ERROR: Grabbing failed (Channel " << i << ")." << std::endl;
       return false;
       //throws an initialization-exception, so program will terminate
     }
-
-
   }
-  // all grabbers successfully initialized
+  //all grabbers successfully initialized
 
   //----------------------------------------
   //check for highest FPS
   double fps = mCaptureVector.at(0).get(CV_CAP_PROP_FPS);
 
-  for(unsigned int i = 1; i < mNumCams; ++i)
+  for (unsigned int i = 1; i < mNumCams; ++i)
   {
     double fps_test = mCaptureVector.at(i).get(CV_CAP_PROP_FPS);
+
     if (fps_test > fps)
     {
       fps = fps_test;
     }
-
   }
 
 
@@ -152,12 +161,11 @@ bool CameraGrabber::onInit()
   setFps(fps);
 
   #if defined DEBUG_CAMERAGRABBER
-        std::cout << "[CameraGrabber::onInit] Initialize... finished" << std::endl;
+    std::cout << "[CameraGrabber::onInit] Initialize... finished" << std::endl;
   # endif
 
   return true;
-} // onInit()
-
+} //onInit()
 
 
 
@@ -165,34 +173,49 @@ bool CameraGrabber::onInit()
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::onGrab()
 {
-    int result = true;
+  int result = true;
 
-    for(unsigned int i = 0; i < mNumCams; ++i)                    //grab on all channels
+  //grab and retrieve
+  /*
+   * for(unsigned int i = 0; i < mNumCams; ++i)                    //grab on all channels
+   * {
+   * (mCaptureVector.at(i))>> mImageMatVector.at(i);
+   * }
+   * if (mCaptureVector.at(i).empty)
+   * {
+   * return false
+   * }
+   */
+
+  //for better synchronizing between the cameras,
+  //first grab (internally in camera) and then
+  for (unsigned int i = 0; i < mNumCams; ++i)                     //grab on all channels
+  {
+    result = result && mCaptureVector.at(i).grab();
+  }
+
+  if (result)
+  {
+    for (unsigned int i = 0; i < mNumCams; ++i)                     //grab on all channels
     {
-        (mCaptureVector.at(i))>> mImageMatVector.at(i);
-
-        //check if the end of a channel is reached
-        if(mImageMatVector.at(i).empty())
-        {
-               result = false;
-        }
+      result = result && mCaptureVector.at(i).retrieve(mImageMatVector.at(i));
     }
+  }
 
-
-    return result;
+  return result;
 }
 
 
-// ----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 std::string CameraGrabber::onGetSourceInfo(unsigned int channel) const
 {
   std::stringstream s;
-  s << "Camera "<<  mCameraId.at(channel) << ": No informations available";
+  s << "Camera " << mCameraId.at(channel) << ": No informations available";
   return s.str();
 }
 
 
-// ----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 double CameraGrabber::getCameraParam(unsigned int channel,int propId)
 {
   if (channel >= mNumCams)
@@ -202,17 +225,15 @@ double CameraGrabber::getCameraParam(unsigned int channel,int propId)
   return mCaptureVector.at(channel).get(propId);
 }
 
-// ----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 /*double CameraGrabber::getCameraParamFps (unsigned int channel)
-{
-  return getCameraParam(channel,CV_CAP_PROP_FPS);
-}
-*/
-// ----------------------------------------------------------------------------------------------------
+ * {
+ * return getCameraParam(channel,CV_CAP_PROP_FPS);
+ * }
+ */
+//----------------------------------------------------------------------------------------------------
 /* double CameraGrabber::getCameraParamFourcc (unsigned int channel)
-{
-  return getCameraParam(channel,CV_CAP_PROP_FOURCC);
-}
-*/
-
-
+ * {
+ * return getCameraParam(channel,CV_CAP_PROP_FOURCC);
+ * }
+ */

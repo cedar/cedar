@@ -47,116 +47,147 @@
 
 
 
-// ------------------------------------------------------------------------------------------------------------------
-
-/*! \class CameraGrabber
- *  \brief This grabber grabs images from avi-files
+/*! \class cedar::dev::sensors::visual::CameraGrabber
+ *  \brief This grabber grabs images from firewire cameras
+ *  \remarks This functionality is implemented by using OpenCV's
+ *           cv::VideoCapture class. See their documentation for details about
+ *           supported cameras.
  */
 
-    class cedar::dev::sensors::visual::CameraGrabber : public GrabberInterface
-    {
+class cedar::dev::sensors::visual::CameraGrabber
+  : public GrabberInterface
+{
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // constructors and destructor
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+
+  /*! \brief  Constructor for a single-file grabber
+   *  \param grabberName    The name for this grabber
+   *  \param configFileName Filename for the configuration
+   *  \param aviFileName    Filename to grab from
+   */
+  CameraGrabber(
+                std::string  configFileName,
+                unsigned int Camera0
+               );
 
 
-      //------------------------------------------------------------------------
-      // Init
-      //------------------------------------------------------------------------
-       public:
+  /*! \brief Constructor for a stereo-file grabber
+   *  \param grabberName    The name for this grabber
+   *  \param configFileName Filename for the configuration
+   *  \param aviFileName0   Filename to grab from for channel 0
+   *  \param aviFileName1   Filename to grab from for channel 1
+   */
+  CameraGrabber(
+                std::string  configFileName,
+                unsigned int Camera0,
+                unsigned int Camera1
+               );
 
-            /*! \brief  Constructor for a single-file grabber
-             *  \param grabberName    The name for this grabber
-             *  \param configFileName Filename for the configuration
-             *  \param aviFileName    Filename to grab from
-             */
-            CameraGrabber(std::string configFileName,
-                       unsigned int Camera0);
-
-
-            /*! \brief Constructor for a stereo-file grabber
-             *  \param grabberName    The name for this grabber
-             *  \param configFileName Filename for the configuration
-             *  \param aviFileName0   Filename to grab from for channel 0
-             *  \param aviFileName1   Filename to grab from for channel 1
-             */
-            CameraGrabber(std::string configFileName,
-                       unsigned int Camera0,
-                       unsigned int Camera1);
-
-            /*! \brief Destructor */
-            ~CameraGrabber();
+  /*! \brief Destructor */
+  ~CameraGrabber();
 
 
-    //------------------------------------------------------------------------
-    // Internal
-    //------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
+  // public methods
+  //--------------------------------------------------------------------------------------------------------------------
+public:
 
-    protected:
-
-            /*! \brief The Id's of the cameras
-             *
-             */
-            std::vector<unsigned int> mCameraId;
-
-
-           /*! \brief This vector contains the needed captures.
-            *   One for every camera.
-                \see
-                    mCameraId
-            */
-            std::vector<cv::VideoCapture> mCaptureVector;
-
-
-      //------------------------------------------------------------------------
-      // Methods
-      //------------------------------------------------------------------------
-
-    public:
-
-
-
-            /*! \brief This passes the arguments directly to the corresponding capture
-             *   \remarks With this Method, it is possible to get Information on any channel.
-             *   \param channel This is the index of the source you want parameter value.<br>
-             *   \param propId This is any supported property-Id<br>
-             *     If property-id is not supported or unknown, return value will be 0.
-             *   \remarks see OpenCV documentation for VideoCapture::get() for details
-             */
-             double getCameraParam(unsigned int channel,int propId);
-
-             /*! \brief Get fps for the given camera
-              *  \remarks
-              *    Default channel is 0
-              */
-             //double getAviParamFps (unsigned int channel=0) ;
-
-             /*! \brief Get fourcc for the given camera
-              *  \remarks
-              *    Default channel is 0
-              */
-             //double getAviParamFourcc (unsigned int channel=0);
-
-
-        protected:
-
-      //------------------------------------------------------------------------
-      // From GrabberInterface
-      //------------------------------------------------------------------------
-
-            bool    onInit();
-
-            /*! \brief Grab on all available files
-             *  \remarks
-             *      The shortest file determine the end
-             *      In case of looping through the files, the shortest file define the restart moment
-             */
-            bool    onGrab();
-
-            bool  onDeclareParameters();
-
-            std::string onGetSourceInfo(unsigned int channel) const;
-
-
-    } ;
+  /*! \brief This passes the arguments directly to the corresponding capture
+   *   \remarks With this Method, it is possible to get Information on any channel.
+   *   \param channel This is the index of the source you want parameter value.<br>
+   *   \param propId This is any supported property-Id<br>
+   *     If property-id is not supported or unknown, return value will be 0.
+   *   \remarks see OpenCV documentation for VideoCapture::get() for details
+   */
+  double getCameraParam(
+                        unsigned int channel,
+                        int          propId
+                       );
 
 
 
-#endif
+  /*! \brief Get fps for the given camera
+   *  \remarks
+   *    Default channel is 0
+   */
+  //double getSourceFps (unsigned int channel=0) ;
+
+  /*! \brief Get fourcc for the given camera
+   *  \remarks
+   *    Default channel is 0
+   */
+  //double getSourceEncoding (unsigned int channel=0);
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  
+  //------------------------------------------------------------------------
+  //From GrabberInterface
+  //------------------------------------------------------------------------
+
+  bool onInit();
+
+  /*! \brief Grab on all available files
+   *  \remarks
+   *      The shortest file determine the end
+   *      In case of looping through the files, the shortest file define the restart moment
+   */
+  bool onGrab();
+
+  bool onDeclareParameters();
+  std::string onGetSourceInfo(
+                              unsigned int channel
+                             ) const;
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+
+  /*! \brief The Id's of the cameras
+   *
+   */
+  std::vector<unsigned int> mCameraId;
+
+
+  /*! \brief This vector contains the needed captures.
+   *    One for every camera.
+   *  \see
+   *    mCameraId
+   */
+  std::vector<cv::VideoCapture> mCaptureVector;private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::dev::sensors::visual::CameraGrabber
+
+#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
+
+

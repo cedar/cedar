@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        InitializationException.h
+    File:        GrabberRecordingException.h
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ruhr-uni-bochum.de

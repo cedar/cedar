@@ -48,195 +48,206 @@
 
 using namespace cedar::dev::sensors::visual;
 
+
+//----------------------------------------------------------------------------------------------------------------------
+//constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+
 //----------------------------------------------------------------------------------------------------
-// Constructor for single-channel grabber
-NetGrabber::NetGrabber(std::string configFileName,
-                       std::string YarpChannel)
-    :   GrabberInterface(configFileName)
+//Constructor for single-channel grabber
+NetGrabber::NetGrabber(
+                       std::string configFileName,
+                       std::string YarpChannel
+                      )
+  : GrabberInterface(configFileName)
 {
-    mYarpChannels.push_back(YarpChannel);
-    doInit(mYarpChannels.size());
+  mYarpChannels.push_back(YarpChannel);
+  doInit(mYarpChannels.size(),"NetGrabber");
 }
 
 
 
 //----------------------------------------------------------------------------------------------------
-// Constructor for stereo-channel grabber
-NetGrabber::NetGrabber(std::string configFileName,
-           std::string YarpChannel0,
-           std::string YarpChannel1)
-:   GrabberInterface( configFileName)
+//Constructor for stereo-channel grabber
+NetGrabber::NetGrabber(
+                       std::string configFileName,
+                       std::string YarpChannel0,
+                       std::string YarpChannel1
+                      )
+  : GrabberInterface( configFileName)
 {
   mYarpChannels.push_back(YarpChannel0);
   mYarpChannels.push_back(YarpChannel1);
-  doInit( mYarpChannels.size());
-
+  doInit( mYarpChannels.size(),"NetGrabber");
 }
 
 //----------------------------------------------------------------------------------------------------
 NetGrabber::~NetGrabber()
 {
-  std::cout<<"YarpGrabber::Destructor\n";
-  for(unsigned int i=0; i<mNumCams;++i)
+  std::cout << "YarpGrabber::Destructor\n";
+
+  for (unsigned int i = 0; i < mNumCams; ++i)
   {
     delete &mYarpChannels.at(i);
     mYarpChannels.pop_back();
   }
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+//methods
+//----------------------------------------------------------------------------------------------------------------------
+
+
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onInit()
 {
-#if defined SHOW_INIT_INFORMATION_NETGRABBER
-  //-------------------------------------------------
-  std::cout << "\n\nYarpGrabber.onInit()\n";
-  std::cout << "YarpGrabber: Initialize Grabber with " << mNumCams << " channels ..." << std::endl;
+  #if defined SHOW_INIT_INFORMATION_NETGRABBER
+    //-------------------------------------------------
+    std::cout << "\n\nYarpGrabber.onInit()\n";
+    std::cout << "YarpGrabber: Initialize Grabber with " << mNumCams << " channels ..." << std::endl;
 
- for(unsigned int i=0; i<mNumCams;++i)
-  {
-    std::cout << "Channel "<< i <<": capture from yarpchannel: " << mYarpChannels.at(i) << "\n";
-  }
-  std::cout << std::flush;
-#endif
+    for (unsigned int i = 0; i < mNumCams; ++i)
+    {
+      std::cout << "Channel " << i << ": capture from yarpchannel: " << mYarpChannels.at(i) << "\n";
+    }
+    std::cout << std::flush;
+  #endif
 
   mImageMatVector.clear();
   mYarpReaderVector.clear();
 
   //-------------------------------------------------
   //open capture one by one
-  cedar::aux::net::NetReader<cv::Mat> *YarpReader=NULL;
+  cedar::aux::net::NetReader<cv::Mat> *YarpReader = NULL;
 
-  for(unsigned int i=0; i<mNumCams;++i)
+  for (unsigned int i = 0; i < mNumCams; ++i)
   {
 
     //loop until connection established
-    std::cout << "NetGrabber: Create channel "<< i << ": "<<mYarpChannels.at(i)<<" "<<std::flush;
+    std::cout << "NetGrabber: Create channel " << i << ": " << mYarpChannels.at(i) << " " << std::flush;
     do
     {
       try
       {
-        std::cout << "."<<std::flush;
+        std::cout << "." << std::flush;
         YarpReader = new cedar::aux::net::NetReader<cv::Mat>(mYarpChannels.at(i));
-        std::cout << "ok"<< std::endl;
+        std::cout << "ok" << std::endl;
 
         mYarpReaderVector.push_back(YarpReader);
-        std::cout << "push_back ok"<< std::endl;
+        std::cout << "push_back ok" << std::endl;
 
         //grab first frame on initializtion
-
       }
       catch (cedar::aux::exc::NetWaitingForWriterException &E)
-
       {
-        // somehow YARP doesnt work ... :( typically fatal.
-        std::cout << "ERROR [NetWaitingForWriterException]: Initialization failed (Channel "<< i << ")." << std::endl;
-         //TODO: undo the already initialized grabbers ???
-         return false;
+        //somehow YARP doesnt work ... :( typically fatal.
+        std::cout << "ERROR [NetWaitingForWriterException]: Initialization failed (Channel " << i << ")."
+                  << std::endl;
+        //TODO: undo the already initialized grabbers ???
+        return false;
       }
-      catch(...)
+      catch (...)
       {
-        std::cout << "ERROR [undefined]: Initialization failed (Channel "<< i << ")." << std::endl;
+        std::cout << "ERROR [undefined]: Initialization failed (Channel " << i << ")." << std::endl;
       }
-    } while(!YarpReader);
+    } while (!YarpReader);
 
 
     //loop until first image received
-    std::cout << "Yarp-Grabber: Try to read from channel "<<i<<" ";
+    std::cout << "Yarp-Grabber: Try to read from channel " << i << " ";
 
-    cv::Mat frame=cv::Mat();
-    bool reading_ok=true;
+    cv::Mat frame   = cv::Mat();
+    bool reading_ok = true;
 
     do
     {
       try
       {
-        std::cout << "."<<std::flush;
+        std::cout << "." << std::flush;
         frame = mYarpReaderVector.at(i)->read();
-        std::cout << "ok"<<std::endl;
+        std::cout << "ok" << std::endl;
         mImageMatVector.push_back(frame);
-        reading_ok=true;
+        reading_ok = true;
       }
       catch (cedar::aux::exc::NetUnexpectedDataException &E)
-      //catch(...)
       {
-        // somehow YARP doesnt work ... :( typically fatal.
+        //catch(...)
+        //somehow YARP doesnt work ... :( typically fatal.
         reading_ok = false;
         usleep(5000);
         //std::cout << "ERROR: Initialization failed (Channel "<< i << ")." << std::endl;
-         //TODO: undo the already initialized grabbers ???
-         //return false;
+        //TODO: undo the already initialized grabbers ???
+        //return false;
       }
-    } while(!reading_ok);
+    } while (!reading_ok);
 
     std::cout << std::endl;
   }
 
 
-  // all grabbers successfully initialized
-#if defined DEBUG_NETGRABBER
+  //all grabbers successfully initialized
+  #if defined DEBUG_NETGRABBER
     std::cout << "YarpGrabber: Initialize... finished" << std::endl;
-# endif
+  # endif
 
-    //TODO
-    //set fps 
-    //until now, it is set to default value of loopedThread
-    //maybe read fps and check against default value from loopedthread
-    //to decide if it was load from config-file 
+  //TODO
+  //set fps
+  //until now, it is set to default value of loopedThread
+  //maybe read fps and check against default value from loopedthread
+  //to decide if it was load from config-file
 
   return true;
-} // onInit()
+} //onInit()
 
 
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onDeclareParameters()
 {
-  //set the default grabbername
- // bool result = cedar::aux::ConfigurationInterface::addParameter(&_mName, "NetGrabber", true) == CONFIG_SUCCESS;
-  //return result;
   return true;
 }
 
 //----------------------------------------------------------------------------------------------------
 std::string NetGrabber::onGetSourceInfo(unsigned int channel) const
 {
-	//TODO: gather information of used yarp-server too
-	return mYarpChannels.at(channel);
+  //TODO: gather information of used yarp-server too
+  return mYarpChannels.at(channel);
 }
 
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onGrab()
 {
-    //unsigned int numCams = getNumCams();
-    int result = true;
+  //unsigned int numCams = getNumCams();
+  int result = true;
 
-    for(unsigned int i = 0; i < mNumCams; ++i)
+  for (unsigned int i = 0; i < mNumCams; ++i)
+  {
+    //nonblocking version of netreader
+
+    //on exception leave programm, so we don't catch it here
+    //try
+    //{
+    mImageMatVector.at(i) = mYarpReaderVector.at(i)->read();
+    /* }
+     * catch (cedar::aux::exc::NetUnexpectedDataException &E)
+     * {
+     *
+     * //
+     *
+     * //@TODO: Timeout for last matrix
+     * //    how to detect the end of a stream??
+     *
+     * //howto detect a false matrix
+     * //result = false;
+     *
+     * }
+     */
+
+    if (mImageMatVector.at(i).empty())
     {
-        //nonblocking version of netreader
-
-       // on exception leave programm, so we don't catch it here
-       // try
-       // {
-          mImageMatVector.at(i) = mYarpReaderVector.at(i)->read() ;
-       /* }
-        catch (cedar::aux::exc::NetUnexpectedDataException &E)
-        {
-
-          //
-
-          //@TODO: Timeout for last matrix
-          //    how to detect the end of a stream??
-
-          //howto detect a false matrix
-          //result = false;
-
-        }
-        */
-        
-        if(mImageMatVector.at(i).empty())
-        {
-          result = false;
-        }
-     }
-     return result;
-} // onGrab()
+      result = false;
+    }
+  }
+  return result;
+} //onGrab()
 
