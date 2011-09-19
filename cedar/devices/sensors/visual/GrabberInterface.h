@@ -528,7 +528,7 @@ private:
      *      This function only calls exit(). Exit terminate the process normally, performing the regular cleanup for terminating processes.
      *   \param sig The captured signal. Only CTRL-C is implemented
      */
-    void sigIntHandler(int sig);
+    static void sigIntHandler(int sig);
 #endif
 
     
