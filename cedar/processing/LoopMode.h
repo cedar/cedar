@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        LoopedTrigger.h
+    File:        LoopMode.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 06
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 09 20
 
     Description:
 
@@ -38,58 +34,48 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_LOOPED_TRIGGER_H
-#define CEDAR_PROC_LOOPED_TRIGGER_H
+#ifndef CEDAR_PROC_LOOP_MODE_H
+#define CEDAR_PROC_LOOP_MODE_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/EnumType.h"
 #include "processing/namespace.h"
-#include "processing/Trigger.h"
-#include "auxiliaries/LoopedThread.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/EnumParameter.h"
-
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <QObject>
 
-/*!@brief A Trigger that sends trigger events in a constant loop.
+
+/*!@brief Abstract description of the class.
  *
- *        This class is a translation of the cedar::aux::LoopedThread concept into the processing framework.
+ * More detailed description of the class.
  */
-class cedar::proc::LoopedTrigger : public cedar::aux::LoopedThread,
-                                   public cedar::proc::Trigger
+class cedar::proc::LoopMode
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+public:
+  typedef cedar::aux::EnumId Id;
+public:
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  LoopedTrigger(double stepSize = 1.0);
 
   //!@brief Destructor
-  virtual ~LoopedTrigger();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void step(double time);
+  static void construct();
 
-  //!@todo Make the start/stop methods in LoopedThread virtual?
-  void startTrigger();
-  void stopTrigger();
-
-public slots:
-  void loopModeChanged();
-  void loopTimeChanged();
+  static const cedar::aux::EnumBase& type();
+  static const cedar::proc::LoopMode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,23 +93,27 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (hopefully never!)
+  static const Id FIXED_ADAPTIVE = 0;
+  static const Id FIXED = 1;
+  static const Id REALTIME = 2;
+
 protected:
-
+  // none yet
 private:
-
+  static cedar::aux::EnumType<cedar::proc::LoopMode> mType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  cedar::aux::EnumParameterPtr mLoopType;
-  cedar::aux::DoubleParameterPtr mLoopTime;
+  // none yet
 
-}; // class cedar::proc::LoopedTrigger
+}; // class cedar::proc::DataRole
 
-#endif // CEDAR_PROC_LOOPED_TRIGGER_H
+#endif // CEDAR_PROC_DATA_ROLE_H
 
