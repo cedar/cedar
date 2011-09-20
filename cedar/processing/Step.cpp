@@ -423,12 +423,13 @@ void cedar::proc::Step::run()
   this->mpArgumentsLock->lockForRead();
   if (this->mNextArguments.get() == NULL)
   {
+#ifdef DEBUG
+    std::cout << "processing::Step [debug]> Warning: using default arguments for step " << this->getName() << "."
+              << " Current argument's address is: " << this->mNextArguments.get() << std::endl;
+#endif // DEBUG
     this->mpArgumentsLock->unlock();
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
-#ifdef DEBUG
-    std::cout << "processing::Step [debug]> Warning: using default arguments for step " << this->getName() << "." << std::endl;
-#endif // DEBUG
   }
   this->mpArgumentsLock->unlock();
 
@@ -459,7 +460,6 @@ void cedar::proc::Step::run()
 
   // remove the argumens, as they have been processed.
   this->mNextArguments.reset();
-
   this->mBusy = false;
   this->mFinished->trigger();
 }
@@ -474,18 +474,22 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
   this->mRunInThread->set(isThreaded);
 }
 
-void cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
+/*!
+ * @returns True, if the arguments were set successfully, false otherwise.
+ *
+ * @remarks The function returns false only if arguments have previously been set that were not yet processed by the
+ *          run function.
+ */
+bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
 {
-  mpArgumentsLock->lockForWrite();
-#ifdef DEBUG
   if (this->mNextArguments.get() != NULL)
   {
-    std::cout << "Warning from ProcessingStep " << this->getName()
-              << ": Overwriting arguments." << std::endl;
+    return false;
   }
-#endif // DEBUG
+  mpArgumentsLock->lockForWrite();
   this->mNextArguments = arguments;
   mpArgumentsLock->unlock();
+  return true;
 }
 
 void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, bool mandatory)
