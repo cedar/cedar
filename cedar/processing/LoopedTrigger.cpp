@@ -44,6 +44,7 @@
 #include "processing/StepTime.h"
 #include "units/TimeUnit.h"
 #include "processing/Manager.h"
+#include "processing/LoopMode.h"
 
 // PROJECT INCLUDES
 
@@ -56,8 +57,17 @@
 
 cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
 :
-cedar::aux::LoopedThread(stepSize)
+cedar::aux::LoopedThread(stepSize),
+mLoopType(new cedar::aux::EnumParameter("LoopMode", cedar::proc::LoopMode::typePtr(), cedar::proc::LoopMode::FIXED_ADAPTIVE)),
+//!@todo Make a TimeParameter and use it here instead.
+mLoopTime(new cedar::aux::DoubleParameter("LoopTime", 1000.0, 1.0, 1000000.0))
 {
+  //!@todo Should these parameters go into cedar::aux::LoopedThread?
+  this->registerParameter(mLoopType);
+  this->registerParameter(mLoopTime);
+
+  QObject::connect(this->mLoopType.get(), SIGNAL(valueChanged()), this, SLOT(loopModeChanged()));
+  QObject::connect(this->mLoopTime.get(), SIGNAL(valueChanged()), this, SLOT(loopTimeChanged()));
 }
 
 cedar::proc::LoopedTrigger::~LoopedTrigger()
@@ -67,6 +77,32 @@ cedar::proc::LoopedTrigger::~LoopedTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::LoopedTrigger::loopModeChanged()
+{
+  this->mLoopTime->setConstant(false);
+  this->useFixedStepSize(false);
+  switch (this->mLoopType->get())
+  {
+    case cedar::proc::LoopMode::FIXED:
+      this->setStepSize(this->mLoopTime->get());
+    default:
+    case cedar::proc::LoopMode::FIXED_ADAPTIVE:
+      this->useFixedStepSize(true);
+      break;
+
+    case cedar::proc::LoopMode::REALTIME:
+      this->mLoopTime->setConstant(true);
+      this->setSimulatedTime();
+      this->setStepSize(0.0);
+      break;
+  }
+}
+
+void cedar::proc::LoopedTrigger::loopTimeChanged()
+{
+  this->setStepSize(this->mLoopTime->get());
+}
 
 void cedar::proc::LoopedTrigger::startTrigger()
 {
