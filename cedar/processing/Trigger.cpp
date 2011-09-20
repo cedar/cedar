@@ -84,8 +84,13 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->setNextArguments(arguments);
-    this->mListeners.at(i)->onTrigger();
+    // If the arguments can be set, trigger the step.
+    //!@todo For dynamics, this can mean that some step times are discarded rather than accumulated.
+    if (this->mListeners.at(i)->setNextArguments(arguments))
+    {
+      this->mListeners.at(i)->onTrigger();
+    }
+    // Otherwise, the step is skipped this time.
   }
   for (size_t i = 0; i < this->mTriggers.size(); ++i)
   {

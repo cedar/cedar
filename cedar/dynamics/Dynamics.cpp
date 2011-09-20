@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        Dynamics.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,

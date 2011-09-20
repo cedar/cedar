@@ -118,7 +118,8 @@ public:
                                             cedar::aux::DataPtr data
                                           ) const;
 
-  void setNextArguments(cedar::proc::ArgumentsPtr arguments);
+  //!@brief Sets the arguments used by the next execution of the run function.
+  bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
   cedar::proc::TriggerPtr& getFinishedTrigger();
 

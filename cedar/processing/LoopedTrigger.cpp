@@ -60,7 +60,7 @@ cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
 cedar::aux::LoopedThread(stepSize),
 mLoopType(new cedar::aux::EnumParameter("LoopMode", cedar::proc::LoopMode::typePtr(), cedar::proc::LoopMode::FIXED_ADAPTIVE)),
 //!@todo Make a TimeParameter and use it here instead.
-mLoopTime(new cedar::aux::DoubleParameter("LoopTime", 1000.0, 1.0, 1000000.0))
+mLoopTime(new cedar::aux::DoubleParameter("LoopTime", 1.0, 1.0, 1000000.0))
 {
   //!@todo Should these parameters go into cedar::aux::LoopedThread?
   this->registerParameter(mLoopType);
