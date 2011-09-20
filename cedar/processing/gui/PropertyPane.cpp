@@ -152,11 +152,11 @@ void cedar::proc::gui::PropertyPane::addLabelRow(const std::string& label)
   this->setSpan(row, 0, 1, 2);
 }
 
-void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterMap& parameters)
+void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterList& parameters)
 {
-  for (cedar::aux::Configurable::ParameterMap::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
+  for (cedar::aux::Configurable::ParameterList::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
   {
-    this->addPropertyRow(iter->second);
+    this->addPropertyRow(*iter);
   }
 }
 

@@ -103,7 +103,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void append(cedar::proc::Step::ParameterMap& parameters);
+  void append(cedar::proc::Step::ParameterList& parameters);
 
   void addHeadingRow(const std::string& label);
 

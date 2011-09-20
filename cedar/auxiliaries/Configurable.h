@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <map>
+#include <list>
 
 /*!@brief Abstract description of the class.
  *
@@ -58,7 +59,8 @@ class cedar::aux::Configurable
   // macros and types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::map<std::string, cedar::aux::ParameterBasePtr> ParameterMap;
+  typedef std::list<cedar::aux::ParameterBasePtr> ParameterList;
+  typedef std::map<std::string, ParameterList::iterator> ParameterMap;
   typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -80,8 +82,8 @@ public:
   void saveJson(const std::string& filename);
   const Children& configurableChildren() const;
 
-  const ParameterMap& getParameters() const;
-  ParameterMap& getParameters();
+  const ParameterList& getParameters() const;
+  ParameterList& getParameters();
   void setName(const std::string& name);
   const std::string& getName() const;
 
@@ -116,11 +118,12 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  ParameterMap mParameters;
   StringParameterPtr _mName;
-  Children mChildren;
 
 private:
+  ParameterList mParameterOrder;
+  ParameterMap mParameterAssociations;
+  Children mChildren;
   // none yet
 
 }; // class cedar::aux::Configurable
