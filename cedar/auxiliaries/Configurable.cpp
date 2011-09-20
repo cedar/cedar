@@ -74,9 +74,9 @@ cedar::aux::Configurable::~Configurable()
 
 void cedar::aux::Configurable::configurationLoaded()
 {
-  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
+  for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
   {
-    iter->second->emitChangedSignal();
+    (*iter)->emitChangedSignal();
   }
 }
 
@@ -107,24 +107,33 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterBasePtr pa
 {
   //! @todo check for duplicate names
   //! @todo make sure there are no dots in the name; make a global function for name checks.
-  this->mParameters[parameter->getName()] = parameter;
+
+  if (this->mParameterAssociations.find(parameter->getName()) != this->mParameterAssociations.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: " + parameter->getName());
+  }
+
+  this->mParameterOrder.push_back(parameter);
+  ParameterList::iterator last_iter = this->mParameterOrder.end();
+  --last_iter;
+  this->mParameterAssociations[parameter->getName()] = last_iter;
 }
 
-const cedar::aux::Configurable::ParameterMap& cedar::aux::Configurable::getParameters() const
+const cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters() const
 {
-  return this->mParameters;
+  return this->mParameterOrder;
 }
 
-cedar::aux::Configurable::ParameterMap& cedar::aux::Configurable::getParameters()
+cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters()
 {
-  return this->mParameters;
+  return this->mParameterOrder;
 }
 
 void cedar::aux::Configurable::saveConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
+  for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
   {
-    iter->second->putTo(root);
+    (*iter)->putTo(root);
   }
 
   for (Children::iterator child = this->mChildren.begin(); child != this->mChildren.end(); ++child)
@@ -137,26 +146,27 @@ void cedar::aux::Configurable::saveConfiguration(cedar::aux::ConfigurationNode& 
 
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  for (ParameterMap::iterator iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
+  for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
   {
+    cedar::aux::ParameterBasePtr& parameter = *iter;
     try
     {
-      const cedar::aux::ConfigurationNode& value = node.get_child(iter->second->getName());
-      iter->second->setTo(value);
+      const cedar::aux::ConfigurationNode& value = node.get_child(parameter->getName());
+      parameter->setTo(value);
     }
     catch (const boost::property_tree::ptree_bad_path& e)
     {
-      if (! iter->second->getHasDefault())
+      if (!parameter->getHasDefault())
       {
         std::string error_message;
-        error_message = "Config node " + iter->second->getName() + " not found. Node names are:";
+        error_message = "Config node " + parameter->getName() + " not found. Node names are:";
 
         for (cedar::aux::ConfigurationNode::const_iterator node_iter = node.begin();
              node_iter != node.end();
              ++node_iter)
         {
           error_message += " " + node_iter->first;
-          if (node_iter->first == iter->second->getName())
+          if (node_iter->first == parameter->getName())
           {
             std::cout << "this is identical" << std::endl;
           }
@@ -168,7 +178,7 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
       }
       else
       {
-        iter->second->makeDefault();
+        parameter->makeDefault();
       }
     }
   }
