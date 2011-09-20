@@ -76,6 +76,10 @@ public:
   //!@todo change from step to configuragle when the change is made in cedar::processing.
   void display(cedar::proc::StepPtr pStep);
 
+  void display(cedar::proc::TriggerPtr pTrigger);
+
+  void display(cedar::aux::ConfigurablePtr pConfigurable);
+
   void resetContents();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -115,6 +119,7 @@ protected:
 private:
   static DataWidgetTypes mDataWidgetTypes;
   cedar::proc::StepPtr mDisplayedStep;
+  cedar::proc::TriggerPtr mDisplayedTrigger;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

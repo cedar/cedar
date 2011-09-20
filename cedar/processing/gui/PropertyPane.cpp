@@ -94,16 +94,32 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 
   std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
   this->addLabelRow(label);
-  this->append(pStep->getParameters());
+  this->display(boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pStep));
+  mDisplayedStep = pStep;
+}
 
-  for (cedar::aux::Configurable::Children::const_iterator iter = pStep->configurableChildren().begin();
-       iter != pStep->configurableChildren().end();
+void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
+{
+  this->resetContents();
+
+  std::string label = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(pTrigger)->getClassId();
+  this->addLabelRow(label);
+  this->display(boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));
+
+  this->mDisplayedTrigger = pTrigger;
+}
+
+void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
+{
+  this->append(pConfigurable->getParameters());
+
+  for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
+       iter != pConfigurable->configurableChildren().end();
        ++iter)
   {
     this->addHeadingRow(iter->first);
     this->append(iter->second->getParameters());
   }
-  mDisplayedStep = pStep;
 }
 
 void cedar::proc::gui::PropertyPane::addHeadingRow(const std::string& label)
@@ -185,11 +201,16 @@ void cedar::proc::gui::PropertyPane::redraw()
   {
     this->display(mDisplayedStep);
   }
+  else if (mDisplayedTrigger)
+  {
+    this->display(mDisplayedTrigger);
+  }
 }
 
 void cedar::proc::gui::PropertyPane::resetPointer()
 {
   this->mDisplayedStep.reset();
+  this->mDisplayedTrigger.reset();
   this->clearContents();
   this->setRowCount(0);
 }

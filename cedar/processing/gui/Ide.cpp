@@ -246,10 +246,13 @@ void cedar::proc::gui::Ide::sceneItemSelected()
   this->mpPropertyTable->resetContents();
   if (selected_items.size() == 1)
   {
-    cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]);
-    if (p_drawer)
+    if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]))
     {
       this->mpPropertyTable->display(p_drawer->getStep());
+    }
+    else if (cedar::proc::gui::TriggerItem *p_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected_items[0]))
+    {
+      this->mpPropertyTable->display(p_drawer->getTrigger());
     }
   }
 }
