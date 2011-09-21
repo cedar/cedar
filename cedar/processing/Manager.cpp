@@ -100,6 +100,7 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
 
 cedar::proc::Manager::~Manager()
 {
+  this->stopThreads();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -167,9 +168,9 @@ void cedar::proc::Manager::startThreads()
   }
 }
 
-void cedar::proc::Manager::stopThreads()
+void cedar::proc::Manager::stopThreads(bool wait)
 {
-  //!@todo wait for all threads to stop
+  // Stop all the threads
   for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
   {
     //!@todo Ugly solution -- is there a better one?
@@ -185,6 +186,19 @@ void cedar::proc::Manager::stopThreads()
   for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
   {
     (*iter)->stop();
+  }
+
+  // wait for all threads to finish
+  if (wait)
+  {
+    for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
+    {
+      (*iter)->wait();
+    }
+    for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
+    {
+      (*iter)->wait();
+    }
   }
 }
 

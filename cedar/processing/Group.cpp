@@ -103,6 +103,15 @@ void cedar::proc::Group::stop()
   }
 }
 
+void cedar::proc::Group::wait()
+{
+  mGroupTrigger->wait();
+  for (ChildGroups::iterator iter = mGroups.begin(); iter != mGroups.end(); iter++)
+  {
+    (*iter)->wait();
+  }
+}
+
 cedar::proc::Group::ChildSteps& cedar::proc::Group::steps()
 {
   return this->mSteps;

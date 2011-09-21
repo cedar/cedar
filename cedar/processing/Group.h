@@ -84,6 +84,7 @@ public:
   void removeGroup(cedar::proc::GroupPtr group);
   void start();
   void stop();
+  void wait();
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
   void saveConfiguration(cedar::aux::ConfigurationNode& root);
