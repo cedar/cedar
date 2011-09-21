@@ -253,6 +253,72 @@ void cedar::proc::Step::checkMandatoryConnections()
   }
 }
 
+void cedar::proc::Step::getDataLocks(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
+{
+  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
+       slot != this->mDataConnections.end();
+       ++slot)
+  {
+    this->getDataLocks(slot->first, locks);
+  }
+}
+
+/*!
+ * @remkars The locks will be inserted into the set, the set is not cleared beforehand.
+ */
+void cedar::proc::Step::getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
+{
+  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
+  if (slot == this->mDataConnections.end())
+  {
+    // ok, no slots
+    return;
+  }
+
+  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
+  {
+    cedar::aux::DataPtr data = iter->second->getData();
+    if (data)
+    {
+      locks.insert(std::make_pair(&data->getLock(), role));
+    }
+  }
+}
+
+void cedar::proc::Step::lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
+{
+  for (std::set<std::pair<QReadWriteLock*, DataRole::Id> >::iterator iter = locks.begin();
+       iter != locks.end();
+       ++iter)
+  {
+    switch (iter->second)
+    {
+      case cedar::proc::DataRole::INPUT:
+        iter->first->lockForRead();
+        break;
+
+      case cedar::proc::DataRole::OUTPUT:
+      case cedar::proc::DataRole::BUFFER:
+        iter->first->lockForWrite();
+        break;
+
+      default:
+        // should never happen unless a role is
+        CEDAR_THROW(cedar::proc::InvalidRoleException, "The given role is not implemented in cedar::proc::Step::lock.");
+    }
+  }
+}
+
+void cedar::proc::Step::unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
+{
+  for (std::set<std::pair<QReadWriteLock*, DataRole::Id> >::iterator iter = locks.begin();
+       iter != locks.end();
+       ++iter)
+  {
+    iter->first->unlock();
+  }
+}
+
 void cedar::proc::Step::lockAll()
 {
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
@@ -434,7 +500,9 @@ void cedar::proc::Step::run()
   this->mpArgumentsLock->unlock();
 
   //!@todo make the (un)locking optional?
-  this->lockAll();
+  std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
+  this->getDataLocks(locks);
+  this->lock(locks);
 
   //!@todo this blocks writing of new arguments and thus (potentially) incoming trigger signals. Is this what we want?
   this->mpArgumentsLock->lockForRead();
@@ -456,7 +524,8 @@ void cedar::proc::Step::run()
   }
   this->mpArgumentsLock->unlock();
 
-  this->unlockAll();
+  this->unlock(locks);
+//  this->unlockAll();
 
   // remove the argumens, as they have been processed.
   this->mNextArguments.reset();
