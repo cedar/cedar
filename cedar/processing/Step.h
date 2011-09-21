@@ -56,6 +56,7 @@
 #include <QThread>
 #include <QReadWriteLock>
 #include <map>
+#include <set>
 
 
 /*!@brief Abstract description of the class.
@@ -161,6 +162,7 @@ public:
   void setName(const std::string& name);
   const std::string& getName() const;
 
+  //!@todo Rework these to lock everything in the right order.
   void lockAll();
   void lockAll(DataRole::Id role);
   void unlockAll();
@@ -199,6 +201,11 @@ protected:
 
   void addTrigger(cedar::proc::TriggerPtr& trigger);
 
+  void getDataLocks(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+  void getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+  void lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+  void unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -209,6 +216,7 @@ private:
 
   bool allInputsValid();
   void setState(cedar::proc::Step::State newState, const std::string& annotation);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
