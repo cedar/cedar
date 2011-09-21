@@ -105,7 +105,7 @@ public:
   void load(cedar::proc::PluginProxyPtr plugin);
 
   void startThreads();
-  void stopThreads();
+  void stopThreads(bool wait = false);
   void connect(
                 cedar::proc::StepPtr source,
                 const std::string& sourceName,
