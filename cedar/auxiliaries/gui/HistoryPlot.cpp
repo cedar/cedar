@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotter.cpp
+    File:        MatrixPlot.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,33 +39,34 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DataPlotter.h"
-#include "auxiliaries/DataT.h"
-#include "auxiliaries/ImageData.h"
-#include "auxiliaries/gui/MatrixPlot.h"
-#include "auxiliaries/gui/ImagePlot.h"
 #include "auxiliaries/gui/HistoryPlot.h"
+#include "auxiliaries/gui/HistoryPlot0D.h"
+#include "auxiliaries/gui/exceptions.h"
+#include "auxiliaries/exceptions.h"
+#include "auxiliaries/DataT.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <iostream>
 
-cedar::proc::gui::DataPlotter::WidgetFactory cedar::proc::gui::DataPlotter::mTypePlotters;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
+cedar::aux::gui::HistoryPlot::HistoryPlot(QWidget *pParent)
 :
-QDockWidget(title.c_str(), pParent)
+cedar::aux::gui::DataPlotInterface(pParent),
+mpCurrentPlotWidget(NULL)
 {
-  this->setFloating(true);
-  this->layout()->setContentsMargins(0, 0, 0, 0);
+  QVBoxLayout *p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
+  this->setLayout(p_layout);
 }
 
-cedar::proc::gui::DataPlotter::~DataPlotter()
+cedar::aux::gui::HistoryPlot::~HistoryPlot()
 {
 }
 
@@ -73,41 +74,22 @@ cedar::proc::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
+void cedar::aux::gui::HistoryPlot::display(cedar::aux::DataPtr data)
 {
-  mData = data;
-  //!@todo doesn't work this way -- related to the to-do entry below.
-//  PlotWidgetInterface *p_widget = getWidgetFactory().get(data)->allocateRaw();
-//  p_widget->plot(data);
+  //!@todo implement for matrices and more dimensions
+  if (this->mpCurrentPlotWidget)
+  {
+    delete this->mpCurrentPlotWidget;
+    this->mpCurrentPlotWidget = NULL;
+  }
 
-  //!@todo find a better solution for this!
-  cedar::aux::gui::DataPlotInterface *p_plot = NULL;
-  if (dynamic_cast<cedar::aux::MatData*>(data.get()))
+  if (this->mData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(data))
   {
-    p_plot = new cedar::aux::gui::MatrixPlot();
-  }
-  else if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::ImagePlot();
-  }
-  else if (dynamic_cast<cedar::aux::DoubleData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::HistoryPlot();
+    this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData);
   }
   else
   {
-    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::proc::gui::DataPlotter::plot.");
+    CEDAR_THROW(cedar::aux::gui::InvalidPlotData, "Don't know how to plot this data.");
   }
-
-  p_plot->display(data);
-  this->setWidget(p_plot);
-}
-
-cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::getWidgetFactory()
-{
-  if (cedar::proc::gui::DataPlotter::mTypePlotters.empty())
-  {
-    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
-  }
-  return cedar::proc::gui::DataPlotter::mTypePlotters;
+  this->layout()->addWidget(this->mpCurrentPlotWidget);
 }

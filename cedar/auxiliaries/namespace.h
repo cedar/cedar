@@ -137,6 +137,9 @@ namespace cedar
     typedef DataT<cv::Mat> MatData;
     CEDAR_GENERATE_POINTER_TYPES(MatData);
 
+    typedef DataT<double> DoubleData;
+    CEDAR_GENERATE_POINTER_TYPES(DoubleData);
+
     CEDAR_DECLARE_AUX_CLASS(ImageData);
 
     /* exceptions */
