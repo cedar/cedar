@@ -139,6 +139,11 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
 
 void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
 {
+  if (!this->isVisible())
+  {
+    return;
+  }
+
   //!@todo this timer event does not seem to stop when the plot window is closed.
   this->mData->lockForRead();
   const double& val = this->mData->getData();
@@ -148,7 +153,6 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
   this->mData->unlock();
   //!@todo: Use actual time measurements here
   mpXValues.push_back(mpXValues.back() + 1);
-  std::cout << mpXValues.back() << std::endl;
 
   while (mpXValues.size() > this->mMaxHistorySize)
   {
