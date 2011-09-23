@@ -52,9 +52,11 @@
 #include <assert.h>
 
 #define CEDAR_DEBUG_ASSERT(expr) assert(expr)
+#define CEDAR_DEBUG_ONLY(expr) expr
 #else
 
 #define CEDAR_DEBUG_ASSERT(expr)
+#define CEDAR_DEBUG_ONLY(expr)
 
 #endif // DEBUG
 
