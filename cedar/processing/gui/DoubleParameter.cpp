@@ -62,6 +62,7 @@ cedar::proc::gui::ParameterBase(pParent)
   this->layout()->addWidget(this->mpSpinbox);
   this->mpSpinbox->setMinimum(-100.0);
   this->mpSpinbox->setMaximum(+100.0);
+  this->mpSpinbox->setDecimals(4); //!@todo Make this an option in NumericParameter
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
