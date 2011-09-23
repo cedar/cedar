@@ -41,6 +41,8 @@ cedar_add_library(cedaraux
   gui/BaseWidget.h
   gui/Viewer.h
   gui/SceneWidget.h
+  gui/HistoryPlot.h
+  gui/HistoryPlot0D.h
   gui/MatrixPlot.h
   gui/MatrixPlot1D.h
   gui/MatrixPlot2D.h

@@ -53,7 +53,7 @@ using namespace cedar::dev::robot;
 // methods
 //------------------------------------------------------------------------------
 
-int main(int argc, char *argv[]) {
+int main(int /* argc */, char ** /* argv[] */) {
 
   string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
 
