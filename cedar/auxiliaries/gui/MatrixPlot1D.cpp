@@ -167,6 +167,11 @@ void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
 
 void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
 {
+  if (!this->isVisible())
+  {
+    return;
+  }
+
   const cv::Mat& mat = this->mMatData->getData();
   this->mMatData->lockForRead();
 
