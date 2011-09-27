@@ -100,10 +100,14 @@ GrabberInterface::~GrabberInterface()
 #if defined ENABLE_CTRL_C_HANDLER
   void GrabberInterface::sigIntHandler(int sig)
   {
-      //exit terminates the calling process
+      //Documentation of std::exit():
       //Terminates the process normally, performing the regular cleanup for terminating processes.
-      //std::cout<< "Signal " << sig << " caught..." << std::endl;
-      exit(1);
+
+      #if defined DEBUG_GRABBER_INTERFACE
+        std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
+      #endif
+
+      std::exit(1);
   }
 #endif
 
@@ -296,7 +300,9 @@ void GrabberInterface::setSnapshotName(const std::string& snapshotName)
   else
   {
     //no: use default
-    //std::cout << "[GrabberInterface::setSnapshotName] Warning: No extension in filename! Using .jpg\n";
+    #if defined ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[GrabberInterface::setSnapshotName] Warning: No extension in filename! Using .jpg\n";
+    #endif
     ext  = ".jpg";
     name = snapshotName;
   }
@@ -374,7 +380,9 @@ bool GrabberInterface::saveSnapshot(unsigned int channel) const
   }
   else
   {
-    std::cout << "Nothing to save. Image matrix is empty!\n";
+    #if defined ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[GrabberInterface::saveSnapshot] Warning: Nothing to save. Image matrix is empty!\n";
+    #endif
     return false;
   }
 
@@ -421,7 +429,7 @@ void GrabberInterface::setRecordName(const std::string& recordName)
 
   mRecordNames.clear();
 
-  //initialze snapshot-names
+  //initialize snapshot-names
   std::string name = recordName;
   std::string ext  = "";
 
@@ -431,14 +439,15 @@ void GrabberInterface::setRecordName(const std::string& recordName)
   if (pos != std::string::npos)
   {
     //yes: extract it
-    int cnt = pos;
     ext  = name.substr(pos);
-    name = name.substr(0,cnt);
+    name = name.substr(0,pos);
   }
   else
   {
     //no: use default
-    std::cout << "[GrabberInterface::setRecordName] Warning: No extension in filename! Using .avi\n";
+    #if defined ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[GrabberInterface::setRecordName] Warning: No extension in filename! Using .avi\n";
+    #endif
     ext  = ".avi";
     name = recordName;
   }
@@ -446,15 +455,20 @@ void GrabberInterface::setRecordName(const std::string& recordName)
   //filename depends on no. of cams
   if (mNumCams > 1)
   {
-
+    std::string name_ch0 = name + "[ch0]" + ext;
+    std::string name_ch1 = name + "[ch1]" + ext;
+    //std::cout << "[GrabberInterface::setRecordName] : set both recordnames to " << name_ch0 <<"  "<< name_ch1 << std::endl;
     //insert all into vector
-    mRecordNames.push_back(name + "[ch0]" + ext);
-    mRecordNames.push_back(name + "[ch1]" + ext);
+    mRecordNames.push_back(name_ch0);
+    mRecordNames.push_back(name_ch1);
   }
   else
   {
     mRecordNames.push_back(name + ext);
   }
+  #if defined DEBUG_GRABBER_INTERFACE
+    std::cout << "[GrabberInterface::setRecordName] finished" << std::endl;
+  #endif
 }
 
 
@@ -466,12 +480,17 @@ void GrabberInterface::setRecordName(unsigned int channel, const std::string& re
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::setRecordName");
   }
-  mRecordNames.at(channel) = recordName;
+
+  if (recordName != "")
+  {
+    mRecordNames.at(channel) = recordName;
+  }
 }
 
 //--------------------------------------------------------------------------------------------------------------------
 std::string GrabberInterface::getRecordName(unsigned int channel) const
 {
+
   if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getRecordName");
@@ -491,7 +510,7 @@ bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
   }
 
   //write the video-file with the actual grabbing-speed
-  //this is independet from speed of an avi-file or the camera
+  //this is independet from speed of the avi-file or the camera framerate
   //double fps = getFps();
 
 

@@ -44,7 +44,7 @@
 #include "../CollatedTraits.h"
 
 // PROJECT INCLUDES
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 

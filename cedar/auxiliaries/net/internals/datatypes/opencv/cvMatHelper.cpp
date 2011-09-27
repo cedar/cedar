@@ -43,7 +43,7 @@
 #include "../../transport/collated/header/MatrixNetHeaderAccessor.h"
 
 // PROJECT INCLUDES
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <yarp/os/NetInt32.h>
 #include <yarp/os/NetFloat64.h>
 

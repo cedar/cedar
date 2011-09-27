@@ -91,7 +91,9 @@ bool VideoGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 VideoGrabber::~VideoGrabber()
 {
-  //std::cout<<"VideoGrabber::Destructor\n";
+  #if defined DEBUG_VIDEOGRABBER
+    std::cout<<"[VideoGrabber::Destructor]"<< std::endl;
+  #endif
   //VideoCaptures are released automatically within the Vector mCaptureVector
 }
 
@@ -138,8 +140,9 @@ bool VideoGrabber::onInit()
     else
     {
       std::cout << "[VideoGrabber::onInit] ERROR: Grabbing failed (Channel " << i << ")." << std::endl;
-      return false;
+
       //throws an initialization-exception, so programm will terminate
+      return false;
     }
   }
   //all grabbers successfully initialized

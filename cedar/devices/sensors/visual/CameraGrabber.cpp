@@ -93,7 +93,9 @@ bool CameraGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 CameraGrabber::~CameraGrabber()
 {
-  //std::cout<<"CameraGrabber::Destructor\n";
+  #if defined DEBUG_CAMERAGRABBER
+    std::cout<<"[CameraGrabber::Destructor]"<< std::endl;
+  #endif
   //VideoCaptures are released automatically within the Vector mCaptureVector
 }
 
@@ -135,8 +137,9 @@ bool CameraGrabber::onInit()
     else
     {
       std::cout << "ERROR: Grabbing failed (Channel " << i << ")." << std::endl;
-      return false;
+
       //throws an initialization-exception, so program will terminate
+      return false;
     }
   }
   //all grabbers successfully initialized
@@ -188,7 +191,7 @@ bool CameraGrabber::onGrab()
    */
 
   //for better synchronizing between the cameras,
-  //first grab (internally in camera) and then
+  //first grab (internally in camera) and then retrieve
   for (unsigned int i = 0; i < mNumCams; ++i)                     //grab on all channels
   {
     result = result && mCaptureVector.at(i).grab();
@@ -196,7 +199,7 @@ bool CameraGrabber::onGrab()
 
   if (result)
   {
-    for (unsigned int i = 0; i < mNumCams; ++i)                     //grab on all channels
+    for (unsigned int i = 0; i < mNumCams; ++i)                   //retrieve all channels
     {
       result = result && mCaptureVector.at(i).retrieve(mImageMatVector.at(i));
     }

@@ -85,7 +85,9 @@ NetGrabber::NetGrabber(
 //----------------------------------------------------------------------------------------------------
 NetGrabber::~NetGrabber()
 {
-  std::cout << "YarpGrabber::Destructor\n";
+  #if defined DEBUG_NETGRABBER
+    std::cout << "YarpGrabber::Destructor\n";
+  #endif
 
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
@@ -102,9 +104,12 @@ NetGrabber::~NetGrabber()
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onInit()
 {
+  #if defined DEBUG_NETGRABBER
+    std::cout << "\n\nYarpGrabber.onInit()\n";
+  #endif
+
   #if defined SHOW_INIT_INFORMATION_NETGRABBER
     //-------------------------------------------------
-    std::cout << "\n\nYarpGrabber.onInit()\n";
     std::cout << "YarpGrabber: Initialize Grabber with " << mNumCams << " channels ..." << std::endl;
 
     for (unsigned int i = 0; i < mNumCams; ++i)
@@ -125,17 +130,20 @@ bool NetGrabber::onInit()
   {
 
     //loop until connection established
-    std::cout << "NetGrabber: Create channel " << i << ": " << mYarpChannels.at(i) << " " << std::flush;
-    do
+    #if defined SHOW_INIT_INFORMATION_NETGRABBER
+      std::cout << "NetGrabber: Create channel " << i << ": " << mYarpChannels.at(i) << " " << std::flush;
+    #endif
+
+      do
     {
       try
       {
-        std::cout << "." << std::flush;
+        // std::cout << "." << std::flush;
         YarpReader = new cedar::aux::net::NetReader<cv::Mat>(mYarpChannels.at(i));
-        std::cout << "ok" << std::endl;
+        // std::cout << "ok" << std::endl;
 
         mYarpReaderVector.push_back(YarpReader);
-        std::cout << "push_back ok" << std::endl;
+        //std::cout << "push_back ok" << std::endl;
 
         //grab first frame on initializtion
       }
@@ -145,17 +153,24 @@ bool NetGrabber::onInit()
         std::cout << "ERROR [NetWaitingForWriterException]: Initialization failed (Channel " << i << ")."
                   << std::endl;
         //TODO: undo the already initialized grabbers ???
+
+        //throws an initialization-exception, so programm will terminate
         return false;
       }
       catch (...)
       {
         std::cout << "ERROR [undefined]: Initialization failed (Channel " << i << ")." << std::endl;
+
+        //throws an initialization-exception, so programm will terminate
+        return false;
       }
     } while (!YarpReader);
 
 
     //loop until first image received
-    std::cout << "Yarp-Grabber: Try to read from channel " << i << " ";
+    #if defined SHOW_INIT_INFORMATION_NETGRABBER
+      std::cout << "Yarp-Grabber: Try to read from channel " << i << " ";
+    #endif
 
     cv::Mat frame   = cv::Mat();
     bool reading_ok = true;
@@ -164,9 +179,9 @@ bool NetGrabber::onInit()
     {
       try
       {
-        std::cout << "." << std::flush;
+        //std::cout << "." << std::flush;
         frame = mYarpReaderVector.at(i)->read();
-        std::cout << "ok" << std::endl;
+        //std::cout << "ok" << std::endl;
         mImageMatVector.push_back(frame);
         reading_ok = true;
       }
@@ -182,7 +197,7 @@ bool NetGrabber::onInit()
       }
     } while (!reading_ok);
 
-    std::cout << std::endl;
+    //std::cout << std::endl;
   }
 
 

@@ -40,17 +40,19 @@
 
 
 //Enable the CTRL-C handler?
-//#define ENABLE_CTRL_C_HANDLER
+#define ENABLE_CTRL_C_HANDLER
 
 
 //------------------------------------------------------------------------
 // show informations on initialization?
 //------------------------------------------------------------------------
-#define SHOW_INIT_INFORMATION_VIDEOGRABBER
-#define SHOW_INIT_INFORMATION_NETGRABBER
-#define SHOW_INIT_INFORMATION_PICTUREGRABBER
-#define SHOW_INIT_INFORMATION_CAMERAGRABBER
+//#define SHOW_INIT_INFORMATION_VIDEOGRABBER
+//#define SHOW_INIT_INFORMATION_NETGRABBER
+//#define SHOW_INIT_INFORMATION_PICTUREGRABBER
+//#define SHOW_INIT_INFORMATION_CAMERAGRABBER
 
+
+//#define ENABLE_GRABBER_WARNING_OUTPUT
 
 //------------------------------------------------------------------------
 // debug output?

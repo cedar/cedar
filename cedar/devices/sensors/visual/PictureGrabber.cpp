@@ -85,7 +85,9 @@ PictureGrabber::PictureGrabber(
 //----------------------------------------------------------------------------------------------------
 PictureGrabber::~PictureGrabber()
 {
-  //std::cout<<"VideoGrabber::Destructor\n";
+  #if defined DEBUG_PICTUREGRABBER
+    std::cout<<"[PictureGrabber::Destructor]"<< std::endl;
+  #endif
   //VideoCaptures are released automatically within the Vector mCaptureVector
 }
 
