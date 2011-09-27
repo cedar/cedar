@@ -106,7 +106,6 @@ public:
 #endif
 
     // ersten freien Readerport im Netzwerk finden
-    do
     {
       mPortNameWriter= PORT_PREFIX + PORT_DELIMINATOR
                        + myPortName
@@ -115,9 +114,15 @@ public:
 
       increaseReaderCounter();
 
-    } while( !yarp::os::Network::exists( mPortNameWriter.c_str(),
+    } 
+    
+    if( !yarp::os::Network::exists( mPortNameWriter.c_str(),
                                          true ) // param: true = quiet
-           );
+           )
+    {
+      CEDAR_THROW( cedar::aux::exc::NetWaitingForWriterException,
+                   "YARP: no writer yet (at intantiation point of reader)" );
+    }
   }
 
   //!@brief Destructor (virtual to be sure)
