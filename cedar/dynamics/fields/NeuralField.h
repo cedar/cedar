@@ -100,8 +100,10 @@ private:
 protected:
   cedar::dyn::SpaceCodePtr mActivation;
   cedar::dyn::SpaceCodePtr mSigmoidalActivation;
+  cedar::dyn::SpaceCodePtr mLateralInteraction;
   cedar::aux::DoubleParameterPtr mRestingLevel;
   cedar::aux::DoubleParameterPtr mTau; //!\todo deal with units, now: milliseconds
+  cedar::aux::DoubleParameterPtr mGlobalInhibition;
   cedar::aux::math::SigmoidPtr mSigmoid;
   cedar::aux::kernel::GaussPtr mKernel;
   cedar::aux::UIntParameterPtr _mDimensionality; //!\todo not the only class needing this - think about parent class

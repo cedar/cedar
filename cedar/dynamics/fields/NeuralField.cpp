@@ -60,14 +60,17 @@ cedar::dyn::NeuralField::NeuralField()
 :
 mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
+mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
 mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
+mGlobalInhibition(new cedar::aux::DoubleParameter("globalInhibition", -0.01, -100.0, 100.0)),
 mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
 _mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
 {
   this->registerParameter(mRestingLevel);
   this->registerParameter(mTau);
+  this->registerParameter(mGlobalInhibition);
   _mDimensionality->set(2);
   this->registerParameter(_mDimensionality);
   _mSizes->makeDefault();
@@ -75,6 +78,8 @@ _mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
   this->registerParameter(_mSizes);
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
+  this->declareBuffer("lateralInteraction");
+  this->setBuffer("lateralInteraction", mLateralInteraction);
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
@@ -143,10 +148,19 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
+  cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
+  const cv::Mat& kernel = this->mKernel->getKernel();
   const double& h = mRestingLevel->get();
   const double& tau = mTau->get();
+  const double& global_inhibition = mGlobalInhibition->get();
   sigmoid_u = mSigmoid->compute<float>(u);
-  cv::Mat d_u = -u + h + sigmoid_u;
+  if (this->_mDimensionality->get() < 3)
+  {
+    mKernel->getReadWriteLock()->lockForRead();
+    cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0, cv::BORDER_WRAP);
+    mKernel->getReadWriteLock()->unlock();
+  }
+  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition * cv::sum(sigmoid_u).val[0];
 
   /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
    *       it when the connections change.
