@@ -64,7 +64,7 @@ void cedar::aux::usleep(unsigned int microseconds)
 
 #else // WINDOWS
 
-  usleep(microseconds);
+  ::usleep(microseconds);
 
 #endif // WINDOWS
 }
@@ -74,6 +74,6 @@ void cedar::aux::sleep(unsigned int seconds)
 #ifdef WINDOWS
   Sleep(1000 * static_cast<DWORD>(seconds));
 #else
-  sleep(seconds);
+  ::sleep(seconds);
 #endif
 }
