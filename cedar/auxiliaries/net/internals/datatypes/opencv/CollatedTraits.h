@@ -40,7 +40,7 @@
 // LOCAL INCLUDES
 // traits specializations:
 #include "../../namespace.h"
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 // PROJECT INCLUDES
 
