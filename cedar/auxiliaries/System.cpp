@@ -51,6 +51,7 @@
 #pragma comment(lib, "comsuppw")
 #endif
 
+QReadWriteLock cedar::aux::System::mCOutLock;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

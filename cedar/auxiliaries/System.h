@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include <string>
+#include <QReadWriteLock>
 
 
 /*!@brief Wrapper for some functions that depend on the operating system.
@@ -92,12 +93,13 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@todo remove, for debugging only.
+  static QReadWriteLock mCOutLock;
   // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  // none yet
 
 }; // class cedar::xxx
 

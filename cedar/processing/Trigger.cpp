@@ -86,6 +86,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
   {
     // If the arguments can be set, trigger the step.
     //!@todo For dynamics, this can mean that some step times are discarded rather than accumulated.
+    //!@todo cedar::proc::Step::setNextArguments should take a const pointer.
     if (this->mListeners.at(i)->setNextArguments(arguments))
     {
       this->mListeners.at(i)->onTrigger();

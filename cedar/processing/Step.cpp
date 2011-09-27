@@ -47,11 +47,17 @@
 #include "auxiliaries/Data.h"
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/macros.h"
+#include "auxiliaries/System.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
+
+// MACROS
+// Enable to show information on locking/unlocking
+// #define DEBUG_LOCKS
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -287,6 +293,7 @@ void cedar::proc::Step::getDataLocks(DataRole::Id role, std::set<std::pair<QRead
 
 void cedar::proc::Step::lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
 {
+  //!@todo Instead of DataRold, use a LockType that specifies read/write lock.
   for (std::set<std::pair<QReadWriteLock*, DataRole::Id> >::iterator iter = locks.begin();
        iter != locks.end();
        ++iter)
@@ -294,12 +301,44 @@ void cedar::proc::Step::lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >
     switch (iter->second)
     {
       case cedar::proc::DataRole::INPUT:
+#ifdef DEBUG_LOCKS
+        cedar::aux::System::mCOutLock.tryLockForWrite(100);
+        std::cout << "readlocking lock " << iter->first << std::endl;
+        cedar::aux::System::mCOutLock.unlock();
+        if (!iter->first->tryLockForRead(100))
+        {
+          cedar::aux::System::mCOutLock.tryLockForWrite(100);
+          std::cout << "timeout " << iter->first << std::endl;
+          cedar::aux::System::mCOutLock.unlock();
+          continue;
+        }
+        cedar::aux::System::mCOutLock.tryLockForWrite(100);
+        std::cout << "readlocked " << iter->first << std::endl;
+        cedar::aux::System::mCOutLock.unlock();
+#else
         iter->first->lockForRead();
+#endif // DEBUG_LOCKS
         break;
 
       case cedar::proc::DataRole::OUTPUT:
       case cedar::proc::DataRole::BUFFER:
+#ifdef DEBUG_LOCKS
+        cedar::aux::System::mCOutLock.tryLockForWrite(100);
+        std::cout << "writelocking lock " << iter->first << std::endl;
+        cedar::aux::System::mCOutLock.unlock();
+        if (!iter->first->tryLockForWrite(100))
+        {
+          cedar::aux::System::mCOutLock.tryLockForWrite(100);
+          std::cout << "timeout " << iter->first << std::endl;
+          cedar::aux::System::mCOutLock.unlock();
+          continue;
+        }
+        cedar::aux::System::mCOutLock.tryLockForWrite(100);
+        std::cout << "writelocked " << iter->first << std::endl;
+        cedar::aux::System::mCOutLock.unlock();
+#else // DEBUG_LOCKS
         iter->first->lockForWrite();
+#endif // DEBUG_LOCKS
         break;
 
       default:
@@ -315,6 +354,11 @@ void cedar::proc::Step::unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id>
        iter != locks.end();
        ++iter)
   {
+#ifdef DEBUG_LOCKS
+    cedar::aux::System::mCOutLock.lockForWrite();
+    std::cout << "unlocking lock " << iter->first << std::endl;
+    cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_LOCKS
     iter->first->unlock();
   }
 }
@@ -451,6 +495,7 @@ void cedar::proc::Step::onTrigger()
 
 bool cedar::proc::Step::allInputsValid()
 {
+  //!@todo Lock these inputs properly?
   std::map<DataRole::Id, SlotMap>::iterator slot_map_iter = this->mDataConnections.find(cedar::proc::DataRole::INPUT);
   if (slot_map_iter == mDataConnections.end())
   {
@@ -485,30 +530,36 @@ void cedar::proc::Step::run()
 
   this->mBusy = true;
 
+  // Read out the arguments
+  cedar::proc::ArgumentsPtr arguments;
   // if no arguments have been set, create default ones.
-  this->mpArgumentsLock->lockForRead();
-  if (this->mNextArguments.get() == NULL)
+  this->mpArgumentsLock->lockForWrite();
+  if (!this->mNextArguments)
   {
-#ifdef DEBUG
-    std::cout << "processing::Step [debug]> Warning: using default arguments for step " << this->getName() << "."
-              << " Current argument's address is: " << this->mNextArguments.get() << std::endl;
-#endif // DEBUG
-    this->mpArgumentsLock->unlock();
-    this->mpArgumentsLock->lockForWrite();
-    this->mNextArguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
+//#ifdef DEBUG
+//    std::cout << "processing::Step [debug]> Warning: using default arguments for step " << this->getName() << "."
+//              << " Current argument's address is: " << this->mNextArguments.get() << std::endl;
+//#endif // DEBUG
+    arguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
+  }
+  else
+  {
+    arguments = this->mNextArguments;
+    this->mNextArguments.reset();
   }
   this->mpArgumentsLock->unlock();
 
   //!@todo make the (un)locking optional?
   std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
   this->getDataLocks(locks);
+  locks.insert(std::make_pair(arguments->getLock(), DataRole::INPUT));
   this->lock(locks);
 
   //!@todo this blocks writing of new arguments and thus (potentially) incoming trigger signals. Is this what we want?
-  this->mpArgumentsLock->lockForRead();
+//  this->mpArgumentsLock->lockForRead();
   try
   {
-    this->compute(*(this->mNextArguments.get()));
+    this->compute(*(arguments.get()));
   }
   catch(const cedar::aux::exc::ExceptionBase& e)
   {
@@ -522,13 +573,12 @@ void cedar::proc::Step::run()
   {
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
-  this->mpArgumentsLock->unlock();
+//  this->mpArgumentsLock->unlock();
 
   this->unlock(locks);
 //  this->unlockAll();
 
   // remove the argumens, as they have been processed.
-  this->mNextArguments.reset();
   this->mBusy = false;
   this->mFinished->trigger();
 }
@@ -551,10 +601,15 @@ void cedar::proc::Step::setThreaded(bool isThreaded)
  */
 bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
 {
-  if (this->mNextArguments.get() != NULL)
+  // first, check if new arguments have already been set.
+  mpArgumentsLock->lockForRead();
+  if (this->mBusy || this->mNextArguments.get() != NULL)
   {
+    mpArgumentsLock->unlock();
     return false;
   }
+  mpArgumentsLock->unlock();
+
   mpArgumentsLock->lockForWrite();
   this->mNextArguments = arguments;
   mpArgumentsLock->unlock();
@@ -709,7 +764,11 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
   {
     data->setOwner(this);
     data->connectedSlotName(name);
+
   }
+#ifdef DEBUG_LOCKS
+  std::cout << "Data/lock: " << this->getName() << "." << name << "/" << (&data->getLock()) << std::endl;
+#endif // DEBUG_LOCKS
 
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())

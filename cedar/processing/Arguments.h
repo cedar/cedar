@@ -47,6 +47,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
 
 
 /*!@brief Abstract description of the class.
@@ -64,6 +65,7 @@ class cedar::proc::Arguments
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  Arguments();
 
   //!@brief Destructor
   virtual ~Arguments();
@@ -72,7 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  QReadWriteLock* getLock();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,7 +96,7 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  QReadWriteLock *mpLock;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

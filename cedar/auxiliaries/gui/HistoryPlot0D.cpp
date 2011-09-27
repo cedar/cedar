@@ -50,6 +50,14 @@
 #include <QVBoxLayout>
 #include <iostream>
 
+// MACROS
+// Enable to show information on locking/unlocking
+// #define DEBUG_LOCKS
+
+#ifdef DEBUG_LOGS
+#  include "auxiliaries/System.h"
+#endif
+
 //!@todo This class and the MatrixPlot1D share a lot of common code -- unify them
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -145,11 +153,29 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
   }
 
   //!@todo this timer event does not seem to stop when the plot window is closed.
+
+#ifdef DEBUG_LOCKS
+  cedar::aux::System::mCOutLock.lockForWrite();
+  std::cout << "readlocking lock " << (&this->mData->getLock()) << std::endl;
+  cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_LOCKS
   this->mData->lockForRead();
+
+#ifdef DEBUG_LOCKS
+  cedar::aux::System::mCOutLock.lockForWrite();
+  std::cout << "readlocked " << (&this->mData->getLock()) << std::endl;
+  cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_LOCKS
+
   const double& val = this->mData->getData();
 
   mpYValues.push_back(val);
 
+#ifdef DEBUG_LOCKS
+  cedar::aux::System::mCOutLock.lockForWrite();
+  std::cout << "unlocking lock " << (&this->mData->getLock()) << std::endl;
+  cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_LOCKS
   this->mData->unlock();
   //!@todo: Use actual time measurements here
   mpXValues.push_back(mpXValues.back() + 1);
