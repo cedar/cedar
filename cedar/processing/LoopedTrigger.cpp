@@ -45,6 +45,7 @@
 #include "units/TimeUnit.h"
 #include "processing/Manager.h"
 #include "processing/LoopMode.h"
+#include "auxiliaries/System.h"
 
 // PROJECT INCLUDES
 

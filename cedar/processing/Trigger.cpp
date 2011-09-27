@@ -49,6 +49,13 @@
 // SYSTEM INCLUDES
 #include <algorithm>
 
+// MACROS
+//#define DEBUG_TRIGGERING
+
+#ifdef DEBUG_TRIGGERING
+#  include "auxiliaries/System.h"
+#endif // DEBUG_TRIGGERING
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,9 +96,22 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
     //!@todo cedar::proc::Step::setNextArguments should take a const pointer.
     if (this->mListeners.at(i)->setNextArguments(arguments))
     {
+#ifdef DEBUG_TRIGGERING
+      cedar::aux::System::mCOutLock.lockForWrite();
+      std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
+      cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_TRIGGERING
       this->mListeners.at(i)->onTrigger();
     }
     // Otherwise, the step is skipped this time.
+#ifdef DEBUG_TRIGGERING
+    else
+    {
+      cedar::aux::System::mCOutLock.lockForWrite();
+      std::cout << "Trigger " << this->getName() << " failed to trigger " << this->mListeners.at(i)->getName() << std::endl;
+      cedar::aux::System::mCOutLock.unlock();
+    }
+#endif // DEBUG_TRIGGERING
   }
   for (size_t i = 0; i < this->mTriggers.size(); ++i)
   {

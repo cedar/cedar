@@ -57,6 +57,7 @@
 // MACROS
 // Enable to show information on locking/unlocking
 // #define DEBUG_LOCKS
+//#define DEBUG_ARGUMENT_SETTING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -475,10 +476,27 @@ void cedar::proc::Step::onTrigger()
   //!@todo Should busy be a part of STATE_*?
   if (!this->mBusy && this->mState != cedar::proc::Step::STATE_EXCEPTION)
   {
+#ifdef DEBUG_ARGUMENT_SETTING
+    cedar::aux::System::mCOutLock.lockForWrite();
+    std::cout << "Evoking the run method of " << this->getName() << std::endl;
+    cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_ARGUMENT_SETTING
     this->setState(cedar::proc::Step::STATE_RUNNING, "");
-    if (this->mRunInThread)
+    if (this->mRunInThread) //!@todo This should be this->mRunInThread->get()
     {
-      this->start();
+      if (!this->isRunning())
+      {
+        this->start();
+      }
+#ifdef DEBUG_ARGUMENT_SETTING
+      else
+      {
+        cedar::aux::System::mCOutLock.lockForWrite();
+        std::cout << "Step " << this->getName() << "'s thread is still alive while triggering. Step was skipped."
+                  << std::endl;
+        cedar::aux::System::mCOutLock.unlock();
+      }
+#endif // DEBUG_ARGUMENT_SETTING
     }
     else
     {
@@ -522,9 +540,20 @@ bool cedar::proc::Step::allInputsValid()
 
 void cedar::proc::Step::run()
 {
+#ifdef DEBUG_ARGUMENT_SETTING
+    cedar::aux::System::mCOutLock.lockForWrite();
+    std::cout << "Running step " << this->getName() << "." << std::endl;
+    cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_ARGUMENT_SETTING
+
   // the step is not executed when it has invalid inputs or it is in a state of an unhandled exception.
   if (!this->allInputsValid())
   {
+#ifdef DEBUG_ARGUMENT_SETTING
+    cedar::aux::System::mCOutLock.lockForWrite();
+    std::cout << "Cancelling step execution of " << this->getName() << " because of invalid inputs." << std::endl;
+    cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_ARGUMENT_SETTING
     return;
   }
 
@@ -534,6 +563,13 @@ void cedar::proc::Step::run()
   cedar::proc::ArgumentsPtr arguments;
   // if no arguments have been set, create default ones.
   this->mpArgumentsLock->lockForWrite();
+
+#ifdef DEBUG_ARGUMENT_SETTING
+  cedar::aux::System::mCOutLock.lockForWrite();
+  std::cout << "Reading next arguments of step " << this->getName() << std::endl;
+  cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_ARGUMENT_SETTING
+
   if (!this->mNextArguments)
   {
 //#ifdef DEBUG
@@ -541,10 +577,23 @@ void cedar::proc::Step::run()
 //              << " Current argument's address is: " << this->mNextArguments.get() << std::endl;
 //#endif // DEBUG
     arguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
+
+#ifdef DEBUG_ARGUMENT_SETTING
+    cedar::aux::System::mCOutLock.lockForWrite();
+    std::cout << "Not resetting next arguments of step " << this->getName() << std::endl;
+    cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_ARGUMENT_SETTING
   }
   else
   {
     arguments = this->mNextArguments;
+
+#ifdef DEBUG_ARGUMENT_SETTING
+    cedar::aux::System::mCOutLock.lockForWrite();
+    std::cout << "Resetting next arguments of step " << this->getName() << std::endl;
+    cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_ARGUMENT_SETTING
+
     this->mNextArguments.reset();
   }
   this->mpArgumentsLock->unlock();
@@ -579,8 +628,8 @@ void cedar::proc::Step::run()
 //  this->unlockAll();
 
   // remove the argumens, as they have been processed.
-  this->mBusy = false;
   this->mFinished->trigger();
+  this->mBusy = false;
 }
 
 cedar::proc::TriggerPtr& cedar::proc::Step::getFinishedTrigger()
@@ -603,7 +652,7 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
 {
   // first, check if new arguments have already been set.
   mpArgumentsLock->lockForRead();
-  if (this->mBusy || this->mNextArguments.get() != NULL)
+  if (this->isRunning() || this->mBusy || this->mNextArguments.get() != NULL)
   {
     mpArgumentsLock->unlock();
     return false;
@@ -611,6 +660,11 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
   mpArgumentsLock->unlock();
 
   mpArgumentsLock->lockForWrite();
+#ifdef DEBUG_ARGUMENT_SETTING
+  cedar::aux::System::mCOutLock.lockForWrite();
+  std::cout << "Setitng next arguments of step " << this->getName() << std::endl;
+  cedar::aux::System::mCOutLock.unlock();
+#endif // DEBUG_ARGUMENT_SETTING
   this->mNextArguments = arguments;
   mpArgumentsLock->unlock();
   return true;

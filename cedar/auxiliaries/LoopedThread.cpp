@@ -47,6 +47,8 @@
 using namespace std;
 using namespace boost::posix_time;
 
+// #define SHOW_TIMING_HELPERS
+
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
@@ -172,7 +174,7 @@ void cedar::aux::LoopedThread::run(void)
       double steps_taken = static_cast<double>(step_duration.total_microseconds()) / static_cast<double>(step_size.total_microseconds());
       unsigned int full_steps_taken = static_cast<unsigned int>( steps_taken + 0.5 );
 
-      #ifdef DEBUG
+      #if defined DEBUG && defined SHOW_TIMING_HELPERS
       // print warning if time steps have been skipped
       if( steps_taken > 1.01 )
         cerr << "WARNING: " << steps_taken << " time steps taken at once! "
