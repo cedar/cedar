@@ -98,7 +98,7 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${YARP_LIBRARIES})
 # Amtec device driver
 ##
 
-option(CEDAR_USE_AMTEC "Include Amtec related classes and examples if possible." ON)
+option(CEDAR_USE_AMTEC "Include Amtec related classes and examples if possible." OFF)
 
 message("-- Looking for amtecdevice")
 find_library(AMTEC_LIBRARY_DEVICE amtecdevice)
