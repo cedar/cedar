@@ -57,6 +57,12 @@
 #include <signal.h>
 
 
+/* \brief typedef for a vector containing instances of the grabbers
+ *
+ */
+typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
+
+
 
 /*! \class cedar::dev::sensors::visual::GrabberInterface
  *  \brief This is the base class for all grabber.
@@ -74,7 +80,7 @@
  *
  *   USAGE:
  *     - to set a name for the grabber: getName, setName form cedar::base<br>
- *     - to conrol the grabbing-thread: <br>
+ *     - to control the grabbing-thread: <br>
  *             QThread::isRunning(), cedar::aux::LoopedThread::start() and stop();
  *             setFps(), getFps() <br>
  *     - grabbing: <br>
@@ -86,7 +92,6 @@
  *
  *
  */
-
 class cedar::dev::sensors::visual::GrabberInterface
   : public cedar::aux::LoopedThread
 {
@@ -107,7 +112,7 @@ protected:
    */
   GrabberInterface(
                      std::string configFileName = ""
-                    );
+                  );
 
 public:
 
@@ -483,6 +488,18 @@ protected:
      */
     virtual bool onInit()  { return true; }
 
+
+    /*! @brief  This method is invoked during destruction of the class.
+     *  \remarks
+     *      Override this method in the derived classes to do their deinitialization.<br>
+     *      For example, use this method instead of the destructor to release dynamic memory. And:
+     *      you have to call this method in the destructor of the derived class.
+     *      Background information: This method is invoked by the CTRL-C handler. So it is the only
+     *      possibility to do some necessarily cleanup like hardware-init or shutting down cameras.
+     */
+    virtual bool onDestroy() { return true; }
+
+
     /*! @brief  This is the grabbing method.
      *  \remarks
      *      This method is called by grab() and has to be implemented by the inherited grabber.
@@ -529,6 +546,10 @@ private:
      *   \param sig The captured signal. Only CTRL-C is implemented
      */
     static void sigIntHandler(int sig);
+
+    //static std::vector<GrabberInterface*> mInstances;
+    static GrabberInstancesVector mInstances;
+
 #endif
 
     

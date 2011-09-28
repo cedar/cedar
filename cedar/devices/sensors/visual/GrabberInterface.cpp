@@ -45,15 +45,19 @@
 
 using namespace cedar::dev::sensors::visual;
 
+
+#ifdef ENABLE_CTRL_C_HANDLER
+  //Initialize the static member vector containing all instances
+  GrabberInstancesVector GrabberInterface::mInstances;
+#endif
+
 //----------------------------------------------------------------------------------------------------------------------
 //constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------------------------------------------------------
-GrabberInterface::GrabberInterface(
-                                   std::string configFileName
-                                  )
+GrabberInterface::GrabberInterface(std::string configFileName)
   : LoopedThread(configFileName)
 {
   #if defined DEBUG_GRABBER_INTERFACE
@@ -70,6 +74,10 @@ GrabberInterface::GrabberInterface(
 //--------------------------------------------------------------------------------------------------------------------
 GrabberInterface::~GrabberInterface()
 {
+
+  #if defined DEBUG_GRABBER_INTERFACE
+    std::cout << "[GrabberInterface::~GrabberInterface]" << std::endl;
+  #endif
 
   //stop LoopedThread
   if (QThread::isRunning())
@@ -88,9 +96,8 @@ GrabberInterface::~GrabberInterface()
     mpReadWriteLock = NULL;
   }
 
-  #if defined DEBUG_GRABBER_INTERFACE
-    std::cout << "[GrabberInterface::~GrabberInterface]" << std::endl;
-  #endif
+  onDestroy();
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,6 +114,10 @@ GrabberInterface::~GrabberInterface()
         std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
       #endif
 
+      for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
+      {
+        (*it)->onDestroy();
+      }
       std::exit(1);
   }
 #endif
@@ -118,6 +129,7 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
 
   #if defined ENABLE_CTRL_C_HANDLER
      signal(SIGINT,&GrabberInterface::sigIntHandler);
+     mInstances.push_back(this);
   #endif
 
   //-----------------------------
@@ -553,7 +565,7 @@ bool GrabberInterface::stopRecording()
 void GrabberInterface::step(double)
 {
   #if defined DEBUG_GRABBER_STEP
-    std::cout << "GrabberInterface_Thread: step() at " << time << std::endl;
+    std::cout << "GrabberInterface_Thread: step()" << std::endl;
   # endif
 
   //TODO: think about an exception

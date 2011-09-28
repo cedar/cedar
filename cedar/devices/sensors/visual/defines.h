@@ -46,25 +46,25 @@
 //------------------------------------------------------------------------
 // show informations on initialization?
 //------------------------------------------------------------------------
-//#define SHOW_INIT_INFORMATION_VIDEOGRABBER
-//#define SHOW_INIT_INFORMATION_NETGRABBER
-//#define SHOW_INIT_INFORMATION_PICTUREGRABBER
-//#define SHOW_INIT_INFORMATION_CAMERAGRABBER
+#define SHOW_INIT_INFORMATION_VIDEOGRABBER
+#define SHOW_INIT_INFORMATION_NETGRABBER
+#define SHOW_INIT_INFORMATION_PICTUREGRABBER
+#define SHOW_INIT_INFORMATION_CAMERAGRABBER
 
 
-//#define ENABLE_GRABBER_WARNING_OUTPUT
+#define ENABLE_GRABBER_WARNING_OUTPUT
 
 //------------------------------------------------------------------------
 // debug output?
 //------------------------------------------------------------------------
 
-//#define DEBUG_GRABBER_INTERFACE
-//#define DEBUG_GRABBER_STEP
+#define DEBUG_GRABBER_INTERFACE
+#define DEBUG_GRABBER_STEP
 
-//#define DEBUG_NETGRABBER
-//#define DEBUG_VIDEOGRABBER
-//#define DEBUG_PICTUREGRABBER
-//#define DEBUG_CAMERAGRABBER
+#define DEBUG_NETGRABBER
+#define DEBUG_VIDEOGRABBER
+#define DEBUG_PICTUREGRABBER
+#define DEBUG_CAMERAGRABBER
 
 #endif
 
