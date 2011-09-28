@@ -57,10 +57,10 @@ using namespace cedar::dev::sensors::visual;
 
 
 //--------------------------------------------------------------------------------------------------------------------
-GrabberInterface::GrabberInterface(std::string configFileName)
+GrabberInterface::GrabberInterface(const std::string& configFileName)
   : LoopedThread(configFileName)
 {
-  #if defined DEBUG_GRABBER_INTERFACE
+  #ifdef DEBUG_GRABBER_INTERFACE
     std::cout << "[GrabberInterface::GrabberInterface]" << std::endl;
   #endif
 
@@ -75,7 +75,7 @@ GrabberInterface::GrabberInterface(std::string configFileName)
 GrabberInterface::~GrabberInterface()
 {
 
-  #if defined DEBUG_GRABBER_INTERFACE
+  #ifdef DEBUG_GRABBER_INTERFACE
     std::cout << "[GrabberInterface::~GrabberInterface]" << std::endl;
   #endif
 
@@ -104,13 +104,13 @@ GrabberInterface::~GrabberInterface()
 //methods
 //----------------------------------------------------------------------------------------------------------------------
 
-#if defined ENABLE_CTRL_C_HANDLER
+#ifdef ENABLE_CTRL_C_HANDLER
   void GrabberInterface::sigIntHandler(int sig)
   {
       //Documentation of std::exit():
       //Terminates the process normally, performing the regular cleanup for terminating processes.
 
-      #if defined DEBUG_GRABBER_INTERFACE
+      #ifdef DEBUG_GRABBER_INTERFACE
         std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
       #endif
 
@@ -127,7 +127,7 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
 {
   mNumCams = numCams;
 
-  #if defined ENABLE_CTRL_C_HANDLER
+  #ifdef ENABLE_CTRL_C_HANDLER
      signal(SIGINT,&GrabberInterface::sigIntHandler);
      mInstances.push_back(this);
   #endif
@@ -195,7 +195,7 @@ void GrabberInterface::setFps(double fps)
   //cycle time in ms: 1000ms/frames_per_second
   double milliseconds = 1000. / fps;
 
-  #if defined DEBUG_GRABBER_INTERFACE
+  #ifdef DEBUG_GRABBER_INTERFACE
 
     if (wasRunning)
     {
@@ -216,7 +216,7 @@ void GrabberInterface::setFps(double fps)
     LoopedThread::start();
   }
 
-  #if defined DEBUG_GRABBER_INTERFACE
+  #ifdef DEBUG_GRABBER_INTERFACE
 
     if (QThread::isRunning())
     {
@@ -312,7 +312,7 @@ void GrabberInterface::setSnapshotName(const std::string& snapshotName)
   else
   {
     //no: use default
-    #if defined ENABLE_GRABBER_WARNING_OUTPUT
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       std::cout << "[GrabberInterface::setSnapshotName] Warning: No extension in filename! Using .jpg\n";
     #endif
     ext  = ".jpg";
@@ -392,7 +392,7 @@ bool GrabberInterface::saveSnapshot(unsigned int channel) const
   }
   else
   {
-    #if defined ENABLE_GRABBER_WARNING_OUTPUT
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       std::cout << "[GrabberInterface::saveSnapshot] Warning: Nothing to save. Image matrix is empty!\n";
     #endif
     return false;
@@ -420,7 +420,7 @@ bool GrabberInterface::saveSnapshotAllCams() const
 
 
 //--------------------------------------------------------------------------------------------------------------------
-CvSize GrabberInterface::getSize(unsigned int channel) const
+cv::Size GrabberInterface::getSize(unsigned int channel) const
 {
   if (channel >= mNumCams)
   {
@@ -457,7 +457,7 @@ void GrabberInterface::setRecordName(const std::string& recordName)
   else
   {
     //no: use default
-    #if defined ENABLE_GRABBER_WARNING_OUTPUT
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       std::cout << "[GrabberInterface::setRecordName] Warning: No extension in filename! Using .avi\n";
     #endif
     ext  = ".avi";
@@ -478,7 +478,7 @@ void GrabberInterface::setRecordName(const std::string& recordName)
   {
     mRecordNames.push_back(name + ext);
   }
-  #if defined DEBUG_GRABBER_INTERFACE
+  #ifdef DEBUG_GRABBER_INTERFACE
     std::cout << "[GrabberInterface::setRecordName] finished" << std::endl;
   #endif
 }
@@ -564,7 +564,7 @@ bool GrabberInterface::stopRecording()
 //void GrabberInterface::step(double time  __attribute__ ((__unused__))) //only supported by gcc
 void GrabberInterface::step(double)
 {
-  #if defined DEBUG_GRABBER_STEP
+  #ifdef DEBUG_GRABBER_STEP
     std::cout << "GrabberInterface_Thread: step()" << std::endl;
   # endif
 

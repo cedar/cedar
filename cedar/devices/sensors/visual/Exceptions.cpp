@@ -22,33 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GrabberRecordingException.cpp
+    File:        Exceptions.cpp
 
     Maintainer:  Georg Hartinger
     Email:       georg.hartinger@ruhr-uni-bochum.de
     Date:        2011 08 01
 
-    Description: This is the @em cedar::aux::exc::GrabberRecordingException class.
+    Description: This is the main file for all new exceptions introduced in the @em cedar::dev::visual namespace.
 
     Credits:
 
 ======================================================================================================================*/
 
-#include "GrabberRecordingException.h"
+// LOCAL INCLUDES
+#include "Exceptions.h"
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+
+
 
 
 //----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
+cedar::aux::exc::GrabberSnapshotException::GrabberSnapshotException()
+{
+  // Sets the type name.
+  this->mType = "GrabberSnapshotException";
+}
 
-//! Constructor
+
+//----------------------------------------------------------------------------------------------------------------------
 cedar::aux::exc::GrabberRecordingException::GrabberRecordingException()
 {
   // Sets the type name.
   this->mType = "GrabberRecordingException";
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
 //----------------------------------------------------------------------------------------------------------------------
 

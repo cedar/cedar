@@ -52,9 +52,9 @@
  *  \remarks This grabber will grab from all video-files known by OpenCV and/or ffmpeg
  *		Please look at their documentation for supported types (i.e. mpg, avi, ogg,...)
  */
-
 class cedar::dev::sensors::visual::VideoGrabber
-  : public GrabberInterface
+:
+public GrabberInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -71,8 +71,8 @@ public:
    *  \param aviFileName		Filename to grab from
    */
   VideoGrabber(
-               std::string configFileName,
-               std::string aviFileName
+                const std::string& configFileName,
+                const std::string& aviFileName
               );
 
 
@@ -83,9 +83,9 @@ public:
    *  \param aviFileName1	Filename to grab from for channel 1
    */
   VideoGrabber(
-               std::string configFileName,
-               std::string aviFileName0,
-               std::string aviFileName1
+               const std::string& configFileName,
+               const std::string& aviFileName0,
+               const std::string& aviFileName1
               );
 
   //!@brief Destructor
