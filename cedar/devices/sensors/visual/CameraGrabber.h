@@ -53,9 +53,9 @@
  *           cv::VideoCapture class. See their documentation for details about
  *           supported cameras.
  */
-
 class cedar::dev::sensors::visual::CameraGrabber
-  : public GrabberInterface
+:
+public GrabberInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -72,7 +72,7 @@ public:
    *  \param aviFileName    Filename to grab from
    */
   CameraGrabber(
-                std::string  configFileName,
+                const std::string& configFileName,
                 unsigned int Camera0
                );
 
@@ -84,7 +84,7 @@ public:
    *  \param aviFileName1   Filename to grab from for channel 1
    */
   CameraGrabber(
-                std::string  configFileName,
+                const std::string& configFileName,
                 unsigned int Camera0,
                 unsigned int Camera1
                );

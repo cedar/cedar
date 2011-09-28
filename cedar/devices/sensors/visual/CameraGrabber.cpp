@@ -36,11 +36,12 @@
 
 // LOCAL INCLUDES
 #include "CameraGrabber.h"
+#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <auxiliaries/exceptions/IndexOutOfRangeException.h>
+
 
 using namespace cv;
 using namespace cedar::dev::sensors::visual;
@@ -53,8 +54,8 @@ using namespace cedar::dev::sensors::visual;
 //----------------------------------------------------------------------------------------------------
 //Constructor for single-file grabber
 CameraGrabber::CameraGrabber(
-                             std::string  configFileName,
-                             unsigned int Camera0
+                              const std::string& configFileName,
+                              unsigned int Camera0
                             )
   : GrabberInterface(configFileName)
 {
@@ -66,9 +67,9 @@ CameraGrabber::CameraGrabber(
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-file grabber
 CameraGrabber::CameraGrabber(
-                             std::string  configFileName,
-                             unsigned int Camera0,
-                             unsigned int Camera1
+                              const std::string& configFileName,
+                              unsigned int Camera0,
+                              unsigned int Camera1
                             )
   : GrabberInterface(configFileName)
 {
@@ -93,7 +94,7 @@ bool CameraGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 CameraGrabber::~CameraGrabber()
 {
-  #if defined DEBUG_CAMERAGRABBER
+  #ifdef DEBUG_CAMERAGRABBER
     std::cout<<"[CameraGrabber::Destructor]"<< std::endl;
   #endif
   //VideoCaptures are released automatically within the Vector mCaptureVector
@@ -106,7 +107,7 @@ bool CameraGrabber::onInit()
 
   //local and/or stored Parameters are already initialized
 
-  #if defined SHOW_INIT_INFORMATION_CAMERAGRABBER
+  #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
     std::cout << "CameraGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
 
     for (unsigned int i = 0; i < mNumCams; ++i)
@@ -163,7 +164,7 @@ bool CameraGrabber::onInit()
   //set stepsize for LoopedThread
   setFps(fps);
 
-  #if defined DEBUG_CAMERAGRABBER
+  #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraGrabber::onInit] Initialize... finished" << std::endl;
   # endif
 

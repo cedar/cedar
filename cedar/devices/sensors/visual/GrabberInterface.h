@@ -42,19 +42,19 @@
 #include "defines.h"
 #include "namespace.h"
 #include "auxiliaries/LoopedThread.h"
-#include "exceptions/GrabberRecordingException.h"
-#include "exceptions/GrabberSnapshotException.h"
+#include "Exceptions.h"
+#include "../../../auxiliaries/exceptions/InitializationException.h"
+#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
-#include <auxiliaries/exceptions/InitializationException.h>
-#include <auxiliaries/exceptions/IndexOutOfRangeException.h>
-#include <opencv2/opencv.hpp>
-#include <QReadWriteLock>
+
 
 // SYSTEM INCLUDES
 #include <string>
 #include <vector>
 #include <signal.h>
+#include <opencv2/opencv.hpp>
+#include <QReadWriteLock>
 
 
 /* \brief typedef for a vector containing instances of the grabbers
@@ -93,7 +93,8 @@ typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInsta
  *
  */
 class cedar::dev::sensors::visual::GrabberInterface
-  : public cedar::aux::LoopedThread
+:
+public cedar::aux::LoopedThread
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,7 +112,7 @@ protected:
    *    Use a derived class instead.
    */
   GrabberInterface(
-                     std::string configFileName = ""
+                    const std::string& configFileName = ""
                   );
 
 public:
@@ -130,20 +131,20 @@ public:
      *  \remarks
      *      Works exactly the same way if image or avi files are used.
      */
-    unsigned int getNumCams()  const;
+    unsigned int getNumCams() const;
 
 
 
     /*! \brief Get the size of a specified camera-channel.
      *   \remarks
-     *       Gets the size of the Image as CvSize.
+     *       Gets the size of the Image as cv::Size.
      *   \throw cedar::aux::exc::IndexOutOfRangeException
      *   \param channel
      *       This is the index of the source you want the size of the picture from.<br>
      *       In the mono case you do not need to supply this value. Default is 0.<br>
      *       In the stereo case it may be 0 or 1.
      */
-    CvSize getSize(
+    cv::Size getSize(
                    unsigned int channel = 0
                   ) const;
 
@@ -205,7 +206,7 @@ public:
      */
     cv::Mat getImage(
                      unsigned int channel = 0
-                    )  const;
+                    ) const;
 
 
 
@@ -227,7 +228,7 @@ public:
      *  \remarks
      *      Used for concurrent reading/writing to the image matrices
      */
-    QReadWriteLock *getReadWriteLockPointer()   const;
+    QReadWriteLock *getReadWriteLockPointer() const;
 
 
 
@@ -316,7 +317,7 @@ public:
      */
     bool saveSnapshot(
                       unsigned int channel = 0
-                     )     const;
+                     ) const;
 
 
 
@@ -326,7 +327,7 @@ public:
      *  \see
      *    saveSnapshot
      */
-    bool saveSnapshotAllCams()                  const;
+    bool saveSnapshotAllCams() const;
 
 
 
@@ -538,7 +539,7 @@ protected:
 private:
   //none yet
 
-#if defined ENABLE_CTRL_C_HANDLER
+#ifdef ENABLE_CTRL_C_HANDLER
 
     /*! \brief Callback function to respond to a captured CTRL-C event
      *   \remarks
@@ -588,7 +589,7 @@ protected:
 
     /*! @brief  mNumCams should be used instead of mImageMatVector.size()
      * \remarks
-     *          Initialization should be done in the construktor of the derived class.
+     *          Initialization should be done in the constructor of the derived class.
      */
     unsigned int mNumCams;
 

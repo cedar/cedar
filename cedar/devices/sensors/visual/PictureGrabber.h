@@ -45,17 +45,18 @@
 
 // SYSTEM INCLUDES
 
+
+
+
 /*! \class cedar::dev::sensors::visual::PictureGrabber
  *  \brief This grabber grabs images from a picture-file
  *  \remarks This functionality is implemented by using the OpenCV classes
  *		cv::ImRead. See their documentation for details about
  *		supported image types.
  */
-
-
-
 class cedar::dev::sensors::visual::PictureGrabber
-  : public GrabberInterface
+:
+public GrabberInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -72,8 +73,8 @@ public:
    *  \param pictureFileName	Filename to grab from
    */
   PictureGrabber(
-                 std::string configFileName,
-                 std::string pictureFileName
+                  const std::string& configFileName,
+                  const std::string& pictureFileName
                 );
 
 
@@ -84,9 +85,9 @@ public:
    *  \param pictureFileName1	Filename to grab from for channel 1
    */
   PictureGrabber(
-                 std::string configFileName,
-                 std::string pictureFileName0,
-                 std::string pictureFileName1
+                  const std::string& configFileName,
+                  const std::string& pictureFileName0,
+                  const std::string& pictureFileName1ame1
                 );
 
   /*! \brief Destructor */

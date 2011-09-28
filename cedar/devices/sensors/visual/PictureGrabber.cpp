@@ -37,7 +37,7 @@
 
 // LOCAL INCLUDES
 #include "PictureGrabber.h"
-#include <auxiliaries/exceptions/IndexOutOfRangeException.h>
+#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 
@@ -57,8 +57,8 @@ using namespace cedar::dev::sensors::visual;
 //----------------------------------------------------------------------------------------------------
 //Constructor for single-file grabber
 PictureGrabber::PictureGrabber(
-                               std::string configFileName,
-                               std::string pictureFileName
+                                const std::string& configFileName,
+                                const std::string& pictureFileName
                               )
   : GrabberInterface(configFileName)
 {
@@ -71,9 +71,9 @@ PictureGrabber::PictureGrabber(
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-file grabber
 PictureGrabber::PictureGrabber(
-                               std::string configFileName,
-                               std::string pictureFileName0,
-                               std::string pictureFileName1
+                                const std::string& configFileName,
+                                const std::string& pictureFileName0,
+                                const std::string& pictureFileName1
                               )
   : GrabberInterface(configFileName)
 {
@@ -85,7 +85,7 @@ PictureGrabber::PictureGrabber(
 //----------------------------------------------------------------------------------------------------
 PictureGrabber::~PictureGrabber()
 {
-  #if defined DEBUG_PICTUREGRABBER
+  #ifdef DEBUG_PICTUREGRABBER
     std::cout<<"[PictureGrabber::Destructor]"<< std::endl;
   #endif
   //VideoCaptures are released automatically within the Vector mCaptureVector
@@ -103,7 +103,7 @@ bool PictureGrabber::onInit()
 
   //local and/or stored parameters are already initialized
 
-  #if defined SHOW_INIT_INFORMATION_PICTUREGRABBER
+  #ifdef SHOW_INIT_INFORMATION_PICTUREGRABBER
     std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
 
     for (unsigned int i = 0; i < mNumCams; ++i)
@@ -138,7 +138,7 @@ bool PictureGrabber::onInit()
   //maybe read fps and check against default value from loopedthread
   //to decide if it was load from config-file
 
-  #if defined DEBUG_PICTUREGRABBER
+  #ifdef DEBUG_PICTUREGRABBER
     std::cout << "[PictureGrabber::onInit] finished" << std::endl;
   # endif
 

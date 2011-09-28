@@ -36,11 +36,12 @@
 
 // LOCAL INCLUDES
 #include "VideoGrabber.h"
+#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <auxiliaries/exceptions/IndexOutOfRangeException.h>
+
 
 using namespace cv;
 using namespace cedar::dev::sensors::visual;
@@ -54,8 +55,8 @@ using namespace cedar::dev::sensors::visual;
 //----------------------------------------------------------------------------------------------------
 //Constructor for single-file grabber
 VideoGrabber::VideoGrabber(
-                           std::string configFileName,
-                           std::string aviFileName
+                           const std::string& configFileName,
+                           const std::string& aviFileName
                           )
   : GrabberInterface(configFileName)
 {
@@ -68,9 +69,9 @@ VideoGrabber::VideoGrabber(
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-file grabber
 VideoGrabber::VideoGrabber(
-                           std::string configFileName,
-                           std::string aviFileName0,
-                           std::string aviFileName1
+                            const std::string& configFileName,
+                            const std::string& aviFileName0,
+                            const std::string& aviFileName1
                           )
   : GrabberInterface(configFileName)
 {
@@ -91,7 +92,7 @@ bool VideoGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 VideoGrabber::~VideoGrabber()
 {
-  #if defined DEBUG_VIDEOGRABBER
+  #ifdef DEBUG_VIDEOGRABBER
     std::cout<<"[VideoGrabber::Destructor]"<< std::endl;
   #endif
   //VideoCaptures are released automatically within the Vector mCaptureVector
@@ -109,7 +110,7 @@ bool VideoGrabber::onInit()
 
   //local and/or stored Parameters are already initialized
 
-  #if defined SHOW_INIT_INFORMATION_VIDEOGRABBER
+  #ifdef SHOW_INIT_INFORMATION_VIDEOGRABBER
     std::cout << "VideoGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
 
     for (unsigned int i = 0; i < mNumCams; ++i)
@@ -191,7 +192,7 @@ bool VideoGrabber::onInit()
   //set stepsize for LoopedThread
   setFps(fps * _mSpeedFactor);
 
-  #if defined DEBUG_VIDEOGRABBER
+  #ifdef DEBUG_VIDEOGRABBER
     std::cout << "[VideoGrabber::onInit] Initialize... finished" << std::endl;
   # endif
 
@@ -221,7 +222,7 @@ bool VideoGrabber::onGrab()
         {
           (mCaptureVector.at(i)) >> mImageMatVector.at(i);
         }
-        #if defined DEBUG_VIDEOGRABBER
+        #ifdef DEBUG_VIDEOGRABBER
           std::cout << "Video restart\n";
         #endif
 
@@ -305,7 +306,7 @@ void VideoGrabber::setPositionRel(double newPositionRel)
    * double new_pos_abs = (act_pos_abs / (act_pos_rel*100)) *newPositionRel;
    * int    np = static_cast<int> (new_pos_abs);
    */
-  #if defined DEBUG_VIDEOGRABBER
+  #ifdef DEBUG_VIDEOGRABBER
     std::cout << "[VideoGrabber::setPositionRel] new position wanted (relative 0..1): " << newPositionRel
               << std::endl;
     std::cout << "[VideoGrabber::setPositionRel] position set to frame: " << new_pos_abs << std::endl;
@@ -340,7 +341,7 @@ void VideoGrabber::setPositionAbs(unsigned int newPositionAbs)
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::setPositionRel");
   }
 
-  #if defined DEBUG_VIDEOGRABBER
+  #ifdef DEBUG_VIDEOGRABBER
     std::cout << "[VideoGrabber::setPositionAbs] current position: " << getPositionAbs() << std::endl;
     std::cout << "[VideoGrabber::setPositionAbs] position set to frame: " << newPositionAbs << std::endl;
   # endif

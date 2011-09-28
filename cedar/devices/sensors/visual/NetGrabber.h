@@ -41,9 +41,9 @@
 
 // LOCAL INCLUDES
 #include "GrabberInterface.h"
+#include "../../../auxiliaries/net/NetReader.h"
 
 // PROJECT INCLUDES
-#include <auxiliaries/net/NetReader.h>
 
 // SYSTEM INCLUDES
 
@@ -56,7 +56,8 @@
  */
 
 class cedar::dev::sensors::visual::NetGrabber
-  : public GrabberInterface
+:
+public GrabberInterface
 {
 //--------------------------------------------------------------------------------------------------------------------
 //macros
@@ -74,8 +75,8 @@ public:
    *  \param YarpChannel	Channel to grab from
    */
   NetGrabber(
-             std::string configFileName,
-             std::string YarpChannel
+              const std::string& configFileName,
+              const std::string& YarpChannel
             );
 
 
@@ -86,9 +87,9 @@ public:
    *  \param YarpChannel1	Channel 0 to grab from
    */
   NetGrabber(
-             std::string configFileName,
-             std::string YarpChannel0,
-             std::string YarpChannel1
+              const std::string& configFileName,
+              const std::string& YarpChannel0,
+              const std::string& YarpChannel1
             );
 
   //!@brief Destructor

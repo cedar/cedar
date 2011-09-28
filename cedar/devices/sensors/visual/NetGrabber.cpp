@@ -37,11 +37,12 @@
 // LOCAL INCLUDES
 #include "NetGrabber.h"
 #include "GrabberInterface.h"
+#include "../../../auxiliaries/net/NetReader.h"
+#include "../../../auxiliaries/net/exceptions/NetException.h"
+#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
-#include <auxiliaries/net/NetReader.h>
-#include <auxiliaries/net/exceptions/NetException.h>
-#include <auxiliaries/exceptions/IndexOutOfRangeException.h>
+
 
 // SYSTEM INCLUDES
 
@@ -57,8 +58,8 @@ using namespace cedar::dev::sensors::visual;
 //----------------------------------------------------------------------------------------------------
 //Constructor for single-channel grabber
 NetGrabber::NetGrabber(
-                       std::string configFileName,
-                       std::string YarpChannel
+                        const std::string& configFileName,
+                        const std::string& YarpChannel
                       )
   : GrabberInterface(configFileName)
 {
@@ -71,9 +72,9 @@ NetGrabber::NetGrabber(
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-channel grabber
 NetGrabber::NetGrabber(
-                       std::string configFileName,
-                       std::string YarpChannel0,
-                       std::string YarpChannel1
+                        const std::string& configFileName,
+                        const std::string& YarpChannel0,
+                        const std::string& YarpChannel1
                       )
   : GrabberInterface( configFileName)
 {
@@ -85,7 +86,7 @@ NetGrabber::NetGrabber(
 //----------------------------------------------------------------------------------------------------
 NetGrabber::~NetGrabber()
 {
-  #if defined DEBUG_NETGRABBER
+  #ifdef DEBUG_NETGRABBER
     std::cout << "YarpGrabber::Destructor\n";
   #endif
 
@@ -104,11 +105,11 @@ NetGrabber::~NetGrabber()
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onInit()
 {
-  #if defined DEBUG_NETGRABBER
+  #ifdef DEBUG_NETGRABBER
     std::cout << "\n\nYarpGrabber.onInit()\n";
   #endif
 
-  #if defined SHOW_INIT_INFORMATION_NETGRABBER
+  #ifdef SHOW_INIT_INFORMATION_NETGRABBER
     //-------------------------------------------------
     std::cout << "YarpGrabber: Initialize Grabber with " << mNumCams << " channels ..." << std::endl;
 
@@ -130,7 +131,7 @@ bool NetGrabber::onInit()
   {
 
     //loop until connection established
-    #if defined SHOW_INIT_INFORMATION_NETGRABBER
+    #ifdef SHOW_INIT_INFORMATION_NETGRABBER
       std::cout << "NetGrabber: Create channel " << i << ": " << mYarpChannels.at(i) << " " << std::flush;
     #endif
 
@@ -168,7 +169,7 @@ bool NetGrabber::onInit()
 
 
     //loop until first image received
-    #if defined SHOW_INIT_INFORMATION_NETGRABBER
+    #ifdef SHOW_INIT_INFORMATION_NETGRABBER
       std::cout << "Yarp-Grabber: Try to read from channel " << i << " ";
     #endif
 
@@ -202,9 +203,9 @@ bool NetGrabber::onInit()
 
 
   //all grabbers successfully initialized
-  #if defined DEBUG_NETGRABBER
+  #ifdef DEBUG_NETGRABBER
     std::cout << "YarpGrabber: Initialize... finished" << std::endl;
-  # endif
+  #endif
 
   //TODO
   //set fps
