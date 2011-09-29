@@ -38,24 +38,49 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_DEFINES_H
 #define CEDAR_DEV_SENSORS_VISUAL_DEFINES_H
 
+//------------------------------------------------------------------------
+// Defines the default file formats of recordings and snapshot.
+// This extension will only be used, if there is no extension
+// in the new name parameter given to setSnapshotName() or setRecordName()
+//------------------------------------------------------------------------
+#define GRABBER_DEFAULT_RECORD_EXTENSION ".avi"
+#define GRABBER_DEFAULT_SNAPSHOT_EXTENSION ".jpg"
 
-//Enable the CTRL-C handler?
+//------------------------------------------------------------------------
+// Defines the additions to the filename.
+// Will be used in a stereo-grabber if you use setSnapshotName(string)
+// or setRecordName(string) to set both filenames at once
+//------------------------------------------------------------------------
+#define GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0 "[ch0]"
+#define GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1 "[ch1]"
+
+
+//------------------------------------------------------------------------
+// Enable the CTRL-C handler.
+// If ctrl-c handler is activated, also some additions to the
+// GrabberInterface will be enabled:
+// 1) a static member vector to store all instances of used grabbers
+// 2) a static member function which handle the interrupt signal
+// 3) some additional code in GrabberInterface.cpp to handle these issues
+//------------------------------------------------------------------------
 #define ENABLE_CTRL_C_HANDLER
 
 
 //------------------------------------------------------------------------
-// show informations on initialization?
+// Enable this, if you want to see some informations on initialization
 //------------------------------------------------------------------------
 #define SHOW_INIT_INFORMATION_VIDEOGRABBER
 #define SHOW_INIT_INFORMATION_NETGRABBER
 #define SHOW_INIT_INFORMATION_PICTUREGRABBER
 #define SHOW_INIT_INFORMATION_CAMERAGRABBER
 
-
+//------------------------------------------------------------------------
+// Enable some warning output during operation
+//------------------------------------------------------------------------
 #define ENABLE_GRABBER_WARNING_OUTPUT
 
 //------------------------------------------------------------------------
-// debug output?
+// Enable class-debugging output
 //------------------------------------------------------------------------
 
 #define DEBUG_GRABBER_INTERFACE

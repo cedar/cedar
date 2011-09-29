@@ -492,11 +492,11 @@ protected:
 
     /*! @brief  This method is invoked during destruction of the class.
      *  \remarks
-     *      Override this method in the derived classes to do their deinitialization.<br>
-     *      For example, use this method instead of the destructor to release dynamic memory. And:
-     *      you have to call this method in the destructor of the derived class.
-     *      Background information: This method is invoked by the CTRL-C handler. So it is the only
-     *      possibility to do some necessarily cleanup like hardware-init or shutting down cameras.
+     *      Override this method in the derived classes to do their cleanup.<br>
+     *      For example, use this method instead of the destructor to release dynamic memory. <br><br>
+     *      Note:<br>You have to call this method in the destructor of the derived class.<br><br>
+     *      Background information:<br>This method is invoked by the CTRL-C handler. So it is the only
+     *      possibility to do some necessarily cleanup like hardware-reinit or shutting down cameras.
      */
     virtual bool onDestroy() { return true; }
 
@@ -539,11 +539,14 @@ protected:
 private:
   //none yet
 
-#ifdef ENABLE_CTRL_C_HANDLER
+  #ifdef ENABLE_CTRL_C_HANDLER
 
     /*! \brief Callback function to respond to a captured CTRL-C event
      *   \remarks
-     *      This function only calls exit(). Exit terminate the process normally, performing the regular cleanup for terminating processes.
+     *      This function calls the onDetroy() function of all registerd grabbers and then exit().
+     *   \see
+     *      onDestroy
+     *      Exit terminate the process normally, performing the regular cleanup for terminating processes.
      *   \param sig The captured signal. Only CTRL-C is implemented
      */
     static void sigIntHandler(int sig);
@@ -551,7 +554,7 @@ private:
     //static std::vector<GrabberInterface*> mInstances;
     static GrabberInstancesVector mInstances;
 
-#endif
+  #endif
 
     
 
