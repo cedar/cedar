@@ -96,7 +96,36 @@ GrabberInterface::~GrabberInterface()
     mpReadWriteLock = NULL;
   }
 
+  //do the cleanup in derived class
   onDestroy();
+
+  //remove this grabber-instance from the InstancesVector
+  #ifdef ENABLE_CTRL_C_HANDLER
+
+    std::vector<GrabberInterface*>::iterator it = mInstances.begin();
+
+    while (((*it) != this) && (it != mInstances.end()))
+    {
+      ++it;
+    }
+
+    if ((*it) == this)
+    {
+      mInstances.erase(it);
+      #ifdef DEBUG_GRABBER_INTERFACE
+        std::cout << "[GrabberInterface::~GrabberInterface] Grabber " << ConfigurationInterface::_mName
+                  << "deleted from list of all instances." << std::endl;
+      #endif
+    }
+
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      else
+      {
+        std::cout << "[GrabberInterface::~GrabberInterface] Warning: Grabber " << ConfigurationInterface::_mName
+                  << "not found in list of all instances" << std::endl;
+      }
+    #endif
+  #endif
 
 }
 
@@ -116,6 +145,7 @@ GrabberInterface::~GrabberInterface()
 
       for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
       {
+        //(*it)->~GrabberInterface;  //do that with smart-pointers??
         (*it)->onDestroy();
       }
       std::exit(1);
@@ -202,9 +232,7 @@ void GrabberInterface::setFps(double fps)
       std::cout << "[GrabberInterface::setFps] grabberthread stopped" << std::endl;
     }
 
-    std::cout << "[GrabberInterface::setFps] new fps " << fps << std::endl;
-    std::cout << "[GrabberInterface::setFps] stepsize[in milliseconds]: " << milliseconds << std::endl;
-
+    std::cout << "[GrabberInterface::setFps] switch to " << fps <<"fps"<< std::endl;
   #endif
 
 
@@ -218,13 +246,18 @@ void GrabberInterface::setFps(double fps)
 
   #ifdef DEBUG_GRABBER_INTERFACE
 
+    std::cout << "[GrabberInterface::setFps] new values: getFps: " << getFps()
+              << " stepsize[in milliseconds]: " << milliseconds << std::endl;
+
     if (QThread::isRunning())
     {
       std::cout << "[GrabberInterface::setFps]: grabberthread running" << std::endl;
     }
+    else
+    {
+      std::cout << "[GrabberInterface::setFps]: grabberthread not running" << std::endl;
+    }
 
-    std::cout << "[GrabberInterface::setFps]: getFps " << getFps() << std::endl;
-    std::cout << "[GrabberInterface::setFps]: stepsize[in milliseconds]: " << milliseconds << std::endl;
   #endif
 }
 
@@ -293,6 +326,11 @@ std::string GrabberInterface::getSourceInfo(unsigned int channel) const
 void GrabberInterface::setSnapshotName(const std::string& snapshotName)
 {
 
+  if (snapshotName == "")
+  {
+    return;
+  }
+
   mSnapshotNames.clear();
 
   //initialize snapshot-names
@@ -315,7 +353,7 @@ void GrabberInterface::setSnapshotName(const std::string& snapshotName)
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       std::cout << "[GrabberInterface::setSnapshotName] Warning: No extension in filename! Using .jpg\n";
     #endif
-    ext  = ".jpg";
+    ext  = GRABBER_DEFAULT_SNAPSHOT_EXTENSION;
     name = snapshotName;
   }
 
@@ -323,8 +361,8 @@ void GrabberInterface::setSnapshotName(const std::string& snapshotName)
   if (mNumCams > 1)
   {
     //insert all into vector
-    mSnapshotNames.push_back(name + "[ch0]" + ext);
-    mSnapshotNames.push_back(name + "[ch1]" + ext);
+    mSnapshotNames.push_back(name + GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0 + ext);
+    mSnapshotNames.push_back(name + GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1 + ext);
   }
   else
   {
@@ -342,9 +380,22 @@ void GrabberInterface::setSnapshotName(unsigned int channel, const std::string& 
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::setSnapshotName");
   }
-  mSnapshotNames.at(channel) = snapshotName;
-}
 
+  if (snapshotName != "")
+  {
+    //check if there is an extension
+    std::string name = snapshotName;
+    std::size_t pos = name.rfind(".");
+
+    if (pos == std::string::npos)
+    {
+      //no: use default extension
+      name.append(GRABBER_DEFAULT_SNAPSHOT_EXTENSION);
+    }
+
+    mSnapshotNames.at(channel) = name;
+  }
+}
 
 
 
@@ -357,7 +408,6 @@ std::string GrabberInterface::getSnapshotName(unsigned int channel) const
   }
   return mSnapshotNames.at(channel);
 }
-
 
 
 
@@ -403,7 +453,6 @@ bool GrabberInterface::saveSnapshot(unsigned int channel) const
 
 
 
-
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::saveSnapshotAllCams() const
 {
@@ -415,7 +464,6 @@ bool GrabberInterface::saveSnapshotAllCams() const
   }
   return result;
 }
-
 
 
 
@@ -460,15 +508,15 @@ void GrabberInterface::setRecordName(const std::string& recordName)
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       std::cout << "[GrabberInterface::setRecordName] Warning: No extension in filename! Using .avi\n";
     #endif
-    ext  = ".avi";
+    ext  = GRABBER_DEFAULT_RECORD_EXTENSION;
     name = recordName;
   }
 
   //filename depends on no. of cams
   if (mNumCams > 1)
   {
-    std::string name_ch0 = name + "[ch0]" + ext;
-    std::string name_ch1 = name + "[ch1]" + ext;
+    std::string name_ch0 = name + GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0 + ext;
+    std::string name_ch1 = name + GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1 + ext;
     //std::cout << "[GrabberInterface::setRecordName] : set both recordnames to " << name_ch0 <<"  "<< name_ch1 << std::endl;
     //insert all into vector
     mRecordNames.push_back(name_ch0);
@@ -495,9 +543,21 @@ void GrabberInterface::setRecordName(unsigned int channel, const std::string& re
 
   if (recordName != "")
   {
-    mRecordNames.at(channel) = recordName;
+    //check if there is an extension
+    std::string name = recordName;
+    std::size_t pos = name.rfind(".");
+
+    if (pos == std::string::npos)
+    {
+      //no: use default extension
+      name.append(GRABBER_DEFAULT_RECORD_EXTENSION);
+    }
+
+    mRecordNames.at(channel) = name;
   }
 }
+
+
 
 //--------------------------------------------------------------------------------------------------------------------
 std::string GrabberInterface::getRecordName(unsigned int channel) const
