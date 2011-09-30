@@ -84,7 +84,7 @@
 //------------------------------------------------------------------------
 
 #define DEBUG_GRABBER_INTERFACE
-#define DEBUG_GRABBER_STEP
+//#define DEBUG_GRABBER_STEP
 
 #define DEBUG_NETGRABBER
 #define DEBUG_VIDEOGRABBER

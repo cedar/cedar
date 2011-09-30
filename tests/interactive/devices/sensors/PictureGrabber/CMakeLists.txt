@@ -1,0 +1,2 @@
+cedar_add_interactive_test("StereoPictureGrabber" StereoPictureGrabberTest.cpp)
+
