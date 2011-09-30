@@ -114,7 +114,7 @@ GrabberInterface::~GrabberInterface()
       mInstances.erase(it);
       #ifdef DEBUG_GRABBER_INTERFACE
         std::cout << "[GrabberInterface::~GrabberInterface] Grabber " << ConfigurationInterface::_mName
-                  << "deleted from list of all instances." << std::endl;
+                  << " deleted from list of all instances." << std::endl;
       #endif
     }
 
@@ -145,7 +145,7 @@ GrabberInterface::~GrabberInterface()
 
       for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
       {
-        //(*it)->~GrabberInterface;  //do that with smart-pointers??
+        //(*it)->~GrabberInterface;  //do that with shared-pointers??
         (*it)->onDestroy();
       }
       std::exit(1);
@@ -232,7 +232,7 @@ void GrabberInterface::setFps(double fps)
       std::cout << "[GrabberInterface::setFps] grabberthread stopped" << std::endl;
     }
 
-    std::cout << "[GrabberInterface::setFps] switch to " << fps <<"fps"<< std::endl;
+    std::cout << "[GrabberInterface::setFps] switch to " << fps <<" fps"<< std::endl;
   #endif
 
 
@@ -247,15 +247,15 @@ void GrabberInterface::setFps(double fps)
   #ifdef DEBUG_GRABBER_INTERFACE
 
     std::cout << "[GrabberInterface::setFps] new values: getFps: " << getFps()
-              << " stepsize[in milliseconds]: " << milliseconds << std::endl;
+              << ", stepsize " << milliseconds << "ms"<< std::endl;
 
     if (QThread::isRunning())
     {
-      std::cout << "[GrabberInterface::setFps]: grabberthread running" << std::endl;
+      std::cout << "[GrabberInterface::setFps] grabberthread running" << std::endl;
     }
     else
     {
-      std::cout << "[GrabberInterface::setFps]: grabberthread not running" << std::endl;
+      std::cout << "[GrabberInterface::setFps] grabberthread not running" << std::endl;
     }
 
   #endif
@@ -599,7 +599,7 @@ bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
     }
   }
 
-  if (mVideoWriterVector.size() != (mNumCams - 1) )
+  if (mVideoWriterVector.size() != (mNumCams ) )
   {
     CEDAR_THROW(cedar::aux::exc::GrabberRecordingException,"GrabberInterface::startRecording")
   }

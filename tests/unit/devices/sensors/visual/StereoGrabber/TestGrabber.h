@@ -187,7 +187,7 @@ public:
   }
 
 
-} ;//cedar::dev::sensors::visual::TestGrabber
+} ;// cedar::dev::sensors::visual::TestGrabber
 
 
 
