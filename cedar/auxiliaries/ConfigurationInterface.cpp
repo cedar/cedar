@@ -628,7 +628,8 @@ int ConfigurationInterface::handleTypeException(const ConfigurationInterface::Pa
 
 int ConfigurationInterface::handleSettingNotFoundException(const ConfigurationInterface::ParameterInfo& info)
 {
-  cerr << "> error in " << mConfigFileName << ": No '" << info.mName << "' setting in configuration file." << endl;
+  //GH:
+  //cerr << "> error in " << mConfigFileName << ": No '" << info.mName << "' setting in configuration file." << endl;
   setParameterToDefault(info);
   return CONFIG_MISSING_ITEM_ERROR;
 }

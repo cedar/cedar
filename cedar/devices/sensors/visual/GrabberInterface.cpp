@@ -85,6 +85,9 @@ GrabberInterface::~GrabberInterface()
     cedar::aux::LoopedThread::stop();
   }
 
+  //stop Recording
+  stopRecording();
+
   //Matrices are released within the vector mImageMatVector
 
   //write out the parameter of the configurationInterface
@@ -143,9 +146,37 @@ GrabberInterface::~GrabberInterface()
         std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
       #endif
 
+
       for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
       {
         //(*it)->~GrabberInterface;  //do that with shared-pointers??
+
+        //stop LoopedThread if needed
+        if ((*it)->isRunning())
+        {
+          (*it)->stop();
+          #ifdef DEBUG_GRABBER_INTERFACE
+            std::cout << "[GrabberInterface::sigIntHandler] Thread stopped" << std::endl;
+          #endif
+        }
+
+        //stop Recording if needed
+        if ((*it)->mRecord)
+        {
+          (*it)->stopRecording();
+          #ifdef DEBUG_GRABBER_INTERFACE
+            std::cout << "[GrabberInterface::sigIntHandler] Recording stopped" << std::endl;
+          #endif
+        }
+
+        //delete dynamic var's
+        if ((*it)->mpReadWriteLock)
+        {
+          delete (*it)->mpReadWriteLock;
+          (*it)->mpReadWriteLock = NULL;
+        }
+
+        //do cleanup in derived classes
         (*it)->onDestroy();
       }
       std::exit(1);
@@ -229,7 +260,7 @@ void GrabberInterface::setFps(double fps)
 
     if (wasRunning)
     {
-      std::cout << "[GrabberInterface::setFps] grabberthread stopped" << std::endl;
+      std::cout << "[GrabberInterface::setFps] thread stopped" << std::endl;
     }
 
     std::cout << "[GrabberInterface::setFps] switch to " << fps <<" fps"<< std::endl;
@@ -246,8 +277,8 @@ void GrabberInterface::setFps(double fps)
 
   #ifdef DEBUG_GRABBER_INTERFACE
 
-    std::cout << "[GrabberInterface::setFps] new values: getFps: " << getFps()
-              << ", stepsize " << milliseconds << "ms"<< std::endl;
+    //std::cout << "[GrabberInterface::setFps] new values: getFps: " << getFps()
+    //         << ", stepsize " << milliseconds << "ms"<< std::endl;
 
     if (QThread::isRunning())
     {
@@ -526,9 +557,6 @@ void GrabberInterface::setRecordName(const std::string& recordName)
   {
     mRecordNames.push_back(name + ext);
   }
-  #ifdef DEBUG_GRABBER_INTERFACE
-    std::cout << "[GrabberInterface::setRecordName] finished" << std::endl;
-  #endif
 }
 
 
@@ -613,8 +641,11 @@ bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::stopRecording()
 {
-  mRecord = false;
-  mVideoWriterVector.clear();
+  if (mRecord)
+  {
+    mRecord = false;
+    mVideoWriterVector.clear();
+  }
   return true;
 }
 

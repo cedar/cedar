@@ -113,6 +113,7 @@ bool PictureGrabber::onInit()
     std::cout << std::flush;
   #endif
 
+
   mImageMatVector.clear();
 
   for (unsigned int i = 0; i < mNumCams; ++i)
@@ -131,12 +132,6 @@ bool PictureGrabber::onInit()
     }
   }
   //all grabbers successfully initialized
-
-  //TODO
-  //set fps
-  //until now, it is set to default value of loopedThread
-  //maybe read fps and check against default value from loopedthread
-  //to decide if it was load from config-file
 
   #ifdef DEBUG_PICTUREGRABBER
     std::cout << "[PictureGrabber::onInit] finished" << std::endl;
@@ -160,7 +155,11 @@ std::string PictureGrabber::onGetSourceInfo(unsigned int channel) const
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::onGrab()
 {
-  //@todo: check if matrizes are ok!!
+  bool result = true;
+  for (unsigned int i=0; i<mNumCams; i++)
+  {
+    result &= !mImageMatVector.at(i).empty();
+  }
   return true;
 }
 

@@ -101,6 +101,17 @@ NetGrabber::~NetGrabber()
 //methods
 //----------------------------------------------------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------------
+bool NetGrabber::onDestroy()
+{
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout<<"[NetGrabber::onDestroy]"<< std::endl;
+  #endif
+
+  //close all captures
+  mYarpReaderVector.clear();
+  return true;
+}
 
 //----------------------------------------------------------------------------------------------------
 bool NetGrabber::onInit()

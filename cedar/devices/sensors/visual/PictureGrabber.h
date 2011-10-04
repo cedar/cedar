@@ -68,7 +68,6 @@ public GrabberInterface
 public:
 
   /*! \brief  Constructor for a single-file grabber
-   *  \param grabberName              The name for this grabber
    *  \param configFileName	Filename for the configuration
    *  \param pictureFileName	Filename to grab from
    */
@@ -79,7 +78,6 @@ public:
 
 
   /*! \brief Constructor for a stereo-file grabber
-   *  \param grabberName		The name for this grabber
    *  \param configFileName		Filename for the configuration
    *  \param pictureFileName0	Filename to grab from for channel 0
    *  \param pictureFileName1	Filename to grab from for channel 1
@@ -94,18 +92,11 @@ public:
   ~PictureGrabber();
 
 
-
-
-
-
   //------------------------------------------------------------------------
   //Members
   //------------------------------------------------------------------------
 
 protected:
-
-
-
 
 
   //------------------------------------------------------------------------

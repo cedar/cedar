@@ -16,17 +16,20 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+//#include "../../../../../../cedar/auxiliaries/LogFile.h"
+//#include "../../../../../../cedar/devices/sensors/visual/PictureGrabber.h"
 #include <devices/sensors/visual/PictureGrabber.h>
+#include <auxiliaries/LogFile.h>
 
 // PROJECT INCLUDES
 
+
 // SYSTEM INCLUDES
-#include <iostream>
-#include <exception>
+#include <opencv2/opencv.hpp>
 
 
 
-/*! \brief This is a short example of how to use the Video-Grabber class.
+/*! \brief This is a short example of how to use the PictureGrabber class as a stereo grabber.
  *
  *  \remarks
  *      <pre>
@@ -49,7 +52,7 @@ int main(int , char **)
 
   //------------------------------------------------------------------
   //definition of used files and names
-  //const char* filename0 = "/usr/local/src/OpenCV-2.2.0/samples/c/cat.jpg";
+  //const char* filename0 = "/usr/local/src/OpenCV-2.2.0/samples/c/cat.jpg"; //error in picture
   const char* filename0 = "/usr/local/src/OpenCV-2.2.0/samples/c/puzzle.png";
   const char* filename1 = "/usr/local/src/OpenCV-2.2.0/samples/c/fruits.jpg";
   const char* grabbername = "Stereopicture_grabber";
@@ -58,10 +61,14 @@ int main(int , char **)
   std::string window0 = (std::string)grabbername+":"+filename0;
   std::string window1 = (std::string)grabbername+":"+filename1;
 
-  std::cout << "Stereopicture_grabber Test\n";
+
+  std::cout << "\n\nInteractive test of the PictureGrabber class (stereo)\n";
+  std::cout << "-----------------------------------------------------\n\n";
+
 
   //------------------------------------------------------------------
   //Create the grabber
+  std::cout << "Create a PictureGrabber:\n";
   cedar::dev::sensors::visual::PictureGrabber picture_grabber(configfile,filename0,filename1);
 
 
@@ -85,22 +92,22 @@ int main(int , char **)
 
     picture_grabber.setName(grabbername);
 
-    std::cout << "Grab from (0) " << picture_grabber.getSourceInfo(0)<< std::endl;
+    std::cout << "\nGrab from (0) " << picture_grabber.getSourceInfo(0)<< std::endl;
     std::cout << "Grab from (1) " << picture_grabber.getSourceInfo(1)<< std::endl;
 
     //error, because it is only a stereo-grabber
     //std::cout << "Grab from (3):" << picture_grabber.getSourceInfo(2);
 
 
-    //Get more Informations from loaded avis
+    std::cout << "\nSize of loaded Pictures:\n";
     cv::Size ch0_size = picture_grabber.getSize(0);
     cv::Size ch1_size = picture_grabber.getSize(1);
-    std::cout << "Channel 0: picture size : " << ch0_size.width <<" x " << ch0_size.height << std::endl;
-    std::cout << "Channel 1: picture size : " << ch1_size.width <<" x " << ch1_size.height << std::endl;
+    std::cout << "Channel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+    std::cout << "Channel 1: " << ch1_size.width <<" x " << ch1_size.height << std::endl;
 
 
     //check framerate of the grabber-thred (thread isn't started yet)
-    std::cout << "picture_grabber thread FPS    : " << picture_grabber.getFps() << std::endl;
+    std::cout << "\nPictureGrabber thread FPS : " << picture_grabber.getFps() << std::endl;
 
     //grabberthread don't have to be started. There is no new content to grab.
 
@@ -119,6 +126,8 @@ int main(int , char **)
     picture_grabber.setSnapshotName(0,"snap01.jpg"); // rename channel 0 to snap.jpg. Channel 1 isn't altered
 
     //Check the constructed filenames
+    std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
+
     std::cout << "SnapshotName_0:\t" << picture_grabber.getSnapshotName(0) <<std::endl;
     std::cout << "SnapshotName_1:\t" << picture_grabber.getSnapshotName(1) <<std::endl;
     std::cout << "RecordName_0:\t" << picture_grabber.getRecordName(0) <<std::endl;
@@ -127,7 +136,7 @@ int main(int , char **)
     //enforcing an error and catch it
     try
     {
-      std::cout << "Try to enforce an exception:";
+      std::cout << "\nTry to enforce an exception:\n";
       std::cout << "SnapshotName_2: " << picture_grabber.getSnapshotName(2) <<std::endl;
     }
     catch (cedar::aux::exc::ExceptionBase& e)
@@ -142,12 +151,13 @@ int main(int , char **)
     //picture_grabber.saveSnapshotAllCams();
 
     // Save a snapshot from channel 0 only
-    // Be aware, that already existing files will be overwritten without question
+    // Be aware, that existing files will be overwritten without any question
     //picture_grabber.saveSnapshot(0);
 
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
+  std::cout << "\nShow pictures\n";
   namedWindow(window0,CV_WINDOW_KEEPRATIO);
   namedWindow(window1,CV_WINDOW_KEEPRATIO);
 
@@ -156,6 +166,7 @@ int main(int , char **)
   cv::Mat frame1 = picture_grabber.getImage(1);
 
   //start recording
+  std::cout << "\nStart Recording\n";
   picture_grabber.setFps(15);
   picture_grabber.start();
   picture_grabber.startRecording(15);
@@ -169,6 +180,7 @@ int main(int , char **)
     imshow(window0,frame0);
     imshow(window1,frame1);
 
+    //it is not necessary to do this, unless a new picture should be used
     frame0 = picture_grabber.getImage();
     frame1 = picture_grabber.getImage(1);
     counter++;
@@ -192,11 +204,11 @@ int main(int , char **)
       break;
     }
 
-    //wait 10ms (needed for highgui)
+    //wait 100ms (needed for highgui)
     waitKey(100);
   }
 
-  //stop grabbing-thread if running because of recording
+  //stop grabbing-thread if running
   if (picture_grabber.isRunning())
   {
     picture_grabber.stop();
