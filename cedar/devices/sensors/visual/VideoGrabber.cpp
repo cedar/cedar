@@ -92,10 +92,10 @@ bool VideoGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 VideoGrabber::~VideoGrabber()
 {
+  onDestroy();
   #ifdef DEBUG_VIDEOGRABBER
     std::cout<<"[VideoGrabber::Destructor]"<< std::endl;
   #endif
-  //VideoCaptures are released automatically within the Vector mCaptureVector
 }
 
 
@@ -103,6 +103,17 @@ VideoGrabber::~VideoGrabber()
 //methods
 //----------------------------------------------------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------------
+bool VideoGrabber::onDestroy()
+{
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout<<"[VideoGrabber::onDestroy]"<< std::endl;
+  #endif
+
+  //close all captures
+  mCaptureVector.clear();
+  return true;
+}
 
 //----------------------------------------------------------------------------------------------------
 bool VideoGrabber::onInit()

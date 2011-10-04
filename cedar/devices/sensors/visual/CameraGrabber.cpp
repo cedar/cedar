@@ -94,6 +94,8 @@ bool CameraGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 CameraGrabber::~CameraGrabber()
 {
+  onDestroy();
+
   #ifdef DEBUG_CAMERAGRABBER
     std::cout<<"[CameraGrabber::Destructor]"<< std::endl;
   #endif
@@ -218,6 +220,17 @@ std::string CameraGrabber::onGetSourceInfo(unsigned int channel) const
   return s.str();
 }
 
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::onDestroy()
+{
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout<<"[CameraGrabber::onDestroy]"<< std::endl;
+  #endif
+
+  //close all captures
+  mCaptureVector.clear();
+  return true;
+}
 
 //----------------------------------------------------------------------------------------------------
 double CameraGrabber::getCameraParam(unsigned int channel,int propId)

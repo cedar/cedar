@@ -60,10 +60,14 @@ int main(int , char **)
   std::string window0 = (std::string)grabbername+":"+filename0;
   std::string window1 = (std::string)grabbername+":"+filename1;
 
-  std::cout << "StereoVideoGrabber Test\n";
+  std::cout << "\n\nInteractive test of the VideoGrabber class (stereo)\n";
+  std::cout << "-----------------------------------------------------\n\n";
+
+
 
   //------------------------------------------------------------------
   //Create the grabber
+  std::cout << "Create a PictureGrabber:\n";
   cedar::dev::sensors::visual::VideoGrabber video_grabber(configfile,filename0,filename1);
 
 
@@ -91,7 +95,7 @@ int main(int , char **)
    */
 
 
-    std::cout << "Grab from (0) " << video_grabber.getSourceInfo(0)<< std::endl;
+    std::cout << "\nGrab from (0) " << video_grabber.getSourceInfo(0)<< std::endl;
     std::cout << "Grab from (1) " << video_grabber.getSourceInfo(1)<< std::endl;
 
     //error, because it is only a stereo-grabber
@@ -99,6 +103,7 @@ int main(int , char **)
 
 
     //Get more Informations from loaded avis
+    std::cout << "\nSome Informations of loaded video files:\n";
     std::cout << "AVI(ch0) fourcc : " << video_grabber.getSourceEncoding() << std::endl;
     std::cout << "AVI(ch0) frames : " << video_grabber.getFrameCount() << std::endl;
     std::cout << "AVI(ch0) pos_rel: " << video_grabber.getPositionRel() << std::endl;
@@ -106,7 +111,7 @@ int main(int , char **)
     std::cout << "AVI(ch0) FPS    : " << video_grabber.getSourceFps() << std::endl;
 
     //check framerate of the grabber-thred (thread isn't started yet)
-    std::cout << "video_grabber thread FPS    : " << video_grabber.getFps() << std::endl;
+    std::cout << "\nVideoGrabber thread FPS: " << video_grabber.getFps() << std::endl;
 
     //disable loop
     //video_grabber.setLoop(false);
@@ -131,6 +136,8 @@ int main(int , char **)
 
 
     //Check the constructed filenames
+    std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
+
     std::cout << "SnapshotName_0:\t" << video_grabber.getSnapshotName(0) <<std::endl;
     std::cout << "SnapshotName_1:\t" << video_grabber.getSnapshotName(1) <<std::endl;
     std::cout << "RecordName_0:\t" << video_grabber.getRecordName(0) <<std::endl;
@@ -139,6 +146,7 @@ int main(int , char **)
     //enforcing an error and catch it
     try
     {
+      std::cout << "\nTry to enforce an exception:\n";
       std::cout << "SnapshotName_2: " << video_grabber.getSnapshotName(2) <<std::endl;
     }
     catch (cedar::aux::exc::ExceptionBase& e)
@@ -157,6 +165,7 @@ int main(int , char **)
     //video_grabber.saveSnapshot(0);
 
 
+    std::cout << "\nGrabbing and scrolling in the Video-File\n";
     // until now, only the first frame of the AVI-file is grabbed.
     // so lets grab the next frame into the buffer
     //video_grabber.grab();
@@ -171,26 +180,26 @@ int main(int , char **)
     //    it depends on the avi-file and/or fileformat
     //    if scrolling works or not
     //    so please use it carefully
-    std::cout << "Grab the second frame (frame no. 1):"<< std::endl;
+    std::cout << "\nGrab the second frame (frame no. 1):"<< std::endl;
     video_grabber.grab();
     std::cout << "AVI(ch0) pos_rel: " << video_grabber.getPositionRel() << std::endl;
     std::cout << "AVI(ch0) pos_abs: " << video_grabber.getPositionAbs() << std::endl;
 
     //goto the half position
-    std::cout << "Scrolling to frame 50:"<< std::endl;
+    std::cout << "\nScrolling to frame 50:"<< std::endl;
     video_grabber.setPositionAbs(50);
     std::cout << "AVI(ch0) pos_rel: " << video_grabber.getPositionRel() << std::endl;
     std::cout << "AVI(ch0) pos_abs: " << video_grabber.getPositionAbs() << std::endl;
 
   //goto the end, i.e. the last frame
-    std::cout << "scrolling to the end of the file:"<< std::endl;
+    std::cout << "\nScrolling to the end of the file:"<< std::endl;
     video_grabber.setPositionRel(1);
     std::cout << "AVI(ch0) pos_rel: " << video_grabber.getPositionRel() << std::endl;
     std::cout << "AVI(ch0) pos_abs: " << video_grabber.getPositionAbs() << std::endl;
 
 
     //switch back to start
-    std::cout << "scrolling to the beginning of the video-file:"<< std::endl;
+    std::cout << "\nScrolling to the beginning of the video-file:"<< std::endl;
     video_grabber.setPositionRel(0);
     std::cout << "AVI(ch0) pos_rel: " << video_grabber.getPositionRel() << std::endl;
     std::cout << "AVI(ch0) pos_abs: " << video_grabber.getPositionAbs() << std::endl;
@@ -212,7 +221,9 @@ int main(int , char **)
 //    return 0;
 
     //Start recording
-    //video_grabber.startRecording(ag->getAviParamFps());
+    //gi->startRecording(ag->getAviParamFps());
+
+
 
 
   //some options
@@ -221,6 +232,7 @@ int main(int , char **)
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
+  std::cout << "\nShow videos\n";
   namedWindow(window0,CV_WINDOW_KEEPRATIO);
   namedWindow(window1,CV_WINDOW_KEEPRATIO);
 
@@ -228,12 +240,14 @@ int main(int , char **)
   cv::Mat frame0 = video_grabber.getImage();
   cv::Mat frame1 = video_grabber.getImage(1);
 
-  //start the grabbing-thread 4 times faster then normal
-  video_grabber.setSpeedFactor(4);
-  std::cout << "video_grabber thread FPS    : " << video_grabber.getFps() << std::endl;
+  //start the grabbing-thread 2 times faster then normal
+  std::cout << "\nSet speed factor of grabbing-thread to 2\n";
+  video_grabber.setSpeedFactor(2);
+  std::cout << "VideoGrabber thread FPS    : " << video_grabber.getFps() << std::endl;
   video_grabber.start();
 
 
+  std::cout << "\nShow rest of videos\n";
   //get frames until avi is over
   while (!frame0.empty())
   {
@@ -252,11 +266,15 @@ int main(int , char **)
   }
 
 
-
   //------------------------------------------------------------------
   //clean up highgui
   destroyWindow(window0);
   destroyWindow(window1);
+
+
+  //for configfile
+  video_grabber.setSpeedFactor(1);;
+
   std::cout << "finished\n";
 
   return 0;

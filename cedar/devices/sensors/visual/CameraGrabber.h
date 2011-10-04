@@ -147,6 +147,7 @@ protected:
                               unsigned int channel
                              ) const;
 
+  virtual bool onDestroy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -172,7 +173,8 @@ protected:
    *  \see
    *    mCameraId
    */
-  std::vector<cv::VideoCapture> mCaptureVector;private:
+  std::vector<cv::VideoCapture> mCaptureVector;
+private:
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------

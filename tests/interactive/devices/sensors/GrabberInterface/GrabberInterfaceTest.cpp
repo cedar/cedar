@@ -35,21 +35,23 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "TestGrabber.h"
+//#include "../../../../../../cedar/devices/sensors/visual/TestGrabber.h"
+//#include "../../../../../../cedar/auxiliaries/LogFile.h"
+#include <devices/sensors/visual/TestGrabber.h>
+#include <auxiliaries/LogFile.h>
 
 // PROJECT INCLUDES
-#include <auxiliaries/LogFile.h>
-#include <opencv2/opencv.hpp>
+
 
 // SYSTEM INCLUDES
-#include <cstdlib>
-#include <iostream>
+#include <opencv2/opencv.hpp>
 
 
-using namespace std;
-using namespace boost::posix_time;
-using namespace cedar::dev::sensors::visual;
-using namespace cedar::aux;
+//using namespace std;
+//using namespace cedar::dev::sensors::visual;
+
+
+//using namespace boost::posix_time;
 
 //constants
 
@@ -60,55 +62,55 @@ using namespace cedar::aux;
 #define GRABBER_NAME_1 "TestGrabber"
 #define CONFIG_FILE_NAME_1 "grabber1.config"
 
-#define GRABBER_NAME_2 "NewTestGrabber"
+#define GRABBER_NAME_2 "TestGrabber_2"
 #define CONFIG_FILE_NAME_2 "grabber2.config"
 
 
 //for functions
 namespace TEST_GRABBER
 {
-	
+
     //---------------------------------------------------------------
-	  // simple function to test the framerate of the grabbing-thread
+    // simple function to test the framerate of the grabbing-thread
     //---------------------------------------------------------------
 
-    bool  test_framrate(TestGrabber& grabber )
-		{
-			
-			double fps = grabber.getFps();
+    bool  test_framrate(cedar::dev::sensors::visual::TestGrabber& grabber )
+    {
 
-			//timestamp for framerate-tests
-			ptime start_test, end_test;
-			start_test = microsec_clock::universal_time();
+      double fps = grabber.getFps();
+
+      //timestamp for framerate-tests
+      //ptime start_test, end_test;
+      //start_test = microsec_clock::universal_time();
       std::cout << "Start thread . . . " << std::flush;
-			grabber.start();
-			sleep(FPS_TEST_DURATION_IN_SEC);
-			grabber.stop();
+      grabber.start();
+      sleep(FPS_TEST_DURATION_IN_SEC);
+      grabber.stop();
       std::cout << "test finished - ";
-			end_test = microsec_clock::universal_time();
-			unsigned int counter = grabber.getCounter();
-			
-			//calculate real diff:
-			//ptime real_test_duration = end_test-start_test;
-			
-			double theoretical_count = fps*FPS_TEST_DURATION_IN_SEC;
-			if (theoretical_count == counter)
-			{
-			  std::cout << "passed\n";
-				return true;
-			}
-			else
-			{
-			  std::cout << "error\ngot "<<counter<<" ticks, there should be "<< theoretical_count<<" ticks!\n";
-				return false;
-			}
-			
-		}
-	
+      //end_test = microsec_clock::universal_time();
+      unsigned int counter = grabber.getCounter();
+
+      //calculate real diff:
+      //ptime real_test_duration = end_test-start_test;
+
+      double theoretical_count = fps*FPS_TEST_DURATION_IN_SEC;
+      if (theoretical_count == counter)
+      {
+        std::cout << "PASSED"<<std::endl;
+        return true;
+      }
+      else
+      {
+        std::cout << "ERROR\ngot "<<counter<<" ticks, there should be "<< theoretical_count<<" ticks!"<<std::endl;
+        return false;
+      }
+
+    }
 
 
-		
-	
+
+
+
 }
 
 
@@ -124,19 +126,23 @@ using namespace TEST_GRABBER;
 int main(int , char **)
 {
 
-  std::cout << "Interactive test of Grabberinterface\n";
+  std::cout << "\n\nInteractive test of Grabberinterface\n";
+  std::cout << "------------------------------------\n\n";
 
-
+  std::cout << "Create a TestGrabber:";
   //create a stereo-grabber (only a dummy grabber for testing)
-  TestGrabber *grabber_1 = new TestGrabber(CONFIG_FILE_NAME_1,CHANNEL_0_NAME,CHANNEL_1_NAME);
+  cedar::dev::sensors::visual::TestGrabber *grabber_1
+        = new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_1,CHANNEL_0_NAME,CHANNEL_1_NAME);
 
   //-----------------------------------------------------------
   grabber_1->setName(GRABBER_NAME_1);
-  std::cout << "\nGrabber created with name "<<grabber_1->getName()<<std::endl;
+  std::cout << "\nGrabber created with name \""<<grabber_1->getName()<<"\"\n";
 
 
   //Test FPS
-  std::cout << "\nTest FPS\nSet Fps to \"40\" and start thread\n";
+  std::cout << "\n\n---------------------------\n";
+  std::cout << "Test FPS\n";
+  std::cout << "\nSet Fps to \"40\" and start thread\n";
   grabber_1->setFps(40);
   test_framrate(*grabber_1);
 
@@ -177,7 +183,9 @@ int main(int , char **)
 
   usleep(1000);
   //std::cout << "\n\n---------------------------\n";
-  TestGrabber *grabber_2 = new TestGrabber(CONFIG_FILE_NAME_1,CHANNEL_0_NAME,CHANNEL_1_NAME);
+  cedar::dev::sensors::visual::TestGrabber *grabber_2
+    = new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_1,CHANNEL_0_NAME,CHANNEL_1_NAME);
+
   //grabber_2->setName(GRABBER_NAME_2);
   std::cout << "\nA new grabber created with name "<<grabber_2->getName()<<std::endl;
   std::cout << "grabber_1->getTestParam "<< grabber_2->getTestParam()<<std::endl;
@@ -185,14 +193,33 @@ int main(int , char **)
 
 
   std::cout << "\n\n---------------------------\n";
-  std::cout << "Test CTRL-C Handler\n";
+  std::cout << "Test CTRL-C Handler\n\n";
 
+  std::cout << "Creating 3 additional grabbers"<<std::endl;
 
-  TestGrabber *grabber_3 = new TestGrabber(CONFIG_FILE_NAME_2,CHANNEL_0_NAME,CHANNEL_1_NAME);
+  std::cout << "\n1.\n";
+  cedar::dev::sensors::visual::TestGrabber *grabber_3
+    = new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_2,CHANNEL_0_NAME,CHANNEL_1_NAME);
   grabber_3->setName(GRABBER_NAME_2);
-  std::cout << "\nA new grabber created with name "<<grabber_3->getName()<<std::endl;
-  std::cout << "grabber_1->getTestParam "<< grabber_3->getTestParam()<<std::endl;
-  std::cout << "grabber_1->getFps "<< grabber_3->getFps()<<std::endl;
+
+  std::cout << "-> A new grabber created with name \""<<grabber_3->getName()<<"\"\n";
+  std::cout << "-> grabber_1->getTestParam "<< grabber_3->getTestParam()<<std::endl;
+  std::cout << "-> grabber_1->getFps "<< grabber_3->getFps()<<std::endl;
+
+
+
+  //create another grabber (a static one)
+  std::cout << "\n2.\n";
+  cedar::dev::sensors::visual::TestGrabber grabber(CONFIG_FILE_NAME_1,CHANNEL_0_NAME);
+  grabber.setName("static grabber");
+  std::cout << "-> A new grabber created with name \""<<grabber.getName()<<"\"\n";
+
+
+  //create another grabber (with a shared pointer)
+  std::cout << "\n3.\n";
+  cedar::dev::sensors::visual::TestGrabberPtr grabber_4(new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_2,CHANNEL_1_NAME ));
+  grabber_4->setName("shared_ptr grabber");
+  std::cout << "-> A new grabber created with name \""<<grabber_4->getName()<<"\"\n";
 
   std::cout << "\n\nPress now CTRL-C\n";
   sleep(3*FPS_TEST_DURATION_IN_SEC);
@@ -205,6 +232,9 @@ int main(int , char **)
 
   delete grabber_3;
   grabber_3=NULL;
+
+  //grabber is static
+  //grabber_4 is shared pointer
 
   std::cout << "Tests finished\n";
 

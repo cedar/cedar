@@ -25,7 +25,7 @@
     File:        defines.h
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
     Description: Defines for @em cedar::devices::sensors::visual.
@@ -57,9 +57,9 @@
 
 //------------------------------------------------------------------------
 // Enable the CTRL-C handler.
-// If ctrl-c handler is activated, also some additions to the
+// If CTRL-C handler is activated, also some additions to the
 // GrabberInterface will be enabled:
-// 1) a static member vector to store all instances of used grabbers
+// 1) a static member vector to store pointer to all instances of created grabbers
 // 2) a static member function which handle the interrupt signal
 // 3) some additional code in GrabberInterface.cpp to handle these issues
 //------------------------------------------------------------------------

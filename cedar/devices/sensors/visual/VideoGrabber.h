@@ -230,6 +230,7 @@ protected:
                               unsigned int channel
                              ) const;
 
+  virtual bool onDestroy();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

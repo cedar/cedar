@@ -35,7 +35,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include <devices/sensors/visual.h>
+#include "GrabberInterface.h"
+
 
 // PROJECT INCLUDES
 
@@ -53,14 +54,20 @@ namespace cedar
       namespace visual
       {
         class TestGrabber;
+        typedef boost::shared_ptr<TestGrabber> TestGrabberPtr;
       }
     }
   }
 }
 
 
-//!@brief A simple Grabber class for testing the Grabber interface
-//
+/*! @brief A simple Grabber class for testing the Grabber interface
+ *
+ *  Creates a Grabber with a TestParam (default-value 123) and FPS set to 15
+ *
+ */
+
+
 class cedar::dev::sensors::visual::TestGrabber : public cedar::dev::sensors::visual::GrabberInterface
 {
 private:
@@ -109,12 +116,14 @@ public:
   {
 
     //-------------------------------------------------
-    std::cout << "[TestGrabber::onInit] Initialize Grabber with " << mNumCams << " channels ..." << std::endl;
-    std::cout << "\tchannels:\n\t - " << mChannelVector.at(0) << "\n";
-    if (mChannelVector.size()>1)
+    std::cout << "[TestGrabber::onInit] Initialize Grabber with " << mNumCams << " channels ...\n";
+
+    for (unsigned int i = 0; i < mNumCams; ++i)
     {
-    std::cout << "\t - " << mChannelVector.at(1) << "\n";
+      std::cout << "Channel " << i << ": " << mChannelVector.at(i) << "\n";
     }
+    std::cout << std::flush;
+
 
     //-------------------------------------------------
     //create empty picture-matrices one by one
@@ -123,6 +132,7 @@ public:
     cv::Mat frame=cv::Mat();
     mImageMatVector.push_back(frame);
     }
+
 
 
     // all grabbers successfully initialized
@@ -134,6 +144,7 @@ public:
   //----------------------------------------------------------------------------------------------------
   bool onDestroy()
   {
+    mChannelVector.clear();
     std::cout << "[TestGrabber::onDestroy] GrabberName: " << getName() << std::endl;
     return true;
   }
