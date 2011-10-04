@@ -484,6 +484,7 @@ void cedar::proc::Step::onTrigger()
     this->setState(cedar::proc::Step::STATE_RUNNING, "");
     if (this->mRunInThread) //!@todo This should be this->mRunInThread->get()
     {
+      CEDAR_DEBUG_NON_CRITICAL_ASSERT(!this->isRunning());
       if (!this->isRunning())
       {
         this->start();
