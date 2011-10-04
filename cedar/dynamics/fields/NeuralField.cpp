@@ -157,7 +157,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   if (this->_mDimensionality->get() < 3)
   {
     mKernel->getReadWriteLock()->lockForRead();
-    cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0, cv::BORDER_WRAP);
+    cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
     mKernel->getReadWriteLock()->unlock();
   }
   cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition * cv::sum(sigmoid_u).val[0];

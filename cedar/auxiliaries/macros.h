@@ -49,14 +49,18 @@
 #define CEDAR_ASSERT(expr) assert(expr)
 
 #ifdef DEBUG
-#include <assert.h>
+  #include <assert.h>
+  #include <iostream>
 
-#define CEDAR_DEBUG_ASSERT(expr) assert(expr)
-#define CEDAR_DEBUG_ONLY(expr) expr
+  #define CEDAR_DEBUG_ASSERT(expr) assert(expr)
+  #define CEDAR_DEBUG_ONLY(expr) expr
+  #define CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cout << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
+
 #else
 
-#define CEDAR_DEBUG_ASSERT(expr)
-#define CEDAR_DEBUG_ONLY(expr)
+  #define CEDAR_DEBUG_ASSERT(expr)
+  #define CEDAR_DEBUG_ONLY(expr)
+  #define CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr)
 
 #endif // DEBUG
 

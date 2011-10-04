@@ -78,8 +78,8 @@ public:
   void registerParameter(cedar::aux::ParameterBasePtr parameter);
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
   void readJson(const std::string& filename);
-  virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);
-  void saveJson(const std::string& filename);
+  virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);//!@todo Should be writeConfiguration?
+  void saveJson(const std::string& filename); //!@todo Should be writeJson?
   const Children& configurableChildren() const;
 
   const ParameterList& getParameters() const;
@@ -118,6 +118,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@todo Remove?
   StringParameterPtr _mName;
 
 private:
