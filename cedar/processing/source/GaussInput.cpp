@@ -45,7 +45,7 @@
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/math/functions.h"
 #include "processing/Arguments.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 #include "auxiliaries/math/tools.h"
 #include "auxiliaries/NumericVectorParameter.h"
 #include "auxiliaries/exceptions.h"

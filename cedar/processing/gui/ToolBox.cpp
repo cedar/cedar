@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/ToolBox.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 #include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES

@@ -48,6 +48,7 @@
 #include "processing/Manager.h"
 #include "auxiliaries/Data.h"
 #include "processing/Step.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

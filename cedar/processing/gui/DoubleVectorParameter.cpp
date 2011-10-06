@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/DoubleVectorParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

@@ -42,6 +42,7 @@
 #include "processing/gui/ArchitectureToolBox.h"
 #include "processing/gui/View.h"
 #include "processing/Manager.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

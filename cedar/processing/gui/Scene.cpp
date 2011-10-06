@@ -46,6 +46,7 @@
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/GroupItem.h"
 #include "processing/gui/NetworkFile.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

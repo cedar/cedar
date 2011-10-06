@@ -52,7 +52,7 @@
 #include "processing/PluginProxy.h"
 #include "processing/PluginDeclaration.h"
 #include "processing/Connection.h"
-
+#include "auxiliaries/assert.h"
 #include "processing/source/GaussInput.h"
 
 // PROJECT INCLUDES

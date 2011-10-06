@@ -46,6 +46,7 @@
 #include "auxiliaries/math/functions.h"
 #include "auxiliaries/utilities.h"
 #include "processing/gui/Scene.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

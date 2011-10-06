@@ -43,6 +43,7 @@
 #include "processing/gui/StepItem.h"
 #include "processing/Group.h"
 #include "processing/Manager.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

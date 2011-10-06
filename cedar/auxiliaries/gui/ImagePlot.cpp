@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/gui/ImagePlot.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 #include "auxiliaries/gui/exceptions.h"
 #include "auxiliaries/ImageData.h"
 

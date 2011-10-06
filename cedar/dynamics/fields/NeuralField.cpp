@@ -47,6 +47,7 @@
 #include "auxiliaries/math/Sigmoid.h"
 #include "auxiliaries/math/AbsSigmoid.h"
 #include "auxiliaries/kernel/Gauss.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -153,26 +154,34 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& h = mRestingLevel->get();
   const double& tau = mTau->get();
   const double& global_inhibition = mGlobalInhibition->get();
+
   sigmoid_u = mSigmoid->compute<float>(u);
+  //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->get() < 3)
   {
     mKernel->getReadWriteLock()->lockForRead();
     cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
     mKernel->getReadWriteLock()->unlock();
   }
-  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition * cv::sum(sigmoid_u).val[0];
 
+  CEDAR_ASSERT(u.size == sigmoid_u.size);
+  CEDAR_ASSERT(u.size == lateral_interaction.size);
+
+  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition * cv::sum(sigmoid_u).val[0];
   /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
    *       it when the connections change.
    */
   if (cedar::aux::DataPtr input = this->getInput("input"))
   {
-    d_u += input->getData<cv::Mat>();
+    cv::Mat& input_mat = input->getData<cv::Mat>();
+    CEDAR_ASSERT(input_mat.size == d_u.size);
+    d_u += input_mat;
   }
 
   //!\todo deal with units, now: milliseconds
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
   //std::cout << "field: " << u.at<float>(0,0) << std::endl;
+
 }
 
 bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const
@@ -222,13 +231,15 @@ void cedar::dyn::NeuralField::updateDimensionality()
   this->lockAll();
   if (new_dimensionality == 1)
   {
-    mActivation->getData() = cv::Mat(sizes[0],1,CV_32F, cv::Scalar(mRestingLevel->get()));
-    mSigmoidalActivation->getData() = cv::Mat(sizes[0],1,CV_32F, cv::Scalar(0));
+    this->mActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(mRestingLevel->get()));
+    this->mSigmoidalActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
+    this->mLateralInteraction->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
   }
   else
   {
-    mActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0),CV_32F, cv::Scalar(mRestingLevel->get()));
-    mSigmoidalActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0),CV_32F, cv::Scalar(0));
+    this->mActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0), CV_32F, cv::Scalar(mRestingLevel->get()));
+    this->mSigmoidalActivation->getData() = cv::Mat(new_dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
+    this->mLateralInteraction->getData() = cv::Mat(new_dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->mKernel->setDimensionality(new_dimensionality);
   this->unlockAll();
