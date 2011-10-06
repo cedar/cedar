@@ -40,7 +40,7 @@
 #include "processing/Connection.h"
 #include "processing/Step.h"
 #include "processing/Trigger.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

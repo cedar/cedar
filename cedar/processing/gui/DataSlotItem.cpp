@@ -45,6 +45,7 @@
 #include "processing/DataRole.h"
 #include "processing/Manager.h"
 #include "auxiliaries/utilities.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

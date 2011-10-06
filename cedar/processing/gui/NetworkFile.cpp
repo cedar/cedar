@@ -53,7 +53,7 @@
 #include "processing/Manager.h"
 #include "auxiliaries/Data.h"
 #include "processing/exceptions.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

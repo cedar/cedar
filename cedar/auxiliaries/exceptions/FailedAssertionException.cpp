@@ -22,48 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        FailedAssertionException.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 04
 
-    Description: Namespace file for cedar::aux::exc.
+    Description: Implementation of the cedar::aux:FailedAssertionException
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_EXC_NAMESPACE_H
-#define CEDAR_AUX_EXC_NAMESPACE_H
-
 // LOCAL INCLUDES
-#include "auxiliaries/lib.h"
+#include "FailedAssertionException.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+//! Constructor
+cedar::aux::exc::FailedAssertionException::FailedAssertionException()
 {
-  namespace aux
-  {
-    //!@brief Namespace for all exception classes.
-    namespace exc
-    {
-      CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
-
-      CEDAR_DECLARE_AUX_CLASS(NullPointerException);
-      CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
-      CEDAR_DECLARE_AUX_CLASS(InitializationException);
-      CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
-      CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
-    }
-  }
+  // Sets the type name.
+  this->mType = "FailedAssertionException";
 }
 
-#endif // CEDAR_AUX_EXC_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

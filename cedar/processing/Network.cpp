@@ -46,6 +46,7 @@
 #include "processing/Group.h"
 #include "processing/Connection.h"
 #include "auxiliaries/Data.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

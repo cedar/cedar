@@ -41,7 +41,7 @@
 #include "auxiliaries/math/functions.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 #include "auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES

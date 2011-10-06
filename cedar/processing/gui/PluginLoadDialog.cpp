@@ -42,7 +42,7 @@
 #include "processing/gui/PluginLoadDialog.h"
 #include "processing/PluginDeclaration.h"
 #include "processing/Manager.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

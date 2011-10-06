@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,49 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        utilities.h
+    File:        assert.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 08 11
+    Date:        2011 10 04
 
-    Description:
+    Description: Header for several assertion-related macros.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_UTILITIES_H
-#define CEDAR_AUX_UTILITIES_H
+/*!@file  macros.h
+ *
+ * @brief File containing multiple global macros for cedar.
+ */
 
-// LOCAL INCLUDES
-#include "auxiliaries/macros.h"
-#include "auxiliaries/assert.h"
+#ifndef CEDAR_ASSERT_MACROS_H
+#define CEDAR_ASSERT_MACROS_H
 
-// SYSTEM INCLUDES
+#include <iostream>
+#include <string>
 
+#include "auxiliaries/exceptions/FailedAssertionException.h"
 
-namespace cedar
-{
-  namespace aux
-  {
-    /*!@brief   If you think a dynamic cast can never fail, use this cast instead.
-     *
-     *          In debug builds, it automatically checks whether you are right. In release mode, it statically casts to
-     *          the desired type.
-     *          The advantage of using this function is a speed gain: dynamic_casts are slow compared to static_casts.
-     *
-     * @remarks The syntax for using this cast is DerivedType* p2 = cedar::aux::asserted_cast<DerivedType*>(p);
-     *          The second template argument does not have to be specified; it is determined automatically by the
-     *          compiler!
-     */
-    template <typename TOut, typename TIn>
-    TOut asserted_cast(TIn pIn)
-    {
-      CEDAR_DEBUG_ASSERT(dynamic_cast<TOut>(pIn) != 0);
-      return static_cast<TOut>(pIn);
-    }
-  }
-}
+#define CEDAR_ASSERT(expr) if (!(expr)) { std::string info = "Assertion failed: " #expr; CEDAR_THROW(cedar::aux::exc::FailedAssertionException, info); }
+#define CEDAR_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cerr << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
 
-#endif // CEDAR_AUX_UTILITIES_H
+#ifdef DEBUG
+  #include <assert.h>
+
+  #define CEDAR_DEBUG_ASSERT(expr) CEDAR_ASSERT(expr)
+  #define CEDAR_DEBUG_ONLY(expr) expr
+  #define CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cerr << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
+
+#else
+
+  #define CEDAR_DEBUG_ASSERT(expr)
+  #define CEDAR_DEBUG_ONLY(expr)
+  #define CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr)
+
+#endif // DEBUG
+
+#endif // CEDAR_ASSERT_MACROS_H
+

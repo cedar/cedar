@@ -44,6 +44,7 @@
 #include "auxiliaries/gui/MatrixPlot.h"
 #include "auxiliaries/DataT.h"
 #include "auxiliaries/exceptions.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

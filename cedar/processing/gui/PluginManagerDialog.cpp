@@ -38,7 +38,7 @@
 #include "processing/gui/PluginManagerDialog.h"
 #include "processing/gui/Settings.h"
 #include "processing/Manager.h"
-#include "auxiliaries/macros.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
