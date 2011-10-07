@@ -147,6 +147,9 @@ bool cedar::proc::Connection::contains(cedar::proc::TriggerPtr trigger)
   return (mTrigger == trigger || mTargetTrigger == trigger);
 }
 
+/*! This function removes the connection, i.e., the end result is that there is no longer a connection between the
+ *  source and target.
+ */
 void cedar::proc::Connection::deleteConnection()
 {
   if (mSource)

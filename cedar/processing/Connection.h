@@ -47,9 +47,12 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Data structure that represents a connection between data slots of processing::Step objects.
  *
- * More detailed description of the class.
+ * @todo The various combinations of connections (i.e., slot to slot, trigger to step, trigger to trigger) should be
+ *       done with subclassing, i.e., there needs to be a Connection class, and relevant subclasses, e.g.,
+ *       DataConnection. Alternatively, data slots, steps and triggers should maybe inherit from a common base class,
+ *       e.g., Connectable.
  */
 class cedar::proc::Connection
 {
@@ -61,7 +64,6 @@ class cedar::proc::Connection
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
   Connection(
               cedar::proc::StepPtr source,
               const std::string& sourceName,
@@ -76,14 +78,17 @@ public:
               cedar::proc::TriggerPtr source,
               cedar::proc::TriggerPtr target
             );
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Tests, whether the step is part of this connection (either source or target).
   bool contains(cedar::proc::StepPtr step);
+  //! Tests, whether the trigger is part of this connection (either source or target).
   bool contains(cedar::proc::TriggerPtr trigger);
+
+  //! Deletes the connection.
   void deleteConnection();
   
   cedar::proc::StepPtr getSource();

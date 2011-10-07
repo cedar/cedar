@@ -65,6 +65,9 @@ cedar::proc::Arguments::~Arguments()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+/*!
+ * @remarks In a multithreaded environment, any access to the arguments should be protected with this lock.
+ */
 QReadWriteLock* cedar::proc::Arguments::getLock()
 {
   return this->mpLock;
