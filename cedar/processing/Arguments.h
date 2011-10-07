@@ -50,9 +50,9 @@
 #include <QReadWriteLock>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for arguments passed along in the cedar processing framework.
  *
- * More detailed description of the class.
+ * Objects of the class cedar::proc::Trigger can send pointers to arguments along with any trigger signal.
  */
 class cedar::proc::Arguments
 {
@@ -74,6 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Returns the lock object associated with the arguments.
   QReadWriteLock* getLock();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -96,6 +97,7 @@ public:
 protected:
   // none yet
 private:
+  //! The lock associated with these arguments.
   QReadWriteLock *mpLock;
 
   //--------------------------------------------------------------------------------------------------------------------

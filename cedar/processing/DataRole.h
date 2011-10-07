@@ -50,9 +50,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief This is an enum class for the roles data can have in a cedar::proc::Step.
  *
- * More detailed description of the class.
+ * Currently, data can be input, output or a buffer, i.e., internal data that should be plottable nonetheless.
  */
 class cedar::proc::DataRole
 {
@@ -60,25 +60,31 @@ class cedar::proc::DataRole
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! The base type of enum ids of this class.
   typedef cedar::aux::EnumId Id;
 public:
+  //! Typedef of the shared pointer of enum values belonging to this class.
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*! @brief Construct method that fills the enum.
+   *  @see cedar::aux::EnumBase
+   */
   static void construct();
 
+  //! @returns A const reference to the base enum object.
   static const cedar::aux::EnumBase& type();
+
+  //! @returns A pointer to the base enum object.
+  //! @todo Should this function be const?
   static const cedar::proc::DataRole::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,13 +103,15 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Identifier for the role input.
   static const Id INPUT = 0;
+  //! Identifier for the role output.
   static const Id OUTPUT = 1;
+  //! Identifier for the role buffer.
   static const Id BUFFER = 2;
 
-protected:
-  // none yet
 private:
+  //! The base enum object.
   static cedar::aux::EnumType<cedar::proc::DataRole> mType;
 
   //--------------------------------------------------------------------------------------------------------------------
