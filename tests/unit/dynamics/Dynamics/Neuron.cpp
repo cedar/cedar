@@ -48,17 +48,14 @@
 
 cedar::Neuron::Neuron(double interactionWeight, double restingLevel)
 :
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", restingLevel, -100, 0)),
-mInteractionWeight(new cedar::aux::DoubleParameter("interactionWeight", interactionWeight, -100, 100)),
+mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", restingLevel, -100, 0)),
+mInteractionWeight(new cedar::aux::DoubleParameter(this, "interactionWeight", interactionWeight, -100, 100)),
 mActivation(new cedar::dyn::DoubleActivation(0.0)),
 mOutput(new cedar::dyn::DoubleActivation(0.0))
 {
   this->declareInput("input");
   this->declareOutput("output");
   this->setOutput("output", mOutput);
-
-  this->registerParameter(this->mRestingLevel);
-  this->registerParameter(this->mInteractionWeight);
 }
 
 cedar::Neuron::~Neuron()

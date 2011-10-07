@@ -65,23 +65,25 @@ class cedar::aux::NumericParameter : public cedar::aux::Parameter<T>
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The constructor.
-  NumericParameter(const std::string& name,
+  NumericParameter(cedar::aux::Configurable *pOwner,
+                   const std::string& name,
                    const T& defaultValue,
                    const T& minimum,
                    const T& maximum)
   :
-  cedar::aux::Parameter<T>(name, defaultValue),
+  cedar::aux::Parameter<T>(pOwner, name, defaultValue),
   mMinimum(minimum),
   mMaximum(maximum)
   {
   }
 
   //!@brief The constructor.
-  NumericParameter(const std::string& name,
+  NumericParameter(cedar::aux::Configurable *pOwner,
+                   const std::string& name,
                    const T& minimum,
                    const T& maximum)
   :
-  cedar::aux::Parameter<T>(name),
+  cedar::aux::Parameter<T>(pOwner, name),
   mMinimum(minimum),
   mMaximum(maximum)
   {

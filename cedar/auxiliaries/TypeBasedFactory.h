@@ -53,15 +53,21 @@
  *
  * More detailed description of the class.
  */
-template <class KeyBaseType, class ValueBaseType>
+template
+<
+  class KeyBaseType,
+  class ValueBaseType,
+  typename KeySmartPointerType, // = boost::shared_ptr<KeyBaseType>
+  typename ValueSmartPointerType // = boost::shared_ptr<ValueBaseType>
+>
 class cedar::aux::TypeBasedFactory
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef boost::shared_ptr<KeyBaseType> KeyBaseTypePtr;
-  typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType> > FactoryPtr;
+  typedef KeySmartPointerType KeyBaseTypePtr;
+  typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType, ValueSmartPointerType> > FactoryPtr;
 
 private:
   typedef std::pair<const std::type_info*, FactoryPtr> Pair;

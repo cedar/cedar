@@ -45,19 +45,21 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::EnumParameter::EnumParameter(const std::string& name,
+cedar::aux::EnumParameter::EnumParameter(cedar::aux::Configurable *pOwner,
+                                         const std::string& name,
                                          boost::shared_ptr<cedar::aux::EnumBase> enumBase)
 :
-cedar::aux::ParameterBase(name, false),
+cedar::aux::ParameterBase(pOwner, name, false),
 mEnumDeclaration(enumBase)
 {
 }
 
-cedar::aux::EnumParameter::EnumParameter(const std::string& name,
+cedar::aux::EnumParameter::EnumParameter(cedar::aux::Configurable *pOwner,
+                                         const std::string& name,
                                          boost::shared_ptr<cedar::aux::EnumBase> enumBase,
                                          cedar::aux::EnumId defaultValue)
 :
-cedar::aux::ParameterBase(name, true),
+cedar::aux::ParameterBase(pOwner, name, true),
 mDefault(defaultValue),
 mEnumDeclaration(enumBase)
 {

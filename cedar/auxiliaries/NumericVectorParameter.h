@@ -66,19 +66,21 @@ class cedar::aux::NumericVectorParameter : public cedar::aux::VectorParameter<T>
 public:
   //!@brief The constructor.
   NumericVectorParameter(
+                          cedar::aux::Configurable *pOwner,
                           const std::string& name,
                           const std::vector<T>& defaultValues,
                           const T& minimum,
                           const T& maximum
                         )
   :
-  cedar::aux::VectorParameter<T>(name, defaultValues),
+  cedar::aux::VectorParameter<T>(pOwner, name, defaultValues),
   mMinimum(minimum),
   mMaximum(maximum)
   {
   }
 
   NumericVectorParameter(
+                          cedar::aux::Configurable *pOwner,
                           const std::string& name,
                           size_t defaultSize,
                           T defaultValue,
@@ -86,7 +88,7 @@ public:
                           const T& maximum
                         )
   :
-  cedar::aux::VectorParameter<T>(name, defaultSize, defaultValue),
+  cedar::aux::VectorParameter<T>(pOwner, name, defaultSize, defaultValue),
   mMinimum(minimum),
   mMaximum(maximum)
   {
@@ -94,12 +96,13 @@ public:
 
   //!@brief The constructor.
   NumericVectorParameter(
+                          cedar::aux::Configurable *pOwner,
                           const std::string& name,
                           const T& minimum,
                           const T& maximum
                         )
   :
-  cedar::aux::VectorParameter<T>(name),
+  cedar::aux::VectorParameter<T>(pOwner, name),
   mMinimum(minimum),
   mMaximum(maximum)
   {

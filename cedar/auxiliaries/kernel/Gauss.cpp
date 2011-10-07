@@ -56,15 +56,11 @@
 cedar::aux::kernel::Gauss::Gauss()
 :
 cedar::aux::kernel::Separable(),
-_mAmplitude(new cedar::aux::DoubleParameter("amplitude", -10000.0, 10000.0)),
-_mSigmas(new cedar::aux::DoubleVectorParameter("sigmas", 2, 3.0, 0.0, 10000)),
-_mShifts(new cedar::aux::DoubleVectorParameter("shifts", 2, 3.0, 0.0, 10000)),
-_mLimit(new cedar::aux::DoubleParameter("limit", 0.01, 1000.0))
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", -10000.0, 10000.0)),
+_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", 2, 3.0, 0.0, 10000)),
+_mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 3.0, 0.0, 10000)),
+_mLimit(new cedar::aux::DoubleParameter(this, "limit", 0.01, 1000.0))
 {
-  this->registerParameter(_mAmplitude);
-  this->registerParameter(_mLimit);
-  this->registerParameter(_mSigmas);
-  this->registerParameter(_mShifts);
   this->onInit();
 }
 
@@ -78,15 +74,11 @@ cedar::aux::kernel::Gauss::Gauss(
                                 )
 :
 cedar::aux::kernel::Separable(dimensionality, kernelFile),
-_mAmplitude(new cedar::aux::DoubleParameter("amplitude", amplitude, -10000.0, 10000.0)),
-_mSigmas(new cedar::aux::DoubleVectorParameter("sigmas", sigmas, 0.0, 10000)),
-_mShifts(new cedar::aux::DoubleVectorParameter("shifts", shifts, 0.0, 10000)),
-_mLimit(new cedar::aux::DoubleParameter("limit", limit, 0.01, 1000.0))
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
+_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", sigmas, 0.0, 10000)),
+_mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, 0.0, 10000)),
+_mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
-  this->registerParameter(_mAmplitude);
-  this->registerParameter(_mLimit);
-  this->registerParameter(_mSigmas);
-  this->registerParameter(_mShifts);
   this->mCenters.resize(dimensionality);
   this->mKernelParts.resize(dimensionality);
   this->mSizes.resize(dimensionality);

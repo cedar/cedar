@@ -56,6 +56,11 @@
 class cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::ParameterBase;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // macros and types
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -75,7 +80,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
   void readJson(const std::string& filename);
   virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);//!@todo Should be writeConfiguration?
@@ -100,7 +104,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void registerParameter(cedar::aux::ParameterBasePtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

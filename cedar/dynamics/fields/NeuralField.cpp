@@ -62,21 +62,16 @@ cedar::dyn::NeuralField::NeuralField()
 mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-mRestingLevel(new cedar::aux::DoubleParameter("restingLevel", -5.0, -100, 0)),
-mTau(new cedar::aux::DoubleParameter("tau", 100.0, 1.0, 10000.0)),
-mGlobalInhibition(new cedar::aux::DoubleParameter("globalInhibition", -0.01, -100.0, 100.0)),
+mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 0)),
+mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
+mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
 mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
-_mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
-_mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
 {
-  this->registerParameter(mRestingLevel);
-  this->registerParameter(mTau);
-  this->registerParameter(mGlobalInhibition);
   _mDimensionality->set(2);
-  this->registerParameter(_mDimensionality);
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
-  this->registerParameter(_mSizes);
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
   this->declareBuffer("lateralInteraction");

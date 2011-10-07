@@ -43,6 +43,8 @@
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/Configurable.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -52,13 +54,18 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::ParameterBase::ParameterBase(const std::string& name, bool hasDefault)
+cedar::aux::ParameterBase::ParameterBase(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
 :
+mpOwner(pOwner),
 mHasDefault(hasDefault),
 mConstant(false),
-mIsHidden(false)
+mIsHidden(false),
+mReferenceCount(0)
 {
+  CEDAR_ASSERT(this->mpOwner != NULL);
   this->setName(name);
+
+  this->mpOwner->registerParameter(cedar::aux::ParameterBasePtr(this));
 }
 
 cedar::aux::ParameterBase::~ParameterBase()
@@ -68,6 +75,21 @@ cedar::aux::ParameterBase::~ParameterBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject)
+{
+  pObject->mReferenceCount += 1;
+}
+
+void intrusive_ptr_release(cedar::aux::ParameterBase *pObject)
+{
+  pObject->mReferenceCount -= 1;
+
+  if (pObject->mReferenceCount == 0)
+  {
+    delete pObject;
+  }
+}
 
 void cedar::aux::ParameterBase::emitChangedSignal()
 {

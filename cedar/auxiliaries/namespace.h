@@ -76,44 +76,50 @@ namespace cedar
 
     CEDAR_DECLARE_AUX_CLASS(Arguments);
 
-    template <class T> class Factory;
-    template <class T, class T2> class FactoryDerived;
+    template <class T, typename SmartPointerType = boost::shared_ptr<T> > class Factory;
+    template <class T, class T2, typename SmartPointerType = boost::shared_ptr<T> > class FactoryDerived;
 
     template <class T> class AbstractFactory;
     template <class T, class T2> class AbstractFactoryDerived;
 
-    template <class KeyBaseType, class ValueBaseType> class TypeBasedFactory;
+    template
+    <
+      class KeyBaseType,
+      class ValueBaseType,
+      typename KeySmartPointerType = boost::shared_ptr<KeyBaseType>,
+      typename ValueSmartPointerType = boost::shared_ptr<ValueBaseType>
+    >
+    class TypeBasedFactory;
 
-    class CEDAR_AUX_LIB_EXPORT ParameterBase;
-    typedef boost::shared_ptr<ParameterBase> ParameterBasePtr;
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ParameterBase);
 
     template <typename T> class Parameter;
     template <typename T> class NumericParameter;
     template <typename T> class VectorParameter;
     template <typename T> class NumericVectorParameter;
     typedef NumericParameter<double> DoubleParameter;
-    typedef boost::shared_ptr<DoubleParameter> DoubleParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     typedef NumericParameter<unsigned int> UIntParameter;
-    typedef boost::shared_ptr<UIntParameter> UIntParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
     typedef Parameter<std::string> StringParameter;
-    typedef boost::shared_ptr<StringParameter> StringParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
     typedef Parameter<bool> BoolParameter;
-    typedef boost::shared_ptr<BoolParameter> BoolParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
     typedef VectorParameter<bool> BoolVectorParameter;
-    typedef boost::shared_ptr<BoolVectorParameter> BoolVectorParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
     typedef VectorParameter<std::string> StringVectorParameter;
-    typedef boost::shared_ptr<StringVectorParameter> StringVectorParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     typedef NumericVectorParameter<double> DoubleVectorParameter;
-    typedef boost::shared_ptr<DoubleVectorParameter> DoubleVectorParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
-    typedef boost::shared_ptr<UIntVectorParameter> UIntVectorParameterPtr;
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
     class DirectoryParameter;
-    typedef boost::shared_ptr<DirectoryParameter> DirectoryParameterPtr;
-    CEDAR_DECLARE_AUX_CLASS(EnumParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DirectoryParameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(EnumParameter);
 
     template <typename T> class SetParameter;
     typedef SetParameter<std::string> StringSetParameter;
-    typedef boost::shared_ptr<StringSetParameter> StringSetParameterPtr;
+    typedef boost::intrusive_ptr<StringSetParameter> StringSetParameterPtr;
 
     typedef boost::property_tree::ptree ConfigurationNode;
 

@@ -50,8 +50,8 @@
  *
  * More detailed description of the class.
  */
-template <typename BaseType, typename DerivedType>
-class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseType>
+template <typename BaseType, typename DerivedType, typename SmartPointerType >
+class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseType, SmartPointerType>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,9 +67,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  boost::shared_ptr<BaseType> allocate() const
+  SmartPointerType allocate() const
   {
-    return boost::shared_ptr<BaseType> (new DerivedType());
+    return SmartPointerType (new DerivedType());
   }
 
   BaseType* allocateRaw() const

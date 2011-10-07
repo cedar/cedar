@@ -77,8 +77,8 @@ mHighlightMode(HIGHLIGHTMODE_NONE),
 mShape(shape),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
-mWidth(new cedar::aux::DoubleParameter("width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
-mHeight(new cedar::aux::DoubleParameter("height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
+mWidth(new cedar::aux::DoubleParameter(this, "width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
+mHeight(new cedar::aux::DoubleParameter(this, "height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
@@ -86,8 +86,6 @@ mAllowedConnectTargets(canConnectTo)
 
   this->mWidth->set(width);
   this->mHeight->set(height);
-  this->registerParameter(this->mWidth);
-  this->registerParameter(this->mHeight);
 
   this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges);
 }

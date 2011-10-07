@@ -64,10 +64,12 @@ class cedar::aux::EnumParameter : public cedar::aux::ParameterBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  EnumParameter(const std::string& name,
+  EnumParameter(cedar::aux::Configurable *pOwner,
+                const std::string& name,
                 boost::shared_ptr<cedar::aux::EnumBase> enumBase);
 
-  EnumParameter(const std::string& name,
+  EnumParameter(cedar::aux::Configurable *pOwner,
+                const std::string& name,
                 boost::shared_ptr<cedar::aux::EnumBase> enumBase,
                 cedar::aux::EnumId defaultValue);
 

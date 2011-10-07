@@ -68,15 +68,15 @@ class cedar::aux::SetParameter : public cedar::aux::ParameterBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SetParameter(const std::string& name)
+  SetParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::ParameterBase(name, false)
+  cedar::aux::ParameterBase(pOwner, name, false)
   {
   }
 
-  SetParameter(const std::string& name, const std::set<T>& defaults)
+  SetParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::set<T>& defaults)
   :
-  cedar::aux::ParameterBase(name, true),
+  cedar::aux::ParameterBase(pOwner, name, true),
   mDefaults(defaults)
   {
     this->makeDefault();

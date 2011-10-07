@@ -43,6 +43,7 @@
 #include "processing/Step.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/exceptions.h"
+#include "auxiliaries/NumericVectorParameter.h"
 #include "processing/TriggerDeclaration.h"
 #include "processing/Trigger.h"
 #include "processing/LoopedTrigger.h"
@@ -52,8 +53,8 @@
 #include "processing/PluginProxy.h"
 #include "processing/PluginDeclaration.h"
 #include "processing/Connection.h"
-#include "auxiliaries/assert.h"
 #include "processing/source/GaussInput.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

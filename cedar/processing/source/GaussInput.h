@@ -46,6 +46,8 @@
 #include "processing/namespace.h"
 #include "dynamics/namespace.h"
 #include "processing/Step.h"
+#include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 

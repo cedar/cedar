@@ -56,10 +56,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::Configurable::Configurable(bool nameVisible)
-:
-_mName(new cedar::aux::StringParameter("name", ""))
 {
-  this->registerParameter(_mName);
+  //!@todo Remove -- not every configurable has a name.
+  this->_mName = cedar::aux::StringParameterPtr(new cedar::aux::StringParameter(this, "name", ""));
   this->_mName->setHidden(!nameVisible);
 }
 
@@ -110,7 +109,7 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterBasePtr pa
 
   if (this->mParameterAssociations.find(parameter->getName()) != this->mParameterAssociations.end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: " + parameter->getName());
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + parameter->getName()) + "\"";
   }
 
   this->mParameterOrder.push_back(parameter);
