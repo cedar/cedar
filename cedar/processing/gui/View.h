@@ -77,14 +77,20 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief return the displayed scene
   cedar::proc::gui::Scene* getScene();
 
+  /*!@brief sets the current operation mode in the scene, chosen from cedar::proc::gui::Scene::MODE
+   * @param mode the operation mode taken from cedar::proc::gui::Scene::MODE
+   * @param param parameter string for the chosen mode
+   */
   void setMode(cedar::proc::gui::Scene::MODE mode, const QString& param = "");
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief handles resize events
   void resizeEvent(QResizeEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,6 +107,7 @@ public:
 protected:
   // none yet
 private:
+  //!@brief a pointer to a scene displayed by the view
   cedar::proc::gui::Scene* mpScene;
 
   //--------------------------------------------------------------------------------------------------------------------

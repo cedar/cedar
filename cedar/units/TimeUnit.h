@@ -99,6 +99,9 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+  /*!@brief conversion method from one TimeUnit to another
+   * @return converted TimeUnit
+   */
   template <unsigned int otherFactor, const char* otherSuffix>
   operator TimeUnit<otherFactor, otherSuffix>()
   const
@@ -107,6 +110,9 @@ public:
     return TimeUnit<otherFactor, otherSuffix>(value);
   }
 
+  /*!@brief star operator for multiplying a TimeUnit with a scalar value on right side
+   * @return result of multiplication
+   */
   TimeUnit operator* (double factor) const
   {
     TimeUnit ret;
@@ -114,6 +120,9 @@ public:
     return ret;
   }
 
+  /*!@brief star operator for multiplying a TimeUnit with a scalar value on left side
+   * @return result of multiplication
+   */
   friend TimeUnit operator*(double real, const TimeUnit& time)
   {
     TimeUnit ret;
@@ -121,11 +130,17 @@ public:
     return ret;
   }
 
+  /*!@brief star operator for multiplying a TimeUnit with a scalar value using *=
+   *
+   */
   void operator*= (double factor)
   {
     this->mAmountInMicroSeconds *= factor;
   }
 
+  /*!@brief slash operator for dividing a TimeUnit by a scalar value
+   * @return result of division
+   */
   TimeUnit operator/ (double divisor) const
   {
     TimeUnit ret;
@@ -133,12 +148,19 @@ public:
     return ret;
   }
 
+  /*!@brief slash operator for dividing a TimeUnit by another TimeUnit
+   * @return the scalar, unit-less result of the division
+   */
   template<unsigned int otherFactor, const char* otherSuffix>
   double operator/ (const TimeUnit<otherFactor, otherSuffix>& time) const
   {
     return this->mAmountInMicroSeconds / time.getRawTime();
   }
 
+  /*!@brief slash operator for dividing a scalar value by a TimeUnit
+   * @return result of division
+   *
+   */
   friend TimeUnit operator/(double real, const TimeUnit& time)
   {
     TimeUnit ret;
@@ -146,11 +168,17 @@ public:
     return ret;
   }
 
+  /*!@brief slash operator for dividing a TimeUnit by a scalar value using /=
+   * @return result of division
+   */
   TimeUnit operator/= (double divisor)
   {
     this->mAmountInMicroSeconds /= divisor;
   }
 
+  /*!@brief comparison of two TimeUnits
+   *
+   */
   template <unsigned int otherFactor, const char* otherSuffix>
   bool operator==(const TimeUnit<otherFactor, otherSuffix>& comp)
   {
