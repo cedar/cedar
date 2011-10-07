@@ -62,32 +62,32 @@ cedar::aux::Configurable()
                                     (
                                       new cedar::aux::StringSetParameter
                                       (
+                                        plugin_group.get(),
                                         "includeDirectories",
                                         default_plugin_include_directories
                                       )
                                     );
-  plugin_group->registerParameter(this->mPluginIncludeDirectories);
 
   mPluginWorkspace = cedar::aux::DirectoryParameterPtr
                      (
                          new cedar::aux::DirectoryParameter
                          (
+                           plugin_group.get(),
                            "workspace",
                             cedar::aux::System::getUserHomeDirectory() + "/src/"
                          )
                      );
-  plugin_group->registerParameter(this->mPluginWorkspace);
 
   std::set<std::string> default_known_plugins;
   this->mKnownPlugins = cedar::aux::StringSetParameterPtr
                         (
                           new cedar::aux::StringSetParameter
                           (
+                            plugin_group.get(),
                             "knownPlugins",
                             default_known_plugins
                           )
                         );
-  plugin_group->registerParameter(this->mKnownPlugins);
 
   try
   {

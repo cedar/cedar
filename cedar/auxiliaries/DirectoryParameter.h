@@ -61,15 +61,15 @@ class cedar::aux::DirectoryParameter : public cedar::aux::ParameterBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DirectoryParameter(const std::string& name)
+  DirectoryParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::ParameterBase(name, false)
+  cedar::aux::ParameterBase(pOwner, name, false)
   {
   }
 
-  DirectoryParameter(const std::string& name, const std::string& defaultValue)
+  DirectoryParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::string& defaultValue)
   :
-  cedar::aux::ParameterBase(name, true),
+  cedar::aux::ParameterBase(pOwner, name, true),
   mDefault(defaultValue.c_str())
   {
   }

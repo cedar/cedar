@@ -63,21 +63,16 @@ cedar::proc::source::GaussInput::GaussInput()
 :
 cedar::proc::Step(),
 mOutput(new cedar::aux::MatData(cv::Mat())),
-_mAmplitude(new cedar::aux::DoubleParameter("amplitude", 1.0, -10000.0, 10000.0)),
-_mDimensionality(new cedar::aux::UIntParameter("dimensionality", 1, 1000)),
-_mSigmas(new cedar::aux::DoubleVectorParameter("sigma", 2, 3.0, 0.01, 1000.0)),
-_mCenters(new cedar::aux::DoubleVectorParameter("centers", 2, 3.0, -10000.0, 10000.0)),
-_mSizes(new cedar::aux::UIntVectorParameter("sizes", 2, 10, 1, 1000.0))
+_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, -10000.0, 10000.0)),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
+_mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000.0)),
+_mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 3.0, -10000.0, 10000.0)),
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
 {
-  this->registerParameter(_mAmplitude);
-  this->registerParameter(_mDimensionality);
   _mDimensionality->set(2);
 //  _mDimensionality->setConstant(true);
-  this->registerParameter(_mSigmas);
   _mSigmas->makeDefault();
-  this->registerParameter(_mCenters);
   _mCenters->makeDefault();
-  this->registerParameter(_mSizes);
   _mSizes->makeDefault();
   this->declareOutput("Gauss input");
   this->setOutput("Gauss input", mOutput);

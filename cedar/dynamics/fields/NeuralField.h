@@ -46,6 +46,8 @@
 #include "dynamics/Dynamics.h"
 #include "auxiliaries/math/namespace.h"
 #include "auxiliaries/kernel/namespace.h"
+#include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 

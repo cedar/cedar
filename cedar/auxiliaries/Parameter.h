@@ -66,17 +66,17 @@ class cedar::aux::Parameter : public cedar::aux::ParameterBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The constructor.
-  Parameter(const std::string& name, const T& defaultValue)
+  Parameter(cedar::aux::Configurable *pOwner, const std::string& name, const T& defaultValue)
   :
-  cedar::aux::ParameterBase(name, true),
+  cedar::aux::ParameterBase(pOwner, name, true),
   mValue(defaultValue),
   mDefault(defaultValue)
   {
   }
 
-  Parameter(const std::string& name)
+  Parameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::ParameterBase(name, false)
+  cedar::aux::ParameterBase(pOwner, name, false)
   {
   }
 

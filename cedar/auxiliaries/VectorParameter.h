@@ -68,24 +68,24 @@ class cedar::aux::VectorParameter : public cedar::aux::ParameterBase
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  VectorParameter(const std::string& name)
+  VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::ParameterBase(name, false)
+  cedar::aux::ParameterBase(pOwner, name, false)
   {
   }
 
-  VectorParameter(const std::string& name, const std::vector<T>& defaults)
+  VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::vector<T>& defaults)
   :
-  cedar::aux::ParameterBase(name, true),
+  cedar::aux::ParameterBase(pOwner, name, true),
   mDefaults(defaults),
   mSize(0)
   {
     this->makeDefault();
   }
 
-  VectorParameter(const std::string& name, size_t size, T defaultValue)
+  VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, size_t size, T defaultValue)
   :
-  cedar::aux::ParameterBase(name, true),
+  cedar::aux::ParameterBase(pOwner, name, true),
   mSize(size),
   mDefaultValue(defaultValue)
   {

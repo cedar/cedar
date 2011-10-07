@@ -50,6 +50,10 @@
   typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
   typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
 
+#define CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME) \
+  typedef boost::intrusive_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
+  typedef boost::intrusive_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
+
 /*! @def     CEDAR_DECLARE_CLASS(CLASS_NAME)
  *
  *  @brief   Automatically declares a class and its corresponding smart pointer types within a namespace block.
@@ -67,9 +71,18 @@
   class CLASS_NAME; \
   CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
 
+#define CEDAR_DECLARE_CLASS_INTRUSIVE(CLASS_NAME) \
+  class CLASS_NAME; \
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME)
+
 #define CEDAR_DECLARE_CLASS_PREFIXED(PREFIX, CLASS_NAME) \
   class PREFIX CLASS_NAME; \
   CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
+
+#define CEDAR_DECLARE_CLASS_INTRUSIVE_PREFIXED(PREFIX, CLASS_NAME) \
+  class PREFIX CLASS_NAME; \
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME)
+
 
 #ifdef MSVC
 #define CEDAR_DECLARE_DEPRECATED(x) __declspec(deprecated) x

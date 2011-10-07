@@ -51,7 +51,7 @@
  *
  * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
  */
-template <typename BaseType>
+template <typename BaseType, typename SmartPointerType>
 class cedar::aux::Factory
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,9 +71,9 @@ public:
    *
    * @returns A smart pointer to the newly allocated resource.
    */
-  virtual boost::shared_ptr<BaseType> allocate() const
+  virtual SmartPointerType allocate() const
   {
-    return boost::shared_ptr<BaseType> (new BaseType());
+    return SmartPointerType (new BaseType());
   }
 
   virtual BaseType* allocateRaw() const

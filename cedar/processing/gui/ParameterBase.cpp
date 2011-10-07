@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/ParameterBase.h"
+#include "auxiliaries/ParameterBase.h"
 
 // PROJECT INCLUDES
 

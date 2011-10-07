@@ -50,6 +50,11 @@
 // SYSTEM INCLUDES
 #include <QObject>
 
+// Functions for boost intrusive pointer.
+extern void intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject);
+extern void intrusive_ptr_release(cedar::aux::ParameterBase *pObject);
+
+
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
@@ -60,12 +65,19 @@ class cedar::aux::ParameterBase : public QObject, public cedar::aux::Base
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend void ::intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject);
+  friend void ::intrusive_ptr_release(cedar::aux::ParameterBase *pObject);
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ParameterBase(const std::string& name, bool hasDefault = true);
+  ParameterBase(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault = true);
 
   //!@brief Destructor
   virtual ~ParameterBase();
@@ -112,6 +124,9 @@ private:
 protected:
   // none yet
 private:
+  //! The owner of this parameter, i.e., the object using it.
+  cedar::aux::Configurable *mpOwner;
+
   //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
   bool mAutoRead;
 
@@ -123,6 +138,9 @@ private:
 
   //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
   bool mIsHidden;
+
+  //! Reference counter for boost intrusive pointer.
+  unsigned int mReferenceCount;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -72,10 +72,9 @@ mpArgumentsLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet (true),
 mState(cedar::proc::Step::STATE_NONE),
 mRegisteredAt(NULL),
-mRunInThread(new cedar::aux::BoolParameter("threaded", runInThread))
+mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
   this->addTrigger(mFinished);
-  this->registerParameter(mRunInThread);
 
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }

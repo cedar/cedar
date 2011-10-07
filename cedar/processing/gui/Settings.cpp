@@ -60,11 +60,9 @@ mLog(new cedar::proc::gui::Settings::DockSettings()),
 mSteps(new cedar::proc::gui::Settings::DockSettings()),
 mTools(new cedar::proc::gui::Settings::DockSettings()),
 mProperties(new cedar::proc::gui::Settings::DockSettings()),
-mMainWindowGeometry(new cedar::aux::StringParameter("mainWindowGeometry", "")),
-mMainWindowState(new cedar::aux::StringParameter("mainWindowState", ""))
+mMainWindowGeometry(new cedar::aux::StringParameter(this, "mainWindowGeometry", "")),
+mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 {
-  this->registerParameter(mMainWindowState);
-  this->registerParameter(mMainWindowGeometry);
 
   cedar::aux::ConfigurablePtr plugins(new cedar::aux::Configurable());
   this->addConfigurableChild("plugins", plugins);
@@ -74,11 +72,11 @@ mMainWindowState(new cedar::aux::StringParameter("mainWindowState", ""))
                    (
                      new cedar::aux::StringSetParameter
                      (
+                       plugins.get(),
                        "loadOnStartup",
                        default_plugins
                      )
                    );
-  plugins->registerParameter(mPluginsToLoad);
 
   cedar::aux::ConfigurablePtr ui_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("ui", ui_settings);
@@ -93,11 +91,9 @@ mMainWindowState(new cedar::aux::StringParameter("mainWindowState", ""))
 
 cedar::proc::gui::Settings::DockSettings::DockSettings()
 :
-mVisible(new cedar::aux::BoolParameter("visible", true)),
-mFloating(new cedar::aux::BoolParameter("floating", false))
+mVisible(new cedar::aux::BoolParameter(this, "visible", true)),
+mFloating(new cedar::aux::BoolParameter(this, "floating", false))
 {
-  this->registerParameter(this->mVisible);
-  this->registerParameter(this->mFloating);
 }
 
 cedar::proc::gui::Settings::~Settings()
