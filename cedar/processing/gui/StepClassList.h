@@ -51,7 +51,7 @@
 #include <QListWidget>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
  *
  * More detailed description of the class.
  */
@@ -76,6 +76,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief for a given category, show all registered steps (their icon and name)
   void showList(const cedar::proc::StepRegistry::CategoryEntries& entries);
 
   //--------------------------------------------------------------------------------------------------------------------
