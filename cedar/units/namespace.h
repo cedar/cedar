@@ -58,10 +58,14 @@ namespace cedar
   namespace unit
   {
     // because strings (as template arguments) must be constant at compile-time, this is used for the prefixes:
+    //!@brief string prefix for microseconds
     extern CEDAR_UNITS_LIB_EXPORT const char prefix_us[];
+    //!@brief string prefix for milliseconds
     extern CEDAR_UNITS_LIB_EXPORT const char prefix_ms[];
+    //!@brief string prefix for seconds
     extern CEDAR_UNITS_LIB_EXPORT const char prefix_s[];
 
+    //!@brief the base class Time
     class CEDAR_UNITS_LIB_EXPORT Time;
 
     /*! @todo This should probably be UnitBase and inherit from a class that is a template argument as well; that way,
@@ -73,8 +77,11 @@ namespace cedar
      */
     template <unsigned int factor, const char* suffix> class TimeUnit;
 
+    //!@brief the template concretization for microseconds
     typedef TimeUnit<1, prefix_us> Microseconds;
+    //!@brief the template concretization for milliseconds
     typedef TimeUnit<1000, prefix_ms> Milliseconds;
+    //!@brief the template concretization for seconds
     typedef TimeUnit<1000000, prefix_s> Seconds;
   }
 }

@@ -77,10 +77,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief refreshes the internal matrix containing the Gaussian input
   void compute(const cedar::proc::Arguments& arguments);
 
 public slots:
+  //!@brief a slot that is triggered if any of the Gauss function parameters are changed
   void updateMatrix();
+  //!@brief a slot to process changes in dimensionality, including reinitializing the buffers
   void updateDimensionality();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -96,6 +99,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief the buffer containing the output
   cedar::aux::MatDataPtr mOutput;
 private:
 
@@ -103,10 +107,15 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief the amplitude of the Gauss function
   cedar::aux::DoubleParameterPtr _mAmplitude;
+  //!@brief the dimensionality of the Gauss function
   cedar::aux::UIntParameterPtr _mDimensionality;
+  //!@brief the vector of sigmas (i.e. width) of the Gauss function
   cedar::aux::DoubleVectorParameterPtr _mSigmas;
+  //!@brief the vector of centers of the Gauss function
   cedar::aux::DoubleVectorParameterPtr _mCenters;
+  //!@brief the vector of sizes of matrix containing the Gauss function for each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
 
 private:
