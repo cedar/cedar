@@ -109,7 +109,7 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterBasePtr pa
 
   if (this->mParameterAssociations.find(parameter->getName()) != this->mParameterAssociations.end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + parameter->getName()) + "\"";
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + parameter->getName() + "\"");
   }
 
   this->mParameterOrder.push_back(parameter);

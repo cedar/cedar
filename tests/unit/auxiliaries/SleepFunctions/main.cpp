@@ -42,6 +42,7 @@
 #include "auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <iostream>
 #include <time.h>
 #include <vector>
@@ -66,19 +67,19 @@ int main()
     cedar::unit::Seconds wait_time(wait_times_seconds.at(i));
     log_file.addTimeStamp();
     log_file << "Waiting for " << wait_time << std::endl;
-    clock_t start = clock();
+    boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
     cedar::aux::sleep(wait_time);
-    clock_t end = clock();
+    boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
 
-    double expired_time = static_cast<double>(end - start) / static_cast<double>(CLOCKS_PER_SEC);
-    if (expired_time < wait_times_seconds.at(i))
+    boost::posix_time::time_duration expired_time = end - start;
+    if (expired_time.total_milliseconds() < static_cast<long>(1000.0 * wait_times_seconds.at(i)))
     {
-      log_file << "Sleep didn't wait long enough; only " << expired_time << " seconds have passed." << std::endl;
+      log_file << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
       errors++;
     }
     else
     {
-      log_file << "Ok: " << expired_time << " seconds have passed." << std::endl;
+      log_file << "Ok: " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
     }
   }
 
@@ -93,20 +94,20 @@ int main()
     cedar::unit::Milliseconds wait_time(wait_times_milliseconds.at(i));
     log_file.addTimeStamp();
     log_file << "Waiting for " << wait_time << std::endl;
-    clock_t start = clock();
+    boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
     cedar::aux::sleep(wait_time);
-    clock_t end = clock();
+    boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
 
-    double expired_time = static_cast<double>(end - start) / static_cast<double>(CLOCKS_PER_SEC);
-    if (expired_time < wait_times_milliseconds.at(i) / 1000.0)
+    boost::posix_time::time_duration expired_time = end - start;
+    if (expired_time.total_milliseconds() < static_cast<long>(wait_times_milliseconds.at(i)))
     {
-      log_file << "Sleep didn't wait long enough; only " << expired_time << " seconds have passed."
+      log_file << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed."
                << " (should have been " << wait_times_milliseconds.at(i) / 1000.0 << ")" << std::endl;
       errors++;
     }
     else
     {
-      log_file << "Ok: " << expired_time << " seconds have passed." << std::endl;
+      log_file << "Ok: " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
     }
   }
 
