@@ -78,7 +78,9 @@ public:
 public:
 
 public slots:
+  //!@brief handles a change of the associated parameters
   void parameterPointerChanged();
+  //!@brief handles a change in the parameters
   void valueChanged(int value);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,6 +101,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief a vector of spinboxes for displaying and changing the associated parameters
   std::vector<QSpinBox*> mSpinboxes;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -75,6 +75,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief returns the raw time (currently, this is microseconds), mainly used in conversion methods
+   * @return raw time (currently microseconds)
+   */
   double getRawTime() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,6 +100,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief the internal representation of time, currently expressed in microseconds
   double mAmountInMicroSeconds;
 private:
   // none yet

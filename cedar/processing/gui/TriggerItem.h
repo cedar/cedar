@@ -69,37 +69,56 @@ public:
   //!@brief The standard constructor.
   TriggerItem();
 
+  /*!@brief The constructor that directly ties to an instance of Trigger
+   * @param trigger an instance of Trigger
+   */
   TriggerItem(cedar::proc::TriggerPtr trigger);
 
   //!@brief Destructor
   ~TriggerItem();
 
 private:
+  //!@brief construct the graphical representation
   void construct();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief paint the graphical representation
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
-  //!@breif Let the trigger know whether it is docked (usually to a step).
+  //!@brief Let the trigger know whether it is docked (usually to a step).
   void isDocked(bool docked);
 
+  /*!@brief returns the instance of Trigger
+   * @return the associated instance of Trigger
+   */
   cedar::proc::TriggerPtr getTrigger();
 
+  //!@brief create the context menu for TriggerItem
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  /*!@brief graphically connect to a StepItem
+   * @param pTarget pointer to StepItem
+   */
   void connectTo(cedar::proc::gui::StepItem *pTarget);
 
+  /*!@brief graphically connect to a TriggerItem
+   * @param pTarget pointer to TriggerItem
+   */
   void connectTo(cedar::proc::gui::TriggerItem *pTarget);
 
+  //!@brief read configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+  //!@brief save configuration to a node
   void saveConfiguration(cedar::aux::ConfigurationNode& root);
 
+  //!@brief checks for a target, if Trigger can connect to this target
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
+  //!@brief disconnect from a listener
   void disconnect(cedar::proc::gui::GraphicsBase* pListener);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,6 +130,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief sets the trigger associated with this graphical representation
   void setTrigger(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -119,6 +139,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief the internal trigger
   cedar::proc::TriggerPtr mTrigger;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -128,6 +149,7 @@ protected:
   // none yet
 
 private:
+  //!@brief the class id of the internal trigger, used for a tooltip
   cedar::proc::TriggerDeclarationPtr mClassId;
 
 }; // class TriggerItem

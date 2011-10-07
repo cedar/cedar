@@ -80,28 +80,38 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief add a tool to the toolbox, represented by an icon
   void addItem(const std::string& icon, const std::string& data, const std::string& tooltip);
+
+  //!@brief add a tool to the toolbox, represented by a simple string name
   void addStringItem(const std::string& icon, const std::string& data, const std::string& tooltip);
+
+  //!@brief \todo add comment here
   std::string getCurrentItemData() const;
 
+  //!@brief set a specific tool mode
   void selectMode(const std::string& mode);
 
 public slots:
+  //!@brief handles a button press in the toolbox
   void toolButtonToggled(bool checked);
 
 signals:
+  //!@brief a signal, which is emitted if the current tool is changed
   void selectionChanged(QString data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief handles the resize event
   void resizeEvent(QResizeEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief refresh the column layout
   void relayout();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -112,10 +122,15 @@ public:
 protected:
   // none yet
 private:
+  //!@brief number of columns in the widget
   unsigned int mColumns;
+  //!@brief size of a button in the widget
   unsigned int mButtonSize;
+  //!@brief the layout of the toolbox
   QGridLayout *mpLayout;
+  //!@brief the currently selected button
   QToolButton *mpSelectedButton;
+  //!@brief map of all buttons in the widget
   std::map<std::string, QToolButton*> mButtons;
 
   //--------------------------------------------------------------------------------------------------------------------

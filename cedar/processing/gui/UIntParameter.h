@@ -78,7 +78,9 @@ public:
 public:
 
 public slots:
+  //!@brief handles a change of the associated parameter
   void parameterPointerChanged();
+  //!@brief handles a change in the parameter
   void valueChanged(int value);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,6 +101,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief a spinbox for the represented parameter
   QSpinBox *mpSpinbox;
 
   //--------------------------------------------------------------------------------------------------------------------
