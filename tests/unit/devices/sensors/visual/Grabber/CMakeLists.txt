@@ -35,7 +35,4 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(visualGrabber
-  main.cpp
-  TestGrabber.h
-)
+cedar_add_unit_test(Grabber main.cpp )

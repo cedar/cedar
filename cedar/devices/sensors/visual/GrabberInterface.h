@@ -25,7 +25,7 @@
     File:        GrabberInterface.h
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
     Description: Header for the @em cedar::devices::sensors::visual::GrabberInterface class.
@@ -57,7 +57,7 @@
 #include <QReadWriteLock>
 
 
-/* \brief typedef for a vector containing instances of the grabbers
+/* \brief Typedef for a vector containing instances of the grabbers
  *
  */
 typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
@@ -69,14 +69,8 @@ typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInsta
  *
  *  \remarks
  *      This class implements all the common features, each grabber has to be capable of.
- *      That is e.g. managing the configuration file, recording, threaded grabbing and stuff like this.
+ *      That is e.g. managing the configuration file, recording, threaded grabbing and other stuff like this.
  *      The name of the grabber is stored in _mName which is defined in cedar::aux::Base
- *
- *      <br><br>
- *
- *      Initialize in the constructor of a derived class the filenames or camera-device-names.
- *      At the end of the constructor call doInit with the number of channels you use.
- *      To get an example look at the VideoGrabber-class. <br><br>
  *
  *   USAGE:
  *     - to set a name for the grabber: getName, setName form cedar::base<br>
@@ -89,6 +83,12 @@ typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInsta
  *     - recording: startRecording(), stopRecording()  <br>
  *     - snapshots: saveSnapshot(), saveSnapshotAllCams(), getSnapshotName()<br>
  *
+ *      <br><br>
+ *      If you would like to create your own derived grabber:
+ *      Initialize in the constructor of a derived class the filenames or camera-device-names.
+ *      At the end of the constructor, call doInit() with the number of channels you use and with a default name.
+ *      At the beginning of the destructor, call onDestroy() and do the cleanup in this function.
+ *      To get an example look at the VideoGrabber-class. <br><br>
  *
  *
  */
@@ -107,9 +107,11 @@ public cedar::aux::LoopedThread
 
 protected:
   /*! @brief The standard constructor.
-   *  \reamarks
+   *  \remarks
    *    The constructor is protected, because no instance of GrabberInterface should be instantiated
    *    Use a derived class instead.
+   *  \param
+   *    configFileName The filename where the configuration parameters should be stored in
    */
   GrabberInterface(
                     const std::string& configFileName = ""
@@ -145,8 +147,8 @@ public:
      *       In the stereo case it may be 0 or 1.
      */
     cv::Size getSize(
-                   unsigned int channel = 0
-                  ) const;
+                      unsigned int channel = 0
+                    ) const;
 
 
 
@@ -161,7 +163,7 @@ public:
      *   \see onGetPhysicalSourceInformation
      */
     virtual std::string getSourceInfo(
-                                      unsigned int channel = 0
+                                       unsigned int channel = 0
                                      ) const;
 
 
@@ -183,7 +185,7 @@ public:
      *  \see LoopedThread::start(), LoopedThread::stop()
      */
     void setFps(
-                double fps
+                 double fps
                );
 
 
@@ -205,7 +207,7 @@ public:
      *      getNumCams
      */
     cv::Mat getImage(
-                     unsigned int channel = 0
+                      unsigned int channel = 0
                     ) const;
 
 
@@ -251,7 +253,7 @@ public:
      *		getSnapshotName
      */
     void setSnapshotName(
-                         const std::string& snapshotName
+                          const std::string& snapshotName
                         );
 
 
@@ -289,8 +291,8 @@ public:
      *
      */
     void setSnapshotName(
-                         unsigned int       channel,
-                         const std::string& snapshotName
+                           unsigned int channel,
+                           const std::string& snapshotName
                         );
 
 
@@ -302,7 +304,7 @@ public:
      *      In the stereo case it may be 0 or 1.
      */
     std::string getSnapshotName(
-                                unsigned int channel = 0
+                                 unsigned int channel = 0
                                ) const;
 
 
@@ -316,7 +318,7 @@ public:
      *      In the stereo case it may be 0 or 1.
      */
     bool saveSnapshot(
-                      unsigned int channel = 0
+                       unsigned int channel = 0
                      ) const;
 
 
@@ -351,7 +353,7 @@ public:
      *
      */
     void setRecordName(
-                       const std::string& recordName
+                        const std::string& recordName
                       );
 
 
@@ -369,20 +371,20 @@ public:
      *      startRecording, setRecordName, getRecordName
      */
     void setRecordName(
-                       unsigned int       channel,
-                       const std::string& recordName
+                        unsigned int channel,
+                        const std::string& recordName
                       );
 
 
 
     /*! \brief Get the current name of the recording file for the given camera
      *   \param
-     *      camera This is the index of the source you want the picture from.<br>
+     *      channel This is the index of the source you want the picture from.<br>
      *      In the mono case you do not need to supply this value. Default is 0.<br>
      *      In the stereo case it may be 0 or 1.
      */
     std::string getRecordName(
-                              unsigned int channel = 0
+                               unsigned int channel = 0
                              ) const;
 
 
@@ -409,16 +411,16 @@ public:
      *      So see the OPENCV manual to determine the usable FOURCC's
      *  \par
      *     for supported codecs, have a look at:<br>
-     *     /usr/local/src/OpenCV_<YOUR_VERSION>/modules/highgui/src/cap_ffmpeg.cpp<br>
+     *     /usr/local/src/OpenCV_{YOUR_VERSION}/modules/highgui/src/cap_ffmpeg.cpp<br>
      *     http://www.fourcc.org/codecs.php<br>
      *
      *  \see
      *      setRecordName
      */
     bool startRecording(
-                        double fps,
-                        int    fourcc = 0,
-                        bool   color = true
+                         double fps,
+                         int fourcc = 0,
+                         bool color = true
                        );
 
 
@@ -431,6 +433,10 @@ public:
      */
     bool stopRecording();
 
+    /*! \brief Get the state of the recording-flag
+     *
+     */
+    bool isRecording() const;
 
 
 
@@ -458,8 +464,8 @@ protected:
      *  \see cedar::aux::ConfigurationInterface::setName
      */
     void doInit(
-                unsigned int       numCams,
-                const std::string& defaultGrabberName
+                 unsigned int       numCams,
+                 const std::string& defaultGrabberName
                );
 
 
@@ -468,7 +474,7 @@ protected:
      *  \remarks For details have a look at cedar::aux::LoopedThread
      */
     void step(
-              double time
+               double time
              );
 
 
@@ -487,7 +493,7 @@ protected:
      *      Parameters from the configfile restored before onInit is invoked. So don't overwrite them.<br>
      *      For examples, look at the classes VideoGrabber, CameraGrabber and PictureGrabber.
      */
-    virtual bool onInit()  { return true; }
+    virtual bool onInit() { return true; }
 
 
     /*! @brief  This method is invoked during destruction of the class.
@@ -528,7 +534,7 @@ protected:
      *		In the stereo case it may be 0 or 1.
      */
     virtual std::string onGetSourceInfo(
-                                        unsigned int channel = 0
+                                         unsigned int channel = 0
                                        ) const = 0;
 
 
@@ -537,7 +543,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //none yet
 
   #ifdef ENABLE_CTRL_C_HANDLER
 
@@ -551,7 +556,9 @@ private:
      */
     static void sigIntHandler(int sig);
 
-    //static std::vector<GrabberInterface*> mInstances;
+    /*! \brief The vector containing the instances of all created grabbers
+     *
+     */
     static GrabberInstancesVector mInstances;
 
   #endif

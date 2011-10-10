@@ -60,7 +60,8 @@ PictureGrabber::PictureGrabber(
                                 const std::string& configFileName,
                                 const std::string& pictureFileName
                               )
-  : GrabberInterface(configFileName)
+:
+GrabberInterface(configFileName)
 {
   mSourceFileName.push_back(pictureFileName);
   doInit(mSourceFileName.size(),"PictureGrabber");
@@ -75,7 +76,8 @@ PictureGrabber::PictureGrabber(
                                 const std::string& pictureFileName0,
                                 const std::string& pictureFileName1
                               )
-  : GrabberInterface(configFileName)
+:
+GrabberInterface(configFileName)
 {
   mSourceFileName.push_back(pictureFileName0);
   mSourceFileName.push_back(pictureFileName1);
@@ -150,6 +152,10 @@ bool PictureGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 std::string PictureGrabber::onGetSourceInfo(unsigned int channel) const
 {
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::onGetSourceInfo");
+  }
   return mSourceFileName.at(channel);
 }
 //----------------------------------------------------------------------------------------------------

@@ -25,10 +25,10 @@
     File:        Exceptions.h
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Header file for all new exceptions introduced in the @em cedar::dev::visual namespace.
+    Description: Header file for all new exceptions introduced in the @em cedar::dev::sensors::visual namespace.
 
     Credits:
 

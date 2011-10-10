@@ -25,10 +25,10 @@
     File:        namespace.h
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Namespace  for @em cedar::devices::sensors
+    Description: Namespace for @em cedar::devices::sensors
 
     Credits:
 
