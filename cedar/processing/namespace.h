@@ -79,8 +79,8 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     template <class DerivedClass> class TriggerDeclarationT;
 
-    typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
-    typedef boost::shared_ptr<cedar::aux::Factory<Trigger> > TriggerFactoryPtr;
+    typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step>> StepFactoryPtr;
+    typedef boost::shared_ptr<cedar::aux::Factory<Trigger, cedar::proc::TriggerPtr> > TriggerFactoryPtr;
 
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);

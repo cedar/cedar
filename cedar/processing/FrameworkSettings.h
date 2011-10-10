@@ -40,6 +40,8 @@
 // LOCAL INCLUDES
 #include "processing/namespace.h"
 #include "auxiliaries/Configurable.h"
+#include "auxiliaries/DirectoryParameter.h"
+#include "auxiliaries/SetParameter.h"
 
 // PROJECT INCLUDES
 

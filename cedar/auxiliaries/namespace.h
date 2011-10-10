@@ -76,8 +76,8 @@ namespace cedar
 
     CEDAR_DECLARE_AUX_CLASS(Arguments);
 
-    template <class T, typename SmartPointerType = boost::shared_ptr<T> > class Factory;
-    template <class T, class T2, typename SmartPointerType = boost::shared_ptr<T> > class FactoryDerived;
+    template <class T, typename SmartPointerType> class Factory;
+    template <class T, class T2, typename SmartPointerType> class FactoryDerived;
 
     template <class T> class AbstractFactory;
     template <class T, class T2> class AbstractFactoryDerived;

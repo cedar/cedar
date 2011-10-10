@@ -44,6 +44,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
 #include "auxiliaries/Base.h"
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
@@ -51,8 +52,8 @@
 #include <QObject>
 
 // Functions for boost intrusive pointer.
-extern void intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject);
-extern void intrusive_ptr_release(cedar::aux::ParameterBase *pObject);
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject);
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::ParameterBase *pObject);
 
 
 /*!@brief Abstract description of the class.

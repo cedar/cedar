@@ -89,7 +89,7 @@ public:
   void add()
   {
     const std::type_info* type = &typeid(Key);
-    FactoryPtr factory(new cedar::aux::FactoryDerived<ValueBaseType, Value>());
+    FactoryPtr factory(new cedar::aux::FactoryDerived<ValueBaseType, Value, boost::shared_ptr<ValueBaseType> >());
     mKeyTypes.push_back(Pair(type, factory));
   }
 

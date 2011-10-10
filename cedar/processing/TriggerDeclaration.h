@@ -55,7 +55,7 @@
 class cedar::proc::TriggerDeclaration : public cedar::proc::DeclarationBase
                                             <
                                               cedar::proc::Trigger,
-                                              cedar::aux::Factory<cedar::proc::Trigger>
+                                              cedar::aux::Factory<cedar::proc::Trigger, cedar::proc::TriggerPtr>
                                             >
 {
 public:
@@ -65,7 +65,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   TriggerDeclaration(cedar::proc::TriggerFactoryPtr classFactory, const std::string& classId)
   :
-  DeclarationBase<cedar::proc::Trigger, cedar::aux::Factory<cedar::proc::Trigger> >
+  DeclarationBase<cedar::proc::Trigger, cedar::aux::Factory<cedar::proc::Trigger, cedar::proc::TriggerPtr> >
   (
     classFactory,
     classId,
@@ -130,7 +130,7 @@ public:
   :
   TriggerDeclaration
   (
-    cedar::proc::TriggerFactoryPtr(new cedar::aux::FactoryDerived<cedar::proc::Trigger, DerivedClass>()),
+    cedar::proc::TriggerFactoryPtr(new cedar::aux::FactoryDerived<cedar::proc::Trigger, DerivedClass, cedar::proc::TriggerPtr>()),
     classId
   )
   {

@@ -43,6 +43,8 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
+#include "auxiliaries/Parameter.h"
+
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
