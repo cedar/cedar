@@ -70,7 +70,6 @@ public GrabberInterface
 public:
 
   /*! \brief  Constructor for a single channel grabber
-   *  \param grabberName	The name for thist grabber
    *  \param configFileName	Filename for the configuration
    *  \param YarpChannel	Channel to grab from
    */
@@ -81,10 +80,9 @@ public:
 
 
   /*! \brief  Constructor for a stereo channel grabber
-   *  \param grabberName	The name for thist grabber
    *  \param configFileName	Filename for the configuration
-   *  \param YarpChannel0	Channel 0 to grab from
-   *  \param YarpChannel1	Channel 0 to grab from
+   *  \param YarpChannel0	Name of a channel from the used yarp-server
+   *  \param YarpChannel1	Another name of a channel from the used yarp-server
    */
   NetGrabber(
               const std::string& configFileName,
@@ -115,7 +113,7 @@ protected:
   bool onGrab();
   bool onDeclareParameters();
   std::string onGetSourceInfo(
-                              unsigned int channel
+                                unsigned int channel
                              ) const;
 
   virtual bool onDestroy();

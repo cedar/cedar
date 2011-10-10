@@ -67,26 +67,24 @@ public GrabberInterface
 public:
 
   /*! \brief  Constructor for a single-file grabber
-   *  \param grabberName    The name for this grabber
    *  \param configFileName Filename for the configuration
-   *  \param aviFileName    Filename to grab from
+   *  \param Camera    Filename to grab from. Look at OpenCV cv::VideoCapture documentation for details
    */
   CameraGrabber(
-                const std::string& configFileName,
-                unsigned int Camera0
+                 const std::string& configFileName,
+                 unsigned int Camera
                );
 
 
   /*! \brief Constructor for a stereo-file grabber
-   *  \param grabberName    The name for this grabber
    *  \param configFileName Filename for the configuration
-   *  \param aviFileName0   Filename to grab from for channel 0
-   *  \param aviFileName1   Filename to grab from for channel 1
+   *  \param Camera0 Device to grab from for channel 0. Look at OpenCV cv::VideoCapture documentation for details
+   *  \param Camera1 Device to grab from for channel 1. Look at OpenCV cv::VideoCapture documentation for details
    */
   CameraGrabber(
-                const std::string& configFileName,
-                unsigned int Camera0,
-                unsigned int Camera1
+                 const std::string& configFileName,
+                 unsigned int Camera0,
+                 unsigned int Camera1
                );
 
   /*! \brief Destructor */
@@ -106,8 +104,8 @@ public:
    *   \remarks see OpenCV documentation for VideoCapture::get() for details
    */
   double getCameraParam(
-                        unsigned int channel,
-                        int          propId
+                         unsigned int channel,
+                         int propId
                        );
 
 
@@ -144,7 +142,7 @@ protected:
 
   bool onDeclareParameters();
   std::string onGetSourceInfo(
-                              unsigned int channel
+                               unsigned int channel
                              ) const;
 
   virtual bool onDestroy();

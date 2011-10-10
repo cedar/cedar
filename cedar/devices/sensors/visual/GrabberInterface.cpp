@@ -25,7 +25,7 @@
     File:        Grabber.h
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
     Description: Header for the @em cedar::Grabber class.
@@ -58,7 +58,8 @@ using namespace cedar::dev::sensors::visual;
 
 //--------------------------------------------------------------------------------------------------------------------
 GrabberInterface::GrabberInterface(const std::string& configFileName)
-  : LoopedThread(configFileName)
+:
+LoopedThread(configFileName)
 {
   #ifdef DEBUG_GRABBER_INTERFACE
     std::cout << "[GrabberInterface::GrabberInterface]" << std::endl;
@@ -137,15 +138,13 @@ GrabberInterface::~GrabberInterface()
 //----------------------------------------------------------------------------------------------------------------------
 
 #ifdef ENABLE_CTRL_C_HANDLER
+
+  //this function handles the ctrl-c (signal: interrupt)
   void GrabberInterface::sigIntHandler(int sig)
   {
-      //Documentation of std::exit():
-      //Terminates the process normally, performing the regular cleanup for terminating processes.
-
       #ifdef DEBUG_GRABBER_INTERFACE
         std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
       #endif
-
 
       for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
       {
@@ -160,7 +159,7 @@ GrabberInterface::~GrabberInterface()
           #endif
         }
 
-        //stop Recording if needed
+        //stop recording if needed
         if ((*it)->mRecord)
         {
           (*it)->stopRecording();
@@ -315,7 +314,7 @@ bool GrabberInterface::grab()
       catch (std::exception& e)
       {
         std::stringstream info;
-        info << "GrabberInterface::grab[ch" << channel << "]_record - " << e.what();
+        info << "[GrabberInterface::grab] Error recording channel" << channel << ": " << e.what();
         CEDAR_THROW(cedar::aux::exc::GrabberRecordingException,info.str());
       }
     }
@@ -647,6 +646,12 @@ bool GrabberInterface::stopRecording()
     mVideoWriterVector.clear();
   }
   return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------
+bool GrabberInterface::isRecording() const
+{
+  return mRecord;
 }
 
 

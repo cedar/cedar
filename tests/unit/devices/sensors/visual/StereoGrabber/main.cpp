@@ -25,7 +25,7 @@
     File:        main.cpp
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
     Description: Unit test for the behavior of the GrabberInterface.
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "TestGrabber.h"
+#include <devices/sensors/visual/TestGrabber.h>
 #include <auxiliaries/LogFile.h> //?? wie bindet sich das ein
 #include <devices/sensors/visual/defines.h>  //for constants and CTRL-C Handler test
 
@@ -64,7 +64,6 @@ using namespace cedar::aux;
 
 //constants
 
-#define FPS_TEST_DURATION_IN_SEC 1
 #define CHANNEL_0_NAME "CHANNEL_0_NAME"
 #define CHANNEL_1_NAME "CHANNEL_1_NAME"
 #define GRABBER_NAME "TestGrabber"
@@ -74,22 +73,9 @@ using namespace cedar::aux;
 
 
 
-//for functions
-namespace TEST_GRABBER
-{
-
-}
-
 
 
 //----------------------------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------------
-
-// main test program
-using namespace TEST_GRABBER;
-
-
 
 //int cpp_main(int , char **)
 int main(int , char **)
@@ -218,6 +204,19 @@ int main(int , char **)
     errors++;
   }
 
+  //-----------------------------------------------------------
+  log_file << "test no " << test_number++ <<": isRecording()" << std::endl;
+  try
+  {
+    grabber_1->isRecording();
+  }
+  catch (...)
+  {
+    log_file << "error" <<std::endl;
+    errors++;
+  }
+
+
 
 
   //-----------------------------------------------------------
@@ -334,17 +333,19 @@ int main(int , char **)
   }
 
 
-  //###########################################################################################
-  //###########################################################################################
-  log_file << "ok\n";             //wird nicht mehr ausgegeben
-  std::cout << "ok"<<std::endl;   //wird ausgegeben
-  // seg-fault hier
-
   //-----------------------------------------------------------
   log_file << "test no " << test_number++ <<": getReadWriteLockPointer()" << std::endl;
+  try
+  {
+    grabber_1->getReadWriteLockPointer();
+  }
+  catch (...)
+  {
+    log_file << "error" <<std::endl;
+    errors++;
+  }
 
-
-
+  //-----------------------------------------------------------
   //check errors
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

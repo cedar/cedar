@@ -1,4 +1,2 @@
-cedar_add_interactive_test( "GrabberInterface" 
-	GrabberInterfaceTest.cpp
-	TestGrabber.h)
+cedar_add_interactive_test( "GrabberInterface" GrabberInterfaceTest.cpp )
 

@@ -35,7 +35,4 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(visualStereoGrabber
-  main.cpp
-  TestGrabber.h
-)
+cedar_add_unit_test(StereoGrabber main.cpp )

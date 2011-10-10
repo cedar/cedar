@@ -61,7 +61,8 @@ NetGrabber::NetGrabber(
                         const std::string& configFileName,
                         const std::string& YarpChannel
                       )
-  : GrabberInterface(configFileName)
+:
+GrabberInterface(configFileName)
 {
   mYarpChannels.push_back(YarpChannel);
   doInit(mYarpChannels.size(),"NetGrabber");
@@ -76,7 +77,8 @@ NetGrabber::NetGrabber(
                         const std::string& YarpChannel0,
                         const std::string& YarpChannel1
                       )
-  : GrabberInterface( configFileName)
+:
+GrabberInterface(configFileName)
 {
   mYarpChannels.push_back(YarpChannel0);
   mYarpChannels.push_back(YarpChannel1);
@@ -238,6 +240,10 @@ bool NetGrabber::onDeclareParameters()
 std::string NetGrabber::onGetSourceInfo(unsigned int channel) const
 {
   //TODO: gather information of used yarp-server too
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"NetGrabber::onGetSourceInfo");
+  }
   return mYarpChannels.at(channel);
 }
 

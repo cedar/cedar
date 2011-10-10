@@ -25,7 +25,7 @@
     File:        CameraGrabber.cpp
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
     Description: Header for the @em cedar::devices::visual::CameraGrabber class.
@@ -55,11 +55,11 @@ using namespace cedar::dev::sensors::visual;
 //Constructor for single-file grabber
 CameraGrabber::CameraGrabber(
                               const std::string& configFileName,
-                              unsigned int Camera0
+                              unsigned int Camera
                             )
   : GrabberInterface(configFileName)
 {
-  mCameraId.push_back(Camera0);
+  mCameraId.push_back(Camera);
   doInit(mCameraId.size(),"CameraGrabber");
 }
 
@@ -215,6 +215,10 @@ bool CameraGrabber::onGrab()
 //----------------------------------------------------------------------------------------------------
 std::string CameraGrabber::onGetSourceInfo(unsigned int channel) const
 {
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::onGetSourceInfo");
+  }
   std::stringstream s;
   s << "Camera " << mCameraId.at(channel) << ": No informations available";
   return s.str();

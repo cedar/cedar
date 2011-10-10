@@ -25,10 +25,11 @@
     File:        Exceptions.cpp
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ruhr-uni-bochum.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: This is the main file for all new exceptions introduced in the @em cedar::dev::visual namespace.
+    Description: This is the main file for all new exceptions introduced in
+                 the @em cedar::dev::sensors::visual namespace.
 
     Credits:
 
@@ -47,7 +48,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::exc::GrabberSnapshotException::GrabberSnapshotException()
 {
-  // Sets the type name.
+  // Set the type name.
   this->mType = "GrabberSnapshotException";
 }
 
@@ -55,7 +56,7 @@ cedar::aux::exc::GrabberSnapshotException::GrabberSnapshotException()
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::exc::GrabberRecordingException::GrabberRecordingException()
 {
-  // Sets the type name.
+  // Set the type name.
   this->mType = "GrabberRecordingException";
 }
 //----------------------------------------------------------------------------------------------------------------------

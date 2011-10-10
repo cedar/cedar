@@ -46,8 +46,6 @@
 // SYSTEM INCLUDES
 
 
-
-
 /*! \class cedar::dev::sensors::visual::PictureGrabber
  *  \brief This grabber grabs images from a picture-file
  *  \remarks This functionality is implemented by using the OpenCV classes
@@ -76,7 +74,6 @@ public:
                   const std::string& pictureFileName
                 );
 
-
   /*! \brief Constructor for a stereo-file grabber
    *  \param configFileName		Filename for the configuration
    *  \param pictureFileName0	Filename to grab from for channel 0
@@ -85,7 +82,7 @@ public:
   PictureGrabber(
                   const std::string& configFileName,
                   const std::string& pictureFileName0,
-                  const std::string& pictureFileName1ame1
+                  const std::string& pictureFileName1
                 );
 
   /*! \brief Destructor */
@@ -116,30 +113,25 @@ public:
    *	Supported image-types depend on operating system and installed libs. <br>
    *	For details look at the OpenCV-documentation (Section "imread").
    *  \param channel which should be changed (default is 0).
-   *  \param FileName of the newly used picture.
+   *  \param FileName of the new picture.
    */
   bool setSourceFile(
-                     unsigned int       channel,
-                     const std::string& FileName
+                      unsigned int channel,
+                      const std::string& FileName
                     );
-
-
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-  //From GrabberInterface
-
+  // inherited from GrabberInterface
   bool onInit();
   bool onGrab();
   bool onDeclareParameters();
   std::string onGetSourceInfo(
-                              unsigned int channel
+                               unsigned int channel
                              ) const;
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -173,8 +165,6 @@ private:
   // none yet
 
 
-
-			     
 }; //class cedar::dev::sensors::visual::PictureGrabber
 
 #endif //CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H

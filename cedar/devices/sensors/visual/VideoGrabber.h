@@ -25,7 +25,7 @@
     File:        VideoGrabber.h
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
     Description: Header for the @em cedar::dev::sensors::visual::VideoGrabber class.
@@ -66,7 +66,6 @@ public GrabberInterface
 public:
 
   /*!	\brief  Constructor for a single-file grabber
-   *	\param grabberName		The name for this grabber
    *	\param configFileName	Filename for the configuration
    *  \param aviFileName		Filename to grab from
    */
@@ -77,15 +76,14 @@ public:
 
 
   /*!	\brief Constructor for a stereo-file grabber
-   *  \param grabberName	The name for this grabber
    *	\param configFileName	Filename for the configuration
    *  \param aviFileName0	Filename to grab from for channel 0
    *  \param aviFileName1	Filename to grab from for channel 1
    */
   VideoGrabber(
-               const std::string& configFileName,
-               const std::string& aviFileName0,
-               const std::string& aviFileName1
+                const std::string& configFileName,
+                const std::string& aviFileName0,
+                const std::string& aviFileName1
               );
 
   //!@brief Destructor
@@ -98,7 +96,7 @@ public:
 public:
  /*! \brief Turn looping on or off (i.e. restart on end) */
   void setLoop(
-               bool loop = true
+                bool loop = true
               );
 
 
@@ -113,7 +111,7 @@ public:
    *		setFPS
    */
   void setSpeedFactor(
-                      double speedFactor
+                       double speedFactor
                      );
 
 
@@ -133,7 +131,7 @@ public:
    *		For absolute positioning use setPositionAbs()
    */
   void setPositionRel(
-                      double newPositionRel
+                       double newPositionRel
                      );
 
 
@@ -151,7 +149,7 @@ public:
    *      For relative positioning use setPostionRel()
    */
   void setPositionAbs(
-                      unsigned int newPositionAbs
+                       unsigned int newPositionAbs
                      );
 
 
@@ -180,8 +178,8 @@ public:
    *  \remarks see OpenCV documentation for VideoCapture::get() details
    */
   double getSourceProperty(
-                           unsigned int channel,
-                           int          propId
+                            unsigned int channel,
+                            int          propId
                           );
 
 
@@ -191,7 +189,7 @@ public:
    *    Default channel is 0
    */
   double getSourceFps(
-                      unsigned int channel = 0
+                       unsigned int channel = 0
                      );
 
 
@@ -201,7 +199,7 @@ public:
    *    Default channel is 0
    */
   double getSourceEncoding(
-                           unsigned int channel = 0
+                            unsigned int channel = 0
                           );
 
 
@@ -227,7 +225,7 @@ protected:
 
   bool onDeclareParameters();
   std::string onGetSourceInfo(
-                              unsigned int channel
+                               unsigned int channel
                              ) const;
 
   virtual bool onDestroy();

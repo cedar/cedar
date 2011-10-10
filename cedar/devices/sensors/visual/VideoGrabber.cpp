@@ -25,7 +25,7 @@
     File:        VideoGrabber.cpp
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
     Description: This is the @em cedar::dev::sensors::visual::VideoGrabber class.
@@ -55,13 +55,13 @@ using namespace cedar::dev::sensors::visual;
 //----------------------------------------------------------------------------------------------------
 //Constructor for single-file grabber
 VideoGrabber::VideoGrabber(
-                           const std::string& configFileName,
-                           const std::string& aviFileName
+                            const std::string& configFileName,
+                            const std::string& aviFileName
                           )
-  : GrabberInterface(configFileName)
+:
+GrabberInterface(configFileName)
 {
   mSourceFileName.push_back(aviFileName);
-
   doInit(mSourceFileName.size(),"VideoGrabber");
 }
 
@@ -73,11 +73,11 @@ VideoGrabber::VideoGrabber(
                             const std::string& aviFileName0,
                             const std::string& aviFileName1
                           )
-  : GrabberInterface(configFileName)
+:
+GrabberInterface(configFileName)
 {
   mSourceFileName.push_back(aviFileName0);
   mSourceFileName.push_back(aviFileName1);
-
   doInit(mSourceFileName.size(),"VideoGrabber");
 }
 
@@ -161,7 +161,6 @@ bool VideoGrabber::onInit()
 
   //----------------------------------------
   //search for the smallest avi-file
-  //unsigned int smallest=100000; //2000sec = 33h at 50Hz framerate
   unsigned int smallest = UINT_MAX;
 
   for (unsigned int i = 0; i < mNumCams; ++i)
@@ -184,11 +183,9 @@ bool VideoGrabber::onInit()
 
   if (mNumCams > 1)     //remove
   {
-
     for (unsigned int i = 1; i < mNumCams; ++i)
     {
       double fps_test = mCaptureVector.at(i).get(CV_CAP_PROP_FPS);
-
       if (fps != fps_test)
       {
         std::cout << "[VideoGrabber::onInit] ERROR: Different framerate in channel 0 and channel " << i << "."
@@ -256,6 +253,10 @@ bool VideoGrabber::onGrab()
 //----------------------------------------------------------------------------------------------------
 std::string VideoGrabber::onGetSourceInfo(unsigned int channel) const
 {
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"VideoGrabber::onGetSourceInfo");
+  }
   return mSourceFileName.at(channel);
 }
 
