@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/UIntVectorParameter.h"
+#include "processing/gui/PropertyPane.h"
 #include "auxiliaries/NumericVectorParameter.h"
 #include "auxiliaries/assert.h"
 
@@ -71,32 +72,49 @@ cedar::proc::gui::UIntVectorParameter::~UIntVectorParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
 void cedar::proc::gui::UIntVectorParameter::parameterPointerChanged()
 {
   cedar::aux::UIntVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
-  // first, clear the old widgets
-  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
+
+  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+  this->propertyChanged();
+}
+
+void cedar::proc::gui::UIntVectorParameter::propertyChanged()
+{
+  cedar::aux::UIntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
+
+  //!@todo Don't throw away old spinboxes, reuse them instead
+  // Create the appropriate amount of spinboxes
+  if (this->mSpinboxes.size() != parameter->size())
   {
-    if (this->mSpinboxes.at(i))
+    for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
     {
       delete this->mSpinboxes.at(i);
     }
+    this->mSpinboxes.clear();
+
+    for (size_t i = 0; i < parameter->size(); ++i)
+    {
+      QSpinBox *p_widget = new QSpinBox();
+      this->mSpinboxes.push_back(p_widget);
+      this->layout()->addWidget(p_widget);
+      p_widget->setMinimumHeight(20);
+      p_widget->setValue(parameter->get().at(i));
+      QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
+    }
+
+    emit heightChanged();
   }
-  this->mSpinboxes.clear();
-  for (
-        size_t i = 0;
-        i < boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter())->get().size();
-        ++i
-      )
+
+  // Update the spinboxes' properties
+  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
   {
-    this->mSpinboxes.push_back(new QSpinBox());
-    this->layout()->addWidget(this->mSpinboxes.at(i));
-    this->mSpinboxes.at(i)->setMinimumHeight(20);
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
-    this->mSpinboxes.at(i)->setValue(parameter->get().at(i));
-    QObject::connect(this->mSpinboxes.at(i), SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
   }
 }
 
