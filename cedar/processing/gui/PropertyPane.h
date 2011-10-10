@@ -100,6 +100,8 @@ public slots:
 
   void resetPointer();
 
+  void rowSizeChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,6 +129,8 @@ private:
   static DataWidgetTypes mDataWidgetTypes;
   cedar::proc::StepPtr mDisplayedStep;
   cedar::proc::TriggerPtr mDisplayedTrigger;
+
+  std::map<cedar::proc::gui::ParameterBase*, int> mParameterRowIndex;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

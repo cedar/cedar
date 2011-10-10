@@ -81,6 +81,7 @@ public:
 
 signals:
   void parameterPointerChanged();
+  void heightChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

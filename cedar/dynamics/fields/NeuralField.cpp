@@ -216,7 +216,7 @@ void cedar::dyn::NeuralField::onStart()
 void cedar::dyn::NeuralField::updateDimensionality()
 {
   int new_dimensionality = static_cast<int>(_mDimensionality->get());
-  _mSizes->get().resize(new_dimensionality, _mSizes->getDefaultValue());
+  _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
 
   std::vector<int> sizes(new_dimensionality);
   for (int dim = 0; dim < new_dimensionality; ++dim)

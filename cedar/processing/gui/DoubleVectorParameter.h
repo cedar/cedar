@@ -79,7 +79,11 @@ public:
 
 public slots:
   void parameterPointerChanged();
+
   void valueChanged(double value);
+
+  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

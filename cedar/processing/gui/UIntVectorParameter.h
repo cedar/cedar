@@ -51,9 +51,12 @@
 #include <QSpinBox>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Widget for manipulating vectors of unsigned integer values.
  *
- * More detailed description of the class.
+ * @todo This should be abstracted, probably in a template class:
+ *       template <class ParameterType, class WidgetType> NumericVectorParameter,
+ *       where, e.g., ParameterType = UIntVector and WidgetType = QSpinBox. Otherwise, a lot of code might get
+ *       duplicated
  */
 class cedar::proc::gui::UIntVectorParameter : public cedar::proc::gui::ParameterBase
 {
@@ -80,8 +83,12 @@ public:
 public slots:
   //!@brief handles a change of the associated parameters
   void parameterPointerChanged();
+
   //!@brief handles a change in the parameters
   void valueChanged(int value);
+
+  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

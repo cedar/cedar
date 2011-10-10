@@ -96,6 +96,11 @@ void cedar::aux::ParameterBase::emitChangedSignal()
   emit valueChanged();
 }
 
+void cedar::aux::ParameterBase::emitPropertyChangedSignal()
+{
+  emit propertyChanged();
+}
+
 bool cedar::aux::ParameterBase::isHidden() const
 {
   return this->mIsHidden;
@@ -114,6 +119,8 @@ bool cedar::aux::ParameterBase::getReadAutomatically() const
 void cedar::aux::ParameterBase::setReadAutomatically(bool value)
 {
   this->mAutoRead = value;
+
+  emit propertyChanged();
 }
 
 bool cedar::aux::ParameterBase::getHasDefault() const
@@ -124,6 +131,8 @@ bool cedar::aux::ParameterBase::getHasDefault() const
 void cedar::aux::ParameterBase::setHasDefault(bool value)
 {
   this->mHasDefault = value;
+
+  emit propertyChanged();
 }
 
 bool cedar::aux::ParameterBase::isConstant() const
@@ -134,4 +143,6 @@ bool cedar::aux::ParameterBase::isConstant() const
 void cedar::aux::ParameterBase::setConstant(bool value)
 {
   this->mConstant = value;
+
+  emit propertyChanged();
 }

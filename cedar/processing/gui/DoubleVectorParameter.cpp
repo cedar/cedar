@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/DoubleVectorParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
+#include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -71,32 +72,50 @@ cedar::proc::gui::DoubleVectorParameter::~DoubleVectorParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+//!@todo A lot of this code is almost the same as cedar::proc::gui::UIntVectorParameter.
+
 void cedar::proc::gui::DoubleVectorParameter::parameterPointerChanged()
 {
   cedar::aux::DoubleVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-  // first, clear the old widgets
-  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
+
+  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+  this->propertyChanged();
+}
+
+void cedar::proc::gui::DoubleVectorParameter::propertyChanged()
+{
+  cedar::aux::DoubleVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
+
+  //!@todo Don't throw away old spinboxes, reuse them instead
+  // Create the appropriate amount of spinboxes
+  if (this->mSpinboxes.size() != parameter->size())
   {
-    if (this->mSpinboxes.at(i))
+    for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
     {
       delete this->mSpinboxes.at(i);
     }
+    this->mSpinboxes.clear();
+
+    for (size_t i = 0; i < parameter->size(); ++i)
+    {
+      QDoubleSpinBox *p_widget = new QDoubleSpinBox();
+      this->mSpinboxes.push_back(p_widget);
+      this->layout()->addWidget(p_widget);
+      p_widget->setMinimumHeight(20);
+      p_widget->setValue(parameter->get().at(i));
+      QObject::connect(p_widget, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
+    }
+
+    emit heightChanged();
   }
-  this->mSpinboxes.clear();
-  for (
-        size_t i = 0;
-        i < boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter())->get().size();
-        ++i
-      )
+
+  // Update the spinboxes' properties
+  for (size_t i = 0; i < this->mSpinboxes.size(); ++i)
   {
-    this->mSpinboxes.push_back(new QDoubleSpinBox());
-    this->layout()->addWidget(this->mSpinboxes.at(i));
-    this->mSpinboxes.at(i)->setMinimumHeight(20);
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
-    this->mSpinboxes.at(i)->setValue(parameter->get().at(i));
-    QObject::connect(this->mSpinboxes.at(i), SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
   }
 }
 
