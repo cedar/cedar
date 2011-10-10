@@ -86,6 +86,7 @@ void cedar::proc::gui::PropertyPane::resetContents()
 {
   this->clearContents();
   this->setRowCount(0);
+  this->mParameterRowIndex.clear();
 }
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
@@ -176,6 +177,9 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr
     p_widget->setEnabled(!parameter->isConstant());
     this->setCellWidget(row, 1, p_widget);
     this->resizeRowToContents(row);
+
+    this->mParameterRowIndex[p_widget] = row;
+    QObject::connect(p_widget, SIGNAL(heightChanged()), this, SLOT(rowSizeChanged()));
   }
 }
 
@@ -193,6 +197,21 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::proc::gui::EnumParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
+}
+
+void cedar::proc::gui::PropertyPane::rowSizeChanged()
+{
+  cedar::proc::gui::ParameterBase *p_parameter = dynamic_cast<cedar::proc::gui::ParameterBase*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_parameter != NULL);
+
+  CEDAR_DEBUG_ASSERT(this->mParameterRowIndex.find(p_parameter) != this->mParameterRowIndex.end());
+  int row = this->mParameterRowIndex.find(p_parameter)->second;
+
+  // the process-events call is only necessary because qt does otherwise not detect the new size properly.
+  // should this bug ever be fixed, this can be removed.
+  QApplication::processEvents();
+
+  this->resizeRowToContents(row);
 }
 
 void cedar::proc::gui::PropertyPane::redraw()

@@ -229,7 +229,7 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
 {
   try
   {
-    _mSigmas->get().at(dimension) = sigma;
+    _mSigmas->set(dimension, sigma);
   }
   catch(std::exception& e)
   {
@@ -247,7 +247,7 @@ void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
 {
   try
   {
-    _mShifts->get().at(dimension) = shift;
+    _mShifts->set(dimension, shift);
   }
   catch(std::exception& e)
   {
@@ -288,7 +288,7 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
 void cedar::aux::kernel::Gauss::updateDimensionality()
 {
   int new_dimensionality = static_cast<int>(_mDimensionality->get());
-  _mSigmas->get().resize(new_dimensionality, _mSigmas->getDefaultValue());
-  _mShifts->get().resize(new_dimensionality, _mShifts->getDefaultValue());
+  _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
+  _mShifts->resize(new_dimensionality, _mShifts->getDefaultValue());
   this->updateKernel();
 }

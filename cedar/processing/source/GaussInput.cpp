@@ -175,8 +175,8 @@ void cedar::proc::source::GaussInput::updateMatrix()
 void cedar::proc::source::GaussInput::updateDimensionality()
 {
   int new_dimensionality = static_cast<int>(_mDimensionality->get());
-  _mSigmas->get().resize(new_dimensionality, _mSigmas->getDefaultValue());
-  _mCenters->get().resize(new_dimensionality, _mCenters->getDefaultValue());
-  _mSizes->get().resize(new_dimensionality, _mSizes->getDefaultValue());
+  _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
+  _mCenters->resize(new_dimensionality, _mCenters->getDefaultValue());
+  _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
   this->updateMatrix();
 }

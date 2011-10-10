@@ -128,10 +128,10 @@ public:
     return this->mValues;
   }
 
-  std::vector<T>& get()
+  /*std::vector<T>& get()
   {
     return this->mValues;
-  }
+  }*/
 
   T getDefaultValue()
   {
@@ -150,6 +150,30 @@ public:
     {
       return this->mDefaultValue;
     }
+  }
+
+  size_t size() const
+  {
+    return this->mValues.size();
+  }
+
+  void resize(size_t size, const T& value = T())
+  {
+    this->mValues.resize(size, value);
+
+    this->emitPropertyChangedSignal();
+  }
+
+  const T& at(size_t index) const
+  {
+    //!@todo Range check.
+    return this->mValues.at(index);
+  }
+
+  void set(size_t index, const T& value)
+  {
+    //!@todo Range check.
+    this->mValues.at(index) = value;
   }
 
   const std::vector<T>& getDefaultValues() const

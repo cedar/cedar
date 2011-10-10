@@ -80,8 +80,12 @@ public:
 public slots:
   //!@brief handles a change of the associated parameter
   void parameterPointerChanged();
+
   //!@brief handles a change in the parameter
   void valueChanged(int value);
+
+  //!@brief Handles changes in the displayed parameter's properties.
+  void propertiesChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
