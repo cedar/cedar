@@ -360,6 +360,11 @@ void cedar::proc::gui::Ide::saveAs()
 
   if (!file.isEmpty())
   {
+    if (!file.endsWith(".json"))
+    {
+      file += ".json";
+    }
+
     this->mNetwork->save(file.toStdString());
     this->mpActionSave->setEnabled(true);
   }
