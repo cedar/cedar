@@ -96,6 +96,7 @@ public slots:
   void startThreads();
   void stopThreads();
 
+  void newFile();
   void save();
   void saveAs();
   void load();

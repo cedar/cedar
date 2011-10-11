@@ -180,8 +180,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>121</width>
+          <height>310</height>
          </rect>
         </property>
         <attribute name="label">
@@ -254,9 +254,6 @@
    <addaction name="mpActionSave"/>
   </widget>
   <action name="mpActionNew">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>New</string>
    </property>
