@@ -47,15 +47,14 @@
 
 // SYSTEM INCLUDES
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <string>
 #include <set>
 #include <map>
 #include <vector>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief This class associates names with pointers to certain objects.
  */
 template <class T, class T_Declaration>
 class cedar::proc::Registry
@@ -71,14 +70,16 @@ public:
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
-   typedef boost::shared_ptr<T> ObjectPointer;
-   typedef boost::shared_ptr<T_Declaration> DeclarationPointer;
-   typedef std::map<std::string, DeclarationPointer> Declarations;
-   typedef std::map<std::string, ObjectPointer> ObjectStorage;
+  typedef boost::shared_ptr<const T> ConstSharedObjectPointer;
+  typedef boost::shared_ptr<T> SharedObjectPointer;
+  typedef boost::weak_ptr<T> ObjectPointer;
+  typedef boost::shared_ptr<T_Declaration> DeclarationPointer;
+  typedef std::map<std::string, DeclarationPointer> Declarations;
+  typedef std::map<std::string, ObjectPointer> ObjectStorage;
 
-   typedef std::set<std::string> CategoryList;
-   typedef std::vector<DeclarationPointer> CategoryEntries;
-   typedef std::map<std::string, CategoryEntries> Categories;
+  typedef std::set<std::string> CategoryList;
+  typedef std::vector<DeclarationPointer> CategoryEntries;
+  typedef std::map<std::string, CategoryEntries> Categories;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -89,9 +90,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void registerObject(ObjectPointer object)
+  void registerObject(SharedObjectPointer object)
   {
-    if (this->mObjects.find(object->getName()) != this->mObjects.end())
+    if (this->mObjects.find(object->getName()) != this->mObjects.end() && this->mObjects[object->getName()].lock())
     {
       CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate object entry: " + object->getName());
     }
@@ -101,7 +102,7 @@ public:
 
   void renameObject(const std::string& oldName, const std::string& newName)
   {
-    ObjectPointer object = this->get(oldName);
+    SharedObjectPointer object = this->get(oldName);
 
     mObjects.erase(mObjects.find(oldName));
 
@@ -111,12 +112,14 @@ public:
 
   void updateObjectName(T* object)
   {
+    //!@todo It might be a good idea to clean up invalid pointers here.
     for (typename ObjectStorage::const_iterator iter = this->mObjects.begin(); iter != this->mObjects.end(); ++iter)
     {
-      if (iter->second.get() == object)
+      SharedObjectPointer object_ptr = iter->second.lock();
+      if (object_ptr && object_ptr.get() == object)
       {
         std::string old_name = iter->first;
-        ObjectPointer object_ptr = iter->second;
+        CEDAR_DEBUG_ASSERT(object_ptr);
         
         if (this->mObjects.find(object->getName()) != this->mObjects.end())
         {
@@ -133,28 +136,58 @@ public:
 
   void removeObject(const std::string& name)
   {
-    ObjectPointer object = this->get(name);
-
-    mObjects.erase(mObjects.find(name));
-  }
-
-  ObjectPointer get(const std::string& name)
-  {
     typename ObjectStorage::iterator iter = this->mObjects.find(name);
     if (iter != this->mObjects.end())
     {
-      return iter->second;
+      this->mObjects.erase(iter);
     }
     else
     {
       CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown object: " + name);
-      return ObjectPointer();
     }
   }
 
-  ObjectPointer createInstance(const std::string& classId, const std::string& name)
+  SharedObjectPointer get(const std::string& name)
   {
-    ObjectPointer object = this->allocateClass(classId);
+    typename ObjectStorage::iterator iter = this->mObjects.find(name);
+    if (iter != this->mObjects.end())
+    {
+      if (!iter->second.lock())
+      {
+        // object has been deleted, remove it
+        this->removeObject(name);
+        CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown object: " + name);
+        return SharedObjectPointer();
+      }
+      else
+      {
+        return iter->second.lock();
+      }
+    }
+    else
+    {
+      CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown object: " + name);
+      return SharedObjectPointer();
+    }
+  }
+
+  ConstSharedObjectPointer get(const std::string& name) const
+  {
+    typename ObjectStorage::const_iterator iter = this->mObjects.find(name);
+    if (iter != this->mObjects.end() && iter->second.lock())
+    {
+      return iter->second.lock();
+    }
+    else
+    {
+      CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown object: " + name);
+      return SharedObjectPointer();
+    }
+  }
+
+  SharedObjectPointer createInstance(const std::string& classId, const std::string& name)
+  {
+    SharedObjectPointer object = this->allocateClass(classId);
     object->setName(name);
     this->registerObject(object);
     return object;
@@ -200,7 +233,7 @@ public:
     }
   }
 
-  DeclarationPointer getDeclarationOf(ObjectPointer object)
+  DeclarationPointer getDeclarationOf(SharedObjectPointer object)
   {
     for (typename std::map<std::string, DeclarationPointer>::iterator iter = this->mDeclarations.begin();
          iter != mDeclarations.end();
@@ -217,7 +250,17 @@ public:
 
   bool testExists(const std::string& name) const
   {
-    return this->mObjects.find(name) != this->mObjects.end();
+    try
+    {
+      this->get(name);
+      return true;
+    }
+    catch(const cedar::proc::InvalidNameException&)
+    {
+      return false;
+    }
+    // This should never happen.
+    CEDAR_ASSERT(false);
   }
 
   const Declarations& declarations() const
@@ -229,7 +272,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  ObjectPointer allocateClass(const std::string& classId) const
+  SharedObjectPointer allocateClass(const std::string& classId) const
   {
     typename std::map<std::string, DeclarationPointer>::const_iterator iter;
     iter = mDeclarations.find(classId);

@@ -200,8 +200,8 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkFilePtr network)
 {
   //!@todo Properly handle removing of steps here; maybe by changing to weak-pointers in the manager?
-  this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->reset();
+  this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
   this->mNetwork->addToScene();
 }
@@ -384,6 +384,7 @@ void cedar::proc::gui::Ide::load()
 
   if (!file.isEmpty())
   {
+    this->newFile();
     cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
     network->load(file.toStdString());
     this->mpActionSave->setEnabled(true);
