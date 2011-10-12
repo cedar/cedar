@@ -103,6 +103,10 @@ void cedar::proc::gui::UIntVectorParameter::propertyChanged()
       this->mSpinboxes.push_back(p_widget);
       this->layout()->addWidget(p_widget);
       p_widget->setMinimumHeight(20);
+
+      // the limits have to be set here already so the value is set properly.
+      this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
+      this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
       p_widget->setValue(parameter->get().at(i));
       QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
     }
@@ -128,6 +132,7 @@ void cedar::proc::gui::UIntVectorParameter::valueChanged(int)
   {
     values.at(i) = this->mSpinboxes.at(i)->value();
   }
+
   parameter->set(values);
 }
 
