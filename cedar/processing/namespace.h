@@ -92,6 +92,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES(TriggerRegistry);
 
     /* Exceptions */
+    class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;

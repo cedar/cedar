@@ -74,6 +74,10 @@ mState(cedar::proc::Step::STATE_NONE),
 mRegisteredAt(NULL),
 mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
+#ifdef DEBUG
+  std::cout << "> allocated data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
+#endif
+
   this->addTrigger(mFinished);
 
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -81,6 +85,9 @@ mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 
 cedar::proc::Step::~Step()
 {
+#ifdef DEBUG
+  std::cout << "> freeing data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
+#endif
   if (mpArgumentsLock != NULL)
   {
     delete mpArgumentsLock;

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Processing IDE</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -254,9 +254,6 @@
    <addaction name="mpActionSave"/>
   </widget>
   <action name="mpActionNew">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>New</string>
    </property>

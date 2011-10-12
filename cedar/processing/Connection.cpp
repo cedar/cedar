@@ -40,6 +40,7 @@
 #include "processing/Connection.h"
 #include "processing/Step.h"
 #include "processing/Trigger.h"
+#include "processing/exceptions.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -61,6 +62,9 @@ mSourceName(sourceName),
 mTarget(target),
 mTargetName(targetName)
 {
+#ifdef DEBUG
+  std::cout << "> allocated data (Connection, " << this << ")" << std::endl;
+#endif
   cedar::proc::Step::connect(source, sourceName, target, targetName);
 }
 
@@ -72,9 +76,12 @@ cedar::proc::Connection::Connection(
 mTrigger(source),
 mTarget(target)
 {
-  if (!mTrigger->isListener(mTarget))
+#ifdef DEBUG
+  std::cout << "> allocated data (Connection, " << this << ")" << std::endl;
+#endif
+  if (!source->isListener(target))
   {
-    mTrigger->addListener(mTarget);
+    source->addListener(target);
   }
 //  cedar::proc::Step::connect(source, sourceName, target, targetName);
 }
@@ -87,34 +94,89 @@ cedar::proc::Connection::Connection(
 mTrigger(source),
 mTargetTrigger(target)
 {
-  if (!mTrigger->isListener(mTargetTrigger))
+#ifdef DEBUG
+  std::cout << "> allocated data (Connection, " << this << ")" << std::endl;
+#endif
+  if (!source->isListener(target))
   {
-    mTrigger->addTrigger(mTargetTrigger);
+    source->addTrigger(target);
   }
 //  cedar::proc::Step::connect(source, sourceName, target, targetName);
 }
+
+cedar::proc::Connection::~Connection()
+{
+#ifdef DEBUG
+  std::cout << "> freeing data (Connection, " << this << ")" << std::endl;
+#endif
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::proc::Connection::isValid() const
+{
+  try
+  {
+    this->getSourceTrigger();
+    this->getTargetTrigger();
+    this->getSource();
+    this->getTarget();
+    return true;
+  }
+  catch (const cedar::proc::ConnectionMemberDeletedException&)
+  {
+    return false;
+  }
+}
+
 cedar::proc::ConstTriggerPtr cedar::proc::Connection::getSourceTrigger() const
 {
-  return this->mTrigger;
+  try
+  {
+    return cedar::proc::ConstTriggerPtr(this->mTrigger);
+  }
+  catch (boost::bad_weak_ptr)
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "The source trigger of the connection no longer exists.");
+  }
 }
 
 cedar::proc::ConstTriggerPtr cedar::proc::Connection::getTargetTrigger() const
 {
-  return this->mTargetTrigger;
+  try
+  {
+    return cedar::proc::ConstTriggerPtr(this->mTargetTrigger);
+  }
+  catch (boost::bad_weak_ptr)
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "The target trigger of the connection no longer exists.");
+  }
 }
 
 cedar::proc::StepPtr cedar::proc::Connection::getSource()
 {
-  return this->mSource;
+  try
+  {
+    return cedar::proc::StepPtr(this->mSource);
+  }
+  catch (boost::bad_weak_ptr)
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "The source step of the connection no longer exists.");
+  }
 }
 
 cedar::proc::ConstStepPtr cedar::proc::Connection::getSource() const
 {
-  return this->mSource;
+  try
+  {
+    return cedar::proc::ConstStepPtr(this->mSource);
+  }
+  catch (boost::bad_weak_ptr)
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "The source step of the connection no longer exists.");
+  }
 }
 
 const std::string& cedar::proc::Connection::getSourceName() const
@@ -124,12 +186,26 @@ const std::string& cedar::proc::Connection::getSourceName() const
 
 cedar::proc::StepPtr cedar::proc::Connection::getTarget()
 {
-  return this->mTarget;
+  try
+  {
+    return cedar::proc::StepPtr(this->mTarget);
+  }
+  catch (boost::bad_weak_ptr)
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "The source step of the connection no longer exists.");
+  }
 }
 
 cedar::proc::ConstStepPtr cedar::proc::Connection::getTarget() const
 {
-  return this->mTarget;
+  try
+  {
+    return cedar::proc::ConstStepPtr(this->mTarget);
+  }
+  catch (boost::bad_weak_ptr)
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "The source step of the connection no longer exists.");
+  }
 }
 
 const std::string& cedar::proc::Connection::getTargetName() const
@@ -139,12 +215,12 @@ const std::string& cedar::proc::Connection::getTargetName() const
 
 bool cedar::proc::Connection::contains(cedar::proc::StepPtr step)
 {
-  return (mSource == step || mTarget == step);
+  return (this->getSource() == step || this->getTarget() == step);
 }
 
 bool cedar::proc::Connection::contains(cedar::proc::TriggerPtr trigger)
 {
-  return (mTrigger == trigger || mTargetTrigger == trigger);
+  return (this->getSourceTrigger() == trigger || this->getTargetTrigger() == trigger);
 }
 
 /*! This function removes the connection, i.e., the end result is that there is no longer a connection between the
@@ -152,18 +228,23 @@ bool cedar::proc::Connection::contains(cedar::proc::TriggerPtr trigger)
  */
 void cedar::proc::Connection::deleteConnection()
 {
-  if (mSource)
+  cedar::proc::StepPtr p_source_step = this->getSource();
+  cedar::proc::StepPtr p_target_step = this->getTarget();
+  cedar::proc::TriggerPtr p_source_trigger = mTrigger.lock();
+  cedar::proc::TriggerPtr p_target_trigger = mTargetTrigger.lock();
+
+  if (p_source_step)
   {
-    mTarget->freeInput(mTargetName);
-    mSource->getFinishedTrigger()->removeListener(mTarget);
+    p_target_step->freeInput(mTargetName);
+    p_source_step->getFinishedTrigger()->removeListener(p_target_step);
   }
-  else if (mTrigger && mTarget)
+  else if (p_source_trigger && p_target_step)
   {
-    mTrigger->removeListener(mTarget);
+    p_source_trigger->removeListener(p_target_step);
   }
-  else if (mTrigger && mTargetTrigger)
+  else if (mTrigger.lock() && p_target_trigger)
   {
-    mTrigger->removeTrigger(mTargetTrigger);
+    p_source_trigger->removeTrigger(p_target_trigger);
   }
   else
   {
