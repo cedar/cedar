@@ -40,6 +40,7 @@
 string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)
 
 # Qt
+message("Searching for Qt...")
 find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
 include(${QT_USE_FILE})
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
@@ -52,12 +53,15 @@ else (${CMAKE_BUILD_STATIC_LIBS})
   set(Boost_USE_STATIC_LIBS OFF)
 endif (${CMAKE_BUILD_STATIC_LIBS})
 
+message("Searching for boost...")
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.40.0 COMPONENTS system date_time filesystem)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
 
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
+  message("Found the following boost libraries: ${Boost_LIBRARIES}")
+  message("Found boost includes at ${Boost_INCLUDE_DIRS}")
 endif()
 
 # OpenCV
