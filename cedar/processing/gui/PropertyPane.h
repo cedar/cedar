@@ -96,8 +96,6 @@ public:
   DataWidgetTypes& dataWidgetTypes();
 
 public slots:
-  void redraw();
-
   void resetPointer();
 
   void rowSizeChanged();
@@ -127,8 +125,8 @@ protected:
   // none yet
 private:
   static DataWidgetTypes mDataWidgetTypes;
-  cedar::proc::StepPtr mDisplayedStep;
-  cedar::proc::TriggerPtr mDisplayedTrigger;
+  //!@todo this should be one configurable pointer
+  boost::weak_ptr<cedar::aux::Configurable> mDisplayedConfigurable;
 
   std::map<cedar::proc::gui::ParameterBase*, int> mParameterRowIndex;
 
