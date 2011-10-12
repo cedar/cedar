@@ -119,11 +119,25 @@ bool cedar::proc::Connection::isValid() const
 {
   try
   {
-    this->getSourceTrigger();
-    this->getTargetTrigger();
-    this->getSource();
-    this->getTarget();
-    return true;
+    if (this->mSource.lock() && this->mTarget.lock())
+    {
+      this->getSource();
+      this->getTarget();
+      return true;
+    }
+    else if (this->mTrigger.lock() && this->mTargetTrigger.lock())
+    {
+      this->getSourceTrigger();
+      this->getTargetTrigger();
+      return true;
+    }
+    else if (this->mTrigger.lock() && this->mTarget.lock())
+    {
+      this->getSourceTrigger();
+      this->getTarget();
+      return true;
+    }
+    return false;
   }
   catch (const cedar::proc::ConnectionMemberDeletedException&)
   {
