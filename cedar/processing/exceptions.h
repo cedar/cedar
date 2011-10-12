@@ -131,4 +131,13 @@ public:
   }
 }; // class cedar::proc::ConnectionNotFoundException
 
+class cedar::proc::ConnectionMemberDeletedException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  ConnectionMemberDeletedException()
+  {
+    this->mType = "ConnectionMemberDeletedException";
+  }
+}; // class cedar::proc::ConnectionMemberDeletedException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

@@ -79,6 +79,9 @@ public:
               cedar::proc::TriggerPtr target
             );
 
+  //!@brief The destructor.
+  ~Connection();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,6 +104,8 @@ public:
   cedar::proc::ConstTriggerPtr getSourceTrigger() const;
   cedar::proc::ConstTriggerPtr getTargetTrigger() const;
 
+  bool isValid() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,11 +122,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::proc::TriggerPtr mTrigger;
-  cedar::proc::TriggerPtr mTargetTrigger;
-  cedar::proc::StepPtr mSource;
+  boost::weak_ptr<cedar::proc::Trigger> mTrigger;
+  boost::weak_ptr<cedar::proc::Trigger> mTargetTrigger;
+  boost::weak_ptr<cedar::proc::Step> mSource;
   std::string mSourceName;
-  cedar::proc::StepPtr mTarget;
+  boost::weak_ptr<cedar::proc::Step> mTarget;
   std::string mTargetName;
 private:
   // none yet

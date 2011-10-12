@@ -252,6 +252,34 @@ void cedar::proc::Manager::getConnections(
   }
 }
 
+/*!
+ *  Connections are considered dead if one of their participants is no longer valid, i.e., if the object has been
+ *  deleted.
+ */
+void cedar::proc::Manager::cleanupConnections()
+{
+  std::vector<cedar::proc::Connection*>::iterator iter = this->mConnections.begin();
+  while (iter != this->mConnections.end())
+  {
+    if (*iter == NULL || !(*iter)->isValid() )
+    {
+      /* The assignment of iter here is sort of like calling iter++, except when erasing, iter++ would not return a
+       * valid iterator. */
+
+      if (*iter != NULL)
+      {
+        delete *iter;
+      }
+
+      iter = this->mConnections.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+}
+
 void cedar::proc::Manager::connect(
                                     cedar::proc::StepPtr source,
                                     const std::string& sourceName,
@@ -259,6 +287,7 @@ void cedar::proc::Manager::connect(
                                     const std::string& targetName
                                   )
 {
+  this->cleanupConnections();
   mConnections.push_back(new cedar::proc::Connection(source,sourceName, target,targetName));
 }
 
@@ -269,6 +298,8 @@ void cedar::proc::Manager::disconnect(
                                        const std::string& targetName
                                      )
 {
+  this->cleanupConnections();
+
   // get the iterator of the connection
   cedar::proc::Connection* p_connection;
   std::vector<cedar::proc::Connection*>::iterator iter = this->mConnections.begin();
@@ -299,6 +330,8 @@ void cedar::proc::Manager::connect(
                                     cedar::proc::StepPtr target
                                   )
 {
+  this->cleanupConnections();
+
   mConnections.push_back(new cedar::proc::Connection(trigger, target));
 }
 
@@ -307,11 +340,15 @@ void cedar::proc::Manager::connect(
                                     cedar::proc::TriggerPtr target
                                   )
 {
+  this->cleanupConnections();
+
   mConnections.push_back(new cedar::proc::Connection(trigger, target));
 }
 
 void cedar::proc::Manager::disconnect(cedar::proc::StepPtr deletedStep)
 {
+  this->cleanupConnections();
+
   std::vector<cedar::proc::Connection*> to_delete;
   // find entries containing the deleted step
   for (size_t i = 0; i < mConnections.size(); ++i)
@@ -331,6 +368,8 @@ void cedar::proc::Manager::disconnect(cedar::proc::StepPtr deletedStep)
 
 void cedar::proc::Manager::disconnect(cedar::proc::TriggerPtr deletedTrigger)
 {
+  this->cleanupConnections();
+
   std::vector<cedar::proc::Connection*> to_delete;
   // find entries containing the deleted step
   for (size_t i = 0; i < mConnections.size(); ++i)
@@ -350,6 +389,8 @@ void cedar::proc::Manager::disconnect(cedar::proc::TriggerPtr deletedTrigger)
 
 void cedar::proc::Manager::deleteConnection(cedar::proc::Connection* connection)
 {
+  this->cleanupConnections();
+
   std::vector<cedar::proc::Connection*>::iterator it = std::find(mConnections.begin(), mConnections.end(), connection);
   if (it != mConnections.end())
   {
@@ -359,12 +400,16 @@ void cedar::proc::Manager::deleteConnection(cedar::proc::Connection* connection)
 
 void cedar::proc::Manager::removeStep(cedar::proc::StepPtr step)
 {
+  this->cleanupConnections();
+
   this->steps().removeObject(step->getName());
   this->disconnect(step);
 }
 
 void cedar::proc::Manager::removeTrigger(cedar::proc::TriggerPtr trigger)
 {
+  this->cleanupConnections();
+
   this->triggers().removeObject(trigger->getName());
   this->disconnect(trigger);
   cedar::proc::LoopedTriggerPtr looped_trigger = boost::shared_dynamic_cast<cedar::proc::LoopedTrigger>(trigger);
