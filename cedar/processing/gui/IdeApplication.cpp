@@ -58,7 +58,7 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL)
 {
-#ifndef MSVC
+#ifdef LINUX
   cedar::dyn::initialize();
 #endif // MSVC
 

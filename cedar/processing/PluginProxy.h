@@ -113,7 +113,7 @@ private:
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
-#ifdef LINUX
+#ifdef UNIX
   void *mpLibHandle;
 #elif defined WINDOWS
   HMODULE mpLibHandle;
