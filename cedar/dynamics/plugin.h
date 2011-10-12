@@ -41,7 +41,7 @@
 #include "dynamics/lib.h"
 #include "processing/PluginDeclaration.h"
 
-#ifdef MSVC // workaround for circular linking
+#ifndef LINUX // workaround for circular linking
 //!@todo Do this for GCC/linux as well?
 CEDAR_BEGIN_PLUGIN_DECLARATION
 

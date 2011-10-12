@@ -85,6 +85,8 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
 {
 #ifdef LINUX
   QString filter = "Plugins (*.so)";
+#elif defined APPLE
+  QString filter = "Plugins (*.dylib)";
 #elif defined WINDOWS
   QString filter = "Plugins (*.dll)";
 #endif
