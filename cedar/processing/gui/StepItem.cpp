@@ -97,10 +97,16 @@ void cedar::proc::gui::StepItem::construct()
   p_effect->setBlurRadius(5.0);
   p_effect->setOffset(3.0, 3.0);
   this->setGraphicsEffect(p_effect);
+#ifdef DEBUG
+  std::cout << "> allocated data (cedar::proc::gui::StepItem, " << this << ")" << std::endl;
+#endif // DEBUG
 }
 
 cedar::proc::gui::StepItem::~StepItem()
 {
+#ifdef DEBUG
+  std::cout << "> freeing data (cedar::proc::gui::StepItem, " << this << ")" << std::endl;
+#endif // DEBUG
 }
 
 //----------------------------------------------------------------------------------------------------------------------

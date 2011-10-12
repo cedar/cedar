@@ -65,10 +65,21 @@
 
 cedar::proc::Network::Network()
 {
+#ifdef DEBUG
+  std::cout << "> allocated data (cedar::proc::Network, " << this << ")" << std::endl;
+#endif // DEBUG
 }
 
 cedar::proc::Network::~Network()
 {
+#ifdef DEBUG
+  std::cout << "> freeing data (cedar::proc::Network, " << this << ")" << std::endl;
+
+  for (size_t i = 0; i < this->steps().size(); ++i)
+  {
+    std::cout << "> [freeing data] Use count of step " << this->mSteps[i] << " is " << this->mSteps[i].use_count() << std::endl;
+  }
+#endif // DEBUG
 }
 
 //----------------------------------------------------------------------------------------------------------------------

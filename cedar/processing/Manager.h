@@ -162,6 +162,9 @@ private:
    * will become invalid, so watch out.*/
   void deleteConnection(cedar::proc::Connection* connection);
 
+  //!@brief Removes any "dead" connections from the manager.
+  void cleanupConnections();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

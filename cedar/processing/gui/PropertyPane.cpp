@@ -95,8 +95,8 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 
   std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
   this->addLabelRow(label);
-  this->display(boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pStep));
-  mDisplayedStep = pStep;
+  this->mDisplayedConfigurable = pStep;
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
 }
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
@@ -105,9 +105,8 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
 
   std::string label = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(pTrigger)->getClassId();
   this->addLabelRow(label);
-  this->display(boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));
-
-  this->mDisplayedTrigger = pTrigger;
+  this->mDisplayedConfigurable = pTrigger;
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable)); // boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));
 }
 
 void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
@@ -214,22 +213,9 @@ void cedar::proc::gui::PropertyPane::rowSizeChanged()
   this->resizeRowToContents(row);
 }
 
-void cedar::proc::gui::PropertyPane::redraw()
-{
-  if (mDisplayedStep)
-  {
-    this->display(mDisplayedStep);
-  }
-  else if (mDisplayedTrigger)
-  {
-    this->display(mDisplayedTrigger);
-  }
-}
-
 void cedar::proc::gui::PropertyPane::resetPointer()
 {
-  this->mDisplayedStep.reset();
-  this->mDisplayedTrigger.reset();
+  this->mDisplayedConfigurable.reset();
   this->clearContents();
   this->setRowCount(0);
 }
