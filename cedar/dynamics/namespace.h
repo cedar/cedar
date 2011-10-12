@@ -70,7 +70,7 @@ namespace cedar
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
 
-#ifdef GCC
+#ifdef LINUX
     // for msvc, this is replaced by the plugin stuff below, currently as a workaround.
     CEDAR_DYN_LIB_EXPORT void initialize();
 #endif // GCC

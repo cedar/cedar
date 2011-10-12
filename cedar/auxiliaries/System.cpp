@@ -40,7 +40,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#ifdef LINUX
+#if defined LINUX || defined APPLE
 #include <stdlib.h>
 #endif
 
@@ -63,7 +63,7 @@ QReadWriteLock cedar::aux::System::mCOutLock;
 
 std::string cedar::aux::System::getUserHomeDirectory()
 {
-#ifdef LINUX
+#if defined LINUX || defined APPLE
   std::string homedir = getenv("HOME");
   return homedir;
 #elif defined WINDOWS
@@ -87,7 +87,7 @@ std::string cedar::aux::System::getUserHomeDirectory()
 
 std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-#ifdef LINUX
+#if defined LINUX || defined APPLE
   return cedar::aux::System::getUserHomeDirectory();
 #elif defined WINDOWS
   LPWSTR path = NULL;

@@ -43,7 +43,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#ifdef LINUX
+#ifdef UNIX
 #include <dlfcn.h>
 #elif defined WINDOWS
 #include <Windows.h>
@@ -126,7 +126,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
-#ifdef LINUX
+#ifdef UNIX
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)
   {
