@@ -129,6 +129,8 @@ public:
 
   cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation();
 
+  cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -176,6 +178,9 @@ private:
 
   //!@brief Directory, where the PluginLoadDialog is supposed to open.
   cedar::aux::DirectoryParameterPtr mPluginLoadDialogLocation;
+
+  //!@brief Directory, where the load dialog for architectures is supposed to open.
+  cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;
 
 }; // class cedar::proc::gui::Settings
 
