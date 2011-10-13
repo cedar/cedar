@@ -38,6 +38,7 @@
 #include "processing/gui/Settings.h"
 #include "auxiliaries/Configurable.h"
 #include "auxiliaries/SetParameter.h"
+#include "auxiliaries/DirectoryParameter.h"
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/System.h"
 
@@ -86,6 +87,10 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
 
+  cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
+  this->addConfigurableChild("fileHistory", recent_files);
+  this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr(new cedar::aux::DirectoryParameter(recent_files.get(), "lastPluginLoadDialogLocation", ""));
+
   this->load();
 }
 
@@ -104,6 +109,11 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastPluginLoadDialogLocation()
+{
+  return this->mPluginLoadDialogLocation;
+}
 
 void cedar::proc::gui::Settings::storeMainWindow(QMainWindow *pWindow)
 {

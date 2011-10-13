@@ -127,6 +127,8 @@ public:
   //!@brief restores a state of the main window
   void restoreMainWindow(QMainWindow *pWindow);
 
+  cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -171,6 +173,9 @@ private:
   cedar::aux::StringParameterPtr mMainWindowGeometry;
   //!@brief list of bytes coming from Qt (minimized, maximized, ...)
   cedar::aux::StringParameterPtr mMainWindowState;
+
+  //!@brief Directory, where the PluginLoadDialog is supposed to open.
+  cedar::aux::DirectoryParameterPtr mPluginLoadDialogLocation;
 
 }; // class cedar::proc::gui::Settings
 
