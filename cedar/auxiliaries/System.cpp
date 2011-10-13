@@ -63,7 +63,7 @@ QReadWriteLock cedar::aux::System::mCOutLock;
 
 std::string cedar::aux::System::getUserHomeDirectory()
 {
-#if defined LINUX || defined APPLE
+#ifdef UNIX
   std::string homedir = getenv("HOME");
   return homedir;
 #elif defined WINDOWS
@@ -87,7 +87,7 @@ std::string cedar::aux::System::getUserHomeDirectory()
 
 std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-#if defined LINUX || defined APPLE
+#ifdef UNIX
   return cedar::aux::System::getUserHomeDirectory();
 #elif defined WINDOWS
   LPWSTR path = NULL;

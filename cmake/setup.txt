@@ -94,13 +94,18 @@ add_definitions(-D CEDAR_LOG_DIR=\\"${CEDAR_LOG_DIR}/\\")
 
 if (UNIX)
   add_definitions(-DUNIX -D__UNIX__)
+  message("-- defined the UNIX constants.")
 endif (UNIX)
+
 if (APPLE)
   add_definitions(-DAPPLE -D__APPLE__)
+  message("-- defined the APPLE constants.")
 endif (APPLE)
-if (LINUX)
+
+if ("${CMAKE_SYSTEM}" MATCHES "Linux")
   add_definitions(-DLINUX -D__LINUX__)
-endif (LINUX) 
+  message("-- defined the LINUX constants.")
+endif ("${CMAKE_SYSTEM}" MATCHES "Linux")
 
 
 if (WIN32)
