@@ -90,6 +90,7 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);
   this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr(new cedar::aux::DirectoryParameter(recent_files.get(), "lastPluginLoadDialogLocation", ""));
+  this->mArchitectureLoadDialogDirectory = cedar::aux::DirectoryParameterPtr(new cedar::aux::DirectoryParameter(recent_files.get(), "lastArchitectureLoadDialogDirectory", ""));
 
   this->load();
 }
@@ -109,6 +110,11 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureLoadDialogDirectory()
+{
+  return this->mArchitectureLoadDialogDirectory;
+}
 
 cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastPluginLoadDialogLocation()
 {

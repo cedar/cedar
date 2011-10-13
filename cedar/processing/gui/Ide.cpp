@@ -376,9 +376,11 @@ void cedar::proc::gui::Ide::saveAs()
 
 void cedar::proc::gui::Ide::load()
 {
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
-                                              "", // initial directory; //!@todo save/restore with window settings
+                                              last_dir->get().absolutePath(), // initial directory
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
@@ -389,6 +391,9 @@ void cedar::proc::gui::Ide::load()
     network->load(file.toStdString());
     this->mpActionSave->setEnabled(true);
     this->resetTo(network);
+
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    last_dir->set(path);
   }
 }
 
