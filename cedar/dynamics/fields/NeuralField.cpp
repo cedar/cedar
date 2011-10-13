@@ -105,6 +105,7 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
 cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
                                                          (
                                                            cedar::proc::ConstDataSlotPtr slot,
