@@ -43,7 +43,7 @@
 #include "dynamics/SpaceCode.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/DataT.h"
+#include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/math/Sigmoid.h"
 #include "auxiliaries/math/AbsSigmoid.h"
 #include "auxiliaries/kernel/Gauss.h"

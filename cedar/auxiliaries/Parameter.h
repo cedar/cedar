@@ -43,94 +43,78 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Base.h"
+#include "auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
+#include <QObject>
+
+// Functions for boost intrusive pointer.
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
+extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
+
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-template <typename T>
-class cedar::aux::Parameter : public cedar::aux::ParameterBase
+class cedar::aux::Parameter : public QObject, public cedar::aux::Base
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend void ::intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
+  friend void ::intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  Parameter(cedar::aux::Configurable *pOwner, const std::string& name, const T& defaultValue)
-  :
-  cedar::aux::ParameterBase(pOwner, name, true),
-  mValue(defaultValue),
-  mDefault(defaultValue)
-  {
-  }
-
-  Parameter(cedar::aux::Configurable *pOwner, const std::string& name)
-  :
-  cedar::aux::ParameterBase(pOwner, name, false)
-  {
-  }
+  //!@brief The standard constructor.
+  Parameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault = true);
 
   //!@brief Destructor
-  ~Parameter()
-  {
-  }
+  virtual ~Parameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const T& getValue() const
-  {
-    return this->mValue;
-  }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
-  {
-    root.put(this->getName(), this->mValue);
-  }
+  bool getReadAutomatically() const;
+  void setReadAutomatically(bool value);
 
-  void set(const T& value)
-  {
-    this->mValue = value;
-    emit valueChanged();
-  }
+  bool getHasDefault() const;
+  void setHasDefault(bool value);
 
-  void setTo(const cedar::aux::ConfigurationNode& node)
-  {
-#ifdef DEBUG
-    try
-    {
-#endif
-      this->mValue = node.get_value<T>();
-#ifdef DEBUG
-    }
-    catch (const boost::property_tree::ptree_bad_path& e)
-    {
-      std::cout << "Error while setting parameter to value: " << e.what() << std::endl;
-    }
-#endif
-  }
+  bool isConstant() const;
+  void setConstant(bool value);
 
-  void makeDefault()
-  {
-    this->set(mDefault);
-  }
+  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
+  virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
+  virtual void makeDefault() = 0;
+
+  bool isHidden() const;
+  void setHidden(bool hide);
+
+  void emitChangedSignal();
+  void emitPropertyChangedSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+  signals:
+    void valueChanged();
+    void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -141,16 +125,26 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  //! The current parameter value.
-  T mValue;
+  //! The owner of this parameter, i.e., the object using it.
+  cedar::aux::Configurable *mpOwner;
 
-  //! The default value of the parameter. Ignored if mHasDefault is false.
-  T mDefault;
+  //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
+  bool mAutoRead;
+
+  //! Whether a default value should be set
+  bool mHasDefault;
+
+  //! Whether this parameter can be changed during runtime.
+  bool mConstant;
+
+  //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
+  bool mIsHidden;
+
+  //! Reference counter for boost intrusive pointer.
+  unsigned int mReferenceCount;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

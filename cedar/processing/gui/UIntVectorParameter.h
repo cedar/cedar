@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
-#include "processing/gui/ParameterBase.h"
+#include "processing/gui/Parameter.h"
 
 // PROJECT INCLUDES
 
@@ -58,7 +58,7 @@
  *       where, e.g., ParameterType = UIntVector and WidgetType = QSpinBox. Otherwise, a lot of code might get
  *       duplicated
  */
-class cedar::proc::gui::UIntVectorParameter : public cedar::proc::gui::ParameterBase
+class cedar::proc::gui::UIntVectorParameter : public cedar::proc::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

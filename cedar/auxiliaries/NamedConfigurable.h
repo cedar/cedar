@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/Configurable.h"
 
 // PROJECT INCLUDES

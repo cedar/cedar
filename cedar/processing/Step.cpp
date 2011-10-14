@@ -45,7 +45,7 @@
 #include "processing/Manager.h"
 #include "processing/exceptions.h"
 #include "auxiliaries/Data.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/macros.h"
 #include "auxiliaries/System.h"
 

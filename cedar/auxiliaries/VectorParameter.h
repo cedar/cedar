@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
@@ -57,7 +57,7 @@
  * More detailed description of the class.
  */
 template <typename T>
-class cedar::aux::VectorParameter : public cedar::aux::ParameterBase
+class cedar::aux::VectorParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // typedef
@@ -73,13 +73,13 @@ public:
   //!@brief The standard constructor.
   VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::ParameterBase(pOwner, name, false)
+  cedar::aux::Parameter(pOwner, name, false)
   {
   }
 
   VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::vector<T>& defaults)
   :
-  cedar::aux::ParameterBase(pOwner, name, true),
+  cedar::aux::Parameter(pOwner, name, true),
   mDefaults(defaults),
   mSize(0)
   {
@@ -88,7 +88,7 @@ public:
 
   VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, size_t size, T defaultValue)
   :
-  cedar::aux::ParameterBase(pOwner, name, true),
+  cedar::aux::Parameter(pOwner, name, true),
   mSize(size),
   mDefaultValue(defaultValue)
   {

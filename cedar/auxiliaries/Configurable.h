@@ -57,13 +57,13 @@ class cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::ParameterBase;
+  friend class cedar::aux::Parameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros and types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::list<cedar::aux::ParameterBasePtr> ParameterList;
+  typedef std::list<cedar::aux::ParameterPtr> ParameterList;
   typedef std::map<std::string, ParameterList::iterator> ParameterMap;
   typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
+  void registerParameter(cedar::aux::ParameterPtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

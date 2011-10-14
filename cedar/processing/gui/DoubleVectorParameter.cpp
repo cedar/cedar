@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/DoubleVectorParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -56,7 +56,7 @@
 
 cedar::proc::gui::DoubleVectorParameter::DoubleVectorParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QVBoxLayout());
   this->layout()->setContentsMargins(0, 0, 0, 0);

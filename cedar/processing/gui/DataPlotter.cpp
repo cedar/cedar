@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/DataPlotter.h"
-#include "auxiliaries/DataT.h"
+#include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/ImageData.h"
 #include "auxiliaries/gui/MatrixPlot.h"
 #include "auxiliaries/gui/ImagePlot.h"

@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/BoolParameter.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,7 @@
 
 cedar::proc::gui::BoolParameter::BoolParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpCheckBox = new QCheckBox();
