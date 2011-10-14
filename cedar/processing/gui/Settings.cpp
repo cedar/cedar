@@ -142,7 +142,7 @@ void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::stri
   std::vector<std::string> new_order;
   if (!this->mRecentArchitectureFiles->contains(filePath))
   {
-    new_order = this->mRecentArchitectureFiles->get();
+    new_order = this->mRecentArchitectureFiles->getValue();
     new_order.push_back(filePath);
   }
   else
@@ -194,14 +194,14 @@ void cedar::proc::gui::Settings::storeMainWindow(QMainWindow *pWindow)
 
 void cedar::proc::gui::Settings::restoreMainWindow(QMainWindow *pWindow)
 {
-  QByteArray window_state_hex(mMainWindowState->get().c_str());
+  QByteArray window_state_hex(mMainWindowState->getValue().c_str());
   QByteArray window_state = QByteArray::fromHex(window_state_hex);
   if (!pWindow->restoreState(window_state))
   {
     std::cout << "Could not restore state of the main window." << std::endl;
   }
   
-  QByteArray window_geometry_hex(mMainWindowGeometry->get().c_str());
+  QByteArray window_geometry_hex(mMainWindowGeometry->getValue().c_str());
   QByteArray window_geometry = QByteArray::fromHex(window_geometry_hex);
   if (!pWindow->restoreGeometry(window_geometry))
   {
@@ -217,8 +217,8 @@ void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
 
 void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)
 {
-  pDock->setVisible(this->mVisible->get());
-  pDock->setFloating(this->mFloating->get());
+  pDock->setVisible(this->mVisible->getValue());
+  pDock->setFloating(this->mFloating->getValue());
 }
 
 cedar::proc::gui::Settings::DockSettingsPtr cedar::proc::gui::Settings::logSettings()

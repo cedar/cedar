@@ -84,7 +84,7 @@ void cedar::proc::LoopedTrigger::loopModeChanged()
   switch (this->mLoopType->get())
   {
     case cedar::proc::LoopMode::FIXED:
-      this->setStepSize(this->mLoopTime->get());
+      this->setStepSize(this->mLoopTime->getValue());
     default:
     case cedar::proc::LoopMode::FIXED_ADAPTIVE:
       this->useFixedStepSize(true);
@@ -100,7 +100,7 @@ void cedar::proc::LoopedTrigger::loopModeChanged()
 
 void cedar::proc::LoopedTrigger::loopTimeChanged()
 {
-  this->setStepSize(this->mLoopTime->get());
+  this->setStepSize(this->mLoopTime->getValue());
 }
 
 void cedar::proc::LoopedTrigger::startTrigger()

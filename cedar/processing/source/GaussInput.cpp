@@ -95,9 +95,9 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
 void cedar::proc::source::GaussInput::updateMatrix()
 {
   std::vector<cv::Mat> kernel_parts;
-  const unsigned int& dimensionality = _mDimensionality->get();
-  const std::vector<double>& sigmas = _mSigmas->get();
-  const std::vector<unsigned int>& sizes_uint = _mSizes->get();
+  const unsigned int& dimensionality = _mDimensionality->getValue();
+  const std::vector<double>& sigmas = _mSigmas->getValue();
+  const std::vector<unsigned int>& sizes_uint = _mSizes->getValue();
   kernel_parts.resize(dimensionality);
   for (size_t dim = 0; dim < dimensionality; ++dim)
   {
@@ -106,10 +106,10 @@ void cedar::proc::source::GaussInput::updateMatrix()
     for (int row = 0; row < kernel_parts.at(dim).rows; ++row)
     {
       kernel_parts.at(dim).at<float>(row, 0)
-          = cedar::aux::math::gauss(static_cast<int>(row) - _mCenters->get().at(dim), sigmas.at(dim));
+          = cedar::aux::math::gauss(static_cast<int>(row) - _mCenters->at(dim), sigmas.at(dim));
     }
   }
-  kernel_parts.at(0) *= _mAmplitude->get();
+  kernel_parts.at(0) *= _mAmplitude->getValue();
   // assemble the input
   std::vector<int> sizes(static_cast<size_t>(dimensionality));
   for (unsigned int i = 0; i < dimensionality; i++)
@@ -174,7 +174,7 @@ void cedar::proc::source::GaussInput::updateMatrix()
 
 void cedar::proc::source::GaussInput::updateDimensionality()
 {
-  int new_dimensionality = static_cast<int>(_mDimensionality->get());
+  int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
   _mCenters->resize(new_dimensionality, _mCenters->getDefaultValue());
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());

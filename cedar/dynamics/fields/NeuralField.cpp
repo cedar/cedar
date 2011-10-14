@@ -147,13 +147,13 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
   const cv::Mat& kernel = this->mKernel->getKernel();
-  const double& h = mRestingLevel->get();
-  const double& tau = mTau->get();
-  const double& global_inhibition = mGlobalInhibition->get();
+  const double& h = mRestingLevel->getValue();
+  const double& tau = mTau->getValue();
+  const double& global_inhibition = mGlobalInhibition->getValue();
 
   sigmoid_u = mSigmoid->compute<float>(u);
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
-  if (this->_mDimensionality->get() < 3)
+  if (this->_mDimensionality->getValue() < 3)
   {
     mKernel->getReadWriteLock()->lockForRead();
     cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
@@ -186,23 +186,23 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
   if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
   {
     // if this field is set to more dimensions than the input (in this case 1), they are not compatible
-    if (this->_mDimensionality->get() != 1)
+    if (this->_mDimensionality->getValue() != 1)
       return false;
 
-    CEDAR_DEBUG_ASSERT(this->_mSizes->get().size() == 1);
+    CEDAR_DEBUG_ASSERT(this->_mSizes->getValue().size() == 1);
 
     // if the dimensions are both 1, rows or cols must be the same as the field size
-    if (static_cast<int>(this->_mSizes->get().at(0)) != matrix.rows
-        && static_cast<int>(this->_mSizes->get().at(0)) != matrix.cols)
+    if (static_cast<int>(this->_mSizes->at(0)) != matrix.rows
+        && static_cast<int>(this->_mSizes->at(0)) != matrix.cols)
       return false;
   }
   else
   {
-    if (static_cast<int>(this->_mDimensionality->get()) != matrix.dims)
+    if (static_cast<int>(this->_mDimensionality->getValue()) != matrix.dims)
       return false;
-    for (unsigned int dim = 0; dim < this->_mSizes->get().size(); ++dim)
+    for (unsigned int dim = 0; dim < this->_mSizes->getValue().size(); ++dim)
     {
-      if (matrix.size[static_cast<int>(dim)] != static_cast<int>(this->_mSizes->get().at(dim)))
+      if (matrix.size[static_cast<int>(dim)] != static_cast<int>(this->_mSizes->at(dim)))
         return false;
     }
   }
@@ -216,24 +216,24 @@ void cedar::dyn::NeuralField::onStart()
 
 void cedar::dyn::NeuralField::updateDimensionality()
 {
-  int new_dimensionality = static_cast<int>(_mDimensionality->get());
+  int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
 
   std::vector<int> sizes(new_dimensionality);
   for (int dim = 0; dim < new_dimensionality; ++dim)
   {
-    sizes[dim] = _mSizes->get().at(dim);
+    sizes[dim] = _mSizes->at(dim);
   }
   this->lockAll();
   if (new_dimensionality == 1)
   {
-    this->mActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(mRestingLevel->get()));
+    this->mActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(mRestingLevel->getValue()));
     this->mSigmoidalActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
   }
   else
   {
-    this->mActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0), CV_32F, cv::Scalar(mRestingLevel->get()));
+    this->mActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0), CV_32F, cv::Scalar(mRestingLevel->getValue()));
     this->mSigmoidalActivation->getData() = cv::Mat(new_dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(new_dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }

@@ -83,7 +83,7 @@ public:
    */
   virtual double compute(double value) const
   {
-    return cedar::aux::math::sigmoidHeavyside(value, mThreshold->get());
+    return cedar::aux::math::sigmoidHeavyside(value, mThreshold->getValue());
   }
 
   //--------------------------------------------------------------------------------------------------------------------

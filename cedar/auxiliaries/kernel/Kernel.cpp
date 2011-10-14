@@ -110,7 +110,7 @@ const cedar::aux::DataPtr cedar::aux::kernel::Kernel::getKernelRaw() const
 void cedar::aux::kernel::Kernel::loadKernelFromFile()
 {
   mpReadWriteLockOutput->lockForWrite();
-  cv::FileStorage fs(_mKernelMatrixFile->get(), cv::FileStorage::READ);
+  cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::READ);
   fs["kernel"] >> mKernel->getData<cv::Mat>();
   mpReadWriteLockOutput->unlock();
 }
@@ -118,14 +118,14 @@ void cedar::aux::kernel::Kernel::loadKernelFromFile()
 void cedar::aux::kernel::Kernel::saveKernelToFile() const
 {
   mpReadWriteLockOutput->lockForRead();
-  cv::FileStorage fs(_mKernelMatrixFile->get(), cv::FileStorage::WRITE);
+  cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::WRITE);
   fs << "kernel" << mKernel->getData<cv::Mat>();
   mpReadWriteLockOutput->unlock();
 }
 
 unsigned int cedar::aux::kernel::Kernel::getDimensionality() const
 {
-  return _mDimensionality->get();
+  return _mDimensionality->getValue();
 }
 
 void cedar::aux::kernel::Kernel::setDimensionality(unsigned int dimensionality)

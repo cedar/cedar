@@ -295,7 +295,7 @@ void cedar::proc::Step::setName(const std::string& name)
 
 const std::string& cedar::proc::Step::getName() const
 {
-  return this->_mName->get();
+  return this->_mName->getValue();
 }
 
 void cedar::proc::Step::checkMandatoryConnections()

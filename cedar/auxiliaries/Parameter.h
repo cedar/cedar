@@ -89,7 +89,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const T& get() const
+  const T& getValue() const
   {
     return this->mValue;
   }
