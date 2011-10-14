@@ -55,6 +55,7 @@ namespace cedar
   {
     CEDAR_DECLARE_AUX_CLASS(Base);
     CEDAR_DECLARE_AUX_CLASS(Configurable);
+    CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
     CEDAR_DECLARE_AUX_CLASS(ConfigurationInterface);
     CEDAR_DECLARE_AUX_CLASS(UserData);

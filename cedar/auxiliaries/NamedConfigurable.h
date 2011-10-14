@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Configurable.h
+    File:        NamedConfigurable.h
 
     Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 14
 
     Description:
 
@@ -38,76 +34,55 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONFIGURABLE_H
-#define CEDAR_AUX_CONFIGURABLE_H
+#ifndef CEDAR_AUX_NAMED_CONFIGURABLE_H
+#define CEDAR_AUX_NAMED_CONFIGURABLE_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
+#include "auxiliaries/Parameter.h"
+#include "auxiliaries/Configurable.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <map>
-#include <list>
 
-/*!@brief An interface for classes that can store and load parameters from files.
+/*!@brief This is a Configurable with a name.
+ *
+ * This class is provided for convenience, because many classes derived from cedar::aux::Configurable use a name.
  */
-class cedar::aux::Configurable
+class cedar::aux::NamedConfigurable : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::ParameterBase;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros and types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef std::list<cedar::aux::ParameterBasePtr> ParameterList;
-  typedef std::map<std::string, ParameterList::iterator> ParameterMap;
-  typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Configurable();
-
-  //!@brief Destructor
-  virtual ~Configurable();
+  NamedConfigurable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
-  void readJson(const std::string& filename);
-  virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);//!@todo Should be writeConfiguration?
-  void saveJson(const std::string& filename); //!@todo Should be writeJson?
-  const Children& configurableChildren() const;
-
-  const ParameterList& getParameters() const;
-  ParameterList& getParameters();
-
-  void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
+  void setName(const std::string& name);
+  const std::string& getName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  virtual void configurationLoaded();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -116,16 +91,15 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  // none yet
+  StringParameterPtr _mName;
 
 private:
-  ParameterList mParameterOrder;
-  ParameterMap mParameterAssociations;
-  Children mChildren;
   // none yet
 
-}; // class cedar::aux::Configurable
+}; // class cedar::aux::NamedConfigurable
 
-#endif // CEDAR_AUX_CONFIGURABLE_H
+#endif // CEDAR_AUX_NAMED_CONFIGURABLE_H
 

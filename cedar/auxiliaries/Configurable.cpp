@@ -55,11 +55,8 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Configurable::Configurable(bool nameVisible)
+cedar::aux::Configurable::Configurable()
 {
-  //!@todo Remove -- not every configurable has a name.
-  this->_mName = cedar::aux::StringParameterPtr(new cedar::aux::StringParameter(this, "name", ""));
-  this->_mName->setHidden(!nameVisible);
 }
 
 
@@ -211,14 +208,4 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
                                                     + name + "\".");
   }
   this->mChildren[name] = child;
-}
-
-void cedar::aux::Configurable::setName(const std::string& name)
-{
-  this->_mName->set(name);
-}
-
-const std::string& cedar::aux::Configurable::getName() const
-{
-  return this->_mName->getValue();
 }

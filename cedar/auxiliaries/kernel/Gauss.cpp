@@ -231,10 +231,11 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
   {
     _mSigmas->set(dimension, sigma);
   }
+  //!@todo Catch only the out-of-bounds exception here
   catch(std::exception& e)
   {
-    std::cout << "Error in " << this->_mName->getValue()
-              << " (cedar::aux::kernel::Gauss::setSigma): vector out of bounds " << std::endl;
+    //!@todo Throw a proper cedar-exception here.
+    std::cout << "Error in cedar::aux::kernel::Gauss::setSigma: vector out of bounds " << std::endl;
   }
 }
 
@@ -249,10 +250,11 @@ void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
   {
     _mShifts->set(dimension, shift);
   }
+  //!@todo Catch only the out-of-bounds exception here
   catch(std::exception& e)
   {
-    std::cout << "Error in " << this->_mName->getValue()
-              << " (cedar::aux::kernel::Gauss::setShift): vector out of bounds " << std::endl;
+    //!@todo Throw a proper cedar-exception here.
+    std::cout << "Error in cedar::aux::kernel::Gauss::setShift: vector out of bounds " << std::endl;
   }
 }
 
