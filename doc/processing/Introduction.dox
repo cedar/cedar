@@ -46,6 +46,9 @@ Looped triggers on the other hand can be started and stopped, thus causing actua
 
 @subsection ProcessingIntroduction_DataAndConnections Data and Connections
 
+The second important concept of the framework is Data. Each step can declare a set of inputs, outputs and buffers
+(buffers represent internal, temporary data that you might be interested in inspecting, e.g., by plotting it). 
+
 
 @section ProcessingTutorialFirstStep Beginner's Tutorial: One Small Step
 
