@@ -83,7 +83,6 @@ cedar::proc::gui::ToolBox::~ToolBox()
 
 void cedar::proc::gui::ToolBox::resizeEvent(QResizeEvent *pEvent)
 {
-  QSize size = pEvent->size();
   QRect rect = this->mpLayout->contentsRect();
   int effective_area = rect.width();
   int per_item_width = static_cast<int>(mButtonSize) + this->mpLayout->spacing();

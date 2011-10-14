@@ -37,15 +37,12 @@
 #include "KinematicChain.h"
 
 // PROJECT INCLUDES
+#include "auxiliaries/gl/gl.h"
 #include "auxiliaries/gl/drawShapes.h"
 #include "auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#ifdef WIN32
-  #include <gl/GL.h>
-#else // WIN32
-  #include <OpenGL/gl.h>
-#endif // WIN32
+
 
 using namespace cedar::dev::robot;
 using namespace cedar::dev::robot::gl;

@@ -35,6 +35,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "auxiliaries/gl/gl.h"
+#include "auxiliaries/gl/glu.h"
 #include "auxiliaries/gl/drawShapes.h"
 #include "auxiliaries/math/constants.h"
 #include "auxiliaries/lib.h"
@@ -43,13 +45,6 @@
 
 // SYSTEM INCLUDES
 
-#ifdef WIN32
-  #include <gl/GL.h>
-  #include <gl/GLU.h>
-#else
-  #include <OpenGL/gl.h>
-  #include <OpenGL/glu.h>
-#endif
 
 using namespace std;
 using namespace cv;
