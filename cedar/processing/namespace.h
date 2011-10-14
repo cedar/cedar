@@ -47,10 +47,13 @@
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
 
-
 namespace cedar
 {
-  /*!@brief Namespace for all processing classes. */
+  /*!
+   *  @brief Namespace containing main elements of cedar's processing framework.
+   *
+   *  @see   @ref ProcessingIntroduction for an introduction and code tutorials.
+   */
   namespace proc
   {
     CEDAR_DECLARE_PROC_CLASS(Arguments);
