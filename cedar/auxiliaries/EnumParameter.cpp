@@ -49,7 +49,7 @@ cedar::aux::EnumParameter::EnumParameter(cedar::aux::Configurable *pOwner,
                                          const std::string& name,
                                          boost::shared_ptr<cedar::aux::EnumBase> enumBase)
 :
-cedar::aux::ParameterBase(pOwner, name, false),
+cedar::aux::Parameter(pOwner, name, false),
 mEnumDeclaration(enumBase)
 {
 }
@@ -59,7 +59,7 @@ cedar::aux::EnumParameter::EnumParameter(cedar::aux::Configurable *pOwner,
                                          boost::shared_ptr<cedar::aux::EnumBase> enumBase,
                                          cedar::aux::EnumId defaultValue)
 :
-cedar::aux::ParameterBase(pOwner, name, true),
+cedar::aux::Parameter(pOwner, name, true),
 mDefault(defaultValue),
 mEnumDeclaration(enumBase)
 {

@@ -42,8 +42,8 @@
 
 // PROJECT INCLUDES
 #include "units/namespace.h"
-#include "units/Time.h"
-#include "units/TimeUnit.h"
+#include "units/Duration.h"
+#include "units/DurationUnit.h"
 
 
 // SYSTEM INCLUDES

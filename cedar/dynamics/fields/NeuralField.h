@@ -88,7 +88,7 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Time& time);
+  void eulerStep(const cedar::unit::Duration& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

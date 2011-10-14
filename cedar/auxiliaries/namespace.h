@@ -55,6 +55,7 @@ namespace cedar
   {
     CEDAR_DECLARE_AUX_CLASS(Base);
     CEDAR_DECLARE_AUX_CLASS(Configurable);
+    CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
     CEDAR_DECLARE_AUX_CLASS(ConfigurationInterface);
     CEDAR_DECLARE_AUX_CLASS(UserData);
@@ -91,9 +92,9 @@ namespace cedar
     >
     class TypeBasedFactory;
 
-    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ParameterBase);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
 
-    template <typename T> class Parameter;
+    template <typename T> class ParameterTemplate;
     template <typename T> class NumericParameter;
     template <typename T> class VectorParameter;
     template <typename T> class NumericVectorParameter;
@@ -101,9 +102,9 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     typedef NumericParameter<unsigned int> UIntParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
-    typedef Parameter<std::string> StringParameter;
+    typedef ParameterTemplate<std::string> StringParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
-    typedef Parameter<bool> BoolParameter;
+    typedef ParameterTemplate<bool> BoolParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
     typedef VectorParameter<bool> BoolVectorParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
@@ -138,12 +139,12 @@ namespace cedar
     //!@brief class declaration of Data
     CEDAR_DECLARE_AUX_CLASS(Data);
 
-    template <typename T> class DataT;
+    template <typename T> class DataTemplate;
 
-    typedef DataT<cv::Mat> MatData;
+    typedef DataTemplate<cv::Mat> MatData;
     CEDAR_GENERATE_POINTER_TYPES(MatData);
 
-    typedef DataT<double> DoubleData;
+    typedef DataTemplate<double> DoubleData;
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
 
     CEDAR_DECLARE_AUX_CLASS(ImageData);

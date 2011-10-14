@@ -46,9 +46,9 @@
 #include "processing/Trigger.h"
 #include "processing/DataRole.h"
 #include "processing/DataSlot.h"
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/Base.h"
-#include "auxiliaries/Configurable.h"
+#include "auxiliaries/NamedConfigurable.h"
 
 // PROJECT INCLUDES
 
@@ -65,7 +65,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Step : public QThread, public cedar::aux::Configurable
+class cedar::proc::Step : public QThread, public cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

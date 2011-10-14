@@ -64,9 +64,9 @@ private:
   typedef
       cedar::aux::TypeBasedFactory
       <
-        cedar::aux::ParameterBase,
-        cedar::proc::gui::ParameterBase,
-        cedar::aux::ParameterBasePtr
+        cedar::aux::Parameter,
+        cedar::proc::gui::Parameter,
+        cedar::aux::ParameterPtr
       >
       DataWidgetTypes;
 
@@ -116,7 +116,7 @@ private:
 
   void addLabelRow(const std::string& label);
 
-  void addPropertyRow(cedar::aux::ParameterBasePtr parameter);
+  void addPropertyRow(cedar::aux::ParameterPtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -128,7 +128,7 @@ private:
   //!@todo this should be one configurable pointer
   boost::weak_ptr<cedar::aux::Configurable> mDisplayedConfigurable;
 
-  std::map<cedar::proc::gui::ParameterBase*, int> mParameterRowIndex;
+  std::map<cedar::proc::gui::Parameter*, int> mParameterRowIndex;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

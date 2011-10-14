@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Time.cpp
+    File:        NamedConfigurable.cpp
 
     Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 14
 
     Description:
 
@@ -39,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "units/Time.h"
+#include "auxiliaries/NamedConfigurable.h"
 
 // PROJECT INCLUDES
 
@@ -49,16 +45,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @todo explain why this constructor is protected.
- */
-cedar::unit::Time::Time(double amount)
+cedar::aux::NamedConfigurable::NamedConfigurable()
 :
-mAmountInMicroSeconds (amount)
-{
-}
-
-cedar::unit::Time::~Time()
+_mName(new cedar::aux::StringParameter(this, "name", ""))
 {
 }
 
@@ -66,10 +55,12 @@ cedar::unit::Time::~Time()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @todo explain why this function should only be used for testing/debugging.
- */
-double cedar::unit::Time::getRawTime() const
+void cedar::aux::NamedConfigurable::setName(const std::string& name)
 {
-  return this->mAmountInMicroSeconds;
+  this->_mName->set(name);
+}
+
+const std::string& cedar::aux::NamedConfigurable::getName() const
+{
+  return this->_mName->getValue();
 }

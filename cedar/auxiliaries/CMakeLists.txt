@@ -47,7 +47,7 @@ cedar_add_library(cedaraux
   gui/MatrixPlot1D.h
   gui/MatrixPlot2D.h
   gui/ImagePlot.h
-  ParameterBase.h
+  Parameter.h
   kernel/Kernel.h
   kernel/Gauss.h
   LINK_LIBRARIES

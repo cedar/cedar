@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "dynamics/namespace.h"
-#include "auxiliaries/DataT.h"
+#include "auxiliaries/DataTemplate.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,7 @@
  * More detailed description of the class.
  */
 template <typename T>
-class cedar::dyn::Activation : public cedar::aux::DataT<T>
+class cedar::dyn::Activation : public cedar::aux::DataTemplate<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,7 +65,7 @@ class cedar::dyn::Activation : public cedar::aux::DataT<T>
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Activation(const T& value) : cedar::aux::DataT<T>(value)
+  Activation(const T& value) : cedar::aux::DataTemplate<T>(value)
   {
   }
 

@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
@@ -57,7 +57,7 @@
  * More detailed description of the class.
  */
 template <typename T>
-class cedar::aux::SetParameter : public cedar::aux::ParameterBase
+class cedar::aux::SetParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -70,13 +70,13 @@ public:
   //!@brief The standard constructor.
   SetParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::ParameterBase(pOwner, name, false)
+  cedar::aux::Parameter(pOwner, name, false)
   {
   }
 
   SetParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::set<T>& defaults)
   :
-  cedar::aux::ParameterBase(pOwner, name, true),
+  cedar::aux::Parameter(pOwner, name, true),
   mDefaults(defaults)
   {
     this->makeDefault();

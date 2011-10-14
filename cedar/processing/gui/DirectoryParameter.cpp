@@ -56,7 +56,7 @@
 
 cedar::proc::gui::DirectoryParameter::DirectoryParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   QHBoxLayout *p_layout = new QHBoxLayout();
   this->setLayout(p_layout);

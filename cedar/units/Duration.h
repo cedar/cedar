@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataT.h
+    File:        Duration.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 06 03
 
     Description:
 
@@ -38,24 +38,25 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_DATA_T_H
-#define CEDAR_AUX_DATA_T_H
+#ifndef CEDAR_UNITS_DURATION_H
+#define CEDAR_UNITS_DURATION_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Data.h"
+#include <units/namespace.h>
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
 
-/*!@brief Abstract description of the class.
+
+/*!@brief Base class for time units.
  *
  * More detailed description of the class.
+ *
+ * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
+ *       cedar::units::Milliseconds.
  */
-template <typename T>
-class cedar::aux::DataT : public cedar::aux::Data
+class cedar::unit::Duration
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,41 +66,27 @@ class cedar::aux::DataT : public cedar::aux::Data
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  DataT()
-  {
-  }
-
-  DataT(const T& value)
-  {
-    this->mData = value;
-  }
+  // This class has no public constructors because it should not be used directly.
 
   //!@brief Destructor
-  virtual ~DataT()
-  {
-  }
+  virtual ~Duration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  T& getData()
-  {
-    return this->mData;
-  }
-
-  const T& getData() const
-  {
-    return this->mData;
-  }
+  /*!@brief returns the raw time (currently, this is microseconds), mainly used in conversion methods
+   * @return raw time (currently microseconds)
+   */
+  double getRawTime() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+  //!@brief The constructor.
+  Duration(double amount);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -113,9 +100,10 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  T mData;
-
+  //!@brief the internal representation of time, currently expressed in microseconds
+  double mAmountInMicroSeconds;
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -128,7 +116,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::DataT
+}; // class cedar::unit::Duration
 
-#endif // CEDAR_AUX_DATA_T_H
+#endif // CEDAR_UNITS_DURATION_H
 
