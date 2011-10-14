@@ -43,7 +43,7 @@
 
 // LOCAL INCLUDES
 #include "processing/namespace.h"
-#include "auxiliaries/Configurable.h"
+#include "auxiliaries/NamedConfigurable.h"
 
 
 // PROJECT INCLUDES
@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::Trigger : public virtual cedar::aux::Configurable
+class cedar::proc::Trigger : public virtual cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

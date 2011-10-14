@@ -56,7 +56,6 @@ _mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", "du
 {
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setConstant(true);
-  this->_mName->setHidden(true);
 }
 
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality, const std::string& kernelFile)
@@ -69,7 +68,6 @@ _mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", ker
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->set(dimensionality);
   _mDimensionality->setConstant(true);
-  this->_mName->setHidden(true);
 }
 
 cedar::aux::kernel::Kernel::~Kernel()
