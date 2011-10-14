@@ -1,0 +1,45 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        install.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: Setup for all files that are to be installed (apart from files that are part of a cedar library).
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# install setup
+
+file(GLOB cedarHeaders "${CEDAR_SOURCE_DIR}/*.h")
+install(FILES ${cedarHeaders} DESTINATION ${CEDAR_HEADER_INSTALL_DIR})
+install(CODE "execute_process(COMMAND make doc)")
+install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/html" DESTINATION ${CEDAR_DOC_INSTALL_DIR})
+install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/latex" DESTINATION ${CEDAR_DOC_INSTALL_DIR})
+
