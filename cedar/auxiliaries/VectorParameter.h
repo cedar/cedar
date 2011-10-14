@@ -126,7 +126,7 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
   }
 
-  const std::vector<T>& get() const
+  const std::vector<T>& getValue() const
   {
     return this->mValues;
   }

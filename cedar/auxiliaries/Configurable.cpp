@@ -220,5 +220,5 @@ void cedar::aux::Configurable::setName(const std::string& name)
 
 const std::string& cedar::aux::Configurable::getName() const
 {
-  return this->_mName->get();
+  return this->_mName->getValue();
 }

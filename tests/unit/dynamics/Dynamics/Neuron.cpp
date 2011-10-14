@@ -78,8 +78,8 @@ void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
 
   double& activation = mActivation->getData();
   double input = this->getInput("input")->getData<double>();
-  double resting_level = mRestingLevel->get();
-  double interaction_weight = mInteractionWeight->get();
+  double resting_level = mRestingLevel->getValue();
+  double interaction_weight = mInteractionWeight->getValue();
 
   // nonlinearity
   double interaction = 0;

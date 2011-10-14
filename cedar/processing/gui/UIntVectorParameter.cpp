@@ -107,7 +107,7 @@ void cedar::proc::gui::UIntVectorParameter::propertyChanged()
       // the limits have to be set here already so the value is set properly.
       this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
       this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
-      p_widget->setValue(parameter->get().at(i));
+      p_widget->setValue(parameter->at(i));
       QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
     }
 
@@ -126,7 +126,7 @@ void cedar::proc::gui::UIntVectorParameter::valueChanged(int)
 {
   cedar::aux::UIntVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
-  std::vector<unsigned int> values = parameter->get();
+  std::vector<unsigned int> values = parameter->getValue();
   CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
   for (size_t i = 0; i < values.size(); ++i)
   {
