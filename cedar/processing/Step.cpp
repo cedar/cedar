@@ -98,6 +98,58 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+/*!
+ * As an example, consider a class A that has a function void A::foo():
+ *
+ * @code
+ *  class A : public cedar::proc::Step
+ *  {
+ *    public:
+ *      void foo()
+ *      {
+ *        // ...
+ *      }
+ *  }
+ * @endcode
+ *
+ * Then in A's constructor, call
+ *
+ * @code
+ *  A:A()
+ *  {
+ *    // ...
+ *    this->registerFunction("foo", boost::bind(&A::foo, this));
+ *    // ...
+ *  }
+ * @endcode
+ *
+ */
+void cedar::proc::Step::registerFunction(const std::string& actionName, boost::function<void()> function)
+{
+  //!@todo Check for restrictions on the name, e.g., no spaces, ...
+  if (this->mActions.find(actionName) != this->mActions.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate action name: " + actionName);
+  }
+  this->mActions[actionName] = function;
+}
+
+void cedar::proc::Step::callAction(const std::string& name)
+{
+  ActionMap::iterator iter = this->mActions.find(name);
+  if (iter == this->mActions.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown action name: " + name);
+  }
+  boost::function<void()>& function = iter->second;
+  function();
+}
+
+const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
+{
+  return this->mActions;
+}
+
 void cedar::proc::Step::onNameChanged()
 {
   if (this->mRegisteredAt != NULL)

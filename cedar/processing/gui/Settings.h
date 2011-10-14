@@ -127,6 +127,14 @@ public:
   //!@brief restores a state of the main window
   void restoreMainWindow(QMainWindow *pWindow);
 
+  cedar::aux::DirectoryParameterPtr lastPluginLoadDialogLocation();
+
+  cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
+
+  void appendArchitectureFileToHistory(const std::string& filePath);
+
+  cedar::aux::StringVectorParameterPtr getArchitectureFileHistory();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -171,6 +179,15 @@ private:
   cedar::aux::StringParameterPtr mMainWindowGeometry;
   //!@brief list of bytes coming from Qt (minimized, maximized, ...)
   cedar::aux::StringParameterPtr mMainWindowState;
+
+  //!@brief Directory, where the PluginLoadDialog is supposed to open.
+  cedar::aux::DirectoryParameterPtr mPluginLoadDialogLocation;
+
+  //!@brief Directory, where the load dialog for architectures is supposed to open.
+  cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;
+
+  //!@brief History of architecture files recently loaded.
+  cedar::aux::StringVectorParameterPtr mRecentArchitectureFiles;
 
 }; // class cedar::proc::gui::Settings
 

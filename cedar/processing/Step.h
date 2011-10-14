@@ -57,6 +57,8 @@
 #include <QReadWriteLock>
 #include <map>
 #include <set>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 
 /*!@brief Abstract description of the class.
@@ -75,6 +77,7 @@ class cedar::proc::Step : public QThread, public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   typedef std::map<std::string, cedar::proc::DataSlotPtr> SlotMap;
+  typedef std::map<std::string, boost::function<void()> > ActionMap;
 
   enum State
   {
@@ -178,6 +181,10 @@ public:
 
   void setRegistry(cedar::proc::StepRegistry* pRegistry);
 
+  const ActionMap& getActions() const;
+
+  void callAction(const std::string& name);
+
 public slots:
   void onNameChanged();
 
@@ -205,6 +212,9 @@ protected:
   void getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
   void lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
   void unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+
+  //! @brief Method that registers a function of an object so that it can be used by the framework.
+  void registerFunction(const std::string& actionName, boost::function<void()> function);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -241,6 +251,8 @@ private:
 
   //! Registry managing the step.
   cedar::proc::StepRegistry* mRegisteredAt;
+
+  ActionMap mActions;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
