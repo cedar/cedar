@@ -64,6 +64,7 @@
     <addaction name="mpActionSave"/>
     <addaction name="mpActionSaveAs"/>
     <addaction name="mpActionLoad"/>
+    <addaction name="mpRecentFiles"/>
     <addaction name="separator"/>
     <addaction name="mpActionExit"/>
    </widget>
@@ -356,6 +357,11 @@
    </property>
    <property name="toolTip">
     <string>Toggle Grid</string>
+   </property>
+  </action>
+  <action name="mpRecentFiles">
+   <property name="text">
+    <string>Recent files</string>
    </property>
   </action>
  </widget>

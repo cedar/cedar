@@ -39,6 +39,7 @@
 #include "auxiliaries/Configurable.h"
 #include "auxiliaries/SetParameter.h"
 #include "auxiliaries/DirectoryParameter.h"
+#include "auxiliaries/VectorParameter.h"
 #include "auxiliaries/Parameter.h"
 #include "auxiliaries/System.h"
 
@@ -89,8 +90,33 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
 
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);
-  this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr(new cedar::aux::DirectoryParameter(recent_files.get(), "lastPluginLoadDialogLocation", ""));
-  this->mArchitectureLoadDialogDirectory = cedar::aux::DirectoryParameterPtr(new cedar::aux::DirectoryParameter(recent_files.get(), "lastArchitectureLoadDialogDirectory", ""));
+  this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr
+      (
+        new cedar::aux::DirectoryParameter
+        (
+          recent_files.get(),
+          "lastPluginLoadDialogLocation",
+          ""
+        )
+      );
+  this->mArchitectureLoadDialogDirectory = cedar::aux::DirectoryParameterPtr
+      (
+        new cedar::aux::DirectoryParameter
+        (
+          recent_files.get(),
+          "lastArchitectureLoadDialogDirectory",
+          ""
+        )
+      );
+  this->mRecentArchitectureFiles = cedar::aux::StringVectorParameterPtr
+      (
+        new cedar::aux::StringVectorParameter
+        (
+          recent_files.get(),
+          "architectureFileHistory",
+          std::vector<std::string>()
+        )
+      );
 
   this->load();
 }
@@ -110,6 +136,40 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::string& filePath)
+{
+  std::vector<std::string> new_order;
+  if (!this->mRecentArchitectureFiles->contains(filePath))
+  {
+    new_order = this->mRecentArchitectureFiles->get();
+    new_order.push_back(filePath);
+  }
+  else
+  {
+    for (size_t i = 0; i < this->mRecentArchitectureFiles->size(); ++i)
+    {
+      const std::string& value = this->mRecentArchitectureFiles->at(i);
+      if (value != filePath)
+      {
+        new_order.push_back(value);
+      }
+    }
+
+    new_order.push_back(filePath);
+  }
+
+  while (new_order.size() > 10) //!@todo Don't hardcode the value, rather make it a parameter that can be changed in some configuration dialog.
+  {
+    new_order.erase(new_order.begin());
+  }
+  this->mRecentArchitectureFiles->set(new_order);
+}
+
+cedar::aux::StringVectorParameterPtr cedar::proc::gui::Settings::getArchitectureFileHistory()
+{
+  return this->mRecentArchitectureFiles;
+}
 
 cedar::aux::DirectoryParameterPtr cedar::proc::gui::Settings::lastArchitectureLoadDialogDirectory()
 {
