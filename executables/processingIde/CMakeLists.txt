@@ -22,40 +22,20 @@
 #   Institute:   Ruhr-Universitaet Bochum
 #                Institut fuer Neuroinformatik
 #
-#   File:        tools.txt
+#   File:        CMakeLists.txt
 #
-#   Maintainer:  Oliver Lomp
-#   Email:       oliver.lomp@ini.rub.de
-#   Date:        2011 07 05
+#   Maintainer:  Oliver Lomp,
+#                Mathis Richter,
+#                Stephan Zibner
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+#                mathis.richter@ini.ruhr-uni-bochum.de,
+#                stephan.zibner@ini.ruhr-uni-bochum.de
+#   Date:        2011 05 23
 #
-#   Description: Setup of tools.
+#   Description:
 #
 #   Credits:
 #
 #=======================================================================================================================
 
-
-########################################################################################################################
-# cedar tools
-list(APPEND subdirectories ${CEDAR_TOOLS_DIR})
-list(LENGTH subdirectories numberOfSubdirectories)
-
-while (${numberOfSubdirectories} STRGREATER 0)
-  list(GET subdirectories 0 subdirectory)
-  list(REMOVE_AT subdirectories 0)
-
-  cedar_get_subdirectories(${subdirectory})
-
-  foreach(newSubdirectory ${returnedSubdirectories})
-
-    if (EXISTS "${newSubdirectory}/CMakeLists.txt")
-      add_subdirectory(${newSubdirectory})
-    endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
-
-    list(APPEND subdirectories ${newSubdirectory})
-  endforeach(newSubdirectory)
-
-  list(LENGTH subdirectories ${numberOfSubdirectories})
-endwhile (${numberOfSubdirectories} STRGREATER 0)
-
-
+cedar_add_executable(processingIde)

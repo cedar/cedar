@@ -41,39 +41,39 @@
 
 ########################################################################################################################
 
-macro(cedar_add_tool)
+macro(cedar_add_executable)
   # find all cpp source files in the current source folder and save them in a list
   file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-  parse_arguments(tool "MOC_HEADERS" "" ${ARGN})
-  car(toolName ${tool_DEFAULT_ARGS})
+  parse_arguments(executable "MOC_HEADERS" "" ${ARGN})
+  car(executableName ${executable_DEFAULT_ARGS})
 
-  qt4_wrap_cpp(toolMocSources ${tool_MOC_HEADERS})
-  set(sourceFiles ${sourceFiles} ${toolMocSources})
+  qt4_wrap_cpp(executableMocSources ${executable_MOC_HEADERS})
+  set(sourceFiles ${sourceFiles} ${executableMocSources})
   
   # remove the ${CEDAR_EXE_DIR} from the current source path and save the result in 'demoSubdirectory'
   string(REPLACE "${CEDAR_EXE_DIR}/" "" demoSubdirectory "${CMAKE_CURRENT_SOURCE_DIR}")
-  # remove the folder name from 'toolSubdirectory'
-  string(REPLACE "/${toolName}" "" toolSubdirectory "${toolSubdirectory}")
+  # remove the folder name from 'executableSubdirectory'
+  string(REPLACE "/${executableName}" "" executableSubdirectory "${executableSubdirectory}")
 
   # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
   set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/tools/${toolSubdirectory})
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${executableSubdirectory})
 
   # compose the name of the executable from a 'demo_' prefix and the demo name
-  set(toolExecutableName ${toolName})
+  set(executableExecutableName ${executableName})
   
   # add the executable with the given name, specifying all source files needed for compilation
   #
   # add_executable(<executable name> [WIN32] [MACOSX_BUNDLE] [EXCLUDE_FROM_ALL] source1 source2 ... sourceN)
-  add_executable(${toolExecutableName} ${sourceFiles})
+  add_executable(${executableExecutableName} ${sourceFiles})
   
   # link all cedar and third party libraries into the demo executable
-  target_link_libraries(${toolExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
+  target_link_libraries(${executableExecutableName} ${CEDAR_LIBS} ${CEDAR_THIRD_PARTY_LIBS})
   
   # change the runtime output directory back to the original value
   set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${originalRuntimeOutputDirectory})
-endmacro(cedar_add_tool)
+endmacro(cedar_add_executable)
 
 macro(cedar_add_unit_test)
   parse_arguments(unitTest "ARGUMENTS" "" ${ARGN})
