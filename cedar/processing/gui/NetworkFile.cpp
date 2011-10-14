@@ -81,6 +81,11 @@ cedar::proc::gui::NetworkFile::~NetworkFile()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+const std::string& cedar::proc::gui::NetworkFile::getFileName() const
+{
+  return this->mFileName;
+}
+
 void cedar::proc::gui::NetworkFile::addToScene()
 {
   //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.

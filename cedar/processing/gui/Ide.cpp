@@ -359,6 +359,7 @@ void cedar::proc::gui::Ide::newFile()
 void cedar::proc::gui::Ide::save()
 {
   this->mNetwork->save();
+  cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(this->mNetwork->getFileName());
 }
 
 void cedar::proc::gui::Ide::saveAs()
@@ -377,6 +378,9 @@ void cedar::proc::gui::Ide::saveAs()
     }
 
     this->mNetwork->save(file.toStdString());
+
+    cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+
     this->mpActionSave->setEnabled(true);
   }
 }
