@@ -101,19 +101,28 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief check if everything is prepared to execute compute()
+  //!@brief check if everything is prepared to execute compute()
   virtual void onStart();
 
   virtual void onStop();
 
+  //!@brief handles an external trigger signal, usually starts a thread or calls the run() function
   void onTrigger();
 
+  //!@brief the code that is executed on each thread execution goes here
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
   //!@brief Method that is called whenever an input is connected to the step.
   virtual void inputConnectionChanged(const std::string& inputName);
 
+  /*!@brief checks the validity of a slot
+   * @param slot the slot that needs checking, specified by its smart pointer
+   */
   cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
+
+  /*!@brief checks the validity of a slot
+   * @param slot_name the slot that needs checking, specified by its name
+   */
   cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slot_name);
 
   virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
@@ -125,11 +134,18 @@ public:
   //!@brief Sets the arguments used by the next execution of the run function.
   bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
+  //!@brief returns the finished trigger
   cedar::proc::TriggerPtr& getFinishedTrigger();
 
+  /*!@brief toggles if a step is executed as an own thread, or if the run() function is called in the same thread as
+   * the source of the trigger signal
+   */
   void setThreaded(bool isThreaded);
 
+  //!@brief provide data to an input slot. This means linking up another step's output to the current step
   void setInput(const std::string& name, cedar::aux::DataPtr data);
+
+  //!@brief removes a connection to another step's output
   void freeInput(const std::string& name);
 
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
