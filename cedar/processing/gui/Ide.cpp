@@ -51,6 +51,7 @@
 #include "processing/exceptions.h"
 #include "processing/Manager.h"
 #include "processing/LoopedTrigger.h"
+#include "auxiliaries/VectorParameter.h"
 
 // PROJECT INCLUDES
 
@@ -98,6 +99,12 @@ cedar::proc::gui::Ide::Ide()
   this->newFile();
 
   this->restoreSettings();
+
+  QObject::connect(cedar::proc::gui::Settings::instance().getArchitectureFileHistory().get(),
+                   SIGNAL(valueChanged()),
+                   this,
+                   SLOT(fillRecentFilesList()));
+  fillRecentFilesList();
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -376,20 +383,32 @@ void cedar::proc::gui::Ide::saveAs()
 
 void cedar::proc::gui::Ide::load()
 {
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
-                                              "", // initial directory; //!@todo save/restore with window settings
+                                              last_dir->get().absolutePath(), // initial directory
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
   if (!file.isEmpty())
   {
-    this->newFile();
-    cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
-    network->load(file.toStdString());
-    this->mpActionSave->setEnabled(true);
-    this->resetTo(network);
+    this->loadFile(file);
   }
+}
+
+void cedar::proc::gui::Ide::loadFile(QString file)
+{
+  this->newFile();
+  cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
+  network->load(file.toStdString());
+  this->mpActionSave->setEnabled(true);
+  this->resetTo(network);
+
+  cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+  QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+  last_dir->set(path);
 }
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
@@ -408,3 +427,35 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
   }
 }
 
+void cedar::proc::gui::Ide::recentFileItemTriggered()
+{
+  QAction *p_sender = dynamic_cast<QAction*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_sender != NULL);
+
+  const QString& file = p_sender->text();
+  this->loadFile(file);
+}
+
+void cedar::proc::gui::Ide::fillRecentFilesList()
+{
+  QMenu *p_menu = new QMenu();
+
+  cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::Settings::instance().getArchitectureFileHistory();
+  if (entries->size() == 0)
+  {
+    this->mpRecentFiles->setEnabled(false);
+  }
+  else
+  {
+    this->mpRecentFiles->setEnabled(true);
+
+    for (size_t i = entries->size(); i > 0; --i)
+    {
+      QAction *p_action = p_menu->addAction(entries->at(i - 1).c_str());
+
+      QObject::connect(p_action, SIGNAL(triggered()), this, SLOT(recentFileItemTriggered()));
+    }
+  }
+
+  this->mpRecentFiles->setMenu(p_menu);
+}

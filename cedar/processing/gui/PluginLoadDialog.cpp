@@ -42,6 +42,7 @@
 #include "processing/gui/PluginLoadDialog.h"
 #include "processing/PluginDeclaration.h"
 #include "processing/Manager.h"
+#include "processing/gui/Settings.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -90,17 +91,21 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
 #elif defined WINDOWS
   QString filter = "Plugins (*.dll)";
 #endif
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastPluginLoadDialogLocation();
   QString file = QFileDialog::getOpenFileName
                               (
                                 this, // parent = 0,
                                 "Select a plugin", // caption = QString(),
-                                "", // const QString & dir = QString(), TODO save and restore previous location(s)
+                                last_dir->get().absolutePath(),
                                 filter
                               );
   if (!file.isEmpty())
   {
     CEDAR_DEBUG_ASSERT(this->mpFileNameEdit->lineEdit() != NULL);
     this->mpFileNameEdit->lineEdit()->setText(file);
+
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    last_dir->set(path);
   }
 }
 

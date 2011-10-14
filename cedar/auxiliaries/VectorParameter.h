@@ -60,8 +60,11 @@ template <typename T>
 class cedar::aux::VectorParameter : public cedar::aux::ParameterBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // typedef
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef typename std::vector<T>::iterator iterator;
+  typedef typename std::vector<T>::const_iterator const_iterator;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -128,6 +131,23 @@ public:
     return this->mValues;
   }
 
+  iterator begin()
+  {
+    return this->mValues.begin();
+  }
+
+  iterator end()
+  {
+    return this->mValues.end();
+  }
+
+  iterator erase(iterator iter)
+  {
+    iterator ret = this->mValues.erase(iter);
+    this->emitChangedSignal();
+    return ret;
+  }
+
   /*std::vector<T>& get()
   {
     return this->mValues;
@@ -150,6 +170,25 @@ public:
     {
       return this->mDefaultValue;
     }
+  }
+
+  bool contains(const T& value)
+  {
+    for (iterator iter = this->begin(); iter != this->end(); ++iter)
+    {
+      if ((*iter) == value)
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  void pushBack(const T& value)
+  {
+    this->mValues.push_back(value);
+    this->emitChangedSignal();
   }
 
   size_t size() const

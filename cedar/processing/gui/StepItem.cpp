@@ -307,10 +307,28 @@ cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlot
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
   QMenu menu;
-  QMenu* p_data = menu.addMenu("data");
+  QMenu *p_data = menu.addMenu("data");
+
+  QMenu *p_actions_menu = menu.addMenu("actions");
   menu.addSeparator();
+
+  const cedar::proc::Step::ActionMap& map = this->mStep->getActions();
+  if (map.empty())
+  {
+    p_actions_menu->setEnabled(false);
+  }
+  else
+  {
+    for (cedar::proc::Step::ActionMap::const_iterator iter = map.begin(); iter != map.end(); ++iter)
+    {
+      p_actions_menu->addAction(iter->first.c_str());
+    }
+  }
+
   QAction *p_delete_action = menu.addAction("delete");
 
+
+  // Actions for data plotting -----------------------------------------------------------------------------------------
   std::map<QAction*, cedar::aux::Enum> action_type_map;
   bool has_data = false;
 
@@ -373,6 +391,12 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     cedar::proc::gui::DataPlotter *p_plotter = new cedar::proc::gui::DataPlotter(title, mpMainWindow);
     p_plotter->plot(p_data);
     p_plotter->show();
+  }
+  else if (a->parentWidget() == p_actions_menu)
+  {
+    std::string action = a->text().toStdString();
+    this->mStep->callAction(action);
+
   }
   else if (a == p_delete_action)
   {
