@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "namespace.h"
 #include "CoraArm.h"
-#include "devices/robot/gl/namespace.h"
 
 // PROJECT INCLUDES
 #include "auxiliaries/gl/drawShapes.h"
