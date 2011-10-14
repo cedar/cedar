@@ -38,7 +38,7 @@
 #include "processing/gui/PropertyPane.h"
 #include "processing/Step.h"
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
 #include "auxiliaries/EnumParameter.h"
@@ -160,7 +160,7 @@ void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterL
   }
 }
 
-void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr parameter)
+void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr parameter)
 {
   if (!parameter->isHidden())
   {
@@ -170,7 +170,7 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterBasePtr
     p_label->setText(parameter->getName().c_str());
     this->setCellWidget(row, 0, p_label);
 
-    cedar::proc::gui::ParameterBase *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    cedar::proc::gui::Parameter *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
     p_widget->setParent(this);
     p_widget->setParameter(parameter);
     p_widget->setEnabled(!parameter->isConstant());
@@ -200,7 +200,7 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
 
 void cedar::proc::gui::PropertyPane::rowSizeChanged()
 {
-  cedar::proc::gui::ParameterBase *p_parameter = dynamic_cast<cedar::proc::gui::ParameterBase*>(QObject::sender());
+  cedar::proc::gui::Parameter *p_parameter = dynamic_cast<cedar::proc::gui::Parameter*>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != NULL);
 
   CEDAR_DEBUG_ASSERT(this->mParameterRowIndex.find(p_parameter) != this->mParameterRowIndex.end());

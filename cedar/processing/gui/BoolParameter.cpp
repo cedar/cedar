@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/BoolParameter.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,7 @@
 
 cedar::proc::gui::BoolParameter::BoolParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpCheckBox = new QCheckBox();
@@ -77,7 +77,7 @@ void cedar::proc::gui::BoolParameter::parameterPointerChanged()
 {
   cedar::aux::BoolParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
-  this->mpCheckBox->setChecked(parameter->get());
+  this->mpCheckBox->setChecked(parameter->getValue());
   QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 }
 

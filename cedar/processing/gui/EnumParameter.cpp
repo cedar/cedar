@@ -51,7 +51,7 @@
 
 cedar::proc::gui::EnumParameter::EnumParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpEdit = new QComboBox();

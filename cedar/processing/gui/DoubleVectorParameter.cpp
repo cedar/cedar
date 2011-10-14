@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "processing/gui/DoubleVectorParameter.h"
 #include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -56,7 +56,7 @@
 
 cedar::proc::gui::DoubleVectorParameter::DoubleVectorParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QVBoxLayout());
   this->layout()->setContentsMargins(0, 0, 0, 0);
@@ -109,7 +109,7 @@ void cedar::proc::gui::DoubleVectorParameter::propertyChanged()
       this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
       this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
 
-      p_widget->setValue(parameter->get().at(i));
+      p_widget->setValue(parameter->at(i));
       QObject::connect(p_widget, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
     }
 
@@ -128,7 +128,7 @@ void cedar::proc::gui::DoubleVectorParameter::valueChanged(double)
 {
   cedar::aux::DoubleVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-  std::vector<double> values = parameter->get();
+  std::vector<double> values = parameter->getValue();
   CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
   for (size_t i = 0; i < values.size(); ++i)
   {

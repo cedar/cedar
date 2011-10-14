@@ -128,12 +128,12 @@ public:
 
   qreal width() const
   {
-    return static_cast<qreal>(this->mWidth->get());
+    return static_cast<qreal>(this->mWidth->getValue());
   }
 
   qreal height() const
   {
-    return static_cast<qreal>(this->mHeight->get());
+    return static_cast<qreal>(this->mHeight->getValue());
   }
 
   void setHeight(qreal height);

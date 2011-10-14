@@ -66,7 +66,7 @@ namespace cedar
     extern CEDAR_UNITS_LIB_EXPORT const char prefix_s[];
 
     //!@brief the base class Time
-    class CEDAR_UNITS_LIB_EXPORT Time;
+    class CEDAR_UNITS_LIB_EXPORT Duration;
 
     /*! @todo This should probably be UnitBase and inherit from a class that is a template argument as well; that way,
      *        it can be used for units other than time as well.
@@ -75,14 +75,14 @@ namespace cedar
      *        etc., which should not work. A solution might be to use Time (etc.) as a member, rather than inheriting
      *        from it, and working with Time objects instead of doubles?
      */
-    template <unsigned int factor, const char* suffix> class TimeUnit;
+    template <unsigned int factor, const char* suffix> class DurationUnit;
 
     //!@brief the template concretization for microseconds
-    typedef TimeUnit<1, prefix_us> Microseconds;
+    typedef DurationUnit<1, prefix_us> Microseconds;
     //!@brief the template concretization for milliseconds
-    typedef TimeUnit<1000, prefix_ms> Milliseconds;
+    typedef DurationUnit<1000, prefix_ms> Milliseconds;
     //!@brief the template concretization for seconds
-    typedef TimeUnit<1000000, prefix_s> Seconds;
+    typedef DurationUnit<1000000, prefix_s> Seconds;
   }
 }
 

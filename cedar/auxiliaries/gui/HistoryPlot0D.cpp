@@ -42,7 +42,7 @@
 #include "auxiliaries/gui/HistoryPlot0D.h"
 #include "auxiliaries/gui/exceptions.h"
 #include "auxiliaries/exceptions.h"
-#include "auxiliaries/DataT.h"
+#include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES

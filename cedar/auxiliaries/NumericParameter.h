@@ -42,7 +42,7 @@
 #define CEDAR_PROC_NUMERIC_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,7 @@
  * More detailed description of the class.
  */
 template <typename T>
-class cedar::aux::NumericParameter : public cedar::aux::Parameter<T>
+class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -71,7 +71,7 @@ public:
                    const T& minimum,
                    const T& maximum)
   :
-  cedar::aux::Parameter<T>(pOwner, name, defaultValue),
+  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
   mMinimum(minimum),
   mMaximum(maximum)
   {
@@ -83,7 +83,7 @@ public:
                    const T& minimum,
                    const T& maximum)
   :
-  cedar::aux::Parameter<T>(pOwner, name),
+  cedar::aux::ParameterTemplate<T>(pOwner, name),
   mMinimum(minimum),
   mMaximum(maximum)
   {

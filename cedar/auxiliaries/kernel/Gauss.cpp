@@ -37,7 +37,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/kernel/Gauss.h"
 #include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/DataT.h"
+#include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/math/functions.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/NumericVectorParameter.h"
@@ -108,11 +108,11 @@ void cedar::aux::kernel::Gauss::onInit()
 void cedar::aux::kernel::Gauss::calculate()
 {
   mpReadWriteLockOutput->lockForWrite();
-  const unsigned int& dimensionality = _mDimensionality->get();
-  const double& amplitude = _mAmplitude->get();
+  const unsigned int& dimensionality = _mDimensionality->getValue();
+  const double& amplitude = _mAmplitude->getValue();
   // sanity check
-  CEDAR_DEBUG_ASSERT(dimensionality == _mSigmas->get().size());
-  CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->get().size());
+  CEDAR_DEBUG_ASSERT(dimensionality == _mSigmas->getValue().size());
+  CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->getValue().size());
   try
   {
     mKernelParts.resize(dimensionality);
@@ -122,7 +122,7 @@ void cedar::aux::kernel::Gauss::calculate()
     for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
       // estimate width
-      if (_mSigmas->get().at(dim) != 0)
+      if (_mSigmas->at(dim) != 0)
       {
         mSizes.at(dim) = getWidth(dim);
       }
@@ -130,17 +130,17 @@ void cedar::aux::kernel::Gauss::calculate()
       {
         mSizes.at(dim) = 1;
       }
-      mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->get().at(dim);
+      mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
       mKernelParts.at(dim) = cv::Mat::zeros(mSizes.at(dim), 1, CV_32FC1);
 
       // calculate kernel part
-      if (_mSigmas->get().at(dim) != 0)
+      if (_mSigmas->at(dim) != 0)
       {
         for (unsigned int j = 0; j < mSizes.at(dim); j++)
         {
           //!\todo move filling up of matrix to some tool function
           mKernelParts.at(dim).at<float>(j, 0)
-              = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas->get().at(dim));
+              = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas->at(dim));
         }
       }
       else // discrete case
@@ -231,16 +231,17 @@ void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
   {
     _mSigmas->set(dimension, sigma);
   }
+  //!@todo Catch only the out-of-bounds exception here
   catch(std::exception& e)
   {
-    std::cout << "Error in " << this->_mName->get()
-              << " (cedar::aux::kernel::Gauss::setSigma): vector out of bounds " << std::endl;
+    //!@todo Throw a proper cedar-exception here.
+    std::cout << "Error in cedar::aux::kernel::Gauss::setSigma: vector out of bounds " << std::endl;
   }
 }
 
 double cedar::aux::kernel::Gauss::getSigma(unsigned int dimension) const
 {
-  return _mSigmas->get().at(dimension);
+  return _mSigmas->at(dimension);
 }
 
 void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
@@ -249,16 +250,17 @@ void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
   {
     _mShifts->set(dimension, shift);
   }
+  //!@todo Catch only the out-of-bounds exception here
   catch(std::exception& e)
   {
-    std::cout << "Error in " << this->_mName->get()
-              << " (cedar::aux::kernel::Gauss::setShift): vector out of bounds " << std::endl;
+    //!@todo Throw a proper cedar-exception here.
+    std::cout << "Error in cedar::aux::kernel::Gauss::setShift: vector out of bounds " << std::endl;
   }
 }
 
 double cedar::aux::kernel::Gauss::getShift(unsigned int dimension) const
 {
-  return _mShifts->get().at(dimension);
+  return _mShifts->at(dimension);
 }
 
 void cedar::aux::kernel::Gauss::setAmplitude(double amplitude)
@@ -268,7 +270,7 @@ void cedar::aux::kernel::Gauss::setAmplitude(double amplitude)
 
 double cedar::aux::kernel::Gauss::getAmplitude() const
 {
-  return _mAmplitude->get();
+  return _mAmplitude->getValue();
 }
 
 unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
@@ -276,7 +278,7 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
   unsigned int tmp;
   /* size of kernel is determined by limit * sigma
    */
-  tmp = static_cast<unsigned int>(ceil(_mLimit->get() * _mSigmas->get().at(dim)));
+  tmp = static_cast<unsigned int>(ceil(_mLimit->getValue() * _mSigmas->at(dim)));
   // check if kernel size is even and if so, make it odd
   if (tmp % 2 == 0)
   {
@@ -287,7 +289,7 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
 
 void cedar::aux::kernel::Gauss::updateDimensionality()
 {
-  int new_dimensionality = static_cast<int>(_mDimensionality->get());
+  int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
   _mShifts->resize(new_dimensionality, _mShifts->getDefaultValue());
   this->updateKernel();

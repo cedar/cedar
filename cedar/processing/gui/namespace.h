@@ -71,7 +71,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
       class CEDAR_PROC_LIB_EXPORT NetworkFile;
       typedef boost::shared_ptr<NetworkFile> NetworkFilePtr;
-      class CEDAR_PROC_LIB_EXPORT ParameterBase;
+      class CEDAR_PROC_LIB_EXPORT Parameter;
       class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
       class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;

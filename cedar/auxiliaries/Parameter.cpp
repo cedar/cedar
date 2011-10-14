@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleParameter.cpp
+    File:        Parameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2011 07 01
 
     Description:
 
@@ -39,36 +39,36 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/UIntParameter.h"
+#include "auxiliaries/Parameter.h"
+#include "auxiliaries/exceptions.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/namespace.h"
+#include "auxiliaries/Configurable.h"
+#include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QHBoxLayout>
-#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::UIntParameter::UIntParameter(QWidget *pParent)
+cedar::aux::Parameter::Parameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
 :
-cedar::proc::gui::Parameter(pParent)
+mpOwner(pOwner),
+mHasDefault(hasDefault),
+mConstant(false),
+mIsHidden(false),
+mReferenceCount(0)
 {
-  this->setLayout(new QHBoxLayout());
-  this->mpSpinbox = new QSpinBox();
-  this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpSpinbox);
-  this->mpSpinbox->setMinimum(0.0);
-  this->mpSpinbox->setMaximum(100.0);
+  CEDAR_ASSERT(this->mpOwner != NULL);
+  this->setName(name);
 
-  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
+  this->mpOwner->registerParameter(cedar::aux::ParameterPtr(this));
 }
 
-//!@brief Destructor
-cedar::proc::gui::UIntParameter::~UIntParameter()
+cedar::aux::Parameter::~Parameter()
 {
 }
 
@@ -76,28 +76,73 @@ cedar::proc::gui::UIntParameter::~UIntParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::UIntParameter::parameterPointerChanged()
+void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject)
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
-
-  this->mpSpinbox->setValue(parameter->getValue());
-  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
-
-  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
-  this->propertiesChanged();
+  pObject->mReferenceCount += 1;
 }
 
-void cedar::proc::gui::UIntParameter::propertiesChanged()
+void intrusive_ptr_release(cedar::aux::Parameter *pObject)
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
-  this->mpSpinbox->setMinimum(parameter->getMinimum());
-  this->mpSpinbox->setMaximum(parameter->getMaximum());
-  this->mpSpinbox->setDisabled(parameter->isConstant());
+  pObject->mReferenceCount -= 1;
+
+  if (pObject->mReferenceCount == 0)
+  {
+    delete pObject;
+  }
 }
 
-void cedar::proc::gui::UIntParameter::valueChanged(int value)
+void cedar::aux::Parameter::emitChangedSignal()
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
-  parameter->set(value);
+  emit valueChanged();
 }
 
+void cedar::aux::Parameter::emitPropertyChangedSignal()
+{
+  emit propertyChanged();
+}
+
+bool cedar::aux::Parameter::isHidden() const
+{
+  return this->mIsHidden;
+}
+
+void cedar::aux::Parameter::setHidden(bool hide)
+{
+  this->mIsHidden = hide;
+}
+
+bool cedar::aux::Parameter::getReadAutomatically() const
+{
+  return this->mAutoRead;
+}
+
+void cedar::aux::Parameter::setReadAutomatically(bool value)
+{
+  this->mAutoRead = value;
+
+  emit propertyChanged();
+}
+
+bool cedar::aux::Parameter::getHasDefault() const
+{
+  return this->mHasDefault;
+}
+
+void cedar::aux::Parameter::setHasDefault(bool value)
+{
+  this->mHasDefault = value;
+
+  emit propertyChanged();
+}
+
+bool cedar::aux::Parameter::isConstant() const
+{
+  return this->mConstant;
+}
+
+void cedar::aux::Parameter::setConstant(bool value)
+{
+  this->mConstant = value;
+
+  emit propertyChanged();
+}

@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/EnumBase.h"
 
@@ -53,7 +53,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::EnumParameter : public cedar::aux::ParameterBase
+class cedar::aux::EnumParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/gui/MatrixPlot1D.h"
 #include "auxiliaries/gui/exceptions.h"
-#include "auxiliaries/DataT.h"
+#include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/assert.h"
 

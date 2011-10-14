@@ -68,7 +68,6 @@ public:
   :
   mThreshold(new DoubleParameter(this, "threshold", threshold, -1000.0, 1000.0))
   {
-    this->_mName->setHidden(true);
   }
 
   //!@brief Destructor

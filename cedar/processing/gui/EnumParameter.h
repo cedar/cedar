@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
-#include "processing/gui/ParameterBase.h"
+#include "processing/gui/Parameter.h"
 
 // PROJECT INCLUDES
 
@@ -51,7 +51,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::EnumParameter : public cedar::proc::gui::ParameterBase
+class cedar::proc::gui::EnumParameter : public cedar::proc::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

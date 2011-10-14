@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.cpp
+    File:        Duration.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 01
+    Date:        2011 06 03
 
     Description:
 
@@ -39,12 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/ParameterBase.h"
-#include "auxiliaries/exceptions.h"
-#include "auxiliaries/Parameter.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/assert.h"
+#include "units/Duration.h"
 
 // PROJECT INCLUDES
 
@@ -54,21 +49,16 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::ParameterBase::ParameterBase(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
+/*!
+ * @todo explain why this constructor is protected.
+ */
+cedar::unit::Duration::Duration(double amount)
 :
-mpOwner(pOwner),
-mHasDefault(hasDefault),
-mConstant(false),
-mIsHidden(false),
-mReferenceCount(0)
+mAmountInMicroSeconds (amount)
 {
-  CEDAR_ASSERT(this->mpOwner != NULL);
-  this->setName(name);
-
-  this->mpOwner->registerParameter(cedar::aux::ParameterBasePtr(this));
 }
 
-cedar::aux::ParameterBase::~ParameterBase()
+cedar::unit::Duration::~Duration()
 {
 }
 
@@ -76,73 +66,10 @@ cedar::aux::ParameterBase::~ParameterBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject)
+/*!
+ * @todo explain why this function should only be used for testing/debugging.
+ */
+double cedar::unit::Duration::getRawTime() const
 {
-  pObject->mReferenceCount += 1;
-}
-
-void intrusive_ptr_release(cedar::aux::ParameterBase *pObject)
-{
-  pObject->mReferenceCount -= 1;
-
-  if (pObject->mReferenceCount == 0)
-  {
-    delete pObject;
-  }
-}
-
-void cedar::aux::ParameterBase::emitChangedSignal()
-{
-  emit valueChanged();
-}
-
-void cedar::aux::ParameterBase::emitPropertyChangedSignal()
-{
-  emit propertyChanged();
-}
-
-bool cedar::aux::ParameterBase::isHidden() const
-{
-  return this->mIsHidden;
-}
-
-void cedar::aux::ParameterBase::setHidden(bool hide)
-{
-  this->mIsHidden = hide;
-}
-
-bool cedar::aux::ParameterBase::getReadAutomatically() const
-{
-  return this->mAutoRead;
-}
-
-void cedar::aux::ParameterBase::setReadAutomatically(bool value)
-{
-  this->mAutoRead = value;
-
-  emit propertyChanged();
-}
-
-bool cedar::aux::ParameterBase::getHasDefault() const
-{
-  return this->mHasDefault;
-}
-
-void cedar::aux::ParameterBase::setHasDefault(bool value)
-{
-  this->mHasDefault = value;
-
-  emit propertyChanged();
-}
-
-bool cedar::aux::ParameterBase::isConstant() const
-{
-  return this->mConstant;
-}
-
-void cedar::aux::ParameterBase::setConstant(bool value)
-{
-  this->mConstant = value;
-
-  emit propertyChanged();
+  return this->mAmountInMicroSeconds;
 }

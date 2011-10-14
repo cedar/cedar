@@ -40,8 +40,8 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/Configurable.h"
-#include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
@@ -55,11 +55,8 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Configurable::Configurable(bool nameVisible)
+cedar::aux::Configurable::Configurable()
 {
-  //!@todo Remove -- not every configurable has a name.
-  this->_mName = cedar::aux::StringParameterPtr(new cedar::aux::StringParameter(this, "name", ""));
-  this->_mName->setHidden(!nameVisible);
 }
 
 
@@ -102,7 +99,7 @@ void cedar::aux::Configurable::saveJson(const std::string& filename)
   boost::property_tree::write_json(filename, configuration);
 }
 
-void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterBasePtr parameter)
+void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterPtr parameter)
 {
   //! @todo check for duplicate names
   //! @todo make sure there are no dots in the name; make a global function for name checks.
@@ -147,7 +144,7 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
 {
   for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
   {
-    cedar::aux::ParameterBasePtr& parameter = *iter;
+    cedar::aux::ParameterPtr& parameter = *iter;
     try
     {
       const cedar::aux::ConfigurationNode& value = node.get_child(parameter->getName());
@@ -211,14 +208,4 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
                                                     + name + "\".");
   }
   this->mChildren[name] = child;
-}
-
-void cedar::aux::Configurable::setName(const std::string& name)
-{
-  this->_mName->set(name);
-}
-
-const std::string& cedar::aux::Configurable::getName() const
-{
-  return this->_mName->get();
 }

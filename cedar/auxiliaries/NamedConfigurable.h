@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DirectoryParameter.h
+    File:        NamedConfigurable.h
 
     Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 14
 
     Description:
 
@@ -38,61 +34,51 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_DIRECTORY_PARAMETER_H
-#define CEDAR_PROC_GUI_DIRECTORY_PARAMETER_H
+#ifndef CEDAR_AUX_NAMED_CONFIGURABLE_H
+#define CEDAR_AUX_NAMED_CONFIGURABLE_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/Parameter.h"
+#include "auxiliaries/namespace.h"
+#include "auxiliaries/ParameterTemplate.h"
+#include "auxiliaries/Configurable.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QLineEdit>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief This is a Configurable with a name.
  *
- * More detailed description of the class.
+ * This class is provided for convenience, because many classes derived from cedar::aux::Configurable use a name.
  */
-class cedar::proc::gui::DirectoryParameter : public cedar::proc::gui::Parameter
+class cedar::aux::NamedConfigurable : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DirectoryParameter(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  virtual ~DirectoryParameter();
+  NamedConfigurable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-public slots:
-  void onBrowseClicked();
-  void parameterPointerChanged();
-  void parameterValueChanged();
+  void setName(const std::string& name);
+  const std::string& getName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -100,18 +86,20 @@ private:
 protected:
   // none yet
 private:
-  QLineEdit *mpEdit;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  // none yet
+  StringParameterPtr _mName;
 
 private:
   // none yet
 
-}; // class cedar::proc::gui::DirectoryParameter
+}; // class cedar::aux::NamedConfigurable
 
-#endif // CEDAR_PROC_GUI_DIRECTORY_PARAMETER_H
+#endif // CEDAR_AUX_NAMED_CONFIGURABLE_H
 
