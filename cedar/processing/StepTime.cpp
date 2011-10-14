@@ -50,7 +50,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::StepTime::StepTime(const cedar::unit::Time& stepTime)
+cedar::proc::StepTime::StepTime(const cedar::unit::Duration& stepTime)
 :
 mStepTime (stepTime)
 {
@@ -64,7 +64,7 @@ cedar::proc::StepTime::~StepTime()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const cedar::unit::Time& cedar::proc::StepTime::getStepTime() const
+const cedar::unit::Duration& cedar::proc::StepTime::getStepTime() const
 {
   return this->mStepTime;
 }

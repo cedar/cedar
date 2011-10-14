@@ -54,7 +54,7 @@
 
 cedar::proc::gui::DoubleParameter::DoubleParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpSpinbox = new QDoubleSpinBox();
@@ -82,7 +82,7 @@ void cedar::proc::gui::DoubleParameter::parameterPointerChanged()
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
   this->mpSpinbox->setMinimum(parameter->getMinimum());
   this->mpSpinbox->setMaximum(parameter->getMaximum());
-  this->mpSpinbox->setValue(parameter->get());
+  this->mpSpinbox->setValue(parameter->getValue());
   QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
 }
 

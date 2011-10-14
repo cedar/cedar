@@ -84,7 +84,7 @@ public:
    */
   virtual double compute(double value) const
   {
-    return cedar::aux::math::sigmoidAbs(value, mBeta->get(), mThreshold->get());
+    return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), mThreshold->getValue());
   }
 
   //--------------------------------------------------------------------------------------------------------------------

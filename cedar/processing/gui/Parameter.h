@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Time.h
+    File:        Parameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 07 06
 
     Description:
 
@@ -38,55 +38,56 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_TIME_H
-#define CEDAR_UNITS_TIME_H
+#ifndef CEDAR_PROC_GUI_PARAMETER_H
+#define CEDAR_PROC_GUI_PARAMETER_H
 
 // LOCAL INCLUDES
-#include <units/namespace.h>
+#include "processing/gui/namespace.h"
+#include "auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QWidget>
 
 
-/*!@brief Base class for time units.
+/*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
- *
- * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
- *       cedar::units::Milliseconds.
  */
-class cedar::unit::Time
+class cedar::proc::gui::Parameter : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // This class has no public constructors because it should not be used directly.
+  //!@brief The standard constructor.
+  Parameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~Time();
+  virtual ~Parameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief returns the raw time (currently, this is microseconds), mainly used in conversion methods
-   * @return raw time (currently microseconds)
-   */
-  double getRawTime() const;
+  void setParameter(cedar::aux::ParameterPtr pParameter);
+  cedar::aux::ParameterPtr getParameter();
+
+signals:
+  void parameterPointerChanged();
+  void heightChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-  //!@brief The constructor.
-  Time(double amount);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -97,26 +98,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  //!@brief the internal representation of time, currently expressed in microseconds
-  double mAmountInMicroSeconds;
-private:
   // none yet
+private:
+  cedar::aux::ParameterPtr mParameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::unit::Time
+}; // class cedar::proc::gui::Parameter
 
-#endif // CEDAR_UNITS_TIME_H
+#endif // CEDAR_PROC_GUI_PARAMETER_H
 

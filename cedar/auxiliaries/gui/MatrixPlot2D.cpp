@@ -42,7 +42,7 @@
 #include "auxiliaries/gui/MatrixPlot2D.h"
 #include "auxiliaries/gui/exceptions.h"
 #include "auxiliaries/gui/MatrixPlot.h"
-#include "auxiliaries/DataT.h"
+#include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/exceptions.h"
 #include "auxiliaries/assert.h"
 

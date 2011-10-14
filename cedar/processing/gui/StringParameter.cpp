@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/StringParameter.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,7 @@
 
 cedar::proc::gui::StringParameter::StringParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpEdit = new QLineEdit();
@@ -77,7 +77,7 @@ void cedar::proc::gui::StringParameter::parameterPointerChanged()
 {
   cedar::aux::StringParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
-  this->mpEdit->setText(parameter->get().c_str());
+  this->mpEdit->setText(parameter->getValue().c_str());
   QObject::connect(this->mpEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEdited(const QString&)));
 }
 

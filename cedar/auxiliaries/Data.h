@@ -94,7 +94,7 @@ public:
   template <typename T>
   T& getData()
   {
-    return dynamic_cast<DataT<T>&>(*this).getData();
+    return dynamic_cast<DataTemplate<T>&>(*this).getData();
   }
   
   template <typename T>

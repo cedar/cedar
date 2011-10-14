@@ -43,7 +43,6 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 
@@ -51,22 +50,20 @@
 #include <map>
 #include <list>
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief An interface for classes that can store and load parameters from files.
  */
 class cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::aux::ParameterBase;
+  friend class cedar::aux::Parameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros and types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::list<cedar::aux::ParameterBasePtr> ParameterList;
+  typedef std::list<cedar::aux::ParameterPtr> ParameterList;
   typedef std::map<std::string, ParameterList::iterator> ParameterMap;
   typedef std::map<std::string, cedar::aux::ConfigurablePtr> Children;
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,7 +71,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Configurable(bool nameVisible = true);
+  Configurable();
+
   //!@brief Destructor
   virtual ~Configurable();
 
@@ -90,8 +88,6 @@ public:
 
   const ParameterList& getParameters() const;
   ParameterList& getParameters();
-  void setName(const std::string& name);
-  const std::string& getName() const;
 
   void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
 
@@ -99,14 +95,13 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
   virtual void configurationLoaded();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void registerParameter(cedar::aux::ParameterBasePtr parameter);
+  void registerParameter(cedar::aux::ParameterPtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -121,11 +116,8 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  //!@todo Remove?
-  StringParameterPtr _mName;
+  // none yet
 
 private:
   ParameterList mParameterOrder;
