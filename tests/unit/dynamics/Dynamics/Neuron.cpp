@@ -88,7 +88,7 @@ void cedar::Neuron::eulerStep(const cedar::unit::Duration& time)
     interaction = 1.0;
   }
 
-  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + resting_level + interaction_weight * input);
+  activation += Seconds(time) / Milliseconds(50.0) * (-1.0 * activation + resting_level + interaction_weight * interaction);
 
   mOutput->getData() = activation;
 }

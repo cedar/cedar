@@ -35,18 +35,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "namespace.h"
 #include "CoraHead.h"
-#include "devices/robot/gl/namespace.h"
 
 // PROJECT INCLUDES
+#include "auxiliaries/gl/gl.h"
 #include "auxiliaries/gl/drawShapes.h"
 
 // SYSTEM INCLUDES
-#ifdef WIN32
-  #include <gl/GL.h>
-#else // WIN32
-  #include <OpenGL/gl.h>
-#endif // WIN32
 
 using namespace cedar::dev::robot;
 using namespace cedar::dev::robot::gl;
