@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Time.cpp
+    File:        Duration.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "units/Time.h"
+#include "units/Duration.h"
 
 // PROJECT INCLUDES
 
@@ -52,13 +52,13 @@
 /*!
  * @todo explain why this constructor is protected.
  */
-cedar::unit::Time::Time(double amount)
+cedar::unit::Duration::Duration(double amount)
 :
 mAmountInMicroSeconds (amount)
 {
 }
 
-cedar::unit::Time::~Time()
+cedar::unit::Duration::~Duration()
 {
 }
 
@@ -69,7 +69,7 @@ cedar::unit::Time::~Time()
 /*!
  * @todo explain why this function should only be used for testing/debugging.
  */
-double cedar::unit::Time::getRawTime() const
+double cedar::unit::Duration::getRawTime() const
 {
   return this->mAmountInMicroSeconds;
 }
