@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.h
+    File:        ParameterTemplate.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,83 +38,99 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PARAMETER_BASE_H
-#define CEDAR_PROC_PARAMETER_BASE_H
+#ifndef CEDAR_PROC_PARAMETER_TEMPLATE_H
+#define CEDAR_PROC_PARAMETER_TEMPLATE_H
 
 // LOCAL INCLUDES
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
-#include "auxiliaries/lib.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QObject>
-
-// Functions for boost intrusive pointer.
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::ParameterBase *pObject);
-
+#include <iostream>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::aux::ParameterBase : public QObject, public cedar::aux::Base
+template <typename T>
+class cedar::aux::ParameterTemplate : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // friends
-  //--------------------------------------------------------------------------------------------------------------------
-  friend void ::intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject);
-  friend void ::intrusive_ptr_release(cedar::aux::ParameterBase *pObject);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ParameterBase(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault = true);
+  //!@brief The constructor.
+  ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name, const T& defaultValue)
+  :
+  cedar::aux::Parameter(pOwner, name, true),
+  mValue(defaultValue),
+  mDefault(defaultValue)
+  {
+  }
+
+  ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name)
+  :
+  cedar::aux::Parameter(pOwner, name, false)
+  {
+  }
 
   //!@brief Destructor
-  virtual ~ParameterBase();
+  ~ParameterTemplate()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  const T& getValue() const
+  {
+    return this->mValue;
+  }
 
-  bool getReadAutomatically() const;
-  void setReadAutomatically(bool value);
+  void putTo(cedar::aux::ConfigurationNode& root)
+  {
+    root.put(this->getName(), this->mValue);
+  }
 
-  bool getHasDefault() const;
-  void setHasDefault(bool value);
+  void set(const T& value)
+  {
+    this->mValue = value;
+    emit valueChanged();
+  }
 
-  bool isConstant() const;
-  void setConstant(bool value);
+  void setTo(const cedar::aux::ConfigurationNode& node)
+  {
+#ifdef DEBUG
+    try
+    {
+#endif
+      this->mValue = node.get_value<T>();
+#ifdef DEBUG
+    }
+    catch (const boost::property_tree::ptree_bad_path& e)
+    {
+      std::cout << "Error while setting parameter to value: " << e.what() << std::endl;
+    }
+#endif
+  }
 
-  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
-  virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
-  virtual void makeDefault() = 0;
-
-  bool isHidden() const;
-  void setHidden(bool hide);
-
-  void emitChangedSignal();
-  void emitPropertyChangedSignal();
+  void makeDefault()
+  {
+    this->set(mDefault);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-  signals:
-    void valueChanged();
-    void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -125,26 +141,16 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  //! The owner of this parameter, i.e., the object using it.
-  cedar::aux::Configurable *mpOwner;
+  //! The current parameter value.
+  T mValue;
 
-  //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
-  bool mAutoRead;
-
-  //! Whether a default value should be set
-  bool mHasDefault;
-
-  //! Whether this parameter can be changed during runtime.
-  bool mConstant;
-
-  //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
-  bool mIsHidden;
-
-  //! Reference counter for boost intrusive pointer.
-  unsigned int mReferenceCount;
+  //! The default value of the parameter. Ignored if mHasDefault is false.
+  T mDefault;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -155,7 +161,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::ParameterBase
+}; // class cedar::aux::ParameterTemplate
 
-#endif // CEDAR_PROC_PARAMETER_BASE_H
+#endif // CEDAR_PROC_PARAMETER_TEMPLATE_H
 

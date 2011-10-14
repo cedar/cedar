@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataT.h
+    File:        Parameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Date:        2011 07 06
 
     Description:
 
@@ -38,62 +38,50 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_DATA_T_H
-#define CEDAR_AUX_DATA_T_H
+#ifndef CEDAR_PROC_GUI_PARAMETER_H
+#define CEDAR_PROC_GUI_PARAMETER_H
 
 // LOCAL INCLUDES
+#include "processing/gui/namespace.h"
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
+#include <QWidget>
+
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-template <typename T>
-class cedar::aux::DataT : public cedar::aux::Data
+class cedar::proc::gui::Parameter : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataT()
-  {
-  }
-
-  DataT(const T& value)
-  {
-    this->mData = value;
-  }
+  Parameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~DataT()
-  {
-  }
+  virtual ~Parameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  void setParameter(cedar::aux::ParameterPtr pParameter);
+  cedar::aux::ParameterPtr getParameter();
 
-  T& getData()
-  {
-    return this->mData;
-  }
-
-  const T& getData() const
-  {
-    return this->mData;
-  }
+signals:
+  void parameterPointerChanged();
+  void heightChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -110,25 +98,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  T mData;
-
+  // none yet
 private:
+  cedar::aux::ParameterPtr mParameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::aux::DataT
+}; // class cedar::proc::gui::Parameter
 
-#endif // CEDAR_AUX_DATA_T_H
+#endif // CEDAR_PROC_GUI_PARAMETER_H
 

@@ -38,7 +38,7 @@
 #define CEDAR_AUX_DIRECTORY_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/ParameterBase.h"
+#include "auxiliaries/Parameter.h"
 #include "auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
@@ -50,7 +50,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::DirectoryParameter : public cedar::aux::ParameterBase
+class cedar::aux::DirectoryParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,13 +63,13 @@ public:
   //!@brief The standard constructor.
   DirectoryParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::ParameterBase(pOwner, name, false)
+  cedar::aux::Parameter(pOwner, name, false)
   {
   }
 
   DirectoryParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::string& defaultValue)
   :
-  cedar::aux::ParameterBase(pOwner, name, true),
+  cedar::aux::Parameter(pOwner, name, true),
   mDefault(defaultValue.c_str())
   {
   }

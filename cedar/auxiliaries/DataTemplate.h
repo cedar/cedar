@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.h
+    File:        DataTemplate.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2011 05 23
 
     Description:
 
@@ -38,50 +38,62 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_PARAMETER_BASE_H
-#define CEDAR_PROC_GUI_PARAMETER_BASE_H
+#ifndef CEDAR_AUX_DATA_TEMPLATE_H
+#define CEDAR_AUX_DATA_TEMPLATE_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
 #include "auxiliaries/namespace.h"
+#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QWidget>
-
+#include <QReadWriteLock>
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::ParameterBase : public QWidget
+template <typename T>
+class cedar::aux::DataTemplate : public cedar::aux::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ParameterBase(QWidget *pParent = NULL);
+  DataTemplate()
+  {
+  }
+
+  DataTemplate(const T& value)
+  {
+    this->mData = value;
+  }
 
   //!@brief Destructor
-  virtual ~ParameterBase();
+  virtual ~DataTemplate()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setParameter(cedar::aux::ParameterBasePtr pParameter);
-  cedar::aux::ParameterBasePtr getParameter();
 
-signals:
-  void parameterPointerChanged();
-  void heightChanged();
+  T& getData()
+  {
+    return this->mData;
+  }
+
+  const T& getData() const
+  {
+    return this->mData;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,21 +110,25 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  // none yet
+  T mData;
+
 private:
-  cedar::aux::ParameterBasePtr mParameter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::gui::ParameterBase
+}; // class cedar::aux::DataTemplate
 
-#endif // CEDAR_PROC_GUI_PARAMETER_BASE_H
+#endif // CEDAR_AUX_DATA_TEMPLATE_H
 

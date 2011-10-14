@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.cpp
+    File:        Parameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,9 +39,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/ParameterBase.h"
-#include "auxiliaries/exceptions.h"
 #include "auxiliaries/Parameter.h"
+#include "auxiliaries/exceptions.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/Configurable.h"
 #include "auxiliaries/assert.h"
@@ -54,7 +54,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::ParameterBase::ParameterBase(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
+cedar::aux::Parameter::Parameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
 :
 mpOwner(pOwner),
 mHasDefault(hasDefault),
@@ -65,10 +65,10 @@ mReferenceCount(0)
   CEDAR_ASSERT(this->mpOwner != NULL);
   this->setName(name);
 
-  this->mpOwner->registerParameter(cedar::aux::ParameterBasePtr(this));
+  this->mpOwner->registerParameter(cedar::aux::ParameterPtr(this));
 }
 
-cedar::aux::ParameterBase::~ParameterBase()
+cedar::aux::Parameter::~Parameter()
 {
 }
 
@@ -76,12 +76,12 @@ cedar::aux::ParameterBase::~ParameterBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void intrusive_ptr_add_ref(cedar::aux::ParameterBase *pObject)
+void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject)
 {
   pObject->mReferenceCount += 1;
 }
 
-void intrusive_ptr_release(cedar::aux::ParameterBase *pObject)
+void intrusive_ptr_release(cedar::aux::Parameter *pObject)
 {
   pObject->mReferenceCount -= 1;
 
@@ -91,56 +91,56 @@ void intrusive_ptr_release(cedar::aux::ParameterBase *pObject)
   }
 }
 
-void cedar::aux::ParameterBase::emitChangedSignal()
+void cedar::aux::Parameter::emitChangedSignal()
 {
   emit valueChanged();
 }
 
-void cedar::aux::ParameterBase::emitPropertyChangedSignal()
+void cedar::aux::Parameter::emitPropertyChangedSignal()
 {
   emit propertyChanged();
 }
 
-bool cedar::aux::ParameterBase::isHidden() const
+bool cedar::aux::Parameter::isHidden() const
 {
   return this->mIsHidden;
 }
 
-void cedar::aux::ParameterBase::setHidden(bool hide)
+void cedar::aux::Parameter::setHidden(bool hide)
 {
   this->mIsHidden = hide;
 }
 
-bool cedar::aux::ParameterBase::getReadAutomatically() const
+bool cedar::aux::Parameter::getReadAutomatically() const
 {
   return this->mAutoRead;
 }
 
-void cedar::aux::ParameterBase::setReadAutomatically(bool value)
+void cedar::aux::Parameter::setReadAutomatically(bool value)
 {
   this->mAutoRead = value;
 
   emit propertyChanged();
 }
 
-bool cedar::aux::ParameterBase::getHasDefault() const
+bool cedar::aux::Parameter::getHasDefault() const
 {
   return this->mHasDefault;
 }
 
-void cedar::aux::ParameterBase::setHasDefault(bool value)
+void cedar::aux::Parameter::setHasDefault(bool value)
 {
   this->mHasDefault = value;
 
   emit propertyChanged();
 }
 
-bool cedar::aux::ParameterBase::isConstant() const
+bool cedar::aux::Parameter::isConstant() const
 {
   return this->mConstant;
 }
 
-void cedar::aux::ParameterBase::setConstant(bool value)
+void cedar::aux::Parameter::setConstant(bool value)
 {
   this->mConstant = value;
 

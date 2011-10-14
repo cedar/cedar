@@ -40,8 +40,8 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/Configurable.h"
-#include "auxiliaries/ParameterBase.h"
 #include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
@@ -99,7 +99,7 @@ void cedar::aux::Configurable::saveJson(const std::string& filename)
   boost::property_tree::write_json(filename, configuration);
 }
 
-void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterBasePtr parameter)
+void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterPtr parameter)
 {
   //! @todo check for duplicate names
   //! @todo make sure there are no dots in the name; make a global function for name checks.
@@ -144,7 +144,7 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
 {
   for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
   {
-    cedar::aux::ParameterBasePtr& parameter = *iter;
+    cedar::aux::ParameterPtr& parameter = *iter;
     try
     {
       const cedar::aux::ConfigurationNode& value = node.get_child(parameter->getName());

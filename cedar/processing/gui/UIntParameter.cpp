@@ -55,7 +55,7 @@
 
 cedar::proc::gui::UIntParameter::UIntParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpSpinbox = new QSpinBox();

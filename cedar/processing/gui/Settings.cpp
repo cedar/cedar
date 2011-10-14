@@ -40,7 +40,7 @@
 #include "auxiliaries/SetParameter.h"
 #include "auxiliaries/DirectoryParameter.h"
 #include "auxiliaries/VectorParameter.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 #include "auxiliaries/System.h"
 
 // PROJECT INCLUDES

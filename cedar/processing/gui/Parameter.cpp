@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/ParameterBase.h"
-#include "auxiliaries/ParameterBase.h"
+#include "processing/gui/Parameter.h"
+#include "auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 
@@ -50,14 +50,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::ParameterBase::ParameterBase(QWidget *pParent)
+cedar::proc::gui::Parameter::Parameter(QWidget *pParent)
 :
 QWidget(pParent)
 {
 }
 
 //!@brief Destructor
-cedar::proc::gui::ParameterBase::~ParameterBase()
+cedar::proc::gui::Parameter::~Parameter()
 {
 }
 
@@ -65,13 +65,13 @@ cedar::proc::gui::ParameterBase::~ParameterBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ParameterBase::setParameter(cedar::aux::ParameterBasePtr pParameter)
+void cedar::proc::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
 {
   this->mParameter = pParameter;
   emit parameterPointerChanged();
 }
 
-cedar::aux::ParameterBasePtr cedar::proc::gui::ParameterBase::getParameter()
+cedar::aux::ParameterPtr cedar::proc::gui::Parameter::getParameter()
 {
   return this->mParameter;
 }

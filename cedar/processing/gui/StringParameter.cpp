@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "processing/gui/StringParameter.h"
-#include "auxiliaries/Parameter.h"
+#include "auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 
@@ -54,7 +54,7 @@
 
 cedar::proc::gui::StringParameter::StringParameter(QWidget *pParent)
 :
-cedar::proc::gui::ParameterBase(pParent)
+cedar::proc::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpEdit = new QLineEdit();
