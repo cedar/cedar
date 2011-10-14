@@ -107,13 +107,7 @@ macro(cedar_add_test)
 
   # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
   set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-  # append unit/ if this is a unit test
-  if(${test_DIRECTORY} MATCHES "unit$")
-    set(runtime_directory "${CEDAR_EXE_DIR}/unittests/${testSubdirectory}")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${runtime_directory})
-  else(${test_DIRECTORY} MATCHES "unit$")
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${testSubdirectory})
-  endif(${test_DIRECTORY} MATCHES "unit$")
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${test_PREFIX}/${testSubdirectory})
 
   # compose the name of the executable from a given prefix and the test name
   set(testExecutableName "${test_PREFIX}_${testName}")
@@ -129,12 +123,7 @@ macro(cedar_add_test)
   #
   # add_test(<test identifier> <executable name> <arguments for the test>)
   if (test_AUTOMATIC)
-    if(${test_DIRECTORY} MATCHES "unit$")   # append unit/ if this is a unit test
-      set(runtime_directory "${CEDAR_EXE_DIR}/unittests/${testSubdirectory}")
-      add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${runtime_directory}/${testExecutableName} ${test_ARGUMENTS})
-    else(${test_DIRECTORY} MATCHES "unit$")
-      add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})    
-    endif(${test_DIRECTORY} MATCHES "unit$")          
+    add_test(${testName} ${CMAKE_COMMAND} -E chdir ${test_DIRECTORY}/${testSubdirectory}/${testName} ${CEDAR_EXE_DIR}/${test_PREFIX}/${testSubdirectory}/${testExecutableName} ${test_ARGUMENTS})
   endif (test_AUTOMATIC)
   
   # link all cedar and third party libraries into the unit test executable
