@@ -131,6 +131,10 @@ public:
 
   cedar::aux::DirectoryParameterPtr lastArchitectureLoadDialogDirectory();
 
+  void appendArchitectureFileToHistory(const std::string& filePath);
+
+  cedar::aux::StringVectorParameterPtr getArchitectureFileHistory();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -181,6 +185,9 @@ private:
 
   //!@brief Directory, where the load dialog for architectures is supposed to open.
   cedar::aux::DirectoryParameterPtr mArchitectureLoadDialogDirectory;
+
+  //!@brief History of architecture files recently loaded.
+  cedar::aux::StringVectorParameterPtr mRecentArchitectureFiles;
 
 }; // class cedar::proc::gui::Settings
 

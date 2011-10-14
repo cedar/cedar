@@ -101,6 +101,8 @@ public slots:
   void saveAs();
   void load();
 
+  void loadFile(QString path);
+
   void resetTo(cedar::proc::gui::NetworkFilePtr network);
 
   void showLoadPluginDialog();
@@ -108,6 +110,10 @@ public slots:
   void showManagePluginsDialog();
 
   void toggleGrid(bool toggled);
+
+  void fillRecentFilesList();
+
+  void recentFileItemTriggered();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -126,6 +132,7 @@ private:
 
   void storeSettings();
   void restoreSettings();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
