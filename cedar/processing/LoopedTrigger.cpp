@@ -42,7 +42,7 @@
 // LOCAL INCLUDES
 #include "processing/LoopedTrigger.h"
 #include "processing/StepTime.h"
-#include "units/TimeUnit.h"
+#include "units/DurationUnit.h"
 #include "processing/Manager.h"
 #include "processing/LoopMode.h"
 #include "auxiliaries/System.h"

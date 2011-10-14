@@ -141,7 +141,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
   return this->cedar::proc::Step::determineInputValidity(slot, data);
 }
 
-void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
+void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
 {
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();

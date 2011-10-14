@@ -44,7 +44,7 @@
 // LOCAL INCLUDES
 #include "dynamics/namespace.h"
 #include "processing/Step.h"
-#include "units/TimeUnit.h"
+#include "units/DurationUnit.h"
 
 // PROJECT INCLUDES
 
@@ -80,7 +80,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  virtual void eulerStep(const cedar::unit::Time& time) = 0;
+  virtual void eulerStep(const cedar::unit::Duration& time) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

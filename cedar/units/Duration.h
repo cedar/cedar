@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Time.h
+    File:        Duration.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_TIME_H
-#define CEDAR_UNITS_TIME_H
+#ifndef CEDAR_UNITS_DURATION_H
+#define CEDAR_UNITS_DURATION_H
 
 // LOCAL INCLUDES
 #include <units/namespace.h>
@@ -56,7 +56,7 @@
  * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
  *       cedar::units::Milliseconds.
  */
-class cedar::unit::Time
+class cedar::unit::Duration
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,7 +69,7 @@ public:
   // This class has no public constructors because it should not be used directly.
 
   //!@brief Destructor
-  virtual ~Time();
+  virtual ~Duration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -86,7 +86,7 @@ public:
 protected:
   // none yet
   //!@brief The constructor.
-  Time(double amount);
+  Duration(double amount);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -116,7 +116,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::unit::Time
+}; // class cedar::unit::Duration
 
-#endif // CEDAR_UNITS_TIME_H
+#endif // CEDAR_UNITS_DURATION_H
 
