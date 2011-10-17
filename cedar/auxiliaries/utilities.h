@@ -38,8 +38,10 @@
 #define CEDAR_AUX_UTILITIES_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/macros.h"
 #include "auxiliaries/assert.h"
+
+// PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 

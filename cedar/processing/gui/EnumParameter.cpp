@@ -37,9 +37,9 @@
 // LOCAL INCLUDES
 #include "processing/gui/EnumParameter.h"
 #include "auxiliaries/EnumParameter.h"
-#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

@@ -41,9 +41,9 @@
 // LOCAL INCLUDES
 #include "namespace.h"
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

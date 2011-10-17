@@ -38,7 +38,7 @@
 #ifndef CEDAR_@CAP_LIB_NAME@_LIB_H
 #define CEDAR_@CAP_LIB_NAME@_LIB_H
 
-#include "auxiliaries/macros.h"
+#include "defines.h"
 
 #ifdef MSVC
 

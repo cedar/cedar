@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 #include "auxiliaries/sleepFunctions.h"
-#include "auxiliaries/macros.h"
+#include "defines.h"
 
 #ifdef WINDOWS
   #include <Windows.h>

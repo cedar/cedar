@@ -39,7 +39,9 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/lib.h"
-#include "auxiliaries/macros.h"
+
+// PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <sstream>

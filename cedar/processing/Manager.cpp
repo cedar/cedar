@@ -49,7 +49,6 @@
 #include "processing/LoopedTrigger.h"
 #include "processing/MultiTrigger.h"
 #include "processing/Group.h"
-#include "auxiliaries/macros.h"
 #include "processing/PluginProxy.h"
 #include "processing/PluginDeclaration.h"
 #include "processing/Connection.h"
@@ -57,6 +56,7 @@
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
