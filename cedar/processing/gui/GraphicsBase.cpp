@@ -84,8 +84,8 @@ mAllowedConnectTargets(canConnectTo)
 {
   this->setZValue(1.0);
 
-  this->mWidth->set(width);
-  this->mHeight->set(height);
+  this->mWidth->setValue(width);
+  this->mHeight->setValue(height);
 
   this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges);
 }
@@ -101,13 +101,13 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 
 void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 {
-  this->mHeight->set(static_cast<double>(height));
+  this->mHeight->setValue(static_cast<double>(height));
   this->update();
 }
 
 void cedar::proc::gui::GraphicsBase::setWidth(qreal width)
 {
-  this->mWidth->set(static_cast<double>(width));
+  this->mWidth->setValue(static_cast<double>(width));
   this->update();
 }
 

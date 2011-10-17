@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Stephan Zibner
-#   Email:       stephan.zibner@ini.rub.de
-#   Date:        2011 07 14
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2011 10 14
 #
 #   Description:
 #
@@ -34,5 +34,6 @@
 #
 #=======================================================================================================================
 
-
-cedar_add_unit_test(Kernel main.cpp)
+cedar_add_unit_test(ArchitectureIO
+                    ArchitectureIO.cpp
+                    )

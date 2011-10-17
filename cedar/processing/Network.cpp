@@ -172,6 +172,16 @@ void cedar::proc::Network::readFile(const std::string& filename)
   this->readFrom(cfg);
 }
 
+void cedar::proc::Network::writeFile(const std::string& filename)
+{
+#ifdef DEBUG_FILE_READING
+  std::cout << "Writing configuration file " << filename << std::endl;
+#endif // DEBUG_FILE_READING
+  cedar::aux::ConfigurationNode cfg;
+  this->saveTo(cfg);
+  boost::property_tree::write_json(filename, cfg);
+}
+
 void cedar::proc::Network::saveTo(cedar::aux::ConfigurationNode& root)
 {
   cedar::aux::ConfigurationNode steps;
@@ -359,19 +369,29 @@ void cedar::proc::Network::readGroups(const cedar::aux::ConfigurationNode& root)
 void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::Connection* pConnection)
 {
   //!@todo move this code to the connection class?
-
-  if (!pConnection->getSource())
+  //!@todo this code is weird anyways, especially the try catch stuff.
+  try
+  {
+    pConnection->getSource();
+  }
+  catch (const cedar::proc::ConnectionMemberDeletedException&)
   {
     // this happens when the source is a trigger
     CEDAR_DEBUG_ASSERT(pConnection->getSourceTrigger().get() != NULL);
     return;
   }
-  if (!pConnection->getTarget())
+
+  try
+  {
+    pConnection->getTarget();
+  }
+  catch (const cedar::proc::ConnectionMemberDeletedException&)
   {
     // this happens when the target is a trigger
     CEDAR_DEBUG_ASSERT(pConnection->getTargetTrigger().get() != NULL);
     return;
   }
+
   std::string source_str = pConnection->getSource()->getName() + "." + pConnection->getSourceName();
   std::string target_str = pConnection->getTarget()->getName() + "." + pConnection->getTargetName();
 

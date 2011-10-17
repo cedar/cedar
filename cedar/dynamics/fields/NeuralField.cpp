@@ -69,7 +69,7 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000))
 {
-  _mDimensionality->set(2);
+  _mDimensionality->setValue(2);
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   this->declareBuffer("activation");

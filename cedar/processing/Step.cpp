@@ -290,7 +290,7 @@ const cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id r
 
 void cedar::proc::Step::setName(const std::string& name)
 {
-  this->_mName->set(name);
+  this->_mName->setValue(name);
 }
 
 const std::string& cedar::proc::Step::getName() const
@@ -698,7 +698,7 @@ cedar::proc::TriggerPtr& cedar::proc::Step::getFinishedTrigger()
 
 void cedar::proc::Step::setThreaded(bool isThreaded)
 {
-  this->mRunInThread->set(isThreaded);
+  this->mRunInThread->setValue(isThreaded);
 }
 
 /*!

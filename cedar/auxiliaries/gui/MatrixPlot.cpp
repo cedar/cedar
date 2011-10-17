@@ -66,6 +66,11 @@ mpCurrentPlotWidget(NULL)
   QVBoxLayout *p_layout = new QVBoxLayout();
   p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
+
+  if (pParent != NULL)
+  {
+    mWindowTitle = pParent->windowTitle();
+  }
 }
 
 cedar::aux::gui::MatrixPlot::~MatrixPlot()
@@ -83,6 +88,12 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
                 "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
+  }
+
+  if (QWidget *p_parent = dynamic_cast<QWidget*>(this->parent()))
+  {
+    QString add = QString(" [%1 x %2]").arg(this->mData->getData().rows).arg(this->mData->getData().cols);
+    p_parent->setWindowTitle(mWindowTitle + add);
   }
 
   if (this->mpCurrentPlotWidget)

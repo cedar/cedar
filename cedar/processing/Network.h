@@ -97,6 +97,7 @@ public:
   void saveTo(cedar::aux::ConfigurationNode& root);
 
   void readFile(const std::string& filename);
+  void writeFile(const std::string& filename);
 
   void add(cedar::proc::StepPtr step);
   void remove(cedar::proc::StepPtr step);

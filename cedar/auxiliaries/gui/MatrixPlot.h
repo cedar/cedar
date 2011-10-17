@@ -103,6 +103,7 @@ protected:
 private:
   cedar::aux::MatDataPtr mData;
   QWidget *mpCurrentPlotWidget;
+  QString mWindowTitle;
 
   static Qwt3D::ColorVector mStandardColorVector;
 

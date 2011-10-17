@@ -66,7 +66,7 @@ _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 _mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", kernelFile))
 {
   mpReadWriteLockOutput = new QReadWriteLock();
-  _mDimensionality->set(dimensionality);
+  _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
 }
 
@@ -128,7 +128,7 @@ unsigned int cedar::aux::kernel::Kernel::getDimensionality() const
 
 void cedar::aux::kernel::Kernel::setDimensionality(unsigned int dimensionality)
 {
-  this->_mDimensionality->set(dimensionality);
+  this->_mDimensionality->setValue(dimensionality);
 }
 
 void cedar::aux::kernel::Kernel::updateKernel()
