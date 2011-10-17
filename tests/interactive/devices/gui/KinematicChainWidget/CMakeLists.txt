@@ -1,0 +1,1 @@
+cedar_add_interactive_test("KinematicChainWidget" main.cpp)
