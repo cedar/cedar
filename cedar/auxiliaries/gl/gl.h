@@ -34,9 +34,10 @@
 
 ======================================================================================================================*/
 
-#if defined (WIN32)
+#if defined WIN32
+  #include <Windows.h>
   #include <gl/GL.h>
-#elif defined (APPLE)
+#elif defined APPLE
   #include <gl/GL.h>
 #else
   #include <GL/gl.h>
