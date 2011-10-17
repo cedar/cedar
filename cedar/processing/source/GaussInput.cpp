@@ -69,7 +69,7 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigma", 2, 3.0, 0.01, 1000
 _mCenters(new cedar::aux::DoubleVectorParameter(this, "centers", 2, 3.0, -10000.0, 10000.0)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
 {
-  _mDimensionality->set(2);
+  _mDimensionality->setValue(2);
 //  _mDimensionality->setConstant(true);
   _mSigmas->makeDefault();
   _mCenters->makeDefault();

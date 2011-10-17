@@ -265,7 +265,7 @@ double cedar::aux::kernel::Gauss::getShift(unsigned int dimension) const
 
 void cedar::aux::kernel::Gauss::setAmplitude(double amplitude)
 {
-  _mAmplitude->set(amplitude);
+  _mAmplitude->setValue(amplitude);
 }
 
 double cedar::aux::kernel::Gauss::getAmplitude() const

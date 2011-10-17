@@ -90,6 +90,6 @@ void cedar::proc::gui::DoubleParameter::valueChanged(double value)
 {
   cedar::aux::DoubleParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
-  parameter->set(value);
+  parameter->setValue(value);
 }
 

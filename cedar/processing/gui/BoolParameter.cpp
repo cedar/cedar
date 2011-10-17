@@ -85,6 +85,6 @@ void cedar::proc::gui::BoolParameter::stateChanged(int state)
 {
   cedar::aux::BoolParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
-  parameter->set(state == Qt::Checked);
+  parameter->setValue(state == Qt::Checked);
 }
 

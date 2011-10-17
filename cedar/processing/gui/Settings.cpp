@@ -185,11 +185,11 @@ void cedar::proc::gui::Settings::storeMainWindow(QMainWindow *pWindow)
 {
   QByteArray window_state = pWindow->saveState();
   QByteArray window_state_hex = window_state.toHex();
-  mMainWindowState->set(window_state_hex.constData());
+  mMainWindowState->setValue(window_state_hex.constData());
   
   QByteArray window_geometry = pWindow->saveGeometry();
   QByteArray window_geometry_hex = window_geometry.toHex();
-  mMainWindowGeometry->set(window_geometry_hex.constData());
+  mMainWindowGeometry->setValue(window_geometry_hex.constData());
 }
 
 void cedar::proc::gui::Settings::restoreMainWindow(QMainWindow *pWindow)
@@ -211,8 +211,8 @@ void cedar::proc::gui::Settings::restoreMainWindow(QMainWindow *pWindow)
 
 void cedar::proc::gui::Settings::DockSettings::getFrom(QDockWidget *pDock)
 {
-  this->mVisible->set(pDock->isVisible());
-  this->mFloating->set(pDock->isFloating());
+  this->mVisible->setValue(pDock->isVisible());
+  this->mFloating->setValue(pDock->isFloating());
 }
 
 void cedar::proc::gui::Settings::DockSettings::setTo(QDockWidget *pDock)

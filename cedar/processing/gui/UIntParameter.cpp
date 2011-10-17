@@ -98,6 +98,6 @@ void cedar::proc::gui::UIntParameter::propertiesChanged()
 void cedar::proc::gui::UIntParameter::valueChanged(int value)
 {
   cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
-  parameter->set(value);
+  parameter->setValue(value);
 }
 

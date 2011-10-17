@@ -57,7 +57,7 @@ _mName(new cedar::aux::StringParameter(this, "name", ""))
 
 void cedar::aux::NamedConfigurable::setName(const std::string& name)
 {
-  this->_mName->set(name);
+  this->_mName->setValue(name);
 }
 
 const std::string& cedar::aux::NamedConfigurable::getName() const
