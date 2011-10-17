@@ -39,9 +39,9 @@
 // LOCAL INCLUDES
 #include "auxiliaries/math/namespace.h"
 #include "auxiliaries/lib.h"
-#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <math.h>

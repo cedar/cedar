@@ -41,8 +41,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_DEFINES_H
-#define CEDAR_AUX_DEFINES_H
+#ifndef CEDAR_DEFINES_H
+#define CEDAR_DEFINES_H
 
 // LOCAL INCLUDES
 
@@ -60,5 +60,69 @@
 #define cedar_foreach BOOST_FOREACH
 
 
+//----------------------------------------------------------------------------------------------------------------------
+// macros
+//----------------------------------------------------------------------------------------------------------------------
 
-#endif // CEDAR_AUX_DEFINES_H
+
+/*! @def     CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
+ *
+ *  @brief   Automatically declares the smart pointer types  of a class within a namespace block.
+ *
+ *           Calling namespace foo { CEDAR_GENERATE_POINTER_TYPES(Bar); } expands to
+ *           namespace foo
+ *           {
+ *             typedef boost::shared_ptr<Bar> BarPtr;
+ *             typedef boost::shared_ptr<const Bar> ConstBarPtr;
+ *           }
+ */
+#define CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME) \
+  typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
+  typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
+
+#define CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME) \
+  typedef boost::intrusive_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
+  typedef boost::intrusive_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
+
+/*! @def     CEDAR_DECLARE_CLASS(CLASS_NAME)
+ *
+ *  @brief   Automatically declares a class and its corresponding smart pointer types within a namespace block.
+ *
+ *           Calling namespace foo { CEDAR_DECLARE_CLASS(Bar); } expands to
+ *           namespace foo
+ *           {
+ *             class Bar;
+ *             typedef boost::shared_ptr<Bar> BarPtr;
+ *             typedef boost::shared_ptr<const Bar> ConstBarPtr;
+ *           }
+ */
+
+#define CEDAR_DECLARE_CLASS(CLASS_NAME) \
+  class CLASS_NAME; \
+  CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
+
+#define CEDAR_DECLARE_CLASS_INTRUSIVE(CLASS_NAME) \
+  class CLASS_NAME; \
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME)
+
+#define CEDAR_DECLARE_CLASS_PREFIXED(PREFIX, CLASS_NAME) \
+  class PREFIX CLASS_NAME; \
+  CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
+
+#define CEDAR_DECLARE_CLASS_INTRUSIVE_PREFIXED(PREFIX, CLASS_NAME) \
+  class PREFIX CLASS_NAME; \
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME)
+
+
+#ifdef MSVC
+#define CEDAR_DECLARE_DEPRECATED(x) __declspec(deprecated) x
+#elif defined GCC
+#define CEDAR_DECLARE_DEPRECATED(x) x __attribute__ ((deprecated))
+#else
+#error CEDAR_DECLARE_DEPRECATED is not implemented for this compiler.
+#endif
+
+
+
+
+#endif // CEDAR_DEFINES_H

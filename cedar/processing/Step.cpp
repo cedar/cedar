@@ -46,10 +46,10 @@
 #include "processing/exceptions.h"
 #include "auxiliaries/Data.h"
 #include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/macros.h"
 #include "auxiliaries/System.h"
 
 // PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

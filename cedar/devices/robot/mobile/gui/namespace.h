@@ -39,9 +39,9 @@
 #define CEDAR_DEV_ROBOT_MOBILE_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/macros.h"
 
 // PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
