@@ -117,32 +117,16 @@ cedar::proc::Connection::~Connection()
 
 bool cedar::proc::Connection::isValid() const
 {
-  try
-  {
-    if (this->mSource.lock() && this->mTarget.lock())
-    {
-      this->getSource();
-      this->getTarget();
-      return true;
-    }
-    else if (this->mTrigger.lock() && this->mTargetTrigger.lock())
-    {
-      this->getSourceTrigger();
-      this->getTargetTrigger();
-      return true;
-    }
-    else if (this->mTrigger.lock() && this->mTarget.lock())
-    {
-      this->getSourceTrigger();
-      this->getTarget();
-      return true;
-    }
-    return false;
-  }
-  catch (const cedar::proc::ConnectionMemberDeletedException&)
-  {
-    return false;
-  }
+  return
+      // Step-to-step connection
+      (this->mSource.lock() && this->mTarget.lock())
+      ||
+      // Step-to-trigger connection
+      (this->mSource.lock() && this->mTargetTrigger.lock())
+      ||
+      // Trigger-to-trigger connection
+      (this->mTrigger.lock() && this->mTargetTrigger.lock())
+      ;
 }
 
 cedar::proc::ConstTriggerPtr cedar::proc::Connection::getSourceTrigger() const
