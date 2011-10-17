@@ -40,6 +40,8 @@
 // LOCAL INCLUDES
 #include "processing/gui/namespace.h"
 #include "auxiliaries/Configurable.h"
+#include "auxiliaries/ParameterTemplate.h"
+#include "auxiliaries/VectorParameter.h"
 
 // PROJECT INCLUDES
 
