@@ -384,6 +384,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     const cedar::aux::Enum& e = action_type_map[a];
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
 
+    //!@todo It would be better if setting the title would be part of the actual widget
     std::string title = this->mStep->getSlot(e, data_name)->getText();
     title += " (" + this->mStep->getName();
     title += "." + data_name + ")";

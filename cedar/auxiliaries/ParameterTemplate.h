@@ -94,15 +94,15 @@ public:
     return this->mValue;
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
-  {
-    root.put(this->getName(), this->mValue);
-  }
-
-  void set(const T& value)
+  void setValue(const T& value)
   {
     this->mValue = value;
     emit valueChanged();
+  }
+
+  void putTo(cedar::aux::ConfigurationNode& root)
+  {
+    root.put(this->getName(), this->mValue);
   }
 
   void setTo(const cedar::aux::ConfigurationNode& node)
@@ -123,7 +123,7 @@ public:
 
   void makeDefault()
   {
-    this->set(mDefault);
+    this->setValue(mDefault);
   }
 
   //--------------------------------------------------------------------------------------------------------------------

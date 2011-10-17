@@ -34,13 +34,13 @@
 
 ======================================================================================================================*/
 
-/*!@file  macros.h
+/*!@file  assert.h
  *
  * @brief File containing multiple global macros for cedar.
  */
 
-#ifndef CEDAR_ASSERT_MACROS_H
-#define CEDAR_ASSERT_MACROS_H
+#ifndef CEDAR_ASSERT_H
+#define CEDAR_ASSERT_H
 
 #include <iostream>
 #include <string>
@@ -65,5 +65,5 @@
 
 #endif // DEBUG
 
-#endif // CEDAR_ASSERT_MACROS_H
+#endif // CEDAR_ASSERT_H
 
