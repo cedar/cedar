@@ -108,6 +108,7 @@ protected:
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
   cedar::aux::math::SigmoidPtr mSigmoid;
   cedar::aux::kernel::GaussPtr mKernel;
+  cedar::aux::DoubleDataPtr mGlobalInhibitionData;
   cedar::aux::UIntParameterPtr _mDimensionality; //!\todo not the only class needing this - think about parent class
   cedar::aux::UIntVectorParameterPtr _mSizes;
 private:
