@@ -50,7 +50,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::aux::ImageData : public cedar::aux::Data
+class cedar::aux::ImageData : public cedar::aux::Data //!@todo Should inherit MatData
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
