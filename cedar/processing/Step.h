@@ -214,15 +214,12 @@ signals:
 protected:
   void run();
 
-  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
   void declareInput(const std::string& name, bool mandatory = true);
-  void declareBuffer(const std::string& name, bool mandatory = true);
-  void declareOutput(const std::string& name, bool mandatory = true);
+  void declareBuffer(const std::string& name);
+  void declareOutput(const std::string& name);
 
-  void declareData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
-  void declareInput(const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
-  void declareBuffer(const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
-  void declareOutput(const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
+  void declareBuffer(const std::string& name, cedar::aux::DataPtr data);
+  void declareOutput(const std::string& name, cedar::aux::DataPtr data);
 
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
@@ -249,6 +246,9 @@ private:
 
   bool allInputsValid();
   void setState(cedar::proc::Step::State newState, const std::string& annotation);
+
+  //!@brief Declares a new piece of data in the step.
+  void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
 
 
   //--------------------------------------------------------------------------------------------------------------------

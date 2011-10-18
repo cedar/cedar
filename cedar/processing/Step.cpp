@@ -729,25 +729,16 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
   return true;
 }
 
-void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data, bool mandatory)
+void cedar::proc::Step::declareBuffer(const std::string& name, cedar::aux::DataPtr data)
 {
-  this->declareData(role, name, mandatory);
-  this->setData(role, name, data);
+  this->declareBuffer(name);
+  this->setBuffer(name, data);
 }
 
-void cedar::proc::Step::declareInput(const std::string& name, cedar::aux::DataPtr data, bool mandatory)
+void cedar::proc::Step::declareOutput(const std::string& name, cedar::aux::DataPtr data)
 {
-  this->declareData(DataRole::INPUT, name, data, mandatory);
-}
-
-void cedar::proc::Step::declareBuffer(const std::string& name, cedar::aux::DataPtr data, bool mandatory)
-{
-  this->declareData(DataRole::BUFFER, name, data, mandatory);
-}
-
-void cedar::proc::Step::declareOutput(const std::string& name, cedar::aux::DataPtr data, bool mandatory)
-{
-  this->declareData(DataRole::OUTPUT, name, data, mandatory);
+  this->declareOutput(name);
+  this->setOutput(name, data);
 }
 
 void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, bool mandatory)
@@ -787,14 +778,14 @@ void cedar::proc::Step::declareInput(const std::string& name, bool mandatory)
   this->declareData(DataRole::INPUT, name, mandatory);
 }
 
-void cedar::proc::Step::declareBuffer(const std::string& name, bool mandatory)
+void cedar::proc::Step::declareBuffer(const std::string& name)
 {
-  this->declareData(DataRole::BUFFER, name, mandatory);
+  this->declareData(DataRole::BUFFER, name, false);
 }
 
-void cedar::proc::Step::declareOutput(const std::string& name, bool mandatory)
+void cedar::proc::Step::declareOutput(const std::string& name)
 {
-  this->declareData(DataRole::OUTPUT, name, mandatory);
+  this->declareData(DataRole::OUTPUT, name, false);
 }
 
 cedar::proc::DataSlotPtr cedar::proc::Step::getSlot(cedar::proc::DataRole::Id role, const std::string& name)
