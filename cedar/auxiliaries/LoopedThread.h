@@ -55,7 +55,7 @@
  *
  * Use this interface if your class should be executable as a Qt thread.
  * Just inherit from this class and implement a step function with the
- * given parameter. This step function is called in an loop until the thread is
+ * given parameter. This step function is called in a loop until the thread is
  * stopped again.
  *
  * - to start your thread, call start()
@@ -80,7 +80,7 @@
  * An additional way to use LoopedThread is the simulation mode. If
  * simulatedTime is set to a value above zero, the step function is called with
  * this simulated time instead of the real (measured) time. This can be useful
- * if only a the behavior of a dynamical system is of interest but not it's
+ * if only the behavior of a dynamical system is of interest but not it's
  * relation to real time.
  *
  * Note that every child class must implement step(). If you design your own wrapper
