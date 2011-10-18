@@ -80,11 +80,12 @@ void cedar::proc::gui::UIntParameter::parameterPointerChanged()
 {
   cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
 
+  this->propertiesChanged();
+
   this->mpSpinbox->setValue(parameter->getValue());
   QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
 
   QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
-  this->propertiesChanged();
 }
 
 void cedar::proc::gui::UIntParameter::propertiesChanged()
