@@ -122,8 +122,36 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
     }
 
     case CV_32FC1:
-      this->mpImageDisplay->setText("Cannot display CV_32FC1 matrix.");
-      return;
+    {
+      //!@todo Some code here is redundant
+      // find min and max for scaling
+      double min, max;
+
+      cv::minMaxLoc(mat, &min, &max);
+      cv::Mat scaled = (mat - min) / (max - min) * 255.0;
+      cv::Mat mat_8u;
+      scaled.convertTo(mat_8u, CV_8U);
+
+      // convert grayscale to three-channel matrix
+      cv::Mat converted;
+      std::vector<cv::Mat> merge_vec;
+      merge_vec.push_back(mat_8u);
+      merge_vec.push_back(mat_8u);
+      merge_vec.push_back(mat_8u);
+      this->mData->lockForRead();
+      cv::merge(merge_vec, converted);
+      this->mData->unlock();
+      CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
+      this->mImage = QImage
+      (
+        converted.data,
+        converted.cols,
+        converted.rows,
+        converted.step,
+        QImage::Format_RGB888
+      ).rgbSwapped();
+      break;
+    }
 
     case CV_32FC3:
       this->mpImageDisplay->setText("Cannot display CV_32FC3 matrix.");
