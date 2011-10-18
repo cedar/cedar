@@ -213,10 +213,17 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   void run();
+
   void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
   void declareInput(const std::string& name, bool mandatory = true);
   void declareBuffer(const std::string& name, bool mandatory = true);
   void declareOutput(const std::string& name, bool mandatory = true);
+
+  void declareData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
+  void declareInput(const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
+  void declareBuffer(const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
+  void declareOutput(const std::string& name, cedar::aux::DataPtr data, bool mandatory = true);
+
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
   void freeBuffer(const std::string& name);

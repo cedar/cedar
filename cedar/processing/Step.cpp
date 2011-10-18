@@ -729,6 +729,27 @@ bool cedar::proc::Step::setNextArguments(cedar::proc::ArgumentsPtr arguments)
   return true;
 }
 
+void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data, bool mandatory)
+{
+  this->declareData(role, name, mandatory);
+  this->setData(role, name, data);
+}
+
+void cedar::proc::Step::declareInput(const std::string& name, cedar::aux::DataPtr data, bool mandatory)
+{
+  this->declareData(DataRole::INPUT, name, data, mandatory);
+}
+
+void cedar::proc::Step::declareBuffer(const std::string& name, cedar::aux::DataPtr data, bool mandatory)
+{
+  this->declareData(DataRole::BUFFER, name, data, mandatory);
+}
+
+void cedar::proc::Step::declareOutput(const std::string& name, cedar::aux::DataPtr data, bool mandatory)
+{
+  this->declareData(DataRole::OUTPUT, name, data, mandatory);
+}
+
 void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, bool mandatory)
 {
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
