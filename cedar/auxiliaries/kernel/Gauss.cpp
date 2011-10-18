@@ -192,7 +192,7 @@ void cedar::aux::kernel::Gauss::calculate()
       }
       if (dimensionality == 1)
       {
-        kernel.at<float>(position[0], 1) = value;
+        kernel.at<float>(position[0], 0) = value;
       }
       else
       {
