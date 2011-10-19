@@ -161,6 +161,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->getValue() < 3)
   {
+    //!@todo Should this not use the data->lock*
     mKernel->getReadWriteLock()->lockForRead();
     cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
     mKernel->getReadWriteLock()->unlock();

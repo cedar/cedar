@@ -46,6 +46,8 @@
 // SYSTEM INCLUDES
 
 /*!@brief Meta class to derive separable kernels when implementing kernels.
+ * @todo  The mKernel matrix should be automatically calculated here, rather than having to implement it in every
+ *        derived class.
  */
 class cedar::aux::kernel::Separable : public cedar::aux::kernel::Kernel
 {
@@ -71,6 +73,11 @@ public:
    * @param dim the desired dimension
    */
   virtual const cv::Mat& getKernelPart(unsigned int dimension) const;
+
+  cv::Mat convolveWith(const cv::Mat& mat) const;
+
+  void setNumParts(unsigned int numParts);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -85,6 +92,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  void setKernelPart(unsigned int dimension, const cv::Mat& mat);
+
+  //!@todo make private
   std::vector<cv::Mat> mKernelParts; //!< the separate parts of a separable kernel
 private:
   // none yet
