@@ -104,6 +104,9 @@ public:
   virtual const cv::Mat& getKernel() const;
   const cedar::aux::DataPtr getKernelRaw() const;
 
+  //!@brief Calculates the convolution of the kernel and the matrix.
+  virtual cv::Mat convolveWith(const cv::Mat& mat) const;
+
   /*!\brief get access to the write lock when in an asynchronous mode
    * \return pointer to the QReadWriteLock
    */

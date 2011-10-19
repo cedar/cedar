@@ -120,8 +120,11 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
       break;
 
     default:
-      CEDAR_THROW(cedar::aux::UnhandledValueException, "The matrix plot widget can not handle a matrix with the given"
-                                                       "dimensionality.");
+    {
+      std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
+      message += QString("%1).").arg(mat.dims).toStdString(); //!@todo replace QString with proper aux function.
+      CEDAR_THROW(cedar::aux::UnhandledValueException, message);
+    }
   }
 }
 

@@ -64,7 +64,31 @@ cedar::aux::kernel::Separable::~Separable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::kernel::Separable::setNumParts(unsigned int numParts)
+{
+  this->mKernelParts.resize(numParts);
+}
+
+cv::Mat cedar::aux::kernel::Separable::convolveWith(const cv::Mat& mat) const
+{
+  cv::Mat tmp = mat.clone();
+  //!@todo Create a convolve function in cedar::aux(::?) and use it here. That method should also handle any dimensionaly.
+  //!@todo Parameter of the convolution must be changeable.
+  for (unsigned int i = 0; i < this->mKernelParts.size(); ++i)
+  {
+    const cv::Mat& kernel_part = this->getKernelPart(i);
+    cv::filter2D(tmp, tmp, -1, kernel_part);
+  }
+  return tmp;
+}
+
 const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimension) const
 {
   return mKernelParts.at(dimension);
+}
+
+void cedar::aux::kernel::Separable::setKernelPart(unsigned int dimension, const cv::Mat& mat)
+{
+  this->mKernelParts.at(dimension) = mat;
 }

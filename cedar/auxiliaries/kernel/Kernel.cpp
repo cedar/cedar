@@ -39,6 +39,7 @@
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/Data.h"
 #include "auxiliaries/DataTemplate.h"
+#include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -84,6 +85,14 @@ cedar::aux::kernel::Kernel::~Kernel()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cv::Mat cedar::aux::kernel::Kernel::convolveWith(const cv::Mat& mat) const
+{
+  //!@todo Implement this method.
+  //!@todo Write unit tests for this method.
+  //!@todo Implement a border type (at least wrap, constant).
+  CEDAR_THROW(cedar::aux::exc::ExceptionBase, "Sorry, but this function is not implemented yet.");
+}
 
 void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
 {
