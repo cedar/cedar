@@ -130,6 +130,9 @@ public slots:
   //!\todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
   void updateKernel();
 
+signals:
+  void kernelUpdated();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -143,4 +143,5 @@ void cedar::aux::kernel::Kernel::setDimensionality(unsigned int dimensionality)
 void cedar::aux::kernel::Kernel::updateKernel()
 {
   this->calculate();
+  emit kernelUpdated();
 }
