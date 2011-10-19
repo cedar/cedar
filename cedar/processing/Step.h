@@ -110,6 +110,7 @@ public:
   void onTrigger();
 
   //!@brief the code that is executed on each thread execution goes here
+  //!@todo Shouldn't this method be private? It should never be called by the user, rather, they should use onTrigger() (as that properly locks all the data)
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
   //!@brief Method that is called whenever an input is connected to the step.
