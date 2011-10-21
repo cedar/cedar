@@ -167,12 +167,19 @@ public:
   cedar::proc::ConstDataSlotPtr getOutputSlot(const std::string& name) const;
   cedar::proc::ConstDataSlotPtr getSlot(DataRole::Id role, const std::string& name) const;
 
+  /*! @remark Do not use this function to connect steps! Use cedar::proc::Manager::connect instead!
+   *  @todo Remove or migrate this function so that users can't see it.
+   */
   static void connect(
                        cedar::proc::StepPtr source,
                        const std::string& sourceName,
                        cedar::proc::StepPtr target,
                        const std::string& targetName
                      );
+
+  /*! @remark Do not use this function to disconnect steps! Use cedar::proc::Manager::disconnect instead!
+   *  @todo Remove or migrate this function so that users can't see it.
+   */
   static void disconnect(
                           cedar::proc::StepPtr source,
                           const std::string& sourceName,
