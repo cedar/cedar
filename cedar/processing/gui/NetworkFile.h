@@ -75,9 +75,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void save();
-  void save(const std::string& destination);
-  void load(const std::string& source);
+  void write();
+  void write(const std::string& destination);
+  void read(const std::string& source);
 
   cedar::proc::NetworkPtr network();
 
@@ -104,8 +104,8 @@ private:
   std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
   std::vector<cedar::proc::gui::GroupItem*> mpGroupsToAdd;
 
-  void saveScene(cedar::aux::ConfigurationNode& root);
-  void loadScene(cedar::aux::ConfigurationNode& root);
+  void writeScene(cedar::aux::ConfigurationNode& root);
+  void readScene(cedar::aux::ConfigurationNode& root);
 
   void addStepsToScene();
   void addTriggersToScene();
