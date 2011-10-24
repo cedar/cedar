@@ -86,6 +86,10 @@ public:
     return this->mData;
   }
 
+  void setData(const cv::Mat& mat)
+  {
+    this->mData = mat;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

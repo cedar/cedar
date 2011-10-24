@@ -736,6 +736,8 @@ void cedar::proc::Step::declareBuffer(const std::string& name, cedar::aux::DataP
 
 void cedar::proc::Step::declareOutput(const std::string& name, cedar::aux::DataPtr data)
 {
+  CEDAR_ASSERT(data.get() != NULL);
+
   this->declareOutput(name);
   this->setOutput(name, data);
 }
