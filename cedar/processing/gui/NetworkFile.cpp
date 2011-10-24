@@ -246,12 +246,12 @@ cedar::proc::NetworkPtr cedar::proc::gui::NetworkFile::network()
   return this->mNetwork;
 }
 
-void cedar::proc::gui::NetworkFile::save()
+void cedar::proc::gui::NetworkFile::write()
 {
-  this->save(this->mFileName);
+  this->write(this->mFileName);
 }
 
-void cedar::proc::gui::NetworkFile::save(const std::string& destination)
+void cedar::proc::gui::NetworkFile::write(const std::string& destination)
 {
   this->mFileName = destination;
 
@@ -260,14 +260,14 @@ void cedar::proc::gui::NetworkFile::save(const std::string& destination)
   this->mNetwork->saveTo(root);
 
   cedar::aux::ConfigurationNode scene;
-  this->saveScene(scene);
+  this->writeScene(scene);
   if (!scene.empty())
     root.add_child("ui", scene);
 
   write_json(destination, root);
 }
 
-void cedar::proc::gui::NetworkFile::load(const std::string& source)
+void cedar::proc::gui::NetworkFile::read(const std::string& source)
 {
   this->mFileName = source;
 
@@ -275,10 +275,10 @@ void cedar::proc::gui::NetworkFile::load(const std::string& source)
   read_json(source, root);
 
   this->mNetwork->readFrom(root);
-  this->loadScene(root);
+  this->readScene(root);
 }
 
-void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode& root)
+void cedar::proc::gui::NetworkFile::writeScene(cedar::aux::ConfigurationNode& root)
 {
   QList<QGraphicsItem *> items = this->mpScene->items();
   for (int i = 0; i < items.size(); ++i)
@@ -315,7 +315,7 @@ void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode& roo
 }
 
 
-void cedar::proc::gui::NetworkFile::loadScene(cedar::aux::ConfigurationNode& root)
+void cedar::proc::gui::NetworkFile::readScene(cedar::aux::ConfigurationNode& root)
 {
   this->mpStepsToAdd.clear();
   this->mpTriggersToAdd.clear();

@@ -206,7 +206,6 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkFilePtr network)
 {
-  //!@todo Properly handle removing of steps here; maybe by changing to weak-pointers in the manager?
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
@@ -358,7 +357,7 @@ void cedar::proc::gui::Ide::newFile()
 
 void cedar::proc::gui::Ide::save()
 {
-  this->mNetwork->save();
+  this->mNetwork->write();
   cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(this->mNetwork->getFileName());
 }
 
@@ -377,7 +376,7 @@ void cedar::proc::gui::Ide::saveAs()
       file += ".json";
     }
 
-    this->mNetwork->save(file.toStdString());
+    this->mNetwork->write(file.toStdString());
 
     cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
 
@@ -405,7 +404,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 {
   this->newFile();
   cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
-  network->load(file.toStdString());
+  network->read(file.toStdString());
   this->mpActionSave->setEnabled(true);
   this->resetTo(network);
 
