@@ -110,7 +110,7 @@ public:
   //!@brief reads a configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
   //!@brief saves a configuration to a node
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root);
 
   //!@brief resets the internal step
   void resetPointer()

@@ -101,7 +101,7 @@ protected:
 
 private:
 
-}; // class cedar::xxx
+}; // class cedar::aux::System
 
 #endif // CEDAR_AUX_SYSTEM_H
 

@@ -83,7 +83,7 @@ void cedar::aux::Configurable::readJson(const std::string& filename)
   this->readConfiguration(configuration);
 }
 
-void cedar::aux::Configurable::saveJson(const std::string& filename)
+void cedar::aux::Configurable::writeJson(const std::string& filename)
 {
   std::string dir = filename;
 
@@ -95,16 +95,20 @@ void cedar::aux::Configurable::saveJson(const std::string& filename)
   boost::filesystem::create_directory(dir);
 
   cedar::aux::ConfigurationNode configuration;
-  this->saveConfiguration(configuration);
+  this->writeConfiguration(configuration);
   boost::property_tree::write_json(filename, configuration);
 }
 
 void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterPtr parameter)
 {
-  //! @todo check for duplicate names
-  //! @todo make sure there are no dots in the name; make a global function for name checks.
+  //!@todo Make a global function for checking names. This function might then also be used for step/data/... names.
+  const std::string& name = parameter->getName();
+  if (name.find(".") != std::string::npos)
+  {
+    CEDAR_THROW(cedar::aux::InvalidNameException, "Parameter names cannot contain any dots ('.').");
+  }
 
-  if (this->mParameterAssociations.find(parameter->getName()) != this->mParameterAssociations.end())
+  if (this->mParameterAssociations.find(name) != this->mParameterAssociations.end())
   {
     CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + parameter->getName() + "\"");
   }
@@ -125,7 +129,7 @@ cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters
   return this->mParameterOrder;
 }
 
-void cedar::aux::Configurable::saveConfiguration(cedar::aux::ConfigurationNode& root)
+void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
   for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
   {
@@ -135,7 +139,7 @@ void cedar::aux::Configurable::saveConfiguration(cedar::aux::ConfigurationNode& 
   for (Children::iterator child = this->mChildren.begin(); child != this->mChildren.end(); ++child)
   {
     cedar::aux::ConfigurationNode child_node;
-    child->second->saveConfiguration(child_node);
+    child->second->writeConfiguration(child_node);
     root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
   }
 }

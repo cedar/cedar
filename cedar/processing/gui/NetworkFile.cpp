@@ -308,7 +308,7 @@ void cedar::proc::gui::NetworkFile::saveScene(cedar::aux::ConfigurationNode& roo
         default:
           continue;
       }
-      p_item->saveConfiguration(node);
+      p_item->writeConfiguration(node);
       root.push_back(cedar::aux::ConfigurationNode::value_type("", node));
     }
   }

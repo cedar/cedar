@@ -84,7 +84,7 @@ public:
 
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root);
 
   cedar::proc::GroupPtr getGroup();
 

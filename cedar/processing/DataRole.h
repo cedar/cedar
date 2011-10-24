@@ -84,7 +84,6 @@ public:
   static const cedar::aux::EnumBase& type();
 
   //! @returns A pointer to the base enum object.
-  //! @todo Should this function be const?
   static const cedar::proc::DataRole::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------

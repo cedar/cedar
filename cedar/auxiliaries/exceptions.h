@@ -77,6 +77,12 @@ class cedar::aux::ParameterNotFoundException : public cedar::aux::exc::Exception
     ParameterNotFoundException();
 }; // class cedar::aux::ParameterNotFoundException
 
+class cedar::aux::DuplicateIdException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    DuplicateIdException();
+}; // class cedar::aux::DuplicateIdException
+
 class cedar::aux::DuplicateNameException : public cedar::aux::exc::ExceptionBase
 {
   public:
@@ -94,5 +100,11 @@ class cedar::aux::NoDefaultException : public cedar::aux::exc::ExceptionBase
 public:
   NoDefaultException();
 }; // class cedar::aux::NoDefaultException
+
+class cedar::aux::InvalidNameException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    InvalidNameException();
+};
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

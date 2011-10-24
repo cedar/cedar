@@ -49,8 +49,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @todo explain why this constructor is protected.
+/*! This constructor is protected to avoid the creation of Duration units by the user. This, in turn, protects its
+ *  internal workings from being exposed an subject to potential misuse, as the internal representation of the duration
+ *  could change at any moment.
  */
 cedar::unit::Duration::Duration(double amount)
 :
@@ -66,8 +67,11 @@ cedar::unit::Duration::~Duration()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @todo explain why this function should only be used for testing/debugging.
+/*!@returns The duration, as represented internally in the Duration object.
+ * @remarks This function should at most be used for testing, because the internal representation might change at any
+ *          time without warning. To access the duration value, use the concrete duration types. E.g., let d be a
+ *          duration object obtained from somewhere, then to get an actual duration out of it, use
+ *          cedar::unit::Seconds(d).
  */
 double cedar::unit::Duration::getRawTime() const
 {
