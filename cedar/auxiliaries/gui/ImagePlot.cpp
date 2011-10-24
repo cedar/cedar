@@ -86,39 +86,20 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
   {
     case CV_8UC1:
     {
-      cv::Mat converted;
-      std::vector<cv::Mat> merge_vec;
-      merge_vec.push_back(mat);
-      merge_vec.push_back(mat);
-      merge_vec.push_back(mat);
       this->mData->lockForRead();
-      cv::merge(merge_vec, converted);
+      cv::Mat converted = threeChannelGrayscale(mat);
       this->mData->unlock();
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
-      this->mImage = QImage
-      (
-        converted.data,
-        converted.cols,
-        converted.rows,
-        converted.step,
-        QImage::Format_RGB888
-      ).rgbSwapped();
+      this->imageFromMat(converted);
       break;
     }
 
     case CV_8UC3:
     {
       this->mData->lockForRead();
-      this->mImage = QImage
-                      (
-                        mat.data,
-                        mat.cols,
-                        mat.rows,
-                        mat.step,
-                        QImage::Format_RGB888
-                      ).rgbSwapped();
-      break;
+      this->imageFromMat(mat);
       this->mData->unlock();
+      break;
     }
 
     case CV_32FC1:
@@ -127,29 +108,17 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
       // find min and max for scaling
       double min, max;
 
+      this->mData->lockForRead();
       cv::minMaxLoc(mat, &min, &max);
       cv::Mat scaled = (mat - min) / (max - min) * 255.0;
+      this->mData->unlock();
       cv::Mat mat_8u;
       scaled.convertTo(mat_8u, CV_8U);
 
       // convert grayscale to three-channel matrix
-      cv::Mat converted;
-      std::vector<cv::Mat> merge_vec;
-      merge_vec.push_back(mat_8u);
-      merge_vec.push_back(mat_8u);
-      merge_vec.push_back(mat_8u);
-      this->mData->lockForRead();
-      cv::merge(merge_vec, converted);
-      this->mData->unlock();
+      cv::Mat converted = threeChannelGrayscale(mat_8u);
       CEDAR_DEBUG_ASSERT(converted.type() == CV_8UC3);
-      this->mImage = QImage
-      (
-        converted.data,
-        converted.cols,
-        converted.rows,
-        converted.step,
-        QImage::Format_RGB888
-      ).rgbSwapped();
+      this->imageFromMat(converted);
       break;
     }
 
@@ -165,6 +134,29 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 
   this->mpImageDisplay->setPixmap(QPixmap::fromImage(this->mImage));
   this->resizePixmap();
+}
+
+cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
+{
+  cv::Mat converted;
+  std::vector<cv::Mat> merge_vec;
+  merge_vec.push_back(in);
+  merge_vec.push_back(in);
+  merge_vec.push_back(in);
+  cv::merge(merge_vec, converted);
+  return converted;
+}
+
+void cedar::aux::gui::ImagePlot::imageFromMat(const cv::Mat& mat)
+{
+  this->mImage = QImage
+  (
+    mat.data,
+    mat.cols,
+    mat.rows,
+    mat.step,
+    QImage::Format_RGB888
+  ).rgbSwapped();
 }
 
 void cedar::aux::gui::ImagePlot::display(cedar::aux::DataPtr data)

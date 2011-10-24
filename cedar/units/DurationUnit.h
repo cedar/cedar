@@ -184,7 +184,6 @@ public:
   template <unsigned int otherFactor, const char* otherSuffix>
   bool operator==(const DurationUnit<otherFactor, otherSuffix>& comp)
   {
-    //! @todo better double comparison.
     return this->mAmountInMicroSeconds == comp.mAmountInMicroSeconds;
   }
 

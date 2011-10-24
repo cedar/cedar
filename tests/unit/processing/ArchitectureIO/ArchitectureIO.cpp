@@ -71,7 +71,6 @@ CEDAR_GENERATE_POINTER_TYPES(TestModule);
 
 int main(int, char**)
 {
-  //!@todo Test connections, triggers too
   using cedar::aux::LogFile;
 
   unsigned int errors = 0;

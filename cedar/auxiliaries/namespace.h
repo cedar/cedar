@@ -152,7 +152,9 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ImageData);
 
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);

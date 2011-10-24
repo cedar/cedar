@@ -130,7 +130,8 @@ protected:
   QReadWriteLock *mpLock;
 
 private:
-  cedar::aux::Configurable* mpeOwner; //!@todo This should be a base*, however, right now Base can't be used with Base*.
+  //!@todo This should be a base*, however, right now Configurable can't be used with Base* because base has a (differently realized) name.
+  cedar::aux::Configurable* mpeOwner;
   std::string mConnectedSlotName;
 
   //--------------------------------------------------------------------------------------------------------------------

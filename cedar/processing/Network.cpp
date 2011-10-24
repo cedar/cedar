@@ -271,7 +271,7 @@ void cedar::proc::Network::saveSteps(cedar::aux::ConfigurationNode& steps)
     cedar::proc::StepDeclarationPtr decl = cedar::proc::Manager::getInstance().steps().getDeclarationOf(step);
 
     cedar::aux::ConfigurationNode step_node;
-    step->saveConfiguration(step_node);
+    step->writeConfiguration(step_node);
     steps.push_back(cedar::aux::ConfigurationNode::value_type(decl->getClassId(), step_node));
   }
 }

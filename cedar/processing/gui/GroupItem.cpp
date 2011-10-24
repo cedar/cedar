@@ -96,11 +96,11 @@ void cedar::proc::gui::GroupItem::readConfiguration(const cedar::aux::Configurat
   this->setGroup(group);
 }
 
-void cedar::proc::gui::GroupItem::saveConfiguration(cedar::aux::ConfigurationNode& root)
+void cedar::proc::gui::GroupItem::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
   CEDAR_DEBUG_ASSERT(this->mGroup);
   root.put("group", this->mGroup->getName());
-  this->cedar::proc::gui::GraphicsBase::saveConfiguration(root);
+  this->cedar::proc::gui::GraphicsBase::writeConfiguration(root);
 }
 
 void cedar::proc::gui::GroupItem::setGroup(cedar::proc::GroupPtr group)

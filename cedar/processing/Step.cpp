@@ -477,7 +477,6 @@ void cedar::proc::Step::lockAll(DataRole::Id role)
 
 void cedar::proc::Step::unlockAll(DataRole::Id role)
 {
-  //!@todo add a timeout?
   std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
   if (slot == this->mDataConnections.end())
   {

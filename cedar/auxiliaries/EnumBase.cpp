@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include "auxiliaries/EnumBase.h"
+#include "auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -62,8 +63,16 @@ cedar::aux::EnumBase::~EnumBase()
 
 void cedar::aux::EnumBase::def(const cedar::aux::Enum& rEnum)
 {
-  //! @todo check for duplicate values
+  if (this->mEnumFromId.find(rEnum.id()) != this->mEnumFromId.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateIdException, "A duplicate id value was provided for the Enum " + rEnum.name());
+  }
   this->mEnumFromId[rEnum.id()] = rEnum;
+
+  if (this->mEnumFromString.find(rEnum.name()) != this->mEnumFromString.end())
+  {
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "A duplicate name was provided for the Enum " + rEnum.name());
+  }
   this->mEnumFromString[rEnum.name()] = rEnum;
   if (rEnum != cedar::aux::Enum::UNDEFINED)
   {

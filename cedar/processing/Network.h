@@ -53,6 +53,7 @@
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
+ * @todo Change the name of the class to Architecture?
  */
 class cedar::proc::Network
 {

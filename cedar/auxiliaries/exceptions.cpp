@@ -55,6 +55,11 @@ cedar::aux::ParameterNotFoundException::ParameterNotFoundException()
   this->mType = "ParameterNotFoundException";
 }
 
+cedar::aux::DuplicateIdException::DuplicateIdException()
+{
+  this->mType = "DuplicateIdException";
+}
+
 cedar::aux::DuplicateNameException::DuplicateNameException()
 {
   this->mType = "DuplicateNameException";
@@ -78,4 +83,9 @@ cedar::aux::RangeException::RangeException()
 cedar::aux::NoDefaultException::NoDefaultException()
 {
   this->mType = "NoDefaultException";
+}
+
+cedar::aux::InvalidNameException::InvalidNameException()
+{
+  this->mType = "InvalidNameException";
 }

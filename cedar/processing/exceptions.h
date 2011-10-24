@@ -45,6 +45,7 @@
 #include "auxiliaries/exceptions/ExceptionBase.h"
 
 /*!@brief An exception that occurs when a name is used as an index that is not known.
+ * @todo  There is already an InvalidNameException in aux, so remove this one.
  */
 class cedar::proc::InvalidNameException : public cedar::aux::exc::ExceptionBase
 {
@@ -80,7 +81,7 @@ class cedar::proc::InvalidCategoryException : public cedar::aux::exc::ExceptionB
 class cedar::proc::InvalidArgumentsException : public cedar::aux::exc::ExceptionBase
 {
   public:
-  InvalidArgumentsException();
+    InvalidArgumentsException();
 }; // class cedar::proc::InvalidArgumentsException
 
 

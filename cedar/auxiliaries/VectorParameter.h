@@ -205,13 +205,11 @@ public:
 
   const T& at(size_t index) const
   {
-    //!@todo Range check.
     return this->mValues.at(index);
   }
 
   void set(size_t index, const T& value)
   {
-    //!@todo Range check.
     this->mValues.at(index) = value;
   }
 

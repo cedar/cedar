@@ -83,8 +83,8 @@ public:
 public:
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
   void readJson(const std::string& filename);
-  virtual void saveConfiguration(cedar::aux::ConfigurationNode& root);//!@todo Should be writeConfiguration?
-  void saveJson(const std::string& filename); //!@todo Should be writeJson?
+  virtual void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeJson(const std::string& filename);
   const Children& configurableChildren() const;
 
   const ParameterList& getParameters() const;

@@ -266,7 +266,7 @@ void cedar::proc::gui::Settings::save()
   std::string path = cedar::aux::System::getUserApplicationDataDirectory() + "/.cedar/processingGui";
   try
   {
-    this->saveJson(path);
+    this->writeJson(path);
   }
   catch (const boost::property_tree::json_parser::json_parser_error& e)
   {

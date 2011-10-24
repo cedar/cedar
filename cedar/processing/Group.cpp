@@ -140,7 +140,7 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
 
 void cedar::proc::Group::saveConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  this->cedar::aux::Configurable::saveConfiguration(root);
+  this->cedar::aux::Configurable::writeConfiguration(root);
 
   cedar::aux::ConfigurationNode step_children;
   for (ChildSteps::const_iterator iter = this->mSteps.begin(); iter != this->mSteps.end(); ++iter)

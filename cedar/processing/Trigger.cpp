@@ -206,7 +206,7 @@ const std::vector<cedar::proc::TriggerPtr>& cedar::proc::Trigger::getTriggerList
 
 void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node)
 {
-  this->cedar::aux::Configurable::saveConfiguration(node);
+  this->cedar::aux::Configurable::writeConfiguration(node);
 
   cedar::aux::ConfigurationNode listeners;
   for (size_t i = 0; i < this->mListeners.size(); ++i)
