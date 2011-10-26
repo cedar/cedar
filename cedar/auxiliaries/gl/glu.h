@@ -37,7 +37,7 @@
 #if defined (WIN32)
   #include <gl/GLU.h>
 #elif defined (APPLE)
-  #include <gl/GLU.h>
+  #include <OpenGL/glu.h>
 #else
   #include <GL/glu.h>
 #endif

@@ -423,6 +423,11 @@ void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
       this->deleteSelectedElements();
       break;
     }
+    case Qt::Key_Backspace:
+    {
+         this->deleteSelectedElements();
+         break;
+       }
     // If the key is not handled by this widget, pass it on to the base widget.
     default:
       this->QMainWindow::keyPressEvent(pEvent);
