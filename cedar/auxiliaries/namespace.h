@@ -146,6 +146,9 @@ namespace cedar
     typedef DataTemplate<cv::Mat> MatData;
     CEDAR_GENERATE_POINTER_TYPES(MatData);
 
+    typedef DataTemplate<cv::Point> CvPointData;
+    CEDAR_GENERATE_POINTER_TYPES(CvPointData);
+
     typedef DataTemplate<double> DoubleData;
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
 
