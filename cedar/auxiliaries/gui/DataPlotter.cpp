@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DataPlotter.h"
+#include "auxiliaries/gui/DataPlotter.h"
 #include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/ImageData.h"
 #include "auxiliaries/gui/MatrixPlot.h"
@@ -51,13 +51,13 @@
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 
-cedar::proc::gui::DataPlotter::WidgetFactory cedar::proc::gui::DataPlotter::mTypePlotters;
+cedar::aux::gui::DataPlotter::WidgetFactory cedar::aux::gui::DataPlotter::mTypePlotters;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
+cedar::aux::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
 :
 QDockWidget(title.c_str(), pParent)
 {
@@ -65,7 +65,7 @@ QDockWidget(title.c_str(), pParent)
   this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
-cedar::proc::gui::DataPlotter::~DataPlotter()
+cedar::aux::gui::DataPlotter::~DataPlotter()
 {
 }
 
@@ -73,7 +73,7 @@ cedar::proc::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
+void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data)
 {
   mData = data;
   //!@todo doesn't work this way -- related to the to-do entry below.
@@ -96,23 +96,23 @@ void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
   }
   else
   {
-    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::proc::gui::DataPlotter::plot.");
+    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::aux::gui::DataPlotter::plot.");
   }
   connect(p_plot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
   p_plot->display(data);
   this->setWidget(p_plot);
 }
 
-cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::getWidgetFactory()
+cedar::aux::gui::DataPlotter::WidgetFactory& cedar::aux::gui::DataPlotter::getWidgetFactory()
 {
-  if (cedar::proc::gui::DataPlotter::mTypePlotters.empty())
+  if (cedar::aux::gui::DataPlotter::mTypePlotters.empty())
   {
-    cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
+    cedar::aux::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
   }
-  return cedar::proc::gui::DataPlotter::mTypePlotters;
+  return cedar::aux::gui::DataPlotter::mTypePlotters;
 }
 
-void cedar::proc::gui::DataPlotter::dataChanged()
+void cedar::aux::gui::DataPlotter::dataChanged()
 {
   this->plot(mData);
 }

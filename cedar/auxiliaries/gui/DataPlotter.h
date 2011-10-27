@@ -42,7 +42,7 @@
 #define CEDAR_PROC_GUI_DATA_PLOTTER_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
+#include "auxiliaries/gui/namespace.h"
 #include "auxiliaries/TypeBasedFactory.h"
 #include "auxiliaries/Data.h"
 
@@ -56,7 +56,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::DataPlotter : public QDockWidget
+class cedar::aux::gui::DataPlotter : public QDockWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -122,7 +122,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::gui::DataPlotter
+}; // class cedar::aux::gui::DataPlotter
 
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
 
