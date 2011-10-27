@@ -107,10 +107,11 @@ protected:
   cedar::aux::DoubleParameterPtr mTau; //!\todo deal with units, now: milliseconds
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
   cedar::aux::math::SigmoidPtr mSigmoid;
-  cedar::aux::kernel::GaussPtr mKernel;
+  std::vector<cedar::aux::kernel::GaussPtr> mKernels;
   cedar::aux::DoubleDataPtr mGlobalInhibitionData;
   cedar::aux::UIntParameterPtr _mDimensionality; //!\todo not the only class needing this - think about parent class
   cedar::aux::UIntVectorParameterPtr _mSizes;
+  cedar::aux::UIntParameterPtr _mNumKernels;
 private:
   // none yet
 
