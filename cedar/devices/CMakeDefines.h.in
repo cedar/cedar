@@ -1,0 +1,5 @@
+// This file is used to make cmake variables available
+// in the c++ source files
+
+#cmakedefine CEDAR_USE_AMTEC
+#cmakedefine CEDAR_USE_KUKA_LWR
