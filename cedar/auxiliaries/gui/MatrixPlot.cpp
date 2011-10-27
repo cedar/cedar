@@ -92,11 +92,12 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
                 "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
   }
 
-  if (QWidget *p_parent = dynamic_cast<QWidget*>(this->parent()))
-  {
-    QString add = QString(" [%1 x %2]").arg(this->mData->getData().rows).arg(this->mData->getData().cols);
-    p_parent->setWindowTitle(mWindowTitle + add);
-  }
+  //!@todo this is buggy: appends a string to the parent's window title over and over again
+//  if (QWidget *p_parent = dynamic_cast<QWidget*>(this->parent()))
+//  {
+//    QString add = QString(" [%1 x %2]").arg(this->mData->getData().rows).arg(this->mData->getData().cols);
+//    p_parent->setWindowTitle(mWindowTitle + add);
+//  }
 
   if (this->mpCurrentPlotWidget)
   {
