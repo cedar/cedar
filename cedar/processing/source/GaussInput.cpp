@@ -111,6 +111,7 @@ void cedar::proc::source::GaussInput::updateMatrix()
   }
   kernel_parts.at(0) *= _mAmplitude->getValue();
   // assemble the input
+  mOutput->lockForWrite();
   std::vector<int> sizes(static_cast<size_t>(dimensionality));
   for (unsigned int i = 0; i < dimensionality; i++)
   {
@@ -124,7 +125,6 @@ void cedar::proc::source::GaussInput::updateMatrix()
   {
     mOutput->getData() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
   }
-  mOutput->lockForWrite();
   cv::Mat& kernel = mOutput->getData();
   // now fill up the big kernel matrix
   std::vector<int> position(static_cast<size_t>(dimensionality));
