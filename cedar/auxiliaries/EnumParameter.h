@@ -83,7 +83,7 @@ public:
 
   void makeDefault();
 
-  cedar::aux::Enum get() const;
+  cedar::aux::Enum getValue() const;
 
   void set(const std::string& enumId);
 

@@ -70,7 +70,7 @@ mEnumDeclaration(enumBase)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Enum cedar::aux::EnumParameter::get() const
+cedar::aux::Enum cedar::aux::EnumParameter::getValue() const
 {
   return mEnumDeclaration->get(this->mValue);
 }
@@ -89,7 +89,7 @@ void cedar::aux::EnumParameter::setTo(const cedar::aux::ConfigurationNode& root)
 
 void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
 {
-  root.put(this->getName(), this->get().name());
+  root.put(this->getName(), this->getValue().name());
 }
 
 void cedar::aux::EnumParameter::makeDefault()
