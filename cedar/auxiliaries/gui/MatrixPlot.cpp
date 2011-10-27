@@ -117,6 +117,7 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
         this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData);
         this->layout()->addWidget(this->mpCurrentPlotWidget);
       }
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
 
     default:

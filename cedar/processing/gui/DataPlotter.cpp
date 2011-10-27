@@ -98,7 +98,7 @@ void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
   {
     CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::proc::gui::DataPlotter::plot.");
   }
-
+  connect(p_plot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
   p_plot->display(data);
   this->setWidget(p_plot);
 }
@@ -110,4 +110,9 @@ cedar::proc::gui::DataPlotter::WidgetFactory& cedar::proc::gui::DataPlotter::get
     cedar::proc::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
   }
   return cedar::proc::gui::DataPlotter::mTypePlotters;
+}
+
+void cedar::proc::gui::DataPlotter::dataChanged()
+{
+  this->plot(mData);
 }

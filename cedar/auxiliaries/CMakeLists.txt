@@ -39,6 +39,7 @@ cedar_add_library(cedaraux
   Object.h
   gl/Object.h
   gui/BaseWidget.h
+  gui/DataPlotInterface.h
   gui/Viewer.h
   gui/SceneWidget.h
   gui/HistoryPlot.h
