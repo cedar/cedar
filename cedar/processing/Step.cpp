@@ -424,85 +424,31 @@ void cedar::proc::Step::unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id>
 
 void cedar::proc::Step::lockAll()
 {
+  std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
+
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
        ++slot)
   {
-    this->lockAll(slot->first);
+    this->getDataLocks(slot->first, locks);
   }
+
+  this->lock(locks);
 }
 
 void cedar::proc::Step::unlockAll()
 {
+  std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
+
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
        ++slot)
   {
-    this->unlockAll(slot->first);
+    this->getDataLocks(slot->first, locks);
   }
+
+  this->unlock(locks);
 }
-
-void cedar::proc::Step::lockAll(DataRole::Id role)
-{
-  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
-  if (slot == this->mDataConnections.end())
-  {
-    // ok, no slots to lock
-    return;
-  }
-
-  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
-  {
-    cedar::aux::DataPtr data = iter->second->getData();
-    if (data)
-    {
-      switch (role)
-      {
-        case cedar::proc::DataRole::INPUT:
-          data->lockForRead();
-          break;
-
-        case cedar::proc::DataRole::OUTPUT:
-        case cedar::proc::DataRole::BUFFER:
-          data->lockForWrite();
-          break;
-
-        default:
-          // should never happen unless a role is
-          CEDAR_THROW(cedar::proc::InvalidRoleException, "The given role is not implemented in cedar::proc::Step::lockAll.");
-      }
-    }
-  }
-}
-
-void cedar::proc::Step::unlockAll(DataRole::Id role)
-{
-  std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
-  if (slot == this->mDataConnections.end())
-  {
-    // ok, no slots to lock
-    return;
-  }
-
-  for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
-  {
-    cedar::aux::DataPtr data = iter->second->getData();
-
-    if (data)
-    {
-      switch (role)
-      {
-        default:
-        case cedar::proc::DataRole::INPUT:
-        case cedar::proc::DataRole::OUTPUT:
-        case cedar::proc::DataRole::BUFFER:
-          data->unlock();
-          break;
-      }
-    }
-  }
-}
-
 
 void cedar::proc::Step::onStart()
 {
