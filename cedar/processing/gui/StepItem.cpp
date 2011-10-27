@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "auxiliaries/gui/DataPlotter.h"
 #include "processing/gui/StepItem.h"
-#include "processing/gui/DataPlotter.h"
 #include "processing/gui/DataSlotItem.h"
 #include "processing/gui/TriggerItem.h"
 #include "processing/gui/exceptions.h"
@@ -389,7 +389,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     title += " (" + this->mStep->getName();
     title += "." + data_name + ")";
 
-    cedar::proc::gui::DataPlotter *p_plotter = new cedar::proc::gui::DataPlotter(title, mpMainWindow);
+    cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter(title, mpMainWindow);
     p_plotter->plot(p_data);
     p_plotter->show();
   }

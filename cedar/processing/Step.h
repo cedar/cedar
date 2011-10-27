@@ -191,9 +191,7 @@ public:
 
   //!@todo Rework these to lock everything in the right order.
   void lockAll();
-  void lockAll(DataRole::Id role);
   void unlockAll();
-  void unlockAll(DataRole::Id role);
 
   static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
   

@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 #include <iostream>
 
 Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
@@ -90,11 +92,12 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
                 "Cannot cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot::display.");
   }
 
-  if (QWidget *p_parent = dynamic_cast<QWidget*>(this->parent()))
-  {
-    QString add = QString(" [%1 x %2]").arg(this->mData->getData().rows).arg(this->mData->getData().cols);
-    p_parent->setWindowTitle(mWindowTitle + add);
-  }
+  //!@todo this is buggy: appends a string to the parent's window title over and over again
+//  if (QWidget *p_parent = dynamic_cast<QWidget*>(this->parent()))
+//  {
+//    QString add = QString(" [%1 x %2]").arg(this->mData->getData().rows).arg(this->mData->getData().cols);
+//    p_parent->setWindowTitle(mWindowTitle + add);
+//  }
 
   if (this->mpCurrentPlotWidget)
   {
@@ -110,20 +113,23 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
       if ( (mat.rows == 1 || mat.cols == 1) && mat.rows != mat.cols)
       {
         this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData);
-        this->layout()->addWidget(this->mpCurrentPlotWidget);
       }
       else
       {
         this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData);
-        this->layout()->addWidget(this->mpCurrentPlotWidget);
       }
+      this->layout()->addWidget(this->mpCurrentPlotWidget);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
 
     default:
     {
       std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
       message += QString("%1).").arg(mat.dims).toStdString(); //!@todo replace QString with proper aux function.
-      CEDAR_THROW(cedar::aux::UnhandledValueException, message);
+      message += "\nPress here to refresh the plot after you have changed the dimensionality.";
+      this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
+      this->layout()->addWidget(this->mpCurrentPlotWidget);
+      connect(this->mpCurrentPlotWidget, SIGNAL(pressed()), this, SIGNAL(dataChanged()));
     }
   }
 }

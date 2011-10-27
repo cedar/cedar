@@ -110,9 +110,10 @@ _mNumKernels(new cedar::aux::UIntParameter(this, "number of kernels", 1, 1, 20))
     this->mKernels.at(i)->hideDimensionality(true);
     this->addConfigurableChild(kernel_name, this->mKernels.at(i));
   }
-  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
+  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   // now check the dimensionality and sizes of all matrices
-  this->updateDimensionality();
+  this->updateMatrices();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -234,21 +235,30 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
 
 void cedar::dyn::NeuralField::onStart()
 {
-
 }
 
-void cedar::dyn::NeuralField::updateDimensionality()
+void cedar::dyn::NeuralField::dimensionalityChanged()
 {
-  int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
-  _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
+  this->_mSizes->resize(_mDimensionality->getValue(), _mSizes->getDefaultValue());
+  this->updateMatrices();
+}
 
-  std::vector<int> sizes(new_dimensionality);
-  for (int dim = 0; dim < new_dimensionality; ++dim)
+void cedar::dyn::NeuralField::dimensionSizeChanged()
+{
+  this->updateMatrices();
+}
+
+void cedar::dyn::NeuralField::updateMatrices()
+{
+  int dimensionality = static_cast<int>(_mDimensionality->getValue());
+
+  std::vector<int> sizes(dimensionality);
+  for (int dim = 0; dim < dimensionality; ++dim)
   {
     sizes[dim] = _mSizes->at(dim);
   }
   this->lockAll();
-  if (new_dimensionality == 1)
+  if (dimensionality == 1)
   {
     this->mActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(mRestingLevel->getValue()));
     this->mSigmoidalActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
@@ -256,9 +266,9 @@ void cedar::dyn::NeuralField::updateDimensionality()
   }
   else
   {
-    this->mActivation->getData() = cv::Mat(new_dimensionality,&sizes.at(0), CV_32F, cv::Scalar(mRestingLevel->getValue()));
-    this->mSigmoidalActivation->getData() = cv::Mat(new_dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
-    this->mLateralInteraction->getData() = cv::Mat(new_dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
+    this->mActivation->getData() = cv::Mat(dimensionality,&sizes.at(0), CV_32F, cv::Scalar(mRestingLevel->getValue()));
+    this->mSigmoidalActivation->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
+    this->mLateralInteraction->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }
   for (unsigned int i=0;i<mKernels.size();i++)
   {
