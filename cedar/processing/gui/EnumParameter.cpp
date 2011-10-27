@@ -80,7 +80,7 @@ void cedar::proc::gui::EnumParameter::parameterPointerChanged()
   for (size_t i = 0; i < parameter->getEnumDeclaration().list().size(); ++i)
   {
     const cedar::aux::Enum& enum_val = parameter->getEnumDeclaration().list().at(i);
-    if (enum_val == parameter->get())
+    if (enum_val == parameter->getValue())
     {
       select_index = static_cast<int>(i);
     }
