@@ -38,19 +38,17 @@
 #define CEDAR_AUX_IMAGE_DATA_H
 
 // LOCAL INCLUDES
+#include "auxiliaries/DataTemplate.h"
 #include "auxiliaries/namespace.h"
-#include "auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief This is a data class representing images.
  */
-class cedar::aux::ImageData : public cedar::aux::Data //!@todo Should inherit MatData
+class cedar::aux::ImageData : public cedar::aux::MatData //!@todo Should inherit MatData
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,33 +61,13 @@ public:
   //!@brief The standard constructor.
   ImageData(const cv::Mat& value)
   :
-  mData(value)
-  {
-  }
-
-  //!@brief Destructor
-  virtual ~ImageData()
+  cedar::aux::MatData(value)
   {
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
-  cv::Mat& getData()
-  {
-    return this->mData;
-  }
-
-  const cv::Mat& getData() const
-  {
-    return this->mData;
-  }
-
-  void setData(const cv::Mat& mat)
-  {
-    this->mData = mat;
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,9 +85,6 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-private:
-  cv::Mat mData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

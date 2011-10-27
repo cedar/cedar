@@ -83,7 +83,8 @@ public:
   cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
 
 public slots:
-  void updateDimensionality();
+  void dimensionalityChanged();
+  void dimensionSizeChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,6 +95,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void updateMatrices();
+
   bool isMatrixCompatibleInput(const cv::Mat& matrix) const;
 
   //--------------------------------------------------------------------------------------------------------------------
