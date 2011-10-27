@@ -70,7 +70,7 @@ mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
 mGlobalInhibitionData(new cedar::aux::DoubleData(0.0)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
-_mNumKernels(new cedar::aux::UIntParameter(this, "number of kernels", 1, 1, 10))
+_mNumKernels(new cedar::aux::UIntParameter(this, "number of kernels", 1, 1, 20))
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
@@ -170,7 +170,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->getValue() < 3)
   {
-    for (unsigned int i=0;i<_mNumKernels->getValue();i++)
+    for (unsigned int i=0;i<_mNumKernels->getValue()&& i < this->mKernels.size();i++)
     {
       cv::Mat convolution_buffer =  cv::Mat::zeros(u.size(),u.type());
       const cv::Mat& kernel = this->mKernels.at(i)->getKernel();
