@@ -107,11 +107,10 @@ _mNumKernels(new cedar::aux::UIntParameter(this, "number of kernels", 1, 1, 10))
     kernel_name += boost::lexical_cast<std::string>(i);
     this->declareBuffer(kernel_name);
     this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
-    this->mKernels.at(0)->hideDimensionality(true);
+    this->mKernels.at(i)->hideDimensionality(true);
     this->addConfigurableChild(kernel_name, this->mKernels.at(i));
   }
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
-
   // now check the dimensionality and sizes of all matrices
   this->updateDimensionality();
 }
@@ -171,7 +170,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->getValue() < 3)
   {
-
     for (unsigned int i=0;i<_mNumKernels->getValue();i++)
     {
       cv::Mat convolution_buffer =  cv::Mat::zeros(u.size(),u.type());
