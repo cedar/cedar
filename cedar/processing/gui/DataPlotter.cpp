@@ -82,13 +82,13 @@ void cedar::proc::gui::DataPlotter::plot(cedar::aux::DataPtr data)
 
   //!@todo find a better solution for this!
   cedar::aux::gui::DataPlotInterface *p_plot = NULL;
-  if (dynamic_cast<cedar::aux::MatData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::MatrixPlot(this);
-  }
-  else if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
+  if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
   {
     p_plot = new cedar::aux::gui::ImagePlot(this);
+  }
+  else if (dynamic_cast<cedar::aux::MatData*>(data.get()))
+  {
+    p_plot = new cedar::aux::gui::MatrixPlot(this);
   }
   else if (dynamic_cast<cedar::aux::DoubleData*>(data.get()))
   {
