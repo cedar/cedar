@@ -47,7 +47,7 @@
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot::kuka;
+using namespace cedar::dev::kuka;
 using namespace std;
 
 //----------------------------------------------------------------------------------------------------------------------

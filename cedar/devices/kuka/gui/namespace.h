@@ -26,7 +26,7 @@
 
     Maintainer:  Guido Knips
     Email:       guido.knips@ini.rub.de
-    Date:        2010 12 9
+    Date:        2011 01 25
 
     Description: Namespace file for cedar::dev::robot::kuka.
 
@@ -35,15 +35,14 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+#ifndef CEDAR_DEV_KUKA_GUI_NAMESPACE_H
+#define CEDAR_DEV_KUKA_GUI_NAMESPACE_H
 
 // MAKE FRI OPTIONAL
 #include "devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -54,16 +53,15 @@ namespace cedar
 {
   namespace dev
   {
-    /*! @brief Namespace for all robot interfaces. */
-    namespace robot
+    namespace kuka
     {
-      namespace kuka
+      namespace gui
       {
-        CEDAR_DECLARE_DEV_CLASS(KukaInterface);
+        class FriStatusWidget;
       }
     }
   }
 }
 
 #endif // CEDAR_USE_KUKA_FRI
-#endif // CEDAR_DEV_ROBOT_KUKA_NAMESPACE_H
+#endif // CEDAR_DEV_KUKA_GUI_NAMESPACE_H

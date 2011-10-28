@@ -49,14 +49,14 @@
 #include <iostream>
 #endif
 
-using namespace cedar::dev::robot::kuka::gui;
-using namespace cedar::dev::robot::kuka;
+using namespace cedar::dev::kuka::gui;
+using namespace cedar::dev::kuka;
 using namespace std;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-FriStatusWidget::FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
+FriStatusWidget::FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("FriStatusWidget", parent)
 {
