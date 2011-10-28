@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckControlWidget.cpp
+    File:        KTeamPositionControllerWidget.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for controlling the E-Puck.
+    Description: Graphical User Interface for the KTeam controller.
 
     Credits:
 
@@ -36,33 +36,30 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/gui/EPuckControlWidget.h"
+#include "devices/kteam/gui/KTeamPositionControllerWidget.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot::mobile::gui;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-EPuckControlWidget::EPuckControlWidget(cedar::dev::robot::mobile::EPuckDrive *peDrive, QWidget *parent)
+cedar::dev::kteam::gui::KTeamPositionControllerWidget::KTeamPositionControllerWidget(cedar::dev::kteam::KTeamPositionController *peController,
+                                                                                     cedar::dev::robot::mobile::Odometry *peModel,
+                                                                                     QWidget *parent)
 :
-cedar::aux::gui::BaseWidget("EPuckControlWidget", parent)
+cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)
 {
-  mpeDrive = peDrive;
+  mpeController = peController;
+  mpeModel = peModel;
   setupUi(this);
-  spinBoxForwardVelocity->setValue(mpeDrive->getForwardVelocity()); //initialize forwardVelocity
-  spinBoxTurningRate->setValue(mpeDrive->getTurningRate()); //initialize turningRate
-  connect(pushButtonStart, SIGNAL(pressed()), this, SLOT(drive()));
-  connect(pushButtonStop, SIGNAL(pressed()), this, SLOT(stop()));
-  connect(pushButtonReset, SIGNAL(pressed()), this, SLOT(reset()));
+  connect(startButton, SIGNAL(pressed()), this, SLOT(start()));
   startTimer(100); //timer for updating display
 }
 
-EPuckControlWidget::~EPuckControlWidget()
+cedar::dev::kteam::gui::KTeamPositionControllerWidget::~KTeamPositionControllerWidget()
 {
 
 }
@@ -71,33 +68,14 @@ EPuckControlWidget::~EPuckControlWidget()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void EPuckControlWidget::drive()
+void cedar::dev::kteam::gui::KTeamPositionControllerWidget::start()
 {
-  mpeDrive->setVelocity(spinBoxForwardVelocity->value(), spinBoxTurningRate->value());
+  mpeController->setTarget(xTargetPosition->value(), yTargetPosition->value());
 }
 
-void EPuckControlWidget::stop()
+void cedar::dev::kteam::gui::KTeamPositionControllerWidget::timerEvent(QTimerEvent * /* event */)
 {
-  mpeDrive->stop();
-}
-
-void EPuckControlWidget::reset()
-{
-  mpeDrive->reset();
-}
-
-void EPuckControlWidget::timerEvent(QTimerEvent * /* event */)
-{
-  int left_encoder;
-  int right_encoder;
-
-  //get new values
-  std::vector<double> wheel_speed = mpeDrive->getWheelSpeed();
-  mpeDrive->getEncoder(left_encoder, right_encoder);
-
   //display new values
-  valueLeftWheelSpeed->display(wheel_speed[0]);
-  valueRightWheelSpeed->display(wheel_speed[1]);
-  valueLeftEncoder->display(left_encoder);
-  valueRightEncoder->display(right_encoder);
+  xRobotPosition->display(mpeModel->getPositionX());
+  yRobotPosition->display(mpeModel->getPositionY());
 }

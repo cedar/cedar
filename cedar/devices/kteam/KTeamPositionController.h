@@ -34,13 +34,13 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_KTEAM_POSITION_CONTROLLER_H
-#define CEDAR_DEV_ROBOT_KTEAM_POSITION_CONTROLLER_H
+#ifndef CEDAR_DEV_KTEAM_POSITION_CONTROLLER_H
+#define CEDAR_DEV_KTEAM_POSITION_CONTROLLER_H
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/KTeamDrive.h"
-#include "devices/robot/mobile/KTeamDriveModel.h"
+#include "devices/kteam/KTeamDrive.h"
+#include "devices/kteam/KTeamDriveModel.h"
 #include "devices/robot/mobile/namespace.h"
 
 // PROJECT INCLUDES
@@ -56,7 +56,7 @@
  * Set the robot's target-position by calling setTarget(), change the factors of the controller by
  * setfactorVelocity() and setfactorTurningRate().
  */
-class cedar::dev::robot::mobile::KTeamPositionController : public QObject
+class cedar::dev::kteam::KTeamPositionController : public QObject
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -74,8 +74,8 @@ public:
   //!@brief Constructs the controller.
   //!@param peDrive Pointer to the controlled robot's drive.
   //!@param peModel Pointer to the model of the controlled robot.
-  KTeamPositionController(cedar::dev::robot::mobile::KTeamDrive *peDrive,
-                          cedar::dev::robot::mobile::KTeamDriveModel *peModel);
+  KTeamPositionController(cedar::dev::kteam::KTeamDrive *peDrive,
+                          cedar::dev::kteam::KTeamDriveModel *peModel);
 
   //!@brief Destructs the controller.
   ~KTeamPositionController();
@@ -164,11 +164,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-
   // none yet (hopefully never!)
 
 protected:
-
   // none yet
 
 private:
@@ -178,11 +176,11 @@ private:
 
   /*!@brief Pointer to the robot to be controlled.
    */
-  cedar::dev::robot::mobile::KTeamDrive *mpeDrive;
+  cedar::dev::kteam::KTeamDrive *mpeDrive;
 
   /*!@brief Pointer to the model of the robot.
    */
-  cedar::dev::robot::mobile::KTeamDriveModel *mpeModel;
+  cedar::dev::kteam::KTeamDriveModel *mpeModel;
 
   //!@brief factor of the turning rate dynamics
   double mFactorTurningRate;
@@ -195,17 +193,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
-
   // none yet (hopefully never!)
 
 protected:
-
   // none yet
 
 private:
-
   // none yet
 
-}; // class cedar::dev::robot::mobile::KTeamPositionController
+}; // class cedar::dev::kteam::KTeamPositionController
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_POSITION_CONTROLLER_H
+#endif // CEDAR_DEV_KTEAM_POSITION_CONTROLLER_H

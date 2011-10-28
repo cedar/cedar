@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/EPuckDrive.h"
+#include "devices/kteam/EPuckDrive.h"
 #include "auxiliaries/math/constants.h"
 #include "auxiliaries/math/tools.h"
 
@@ -44,7 +44,7 @@
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot::mobile;
+using namespace cedar::dev::kteam;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

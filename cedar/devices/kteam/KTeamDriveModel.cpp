@@ -46,13 +46,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-  cedar::dev::robot::mobile::KTeamDriveModel::KTeamDriveModel(cedar::dev::robot::mobile::KTeamDrive *peDrive)
+  cedar::dev::kteam::KTeamDriveModel::KTeamDriveModel(cedar::dev::kteam::KTeamDrive *peDrive)
   {
     mInitialized = false;
     init(peDrive);
   }
 
-  cedar::dev::robot::mobile::KTeamDriveModel::~KTeamDriveModel()
+  cedar::dev::kteam::KTeamDriveModel::~KTeamDriveModel()
   {
 
   }
@@ -61,7 +61,7 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int cedar::dev::robot::mobile::KTeamDriveModel::init(cedar::dev::robot::mobile::KTeamDrive *peDrive)
+int cedar::dev::kteam::KTeamDriveModel::init(cedar::dev::kteam::KTeamDrive *peDrive)
 {
   if(this->isInitialized())
   {
@@ -97,12 +97,12 @@ int cedar::dev::robot::mobile::KTeamDriveModel::init(cedar::dev::robot::mobile::
   return 1;
 }
 
-bool cedar::dev::robot::mobile::KTeamDriveModel::isInitialized() const
+bool cedar::dev::kteam::KTeamDriveModel::isInitialized() const
 {
   return this->mInitialized;
 }
 
-void cedar::dev::robot::mobile::KTeamDriveModel::update()
+void cedar::dev::kteam::KTeamDriveModel::update()
 {
   //get new encoder-values
   int left_encoder;
@@ -141,7 +141,7 @@ void cedar::dev::robot::mobile::KTeamDriveModel::update()
   }
 }
 
-void cedar::dev::robot::mobile::KTeamDriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
+void cedar::dev::kteam::KTeamDriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
 {
   //calculate the moved distance since last update
   double ds = calculateDifferencePosition(leftEncoder, mOldEncoder.at<int>(0,0),
@@ -160,7 +160,7 @@ void cedar::dev::robot::mobile::KTeamDriveModel::calculatePositionAndOrientation
   setOrientation(new_orientation);
 }
 
-double cedar::dev::robot::mobile::KTeamDriveModel::calculateDifferencePosition(
+double cedar::dev::kteam::KTeamDriveModel::calculateDifferencePosition(
                                                                                 int newLeftEncoder,
                                                                                 int oldLeftEncoder,
                                                                                 int newRightEncoder,
@@ -171,7 +171,7 @@ double cedar::dev::robot::mobile::KTeamDriveModel::calculateDifferencePosition(
           + (newLeftEncoder - oldLeftEncoder)) * mpeDrive->getDistancePerPulse() / 2;
 }
 
-double cedar::dev::robot::mobile::KTeamDriveModel::calculateDifferenceOrientation(
+double cedar::dev::kteam::KTeamDriveModel::calculateDifferenceOrientation(
                                                                                    int newLeftEncoder,
                                                                                    int oldLeftEncoder,
                                                                                    int newRightEncoder,

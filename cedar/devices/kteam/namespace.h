@@ -24,24 +24,24 @@
 
     File:        namespace.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Namespace file for cedar::dev::robot::mobile::gui.
+    Description: Namespace file for cedar::dev::kteam.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_GUI_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_MOBILE_GUI_NAMESPACE_H
+#ifndef CEDAR_DEV_KTEAM_NAMESPACE_H
+#define CEDAR_DEV_KTEAM_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -50,18 +50,14 @@ namespace cedar
 {
   namespace dev
   {
-    namespace robot
+    namespace kteam
     {
-      namespace mobile
-      {
-        namespace gui
-        {
-          CEDAR_DECLARE_DEV_CLASS(EPuckControlWidget);
-          CEDAR_DECLARE_DEV_CLASS(KTeamPositionControllerWidget);
-        }
-      }
+      CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
+      CEDAR_DECLARE_DEV_CLASS(KTeamDrive);
+      CEDAR_DECLARE_DEV_CLASS(KTeamDriveModel);
+      CEDAR_DECLARE_DEV_CLASS(KTeamPositionController);
     }
   }
 }
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_GUI_NAMESPACE_H
+#endif // CEDAR_DEV_KTEAM_NAMESPACE_H

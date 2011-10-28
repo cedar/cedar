@@ -38,9 +38,9 @@
 
 // PROJECT INCLUDES
 
-#include "devices/robot/mobile/EPuckDrive.h"
+#include "devices/kteam/EPuckDrive.h"
 #include "devices/communication/SerialCommunication.h"
-#include "devices/robot/mobile/gui/EPuckControlWidget.h"
+#include "devices/kteam/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES
 
@@ -60,13 +60,13 @@ int main(int argc, char **argv)
   = new cedar::dev::com::SerialCommunication("tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
 
   //initialize e-puck-drive
-  cedar::dev::robot::mobile::EPuckDrive *p_drive;
+  cedar::dev::kteam::EPuckDrive *p_drive;
   p_drive
-  = new cedar::dev::robot::mobile::EPuckDrive(p_communication, "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+  = new cedar::dev::kteam::EPuckDrive(p_communication, "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
 
   //open the control-GUI
-  cedar::dev::robot::mobile::gui::EPuckControlWidget *p_epuck_control;
-  p_epuck_control = new cedar::dev::robot::mobile::gui::EPuckControlWidget(p_drive);
+  cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
+  p_epuck_control = new cedar::dev::kteam::gui::EPuckControlWidget(p_drive);
   p_epuck_control->show();
 
   //start the program

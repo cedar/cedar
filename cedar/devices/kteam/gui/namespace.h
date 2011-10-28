@@ -28,20 +28,20 @@
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Namespace file for cedar::dev::robot::mobile.
+    Description: Namespace file for cedar::dev::robot::mobile::gui.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_NAMESPACE_H
-#define CEDAR_DEV_ROBOT_MOBILE_NAMESPACE_H
+#ifndef CEDAR_DEV_KTEAM_GUI_NAMESPACE_H
+#define CEDAR_DEV_KTEAM_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
 
 // PROJECT INCLUDES
+#include "defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -50,16 +50,15 @@ namespace cedar
 {
   namespace dev
   {
-    namespace robot
+    namespace kteam
     {
-      namespace mobile
+      namespace gui
       {
-        CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
-        CEDAR_DECLARE_DEV_CLASS(Locomotion);
-        CEDAR_DECLARE_DEV_CLASS(Odometry);
+        CEDAR_DECLARE_DEV_CLASS(EPuckControlWidget);
+        CEDAR_DECLARE_DEV_CLASS(KTeamPositionControllerWidget);
       }
     }
   }
 }
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_NAMESPACE_H
+#endif // CEDAR_DEV_ROBOT_MOBILE_GUI_NAMESPACE_H

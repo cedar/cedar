@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDrive.cpp
+    File:        EPuckControlWidget.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the differential drive of a PWM-driven robot.
+    Description: Graphical User Interface for controlling the E-Puck.
 
     Credits:
 
@@ -36,25 +36,33 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/KTeamDrive.h"
+#include "devices/kteam/gui/EPuckControlWidget.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
 
-using namespace cedar::dev::robot::mobile;
+using namespace cedar::dev::kteam::gui;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-KTeamDrive::KTeamDrive()
+EPuckControlWidget::EPuckControlWidget(cedar::dev::kteam::EPuckDrive *peDrive, QWidget *parent)
+:
+cedar::aux::gui::BaseWidget("EPuckControlWidget", parent)
 {
-
+  mpeDrive = peDrive;
+  setupUi(this);
+  spinBoxForwardVelocity->setValue(mpeDrive->getForwardVelocity()); //initialize forwardVelocity
+  spinBoxTurningRate->setValue(mpeDrive->getTurningRate()); //initialize turningRate
+  connect(pushButtonStart, SIGNAL(pressed()), this, SLOT(drive()));
+  connect(pushButtonStop, SIGNAL(pressed()), this, SLOT(stop()));
+  connect(pushButtonReset, SIGNAL(pressed()), this, SLOT(reset()));
+  startTimer(100); //timer for updating display
 }
 
-KTeamDrive::~KTeamDrive()
+EPuckControlWidget::~EPuckControlWidget()
 {
 
 }
@@ -63,53 +71,33 @@ KTeamDrive::~KTeamDrive()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double KTeamDrive::getPulsesPerRevolution() const
+void EPuckControlWidget::drive()
 {
-  return _mPulsesPerRevolution;
+  mpeDrive->setVelocity(spinBoxForwardVelocity->value(), spinBoxTurningRate->value());
 }
 
-int KTeamDrive::getMaximalEncoderValue() const
+void EPuckControlWidget::stop()
 {
-  return _mMaximalEncoderValue;
+  mpeDrive->stop();
 }
 
-int KTeamDrive::getMinimalEncoderValue() const
+void EPuckControlWidget::reset()
 {
-  return _mMinimalEncoderValue;
+  mpeDrive->reset();
 }
 
-double KTeamDrive::getDistancePerPulse() const
+void EPuckControlWidget::timerEvent(QTimerEvent * /* event */)
 {
-  return mDistancePerPulse;
-}
+  int left_encoder;
+  int right_encoder;
 
-int KTeamDrive::getMaximalNumberPulsesPerSecond() const
-{
-  return _mMaximalNumberPulsesPerSecond;
-}
+  //get new values
+  std::vector<double> wheel_speed = mpeDrive->getWheelSpeed();
+  mpeDrive->getEncoder(left_encoder, right_encoder);
 
-int KTeamDrive::resetEncoder()
-{
-  int s = setEncoder(0,0);
-  if (s == 0 && _mDebug) //setting encoder failed
-  {
-    std::cout << "KTeamDrive: Error Resetting Encoder\n";
-  }
-  return s;
-}
-
-int KTeamDrive::reset()
-{
-  int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
-  s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0
-  if (s == 0 && _mDebug) //setting wheel speed or resetting encoder failed
-  {
-    std::cout << "KTeamDrive: Error Resetting Robot\n";
-    }
-  else if (_mDebug)
-  {
-    std::cout << "KTeamDrive: Resetting Robot Successful\n";
-  }
-
-  return s;
+  //display new values
+  valueLeftWheelSpeed->display(wheel_speed[0]);
+  valueRightWheelSpeed->display(wheel_speed[1]);
+  valueLeftEncoder->display(left_encoder);
+  valueRightEncoder->display(right_encoder);
 }
