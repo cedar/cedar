@@ -51,11 +51,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::steps::StaticGain::StaticGain()
 :
+// outputs
 mOutput(new cedar::aux::MatData(cv::Mat())),
+// parameters
 _mGainFactor(new cedar::aux::DoubleParameter(this, "gainFactor", 1.0, -10000.0, 10000.0))
 {
+  // declare all data
   this->declareInput("input");
   this->declareOutput("output", mOutput);
+
+  // connect the parameter's change signal
   QObject::connect(_mGainFactor.get(), SIGNAL(valueChanged()), this, SLOT(gainChanged()));
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,11 +69,13 @@ _mGainFactor(new cedar::aux::DoubleParameter(this, "gainFactor", 1.0, -10000.0, 
 
 void cedar::proc::steps::StaticGain::compute(const cedar::proc::Arguments&)
 {
+  // the result is simply input * gain.
   this->mOutput->setData(this->mInput->getData() * this->_mGainFactor->getValue());
 }
 
 void cedar::proc::steps::StaticGain::gainChanged()
 {
+  // when the gain changes, the output needs to be recalculated.
   this->onTrigger();
 }
 
@@ -78,28 +85,36 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::StaticGain::determineInputVa
                                   cedar::aux::DataPtr data
                                 ) const
 {
+  // First, let's make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(slot->getName() == "input")
+
   if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
   {
+    // Mat data is accepted.
     return cedar::proc::DataSlot::VALIDITY_VALID;
   }
   else
   {
+    // Everything else is rejected.
     return cedar::proc::DataSlot::VALIDITY_ERROR;
   }
 }
 
 void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& CEDAR_DEBUG_ONLY(inputName))
 {
+  // Again, let's first make sure that this is really the input in case anyone ever changes our interface.
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
+  // Assign the input to the member. This saves us from casting in every computation step.
   this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
-  if (this->mInput)
-  {
-    const cv::Mat& input = this->mInput->getData();
-    // make a copy to create a matrix of the same type, dimensions, ...
-    this->mOutput->setData(input.clone());
-  }
+  // This should always work since other types should not be accepted.
+  CEDAR_DEBUG_ASSERT(this->mInput);
 
+  // Let's get a reference to the input matrix.
+  const cv::Mat& input = this->mInput->getData();
+  // Make a copy to create a matrix of the same type, dimensions, ...
+  this->mOutput->setData(input.clone());
+
+  // Finally, this also requires a recomputation of the output.
   this->onTrigger();
 }

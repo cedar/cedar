@@ -48,9 +48,18 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief   This is a static gain step that allows multiplying a matrix input with a factor.
  *
- * More detailed description of the class.
+ *          This step implements the cedar::proc::Step interface and allows a user to easily multiply any matrix with a
+ *          gain factor. This step is called a static gain step because the gain factor is determined by a parameter,
+ *          rather than being an input that might change over time.
+ *
+ * @remarks This step declares the following interface:
+ *          input - any matrix data
+ *          output - the output, i.e., input multiplied by gainFactor
+ *
+ *          Parameters of the step are:
+ *          gainFactor - the gain factor.
  */
 class cedar::proc::steps::StaticGain : public cedar::proc::Step
 {
@@ -69,20 +78,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief refreshes the internal matrix containing the Gaussian input
+  //!@brief Updates the output matrix.
   void compute(const cedar::proc::Arguments& arguments);
 
 
 public slots:
-  //!@brief a slot that is triggered if any of the Gauss function parameters are changed
+  //!@brief This slot is connected to the valueChanged() event of the gain value parameter.
   void gainChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Reacts to a change in the input connection.
   void inputConnectionChanged(const std::string& inputName);
 
+  //!@brief Determines whether the data item can be connected to the slot.
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
@@ -98,10 +109,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief MatrixData representing the input.
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
   cedar::aux::MatDataPtr mInput;
 
-  //!@brief the buffer containing the output
+  //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;
 private:
 
