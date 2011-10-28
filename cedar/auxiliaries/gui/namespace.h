@@ -60,7 +60,7 @@ namespace cedar
 
       /* Plot widgets */
       CEDAR_DECLARE_AUX_CLASS(DataPlotInterface);
-
+      CEDAR_DECLARE_AUX_CLASS(DataPlotter);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot1D);
       CEDAR_DECLARE_AUX_CLASS(MatrixPlot2D);
