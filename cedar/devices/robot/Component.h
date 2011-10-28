@@ -65,10 +65,6 @@ class cedar::dev::robot::Component : public virtual cedar::aux::Base
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
-  Component();
-  //!@brief destructor
-  virtual ~Component() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

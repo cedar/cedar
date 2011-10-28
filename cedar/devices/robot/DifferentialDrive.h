@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/Locomotion.h"
+#include "devices/robot/Locomotion.h"
 
 // PROJECT INCLUDES
 
@@ -50,7 +50,7 @@
  * This is an abstract class with functions and attributes common to differential drives. Robots with differential
  * drives are e.g. the mobile robots by K-Team.
  */
-class cedar::dev::robot::mobile::DifferentialDrive : public cedar::dev::robot::mobile::Locomotion
+class cedar::dev::robot::DifferentialDrive : public cedar::dev::robot::Locomotion
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

@@ -43,18 +43,16 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
-using namespace cedar::dev::robot::mobile;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-DifferentialDrive::DifferentialDrive()
+cedar::dev::robot::DifferentialDrive::DifferentialDrive()
 {
 
 }
 
-DifferentialDrive::~DifferentialDrive()
+cedar::dev::robot::DifferentialDrive::~DifferentialDrive()
 {
 
 }
@@ -63,22 +61,22 @@ DifferentialDrive::~DifferentialDrive()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double DifferentialDrive::getWheelDistance() const
+double cedar::dev::robot::DifferentialDrive::getWheelDistance() const
 {
   return _mWheelDistance;
 }
 
-double DifferentialDrive::getWheelRadius() const
+double cedar::dev::robot::DifferentialDrive::getWheelRadius() const
 {
   return _mWheelRadius;
 }
 
-const std::vector<double>& DifferentialDrive::getWheelSpeed() const
+const std::vector<double>& cedar::dev::robot::DifferentialDrive::getWheelSpeed() const
 {
   return mWheelSpeed;
 }
 
-std::vector<double> DifferentialDrive::calculateVelocity(double leftWheelSpeed, double rightWheelSpeed)
+std::vector<double> cedar::dev::robot::DifferentialDrive::calculateVelocity(double leftWheelSpeed, double rightWheelSpeed)
 {
     //construct the vector to return
     std::vector<double> velocity;
@@ -91,7 +89,7 @@ std::vector<double> DifferentialDrive::calculateVelocity(double leftWheelSpeed, 
     return velocity;
 }
 
-std::vector<double> DifferentialDrive::calculateWheelSpeed(double forwardVelocity, double turningRate)
+std::vector<double> cedar::dev::robot::DifferentialDrive::calculateWheelSpeed(double forwardVelocity, double turningRate)
 {
   //construct the vector to return
   std::vector<double> wheel_speed;
@@ -104,7 +102,7 @@ std::vector<double> DifferentialDrive::calculateWheelSpeed(double forwardVelocit
   return wheel_speed;
 }
 
-int DifferentialDrive::setVelocity(double forwardVelocity, double turningRate)
+int cedar::dev::robot::DifferentialDrive::setVelocity(double forwardVelocity, double turningRate)
 {
   std::vector<double> wheel_speed;
   wheel_speed.resize(2);
@@ -120,7 +118,7 @@ int DifferentialDrive::setVelocity(double forwardVelocity, double turningRate)
   return s;
 }
 
-int DifferentialDrive::setForwardVelocity(double forwardVelocity)
+int cedar::dev::robot::DifferentialDrive::setForwardVelocity(double forwardVelocity)
 {
   std::vector<double> wheel_speed;
   wheel_speed.resize(2);
@@ -136,7 +134,7 @@ int DifferentialDrive::setForwardVelocity(double forwardVelocity)
   return s;
 }
 
-int DifferentialDrive::setTurningRate(double turningRate)
+int cedar::dev::robot::DifferentialDrive::setTurningRate(double turningRate)
 {
   std::vector<double> wheel_speed;
   wheel_speed.resize(2);
@@ -152,7 +150,7 @@ int DifferentialDrive::setTurningRate(double turningRate)
   return s;
 }
 
-double DifferentialDrive::getMaximalWheelSpeed() const
+double cedar::dev::robot::DifferentialDrive::getMaximalWheelSpeed() const
 {
   return mMaximalWheelSpeed;
 }

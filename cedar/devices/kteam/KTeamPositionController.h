@@ -41,7 +41,7 @@
 
 #include "devices/kteam/KTeamDrive.h"
 #include "devices/kteam/KTeamDriveModel.h"
-#include "devices/robot/mobile/namespace.h"
+#include "devices/robot/namespace.h"
 
 // PROJECT INCLUDES
 
