@@ -1,0 +1,6 @@
+if(CEDAR_USE_AMTEC)
+	cedar_add_interactive_test("CoraHwAndSim" main.cpp iiClosedFormInverseKinematics.hpp iiClosedFormInverseKinematics.cpp ForwardInverseWidget.cpp MOC_HEADERS ForwardInverseWidget.h)
+#	cedar_add_interactive_test("CoraHwAndSim" main.cpp ForwardInverseWidget.cpp MOC_HEADERS ForwardInverseWidget.h)
+else(CEDAR_USE_AMTEC)
+	message("-- skipping CoraHwAndSim")
+endif(CEDAR_USE_AMTEC)
