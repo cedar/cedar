@@ -89,7 +89,7 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::steps::StaticGain::determineInputVa
   }
 }
 
-void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& CEDAR_DEBUG_ONLY(inputName))
+void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& inputName)
 {
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
