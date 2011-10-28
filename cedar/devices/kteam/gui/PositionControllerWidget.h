@@ -22,40 +22,50 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDriveModel.h
+    File:        PositionControllerWidget.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the kinematics model of a differential drive robot with encoders.
+    Description: Graphical User Interface for the KTeam controller.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_MODEL_H
-#define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_MODEL_H
+#ifndef CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#define CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
 
 // LOCAL INCLUDES
 
-#include "devices/robot/Odometry.h"
-#include "devices/kteam/KTeamDrive.h"
-
 // PROJECT INCLUDES
+
+#include "devices/kteam/PositionController.h"
+#include "devices/robot/Odometry.h"
+#include "cedar/devices/kteam/gui/ui_KTeamPositionControllerWidget.h"
+#include "devices/kteam/gui/namespace.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief An object of this class represents the kinematics model of a differential drive robot with encoders.
+#include <Qt>
+
+/*!@brief Graphical User Interface for the KTeam controller.
  *
- * The class calculates position and orientation of the robot in a coordinate-system based on the robot's encoders
- * (odometry).
+ * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
  */
-class cedar::dev::kteam::KTeamDriveModel : public cedar::dev::robot::Odometry
+class cedar::dev::kteam::gui::PositionControllerWidget
+: public cedar::aux::gui::BaseWidget, private Ui_KTeamPositionControllerWidget
 {
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+
+private:
+
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -63,29 +73,28 @@ class cedar::dev::kteam::KTeamDriveModel : public cedar::dev::robot::Odometry
 
 public:
 
-  //!@brief Constructs the model of the K-Team robot.
-  //!@param peDrive Pointer to the drive of the robot the position shall be calculated of.
-  KTeamDriveModel(cedar::dev::kteam::KTeamDrive *peDrive);
+  //!@brief Constructs the GUI.
+  //!@param peController Pointer to the controller used to control the robot.
+  //!@param peModel Pointer to the model of the controlled robot.
+  //!@param parent Pointer to parent widget
+  PositionControllerWidget(
+                            cedar::dev::kteam::PositionController *peController,
+                            cedar::dev::robot::Odometry *peModel,
+                            QWidget *parent = 0
+                          );
 
-  //!@brief Destructs the model of the K-Team robot.
-  virtual ~KTeamDriveModel();
+  //!@brief Destructs the GUI.
+  virtual ~PositionControllerWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 
-public:
+public slots:
 
-  /*!@brief Initializes the model.
-   *@param peDrive Pointer to the drive of the robot the position shall be calculated of.
-   *@return 1 if initialization was successful, else 0.
+  /*!@brief Sets the target-position of the robot.
    */
-  int init(cedar::dev::kteam::KTeamDrive *peDrive);
-
-  /*!@brief Get-function of the initialization-status.
-   * @return true if model is initialized, else false.
-   */
-  bool isInitialized() const;
+  void start();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,37 +110,14 @@ protected:
 
 private:
 
-  /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
-   *@param LeftEncoder The current encoder-value of the left wheel.
-   *@param RightEncoder The current encoder-value of the right wheel.
+  /*!@brief The timer-event.
+   * @param event pointer to event
    */
-   void calculatePositionAndOrientation(int leftEncoder, int rightEncoder);
+  void timerEvent(QTimerEvent *event);
 
-  /*!@brief Updates the current position.
-   *
-   * This function is called by timerEvent() of MobileRobotModel. It calls calculatePositionAndOrientation().
+  /*!@brief Updates the displayed position.
    */
   void update();
-
-  /*!@brief This function implements the calculation of the distance the robot has moved since the last update.
-   *@param newLeftEncoder The current encoder-value of the left wheel.
-   *@param oldLeftEncoder The last encoder-value of the left wheel.
-   *@param newRightEncoder The current encoder-value of the right wheel.
-   *@param oldRightEncoder The last encoder-value of the right wheel.
-   *@return The distance the robot has moved [in m].
-   */
-  double calculateDifferencePosition(int newLeftEncoder, int oldLeftEncoder,
-                                   int newRightEncoder, int oldRightEncoder);
-
-  /*!@brief This function implements the calculation of the angle the robot has turned since the last update.
-   *@param newLeftEncoder The current encoder-value of the left wheel.
-   *@param oldLeftEncoder The last encoder-value of the left wheel.
-   *@param newRightEncoder The current encoder-value of the right wheel.
-   *@param oldRightEncoder The last encoder-value of the right wheel.
-   *@return The angle the robot has turned [in rad].
-   */
-  double calculateDifferenceOrientation(int newLeftEncoder, int oldLeftEncoder,
-                                      int newRightEncoder, int oldRightEncoder);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -147,16 +133,11 @@ protected:
 
 private:
 
-  //!@brief The initialization-status
-  bool mInitialized;
+  //!@brief Pointer to the robot control.
+  PositionController *mpeController;
 
-  /*!@brief Pointer to the robot the position is calculated of.
-   */
-  cedar::dev::kteam::KTeamDrive *mpeDrive;
-
-  /*!@brief Stores the last encoder-values (needed to calculate the distance the robot has moved).
-   */
-  cv::Mat mOldEncoder;
+  //!@brief Pointer to the robot's model.
+  cedar::dev::robot::Odometry *mpeModel;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -174,7 +155,6 @@ private:
 
   // none yet
 
-}; // class cedar::dev::kteam::KTeamDriveModel
+}; // class cedar::dev::kteam::gui::PositionControllerWidget
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_MODEL_H
-
+#endif // CEDAR_DEV_KTEAM_GUI_POSITION_CONTROLLER_WIDGET_H

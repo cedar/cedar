@@ -39,7 +39,7 @@
 // PROJECT INCLUDES
 
 #include "devices/kteam/EPuckDrive.h"
-#include "devices/kteam/KTeamDriveModel.h"
+#include "devices/kteam/DriveModel.h"
 #include "auxiliaries/gl/Scene.h"
 #include "auxiliaries/gui/SceneWidget.h"
 #include "auxiliaries/gui/Viewer.h"
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
   pDrive = new cedar::dev::kteam::EPuckDrive(pCommunication,
                                                      "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
   //initialize the model of the e-puck
-  cedar::dev::kteam::KTeamDriveModelPtr p_kteam_model(new cedar::dev::kteam::KTeamDriveModel(pDrive));
+  cedar::dev::kteam::DriveModelPtr p_kteam_model(new cedar::dev::kteam::DriveModel(pDrive));
   p_kteam_model->setName("E-Puck");
   //add cylinder representing the robot
   ObjectPtr p_cylinder(new Cylinder(p_kteam_model, 0.07, 0.05));

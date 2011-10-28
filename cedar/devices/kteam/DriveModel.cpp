@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "KTeamDriveModel.h"
+#include "DriveModel.h"
 
 // PROJECT INCLUDES
 
@@ -46,13 +46,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-  cedar::dev::kteam::KTeamDriveModel::KTeamDriveModel(cedar::dev::kteam::KTeamDrive *peDrive)
+  cedar::dev::kteam::DriveModel::DriveModel(cedar::dev::kteam::Drive *peDrive)
   {
     mInitialized = false;
     init(peDrive);
   }
 
-  cedar::dev::kteam::KTeamDriveModel::~KTeamDriveModel()
+  cedar::dev::kteam::DriveModel::~DriveModel()
   {
 
   }
@@ -61,7 +61,7 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int cedar::dev::kteam::KTeamDriveModel::init(cedar::dev::kteam::KTeamDrive *peDrive)
+int cedar::dev::kteam::DriveModel::init(cedar::dev::kteam::Drive *peDrive)
 {
   if(this->isInitialized())
   {
@@ -97,12 +97,12 @@ int cedar::dev::kteam::KTeamDriveModel::init(cedar::dev::kteam::KTeamDrive *peDr
   return 1;
 }
 
-bool cedar::dev::kteam::KTeamDriveModel::isInitialized() const
+bool cedar::dev::kteam::DriveModel::isInitialized() const
 {
   return this->mInitialized;
 }
 
-void cedar::dev::kteam::KTeamDriveModel::update()
+void cedar::dev::kteam::DriveModel::update()
 {
   //get new encoder-values
   int left_encoder;
@@ -141,7 +141,7 @@ void cedar::dev::kteam::KTeamDriveModel::update()
   }
 }
 
-void cedar::dev::kteam::KTeamDriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
+void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(int leftEncoder, int rightEncoder)
 {
   //calculate the moved distance since last update
   double ds = calculateDifferencePosition(leftEncoder, mOldEncoder.at<int>(0,0),
@@ -160,7 +160,7 @@ void cedar::dev::kteam::KTeamDriveModel::calculatePositionAndOrientation(int lef
   setOrientation(new_orientation);
 }
 
-double cedar::dev::kteam::KTeamDriveModel::calculateDifferencePosition(
+double cedar::dev::kteam::DriveModel::calculateDifferencePosition(
                                                                                 int newLeftEncoder,
                                                                                 int oldLeftEncoder,
                                                                                 int newRightEncoder,
@@ -171,7 +171,7 @@ double cedar::dev::kteam::KTeamDriveModel::calculateDifferencePosition(
           + (newLeftEncoder - oldLeftEncoder)) * mpeDrive->getDistancePerPulse() / 2;
 }
 
-double cedar::dev::kteam::KTeamDriveModel::calculateDifferenceOrientation(
+double cedar::dev::kteam::DriveModel::calculateDifferenceOrientation(
                                                                                    int newLeftEncoder,
                                                                                    int oldLeftEncoder,
                                                                                    int newRightEncoder,
