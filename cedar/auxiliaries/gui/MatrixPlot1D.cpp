@@ -175,9 +175,13 @@ void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
 
   const cv::Mat& mat = this->mMatData->getData();
   this->mMatData->lockForRead();
-
+  if (mat.rows != 1 && mat.cols != 1) // plot is no longer capable of displaying the data
+  {
+    this->mMatData->unlock();
+    emit dataChanged();
+    return;
+  }
   CEDAR_DEBUG_ASSERT(mpXValues.size() == mpYValues.size());
-
   for (size_t i = 0; i < mpXValues.size(); ++i)
   {
     switch (mat.type())

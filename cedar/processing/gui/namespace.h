@@ -58,7 +58,6 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT ArchitectureToolBox;
       class CEDAR_PROC_LIB_EXPORT BoolParameter;
       class CEDAR_PROC_LIB_EXPORT Connection;
-      class CEDAR_PROC_LIB_EXPORT DataPlotter;
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
       class CEDAR_PROC_LIB_EXPORT DirectoryParameter;
       class CEDAR_PROC_LIB_EXPORT DoubleParameter;
