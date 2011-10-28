@@ -272,7 +272,7 @@ void cedar::dyn::NeuralField::updateMatrices()
   }
   for (unsigned int i=0;i<mKernels.size();i++)
   {
-    this->mKernels.at(i)->setDimensionality(new_dimensionality);
+    this->mKernels.at(i)->setDimensionality(dimensionality);
   }
   this->unlockAll();
 }
