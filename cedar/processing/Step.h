@@ -61,9 +61,16 @@
 #include <boost/bind.hpp>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief This class represents a processing step in the processing framework.
  *
- * More detailed description of the class.
+ * The concept of processing steps is explained in @ref ProcessingIntroduction. In short, a processing step represents
+ * a computational function that processes some input data into output data. Examples of a processing step could be
+ * converting an image to a different color space, approximating the solution of a dynamical system
+ * (see cedar::dyn::Dynamics) or raeding data from disk.
+ *
+ * Processing steps also have data slots that represent inputs, outputs and buffers (temporary data that can be
+ * displayed in plots). Each data slot is assigned some data pointer, input slots get external data, buffer and output
+ * slots must be assigned by the user, usually during the constructor.
  */
 class cedar::proc::Step : public QThread, public cedar::aux::NamedConfigurable
 {
@@ -76,14 +83,22 @@ class cedar::proc::Step : public QThread, public cedar::aux::NamedConfigurable
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Map of data slot names to the corresponding cedar::proc::DataSlot objects.
   typedef std::map<std::string, cedar::proc::DataSlotPtr> SlotMap;
+
+  //! Map from action names to their corresponding functions.
   typedef std::map<std::string, boost::function<void()> > ActionMap;
 
+  //! Enum that represents the current state of the step.
   enum State
   {
+    //! The state is indetermined.
     STATE_NONE,
+    //! The step is not running.
     STATE_NOT_RUNNING,
+    //! The step is currently running.
     STATE_RUNNING,
+    //! There was an exception thrown in the step's compute function.
     STATE_EXCEPTION
   };
 
@@ -101,31 +116,25 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief check if everything is prepared to execute compute()
+  //!@brief Method that gets called once by cedar::proc::LoopedTrigger once prior starting the trigger.
   virtual void onStart();
 
+  //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
   virtual void onStop();
 
-  //!@brief handles an external trigger signal, usually starts a thread or calls the run() function
+  //!@brief Handles an external trigger signal.
   void onTrigger();
-
-  //!@brief the code that is executed on each thread execution goes here
-  //!@todo Shouldn't this method be private? It should never be called by the user, rather, they should use onTrigger() (as that properly locks all the data)
-  virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
   //!@brief Method that is called whenever an input is connected to the step.
   virtual void inputConnectionChanged(const std::string& inputName);
 
-  /*!@brief checks the validity of a slot
-   * @param slot the slot that needs checking, specified by its smart pointer
-   */
+  //!@brief Checks the validity of a slot.
   cedar::proc::DataSlot::VALIDITY getInputValidity(cedar::proc::DataSlotPtr slot);
 
-  /*!@brief checks the validity of a slot
-   * @param slot_name the slot that needs checking, specified by its name
-   */
-  cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slot_name);
+  //!@brief Checks the validity of a slot.
+  cedar::proc::DataSlot::VALIDITY getInputValidity(const std::string& slotName);
 
+  //!@brief Function that determines the validity of input data.
   virtual cedar::proc::DataSlot::VALIDITY determineInputValidity
                                           (
                                             cedar::proc::ConstDataSlotPtr slot,
@@ -135,100 +144,151 @@ public:
   //!@brief Sets the arguments used by the next execution of the run function.
   bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
-  //!@brief returns the finished trigger
+  //!@brief Returns the finished trigger.
   cedar::proc::TriggerPtr& getFinishedTrigger();
 
-  /*!@brief toggles if a step is executed as an own thread, or if the run() function is called in the same thread as
-   * the source of the trigger signal
+  /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
+   *        the source of the trigger signal.
    */
   void setThreaded(bool isThreaded);
 
-  //!@brief provide data to an input slot. This means linking up another step's output to the current step
+  //!@brief Provide data to an input slot. This means linking up another step's output to the current step.
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
-  //!@brief removes a connection to another step's output
+  //!@brief Removes a connection to another step's output.
   void freeInput(const std::string& name);
 
+  //!@brief Returns a specific data pointer stored in this step.
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
+
+  //!@brief Returns a specific input data pointer stored in this step.
   cedar::aux::DataPtr getInput(const std::string& name);
+
+  //!@brief Returns a specific buffer data pointer stored in this step.
   cedar::aux::DataPtr getBuffer(const std::string& name);
+
+  //!@brief Returns a specific output data pointer stored in this step.
   cedar::aux::DataPtr getOutput(const std::string& name);
 
+  //!@brief Returns the map of data slots for a given role.
   cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role);
+
+  //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
 
+  //!@brief Returns the input slot corresponding to the given name.
+  //!@see cedar::proc::Step::getSlot
   cedar::proc::DataSlotPtr getInputSlot(const std::string& name);
+
+  //!@brief Returns the buffer slot corresponding to the given name.
+  //!@see cedar::proc::Step::getSlot
   cedar::proc::DataSlotPtr getBufferSlot(const std::string& name);
+
+  //!@brief Returns the output slot corresponding to the given name.
+  //!@see cedar::proc::Step::getSlot
   cedar::proc::DataSlotPtr getOutputSlot(const std::string& name);
+
+  //!@brief Returns the slot corresponding to the specified role and name.
   cedar::proc::DataSlotPtr getSlot(DataRole::Id role, const std::string& name);
 
+  //!@brief Returns a const pointer to the input slot corresponding to the given name.
+  //!@see cedar::proc::Step::getSlot
   cedar::proc::ConstDataSlotPtr getInputSlot(const std::string& name) const;
+
+  //!@brief Returns a const pointer to the buffer slot corresponding to the given name.
+  //!@see cedar::proc::Step::getSlot
   cedar::proc::ConstDataSlotPtr getBufferSlot(const std::string& name) const;
+
+  //!@brief Returns a const pointer to the output slot corresponding to the given name.
+  //!@see cedar::proc::Step::getSlot
   cedar::proc::ConstDataSlotPtr getOutputSlot(const std::string& name) const;
+
+  //!@brief Returns a const pointer to the slot corresponding to the given role and name.
+  //!@see cedar::proc::Step::getSlot
   cedar::proc::ConstDataSlotPtr getSlot(DataRole::Id role, const std::string& name) const;
 
-  /*! @remark Do not use this function to connect steps! Use cedar::proc::Manager::connect instead!
-   *  @todo Remove or migrate this function so that users can't see it.
-   */
-  static void connect(
-                       cedar::proc::StepPtr source,
-                       const std::string& sourceName,
-                       cedar::proc::StepPtr target,
-                       const std::string& targetName
-                     );
+  //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
+  bool autoConnectTriggers() const;
 
-  /*! @remark Do not use this function to disconnect steps! Use cedar::proc::Manager::disconnect instead!
-   *  @todo Remove or migrate this function so that users can't see it.
-   */
-  static void disconnect(
-                          cedar::proc::StepPtr source,
-                          const std::string& sourceName,
-                          cedar::proc::StepPtr target,
-                          const std::string& targetName
-                        );
+  //!@brief Sets the name of this step.
   void setName(const std::string& name);
+
+  //!@brief Returns the name of this step.
   const std::string& getName() const;
 
-  //!@todo Rework these to lock everything in the right order.
+  //!@brief Locks all data of this step.
   void lockAll();
+
+  //!@brief Unlocks all data of this step.
   void unlockAll();
 
-  static void parseDataName(const std::string& instr, std::string& stepName, std::string& dataName);
-  
+  //!@brief Returns the current cedar::proc::Step::STATE of the step.
   State getState() const;
+
+  //!@brief Returns the annotation of the current state, e.g., the reasons for failing or the message of the last
+  //        exception.
   const std::string& getStateAnnotation() const;
 
+  //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
+
+  //!@brief Returns the trigger associated with the given index.
   cedar::proc::TriggerPtr getTrigger(size_t index);
 
+  //!@brief Sets the associated registry for the step.
   void setRegistry(cedar::proc::StepRegistry* pRegistry);
 
+  //!@brief Returns the map of actions defined for this step.
   const ActionMap& getActions() const;
 
+  //!@brief Calls the action with the given name.
   void callAction(const std::string& name);
 
+  //!@brief Parses a data and step name without specifying a role.
+  static void parseDataNameNoRole
+              (
+                const std::string& instr,
+                std::string& stepName,
+                std::string& dataName
+              );
+
 public slots:
+  //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
 
 signals:
+  //!@brief Signal that is emmitted whenever the step's state is changed.
   void stateChanged();
+
+  //!@brief Signal that is emmitted whenever the step's name is changed.
   void nameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void run();
-
+  //!@brief Declares an input slot.
   void declareInput(const std::string& name, bool mandatory = true);
+
+  //!@brief Declares a buffer slot.
   void declareBuffer(const std::string& name);
+
+  //!@brief Declares an output slot.
   void declareOutput(const std::string& name);
 
+  //!@brief Declares a buffer slot and immediately sets the data pointer for that slot.
   void declareBuffer(const std::string& name, cedar::aux::DataPtr data);
+
+  //!@brief Declares an output slot and immediately sets the data pointer for that slot.
   void declareOutput(const std::string& name, cedar::aux::DataPtr data);
 
+  //!@brief Sets the data pointer for the buffer called name.
   void setBuffer(const std::string& name, cedar::aux::DataPtr data);
+
+  //!@brief Sets the data pointer for the output called name.
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
+
+  //!@brief Sets the data pointer of the buffer
   void freeBuffer(const std::string& name);
   void freeOutput(const std::string& name);
 
@@ -236,6 +296,8 @@ protected:
 
   void getDataLocks(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
   void getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+
+  //!@todo Instead of a DataRole::Id, use some (new) enum (LOCK_WRITE, LOCK_READ) and make a cedar::aux funciton out of this.
   void lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
   void unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
 
@@ -246,6 +308,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief This is the method that contains the computations performed by this step.
+   *
+   *        The arguments parameter is empty, unless the step is connected to a cedar::proc::LoopedTrigger, in which
+   *        case arguments of the type cedar::proc::StepTime are passed.
+   *
+   * @todo  Shouldn't this method be private? It should never be called by the user, rather, they should use onTrigger()
+   *        (as that properly locks all the data).
+   */
+  virtual void compute(const cedar::proc::Arguments& arguments) = 0;
+
+  void run();
+
   void checkMandatoryConnections();
   void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
   void freeData(DataRole::Id role, const std::string& name);
@@ -281,18 +355,17 @@ private:
   //! Registry managing the step.
   cedar::proc::StepRegistry* mRegisteredAt;
 
+  //!@brief Map of all actions defined for this step.
   ActionMap mActions;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
-  cedar::aux::BoolParameterPtr mRunInThread;
+  cedar::aux::BoolParameterPtr _mRunInThread;
 
 }; // class cedar::proc::Step
 
