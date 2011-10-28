@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H
-#define CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H
+#ifndef CEDAR_DEV_KUKA_KUKA_INTERFACE_H
+#define CEDAR_DEV_KUKA_KUKA_INTERFACE_H
 
 // MAKE FRI OPTIONAL
 #include "devices/robot/CMakeDefines.h"
@@ -57,7 +57,7 @@
 
  * This class wraps the KUKA Fast Research Interface (FRI)
  */
-class cedar::dev::robot::kuka::KukaInterface :  public cedar::dev::robot::KinematicChain
+class cedar::dev::kuka::KukaInterface :  public cedar::dev::robot::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

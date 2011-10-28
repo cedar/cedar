@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
-#define CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+#ifndef CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
+#define CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
 
 // MAKE FRI OPTIONAL
 #include "devices/robot/CMakeDefines.h"
@@ -45,11 +45,11 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "devices/robot/kuka/KukaInterface.h"
+#include "devices/kuka/KukaInterface.h"
 #ifdef DEBUG
-#include "cedar/devices/debug/robot/kuka/gui/ui_FriStatusWidget.h"
+#include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
 #else
-#include "cedar/devices/robot/kuka/gui/ui_FriStatusWidget.h"
+#include "cedar/devices/kuka/gui/ui_FriStatusWidget.h"
 #endif
 #include "auxiliaries/gui/BaseWidget.h"
 
@@ -61,7 +61,7 @@
  *
  * This includes the status, the connection quality, the sample time and if the robot is powered
  */
-class cedar::dev::robot::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
+class cedar::dev::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
                                                       private Ui_FriStatusWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ public:
    * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
    * @param parent parent widget
    */
-  FriStatusWidget(cedar::dev::robot::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
+  FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
 
   //!@brief Destructor
   ~FriStatusWidget();
@@ -116,7 +116,7 @@ protected:
   // none yet
 private:
   bool mIsInit; //!<true, if object has been initialized
-  cedar::dev::robot::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
+  cedar::dev::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -129,8 +129,8 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::robot::kuka::gui::FriStatusWidget
+}; // class cedar::dev::kuka::gui::FriStatusWidget
 
 #endif // CEDAR_USE_KUKA_FRI
-#endif // CEDAR_DEV_ROBOT_KUKA_GUI_STATUS_WIDGET_H
+#endif // CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
 

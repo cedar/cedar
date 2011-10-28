@@ -43,7 +43,7 @@ cedar_add_library(cedardev
   kteam/gui/KTeamPositionControllerWidget.h
   kteam/KTeamPositionController.h
   communication/gui/CommunicationWidget.h
-  robot/kuka/gui/FriStatusWidget.h
+  kuka/gui/FriStatusWidget.h
   LINK_LIBRARIES
   cedaraux
 )

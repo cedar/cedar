@@ -36,7 +36,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/kuka/gui/FriStatusWidget.h"
+#include "devices/kuka/gui/FriStatusWidget.h"
 #include "devices/robot/gui/KinematicChainWidget.h"
 
 // SYSTEM INCLUDES
@@ -45,8 +45,8 @@
 #include <iostream>
 
 using namespace std;
-using namespace cedar::dev::robot::kuka;
-using cedar::dev::robot::kuka::gui::FriStatusWidget;
+using namespace cedar::dev::kuka;
+using cedar::dev::kuka::gui::FriStatusWidget;
 using cedar::dev::robot::KinematicChainPtr;
 
 int main(int argc, char **argv)
