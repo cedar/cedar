@@ -153,8 +153,6 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
     return;
   }
 
-  //!@todo this timer event does not seem to stop when the plot window is closed.
-
 #ifdef DEBUG_LOCKS
   cedar::aux::System::mCOutLock.lockForWrite();
   std::cout << "readlocking lock " << (&this->mData->getLock()) << std::endl;
