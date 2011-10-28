@@ -64,6 +64,7 @@ cedar_add_library(cedarproc
   gui/DirectoryParameter.h
   gui/View.h
   source/GaussInput.h
+  steps/StaticGain.h
   LoopedTrigger.h
   Step.h
   RESOURCES
