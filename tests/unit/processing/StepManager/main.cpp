@@ -100,10 +100,10 @@ int main(int /* argc */, char** /* argv */)
 
   log_file << "Trying to call compute functions ... ";
   StepPtr step_a = Manager::getInstance().steps().get("stepA");
-  step_a->compute(cedar::proc::Arguments());
+  step_a->onTrigger();
 
   StepPtr step_b = Manager::getInstance().steps().get("stepB");
-  step_b->compute(cedar::proc::Arguments());
+  step_b->onTrigger();
   log_file << "done." << std::endl;
 
   // return
