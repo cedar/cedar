@@ -42,15 +42,16 @@
 
 // SYSTEM INCLUDES
 
-
-using namespace std;
-using namespace cedar::dev::robot;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-ControlThread::ControlThread(const KinematicChainPtr &kinematicChain, const std::string& configFileName) : LoopedThread(100, 0.01, configFileName)
+ControlThread::ControlThread(
+                              const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+                              const std::string& configFileName
+                            )
+:
+cedar::aux::LoopedThread(100, 0.01, configFileName)
 {
   mpKinematicChain = kinematicChain;
   return;
@@ -63,9 +64,9 @@ void ControlThread::step(double stepSize)
   double current_vel = mpKinematicChain->getJointVelocity(JOINT);
 
   double rate_of_change = 1.0 * (TARGET - current_pos);
-  rate_of_change = min<double>(rate_of_change, current_vel + 0.4);
+  rate_of_change = std::min<double>(rate_of_change, current_vel + 0.4);
 
-  cout << "setting speed " << rate_of_change << endl;
+  std::cout << "setting speed " << rate_of_change << std::endl;
   mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
 }
 

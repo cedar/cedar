@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AmtecKinematicChain.h
+    File:        KinematicChain.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
@@ -34,17 +34,17 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
-#define CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H
+#ifndef CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_H
+#define CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_H
 
 // MAKE AMTEC OPTIONAL
-#include "CMakeDefines.h"
+#include "devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_AMTEC
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "ReferenceGeometry.h"
-#include "KinematicChain.h"
+#include "devices/amtec/namespace.h"
+#include "devices/robot/ReferenceGeometry.h"
+#include "devices/robot/KinematicChain.h"
 
 // PROJECT INCLUDES
 
@@ -55,7 +55,7 @@
 
 /*!@brief KinematicChain implementation for Amtec modules
  */
-class cedar::dev::robot::AmtecKinematicChain : public cedar::dev::robot::KinematicChain
+class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,12 +66,12 @@ class cedar::dev::robot::AmtecKinematicChain : public cedar::dev::robot::Kinemat
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  AmtecKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
   //!@brief constructor
-  AmtecKinematicChain(const std::string& configFileName);
+  KinematicChain(const std::string& configFileName);
 
   //!@brief Destructor
-  ~AmtecKinematicChain();
+  ~KinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -137,7 +137,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::dev::robot::AmtecKinematicChain
+}; // class cedar::dev::amtec::KinematicChain
 
 #endif // CEDAR_USE_AMTEC
 #endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H

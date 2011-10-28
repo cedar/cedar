@@ -38,7 +38,6 @@
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "CMakeDefines.h"
 #include "devices/lib.h"
 
 // PROJECT INCLUDES
@@ -57,9 +56,6 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(Robot);
       CEDAR_DECLARE_DEV_CLASS(KinematicChain);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainModel);
-#ifdef CEDAR_USE_AMTEC
-      CEDAR_DECLARE_DEV_CLASS(AmtecKinematicChain);
-#endif // CEDAR_USE_AMTEC
       CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
       CEDAR_DECLARE_DEV_CLASS(ReferenceGeometry);
       CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);

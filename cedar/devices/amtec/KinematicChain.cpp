@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AmtecKinematicChain.cpp
+    File:        KinematicChain.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
@@ -34,12 +34,11 @@
 
 ======================================================================================================================*/
 
-// MAKE AMTEC OPTIONAL
-#include "CMakeDefines.h"
-#ifdef CEDAR_USE_AMTEC
 
 // LOCAL INCLUDES
-#include "AmtecKinematicChain.h"
+#include "devices/amtec/KinematicChain.h"
+// MAKE AMTEC OPTIONAL
+#ifdef CEDAR_USE_AMTEC
 
 // PROJECT INCLUDES
 #include "auxiliaries/exceptions/InitializationException.h"
@@ -58,8 +57,9 @@ using namespace cedar::dev::robot;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeometryPtr& rpReferenceGeometry) :
-    KinematicChain(rpReferenceGeometry)
+cedar::dev::amtec::KinematicChain::KinematicChain(const ReferenceGeometryPtr& rpReferenceGeometry)
+:
+cedar::dev::robot::KinematicChain(rpReferenceGeometry)
 {
   mpDevice = 0;
   mInitString = string("ESD:0,450");
@@ -75,8 +75,9 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const ReferenceGeome
 }
 
 
-cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const std::string& configFileName) :
-    KinematicChain(configFileName)
+cedar::dev::amtec::KinematicChain::KinematicChain(const std::string& configFileName)
+:
+cedar::dev::robot::KinematicChain(configFileName)
 {
   mpDevice = 0;
   mInitString = string("ESD:0,450");
@@ -92,7 +93,7 @@ cedar::dev::robot::AmtecKinematicChain::AmtecKinematicChain(const std::string& c
 }
 
 
-cedar::dev::robot::AmtecKinematicChain::~AmtecKinematicChain()
+cedar::dev::amtec::KinematicChain::~KinematicChain()
 {
   for(unsigned int i = 0; i < mModules.size(); ++i)
   {
@@ -112,7 +113,7 @@ cedar::dev::robot::AmtecKinematicChain::~AmtecKinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 
 
-bool cedar::dev::robot::AmtecKinematicChain::initDevice()
+bool cedar::dev::amtec::KinematicChain::initDevice()
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -166,7 +167,7 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 
   if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
   {
-    cout << "AmtecKinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
+    cout << "KinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
   }
 
   readOrDefaultConfiguration();
@@ -215,7 +216,7 @@ bool cedar::dev::robot::AmtecKinematicChain::initDevice()
 }
 
 
-double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
+double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -241,7 +242,7 @@ double cedar::dev::robot::AmtecKinematicChain::getJointAngle(unsigned int joint)
 }
 
 
-double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joint)
+double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -267,7 +268,7 @@ double cedar::dev::robot::AmtecKinematicChain::getJointVelocity(unsigned int joi
 }
 
 
-void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, double value)
+void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double value)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -291,7 +292,7 @@ void cedar::dev::robot::AmtecKinematicChain::setJointAngle(unsigned int index, d
 }
 
 
-bool cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index, double velocity)
+bool cedar::dev::amtec::KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -318,7 +319,7 @@ bool cedar::dev::robot::AmtecKinematicChain::setJointVelocity(unsigned int index
 }
 
 
-bool cedar::dev::robot::AmtecKinematicChain::calibrateModule(unsigned int module)
+bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -374,11 +375,11 @@ bool cedar::dev::robot::AmtecKinematicChain::calibrateModule(unsigned int module
 }
 
 
-void cedar::dev::robot::AmtecKinematicChain::readParamsFromConfigFile()
+void cedar::dev::amtec::KinematicChain::readParamsFromConfigFile()
 {
   if(addParameter(&mInitString, "amtecInitString", "ESD:0,450") != CONFIG_SUCCESS)
   {
-    cout << "AmtecKinematicChain: Error reading 'amtecInitString' from config file!" << endl;
+    cout << "KinematicChain: Error reading 'amtecInitString' from config file!" << endl;
   }
 
   readOrDefaultConfiguration();
@@ -386,7 +387,7 @@ void cedar::dev::robot::AmtecKinematicChain::readParamsFromConfigFile()
 }
 
 
-bool cedar::dev::robot::AmtecKinematicChain::isCalibrated(unsigned int module)
+bool cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int module)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -414,7 +415,7 @@ bool cedar::dev::robot::AmtecKinematicChain::isCalibrated(unsigned int module)
 }
 
 
-float cedar::dev::robot::AmtecKinematicChain::getMaxAcceleration(unsigned int index)
+float cedar::dev::amtec::KinematicChain::getMaxAcceleration(unsigned int index)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -438,7 +439,7 @@ float cedar::dev::robot::AmtecKinematicChain::getMaxAcceleration(unsigned int in
 }
 
 
-void cedar::dev::robot::AmtecKinematicChain::setMaxAcceleration(unsigned int index, float maxAcc)
+void cedar::dev::amtec::KinematicChain::setMaxAcceleration(unsigned int index, float maxAcc)
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
