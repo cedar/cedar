@@ -94,10 +94,10 @@ private:
 protected:
   void setKernelPart(unsigned int dimension, const cv::Mat& mat);
 
-  //!@todo make private
+  //!@todo Make private?
   std::vector<cv::Mat> mKernelParts; //!< the separate parts of a separable kernel
+
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
