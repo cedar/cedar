@@ -53,9 +53,9 @@ namespace cedar
     namespace kteam
     {
       CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
-      CEDAR_DECLARE_DEV_CLASS(KTeamDrive);
-      CEDAR_DECLARE_DEV_CLASS(KTeamDriveModel);
-      CEDAR_DECLARE_DEV_CLASS(KTeamPositionController);
+      CEDAR_DECLARE_DEV_CLASS(Drive);
+      CEDAR_DECLARE_DEV_CLASS(DriveModel);
+      CEDAR_DECLARE_DEV_CLASS(PositionController);
     }
   }
 }

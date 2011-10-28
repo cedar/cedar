@@ -39,8 +39,8 @@
 
 // LOCAL INCLUDES
 
-#include "devices/kteam/KTeamDrive.h"
-#include "devices/kteam/KTeamDriveModel.h"
+#include "devices/kteam/Drive.h"
+#include "devices/kteam/DriveModel.h"
 #include "devices/robot/namespace.h"
 
 // PROJECT INCLUDES
@@ -56,7 +56,7 @@
  * Set the robot's target-position by calling setTarget(), change the factors of the controller by
  * setfactorVelocity() and setfactorTurningRate().
  */
-class cedar::dev::kteam::KTeamPositionController : public QObject
+class cedar::dev::kteam::PositionController : public QObject
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -74,11 +74,11 @@ public:
   //!@brief Constructs the controller.
   //!@param peDrive Pointer to the controlled robot's drive.
   //!@param peModel Pointer to the model of the controlled robot.
-  KTeamPositionController(cedar::dev::kteam::KTeamDrive *peDrive,
-                          cedar::dev::kteam::KTeamDriveModel *peModel);
+  PositionController(cedar::dev::kteam::Drive *peDrive,
+                          cedar::dev::kteam::DriveModel *peModel);
 
   //!@brief Destructs the controller.
-  ~KTeamPositionController();
+  ~PositionController();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -90,7 +90,7 @@ public:
    * !@param xPosition x-coordinate of the target [in m].
    * !@param yPosition y-coordinate of the target [in m].
    */
-  void setTarget(double xPosition,double yPosition);
+  void setTarget(double xPosition, double yPosition);
 
   /*!@brief The get-function of the target-position.
    *@return Vektor with x- and y-coordinate [both in m]  of the target.
@@ -176,11 +176,11 @@ private:
 
   /*!@brief Pointer to the robot to be controlled.
    */
-  cedar::dev::kteam::KTeamDrive *mpeDrive;
+  cedar::dev::kteam::Drive *mpeDrive;
 
   /*!@brief Pointer to the model of the robot.
    */
-  cedar::dev::kteam::KTeamDriveModel *mpeModel;
+  cedar::dev::kteam::DriveModel *mpeModel;
 
   //!@brief factor of the turning rate dynamics
   double mFactorTurningRate;

@@ -55,7 +55,7 @@ namespace cedar
       namespace gui
       {
         CEDAR_DECLARE_DEV_CLASS(EPuckControlWidget);
-        CEDAR_DECLARE_DEV_CLASS(KTeamPositionControllerWidget);
+        CEDAR_DECLARE_DEV_CLASS(PositionControllerWidget);
       }
     }
   }

@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/kteam/KTeamDrive.h"
+#include "devices/kteam/Drive.h"
 
 // PROJECT INCLUDES
 
@@ -58,7 +58,7 @@
  */
 class cedar::dev::kteam::EPuckDrive
 :
-public cedar::dev::kteam::KTeamDrive, public cedar::aux::ConfigurationInterface
+public cedar::dev::kteam::Drive, public cedar::aux::ConfigurationInterface
 {
 
   //--------------------------------------------------------------------------------------------------------------------

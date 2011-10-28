@@ -22,79 +22,95 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamPositionControllerWidget.h
+    File:        KTeamDrive.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for the KTeam controller.
+    Description: An object of this class represents the differential drive of a PWM-driven robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
-#define CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
+#define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
 
 // LOCAL INCLUDES
+#include "devices/robot/DifferentialDrive.h"
+#include "devices/kteam/namespace.h"
 
 // PROJECT INCLUDES
 
-#include "devices/kteam/KTeamPositionController.h"
-#include "devices/robot/Odometry.h"
-#include "cedar/devices/kteam/gui/ui_KTeamPositionControllerWidget.h"
-#include "devices/kteam/gui/namespace.h"
-#include "auxiliaries/gui/BaseWidget.h"
-
 // SYSTEM INCLUDES
 
-#include <Qt>
-
-/*!@brief Graphical User Interface for the KTeam controller.
+/*!@brief An object of this class represents the differential drive of a PWM-driven robot.
  *
- * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
+ * This is an abstract class with functions and attributes common to differential drive robots with
+ * Pulse-Width-Modulation-driven wheels. These are e.g. the mobile robots E-Puck, Khepera and Koala.
  */
-class cedar::dev::kteam::gui::KTeamPositionControllerWidget
-: public cedar::aux::gui::BaseWidget, private Ui_KTeamPositionControllerWidget
+class cedar::dev::kteam::Drive : public cedar::dev::robot::DifferentialDrive
 {
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
-private:
-
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
-  //!@brief Constructs the GUI.
-  //!@param peController Pointer to the controller used to control the robot.
-  //!@param peModel Pointer to the model of the controlled robot.
-  //!@param parent Pointer to parent widget
-  KTeamPositionControllerWidget(
-                                 cedar::dev::kteam::KTeamPositionController *peController,
-                                 cedar::dev::robot::Odometry *peModel,
-                                 QWidget *parent = 0
-                               );
-
-  //!@brief Destructs the GUI.
-  virtual ~KTeamPositionControllerWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 
-public slots:
+public:
 
-  /*!@brief Sets the target-position of the robot.
+  /*!@brief The get-function of the number of pulses per wheel-revolution.
+   *@return Number of Pulses per Revolution.
    */
-  void start();
+  double getPulsesPerRevolution() const;
+
+  /*!@brief The get-function of the maximal encoder value.
+   *@return The maximal encoder value.
+   */
+  int getMaximalEncoderValue() const;
+
+  /*!@brief The get-function of the minimal encoder value.
+   *@return The minimal encoder value.
+   */
+  int getMinimalEncoderValue() const;
+
+  /*!@brief The get-function of the distance one wheel moves each pulse.
+   *@return The distance one wheel moves each pulse [in m].
+   */
+  double getDistancePerPulse() const;
+
+  /*!@brief The get-function of the maximum possible number of pulses per second.
+   *@return The maximal number of pulses per second.
+   */
+  int getMaximalNumberPulsesPerSecond() const;
+
+  /*!@brief The get-function of left and right encoder values.
+   *@param leftEncoder Variable the left encoder value shall be stored in.
+   *@param rightEncoder Variable the right encoder value shall be stored in.
+   *@return 1 if getting encoder values was successful and 0 otherwise.
+   */
+  virtual int getEncoder(int &leftEncoder, int &rightEncoder) = 0;
+
+  /*!@brief Sets both encoder values to 0.
+   *@return 1 if resetting encoder values was successful and 0 otherwise.
+   */
+  int resetEncoder();
+
+  /*!@brief Resets the robot.
+   *@return 1 if resetting the robot was successful and 0 otherwise.
+   *
+   *Reset sets both wheel speeds and encoder values to 0.
+   */
+  int reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -102,7 +118,12 @@ public slots:
 
 protected:
 
-  // none yet
+  /*!@brief Sets both encoder values.
+   *@param leftEncoder The left encoder value to be set.
+   *@param rightEncoder The right encoder value to be set.
+   *@return 1 if setting encoder values was successful and 0 otherwise.
+   */
+  virtual int setEncoder(int leftEncoder, int rightEncoder) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -110,14 +131,7 @@ protected:
 
 private:
 
-  /*!@brief The timer-event.
-   * @param event pointer to event
-   */
-  void timerEvent(QTimerEvent *event);
-
-  /*!@brief Updates the displayed position.
-   */
-  void update();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -129,15 +143,12 @@ public:
 
 protected:
 
-  // none yet
+  //!@brief Distance the wheel moves each pulse [in m].
+  double mDistancePerPulse;
 
 private:
 
-  //!@brief Pointer to the robot control.
-  KTeamPositionController *mpeController;
-
-  //!@brief Pointer to the robot's model.
-  cedar::dev::robot::Odometry *mpeModel;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -149,12 +160,22 @@ public:
 
 protected:
 
-  // none yet
+  //!@brief Number of pulses per revolution of wheel.
+  double _mPulsesPerRevolution;
+
+  //!@brief The maximal encoder value.
+  int _mMaximalEncoderValue;
+
+  //!@brief The minimal encoder value.
+  int _mMinimalEncoderValue;
+
+  //!@brief The maximal possible number of pulses per second.
+  int _mMaximalNumberPulsesPerSecond;
 
 private:
 
   // none yet
 
-}; // class cedar::dev::kteam::gui::KTeamPositionControllerWidget
+}; // class cedar::dev::kteam::KTeamDrive
 
-#endif // CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H

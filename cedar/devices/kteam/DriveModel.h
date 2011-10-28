@@ -22,37 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDrive.h
+    File:        KTeamDriveModel.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the differential drive of a PWM-driven robot.
+    Description: An object of this class represents the kinematics model of a differential drive robot with encoders.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
-#define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
+#ifndef CEDAR_DEV_KTEAM_DRIVE_MODEL_H
+#define CEDAR_DEV_KTEAM_DRIVE_MODEL_H
 
 // LOCAL INCLUDES
-#include "devices/robot/DifferentialDrive.h"
-#include "devices/kteam/namespace.h"
+
+#include "devices/robot/Odometry.h"
+#include "devices/kteam/Drive.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-/*!@brief An object of this class represents the differential drive of a PWM-driven robot.
+/*!@brief An object of this class represents the kinematics model of a differential drive robot with encoders.
  *
- * This is an abstract class with functions and attributes common to differential drive robots with
- * Pulse-Width-Modulation-driven wheels. These are e.g. the mobile robots E-Puck, Khepera and Koala.
+ * The class calculates position and orientation of the robot in a coordinate-system based on the robot's encoders
+ * (odometry).
  */
-class cedar::dev::kteam::KTeamDrive : public cedar::dev::robot::DifferentialDrive
+class cedar::dev::kteam::DriveModel : public cedar::dev::robot::Odometry
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -60,7 +60,15 @@ class cedar::dev::kteam::KTeamDrive : public cedar::dev::robot::DifferentialDriv
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
+  //!@brief Constructs the model of the K-Team robot.
+  //!@param peDrive Pointer to the drive of the robot the position shall be calculated of.
+  DriveModel(cedar::dev::kteam::Drive *peDrive);
+
+  //!@brief Destructs the model of the K-Team robot.
+  virtual ~DriveModel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -68,49 +76,16 @@ public:
 
 public:
 
-  /*!@brief The get-function of the number of pulses per wheel-revolution.
-   *@return Number of Pulses per Revolution.
+  /*!@brief Initializes the model.
+   *@param peDrive Pointer to the drive of the robot the position shall be calculated of.
+   *@return 1 if initialization was successful, else 0.
    */
-  double getPulsesPerRevolution() const;
+  int init(cedar::dev::kteam::Drive *peDrive);
 
-  /*!@brief The get-function of the maximal encoder value.
-   *@return The maximal encoder value.
+  /*!@brief Get-function of the initialization-status.
+   * @return true if model is initialized, else false.
    */
-  int getMaximalEncoderValue() const;
-
-  /*!@brief The get-function of the minimal encoder value.
-   *@return The minimal encoder value.
-   */
-  int getMinimalEncoderValue() const;
-
-  /*!@brief The get-function of the distance one wheel moves each pulse.
-   *@return The distance one wheel moves each pulse [in m].
-   */
-  double getDistancePerPulse() const;
-
-  /*!@brief The get-function of the maximum possible number of pulses per second.
-   *@return The maximal number of pulses per second.
-   */
-  int getMaximalNumberPulsesPerSecond() const;
-
-  /*!@brief The get-function of left and right encoder values.
-   *@param leftEncoder Variable the left encoder value shall be stored in.
-   *@param rightEncoder Variable the right encoder value shall be stored in.
-   *@return 1 if getting encoder values was successful and 0 otherwise.
-   */
-  virtual int getEncoder(int &leftEncoder, int &rightEncoder) = 0;
-
-  /*!@brief Sets both encoder values to 0.
-   *@return 1 if resetting encoder values was successful and 0 otherwise.
-   */
-  int resetEncoder();
-
-  /*!@brief Resets the robot.
-   *@return 1 if resetting the robot was successful and 0 otherwise.
-   *
-   *Reset sets both wheel speeds and encoder values to 0.
-   */
-  int reset();
+  bool isInitialized() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -118,12 +93,7 @@ public:
 
 protected:
 
-  /*!@brief Sets both encoder values.
-   *@param leftEncoder The left encoder value to be set.
-   *@param rightEncoder The right encoder value to be set.
-   *@return 1 if setting encoder values was successful and 0 otherwise.
-   */
-  virtual int setEncoder(int leftEncoder, int rightEncoder) = 0;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -131,7 +101,37 @@ protected:
 
 private:
 
-  // none yet
+  /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
+   *@param LeftEncoder The current encoder-value of the left wheel.
+   *@param RightEncoder The current encoder-value of the right wheel.
+   */
+   void calculatePositionAndOrientation(int leftEncoder, int rightEncoder);
+
+  /*!@brief Updates the current position.
+   *
+   * This function is called by timerEvent() of MobileRobotModel. It calls calculatePositionAndOrientation().
+   */
+  void update();
+
+  /*!@brief This function implements the calculation of the distance the robot has moved since the last update.
+   *@param newLeftEncoder The current encoder-value of the left wheel.
+   *@param oldLeftEncoder The last encoder-value of the left wheel.
+   *@param newRightEncoder The current encoder-value of the right wheel.
+   *@param oldRightEncoder The last encoder-value of the right wheel.
+   *@return The distance the robot has moved [in m].
+   */
+  double calculateDifferencePosition(int newLeftEncoder, int oldLeftEncoder,
+                                   int newRightEncoder, int oldRightEncoder);
+
+  /*!@brief This function implements the calculation of the angle the robot has turned since the last update.
+   *@param newLeftEncoder The current encoder-value of the left wheel.
+   *@param oldLeftEncoder The last encoder-value of the left wheel.
+   *@param newRightEncoder The current encoder-value of the right wheel.
+   *@param oldRightEncoder The last encoder-value of the right wheel.
+   *@return The angle the robot has turned [in rad].
+   */
+  double calculateDifferenceOrientation(int newLeftEncoder, int oldLeftEncoder,
+                                      int newRightEncoder, int oldRightEncoder);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -143,12 +143,20 @@ public:
 
 protected:
 
-  //!@brief Distance the wheel moves each pulse [in m].
-  double mDistancePerPulse;
+  // none yet
 
 private:
 
-  // none yet
+  //!@brief The initialization-status
+  bool mInitialized;
+
+  /*!@brief Pointer to the robot the position is calculated of.
+   */
+  cedar::dev::kteam::Drive *mpeDrive;
+
+  /*!@brief Stores the last encoder-values (needed to calculate the distance the robot has moved).
+   */
+  cv::Mat mOldEncoder;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -160,22 +168,13 @@ public:
 
 protected:
 
-  //!@brief Number of pulses per revolution of wheel.
-  double _mPulsesPerRevolution;
-
-  //!@brief The maximal encoder value.
-  int _mMaximalEncoderValue;
-
-  //!@brief The minimal encoder value.
-  int _mMinimalEncoderValue;
-
-  //!@brief The maximal possible number of pulses per second.
-  int _mMaximalNumberPulsesPerSecond;
+  // none yet
 
 private:
 
   // none yet
 
-}; // class cedar::dev::kteam::KTeamDrive
+}; // class cedar::dev::kteam::KTeamDriveModel
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
+#endif // CEDAR_DEV_KTEAM_DRIVE_MODEL_H
+

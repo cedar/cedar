@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/kteam/KTeamPositionController.h"
+#include "devices/kteam/PositionController.h"
 
 // PROJECT INCLUDES
 
@@ -46,8 +46,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::kteam::KTeamPositionController::KTeamPositionController(cedar::dev::kteam::KTeamDrive *peDrive,
-                                                                    cedar::dev::kteam::KTeamDriveModel *peModel)
+cedar::dev::kteam::PositionController::PositionController(
+                                                           cedar::dev::kteam::Drive *peDrive,
+                                                           cedar::dev::kteam::DriveModel *peModel
+                                                         )
 {
   //Initialization of members
   mTarget = cv::Mat(2, 1, CV_64FC1);
@@ -69,7 +71,7 @@ cedar::dev::kteam::KTeamPositionController::KTeamPositionController(cedar::dev::
   startTimer(1);
 }
 
-cedar::dev::kteam::KTeamPositionController::~KTeamPositionController()
+cedar::dev::kteam::PositionController::~PositionController()
 {
 
 }
@@ -78,18 +80,18 @@ cedar::dev::kteam::KTeamPositionController::~KTeamPositionController()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::dev::kteam::KTeamPositionController::timerEvent(QTimerEvent * /* event */)
+void cedar::dev::kteam::PositionController::timerEvent(QTimerEvent * /* event */)
 {
   update();
 }
 
-void cedar::dev::kteam::KTeamPositionController::setTarget(double xPosition, double yPosition)
+void cedar::dev::kteam::PositionController::setTarget(double xPosition, double yPosition)
 {
   mTarget.at<double>(0,0) = xPosition; //set x-position
   mTarget.at<double>(1,0) = yPosition; //set y-position
 }
 
-void cedar::dev::kteam::KTeamPositionController::update()
+void cedar::dev::kteam::PositionController::update()
 {
   // get distance to target
   double distance = getDistance(mpeModel->getPosition(), mTarget);
@@ -111,39 +113,39 @@ void cedar::dev::kteam::KTeamPositionController::update()
   }
 }
 
-double cedar::dev::kteam::KTeamPositionController::calculateTurningRate(double orientation, double distance) const
+double cedar::dev::kteam::PositionController::calculateTurningRate(double orientation, double distance) const
 {
   return mFactorTurningRate * distance * sin(orientation - getAngle(mpeModel->getPosition(), mTarget));
 }
 
-double cedar::dev::kteam::KTeamPositionController::calculateForwardVelocity(double orientation, double distance) const
+double cedar::dev::kteam::PositionController::calculateForwardVelocity(double orientation, double distance) const
 {
   return mFactorVelocity * distance * (- cos(orientation - getAngle(mpeModel->getPosition(), mTarget)));
 }
 
-double cedar::dev::kteam::KTeamPositionController::getDistance(cv::Mat robotPosition, cv::Mat targetPosition) const
+double cedar::dev::kteam::PositionController::getDistance(cv::Mat robotPosition, cv::Mat targetPosition) const
 {
   return sqrt(pow(targetPosition.at<double>(0,0) - robotPosition.at<double>(0,0),2)
               + pow(targetPosition.at<double>(1,0) - robotPosition.at<double>(1,0),2));
 }
 
-double cedar::dev::kteam::KTeamPositionController::getAngle(cv::Mat robotPosition, cv::Mat targetPosition) const
+double cedar::dev::kteam::PositionController::getAngle(cv::Mat robotPosition, cv::Mat targetPosition) const
 {
   return atan2(targetPosition.at<double>(1,0) - robotPosition.at<double>(1,0),
                  targetPosition.at<double>(0,0) - robotPosition.at<double>(0,0));
 }
 
-cv::Mat cedar::dev::kteam::KTeamPositionController::getTarget() const
+cv::Mat cedar::dev::kteam::PositionController::getTarget() const
 {
   return mTarget;
 }
 
-void cedar::dev::kteam::KTeamPositionController::setFactorTurningRate(double factorTurningRate)
+void cedar::dev::kteam::PositionController::setFactorTurningRate(double factorTurningRate)
 {
   mFactorTurningRate = factorTurningRate;
 }
 
-void cedar::dev::kteam::KTeamPositionController::setFactorVelocity(double factorVelocity)
+void cedar::dev::kteam::PositionController::setFactorVelocity(double factorVelocity)
 {
   mFactorVelocity = factorVelocity;
 }

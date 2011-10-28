@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>KTeamPositionControllerWidget</class>
- <widget class="QWidget" name="KTeamPositionControllerWidget">
+ <class>PositionControllerWidget</class>
+ <widget class="QWidget" name="PositionControllerWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>KTeamPositionControllerWidget</string>
+   <string>PositionControllerWidget</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="fieldGrowthPolicy">

@@ -40,9 +40,9 @@
 
 #include "devices/kteam/EPuckDrive.h"
 #include "devices/communication/SerialCommunication.h"
-#include "devices/kteam/KTeamDriveModel.h"
-#include "devices/kteam/KTeamPositionController.h"
-#include "devices/kteam/gui/KTeamPositionControllerWidget.h"
+#include "devices/kteam/DriveModel.h"
+#include "devices/kteam/PositionController.h"
+#include "devices/kteam/gui/PositionControllerWidget.h"
 #include "devices/kteam/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES
@@ -68,16 +68,16 @@ int main(int argc, char **argv)
   = new cedar::dev::kteam::EPuckDrive(p_communication, "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
 
   //initialize model of the e-puck
-  cedar::dev::kteam::KTeamDriveModel *p_model;
-  p_model = new cedar::dev::kteam::KTeamDriveModel(p_drive);
+  cedar::dev::kteam::DriveModel *p_model;
+  p_model = new cedar::dev::kteam::DriveModel(p_drive);
 
   //create the controller
-  cedar::dev::kteam::KTeamPositionController *p_controller;
-  p_controller = new cedar::dev::kteam::KTeamPositionController(p_drive, p_model);
+  cedar::dev::kteam::PositionController *p_controller;
+  p_controller = new cedar::dev::kteam::PositionController(p_drive, p_model);
 
   //create the controller-GUI
-  cedar::dev::kteam::gui::KTeamPositionControllerWidget *p_controller_widget;
-  p_controller_widget = new cedar::dev::kteam::gui::KTeamPositionControllerWidget(p_controller, p_model);
+  cedar::dev::kteam::gui::PositionControllerWidget *p_controller_widget;
+  p_controller_widget = new cedar::dev::kteam::gui::PositionControllerWidget(p_controller, p_model);
 
   //create the e-puck-control-GUI
   cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
