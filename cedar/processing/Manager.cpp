@@ -53,6 +53,7 @@
 #include "processing/PluginDeclaration.h"
 #include "processing/Connection.h"
 #include "processing/source/GaussInput.h"
+#include "processing/steps/StaticGain.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -94,9 +95,14 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
                                                   );
   looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
   this->triggers().declareClass(looped_trigger_declaration);
+
   StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
   input_decl->setIconPath(":/steps/gauss_input.svg");
   this->steps().declareClass(input_decl);
+
+  StepDeclarationPtr static_gain_decl(new StepDeclarationT<cedar::proc::steps::StaticGain>("cedar.processing.steps.StaticGain", "Utilities"));
+  static_gain_decl->setIconPath(":/steps/static_gain.svg");
+  this->steps().declareClass(static_gain_decl);
 }
 
 cedar::proc::Manager::~Manager()
