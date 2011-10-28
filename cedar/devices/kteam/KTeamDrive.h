@@ -22,43 +22,35 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckDrive.h
+    File:        KTeamDrive.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the drive of the E-Puck, a differential drive mobile robot.
+    Description: An object of this class represents the differential drive of a PWM-driven robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
-#define CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
+#define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
 
 // LOCAL INCLUDES
-
-#include "devices/robot/mobile/KTeamDrive.h"
+#include "devices/robot/mobile/DifferentialDrive.h"
+#include "devices/kteam/namespace.h"
 
 // PROJECT INCLUDES
 
-#include "auxiliaries/ConfigurationInterface.h"
-#include "devices/communication/SerialCommunication.h"
-
 // SYSTEM INCLUDES
 
-#include <math.h>
-
-/*!@brief An object of this class represents the drive of the E-Puck, a differential drive mobile robot.
+/*!@brief An object of this class represents the differential drive of a PWM-driven robot.
  *
- *This class initiates the communication with the E-Puck and handles the string-based communication. An initialized
- *object of the class SerialCommunication with the E-Puck's devicePath has to be set, otherwise the initialization will
- *fail. The data of the E-Puck is read from a configuration file.
+ * This is an abstract class with functions and attributes common to differential drive robots with
+ * Pulse-Width-Modulation-driven wheels. These are e.g. the mobile robots E-Puck, Khepera and Koala.
  */
-class cedar::dev::robot::mobile::EPuckDrive
-:
-public cedar::dev::robot::mobile::KTeamDrive, public cedar::aux::ConfigurationInterface
+class cedar::dev::kteam::KTeamDrive : public cedar::dev::robot::mobile::DifferentialDrive
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,14 +63,11 @@ public cedar::dev::robot::mobile::KTeamDrive, public cedar::aux::ConfigurationIn
 
 public:
 
-  /*!@brief Constructs an object which represents the drive of an E-Puck robot.
-   *@param peCommunication Pointer to the communication-device to be used (has to be initialized)
-   *@param config Path and name of the config-file to be used.
-   */
-  EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, const std::string& config);
+  //!@brief Constructs an object which represents the PWM-driven differential drive of a robot.
+  KTeamDrive();
 
   //!@brief Destructs the object.
-  ~EPuckDrive();
+  virtual ~KTeamDrive() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -86,38 +75,49 @@ public:
 
 public:
 
-  /*!@brief Initializes the E-Puck drive.
-   *@param peCommunication Pointer to the Serial Communication to use.
-   *@return 1 if initialization was successful, else 0.
+  /*!@brief The get-function of the number of pulses per wheel-revolution.
+   *@return Number of Pulses per Revolution.
    */
-  int init(cedar::dev::com::SerialCommunication *peCommunication);
+  double getPulsesPerRevolution() const;
 
-  /*!@brief The get-function of the initialization status.
-   *@return true if EPuckDrive is initialized, else false.
+  /*!@brief The get-function of the maximal encoder value.
+   *@return The maximal encoder value.
    */
-  bool isInitialized() const;
+  int getMaximalEncoderValue() const;
 
-  /*!@brief The get-function of the left and right encoder value.
+  /*!@brief The get-function of the minimal encoder value.
+   *@return The minimal encoder value.
+   */
+  int getMinimalEncoderValue() const;
+
+  /*!@brief The get-function of the distance one wheel moves each pulse.
+   *@return The distance one wheel moves each pulse [in m].
+   */
+  double getDistancePerPulse() const;
+
+  /*!@brief The get-function of the maximum possible number of pulses per second.
+   *@return The maximal number of pulses per second.
+   */
+  int getMaximalNumberPulsesPerSecond() const;
+
+  /*!@brief The get-function of left and right encoder values.
    *@param leftEncoder Variable the left encoder value shall be stored in.
    *@param rightEncoder Variable the right encoder value shall be stored in.
    *@return 1 if getting encoder values was successful and 0 otherwise.
    */
-  int getEncoder(int &leftEncoder, int &rightEncoder);
+  virtual int getEncoder(int &leftEncoder, int &rightEncoder) = 0;
 
-  /*!@brief The get-function of the current acceleration.
-   *@param xAcceleration Variable the acceleration in left-right-direction shall be stored in.
-   *@param yAcceleration Variable the acceleration in heading-direction shall be stored in.
-   *@param zAcceleration Variable the acceleration in up-down-direction shall be stored in.
-   *@return 1 if getting acceleration values was successful and 0 otherwise.
+  /*!@brief Sets both encoder values to 0.
+   *@return 1 if resetting encoder values was successful and 0 otherwise.
    */
-  int getAcceleration(int &xAcceleration, int &yAcceleration, int &zAcceleration);
+  int resetEncoder();
 
-  /*!@brief The set-function of the left and right wheel speed.
-   *@param leftWheelSpeed The wheel speed of the left wheel to be set [in m/s].
-   *@param rightWheelSpeed The wheel speed of the right wheel to be set [in m/s].
-   *@return 1 if setting wheel speeds was successful and 0 otherwise.
+  /*!@brief Resets the robot.
+   *@return 1 if resetting the robot was successful and 0 otherwise.
+   *
+   *Reset sets both wheel speeds and encoder values to 0.
    */
-  int setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed);
+  int reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -125,7 +125,12 @@ public:
 
 protected:
 
-  // none yet
+  /*!@brief Sets both encoder values.
+   *@param leftEncoder The left encoder value to be set.
+   *@param rightEncoder The right encoder value to be set.
+   *@return 1 if setting encoder values was successful and 0 otherwise.
+   */
+  virtual int setEncoder(int leftEncoder, int rightEncoder) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -133,12 +138,7 @@ protected:
 
 private:
 
-  /*!@brief Sets both encoder values.
-   *@param leftEncoder The left encoder value to be set.
-   *@param rightEncoder The right encoder value to be set.
-   *@return 1 if setting encoder values was successful and 0 otherwise.
-   */
-  int setEncoder(int leftEncoder, int rightEncoder);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -150,13 +150,12 @@ public:
 
 protected:
 
-  // none yet
+  //!@brief Distance the wheel moves each pulse [in m].
+  double mDistancePerPulse;
 
 private:
 
-  //!@brief The initialization status of EPuckDrive
-  //!true if initialized, else false
-  bool mInitialized;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -168,12 +167,22 @@ public:
 
 protected:
 
-  // none yet
+  //!@brief Number of pulses per revolution of wheel.
+  double _mPulsesPerRevolution;
+
+  //!@brief The maximal encoder value.
+  int _mMaximalEncoderValue;
+
+  //!@brief The minimal encoder value.
+  int _mMinimalEncoderValue;
+
+  //!@brief The maximal possible number of pulses per second.
+  int _mMaximalNumberPulsesPerSecond;
 
 private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::EPuckDrive
+}; // class cedar::dev::kteam::KTeamDrive
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
+#endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H

@@ -38,13 +38,13 @@
 
 // PROJECT INCLUDES
 
-#include "devices/robot/mobile/EPuckDrive.h"
-#include "devices/robot/mobile/KTeamDriveModel.h"
+#include "devices/kteam/EPuckDrive.h"
+#include "devices/kteam/KTeamDriveModel.h"
 #include "auxiliaries/gl/Scene.h"
 #include "auxiliaries/gui/SceneWidget.h"
 #include "auxiliaries/gui/Viewer.h"
 #include "auxiliaries/gl/Cylinder.h"
-#include "devices/robot/mobile/gui/EPuckControlWidget.h"
+#include "devices/kteam/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES
 
@@ -79,11 +79,11 @@ int main(int argc, char **argv)
   = new cedar::dev::com::SerialCommunication("tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
 
   //initialize the e-puck
-  cedar::dev::robot::mobile::EPuckDrive *pDrive;
-  pDrive = new cedar::dev::robot::mobile::EPuckDrive(pCommunication,
+  cedar::dev::kteam::EPuckDrive *pDrive;
+  pDrive = new cedar::dev::kteam::EPuckDrive(pCommunication,
                                                      "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
   //initialize the model of the e-puck
-  cedar::dev::robot::mobile::KTeamDriveModelPtr p_kteam_model(new cedar::dev::robot::mobile::KTeamDriveModel(pDrive));
+  cedar::dev::kteam::KTeamDriveModelPtr p_kteam_model(new cedar::dev::kteam::KTeamDriveModel(pDrive));
   p_kteam_model->setName("E-Puck");
   //add cylinder representing the robot
   ObjectPtr p_cylinder(new Cylinder(p_kteam_model, 0.07, 0.05));
@@ -94,8 +94,8 @@ int main(int argc, char **argv)
   p_scene_widget->show();
 
   //open the control-GUI
-  cedar::dev::robot::mobile::gui::EPuckControlWidget *p_epuck_control;
-  p_epuck_control = new cedar::dev::robot::mobile::gui::EPuckControlWidget(pDrive);
+  cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
+  p_epuck_control = new cedar::dev::kteam::gui::EPuckControlWidget(pDrive);
   p_epuck_control->show();
 
   //change the robot's initial orientation

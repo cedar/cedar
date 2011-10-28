@@ -22,50 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamPositionControllerWidget.h
+    File:        EPuckDrive.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for the KTeam controller.
+    Description: An object of this class represents the drive of the E-Puck, a differential drive mobile robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
-#define CEDAR_DEV_ROBOT_MOBILE_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
+#define CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
 
 // LOCAL INCLUDES
 
+#include "devices/kteam/KTeamDrive.h"
+
 // PROJECT INCLUDES
 
-#include "devices/robot/mobile/KTeamPositionController.h"
-#include "devices/robot/mobile/Odometry.h"
-#include "cedar/devices/robot/mobile/gui/ui_KTeamPositionControllerWidget.h"
-#include "devices/robot/mobile/gui/namespace.h"
-#include "auxiliaries/gui/BaseWidget.h"
+#include "auxiliaries/ConfigurationInterface.h"
+#include "devices/communication/SerialCommunication.h"
 
 // SYSTEM INCLUDES
 
-#include <Qt>
+#include <math.h>
 
-/*!@brief Graphical User Interface for the KTeam controller.
+/*!@brief An object of this class represents the drive of the E-Puck, a differential drive mobile robot.
  *
- * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
+ *This class initiates the communication with the E-Puck and handles the string-based communication. An initialized
+ *object of the class SerialCommunication with the E-Puck's devicePath has to be set, otherwise the initialization will
+ *fail. The data of the E-Puck is read from a configuration file.
  */
-class cedar::dev::robot::mobile::gui::KTeamPositionControllerWidget
-: public cedar::aux::gui::BaseWidget, private Ui_KTeamPositionControllerWidget
+class cedar::dev::kteam::EPuckDrive
+:
+public cedar::dev::kteam::KTeamDrive, public cedar::aux::ConfigurationInterface
 {
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
-private:
-
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -73,26 +71,53 @@ private:
 
 public:
 
-  //!@brief Constructs the GUI.
-  //!@param peController Pointer to the controller used to control the robot.
-  //!@param peModel Pointer to the model of the controlled robot.
-  //!@param parent Pointer to parent widget
-  KTeamPositionControllerWidget(cedar::dev::robot::mobile::KTeamPositionController *peController,
-                      cedar::dev::robot::mobile::Odometry *peModel,
-                      QWidget *parent = 0);
+  /*!@brief Constructs an object which represents the drive of an E-Puck robot.
+   *@param peCommunication Pointer to the communication-device to be used (has to be initialized)
+   *@param config Path and name of the config-file to be used.
+   */
+  EPuckDrive(cedar::dev::com::SerialCommunication *peCommunication, const std::string& config);
 
-  //!@brief Destructs the GUI.
-  virtual ~KTeamPositionControllerWidget();
+  //!@brief Destructs the object.
+  ~EPuckDrive();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 
-public slots:
+public:
 
-  /*!@brief Sets the target-position of the robot.
+  /*!@brief Initializes the E-Puck drive.
+   *@param peCommunication Pointer to the Serial Communication to use.
+   *@return 1 if initialization was successful, else 0.
    */
-  void start();
+  int init(cedar::dev::com::SerialCommunication *peCommunication);
+
+  /*!@brief The get-function of the initialization status.
+   *@return true if EPuckDrive is initialized, else false.
+   */
+  bool isInitialized() const;
+
+  /*!@brief The get-function of the left and right encoder value.
+   *@param leftEncoder Variable the left encoder value shall be stored in.
+   *@param rightEncoder Variable the right encoder value shall be stored in.
+   *@return 1 if getting encoder values was successful and 0 otherwise.
+   */
+  int getEncoder(int &leftEncoder, int &rightEncoder);
+
+  /*!@brief The get-function of the current acceleration.
+   *@param xAcceleration Variable the acceleration in left-right-direction shall be stored in.
+   *@param yAcceleration Variable the acceleration in heading-direction shall be stored in.
+   *@param zAcceleration Variable the acceleration in up-down-direction shall be stored in.
+   *@return 1 if getting acceleration values was successful and 0 otherwise.
+   */
+  int getAcceleration(int &xAcceleration, int &yAcceleration, int &zAcceleration);
+
+  /*!@brief The set-function of the left and right wheel speed.
+   *@param leftWheelSpeed The wheel speed of the left wheel to be set [in m/s].
+   *@param rightWheelSpeed The wheel speed of the right wheel to be set [in m/s].
+   *@return 1 if setting wheel speeds was successful and 0 otherwise.
+   */
+  int setWheelSpeed(double leftWheelSpeed, double rightWheelSpeed);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,14 +133,12 @@ protected:
 
 private:
 
-  /*!@brief The timer-event.
-   * @param event pointer to event
+  /*!@brief Sets both encoder values.
+   *@param leftEncoder The left encoder value to be set.
+   *@param rightEncoder The right encoder value to be set.
+   *@return 1 if setting encoder values was successful and 0 otherwise.
    */
-  void timerEvent(QTimerEvent *event);
-
-  /*!@brief Updates the displayed position.
-   */
-  void update();
+  int setEncoder(int leftEncoder, int rightEncoder);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -131,11 +154,9 @@ protected:
 
 private:
 
-  //!@brief Pointer to the robot control.
-  KTeamPositionController *mpeController;
-
-  //!@brief Pointer to the robot's model.
-  Odometry *mpeModel;
+  //!@brief The initialization status of EPuckDrive
+  //!true if initialized, else false
+  bool mInitialized;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -153,6 +174,6 @@ private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::gui::KTeamPositionControllerWidget
+}; // class cedar::dev::kteam::EPuckDrive
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#endif // CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H

@@ -40,7 +40,7 @@
 // LOCAL INCLUDES
 
 #include "devices/robot/mobile/Odometry.h"
-#include "devices/robot/mobile/KTeamDrive.h"
+#include "devices/kteam/KTeamDrive.h"
 
 // PROJECT INCLUDES
 
@@ -51,7 +51,7 @@
  * The class calculates position and orientation of the robot in a coordinate-system based on the robot's encoders
  * (odometry).
  */
-class cedar::dev::robot::mobile::KTeamDriveModel : public cedar::dev::robot::mobile::Odometry
+class cedar::dev::kteam::KTeamDriveModel : public cedar::dev::robot::mobile::Odometry
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,7 +65,7 @@ public:
 
   //!@brief Constructs the model of the K-Team robot.
   //!@param peDrive Pointer to the drive of the robot the position shall be calculated of.
-  KTeamDriveModel(cedar::dev::robot::mobile::KTeamDrive *peDrive);
+  KTeamDriveModel(cedar::dev::kteam::KTeamDrive *peDrive);
 
   //!@brief Destructs the model of the K-Team robot.
   virtual ~KTeamDriveModel();
@@ -80,7 +80,7 @@ public:
    *@param peDrive Pointer to the drive of the robot the position shall be calculated of.
    *@return 1 if initialization was successful, else 0.
    */
-  int init(cedar::dev::robot::mobile::KTeamDrive *peDrive);
+  int init(cedar::dev::kteam::KTeamDrive *peDrive);
 
   /*!@brief Get-function of the initialization-status.
    * @return true if model is initialized, else false.
@@ -152,7 +152,7 @@ private:
 
   /*!@brief Pointer to the robot the position is calculated of.
    */
-  cedar::dev::robot::mobile::KTeamDrive *mpeDrive;
+  cedar::dev::kteam::KTeamDrive *mpeDrive;
 
   /*!@brief Stores the last encoder-values (needed to calculate the distance the robot has moved).
    */
@@ -174,7 +174,7 @@ private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::KTeamDriveModel
+}; // class cedar::dev::kteam::KTeamDriveModel
 
 #endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_MODEL_H
 

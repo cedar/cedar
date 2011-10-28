@@ -22,43 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckControlWidget.h
+    File:        KTeamPositionControllerWidget.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for controlling the E-Puck.
+    Description: Graphical User Interface for the KTeam controller.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_GUI_EPUCK_CONTROL_WIDGET_H
-#define CEDAR_DEV_ROBOT_MOBILE_GUI_EPUCK_CONTROL_WIDGET_H
+#ifndef CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#define CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
 
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
 
-#include "devices/robot/mobile/EPuckDrive.h"
-#include "cedar/devices/robot/mobile/gui/ui_EPuckControlWidget.h"
-#include "devices/robot/mobile/gui/namespace.h"
+#include "devices/kteam/KTeamPositionController.h"
+#include "devices/robot/mobile/Odometry.h"
+#include "cedar/devices/robot/mobile/gui/ui_KTeamPositionControllerWidget.h"
+#include "devices/kteam/gui/namespace.h"
 #include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 
 #include <Qt>
 
-/*!@brief Graphical User Interface for controlling the E-Puck.
+/*!@brief Graphical User Interface for the KTeam controller.
  *
- * Type the desired forward velocity and turning rate into the boxes. The wheel speed of the 2 differential-drive-wheels
- * is displayed as well as the encoder-values. The E-Puck starts driving with the specified velocity or changes its
- * velocity after pressing the 'Set Velocity'-button. Stop the E-Puck with 'Stop' and reset speed and encoder-values
- * with 'Reset'.
+ * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
  */
-class cedar::dev::robot::mobile::gui::EPuckControlWidget
-: public cedar::aux::gui::BaseWidget, private Ui_EPuckControlWidget
+class cedar::dev::kteam::gui::KTeamPositionControllerWidget
+: public cedar::aux::gui::BaseWidget, private Ui_KTeamPositionControllerWidget
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -72,14 +70,19 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  //!@brief Constructs the E-Puck-Control.
-  //!@param peDrive Pointer to the E-Puck that shall be controlled.
-  //!@param parent Pointer to parent widget
-  EPuckControlWidget(cedar::dev::robot::mobile::EPuckDrive *peDrive, QWidget *parent = 0);
 
-  //!@brief Closes the control.
-  virtual ~EPuckControlWidget();
+public:
+
+  //!@brief Constructs the GUI.
+  //!@param peController Pointer to the controller used to control the robot.
+  //!@param peModel Pointer to the model of the controlled robot.
+  //!@param parent Pointer to parent widget
+  KTeamPositionControllerWidget(cedar::dev::kteam::KTeamPositionController *peController,
+                      cedar::dev::robot::mobile::Odometry *peModel,
+                      QWidget *parent = 0);
+
+  //!@brief Destructs the GUI.
+  virtual ~KTeamPositionControllerWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -87,17 +90,9 @@ public:
 
 public slots:
 
-  /*!@brief Sets the velocity of the robot.
+  /*!@brief Sets the target-position of the robot.
    */
-  void drive();
-
-  /*!@brief Stops the robot.
-   */
-  void stop();
-
-  /*!@brief Stops the robot and resets the encoder-values.
-   */
-  void reset();
+  void start();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -114,11 +109,11 @@ protected:
 private:
 
   /*!@brief The timer-event.
-   * @param event Pointer to event
+   * @param event pointer to event
    */
   void timerEvent(QTimerEvent *event);
 
-  /*!@brief Updates the displayed wheel-speeds and encoder-values and is called by timerEvent.
+  /*!@brief Updates the displayed position.
    */
   void update();
 
@@ -136,8 +131,11 @@ protected:
 
 private:
 
-  //!@brief Pointer to the controlled robot.
-  EPuckDrive *mpeDrive;
+  //!@brief Pointer to the robot control.
+  KTeamPositionController *mpeController;
+
+  //!@brief Pointer to the robot's model.
+  cedar::dev::robot::mobile::Odometry *mpeModel;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -155,6 +153,6 @@ private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
+}; // class cedar::dev::kteam::gui::KTeamPositionControllerWidget
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_GUI_EPUCK_CONTROL_WIDGET_H
+#endif // CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H

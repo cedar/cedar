@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamPositionControllerWidget.cpp
+    File:        KTeamDrive.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for the KTeam controller.
+    Description: An object of this class represents the differential drive of a PWM-driven robot.
 
     Credits:
 
@@ -36,32 +36,25 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/gui/KTeamPositionControllerWidget.h"
+#include "devices/kteam/KTeamDrive.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
 
-using namespace cedar::dev::robot::mobile::gui;
+using namespace cedar::dev::kteam;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-KTeamPositionControllerWidget::KTeamPositionControllerWidget(cedar::dev::robot::mobile::KTeamPositionController *peController,
-                                                             cedar::dev::robot::mobile::Odometry *peModel,
-                                                             QWidget *parent)
-:
-cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)
+KTeamDrive::KTeamDrive()
 {
-  mpeController = peController;
-  mpeModel = peModel;
-  setupUi(this);
-  connect(startButton, SIGNAL(pressed()), this, SLOT(start()));
-  startTimer(100); //timer for updating display
+
 }
 
-KTeamPositionControllerWidget::~KTeamPositionControllerWidget()
+KTeamDrive::~KTeamDrive()
 {
 
 }
@@ -70,14 +63,53 @@ KTeamPositionControllerWidget::~KTeamPositionControllerWidget()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void KTeamPositionControllerWidget::start()
+double KTeamDrive::getPulsesPerRevolution() const
 {
-  mpeController->setTarget(xTargetPosition->value(), yTargetPosition->value());
+  return _mPulsesPerRevolution;
 }
 
-void KTeamPositionControllerWidget::timerEvent(QTimerEvent * /* event */)
+int KTeamDrive::getMaximalEncoderValue() const
 {
-  //display new values
-  xRobotPosition->display(mpeModel->getPositionX());
-  yRobotPosition->display(mpeModel->getPositionY());
+  return _mMaximalEncoderValue;
+}
+
+int KTeamDrive::getMinimalEncoderValue() const
+{
+  return _mMinimalEncoderValue;
+}
+
+double KTeamDrive::getDistancePerPulse() const
+{
+  return mDistancePerPulse;
+}
+
+int KTeamDrive::getMaximalNumberPulsesPerSecond() const
+{
+  return _mMaximalNumberPulsesPerSecond;
+}
+
+int KTeamDrive::resetEncoder()
+{
+  int s = setEncoder(0,0);
+  if (s == 0 && _mDebug) //setting encoder failed
+  {
+    std::cout << "KTeamDrive: Error Resetting Encoder\n";
+  }
+  return s;
+}
+
+int KTeamDrive::reset()
+{
+  int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
+  s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0
+  if (s == 0 && _mDebug) //setting wheel speed or resetting encoder failed
+  {
+    std::cout << "KTeamDrive: Error Resetting Robot\n";
+    }
+  else if (_mDebug)
+  {
+    std::cout << "KTeamDrive: Resetting Robot Successful\n";
+  }
+
+  return s;
 }

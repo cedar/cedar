@@ -22,102 +22,83 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDrive.h
+    File:        EPuckControlWidget.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the differential drive of a PWM-driven robot.
+    Description: Graphical User Interface for controlling the E-Puck.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
-#define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
+#ifndef CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
+#define CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/DifferentialDrive.h"
-
 // PROJECT INCLUDES
+
+#include "devices/kteam/EPuckDrive.h"
+#include "cedar/devices/kteam/gui/ui_EPuckControlWidget.h"
+#include "devices/kteam/gui/namespace.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief An object of this class represents the differential drive of a PWM-driven robot.
+#include <Qt>
+
+/*!@brief Graphical User Interface for controlling the E-Puck.
  *
- * This is an abstract class with functions and attributes common to differential drive robots with
- * Pulse-Width-Modulation-driven wheels. These are e.g. the mobile robots E-Puck, Khepera and Koala.
+ * Type the desired forward velocity and turning rate into the boxes. The wheel speed of the 2 differential-drive-wheels
+ * is displayed as well as the encoder-values. The E-Puck starts driving with the specified velocity or changes its
+ * velocity after pressing the 'Set Velocity'-button. Stop the E-Puck with 'Stop' and reset speed and encoder-values
+ * with 'Reset'.
  */
-class cedar::dev::robot::mobile::KTeamDrive : public cedar::dev::robot::mobile::DifferentialDrive
+class cedar::dev::kteam::gui::EPuckControlWidget
+:
+public cedar::aux::gui::BaseWidget, private Ui_EPuckControlWidget
 {
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
+private:
+
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
+  //!@brief Constructs the E-Puck-Control.
+  //!@param peDrive Pointer to the E-Puck that shall be controlled.
+  //!@param parent Pointer to parent widget
+  EPuckControlWidget(cedar::dev::kteam::EPuckDrive *peDrive, QWidget *parent = 0);
 
-  //!@brief Constructs an object which represents the PWM-driven differential drive of a robot.
-  KTeamDrive();
-
-  //!@brief Destructs the object.
-  virtual ~KTeamDrive() = 0;
+  //!@brief Closes the control.
+  virtual ~EPuckControlWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 
-public:
+public slots:
 
-  /*!@brief The get-function of the number of pulses per wheel-revolution.
-   *@return Number of Pulses per Revolution.
+  /*!@brief Sets the velocity of the robot.
    */
-  double getPulsesPerRevolution() const;
+  void drive();
 
-  /*!@brief The get-function of the maximal encoder value.
-   *@return The maximal encoder value.
+  /*!@brief Stops the robot.
    */
-  int getMaximalEncoderValue() const;
+  void stop();
 
-  /*!@brief The get-function of the minimal encoder value.
-   *@return The minimal encoder value.
+  /*!@brief Stops the robot and resets the encoder-values.
    */
-  int getMinimalEncoderValue() const;
-
-  /*!@brief The get-function of the distance one wheel moves each pulse.
-   *@return The distance one wheel moves each pulse [in m].
-   */
-  double getDistancePerPulse() const;
-
-  /*!@brief The get-function of the maximum possible number of pulses per second.
-   *@return The maximal number of pulses per second.
-   */
-  int getMaximalNumberPulsesPerSecond() const;
-
-  /*!@brief The get-function of left and right encoder values.
-   *@param leftEncoder Variable the left encoder value shall be stored in.
-   *@param rightEncoder Variable the right encoder value shall be stored in.
-   *@return 1 if getting encoder values was successful and 0 otherwise.
-   */
-  virtual int getEncoder(int &leftEncoder, int &rightEncoder) = 0;
-
-  /*!@brief Sets both encoder values to 0.
-   *@return 1 if resetting encoder values was successful and 0 otherwise.
-   */
-  int resetEncoder();
-
-  /*!@brief Resets the robot.
-   *@return 1 if resetting the robot was successful and 0 otherwise.
-   *
-   *Reset sets both wheel speeds and encoder values to 0.
-   */
-  int reset();
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -125,12 +106,7 @@ public:
 
 protected:
 
-  /*!@brief Sets both encoder values.
-   *@param leftEncoder The left encoder value to be set.
-   *@param rightEncoder The right encoder value to be set.
-   *@return 1 if setting encoder values was successful and 0 otherwise.
-   */
-  virtual int setEncoder(int leftEncoder, int rightEncoder) = 0;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -138,7 +114,14 @@ protected:
 
 private:
 
-  // none yet
+  /*!@brief The timer-event.
+   * @param event Pointer to event
+   */
+  void timerEvent(QTimerEvent *event);
+
+  /*!@brief Updates the displayed wheel-speeds and encoder-values and is called by timerEvent.
+   */
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -150,12 +133,12 @@ public:
 
 protected:
 
-  //!@brief Distance the wheel moves each pulse [in m].
-  double mDistancePerPulse;
+  // none yet
 
 private:
 
-  // none yet
+  //!@brief Pointer to the controlled robot.
+  cedar::dev::kteam::EPuckDrive *mpeDrive;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -167,22 +150,12 @@ public:
 
 protected:
 
-  //!@brief Number of pulses per revolution of wheel.
-  double _mPulsesPerRevolution;
-
-  //!@brief The maximal encoder value.
-  int _mMaximalEncoderValue;
-
-  //!@brief The minimal encoder value.
-  int _mMinimalEncoderValue;
-
-  //!@brief The maximal possible number of pulses per second.
-  int _mMaximalNumberPulsesPerSecond;
+  // none yet
 
 private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::KTeamDrive
+}; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
+#endif // CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
