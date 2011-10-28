@@ -110,13 +110,13 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterPtr parame
 
   if (this->mParameterAssociations.find(name) != this->mParameterAssociations.end())
   {
-    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + parameter->getName() + "\"");
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + name + "\"");
   }
 
   this->mParameterOrder.push_back(parameter);
   ParameterList::iterator last_iter = this->mParameterOrder.end();
   --last_iter;
-  this->mParameterAssociations[parameter->getName()] = last_iter;
+  this->mParameterAssociations[name] = last_iter;
 }
 
 const cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters() const

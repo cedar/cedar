@@ -22,133 +22,99 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Communication.h
+    File:        Gain.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 28
 
-    Description: This class provides a string-based communication with an external device.
+    Description:
 
-    Credits:     Marc Sons (Author of msTransport.h this class is a revised and cedar-compatible version of)
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_COMMUNICATION_H_
-#define CEDAR_DEV_COM_COMMUNICATION_H_
+#ifndef CEDAR_PROC_STEPS_STATIC_GAIN_H
+#define CEDAR_PROC_STEPS_STATIC_GAIN_H
 
 // LOCAL INCLUDES
-
-#include "devices/com/namespace.h"
+#include "processing/steps/namespace.h"
+#include "processing/Step.h"
+#include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/DataTemplate.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-#include <string>
-#include <QReadWriteLock>
 
-/*!@brief This class provides a string-based communication with an external device.
+/*!@brief Abstract description of the class.
  *
- * This includes opening and closing the channel as well as sending and receiving strings. Examples for external
- * devices communicating per string are mobile robots (E-Puck, Khepera). It is also possible to lock the channel to
- * prevent read-/write-errors if multiple threads are accessing the device.
+ * More detailed description of the class.
  */
-class cedar::dev::com::Communication
+class cedar::proc::steps::StaticGain : public cedar::proc::Step
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
-  //!@brief Initiates a new communication with an external device.
-  Communication();
-
-  //!@brief Ends the communication with the device.
-  virtual ~Communication ();
+  //!@brief The standard constructor.
+  StaticGain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
+  //!@brief refreshes the internal matrix containing the Gaussian input
+  void compute(const cedar::proc::Arguments& arguments);
 
-  /*!@brief Sends a string to the device.
-   *@param command The string to be sent.
-   *@return 1 if sending was successful and 0 in case of an error.
-   */
-  virtual int send(const std::string& command) = 0;
 
-  /*!@brief Receives a string from the device.
-   *@param answer Variable the received string shall be stored in.
-   *@return number of received bytes on success and 0 in case of an error.
-   */
-  virtual int receive(std::string& answer) = 0;
-
-  /*!@brief Locks the channel for reading or writing.
-   *
-   *This function locks the channel for reading or writing operations. If the channel is already locked, the calling
-   *thread is blocked until the channel is unlocked again. Always call unlock() after locking the channel!
-   */
-  void lock();
-
-  //!@brief Unlocks the channel. If the channel is currently not locked, this function has no effect.
-  void unlock();
+public slots:
+  //!@brief a slot that is triggered if any of the Gauss function parameters are changed
+  void gainChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
+  void inputConnectionChanged(const std::string& inputName);
 
-  //!@brief Closes the channel.
-  virtual void close() = 0;
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::DataPtr data
+                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
+  //!@brief MatrixData representing the input.
+  cedar::aux::MatDataPtr mInput;
 
-  //!@brief Implements the read-/write-lock.
-  QReadWriteLock mLock;
-
+  //!@brief the buffer containing the output
+  cedar::aux::MatDataPtr mOutput;
 private:
-
-  //!@brief Status of the read-/write-lock. True if one thread has currently locked the channel, else false.
-  bool mLocked;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-  // none yet (hopefully never!)
-
 protected:
-  // none yet
+  //!@brief the amplitude of the Gauss function
+  cedar::aux::DoubleParameterPtr _mGainFactor;
 
 private:
-  // none yet
 
-}; // class cedar::dev::com::Communication
+}; // class cedar::proc::steps::StaticGain
 
-#endif // CEDAR_DEV_COM_COMMUNICATION_H_
+#endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
+

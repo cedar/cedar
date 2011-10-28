@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "EPuckDrive.h"
+#include "devices/robot/mobile/EPuckDrive.h"
 #include "auxiliaries/math/constants.h"
 #include "auxiliaries/math/tools.h"
 

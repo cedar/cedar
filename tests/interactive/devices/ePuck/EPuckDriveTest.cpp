@@ -39,7 +39,7 @@
 // PROJECT INCLUDES
 
 #include "devices/robot/mobile/EPuckDrive.h"
-#include "devices/com/SerialCommunication.h"
+#include "devices/communication/SerialCommunication.h"
 #include "devices/robot/mobile/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES

@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include  "SerialCommunication.h"
+#include  "devices/communication/SerialCommunication.h"
 
 // PROJECT INCLUDES
 

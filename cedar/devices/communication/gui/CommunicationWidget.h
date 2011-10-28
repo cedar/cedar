@@ -22,43 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamPositionControllerWidget.h
+    File:        CommunicationWidget.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for the KTeam controller.
+    Description: Graphical User Interface for testing the class Communication.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
-#define CEDAR_DEV_ROBOT_MOBILE_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#ifndef CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+#define CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
 
 // LOCAL INCLUDES
 
+#include "devices/communication/Communication.h"
+#include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
+#include "devices/communication/gui/namespace.h"
+
 // PROJECT INCLUDES
 
-#include "devices/robot/mobile/KTeamPositionController.h"
-#include "devices/robot/mobile/Odometry.h"
-#include "cedar/devices/robot/mobile/gui/ui_KTeamPositionControllerWidget.h"
-#include "devices/robot/mobile/gui/namespace.h"
 #include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 
 #include <Qt>
+#include <QString>
 
-/*!@brief Graphical User Interface for the KTeam controller.
+/*!@brief Graphical User Interface for testing the class Communication.
  *
- * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
+ * Type the string to be sent into 'command' and click 'send'. The answer of the device is then displayed in 'answer'.
  */
-class cedar::dev::robot::mobile::gui::KTeamPositionControllerWidget
-: public cedar::aux::gui::BaseWidget, private Ui_KTeamPositionControllerWidget
+class cedar::dev::com::gui::CommunicationWidget : public cedar::aux::gui::BaseWidget, private Ui_CommunicationWidget
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -74,15 +73,11 @@ private:
 public:
 
   //!@brief Constructs the GUI.
-  //!@param peController Pointer to the controller used to control the robot.
-  //!@param peModel Pointer to the model of the controlled robot.
-  //!@param parent Pointer to parent widget
-  KTeamPositionControllerWidget(cedar::dev::robot::mobile::KTeamPositionController *peController,
-                      cedar::dev::robot::mobile::Odometry *peModel,
-                      QWidget *parent = 0);
+  //!@param peCommunication Pointer to the communication-class to be tested.
+  CommunicationWidget(cedar::dev::com::Communication *peCommunication);
 
   //!@brief Destructs the GUI.
-  virtual ~KTeamPositionControllerWidget();
+  virtual ~CommunicationWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -90,9 +85,11 @@ public:
 
 public slots:
 
-  /*!@brief Sets the target-position of the robot.
+  /*!@brief Sends the string.
+   *
+   * This function calls 'send' of the linked communication class with the string typed into 'command' as parameter.
    */
-  void start();
+  void send();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -108,14 +105,7 @@ protected:
 
 private:
 
-  /*!@brief The timer-event.
-   * @param event pointer to event
-   */
-  void timerEvent(QTimerEvent *event);
-
-  /*!@brief Updates the displayed position.
-   */
-  void update();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -131,11 +121,8 @@ protected:
 
 private:
 
-  //!@brief Pointer to the robot control.
-  KTeamPositionController *mpeController;
-
-  //!@brief Pointer to the robot's model.
-  Odometry *mpeModel;
+  // pointer to the Communication-class.
+  cedar::dev::com::Communication *mpeCommunication;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -153,6 +140,7 @@ private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::gui::KTeamPositionControllerWidget
+}; // class cedar::dev::com::gui::CommunicationWidget
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#endif // CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+

@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CommunicationWidget.cpp
+    File:        Odometry.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for testing the class Communication.
+    Description: An object of this class represents the model of a mobile robot's kinematics.
 
     Credits:
 
@@ -36,41 +36,73 @@
 
 // LOCAL INCLUDES
 
-#include "devices/com/gui/CommunicationWidget.h"
+#include "devices/robot/mobile/Odometry.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::com::gui;
+using namespace cedar::dev::robot::mobile;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-  CommunicationWidget::CommunicationWidget(cedar::dev::com::Communication *peCommunication)
-  {
-    mpeCommunication = peCommunication;
-    setupUi(this);
-    connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
-  }
+Odometry::Odometry()
+{
 
-  CommunicationWidget::~CommunicationWidget()
-  {
+}
 
-  }
+Odometry::~Odometry()
+{
+
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-  void CommunicationWidget::send()
-  {
-    mpeCommunication->lock();
-    mpeCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
-    std::string answer;
-    QString q_answer;
-    mpeCommunication->receive(answer);
-    mpeCommunication->unlock();
-    boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
-  }
+cv::Mat Odometry::getPosition() const
+{
+  //construct the matrix to return
+  cv::Mat position = cv::Mat(2,1,CV_64FC1);
+
+  //store the x- and y-position in the new matrix (gets are from Object.h)
+  position.at<double>(0,0) = getPositionX();
+  position.at<double>(1,0) = getPositionY();
+  return position;
+}
+
+double Odometry::getOrientation() const
+{
+  //calculates the orientation from the quaternion stored in Object.h.
+  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
+}
+
+void Odometry::setPosition(double xPosition, double yPosition)
+{
+  //calls setPosition of the Object-class
+  Object::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
+}
+
+void Odometry::setOrientation(double orientation)
+{
+  //construct a new matrix as parameter for setOrientationQuaternion
+  cv::Mat orientation_mat = cv::Mat(4, 1, CV_64FC1);
+  orientation_mat.at<double>(0,0) = 0; //orientation is a unit-quaternion
+  orientation_mat.at<double>(1,0) = cos(orientation);
+  orientation_mat.at<double>(2,0) = sin(orientation);
+  orientation_mat.at<double>(3,0) = 0; //no orientation in z-direction
+
+  setOrientationQuaternion(orientation_mat);
+}
+
+void Odometry::timerEvent(QTimerEvent * /* event */)
+{
+  update();
+}
+
+void Odometry::setDebug(bool debug)
+{
+  mDebug = debug;
+}

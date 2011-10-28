@@ -9,6 +9,7 @@
     <file>triggers/multi_trigger.svg</file>
     <file>steps/no_icon.svg</file>
     <file>steps/gauss_input.svg</file>
+    <file>steps/static_gain.svg</file>
     <file>toolbaricons/grid.svg</file>
   </qresource>
 </RCC>

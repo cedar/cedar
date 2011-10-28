@@ -87,7 +87,6 @@ int cedar::dev::robot::mobile::KTeamDriveModel::init(cedar::dev::robot::mobile::
 
   //start update-timer and running-time
   startTimer(1);
-  mTime.start();
 
   update();
 
@@ -112,7 +111,6 @@ void cedar::dev::robot::mobile::KTeamDriveModel::update()
 
   //calculate new position and orientation
   calculatePositionAndOrientation(left_encoder, right_encoder);
-  int time = mTime.elapsed();
 
   //store encoder-values (needed for next update)
 
@@ -139,7 +137,7 @@ void cedar::dev::robot::mobile::KTeamDriveModel::update()
   if(mDebug)
   {
     //output for importing into matlab
-    std::cout << time << " " << getPositionX() << " " << getPositionY() << " " << getOrientation() << "\n";
+    std::cout << getPositionX() << " " << getPositionY() << " " << getOrientation() << "\n";
   }
 }
 

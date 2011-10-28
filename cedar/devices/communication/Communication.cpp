@@ -22,73 +22,52 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MobileRobot.cpp
+    File:        Communication.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the drive of a mobile robot.
+    Description: This class provides a string-based communication with an external device.
 
-    Credits:
+    Credits:     Marc Sons (Author of msTransport.cpp this class is a revised and cedar-compatible version of)
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
 
-#include "MobileRobot.h"
+#include "devices/communication/Communication.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
 
-using namespace cedar::dev::robot::mobile;
+using namespace cedar::dev::com;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-  MobileRobot::MobileRobot()
-  {
+Communication::Communication()
+{
 
-  }
+}
 
-  MobileRobot::~MobileRobot()
-  {
+Communication::~Communication()
+{
 
-  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-  const std::vector<double>& MobileRobot::getVelocity() const
-  {
-    return mVelocity;
-  }
+void Communication::lock()
+{
+  mLock.lockForWrite();
+}
 
-  double MobileRobot::getForwardVelocity() const
-  {
-    return mVelocity[0];
-  }
-
-  double MobileRobot::getTurningRate() const
-  {
-    return mVelocity[1];
-  }
-
-  int MobileRobot::stop()
-  {
-    int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
-    if (s == 0 && _mDebug) //setting velocity failed
-    {
-      std::cout << "MobileRobot: Error Stopping Robot\n";
-    }
-    else if (_mDebug)
-    {
-      std::cout << "MobileRobot: Stopping Robot Successful\n";
-    }
-
-    return s;
-  }
+void Communication::unlock()
+{
+  mLock.unlock();
+}

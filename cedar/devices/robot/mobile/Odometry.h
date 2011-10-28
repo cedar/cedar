@@ -22,10 +22,10 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MobileRobotModel.h
+    File:        Odometry.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
     Description: An object of this class represents the model of a mobile robot's kinematics.
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_MODEL_H
-#define CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_MODEL_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+#define CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
 
 // LOCAL INCLUDES
 
@@ -57,7 +57,7 @@
  * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
  * implementation is handled in its subclasses.
  */
-class cedar::dev::robot::mobile::MobileRobotModel : public cedar::aux::Object
+class cedar::dev::robot::mobile::Odometry : public cedar::aux::Object
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -70,10 +70,10 @@ class cedar::dev::robot::mobile::MobileRobotModel : public cedar::aux::Object
 public:
 
   //!@brief Constructs the model of the robot's kinematics.
-  MobileRobotModel();
+  Odometry();
 
   //!@brief Destructs the model of the robot's kinematics.
-  virtual ~MobileRobotModel();
+  virtual ~Odometry();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -142,10 +142,6 @@ public:
   // none yet (hopefully never!)
 
 protected:
-
-  //!@brief total running time from construction of the class on (for debugging)
-  QTime mTime;
-
   //!@brief The debug-flag.
   bool mDebug;
 
@@ -171,5 +167,5 @@ private:
 
 }; // class cedar::dev::robot::MobileRobotModel
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_MODEL_H
+#endif // CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
 

@@ -22,10 +22,10 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MobileRobot.h
+    File:        Locomotion.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
     Description: An object of this class represents the drive of a mobile robot.
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_H
-#define CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_LOCOMOTION_H
+#define CEDAR_DEV_ROBOT_MOBILE_LOCOMOTION_H
 
 // LOCAL INCLUDES
 
@@ -46,12 +46,12 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief An object of this class represents the drive of a mobile robot.
+/*!@brief An object of this class represents the locomotion of a mobile robot.
  *
  * This is an abstract class with functions and attributes common to drives of mobile robots. Mobile robots are e.g
  * robots with differential drives or walking robots.
  */
-class cedar::dev::robot::mobile::MobileRobot : public cedar::dev::robot::Component
+class cedar::dev::robot::mobile::Locomotion : public cedar::dev::robot::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,10 +64,10 @@ class cedar::dev::robot::mobile::MobileRobot : public cedar::dev::robot::Compone
 public:
 
   //!@brief Constructs the object which represents the drive of a mobile robot.
-  MobileRobot();
+  Locomotion();
 
   //!@brief Destructs the object.
-  virtual ~MobileRobot();
+  virtual ~Locomotion();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -170,6 +170,6 @@ private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::MobileRobot
+}; // class cedar::dev::robot::mobile::Locomotion
 
 #endif // CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_H
