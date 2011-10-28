@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MobileRobotModel.cpp
+    File:        CommunicationWidget.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the model of a mobile robot's kinematics.
+    Description: Graphical User Interface for testing the class Communication.
 
     Credits:
 
@@ -36,78 +36,41 @@
 
 // LOCAL INCLUDES
 
-#include "MobileRobotModel.h"
+#include "devices/communication/gui/CommunicationWidget.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot::mobile;
+using namespace cedar::dev::com::gui;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-MobileRobotModel::MobileRobotModel()
-{
+  CommunicationWidget::CommunicationWidget(cedar::dev::com::Communication *peCommunication)
+  {
+    mpeCommunication = peCommunication;
+    setupUi(this);
+    connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
+  }
 
-}
+  CommunicationWidget::~CommunicationWidget()
+  {
 
-MobileRobotModel::~MobileRobotModel()
-{
-
-}
+  }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat MobileRobotModel::getPosition() const
-{
-  //construct the matrix to return
-  cv::Mat position = cv::Mat(2,1,CV_64FC1);
-
-  //store the x- and y-position in the new matrix (gets are from Object.h)
-  position.at<double>(0,0) = getPositionX();
-  position.at<double>(1,0) = getPositionY();
-  return position;
-}
-
-double MobileRobotModel::getOrientation() const
-{
-  //calculates the orientation from the quaternion stored in Object.h.
-  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
-}
-
-void MobileRobotModel::setPosition(double xPosition, double yPosition)
-{
-  //calls setPosition of the Object-class
-  Object::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
-}
-
-void MobileRobotModel::setOrientation(double orientation)
-{
-  //construct a new matrix as parameter for setOrientationQuaternion
-  cv::Mat orientation_mat = cv::Mat(4, 1, CV_64FC1);
-  orientation_mat.at<double>(0,0) = 0; //orientation is a unit-quaternion
-  orientation_mat.at<double>(1,0) = cos(orientation);
-  orientation_mat.at<double>(2,0) = sin(orientation);
-  orientation_mat.at<double>(3,0) = 0; //no orientation in z-direction
-
-  setOrientationQuaternion(orientation_mat);
-}
-
-void MobileRobotModel::timerEvent(QTimerEvent * /* event */)
-{
-  update();
-}
-
-void MobileRobotModel::setDebug(bool debug)
-{
-  mDebug = debug;
-}
-
-void MobileRobotModel::resetTime()
-{
-  mTime.start();
-}
+  void CommunicationWidget::send()
+  {
+    mpeCommunication->lock();
+    mpeCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
+    std::string answer;
+    QString q_answer;
+    mpeCommunication->receive(answer);
+    mpeCommunication->unlock();
+    boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
+  }

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        serialCommunicationTest.cpp
+    File:        Locomotion.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Interactive test-program for the SerialCommunication class.
+    Description: An object of this class represents the locomotion of a mobile robot.
 
     Credits:
 
@@ -36,37 +36,59 @@
 
 // LOCAL INCLUDES
 
+#include "devices/robot/mobile/Locomotion.h"
+
 // PROJECT INCLUDES
 
-#include "devices/communication/SerialCommunication.h"
-#include "devices/communication/gui/CommunicationWidget.h"
-
 // SYSTEM INCLUDES
+#include <iostream>
 
-#include <QApplication>
+using namespace cedar::dev::robot::mobile;
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+  Locomotion::Locomotion()
+  {
+
+  }
+
+  Locomotion::~Locomotion()
+  {
+
+  }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int main(int argc, char **argv)
-{
-  //open the channel
-  cedar::dev::com::SerialCommunication *p_com;
-  p_com = new cedar::dev::com::SerialCommunication("tests/interactive/devices/com/SerialCommunicationConfig.cfg");
+  const std::vector<double>& Locomotion::getVelocity() const
+  {
+    return mVelocity;
+  }
 
-  QApplication a(argc, argv);
+  double Locomotion::getForwardVelocity() const
+  {
+    return mVelocity[0];
+  }
 
-  // create the GUI
-  cedar::dev::com::gui::CommunicationWidget *communication_widget;
-  communication_widget = new cedar::dev::com::gui::CommunicationWidget(p_com);
-  communication_widget->show();
+  double Locomotion::getTurningRate() const
+  {
+    return mVelocity[1];
+  }
 
-  //start the program
-  a.exec();
+  int Locomotion::stop()
+  {
+    int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
+    if (s == 0 && _mDebug) //setting velocity failed
+    {
+      std::cout << "Locomotion: Error Stopping Robot\n";
+    }
+    else if (_mDebug)
+    {
+      std::cout << "Locomotion: Stopping Robot Successful\n";
+    }
 
-  delete p_com;
-  delete communication_widget;
-
-  return 0;
-}
+    return s;
+  }

@@ -49,7 +49,7 @@ using namespace cedar::dev::robot::mobile::gui;
 //----------------------------------------------------------------------------------------------------------------------
 
 KTeamPositionControllerWidget::KTeamPositionControllerWidget(cedar::dev::robot::mobile::KTeamPositionController *peController,
-                                                             cedar::dev::robot::mobile::MobileRobotModel *peModel,
+                                                             cedar::dev::robot::mobile::Odometry *peModel,
                                                              QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)

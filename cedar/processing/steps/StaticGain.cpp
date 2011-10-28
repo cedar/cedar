@@ -22,94 +22,84 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamDrive.cpp
+    File:        StaticGain.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 28
 
-    Description: An object of this class represents the differential drive of a PWM-driven robot.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-
-#include "devices/robot/mobile/KTeamDrive.h"
+#include "processing/steps/StaticGain.h"
+#include "auxiliaries/assert.h"
+#include "auxiliaries/exceptions.h"
+#include "processing/DataSlot.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
-
-using namespace cedar::dev::robot::mobile;
+#include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-KTeamDrive::KTeamDrive()
+cedar::proc::steps::StaticGain::StaticGain()
+:
+mOutput(new cedar::aux::MatData(cv::Mat())),
+_mGainFactor(new cedar::aux::DoubleParameter(this, "gainFactor", 1.0, -10000.0, 10000.0))
 {
-
+  this->declareInput("input");
+  this->declareOutput("output", mOutput);
+  QObject::connect(_mGainFactor.get(), SIGNAL(valueChanged()), this, SLOT(gainChanged()));
 }
-
-KTeamDrive::~KTeamDrive()
-{
-
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double KTeamDrive::getPulsesPerRevolution() const
+void cedar::proc::steps::StaticGain::compute(const cedar::proc::Arguments&)
 {
-  return _mPulsesPerRevolution;
+  this->mOutput->setData(this->mInput->getData() * this->_mGainFactor->getValue());
 }
 
-int KTeamDrive::getMaximalEncoderValue() const
+void cedar::proc::steps::StaticGain::gainChanged()
 {
-  return _mMaximalEncoderValue;
+  this->onTrigger();
 }
 
-int KTeamDrive::getMinimalEncoderValue() const
+cedar::proc::DataSlot::VALIDITY cedar::proc::steps::StaticGain::determineInputValidity
+                                (
+                                  cedar::proc::ConstDataSlotPtr CEDAR_DEBUG_ONLY(slot),
+                                  cedar::aux::DataPtr data
+                                ) const
 {
-  return _mMinimalEncoderValue;
-}
-
-double KTeamDrive::getDistancePerPulse() const
-{
-  return mDistancePerPulse;
-}
-
-int KTeamDrive::getMaximalNumberPulsesPerSecond() const
-{
-  return _mMaximalNumberPulsesPerSecond;
-}
-
-int KTeamDrive::resetEncoder()
-{
-  int s = setEncoder(0,0);
-  if (s == 0 && _mDebug) //setting encoder failed
+  CEDAR_DEBUG_ASSERT(slot->getName() == "input")
+  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
   {
-    std::cout << "KTeamDrive: Error Resetting Encoder\n";
+    return cedar::proc::DataSlot::VALIDITY_VALID;
   }
-  return s;
+  else
+  {
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
 }
 
-int KTeamDrive::reset()
+void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& inputName)
 {
-  int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
-  s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0
-  if (s == 0 && _mDebug) //setting wheel speed or resetting encoder failed
+  CEDAR_DEBUG_ASSERT(inputName == "input");
+
+  this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
+  if (this->mInput)
   {
-    std::cout << "KTeamDrive: Error Resetting Robot\n";
-    }
-  else if (_mDebug)
-  {
-    std::cout << "KTeamDrive: Resetting Robot Successful\n";
+    const cv::Mat& input = this->mInput->getData();
+    // make a copy to create a matrix of the same type, dimensions, ...
+    this->mOutput->setData(input.clone());
   }
 
-  return s;
+  this->onTrigger();
 }

@@ -22,57 +22,41 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Communication.cpp
+    File:        namespace.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 10 28
 
-    Description: This class provides a string-based communication with an external device.
+    Description: Namespace file for cedar::proc::steps.
 
-    Credits:     Marc Sons (Author of msTransport.cpp this class is a revised and cedar-compatible version of)
+    Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
 
-#include "Communication.h"
+#ifndef CEDAR_PROC_STEPS_NAMESPACE_H
+#define CEDAR_PROC_STEPS_NAMESPACE_H
+
+// LOCAL INCLUDES
+#include "processing/lib.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-using namespace cedar::dev::com;
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-Communication::Communication()
+namespace cedar
 {
-
-}
-
-Communication::~Communication()
-{
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-void Communication::lock()
-{
-  mLock.lockForWrite();
-  mLocked = true;
-}
-
-void Communication::unlock()
-{
-  if (mLocked)
+  namespace proc
   {
-    mLocked = false;
-    mLock.unlock();
+    /*!@brief Namespace for processing steps. */
+    namespace steps
+    {
+      CEDAR_DECLARE_PROC_CLASS(StaticGain);
+    }
   }
 }
+
+#endif // CEDAR_PROC_STEPS_NAMESPACE_H

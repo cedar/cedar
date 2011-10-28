@@ -44,7 +44,7 @@
 // PROJECT INCLUDES
 
 #include "auxiliaries/ConfigurationInterface.h"
-#include "devices/com/SerialCommunication.h"
+#include "devices/communication/SerialCommunication.h"
 
 // SYSTEM INCLUDES
 
