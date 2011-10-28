@@ -40,21 +40,20 @@
 
 // LOCAL INCLUDES
 #include "devices/lib.h"
-
-// PROJECT INCLUDES
-
+#include "devices/robot/gui/namespace.h"
 #include "devices/robot/KinematicChain.h"
 #include "auxiliaries/ConfigurationInterface.h"
 
-// SYSTEM INCLUDES
+// PROJECT INCLUDES
 
+// SYSTEM INCLUDES
 #include <QtCore/QTimer>
 #include <QtGui/QGridLayout>
 #include <QtGui/QWidget>
 
 //!@brief A simple widget to access all the joints via GUI
 //!@todo Move this into the right namespace.
-class CEDAR_DEV_LIB_EXPORT KinematicChainWidget
+class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainWidget
   :
   public QWidget,
   public cedar::aux::ConfigurationInterface
@@ -70,7 +69,7 @@ class CEDAR_DEV_LIB_EXPORT KinematicChainWidget
   //----------------------------------------------------------------------------
 
 public:
-
+//!@todo please check if we really need four constructors in this class
   /*!@brief Constructor
    *
    *@param kinematicChain pointer to a kinematic chain
