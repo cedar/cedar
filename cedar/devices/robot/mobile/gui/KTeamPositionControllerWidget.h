@@ -42,7 +42,7 @@
 // PROJECT INCLUDES
 
 #include "devices/robot/mobile/KTeamPositionController.h"
-#include "devices/robot/mobile/MobileRobotModel.h"
+#include "devices/robot/mobile/Odometry.h"
 #include "cedar/devices/robot/mobile/gui/ui_KTeamPositionControllerWidget.h"
 #include "devices/robot/mobile/gui/namespace.h"
 #include "auxiliaries/gui/BaseWidget.h"
@@ -78,7 +78,7 @@ public:
   //!@param peModel Pointer to the model of the controlled robot.
   //!@param parent Pointer to parent widget
   KTeamPositionControllerWidget(cedar::dev::robot::mobile::KTeamPositionController *peController,
-                      cedar::dev::robot::mobile::MobileRobotModel *peModel,
+                      cedar::dev::robot::mobile::Odometry *peModel,
                       QWidget *parent = 0);
 
   //!@brief Destructs the GUI.
@@ -135,7 +135,7 @@ private:
   KTeamPositionController *mpeController;
 
   //!@brief Pointer to the robot's model.
-  MobileRobotModel *mpeModel;
+  Odometry *mpeModel;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

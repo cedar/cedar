@@ -22,38 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Communication.cpp
+    File:        Odometry.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: This class provides a string-based communication with an external device.
+    Description: An object of this class represents the model of a mobile robot's kinematics.
 
-    Credits:     Marc Sons (Author of msTransport.cpp this class is a revised and cedar-compatible version of)
+    Credits:
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
 
-#include "Communication.h"
+#include "devices/robot/mobile/Odometry.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::com;
+using namespace cedar::dev::robot::mobile;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Communication::Communication()
+Odometry::Odometry()
 {
 
 }
 
-Communication::~Communication()
+Odometry::~Odometry()
 {
 
 }
@@ -62,17 +62,47 @@ Communication::~Communication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Communication::lock()
+cv::Mat Odometry::getPosition() const
 {
-  mLock.lockForWrite();
-  mLocked = true;
+  //construct the matrix to return
+  cv::Mat position = cv::Mat(2,1,CV_64FC1);
+
+  //store the x- and y-position in the new matrix (gets are from Object.h)
+  position.at<double>(0,0) = getPositionX();
+  position.at<double>(1,0) = getPositionY();
+  return position;
 }
 
-void Communication::unlock()
+double Odometry::getOrientation() const
 {
-  if (mLocked)
-  {
-    mLocked = false;
-    mLock.unlock();
-  }
+  //calculates the orientation from the quaternion stored in Object.h.
+  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
+}
+
+void Odometry::setPosition(double xPosition, double yPosition)
+{
+  //calls setPosition of the Object-class
+  Object::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
+}
+
+void Odometry::setOrientation(double orientation)
+{
+  //construct a new matrix as parameter for setOrientationQuaternion
+  cv::Mat orientation_mat = cv::Mat(4, 1, CV_64FC1);
+  orientation_mat.at<double>(0,0) = 0; //orientation is a unit-quaternion
+  orientation_mat.at<double>(1,0) = cos(orientation);
+  orientation_mat.at<double>(2,0) = sin(orientation);
+  orientation_mat.at<double>(3,0) = 0; //no orientation in z-direction
+
+  setOrientationQuaternion(orientation_mat);
+}
+
+void Odometry::timerEvent(QTimerEvent * /* event */)
+{
+  update();
+}
+
+void Odometry::setDebug(bool debug)
+{
+  mDebug = debug;
 }

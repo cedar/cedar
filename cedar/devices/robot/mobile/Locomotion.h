@@ -22,42 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MobileRobotModel.h
+    File:        Locomotion.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the model of a mobile robot's kinematics.
+    Description: An object of this class represents the drive of a mobile robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_MODEL_H
-#define CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_MODEL_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_LOCOMOTION_H
+#define CEDAR_DEV_ROBOT_MOBILE_LOCOMOTION_H
 
 // LOCAL INCLUDES
 
 #include "devices/robot/mobile/namespace.h"
+#include "devices/robot/Component.h"
 
 // PROJECT INCLUDES
 
-#include "auxiliaries/Object.h"
-
 // SYSTEM INCLUDES
 
-#include <opencv2/opencv.hpp>
-#include <QObject>
-#include <QTime>
-
-/*!@brief An object of this class represents the model of a mobile robot's kinematics.
+/*!@brief An object of this class represents the locomotion of a mobile robot.
  *
- * The class calculates position and orientation of the robot in a coordinate-system based on the robot's sensoric
- * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
- * implementation is handled in its subclasses.
+ * This is an abstract class with functions and attributes common to drives of mobile robots. Mobile robots are e.g
+ * robots with differential drives or walking robots.
  */
-class cedar::dev::robot::mobile::MobileRobotModel : public cedar::aux::Object
+class cedar::dev::robot::mobile::Locomotion : public cedar::dev::robot::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,11 +63,11 @@ class cedar::dev::robot::mobile::MobileRobotModel : public cedar::aux::Object
 
 public:
 
-  //!@brief Constructs the model of the robot's kinematics.
-  MobileRobotModel();
+  //!@brief Constructs the object which represents the drive of a mobile robot.
+  Locomotion();
 
-  //!@brief Destructs the model of the robot's kinematics.
-  virtual ~MobileRobotModel();
+  //!@brief Destructs the object.
+  virtual ~Locomotion();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -81,33 +75,48 @@ public:
 
 public:
 
-  /*!@brief The get-function of the robot's current position.
-   *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
-   */
-  cv::Mat getPosition() const;
+  //!@brief The get-function of both forward velocity and turning rate.
+  //!@return 2-dimensional vector with mForwardVelocity [in m/s] as 1st and mTurningRate in [rad/s] as 2nd element.
+  const std::vector<double>& getVelocity() const;
 
-  /*!@brief The get-function of the robot's current orientation.
-   *@return The current orientation [in rad].
-   */
-  double getOrientation() const;
+  //!@brief The get-function of the forward velocity.
+  //!@return Forward Velocity [in m/s]
+  double getForwardVelocity() const;
 
-  /*!@brief The set-function of the robot's position.
-   *@param xPosition Position of the robot on the x-axis to be set [in m].
-   *@param yPosition Position of the robot on the y-axis to be set [in m].
-   */
-  void setPosition(double xPosition, double yPosition);
+  //!@brief The get-function of the turning rate.
+  //!@return Turning Rate [in rad/s]
+  double getTurningRate() const;
 
-  /*!@brief The set-function of the robot's orientation.
-   *@param orientation Orientation of the robot [in rad].
+  /*!@brief Sets both forward velocity and turning rate.
+   *@param forwardVelocity The forward velocity to be set [in m/s].
+   *@param turningRate The turning rate to be set [in rad/s].
+   *@return 1 if setting forward velocity and turning rate was successful and 0 otherwise.
    */
-  void setOrientation(double orientation);
+  virtual int setVelocity(double forwardVelocity, double turningRate) = 0;
 
-  //!@brief Sets the Debug-flag
-  void setDebug(bool debug);
-
-  /*!@brief reset elapsed time.
+  /*!@brief Sets forward velocity only.
+   *@param forwardVelocity The forward velocity to be set [in m/s].
+   *@return 1 if setting forward velocity was successful and 0 otherwise.
    */
-  void resetTime();
+  virtual int setForwardVelocity(double forwardVelocity) = 0;
+
+  /*!@brief Sets turning rate only.
+   *@param turningRate The turning rate to be set [in rad/s].
+   *@return 1 if setting turning rate was successful and 0 otherwise.
+   */
+  virtual int setTurningRate(double turningRate) = 0;
+
+  /*!@brief Stops the robot.
+   *@return 1 if stopping the robot was successful and 0 otherwise.
+   */
+  int stop();
+
+  /*!@brief Resets the robot.
+   *@return 1 if resetting the robot was successful and 0 otherwise.
+   *
+   *This function stops the robot and resets its movement-sensors (e.g. encoders).
+   */
+  virtual int reset() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -115,13 +124,7 @@ public:
 
 protected:
 
-
-  /*!@brief Updates the current position.
-   *
-   * This function is called by timerEvent(). Implement it in the sublass
-   * so that it updates the robot's position.
-   */
-  virtual void update() = 0;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -129,9 +132,7 @@ protected:
 
 private:
 
-  /*!@brief The timerEvent.
-   */
-  void timerEvent(QTimerEvent *event);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -143,11 +144,8 @@ public:
 
 protected:
 
-  //!@brief total running time from construction of the class on (for debugging)
-  QTime mTime;
-
-  //!@brief The debug-flag.
-  bool mDebug;
+  //!@brief Vector with forward velocity as 1st and turning rate as 2nd element [both in m/s].
+  std::vector<double> mVelocity;
 
 private:
 
@@ -163,13 +161,15 @@ public:
 
 protected:
 
-  // none yet
+  /*!@brief The Debug-Flag.
+   *If true, error-messages and received strings from the robot are displayed on Console, else not.
+   */
+  bool _mDebug;
 
 private:
 
   // none yet
 
-}; // class cedar::dev::robot::MobileRobotModel
+}; // class cedar::dev::robot::mobile::Locomotion
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_MODEL_H
-
+#endif // CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_H

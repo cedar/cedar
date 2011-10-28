@@ -22,40 +22,49 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MobileRobot.h
+    File:        CommunicationWidget.h
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the drive of a mobile robot.
+    Description: Graphical User Interface for testing the class Communication.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_H
-#define CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_H
+#ifndef CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+#define CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/namespace.h"
-#include "devices/robot/Component.h"
+#include "devices/communication/Communication.h"
+#include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
+#include "devices/communication/gui/namespace.h"
 
 // PROJECT INCLUDES
 
+#include "auxiliaries/gui/BaseWidget.h"
+
 // SYSTEM INCLUDES
 
-/*!@brief An object of this class represents the drive of a mobile robot.
+#include <Qt>
+#include <QString>
+
+/*!@brief Graphical User Interface for testing the class Communication.
  *
- * This is an abstract class with functions and attributes common to drives of mobile robots. Mobile robots are e.g
- * robots with differential drives or walking robots.
+ * Type the string to be sent into 'command' and click 'send'. The answer of the device is then displayed in 'answer'.
  */
-class cedar::dev::robot::mobile::MobileRobot : public cedar::dev::robot::Component
+class cedar::dev::com::gui::CommunicationWidget : public cedar::aux::gui::BaseWidget, private Ui_CommunicationWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+
+private:
+
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -63,60 +72,24 @@ class cedar::dev::robot::mobile::MobileRobot : public cedar::dev::robot::Compone
 
 public:
 
-  //!@brief Constructs the object which represents the drive of a mobile robot.
-  MobileRobot();
+  //!@brief Constructs the GUI.
+  //!@param peCommunication Pointer to the communication-class to be tested.
+  CommunicationWidget(cedar::dev::com::Communication *peCommunication);
 
-  //!@brief Destructs the object.
-  virtual ~MobileRobot();
+  //!@brief Destructs the GUI.
+  virtual ~CommunicationWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 
-public:
+public slots:
 
-  //!@brief The get-function of both forward velocity and turning rate.
-  //!@return 2-dimensional vector with mForwardVelocity [in m/s] as 1st and mTurningRate in [rad/s] as 2nd element.
-  const std::vector<double>& getVelocity() const;
-
-  //!@brief The get-function of the forward velocity.
-  //!@return Forward Velocity [in m/s]
-  double getForwardVelocity() const;
-
-  //!@brief The get-function of the turning rate.
-  //!@return Turning Rate [in rad/s]
-  double getTurningRate() const;
-
-  /*!@brief Sets both forward velocity and turning rate.
-   *@param forwardVelocity The forward velocity to be set [in m/s].
-   *@param turningRate The turning rate to be set [in rad/s].
-   *@return 1 if setting forward velocity and turning rate was successful and 0 otherwise.
-   */
-  virtual int setVelocity(double forwardVelocity, double turningRate) = 0;
-
-  /*!@brief Sets forward velocity only.
-   *@param forwardVelocity The forward velocity to be set [in m/s].
-   *@return 1 if setting forward velocity was successful and 0 otherwise.
-   */
-  virtual int setForwardVelocity(double forwardVelocity) = 0;
-
-  /*!@brief Sets turning rate only.
-   *@param turningRate The turning rate to be set [in rad/s].
-   *@return 1 if setting turning rate was successful and 0 otherwise.
-   */
-  virtual int setTurningRate(double turningRate) = 0;
-
-  /*!@brief Stops the robot.
-   *@return 1 if stopping the robot was successful and 0 otherwise.
-   */
-  int stop();
-
-  /*!@brief Resets the robot.
-   *@return 1 if resetting the robot was successful and 0 otherwise.
+  /*!@brief Sends the string.
    *
-   *This function stops the robot and resets its movement-sensors (e.g. encoders).
+   * This function calls 'send' of the linked communication class with the string typed into 'command' as parameter.
    */
-  virtual int reset() = 0;
+  void send();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -144,12 +117,12 @@ public:
 
 protected:
 
-  //!@brief Vector with forward velocity as 1st and turning rate as 2nd element [both in m/s].
-  std::vector<double> mVelocity;
+  // none yet
 
 private:
 
-  // none yet
+  // pointer to the Communication-class.
+  cedar::dev::com::Communication *mpeCommunication;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -161,15 +134,13 @@ public:
 
 protected:
 
-  /*!@brief The Debug-Flag.
-   *If true, error-messages and received strings from the robot are displayed on Console, else not.
-   */
-  bool _mDebug;
+  // none yet
 
 private:
 
   // none yet
 
-}; // class cedar::dev::robot::mobile::MobileRobot
+}; // class cedar::dev::com::gui::CommunicationWidget
 
-#endif // CEDAR_DEV_ROBOT_MOBILE_MOBILE_ROBOT_H
+#endif // CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+

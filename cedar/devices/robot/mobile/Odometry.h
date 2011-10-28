@@ -22,41 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Communication.h
+    File:        Odometry.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: This class provides a string-based communication with an external device.
+    Description: An object of this class represents the model of a mobile robot's kinematics.
 
-    Credits:     Marc Sons (Author of msTransport.h this class is a revised and cedar-compatible version of)
+    Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_COMMUNICATION_H_
-#define CEDAR_DEV_COM_COMMUNICATION_H_
+#ifndef CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+#define CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
 
 // LOCAL INCLUDES
 
-#include "devices/com/namespace.h"
+#include "devices/robot/mobile/namespace.h"
 
 // PROJECT INCLUDES
 
+#include "auxiliaries/Object.h"
+
 // SYSTEM INCLUDES
 
-#include <string>
-#include <QReadWriteLock>
+#include <opencv2/opencv.hpp>
+#include <QObject>
+#include <QTime>
 
-/*!@brief This class provides a string-based communication with an external device.
+/*!@brief An object of this class represents the model of a mobile robot's kinematics.
  *
- * This includes opening and closing the channel as well as sending and receiving strings. Examples for external
- * devices communicating per string are mobile robots (E-Puck, Khepera). It is also possible to lock the channel to
- * prevent read-/write-errors if multiple threads are accessing the device.
+ * The class calculates position and orientation of the robot in a coordinate-system based on the robot's sensoric
+ * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
+ * implementation is handled in its subclasses.
  */
-class cedar::dev::com::Communication
+class cedar::dev::robot::mobile::Odometry : public cedar::aux::Object
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -67,11 +69,11 @@ class cedar::dev::com::Communication
 
 public:
 
-  //!@brief Initiates a new communication with an external device.
-  Communication();
+  //!@brief Constructs the model of the robot's kinematics.
+  Odometry();
 
-  //!@brief Ends the communication with the device.
-  virtual ~Communication ();
+  //!@brief Destructs the model of the robot's kinematics.
+  virtual ~Odometry();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -79,27 +81,33 @@ public:
 
 public:
 
-  /*!@brief Sends a string to the device.
-   *@param command The string to be sent.
-   *@return 1 if sending was successful and 0 in case of an error.
+  /*!@brief The get-function of the robot's current position.
+   *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
    */
-  virtual int send(const std::string& command) = 0;
+  cv::Mat getPosition() const;
 
-  /*!@brief Receives a string from the device.
-   *@param answer Variable the received string shall be stored in.
-   *@return number of received bytes on success and 0 in case of an error.
+  /*!@brief The get-function of the robot's current orientation.
+   *@return The current orientation [in rad].
    */
-  virtual int receive(std::string& answer) = 0;
+  double getOrientation() const;
 
-  /*!@brief Locks the channel for reading or writing.
-   *
-   *This function locks the channel for reading or writing operations. If the channel is already locked, the calling
-   *thread is blocked until the channel is unlocked again. Always call unlock() after locking the channel!
+  /*!@brief The set-function of the robot's position.
+   *@param xPosition Position of the robot on the x-axis to be set [in m].
+   *@param yPosition Position of the robot on the y-axis to be set [in m].
    */
-  void lock();
+  void setPosition(double xPosition, double yPosition);
 
-  //!@brief Unlocks the channel. If the channel is currently not locked, this function has no effect.
-  void unlock();
+  /*!@brief The set-function of the robot's orientation.
+   *@param orientation Orientation of the robot [in rad].
+   */
+  void setOrientation(double orientation);
+
+  //!@brief Sets the Debug-flag
+  void setDebug(bool debug);
+
+  /*!@brief reset elapsed time.
+   */
+  void resetTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,8 +115,13 @@ public:
 
 protected:
 
-  //!@brief Closes the channel.
-  virtual void close() = 0;
+
+  /*!@brief Updates the current position.
+   *
+   * This function is called by timerEvent(). Implement it in the sublass
+   * so that it updates the robot's position.
+   */
+  virtual void update() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -116,7 +129,9 @@ protected:
 
 private:
 
-  // none yet
+  /*!@brief The timerEvent.
+   */
+  void timerEvent(QTimerEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -127,28 +142,30 @@ public:
   // none yet (hopefully never!)
 
 protected:
-
-  //!@brief Implements the read-/write-lock.
-  QReadWriteLock mLock;
+  //!@brief The debug-flag.
+  bool mDebug;
 
 private:
 
-  //!@brief Status of the read-/write-lock. True if one thread has currently locked the channel, else false.
-  bool mLocked;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 
 public:
+
   // none yet (hopefully never!)
 
 protected:
+
   // none yet
 
 private:
+
   // none yet
 
-}; // class cedar::dev::com::Communication
+}; // class cedar::dev::robot::MobileRobotModel
 
-#endif // CEDAR_DEV_COM_COMMUNICATION_H_
+#endif // CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+

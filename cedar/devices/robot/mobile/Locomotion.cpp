@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CommunicationWidget.cpp
+    File:        Locomotion.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Graphical User Interface for testing the class Communication.
+    Description: An object of this class represents the locomotion of a mobile robot.
 
     Credits:
 
@@ -36,26 +36,25 @@
 
 // LOCAL INCLUDES
 
-#include "devices/com/gui/CommunicationWidget.h"
+#include "devices/robot/mobile/Locomotion.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
 
-using namespace cedar::dev::com::gui;
+using namespace cedar::dev::robot::mobile;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-  CommunicationWidget::CommunicationWidget(cedar::dev::com::Communication *peCommunication)
+  Locomotion::Locomotion()
   {
-    mpeCommunication = peCommunication;
-    setupUi(this);
-    connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
+
   }
 
-  CommunicationWidget::~CommunicationWidget()
+  Locomotion::~Locomotion()
   {
 
   }
@@ -64,13 +63,32 @@ using namespace cedar::dev::com::gui;
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-  void CommunicationWidget::send()
+  const std::vector<double>& Locomotion::getVelocity() const
   {
-    mpeCommunication->lock();
-    mpeCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
-    std::string answer;
-    QString q_answer;
-    mpeCommunication->receive(answer);
-    mpeCommunication->unlock();
-    boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
+    return mVelocity;
+  }
+
+  double Locomotion::getForwardVelocity() const
+  {
+    return mVelocity[0];
+  }
+
+  double Locomotion::getTurningRate() const
+  {
+    return mVelocity[1];
+  }
+
+  int Locomotion::stop()
+  {
+    int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
+    if (s == 0 && _mDebug) //setting velocity failed
+    {
+      std::cout << "Locomotion: Error Stopping Robot\n";
+    }
+    else if (_mDebug)
+    {
+      std::cout << "Locomotion: Stopping Robot Successful\n";
+    }
+
+    return s;
   }

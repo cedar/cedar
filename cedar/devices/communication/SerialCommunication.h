@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/com/Communication.h"
+#include "devices/communication/Communication.h"
 
 // PROJECT INCLUDES
 

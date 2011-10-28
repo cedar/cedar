@@ -54,13 +54,13 @@ namespace cedar
     {
       namespace mobile
       {
-        CEDAR_DECLARE_DEV_CLASS(MobileRobot);
         CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
-        CEDAR_DECLARE_DEV_CLASS(KTeamDrive);
         CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
-        CEDAR_DECLARE_DEV_CLASS(MobileRobotModel);
+        CEDAR_DECLARE_DEV_CLASS(KTeamDrive);
         CEDAR_DECLARE_DEV_CLASS(KTeamDriveModel);
         CEDAR_DECLARE_DEV_CLASS(KTeamPositionController);
+        CEDAR_DECLARE_DEV_CLASS(Locomotion);
+        CEDAR_DECLARE_DEV_CLASS(Odometry);
       }
     }
   }

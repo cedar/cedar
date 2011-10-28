@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "KTeamDrive.h"
+#include "devices/robot/mobile/KTeamDrive.h"
 
 // PROJECT INCLUDES
 
