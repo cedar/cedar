@@ -38,7 +38,7 @@
 #define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
 
 // LOCAL INCLUDES
-#include "devices/robot/mobile/DifferentialDrive.h"
+#include "devices/robot/DifferentialDrive.h"
 #include "devices/kteam/namespace.h"
 
 // PROJECT INCLUDES
@@ -50,7 +50,7 @@
  * This is an abstract class with functions and attributes common to differential drive robots with
  * Pulse-Width-Modulation-driven wheels. These are e.g. the mobile robots E-Puck, Khepera and Koala.
  */
-class cedar::dev::kteam::KTeamDrive : public cedar::dev::robot::mobile::DifferentialDrive
+class cedar::dev::kteam::KTeamDrive : public cedar::dev::robot::DifferentialDrive
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -60,14 +60,7 @@ class cedar::dev::kteam::KTeamDrive : public cedar::dev::robot::mobile::Differen
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
-  //!@brief Constructs an object which represents the PWM-driven differential drive of a robot.
-  KTeamDrive();
-
-  //!@brief Destructs the object.
-  virtual ~KTeamDrive() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

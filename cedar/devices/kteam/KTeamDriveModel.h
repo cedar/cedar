@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/Odometry.h"
+#include "devices/robot/Odometry.h"
 #include "devices/kteam/KTeamDrive.h"
 
 // PROJECT INCLUDES
@@ -51,7 +51,7 @@
  * The class calculates position and orientation of the robot in a coordinate-system based on the robot's encoders
  * (odometry).
  */
-class cedar::dev::kteam::KTeamDriveModel : public cedar::dev::robot::mobile::Odometry
+class cedar::dev::kteam::KTeamDriveModel : public cedar::dev::robot::Odometry
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

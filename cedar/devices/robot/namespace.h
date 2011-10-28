@@ -53,12 +53,15 @@ namespace cedar
     namespace robot
     {
       CEDAR_DECLARE_DEV_CLASS(Component);
-      CEDAR_DECLARE_DEV_CLASS(Robot);
+      CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
+      CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
+      CEDAR_DECLARE_DEV_CLASS(Locomotion);
       CEDAR_DECLARE_DEV_CLASS(KinematicChain);
       CEDAR_DECLARE_DEV_CLASS(KinematicChainModel);
-      CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+      CEDAR_DECLARE_DEV_CLASS(Odometry);
       CEDAR_DECLARE_DEV_CLASS(ReferenceGeometry);
-      CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
+      CEDAR_DECLARE_DEV_CLASS(Robot);
+      CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
     }
   }
 }

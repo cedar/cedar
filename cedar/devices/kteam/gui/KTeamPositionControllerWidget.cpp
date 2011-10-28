@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::dev::kteam::gui::KTeamPositionControllerWidget::KTeamPositionControllerWidget(cedar::dev::kteam::KTeamPositionController *peController,
-                                                                                     cedar::dev::robot::mobile::Odometry *peModel,
+                                                                                     cedar::dev::robot::Odometry *peModel,
                                                                                      QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)

@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Odometry.cpp
+    File:        Locomotion.cpp
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: An object of this class represents the model of a mobile robot's kinematics.
+    Description: An object of this class represents the locomotion of a mobile robot.
 
     Credits:
 
@@ -36,73 +36,46 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/mobile/Odometry.h"
+#include "devices/robot/Locomotion.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::robot::mobile;
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Odometry::Odometry()
-{
-
-}
-
-Odometry::~Odometry()
-{
-
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat Odometry::getPosition() const
+const std::vector<double>& cedar::dev::robot::Locomotion::getVelocity() const
 {
-  //construct the matrix to return
-  cv::Mat position = cv::Mat(2,1,CV_64FC1);
-
-  //store the x- and y-position in the new matrix (gets are from Object.h)
-  position.at<double>(0,0) = getPositionX();
-  position.at<double>(1,0) = getPositionY();
-  return position;
+  return mVelocity;
 }
 
-double Odometry::getOrientation() const
+double cedar::dev::robot::Locomotion::getForwardVelocity() const
 {
-  //calculates the orientation from the quaternion stored in Object.h.
-  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
+  return mVelocity[0];
 }
 
-void Odometry::setPosition(double xPosition, double yPosition)
+double cedar::dev::robot::Locomotion::getTurningRate() const
 {
-  //calls setPosition of the Object-class
-  Object::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
+  return mVelocity[1];
 }
 
-void Odometry::setOrientation(double orientation)
+int cedar::dev::robot::Locomotion::stop()
 {
-  //construct a new matrix as parameter for setOrientationQuaternion
-  cv::Mat orientation_mat = cv::Mat(4, 1, CV_64FC1);
-  orientation_mat.at<double>(0,0) = 0; //orientation is a unit-quaternion
-  orientation_mat.at<double>(1,0) = cos(orientation);
-  orientation_mat.at<double>(2,0) = sin(orientation);
-  orientation_mat.at<double>(3,0) = 0; //no orientation in z-direction
-
-  setOrientationQuaternion(orientation_mat);
-}
-
-void Odometry::timerEvent(QTimerEvent * /* event */)
-{
-  update();
-}
-
-void Odometry::setDebug(bool debug)
-{
-  mDebug = debug;
+  int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
+  if (s == 0 && _mDebug) //setting velocity failed
+  {
+    std::cout << "Locomotion: Error Stopping Robot\n";
+  }
+  else if (_mDebug)
+  {
+    std::cout << "Locomotion: Stopping Robot Successful\n";
+  }
+  return s;
 }
