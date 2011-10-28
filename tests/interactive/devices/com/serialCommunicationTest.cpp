@@ -38,8 +38,8 @@
 
 // PROJECT INCLUDES
 
-#include "devices/com/SerialCommunication.h"
-#include "devices/com/gui/CommunicationWidget.h"
+#include "devices/communication/SerialCommunication.h"
+#include "devices/communication/gui/CommunicationWidget.h"
 
 // SYSTEM INCLUDES
 
