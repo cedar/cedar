@@ -22,95 +22,140 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        EPuckControlWidget.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Andre Bartel
+    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: Graphical User Interface for controlling the E-Puck.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_H
-#define CEDAR_DEV_ROBOT_COMPONENT_H
+#ifndef CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
+#define CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/communication/Communication.h"
+
+#include "devices/kteam/EPuckDrive.h"
+#include "cedar/devices/kteam/gui/ui_EPuckControlWidget.h"
+#include "devices/kteam/gui/namespace.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
 
+#include <Qt>
 
-/*!@brief Abstract description of the class.
+/*!@brief Graphical User Interface for controlling the E-Puck.
  *
- * More detailed description of the class.
+ * Type the desired forward velocity and turning rate into the boxes. The wheel speed of the 2 differential-drive-wheels
+ * is displayed as well as the encoder-values. The E-Puck starts driving with the specified velocity or changes its
+ * velocity after pressing the 'Set Velocity'-button. Stop the E-Puck with 'Stop' and reset speed and encoder-values
+ * with 'Reset'.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::kteam::gui::EPuckControlWidget
+:
+public cedar::aux::gui::BaseWidget, private Ui_EPuckControlWidget
 {
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+
+private:
+
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Constructs the E-Puck-Control.
+  //!@param peDrive Pointer to the E-Puck that shall be controlled.
+  //!@param parent Pointer to parent widget
+  EPuckControlWidget(cedar::dev::kteam::EPuckDrive *peDrive, QWidget *parent = 0);
+
+  //!@brief Closes the control.
+  virtual ~EPuckControlWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
 
+public slots:
+
+  /*!@brief Sets the velocity of the robot.
+   */
+  void drive();
+
+  /*!@brief Stops the robot.
+   */
+  void stop();
+
+  /*!@brief Stops the robot and resets the encoder-values.
+   */
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+
 private:
-  // none yet
+
+  /*!@brief The timer-event.
+   * @param event Pointer to event
+   */
+  void timerEvent(QTimerEvent *event);
+
+  /*!@brief Updates the displayed wheel-speeds and encoder-values and is called by timerEvent.
+   */
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
   // none yet (hopefully never!)
+
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
+
+  // none yet
 
 private:
-  // none yet
+
+  //!@brief Pointer to the controlled robot.
+  cedar::dev::kteam::EPuckDrive *mpeDrive;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
-  // none yet
+
+  // none yet (hopefully never!)
+
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
-private:
+
   // none yet
 
-}; // class cedar::dev::robot::Component
+private:
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_H
+  // none yet
+
+}; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
+
+#endif // CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H

@@ -22,95 +22,139 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        PositionControllerWidget.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Andre Bartel
+    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: Graphical User Interface for the KTeam controller.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_H
-#define CEDAR_DEV_ROBOT_COMPONENT_H
+#ifndef CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#define CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/communication/Communication.h"
+
+#include "devices/kteam/PositionController.h"
+#include "devices/robot/Odometry.h"
+#include "cedar/devices/kteam/gui/ui_KTeamPositionControllerWidget.h"
+#include "devices/kteam/gui/namespace.h"
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
 
+#include <Qt>
 
-/*!@brief Abstract description of the class.
+/*!@brief Graphical User Interface for the KTeam controller.
  *
- * More detailed description of the class.
+ * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::kteam::gui::PositionControllerWidget
+: public cedar::aux::gui::BaseWidget, private Ui_KTeamPositionControllerWidget
 {
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
+private:
+
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
+  //!@brief Constructs the GUI.
+  //!@param peController Pointer to the controller used to control the robot.
+  //!@param peModel Pointer to the model of the controlled robot.
+  //!@param parent Pointer to parent widget
+  PositionControllerWidget(
+                            cedar::dev::kteam::PositionController *peController,
+                            cedar::dev::robot::Odometry *peModel,
+                            QWidget *parent = 0
+                          );
+
+  //!@brief Destructs the GUI.
+  virtual ~PositionControllerWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
 
+public slots:
+
+  /*!@brief Sets the target-position of the robot.
+   */
+  void start();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+
 private:
-  // none yet
+
+  /*!@brief The timer-event.
+   * @param event pointer to event
+   */
+  void timerEvent(QTimerEvent *event);
+
+  /*!@brief Updates the displayed position.
+   */
+  void update();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
   // none yet (hopefully never!)
+
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
+
+  // none yet
 
 private:
-  // none yet
+
+  //!@brief Pointer to the robot control.
+  PositionController *mpeController;
+
+  //!@brief Pointer to the robot's model.
+  cedar::dev::robot::Odometry *mpeModel;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
-  // none yet
+
+  // none yet (hopefully never!)
+
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
-private:
+
   // none yet
 
-}; // class cedar::dev::robot::Component
+private:
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_H
+  // none yet
+
+}; // class cedar::dev::kteam::gui::PositionControllerWidget
+
+#endif // CEDAR_DEV_KTEAM_GUI_POSITION_CONTROLLER_WIDGET_H

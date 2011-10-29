@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ControlThread.cpp
+    File:        KTeamPositionControllerWidget.cpp
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
-    Date:        2011 05 10
+    Maintainer:  Andre Bartel
+    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Example of speed control of an single joint.
+    Description: Graphical User Interface for the KTeam controller.
 
     Credits:
 
@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "ControlThread.h"
+#include "devices/kteam/gui/PositionControllerWidget.h"
 
 // PROJECT INCLUDES
 
@@ -46,27 +46,36 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-ControlThread::ControlThread(
-                              const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-                              const std::string& configFileName
-                            )
+cedar::dev::kteam::gui::PositionControllerWidget::PositionControllerWidget(cedar::dev::kteam::PositionController *peController,
+                                                                           cedar::dev::robot::Odometry *peModel,
+                                                                           QWidget *parent)
 :
-cedar::aux::LoopedThread(100, 0.01, configFileName)
+cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)
 {
-  mpKinematicChain = kinematicChain;
-  return;
+  mpeController = peController;
+  mpeModel = peModel;
+  setupUi(this);
+  connect(startButton, SIGNAL(pressed()), this, SLOT(start()));
+  startTimer(100); //timer for updating display
 }
 
-
-void ControlThread::step(double stepSize)
+cedar::dev::kteam::gui::PositionControllerWidget::~PositionControllerWidget()
 {
-  double current_pos = mpKinematicChain->getJointAngle(JOINT);
-  double current_vel = mpKinematicChain->getJointVelocity(JOINT);
 
-  double rate_of_change = 1.0 * (TARGET - current_pos);
-  rate_of_change = std::min<double>(rate_of_change, current_vel + 0.4);
-
-  std::cout << "setting speed " << rate_of_change << std::endl;
-  mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dev::kteam::gui::PositionControllerWidget::start()
+{
+  mpeController->setTarget(xTargetPosition->value(), yTargetPosition->value());
+}
+
+void cedar::dev::kteam::gui::PositionControllerWidget::timerEvent(QTimerEvent * /* event */)
+{
+  //display new values
+  xRobotPosition->display(mpeModel->getPositionX());
+  yRobotPosition->display(mpeModel->getPositionY());
+}

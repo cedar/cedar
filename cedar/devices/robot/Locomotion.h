@@ -22,40 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        Locomotion.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: An object of this class represents the drive of a mobile robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_H
-#define CEDAR_DEV_ROBOT_COMPONENT_H
+#ifndef CEDAR_DEV_ROBOT_LOCOMOTION_H
+#define CEDAR_DEV_ROBOT_LOCOMOTION_H
 
 // LOCAL INCLUDES
+
 #include "devices/robot/namespace.h"
+#include "devices/robot/Component.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief An object of this class represents the locomotion of a mobile robot.
  *
- * More detailed description of the class.
+ * This is an abstract class with functions and attributes common to drives of mobile robots. Mobile robots are e.g
+ * robots with differential drives or walking robots.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::robot::Locomotion : public cedar::dev::robot::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -71,46 +67,101 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief The get-function of both forward velocity and turning rate.
+  //!@return 2-dimensional vector with mForwardVelocity [in m/s] as 1st and mTurningRate in [rad/s] as 2nd element.
+  const std::vector<double>& getVelocity() const;
+
+  //!@brief The get-function of the forward velocity.
+  //!@return Forward Velocity [in m/s]
+  double getForwardVelocity() const;
+
+  //!@brief The get-function of the turning rate.
+  //!@return Turning Rate [in rad/s]
+  double getTurningRate() const;
+
+  /*!@brief Sets both forward velocity and turning rate.
+   *@param forwardVelocity The forward velocity to be set [in m/s].
+   *@param turningRate The turning rate to be set [in rad/s].
+   *@return 1 if setting forward velocity and turning rate was successful and 0 otherwise.
+   */
+  virtual int setVelocity(double forwardVelocity, double turningRate) = 0;
+
+  /*!@brief Sets forward velocity only.
+   *@param forwardVelocity The forward velocity to be set [in m/s].
+   *@return 1 if setting forward velocity was successful and 0 otherwise.
+   */
+  virtual int setForwardVelocity(double forwardVelocity) = 0;
+
+  /*!@brief Sets turning rate only.
+   *@param turningRate The turning rate to be set [in rad/s].
+   *@return 1 if setting turning rate was successful and 0 otherwise.
+   */
+  virtual int setTurningRate(double turningRate) = 0;
+
+  /*!@brief Stops the robot.
+   *@return 1 if stopping the robot was successful and 0 otherwise.
+   */
+  int stop();
+
+  /*!@brief Resets the robot.
+   *@return 1 if resetting the robot was successful and 0 otherwise.
+   *
+   *This function stops the robot and resets its movement-sensors (e.g. encoders).
+   */
+  virtual int reset() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+
 private:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
   // none yet (hopefully never!)
+
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
+
+  //!@brief Vector with forward velocity as 1st and turning rate as 2nd element [both in m/s].
+  std::vector<double> mVelocity;
 
 private:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
-  // none yet
+
+  // none yet (hopefully never!)
+
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
+
+  /*!@brief The Debug-Flag.
+   *If true, error-messages and received strings from the robot are displayed on Console, else not.
+   */
+  bool _mDebug;
+
 private:
+
   // none yet
 
-}; // class cedar::dev::robot::Component
+}; // class cedar::dev::robot::Locomotion
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_H
+#endif // CEDAR_DEV_ROBOT_LOCOMOTION_H

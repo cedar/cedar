@@ -22,22 +22,21 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.cpp
+    File:        Odometry.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 08
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: An object of this class represents the model of a mobile robot's kinematics.
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "devices/robot/Component.h"
-#include "devices/robot/Robot.h"
+
+#include "devices/robot/Odometry.h"
 
 // PROJECT INCLUDES
 
@@ -50,3 +49,48 @@
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cv::Mat cedar::dev::robot::Odometry::getPosition() const
+{
+  //construct the matrix to return
+  cv::Mat position = cv::Mat(2,1,CV_64FC1);
+
+  //store the x- and y-position in the new matrix (gets are from Object.h)
+  position.at<double>(0,0) = getPositionX();
+  position.at<double>(1,0) = getPositionY();
+  return position;
+}
+
+double cedar::dev::robot::Odometry::getOrientation() const
+{
+  //calculates the orientation from the quaternion stored in Object.h.
+  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
+}
+
+void cedar::dev::robot::Odometry::setPosition(double xPosition, double yPosition)
+{
+  //calls setPosition of the Object-class
+  Object::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
+}
+
+void cedar::dev::robot::Odometry::setOrientation(double orientation)
+{
+  //construct a new matrix as parameter for setOrientationQuaternion
+  cv::Mat orientation_mat = cv::Mat(4, 1, CV_64FC1);
+  orientation_mat.at<double>(0,0) = 0; //orientation is a unit-quaternion
+  orientation_mat.at<double>(1,0) = cos(orientation);
+  orientation_mat.at<double>(2,0) = sin(orientation);
+  orientation_mat.at<double>(3,0) = 0; //no orientation in z-direction
+
+  setOrientationQuaternion(orientation_mat);
+}
+
+void cedar::dev::robot::Odometry::timerEvent(QTimerEvent * /* event */)
+{
+  update();
+}
+
+void cedar::dev::robot::Odometry::setDebug(bool debug)
+{
+  mDebug = debug;
+}

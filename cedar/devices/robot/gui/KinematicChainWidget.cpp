@@ -60,7 +60,7 @@ using namespace cedar::dev::robot;
 // constructors and destructor
 //----------------------------------------------------------------------------
 
-KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicChain, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicChain, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
@@ -72,7 +72,7 @@ KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicCha
 }
 
 
-KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
 :
 QWidget(parent),
 ConfigurationInterface(configFileName)
@@ -103,7 +103,7 @@ ConfigurationInterface(configFileName)
 }
 
 
-KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   for(unsigned int i = 1; i < kinematicChains.size(); ++i)
   {
@@ -126,7 +126,7 @@ KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> 
 }
 
 
-KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
 :
 QWidget(parent),
 ConfigurationInterface(configFileName)
@@ -168,7 +168,7 @@ ConfigurationInterface(configFileName)
 }
 
 
-KinematicChainWidget::~KinematicChainWidget()
+cedar::dev::robot::gui::KinematicChainWidget::~KinematicChainWidget()
 {
   for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
   {
@@ -183,7 +183,7 @@ KinematicChainWidget::~KinematicChainWidget()
 // methods
 //------------------------------------------------------------------------------
 
-void KinematicChainWidget::setActiveColumn(unsigned int c)
+void cedar::dev::robot::gui::KinematicChainWidget::setActiveColumn(unsigned int c)
 {
   for(unsigned int i = 0; i < 3; ++i)
   {
@@ -196,7 +196,7 @@ void KinematicChainWidget::setActiveColumn(unsigned int c)
 }
 
 
-void KinematicChainWidget::radioButtonAngleClicked()
+void cedar::dev::robot::gui::KinematicChainWidget::radioButtonAngleClicked()
 {
   setActiveColumn(0);
   for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
@@ -208,7 +208,7 @@ void KinematicChainWidget::radioButtonAngleClicked()
 }
 
 
-void KinematicChainWidget::radioButtonVelocityClicked()
+void cedar::dev::robot::gui::KinematicChainWidget::radioButtonVelocityClicked()
 {
   setActiveColumn(1);
 
@@ -228,7 +228,7 @@ void KinematicChainWidget::radioButtonVelocityClicked()
 }
 
 
-void KinematicChainWidget::radioButtonAccelerationClicked()
+void cedar::dev::robot::gui::KinematicChainWidget::radioButtonAccelerationClicked()
 {
   setActiveColumn(2);
 
@@ -248,7 +248,7 @@ void KinematicChainWidget::radioButtonAccelerationClicked()
 }
 
 
-void KinematicChainWidget::updateSpinBoxes()
+void cedar::dev::robot::gui::KinematicChainWidget::updateSpinBoxes()
 {
   for(unsigned i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
   {
@@ -274,7 +274,7 @@ void KinematicChainWidget::updateSpinBoxes()
 }
 
 
-void KinematicChainWidget::updateJointValue()
+void cedar::dev::robot::gui::KinematicChainWidget::updateJointValue()
 {
   QDoubleSpinBox *sender = static_cast<QDoubleSpinBox*>(this->sender());
   int index_sender = mpGridLayout->indexOf(sender);
@@ -320,7 +320,7 @@ void KinematicChainWidget::updateJointValue()
 }
 
 
-void KinematicChainWidget::initWindow()
+void cedar::dev::robot::gui::KinematicChainWidget::initWindow()
 {
   setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
 

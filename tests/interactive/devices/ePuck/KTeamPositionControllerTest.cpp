@@ -38,12 +38,12 @@
 
 // PROJECT INCLUDES
 
-#include "devices/robot/mobile/EPuckDrive.h"
+#include "devices/kteam/EPuckDrive.h"
 #include "devices/communication/SerialCommunication.h"
-#include "devices/robot/mobile/KTeamDriveModel.h"
-#include "devices/robot/mobile/KTeamPositionController.h"
-#include "devices/robot/mobile/gui/KTeamPositionControllerWidget.h"
-#include "devices/robot/mobile/gui/EPuckControlWidget.h"
+#include "devices/kteam/DriveModel.h"
+#include "devices/kteam/PositionController.h"
+#include "devices/kteam/gui/PositionControllerWidget.h"
+#include "devices/kteam/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES
 
@@ -63,25 +63,25 @@ int main(int argc, char **argv)
   = new cedar::dev::com::SerialCommunication("tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
 
   //initialize the e-puck-drive
-  cedar::dev::robot::mobile::EPuckDrive *p_drive;
+  cedar::dev::kteam::EPuckDrive *p_drive;
   p_drive
-  = new cedar::dev::robot::mobile::EPuckDrive(p_communication, "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+  = new cedar::dev::kteam::EPuckDrive(p_communication, "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
 
   //initialize model of the e-puck
-  cedar::dev::robot::mobile::KTeamDriveModel *p_model;
-  p_model = new cedar::dev::robot::mobile::KTeamDriveModel(p_drive);
+  cedar::dev::kteam::DriveModel *p_model;
+  p_model = new cedar::dev::kteam::DriveModel(p_drive);
 
   //create the controller
-  cedar::dev::robot::mobile::KTeamPositionController *p_controller;
-  p_controller = new cedar::dev::robot::mobile::KTeamPositionController(p_drive, p_model);
+  cedar::dev::kteam::PositionController *p_controller;
+  p_controller = new cedar::dev::kteam::PositionController(p_drive, p_model);
 
   //create the controller-GUI
-  cedar::dev::robot::mobile::gui::KTeamPositionControllerWidget *p_controller_widget;
-  p_controller_widget = new cedar::dev::robot::mobile::gui::KTeamPositionControllerWidget(p_controller, p_model);
+  cedar::dev::kteam::gui::PositionControllerWidget *p_controller_widget;
+  p_controller_widget = new cedar::dev::kteam::gui::PositionControllerWidget(p_controller, p_model);
 
   //create the e-puck-control-GUI
-  cedar::dev::robot::mobile::gui::EPuckControlWidget *p_epuck_control;
-  p_epuck_control = new cedar::dev::robot::mobile::gui::EPuckControlWidget(p_drive);
+  cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
+  p_epuck_control = new cedar::dev::kteam::gui::EPuckControlWidget(p_drive);
 
   //show status-information of the model
   p_model->setDebug(true);

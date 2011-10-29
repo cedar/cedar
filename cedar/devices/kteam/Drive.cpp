@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EPuckDriveTest.cpp
+    File:        KTeamDrive.cpp
 
     Maintainer:  Andre Bartel
     Email:       andre.bartel@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
-    Description: Interactive test-program for the EPuckDrive class.
+    Description: An object of this class represents the differential drive of a PWM-driven robot.
 
     Credits:
 
@@ -36,48 +36,70 @@
 
 // LOCAL INCLUDES
 
+#include "devices/kteam/Drive.h"
+
 // PROJECT INCLUDES
 
-#include "devices/kteam/EPuckDrive.h"
-#include "devices/communication/SerialCommunication.h"
-#include "devices/kteam/gui/EPuckControlWidget.h"
-
 // SYSTEM INCLUDES
+#include <iostream>
 
-#include <QApplication>
+using namespace cedar::dev::kteam;
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int main(int argc, char **argv)
+double Drive::getPulsesPerRevolution() const
 {
-  QApplication a(argc, argv);
+  return _mPulsesPerRevolution;
+}
 
-  //open the channel to the e-puck
-  cedar::dev::com::SerialCommunication *p_communication;
-  p_communication
-  = new cedar::dev::com::SerialCommunication("tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
+int Drive::getMaximalEncoderValue() const
+{
+  return _mMaximalEncoderValue;
+}
 
-  //initialize e-puck-drive
-  cedar::dev::kteam::EPuckDrive *p_drive;
-  p_drive
-  = new cedar::dev::kteam::EPuckDrive(p_communication, "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+int Drive::getMinimalEncoderValue() const
+{
+  return _mMinimalEncoderValue;
+}
 
-  //open the control-GUI
-  cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
-  p_epuck_control = new cedar::dev::kteam::gui::EPuckControlWidget(p_drive);
-  p_epuck_control->show();
+double Drive::getDistancePerPulse() const
+{
+  return mDistancePerPulse;
+}
 
-  //start the program
-  a.exec();
+int Drive::getMaximalNumberPulsesPerSecond() const
+{
+  return _mMaximalNumberPulsesPerSecond;
+}
 
-  //reset the e-puck
-  p_drive->reset();
+int Drive::resetEncoder()
+{
+  int s = setEncoder(0,0);
+  if (s == 0 && _mDebug) //setting encoder failed
+  {
+    std::cout << "KTeamDrive: Error Resetting Encoder\n";
+  }
+  return s;
+}
 
-  delete p_drive;
-  delete p_communication;
-  delete p_epuck_control;
+int Drive::reset()
+{
+  int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
+  s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0
+  if (s == 0 && _mDebug) //setting wheel speed or resetting encoder failed
+  {
+    std::cout << "KTeamDrive: Error Resetting Robot\n";
+    }
+  else if (_mDebug)
+  {
+    std::cout << "KTeamDrive: Resetting Robot Successful\n";
+  }
 
-  return 0;
+  return s;
 }

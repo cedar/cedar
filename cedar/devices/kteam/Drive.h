@@ -22,41 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        KTeamDrive.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Andre Bartel
+    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: An object of this class represents the differential drive of a PWM-driven robot.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_H
-#define CEDAR_DEV_ROBOT_COMPONENT_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
+#define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
+#include "devices/robot/DifferentialDrive.h"
+#include "devices/kteam/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief An object of this class represents the differential drive of a PWM-driven robot.
  *
- * More detailed description of the class.
+ * This is an abstract class with functions and attributes common to differential drive robots with
+ * Pulse-Width-Modulation-driven wheels. These are e.g. the mobile robots E-Puck, Khepera and Koala.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::kteam::Drive : public cedar::dev::robot::DifferentialDrive
 {
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -69,48 +65,117 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
 
+  /*!@brief The get-function of the number of pulses per wheel-revolution.
+   *@return Number of Pulses per Revolution.
+   */
+  double getPulsesPerRevolution() const;
+
+  /*!@brief The get-function of the maximal encoder value.
+   *@return The maximal encoder value.
+   */
+  int getMaximalEncoderValue() const;
+
+  /*!@brief The get-function of the minimal encoder value.
+   *@return The minimal encoder value.
+   */
+  int getMinimalEncoderValue() const;
+
+  /*!@brief The get-function of the distance one wheel moves each pulse.
+   *@return The distance one wheel moves each pulse [in m].
+   */
+  double getDistancePerPulse() const;
+
+  /*!@brief The get-function of the maximum possible number of pulses per second.
+   *@return The maximal number of pulses per second.
+   */
+  int getMaximalNumberPulsesPerSecond() const;
+
+  /*!@brief The get-function of left and right encoder values.
+   *@param leftEncoder Variable the left encoder value shall be stored in.
+   *@param rightEncoder Variable the right encoder value shall be stored in.
+   *@return 1 if getting encoder values was successful and 0 otherwise.
+   */
+  virtual int getEncoder(int &leftEncoder, int &rightEncoder) = 0;
+
+  /*!@brief Sets both encoder values to 0.
+   *@return 1 if resetting encoder values was successful and 0 otherwise.
+   */
+  int resetEncoder();
+
+  /*!@brief Resets the robot.
+   *@return 1 if resetting the robot was successful and 0 otherwise.
+   *
+   *Reset sets both wheel speeds and encoder values to 0.
+   */
+  int reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
-  // none yet
+
+  /*!@brief Sets both encoder values.
+   *@param leftEncoder The left encoder value to be set.
+   *@param rightEncoder The right encoder value to be set.
+   *@return 1 if setting encoder values was successful and 0 otherwise.
+   */
+  virtual int setEncoder(int leftEncoder, int rightEncoder) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+
 private:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
   // none yet (hopefully never!)
+
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
+
+  //!@brief Distance the wheel moves each pulse [in m].
+  double mDistancePerPulse;
 
 private:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
-  // none yet
+
+  // none yet (hopefully never!)
+
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
+
+  //!@brief Number of pulses per revolution of wheel.
+  double _mPulsesPerRevolution;
+
+  //!@brief The maximal encoder value.
+  int _mMaximalEncoderValue;
+
+  //!@brief The minimal encoder value.
+  int _mMinimalEncoderValue;
+
+  //!@brief The maximal possible number of pulses per second.
+  int _mMaximalNumberPulsesPerSecond;
+
 private:
+
   // none yet
 
-}; // class cedar::dev::robot::Component
+}; // class cedar::dev::kteam::KTeamDrive
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_H
+#endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H

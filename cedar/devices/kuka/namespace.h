@@ -22,46 +22,44 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KinematicChainWidget.cpp
+    File:        namespace.h
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.rub.de
-    Date:        2011 01 06
+    Maintainer:  Guido Knips
+    Email:       guido.knips@ini.rub.de
+    Date:        2010 12 9
 
-    Description: Example for an @em cedar::dev::robot::KinematicChainWidget.
+    Description: Namespace file for cedar::dev::kuka.
 
     Credits:
 
 ======================================================================================================================*/
 
+
+#ifndef CEDAR_DEV_KUKA_NAMESPACE_H
+#define CEDAR_DEV_KUKA_NAMESPACE_H
+
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_LWR
+
 // LOCAL INCLUDES
+#include "devices/lib.h"
 
 // PROJECT INCLUDES
 
-#include "devices/robot/gui/KinematicChainWidget.h"
-#include "devices/amtec/KinematicChain.h"
-
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
 
-#include <iostream>
-#include <QtGui/QApplication>
-
-//------------------------------------------------------------------------------
-// methods
-//------------------------------------------------------------------------------
-
-int main(int argc, char *argv[]) {
-  try
+namespace cedar
+{
+  namespace dev
   {
-    cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::amtec::KinematicChain("../../../tests/interactive/devices/gui/AmtecKinematicChain/cora_arm.conf"));
-    //p_kinematic_chain->useCurrentHardwareValues(true);
-    QApplication app(argc, argv);
-    cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain);
-    widget.show();
-    return app.exec();
-  }
-  catch(std::exception e)
-  {
-    std::cout << "Exception: " << e.what() << std::endl;
+    namespace kuka
+    {
+      CEDAR_DECLARE_DEV_CLASS(KukaInterface);
+    }
   }
 }
+
+#endif // CEDAR_USE_KUKA_FRI
+#endif // CEDAR_DEV_KUKA_NAMESPACE_H

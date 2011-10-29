@@ -95,8 +95,8 @@ int main(int argc, char **argv)
   p_scene_widget->show();
 
   // create widgets
-  KinematicChainWidget widget_arm(p_cora_arm);
-  KinematicChainWidget widget_head(p_cora_head);
+  cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_cora_arm);
+  cedar::dev::robot::gui::KinematicChainWidget widget_head(p_cora_head);
   widget_arm.show();
   widget_head.show();
 

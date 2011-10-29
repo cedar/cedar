@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ControlThread.cpp
+    File:        Locomotion.cpp
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
-    Date:        2011 05 10
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Example of speed control of an single joint.
+    Description: An object of this class represents the locomotion of a mobile robot.
 
     Credits:
 
@@ -36,37 +36,46 @@
 
 // LOCAL INCLUDES
 
-#include "ControlThread.h"
+#include "devices/robot/Locomotion.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-ControlThread::ControlThread(
-                              const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-                              const std::string& configFileName
-                            )
-:
-cedar::aux::LoopedThread(100, 0.01, configFileName)
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+const std::vector<double>& cedar::dev::robot::Locomotion::getVelocity() const
 {
-  mpKinematicChain = kinematicChain;
-  return;
+  return mVelocity;
 }
 
-
-void ControlThread::step(double stepSize)
+double cedar::dev::robot::Locomotion::getForwardVelocity() const
 {
-  double current_pos = mpKinematicChain->getJointAngle(JOINT);
-  double current_vel = mpKinematicChain->getJointVelocity(JOINT);
-
-  double rate_of_change = 1.0 * (TARGET - current_pos);
-  rate_of_change = std::min<double>(rate_of_change, current_vel + 0.4);
-
-  std::cout << "setting speed " << rate_of_change << std::endl;
-  mpKinematicChain->setJointVelocity(JOINT, rate_of_change);
+  return mVelocity[0];
 }
 
+double cedar::dev::robot::Locomotion::getTurningRate() const
+{
+  return mVelocity[1];
+}
+
+int cedar::dev::robot::Locomotion::stop()
+{
+  int s = setVelocity(0,0); //stop by setting both forward velocity and turning rate to 0
+  if (s == 0 && _mDebug) //setting velocity failed
+  {
+    std::cout << "Locomotion: Error Stopping Robot\n";
+  }
+  else if (_mDebug)
+  {
+    std::cout << "Locomotion: Stopping Robot Successful\n";
+  }
+  return s;
+}

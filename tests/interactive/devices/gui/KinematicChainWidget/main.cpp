@@ -46,19 +46,14 @@
 #include <iostream>
 #include <QtGui/QApplication>
 
-
-using namespace std;
-using namespace cedar::dev::robot;
-
-
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
 
 int main(int argc, char *argv[]) {
-  KinematicChainPtr p_kinematic_chain(new SimulatedKinematicChain("../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf"));
+  cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::robot::SimulatedKinematicChain("../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf"));
   QApplication app(argc, argv);
-  KinematicChainWidget widget(p_kinematic_chain, "../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf");
+  cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain, "../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf");
   widget.show();
   return app.exec();
 }

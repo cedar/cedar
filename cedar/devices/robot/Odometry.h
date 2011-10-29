@@ -22,40 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        Odometry.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: An object of this class represents the model of a mobile robot's kinematics.
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_H
-#define CEDAR_DEV_ROBOT_COMPONENT_H
+#ifndef CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+#define CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
 
 // LOCAL INCLUDES
+
 #include "devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/communication/Communication.h"
+
+#include "auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
 
+#include <opencv2/opencv.hpp>
+#include <QObject>
+#include <QTime>
 
-/*!@brief Abstract description of the class.
+/*!@brief An object of this class represents the model of a mobile robot's kinematics.
  *
- * More detailed description of the class.
+ * The class calculates position and orientation of the robot in a coordinate-system based on the robot's sensoric
+ * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
+ * implementation is handled in its subclasses.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+//!@todo why inheriting from Object here??
+class cedar::dev::robot::Odometry : public cedar::aux::Object
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,53 +67,100 @@ class cedar::dev::robot::Component : public virtual cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
 
+  /*!@brief The get-function of the robot's current position.
+   *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
+   */
+  cv::Mat getPosition() const;
+
+  /*!@brief The get-function of the robot's current orientation.
+   *@return The current orientation [in rad].
+   */
+  double getOrientation() const;
+
+  /*!@brief The set-function of the robot's position.
+   *@param xPosition Position of the robot on the x-axis to be set [in m].
+   *@param yPosition Position of the robot on the y-axis to be set [in m].
+   */
+  void setPosition(double xPosition, double yPosition);
+
+  /*!@brief The set-function of the robot's orientation.
+   *@param orientation Orientation of the robot [in rad].
+   */
+  void setOrientation(double orientation);
+
+  //!@brief Sets the Debug-flag
+  void setDebug(bool debug);
+
+  /*!@brief reset elapsed time.
+   */
+  void resetTime();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
+
 protected:
-  // none yet
+
+
+  /*!@brief Updates the current position.
+   *
+   * This function is called by timerEvent(). Implement it in the sublass
+   * so that it updates the robot's position.
+   */
+  virtual void update() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
+
 private:
-  // none yet
+
+  /*!@brief The timerEvent.
+   */
+  void timerEvent(QTimerEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
+
   // none yet (hopefully never!)
+
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
+  //!@brief The debug-flag.
+  bool mDebug;
 
 private:
+
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
-  // none yet
+
+  // none yet (hopefully never!)
+
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
-private:
+
   // none yet
 
-}; // class cedar::dev::robot::Component
+private:
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_H
+  // none yet
+
+}; // class cedar::dev::robot::MobileRobotModel
+
+#endif // CEDAR_DEV_ROBOT_MOBILE_ODOMETRY_H
+

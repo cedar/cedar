@@ -40,14 +40,9 @@
 
 // PROJECT INCLUDES
 
-#include "devices/robot/AmtecKinematicChain.h"
+#include "devices/amtec/KinematicChain.h"
 
 // SYSTEM INCLUDES
-
-
-using namespace std;
-using namespace cedar::dev::robot;
-
 
 //------------------------------------------------------------------------------
 // methods
@@ -55,19 +50,19 @@ using namespace cedar::dev::robot;
 
 int main(int /* argc */, char ** /* argv[] */) {
 
-  string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
+  std::string config_file("../../tests/interactive/devices/AmtecSpeedControl/cora_arm.conf");
 
   try
   {
-    KinematicChainPtr p_kinematic_chain(new AmtecKinematicChain(config_file));
+    cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::amtec::KinematicChain(config_file));
     ControlThread thread(p_kinematic_chain, config_file);
-    cout << "moving arm for 15s just by controling velocity..." << endl;
+    std::cout << "moving arm for 15s just by controling velocity..." << std::endl;
     thread.start();
     thread.wait(15000);
     thread.stop();
   }
-  catch(exception e)
+  catch(std::exception e)
   {
-    cout << "Exception: " << e.what() << endl;
+    std::cout << "Exception: " << e.what() << std::endl;
   }
 }

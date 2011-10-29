@@ -22,40 +22,40 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        KinematicChain.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Date:        2011 01 18
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_H
+#define CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_H
 
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_H
-#define CEDAR_DEV_ROBOT_COMPONENT_H
+// MAKE AMTEC OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_AMTEC
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
+#include "devices/amtec/namespace.h"
+#include "devices/robot/ReferenceGeometry.h"
+#include "devices/robot/KinematicChain.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
+#include "AmtecDeviceDriver/Device/Device.h"
+#include <QMutex>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief KinematicChain implementation for Amtec modules
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,12 +65,34 @@ class cedar::dev::robot::Component : public virtual cedar::aux::Base
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief constructor
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  //!@brief constructor
+  KinematicChain(const std::string& configFileName);
+
+  //!@brief Destructor
+  ~KinematicChain();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  /*!@brief returns the max. acceleration of a joint
+   *
+   * @param index
+   */
+  float getMaxAcceleration(unsigned int index);
+
+  /*!@brief sets the max. acceleration of a joint
+   *
+   * Unfortunately, the Amtec modules seem to ignore this value while in
+   * velocity mode.
+   *
+   * @param index
+   * @param maxAcc
+   */
+void setMaxAcceleration(unsigned int index, float maxAcc);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,7 +104,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  bool initDevice();
+  bool calibrateModule(unsigned int module);
+  double getJointAngle(unsigned int index);
+  double getJointVelocity(unsigned int index);
+  bool isCalibrated(unsigned int module);
+  void readParamsFromConfigFile();
+  void setJointAngle(unsigned int index, double value);
+  bool setJointVelocity(unsigned int index, double velocity);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -90,27 +119,25 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
-
-private:
   // none yet
+private:
+  CDevice *mpDevice;
+  std::string mInitString;
+  int mInit;
+  std::vector<int> mModules;
+  QMutex mCanBusMutex;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  // none yet (hopefully never!)
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
+  // none yet
 private:
   // none yet
 
-}; // class cedar::dev::robot::Component
+}; // class cedar::dev::amtec::KinematicChain
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_H
+#endif // CEDAR_USE_AMTEC
+#endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H

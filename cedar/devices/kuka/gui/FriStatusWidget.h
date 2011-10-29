@@ -22,55 +22,73 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.h
+    File:        FriStatusWidget.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.ruhr-uni-bochum.de
+    Date:        2010 11 23
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
+#define CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
 
-#ifndef CEDAR_DEV_ROBOT_COMPONENT_H
-#define CEDAR_DEV_ROBOT_COMPONENT_H
+// MAKE FRI OPTIONAL
+#include "devices/robot/CMakeDefines.h"
+#ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
+#include "namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/communication/Communication.h"
+#include "devices/kuka/KukaInterface.h"
+#ifdef DEBUG
+#include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
+#else
+#include "cedar/devices/kuka/gui/ui_FriStatusWidget.h"
+#endif
+#include "auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <string>
-#include <set>
+#include <Qt>
+#include <QObject>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Widget that displays informations about the status of the KUKA-FRI
  *
- * More detailed description of the class.
+ * This includes the status, the connection quality, the sample time and if the robot is powered
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
+                                                      private Ui_FriStatusWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+private:
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief The constructor.
+   *
+   * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
+   * @param parent parent widget
+   */
+  FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
+
+  //!@brief Destructor
+  ~FriStatusWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
+  /*!@brief refreshes the displayed data*/
+  void timerEvent(QTimerEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -82,7 +100,12 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*!@brief initializes the class
+   */
+  void init();
+  /*!@brief updates the displayed information
+   */
+  void updateInformation();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -90,27 +113,24 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  //! name of the category the component is in (in the configuration file)
-  std::string mCategoryName;
-  //! pointer to the robot the component belongs to
-  RobotPtr mpRobot;
-  //! pointer to the communication device
-  cedar::dev::com::Communication *mpeCommunication;
-
-private:
   // none yet
+private:
+  bool mIsInit; //!<true, if object has been initialized
+  cedar::dev::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  // none yet (hopefully never!)
 protected:
-  //! name of the parent component (if it exists)
-  std::string _mParentName;
+  // none yet
+
 private:
   // none yet
 
-}; // class cedar::dev::robot::Component
+}; // class cedar::dev::kuka::gui::FriStatusWidget
 
-#endif // CEDAR_DEV_ROBOT_COMPONENT_H
+#endif // CEDAR_USE_KUKA_FRI
+#endif // CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
+

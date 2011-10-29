@@ -22,31 +22,82 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Component.cpp
+    File:        EPuckControlWidget.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 08
+    Maintainer:  Andre Bartel
+    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Date:        2011 03 19
 
-    Description: Abstract component of a robot (e.g., a kinematic chain).
+    Description: Graphical User Interface for controlling the E-Puck.
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "devices/robot/Component.h"
-#include "devices/robot/Robot.h"
+
+#include "devices/kteam/gui/EPuckControlWidget.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+using namespace cedar::dev::kteam::gui;
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+EPuckControlWidget::EPuckControlWidget(cedar::dev::kteam::EPuckDrive *peDrive, QWidget *parent)
+:
+cedar::aux::gui::BaseWidget("EPuckControlWidget", parent)
+{
+  mpeDrive = peDrive;
+  setupUi(this);
+  spinBoxForwardVelocity->setValue(mpeDrive->getForwardVelocity()); //initialize forwardVelocity
+  spinBoxTurningRate->setValue(mpeDrive->getTurningRate()); //initialize turningRate
+  connect(pushButtonStart, SIGNAL(pressed()), this, SLOT(drive()));
+  connect(pushButtonStop, SIGNAL(pressed()), this, SLOT(stop()));
+  connect(pushButtonReset, SIGNAL(pressed()), this, SLOT(reset()));
+  startTimer(100); //timer for updating display
+}
+
+EPuckControlWidget::~EPuckControlWidget()
+{
+
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void EPuckControlWidget::drive()
+{
+  mpeDrive->setVelocity(spinBoxForwardVelocity->value(), spinBoxTurningRate->value());
+}
+
+void EPuckControlWidget::stop()
+{
+  mpeDrive->stop();
+}
+
+void EPuckControlWidget::reset()
+{
+  mpeDrive->reset();
+}
+
+void EPuckControlWidget::timerEvent(QTimerEvent * /* event */)
+{
+  int left_encoder;
+  int right_encoder;
+
+  //get new values
+  std::vector<double> wheel_speed = mpeDrive->getWheelSpeed();
+  mpeDrive->getEncoder(left_encoder, right_encoder);
+
+  //display new values
+  valueLeftWheelSpeed->display(wheel_speed[0]);
+  valueRightWheelSpeed->display(wheel_speed[1]);
+  valueLeftEncoder->display(left_encoder);
+  valueRightEncoder->display(right_encoder);
+}
