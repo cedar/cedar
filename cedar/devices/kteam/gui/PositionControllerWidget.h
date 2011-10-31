@@ -43,7 +43,7 @@
 
 #include "devices/kteam/PositionController.h"
 #include "devices/robot/Odometry.h"
-#include "cedar/devices/kteam/gui/ui_KTeamPositionControllerWidget.h"
+#include "cedar/devices/kteam/gui/ui_PositionControllerWidget.h"
 #include "devices/kteam/gui/namespace.h"
 #include "auxiliaries/gui/BaseWidget.h"
 
@@ -56,7 +56,7 @@
  * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
  */
 class cedar::dev::kteam::gui::PositionControllerWidget
-: public cedar::aux::gui::BaseWidget, private Ui_KTeamPositionControllerWidget
+: public cedar::aux::gui::BaseWidget, private Ui_PositionControllerWidget
 {
 
   //--------------------------------------------------------------------------------------------------------------------
