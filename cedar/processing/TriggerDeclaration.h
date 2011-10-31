@@ -52,6 +52,10 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief A TriggerDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
+ * create a trigger of this id. It is a concretization of DeclarationBase.
+ *
+ */
 class cedar::proc::TriggerDeclaration : public cedar::proc::DeclarationBase
                                             <
                                               cedar::proc::Trigger,
@@ -82,11 +86,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief sets the path to icon file
   void setIconPath(const std::string& path)
   {
     this->mIconPath = path;
   }
 
+  //!@brief returns the path to icon file
   const std::string& getIconPath() const
   {
     return this->mIconPath;
@@ -110,6 +116,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief path to icon file
   std::string mIconPath;
 };
 

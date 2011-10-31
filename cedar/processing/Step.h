@@ -61,9 +61,8 @@
 #include <boost/bind.hpp>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for computation steps in cedar's processing framework
  *
- * More detailed description of the class.
  */
 class cedar::proc::Step : public QThread, public cedar::aux::NamedConfigurable
 {
