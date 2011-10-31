@@ -52,55 +52,72 @@ class cedar::aux::UnhandledTypeException : public cedar::aux::exc::ExceptionBase
     UnhandledTypeException();
 }; // class cedar::aux::UnhandledTypeException
 
+/*!@brief Exception that occurs when a value is not handled (e.g. out of bounds).
+ */
 class cedar::aux::UnhandledValueException : public cedar::aux::exc::ExceptionBase
 {
   public:
     UnhandledValueException();
 }; // class cedar::aux::UnhandledValueException
 
-
+/*!@brief Exception that occurs when a type is not known.
+ */
 class cedar::aux::UnknownTypeException : public cedar::aux::exc::ExceptionBase
 {
   public:
     UnknownTypeException();
 }; // class cedar::aux::UnknownTypeException
 
+/*!@brief Exception that occurs when a name is not known.
+ */
 class cedar::aux::UnknownNameException : public cedar::aux::exc::ExceptionBase
 {
   public:
     UnknownNameException();
 }; // class cedar::aux::UnknownNameException
 
+/*!@brief Exception that occurs when a parameter is not found.
+ */
 class cedar::aux::ParameterNotFoundException : public cedar::aux::exc::ExceptionBase
 {
   public:
     ParameterNotFoundException();
 }; // class cedar::aux::ParameterNotFoundException
 
+/*!@brief Exception that occurs when a unique id appears twice.
+ */
 class cedar::aux::DuplicateIdException : public cedar::aux::exc::ExceptionBase
 {
   public:
     DuplicateIdException();
 }; // class cedar::aux::DuplicateIdException
 
+/*!@brief Exception that occurs when a unique name appears twice.
+ */
 class cedar::aux::DuplicateNameException : public cedar::aux::exc::ExceptionBase
 {
   public:
     DuplicateNameException();
 }; // class cedar::aux::DuplicateNameException
 
+/*!@brief Exception that occurs when a value leaves a certain range.
+ */
 class cedar::aux::RangeException : public cedar::aux::exc::ExceptionBase
 {
 public:
   RangeException();
 }; // class cedar::aux::RangeException
 
+/*!@brief Exception that occurs when no default case is present but was reached somehow.
+ */
 class cedar::aux::NoDefaultException : public cedar::aux::exc::ExceptionBase
 {
 public:
   NoDefaultException();
 }; // class cedar::aux::NoDefaultException
 
+/*!@brief Exception that occurs when a name is not valid (e.g. contains special characters).
+ */
 class cedar::aux::InvalidNameException : public cedar::aux::exc::ExceptionBase
 {
   public:

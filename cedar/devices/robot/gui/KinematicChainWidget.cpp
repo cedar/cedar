@@ -60,7 +60,13 @@ using namespace cedar::dev::robot;
 // constructors and destructor
 //----------------------------------------------------------------------------
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const KinematicChainPtr &kinematicChain, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
+                                                                    const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+                                                                    QWidget * parent,
+                                                                    Qt::WindowFlags f
+                                                                  )
+:
+QWidget(parent, f)
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
@@ -72,7 +78,12 @@ cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const Kinemat
 }
 
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
+                                                                    const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+                                                                    const std::string& configFileName,
+                                                                    QWidget *parent,
+                                                                    Qt::WindowFlags
+                                                                  )
 :
 QWidget(parent),
 ConfigurationInterface(configFileName)
@@ -103,7 +114,13 @@ ConfigurationInterface(configFileName)
 }
 
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
+                                                                    const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
+                                                                    QWidget * parent,
+                                                                    Qt::WindowFlags f
+                                                                  )
+:
+QWidget(parent, f)
 {
   for(unsigned int i = 1; i < kinematicChains.size(); ++i)
   {
@@ -126,7 +143,12 @@ cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const std::ve
 }
 
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(const std::vector<KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent, Qt::WindowFlags /* f */)
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
+                                                                    const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
+                                                                    const std::string& configFileName,
+                                                                    QWidget *parent,
+                                                                    Qt::WindowFlags
+                                                                  )
 :
 QWidget(parent),
 ConfigurationInterface(configFileName)

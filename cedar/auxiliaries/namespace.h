@@ -72,6 +72,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(Object);
     CEDAR_DECLARE_AUX_CLASS(System);
 
+    //!@brief A type for identifying enum entries. Corresponds to the C++ enum int values for each enum entry.
     typedef unsigned int EnumId;
     CEDAR_DECLARE_AUX_CLASS(Enum);
     CEDAR_DECLARE_AUX_CLASS(EnumBase);
@@ -100,20 +101,28 @@ namespace cedar
     template <typename T> class NumericParameter;
     template <typename T> class VectorParameter;
     template <typename T> class NumericVectorParameter;
+    //!@ A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
+    //!@ A concretization of NumericParameter for unsigned int values.
     typedef NumericParameter<unsigned int> UIntParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
+    //!@ A concretization of ParameterTemplate for strings.
     typedef ParameterTemplate<std::string> StringParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
+    //!@ A concretization of ParameterTemplate for booleans.
     typedef ParameterTemplate<bool> BoolParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
+    //!@ A concretization of VectorParameter for booleans.
     typedef VectorParameter<bool> BoolVectorParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
+    //!@ A concretization of VectorParameter for strings.
     typedef VectorParameter<std::string> StringVectorParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
+    //!@ A concretization of NumericVectorParameter for double values.
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
+    //!@ A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
     class DirectoryParameter;
@@ -143,15 +152,19 @@ namespace cedar
 
     template <typename T> class DataTemplate;
 
+    //!@ A concretization of DataTemplate for simple matrices (cv::Mat).
     typedef DataTemplate<cv::Mat> MatData;
     CEDAR_GENERATE_POINTER_TYPES(MatData);
 
+    //!@ A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
     CEDAR_GENERATE_POINTER_TYPES(CvPointData);
 
+    //!@ A concretization of DataTemplate for double values.
     typedef DataTemplate<double> DoubleData;
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
 
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(ImageData);
 
     /* exceptions */
@@ -166,6 +179,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
+    //!@endcond
   }
 }
 

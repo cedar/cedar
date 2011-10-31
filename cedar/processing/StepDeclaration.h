@@ -51,6 +51,10 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
+ * create a step of this id. It is a concretization of DeclarationBase.
+ *
+ */
 class cedar::proc::StepDeclaration : public cedar::proc::DeclarationBase
                                             <
                                               cedar::proc::Step,
