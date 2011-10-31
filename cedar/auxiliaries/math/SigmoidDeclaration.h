@@ -50,6 +50,10 @@
 
 // SYSTEM INCLUDES
 
+/*!@brief A SigmoidDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
+ * create a sigmoid of this id. It is a concretization of DeclarationBase.
+ *
+ */
 class cedar::aux::math::SigmoidDeclaration
 {
 public:

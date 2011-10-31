@@ -51,9 +51,8 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Derived from Arguments, StepTime contains the time that has passed since the last call of a Step.
  *
- * More detailed description of the class.
  */
 class cedar::proc::StepTime : public cedar::proc::Arguments
 {
@@ -75,6 +74,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief returns the last step duration
   const cedar::unit::Duration& getStepTime() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,6 +97,7 @@ public:
 protected:
   // none yet
 private:
+  //!@brief last step duration
   cedar::unit::Duration mStepTime;
 
   //--------------------------------------------------------------------------------------------------------------------

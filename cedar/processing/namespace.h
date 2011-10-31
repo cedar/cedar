@@ -56,6 +56,7 @@ namespace cedar
    */
   namespace proc
   {
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_PROC_CLASS(Arguments);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
@@ -68,33 +69,37 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(StepTime);
     CEDAR_DECLARE_PROC_CLASS(Trigger);
     CEDAR_DECLARE_PROC_CLASS(Group);
-    
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
-    class Connection;
-    typedef boost::shared_ptr<Connection> ConnectionPtr;
+    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
+    CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
+    CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
+    CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
+    CEDAR_DECLARE_PROC_CLASS(Connection);
+    //!@endcond
 
     template <class BaseClass, class FactoryType> class DeclarationBase;
     
-    CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
     template <class DerivedClass> class StepDeclarationT;
 
-    CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     template <class DerivedClass> class TriggerDeclarationT;
 
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger, cedar::proc::TriggerPtr> > TriggerFactoryPtr;
 
-    CEDAR_DECLARE_PROC_CLASS(PluginProxy);
-    CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
 
     template <class T, class T_Declaration> class Registry;
     typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES(StepRegistry);
+    //!@endcond
     typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES(TriggerRegistry);
+    //!@endcond
 
     /* Exceptions */
+    //!@cond SKIPPED_DOCUMENTATION
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
@@ -107,6 +112,7 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
     class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
+    //!@endcond
   }
 }
 

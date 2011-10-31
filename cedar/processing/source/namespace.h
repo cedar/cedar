@@ -57,8 +57,10 @@ namespace cedar
   {
     namespace source
     {
+      //!@cond SKIPPED_DOCUMENTATION
       class GaussInput;
       typedef boost::shared_ptr<GaussInput> GaussInputPtr;
+      //!@endcond
     }
   }
 }

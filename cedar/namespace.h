@@ -46,7 +46,7 @@
 // SYSTEM INCLUDES
 
 
-/*@brief Namespace for cedar (top level). */
+/*!@brief Namespace for cedar (top level). */
 namespace cedar
 {
 

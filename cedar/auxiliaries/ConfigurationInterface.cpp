@@ -38,7 +38,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/ConfigurationInterface.h"
 #include "auxiliaries/UserData.h"
-
+#include "auxiliaries/exceptions.h"
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
@@ -440,7 +440,8 @@ int ConfigurationInterface::readConfigurationFile()
   try
   {
     mConfig.readFile(mConfigFileName.c_str());
-  } catch (const FileIOException &fioex) // general IO error, file not readable
+  }
+  catch(const FileIOException &fioex) // general IO error, file not readable
   {
     std::cerr << "> error in " << mConfigFileName << ": I/O error while reading file." << std::endl;
     for (ParameterInfoVector::iterator iter = this->mParameterInfos.begin();
@@ -452,7 +453,8 @@ int ConfigurationInterface::readConfigurationFile()
     }
     mConfigurationErrors.push_back("error in " + mConfigFileName + ": I/O error while reading file.");
     return CONFIG_FILE_ERROR;
-  } catch (const ParseException &pex) // parser error - some errors can be fixed
+  }
+  catch(const ParseException &pex) // parser error - some errors can be fixed
   {
     std::cerr << "> error in " << mConfigFileName << ": Parse error at "
         << pex.getFile() << ":" << pex.getLine() << " - " << pex.getError()
@@ -506,10 +508,12 @@ int ConfigurationInterface::readConfiguration()
       try
       {
         *(static_cast<double*> (iter->mpMember)) = mConfig.lookup(iter->mName);
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
-      } catch (const SettingTypeException &nfex)
+      }
+      catch(const SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
@@ -520,10 +524,12 @@ int ConfigurationInterface::readConfiguration()
       try
       {
         *(static_cast<bool*> (iter->mpMember)) = mConfig.lookup(iter->mName);
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
-      } catch (const SettingTypeException &nfex)
+      }
+      catch(const SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
@@ -541,10 +547,12 @@ int ConfigurationInterface::readConfiguration()
         {
           *(static_cast<int*> (iter->mpMember)) = mConfig.lookup(iter->mName);
         }
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
-      } catch (const SettingTypeException &nfex)
+      }
+      catch(const SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
@@ -556,10 +564,12 @@ int ConfigurationInterface::readConfiguration()
       {
         string temp = mConfig.lookup(iter->mName);
         *(static_cast<string*> (iter->mpMember)) = temp;
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
-      } catch (const SettingTypeException &nfex)
+      }
+      catch(const SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
@@ -647,7 +657,8 @@ int ConfigurationInterface::writeConfiguration()
       try
       {
         mConfig.lookup(iter->mName) = *(static_cast<double*> (iter->mpMember));
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         mConfig.lookup(iter->mName) = *(static_cast<double*> (iter->mpMember));
@@ -667,7 +678,8 @@ int ConfigurationInterface::writeConfiguration()
         {
           mConfig.lookup(iter->mName) = *(static_cast<int*> (iter->mpMember));
         }
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         if (iter->mIsUnsigned)
@@ -687,7 +699,8 @@ int ConfigurationInterface::writeConfiguration()
       try
       {
         mConfig.lookup(iter->mName) = *(static_cast<bool*> (iter->mpMember));
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         mConfig.lookup(iter->mName) = *(static_cast<bool*> (iter->mpMember));
@@ -699,7 +712,8 @@ int ConfigurationInterface::writeConfiguration()
       try
       {
         mConfig.lookup(iter->mName) = *(static_cast<string*> (iter->mpMember));
-      } catch (const SettingNotFoundException &nfex)
+      }
+      catch(const SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         mConfig.lookup(iter->mName) = *(static_cast<string*> (iter->mpMember));
@@ -760,7 +774,8 @@ int ConfigurationInterface::writeConfiguration()
 #ifdef DEBUG
     cout << "New configuration successfully written to: " << (mConfigFileName.c_str()) << endl;
 #endif
-  } catch (const FileIOException &fioex)
+  }
+  catch(const FileIOException &fioex)
   {
     // check if path exists - if not, try to fix it
     try
@@ -782,7 +797,8 @@ int ConfigurationInterface::writeConfiguration()
         return CONFIG_SUCCESS;
       }
       // else: path already exists, move on to next error (file permissions)
-    } catch (const FileIOException &directoryException)
+    }
+    catch(const FileIOException &directoryException)
     {
       // we tried to create a directory to store the file, but it failed
       cerr << "I/O error while writing file: " << (mConfigFileName.c_str())
@@ -1030,7 +1046,7 @@ void ConfigurationInterface::writeArray(
     }
   }
 
-  catch (const libconfig::SettingNotFoundException &nfex)
+  catch(const libconfig::SettingNotFoundException &nfex)
   {
     createNewGroupEntry(name, libconfig::Setting::TypeArray, mConfig.getRoot());
     libconfig::Setting &array = mConfig.lookup(name);
@@ -1064,7 +1080,7 @@ void ConfigurationInterface::writeArrayUInt(
     }
   }
 
-  catch (const libconfig::SettingNotFoundException &nfex)
+  catch(const libconfig::SettingNotFoundException &nfex)
   {
     createNewGroupEntry(name, libconfig::Setting::TypeArray, mConfig.getRoot());
     libconfig::Setting &array = mConfig.lookup(name);
@@ -1117,7 +1133,7 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
   {
     if (mConfig.lookup(info.mName).getType() != Setting::TypeArray)
     {
-      throw 20;
+      CEDAR_THROW(cedar::aux::TypeMismatchException, "Expected type does not match real type.");
     }
     std::vector<T>* p_vector = static_cast<std::vector<T>*> (info.mpMember);
     p_vector->clear();
@@ -1126,14 +1142,16 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
       Setting &setting = mConfig.lookup(info.mName)[j];
       if (setting.getType() != info.mIsVectorOfType)
       {
-        throw 20;
+        CEDAR_THROW(cedar::aux::TypeMismatchException, "Expected type does not match real type.");
       }
       p_vector->push_back(mConfig.lookup(info.mName)[j]);
     }
-  } catch (const SettingNotFoundException &nfex)
+  }
+  catch(const SettingNotFoundException &nfex)
   {
     result = handleSettingNotFoundException(info);
-  } catch (const SettingTypeException &nfex)
+  }
+  catch(const SettingTypeException &nfex)
   {
     cerr << "> error in " << mConfigFileName << ": Wrong type for '"
         << info.mName << "' setting in configuration file." << endl;
@@ -1147,7 +1165,8 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
     }
     setParameterToDefault(info);
     result = CONFIG_TYPE_ERROR;
-  } catch (int e)
+  }
+  catch(const cedar::aux::TypeMismatchException& e)
   {
     cerr << "> error in " << mConfigFileName << ": array '" << info.mName << "' is corrupt" << std::endl;
     removeItem(info.mName);

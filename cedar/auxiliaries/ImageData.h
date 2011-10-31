@@ -48,7 +48,7 @@
 
 /*!@brief This is a data class representing images.
  */
-class cedar::aux::ImageData : public cedar::aux::MatData //!@todo Should inherit MatData
+class cedar::aux::ImageData : public cedar::aux::MatData
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

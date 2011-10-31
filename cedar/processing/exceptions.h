@@ -53,6 +53,8 @@ class cedar::proc::InvalidNameException : public cedar::aux::exc::ExceptionBase
     InvalidNameException();
 }; // class cedar::proc::InvalidNameException
 
+/*!@brief An exception that occurs when an object is not found in a Registry.
+ */
 class cedar::proc::InvalidObjectException : public cedar::aux::exc::ExceptionBase
 {
   public:
@@ -111,18 +113,26 @@ class cedar::proc::MissingDeclarationException: public cedar::aux::exc::Exceptio
   MissingDeclarationException();
 }; // class cedar::proc::MissingDeclarationException
 
+/*!@brief An exception that is thrown, when a plugin file cannot be found.
+ */
 class cedar::proc::PluginException: public cedar::aux::exc::ExceptionBase
 {
 public:
   PluginException();
 }; // class cedar::proc::PluginException
 
+/*!@brief An exception that is thrown, when FrameworkSettings encounters a parsing error during loading or saving
+ * of settings.
+ */
 class cedar::proc::ParseException: public cedar::aux::exc::ExceptionBase
 {
 public:
   ParseException();
 }; // class cedar::proc::ParseException
 
+/*!@brief An exception that is thrown by the Manager, if a connection that is marked for deletion, cannot be found in
+ * the list of connections.
+ */
 class cedar::proc::ConnectionNotFoundException : public cedar::aux::exc::ExceptionBase
 {
 public:
@@ -132,6 +142,9 @@ public:
   }
 }; // class cedar::proc::ConnectionNotFoundException
 
+/*!@brief An exception that is thrown by Connection, if a weak-pointer check fails. This means the connected item does
+ * not longer exist.
+ */
 class cedar::proc::ConnectionMemberDeletedException : public cedar::aux::exc::ExceptionBase
 {
 public:
