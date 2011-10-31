@@ -76,12 +76,12 @@ int main(int argc, char **argv)
   //open the channel to the robot
   cedar::dev::com::SerialCommunication *pCommunication;
   pCommunication
-  = new cedar::dev::com::SerialCommunication("tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
+  = new cedar::dev::com::SerialCommunication("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
 
   //initialize the e-puck
   cedar::dev::kteam::EPuckDrive *pDrive;
   pDrive = new cedar::dev::kteam::EPuckDrive(pCommunication,
-                                                     "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+                                                     "../../tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
   //initialize the model of the e-puck
   cedar::dev::kteam::DriveModelPtr p_kteam_model(new cedar::dev::kteam::DriveModel(pDrive));
   p_kteam_model->setName("E-Puck");
