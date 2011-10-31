@@ -52,7 +52,6 @@
 #include <QtGui/QWidget>
 
 //!@brief A simple widget to access all the joints via GUI
-//!@todo Move this into the right namespace.
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
 //class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainWidget
 class cedar::dev::robot::gui::KinematicChainWidget

@@ -179,6 +179,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
     CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
+    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
     //!@endcond
   }
 }
