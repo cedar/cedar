@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 //!@todo built-in check, if addParameter adds a parameter that is already stored
-//!@todo remove the "throw 20" lines, replace with real exception or something from CONFIG_READ_WRITE_STATE
 
 #ifndef CEDAR_AUX_CONFIGURATION_INTERFACE_H
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H

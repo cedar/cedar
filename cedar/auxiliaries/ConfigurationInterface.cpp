@@ -38,7 +38,7 @@
 // LOCAL INCLUDES
 #include "auxiliaries/ConfigurationInterface.h"
 #include "auxiliaries/UserData.h"
-
+#include "auxiliaries/exceptions.h"
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
@@ -1117,7 +1117,7 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
   {
     if (mConfig.lookup(info.mName).getType() != Setting::TypeArray)
     {
-      throw 20;
+      CEDAR_THROW(cedar::aux::TypeMismatchException, "Expected type does not match real type.");
     }
     std::vector<T>* p_vector = static_cast<std::vector<T>*> (info.mpMember);
     p_vector->clear();
@@ -1126,7 +1126,7 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
       Setting &setting = mConfig.lookup(info.mName)[j];
       if (setting.getType() != info.mIsVectorOfType)
       {
-        throw 20;
+        CEDAR_THROW(cedar::aux::TypeMismatchException, "Expected type does not match real type.");
       }
       p_vector->push_back(mConfig.lookup(info.mName)[j]);
     }
