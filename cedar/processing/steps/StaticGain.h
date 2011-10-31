@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Gain.h
+    File:        StaticGain.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -39,11 +39,11 @@
 
 // LOCAL INCLUDES
 #include "processing/steps/namespace.h"
+
+// PROJECT INCLUDES
 #include "processing/Step.h"
 #include "auxiliaries/NumericParameter.h"
 #include "auxiliaries/DataTemplate.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -69,12 +69,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief refreshes the internal matrix containing the Gaussian input
+  //!@brief refreshes the internal matrix containing the input multiplied with the gain factor
   void compute(const cedar::proc::Arguments& arguments);
 
 
 public slots:
-  //!@brief a slot that is triggered if any of the Gauss function parameters are changed
+  //!@brief a slot that is triggered if the gain factor is changed
   void gainChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief the amplitude of the Gauss function
+  //!@brief the factor by which the input is multiplied
   cedar::aux::DoubleParameterPtr _mGainFactor;
 
 private:
