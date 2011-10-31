@@ -89,3 +89,8 @@ cedar::aux::InvalidNameException::InvalidNameException()
 {
   this->mType = "InvalidNameException";
 }
+
+cedar::aux::TypeMismatchException::TypeMismatchException()
+{
+  this->mType = "TypeMismatchException";
+}

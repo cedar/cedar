@@ -44,7 +44,7 @@
 #include "auxiliaries/namespace.h"
 #include "auxiliaries/exceptions/ExceptionBase.h"
 
-/*!@brief Exception that occurs when a type is not handled.
+/*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */
 class cedar::aux::UnhandledTypeException : public cedar::aux::exc::ExceptionBase
 {
@@ -122,6 +122,14 @@ class cedar::aux::InvalidNameException : public cedar::aux::exc::ExceptionBase
 {
   public:
     InvalidNameException();
+};
+
+/*!@brief Exception that occurs when an given type does not match an expected type.
+ */
+class cedar::aux::TypeMismatchException : public cedar::aux::exc::ExceptionBase
+{
+  public:
+    TypeMismatchException();
 };
 
 #endif // CEDAR_AUX_EXCEPTIONS_H
