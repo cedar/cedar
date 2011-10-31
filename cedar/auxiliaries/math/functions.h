@@ -47,19 +47,17 @@
 #include <math.h>
 #include <stdint.h>
 
-/*
- *  todo
- */
-
 namespace cedar
 {
   namespace aux
   {
     namespace math
     {
+    /*!@brief A simple one-dimensional Gauss function.
+     */
       inline double gauss(double x, double sigma)
       {
-        return exp(-pow(x, 2) / (2 * pow(sigma, 2)));
+        return exp(-pow(x, 2.0) / (2.0 * pow(sigma, 2.0)));
       }
 
       /*!@brief Rounds a number to the closest integer.
