@@ -36,11 +36,11 @@
 
 // LOCAL INCLUDES
 #include "processing/steps/StaticGain.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/exceptions.h"
-#include "processing/DataSlot.h"
 
 // PROJECT INCLUDES
+#include "processing/DataSlot.h"
+#include "auxiliaries/assert.h"
+#include "auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
