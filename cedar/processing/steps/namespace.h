@@ -54,7 +54,9 @@ namespace cedar
     /*!@brief Namespace for processing steps. */
     namespace steps
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
+      //!@endcond
     }
   }
 }

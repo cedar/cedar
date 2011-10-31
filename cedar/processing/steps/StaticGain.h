@@ -81,8 +81,10 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief handle changes of input
   void inputConnectionChanged(const std::string& inputName);
 
+  //!@brief checks the input validity of a connected input
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                   (
                                     cedar::proc::ConstDataSlotPtr slot,
