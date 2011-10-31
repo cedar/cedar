@@ -50,7 +50,7 @@ cedar::dev::kteam::gui::PositionControllerWidget::PositionControllerWidget(cedar
                                                                            cedar::dev::robot::Odometry *peModel,
                                                                            QWidget *parent)
 :
-cedar::aux::gui::BaseWidget("KTeamPositionControllerWidget", parent)
+cedar::aux::gui::BaseWidget("PositionControllerWidget", parent)
 {
   mpeController = peController;
   mpeModel = peModel;
