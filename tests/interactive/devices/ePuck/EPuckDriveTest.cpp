@@ -57,12 +57,12 @@ int main(int argc, char **argv)
   //open the channel to the e-puck
   cedar::dev::com::SerialCommunication *p_communication;
   p_communication
-  = new cedar::dev::com::SerialCommunication("tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
+  = new cedar::dev::com::SerialCommunication("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
 
   //initialize e-puck-drive
   cedar::dev::kteam::EPuckDrive *p_drive;
   p_drive
-  = new cedar::dev::kteam::EPuckDrive(p_communication, "tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
+  = new cedar::dev::kteam::EPuckDrive(p_communication, "../../tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
 
   //open the control-GUI
   cedar::dev::kteam::gui::EPuckControlWidget *p_epuck_control;
