@@ -67,7 +67,6 @@ mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 
 mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
 mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
-mGlobalInhibitionData(new cedar::aux::DoubleData(0.0)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
 _mNumKernels(new cedar::aux::UIntParameter(this, "number of kernels", 1, 1, 20))
@@ -81,9 +80,6 @@ _mNumKernels(new cedar::aux::UIntParameter(this, "number of kernels", 1, 1, 20))
   this->setBuffer("activation", mActivation);
   this->declareBuffer("lateralInteraction");
   this->setBuffer("lateralInteraction", mLateralInteraction);
-
-  this->declareBuffer("globalInhibitionValue");
-  this->setBuffer("globalInhibitionValue", mGlobalInhibitionData);
 
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
@@ -156,7 +152,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
   return this->cedar::proc::Step::determineInputValidity(slot, data);
 }
 
-void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
+void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
@@ -164,7 +160,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
-  double& global_inhibition_value = mGlobalInhibitionData->getData();
 
   sigmoid_u = mSigmoid->compute<float>(u);
   lateral_interaction = cv::Mat::zeros(u.size(),u.type());
@@ -186,8 +181,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);
 
-  global_inhibition_value = global_inhibition * cv::sum(sigmoid_u)[0];
-  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition_value;
+  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0];;
   /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
    *       it when the connections change.
    */

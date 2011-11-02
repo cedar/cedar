@@ -93,9 +93,8 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@todo remove, for debugging only.
+  //!@brief For debugging only.
   static QReadWriteLock mCOutLock;
-  // none yet (hopefully never!)
 protected:
   // none yet
 

@@ -42,7 +42,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
-#include "cedar/units/DurationUnit.h"
+#include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopMode.h"
 #include "cedar/auxiliaries/System.h"

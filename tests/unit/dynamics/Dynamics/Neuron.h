@@ -76,7 +76,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Duration& time);
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
