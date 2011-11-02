@@ -84,7 +84,16 @@ namespace cedar
       {
         return std::floor(val + static_cast<T>(0.5));
       }
-    };
-  };
-};
+
+      inline unsigned int getDimensionalityOf(cv::Mat matrix)
+      {
+        if (matrix.rows == 1 || matrix.cols == 1)
+        {
+          return 1;
+        }
+        return matrix.dims;
+      }
+    }
+  }
+}
 #endif  // CEDAR_AUX_MATH_TOOLS_H
