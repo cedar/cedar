@@ -65,7 +65,18 @@ mTargetName(targetName)
 #ifdef DEBUG
   std::cout << "> allocated data (Connection, " << this << ")" << std::endl;
 #endif
-  cedar::proc::Step::connect(source, sourceName, target, targetName);
+
+  target->setInput(targetName, source->getOutput(sourceName));
+  /*
+   * if the target is set to be auto-connected to triggers, do so. It makes sense to check this only for the target;
+   * the source is not relevant, because the target may need to be triggered by the source, even if the source may not
+   * want to be triggered. E.g., a dynamical system (not auto-connected) may trigger further processing during each
+   * iteration.
+   */
+  if (target->autoConnectTriggers())
+  {
+    source->getFinishedTrigger()->addListener(target);
+  }
 }
 
 cedar::proc::Connection::Connection(
@@ -83,7 +94,6 @@ mTarget(target)
   {
     source->addListener(target);
   }
-//  cedar::proc::Step::connect(source, sourceName, target, targetName);
 }
 
 cedar::proc::Connection::Connection(
