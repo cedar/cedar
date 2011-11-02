@@ -38,8 +38,8 @@
 #define CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 

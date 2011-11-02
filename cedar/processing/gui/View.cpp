@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/View.h"
+#include "cedar/processing/gui/View.h"
 
 // PROJECT INCLUDES
 

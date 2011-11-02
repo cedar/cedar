@@ -38,9 +38,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/ReferenceGeometry.h"
-#include "auxiliaries/LogFile.h"
-#include "auxiliaries/math/tools.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <string>

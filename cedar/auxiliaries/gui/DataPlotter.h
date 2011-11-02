@@ -42,9 +42,9 @@
 #define CEDAR_PROC_GUI_DATA_PLOTTER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/TypeBasedFactory.h"
-#include "auxiliaries/Data.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 

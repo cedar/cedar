@@ -41,9 +41,9 @@
 #define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/math/sigmoids.h"
-#include "auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
 
 // PROJECT INCLUDES
 

@@ -36,8 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/kuka/gui/FriStatusWidget.h"
-#include "devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/kuka/gui/FriStatusWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
 
 // SYSTEM INCLUDES
 #include <vector>

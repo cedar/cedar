@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gl/Scene.h"
 
 // PROJECT INCLUDES
 

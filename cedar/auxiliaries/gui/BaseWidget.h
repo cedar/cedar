@@ -39,7 +39,7 @@
 #define CEDAR_AUX_GUI_BASE_WIDGET_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // PROJECT INCLUDES
 

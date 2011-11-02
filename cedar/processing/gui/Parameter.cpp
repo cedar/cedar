@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/Parameter.h"
-#include "auxiliaries/Parameter.h"
+#include "cedar/processing/gui/Parameter.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 

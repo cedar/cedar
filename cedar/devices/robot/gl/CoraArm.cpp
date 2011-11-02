@@ -39,7 +39,7 @@
 #include "CoraArm.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
 
 // SYSTEM INCLUDES
 

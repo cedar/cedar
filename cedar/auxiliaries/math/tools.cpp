@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // PROJECT INCLUDES
 

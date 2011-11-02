@@ -42,9 +42,9 @@
 #define CEDAR_PROC_STEP_ITEM_H
 
 // LOCAL INCLUDES
-#include "processing/Step.h"
-#include "processing/gui/namespace.h"
-#include "processing/gui/GraphicsBase.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 

@@ -41,9 +41,9 @@
 #define CEDAR_AUX_MATH_SIGMOID_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 

@@ -39,21 +39,21 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/NetworkFile.h"
-#include "processing/gui/Connection.h"
-#include "processing/gui/StepItem.h"
-#include "processing/gui/TriggerItem.h"
-#include "processing/gui/GroupItem.h"
-#include "processing/gui/DataSlotItem.h"
-#include "processing/gui/exceptions.h"
-#include "processing/Step.h"
-#include "processing/Group.h"
-#include "processing/DataSlot.h"
-#include "processing/Connection.h"
-#include "processing/Manager.h"
-#include "auxiliaries/Data.h"
-#include "processing/exceptions.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/NetworkFile.h"
+#include "cedar/processing/gui/Connection.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/GroupItem.h"
+#include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Connection.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

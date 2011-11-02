@@ -35,10 +35,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/PluginManagerDialog.h"
-#include "processing/gui/Settings.h"
-#include "processing/Manager.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/PluginManagerDialog.h"
+#include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

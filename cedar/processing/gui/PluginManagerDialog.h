@@ -44,8 +44,8 @@
   #include "cedar/processing/gui/ui_PluginManagerDialog.h"
 #endif
 
-#include "processing/gui/namespace.h"
-#include "processing/PluginProxy.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/PluginProxy.h"
 
 // PROJECT INCLUDES
 

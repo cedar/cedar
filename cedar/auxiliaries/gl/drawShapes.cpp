@@ -35,11 +35,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/gl.h"
-#include "auxiliaries/gl/glu.h"
-#include "auxiliaries/gl/drawShapes.h"
-#include "auxiliaries/math/constants.h"
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/glu.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 

@@ -41,7 +41,7 @@
 #include "unit/auxiliaries/ConfigurationInterface/TestClass.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

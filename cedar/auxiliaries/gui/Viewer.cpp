@@ -36,10 +36,10 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/namespace.h"
 
 // SYSTEM INCLUDES
 

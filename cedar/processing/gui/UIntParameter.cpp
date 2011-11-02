@@ -39,9 +39,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/UIntParameter.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/namespace.h"
+#include "cedar/processing/gui/UIntParameter.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 

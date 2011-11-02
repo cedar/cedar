@@ -38,8 +38,8 @@
 
 // PROJECT INCLUDES
 
-#include "devices/robot/gui/KinematicChainWidget.h"
-#include "devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
 
 // SYSTEM INCLUDES
 

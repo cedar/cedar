@@ -41,10 +41,10 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/SceneWidget.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Object.h"
+#include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
 

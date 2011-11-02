@@ -42,8 +42,8 @@
 #define CEDAR_PROC_GUI_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "auxiliaries/namespace.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 

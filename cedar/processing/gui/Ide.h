@@ -47,7 +47,7 @@
 #else
   #include "cedar/processing/gui/ui_Ide.h"
 #endif
-#include "processing/gui/namespace.h"
+#include "cedar/processing/gui/namespace.h"
 
 // PROJECT INCLUDES
 

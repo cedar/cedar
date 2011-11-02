@@ -37,10 +37,10 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/math/coordinateTransformations.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/math/constants.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/math/coordinateTransformations.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 

@@ -38,8 +38,8 @@
 
 // PROJECT INCLUDES
 
-#include "devices/communication/SerialCommunication.h"
-#include "devices/communication/gui/CommunicationWidget.h"
+#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/communication/gui/CommunicationWidget.h"
 
 // SYSTEM INCLUDES
 

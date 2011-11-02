@@ -41,8 +41,8 @@
 #include "unit/auxiliaries/ConfigurationInterface/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/ConfigurationInterface.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

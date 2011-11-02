@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/coordinateTransformations.h"
-#include "auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/math/coordinateTransformations.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // PROJECT INCLUDES
 

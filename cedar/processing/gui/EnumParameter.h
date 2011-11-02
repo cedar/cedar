@@ -38,8 +38,8 @@
 #define CEDAR_PROC_GUI_ENUM_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/Parameter.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/Parameter.h"
 
 // PROJECT INCLUDES
 

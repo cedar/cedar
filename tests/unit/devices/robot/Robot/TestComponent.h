@@ -42,8 +42,8 @@
 #include "unit/devices/robot/Robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "devices/robot/Robot.h"
-#include "devices/robot/Component.h"
+#include "cedar/devices/robot/Robot.h"
+#include "cedar/devices/robot/Component.h"
 
 // SYSTEM INCLUDES
 #include <string>

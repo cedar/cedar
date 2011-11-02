@@ -38,13 +38,13 @@
 
 // PROJECT INCLUDES
 
-#include "devices/kteam/EPuckDrive.h"
-#include "devices/kteam/DriveModel.h"
-#include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gui/SceneWidget.h"
-#include "auxiliaries/gui/Viewer.h"
-#include "auxiliaries/gl/Cylinder.h"
-#include "devices/kteam/gui/EPuckControlWidget.h"
+#include "cedar/devices/kteam/EPuckDrive.h"
+#include "cedar/devices/kteam/DriveModel.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/devices/kteam/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES
 
