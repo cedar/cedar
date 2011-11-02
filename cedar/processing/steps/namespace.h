@@ -56,6 +56,7 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
+      CEDAR_DECLARE_PROC_CLASS(Resize);
       //!@endcond
     }
   }
