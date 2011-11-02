@@ -368,7 +368,7 @@ void cedar::proc::Step::getDataLocks(std::set<std::pair<QReadWriteLock*, DataRol
 }
 
 /*!
- * @remkars The locks will be inserted into the set, the set is not cleared beforehand.
+ * @remarks The locks will be inserted into the set, the set is not cleared beforehand.
  */
 void cedar::proc::Step::getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
 {
@@ -772,10 +772,6 @@ void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, 
   this->checkMandatoryConnections();
 }
 
-/*!
- * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the step
- *                  unless the pointer to this slot (and all other mandatory slots) are non-zero.
- */
 void cedar::proc::Step::declareInput(const std::string& name, bool mandatory)
 {
   this->declareData(DataRole::INPUT, name, mandatory);
