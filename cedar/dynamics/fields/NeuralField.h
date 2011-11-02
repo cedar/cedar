@@ -130,8 +130,6 @@ protected:
   cedar::aux::math::SigmoidPtr mSigmoid;
   //!@brief the lateral interaction kernel, strictly excitatory at the moment
   cedar::aux::kernel::GaussPtr mKernel;
-  //!@brief not documented
-  cedar::aux::DoubleDataPtr mGlobalInhibitionData; //!@todo why do we need this? explain this please
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension
