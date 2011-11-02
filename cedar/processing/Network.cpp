@@ -414,8 +414,10 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
   std::string source_step, source_data;
   std::string target_step, target_data;
 
-  cedar::proc::Step::parseDataName(source, source_step, source_data);
-  cedar::proc::Step::parseDataName(target, target_step, target_data);
+  // We don't need to parse the role here because only outputs can be connected to inputs, thus it is clear which is
+  // which.
+  cedar::proc::Step::parseDataNameNoRole(source, source_step, source_data);
+  cedar::proc::Step::parseDataNameNoRole(target, target_step, target_data);
 
   cedar::proc::Manager::getInstance().connect(
                                                cedar::proc::Manager::getInstance().steps().get(source_step),
