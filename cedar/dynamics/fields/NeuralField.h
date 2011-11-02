@@ -98,7 +98,7 @@ protected:
    * \dot{u}(\boldmath{x},t) = \frac{\delta t}{\tau} (-u + h + \int\dots\int w(\boldmath{x}' - \boldmath{x}) \sigma(u\boldmath{x}) d\boldmath{x} + s(\boldmath{x}))
    * \f]
    */
-  void eulerStep(const cedar::unit::Duration& time);
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -130,8 +130,6 @@ protected:
   cedar::aux::math::SigmoidPtr mSigmoid;
   //!@brief the lateral interaction kernel, strictly excitatory at the moment
   std::vector<cedar::aux::kernel::GaussPtr> mKernels;
-  //!@brief not documented
-  cedar::aux::DoubleDataPtr mGlobalInhibitionData; //!@todo why do we need this? explain this please
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension

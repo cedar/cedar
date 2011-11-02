@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DurationUnit.h
+    File:        TimeUnit.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,12 +38,12 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_DURATION_UNIT_H
-#define CEDAR_UNITS_DURATION_UNIT_H
+#ifndef CEDAR_UNITS_TIME_UNIT_H
+#define CEDAR_UNITS_TIME_UNIT_H
 
 // LOCAL INCLUDES
 #include "cedar/units/namespace.h"
-#include "cedar/units/Duration.h"
+#include "cedar/units/Time.h"
 
 // PROJECT INCLUDES
 
@@ -58,7 +58,7 @@
  * @todo Read units from strings.
  */
 template <unsigned int T_factor, const char* T_suffix>
-class cedar::unit::DurationUnit : public Duration
+class cedar::unit::TimeUnit : public Time
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -68,7 +68,7 @@ class cedar::unit::DurationUnit : public Duration
   // friends
   //--------------------------------------------------------------------------------------------------------------------
 
-  friend std::ostream& operator <<(std::ostream &stream, const DurationUnit& unit)
+  friend std::ostream& operator <<(std::ostream &stream, const TimeUnit& unit)
   {
     stream << unit.mAmountInMicroSeconds / static_cast<double>(T_factor) << " " << T_suffix;
     return stream;
@@ -81,18 +81,18 @@ public:
   /*!@brief The standard constructor.
    *
    */
-  DurationUnit(double amount = 1.0)
+  TimeUnit(double amount = 1.0)
   :
-  Duration(amount * static_cast<double>(T_factor))
+  Time(amount * static_cast<double>(T_factor))
   {
   }
 
   /*!@brief Constructor that takes a base time object.
    *
    */
-  DurationUnit(const cedar::unit::Duration& time)
+  TimeUnit(const cedar::unit::Time& time)
   :
-  Duration(time)
+  Time(time)
   {
   }
 
@@ -105,19 +105,19 @@ public:
    * @return converted TimeUnit
    */
   template <unsigned int otherFactor, const char* otherSuffix>
-  operator DurationUnit<otherFactor, otherSuffix>()
+  operator TimeUnit<otherFactor, otherSuffix>()
   const
   {
     double value = this->getRawTime() / otherFactor;
-    return DurationUnit<otherFactor, otherSuffix>(value);
+    return TimeUnit<otherFactor, otherSuffix>(value);
   }
 
   /*!@brief star operator for multiplying a TimeUnit with a scalar value on right side
    * @return result of multiplication
    */
-  DurationUnit operator* (double factor) const
+  TimeUnit operator* (double factor) const
   {
-    DurationUnit ret;
+    TimeUnit ret;
     ret.mAmountInMicroSeconds = factor * this->mAmountInMicroSeconds;
     return ret;
   }
@@ -125,9 +125,9 @@ public:
   /*!@brief star operator for multiplying a TimeUnit with a scalar value on left side
    * @return result of multiplication
    */
-  friend DurationUnit operator*(double real, const DurationUnit& time)
+  friend TimeUnit operator*(double real, const TimeUnit& time)
   {
-    DurationUnit ret;
+    TimeUnit ret;
     ret.mAmountInMicroSeconds = real * time.mAmountInMicroSeconds;
     return ret;
   }
@@ -143,9 +143,9 @@ public:
   /*!@brief slash operator for dividing a TimeUnit by a scalar value
    * @return result of division
    */
-  DurationUnit operator/ (double divisor) const
+  TimeUnit operator/ (double divisor) const
   {
-    DurationUnit ret;
+    TimeUnit ret;
     ret.mAmountInMicroSeconds = this->mAmountInMicroSeconds / divisor;
     return ret;
   }
@@ -154,7 +154,7 @@ public:
    * @return the scalar, unit-less result of the division
    */
   template<unsigned int otherFactor, const char* otherSuffix>
-  double operator/ (const DurationUnit<otherFactor, otherSuffix>& time) const
+  double operator/ (const TimeUnit<otherFactor, otherSuffix>& time) const
   {
     return this->mAmountInMicroSeconds / time.getRawTime();
   }
@@ -163,9 +163,9 @@ public:
    * @return result of division
    *
    */
-  friend DurationUnit operator/(double real, const DurationUnit& time)
+  friend TimeUnit operator/(double real, const TimeUnit& time)
   {
-    DurationUnit ret;
+    TimeUnit ret;
     ret.mAmountInMicroSeconds = real / time.mAmountInMicroSeconds;
     return ret;
   }
@@ -173,7 +173,7 @@ public:
   /*!@brief slash operator for dividing a TimeUnit by a scalar value using /=
    * @return result of division
    */
-  DurationUnit operator/= (double divisor)
+  TimeUnit operator/= (double divisor)
   {
     this->mAmountInMicroSeconds /= divisor;
   }
@@ -182,7 +182,7 @@ public:
    *
    */
   template <unsigned int otherFactor, const char* otherSuffix>
-  bool operator==(const DurationUnit<otherFactor, otherSuffix>& comp)
+  bool operator==(const TimeUnit<otherFactor, otherSuffix>& comp)
   {
     return this->mAmountInMicroSeconds == comp.mAmountInMicroSeconds;
   }
@@ -223,7 +223,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::unit::DurationUnit
+}; // class cedar::unit::TimeUnit
 
-#endif // CEDAR_UNITS_DURATION_UNIT_H
+#endif // CEDAR_UNITS_TIME_UNIT_H
 

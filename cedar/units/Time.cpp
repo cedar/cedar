@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/units/Duration.h"
+#include "cedar/units/Time.h"
 
 // PROJECT INCLUDES
 
@@ -53,13 +53,13 @@
  *  internal workings from being exposed an subject to potential misuse, as the internal representation of the duration
  *  could change at any moment.
  */
-cedar::unit::Duration::Duration(double amount)
+cedar::unit::Time::Time(double amount)
 :
 mAmountInMicroSeconds (amount)
 {
 }
 
-cedar::unit::Duration::~Duration()
+cedar::unit::Time::~Time()
 {
 }
 
@@ -73,7 +73,7 @@ cedar::unit::Duration::~Duration()
  *          duration object obtained from somewhere, then to get an actual duration out of it, use
  *          cedar::unit::Seconds(d).
  */
-double cedar::unit::Duration::getRawTime() const
+double cedar::unit::Time::getRawTime() const
 {
   return this->mAmountInMicroSeconds;
 }
