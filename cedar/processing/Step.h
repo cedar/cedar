@@ -42,13 +42,13 @@
 #define CEDAR_PROC_STEP_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Trigger.h"
-#include "processing/DataRole.h"
-#include "processing/DataSlot.h"
-#include "auxiliaries/Parameter.h"
-#include "auxiliaries/Base.h"
-#include "auxiliaries/NamedConfigurable.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/DataRole.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/Base.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // PROJECT INCLUDES
 

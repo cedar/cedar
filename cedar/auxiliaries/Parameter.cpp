@@ -39,12 +39,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/Parameter.h"
-#include "auxiliaries/exceptions.h"
-#include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/assert.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

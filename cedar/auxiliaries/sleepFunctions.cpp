@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#include "auxiliaries/sleepFunctions.h"
-#include "defines.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/defines.h"
 
 #ifdef WINDOWS
   #include <Windows.h>

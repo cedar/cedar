@@ -38,8 +38,8 @@
 #define CEDAR_AUX_ENUM_TYPE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/EnumBase.h"
 
 // PROJECT INCLUDES
 

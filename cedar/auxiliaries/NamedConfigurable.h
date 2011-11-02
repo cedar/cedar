@@ -38,9 +38,9 @@
 #define CEDAR_AUX_NAMED_CONFIGURABLE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // PROJECT INCLUDES
 

@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/Locomotion.h"
+#include "cedar/devices/robot/Locomotion.h"
 
 // PROJECT INCLUDES
 

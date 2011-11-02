@@ -42,7 +42,7 @@
 #define CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/VectorParameter.h"
 
 // PROJECT INCLUDES
 

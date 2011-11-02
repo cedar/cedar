@@ -35,11 +35,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/EnumParameter.h"
-#include "auxiliaries/EnumParameter.h"
+#include "cedar/processing/gui/EnumParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

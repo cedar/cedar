@@ -42,10 +42,10 @@
 #define CEDAR_PROC_STEP_DECLARATION_H
 
 // LOCAL INCLUDES
-#include "processing/DeclarationBase.h"
-#include "processing/namespace.h"
-#include "auxiliaries/AbstractFactory.h"
-#include "auxiliaries/AbstractFactoryDerived.h"
+#include "cedar/processing/DeclarationBase.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/AbstractFactoryDerived.h"
 
 // PROJECT INCLUDES
 

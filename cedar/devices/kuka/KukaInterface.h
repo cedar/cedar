@@ -38,15 +38,15 @@
 #define CEDAR_DEV_KUKA_KUKA_INTERFACE_H
 
 // MAKE FRI OPTIONAL
-#include "devices/robot/CMakeDefines.h"
+#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES (includes from this project)
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "devices/robot/KinematicChain.h"
-#include "auxiliaries/ConfigurationInterface.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <fri/friremote.h>

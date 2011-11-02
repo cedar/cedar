@@ -43,12 +43,12 @@
 #define CEDAR_CEDAR_PROC_H
 
 // CLASSES
-#include "processing/namespace.h"
-#include "processing/Manager.h"
-#include "processing/Step.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Step.h"
 
 // GUI CLASSES
-#include "processing/gui/StepClassList.h"
-#include "processing/gui/View.h"
+#include "cedar/processing/gui/StepClassList.h"
+#include "cedar/processing/gui/View.h"
 
 #endif // CEDAR_CEDAR_PROC_H

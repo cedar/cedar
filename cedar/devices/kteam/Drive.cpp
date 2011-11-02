@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/kteam/Drive.h"
+#include "cedar/devices/kteam/Drive.h"
 
 // PROJECT INCLUDES
 

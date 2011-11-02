@@ -39,11 +39,11 @@
 #define CEDAR_DEV_ROBOT_REFERENCE_GEOMETRY_H
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
+#include "cedar/devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/ConfigurationInterface.h"
-#include "auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 #include <vector>

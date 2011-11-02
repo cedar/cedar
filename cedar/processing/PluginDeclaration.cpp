@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/PluginDeclaration.h"
+#include "cedar/processing/PluginDeclaration.h"
 
 // PROJECT INCLUDES
 

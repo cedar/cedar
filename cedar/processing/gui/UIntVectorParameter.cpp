@@ -39,10 +39,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/UIntVectorParameter.h"
-#include "processing/gui/PropertyPane.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/UIntVectorParameter.h"
+#include "cedar/processing/gui/PropertyPane.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

@@ -36,9 +36,9 @@
 
 // LOCAL INCLUDES
 
-#include "devices/kteam/EPuckDrive.h"
-#include "auxiliaries/math/constants.h"
-#include "auxiliaries/math/tools.h"
+#include "cedar/devices/kteam/EPuckDrive.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 

@@ -41,11 +41,11 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "dynamics/namespace.h"
-#include "dynamics/Activation.h"
-#include "dynamics/Dynamics.h"
-#include "dynamics/SpaceCode.h"
-#include "dynamics/fields/NeuralField.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/dynamics/Activation.h"
+#include "cedar/dynamics/Dynamics.h"
+#include "cedar/dynamics/SpaceCode.h"
+#include "cedar/dynamics/fields/NeuralField.h"
 
 
 

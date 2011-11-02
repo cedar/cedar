@@ -42,12 +42,12 @@
 #define CEDAR_DYN_NEURAL_FIELD_H
 
 // LOCAL INCLUDES
-#include "dynamics/namespace.h"
-#include "dynamics/Dynamics.h"
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/kernel/namespace.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/NumericVectorParameter.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 

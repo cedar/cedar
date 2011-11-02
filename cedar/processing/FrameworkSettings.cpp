@@ -35,11 +35,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/FrameworkSettings.h"
-#include "auxiliaries/SetParameter.h"
-#include "auxiliaries/DirectoryParameter.h"
-#include "auxiliaries/System.h"
-#include "processing/exceptions.h"
+#include "cedar/processing/FrameworkSettings.h"
+#include "cedar/auxiliaries/SetParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/System.h"
+#include "cedar/processing/exceptions.h"
 
 // PROJECT INCLUDES
 

@@ -39,25 +39,25 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Manager.h"
-#include "processing/Step.h"
-#include "processing/exceptions.h"
-#include "auxiliaries/exceptions.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "processing/TriggerDeclaration.h"
-#include "processing/Trigger.h"
-#include "processing/LoopedTrigger.h"
-#include "processing/MultiTrigger.h"
-#include "processing/Group.h"
-#include "processing/PluginProxy.h"
-#include "processing/PluginDeclaration.h"
-#include "processing/Connection.h"
-#include "processing/source/GaussInput.h"
-#include "processing/steps/StaticGain.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/processing/TriggerDeclaration.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/MultiTrigger.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/PluginProxy.h"
+#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/processing/Connection.h"
+#include "cedar/processing/source/GaussInput.h"
+#include "cedar/processing/steps/StaticGain.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>

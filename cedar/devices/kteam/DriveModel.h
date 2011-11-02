@@ -39,8 +39,8 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/Odometry.h"
-#include "devices/kteam/Drive.h"
+#include "cedar/devices/robot/Odometry.h"
+#include "cedar/devices/kteam/Drive.h"
 
 // PROJECT INCLUDES
 

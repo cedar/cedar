@@ -42,8 +42,8 @@
 #define CEDAR_AUX_CONFIGURABLE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 

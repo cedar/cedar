@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/Odometry.h"
+#include "cedar/devices/robot/Odometry.h"
 
 // PROJECT INCLUDES
 

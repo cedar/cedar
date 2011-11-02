@@ -39,11 +39,11 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/namespace.h"
+#include "cedar/devices/robot/namespace.h"
 
 // PROJECT INCLUDES
 
-#include "auxiliaries/Object.h"
+#include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
 

@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "units/Duration.h"
+#include "cedar/units/Duration.h"
 
 // PROJECT INCLUDES
 

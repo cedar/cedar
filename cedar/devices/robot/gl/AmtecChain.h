@@ -38,8 +38,8 @@
 #define CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
 
 // LOCAL INCLUDES
-#include "devices/robot/gl/namespace.h"
-#include "devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/robot/gl/namespace.h"
+#include "cedar/devices/robot/gl/KinematicChain.h"
 
 // PROJECT INCLUDES
 

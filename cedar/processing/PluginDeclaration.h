@@ -38,8 +38,8 @@
 #define CEDAR_PROC_PLUGIN_DECLARATION_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/StepDeclaration.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/StepDeclaration.h"
 
 // PROJECT INCLUDES
 

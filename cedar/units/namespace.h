@@ -43,7 +43,7 @@
 #define CEDAR_UNITS_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "units/lib.h"
+#include "cedar/units/lib.h"
 
 // PROJECT INCLUDES
 

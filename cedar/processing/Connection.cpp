@@ -37,11 +37,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Connection.h"
-#include "processing/Step.h"
-#include "processing/Trigger.h"
-#include "processing/exceptions.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/Connection.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

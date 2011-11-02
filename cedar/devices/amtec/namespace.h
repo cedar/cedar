@@ -38,8 +38,8 @@
 #define CEDAR_DEV_AMTEC_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "devices/robot/CMakeDefines.h"
-#include "devices/lib.h"
+#include "cedar/devices/robot/CMakeDefines.h"
+#include "cedar/devices/lib.h"
 
 // PROJECT INCLUDES
 
