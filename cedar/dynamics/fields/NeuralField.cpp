@@ -39,15 +39,15 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "dynamics/fields/NeuralField.h"
-#include "dynamics/SpaceCode.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/math/Sigmoid.h"
-#include "auxiliaries/math/AbsSigmoid.h"
-#include "auxiliaries/kernel/Gauss.h"
-#include "auxiliaries/assert.h"
+#include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/dynamics/SpaceCode.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
+#include "cedar/auxiliaries/assert.h"
 
 
 // PROJECT INCLUDES
