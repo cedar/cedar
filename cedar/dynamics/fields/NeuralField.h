@@ -42,12 +42,12 @@
 #define CEDAR_DYN_NEURAL_FIELD_H
 
 // LOCAL INCLUDES
-#include "cedar/dynamics/namespace.h"
-#include "cedar/dynamics/Dynamics.h"
-#include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "dynamics/namespace.h"
+#include "dynamics/Dynamics.h"
+#include "auxiliaries/math/namespace.h"
+#include "auxiliaries/kernel/namespace.h"
+#include "auxiliaries/NumericParameter.h"
+#include "auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 
@@ -129,13 +129,14 @@ protected:
   //!@brief any sigmoid function
   cedar::aux::math::SigmoidPtr mSigmoid;
   //!@brief the lateral interaction kernel, strictly excitatory at the moment
-  cedar::aux::kernel::GaussPtr mKernel;
+  std::vector<cedar::aux::kernel::GaussPtr> mKernels;
   //!@brief not documented
   cedar::aux::DoubleDataPtr mGlobalInhibitionData; //!@todo why do we need this? explain this please
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
+  cedar::aux::UIntParameterPtr _mNumKernels;
 private:
   // none yet
 
