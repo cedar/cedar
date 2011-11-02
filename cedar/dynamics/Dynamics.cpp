@@ -39,9 +39,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "processing/StepTime.h"
-#include "processing/exceptions.h"
+#include "cedar/dynamics/Dynamics.h"
+#include "cedar/processing/StepTime.h"
+#include "cedar/processing/exceptions.h"
 
 // PROJECT INCLUDES
 

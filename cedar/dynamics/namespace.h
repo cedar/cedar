@@ -43,9 +43,9 @@
 #define CEDAR_DYN_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "dynamics/lib.h"
+#include "cedar/dynamics/lib.h"
 
-#include "processing/PluginDeclaration.h"
+#include "cedar/processing/PluginDeclaration.h"
 
 // PROJECT INCLUDES
 

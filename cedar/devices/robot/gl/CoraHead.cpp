@@ -39,8 +39,8 @@
 #include "CoraHead.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/gl.h"
-#include "auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
 
 // SYSTEM INCLUDES
 

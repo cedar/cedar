@@ -35,10 +35,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/PluginProxy.h"
-#include "processing/PluginDeclaration.h"
-#include "processing/Manager.h"
-#include "processing/exceptions.h"
+#include "cedar/processing/PluginProxy.h"
+#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/exceptions.h"
 
 // PROJECT INCLUDES
 

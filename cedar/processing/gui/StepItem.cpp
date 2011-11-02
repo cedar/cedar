@@ -39,16 +39,16 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/DataPlotter.h"
-#include "processing/gui/StepItem.h"
-#include "processing/gui/DataSlotItem.h"
-#include "processing/gui/TriggerItem.h"
-#include "processing/gui/exceptions.h"
-#include "processing/DataSlot.h"
-#include "processing/Manager.h"
-#include "auxiliaries/Data.h"
-#include "processing/Step.h"
-#include "auxiliaries/assert.h"
+#include "cedar/auxiliaries/gui/DataPlotter.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

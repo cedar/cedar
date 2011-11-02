@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "devices/robot/Component.h"
-#include "devices/robot/Robot.h"
+#include "cedar/devices/robot/Component.h"
+#include "cedar/devices/robot/Robot.h"
 
 // PROJECT INCLUDES
 

@@ -39,13 +39,13 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DataSlotItem.h"
-#include "processing/gui/StepItem.h"
-#include "processing/DataSlot.h"
-#include "processing/DataRole.h"
-#include "processing/Manager.h"
-#include "auxiliaries/utilities.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/DataRole.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

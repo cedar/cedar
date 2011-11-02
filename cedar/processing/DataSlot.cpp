@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/DataSlot.h"
+#include "cedar/processing/DataSlot.h"
 
 // PROJECT INCLUDES
 

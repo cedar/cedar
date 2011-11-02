@@ -39,19 +39,19 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Ide.h"
-#include "processing/gui/Scene.h"
-#include "processing/gui/Settings.h"
-#include "processing/gui/StepItem.h"
-#include "processing/gui/TriggerItem.h"
-#include "processing/gui/StepClassList.h"
-#include "processing/gui/NetworkFile.h"
-#include "processing/gui/PluginLoadDialog.h"
-#include "processing/gui/PluginManagerDialog.h"
-#include "processing/exceptions.h"
-#include "processing/Manager.h"
-#include "processing/LoopedTrigger.h"
-#include "auxiliaries/VectorParameter.h"
+#include "cedar/processing/gui/Ide.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/StepClassList.h"
+#include "cedar/processing/gui/NetworkFile.h"
+#include "cedar/processing/gui/PluginLoadDialog.h"
+#include "cedar/processing/gui/PluginManagerDialog.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/auxiliaries/VectorParameter.h"
 
 // PROJECT INCLUDES
 

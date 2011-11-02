@@ -38,8 +38,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/sleepFunctions.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <boost/date_time/posix_time/posix_time_types.hpp>

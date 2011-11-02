@@ -37,9 +37,9 @@
 #ifndef CEDAR_AUX_SLEEP_FUNCTIONS_H
 #define CEDAR_AUX_SLEEP_FUNCTIONS_H
 
-#include "units/Duration.h"
-#include "units/DurationUnit.h"
-#include "auxiliaries/lib.h"
+#include "cedar/units/Duration.h"
+#include "cedar/units/DurationUnit.h"
+#include "cedar/auxiliaries/lib.h"
 
 namespace cedar
 {

@@ -35,12 +35,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/steps/StaticGain.h"
+#include "cedar/processing/steps/StaticGain.h"
 
 // PROJECT INCLUDES
-#include "processing/DataSlot.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

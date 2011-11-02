@@ -38,15 +38,15 @@
 #include "iiClosedFormInverseKinematics.hpp"
 
 // PROJECT INCLUDES
-#include "devices/amtec/KinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/gl/CoraArm.h"
-#include "devices/robot/gl/CoraHead.h"
-#include "devices/robot/gui/KinematicChainWidget.h"
-#include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gui/Viewer.h"
-#include "auxiliaries/gui/SceneWidget.h"
+#include "cedar/devices/amtec/KinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/gl/CoraArm.h"
+#include "cedar/devices/robot/gl/CoraHead.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
 
 // SYSTEM INCLUDES
 

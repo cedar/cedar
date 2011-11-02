@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // PROJECT INCLUDES
 

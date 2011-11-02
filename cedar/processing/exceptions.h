@@ -41,8 +41,8 @@
 #ifndef CEDAR_PROC_EXCEPTIONS_H
 #define CEDAR_PROC_EXCEPTIONS_H
 
-#include "processing/namespace.h"
-#include "auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 /*!@brief An exception that occurs when a name is used as an index that is not known.
  * @todo  There is already an InvalidNameException in aux, so remove this one.

@@ -37,11 +37,11 @@
 #define CEDAR_AUX_MATH_SIGMOIDS_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <math.h>

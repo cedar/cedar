@@ -36,10 +36,10 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/screwCalculus.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/math/constants.h"
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 

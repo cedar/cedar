@@ -39,9 +39,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/ToolBox.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/processing/gui/ToolBox.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 

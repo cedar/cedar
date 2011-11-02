@@ -38,8 +38,8 @@
 #define CEDAR_DEV_ROBOT_GL_CORA_HEAD_H
 
 // LOCAL INCLUDES
-#include "devices/robot/gl/namespace.h"
-#include "devices/robot/gl/AmtecChain.h"
+#include "cedar/devices/robot/gl/namespace.h"
+#include "cedar/devices/robot/gl/AmtecChain.h"
 
 // PROJECT INCLUDES
 

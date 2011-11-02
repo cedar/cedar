@@ -76,7 +76,7 @@ endif (CEDAR_BUILD_STATIC_LIBS)
 link_directories(${CEDAR_LIB_DIR})
 
 # add the cedar home directory to the ones that need to be included
-include_directories(${CEDAR_SOURCE_DIR} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
+include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
 
 ########################################################################################################################

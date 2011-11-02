@@ -42,9 +42,9 @@
 #define CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/AbstractFactory.h"
-#include "auxiliaries/AbstractFactoryDerived.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/AbstractFactoryDerived.h"
 
 // PROJECT INCLUDES
 

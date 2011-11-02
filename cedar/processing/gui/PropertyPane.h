@@ -38,10 +38,10 @@
 #define CEDAR_PROC_PROPERTY_PANE_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/namespace.h"
-#include "auxiliaries/TypeBasedFactory.h"
-#include "processing/Step.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/Step.h"
 
 // PROJECT INCLUDES
 

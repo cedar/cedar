@@ -42,8 +42,8 @@
 #define CEDAR_DYN_SPACE_CODE_H
 
 // LOCAL INCLUDES
-#include "dynamics/namespace.h"
-#include "dynamics/Activation.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/dynamics/Activation.h"
 
 // PROJECT INCLUDES
 

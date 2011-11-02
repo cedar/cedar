@@ -42,9 +42,9 @@
 #define CEDAR_PROC_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Base.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 

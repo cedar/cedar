@@ -38,8 +38,8 @@
 #define CEDAR_PROC_LOOP_MODE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/EnumType.h"
-#include "processing/namespace.h"
+#include "cedar/auxiliaries/EnumType.h"
+#include "cedar/processing/namespace.h"
 
 // PROJECT INCLUDES
 

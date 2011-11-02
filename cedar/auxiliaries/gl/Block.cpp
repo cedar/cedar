@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/drawShapes.h"
-#include "auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/Block.h"
 
 // PROJECT INCLUDES
 

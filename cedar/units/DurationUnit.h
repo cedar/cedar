@@ -42,8 +42,8 @@
 #define CEDAR_UNITS_DURATION_UNIT_H
 
 // LOCAL INCLUDES
-#include <units/namespace.h>
-#include "units/Duration.h"
+#include "cedar/units/namespace.h"
+#include "cedar/units/Duration.h"
 
 // PROJECT INCLUDES
 

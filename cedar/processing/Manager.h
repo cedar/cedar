@@ -42,13 +42,13 @@
 #define CEDAR_PROC_MANAGER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "processing/namespace.h"
-#include "processing/Registry.h"
-#include "processing/StepDeclaration.h"
-#include "processing/TriggerDeclaration.h"
-#include "processing/FrameworkSettings.h"
-#include "processing/Step.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Registry.h"
+#include "cedar/processing/StepDeclaration.h"
+#include "cedar/processing/TriggerDeclaration.h"
+#include "cedar/processing/FrameworkSettings.h"
+#include "cedar/processing/Step.h"
 
 // PROJECT INCLUDES
 

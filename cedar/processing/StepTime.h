@@ -42,9 +42,9 @@
 #define CEDAR_PROC_STEP_TIME_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Arguments.h"
-#include "units/Duration.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Arguments.h"
+#include "cedar/units/Duration.h"
 
 // PROJECT INCLUDES
 

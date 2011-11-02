@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/NullPointerException.h"
+#include "cedar/auxiliaries/exceptions/NullPointerException.h"
 
 // PROJECT INCLUDES
 

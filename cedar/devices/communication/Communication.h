@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/communication/namespace.h"
+#include "cedar/devices/communication/namespace.h"
 
 // PROJECT INCLUDES
 

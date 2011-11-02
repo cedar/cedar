@@ -40,10 +40,10 @@
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
-#include "auxiliaries/UserData.h"
-#include "auxiliaries/IntervalData.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Base.h"
+#include "cedar/auxiliaries/UserData.h"
+#include "cedar/auxiliaries/IntervalData.h"
 
 // PROJECT INCLUDES
 

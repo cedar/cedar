@@ -42,16 +42,16 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/LogFile.h"
-#include "processing/Arguments.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/processing/Arguments.h"
 #include "Neuron.h"
-#include "processing/LoopedTrigger.h"
-#include "processing/Step.h"
-#include "processing/StepTime.h"
-#include "processing/Manager.h"
-#include "processing/Network.h"
-#include "processing/StepDeclaration.h"
-#include "auxiliaries/sleepFunctions.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/StepTime.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
+#include "cedar/processing/StepDeclaration.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

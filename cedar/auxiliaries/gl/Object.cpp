@@ -36,10 +36,10 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 

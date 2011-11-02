@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/communication/gui/CommunicationWidget.h"
+#include "cedar/devices/communication/gui/CommunicationWidget.h"
 
 // PROJECT INCLUDES
 

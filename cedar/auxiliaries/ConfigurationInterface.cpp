@@ -36,9 +36,9 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/ConfigurationInterface.h"
-#include "auxiliaries/UserData.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/UserData.h"
+#include "cedar/auxiliaries/exceptions.h"
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES

@@ -42,8 +42,8 @@
 #define CEDAR_DYN_ACTIVATION_H
 
 // LOCAL INCLUDES
-#include "dynamics/namespace.h"
-#include "auxiliaries/DataTemplate.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/auxiliaries/DataTemplate.h"
 
 // PROJECT INCLUDES
 

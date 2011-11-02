@@ -39,7 +39,7 @@
 #define CEDAR_PROC_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "processing/lib.h"
+#include "cedar/processing/lib.h"
 
 // PROJECT INCLUDES
 

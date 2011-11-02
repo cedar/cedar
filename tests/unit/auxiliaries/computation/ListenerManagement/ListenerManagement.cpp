@@ -42,9 +42,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "processing/Trigger.h"
-#include "processing/Step.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

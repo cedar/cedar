@@ -42,8 +42,8 @@
 #define CEDAR_PROC_GUI_CONNECTION_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 

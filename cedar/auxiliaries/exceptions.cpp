@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-#include "auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 cedar::aux::UnhandledTypeException::UnhandledTypeException()
 {

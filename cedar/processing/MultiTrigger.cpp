@@ -40,7 +40,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/MultiTrigger.h"
+#include "cedar/processing/MultiTrigger.h"
 
 // PROJECT INCLUDES
 

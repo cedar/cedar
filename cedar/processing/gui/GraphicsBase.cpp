@@ -39,14 +39,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/GraphicsBase.h"
-#include "processing/gui/StepItem.h"
-#include "processing/gui/TriggerItem.h"
-#include "processing/gui/DataSlotItem.h"
-#include "auxiliaries/math/functions.h"
-#include "auxiliaries/utilities.h"
-#include "processing/gui/Scene.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/DataSlotItem.h"
+#include "cedar/auxiliaries/math/functions.h"
+#include "cedar/auxiliaries/utilities.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

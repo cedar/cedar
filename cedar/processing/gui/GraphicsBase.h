@@ -42,10 +42,10 @@
 #define CEDAR_PROC_GUI_GRAPHICS_BASE_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/NumericParameter.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/Connection.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 

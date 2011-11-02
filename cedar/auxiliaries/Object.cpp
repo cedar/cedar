@@ -38,7 +38,7 @@
 #include "Object.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

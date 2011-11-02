@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-#include "namespace.h"
+#include "cedar/units/namespace.h"
 
 const char cedar::unit::prefix_us[] = "µs";
 const char cedar::unit::prefix_ms[] = "ms";

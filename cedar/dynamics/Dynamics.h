@@ -42,9 +42,9 @@
 #define CEDAR_DYN_H
 
 // LOCAL INCLUDES
-#include "dynamics/namespace.h"
-#include "processing/Step.h"
-#include "units/DurationUnit.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/units/DurationUnit.h"
 
 // PROJECT INCLUDES
 

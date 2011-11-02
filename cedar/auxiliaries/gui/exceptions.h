@@ -37,8 +37,8 @@
 #ifndef CEDAR_AUX_GUI_EXCEPTIONS_H
 #define CEDAR_AUX_GUI_EXCEPTIONS_H
 
-#include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 /*!@brief Exception that occurs when a type is not handled.
  */

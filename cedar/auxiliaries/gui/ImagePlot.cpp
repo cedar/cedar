@@ -39,10 +39,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/ImagePlot.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/gui/exceptions.h"
-#include "auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/ImageData.h"
 
 // PROJECT INCLUDES
 

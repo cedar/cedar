@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/planarGeometry.h"
-#include "auxiliaries/math/algebraTools.h"
+#include "cedar/auxiliaries/math/planarGeometry.h"
+#include "cedar/auxiliaries/math/algebraTools.h"
 
 // PROJECT INCLUDES
 

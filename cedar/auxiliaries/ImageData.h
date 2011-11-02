@@ -38,8 +38,8 @@
 #define CEDAR_AUX_IMAGE_DATA_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 

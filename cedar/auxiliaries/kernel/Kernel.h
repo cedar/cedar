@@ -38,9 +38,9 @@
 #define CEDAR_AUX_KERNEL_KERNEL_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernel/namespace.h"
-#include "auxiliaries/Configurable.h"
-#include "processing/namespace.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/processing/namespace.h"
 
 // PROJECT INCLUDES
 

@@ -36,9 +36,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/Object.h"
-#include "auxiliaries/gl/Block.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

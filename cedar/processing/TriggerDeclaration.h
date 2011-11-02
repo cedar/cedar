@@ -42,11 +42,11 @@
 #define CEDAR_PROC_TRIGGER_DECLARATION_H
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
-#include "processing/namespace.h"
-#include "processing/DeclarationBase.h"
-#include "auxiliaries/Factory.h"
-#include "auxiliaries/FactoryDerived.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/DeclarationBase.h"
+#include "cedar/auxiliaries/Factory.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
 
 // PROJECT INCLUDES
 

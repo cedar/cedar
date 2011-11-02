@@ -40,7 +40,7 @@
 
 // PROJECT INCLUDES
 
-#include "devices/amtec/KinematicChain.h"
+#include "cedar/devices/amtec/KinematicChain.h"
 
 // SYSTEM INCLUDES
 

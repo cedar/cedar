@@ -42,8 +42,8 @@
 #define CEDAR_PROC_MULTI_TRIGGER_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Trigger.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Trigger.h"
 
 
 // PROJECT INCLUDES

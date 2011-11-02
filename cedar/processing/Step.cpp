@@ -39,17 +39,17 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Step.h"
-#include "processing/Arguments.h"
-#include "processing/DataSlot.h"
-#include "processing/Manager.h"
-#include "processing/exceptions.h"
-#include "auxiliaries/Data.h"
-#include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/System.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/Arguments.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/System.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

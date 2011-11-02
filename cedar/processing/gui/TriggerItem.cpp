@@ -39,14 +39,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/TriggerItem.h"
-#include "processing/gui/StepItem.h"
-#include "processing/gui/exceptions.h"
-#include "processing/LoopedTrigger.h"
-#include "processing/Manager.h"
-#include "auxiliaries/Data.h"
-#include "auxiliaries/utilities.h"
-#include "processing/Trigger.h"
+#include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/exceptions.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/utilities.h"
+#include "cedar/processing/Trigger.h"
 
 // PROJECT INCLUDES
 

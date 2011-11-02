@@ -38,8 +38,8 @@
 #define CEDAR_AUX_DIRECTORY_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/Parameter.h"
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QDir>
