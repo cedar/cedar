@@ -340,17 +340,21 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief the finished trigger, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
+  //!@Brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mDataConnections;
 
 private:
-  /*!@brief Whether the connect function should automatically connect the triggers as well.
-   */
+  //!@brief Whether the connect function should automatically connect the triggers as well.
   const bool mAutoConnectTriggers;
+  //!@brief flag that states if step is still computing its latest output
   bool mBusy;
   QReadWriteLock* mpArgumentsLock;
   ArgumentsPtr mNextArguments;
+  //!@brief flag that states if all mandatory connections (i.e. inputs) are set
   bool mMandatoryConnectionsAreSet;
+  //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
   std::string mStateAnnotation;
   std::vector<cedar::proc::TriggerPtr> mTriggers;

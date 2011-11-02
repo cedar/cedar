@@ -94,16 +94,25 @@ public:
   //! Deletes the connection.
   void deleteConnection();
   
+  //! returns the source step instance
   cedar::proc::StepPtr getSource();
+  //! returns the source step instance as const
   cedar::proc::ConstStepPtr getSource() const;
+  //! returns the source step's name
   const std::string& getSourceName() const;
+  //! returns the target step instance
   cedar::proc::StepPtr getTarget();
+  //! returns the target step instance as const
   cedar::proc::ConstStepPtr getTarget() const;
+  //! returns the target step's name
   const std::string& getTargetName() const;
 
+  //! returns the source trigger instance
   cedar::proc::ConstTriggerPtr getSourceTrigger() const;
+  //! returns the target trigger instance
   cedar::proc::ConstTriggerPtr getTargetTrigger() const;
 
+  //! are source and target still valid? (i.e. the weak pointer can be casted to shared pointer)
   bool isValid() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,11 +131,17 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief the source trigger
   boost::weak_ptr<cedar::proc::Trigger> mTrigger;
+  //!@brief the target trigger
   boost::weak_ptr<cedar::proc::Trigger> mTargetTrigger;
+  //!@brief the source step
   boost::weak_ptr<cedar::proc::Step> mSource;
+  //!@brief the source step's name
   std::string mSourceName;
+  //!@brief the target step
   boost::weak_ptr<cedar::proc::Step> mTarget;
+  //!@brief the target step's name
   std::string mTargetName;
 private:
   // none yet
