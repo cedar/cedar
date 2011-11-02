@@ -39,8 +39,8 @@
 #include "unit/devices/robot/Robot/TestRobot.h"
 
 // PROJECT INCLUDES
-#include "devices/robot/Robot.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/devices/robot/Robot.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

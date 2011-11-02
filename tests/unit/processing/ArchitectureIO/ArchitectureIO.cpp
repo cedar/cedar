@@ -34,13 +34,13 @@
 
 ======================================================================================================================*/
 
-#include "auxiliaries/LogFile.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/DataTemplate.h"
-#include "processing/Step.h"
-#include "processing/StepDeclaration.h"
-#include "processing/Manager.h"
-#include "processing/Network.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/StepDeclaration.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
 
 class TestModule : public cedar::proc::Step
 {

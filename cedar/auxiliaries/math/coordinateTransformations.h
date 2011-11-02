@@ -38,7 +38,7 @@
 #define CEDAR_AUX_MATH_COORDNIATE_TRANSFORMATIONS_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 

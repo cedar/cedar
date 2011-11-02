@@ -39,7 +39,7 @@
 #include "unit/devices/robot/Robot/TestComponent.h"
 
 // PROJECT INCLUDES
-#include "devices/robot/Component.h"
+#include "cedar/devices/robot/Component.h"
 
 // SYSTEM INCLUDES
 #include <string>

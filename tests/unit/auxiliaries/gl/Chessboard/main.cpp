@@ -36,8 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Chessboard.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

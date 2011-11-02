@@ -39,7 +39,7 @@
 #define CEDAR_AUX_MATH_LIMITS_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/namespace.h"
 
 // PROJECT INCLUDES
 

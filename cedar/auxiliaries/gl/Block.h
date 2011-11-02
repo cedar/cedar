@@ -39,12 +39,12 @@
 #define CEDAR_AUX_GL_BLOCK_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/namespace.h"
-#include "auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Object.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
 

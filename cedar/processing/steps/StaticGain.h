@@ -38,12 +38,12 @@
 #define CEDAR_PROC_STEPS_STATIC_GAIN_H
 
 // LOCAL INCLUDES
-#include "processing/steps/namespace.h"
+#include "cedar/processing/steps/namespace.h"
 
 // PROJECT INCLUDES
-#include "processing/Step.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/DataTemplate.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
 
 // SYSTEM INCLUDES
 

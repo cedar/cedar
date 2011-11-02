@@ -39,8 +39,8 @@
 #define CEDAR_PROC_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "processing/lib.h"
-#include "auxiliaries/AbstractFactory.h"
+#include "cedar/processing/lib.h"
+#include "cedar/auxiliaries/AbstractFactory.h"
 
 // PROJECT INCLUDES
 

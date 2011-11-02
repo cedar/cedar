@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/DataPlotInterface.h"
 
 // PROJECT INCLUDES
 

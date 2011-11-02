@@ -42,9 +42,9 @@
 #define CEDAR_PROC_GROUP_ITEM_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/GraphicsBase.h"
-#include "processing/namespace.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/processing/namespace.h"
 
 // PROJECT INCLUDES
 

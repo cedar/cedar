@@ -39,12 +39,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/MatrixPlot2D.h"
-#include "auxiliaries/gui/exceptions.h"
-#include "auxiliaries/gui/MatrixPlot.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/exceptions.h"
-#include "auxiliaries/assert.h"
+#include "cedar/auxiliaries/gui/MatrixPlot2D.h"
+#include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/gui/MatrixPlot.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

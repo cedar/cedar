@@ -44,21 +44,21 @@
 #define CEDAR_AUX_GUI_SCENE_WIDGET_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gl/Object.h"
-#include "auxiliaries/gl/Block.h"
-#include "auxiliaries/gl/Sphere.h"
-#include "auxiliaries/gl/Cone.h"
-#include "auxiliaries/gl/Cylinder.h"
-#include "auxiliaries/gl/Pyramid.h"
-#include "auxiliaries/gl/Prism.h"
-#include "auxiliaries/gl/Torus.h"
-#include "auxiliaries/gl/Ellipse.h"
-#include "auxiliaries/gl/Chessboard.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gl/Cone.h"
+#include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Pyramid.h"
+#include "cedar/auxiliaries/gl/Prism.h"
+#include "cedar/auxiliaries/gl/Torus.h"
+#include "cedar/auxiliaries/gl/Ellipse.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 #ifdef DEBUG
   #include "cedar/auxiliaries/debug/gui/ui_SceneWidget.h"
 #else

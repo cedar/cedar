@@ -39,11 +39,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/GroupItem.h"
-#include "processing/gui/StepItem.h"
-#include "processing/Group.h"
-#include "processing/Manager.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/GroupItem.h"
+#include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

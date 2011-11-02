@@ -38,10 +38,10 @@
 #define CEDAR_PROC_GUI_SETTINGS_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/VectorParameter.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/VectorParameter.h"
 
 // PROJECT INCLUDES
 

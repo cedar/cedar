@@ -42,10 +42,10 @@
 #define CEDAR_PROC_GUI_TRIGGER_ITEM_H
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
-#include "processing/gui/namespace.h"
-#include "processing/gui/Connection.h"
-#include "processing/gui/GraphicsBase.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/Connection.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 
 // PROJECT INCLUDES
 

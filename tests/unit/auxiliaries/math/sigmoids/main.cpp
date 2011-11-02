@@ -37,14 +37,14 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/math/sigmoids.h"
-#include "auxiliaries/LogFile.h"
-#include "auxiliaries/math/Sigmoid.h"
-#include "auxiliaries/math/AbsSigmoid.h"
-#include "auxiliaries/math/ExpSigmoid.h"
-#include "auxiliaries/math/HeavysideSigmoid.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/math/SigmoidDeclaration.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/math/ExpSigmoid.h"
+#include "cedar/auxiliaries/math/HeavysideSigmoid.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/SigmoidDeclaration.h"
 
 // SYSTEM INCLUDES
 

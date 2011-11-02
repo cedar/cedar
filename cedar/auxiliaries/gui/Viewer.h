@@ -39,11 +39,11 @@
 #define CEDAR_AUX_GUI_VIEWER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/namespace.h"
-#include "auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Scene.h"
 
 // SYSTEM INCLUDES
 #include <QGLViewer/qglviewer.h>

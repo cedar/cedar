@@ -39,7 +39,7 @@
 #define CEDAR_AUX_GL_DRAW_SHAPES_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 

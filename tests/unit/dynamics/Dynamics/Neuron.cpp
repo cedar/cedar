@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 #include "Neuron.h"
-#include "auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 

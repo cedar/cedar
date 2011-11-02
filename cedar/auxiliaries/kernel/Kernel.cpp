@@ -35,11 +35,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernel/Kernel.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/Data.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 

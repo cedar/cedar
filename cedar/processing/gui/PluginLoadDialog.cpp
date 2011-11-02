@@ -39,11 +39,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/PluginLoadDialog.h"
-#include "processing/PluginDeclaration.h"
-#include "processing/Manager.h"
-#include "processing/gui/Settings.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/PluginLoadDialog.h"
+#include "cedar/processing/PluginDeclaration.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

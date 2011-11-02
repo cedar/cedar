@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/kernel/Separable.h"
 
 // PROJECT INCLUDES
 

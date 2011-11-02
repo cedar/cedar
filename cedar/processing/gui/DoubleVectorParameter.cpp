@@ -39,10 +39,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DoubleVectorParameter.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/Parameter.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

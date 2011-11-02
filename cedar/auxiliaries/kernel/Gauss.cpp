@@ -35,14 +35,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernel/Gauss.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/math/functions.h"
-#include "auxiliaries/exceptions.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/math/functions.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 

@@ -42,8 +42,8 @@
 #define CEDAR_PROC_SCENE_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/namespace.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/namespace.h"
 
 // PROJECT INCLUDES
 

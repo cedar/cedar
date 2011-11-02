@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // PROJECT INCLUDES
 
