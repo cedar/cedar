@@ -40,7 +40,11 @@
 // LOCAL INCLUDES
 
 #include "cedar/devices/communication/Communication.h"
-#include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
+#ifdef DEBUG
+  #include "cedar/devices/debug/communication/gui/ui_CommunicationWidget.h"
+#else
+  #include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
+#endif
 #include "cedar/devices/communication/gui/namespace.h"
 
 // PROJECT INCLUDES
