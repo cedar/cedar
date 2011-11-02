@@ -83,36 +83,58 @@ public:
   cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
 
 public slots:
+  //@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
+  //@brief handle a change in size along dimensions, which leads to creating new matrices
   void dimensionSizeChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  /*!@brief compute the euler step of the field equation
+   *
+   * This is the field equation:
+   * \f[
+   * \dot{u}(\boldmath{x},t) = \frac{\delta t}{\tau} (-u + h + \int\dots\int w(\boldmath{x}' - \boldmath{x}) \sigma(u\boldmath{x}) d\boldmath{x} + s(\boldmath{x}))
+   * \f]
+   */
   void eulerStep(const cedar::unit::Duration& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief update the size and dimensionality of internal matrices
   void updateMatrices();
 
+  //!@brief check if input fits to field in dimension and size
   bool isMatrixCompatibleInput(const cv::Mat& matrix) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
   cedar::dyn::SpaceCodePtr mActivation;
+  //!@brief this SpaceCode matrix contains the current field activity, sent through the sigmoid function
   cedar::dyn::SpaceCodePtr mSigmoidalActivation;
+  //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::dyn::SpaceCodePtr mLateralInteraction;
+  //!@brief the resting level of a field
   cedar::aux::DoubleParameterPtr mRestingLevel;
-  cedar::aux::DoubleParameterPtr mTau; //!\todo deal with units, now: milliseconds
+  //!@brief the relaxation rate of the field
+  cedar::aux::DoubleParameterPtr mTau; //!@todo deal with units, now: milliseconds
+  //!@brief the global inhibition of the field, which is not contained in the kernel
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
+  //!@brief any sigmoid function
   cedar::aux::math::SigmoidPtr mSigmoid;
+  //!@brief the lateral interaction kernel, strictly excitatory at the moment
   std::vector<cedar::aux::kernel::GaussPtr> mKernels;
-  cedar::aux::DoubleDataPtr mGlobalInhibitionData;
-  cedar::aux::UIntParameterPtr _mDimensionality; //!\todo not the only class needing this - think about parent class
+  //!@brief not documented
+  cedar::aux::DoubleDataPtr mGlobalInhibitionData; //!@todo why do we need this? explain this please
+  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
+  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
   cedar::aux::UIntParameterPtr _mNumKernels;
 private:
