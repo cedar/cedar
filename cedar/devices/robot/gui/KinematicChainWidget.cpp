@@ -37,10 +37,10 @@
 
 // LOCAL INCLUDES
 
-#include "devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
 
 // PROJECT INCLUDES
-#include <auxiliaries/exceptions/InitializationException.h>
+#include "cedar/auxiliaries/exceptions/InitializationException.h"
 
 // SYSTEM INCLUDES
 

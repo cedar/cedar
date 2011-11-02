@@ -39,16 +39,16 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/source/GaussInput.h"
-#include "dynamics/Activation.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/math/functions.h"
-#include "processing/Arguments.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/processing/source/GaussInput.h"
+#include "cedar/dynamics/Activation.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/math/functions.h"
+#include "cedar/processing/Arguments.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 

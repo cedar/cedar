@@ -38,7 +38,7 @@
 #define CEDAR_PROC_PLUGIN_PROXY_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
+#include "cedar/processing/namespace.h"
 
 // PROJECT INCLUDES
 

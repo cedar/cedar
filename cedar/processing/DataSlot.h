@@ -38,8 +38,8 @@
 #define CEDAR_PROC_DATA_SLOT_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/DataRole.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/DataRole.h"
 
 // PROJECT INCLUDES
 

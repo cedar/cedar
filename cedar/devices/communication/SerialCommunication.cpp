@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include  "devices/communication/SerialCommunication.h"
+#include "cedar/devices/communication/SerialCommunication.h"
 
 // PROJECT INCLUDES
 

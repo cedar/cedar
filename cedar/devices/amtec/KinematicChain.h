@@ -38,13 +38,13 @@
 #define CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_H
 
 // MAKE AMTEC OPTIONAL
-#include "devices/robot/CMakeDefines.h"
+#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_AMTEC
 
 // LOCAL INCLUDES
-#include "devices/amtec/namespace.h"
-#include "devices/robot/ReferenceGeometry.h"
-#include "devices/robot/KinematicChain.h"
+#include "cedar/devices/amtec/namespace.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // PROJECT INCLUDES
 

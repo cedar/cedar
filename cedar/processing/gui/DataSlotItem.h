@@ -42,10 +42,10 @@
 #define CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/GraphicsBase.h"
-#include "auxiliaries/Data.h"
-#include "processing/DataRole.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/DataRole.h"
 
 // PROJECT INCLUDES
 

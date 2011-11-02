@@ -39,7 +39,7 @@
 #define CEDAR_AUX_LOG_FILE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 #include "namespace.h"

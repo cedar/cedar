@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 

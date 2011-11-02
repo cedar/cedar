@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/LoopMode.h"
+#include "cedar/processing/LoopMode.h"
 
 // PROJECT INCLUDES
 

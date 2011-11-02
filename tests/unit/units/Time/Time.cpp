@@ -42,8 +42,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedarUnits.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/cedarUnits.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

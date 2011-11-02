@@ -45,7 +45,7 @@
 #include <iostream>
 #include <string>
 
-#include "auxiliaries/exceptions/FailedAssertionException.h"
+#include "cedar/auxiliaries/exceptions/FailedAssertionException.h"
 
 /*!@brief This macro replaces the C++ assertion and throws an exception instead, pointing out the line number of the
  * failed assertion. */

@@ -38,8 +38,8 @@
 #define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
 
 // LOCAL INCLUDES
-#include "devices/robot/DifferentialDrive.h"
-#include "devices/kteam/namespace.h"
+#include "cedar/devices/robot/DifferentialDrive.h"
+#include "cedar/devices/kteam/namespace.h"
 
 // PROJECT INCLUDES
 

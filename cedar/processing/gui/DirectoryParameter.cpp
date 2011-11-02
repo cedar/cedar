@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DirectoryParameter.h"
-#include "auxiliaries/DirectoryParameter.h"
+#include "cedar/processing/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 
 // PROJECT INCLUDES
 

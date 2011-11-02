@@ -40,8 +40,8 @@
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Object.h"
-#include "devices/robot/KinematicChainModel.h"
+#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

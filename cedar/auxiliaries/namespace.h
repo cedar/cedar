@@ -38,10 +38,10 @@
 #define CEDAR_AUX_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <sstream>

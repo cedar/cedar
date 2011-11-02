@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 
-#include "devices/kteam/gui/EPuckControlWidget.h"
+#include "cedar/devices/kteam/gui/EPuckControlWidget.h"
 
 // PROJECT INCLUDES
 

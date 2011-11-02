@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
-#include "dynamics/plugin.h"
-#include "dynamics/namespace.h"
-#include "dynamics/fields/NeuralField.h"
-#include "processing/StepDeclaration.h"
-#include "processing/Manager.h"
+#include "cedar/dynamics/plugin.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/processing/StepDeclaration.h"
+#include "cedar/processing/Manager.h"
 
 #ifdef LINUX
 void cedar::dyn::initialize()

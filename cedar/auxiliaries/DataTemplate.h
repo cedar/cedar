@@ -42,8 +42,8 @@
 #define CEDAR_AUX_DATA_TEMPLATE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Data.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Data.h"
 
 // PROJECT INCLUDES
 

@@ -39,7 +39,7 @@
 #define CEDAR_DEV_KTEAM_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
+#include "cedar/devices/lib.h"
 
 // PROJECT INCLUDES
 

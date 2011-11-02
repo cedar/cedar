@@ -35,15 +35,15 @@
 ======================================================================================================================*/
 
 // MAKE FRI OPTIONAL
-#include "devices/robot/CMakeDefines.h"
+#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES
 #include "KukaInterface.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
-#include "devices/robot/ReferenceGeometry.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
 
 // SYSTEM INCLUDES
 

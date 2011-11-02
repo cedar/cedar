@@ -42,11 +42,11 @@
 #define CEDAR_PROC_LOOPED_TRIGGER_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Trigger.h"
-#include "auxiliaries/LoopedThread.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/EnumParameter.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 
 // PROJECT INCLUDES

@@ -39,14 +39,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Network.h"
-#include "processing/Manager.h"
-#include "processing/Step.h"
-#include "processing/DataSlot.h"
-#include "processing/Group.h"
-#include "processing/Connection.h"
-#include "auxiliaries/Data.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/Network.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/Connection.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

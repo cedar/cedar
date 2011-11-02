@@ -36,12 +36,12 @@
 
 
 // LOCAL INCLUDES
-#include "devices/amtec/KinematicChain.h"
+#include "cedar/devices/amtec/KinematicChain.h"
 // MAKE AMTEC OPTIONAL
 #ifdef CEDAR_USE_AMTEC
 
 // PROJECT INCLUDES
-#include "auxiliaries/exceptions/InitializationException.h"
+#include "cedar/auxiliaries/exceptions/InitializationException.h"
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/m5apiw32.h"

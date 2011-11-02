@@ -39,10 +39,10 @@
 #define KINEMATICCHAINWIDGET_H_
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
-#include "devices/robot/gui/namespace.h"
-#include "devices/robot/KinematicChain.h"
-#include "auxiliaries/ConfigurationInterface.h"
+#include "cedar/devices/lib.h"
+#include "cedar/devices/robot/gui/namespace.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // PROJECT INCLUDES
 

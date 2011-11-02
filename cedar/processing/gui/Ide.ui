@@ -369,17 +369,17 @@
   <customwidget>
    <class>cedar::proc::gui::View</class>
    <extends>QGraphicsView</extends>
-   <header location="global">processing/gui/View.h</header>
+   <header location="global">cedar/processing/gui/View.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::proc::gui::PropertyPane</class>
    <extends>QTableWidget</extends>
-   <header>processing/gui/PropertyPane.h</header>
+   <header>cedar/processing/gui/PropertyPane.h</header>
   </customwidget>
   <customwidget>
    <class>cedar::proc::gui::ArchitectureToolBox</class>
    <extends>QWidget</extends>
-   <header>processing/gui/ArchitectureToolBox.h</header>
+   <header>cedar/processing/gui/ArchitectureToolBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

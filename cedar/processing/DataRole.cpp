@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/DataRole.h"
+#include "cedar/processing/DataRole.h"
 
 // PROJECT INCLUDES
 

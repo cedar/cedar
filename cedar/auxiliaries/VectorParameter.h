@@ -42,9 +42,9 @@
 #define CEDAR_AUX_VECTOR_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Parameter.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 

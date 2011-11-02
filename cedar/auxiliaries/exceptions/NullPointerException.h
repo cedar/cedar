@@ -39,8 +39,8 @@
 #define CEDAR_AUX_EXC_NULL_POINTER_EXCEPTION_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/namespace.h"
-#include "auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/exceptions/namespace.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 
