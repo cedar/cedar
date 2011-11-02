@@ -257,17 +257,20 @@ public slots:
   void onNameChanged();
 
 signals:
-  //!@brief Signal that is emmitted whenever the step's state is changed.
+  //!@brief Signal that is emitted whenever the step's state is changed.
   void stateChanged();
 
-  //!@brief Signal that is emmitted whenever the step's name is changed.
+  //!@brief Signal that is emitted whenever the step's name is changed.
   void nameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Declares an input slot.
+  /*!@brief Declares an input slot.
+   * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the step
+   *                  unless the pointer to this slot (and all other mandatory slots) are non-zero.
+   */
   void declareInput(const std::string& name, bool mandatory = true);
 
   //!@brief Declares a buffer slot.
@@ -352,7 +355,7 @@ private:
   std::string mStateAnnotation;
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
-  //! Registry managing the step.
+  //!@brief Registry managing the step.
   cedar::proc::StepRegistry* mRegisteredAt;
 
   //!@brief Map of all actions defined for this step.
