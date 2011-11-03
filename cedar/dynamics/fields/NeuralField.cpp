@@ -49,11 +49,12 @@
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
 
+
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
-
+#include <boost/lexical_cast.hpp>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,10 +68,14 @@ mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
 mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000))
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
+_mNumKernels(new cedar::aux::UIntParameter(this, "number of kernels", 1, 1, 20))
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
+  //default is two modes/kernels for lateral interaction
+  _mNumKernels->setValue(2);
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
   this->declareBuffer("lateralInteraction");
@@ -89,15 +94,20 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000))
   shifts.push_back(0.0);
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
-  mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 5.0, 2));
-  this->declareBuffer("kernel");
-  this->setBuffer("kernel", mKernel->getKernelRaw());
-  this->mKernel->hideDimensionality(true);
-  this->addConfigurableChild("lateral kernel", this->mKernel);
 
+  for (unsigned int i=0;i<_mNumKernels->getValue();i++)
+  {
+    cedar::aux::kernel::GaussPtr kernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 5.0, 2));
+    mKernels.push_back(kernel);
+    std::string kernel_name("lateral kernel ");
+    kernel_name += boost::lexical_cast<std::string>(i);
+    this->declareBuffer(kernel_name);
+    this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
+    this->mKernels.at(i)->hideDimensionality(true);
+    this->addConfigurableChild(kernel_name, this->mKernels.at(i));
+  }
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
-
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
 }
@@ -147,19 +157,25 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
-  const cv::Mat& kernel = this->mKernel->getKernel();
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
 
   sigmoid_u = mSigmoid->compute<float>(u);
+  lateral_interaction = cv::Mat::zeros(u.size(),u.type());
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->getValue() < 3)
   {
-    //!@todo Should this not use the data->lock*
-    mKernel->getReadWriteLock()->lockForRead();
-    cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
-    mKernel->getReadWriteLock()->unlock();
+    for (unsigned int i=0;i<_mNumKernels->getValue()&& i < this->mKernels.size();i++)
+    {
+      cv::Mat convolution_buffer =  cv::Mat::zeros(u.size(),u.type());
+      const cv::Mat& kernel = this->mKernels.at(i)->getKernel();
+      //!@todo Should this not use the data->lock*
+      mKernels.at(i)->getReadWriteLock()->lockForRead();
+      cv::filter2D(sigmoid_u, convolution_buffer, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
+      mKernels.at(i)->getReadWriteLock()->unlock();
+      lateral_interaction+=convolution_buffer;
+    }
   }
 
   CEDAR_ASSERT(u.size == sigmoid_u.size);
@@ -244,7 +260,9 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mSigmoidalActivation->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }
+  for (unsigned int i=0;i<mKernels.size();i++)
+  {
+    this->mKernels.at(i)->setDimensionality(dimensionality);
+  }
   this->unlockAll();
-
-  this->mKernel->setDimensionality(dimensionality);
 }
