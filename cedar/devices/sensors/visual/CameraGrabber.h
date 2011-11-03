@@ -145,7 +145,7 @@ protected:
                                unsigned int channel
                              ) const;
 
-  virtual bool onDestroy();
+  void onCleanUp();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
