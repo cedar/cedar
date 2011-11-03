@@ -67,6 +67,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+
+  //!@brief Constructor
+  //!@param classFactory a factory to create a new instance of a specific Trigger child
+  //!@param classId a unique string id for the Trigger child, which is created by the factory
   TriggerDeclaration(cedar::proc::TriggerFactoryPtr classFactory, const std::string& classId)
   :
   DeclarationBase<cedar::proc::Trigger, cedar::aux::Factory<cedar::proc::Trigger, cedar::proc::TriggerPtr> >
@@ -78,6 +82,7 @@ public:
   {
   }
 
+  //!@brief Destructor
   virtual ~TriggerDeclaration()
   {
   }
@@ -152,6 +157,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief checks if a generic Trigger is of a given child type (the template parameter of TriggerDeclarationT)
+  //!@param pointer trigger instance that is checked
   bool isObjectInstanceOf(cedar::proc::TriggerPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;

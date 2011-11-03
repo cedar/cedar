@@ -257,17 +257,20 @@ public slots:
   void onNameChanged();
 
 signals:
-  //!@brief Signal that is emmitted whenever the step's state is changed.
+  //!@brief Signal that is emitted whenever the step's state is changed.
   void stateChanged();
 
-  //!@brief Signal that is emmitted whenever the step's name is changed.
+  //!@brief Signal that is emitted whenever the step's name is changed.
   void nameChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Declares an input slot.
+  /*!@brief Declares an input slot.
+   * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the step
+   *                  unless the pointer to this slot (and all other mandatory slots) are non-zero.
+   */
   void declareInput(const std::string& name, bool mandatory = true);
 
   //!@brief Declares a buffer slot.
@@ -337,22 +340,26 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief the finished trigger, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
+  //!@Brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mDataConnections;
 
 private:
-  /*!@brief Whether the connect function should automatically connect the triggers as well.
-   */
+  //!@brief Whether the connect function should automatically connect the triggers as well.
   const bool mAutoConnectTriggers;
+  //!@brief flag that states if step is still computing its latest output
   bool mBusy;
   QReadWriteLock* mpArgumentsLock;
   ArgumentsPtr mNextArguments;
+  //!@brief flag that states if all mandatory connections (i.e. inputs) are set
   bool mMandatoryConnectionsAreSet;
+  //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
   std::string mStateAnnotation;
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
-  //! Registry managing the step.
+  //!@brief Registry managing the step.
   cedar::proc::StepRegistry* mRegisteredAt;
 
   //!@brief Map of all actions defined for this step.

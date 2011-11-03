@@ -66,6 +66,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief The standard constructor.
   StepDeclaration(
                    cedar::proc::StepFactoryPtr classFactory,
                    const std::string& classId,
@@ -76,6 +77,7 @@ public:
   {
   }
 
+  //!@brief Destructor
   ~StepDeclaration()
   {
   }
@@ -85,11 +87,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief set path to icon included in the graphical representation of this step
   void setIconPath(const std::string& path)
   {
     this->mIconPath = path;
   }
 
+  //!@brief get path to icon included in the graphical representation of this step
   const std::string& getIconPath()
   {
     return this->mIconPath;
@@ -113,6 +117,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief path to icon included in the graphical representation of this step
   std::string mIconPath;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -161,6 +166,8 @@ public:
   {
   }
 
+  //!@brief checks if a generic Step is of a given child type (the template parameter of StepDeclarationT)
+  //!@param pointer step instance that is checked
   bool isObjectInstanceOf(cedar::proc::StepPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;

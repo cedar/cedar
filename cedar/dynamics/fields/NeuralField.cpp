@@ -227,10 +227,6 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
   return true;
 }
 
-void cedar::dyn::NeuralField::onStart()
-{
-}
-
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(_mDimensionality->getValue(), _mSizes->getDefaultValue());
