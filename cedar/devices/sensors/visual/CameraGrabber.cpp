@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Header for the @em cedar::devices::visual::CameraGrabber class.
+    Description: Implementation of the @em cedar::devices::visual::CameraGrabber class.
 
     Credits:
 
@@ -57,8 +57,13 @@ CameraGrabber::CameraGrabber(
                               const std::string& configFileName,
                               unsigned int Camera
                             )
-  : GrabberInterface(configFileName)
+:
+GrabberInterface(configFileName)
 {
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout << "[CameraGrabber::CameraGrabber] Create single channel instance" << std::endl;
+  #endif
+
   mCameraId.push_back(Camera);
   doInit(mCameraId.size(),"CameraGrabber");
 }
@@ -71,12 +76,28 @@ CameraGrabber::CameraGrabber(
                               unsigned int Camera0,
                               unsigned int Camera1
                             )
-  : GrabberInterface(configFileName)
+:
+GrabberInterface(configFileName)
 {
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout << "[CameraGrabber::CameraGrabber] Create stereo channel instance" << std::endl;
+  #endif
+
   mCameraId.push_back(Camera0);
   mCameraId.push_back(Camera1);
 
   doInit(mCameraId.size(),"CameraGrabber");
+}
+
+//----------------------------------------------------------------------------------------------------
+CameraGrabber::~CameraGrabber()
+{
+  doCleanUp();
+
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout<<"[CameraGrabber::Destructor]"<< std::endl;
+  #endif
+  //VideoCaptures are released automatically within the Vector mCaptureVector
 }
 
 
@@ -92,26 +113,16 @@ bool CameraGrabber::onDeclareParameters()
 }
 
 //----------------------------------------------------------------------------------------------------
-CameraGrabber::~CameraGrabber()
-{
-  onDestroy();
-
-  #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[CameraGrabber::Destructor]"<< std::endl;
-  #endif
-  //VideoCaptures are released automatically within the Vector mCaptureVector
-}
-
-
-//----------------------------------------------------------------------------------------------------
 bool CameraGrabber::onInit()
 {
-
   //local and/or stored Parameters are already initialized
+
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout<<"[CameraGrabber::onInit]"<< std::endl;
+  #endif
 
   #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
     std::cout << "CameraGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
-
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
       std::cout << "Channel " << i << ": capture from: camera " << mCameraId.at(i) << "\n";
@@ -119,15 +130,14 @@ bool CameraGrabber::onInit()
     std::cout << std::flush;
   #endif
 
+  //----------------------------------------
+  //open capture one by one, and create storage (cv::Mat) for it
   mImageMatVector.clear();
   mCaptureVector.clear();
 
-  //----------------------------------------
-  //open capture one by one, and create storage (cv::Mat) for it
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
     VideoCapture capture(mCameraId.at(i));
-
     if (capture.isOpened())
     {
       mCaptureVector.push_back(capture);
@@ -140,9 +150,7 @@ bool CameraGrabber::onInit()
     else
     {
       std::cout << "ERROR: Grabbing failed (Channel " << i << ")." << std::endl;
-
-      //throws an initialization-exception, so program will terminate
-      return false;
+      return false; //throws an initialization-exception
     }
   }
   //all grabbers successfully initialized
@@ -150,17 +158,14 @@ bool CameraGrabber::onInit()
   //----------------------------------------
   //check for highest FPS
   double fps = mCaptureVector.at(0).get(CV_CAP_PROP_FPS);
-
   for (unsigned int i = 1; i < mNumCams; ++i)
   {
     double fps_test = mCaptureVector.at(i).get(CV_CAP_PROP_FPS);
-
     if (fps_test > fps)
     {
       fps = fps_test;
     }
   }
-
 
   //----------------------------------------
   //set stepsize for LoopedThread
@@ -173,9 +178,6 @@ bool CameraGrabber::onInit()
   return true;
 } //onInit()
 
-
-
-
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::onGrab()
 {
@@ -183,7 +185,7 @@ bool CameraGrabber::onGrab()
 
   //grab and retrieve
   /*
-   * for(unsigned int i = 0; i < mNumCams; ++i)                    //grab on all channels
+   * for(unsigned int i = 0; i < mNumCams; ++i)
    * {
    * (mCaptureVector.at(i))>> mImageMatVector.at(i);
    * }
@@ -194,15 +196,16 @@ bool CameraGrabber::onGrab()
    */
 
   //for better synchronizing between the cameras,
-  //first grab (internally in camera) and then retrieve
-  for (unsigned int i = 0; i < mNumCams; ++i)                     //grab on all channels
+  //first grab internally in camera (OpenCV)
+  for (unsigned int i = 0; i < mNumCams; ++i)
   {
     result = result && mCaptureVector.at(i).grab();
   }
 
+  //and then retrieve the frames
   if (result)
   {
-    for (unsigned int i = 0; i < mNumCams; ++i)                   //retrieve all channels
+    for (unsigned int i = 0; i < mNumCams; ++i)
     {
       result = result && mCaptureVector.at(i).retrieve(mImageMatVector.at(i));
     }
@@ -215,25 +218,25 @@ bool CameraGrabber::onGrab()
 //----------------------------------------------------------------------------------------------------
 std::string CameraGrabber::onGetSourceInfo(unsigned int channel) const
 {
-  if (channel >= mNumCams)
-  {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::onGetSourceInfo");
-  }
+  //value of channel is already checked by getSourceInfo
+  //if (channel >= mNumCams)
+  //{
+  //  CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::onGetSourceInfo");
+  //}
   std::stringstream s;
   s << "Camera " << mCameraId.at(channel) << ": No informations available";
   return s.str();
 }
 
 //----------------------------------------------------------------------------------------------------
-bool CameraGrabber::onDestroy()
+void CameraGrabber::onCleanUp()
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[CameraGrabber::onDestroy]"<< std::endl;
+    std::cout<<"[CameraGrabber::onCleanUp]"<< std::endl;
   #endif
 
   //close all captures
   mCaptureVector.clear();
-  return true;
 }
 
 //----------------------------------------------------------------------------------------------------

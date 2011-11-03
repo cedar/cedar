@@ -25,10 +25,10 @@
     File:        main.cpp
 
     Maintainer:  Georg.Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Unit test for the behavior of the GrabberInterface.
+    Description: Interactive test of the GrabberInterface.
 
     Credits:
 
@@ -46,12 +46,14 @@
 #include <opencv2/opencv.hpp>
 
 
+//--------------------------------------------------------------------------------------------------------------------
 //constants
+//--------------------------------------------------------------------------------------------------------------------
 #define FPS_TEST_DURATION_IN_SEC 1
 #define CHANNEL_0_NAME "CHANNEL_0_NAME"
 #define CHANNEL_1_NAME "CHANNEL_1_NAME"
 
-#define GRABBER_NAME_1 "TestGrabber"
+#define GRABBER_NAME_1 "TestGrabber_1"
 #define CONFIG_FILE_NAME_1 "grabber1.config"
 
 #define GRABBER_NAME_2 "TestGrabber_2"
@@ -59,6 +61,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------
 //additional namespace to hide global functions
+//--------------------------------------------------------------------------------------------------------------------
 namespace TEST_GRABBER
 {
     using namespace boost::posix_time;
@@ -66,24 +69,23 @@ namespace TEST_GRABBER
     //---------------------------------------------------------------
     // simple function to test the framerate of the grabbing-thread
     //---------------------------------------------------------------
-
     bool  test_framrate(cedar::dev::sensors::visual::TestGrabber& grabber )
     {
-
       double fps = grabber.getFps();
-
-      //timestamp for framerate-tests
-      ptime test_start = microsec_clock::local_time();
       std::cout << "Start thread . . . " << std::flush;
+
+      //start grabbing and wait
+      ptime test_start = microsec_clock::local_time();
       grabber.start();
       sleep(FPS_TEST_DURATION_IN_SEC);
+
+      //stop
       grabber.stop();
-      std::cout << "test finished - ";
       ptime test_end = microsec_clock::local_time();
+      std::cout << "test finished - ";
 
       //calculate real diff:
       time_duration test_duration = test_end - test_start;
-
       unsigned int real_count = grabber.getCounter();
       double theoretical_count = fps*test_duration.seconds();
 
@@ -94,15 +96,17 @@ namespace TEST_GRABBER
       }
       else
       {
-        std::cout << "ERROR\ngot "<<real_count<<" fps, there should be "
-                  << theoretical_count<<" fps!"<<std::endl;
+        std::cout << "ERROR\n\tGot " << real_count << " fps, there should be "
+                  << theoretical_count << " fps!" << std::endl;
         return false;
       }
     } // test_framrate
 } // namespace TEST_GRABBER
-//--------------------------------------------------------------------------------------------------------------------
 
+
+//--------------------------------------------------------------------------------------------------------------------
 // main test program
+//--------------------------------------------------------------------------------------------------------------------
 using namespace TEST_GRABBER;
 
 int main(int , char **)
@@ -119,10 +123,18 @@ int main(int , char **)
   grabber_1->setName(GRABBER_NAME_1);
   std::cout << "\nGrabber created with name \""<<grabber_1->getName()<<"\"\n";
 
+  //save default values
+  int grabber_1_testparam = grabber_1->getTestParam();
+  double grabber_1_fps = grabber_1->getFps();
+  std::string grabber_1_name = grabber_1->getName();
+
   //-----------------------------------------------------------
   //Test FPS
-  std::cout << "\n\n---------------------------\n";
-  std::cout << "Test FPS\n";
+  //-----------------------------------------------------------
+  std::cout << "\n\n---------------------------\n"
+            << "Test FPS\n"
+            << "---------------------------\n";
+
   std::cout << "\nSet Fps to \"40\" and start thread\n";
   grabber_1->setFps(40);
   test_framrate(*grabber_1);
@@ -146,36 +158,49 @@ int main(int , char **)
 
   //-----------------------------------------------------------
   //Test parameter save and restore
-  std::cout << "\n\n---------------------------\n";
-  std::cout << "Test default parameter: load and save\n";
+  //-----------------------------------------------------------
+  std::cout << "\n\n---------------------------\n"
+            << "Test default parameter: load and save\n"
+            << "---------------------------\n";
+
   std::cout << "grabber_1->getTestParam "<< grabber_1->getTestParam()<<std::endl;
 
   //do with another number
   grabber_1->setTestParam(456);
   grabber_1->setFps(50);
-  std::cout << "Set TestParam to \"456\" and FPS to \"50\"\n";
+  grabber_1->setName(GRABBER_NAME_1);
 
+  std::cout << "Set:\n\tGrabbername to \"" << GRABBER_NAME_1 << "\"\n"
+            <<"\tTestParam to \"456\"\n"
+            <<"\tFPS to \"50\"\n"
+            <<"Recreate the grabber\n";
 
   delete grabber_1;
   grabber_1 = NULL;
 
   usleep(1000);
-  //std::cout << "\n\n---------------------------\n";
   cedar::dev::sensors::visual::TestGrabber *grabber_2
     = new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_1,CHANNEL_0_NAME,CHANNEL_1_NAME);
 
-  //grabber_2->setName(GRABBER_NAME_2);
-  std::cout << "\nA new grabber created with name "<<grabber_2->getName()<<std::endl;
-  std::cout << "grabber_1->getTestParam "<< grabber_2->getTestParam()<<std::endl;
-  std::cout << "grabber_1->getFps "<< grabber_2->getFps()<<std::endl;
+  std::cout << "A new grabber created:\n"
+            << "\tGrabbername \""<< grabber_2->getName() << "\"\n"
+            << "\tTestParam \"" << grabber_2->getTestParam() << "\"\n"
+            << "\tFps "<< grabber_2->getFps() << "\"\n";
 
+  //restore default values
+  grabber_2->setTestParam(grabber_1_testparam);
+  grabber_2->setFps(grabber_1_fps);
+  grabber_2->setName(grabber_1_name);
+  grabber_2->writeConfiguration();
 
   //-----------------------------------------------------------
   //Test CTRL-C handler
-  std::cout << "\n\n---------------------------\n";
-  std::cout << "Test CTRL-C Handler\n\n";
+  //-----------------------------------------------------------
+  std::cout << "\n\n---------------------------\n"
+            << "Test CTRL-C Handler\n"
+            << "---------------------------\n";
 
-  std::cout << "Creating 3 additional grabbers"<<std::endl;
+  std::cout << "\nCreating 3 additional grabbers"<<std::endl;
 
   std::cout << "\n1.\n";
   cedar::dev::sensors::visual::TestGrabber *grabber_3
@@ -196,8 +221,9 @@ int main(int , char **)
   std::cout << "\n3.\n";
   cedar::dev::sensors::visual::TestGrabberPtr
         grabber_4(new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_2,CHANNEL_1_NAME ));
-  grabber_4->setName("shared_ptr grabber");
   std::cout << "-> A new grabber created with name \""<<grabber_4->getName()<<"\"\n";
+  grabber_4->setName("shared_ptr grabber");
+  std::cout << "-> Set name to \""<<grabber_4->getName()<<"\"\n";
 
 
   std::cout << "\n\nPress now CTRL-C\n";

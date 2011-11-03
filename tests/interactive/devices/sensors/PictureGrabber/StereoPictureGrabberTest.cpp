@@ -118,7 +118,7 @@ int main(int , char **)
     //It is possible to create a snaptshot of the pics.
     //In the case, you set another extenstion as in the source, the image will be converted
 
-    //Set Snapshotnames without channel-number (in mono-case: default value is 0)
+    //Set snapshotnames without channel-number (in mono-case: default value is 0)
     //This is the same behavior as setRecordName()
     //The type of the file (e.g. bitmap or jpg or something else) depend on extension
     //look at the documentation of setSnapshotName for details

@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConfigurationInterface.h
+    File:        PictureGrabber.cpp
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 01 08
 
-    Description: Grabber to grab from pictures.
+    Description: Implementation of the @em cedar::dev::sensors::visual::PictureGrabber class..
 
     Credits:
 
@@ -42,8 +42,6 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
-
 
 
 using namespace cv;
@@ -67,8 +65,6 @@ GrabberInterface(configFileName)
   doInit(mSourceFileName.size(),"PictureGrabber");
 }
 
-
-
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-file grabber
 PictureGrabber::PictureGrabber(
@@ -87,27 +83,22 @@ GrabberInterface(configFileName)
 //----------------------------------------------------------------------------------------------------
 PictureGrabber::~PictureGrabber()
 {
+  doCleanUp();
   #ifdef DEBUG_PICTUREGRABBER
     std::cout<<"[PictureGrabber::Destructor]"<< std::endl;
   #endif
-  //VideoCaptures are released automatically within the Vector mCaptureVector
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 //methods
 //----------------------------------------------------------------------------------------------------------------------
 
-
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::onInit()
 {
-
   //local and/or stored parameters are already initialized
-
   #ifdef SHOW_INIT_INFORMATION_PICTUREGRABBER
     std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
-
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
       std::cout << "Channel " << i << ": capture from Picture: " << mSourceFileName.at(i) << "\n";
@@ -115,9 +106,9 @@ bool PictureGrabber::onInit()
     std::cout << std::flush;
   #endif
 
-
   mImageMatVector.clear();
 
+  //for every channel, read from image-file
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
     cv::Mat frame = cv::imread(mSourceFileName.at(i));
@@ -128,9 +119,10 @@ bool PictureGrabber::onInit()
     }
     else
     {
-      std::cout << "ERROR: Grabbing failed (Channel " << i << "): \"" << mSourceFileName.at(i) << "\"." << std::endl;
-      return false;
-      //exception thrown in GrabberInterface
+      std::cout << "[PictureGrabber::onInit] ERROR: Grabbing failed\n"
+                << "\tChannel " << i << ": \"" << mSourceFileName.at(i) << "\"."
+                << std::endl;
+      return false; //throws initialization exception
     }
   }
   //all grabbers successfully initialized
@@ -141,7 +133,6 @@ bool PictureGrabber::onInit()
 
   return true;
 }
-
 
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::onDeclareParameters()
@@ -158,6 +149,7 @@ std::string PictureGrabber::onGetSourceInfo(unsigned int channel) const
   }
   return mSourceFileName.at(channel);
 }
+
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::onGrab()
 {
@@ -168,8 +160,6 @@ bool PictureGrabber::onGrab()
   }
   return true;
 }
-
-
 
 //----------------------------------------------------------------------------------------------------
 bool PictureGrabber::setSourceFile(unsigned int channel, const std::string& FileName )

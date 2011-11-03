@@ -116,7 +116,7 @@ protected:
                                 unsigned int channel
                              ) const;
 
-  virtual bool onDestroy();
+  void onCleanUp();
 
   //--------------------------------------------------------------------------------------------------------------------
   //private methods
@@ -140,7 +140,7 @@ protected:
    */
   std::vector<std::string> mYarpChannels;
 
-  /*! \brief This vector contains the needed Yarp Reads.
+  /*! \brief This vector contains the needed Yarp Readers.
    *		One for every channel.
    *   \see
    *       mImageMatVector

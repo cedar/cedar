@@ -227,7 +227,7 @@ int main(int , char **)
 
 
   //some options
-  video_grabber.setLoop(false);
+  video_grabber.setLoop(true);
 
 
   //------------------------------------------------------------------
@@ -246,6 +246,17 @@ int main(int , char **)
   std::cout << "VideoGrabber thread FPS    : " << video_grabber.getFps() << std::endl;
   video_grabber.start();
 
+  //enable Recording
+  //The FPS of Recording is independent from GrabbingThread.
+
+  //recording with actual speed (depends on speed factor)
+  video_grabber.startRecording(video_grabber.getFps(),CV_FOURCC('M','P','4','2'));
+
+  //recording with speed of avi-file
+  //video_grabber.startRecording(video_grabber.getSourceFps(),CV_FOURCC('M','P','4','2'));
+
+  //recording with fixed framerate
+  //video_grabber.startRecording(70,CV_FOURCC('M','P','4','2'));
 
   std::cout << "\nShow rest of videos\n";
   //get frames until avi is over

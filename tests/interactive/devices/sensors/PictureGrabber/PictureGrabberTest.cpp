@@ -27,6 +27,8 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
+
+
 /*! \file This is a short example of how to use the PictureGrabber class as a stereo grabber.
  *
  *  \remarks
