@@ -131,6 +131,16 @@ public:
     return this->mValues;
   }
 
+  const T& back() const
+  {
+    return this->mValues.back();
+  }
+
+  T& back()
+  {
+    return this->mValues.back();
+  }
+
   iterator begin()
   {
     return this->mValues.begin();

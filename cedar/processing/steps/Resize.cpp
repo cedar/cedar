@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/MatrixIterator.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -95,8 +96,143 @@ void cedar::proc::steps::Resize::compute(const cedar::proc::Arguments&)
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
 
-  cv::Size size = this->getOutputSize();
-  cv::resize(input, output, size, 0, 0, this->_mInterpolationType->getValue());
+  if (this->_mOutputSize->size() <= 2)
+  {
+    cv::Size size = this->getOutputSize();
+    cv::resize(input, output, size, 0, 0, this->_mInterpolationType->getValue());
+  }
+  else
+  {
+    CEDAR_ASSERT(this->_mInterpolationType->getValue() == cedar::proc::steps::Resize::Interpolation::LINEAR);
+
+    switch (this->_mInterpolationType->getValue())
+    {
+      default:
+        std::cout << "Unimplemented interpolation type in cedar::proc::steps::Resize::compute. "
+                  << "Defaulting to linear interpolation."
+                  << std::endl;
+      case cedar::proc::steps::Resize::Interpolation::LINEAR:
+      {
+        cedar::aux::MatrixIterator iter(output);
+        do
+        {
+          double interpolated_value = this->linearInterpolationND(input, output, iter.getCurrentIndexVector());
+          cedar::aux::math::assignMatrixEntry(output, iter.getCurrentIndexVector(), interpolated_value);
+        }
+        while (iter.increment());
+        break;
+      }
+    }
+  }
+}
+
+double cedar::proc::steps::Resize::linearInterpolationND
+                                 (
+                                   const cv::Mat& source,
+                                   cv::Mat& target,
+                                   const std::vector<int>& targetIndex
+                                 )
+{
+  CEDAR_ASSERT(target.dims > 0);
+  CEDAR_ASSERT(source.dims == target.dims);
+
+
+  // prepare auxiliary data
+  // vector of all lower/upper indices in the source matrix
+  std::vector<std::pair<int, int> > bounds;
+  std::vector<double> interpolated_indices;
+  bounds.resize(target.dims);
+  interpolated_indices.resize(target.dims);
+
+  for (int d = 0; d < target.dims; ++d)
+  {
+    double ratio = static_cast<double>(source.size[d]) / static_cast<double>(target.size[d]);
+    double real_index = targetIndex.at(d)*ratio;
+    int lower = floor(real_index);
+    int upper = ceil(real_index);
+    if(upper >= source.size[d])
+      upper = source.size[d] - 1;
+
+    bounds.at(d) = std::make_pair(lower, upper);
+    interpolated_indices.at(d) = real_index;
+  }
+
+  // retrieve result
+  std::vector<double> result;
+  linearInterpolationNDRecursion(source, target, bounds, interpolated_indices, targetIndex, 0, result);
+  CEDAR_DEBUG_ASSERT(result.size() == 1);
+  return result.at(0);
+}
+
+void cedar::proc::steps::Resize::linearInterpolationNDRecursion
+                                 (
+                                   const cv::Mat& source,
+                                   cv::Mat& target,
+                                   const std::vector<std::pair<int, int> >& bounds,
+                                   std::vector<double>& interpolatedIndices,
+                                   const std::vector<int>& targetIndex,
+                                   int currentDimension,
+                                   std::vector<double>& interpolatedValues
+                                 )
+{
+  CEDAR_ASSERT(source.type() == CV_32F);
+  CEDAR_ASSERT(source.dims == target.dims);
+  CEDAR_ASSERT(source.dims > 0);
+  if (currentDimension == target.dims - 1)
+  {
+    // case 1: end of the recursion
+    //         - this part interpolates between the actual values along each combination of dimensions.
+    unsigned int num = pow(2, source.dims - 1);
+    interpolatedValues.resize(num);
+
+    int lower_index = bounds.at(currentDimension).first;
+    double difference = interpolatedIndices.at(currentDimension) - static_cast<double>(lower_index);
+
+    std::vector<int> index;
+    index.resize(target.dims, 0);
+    for(unsigned int i = 0; i < num; ++i)
+    {
+
+      for (size_t j = 0; j < static_cast<size_t>(source.dims) - 1; ++j)
+      {
+        if ( (i & (1 << j)) > 0 )
+          index.at(j) = bounds.at(j).first;
+        else
+          index.at(j) = bounds.at(j).second;
+      }
+
+      index.back() = bounds.back().first;
+      double lower_value = source.at<float>(&index.front());
+      index.back() = bounds.back().second;
+      double upper_value = source.at<float>(&index.front());
+      interpolatedValues.at(i) = lower_value * difference + (1.0 - difference) * upper_value;
+    }
+  }
+  else
+  {
+    // case 2: process deeper recursion
+    //         - compute the interpolated values from the ones calculated in the deeper recursion
+    std::vector<double> next_interpolated_values;
+    linearInterpolationNDRecursion(source,
+                                   target,
+                                   bounds,
+                                   interpolatedIndices,
+                                   targetIndex,
+                                   currentDimension + 1,
+                                   next_interpolated_values);
+
+    int lower_index = bounds.at(currentDimension).first;
+    double distance = interpolatedIndices.at(currentDimension) - static_cast<double>(lower_index);
+
+    // process the result of the recursion
+    size_t num = pow(2, currentDimension);
+    interpolatedValues.resize(num);
+    for (size_t i = 0; i < num; ++i)
+    {
+      interpolatedValues.at(i) = (1.0 - distance) * next_interpolated_values.at(2 * i)
+                                 + distance * next_interpolated_values.at(2 * i + 1);
+    }
+  }
 }
 
 cv::Size cedar::proc::steps::Resize::getOutputSize() const
@@ -118,9 +254,15 @@ cv::Size cedar::proc::steps::Resize::getOutputSize() const
 void cedar::proc::steps::Resize::outputSizeChanged()
 {
   const cv::Mat& input = this->mInput->getData();
-  cv::Size size = this->getOutputSize();
-  this->mOutput->setData(cv::Mat::zeros(size, input.type()));
-  // when the gain changes, the output needs to be recalculated.
+  int size = static_cast<int>(this->_mOutputSize->size());
+  std::vector<int> sizes;
+  for (size_t i = 0; i < this->_mOutputSize->size(); ++i)
+  {
+    sizes.push_back(static_cast<int>(this->_mOutputSize->at(i)));
+  }
+  cv::Mat new_output_mat = cv::Mat(size, &sizes.at(0), input.type(), cv::Scalar(0));
+  this->mOutput->setData(new_output_mat);
+
   this->onTrigger();
 }
 
@@ -163,10 +305,8 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
   // Let's get a reference to the input matrix.
   const cv::Mat& input = this->mInput->getData();
 
+  // Adapt the dimensionality of the output size vector.
   this->_mOutputSize->resize(cedar::aux::math::getDimensionalityOf(input), 1);
-
-  // Make a copy to create a matrix of the same type, dimensions, ...
-  this->mOutput->setData(input.clone());
 
   // Finally, this also requires a recomputation of the output.
   this->outputSizeChanged();

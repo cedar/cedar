@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/lib.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -92,6 +93,26 @@ namespace cedar
           return 1;
         }
         return matrix.dims;
+      }
+
+      inline void assignMatrixEntry(cv::Mat& matrix, std::vector<int> index, double value)
+      {
+        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
+
+        switch (matrix.type())
+        {
+          case CV_32F:
+            matrix.at<float>(&index.at(0)) = static_cast<float>(value);
+            break;
+
+          case CV_64F:
+            matrix.at<double>(&index.at(0)) = static_cast<double>(value);
+            break;
+
+          default:
+            // this should never happen due to the assert above.
+            CEDAR_ASSERT(false);
+        }
       }
     }
   }
