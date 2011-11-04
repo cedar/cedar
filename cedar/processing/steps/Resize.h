@@ -136,6 +136,28 @@ protected:
 private:
   cv::Size getOutputSize() const;
 
+  /*!@brief A recursive interpolation function for n-dimensional tensors.
+   */
+  double linearInterpolationND
+  (
+    const cv::Mat& source,
+    cv::Mat& target,
+    const std::vector<int>& targetIndex
+  );
+
+  /*!@brief A recursive helper function for n-dimensional linear interpolation of tensors.
+   */
+  void linearInterpolationNDRecursion
+  (
+    const cv::Mat& source,
+    cv::Mat& target,
+    const std::vector<std::pair<int, int> >& bounds,
+    std::vector<double>& interpolatedIndices,
+    const std::vector<int>& targetIndex,
+    int currentDimension,
+    std::vector<double>& interpolatedValues
+  );
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
