@@ -39,11 +39,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/HistoryPlot.h"
-#include "auxiliaries/gui/HistoryPlot0D.h"
-#include "auxiliaries/gui/exceptions.h"
-#include "auxiliaries/exceptions.h"
-#include "auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/gui/HistoryPlot.h"
+#include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/DataTemplate.h"
 
 // PROJECT INCLUDES
 

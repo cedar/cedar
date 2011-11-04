@@ -35,13 +35,13 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/Settings.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/SetParameter.h"
-#include "auxiliaries/DirectoryParameter.h"
-#include "auxiliaries/VectorParameter.h"
-#include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/System.h"
+#include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/SetParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/System.h"
 
 // PROJECT INCLUDES
 

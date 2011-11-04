@@ -38,8 +38,8 @@
 #define CEDAR_AUX_KERNEL_SEPARABLE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernel/namespace.h"
-#include "auxiliaries/kernel/Kernel.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
 
 // PROJECT INCLUDES
 
@@ -94,10 +94,10 @@ private:
 protected:
   void setKernelPart(unsigned int dimension, const cv::Mat& mat);
 
-  //!@todo make private
+  //!@todo Make private?
   std::vector<cv::Mat> mKernelParts; //!< the separate parts of a separable kernel
+
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

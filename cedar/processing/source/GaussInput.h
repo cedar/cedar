@@ -42,12 +42,12 @@
 #define CEDAR_PROC_SOURCE_GAUSS_INPUT_H
 
 // LOCAL INCLUDES
-#include "processing/source/namespace.h"
-#include "processing/namespace.h"
-#include "dynamics/namespace.h"
-#include "processing/Step.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/NumericVectorParameter.h"
+#include "cedar/processing/source/namespace.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 

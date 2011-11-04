@@ -42,7 +42,7 @@
 // PROJECT INCLUDES
 
 // LOCAL INCLUDES
-#include "auxiliaries/UserData.h"
+#include "cedar/auxiliaries/UserData.h"
 /*!
  * @brief Class for interval data mainly used by automated gui creation.
  */

@@ -39,9 +39,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/IdeApplication.h"
-#include "dynamics/namespace.h"
-#include "auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/processing/gui/IdeApplication.h"
+#include "cedar/dynamics/namespace.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 

@@ -42,9 +42,9 @@
 #define CEDAR_AUX_VECTOR_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Parameter.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -131,6 +131,16 @@ public:
     return this->mValues;
   }
 
+  const T& back() const
+  {
+    return this->mValues.back();
+  }
+
+  T& back()
+  {
+    return this->mValues.back();
+  }
+
   iterator begin()
   {
     return this->mValues.begin();
@@ -146,11 +156,6 @@ public:
     iterator ret = this->mValues.erase(iter);
     this->emitChangedSignal();
     return ret;
-  }
-
-  const T& back() const
-  {
-    return this->mValues.back();
   }
 
   /*std::vector<T>& get()

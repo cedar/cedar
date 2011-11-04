@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/StringParameter.h"
-#include "auxiliaries/ParameterTemplate.h"
+#include "cedar/processing/gui/StringParameter.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 

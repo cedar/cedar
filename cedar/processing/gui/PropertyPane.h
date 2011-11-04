@@ -38,15 +38,16 @@
 #define CEDAR_PROC_PROPERTY_PANE_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/namespace.h"
-#include "auxiliaries/TypeBasedFactory.h"
-#include "processing/Step.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/processing/Step.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QTableWidget>
+#include <boost/signals2/connection.hpp>
 
 
 /*!@brief Abstract description of the class.
@@ -97,6 +98,7 @@ public:
 
 public slots:
   void resetPointer();
+  void redraw();
 
   void rowSizeChanged();
 
@@ -130,6 +132,7 @@ private:
 
   std::map<cedar::proc::gui::Parameter*, int> mParameterRowIndex;
 
+  boost::signals2::connection mSlotConnection;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

@@ -39,14 +39,14 @@
 #define CEDAR_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "defines.h" // IT MIGHT NOT BE A CLEAN DESIGN TO INCLUDE THIS HERE (?) ANY SUGGESTIONS?
+#include "cedar/defines.h" // IT MIGHT NOT BE A CLEAN DESIGN TO INCLUDE THIS HERE (?) ANY SUGGESTIONS?
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*@brief Namespace for cedar (top level). */
+/*!@brief Namespace for cedar (top level). */
 namespace cedar
 {
 

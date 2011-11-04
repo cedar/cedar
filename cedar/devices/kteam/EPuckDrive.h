@@ -39,12 +39,12 @@
 
 // LOCAL INCLUDES
 
-#include "devices/kteam/Drive.h"
+#include "cedar/devices/kteam/Drive.h"
 
 // PROJECT INCLUDES
 
-#include "auxiliaries/ConfigurationInterface.h"
-#include "devices/communication/SerialCommunication.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/devices/communication/SerialCommunication.h"
 
 // SYSTEM INCLUDES
 

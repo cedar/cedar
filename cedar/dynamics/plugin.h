@@ -38,8 +38,8 @@
 #define CEDAR_DYN_PLUGIN_H
 
 // LOCAL INCLUDES
-#include "dynamics/lib.h"
-#include "processing/PluginDeclaration.h"
+#include "cedar/dynamics/lib.h"
+#include "cedar/processing/PluginDeclaration.h"
 
 #ifndef LINUX // workaround for circular linking
 //!@todo Do this for GCC/linux as well?

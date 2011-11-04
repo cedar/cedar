@@ -38,9 +38,9 @@
 #define CEDAR_AUX_TYPE_BASED_FACTORY_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/FactoryDerived.h"
-#include "auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 

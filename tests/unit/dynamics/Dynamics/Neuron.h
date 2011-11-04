@@ -38,8 +38,8 @@
 #define CEDAR_NEURON_H
 
 // LOCAL INCLUDES
-#include "dynamics/Dynamics.h"
-#include "dynamics/Activation.h"
+#include "cedar/dynamics/Dynamics.h"
+#include "cedar/dynamics/Activation.h"
 
 // PROJECT INCLUDES
 
@@ -76,7 +76,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  void eulerStep(const cedar::unit::Duration& time);
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

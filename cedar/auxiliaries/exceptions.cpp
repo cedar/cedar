@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-#include "auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 cedar::aux::UnhandledTypeException::UnhandledTypeException()
 {
@@ -88,4 +88,9 @@ cedar::aux::NoDefaultException::NoDefaultException()
 cedar::aux::InvalidNameException::InvalidNameException()
 {
   this->mType = "InvalidNameException";
+}
+
+cedar::aux::TypeMismatchException::TypeMismatchException()
+{
+  this->mType = "TypeMismatchException";
 }

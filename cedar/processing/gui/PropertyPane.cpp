@@ -35,23 +35,23 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/PropertyPane.h"
-#include "processing/Step.h"
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/EnumParameter.h"
-#include "processing/gui/BoolParameter.h"
-#include "processing/gui/DoubleParameter.h"
-#include "processing/gui/DoubleVectorParameter.h"
-#include "processing/gui/UIntParameter.h"
-#include "processing/gui/UIntVectorParameter.h"
-#include "processing/gui/StringParameter.h"
-#include "processing/gui/EnumParameter.h"
-#include "auxiliaries/DirectoryParameter.h"
-#include "processing/gui/DirectoryParameter.h"
-#include "processing/Manager.h"
+#include "cedar/processing/gui/PropertyPane.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/gui/BoolParameter.h"
+#include "cedar/processing/gui/DoubleParameter.h"
+#include "cedar/processing/gui/DoubleVectorParameter.h"
+#include "cedar/processing/gui/UIntParameter.h"
+#include "cedar/processing/gui/UIntVectorParameter.h"
+#include "cedar/processing/gui/StringParameter.h"
+#include "cedar/processing/gui/EnumParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/processing/gui/DirectoryParameter.h"
+#include "cedar/processing/Manager.h"
 
 // PROJECT INCLUDES
 
@@ -60,6 +60,7 @@
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include <QApplication>
+#include <boost/bind.hpp>
 
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes cedar::proc::gui::PropertyPane::mDataWidgetTypes;
@@ -111,8 +112,12 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
 
 void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
 {
+  if (mSlotConnection.connected())
+  {
+    mSlotConnection.disconnect();
+  }
   this->append(pConfigurable->getParameters());
-
+  mSlotConnection = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::proc::gui::PropertyPane::redraw, this));
   for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
        iter != pConfigurable->configurableChildren().end();
        ++iter)
@@ -218,4 +223,10 @@ void cedar::proc::gui::PropertyPane::resetPointer()
   this->mDisplayedConfigurable.reset();
   this->clearContents();
   this->setRowCount(0);
+}
+
+void cedar::proc::gui::PropertyPane::redraw()
+{
+  this->resetContents();
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
 }

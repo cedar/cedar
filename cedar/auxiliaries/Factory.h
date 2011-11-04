@@ -38,7 +38,7 @@
 #define CEDAR_AUX_FACTORY_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 

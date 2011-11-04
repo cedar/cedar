@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/BoolParameter.h"
-#include "auxiliaries/ParameterTemplate.h"
+#include "cedar/processing/gui/BoolParameter.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 

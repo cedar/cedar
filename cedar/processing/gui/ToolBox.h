@@ -42,7 +42,7 @@
 #define CEDAR_PROC_GUI_TOOLBOX_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
+#include "cedar/processing/gui/namespace.h"
 
 // PROJECT INCLUDES
 

@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/kernel/Separable.h"
 
 // PROJECT INCLUDES
 
@@ -85,7 +85,7 @@ cv::Mat cedar::aux::kernel::Separable::convolveWith(const cv::Mat& mat) const
 
 const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimension) const
 {
-  return mKernelParts.at(dimension);
+  return this->mKernelParts.at(dimension);
 }
 
 void cedar::aux::kernel::Separable::setKernelPart(unsigned int dimension, const cv::Mat& mat)

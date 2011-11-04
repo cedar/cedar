@@ -38,8 +38,8 @@
 #define CEDAR_AUX_ENUM_TYPE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/EnumBase.h"
 
 // PROJECT INCLUDES
 
@@ -52,7 +52,32 @@
  *
  * To make an enum using this class, create a new class that has a static construct function. In the construct function,
  * declare all the enum values belonging to your enum.
- * @todo explain this better and add example code
+ *
+ * This is probably best explained with an example:
+ *
+ * @code
+class ExampleEnum
+{
+  public:
+    typedef cedar::aux::EnumId Id;
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    static const Id VALUE1 = 0;
+    static const Id VALUE2 = 1;
+    static const Id VALUE3 = 2;
+
+    // this function must always be static, void and called construct.
+    static void construct()
+    {
+      mType.type()->def(cedar::aux::Enum(VALUE1, "VALUE1", "What you want to show to the user for value 1"));
+      mType.type()->def(cedar::aux::Enum(VALUE2, "VALUE2"));
+      mType.type()->def(cedar::aux::Enum(VALUE3, "VALUE3", "I'm different."));
+    }
+
+  private:
+    static cedar::aux::EnumType<ExampleEnum> mType;
+};
+ * @endcode
  */
 template <class T>
 class cedar::aux::EnumType

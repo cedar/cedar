@@ -45,16 +45,24 @@
 #include <iostream>
 #include <string>
 
-#include "auxiliaries/exceptions/FailedAssertionException.h"
+#include "cedar/auxiliaries/exceptions/FailedAssertionException.h"
 
+/*!@brief This macro replaces the C++ assertion and throws an exception instead, pointing out the line number of the
+ * failed assertion. */
 #define CEDAR_ASSERT(expr) if (!(expr)) { std::string info = "Assertion failed: " #expr; CEDAR_THROW(cedar::aux::exc::FailedAssertionException, info); }
+
+/*!@brief This is a mild variant of a cedar assertion, which does not throw an exception. */
 #define CEDAR_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cerr << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
 
 #ifdef DEBUG
   #include <assert.h>
-
+/*!@brief This macro replaces the C++ assertion and throws an exception instead, pointing out the line number of the
+ * failed assertion. It is only active when cedar is built in debug configuration. */
   #define CEDAR_DEBUG_ASSERT(expr) CEDAR_ASSERT(expr)
+/*!@brief This macro hides code in release mode, which is only used in debug mode (e.g. output to std::cout) */
   #define CEDAR_DEBUG_ONLY(expr) expr
+/*!@brief This is a mild variant of a cedar assertion, which does not throw an exception. It is only active when cedar
+ * is built in debug configuration*/
   #define CEDAR_DEBUG_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cerr << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
 
 #else

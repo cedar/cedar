@@ -39,8 +39,8 @@
 #define CEDAR_AUX_USER_DATA_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Base.h"
 
 // PROJECT INCLUDES
 

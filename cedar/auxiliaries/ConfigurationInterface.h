@@ -35,16 +35,15 @@
 ======================================================================================================================*/
 
 //!@todo built-in check, if addParameter adds a parameter that is already stored
-//!@todo remove the "throw 20" lines, replace with real exception or something from CONFIG_READ_WRITE_STATE
 
 #ifndef CEDAR_AUX_CONFIGURATION_INTERFACE_H
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Base.h"
-#include "auxiliaries/UserData.h"
-#include "auxiliaries/IntervalData.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Base.h"
+#include "cedar/auxiliaries/UserData.h"
+#include "cedar/auxiliaries/IntervalData.h"
 
 // PROJECT INCLUDES
 

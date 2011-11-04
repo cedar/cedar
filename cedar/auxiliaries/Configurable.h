@@ -42,14 +42,17 @@
 #define CEDAR_AUX_CONFIGURABLE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
 #include <list>
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
+#include <boost/function.hpp>
 
 /*!@brief An interface for classes that can store and load parameters from files.
  */
@@ -91,6 +94,9 @@ public:
   ParameterList& getParameters();
 
   void addConfigurableChild(const std::string& name, cedar::aux::ConfigurablePtr child);
+  //!@brief removes a child configuration from the configuration tree - if name is not found, an exception is thrown
+  void removeConfigurableChild(const std::string& name);
+  boost::signals2::connection connectToTreeChangedSignal(boost::function<void ()> slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -110,7 +116,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  boost::signals2::signal<void ()> mTreeChanged;
 private:
   // none yet
 
@@ -124,8 +130,6 @@ private:
   ParameterList mParameterOrder;
   ParameterMap mParameterAssociations;
   Children mChildren;
-  // none yet
-
 }; // class cedar::aux::Configurable
 
 #endif // CEDAR_AUX_CONFIGURABLE_H

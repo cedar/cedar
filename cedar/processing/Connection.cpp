@@ -37,11 +37,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Connection.h"
-#include "processing/Step.h"
-#include "processing/Trigger.h"
-#include "processing/exceptions.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/Connection.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -65,7 +65,18 @@ mTargetName(targetName)
 #ifdef DEBUG
   std::cout << "> allocated data (Connection, " << this << ")" << std::endl;
 #endif
-  cedar::proc::Step::connect(source, sourceName, target, targetName);
+
+  target->setInput(targetName, source->getOutput(sourceName));
+  /*
+   * if the target is set to be auto-connected to triggers, do so. It makes sense to check this only for the target;
+   * the source is not relevant, because the target may need to be triggered by the source, even if the source may not
+   * want to be triggered. E.g., a dynamical system (not auto-connected) may trigger further processing during each
+   * iteration.
+   */
+  if (target->autoConnectTriggers())
+  {
+    source->getFinishedTrigger()->addListener(target);
+  }
 }
 
 cedar::proc::Connection::Connection(
@@ -83,7 +94,6 @@ mTarget(target)
   {
     source->addListener(target);
   }
-//  cedar::proc::Step::connect(source, sourceName, target, targetName);
 }
 
 cedar::proc::Connection::Connection(
@@ -226,8 +236,8 @@ bool cedar::proc::Connection::contains(cedar::proc::TriggerPtr trigger)
  */
 void cedar::proc::Connection::deleteConnection()
 {
-  cedar::proc::StepPtr p_source_step = this->getSource();
-  cedar::proc::StepPtr p_target_step = this->getTarget();
+  cedar::proc::StepPtr p_source_step = mSource.lock();
+  cedar::proc::StepPtr p_target_step = mTarget.lock();
   cedar::proc::TriggerPtr p_source_trigger = mTrigger.lock();
   cedar::proc::TriggerPtr p_target_trigger = mTargetTrigger.lock();
 

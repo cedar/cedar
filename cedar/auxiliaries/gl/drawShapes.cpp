@@ -35,11 +35,11 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/gl.h"
-#include "auxiliaries/gl/glu.h"
-#include "auxiliaries/gl/drawShapes.h"
-#include "auxiliaries/math/constants.h"
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/glu.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
@@ -148,7 +148,7 @@ void cedar::aux::gl::drawCone(
 	
   Mat line = (end-start)(Rect(0, 0, 1, 3));
   // if start = end do nothing
-  if (norm(line) == 0)
+  if (cv::norm(line) == 0)
   {
     return;
   }
@@ -159,18 +159,18 @@ void cedar::aux::gl::drawCone(
   // make z-axis collinear with the cone center line
   Mat z = Mat::zeros(3, 1, start.type());
   z.at<T>(2, 0) = 1;
-  double alpha = acos(line.dot(z) / norm(line));
+  double alpha = acos( line.dot(z) / cv::norm(line) );
   if (alpha != 0)
   {
     Mat axis = z.cross(line);
     glRotated(alpha*180/cedar::aux::math::pi, axis.at<T>(0, 0), axis.at<T>(1, 0), axis.at<T>(2, 0));
   }
   // draw the cone
-  drawCone(0, norm(line), radiusStart, radiusEnd, slices, wireFrame);
+  drawCone(0, cv::norm(line), radiusStart, radiusEnd, slices, wireFrame);
   // return to saved transformation
   glPopMatrix();
 }
-template CEDAR_AUX_LIB_EXPORT 
+template CEDAR_AUX_LIB_EXPORT
   void cedar::aux::gl::drawCone<double>(
                                           const cv::Mat,
                                           const cv::Mat,
@@ -203,14 +203,14 @@ void cedar::aux::gl::drawArrow(
 {
   drawCone<T>(
                start,
-               start+(1-headLength/norm(end-start))*(end-start),
+               start+(1-headLength/cv::norm(end-start))*(end-start),
                shaftRadius,
                shaftRadius,
                patches,
                wireFrame
              );
   drawCone<T>(
-               start+(1-headLength/norm(end-start))*(end-start),
+               start+(1-headLength/cv::norm(end-start))*(end-start),
                end,
                headRadius,
                0,
@@ -350,12 +350,12 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // bottom
   glNormal3d(0.0, 0.0, -1.0);
   glVertex3d(0, -width/2, 0);
-  glVertex3d(sqrt(3.0)*width/2, 0, 0);
+  glVertex3d(sqrt(3)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   // top
   glNormal3d(0.0, 0.0, 1.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, height);
+  glVertex3d(sqrt(3)*width/2, 0, height);
   glVertex3d(0, width/2, height);
   glEnd();
   
@@ -363,15 +363,15 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // front left
   glNormal3d(.33, -.66, 0.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, 0);
+  glVertex3d(sqrt(3)*width/2, 0, height);
+  glVertex3d(sqrt(3)*width/2, 0, 0);
   glVertex3d(0, -width/2, 0);
   // front right
   glNormal3d(.33, .66, 0.0);
-  glVertex3d(sqrt(3.0)*width/2, 0, 0);
+  glVertex3d(sqrt(3)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   glVertex3d(0, width/2, height);
-  glVertex3d(sqrt(3.0)*width/2, 0, height);
+  glVertex3d(sqrt(3)*width/2, 0, height);
   // back
   glNormal3d(-1.0, 0.0, 0.0);
   glVertex3d(0, -width/2, 0);
@@ -399,17 +399,25 @@ void cedar::aux::gl::drawTorus(
 }
 
 void cedar::aux::gl::drawEllipse(
-                                  double a,
-                                  double b,
+                                  double _a,
+                                  double _b,
                                   double thickness,
                                   int slices,
                                   int stacks,
                                   bool wireFrame
                                 )
 {
-  // approximates the ellipse with 16 3rd order Bezier surfaces, which is not perfect, but almost
-  double t = thickness;
-  double d = 4.0/3.0*(sqrt(2.0)-1);
+  // TODO: rethink these narrowing operations 
+  //       (quickfix only)
+  float a= static_cast<float>(_a);
+  float b= static_cast<float>(_b);
+  float t= static_cast<float>(thickness);
+  //  double t = thickness;
+  float d = 4.0/3.0*(sqrt(2)-1);
+
+
+// approximates the ellipse with 16 3rd order Bezier surfaces, which is not perfect, but almost
+
   // first quarter
   GLfloat I_1[4][4][3] =
   {

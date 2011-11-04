@@ -39,17 +39,17 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Step.h"
-#include "processing/Arguments.h"
-#include "processing/DataSlot.h"
-#include "processing/Manager.h"
-#include "processing/exceptions.h"
-#include "auxiliaries/Data.h"
-#include "auxiliaries/ParameterTemplate.h"
-#include "auxiliaries/System.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/Arguments.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/System.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -72,7 +72,7 @@ mpArgumentsLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet (true),
 mState(cedar::proc::Step::STATE_NONE),
 mRegisteredAt(NULL),
-mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
+_mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
 #ifdef DEBUG
   std::cout << "> allocated data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
@@ -150,6 +150,8 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
   return this->mActions;
 }
 
+/*! This method takes care of changing the step's name in the registry as well.
+ */
 void cedar::proc::Step::onNameChanged()
 {
   if (this->mRegisteredAt != NULL)
@@ -200,11 +202,25 @@ void cedar::proc::Step::setState(cedar::proc::Step::State newState, const std::s
   }
 }
 
+/*! This is the default implementation of this function. The function, it does nothing!
+ *  In your subclasses of cedar::proc::Step you may override this function to react to changes in the connected inputs
+ *  of the step. One common use for this method is to store a pointer to the new/changed data in the correct format,
+ *  e.g., an image processing step could cast the input data from cedar::aux::Data to cedar::aux::ImageData. This makes
+ *  performing the cast in each comoute call unnecessary and thus saves a little bit of time.
+ *
+ *  @param inputName The name of the input slot whose data was changed.
+ */
 void cedar::proc::Step::inputConnectionChanged(const std::string& /*inputName*/)
 {
-  // default: empty. This should be overwritten in all subclasses in order to react to, e.g., a new matrix size.
 }
 
+/*!
+ *  This function checks the current validity of a data slot. If the validity is already known, it is returned without
+ *  rechecking it. If the current validity is cedar::proc::DataSlot::VALIDITY_UNKNOWN, the slot's validity is determined
+ *  by calling the cedar::proc::Step::determineInputValidity method.
+ *
+ *  @param slot the slot that needs checking, specified via its smart pointer.
+ */
 cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(cedar::proc::DataSlotPtr slot)
 {
   if (slot->getValidlity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
@@ -234,11 +250,22 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(cedar::proc:
   return slot->getValidlity();
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(const std::string& slot_name)
+/*! This is a convenience method that calls cedar::proc::Step::getInputValidity(cedar::proc::DataSlotPtr) with the slot
+ *  pointer obtained via the specified name.
+ *
+ *  @param slotName the slot that needs checking, specified by its name
+ */
+cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(const std::string& slotName)
 {
-  return this->getInputValidity(this->getSlot(cedar::proc::DataRole::INPUT, slot_name));
+  return this->getInputValidity(this->getSlot(cedar::proc::DataRole::INPUT, slotName));
 }
 
+/*! This is the default implementation which always returns cedar::proc::DataSlot::VALIDITY_VALID. Override this
+ *  function in your subclass to provide custom type checks and other things.
+ *
+ *  For example, you can check whether an input matrix has the right dimensionality, or whether the new input is a
+ *  matrix at all.
+ */
 cedar::proc::DataSlot::VALIDITY cedar::proc::Step::determineInputValidity
                                                    (
                                                      cedar::proc::ConstDataSlotPtr,
@@ -246,19 +273,31 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Step::determineInputValidity
                                                    )
                                                    const
 {
-  // default: just validate. This should be overwritten in all subclasses in order to react to, e.g., a matrix size of a wrong size.
   return cedar::proc::DataSlot::VALIDITY_VALID;
 }
 
-
-void cedar::proc::Step::parseDataName(const std::string& instr, std::string& stepName, std::string& dataName)
+/*! This function parses strings of the form "stepName.dataName" and separates the string into "stepName" and
+ *  "dataName". In this case, no role is expected to be present in this string.
+ *
+ *  @returns Nothing, output is written to the parameters @em stepName and @em dataName.
+ *
+ *  @throws cedar::proc::InvalidNameException if the name cannot be parsed, e.g., if no dot is contained.
+ */
+void cedar::proc::Step::parseDataNameNoRole
+                        (
+                          const std::string& instr,
+                          std::string& stepName,
+                          std::string& dataName
+                        )
 {
+  // find the last dot.
   size_t dot_idx = instr.rfind('.');
   if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for step. Path is: " + instr);
   }
 
+  // split the string.
   stepName = instr.substr(0, dot_idx);
   dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
 }
@@ -329,7 +368,7 @@ void cedar::proc::Step::getDataLocks(std::set<std::pair<QReadWriteLock*, DataRol
 }
 
 /*!
- * @remkars The locks will be inserted into the set, the set is not cleared beforehand.
+ * @remarks The locks will be inserted into the set, the set is not cleared beforehand.
  */
 void cedar::proc::Step::getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
 {
@@ -422,6 +461,12 @@ void cedar::proc::Step::unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id>
   }
 }
 
+/*!
+ * Locking is done in a special order that prevents deadlocks, therefore you should always use this function to lock the
+ * steps data.
+ *
+ * @remarks Inputs are locked for reading, outputs and buffers for writing.
+ */
 void cedar::proc::Step::lockAll()
 {
   std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
@@ -460,6 +505,13 @@ void cedar::proc::Step::onStop()
   this->setState(cedar::proc::Step::STATE_NONE, "");
 }
 
+/*! This method takes care of locking and unlocking all the data of the step properly and calls the compute method,
+ *  either by spawning a new thread or by calling it directly.
+ *
+ *  @remarks This method does nothing if the step is already running or there are invalid inputs (see
+ *           cedar::proc::DataRole::VALIDITY). It also does nothing if the compute function has previously encountered
+ *           an exception.
+ */
 void cedar::proc::Step::onTrigger()
 {
   //!@todo signal to the gui/user somehow when a step becomes inactive due to erroneous connections
@@ -485,7 +537,7 @@ void cedar::proc::Step::onTrigger()
     cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_ARGUMENT_SETTING
     this->setState(cedar::proc::Step::STATE_RUNNING, "");
-    if (this->mRunInThread->getValue())
+    if (this->_mRunInThread->getValue())
     {
       CEDAR_DEBUG_NON_CRITICAL_ASSERT(!this->isRunning());
       if (!this->isRunning())
@@ -643,7 +695,7 @@ cedar::proc::TriggerPtr& cedar::proc::Step::getFinishedTrigger()
 
 void cedar::proc::Step::setThreaded(bool isThreaded)
 {
-  this->mRunInThread->setValue(isThreaded);
+  this->_mRunInThread->setValue(isThreaded);
 }
 
 /*!
@@ -735,9 +787,16 @@ void cedar::proc::Step::declareOutput(const std::string& name)
   this->declareData(DataRole::OUTPUT, name, false);
 }
 
+/*!
+ * @throws cedar::proc::InvalidRoleException If no slot exists for the given role.
+ * @throws cedar::proc::InvalidNameException If @em name cannot be found in the list of slots for the given role.
+ */
 cedar::proc::DataSlotPtr cedar::proc::Step::getSlot(cedar::proc::DataRole::Id role, const std::string& name)
 {
+  // Find the slot map for the given role.
   std::map<DataRole::Id, SlotMap>::iterator slot_map_iter = this->mDataConnections.find(role);
+
+  // If it cannot be found, throw an exception/
   if (slot_map_iter == this->mDataConnections.end())
   {
     std::string message = "Role not found in cedar::proc::Step::getSlot(";
@@ -747,8 +806,12 @@ cedar::proc::DataSlotPtr cedar::proc::Step::getSlot(cedar::proc::DataRole::Id ro
     message += "\").";
     CEDAR_THROW(cedar::proc::InvalidRoleException, message);
   }
+
+  // Find the slot (iterator) for the given name
   SlotMap& slot_map = slot_map_iter->second;
   SlotMap::iterator slot_iter = slot_map.find(name);
+
+  // If the name cannot be found, throw an exception.
   if (slot_iter == slot_map.end())
   {
     std::string message = "Slot name not found in cedar::proc::Step::getSlot(";
@@ -758,6 +821,8 @@ cedar::proc::DataSlotPtr cedar::proc::Step::getSlot(cedar::proc::DataRole::Id ro
     message += "\").";
     CEDAR_THROW(cedar::proc::InvalidNameException, message);
   }
+
+  // if everything worked, return the actual slot.
   return slot_iter->second;
 }
 
@@ -899,6 +964,11 @@ void cedar::proc::Step::freeData(DataRole::Id role, const std::string& name)
   this->checkMandatoryConnections();
 }
 
+/*!
+ * @remarks This method is usually called by other framework parts rather than by the user. So only call it if you know
+ *          what you are doing :)
+ * @see     cedar::proc::Manager::connect.
+ */
 void cedar::proc::Step::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
@@ -967,28 +1037,12 @@ cedar::aux::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::str
   return map_iterator->second->getData();
 }
 
-
-//!@todo this function is semantically redundant with the Manager::connect method -- one of them should go.
-void cedar::proc::Step::connect(
-                                 cedar::proc::StepPtr source,
-                                 const std::string& sourceName,
-                                 cedar::proc::StepPtr target,
-                                 const std::string& targetName
-                               )
+bool cedar::proc::Step::autoConnectTriggers() const
 {
-  target->setInput(targetName, source->getOutput(sourceName));
-  /*
-   * if the target is set to be auto-connected to triggers, do so. It makes sense to check this only for the target;
-   * the source is not relevant, because the target may need to be triggered by the source, even if the source may not
-   * want to be triggered. E.g., a dynamical system (not auto-connected) may trigger further processing during each
-   * iteration.
-   */
-  if (target->mAutoConnectTriggers)
-  {
-    source->getFinishedTrigger()->addListener(target);
-  }
+  return this->mAutoConnectTriggers;
 }
 
+/*
 void cedar::proc::Step::disconnect(
                                     cedar::proc::StepPtr source,
                                     const std::string&,
@@ -999,3 +1053,4 @@ void cedar::proc::Step::disconnect(
   target->freeInput(targetName);
   source->getFinishedTrigger()->removeListener(target);
 }
+*/

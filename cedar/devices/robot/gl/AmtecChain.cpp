@@ -39,7 +39,7 @@
 #include "AmtecChain.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 

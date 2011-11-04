@@ -42,8 +42,8 @@
 #define CEDAR_PROC_GUI_IDE_APPLICATION_XXX_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/gui/Ide.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/Ide.h"
 
 // PROJECT INCLUDES
 

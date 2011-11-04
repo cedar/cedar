@@ -41,8 +41,8 @@
 #ifndef CEDAR_PROC_GUI_EXCEPTIONS_H
 #define CEDAR_PROC_GUI_EXCEPTIONS_H
 
-#include "processing/gui/namespace.h"
-#include "auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 /*!@brief TODO
  */

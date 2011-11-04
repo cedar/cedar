@@ -35,14 +35,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/kernel/Gauss.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/math/functions.h"
-#include "auxiliaries/exceptions.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/math/functions.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 
@@ -80,7 +80,7 @@ _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, 0.0, 1000
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
   this->mCenters.resize(dimensionality);
-  this->mKernelParts.resize(dimensionality);
+  this->setNumParts(dimensionality);
   this->mSizes.resize(dimensionality);
   this->onInit();
 }
@@ -115,7 +115,7 @@ void cedar::aux::kernel::Gauss::calculate()
   CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->getValue().size());
   try
   {
-    mKernelParts.resize(dimensionality);
+    this->setNumParts(dimensionality);
     mCenters.resize(dimensionality);
     mSizes.resize(dimensionality);
     // calculate the kernel parts for every dimension
@@ -131,7 +131,7 @@ void cedar::aux::kernel::Gauss::calculate()
         mSizes.at(dim) = 1;
       }
       mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
-      mKernelParts.at(dim) = cv::Mat::zeros(mSizes.at(dim), 1, CV_32FC1);
+      this->setKernelPart(dim, cv::Mat::zeros(mSizes.at(dim), 1, CV_32FC1));
 
       // calculate kernel part
       if (_mSigmas->at(dim) != 0)
@@ -139,19 +139,19 @@ void cedar::aux::kernel::Gauss::calculate()
         for (unsigned int j = 0; j < mSizes.at(dim); j++)
         {
           //!\todo move filling up of matrix to some tool function
-          mKernelParts.at(dim).at<float>(j, 0)
+          this->mKernelParts.at(dim).at<float>(j, 0)
               = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas->at(dim));
         }
       }
       else // discrete case
       {
-        mKernelParts.at(dim).at<float>(0, 0) = 1;
+        this->mKernelParts.at(dim).at<float>(0, 0) = 1;
       }
       // normalize
-      mKernelParts.at(dim) = mKernelParts.at(dim) * (1. / cv::sum(mKernelParts.at(dim)).val[0]);
+      this->setKernelPart(dim, this->getKernelPart(dim) * (1. / cv::sum(this->getKernelPart(dim)).val[0]));
       if (dim == 0)
       {
-        mKernelParts.at(dim) = amplitude * mKernelParts.at(dim);
+        this->setKernelPart(dim, amplitude * this->getKernelPart(dim));
       }
     }
     // assemble the kernel
@@ -188,7 +188,7 @@ void cedar::aux::kernel::Gauss::calculate()
       float value = 1.0;
       for (unsigned int dim = 0; dim < dimensionality; dim++)
       {
-        value *= mKernelParts.at(dim).at<float>(position[dim], 0);
+        value *= this->getKernelPart(dim).at<float>(position[dim], 0);
       }
       if (dimensionality == 1)
       {

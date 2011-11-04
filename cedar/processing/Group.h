@@ -42,8 +42,8 @@
 #define CEDAR_PROC_GROUP_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "auxiliaries/NamedConfigurable.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // PROJECT INCLUDES
 

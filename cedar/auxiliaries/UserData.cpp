@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/UserData.h"
+#include "cedar/auxiliaries/UserData.h"
 
 // PROJECT INCLUDES
 

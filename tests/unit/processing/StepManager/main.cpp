@@ -42,12 +42,12 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/LogFile.h"
-#include "processing/Manager.h"
-#include "processing/Network.h"
-#include "processing/Step.h"
-#include "processing/StepDeclaration.h"
-#include "processing/Arguments.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/StepDeclaration.h"
+#include "cedar/processing/Arguments.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -100,10 +100,10 @@ int main(int /* argc */, char** /* argv */)
 
   log_file << "Trying to call compute functions ... ";
   StepPtr step_a = Manager::getInstance().steps().get("stepA");
-  step_a->compute(cedar::proc::Arguments());
+  step_a->onTrigger();
 
   StepPtr step_b = Manager::getInstance().steps().get("stepB");
-  step_b->compute(cedar::proc::Arguments());
+  step_b->onTrigger();
   log_file << "done." << std::endl;
 
   // return

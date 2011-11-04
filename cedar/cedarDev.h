@@ -41,17 +41,17 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/Component.h"
-#include "devices/robot/ComponentNotAvailableException.h"
-#include "devices/robot/KinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/namespace.h"
-#include "devices/robot/ReferenceGeometry.h"
-#include "devices/robot/Robot.h"
-#include "devices/robot/gl/KinematicChain.h"
-#include "devices/robot/gl/AmtecChain.h"
-#include "devices/robot/gl/CoraArm.h"
+#include "cedar/devices/robot/Component.h"
+#include "cedar/devices/robot/ComponentNotAvailableException.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/namespace.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
+#include "cedar/devices/robot/Robot.h"
+#include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/robot/gl/AmtecChain.h"
+#include "cedar/devices/robot/gl/CoraArm.h"
 
 
 

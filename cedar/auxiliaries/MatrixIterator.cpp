@@ -22,21 +22,21 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KTeamPositionControllerWidget.cpp
+    File:        Base.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2010 10 12
 
-    Description: Graphical User Interface for the KTeam controller.
+    Description: Implementation of the @em cedar::aux::Base class.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
 
-#include "devices/kteam/gui/PositionControllerWidget.h"
+// LOCAL INCLUDES
+#include "cedar/auxiliaries/MatrixIterator.h"
 
 // PROJECT INCLUDES
 
@@ -46,36 +46,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::kteam::gui::PositionControllerWidget::PositionControllerWidget(cedar::dev::kteam::PositionController *peController,
-                                                                           cedar::dev::robot::Odometry *peModel,
-                                                                           QWidget *parent)
+//! constructor
+cedar::aux::MatrixIterator::MatrixIterator(const cv::Mat& matrix)
 :
-cedar::aux::gui::BaseWidget("PositionControllerWidget", parent)
+mMatrixRef(matrix)
 {
-  mpeController = peController;
-  mpeModel = peModel;
-  setupUi(this);
-  connect(startButton, SIGNAL(pressed()), this, SLOT(start()));
-  startTimer(100); //timer for updating display
-}
-
-cedar::dev::kteam::gui::PositionControllerWidget::~PositionControllerWidget()
-{
-
+  this->mIndex.resize(matrix.dims, 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::dev::kteam::gui::PositionControllerWidget::start()
-{
-  mpeController->setTarget(xTargetPosition->value(), yTargetPosition->value());
-}
-
-void cedar::dev::kteam::gui::PositionControllerWidget::timerEvent(QTimerEvent * /* event */)
-{
-  //display new values
-  xRobotPosition->display(mpeModel->getPositionX());
-  yRobotPosition->display(mpeModel->getPositionY());
-}

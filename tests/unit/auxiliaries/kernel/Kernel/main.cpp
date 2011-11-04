@@ -38,8 +38,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/kernel/Gauss.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

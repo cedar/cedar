@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#include "auxiliaries/sleepFunctions.h"
-#include "defines.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/defines.h"
 
 #ifdef WINDOWS
   #include <Windows.h>
@@ -43,7 +43,7 @@
   #include <unistd.h>
 #endif // WINDOWS
 
-void cedar::aux::sleep(cedar::unit::Duration time)
+void cedar::aux::sleep(cedar::unit::Time time)
 {
   cedar::unit::Microseconds us(time);
   cedar::aux::usleep(static_cast<unsigned int>(us.getRawTime()));

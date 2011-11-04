@@ -39,14 +39,14 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Network.h"
-#include "processing/Manager.h"
-#include "processing/Step.h"
-#include "processing/DataSlot.h"
-#include "processing/Group.h"
-#include "processing/Connection.h"
-#include "auxiliaries/Data.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/Network.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/Connection.h"
+#include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -414,8 +414,10 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
   std::string source_step, source_data;
   std::string target_step, target_data;
 
-  cedar::proc::Step::parseDataName(source, source_step, source_data);
-  cedar::proc::Step::parseDataName(target, target_step, target_data);
+  // We don't need to parse the role here because only outputs can be connected to inputs, thus it is clear which is
+  // which.
+  cedar::proc::Step::parseDataNameNoRole(source, source_step, source_data);
+  cedar::proc::Step::parseDataNameNoRole(target, target_step, target_data);
 
   cedar::proc::Manager::getInstance().connect(
                                                cedar::proc::Manager::getInstance().steps().get(source_step),

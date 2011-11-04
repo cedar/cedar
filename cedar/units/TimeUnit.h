@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Duration.h
+    File:        TimeUnit.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 03
+    Date:        2011 05 23
 
     Description:
 
@@ -38,55 +38,163 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_UNITS_DURATION_H
-#define CEDAR_UNITS_DURATION_H
+#ifndef CEDAR_UNITS_TIME_UNIT_H
+#define CEDAR_UNITS_TIME_UNIT_H
 
 // LOCAL INCLUDES
-#include <units/namespace.h>
+#include "cedar/units/namespace.h"
+#include "cedar/units/Time.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
 
 
-/*!@brief Base class for time units.
+/*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  *
- * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
- *       cedar::units::Milliseconds.
+ * @todo Read units from strings.
  */
-class cedar::unit::Duration
+template <unsigned int T_factor, const char* T_suffix>
+class cedar::unit::TimeUnit : public Time
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+
+  friend std::ostream& operator <<(std::ostream &stream, const TimeUnit& unit)
+  {
+    stream << unit.mAmountInMicroSeconds / static_cast<double>(T_factor) << " " << T_suffix;
+    return stream;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // This class has no public constructors because it should not be used directly.
+  /*!@brief The standard constructor.
+   *
+   */
+  TimeUnit(double amount = 1.0)
+  :
+  Time(amount * static_cast<double>(T_factor))
+  {
+  }
+
+  /*!@brief Constructor that takes a base time object.
+   *
+   */
+  TimeUnit(const cedar::unit::Time& time)
+  :
+  Time(time)
+  {
+  }
 
   //!@brief Destructor
-  virtual ~Duration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  /*!@brief returns the raw time (currently, this is microseconds), mainly used in conversion methods
-   * @return raw time (currently microseconds)
+  /*!@brief conversion method from one TimeUnit to another
+   * @return converted TimeUnit
    */
-  double getRawTime() const;
+  template <unsigned int otherFactor, const char* otherSuffix>
+  operator TimeUnit<otherFactor, otherSuffix>()
+  const
+  {
+    double value = this->getRawTime() / otherFactor;
+    return TimeUnit<otherFactor, otherSuffix>(value);
+  }
+
+  /*!@brief star operator for multiplying a TimeUnit with a scalar value on right side
+   * @return result of multiplication
+   */
+  TimeUnit operator* (double factor) const
+  {
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = factor * this->mAmountInMicroSeconds;
+    return ret;
+  }
+
+  /*!@brief star operator for multiplying a TimeUnit with a scalar value on left side
+   * @return result of multiplication
+   */
+  friend TimeUnit operator*(double real, const TimeUnit& time)
+  {
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = real * time.mAmountInMicroSeconds;
+    return ret;
+  }
+
+  /*!@brief star operator for multiplying a TimeUnit with a scalar value using *=
+   *
+   */
+  void operator*= (double factor)
+  {
+    this->mAmountInMicroSeconds *= factor;
+  }
+
+  /*!@brief slash operator for dividing a TimeUnit by a scalar value
+   * @return result of division
+   */
+  TimeUnit operator/ (double divisor) const
+  {
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = this->mAmountInMicroSeconds / divisor;
+    return ret;
+  }
+
+  /*!@brief slash operator for dividing a TimeUnit by another TimeUnit
+   * @return the scalar, unit-less result of the division
+   */
+  template<unsigned int otherFactor, const char* otherSuffix>
+  double operator/ (const TimeUnit<otherFactor, otherSuffix>& time) const
+  {
+    return this->mAmountInMicroSeconds / time.getRawTime();
+  }
+
+  /*!@brief slash operator for dividing a scalar value by a TimeUnit
+   * @return result of division
+   *
+   */
+  friend TimeUnit operator/(double real, const TimeUnit& time)
+  {
+    TimeUnit ret;
+    ret.mAmountInMicroSeconds = real / time.mAmountInMicroSeconds;
+    return ret;
+  }
+
+  /*!@brief slash operator for dividing a TimeUnit by a scalar value using /=
+   * @return result of division
+   */
+  TimeUnit operator/= (double divisor)
+  {
+    this->mAmountInMicroSeconds /= divisor;
+  }
+
+  /*!@brief comparison of two TimeUnits
+   *
+   */
+  template <unsigned int otherFactor, const char* otherSuffix>
+  bool operator==(const TimeUnit<otherFactor, otherSuffix>& comp)
+  {
+    return this->mAmountInMicroSeconds == comp.mAmountInMicroSeconds;
+  }
+
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-  //!@brief The constructor.
-  Duration(double amount);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -100,8 +208,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  //!@brief the internal representation of time, currently expressed in microseconds
-  double mAmountInMicroSeconds;
+  // none yet
 private:
   // none yet
 
@@ -116,7 +223,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::unit::Duration
+}; // class cedar::unit::TimeUnit
 
-#endif // CEDAR_UNITS_DURATION_H
+#endif // CEDAR_UNITS_TIME_UNIT_H
 

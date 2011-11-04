@@ -42,18 +42,17 @@
 #define CEDAR_PROC_STEP_TIME_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/Arguments.h"
-#include "units/Duration.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/Arguments.h"
+#include "cedar/units/Time.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Derived from Arguments, StepTime contains the time that has passed since the last call of a Step.
  *
- * More detailed description of the class.
  */
 class cedar::proc::StepTime : public cedar::proc::Arguments
 {
@@ -66,7 +65,7 @@ class cedar::proc::StepTime : public cedar::proc::Arguments
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepTime(const cedar::unit::Duration& stepTime);
+  StepTime(const cedar::unit::Time& stepTime);
 
   //!@brief Destructor
   virtual ~StepTime();
@@ -75,7 +74,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const cedar::unit::Duration& getStepTime() const;
+  //!@brief returns the last step duration
+  const cedar::unit::Time& getStepTime() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,7 +97,8 @@ public:
 protected:
   // none yet
 private:
-  cedar::unit::Duration mStepTime;
+  //!@brief last step duration
+  cedar::unit::Time mStepTime;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

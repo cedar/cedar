@@ -42,15 +42,19 @@
 #define CEDAR_PROC_STEP_DECLARATION_H
 
 // LOCAL INCLUDES
-#include "processing/DeclarationBase.h"
-#include "processing/namespace.h"
-#include "auxiliaries/AbstractFactory.h"
-#include "auxiliaries/AbstractFactoryDerived.h"
+#include "cedar/processing/DeclarationBase.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/AbstractFactoryDerived.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+/*!@brief A StepDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
+ * create a step of this id. It is a concretization of DeclarationBase.
+ *
+ */
 class cedar::proc::StepDeclaration : public cedar::proc::DeclarationBase
                                             <
                                               cedar::proc::Step,
@@ -62,6 +66,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief The standard constructor.
   StepDeclaration(
                    cedar::proc::StepFactoryPtr classFactory,
                    const std::string& classId,
@@ -72,6 +77,7 @@ public:
   {
   }
 
+  //!@brief Destructor
   ~StepDeclaration()
   {
   }
@@ -81,11 +87,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief set path to icon included in the graphical representation of this step
   void setIconPath(const std::string& path)
   {
     this->mIconPath = path;
   }
 
+  //!@brief get path to icon included in the graphical representation of this step
   const std::string& getIconPath()
   {
     return this->mIconPath;
@@ -109,6 +117,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief path to icon included in the graphical representation of this step
   std::string mIconPath;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,6 +166,8 @@ public:
   {
   }
 
+  //!@brief checks if a generic Step is of a given child type (the template parameter of StepDeclarationT)
+  //!@param pointer step instance that is checked
   bool isObjectInstanceOf(cedar::proc::StepPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;

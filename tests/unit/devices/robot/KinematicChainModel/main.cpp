@@ -36,12 +36,12 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/ReferenceGeometry.h"
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/math/constants.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 

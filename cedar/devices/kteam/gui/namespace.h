@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -55,7 +55,6 @@ namespace cedar
       namespace gui
       {
         CEDAR_DECLARE_DEV_CLASS(EPuckControlWidget);
-        CEDAR_DECLARE_DEV_CLASS(PositionControllerWidget);
       }
     }
   }

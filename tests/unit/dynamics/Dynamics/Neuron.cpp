@@ -36,7 +36,7 @@
 
 // LOCAL INCLUDES
 #include "Neuron.h"
-#include "auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 
@@ -71,7 +71,7 @@ double cedar::Neuron::getActivity() const
   return this->mActivation->getData();
 }
 
-void cedar::Neuron::eulerStep(const cedar::unit::Duration& time)
+void cedar::Neuron::eulerStep(const cedar::unit::Time& time)
 {
   using cedar::unit::Seconds;
   using cedar::unit::Milliseconds;

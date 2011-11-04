@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/DoubleParameter.h"
-#include "auxiliaries/NumericParameter.h"
+#include "cedar/processing/gui/DoubleParameter.h"
+#include "cedar/auxiliaries/NumericParameter.h"
 
 // PROJECT INCLUDES
 

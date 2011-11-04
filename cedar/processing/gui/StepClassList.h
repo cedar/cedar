@@ -42,8 +42,8 @@
 #define CEDAR_PROC_GUI_STEP_CLASS_LIST_H
 
 // LOCAL INCLUDES
-#include "processing/gui/namespace.h"
-#include "processing/Manager.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/Manager.h"
 
 // PROJECT INCLUDES
 

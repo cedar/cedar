@@ -40,9 +40,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
-#include "processing/Step.h"
-#include "processing/Manager.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/Step.h"
+#include "cedar/processing/Manager.h"
 
 // PROJECT INCLUDES
 

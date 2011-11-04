@@ -39,21 +39,23 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "dynamics/fields/NeuralField.h"
-#include "dynamics/SpaceCode.h"
-#include "auxiliaries/NumericParameter.h"
-#include "auxiliaries/NumericVectorParameter.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/math/Sigmoid.h"
-#include "auxiliaries/math/AbsSigmoid.h"
-#include "auxiliaries/kernel/Gauss.h"
-#include "auxiliaries/assert.h"
+#include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/dynamics/SpaceCode.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
+#include "cedar/auxiliaries/math/AbsSigmoid.h"
+#include "cedar/auxiliaries/kernel/Gauss.h"
+#include "cedar/auxiliaries/assert.h"
+
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
-
+#include <boost/lexical_cast.hpp>
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,19 +68,19 @@ mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 
 mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
 mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
-mGlobalInhibitionData(new cedar::aux::DoubleData(0.0)),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
-_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000))
+_mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
+_mNumberOfKernels(new cedar::aux::UIntParameter(this, "numberOfKernels", 1, 1, 20))
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
+  //default is two modes/kernels for lateral interaction
+  _mNumberOfKernels->setValue(2);
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   this->declareBuffer("activation");
   this->setBuffer("activation", mActivation);
   this->declareBuffer("lateralInteraction");
   this->setBuffer("lateralInteraction", mLateralInteraction);
-
-  this->declareBuffer("globalInhibitionValue");
-  this->setBuffer("globalInhibitionValue", mGlobalInhibitionData);
 
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
@@ -93,15 +95,28 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000))
   shifts.push_back(0.0);
   sigmas.push_back(3.0);
   shifts.push_back(0.0);
-  mKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 5.0, 2));
-  this->declareBuffer("kernel");
-  this->setBuffer("kernel", mKernel->getKernelRaw());
-  this->mKernel->hideDimensionality(true);
-  this->addConfigurableChild("lateral kernel", this->mKernel);
 
+  for (unsigned int i = 0; i < _mNumberOfKernels->getValue(); i++)
+  {
+    cedar::aux::kernel::GaussPtr kernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
+                                                                                                      1.0,
+                                                                                                      sigmas,
+                                                                                                      shifts,
+                                                                                                      5.0,
+                                                                                                      2
+                                                                                                    ));
+    mKernels.push_back(kernel);
+    std::string kernel_name("lateralKernel");
+    kernel_name += boost::lexical_cast<std::string>(i);
+    this->declareBuffer(kernel_name);
+    this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
+    this->mKernels.at(i)->hideDimensionality(true);
+    this->addConfigurableChild(kernel_name, this->mKernels.at(i));
+  }
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
-
+  QObject::connect(_mNumberOfKernels.get(), SIGNAL(valueChanged()), this, SLOT(numberOfKernelsChanged()));
+  mOldNumberOfKernels = _mNumberOfKernels->getValue();
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
 }
@@ -146,32 +161,36 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
   return this->cedar::proc::Step::determineInputValidity(slot, data);
 }
 
-void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
+void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
-  const cv::Mat& kernel = this->mKernel->getKernel();
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
-  double& global_inhibition_value = mGlobalInhibitionData->getData();
 
   sigmoid_u = mSigmoid->compute<float>(u);
+  lateral_interaction = cv::Mat::zeros(u.size(),u.type());
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->getValue() < 3)
   {
-    //!@todo Should this not use the data->lock*
-    mKernel->getReadWriteLock()->lockForRead();
-    cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
-    mKernel->getReadWriteLock()->unlock();
+    for (unsigned int i = 0; i < _mNumberOfKernels->getValue() && i < this->mKernels.size(); i++)
+    {
+      cv::Mat convolution_buffer =  cv::Mat::zeros(u.size(),u.type());
+      const cv::Mat& kernel = this->mKernels.at(i)->getKernel();
+      //!@todo Should this not use the data->lock*
+      mKernels.at(i)->getReadWriteLock()->lockForRead();
+      cv::filter2D(sigmoid_u, convolution_buffer, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
+      mKernels.at(i)->getReadWriteLock()->unlock();
+      lateral_interaction += convolution_buffer;
+    }
   }
 
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);
 
-  global_inhibition_value = global_inhibition * cv::sum(sigmoid_u)[0];
-  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition_value;
+  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0];;
   /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
    *       it when the connections change.
    */
@@ -217,10 +236,6 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
   return true;
 }
 
-void cedar::dyn::NeuralField::onStart()
-{
-}
-
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
   this->_mSizes->resize(_mDimensionality->getValue(), _mSizes->getDefaultValue());
@@ -254,7 +269,64 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mSigmoidalActivation->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }
+  for (unsigned int i=0;i<mKernels.size();i++)
+  {
+    this->mKernels.at(i)->setDimensionality(dimensionality);
+  }
   this->unlockAll();
+}
 
-  this->mKernel->setDimensionality(dimensionality);
+void cedar::dyn::NeuralField::numberOfKernelsChanged()
+{
+  const unsigned int& new_number = _mNumberOfKernels->getValue();
+  CEDAR_ASSERT(mOldNumberOfKernels != new_number);
+  if (mOldNumberOfKernels < new_number) // more kernels
+  {
+    std::vector<double> sigmas;
+    std::vector<double> shifts;
+    const unsigned int& field_dimensionality = this->_mDimensionality->getValue();
+    for (unsigned int dim = 0; dim < field_dimensionality; ++dim)
+    {
+      sigmas.push_back(3.0);
+      shifts.push_back(0.0);
+    }
+    for (unsigned int i = mOldNumberOfKernels; i < new_number; i++)
+    {
+      cedar::aux::kernel::GaussPtr kernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
+                                                                                                        1.0,
+                                                                                                        sigmas,
+                                                                                                        shifts,
+                                                                                                        5.0,
+                                                                                                        field_dimensionality
+                                                                                                      ));
+      mKernels.push_back(kernel);
+      std::string kernel_name("lateralKernel");
+      kernel_name += boost::lexical_cast<std::string>(i);
+      try
+      {
+        this->declareBuffer(kernel_name);
+        this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
+      }
+      catch(cedar::proc::DuplicateNameException& exc)
+      {
+        // buffer already exists...
+      }
+      this->mKernels.at(i)->hideDimensionality(true);
+      this->addConfigurableChild(kernel_name, this->mKernels.at(i));
+    }
+  }
+  else if(mOldNumberOfKernels > new_number) // less kernels
+  {
+    for (unsigned int i = mOldNumberOfKernels-1; i >= new_number; --i)
+    {
+      mKernels.pop_back();
+      std::string kernel_name("lateralKernel");
+      kernel_name += boost::lexical_cast<std::string>(i);
+//      this->declareBuffer(kernel_name);
+//      this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
+//      this->mKernels.at(i)->hideDimensionality(true);
+      this->removeConfigurableChild(kernel_name);
+    }
+  }
+  mOldNumberOfKernels = new_number;
 }

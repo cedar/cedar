@@ -42,8 +42,8 @@
 
 // PROJECT INCLUDES
 
-#include "auxiliaries/LoopedThread.h"
-#include "devices/robot/KinematicChain.h"
+#include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
 

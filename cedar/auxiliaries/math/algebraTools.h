@@ -41,8 +41,8 @@
 #define CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/lib.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 

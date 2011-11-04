@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // PROJECT INCLUDES
 

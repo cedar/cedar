@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 
 // PROJECT INCLUDES
 

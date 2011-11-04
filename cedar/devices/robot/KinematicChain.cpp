@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "devices/robot/KinematicChain.h"
-#include "devices/robot/ReferenceGeometry.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
 
 // PROJECT INCLUDES
 

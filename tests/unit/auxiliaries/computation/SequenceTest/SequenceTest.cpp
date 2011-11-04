@@ -42,11 +42,11 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "processing/Trigger.h"
-#include "processing/MultiTrigger.h"
-#include "processing/Step.h"
-#include "auxiliaries/LogFile.h"
-#include "auxiliaries/sleepFunctions.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/MultiTrigger.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

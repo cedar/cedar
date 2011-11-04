@@ -40,11 +40,11 @@
 
 // LOCAL INCLUDES
 
-#include "devices/communication/Communication.h"
+#include "cedar/devices/communication/Communication.h"
 
 // PROJECT INCLUDES
 
-#include "auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 

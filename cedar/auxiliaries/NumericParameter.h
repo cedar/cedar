@@ -42,7 +42,7 @@
 #define CEDAR_PROC_NUMERIC_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
 
 // PROJECT INCLUDES
 

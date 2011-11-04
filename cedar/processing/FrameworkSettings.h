@@ -38,10 +38,10 @@
 #define CEDAR_PROC_FRAMEWORK_SETTINGS_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "auxiliaries/Configurable.h"
-#include "auxiliaries/DirectoryParameter.h"
-#include "auxiliaries/SetParameter.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/SetParameter.h"
 
 // PROJECT INCLUDES
 

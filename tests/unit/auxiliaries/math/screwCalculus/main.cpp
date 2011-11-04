@@ -38,10 +38,10 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/math/screwCalculus.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/LogFile.h"
-#include "auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -103,7 +103,7 @@ int main()
     errors++;
     log_file << "ERROR in function wedgeAxis<double>(cv::Mat& axis, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(norm(mat33_double - wedgeAxis<double>(vec3_double))))
+  if (!IsZero(cv::norm(mat33_double - wedgeAxis<double>(vec3_double))))
   {
     errors++;
     log_file << "ERROR in function wedgeAxis<double>(cv::Mat& axis)" << endl;
@@ -131,7 +131,7 @@ int main()
     errors++;
     log_file << "ERROR in function wedgeAxis<float>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(norm(mat33_float - wedgeAxis<float>(vec3_float))))
+  if (!IsZero(cv::norm(mat33_float - wedgeAxis<float>(vec3_float))))
   {
     errors++;
     log_file << "ERROR in function wedgeAxis<float>(cv::Mat& vector)" << endl;
@@ -154,7 +154,7 @@ int main()
     errors++;
     log_file << "ERROR in function veeAxis<double>(cv::Mat& vector, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(vec3_double - veeAxis<double>(mat33_double))))
+  if (!IsZero(cv::norm(vec3_double - veeAxis<double>(mat33_double))))
   {
     errors++;
     log_file << "ERROR in function veeAxis<double>(cv::Mat& matrix)" << endl;
@@ -174,7 +174,7 @@ int main()
     errors++;
     log_file << "ERROR in function veeAxis<float>(cv::Mat& matrix, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(vec3_float - veeAxis<float>(mat33_float))))
+  if (!IsZero(cv::norm(vec3_float - veeAxis<float>(mat33_float))))
   {
     errors++;
     log_file << "ERROR in function veeAxis<float>(cv::Mat& matrix)" << endl;
@@ -215,7 +215,7 @@ int main()
     errors++;
     log_file << "ERROR in function wedgeTwist<double>(cv::Mat& twist, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(norm(mat44_double - wedgeTwist<double>(vec6_double))))
+  if (!IsZero(cv::norm(mat44_double - wedgeTwist<double>(vec6_double))))
   {
     errors++;
     log_file << "ERROR in function wedgeTwist<double>(cv::Mat& twist)" << endl;
@@ -253,7 +253,7 @@ int main()
     errors++;
     log_file << "ERROR in function wedgeTwist<float>(cv::Mat& twist, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(norm(mat44_float - wedgeTwist<float>(vec6_float))))
+  if (!IsZero(cv::norm(mat44_float - wedgeTwist<float>(vec6_float))))
   {
     errors++;
     log_file << "ERROR in function wedgeTwist<float>(cv::Mat& twist)" << endl;
@@ -279,7 +279,7 @@ int main()
     errors++;
     log_file << "ERROR in function veeTwist<double>(cv::Mat& vector, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(vec6_double - veeTwist<double>(mat44_double))))
+  if (!IsZero(cv::norm(vec6_double - veeTwist<double>(mat44_double))))
   {
     errors++;
     log_file << "ERROR in function veeTwist<double>(cv::Mat& matrix)" << endl;
@@ -302,7 +302,7 @@ int main()
     errors++;
     log_file << "ERROR in function veeTwist<float>(cv::Mat& vector, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(vec6_float - veeTwist<float>(mat44_float))))
+  if (!IsZero(cv::norm(vec6_float - veeTwist<float>(mat44_float))))
   {
     errors++;
     log_file << "ERROR in function veeTwist<float>(cv::Mat& matrix)" << endl;
@@ -315,7 +315,7 @@ int main()
   vec3_double.at<double>(0, 0) = 1;
   vec3_double.at<double>(1, 0) = 2;
   vec3_double.at<double>(2, 0) = 3;
-  vec3_double = vec3_double * (1 / norm(vec3_double));
+  vec3_double = vec3_double * (1 / cv::norm(vec3_double));
   expAxis<double>(vec3_double, 1, mat33_double);
   if (!
        (
@@ -334,7 +334,7 @@ int main()
     errors++;
     log_file << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(mat33_double - expAxis<double>(vec3_double, 1))))
+  if (!IsZero(cv::norm(mat33_double - expAxis<double>(vec3_double, 1))))
   {
     errors++;
     log_file << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta)" << endl;
@@ -344,7 +344,7 @@ int main()
   vec3_float.at<float>(0, 0) = 1;
   vec3_float.at<float>(1, 0) = 2;
   vec3_float.at<float>(2, 0) = 3;
-  vec3_float = vec3_float * (1 / norm(vec3_float));
+  vec3_float = vec3_float * (1 / cv::norm(vec3_float));
   expAxis<float>(vec3_float, 1, mat33_float);
   if (!
        (
@@ -363,7 +363,7 @@ int main()
     errors++;
     log_file << "ERROR in function expAxis<float>(const cv::Mat& matrix, float theta, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(mat33_float - expAxis<float>(vec3_float, 1))))
+  if (!IsZero(cv::norm(mat33_float - expAxis<float>(vec3_float, 1))))
   {
     errors++;
     log_file << "ERROR in function expAxis<float>(const cv::Mat& matrix, double theta)" << endl;
@@ -414,7 +414,7 @@ int main()
   vec6_double.at<double>(3, 0) = vec3_double.at<double>(0, 0);
   vec6_double.at<double>(4, 0) = vec3_double.at<double>(1, 0);
   vec6_double.at<double>(5, 0) = vec3_double.at<double>(2, 0);
-  expTwist<double>(vec6_double, cedar::aux::math::pi, mat44_double);
+  expTwist<double>(vec6_double, M_PI, mat44_double);
   if (!
        (
         IsZero(mat44_double.at<double>(0, 0) - -0.85714285714285676)
@@ -439,7 +439,7 @@ int main()
     errors++;
     log_file << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(mat44_double - expTwist<double>(vec6_double, cedar::aux::math::pi))))
+  if (!IsZero(cv::norm(mat44_double - expTwist<double>(vec6_double, M_PI))))
   {
     errors++;
     log_file << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << endl;
@@ -452,7 +452,7 @@ int main()
   vec6_float.at<float>(3, 0) = vec3_float.at<float>(0, 0);
   vec6_float.at<float>(4, 0) = vec3_float.at<float>(1, 0);
   vec6_float.at<float>(5, 0) = vec3_float.at<float>(2, 0);
-  expTwist<float>(vec6_float, cedar::aux::math::pi, mat44_float);
+  expTwist<float>(vec6_float, M_PI, mat44_float);
   if (!
        (
         IsZero(mat44_float.at<float>(0, 0) - -0.85714285714285676)
@@ -477,7 +477,7 @@ int main()
     errors++;
     log_file << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << endl;
   }
-  if (!IsZero(norm(mat44_float - expTwist<float>(vec6_float, cedar::aux::math::pi))))
+  if (!IsZero(cv::norm(mat44_float - expTwist<float>(vec6_float, M_PI))))
   {
     errors++;
     log_file << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << endl;
@@ -571,7 +571,7 @@ int main()
     log_file << "ERROR in function rigidToAdjointTransformation<double>(const cv::Mat& rigidTransformation, "
              << "cv::Mat& adjointTransformation)" << endl;
   }
-  if (!IsZero(norm(mat66_double - rigidToAdjointTransformation<double>(mat44_double))))
+  if (!IsZero(cv::norm(mat66_double - rigidToAdjointTransformation<double>(mat44_double))))
   {
     errors++;
     log_file << "ERROR in function rigidToAdjointTransformation<double>(const cv::Mat& rigidTransformation)" << endl;
@@ -627,7 +627,7 @@ int main()
     log_file << "ERROR in function rigidToAdjointTransformation<float>(const cv::Mat& rigidTransformation, "
              << "cv::Mat& adjointTransformation)" << endl;
   }
-  if (!IsZero(norm(mat66_float - rigidToAdjointTransformation<float>(mat44_float))))
+  if (!IsZero(cv::norm(mat66_float - rigidToAdjointTransformation<float>(mat44_float))))
   {
     errors++;
     log_file << "ERROR in function rigidToAdjointTransformation<float>(const cv::Mat& rigidTransformation)" << endl;
@@ -663,7 +663,7 @@ int main()
     log_file << "ERROR in function adjointToRigidTransformation<double>(const cv::Mat& adjointTransformation, "
              << "cv::Mat& rigidTransformation)" << endl;
   }
-  if (!IsZero(norm(mat44_double - adjointToRigidTransformation<double>(mat66_double))))
+  if (!IsZero(cv::norm(mat44_double - adjointToRigidTransformation<double>(mat66_double))))
   {
     errors++;
     log_file << "ERROR in function adjointToRigidTransformation<double>(const cv::Mat& adjointTransformation)" << endl;
@@ -696,7 +696,7 @@ int main()
     log_file << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation, "
              << "cv::Mat& rigidTransformation)" << endl;
   }
-  if (!IsZero(norm(mat44_float - adjointToRigidTransformation<float>(mat66_float))))
+  if (!IsZero(cv::norm(mat44_float - adjointToRigidTransformation<float>(mat66_float))))
   {
     errors++;
     log_file << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation)" << endl;
@@ -715,13 +715,13 @@ int main()
   expTwist<double>(vec6_double, 1, mat44_double);
   rigidToAdjointTransformation<double>(mat44_double, mat66_double);
   invertAdjointTransformation<double>(mat66_double, inverse66_double);
-  if (!IsZero(norm(inverse66_double - mat66_double.inv())))
+  if (!IsZero(cv::norm(inverse66_double - mat66_double.inv())))
   {
     errors++;
     log_file << "ERROR in function invertAdjointTransformation<double>(const cv::Mat& adjointTransformation, "
              << "cv::Mat& inverse)" << endl;
   }
-  if (!IsZero(norm(invertAdjointTransformation<double>(mat66_double) - mat66_double.inv())))
+  if (!IsZero(cv::norm(invertAdjointTransformation<double>(mat66_double) - mat66_double.inv())))
   {
     errors++;
     log_file << "ERROR in function invertAdjointTransformation<double>(const cv::Mat& adjointTransformation)" << endl;
@@ -737,13 +737,13 @@ int main()
   expTwist<float>(vec6_float, 1, mat44_float);
   rigidToAdjointTransformation<float>(mat44_float, mat66_float);
   invertAdjointTransformation<float>(mat66_float, inverse66_float);
-  if (!IsZero(norm(inverse66_float - mat66_float.inv())))
+  if (!IsZero(cv::norm(inverse66_float - mat66_float.inv())))
   {
     errors++;
     log_file << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation, "
              << "cv::Mat& inverse)" << endl;
   }
-  if (!IsZero(norm(invertAdjointTransformation<float>(mat66_float) - mat66_float.inv())))
+  if (!IsZero(cv::norm(invertAdjointTransformation<float>(mat66_float) - mat66_float.inv())))
   {
     errors++;
     log_file << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation)" << endl;

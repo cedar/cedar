@@ -42,8 +42,8 @@
 #define CEDAR_AUX_GUI_MATRIX_PLOT_1D_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/DataPlotInterface.h"
 
 // PROJECT INCLUDES
 

@@ -36,8 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Cone.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/gl/Cone.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

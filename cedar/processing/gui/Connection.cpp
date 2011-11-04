@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/Connection.h"
-#include "processing/gui/StepItem.h"
+#include "cedar/processing/gui/Connection.h"
+#include "cedar/processing/gui/StepItem.h"
 
 // PROJECT INCLUDES
 

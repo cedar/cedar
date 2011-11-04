@@ -38,9 +38,9 @@
 #define CEDAR_AUX_KERNEL_GAUSS_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/kernel/namespace.h"
-#include "auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/kernel/Separable.h"
 
 // PROJECT INCLUDES
 

@@ -39,7 +39,7 @@
 #define CEDAR_PROC_STEPS_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "processing/lib.h"
+#include "cedar/processing/lib.h"
 
 // PROJECT INCLUDES
 
@@ -54,8 +54,11 @@ namespace cedar
     /*!@brief Namespace for processing steps. */
     namespace steps
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
-      CEDAR_DECLARE_PROC_CLASS(Projection)
+      CEDAR_DECLARE_PROC_CLASS(Projection);
+      CEDAR_DECLARE_PROC_CLASS(Resize);
+      //!@endcond
     }
   }
 }

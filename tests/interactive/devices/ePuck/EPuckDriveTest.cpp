@@ -38,9 +38,9 @@
 
 // PROJECT INCLUDES
 
-#include "devices/kteam/EPuckDrive.h"
-#include "devices/communication/SerialCommunication.h"
-#include "devices/kteam/gui/EPuckControlWidget.h"
+#include "cedar/devices/kteam/EPuckDrive.h"
+#include "cedar/devices/communication/SerialCommunication.h"
+#include "cedar/devices/kteam/gui/EPuckControlWidget.h"
 
 // SYSTEM INCLUDES
 

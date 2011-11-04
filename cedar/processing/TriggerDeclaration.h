@@ -42,16 +42,20 @@
 #define CEDAR_PROC_TRIGGER_DECLARATION_H
 
 // LOCAL INCLUDES
-#include "processing/Trigger.h"
-#include "processing/namespace.h"
-#include "processing/DeclarationBase.h"
-#include "auxiliaries/Factory.h"
-#include "auxiliaries/FactoryDerived.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/DeclarationBase.h"
+#include "cedar/auxiliaries/Factory.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+/*!@brief A TriggerDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
+ * create a trigger of this id. It is a concretization of DeclarationBase.
+ *
+ */
 class cedar::proc::TriggerDeclaration : public cedar::proc::DeclarationBase
                                             <
                                               cedar::proc::Trigger,
@@ -63,6 +67,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+
+  //!@brief Constructor
+  //!@param classFactory a factory to create a new instance of a specific Trigger child
+  //!@param classId a unique string id for the Trigger child, which is created by the factory
   TriggerDeclaration(cedar::proc::TriggerFactoryPtr classFactory, const std::string& classId)
   :
   DeclarationBase<cedar::proc::Trigger, cedar::aux::Factory<cedar::proc::Trigger, cedar::proc::TriggerPtr> >
@@ -74,6 +82,7 @@ public:
   {
   }
 
+  //!@brief Destructor
   virtual ~TriggerDeclaration()
   {
   }
@@ -82,11 +91,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief sets the path to icon file
   void setIconPath(const std::string& path)
   {
     this->mIconPath = path;
   }
 
+  //!@brief returns the path to icon file
   const std::string& getIconPath() const
   {
     return this->mIconPath;
@@ -110,6 +121,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief path to icon file
   std::string mIconPath;
 };
 
@@ -145,6 +157,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief checks if a generic Trigger is of a given child type (the template parameter of TriggerDeclarationT)
+  //!@param pointer trigger instance that is checked
   bool isObjectInstanceOf(cedar::proc::TriggerPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;

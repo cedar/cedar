@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,139 +22,101 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PositionControllerWidget.h
+    File:        Time.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 06 03
 
-    Description: Graphical User Interface for the KTeam controller.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
-#define CEDAR_DEV_KTEAM_GUI_KTEAM_POSITION_CONTROLLER_WIDGET_H
+#ifndef CEDAR_UNITS_TIME_H
+#define CEDAR_UNITS_TIME_H
 
 // LOCAL INCLUDES
+#include "cedar/units/namespace.h"
 
 // PROJECT INCLUDES
 
-#include "devices/kteam/PositionController.h"
-#include "devices/robot/Odometry.h"
-#include "cedar/devices/kteam/gui/ui_PositionControllerWidget.h"
-#include "devices/kteam/gui/namespace.h"
-#include "auxiliaries/gui/BaseWidget.h"
-
 // SYSTEM INCLUDES
 
-#include <Qt>
 
-/*!@brief Graphical User Interface for the KTeam controller.
+/*!@brief Base class for time units.
  *
- * Type the desired position into the boxes. The current position of the robot is displayed in the relevant boxes.
+ * More detailed description of the class.
+ *
+ * @todo explain here that functions expecting a time as argument should always use this class and not, e.g.,
+ *       cedar::units::Milliseconds.
  */
-class cedar::dev::kteam::gui::PositionControllerWidget
-: public cedar::aux::gui::BaseWidget, private Ui_PositionControllerWidget
+class cedar::unit::Time
 {
-
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
-private:
-
-  Q_OBJECT
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
+  // This class has no public constructors because it should not be used directly.
 
-  //!@brief Constructs the GUI.
-  //!@param peController Pointer to the controller used to control the robot.
-  //!@param peModel Pointer to the model of the controlled robot.
-  //!@param parent Pointer to parent widget
-  PositionControllerWidget(
-                            cedar::dev::kteam::PositionController *peController,
-                            cedar::dev::robot::Odometry *peModel,
-                            QWidget *parent = 0
-                          );
-
-  //!@brief Destructs the GUI.
-  virtual ~PositionControllerWidget();
+  //!@brief Destructor
+  virtual ~Time();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
-public slots:
-
-  /*!@brief Sets the target-position of the robot.
+public:
+  /*!@brief returns the raw time (currently, this is microseconds), mainly used in conversion methods
+   * @return raw time (currently microseconds)
    */
-  void start();
+  double getRawTime() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
-
   // none yet
+  //!@brief The constructor.
+  Time(double amount);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
-  /*!@brief The timer-event.
-   * @param event pointer to event
-   */
-  void timerEvent(QTimerEvent *event);
-
-  /*!@brief Updates the displayed position.
-   */
-  void update();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   // none yet (hopefully never!)
-
 protected:
-
-  // none yet
-
+  //!@brief the internal representation of time, currently expressed in microseconds
+  double mAmountInMicroSeconds;
 private:
-
-  //!@brief Pointer to the robot control.
-  PositionController *mpeController;
-
-  //!@brief Pointer to the robot's model.
-  cedar::dev::robot::Odometry *mpeModel;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   // none yet
 
-}; // class cedar::dev::kteam::gui::PositionControllerWidget
+}; // class cedar::unit::Time
 
-#endif // CEDAR_DEV_KTEAM_GUI_POSITION_CONTROLLER_WIDGET_H
+#endif // CEDAR_UNITS_TIME_H
+

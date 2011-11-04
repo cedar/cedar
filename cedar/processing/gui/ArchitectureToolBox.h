@@ -42,8 +42,8 @@
 #define CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
 
 // LOCAL INCLUDES
-#include "processing/gui/ToolBox.h"
-#include "processing/gui/Scene.h"
+#include "cedar/processing/gui/ToolBox.h"
+#include "cedar/processing/gui/Scene.h"
 
 // PROJECT INCLUDES
 

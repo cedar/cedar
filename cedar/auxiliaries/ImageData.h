@@ -38,8 +38,8 @@
 #define CEDAR_AUX_IMAGE_DATA_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -48,7 +48,7 @@
 
 /*!@brief This is a data class representing images.
  */
-class cedar::aux::ImageData : public cedar::aux::MatData //!@todo Should inherit MatData
+class cedar::aux::ImageData : public cedar::aux::MatData
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

@@ -39,10 +39,10 @@
 #define KINEMATICCHAINWIDGET_H_
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
-#include "devices/robot/gui/namespace.h"
-#include "devices/robot/KinematicChain.h"
-#include "auxiliaries/ConfigurationInterface.h"
+#include "cedar/devices/lib.h"
+#include "cedar/devices/robot/gui/namespace.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // PROJECT INCLUDES
 
@@ -52,11 +52,12 @@
 #include <QtGui/QWidget>
 
 //!@brief A simple widget to access all the joints via GUI
-//!@todo Move this into the right namespace.
-class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainWidget
-  :
-  public QWidget,
-  public cedar::aux::ConfigurationInterface
+//!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
+//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainWidget
+class cedar::dev::robot::gui::KinematicChainWidget
+:
+public QWidget,
+public cedar::aux::ConfigurationInterface
 {
   //----------------------------------------------------------------------------
   // macros

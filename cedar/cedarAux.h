@@ -41,28 +41,28 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "auxiliaries/ConfigurationInterface.h"
-#include "auxiliaries/LogFile.h"
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/LoopedThread.h"
-#include "auxiliaries/UserData.h"
+#include "cedar/auxiliaries/Base.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/UserData.h"
 
-#include "auxiliaries/exceptions/ExceptionBase.h"
-#include "auxiliaries/exceptions/IndexOutOfRangeException.h"
-#include "auxiliaries/exceptions/namespace.h"
-#include "auxiliaries/exceptions/NullPointerException.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/auxiliaries/exceptions/namespace.h"
+#include "cedar/auxiliaries/exceptions/NullPointerException.h"
 
-#include "auxiliaries/math/algebraTools.h"
-#include "auxiliaries/math/coordinateTransformations.h"
-#include "auxiliaries/math/Limits.h"
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/math/screwCalculus.h"
-#include "auxiliaries/math/sigmoids.h"
-#include "auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/algebraTools.h"
+#include "cedar/auxiliaries/math/coordinateTransformations.h"
+#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/tools.h"
 
-#include "auxiliaries/gui/namespace.h"
-#include "auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 // SYSTEM INCLUDES
 
 #endif // CEDAR_CEDAR_AUX_H

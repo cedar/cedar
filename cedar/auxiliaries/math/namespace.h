@@ -40,10 +40,10 @@
 
 // LOCAL INCLUDES
 #include "namespace.h"
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
-#include "defines.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

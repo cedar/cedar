@@ -39,12 +39,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gui/DataPlotter.h"
-#include "auxiliaries/DataTemplate.h"
-#include "auxiliaries/ImageData.h"
-#include "auxiliaries/gui/MatrixPlot.h"
-#include "auxiliaries/gui/ImagePlot.h"
-#include "auxiliaries/gui/HistoryPlot.h"
+#include "cedar/auxiliaries/gui/DataPlotter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/ImageData.h"
+#include "cedar/auxiliaries/gui/MatrixPlot.h"
+#include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/gui/HistoryPlot.h"
 
 // PROJECT INCLUDES
 

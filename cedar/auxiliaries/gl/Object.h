@@ -40,12 +40,12 @@
 
 // LOCAL INCLUDES
 #include "namespace.h"
-#include "auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Object.h"
-#include "auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <string>

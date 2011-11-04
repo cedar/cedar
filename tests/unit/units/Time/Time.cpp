@@ -42,14 +42,14 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedarUnits.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/cedarUnits.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <cmath>
 
-void testStreamOutput(cedar::unit::Duration time)
+void testStreamOutput(cedar::unit::Time time)
 {
   std::cout << "Time output test: " << std::endl;
   std::cout << cedar::unit::Microseconds(time)

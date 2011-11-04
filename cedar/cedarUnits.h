@@ -41,9 +41,9 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "units/namespace.h"
-#include "units/Duration.h"
-#include "units/DurationUnit.h"
+#include "cedar/units/namespace.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/TimeUnit.h"
 
 
 // SYSTEM INCLUDES

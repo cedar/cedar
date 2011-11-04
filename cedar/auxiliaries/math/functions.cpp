@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/functions.h"
+#include "cedar/auxiliaries/math/functions.h"
 
 // PROJECT INCLUDES
 

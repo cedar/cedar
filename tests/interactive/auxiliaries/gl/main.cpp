@@ -36,18 +36,18 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gui/SceneWidget.h"
-#include "auxiliaries/gui/Viewer.h"
-#include "auxiliaries/gl/Block.h"
-#include "auxiliaries/gl/Sphere.h"
-#include "auxiliaries/gl/Cone.h"
-#include "auxiliaries/gl/Cylinder.h"
-#include "auxiliaries/gl/Pyramid.h"
-#include "auxiliaries/gl/Prism.h"
-#include "auxiliaries/gl/Torus.h"
-#include "auxiliaries/gl/Ellipse.h"
-#include "auxiliaries/gl/Chessboard.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gl/Cone.h"
+#include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Pyramid.h"
+#include "cedar/auxiliaries/gl/Prism.h"
+#include "cedar/auxiliaries/gl/Torus.h"
+#include "cedar/auxiliaries/gl/Ellipse.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>

@@ -42,14 +42,18 @@
 #define CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/namespace.h"
-#include "auxiliaries/AbstractFactory.h"
-#include "auxiliaries/AbstractFactoryDerived.h"
+#include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/AbstractFactoryDerived.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+/*!@brief A SigmoidDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
+ * create a sigmoid of this id. It is a concretization of DeclarationBase.
+ *
+ */
 class cedar::aux::math::SigmoidDeclaration
 {
 public:

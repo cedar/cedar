@@ -41,10 +41,14 @@
 
 // PROJECT INCLUDES
 
-#include "devices/kteam/EPuckDrive.h"
-#include "cedar/devices/kteam/gui/ui_EPuckControlWidget.h"
-#include "devices/kteam/gui/namespace.h"
-#include "auxiliaries/gui/BaseWidget.h"
+#include "cedar/devices/kteam/EPuckDrive.h"
+#ifdef DEBUG
+  #include "cedar/devices/debug/kteam/gui/ui_EPuckControlWidget.h"
+#else
+  #include "cedar/devices/kteam/gui/ui_EPuckControlWidget.h"
+#endif
+#include "cedar/devices/kteam/gui/namespace.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 

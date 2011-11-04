@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/utilities.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 

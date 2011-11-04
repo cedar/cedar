@@ -38,10 +38,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/Group.h"
-#include "processing/LoopedTrigger.h"
-#include "processing/Manager.h"
-#include "processing/Step.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/Step.h"
 
 // PROJECT INCLUDES
 

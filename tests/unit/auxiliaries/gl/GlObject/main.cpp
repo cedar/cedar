@@ -37,9 +37,9 @@
 #include "TestObject.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Object.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>

@@ -39,10 +39,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/gui/ArchitectureToolBox.h"
-#include "processing/gui/View.h"
-#include "processing/Manager.h"
-#include "auxiliaries/assert.h"
+#include "cedar/processing/gui/ArchitectureToolBox.h"
+#include "cedar/processing/gui/View.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 

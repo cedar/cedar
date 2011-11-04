@@ -38,7 +38,7 @@
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
+#include "cedar/devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -52,6 +52,7 @@ namespace cedar
     /*! @brief Namespace for all robot interfaces. */
     namespace robot
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_DEV_CLASS(Component);
       CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
       CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
@@ -62,6 +63,7 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(ReferenceGeometry);
       CEDAR_DECLARE_DEV_CLASS(Robot);
       CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+      //!@endcond
     }
   }
 }

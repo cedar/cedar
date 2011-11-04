@@ -39,7 +39,7 @@
 #define CEDAR_PROC_GUI_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "processing/lib.h"
+#include "cedar/processing/lib.h"
 
 // PROJECT INCLUDES
 
@@ -55,6 +55,7 @@ namespace cedar
   {
     namespace gui
     {
+      //!@cond SKIPPED_DOCUMENTATION
       class CEDAR_PROC_LIB_EXPORT ArchitectureToolBox;
       class CEDAR_PROC_LIB_EXPORT BoolParameter;
       class CEDAR_PROC_LIB_EXPORT Connection;
@@ -88,6 +89,7 @@ namespace cedar
       /* Exceptions */
       class CEDAR_PROC_LIB_EXPORT InvalidStepNameException;
       class CEDAR_PROC_LIB_EXPORT InvalidTriggerNameException;
+      //!@endcond
 
       /* enums */
       enum ConnectValidity

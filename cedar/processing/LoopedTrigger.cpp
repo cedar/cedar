@@ -40,12 +40,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "processing/LoopedTrigger.h"
-#include "processing/StepTime.h"
-#include "units/DurationUnit.h"
-#include "processing/Manager.h"
-#include "processing/LoopMode.h"
-#include "auxiliaries/System.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/StepTime.h"
+#include "cedar/units/TimeUnit.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/LoopMode.h"
+#include "cedar/auxiliaries/System.h"
 
 // PROJECT INCLUDES
 

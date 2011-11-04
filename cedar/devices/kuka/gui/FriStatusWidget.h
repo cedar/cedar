@@ -38,20 +38,20 @@
 #define CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
 
 // MAKE FRI OPTIONAL
-#include "devices/robot/CMakeDefines.h"
+#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
 // LOCAL INCLUDES
 #include "namespace.h"
 
 // PROJECT INCLUDES
-#include "devices/kuka/KukaInterface.h"
+#include "cedar/devices/kuka/KukaInterface.h"
 #ifdef DEBUG
 #include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
 #else
 #include "cedar/devices/kuka/gui/ui_FriStatusWidget.h"
 #endif
-#include "auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
 #include <Qt>

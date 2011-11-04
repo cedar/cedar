@@ -38,10 +38,10 @@
 #define CEDAR_PROC_REGISTRY_H
 
 // LOCAL INCLUDES
-#include "processing/namespace.h"
-#include "processing/exceptions.h"
-#include "auxiliaries/assert.h"
-#include "auxiliaries/LoopedThread.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 
 // PROJECT INCLUDES
 

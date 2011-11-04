@@ -38,7 +38,7 @@
 #define CEDAR_AUX_SYSTEM_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -93,9 +93,8 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@todo remove, for debugging only.
+  //!@brief For debugging only.
   static QReadWriteLock mCOutLock;
-  // none yet (hopefully never!)
 protected:
   // none yet
 

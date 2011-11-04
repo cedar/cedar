@@ -38,8 +38,8 @@
 #define CEDAR_AUX_FACTORY_DERIVED_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/namespace.h"
-#include "auxiliaries/Factory.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Factory.h"
 
 // PROJECT INCLUDES
 

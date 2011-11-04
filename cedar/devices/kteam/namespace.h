@@ -39,7 +39,7 @@
 #define CEDAR_DEV_KTEAM_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "devices/lib.h"
+#include "cedar/devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -55,7 +55,6 @@ namespace cedar
       CEDAR_DECLARE_DEV_CLASS(EPuckDrive);
       CEDAR_DECLARE_DEV_CLASS(Drive);
       CEDAR_DECLARE_DEV_CLASS(DriveModel);
-      CEDAR_DECLARE_DEV_CLASS(PositionController);
     }
   }
 }
