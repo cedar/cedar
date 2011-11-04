@@ -85,6 +85,8 @@ public slots:
   void dimensionalityChanged();
   //!@brief handle a change in size along dimensions, which leads to creating new matrices
   void dimensionSizeChanged();
+  //!@brief handle a change in number of lateral interaction kernels
+  void numberOfKernelsChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -132,7 +134,10 @@ protected:
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
-  cedar::aux::UIntParameterPtr _mNumKernels;
+  //!@brief the number of kernels
+  cedar::aux::UIntParameterPtr _mNumberOfKernels;
+  //!@brief the old number of kernels - needed to deal with changes in number of kernels
+  unsigned int mOldNumberOfKernels;
 private:
   // none yet
 
