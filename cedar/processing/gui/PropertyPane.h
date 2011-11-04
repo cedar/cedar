@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 #include <QTableWidget>
+#include <boost/signals2/connection.hpp>
 
 
 /*!@brief Abstract description of the class.
@@ -97,6 +98,7 @@ public:
 
 public slots:
   void resetPointer();
+  void redraw();
 
   void rowSizeChanged();
 
@@ -130,6 +132,7 @@ private:
 
   std::map<cedar::proc::gui::Parameter*, int> mParameterRowIndex;
 
+  boost::signals2::connection mSlotConnection;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

@@ -212,4 +212,23 @@ void cedar::aux::Configurable::addConfigurableChild(const std::string& name, ced
                                                     + name + "\".");
   }
   this->mChildren[name] = child;
+  // emit boost signal
+  mTreeChanged();
+}
+
+void cedar::aux::Configurable::removeConfigurableChild(const std::string& name)
+{
+  Children::iterator child = this->mChildren.find(name);
+  if (child == this->mChildren.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "There is no configurable child with the name \"" + name + "\".");
+  }
+  this->mChildren.erase(child);
+  // emit boost signal
+  mTreeChanged();
+}
+
+boost::signals2::connection cedar::aux::Configurable::connectToTreeChangedSignal(boost::function<void ()> slot)
+{
+  return mTreeChanged.connect(slot);
 }
