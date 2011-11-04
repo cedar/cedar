@@ -40,7 +40,7 @@
 
 // PROJECT INCLUDES
 
-#include <auxiliaries/exceptions/InitializationException.h>
+#include <cedar/auxiliaries/exceptions/InitializationException.h>
 
 // SYSTEM INCLUDES
 

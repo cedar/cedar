@@ -217,7 +217,7 @@ void cedar::aux::math::logAxis(const cv::Mat& rRotation, cv::Mat& rOmega, double
   rOmega.at<T>(0, 0) = 1 / (2 * sin_theta) * (rRotation.at<T>(2, 1) - rRotation.at<T>(1, 2));
   rOmega.at<T>(1, 0) = 1 / (2 * sin_theta) * (rRotation.at<T>(0, 2) - rRotation.at<T>(2, 0));
   rOmega.at<T>(2, 0) = 1 / (2 * sin_theta) * (rRotation.at<T>(1, 0) - rRotation.at<T>(0, 1));
-  rOmega = rOmega * (1 / norm(rOmega));
+  rOmega = rOmega * (1 / cv::norm(rOmega));
 
   if (IsZero(rTheta - cedar::aux::math::pi))
   {
@@ -266,7 +266,7 @@ void cedar::aux::math::expTwist(const cv::Mat& rXi, double theta, cv::Mat& rResu
   Mat p;
 
   // translation
-  if (norm(omega) == 0) // pure translation
+  if (cv::norm(omega) == 0) // pure translation
   {
     p = v * theta;
   }
@@ -502,7 +502,7 @@ template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::invertAdjointTransformat
 template<typename T>
 cv::Mat cedar::aux::math::twistCoordinates(const cv::Mat& rSupportPoint, const cv::Mat& rAxis)
 {
-  Mat omega = rAxis(Rect(0, 0, 1, 3)) * (1 / norm(rAxis(Rect(0, 0, 1, 3))));
+  Mat omega = rAxis(Rect(0, 0, 1, 3)) * (1 / cv::norm(rAxis(Rect(0, 0, 1, 3))));
   Mat cross = rSupportPoint(Rect(0, 0, 1, 3)).cross(omega);
   Mat twist = cv::Mat::zeros(6, 1, rSupportPoint.type());
   twist.at<double>(0, 0) = cross.at<double>(0, 0);

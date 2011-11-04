@@ -22,44 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Base.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 28
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2010 10 12
 
-    Description: Namespace file for cedar::proc::steps.
+    Description: Implementation of the @em cedar::aux::Base class.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_PROC_STEPS_NAMESPACE_H
-#define CEDAR_PROC_STEPS_NAMESPACE_H
-
 // LOCAL INCLUDES
-#include "cedar/processing/lib.h"
+#include "cedar/auxiliaries/MatrixIterator.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+//! constructor
+cedar::aux::MatrixIterator::MatrixIterator(const cv::Mat& matrix)
+:
+mMatrixRef(matrix)
 {
-  namespace proc
-  {
-    /*!@brief Namespace for processing steps. */
-    namespace steps
-    {
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_PROC_CLASS(StaticGain);
-      CEDAR_DECLARE_PROC_CLASS(Resize);
-      //!@endcond
-    }
-  }
+  this->mIndex.resize(matrix.dims, 0);
 }
 
-#endif // CEDAR_PROC_STEPS_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
