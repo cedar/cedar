@@ -44,7 +44,7 @@
 // LOCAL INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/units/DurationUnit.h"
+#include "cedar/units/TimeUnit.h"
 
 // PROJECT INCLUDES
 
@@ -74,19 +74,23 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  virtual void eulerStep(const cedar::unit::Duration& time) = 0;
+  /*!@brief this is the core method of dynamics - here, an euler step is executed with a given Time interval time
+   * @param time the time that has passed since the last call to this method
+   * @todo put this to private
+   */
+  virtual void eulerStep(const cedar::unit::Time& time) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief compute calls eulerStep
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

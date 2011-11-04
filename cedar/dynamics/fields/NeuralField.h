@@ -77,15 +77,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief
-  void onStart();
-
+  //!@brief determine if a given Data is a valid input to the field
   cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
 
 public slots:
-  //@brief handle a change in dimensionality, which leads to creating new matrices
+  //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();
-  //@brief handle a change in size along dimensions, which leads to creating new matrices
+  //!@brief handle a change in size along dimensions, which leads to creating new matrices
   void dimensionSizeChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,7 +96,7 @@ protected:
    * \dot{u}(\boldmath{x},t) = \frac{\delta t}{\tau} (-u + h + \int\dots\int w(\boldmath{x}' - \boldmath{x}) \sigma(u\boldmath{x}) d\boldmath{x} + s(\boldmath{x}))
    * \f]
    */
-  void eulerStep(const cedar::unit::Duration& time);
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
