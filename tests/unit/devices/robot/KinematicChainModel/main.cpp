@@ -36,11 +36,12 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/ReferenceGeometry.h"
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 
@@ -67,8 +68,8 @@ int main()
 
   // set test configurations
   p_test_arm->setWorkingMode(KinematicChain::VELOCITY);
-  p_test_arm->setJointAngle(2, -M_PI*0.5);
-  p_test_arm->setJointAngle(3, M_PI*0.5);
+  p_test_arm->setJointAngle(2, -cedar::aux::math::pi*0.5);
+  p_test_arm->setJointAngle(3, cedar::aux::math::pi*0.5);
   p_test_arm->setJointVelocity(1, 1);
   p_test_arm->setJointVelocity(2, 1);
   test_arm_model.update();

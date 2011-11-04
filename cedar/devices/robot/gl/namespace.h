@@ -39,6 +39,7 @@
 #define CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "cedar/devices/lib.h"
 
 // PROJECT INCLUDES
 #include "namespace.h"
@@ -55,21 +56,10 @@ namespace cedar
       //!@brief Namespace for widget classes.
       namespace gl
       {
-        class KinematicChain;
-        //!@brief smart pointer for KinematicChain
-        typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
-
-        class AmtecChain;
-        //!@brief smart pointer for AmtecChain
-        typedef boost::shared_ptr<AmtecChain> AmtecChainPtr;
-
-        class CoraArm;
-        //!@brief smart pointer for CoraArm
-        typedef boost::shared_ptr<CoraArm> CoraArmPtr;
-
-        class CoraHead;
-        //!@brief smart pointer for CoraHead
-        typedef boost::shared_ptr<CoraHead> CoraHeadPtr;
+        CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+        CEDAR_DECLARE_DEV_CLASS(AmtecChain);
+        CEDAR_DECLARE_DEV_CLASS(CoraArm);
+        CEDAR_DECLARE_DEV_CLASS(CoraHead);
       }
     }
   }

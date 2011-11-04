@@ -39,7 +39,7 @@
 #define CEDAR_AUX_EXC_EXCEPTION_BASE_H
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/namespace.h"
+#include "cedar/auxiliaries/exceptions/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -69,7 +69,7 @@ class cedar::aux::exc::ExceptionBase : public std::exception
    *  @remarks The type passed as \em Exception_type should inherit from \em cedar::aux::exc::ExceptionBase.
    *           Do not line-break the following macro(s), or the __LINE__ specification will be wrong!
    */
-  #define CEDAR_THROW(Exception_type, message) Exception_type exception; exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception;
+  #define CEDAR_THROW(Exception_type, message) { Exception_type exception; exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -90,7 +90,7 @@ public:
 public:
 
   //!@brief Compiles the exception info string.
-  virtual std::string exceptionInfo(void) const;
+  virtual const std::string& exceptionInfo() const;
 
   //!@brief Sets the message for the exception.
   void setMessage(const std::string& message);
@@ -137,6 +137,9 @@ private:
 
   //! Source-file that threw the exception.
   std::string mFileName;
+
+  //! Helper for converting the exception info to a const char* string.
+  mutable std::string mExceptionInfo;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

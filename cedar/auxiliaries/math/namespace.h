@@ -39,12 +39,14 @@
 #define CEDAR_AUX_MATH_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-
+#include <boost/smart_ptr.hpp>
 
 namespace cedar
 {
@@ -54,6 +56,20 @@ namespace cedar
     namespace math
     {
       template <typename T> struct Limits;
+
+      CEDAR_DECLARE_CLASS(Sigmoid);
+
+      CEDAR_DECLARE_CLASS(AbsSigmoid);
+
+      CEDAR_DECLARE_CLASS(ExpSigmoid);
+
+      CEDAR_DECLARE_CLASS(HeavysideSigmoid);
+
+      CEDAR_DECLARE_CLASS(SigmoidDeclaration);
+
+      template <class DerivedClass> class SigmoidDeclarationT;
+
+      typedef boost::shared_ptr<cedar::aux::AbstractFactory<Sigmoid> > SigmoidFactoryPtr;
     }
   }
 }

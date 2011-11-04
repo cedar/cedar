@@ -35,8 +35,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedarDev.h"
-#include "cedarAux.h"
+#include "cedar/cedarUnits.h"
+#include "cedar/cedarAux.h"
+#include "cedar/cedarProc.h"
+#include "cedar/cedarDev.h"
+#include "cedar/cedarDyn.h"
+
 
 // PROJECT INCLUDES
 

@@ -35,14 +35,16 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/glu.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <math.h>
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+
 
 using namespace std;
 using namespace cv;
@@ -161,30 +163,32 @@ void cedar::aux::gl::drawCone(
   if (alpha != 0)
   {
     Mat axis = z.cross(line);
-    glRotated(alpha*180/M_PI, axis.at<T>(0, 0), axis.at<T>(1, 0), axis.at<T>(2, 0));
+    glRotated(alpha*180/cedar::aux::math::pi, axis.at<T>(0, 0), axis.at<T>(1, 0), axis.at<T>(2, 0));
   }
   // draw the cone
   drawCone(0, norm(line), radiusStart, radiusEnd, slices, wireFrame);
   // return to saved transformation
   glPopMatrix();
 }
-template void cedar::aux::gl::drawCone<double>(
-                                                const cv::Mat,
-                                                const cv::Mat,
-                                                double,
-                                                double,
-                                                int,
-                                                bool
-                                              );
+template CEDAR_AUX_LIB_EXPORT 
+  void cedar::aux::gl::drawCone<double>(
+                                          const cv::Mat,
+                                          const cv::Mat,
+                                          double,
+                                          double,
+                                          int,
+                                          bool
+                                        );
 
-template void cedar::aux::gl::drawCone<float>(
-                                               const cv::Mat,
-                                               const cv::Mat,
-                                               double,
-                                               double,
-                                               int,
-                                               bool
-                                             );
+template CEDAR_AUX_LIB_EXPORT
+  void cedar::aux::gl::drawCone<float>(
+                                         const cv::Mat,
+                                         const cv::Mat,
+                                         double,
+                                         double,
+                                         int,
+                                         bool
+                                       );
 
 template<typename T>
 void cedar::aux::gl::drawArrow(
@@ -194,7 +198,7 @@ void cedar::aux::gl::drawArrow(
                                 double headRadius,
                                 double headLength,
                                 int patches,
-                                bool wireFrame=false
+                                bool wireFrame
                               )
 {
   drawCone<T>(
@@ -215,23 +219,23 @@ void cedar::aux::gl::drawArrow(
              );
 
 }
-template void cedar::aux::gl::drawArrow<float>(
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<float>(
                                                 const cv::Mat start,
                                                 const cv::Mat end,
                                                 double shaftRadius,
                                                 double headRadius,
                                                 double headLength,
                                                 int patches,
-                                                bool wireFrame=false
+                                                bool wireFrame
                                               );
-template void cedar::aux::gl::drawArrow<double>(
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<double>(
                                                  const cv::Mat start,
                                                  const cv::Mat end,
                                                  double shaftRadius,
                                                  double headRadius,
                                                  double headLength,
                                                  int patches,
-                                                 bool wireFrame=false
+                                                 bool wireFrame
                                                );
 
 void cedar::aux::gl::drawSphere(
@@ -346,12 +350,12 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // bottom
   glNormal3d(0.0, 0.0, -1.0);
   glVertex3d(0, -width/2, 0);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   // top
   glNormal3d(0.0, 0.0, 1.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
   glVertex3d(0, width/2, height);
   glEnd();
   
@@ -359,15 +363,15 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // front left
   glNormal3d(.33, -.66, 0.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, -width/2, 0);
   // front right
   glNormal3d(.33, .66, 0.0);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   glVertex3d(0, width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
   // back
   glNormal3d(-1.0, 0.0, 0.0);
   glVertex3d(0, -width/2, 0);
@@ -405,7 +409,7 @@ void cedar::aux::gl::drawEllipse(
 {
   // approximates the ellipse with 16 3rd order Bezier surfaces, which is not perfect, but almost
   double t = thickness;
-  double d = 4.0/3.0*(sqrt(2)-1);
+  double d = 4.0/3.0*(sqrt(2.0)-1);
   // first quarter
   GLfloat I_1[4][4][3] =
   {

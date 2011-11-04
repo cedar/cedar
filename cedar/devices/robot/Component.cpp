@@ -36,28 +36,16 @@
 
 
 // LOCAL INCLUDES
-#include "devices/robot/Component.h"
-#include "devices/robot/Robot.h"
+#include "cedar/devices/robot/Component.h"
+#include "cedar/devices/robot/Robot.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-//! constructor
-Component::Component(void)
-{
-}
-
-//! destructor
-Component::~Component(void)
-{
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods

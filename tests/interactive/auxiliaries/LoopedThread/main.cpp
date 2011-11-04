@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 
-#include "auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 
 #include <cstdlib>
 #include <iostream>

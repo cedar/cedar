@@ -37,7 +37,8 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/algebraTools.h"
+#include "cedar/auxiliaries/math/algebraTools.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // PROJECT INCLUDES
 
@@ -112,7 +113,7 @@ std::vector<double> cedar::aux::math::solveCubic(const std::vector<double>& rCoe
     }
     else /* one single and one double solution */
     {
-      double u = cbrt(-q);
+      double u = cedar::aux::math::fast_cuberoot(-q);
       solutions.push_back(2 * u);
       solutions.push_back(-u);
     }
@@ -123,14 +124,14 @@ std::vector<double> cedar::aux::math::solveCubic(const std::vector<double>& rCoe
     double t = 2.0 * sqrt(-p);
     
     solutions.push_back(t * cos(phi));
-    solutions.push_back(-t * cos(phi + M_PI / 3.0));
-    solutions.push_back(-t * cos(phi - M_PI / 3.0));
+    solutions.push_back(-t * cos(phi + cedar::aux::math::pi / 3.0));
+    solutions.push_back(-t * cos(phi - cedar::aux::math::pi / 3.0));
   }
   else /* one real solution */
   {
     double sqrt_D = sqrt(D);
-    double u = cbrt(sqrt_D - q);
-    double v = -cbrt(sqrt_D + q);
+    double u = cedar::aux::math::fast_cuberoot(sqrt_D - q);
+    double v = -cedar::aux::math::fast_cuberoot(sqrt_D + q);
     
     solutions.push_back(u + v);
   }
@@ -265,7 +266,7 @@ std::vector<double> cedar::aux::math::solveQuartic(const std::vector<double>& rC
   return solutions;
 }
 
-std::vector<double> cedar::aux::math::solvePolynomial(const std::vector<double>& rCoefficients)
+std::vector<double> cedar::aux::math::solvePolynomial(const std::vector<double>& /*rCoefficients*/)
 {
   std::vector<double> solutions;
   return solutions;

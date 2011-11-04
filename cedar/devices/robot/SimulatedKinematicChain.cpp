@@ -37,7 +37,7 @@
 #include "SimulatedKinematicChain.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 

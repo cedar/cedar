@@ -37,11 +37,12 @@
 #include "KinematicChain.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/drawShapes.h"
-#include "auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include <OpenGL/gl.h>
+
 
 using namespace cedar::dev::robot;
 using namespace cedar::dev::robot::gl;
@@ -104,9 +105,9 @@ void gl::KinematicChain::drawBase()
   glColor4d(mColorR, mColorG, mColorB, 0);
   drawTorus(0.1, 0.015, mResolution, mResolution, mIsDrawnAsWireFrame);
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  glTranslatef(0.0, 0.0, 0.005);
+  glTranslatef(0.0f, 0.0f, 0.005f);
   drawDisk(0.0, 0.1, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-  glTranslatef(0.0, 0.0, -0.01);
+  glTranslatef(0.0f, 0.0f, -0.01f);
   drawDisk(0.0, 0.1, mResolution, mResolution, true, mIsDrawnAsWireFrame);
 }
 

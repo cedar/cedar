@@ -39,12 +39,12 @@
 #define CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_MODEL_H
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
+#include "cedar/devices/robot/namespace.h"
 #include "ReferenceGeometry.h"
 #include "KinematicChain.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Object.h"
+#include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
 #include <string>

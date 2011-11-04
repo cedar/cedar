@@ -36,14 +36,15 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "devices/robot/gl/CoraArm.h"
-#include "devices/robot/gl/CoraHead.h"
-#include "devices/robot/gui/KinematicChainWidget.h"
-#include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gui/Viewer.h"
-#include "auxiliaries/gui/SceneWidget.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/gl/CoraArm.h"
+#include "cedar/devices/robot/gl/CoraHead.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
+#include "cedar/auxiliaries/sleepFunctions.h"
 
 
 // SYSTEM INCLUDES
@@ -94,8 +95,8 @@ int main(int argc, char **argv)
   p_scene_widget->show();
 
   // create widgets
-  KinematicChainWidget widget_arm(p_cora_arm);
-  KinematicChainWidget widget_head(p_cora_head);
+  cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_cora_arm);
+  cedar::dev::robot::gui::KinematicChainWidget widget_head(p_cora_head);
   widget_arm.show();
   widget_head.show();
 
@@ -105,7 +106,7 @@ int main(int argc, char **argv)
   a.exec();
 
   p_cora_arm->stop();
-  sleep(1);
+  cedar::aux::sleep(cedar::unit::Seconds(1));
 
   return 0;
 }

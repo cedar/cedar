@@ -44,8 +44,8 @@
 
 // PROJECT INCLUDES
 
-#include "devices/robot/KinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
 
 // SYSTEM INCLUDES
 

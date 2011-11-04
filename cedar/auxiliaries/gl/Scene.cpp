@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gl/Scene.h"
 
 // PROJECT INCLUDES
 
@@ -168,7 +168,7 @@ void Scene::initGl()
   
   // Create light components
   GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-  GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8, 1.0f };
+  GLfloat diffuseLight[] = { 0.8f, 0.8f, 0.8f, 1.0f };
   GLfloat specularLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
   GLfloat position[] = { -0.5f, 1.0f, -1.0f, 1.0f };
   

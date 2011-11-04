@@ -39,7 +39,7 @@
 #include "unit/auxiliaries/ConfigurationInterface/TestClass.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <string>

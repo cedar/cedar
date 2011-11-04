@@ -36,10 +36,10 @@
 
 
 // LOCAL INCLUDES
-#include "devices/robot/ReferenceGeometry.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -124,7 +124,7 @@ void ReferenceGeometry::init()
   }
 }
 
-const unsigned int ReferenceGeometry::getNumberOfJoints() const
+unsigned int ReferenceGeometry::getNumberOfJoints() const
 {
   return _mJoints.size();
 }

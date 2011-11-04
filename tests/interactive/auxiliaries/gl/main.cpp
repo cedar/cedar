@@ -36,22 +36,23 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gui/SceneWidget.h"
-#include "auxiliaries/gui/Viewer.h"
-#include "auxiliaries/gl/Block.h"
-#include "auxiliaries/gl/Sphere.h"
-#include "auxiliaries/gl/Cone.h"
-#include "auxiliaries/gl/Cylinder.h"
-#include "auxiliaries/gl/Pyramid.h"
-#include "auxiliaries/gl/Prism.h"
-#include "auxiliaries/gl/Torus.h"
-#include "auxiliaries/gl/Ellipse.h"
-#include "auxiliaries/gl/Chessboard.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gl/Cone.h"
+#include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Pyramid.h"
+#include "cedar/auxiliaries/gl/Prism.h"
+#include "cedar/auxiliaries/gl/Torus.h"
+#include "cedar/auxiliaries/gl/Ellipse.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
 #include <QApplication>
 
+//!@todo remove these using namespaces -- when compiling with windows, they lead to ambiguous symbols!
 using namespace std;
 using namespace cedar::aux::gl;
 using namespace cedar::aux::gui;
@@ -126,7 +127,7 @@ int main(int argc, char **argv)
   cedar::aux::ObjectPtr p_ellipse_object(new cedar::aux::Object());
   p_ellipse_object->setPosition(-7.5, -3, 3);
   p_ellipse_object->setName(std::string("Elfriede la Ellipse"));
-  ObjectPtr p_ellipse(new Ellipse(p_ellipse_object, 1, 2, 0.3, 1, 1, 0));
+  ObjectPtr p_ellipse(new cedar::aux::gl::Ellipse(p_ellipse_object, 1, 2, 0.3, 1, 1, 0));
   p_scene->addObject(p_ellipse);
 
   // create a chessboard visualization and add it to the scene

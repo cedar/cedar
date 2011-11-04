@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // PROJECT INCLUDES
 

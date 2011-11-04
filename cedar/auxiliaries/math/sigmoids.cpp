@@ -36,16 +36,23 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/sigmoids.h"
+#include "cedar/auxiliaries/math/constants.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+//!@todo should the template functions be moved to the header?
 
 using namespace std;
 
 double cedar::aux::math::sigmoid(const double x, const double beta, const double threshold)
+{
+  return sigmoidExp(x, beta, threshold);
+}
+
+double cedar::aux::math::sigmoidExp(const double x, const double beta, const double threshold)
 {
   return 1 / (1 + exp(-beta * (x - threshold)));
 }
@@ -55,40 +62,47 @@ double cedar::aux::math::sigmoidAbs(const double x, const double beta, const dou
   return 0.5 * (1. + beta * (x - threshold) / (1. + beta * fabs(x - threshold)));
 }
 
+double cedar::aux::math::sigmoidHeavyside(const double x, const double threshold)
+{
+  if (x < threshold)
+    return 0.0;
+  return 1.0;
+}
+
 template<typename T>
-cv::Mat cedar::aux::math::sigmoid(const cv::Mat& mat, const double beta, const double threshold = 0)
+cv::Mat cedar::aux::math::sigmoid(const cv::Mat& mat, const double beta, const double threshold)
 {
   cv::Mat result = mat.clone();
   for (int col = 0; col < mat.cols; col++)
   {
     for (int row = 0; row < mat.rows; row++)
     {
-      result.at<T>(row,col) = sigmoid(mat.at<T>(row,col),beta,threshold);
+      result.at<T>(row,col) = sigmoidExp(mat.at<T>(row,col),beta,threshold);
     }
   }
   return result;
 }
-template cv::Mat cedar::aux::math::sigmoid<double>(const cv::Mat&, const double, const double);
-template cv::Mat cedar::aux::math::sigmoid<float>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoid<double>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoid<float>(const cv::Mat&, const double, const double);
 
 //same as cv::mat sigmoidAbs but does not create new memory for result
 template<typename T>
-void cedar::aux::math::sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0)
+void cedar::aux::math::sigmoid(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold)
 {
   for (int col = 0; col < mat.cols; col++)
   {
     for (int row = 0; row < mat.rows; row++)
     {
-      result.at<T>(row,col) = sigmoid(mat.at<T>(row,col),beta,threshold);
+      result.at<T>(row,col) = sigmoidExp(mat.at<T>(row,col),beta,threshold);
     }
   }
 }
-template void cedar::aux::math::sigmoid<double>(const cv::Mat&, cv::Mat&, const double, const double);
-template void cedar::aux::math::sigmoid<float>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoid<double>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoid<float>(const cv::Mat&, cv::Mat&, const double, const double);
 
 
 template<typename T>
-cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold = 0)
+cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, const double threshold)
 {
   cv::Mat result = mat.clone();
   for (int col = 0; col < mat.cols; col++)
@@ -100,11 +114,11 @@ cv::Mat cedar::aux::math::sigmoidAbs(const cv::Mat& mat, const double beta, cons
   }
   return result;
 }
-template cv::Mat cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, const double, const double);
-template cv::Mat cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT cv::Mat cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, const double, const double);
 //same as cv::mat sigmoidAbs but does not create new memory for result
 template<typename T>
-void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold = 0)
+void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const double beta, const double threshold)
 {
   for (int col = 0; col < mat.cols; col++)
   {
@@ -115,8 +129,8 @@ void cedar::aux::math::sigmoidAbs(const cv::Mat& mat, cv::Mat& result, const dou
   }
 }
 
-template void cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, cv::Mat&, const double, const double);
-template void cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoidAbs<double>(const cv::Mat&, cv::Mat&, const double, const double);
+template CEDAR_AUX_LIB_EXPORT void cedar::aux::math::sigmoidAbs<float>(const cv::Mat&, cv::Mat&, const double, const double);
 
 std::vector<double> cedar::aux::math::sigmoid(const std::vector<double>& x, const double beta, const double threshold)
 {
@@ -124,8 +138,7 @@ std::vector<double> cedar::aux::math::sigmoid(const std::vector<double>& x, cons
   buffer.resize(x.size());
   for (unsigned int i = 0; i < x.size(); i++)
   {
-//    buffer[i] = 1 / (1 + exp(-beta * (x[i] - threshold)));
-    buffer[i] = sigmoid(x[i], beta, threshold);
+    buffer[i] = sigmoidExp(x[i], beta, threshold);
   }
   return buffer;
 }
@@ -146,6 +159,6 @@ double cedar::aux::math::sigmoidInterval(const double value, const double t1, co
   }
   else
   {
-    return 0.5 * (-cos((value - t1) / (t2 - t1) * M_PI) + 1);
+    return 0.5 * (-cos((value - t1) / (t2 - t1) * cedar::aux::math::pi) + 1);
   }
 }

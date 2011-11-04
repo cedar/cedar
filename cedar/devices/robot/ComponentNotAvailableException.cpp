@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "devices/robot/ComponentNotAvailableException.h"
+#include "cedar/devices/robot/ComponentNotAvailableException.h"
 
 // PROJECT INCLUDES
 

@@ -38,18 +38,13 @@
 
 // PROJECT INCLUDES
 
-#include "devices/robot/gui/KinematicChainWidget.h"
-#include "devices/robot/AmtecKinematicChain.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/amtec/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
 #include <iostream>
 #include <QtGui/QApplication>
-
-
-using namespace std;
-using namespace cedar::dev::robot;
-
 
 //------------------------------------------------------------------------------
 // methods
@@ -58,15 +53,15 @@ using namespace cedar::dev::robot;
 int main(int argc, char *argv[]) {
   try
   {
-    KinematicChainPtr p_kinematic_chain(new AmtecKinematicChain("../../../tests/interactive/devices/gui/AmtecKinematicChain/cora_arm.conf"));
+    cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::amtec::KinematicChain("../../../tests/interactive/devices/gui/AmtecKinematicChain/cora_arm.conf"));
     //p_kinematic_chain->useCurrentHardwareValues(true);
     QApplication app(argc, argv);
-    KinematicChainWidget widget(p_kinematic_chain);
+    cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain);
     widget.show();
     return app.exec();
   }
-  catch(exception e)
+  catch(std::exception e)
   {
-    cout << "Exception: " << e.what() << endl;
+    std::cout << "Exception: " << e.what() << std::endl;
   }
 }

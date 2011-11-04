@@ -38,15 +38,15 @@
 #include "iiClosedFormInverseKinematics.hpp"
 
 // PROJECT INCLUDES
-#include "devices/robot/AmtecKinematicChain.h"
-#include "devices/robot/KinematicChainModel.h"
-#include "devices/robot/SimulatedKinematicChain.h"
-#include "devices/robot/gl/CoraArm.h"
-#include "devices/robot/gl/CoraHead.h"
-#include "devices/robot/gui/KinematicChainWidget.h"
-#include "auxiliaries/gl/Scene.h"
-#include "auxiliaries/gui/Viewer.h"
-#include "auxiliaries/gui/SceneWidget.h"
+#include "cedar/devices/amtec/KinematicChain.h"
+#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/SimulatedKinematicChain.h"
+#include "cedar/devices/robot/gl/CoraArm.h"
+#include "cedar/devices/robot/gl/CoraHead.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/auxiliaries/gl/Scene.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
+#include "cedar/auxiliaries/gui/SceneWidget.h"
 
 // SYSTEM INCLUDES
 
@@ -56,7 +56,6 @@ using namespace cedar::aux::gl;
 using namespace cedar::aux::gui;
 using namespace cedar::dev::robot::gl;
 using namespace cedar::dev::robot;
-
 
 bool useHardware = true;
 
@@ -69,7 +68,7 @@ int main(int argc, char **argv)
   cedar::dev::robot::KinematicChainPtr p_cora_arm_hw;
   if(useHardware)
   {
-    p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr(new AmtecKinematicChain(string("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")));
+    p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr(new cedar::dev::amtec::KinematicChain(string("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")));
   }
 
   // create models calculation of the transformation

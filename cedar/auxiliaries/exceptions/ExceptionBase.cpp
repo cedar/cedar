@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 // PROJECT INCLUDES
 
@@ -64,7 +64,7 @@ cedar::aux::exc::ExceptionBase::~ExceptionBase(void) throw ()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::aux::exc::ExceptionBase::exceptionInfo(void) const
+const std::string& cedar::aux::exc::ExceptionBase::exceptionInfo(void) const
 {
   std::string info = "";
 
@@ -72,19 +72,20 @@ std::string cedar::aux::exc::ExceptionBase::exceptionInfo(void) const
   if ( ! this->mMessage.empty() )
   {
     info += "Exception: " + this->mMessage;
-    info += " ";
+    info += "\n";
   }
 
   // Add the typename, file and line information
   info += "Type: " + this->mType;
-  info += " File: " + this->mFileName;
-  info += " Line: ";
+  info += "\nFile: " + this->mFileName;
+  info += "\nLine: ";
   std::stringstream input_stream;
   input_stream << this->mLineNumber;
   info += input_stream.str();
 
+  this->mExceptionInfo = info;
   // return the compiled string.
-  return info;
+  return this->mExceptionInfo;
 }
 
 void cedar::aux::exc::ExceptionBase::printInfo(void) const

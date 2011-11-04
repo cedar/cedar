@@ -36,9 +36,10 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "auxiliaries/Object.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -61,11 +62,11 @@ int main()
   // position
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: position" << std::endl;
-  object.setPosition(1337, 0, M_PI);
+  object.setPosition(1337, 0, cedar::aux::math::pi);
   if (
       object.getPositionX() != 1337.0
       || object.getPositionY() != 0.0
-      || object.getPositionZ() != M_PI
+      || object.getPositionZ() != cedar::aux::math::pi
       )
   {
     errors++;
@@ -75,13 +76,13 @@ int main()
   cv::Mat p1 = cv::Mat::ones(4, 1, CV_64FC1);
   p1.at<double>(0, 0) = 555.555;
   p1.at<double>(1, 0) = 2;
-  p1.at<double>(2, 0) = sqrt(3);
+  p1.at<double>(2, 0) = sqrt(3.0);
   object.setPosition(p1);
   cv::Mat p2 = object.getPosition();
   if (
       p2.at<double>(0, 0) != 555.555
       || p2.at<double>(1, 0) != 2.0
-      || p2.at<double>(2, 0) != sqrt(3)
+      || p2.at<double>(2, 0) != sqrt(3.0)
       || p2.at<double>(3, 0) != 1.0
       )
   {
@@ -122,15 +123,15 @@ int main()
 
   cv::Mat T = object.getTransformation();
   if (
-      !IsZero(T.at<double>(0, 0) - sqrt(2)/2)
+      !IsZero(T.at<double>(0, 0) - sqrt(2.0)/2)
       || !IsZero(T.at<double>(0, 1) - 0.0)
-      || !IsZero(T.at<double>(0, 2) - -sqrt(2)/2)
+      || !IsZero(T.at<double>(0, 2) - -sqrt(2.0)/2)
       || !IsZero(T.at<double>(1, 0) - 0)
       || !IsZero(T.at<double>(1, 1) - 1)
       || !IsZero(T.at<double>(1, 2) - 0)
-      || !IsZero(T.at<double>(2, 0) - sqrt(2)/2)
+      || !IsZero(T.at<double>(2, 0) - sqrt(2.0)/2)
       || !IsZero(T.at<double>(2, 1) - 0)
-      || !IsZero(T.at<double>(2, 2) - sqrt(2)/2)
+      || !IsZero(T.at<double>(2, 2) - sqrt(2.0)/2)
       || !IsZero(T.at<double>(0, 3) - 1)
       || !IsZero(T.at<double>(1, 3) - 10)
       || !IsZero(T.at<double>(2, 3) - 100)
@@ -152,18 +153,18 @@ int main()
   cv::Mat q4 = cv::Mat::zeros(4, 1, CV_64FC1);
   q4.at<double>(0, 0) = 1.0;
   object.setOrientationQuaternion(q4);
-  object.rotate(0, M_PI/2);
-  object.rotate(1, M_PI/4);
+  object.rotate(0, cedar::aux::math::pi/2);
+  object.rotate(1, cedar::aux::math::pi/4);
 
   cv::Mat D = object.getTransformation();
   if (
-      !IsZero(D.at<double>(0, 0) - sqrt(2)/2)
+      !IsZero(D.at<double>(0, 0) - sqrt(2.0)/2)
       || !IsZero(D.at<double>(0, 1) - 0.0)
-      || !IsZero(D.at<double>(0, 2) - sqrt(2)/2)
+      || !IsZero(D.at<double>(0, 2) - sqrt(2.0)/2)
 
-      || !IsZero(D.at<double>(1, 0) - sqrt(2)/2)
+      || !IsZero(D.at<double>(1, 0) - sqrt(2.0)/2)
       || !IsZero(D.at<double>(1, 1) - 0)
-      || !IsZero(D.at<double>(1, 2) - -sqrt(2)/2)
+      || !IsZero(D.at<double>(1, 2) - -sqrt(2.0)/2)
 
       || !IsZero(D.at<double>(2, 0) - 0)
       || !IsZero(D.at<double>(2, 1) - 1)
@@ -189,7 +190,7 @@ int main()
   cedar::aux::Object configured_object("test.conf");
   cv::Mat C = configured_object.getTransformation();
   if (
-      !IsZero(C.at<double>(0, 0) - cos(M_PI/6))
+      !IsZero(C.at<double>(0, 0) - cos(cedar::aux::math::pi/6))
       || !IsZero(C.at<double>(0, 1) - 0)
       || !IsZero(C.at<double>(0, 2) - -0.5)
       || !IsZero(C.at<double>(1, 0) - 0)
@@ -197,7 +198,7 @@ int main()
       || !IsZero(C.at<double>(1, 2) - 0)
       || !IsZero(C.at<double>(2, 0) - 0.5)
       || !IsZero(C.at<double>(2, 1) - 0)
-      || !IsZero(C.at<double>(2, 2) - cos(M_PI/6))
+      || !IsZero(C.at<double>(2, 2) - cos(cedar::aux::math::pi/6))
       || !IsZero(C.at<double>(0, 3) - 2.0)
       || !IsZero(C.at<double>(1, 3) - 2.2)
       || !IsZero(C.at<double>(2, 3) - 2.5)

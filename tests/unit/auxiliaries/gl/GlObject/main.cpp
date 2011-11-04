@@ -37,9 +37,9 @@
 #include "TestObject.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/gl/Object.h"
-#include "auxiliaries/math/tools.h"
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -86,11 +86,11 @@ int main()
   // color
   //--------------------------------------------------------------------------------------------------------------------
   log_file << "test: color" << std::endl;
-  gl_object.setColor(0.3, 1, sqrt(2)/2);
+  gl_object.setColor(0.3, 1, sqrt(2.0)/2);
   if (
       gl_object.colorR() != 0.3
       || gl_object.colorG() != 1.0
-      || gl_object.colorB() != sqrt(2)/2
+      || gl_object.colorB() != sqrt(2.0)/2
       )
   {
     errors++;

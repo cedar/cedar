@@ -36,8 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "devices/robot/kuka/gui/FriStatusWidget.h"
-#include "devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/kuka/gui/FriStatusWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainWidget.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -45,8 +45,8 @@
 #include <iostream>
 
 using namespace std;
-using namespace cedar::dev::robot::kuka;
-using cedar::dev::robot::kuka::gui::FriStatusWidget;
+using namespace cedar::dev::kuka;
+using cedar::dev::kuka::gui::FriStatusWidget;
 using cedar::dev::robot::KinematicChainPtr;
 
 int main(int argc, char **argv)
@@ -57,7 +57,8 @@ int main(int argc, char **argv)
   FriStatusWidget * p_fri_status_widget = new FriStatusWidget(p_kukain);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
-  KinematicChainWidget * p_kinematic_chain_widget = new KinematicChainWidget(p_kukain, "../../tests/interactive/devices/kuka/kinematic_chain_widget.conf");
+  cedar::dev::robot::gui::KinematicChainWidget *p_kinematic_chain_widget
+    = new cedar::dev::robot::gui::KinematicChainWidget(p_kukain, "../../tests/interactive/devices/kuka/kinematic_chain_widget.conf");
   p_kinematic_chain_widget->show();
 
   a.exec();

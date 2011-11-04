@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "auxiliaries/exceptions/InitializationException.h"
+#include "cedar/auxiliaries/exceptions/InitializationException.h"
 
 // PROJECT INCLUDES
 

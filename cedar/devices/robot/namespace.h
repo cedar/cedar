@@ -38,7 +38,7 @@
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "CMakeDefines.h"
+#include "cedar/devices/lib.h"
 
 // PROJECT INCLUDES
 
@@ -52,39 +52,18 @@ namespace cedar
     /*! @brief Namespace for all robot interfaces. */
     namespace robot
     {
-      class Component;
-      //!@brief smart pointer for Component
-      typedef boost::shared_ptr<Component> ComponentPtr;
-
-      class Robot;
-      //!@brief smart pointer for Robot
-      typedef boost::shared_ptr<Robot> RobotPtr;
-
-      class KinematicChain;
-      //!@brief smart pointer for KinematicChain
-      typedef boost::shared_ptr<KinematicChain> KinematicChainPtr;
-
-      class KinematicChainModel;
-      //!@brief smart pointer for KinematicChainModel
-      typedef boost::shared_ptr<KinematicChainModel> KinematicChainModelPtr;
-
-#ifdef CEDAR_USE_AMTEC
-      class AmtecKinematicChain;
-      //!@brief smart pointer for AmtecKinematicChainModel
-      typedef boost::shared_ptr<AmtecKinematicChain> AmtecKinematicChainPtr;
-#endif // CEDAR_USE_AMTEC
-
-      class SimulatedKinematicChain;
-      //!@brief smart pointer for SimulatedKinematicChainModel
-      typedef boost::shared_ptr<SimulatedKinematicChain> SimulatedKinematicChainPtr;
-      
-      class ReferenceGeometry;
-      //!@brief smart pointer for ReferenceGeometry
-      typedef boost::shared_ptr<ReferenceGeometry> ReferenceGeometryPtr;
-
-      class ComponentNotAvailableException;
-      //!@brief smart pointer for ComponentNotAvailableException
-      typedef boost::shared_ptr<ComponentNotAvailableException> ComponentNotAvailableExceptionPtr;
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_DEV_CLASS(Component);
+      CEDAR_DECLARE_DEV_CLASS(ComponentNotAvailableException);
+      CEDAR_DECLARE_DEV_CLASS(DifferentialDrive);
+      CEDAR_DECLARE_DEV_CLASS(Locomotion);
+      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+      CEDAR_DECLARE_DEV_CLASS(KinematicChainModel);
+      CEDAR_DECLARE_DEV_CLASS(Odometry);
+      CEDAR_DECLARE_DEV_CLASS(ReferenceGeometry);
+      CEDAR_DECLARE_DEV_CLASS(Robot);
+      CEDAR_DECLARE_DEV_CLASS(SimulatedKinematicChain);
+      //!@endcond
     }
   }
 }

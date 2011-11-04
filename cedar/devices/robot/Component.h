@@ -39,11 +39,11 @@
 #define CEDAR_DEV_ROBOT_COMPONENT_H
 
 // LOCAL INCLUDES
-#include "devices/robot/namespace.h"
+#include "cedar/devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/Base.h"
-#include "devices/com/SerialCommunication.h"
+#include "cedar/auxiliaries/Base.h"
+#include "cedar/devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -65,10 +65,6 @@ class cedar::dev::robot::Component : public virtual cedar::aux::Base
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief constructor
-  Component();
-  //!@brief destructor
-  virtual ~Component() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

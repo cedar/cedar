@@ -38,7 +38,7 @@
 #include "Object.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -127,27 +127,27 @@ cv::Mat Object::getPosition()
   return mPosition.clone();
 }
 
-double Object::getPositionX()
+double Object::getPositionX() const
 {
   return mPosition.at<double>(0, 0);
 }
 
-double Object::getPositionY()
+double Object::getPositionY() const
 {
   return mPosition.at<double>(1, 0);
 }
 
-double Object::getPositionZ()
+double Object::getPositionZ() const
 {
   return mPosition.at<double>(2, 0);
 }
 
-cv::Mat Object::getOrientationQuaternion()
+cv::Mat Object::getOrientationQuaternion() const
 {
   return mOrientationQuaternion.clone();
 }
 
-double Object::getOrientationQuaternion(unsigned int component)
+double Object::getOrientationQuaternion(unsigned int component) const
 {
   return mOrientationQuaternion.at<double>(component, 0);
 }

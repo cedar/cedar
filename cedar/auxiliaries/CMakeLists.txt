@@ -39,6 +39,19 @@ cedar_add_library(cedaraux
   Object.h
   gl/Object.h
   gui/BaseWidget.h
+  gui/DataPlotInterface.h
+  gui/DataPlotter.h
   gui/Viewer.h
   gui/SceneWidget.h
+  gui/HistoryPlot.h
+  gui/HistoryPlot0D.h
+  gui/MatrixPlot.h
+  gui/MatrixPlot1D.h
+  gui/MatrixPlot2D.h
+  gui/ImagePlot.h
+  Parameter.h
+  kernel/Kernel.h
+  kernel/Gauss.h
+  LINK_LIBRARIES
+  cedarunits
 )

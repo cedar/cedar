@@ -39,6 +39,7 @@
 #define CEDAR_AUX_GL_NAMESPACE_H
 
 // LOCAL INCLUDES
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 #include "namespace.h"
@@ -54,49 +55,17 @@ namespace cedar
     /*!@brief Namespace for all gl classes. */
     namespace gl
     {
-      class Scene;
-      //!@brief smart pointer for Scene
-      typedef boost::shared_ptr<Scene> ScenePtr;
-
-      class Object;
-      //!@brief smart pointer for Object
-      typedef boost::shared_ptr<Object> ObjectPtr;
-
-      class Block;
-      //!@brief smart pointer for Block
-      typedef boost::shared_ptr<Block> BlockPtr;
-
-      class Sphere;
-      //!@brief smart pointer for Sphere
-      typedef boost::shared_ptr<Sphere> SpherePtr;
-
-      class Cone;
-      //!@brief smart pointer for Cone
-      typedef boost::shared_ptr<Cone> ConePtr;
-
-      class Cylinder;
-      //!@brief smart pointer for Cylinder
-      typedef boost::shared_ptr<Cylinder> CylinderPtr;
-
-      class Prism;
-      //!@brief smart pointer for Prism
-      typedef boost::shared_ptr<Prism> PrismPtr;
-
-      class Pyramid;
-      //!@brief smart pointer for Pyramid
-      typedef boost::shared_ptr<Pyramid> PyramidPtr;
-
-      class Torus;
-      //!@brief smart pointer for Torus
-      typedef boost::shared_ptr<Torus> TorusPtr;
-
-      class Ellipse;
-      //!@brief smart pointer for Ellipse
-      typedef boost::shared_ptr<Ellipse> EllipsePtr;
-
-      class Chessboard;
-      //!@brief smart pointer for Chessboard
-      typedef boost::shared_ptr<Chessboard> ChessboardPtr;
+      CEDAR_DECLARE_AUX_CLASS(Scene);
+      CEDAR_DECLARE_AUX_CLASS(Object);
+      CEDAR_DECLARE_AUX_CLASS(Block);
+      CEDAR_DECLARE_AUX_CLASS(Sphere);
+      CEDAR_DECLARE_AUX_CLASS(Cone);
+      CEDAR_DECLARE_AUX_CLASS(Cylinder);
+      CEDAR_DECLARE_AUX_CLASS(Prism);
+      CEDAR_DECLARE_AUX_CLASS(Pyramid);
+      CEDAR_DECLARE_AUX_CLASS(Torus);
+      CEDAR_DECLARE_AUX_CLASS(Ellipse);
+      CEDAR_DECLARE_AUX_CLASS(Chessboard);
     }
   }
 }
