@@ -236,8 +236,8 @@ bool cedar::proc::Connection::contains(cedar::proc::TriggerPtr trigger)
  */
 void cedar::proc::Connection::deleteConnection()
 {
-  cedar::proc::StepPtr p_source_step = this->getSource();
-  cedar::proc::StepPtr p_target_step = this->getTarget();
+  cedar::proc::StepPtr p_source_step = mSource.lock();
+  cedar::proc::StepPtr p_target_step = mTarget.lock();
   cedar::proc::TriggerPtr p_source_trigger = mTrigger.lock();
   cedar::proc::TriggerPtr p_target_trigger = mTargetTrigger.lock();
 
