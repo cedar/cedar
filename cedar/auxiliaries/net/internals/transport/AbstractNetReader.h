@@ -45,9 +45,9 @@
 #define CEDAR_ABSTRACTNETREADER_H
 
 // LOCAL INCLUDES
-#include "../namespace.h"
-#include "AbstractNetBase.h"
-#include "auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/AbstractNetBase.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
 #include <boost/lexical_cast.hpp>

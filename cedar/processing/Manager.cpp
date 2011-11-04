@@ -54,6 +54,7 @@
 #include "cedar/processing/Connection.h"
 #include "cedar/processing/source/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
+#include "cedar/auxiliaries/net/NetReader.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES

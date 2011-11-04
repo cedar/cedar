@@ -16,10 +16,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-//#include "../../../../../../cedar/auxiliaries/LogFile.h"
-//#include "../../../../../../cedar/devices/sensors/visual/PictureGrabber.h"
-#include <devices/sensors/visual/PictureGrabber.h>
-#include <auxiliaries/LogFile.h>
+#include "cedar/devices/sensors/visual/PictureGrabber.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // PROJECT INCLUDES
 

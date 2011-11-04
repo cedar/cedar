@@ -41,8 +41,8 @@
 #define CEDAR_CVMATNETHEADER_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "../../transport/collated/header/MatrixNetHeader.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/header/MatrixNetHeader.h"
 
 
 // PROJECT INCLUDES

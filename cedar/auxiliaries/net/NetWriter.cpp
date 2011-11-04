@@ -36,10 +36,10 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "NetWriter.h"
-#include "internals/transport/simple/SimpleNetWriter.h"
-#include "internals/transport/collated/CollatedNetWriter.h"
-#include "internals/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/NetWriter.h"
+#include "cedar/auxiliaries/net/internals/transport/simple/SimpleNetWriter.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetWriter.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatHelper.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

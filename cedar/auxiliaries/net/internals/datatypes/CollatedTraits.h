@@ -39,7 +39,7 @@
 #define CEDAR_COLLATEDTRAITS_H
 
 // LOCAL INCLUDES
-#include "../namespace.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
 
 // PROJECT INCLUDES
 #include <boost/static_assert.hpp>
@@ -74,7 +74,7 @@ struct collated_traits
 } } } } // end namespaces 
 
 // specializations (these will compile):
-#include "opencv/CollatedTraits.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/CollatedTraits.h"
 
 
 #endif

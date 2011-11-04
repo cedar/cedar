@@ -40,7 +40,7 @@
 #define CEDAR_COLLATEDNETHEADER_H
 
 // LOCAL INCLUDES
-#include "../../../namespace.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
 
 // PROJECT INCLUDES
 

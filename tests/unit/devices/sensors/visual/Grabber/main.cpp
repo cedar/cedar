@@ -35,9 +35,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include <devices/sensors/visual/TestGrabber.h>
-#include <auxiliaries/LogFile.h> //?? wie bindet sich das ein
-#include <devices/sensors/visual/defines.h>  //for constants and CTRL-C Handler test
+#include "cedar/devices/sensors/visual/TestGrabber.h"
+#include "cedar/auxiliaries/LogFile.h" //?? wie bindet sich das ein
+#include "cedar/devices/sensors/visual/defines.h"  //for constants and CTRL-C Handler test
 
 // PROJECT INCLUDES
 

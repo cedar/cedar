@@ -39,8 +39,8 @@
 #define CEDAR_INTERFACECOLLATEDDATA_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "../CollatedTraits.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedTraits.h"
 
 // PROJECT INCLUDES
 

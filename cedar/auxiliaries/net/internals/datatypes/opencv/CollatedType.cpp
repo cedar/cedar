@@ -37,7 +37,7 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "../CollatedType.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedType.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

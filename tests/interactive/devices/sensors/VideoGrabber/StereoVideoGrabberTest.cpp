@@ -18,7 +18,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include <devices/sensors/visual/VideoGrabber.h>
+#include "cedar/devices/sensors/visual/VideoGrabber.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

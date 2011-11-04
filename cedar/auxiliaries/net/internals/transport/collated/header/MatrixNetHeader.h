@@ -40,8 +40,8 @@
 #define CEDAR_MATRIXNETHEADER_H
 
 // LOCAL INCLUDES
-#include "../../../namespace.h"
-#include "CollatedNetHeader.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/header/CollatedNetHeader.h"
 
 // PROJECT INCLUDES
 

@@ -44,12 +44,12 @@
 #define CEDAR_COLLATEDNETREADER_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "CollatedNetBase.h"
-#include "../AbstractNetReader.h"
-#include "../../datatypes/CollatedType.h"
-#include "CollatedNetPortable.h"
-#include "../../../exceptions/NetException.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetBase.h"
+#include "cedar/auxiliaries/net/internals/transport/AbstractNetReader.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedType.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetPortable.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/PortReaderBuffer.h>

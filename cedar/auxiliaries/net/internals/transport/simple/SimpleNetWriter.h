@@ -40,8 +40,8 @@
 #define CEDAR_SIMPLENETWRITER_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "../AbstractNetWriter.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/AbstractNetWriter.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/BufferedPort.h>

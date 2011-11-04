@@ -37,8 +37,7 @@
 #ifndef CEDAR_NAMESPACE_H
 #define CEDAR_NAMESPACE_H
 
-//#include <cedar/namespace.h> 
-#include "../../../namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 namespace cedar {
   namespace aux {
