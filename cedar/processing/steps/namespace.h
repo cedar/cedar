@@ -55,6 +55,7 @@ namespace cedar
     namespace steps
     {
       CEDAR_DECLARE_PROC_CLASS(StaticGain);
+      CEDAR_DECLARE_PROC_CLASS(Projection)
     }
   }
 }

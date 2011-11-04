@@ -54,6 +54,7 @@
 #include "processing/Connection.h"
 #include "processing/source/GaussInput.h"
 #include "processing/steps/StaticGain.h"
+#include "processing/steps/Projection.h"
 #include "auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -103,6 +104,10 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   StepDeclarationPtr static_gain_decl(new StepDeclarationT<cedar::proc::steps::StaticGain>("cedar.processing.steps.StaticGain", "Utilities"));
   static_gain_decl->setIconPath(":/steps/static_gain.svg");
   this->steps().declareClass(static_gain_decl);
+
+  StepDeclarationPtr projection_decl(new StepDeclarationT<cedar::proc::steps::Projection>("cedar.processing.steps.Projection", "Utilities"));
+  projection_decl->setIconPath(":/steps/static_gain.svg");
+  this->steps().declareClass(projection_decl);
 }
 
 cedar::proc::Manager::~Manager()

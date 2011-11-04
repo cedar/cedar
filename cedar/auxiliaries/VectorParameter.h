@@ -148,6 +148,11 @@ public:
     return ret;
   }
 
+  const T& back() const
+  {
+    return this->mValues.back();
+  }
+
   /*std::vector<T>& get()
   {
     return this->mValues;
