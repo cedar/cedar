@@ -50,6 +50,12 @@
 
 
 /*!@brief   A processing step that resizes a matrix.
+ *
+ *          This step can resize an input matrix of any dimensionality to a matrix with the same dimensionality
+ *          but a different shape.
+ *
+ * @remarks Note, that for more that two dimensions, only linear interpolation is implemented. Any other choice will
+ *          default to this method.
  */
 class cedar::proc::steps::Resize : public cedar::proc::Step
 {
@@ -65,9 +71,13 @@ class cedar::proc::steps::Resize : public cedar::proc::Step
   class Interpolation
   {
     public:
+      //! Typedef for the interpolation id.
       typedef cedar::aux::EnumId Id;
+
+      //! Shared-pointer typedef for the base type pointer.
       typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
+      //! Static constructor function.
       static void construct()
       {
         mType.type()->def(cedar::aux::Enum(LINEAR, "LINEAR", "Linear"));
@@ -77,23 +87,35 @@ class cedar::proc::steps::Resize : public cedar::proc::Step
         mType.type()->def(cedar::aux::Enum(LANCZOS4, "LANCZOS4", "Lanczos 4 (8 x 8)"));
       }
 
+      //! Returns a const reference to the enum's type object.
       static const cedar::aux::EnumBase& type()
       {
         return *mType.type();
       }
 
+      //! Returns a const reference to the pointer of the enum's type object.
       static const TypePtr& typePtr()
       {
         return mType.type();
       }
 
+      //! Linear interpolation.
       static const Id LINEAR = cv::INTER_LINEAR;
+
+      //! Nearest neighbor interpolation.
       static const Id NEAREST = cv::INTER_NEAREST;
+
+      //! Area interpolation.
       static const Id AREA = cv::INTER_AREA;
+
+      //! Cubic interpolation.
       static const Id CUBIC = cv::INTER_CUBIC;
+
+      //! Lanczos 4 interpolation.
       static const Id LANCZOS4 = cv::INTER_LANCZOS4;
 
     private:
+      //! Static pointer to the cedar::aux::EnumType object that manages the enum values.
       static cedar::aux::EnumType<Interpolation> mType;
   };
 
@@ -113,7 +135,10 @@ public:
 
 
 public slots:
+  //!@brief Slot that reacts to changes in the output size.
   void outputSizeChanged();
+
+  //!@brief Slot that triggers the computation of the step.
   void recompute();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,6 +159,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief   Returns a cv::Size that contains the correct sizes according to the step's parameters.
+   *
+   * @remarks Due to the nature of opencv's matrix size handling, this funciton only works for matrices with 2 or less
+   *          dimensions.
+   */
   cv::Size getOutputSize() const;
 
   /*!@brief A recursive interpolation function for n-dimensional tensors.
@@ -175,6 +205,10 @@ private:
 protected:
   //!@brief The factor by which the input is multiplied.
   cedar::aux::UIntVectorParameterPtr _mOutputSize;
+
+  /*!@brief The type of interpolation performed by the step.
+   *
+   */
   cedar::aux::EnumParameterPtr _mInterpolationType;
 
 private:
