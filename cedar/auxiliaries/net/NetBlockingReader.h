@@ -38,10 +38,10 @@
 #define CEDAR_NETBLOCKINGREADER_H
 
 // LOCAL INCLUDES
-#include "internals/namespace.h"
-#include "internals/transport/simple/SimpleNetReader.h"
-#include "internals/transport/collated/CollatedNetReader.h"
-#include "internals/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/simple/SimpleNetReader.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetReader.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatHelper.h"
 
 // PROJECT INCLUDES
 

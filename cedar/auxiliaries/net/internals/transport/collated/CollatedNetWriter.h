@@ -44,12 +44,12 @@
 #define CEDAR_COLLATEDNETWRITER_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "CollatedNetBase.h"
-#include "../../datatypes/CollatedType.h"
-#include "CollatedNetPortable.h"
-#include "../../../exceptions/NetException.h"
-#include "../AbstractNetWriter.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetBase.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedType.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetPortable.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/internals/transport/AbstractNetWriter.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/PortWriterBuffer.h>
@@ -68,7 +68,7 @@ namespace cedar {
 
 /*!@brief implementation of matrix-over-network writer
  *
- * 
+ * @see CollatedNetReader
  */
 template <typename T>
 class CollatedNetWriter : 
@@ -119,7 +119,7 @@ public:
    * changed from the earlier trasmissions.
    *
    */
-  void write(const T &t) 
+  void write(const T &t)
   {
 #ifdef DEBUG_NETT
     cout << "  CollatedNetWriter [write()]" << endl;

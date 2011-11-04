@@ -41,8 +41,8 @@
 #define CEDAR_ABSTRACTNETBASE_H
 
 // LOCAL INCLUDES
-#include "../namespace.h"
-#include "interfaces/InterfaceOpenable.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/interfaces/InterfaceOpenable.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/Network.h>
@@ -83,12 +83,12 @@ private:
   pid_t  mServerPID;
 
 
+protected:
   // these constants will be added to the user-defined port name
   static const std::string PORT_PREFIX;
   static const std::string PORT_DELIMINATOR;
   static const std::string PORT_SUFFIX_OUT;
   static const std::string PORT_SUFFIX_IN;
-
 
   //---------------------------------------------------------------------------
   // parameters

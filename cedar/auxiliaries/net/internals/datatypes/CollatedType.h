@@ -40,8 +40,8 @@
 #define CEDAR_COLLATEDTYPE_H
 
 // LOCAL INCLUDES
-#include "../namespace.h"
-#include "CollatedTraits.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedTraits.h"
 
 // PROJECT INCLUDES
 #include <boost/static_assert.hpp>
@@ -115,6 +115,6 @@ public:
 
 
 // Spezialisierungen: ...
-#include "opencv/CollatedType.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/CollatedType.h"
 
 #endif

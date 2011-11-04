@@ -45,10 +45,10 @@
 #define CEDAR_COLLATEDNETPORTABLE_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "../../datatypes/CollatedType.h"
-#include "header/MatrixNetHeaderAccessor.h"
-#include "../../../exceptions/NetException.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedType.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/header/MatrixNetHeaderAccessor.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
 #include <boost/utility.hpp>

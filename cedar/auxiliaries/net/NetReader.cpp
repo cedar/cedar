@@ -36,18 +36,13 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "NetReader.h"
-#include "internals/transport/simple/SimpleNetReader.h"
-#include "internals/transport/collated/CollatedNetReader.h"
-#include "internals/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/NetReader.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
-
-using namespace cedar::aux::net::detail;
 
 namespace cedar {
   namespace aux {
@@ -59,6 +54,7 @@ template class NetReader<int>;
 template class NetReader<float>;
 template class NetReader<double>;
 template class NetReader<cv::Mat>;
+
 
 } } } // end namespaces
 

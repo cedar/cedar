@@ -44,8 +44,8 @@
 #define CEDAR_ABSTRACTNETWRITER_H
 
 // LOCAL INCLUDES
-#include "../namespace.h"
-#include "AbstractNetBase.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/AbstractNetBase.h"
 
 // PROJECT INCLUDES
 

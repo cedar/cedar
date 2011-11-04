@@ -38,8 +38,8 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "AbstractNetBase.h"
-#include "auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/internals/transport/AbstractNetBase.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
 #include <yarp/conf/version.h>
@@ -79,6 +79,7 @@ const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
 AbstractNetBase::AbstractNetBase(const std::string &myPortNameWithSuffix) 
           : mNetwork(), mFullPortName(), mIsConnected(false)
 {
+
 #ifdef DEBUG_NETT
   cout << "  AbstractNetBase [CONSTRUCTOR]" << endl;
 #else

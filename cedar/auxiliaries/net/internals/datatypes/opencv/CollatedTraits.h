@@ -39,12 +39,12 @@
 
 // LOCAL INCLUDES
 // traits specializations:
-#include "../../namespace.h"
-#include <opencv2/opencv.hpp>
+#include "cedar/auxiliaries/net/internals/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
 
 
 namespace cedar {

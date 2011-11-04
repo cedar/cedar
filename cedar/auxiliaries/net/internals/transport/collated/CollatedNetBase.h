@@ -38,13 +38,13 @@
 #define CEDAR_COLLATEDNETBASE_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "../../datatypes/interfaces/InterfaceCollatedData.h"
-#include "../interfaces/InterfaceOpenable.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/datatypes/interfaces/InterfaceCollatedData.h"
+#include "cedar/auxiliaries/net/internals/transport/interfaces/InterfaceOpenable.h"
 
-#include "../../datatypes/CollatedTraits.h"
-#include "../../datatypes/CollatedType.h"
-#include "CollatedNetPortable.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedTraits.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedType.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetPortable.h"
 
 // PROJECT INCLUDES
 

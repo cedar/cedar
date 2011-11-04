@@ -34,13 +34,13 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "auxiliaries/net/NetBlockingReader.h"
-#include "auxiliaries/net/NetReader.h"
-#include "auxiliaries/net/NetWriter.h"
-#include "auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/net/NetBlockingReader.h"
+#include "cedar/auxiliaries/net/NetReader.h"
+#include "cedar/auxiliaries/net/NetWriter.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
-#include "auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

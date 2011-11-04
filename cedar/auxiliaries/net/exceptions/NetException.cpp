@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "NetException.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
 

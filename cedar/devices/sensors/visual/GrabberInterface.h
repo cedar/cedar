@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "defines.h"
 #include "namespace.h"
-#include "auxiliaries/LoopedThread.h"
+#include "cedar/auxiliaries/LoopedThread.h"
 #include "Exceptions.h"
 #include "../../../auxiliaries/exceptions/InitializationException.h"
 #include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"

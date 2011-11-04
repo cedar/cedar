@@ -38,10 +38,10 @@
 #define CEDAR_NETWRITER_H
 
 // LOCAL INCLUDES
-#include "internals/namespace.h"
-#include "internals/transport/simple/SimpleNetWriter.h"
-#include "internals/transport/collated/CollatedNetWriter.h"
-#include "internals/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/simple/SimpleNetWriter.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetWriter.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatHelper.h"
 
 // PROJECT INCLUDES
 #include <boost/static_assert.hpp>

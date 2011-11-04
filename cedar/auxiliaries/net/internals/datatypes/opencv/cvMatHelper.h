@@ -39,10 +39,10 @@
 #define CEDAR_CVMATHELPER_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "../interfaces/InterfaceCollatedData.h"
-#include "../CollatedTraits.h"
-#include "cvMatNetHeader.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/datatypes/interfaces/InterfaceCollatedData.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedTraits.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatNetHeader.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

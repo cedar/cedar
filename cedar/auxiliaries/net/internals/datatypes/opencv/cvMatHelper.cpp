@@ -36,11 +36,11 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "cvMatHelper.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatHelper.h"
 
-#include "../interfaces/InterfaceCollatedData.h"
-#include "cvMatNetHeader.h"
-#include "../../transport/collated/header/MatrixNetHeaderAccessor.h"
+#include "cedar/auxiliaries/net/internals/datatypes/interfaces/InterfaceCollatedData.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatNetHeader.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/header/MatrixNetHeaderAccessor.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

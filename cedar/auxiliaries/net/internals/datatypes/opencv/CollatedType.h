@@ -39,9 +39,9 @@
 #define CEDAR_COLLATEDTYPE_OPENCV_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "cvMatHelper.h"
-#include "../CollatedTraits.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/internals/datatypes/CollatedTraits.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

@@ -38,9 +38,9 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "../../../namespace.h"
-#include "MatrixNetHeader.h"
-#include "MatrixNetHeaderAccessor.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/header/MatrixNetHeader.h"
+#include "cedar/auxiliaries/net/internals/transport/collated/header/MatrixNetHeaderAccessor.h"
 
 // PROJECT INCLUDES
 

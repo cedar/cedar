@@ -40,9 +40,9 @@
 #define CEDAR_SIMPLENETREADER_H
 
 // LOCAL INCLUDES
-#include "../../namespace.h"
-#include "../AbstractNetReader.h"
-#include "../../../exceptions/NetException.h"
+#include "cedar/auxiliaries/net/internals/namespace.h"
+#include "cedar/auxiliaries/net/internals/transport/AbstractNetReader.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
 #include <yarp/os/BufferedPort.h>
