@@ -67,8 +67,10 @@ namespace cedar
     typedef Activation<cv::Mat> MatActivation;
     CEDAR_GENERATE_POINTER_TYPES(MatActivation);
 
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
+    //!@endcond
 
 #ifdef LINUX
     // for msvc, this is replaced by the plugin stuff below, currently as a workaround.

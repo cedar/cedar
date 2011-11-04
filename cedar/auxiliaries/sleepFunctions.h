@@ -37,15 +37,15 @@
 #ifndef CEDAR_AUX_SLEEP_FUNCTIONS_H
 #define CEDAR_AUX_SLEEP_FUNCTIONS_H
 
-#include "cedar/units/Duration.h"
-#include "cedar/units/DurationUnit.h"
+#include "cedar/units/Time.h"
+#include "cedar/units/TimeUnit.h"
 #include "cedar/auxiliaries/lib.h"
 
 namespace cedar
 {
   namespace aux
   {
-    CEDAR_AUX_LIB_EXPORT void sleep(cedar::unit::Duration time);
+    CEDAR_AUX_LIB_EXPORT void sleep(cedar::unit::Time time);
     CEDAR_AUX_LIB_EXPORT void usleep(unsigned int microseconds);
     CEDAR_AUX_LIB_EXPORT void sleep(unsigned int seconds);
   }

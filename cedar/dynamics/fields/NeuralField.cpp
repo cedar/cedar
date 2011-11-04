@@ -142,7 +142,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
   return this->cedar::proc::Step::determineInputValidity(slot, data);
 }
 
-void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Duration& time)
+void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
@@ -209,10 +209,6 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
     }
   }
   return true;
-}
-
-void cedar::dyn::NeuralField::onStart()
-{
 }
 
 void cedar::dyn::NeuralField::dimensionalityChanged()

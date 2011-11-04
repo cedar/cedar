@@ -44,7 +44,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/units/Duration.h"
+#include "cedar/units/Time.h"
 
 // PROJECT INCLUDES
 
@@ -65,7 +65,7 @@ class cedar::proc::StepTime : public cedar::proc::Arguments
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepTime(const cedar::unit::Duration& stepTime);
+  StepTime(const cedar::unit::Time& stepTime);
 
   //!@brief Destructor
   virtual ~StepTime();
@@ -75,7 +75,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief returns the last step duration
-  const cedar::unit::Duration& getStepTime() const;
+  const cedar::unit::Time& getStepTime() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,7 +98,7 @@ protected:
   // none yet
 private:
   //!@brief last step duration
-  cedar::unit::Duration mStepTime;
+  cedar::unit::Time mStepTime;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
