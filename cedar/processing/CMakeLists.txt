@@ -65,6 +65,7 @@ cedar_add_library(cedarproc
   gui/View.h
   source/GaussInput.h
   steps/StaticGain.h
+  steps/Projection.h
   steps/Resize.h
   LoopedTrigger.h
   Step.h

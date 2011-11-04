@@ -54,6 +54,7 @@
 #include "cedar/processing/Connection.h"
 #include "cedar/processing/source/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
+#include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/steps/Resize.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -105,6 +106,10 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   static_gain_decl->setIconPath(":/steps/static_gain.svg");
   this->steps().declareClass(static_gain_decl);
 
+  StepDeclarationPtr projection_decl(new StepDeclarationT<cedar::proc::steps::Projection>("cedar.processing.steps.Projection", "Utilities"));
+  projection_decl->setIconPath(":/steps/static_gain.svg");
+  this->steps().declareClass(projection_decl);
+  
   StepDeclarationPtr resize_decl(new StepDeclarationT<cedar::proc::steps::Resize>("cedar.processing.steps.Resize", "Utilities"));
   resize_decl->setIconPath(":/steps/resize.svg");
   this->steps().declareClass(resize_decl);
