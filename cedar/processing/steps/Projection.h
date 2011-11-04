@@ -86,8 +86,11 @@ protected slots:
   //!@brief a slot that is triggered if the gain factor is changed
   void reconfigure();
   void inputConnectionChanged(const std::string& inputName);
+  void numberOfDimensionMappingsChanged();
   void inputDimensionalityChanged();
   void outputDimensionalityChanged();
+  void inputDimensionSizesChanged();
+  void outputDimensionSizesChanged();
   void initializeInputMatrix();
   void initializeOutputMatrix();
 
@@ -116,12 +119,16 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+
+private:
+  cedar::aux::UIntParameterPtr _mNumberOfDimensionMappings;
+
   //!@brief mapping between the input and output dimensions
   //! each index i of the vector represents the corresponding dimension in the input,
   //! the value at index i represents the corresponding dimension in the output
-  cedar::aux::UIntVectorParameterPtr _mDimensionMapping;
+  cedar::aux::UIntVectorParameterPtr _mDimensionMappings;
 
-private:
   //!@brief dimensionality of the input
   //!@todo determine when an input step is connected to the projection
   cedar::aux::UIntParameterPtr _mInputDimensionality;
@@ -131,6 +138,7 @@ private:
 
   cedar::aux::UIntVectorParameterPtr _mInputDimensionSizes;
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
+
 }; // class cedar::proc::steps::Projection
 
 #endif // CEDAR_PROC_STEPS_PROJECTION_H
