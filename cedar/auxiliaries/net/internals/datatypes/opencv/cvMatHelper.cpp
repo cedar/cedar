@@ -44,8 +44,6 @@
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
-#include <yarp/os/NetInt32.h>
-#include <yarp/os/NetFloat64.h>
 
 // SYSTEM INCLUDES
 #include <stdio.h>
@@ -65,7 +63,7 @@ namespace cedar {
 template <typename CVT> void cvMatHelper<CVT>::init_checkheader(
                                                  const HeaderType &header)
 {
-#define CONST_MAGIC_NUMBER yarp::os::NetInt32(MAGIC_NUMBER)
+#define CONST_MAGIC_NUMBER (MAGIC_NUMBER)
 
   // einmalig Header-Infos fuellen 
   mCheckHeader.magicNumber= CONST_MAGIC_NUMBER;
