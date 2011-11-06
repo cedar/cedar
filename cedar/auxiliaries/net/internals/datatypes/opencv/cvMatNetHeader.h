@@ -59,12 +59,11 @@ namespace cedar {
  *
  * This is the openCV::Mat specialization
  */
-#include <yarp/os/begin_pack_for_net.h>
 struct cvMatNetHeader : MatrixNetHeader
 {
 public:
-  yarp::os::NetInt32 cvMatType;
-} PACKED_FOR_NET;
+  unsigned int cvMatType;
+};
 
 } } } } // end namespaces
 

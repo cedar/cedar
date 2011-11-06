@@ -62,12 +62,11 @@ namespace cedar {
  * functions. For accessing the data, 
  * see the static class MatrixNetHeaderAccessor
  */
-#include <yarp/os/begin_pack_for_net.h>
 struct CollatedNetHeader
 {
   // dummy for polymorphism
-  yarp::os::NetUint32 magicNumber;
-} PACKED_FOR_NET;
+  unsigned int magicNumber;
+};
 
 } } } } // end namespaces
       

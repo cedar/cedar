@@ -55,14 +55,13 @@ namespace cedar {
 /*!@brief extend the header struct to matrix data (cols, rows)
  *
  */
-#include <yarp/os/begin_pack_for_net.h>
 struct MatrixNetHeader : CollatedNetHeader
 {
 public:
-  yarp::os::NetInt32 rows;
-  yarp::os::NetInt32 cols;
-  yarp::os::NetUint32 elemSize;
-} PACKED_FOR_NET;
+  unsigned int rows;
+  unsigned int cols;
+  unsigned int elemSize;
+};
 
 } } } }  // end namespaces
 
