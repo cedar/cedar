@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,85 +22,98 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        PropertyPane.h
+    File:        MatrixIterator.h
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2011 11 04
 
-    Description:
+    Description: Header for the @em cedar::aux::MatrixIterator class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PROPERTY_PANE_H
-#define CEDAR_PROC_PROPERTY_PANE_H
+
+#ifndef CEDAR_AUX_MATRIX_ITERATOR_H
+#define CEDAR_AUX_MATRIX_ITERATOR_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
-#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QTableWidget>
-#include <boost/signals2/connection.hpp>
+#include <vector>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief This is an iterator that allows easy iteration of all elements in an n-dimensional matrix.
  *
- * More detailed description of the class.
+ * For example, say you have a cv::Mat my_matrix that you want to iterate. Then you can do so with the following code:
+ * @code
+ * cv::Mat my_matrix = ...
+ * cedar::aux::MatrixIterator iter(my_matrix);
+ * do
+ * {
+ *   my_matrix.at<float>(iter.getCurrentIndex()) = ...
+ * }
+ * while (iter.increment());
+ * @endcode
+ *
+ * @remarks The iterator stores a reference to the matrix, which means that the iterator must be in the same scope as
+ *          the matrix itself. Otherwise, hilarity ensues!
+ *
+ * @todo Write a unit test for this class.
  */
-class cedar::proc::gui::PropertyPane : public QTableWidget
+class cedar::aux::MatrixIterator
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
-
-private:
-  typedef
-      cedar::aux::TypeBasedFactory
-      <
-        cedar::aux::Parameter,
-        cedar::proc::gui::Parameter,
-        cedar::aux::ParameterPtr
-      >
-      DataWidgetTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  PropertyPane(QWidget *pParent = NULL);
-
-  //!@brief Destructor
-  ~PropertyPane();
-
-  //!@todo change from step to configuragle when the change is made in cedar::processing.
-  void display(cedar::proc::StepPtr pStep);
-
-  void display(cedar::proc::TriggerPtr pTrigger);
-
-  void display(cedar::aux::ConfigurablePtr pConfigurable);
-
-  void resetContents();
+  /*!@brief The constructor.
+   *
+   * @param matrix The matrix to iterate.
+   */
+  MatrixIterator(const cv::Mat& matrix);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  DataWidgetTypes& dataWidgetTypes();
+  //!@brief Returns
+  inline const int* getCurrentIndex()
+  {
+    return &this->mIndex.front();
+  }
 
-public slots:
-  void resetPointer();
-  void redraw();
+  inline const std::vector<int>& getCurrentIndexVector()
+  {
+    return this->mIndex;
+  }
 
-  void rowSizeChanged();
+  /*!
+   * @returns False, if the iterator arrived at the end of the matrix, true otherwise.
+   */
+  inline bool increment()
+  {
+    mIndex.front() += 1;
+
+    // check for overflows
+    size_t d = 0;
+    while (d < mIndex.size() - 1 && mIndex.at(d) >= static_cast<int>(this->mMatrixRef.size[d]))
+    {
+      mIndex.at(d) = 0;
+      mIndex.at(d + 1) += 1;
+      ++d;
+    }
+
+    return mIndex.back() < static_cast<int>(this->mMatrixRef.size[this->mMatrixRef.dims - 1]);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -112,13 +125,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void append(cedar::proc::Step::ParameterList& parameters);
-
-  void addHeadingRow(const std::string& label);
-
-  void addLabelRow(const std::string& label);
-
-  void addPropertyRow(cedar::aux::ParameterPtr parameter);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -126,23 +133,18 @@ private:
 protected:
   // none yet
 private:
-  static DataWidgetTypes mDataWidgetTypes;
-  //!@todo this should be one configurable pointer
-  boost::weak_ptr<cedar::aux::Configurable> mDisplayedConfigurable;
+  std::vector<int> mIndex;
+  const cv::Mat& mMatrixRef;
 
-  std::map<cedar::proc::gui::Parameter*, int> mParameterRowIndex;
-
-  boost::signals2::connection mSlotConnection;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::gui::PropertyPane
+}; // class cedar::aux::MatrixIterator
 
-#endif // CEDAR_PROC_PROPERTY_PANE_H
+#endif // CEDAR_AUX_MATRIX_ITERATOR_H
 

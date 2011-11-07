@@ -55,6 +55,7 @@
 #include "cedar/processing/source/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/source/NetReader.h"
+#include "cedar/processing/steps/Resize.h"
 #include "cedar/processing/steps/NetWriter.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -109,6 +110,9 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   StepDeclarationPtr net_reader_decl(new
     StepDeclarationT<cedar::proc::steps::NetReaderSource>("cedar.processing.source.NetReader", "Inputs"));
   net_reader_decl->setIconPath(":/steps/net_reader.svg");
+  StepDeclarationPtr resize_decl(new StepDeclarationT<cedar::proc::steps::Resize>("cedar.processing.steps.Resize", "Utilities"));
+  resize_decl->setIconPath(":/steps/resize.svg");
+  this->steps().declareClass(resize_decl);
   this->steps().declareClass(net_reader_decl);
 
   StepDeclarationPtr net_writer_decl(new
