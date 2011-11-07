@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericVectorParameter.h
+    File:        Projection.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 20
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2011 10 31
 
     Description:
 
@@ -38,13 +34,16 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
-#define CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
+#ifndef CEDAR_PROC_STEPS_PROJECTION_H
+#define CEDAR_PROC_STEPS_PROJECTION_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/processing/steps/namespace.h"
 
 // PROJECT INCLUDES
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -53,120 +52,73 @@
  *
  * More detailed description of the class.
  */
-template <typename T>
-class cedar::aux::NumericVectorParameter : public cedar::aux::VectorParameter<T>
+class cedar::proc::steps::Projection : public cedar::proc::Step
 {
+private:
+  typedef void (cedar::proc::steps::Projection::*ProjectionFunctionPtr)();
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  NumericVectorParameter(
-                          cedar::aux::Configurable *pOwner,
-                          const std::string& name,
-                          const std::vector<T>& defaultValues,
-                          const T& minimum,
-                          const T& maximum
-                        )
-  :
-  cedar::aux::VectorParameter<T>(pOwner, name, defaultValues),
-  mMinimum(minimum),
-  mMaximum(maximum)
-  {
-  }
-
-  NumericVectorParameter(
-                          cedar::aux::Configurable *pOwner,
-                          const std::string& name,
-                          size_t defaultSize,
-                          T defaultValue,
-                          const T& minimum,
-                          const T& maximum
-                        )
-  :
-  cedar::aux::VectorParameter<T>(pOwner, name, defaultSize, defaultValue),
-  mMinimum(minimum),
-  mMaximum(maximum)
-  {
-  }
-
-  //!@brief The constructor.
-  NumericVectorParameter(
-                          cedar::aux::Configurable *pOwner,
-                          const std::string& name,
-                          const T& minimum,
-                          const T& maximum
-                        )
-  :
-  cedar::aux::VectorParameter<T>(pOwner, name),
-  mMinimum(minimum),
-  mMaximum(maximum)
-  {
-  }
-
-  //!@brief Destructor
-  ~NumericVectorParameter()
-  {
-  }
+  //!@brief The standard constructor.
+  Projection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  const T& getMinimum() const
-  {
-    return this->mMinimum;
-  }
-
-  void setMinimum(const T& value)
-  {
-    this->mMinimum = value;
-
-    this->emitPropertyChangedSignal();
-  }
-
-  const T& getMaximum() const
-  {
-    return this->mMaximum;
-  }
-
-  void setMaximum(const T& value)
-  {
-    this->mMaximum = value;
-
-    this->emitPropertyChangedSignal();
-  }
+  //!@brief refreshes the internal matrix containing the input multiplied with the gain factor
+  void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                (
+                                  cedar::proc::ConstDataSlotPtr slot,
+                                  cedar::aux::DataPtr data
+                                ) const;
+
+protected slots:
+  //!@brief a slot that is triggered if the gain factor is changed
+  void reconfigure();
+  void inputConnectionChanged(const std::string& inputName);
+  void inputDimensionalityChanged();
+  void outputDimensionalityChanged();
+  void inputDimensionSizesChanged();
+  void outputDimensionSizesChanged();
+  void initializeInputMatrix();
+  void initializeOutputMatrix();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void expand0D();
+  void expand();
+  void compress0D();
+  void compress();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
+  //!@brief MatrixData representing the input.
+  cedar::aux::MatDataPtr mInput;
+  //!@brief the buffer containing the output
+  cedar::aux::MatDataPtr mOutput;
+
 private:
-  //! The minimum value, if applicable to the type.
-  T mMinimum;
+  ProjectionFunctionPtr mpProjectionMethod;
 
-  //! The maximum value, if applicable to the type.
-  T mMaximum;
-
+  std::vector<unsigned int> mIndicesToCompress;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -174,9 +126,21 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //!@brief mapping between the input and output dimensions
+  //! each index i of the vector represents the corresponding dimension in the input,
+  //! the value at index i represents the corresponding dimension in the output
+  cedar::aux::UIntVectorParameterPtr _mDimensionMappings;
 
-}; // class cedar::aux::NumericVectorParameter
+  //!@brief dimensionality of the input
+  //!@todo determine when an input step is connected to the projection
+  cedar::aux::UIntParameterPtr _mInputDimensionality;
+  //!@brief dimensionality of the output
+  //!@todo determine when the projection is connected to an output step
+  cedar::aux::UIntParameterPtr _mOutputDimensionality;
 
-#endif // CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
+  cedar::aux::UIntVectorParameterPtr _mInputDimensionSizes;
+  cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
+}; // class cedar::proc::steps::Projection
+
+#endif // CEDAR_PROC_STEPS_PROJECTION_H
 
