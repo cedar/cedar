@@ -147,20 +147,15 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
-  const cv::Mat& kernel = this->mKernel->getKernel();
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
 
   sigmoid_u = mSigmoid->compute<float>(u);
-  //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
-  if (this->_mDimensionality->getValue() < 3)
-  {
-    //!@todo Should this not use the data->lock*
-    mKernel->getReadWriteLock()->lockForRead();
-    cv::filter2D(sigmoid_u, lateral_interaction, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
-    mKernel->getReadWriteLock()->unlock();
-  }
+  //!@todo Should this not use the data->lock*
+  mKernel->getReadWriteLock()->lockForRead();
+  lateral_interaction = mKernel->convolveWith(sigmoid_u);
+  mKernel->getReadWriteLock()->unlock();
 
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);
