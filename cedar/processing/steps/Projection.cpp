@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/steps/Projection.h"
 
 // PROJECT INCLUDES
@@ -57,7 +58,6 @@ cedar::proc::steps::Projection::Projection()
 :
 mInput(new cedar::aux::MatData(cv::Mat())),
 mOutput(new cedar::aux::MatData(cv::Mat())),
-_mNumberOfDimensionMappings(new cedar::aux::UIntParameter(this, "number of mappings", 0, 0, 1)),
 _mDimensionMappings(new cedar::aux::UIntVectorParameter(this, "dimension mapping", 1, 1, 0, 1)),
 _mInputDimensionality(new cedar::aux::UIntParameter(this, "input dimensionality", 1, 0, 10)),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
@@ -70,7 +70,6 @@ _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimensi
   this->initializeInputMatrix();
   this->initializeOutputMatrix();
 
-  QObject::connect(_mNumberOfDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(numberOfDimensionMappingsChanged()));
   QObject::connect(_mDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
   QObject::connect(_mInputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(inputDimensionalityChanged()));
   QObject::connect(_mOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionalityChanged()));
@@ -83,21 +82,16 @@ _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimensi
 
 void cedar::proc::steps::Projection::compute(const cedar::proc::Arguments&)
 {
-  expand();
-}
-
-void cedar::proc::steps::Projection::numberOfDimensionMappingsChanged()
-{
-  this->_mDimensionMappings->resize(_mNumberOfDimensionMappings->getValue(), _mDimensionMappings->getDefaultValue());
-  this->reconfigure();
+  (this->*mpProjectionMethod)();
 }
 
 void cedar::proc::steps::Projection::inputDimensionalityChanged()
 {
   unsigned int new_dimensionality = _mInputDimensionality->getValue();
   this->_mInputDimensionSizes->resize(new_dimensionality, _mInputDimensionSizes->getDefaultValue());
-  this->_mNumberOfDimensionMappings->setMaximum(new_dimensionality);
   this->initializeInputMatrix();
+
+  this->_mDimensionMappings->resize(new_dimensionality, _mDimensionMappings->getDefaultValue());
   this->reconfigure();
 }
 
@@ -105,7 +99,7 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
 {
   unsigned int new_dimensionality = _mOutputDimensionality->getValue();
   this->_mOutputDimensionSizes->resize(new_dimensionality, _mOutputDimensionSizes->getDefaultValue());
-  //!@todo set the maximum values of the mDimensionMappings vector to new_dimensionality
+  this->_mDimensionMappings->setMaximum(new_dimensionality);
   this->initializeOutputMatrix();
   this->reconfigure();
 }
@@ -122,7 +116,43 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 
 void cedar::proc::steps::Projection::reconfigure()
 {
-  std::cout << "reconfigure me!\n";
+  unsigned int input_dimensionality = _mInputDimensionality->getValue();
+  unsigned int output_dimensionality = _mOutputDimensionality->getValue();
+
+  if (input_dimensionality > output_dimensionality)
+  {
+    if (input_dimensionality == 0)
+    {
+      mpProjectionMethod = &cedar::proc::steps::Projection::compress0D;
+    }
+    else
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::compress;
+
+      CEDAR_DEBUG_ASSERT(_mInputDimensionality->getValue() == _mDimensionMappings->getValue().size())
+
+      mIndicesToCompress.clear();
+
+      for (unsigned int index = 0; index < _mInputDimensionality->getValue(); ++index)
+      {
+        if (_mDimensionMappings->getValue().at(index) == 10)
+        {
+          mIndicesToCompress.push_back(index);
+        }
+      }
+    }
+  }
+  else
+  {
+    if (input_dimensionality == 0)
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0D;
+    }
+    else
+    {
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand;
+    }
+  }
 }
 
 void cedar::proc::steps::Projection::initializeInputMatrix()
@@ -247,7 +277,19 @@ void cedar::proc::steps::Projection::expand()
 }
 
 void cedar::proc::steps::Projection::compress()
-{};
+{
+  /*
+  for (unsigned int i = 0; i < mIndicesToCompress.size(); ++i)
+  {
+    mInput->setValue(mInput.max(mIndicesToCompress.at(i) - i));
+  }
+  */
+};
+
+void cedar::proc::steps::Projection::compress0D()
+{
+
+};
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputValidity
                                 (
