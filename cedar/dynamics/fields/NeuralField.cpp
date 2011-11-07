@@ -279,7 +279,6 @@ void cedar::dyn::NeuralField::updateMatrices()
 void cedar::dyn::NeuralField::numberOfKernelsChanged()
 {
   const unsigned int& new_number = _mNumberOfKernels->getValue();
-  CEDAR_ASSERT(mOldNumberOfKernels != new_number);
   if (mOldNumberOfKernels < new_number) // more kernels
   {
     std::vector<double> sigmas;
@@ -290,6 +289,7 @@ void cedar::dyn::NeuralField::numberOfKernelsChanged()
       sigmas.push_back(3.0);
       shifts.push_back(0.0);
     }
+    // create as many kernels as necessary
     for (unsigned int i = mOldNumberOfKernels; i < new_number; i++)
     {
       cedar::aux::kernel::GaussPtr kernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
@@ -302,6 +302,7 @@ void cedar::dyn::NeuralField::numberOfKernelsChanged()
       mKernels.push_back(kernel);
       std::string kernel_name("lateralKernel");
       kernel_name += boost::lexical_cast<std::string>(i);
+      // try to create a new buffer - if kernel did exist previously, this buffer is already present
       try
       {
         this->declareBuffer(kernel_name);
@@ -322,11 +323,11 @@ void cedar::dyn::NeuralField::numberOfKernelsChanged()
       mKernels.pop_back();
       std::string kernel_name("lateralKernel");
       kernel_name += boost::lexical_cast<std::string>(i);
-//      this->declareBuffer(kernel_name);
-//      this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
-//      this->mKernels.at(i)->hideDimensionality(true);
       this->removeConfigurableChild(kernel_name);
     }
   }
+  // if mOldNumberOfKernels == new_number, nothing must be done
+
+  // reset mOldNumberOfKernels
   mOldNumberOfKernels = new_number;
 }
