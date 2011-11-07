@@ -65,3 +65,5 @@ CTestTestfile.cmake
 
 syntax: regexp
 ^tests/unit/processing/ArchitectureIO/architecture1\.json$
+syntax: regexp
+^cedar\.conf$
