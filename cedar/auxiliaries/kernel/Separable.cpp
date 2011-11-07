@@ -37,6 +37,7 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -76,7 +77,22 @@ cv::Mat cedar::aux::kernel::Separable::convolveWith(const cv::Mat& mat) const
   cv::Mat tmp = mat.clone();
   for (unsigned int i = 0; i < this->mKernelParts.size(); ++i)
   {
-    tmp = cedar::aux::math::convolve(tmp, this->getKernelPart(i));
+    cv::Mat kernel;
+    switch (i)
+    {
+      case 0:
+        kernel = this->getKernelPart(i);
+        break;
+
+      case 1:
+        kernel = this->getKernelPart(i).t();
+        break;
+
+      default:
+        CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot add more than three dimensions to a kernel (yet).");
+    }
+
+    tmp = cedar::aux::math::convolve(tmp, kernel);
   }
   return tmp;
 }
