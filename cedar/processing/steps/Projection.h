@@ -102,9 +102,11 @@ protected slots:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void expand0D();
-  void expand();
-  void compress0D();
-  void compress();
+  void expandND();
+  void compressNDto0D();
+  void compress3Dto2D();
+  void compress3Dto1D();
+  void compress2Dto1D();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -140,6 +142,7 @@ private:
 
   cedar::aux::UIntVectorParameterPtr _mInputDimensionSizes;
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
+  cedar::aux::UIntParameterPtr _mCompressionType;
 }; // class cedar::proc::steps::Projection
 
 #endif // CEDAR_PROC_STEPS_PROJECTION_H

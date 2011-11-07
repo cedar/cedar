@@ -46,6 +46,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/processing/Arguments.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -62,7 +63,8 @@ _mDimensionMappings(new cedar::aux::UIntVectorParameter(this, "dimension mapping
 _mInputDimensionality(new cedar::aux::UIntParameter(this, "input dimensionality", 1, 0, 10)),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
 _mInputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "input dimension sizes", 1, 10, 1, 1000)),
-_mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000))
+_mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
+_mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 3))
 {
   this->declareInput("input");
   this->declareOutput("output", mOutput);
@@ -121,25 +123,37 @@ void cedar::proc::steps::Projection::reconfigure()
 
   if (input_dimensionality > output_dimensionality)
   {
-    if (input_dimensionality == 0)
+    CEDAR_DEBUG_ASSERT(_mInputDimensionality->getValue() == _mDimensionMappings->getValue().size())
+
+    mIndicesToCompress.clear();
+
+    for (unsigned int index = 0; index < _mInputDimensionality->getValue(); ++index)
     {
-      mpProjectionMethod = &cedar::proc::steps::Projection::compress0D;
+      if (_mDimensionMappings->getValue().at(index) == 10)
+      {
+        mIndicesToCompress.push_back(index);
+      }
+    }
+
+    if (input_dimensionality == 3 && output_dimensionality == 2)
+    {
+      mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
+    }
+    else if (input_dimensionality == 3 && output_dimensionality == 1)
+    {
+      mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto1D;
+    }
+    else if (input_dimensionality == 2 && output_dimensionality == 1)
+    {
+      mpProjectionMethod = &cedar::proc::steps::Projection::compress2Dto1D;
+    }
+    else if (output_dimensionality == 0)
+    {
+      mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0D;
     }
     else
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::compress;
-
-      CEDAR_DEBUG_ASSERT(_mInputDimensionality->getValue() == _mDimensionMappings->getValue().size())
-
-      mIndicesToCompress.clear();
-
-      for (unsigned int index = 0; index < _mInputDimensionality->getValue(); ++index)
-      {
-        if (_mDimensionMappings->getValue().at(index) == 10)
-        {
-          mIndicesToCompress.push_back(index);
-        }
-      }
+      std::cout << "Not implemented yet.\n";
     }
   }
   else
@@ -150,7 +164,7 @@ void cedar::proc::steps::Projection::reconfigure()
     }
     else
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand;
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expandND;
     }
   }
 }
@@ -230,7 +244,7 @@ void cedar::proc::steps::Projection::expand1Dto2D()
 }
 */
 
-void cedar::proc::steps::Projection::expand()
+void cedar::proc::steps::Projection::expandND()
 {
   const cv::Mat& input = mInput->getData();
   cv::Mat& output = mOutput->getData();
@@ -276,17 +290,29 @@ void cedar::proc::steps::Projection::expand()
   }
 }
 
-void cedar::proc::steps::Projection::compress()
+void cedar::proc::steps::Projection::compress2Dto1D()
 {
-  /*
-  for (unsigned int i = 0; i < mIndicesToCompress.size(); ++i)
-  {
-    mInput->setValue(mInput.max(mIndicesToCompress.at(i) - i));
-  }
-  */
+  CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
+
+  cv::reduce(mInput->getData(), mOutput->getData(), mIndicesToCompress.at(0), _mCompressionType->getValue());
+}
+
+void cedar::proc::steps::Projection::compress3Dto2D()
+{
+  CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
+
+  cedar::aux::math::reduceCvMat3D<float>(mInput->getData(), mOutput->getData(), mIndicesToCompress.at(0), _mCompressionType->getValue());
 };
 
-void cedar::proc::steps::Projection::compress0D()
+void cedar::proc::steps::Projection::compress3Dto1D()
+{
+  CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 2);
+
+//  cv::aux::math::cvReduceMat3D(mInput->getValue(), mOutput->getValue(), mIndicesToCompress.at(0), _mCompressionType);
+//  cv::reduce(mOutput->getValue(), mOutput->getValue(), mIndicesToCompress.at(0), _mCompressionType);
+};
+
+void cedar::proc::steps::Projection::compressNDto0D()
 {
 
 };
