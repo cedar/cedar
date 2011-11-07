@@ -214,7 +214,7 @@ cv::Mat cedar::aux::math::convolve(const cv::Mat& matrix, const cv::Mat& kernel)
   {
     case 1:
     case 2:
-      cv::filter2D(matrix, result, -1, kernel);
+      cv::filter2D(matrix, result, -1, kernel, cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);
       break;
 
     default:

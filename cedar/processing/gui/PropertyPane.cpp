@@ -60,6 +60,7 @@
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include <QApplication>
+#include <boost/bind.hpp>
 
 
 cedar::proc::gui::PropertyPane::DataWidgetTypes cedar::proc::gui::PropertyPane::mDataWidgetTypes;
@@ -111,8 +112,12 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
 
 void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
 {
+  if (mSlotConnection.connected())
+  {
+    mSlotConnection.disconnect();
+  }
   this->append(pConfigurable->getParameters());
-
+  mSlotConnection = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::proc::gui::PropertyPane::redraw, this));
   for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
        iter != pConfigurable->configurableChildren().end();
        ++iter)
@@ -218,4 +223,10 @@ void cedar::proc::gui::PropertyPane::resetPointer()
   this->mDisplayedConfigurable.reset();
   this->clearContents();
   this->setRowCount(0);
+}
+
+void cedar::proc::gui::PropertyPane::redraw()
+{
+  this->resetContents();
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
 }
