@@ -54,7 +54,8 @@
 #include "cedar/processing/Connection.h"
 #include "cedar/processing/source/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
-#include "cedar/auxiliaries/net/NetReader.h"
+#include "cedar/processing/source/NetReader.h"
+#include "cedar/processing/steps/NetWriter.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -104,6 +105,16 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   StepDeclarationPtr static_gain_decl(new StepDeclarationT<cedar::proc::steps::StaticGain>("cedar.processing.steps.StaticGain", "Utilities"));
   static_gain_decl->setIconPath(":/steps/static_gain.svg");
   this->steps().declareClass(static_gain_decl);
+
+  StepDeclarationPtr net_reader_decl(new
+    StepDeclarationT<cedar::proc::steps::NetReaderSource>("cedar.processing.source.NetReader", "Inputs"));
+  net_reader_decl->setIconPath(":/steps/net_reader.svg");
+  this->steps().declareClass(net_reader_decl);
+
+  StepDeclarationPtr net_writer_decl(new
+    StepDeclarationT<cedar::proc::steps::NetWriterSink>("cedar.processing.steps.NetWriter", "Utilities"));
+  net_writer_decl->setIconPath(":/steps/net_writer.svg");
+  this->steps().declareClass(net_writer_decl);
 }
 
 cedar::proc::Manager::~Manager()

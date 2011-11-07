@@ -1,7 +1,7 @@
-/*======================================================================================================================
+/*=============================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -17,129 +17,109 @@
     You should have received a copy of the GNU Lesser General Public License
     along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-========================================================================================================================
+===============================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataTemplate.h
+    File:        NetWriterSink.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Sun 06 Nov 2011 11:42:04 PM CET
 
     Description:
 
     Credits:
 
-======================================================================================================================*/
+=============================================================================*/
 
-#ifndef CEDAR_AUX_DATA_TEMPLATE_H
-#define CEDAR_AUX_DATA_TEMPLATE_H
+#ifndef CEDAR_NETWRITERSINK_H
+#define CEDAR_NETWRITERSINK_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/steps/namespace.h"
 
 // PROJECT INCLUDES
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/net/NetWriter.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
- */
-template <typename T>
-class cedar::aux::DataTemplate : public cedar::aux::Data
+namespace cedar {
+  namespace proc {
+    namespace steps {
+      class NetWriterSink;
+    }
+  }
+}
+
+/*!@brief   This  */
+class cedar::proc::steps::NetWriterSink : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef T DataType;
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataTemplate()
-  {
-  }
-
-  DataTemplate(const T& value)
-  {
-    this->mData = value;
-  }
-
-  //!@brief Destructor
-  virtual ~DataTemplate()
-  {
-  }
+  NetWriterSink();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+  void onStart();
+  void onStop();
 
-  T& getData()
-  {
-    return this->mData;
-  }
 
-  const T& getData() const
-  {
-    return this->mData;
-  }
-
-  void setData(const T& data)
-  {
-    this->mData = data;
-  }
+public slots:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief Reacts to a change in the input connection.
+  void inputConnectionChanged(const std::string& inputName);
+
+  //!@brief Determines whether the data item can be connected to the slot.
+  cedar::proc::DataSlot::VALIDITY determineInputValidity
+                                  (
+                                    cedar::proc::ConstDataSlotPtr slot,
+                                    cedar::aux::DataPtr data
+                                  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  T mData;
+  //!@brief MatrixData representing the input. Storing it like this saves time during computation.
+  cedar::aux::MatDataPtr mInput;
 
 private:
+  //!@brief the writer object (RAII)
+  cedar::aux::net::NetWriter< cedar::aux::MatData::DataType > *mpWriter;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
 
 private:
-  // none yet
 
-}; // class cedar::aux::DataTemplate
+}; // class cedar::proc::steps::NetWriterSink
 
-#endif // CEDAR_AUX_DATA_TEMPLATE_H
+#endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
 
