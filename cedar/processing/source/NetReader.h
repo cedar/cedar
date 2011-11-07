@@ -1,7 +1,7 @@
-/*======================================================================================================================
+/*=============================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -17,129 +17,99 @@
     You should have received a copy of the GNU Lesser General Public License
     along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
-========================================================================================================================
+===============================================================================
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataTemplate.h
+    File:        NetReaderSource.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 23
+    Maintainer:  Jean-Stephane Jokeit
+    Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
+    Date:        Thu 03 Nov 2011 04:47:26 PM CET
 
     Description:
 
     Credits:
 
-======================================================================================================================*/
+=============================================================================*/
 
-#ifndef CEDAR_AUX_DATA_TEMPLATE_H
-#define CEDAR_AUX_DATA_TEMPLATE_H
+#ifndef CEDAR_NETREADERSTEP_H
+#define CEDAR_NETREADERSTEP_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Data.h"
+#include "cedar/processing/steps/namespace.h"
 
 // PROJECT INCLUDES
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/net/NetReader.h"
 
 // SYSTEM INCLUDES
-#include <QReadWriteLock>
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
- */
-template <typename T>
-class cedar::aux::DataTemplate : public cedar::aux::Data
+namespace cedar {
+  namespace proc {
+    namespace steps {
+      class NetReaderSource;
+    }
+  }
+}
+
+/*!@brief    */
+class cedar::proc::steps::NetReaderSource : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef T DataType;
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataTemplate()
-  {
-  }
-
-  DataTemplate(const T& value)
-  {
-    this->mData = value;
-  }
-
-  //!@brief Destructor
-  virtual ~DataTemplate()
-  {
-  }
+  NetReaderSource();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Updates the output matrix.
+  void compute(const cedar::proc::Arguments& arguments);
+  void onStop();
+  void onStart();
 
-  T& getData()
-  {
-    return this->mData;
-  }
 
-  const T& getData() const
-  {
-    return this->mData;
-  }
-
-  void setData(const T& data)
-  {
-    this->mData = data;
-  }
+public slots:
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  T mData;
-
+  //!@brief The data containing the output.
+  cedar::aux::MatDataPtr mOutput;
 private:
+  //!@brief the reader object (RAII)
+  cedar::aux::net::NetReader< cedar::aux::MatData::DataType > *mpReader;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
 
 private:
-  // none yet
 
-}; // class cedar::aux::DataTemplate
+}; // class cedar::proc::steps::NetReaderSource
 
-#endif // CEDAR_AUX_DATA_TEMPLATE_H
+#endif // CEDAR_PROC_STEPS_STATIC_GAIN_H
 
