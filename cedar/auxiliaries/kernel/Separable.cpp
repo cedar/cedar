@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 
@@ -73,12 +74,9 @@ void cedar::aux::kernel::Separable::setNumParts(unsigned int numParts)
 cv::Mat cedar::aux::kernel::Separable::convolveWith(const cv::Mat& mat) const
 {
   cv::Mat tmp = mat.clone();
-  //!@todo Create a convolve function in cedar::aux(::?) and use it here. That method should also handle any dimensionaly.
-  //!@todo Parameter of the convolution must be changeable.
   for (unsigned int i = 0; i < this->mKernelParts.size(); ++i)
   {
-    const cv::Mat& kernel_part = this->getKernelPart(i);
-    cv::filter2D(tmp, tmp, -1, kernel_part);
+    tmp = cedar::aux::math::convolve(tmp, this->getKernelPart(i));
   }
   return tmp;
 }
