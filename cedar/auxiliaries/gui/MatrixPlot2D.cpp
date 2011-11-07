@@ -173,7 +173,7 @@ void cedar::aux::gui::MatrixPlot2D::display(cedar::aux::DataPtr data)
                 "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot2D::display.");
   }
 
-  this->startTimer(200); //!@todo make the refresh time configurable.
+  this->startTimer(60); //!@todo make the refresh time configurable.
 }
 
 void cedar::aux::gui::MatrixPlot2D::init()
