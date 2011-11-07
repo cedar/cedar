@@ -201,3 +201,275 @@ void cedar::aux::math::write(cv::Mat matrix)
   }
   cout << "\n";
 }
+
+template <typename T>
+void cedar::aux::math::reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator)
+{
+  int source_dimension_size_0 = source.size[0];
+  int source_dimension_size_1 = source.size[1];
+  int source_dimension_size_2 = source.size[2];
+
+  double sum;
+  double min;
+  double max;
+
+  switch (dimensionToReduce)
+  {
+    case 0:
+    {
+      switch (reductionOperator)
+      {
+        case (CV_REDUCE_SUM):
+        {
+          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              sum = 0;
+              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+              {
+                sum += source.at<T>(dim_0, dim_1, dim_2);
+              }
+              destination.at<T>(dim_1, dim_2) = sum;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_AVG):
+        {
+          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              sum = 0;
+              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+              {
+                sum += source.at<T>(dim_0, dim_1, dim_2);
+              }
+              destination.at<T>(dim_1, dim_2) = sum/source_dimension_size_0;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_MAX):
+        {
+          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              max = -10000;
+              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+              {
+                min = source.at<T>(dim_0, dim_1, dim_2);
+                if (min > max)
+                {
+                  max = min;
+                }
+              }
+              destination.at<T>(dim_1, dim_2) = max;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_MIN):
+        {
+          for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              min = 10000;
+              for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+              {
+                max = source.at<T>(dim_0, dim_1, dim_2);
+                if(max < min)
+                {
+                  min = max;
+                }
+              }
+              destination.at<T>(dim_1, dim_2) = min;
+            }
+          }
+          break;
+        }
+        default:
+        {
+          break;
+        }
+      } // END switch reductionOperator
+      break;
+    }
+    case 1:
+    {
+      switch (reductionOperator)
+      {
+        case (CV_REDUCE_SUM):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              sum = 0;
+              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+              {
+                sum += source.at<T>(dim_0, dim_1, dim_2);
+              }
+              destination.at<T>(dim_0, dim_2) = sum;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_AVG):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              sum = 0;
+              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+              {
+                sum += source.at<T>(dim_0, dim_1, dim_2);
+              }
+              destination.at<T>(dim_0, dim_2) = sum/source_dimension_size_0;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_MAX):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              max = -10000;
+              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+              {
+                min = source.at<T>(dim_0, dim_1, dim_2);
+                if (min > max)
+                {
+                  max = min;
+                }
+              }
+              destination.at<T>(dim_0, dim_2) = max;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_MIN):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+            {
+              min = 10000;
+              for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+              {
+                max = source.at<T>(dim_0, dim_1, dim_2);
+                if (max < min)
+                {
+                  min = max;
+                }
+              }
+              destination.at<T>(dim_0, dim_2) = min;
+            }
+          }
+          break;
+        }
+        default:
+        {
+          break;
+        }
+      } // END switch reductionOperator
+      break;
+    }
+    case 2:
+    {
+      switch (reductionOperator)
+      {
+        case (CV_REDUCE_SUM):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+            {
+              sum = 0;
+              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+              {
+                sum += source.at<T>(dim_0 ,dim_1, dim_2);
+              }
+              destination.at<T>(dim_0, dim_1) = sum;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_AVG):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+            {
+              sum = 0;
+              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+              {
+                sum += source.at<T>(dim_0, dim_1, dim_2);
+              }
+              destination.at<T>(dim_0, dim_1) = sum/source_dimension_size_0;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_MAX):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+            {
+              max = -10000;
+              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+              {
+                min = source.at<T>(dim_0, dim_1, dim_2);
+                if (min > max)
+                {
+                  max = min;
+                }
+              }
+              destination.at<T>(dim_0, dim_1) = max;
+            }
+          }
+          break;
+        }
+        case (CV_REDUCE_MIN):
+        {
+          for (int dim_0 = 0; dim_0 < source_dimension_size_0; ++dim_0)
+          {
+            for (int dim_1 = 0; dim_1 < source_dimension_size_1; ++dim_1)
+            {
+              min = 10000;
+              for (int dim_2 = 0; dim_2 < source_dimension_size_2; ++dim_2)
+              {
+                max = source.at<T>(dim_0, dim_1, dim_2);
+                if (max < min)
+                {
+                  min = max;
+                }
+              }
+              destination.at<T>(dim_0, dim_1) = min;
+            }
+          }
+          break;
+        }
+        default:
+        {
+          break;
+        }
+      } // END switch reductionOperator
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+}
+
+template void cedar::aux::math::reduceCvMat3D<float>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator);
+template void cedar::aux::math::reduceCvMat3D<double>(const cv::Mat& source, cv::Mat& dst, int dimensionToReduce, int reductionOperator);

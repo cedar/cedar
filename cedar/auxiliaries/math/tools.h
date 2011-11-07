@@ -114,7 +114,18 @@ namespace cedar
             CEDAR_ASSERT(false);
         }
       }
+
+      /*!\brief Same functionality as cvReduce for 2D->1D.
+       *
+       * \param[in] src a 3D matrix source
+       * \param[out] dst a 2D matrix destination (CV_64FC1)
+       * \param[in] dim on which dimension should be reduced?
+       * \param[in] op reduction operator (again, same choices as cvReduce)
+       *
+       */
+      template <typename T>
+      void reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator = CV_REDUCE_SUM);
     }
   }
 }
-#endif  // CEDAR_AUX_MATH_TOOLS_H
+#endif // CEDAR_AUX_MATH_TOOLS_H
