@@ -89,11 +89,6 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
 
 void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
 {
-  this->updateMatrix();
-}
-
-void cedar::proc::source::GaussInput::updateMatrix()
-{
   std::vector<cv::Mat> kernel_parts;
   const unsigned int& dimensionality = _mDimensionality->getValue();
   const std::vector<double>& sigmas = _mSigmas->getValue();
@@ -111,7 +106,6 @@ void cedar::proc::source::GaussInput::updateMatrix()
   }
   kernel_parts.at(0) *= _mAmplitude->getValue();
   // assemble the input
-  mOutput->lockForWrite();
   std::vector<int> sizes(static_cast<size_t>(dimensionality));
   for (unsigned int i = 0; i < dimensionality; i++)
   {
@@ -169,7 +163,11 @@ void cedar::proc::source::GaussInput::updateMatrix()
       }
     }
   }
-  mOutput->unlock();
+}
+
+void cedar::proc::source::GaussInput::updateMatrix()
+{
+  this->onTrigger();
 }
 
 void cedar::proc::source::GaussInput::updateDimensionality()
@@ -178,5 +176,5 @@ void cedar::proc::source::GaussInput::updateDimensionality()
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
   _mCenters->resize(new_dimensionality, _mCenters->getDefaultValue());
   _mSizes->resize(new_dimensionality, _mSizes->getDefaultValue());
-  this->updateMatrix();
+  this->onTrigger();
 }

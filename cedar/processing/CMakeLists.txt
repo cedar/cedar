@@ -66,6 +66,7 @@ cedar_add_library(cedarproc
   source/GaussInput.h
   steps/StaticGain.h
   source/NetReader.h
+  steps/Resize.h
   steps/NetWriter.h
   LoopedTrigger.h
   Step.h

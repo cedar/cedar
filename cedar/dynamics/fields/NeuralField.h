@@ -85,6 +85,8 @@ public slots:
   void dimensionalityChanged();
   //!@brief handle a change in size along dimensions, which leads to creating new matrices
   void dimensionSizeChanged();
+  //!@brief handle a change in number of lateral interaction kernels
+  void numberOfKernelsChanged();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,11 +129,15 @@ protected:
   //!@brief any sigmoid function
   cedar::aux::math::SigmoidPtr mSigmoid;
   //!@brief the lateral interaction kernel, strictly excitatory at the moment
-  cedar::aux::kernel::GaussPtr mKernel;
+  std::vector<cedar::aux::kernel::GaussPtr> mKernels;
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief the number of kernels
+  cedar::aux::UIntParameterPtr _mNumberOfKernels;
+  //!@brief the old number of kernels - needed to deal with changes in number of kernels
+  unsigned int mOldNumberOfKernels;
 private:
   // none yet
 
