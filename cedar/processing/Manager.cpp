@@ -52,7 +52,7 @@
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/Connection.h"
-#include "cedar/processing/source/GaussInput.h"
+#include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/steps/Resize.h"
 #include "cedar/auxiliaries/assert.h"
@@ -97,7 +97,7 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
   this->triggers().declareClass(looped_trigger_declaration);
 
-  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::source::GaussInput>("cedar.processing.source.GaussInput", "Inputs"));
+  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::sources::GaussInput>("cedar.processing.sources.GaussInput", "Inputs"));
   input_decl->setIconPath(":/steps/gauss_input.svg");
   this->steps().declareClass(input_decl);
 
