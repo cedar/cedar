@@ -11,6 +11,7 @@
     <file>steps/gauss_input.svg</file>
     <file>steps/static_gain.svg</file>
     <file>steps/resize.svg</file>
+    <file>steps/preshape.svg</file>
     <file>toolbaricons/grid.svg</file>
   </qresource>
 </RCC>
