@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        VectorParameter.h
+    File:        SetParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
