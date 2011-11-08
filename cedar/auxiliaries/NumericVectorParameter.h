@@ -117,9 +117,23 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  void setMinimum(const T& minimum)
+  {
+    this->mMinimum = minimum;
+
+    this->emitPropertyChangedSignal();
+  }
+
   const T& getMinimum() const
   {
     return this->mMinimum;
+  }
+
+  void setMaximum(const T& minimum)
+  {
+    this->mMaximum = minimum;
+
+    this->emitPropertyChangedSignal();
   }
 
   void setMinimum(const T& value)

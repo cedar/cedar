@@ -162,13 +162,13 @@ void cedar::aux::kernel::Gauss::calculate()
     }
     if (dimensionality == 1)
     {
-      mKernel->getData<cv::Mat>() = cv::Mat(sizes[0], 1, CV_32F);
+      mKernel->getData() = cv::Mat(sizes[0], 1, CV_32F);
     }
     else
     {
-      mKernel->getData<cv::Mat>() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
+      mKernel->getData() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
     }
-    cv::Mat& kernel = mKernel->getData<cv::Mat>();
+    cv::Mat& kernel = mKernel->getData();
     // now fill up the big kernel matrix
     std::vector<int> position(static_cast<size_t>(dimensionality));
     unsigned int max_index = 1;

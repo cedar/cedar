@@ -38,30 +38,34 @@
 # testing settings
 
 # enable unit tests via ctest
-enable_testing()
+if(CEDAR_BUILD_TESTS)
+  message("-- configuring tests")
+  enable_testing()
 
 
 ########################################################################################################################
 # cedar unit and interactive tests
-list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_INTERACTIVE_TEST_DIR})
-list(LENGTH subdirectories numberOfSubdirectories)
+  list(APPEND subdirectories ${CEDAR_UNIT_TEST_DIR} ${CEDAR_INTERACTIVE_TEST_DIR})
+  list(LENGTH subdirectories numberOfSubdirectories)
+  
+  while (${numberOfSubdirectories} STRGREATER 0)
+    list(GET subdirectories 0 subdirectory)
+    list(REMOVE_AT subdirectories 0)
+  
+    cedar_get_subdirectories(${subdirectory})
+  
+    foreach(newSubdirectory ${returnedSubdirectories})
+  
+      if (EXISTS "${newSubdirectory}/CMakeLists.txt")
+        add_subdirectory(${newSubdirectory})
+      endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
+  
+      list(APPEND subdirectories ${newSubdirectory})
+    endforeach(newSubdirectory)
+  
+    list(LENGTH subdirectories ${numberOfSubdirectories})
+  endwhile (${numberOfSubdirectories} STRGREATER 0)
 
-while (${numberOfSubdirectories} STRGREATER 0)
-  list(GET subdirectories 0 subdirectory)
-  list(REMOVE_AT subdirectories 0)
-
-  cedar_get_subdirectories(${subdirectory})
-
-  foreach(newSubdirectory ${returnedSubdirectories})
-
-    if (EXISTS "${newSubdirectory}/CMakeLists.txt")
-      add_subdirectory(${newSubdirectory})
-    endif (EXISTS "${newSubdirectory}/CMakeLists.txt")
-
-    list(APPEND subdirectories ${newSubdirectory})
-  endforeach(newSubdirectory)
-
-  list(LENGTH subdirectories ${numberOfSubdirectories})
-endwhile (${numberOfSubdirectories} STRGREATER 0)
-
-
+else(CEDAR_BUILD_TESTS)
+  message("-- excluding tests from build")
+endif(CEDAR_BUILD_TESTS)

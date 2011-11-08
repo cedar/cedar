@@ -38,6 +38,8 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -200,6 +202,26 @@ void cedar::aux::math::write(cv::Mat matrix)
     break;
   }
   cout << "\n";
+}
+
+cv::Mat cedar::aux::math::convolve(const cv::Mat& matrix, const cv::Mat& kernel)
+{
+  cv::Mat result;
+
+  CEDAR_ASSERT(matrix.dims == kernel.dims);
+
+  switch (matrix.dims)
+  {
+    case 1:
+    case 2:
+      cv::filter2D(matrix, result, -1, kernel, cv::Point(-1, -1), 0.0, cv::BORDER_CONSTANT);
+      break;
+
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve functions of the given dimensionality.");
+  }
+
+  return result;
 }
 
 template <typename T>

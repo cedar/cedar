@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -114,6 +115,12 @@ namespace cedar
             CEDAR_ASSERT(false);
         }
       }
+      
+      /*!@brief This function convolves a matrix with a given kernel and returns the resulting matrix.
+       * @todo  Make a parameter for border handling etc. (at least wrap, constant)
+       * @todo  Write unit tests for this method.
+       */
+      cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel);
 
       /*!\brief Same functionality as cvReduce for 2D->1D.
        *
@@ -125,6 +132,7 @@ namespace cedar
        */
       template <typename T>
       void reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator = CV_REDUCE_SUM);
+
     }
   }
 }
