@@ -56,6 +56,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <boost/lexical_cast.hpp>
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -171,17 +172,15 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& global_inhibition = mGlobalInhibition->getValue();
 
   sigmoid_u = mSigmoid->compute<float>(u);
-  lateral_interaction = cv::Mat::zeros(u.size(),u.type());
+  lateral_interaction = cv::Mat::zeros(u.size(), u.type());
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->getValue() < 3)
   {
     for (unsigned int i = 0; i < _mNumberOfKernels->getValue() && i < this->mKernels.size(); i++)
     {
-      cv::Mat convolution_buffer =  cv::Mat::zeros(u.size(),u.type());
-      const cv::Mat& kernel = this->mKernels.at(i)->getKernel();
-      //!@todo Should this not use the data->lock*
+      //!@todo Should/does this not use the data->lock*
       mKernels.at(i)->getReadWriteLock()->lockForRead();
-      cv::filter2D(sigmoid_u, convolution_buffer, -1, kernel, cv::Point(-1, -1), 0 /* , cv::BORDER_WRAP */);
+      cv::Mat convolution_buffer = this->mKernels.at(i)->convolveWith(sigmoid_u);
       mKernels.at(i)->getReadWriteLock()->unlock();
       lateral_interaction += convolution_buffer;
     }
@@ -190,7 +189,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);
 
-  cv::Mat d_u = -u + h + sigmoid_u + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0];;
+  cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0];;
   /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
    *       it when the connections change.
    */

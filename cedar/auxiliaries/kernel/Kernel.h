@@ -151,7 +151,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::aux::DataPtr mKernel; //!< matrix containing the kernel
+  cedar::aux::MatDataPtr mKernel; //!< matrix containing the kernel
   QReadWriteLock *mpReadWriteLockOutput;//!< read and write lock to protect the kernel when calculating its values
 private:
   // none yet

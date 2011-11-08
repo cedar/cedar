@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 
@@ -88,10 +89,7 @@ cedar::aux::kernel::Kernel::~Kernel()
 
 cv::Mat cedar::aux::kernel::Kernel::convolveWith(const cv::Mat& mat) const
 {
-  //!@todo Implement this method.
-  //!@todo Write unit tests for this method.
-  //!@todo Implement a border type (at least wrap, constant).
-  CEDAR_THROW(cedar::aux::exc::ExceptionBase, "Sorry, but this function is not implemented yet.");
+  return cedar::aux::math::convolve(mat, this->mKernel->getData());
 }
 
 void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
@@ -106,7 +104,7 @@ QReadWriteLock* cedar::aux::kernel::Kernel::getReadWriteLock()
 
 const cv::Mat& cedar::aux::kernel::Kernel::getKernel() const
 {
-  return mKernel->getData<cv::Mat>();
+  return mKernel->getData();
 }
 
 const cedar::aux::DataPtr cedar::aux::kernel::Kernel::getKernelRaw() const
@@ -118,7 +116,7 @@ void cedar::aux::kernel::Kernel::loadKernelFromFile()
 {
   mpReadWriteLockOutput->lockForWrite();
   cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::READ);
-  fs["kernel"] >> mKernel->getData<cv::Mat>();
+  fs["kernel"] >> mKernel->getData();
   mpReadWriteLockOutput->unlock();
 }
 
@@ -126,7 +124,7 @@ void cedar::aux::kernel::Kernel::saveKernelToFile() const
 {
   mpReadWriteLockOutput->lockForRead();
   cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::WRITE);
-  fs << "kernel" << mKernel->getData<cv::Mat>();
+  fs << "kernel" << mKernel->getData();
   mpReadWriteLockOutput->unlock();
 }
 
