@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataSlot.h
+    File:        Preshape.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 29
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 11 08
 
     Description:
 
@@ -34,14 +34,16 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_SLOT_H
-#define CEDAR_PROC_DATA_SLOT_H
+#ifndef CEDAR_DYN_PRESHAPE_H
+#define CEDAR_DYN_PRESHAPE_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/processing/DataRole.h"
 
 // PROJECT INCLUDES
+#include "cedar/dynamics/namespace.h"
+#include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -50,117 +52,86 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::DataSlot
+class cedar::dyn::Preshape : public cedar::dyn::Dynamics
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  /*! Enum describing the validity of the data connected to this slot.
-   */
-  enum VALIDITY
-  {
-    //! The data is valid.
-    VALIDITY_VALID,
-    //! The data may not be valid, but the step using it can be computed nonetheless.
-    VALIDITY_WARNING,
-    //! The data is erroneous, computing the corresponding step may explode things.
-    VALIDITY_ERROR,
-    //! The validity is unknown and needs to be determined before execution.
-    VALIDITY_UNKNOWN
-  };
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  Preshape();
 
   //!@brief Destructor
-  virtual ~DataSlot();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  inline unsigned int getNumData() const
-  {
-    return this->mData.size();
-  }
+  //!@brief determine if a given Data is a valid input to the field
+  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
 
-  cedar::aux::DataPtr getData(unsigned int index = 0);
-  cedar::aux::ConstDataPtr getData(unsigned int index = 0) const;
-
-  cedar::proc::DataRole::Id getRole() const;
-
-  void setData(cedar::aux::DataPtr data, unsigned int index = 0);
-
-  void addData(cedar::aux::DataPtr data);
-
-  const std::string& getName() const;
-
-  void setText(const std::string& text);
-
-  //!@brief Returns the text to display to the user.
-  const std::string& getText() const;
-
-  bool isMandatory() const;
-
-  VALIDITY getValidlity() const;
-  void setValidity(VALIDITY validity);
-
-  /*!
-   * @remarks This function throws unless the role of this slot is input.
-   */
-  void setCollection(bool isCollection);
-  bool isCollection() const;
+public slots:
+  //!@brief handle a change in dimensionality, which leads to creating new matrices
+  void dimensionalityChanged();
+  //!@brief handle a change in size along dimensions, which leads to creating new matrices
+  void dimensionSizeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief compute the euler step of the preshape dynamics
+   *
+   * This is the equation:
+   * \f[
+   *
+   * \f]
+   */
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief update the size and dimensionality of internal matrices
+  void updateMatrices();
+
+  //!@brief check if input fits to field in dimension and size
+  bool isMatrixCompatibleInput(const cv::Mat& matrix) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  // none yet
+  //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
+  cedar::dyn::SpaceCodePtr mActivation;
+  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
+  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  //!@brief the field sizes in each dimension
+  cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief time scale
+  cedar::aux::DoubleParameterPtr _mTimeScale;
 private:
-  std::vector<cedar::aux::DataPtr> mData;
-  bool mMandatory;
-
-  //!@brief Whether this slot can have multiple data items.
-  bool mIsCollection;
-
-  VALIDITY mValidity;
-
-  //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
-  std::string mName;
-
-  //! Text of the slot, i.e., the text that is displayed to the user (ignored if empty).
-  std::string mText;
-
-  //! Role of the slot (input, output, ...)
-  cedar::proc::DataRole::Id mRole;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::DataSlot
+}; // class cedar::dyn::Preshape
 
-#endif // CEDAR_PROC_DATA_SLOT_H
+#endif // CEDAR_DYN_PRESHAPE_H
 

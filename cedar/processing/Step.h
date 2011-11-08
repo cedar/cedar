@@ -161,6 +161,16 @@ public:
   //!@brief Returns a specific data pointer stored in this step.
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
 
+  /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
+   *
+   *          A slot that is a collection can have multiple data items associated with it.
+   *
+   * @remarks This is only valid for inputs.
+   *
+   * @see     cedar::proc::DataSlot for details on collections.
+   */
+  void makeInputCollection(const std::string& name, bool isCollection = true);
+
   //!@brief Returns a specific input data pointer stored in this step.
   cedar::aux::DataPtr getInput(const std::string& name);
 
