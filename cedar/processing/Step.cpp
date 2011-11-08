@@ -58,6 +58,8 @@
 // Enable to show information on locking/unlocking
 // #define DEBUG_LOCKS
 //#define DEBUG_ARGUMENT_SETTING
+// Show information about execution/triggering of steps
+//#define DEBUG_RUNNING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -514,10 +516,25 @@ void cedar::proc::Step::onStop()
  */
 void cedar::proc::Step::onTrigger()
 {
+#ifdef DEBUG_RUNNING
+  std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
+#endif // DEBUG_RUNNING
+  // if an exception has happened, do nothing.
+  if (this->mState == cedar::proc::Step::STATE_EXCEPTION)
+  {
+    this->mpArgumentsLock->lockForWrite();
+    this->mNextArguments.reset();
+    this->mpArgumentsLock->unlock();
+    return;
+  }
+
   //!@todo signal to the gui/user somehow when a step becomes inactive due to erroneous connections
   if (!this->allInputsValid())
   {
     this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
+    this->mpArgumentsLock->lockForWrite();
+    this->mNextArguments.reset();
+    this->mpArgumentsLock->unlock();
     return;
   }
 
@@ -529,7 +546,7 @@ void cedar::proc::Step::onTrigger()
   } // this->mMandatoryConnectionsAreSet
 
   //!@todo Should busy be a part of STATE_*?
-  if (!this->mBusy && this->mState != cedar::proc::Step::STATE_EXCEPTION)
+  if (!this->mBusy)
   {
 #ifdef DEBUG_ARGUMENT_SETTING
     cedar::aux::System::mCOutLock.lockForWrite();
@@ -610,6 +627,9 @@ void cedar::proc::Step::run()
     std::cout << "Cancelling step execution of " << this->getName() << " because of invalid inputs." << std::endl;
     cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_ARGUMENT_SETTING
+    this->mpArgumentsLock->lockForWrite();
+    this->mNextArguments.reset();
+    this->mpArgumentsLock->unlock();
     return;
   }
 
@@ -660,8 +680,6 @@ void cedar::proc::Step::run()
   locks.insert(std::make_pair(arguments->getLock(), DataRole::INPUT));
   this->lock(locks);
 
-  //!@todo this blocks writing of new arguments and thus (potentially) incoming trigger signals. Is this what we want?
-//  this->mpArgumentsLock->lockForRead();
   try
   {
     this->compute(*(arguments.get()));
@@ -678,10 +696,8 @@ void cedar::proc::Step::run()
   {
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
-//  this->mpArgumentsLock->unlock();
 
   this->unlock(locks);
-//  this->unlockAll();
 
   // remove the argumens, as they have been processed.
   this->mFinished->trigger();
