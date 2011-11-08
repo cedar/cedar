@@ -52,6 +52,7 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
   (
     new cedar::proc::StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields")
   );
+  field_decl->setIconPath(":/steps/field_temp.svg");
 
 #ifdef LINUX
   cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
