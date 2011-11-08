@@ -1,0 +1,5 @@
+if(CEDAR_USE_AMTEC)
+	cedar_add_interactive_test("AmtecSpeedControl" main.cpp ControlThread.h ControlThread.cpp)
+else(CEDAR_USE_AMTEC)
+	message("-- skipping AmtecSpeedControl")
+endif(CEDAR_USE_AMTEC)
