@@ -58,6 +58,8 @@
 // Enable to show information on locking/unlocking
 // #define DEBUG_LOCKS
 //#define DEBUG_ARGUMENT_SETTING
+// Show information about execution/triggering of steps
+//#define DEBUG_RUNNING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -514,9 +516,15 @@ void cedar::proc::Step::onStop()
  */
 void cedar::proc::Step::onTrigger()
 {
+#ifdef DEBUG_RUNNING
+  std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
+#endif // DEBUG_RUNNING
   // if an exception has happened, do nothing.
   if (this->mState == cedar::proc::Step::STATE_EXCEPTION)
   {
+    this->mpArgumentsLock->lockForWrite();
+    this->mNextArguments.reset();
+    this->mpArgumentsLock->unlock();
     return;
   }
 
@@ -524,6 +532,9 @@ void cedar::proc::Step::onTrigger()
   if (!this->allInputsValid())
   {
     this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
+    this->mpArgumentsLock->lockForWrite();
+    this->mNextArguments.reset();
+    this->mpArgumentsLock->unlock();
     return;
   }
 
@@ -616,6 +627,9 @@ void cedar::proc::Step::run()
     std::cout << "Cancelling step execution of " << this->getName() << " because of invalid inputs." << std::endl;
     cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_ARGUMENT_SETTING
+    this->mpArgumentsLock->lockForWrite();
+    this->mNextArguments.reset();
+    this->mpArgumentsLock->unlock();
     return;
   }
 

@@ -109,12 +109,14 @@ void cedar::proc::LoopedTrigger::startTrigger()
   {
     this->mListeners.at(i)->onStart();
   }
+  CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
   this->start();
 }
 
 void cedar::proc::LoopedTrigger::stopTrigger()
 {
-  this->stop();
+  this->stop(2000);
+
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
     this->mListeners.at(i)->onStop();

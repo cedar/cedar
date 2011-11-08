@@ -53,7 +53,7 @@
 //#define DEBUG_TRIGGERING
 
 #ifdef DEBUG_TRIGGERING
-#  include "auxiliaries/System.h"
+#  include "cedar/auxiliaries/System.h"
 #endif // DEBUG_TRIGGERING
 
 //----------------------------------------------------------------------------------------------------------------------
