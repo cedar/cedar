@@ -59,6 +59,8 @@ _mTimeScale(new cedar::aux::DoubleParameter(this, "timeScale", 0.1, 0.001, 10.0)
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
+  QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
+  QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   this->declareOutput("activation");
   this->setOutput("activation", mActivation);
 

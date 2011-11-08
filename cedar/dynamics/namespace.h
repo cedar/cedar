@@ -61,9 +61,11 @@ namespace cedar
   {
     CEDAR_DECLARE_DYN_CLASS(Dynamics);
 
+    //!@brief a template class tailored for use in all dynamics
     template <typename T> class Activation;
     typedef Activation<double> DoubleActivation;
     CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
+    //!@brief
     typedef Activation<cv::Mat> MatActivation;
     CEDAR_GENERATE_POINTER_TYPES(MatActivation);
 
