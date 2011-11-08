@@ -39,8 +39,16 @@ cmake_minimum_required(VERSION 2.8)
 # set the cedar home directory to the current directory
 set(CEDAR_HOME ${CMAKE_CURRENT_SOURCE_DIR} CACHE PATH "Home of cedar; should NOT be altered.")
 
+
+
 # include config file
 set(CEDAR_CONF_FILE ${CEDAR_HOME}/cedar.conf CACHE FILEPATH "Default configuration file of cedar.")
+
+# check if the config file exists 
+if (NOT EXISTS ${CEDAR_CONF_FILE})
+  message(FATAL_ERROR "The cedar.conf file could not be found. Please create it, e.g., by copying cedar.conf.example to ${CEDAR_CONF_FILE} and filling out the proper values.")
+endif(NOT EXISTS ${CEDAR_CONF_FILE})
+
 message (STATUS "including ${CEDAR_CONF_FILE} configuration file")
 include(${CEDAR_CONF_FILE})
 
