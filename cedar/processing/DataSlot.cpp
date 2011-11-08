@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -48,6 +49,7 @@
 cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
 :
 mMandatory(isMandatory),
+mIsCollection(false),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
 mRole(role)
@@ -61,6 +63,17 @@ cedar::proc::DataSlot::~DataSlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::DataSlot::setCollection(bool isCollection)
+{
+  CEDAR_ASSERT(this->mRole == cedar::proc::DataRole::INPUT);
+  this->mIsCollection = isCollection;
+}
+
+bool cedar::proc::DataSlot::isCollection() const
+{
+  return this->mIsCollection;
+}
 
 /*!
  * @remarks Set to an empty string ("") to disable the text and use the name instead.
@@ -94,7 +107,7 @@ bool cedar::proc::DataSlot::isMandatory() const
   return this->mMandatory;
 }
 
-void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
+void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data, unsigned int index)
 {
   // reset validity when the data changes.
   if (this->mRole == cedar::proc::DataRole::INPUT)
@@ -102,17 +115,36 @@ void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
     this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
 
-  this->mData = data;
+  if (this->mData.size() <= index)
+  {
+    this->mData.resize(index + 1);
+  }
+
+  this->mData.at(index) = data;
 }
 
-cedar::aux::DataPtr cedar::proc::DataSlot::getData()
+cedar::aux::DataPtr cedar::proc::DataSlot::getData(unsigned int index)
 {
-  return this->mData;
+  if (index < this->mData.size())
+  {
+    return this->mData.at(index);
+  }
+  else
+  {
+    return cedar::aux::DataPtr();
+  }
 }
 
-cedar::aux::ConstDataPtr cedar::proc::DataSlot::getData() const
+cedar::aux::ConstDataPtr cedar::proc::DataSlot::getData(unsigned int index) const
 {
-  return this->mData;
+  if (index < this->mData.size())
+  {
+    return this->mData.at(index);
+  }
+  else
+  {
+    return cedar::aux::DataPtr();
+  }
 }
 
 cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const

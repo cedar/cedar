@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/processing/source/GaussInput.h"
+#include "cedar/processing/sources/GaussInput.h"
 #include "cedar/dynamics/Activation.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/NumericParameter.h"
@@ -59,7 +59,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::source::GaussInput::GaussInput()
+cedar::proc::sources::GaussInput::GaussInput()
 :
 cedar::proc::Step(),
 mOutput(new cedar::aux::MatData(cv::Mat())),
@@ -87,7 +87,7 @@ _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000.0))
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
+void cedar::proc::sources::GaussInput::compute(const cedar::proc::Arguments&)
 {
   std::vector<cv::Mat> kernel_parts;
   const unsigned int& dimensionality = _mDimensionality->getValue();
@@ -165,12 +165,12 @@ void cedar::proc::source::GaussInput::compute(const cedar::proc::Arguments&)
   }
 }
 
-void cedar::proc::source::GaussInput::updateMatrix()
+void cedar::proc::sources::GaussInput::updateMatrix()
 {
   this->onTrigger();
 }
 
-void cedar::proc::source::GaussInput::updateDimensionality()
+void cedar::proc::sources::GaussInput::updateDimensionality()
 {
   int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());

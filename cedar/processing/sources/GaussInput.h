@@ -38,11 +38,11 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SOURCE_GAUSS_INPUT_H
-#define CEDAR_PROC_SOURCE_GAUSS_INPUT_H
+#ifndef CEDAR_PROC_SOURCES_GAUSS_INPUT_H
+#define CEDAR_PROC_SOURCES_GAUSS_INPUT_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/source/namespace.h"
+#include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
@@ -58,7 +58,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::source::GaussInput : public cedar::proc::Step
+class cedar::proc::sources::GaussInput : public cedar::proc::Step
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -122,5 +122,5 @@ private:
 
 }; // class cedar::proc::source::GaussInput
 
-#endif // CEDAR_PROC_SOURCE_GAUSS_INPUT_H
+#endif // CEDAR_PROC_SOURCES_GAUSS_INPUT_H
 

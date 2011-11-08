@@ -70,6 +70,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
+    CEDAR_DECLARE_DYN_CLASS(Preshape);
     //!@endcond
 
 #ifdef LINUX

@@ -39,8 +39,8 @@
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_PROC_SOURCE_NAMESPACE_H
-#define CEDAR_PROC_SOURCE_NAMESPACE_H
+#ifndef CEDAR_PROC_SOURCES_NAMESPACE_H
+#define CEDAR_PROC_SOURCES_NAMESPACE_H
 
 // LOCAL INCLUDES
 
@@ -55,7 +55,7 @@ namespace cedar
   /*!@brief Namespace for all processing classes. */
   namespace proc
   {
-    namespace source
+    namespace sources
     {
       //!@cond SKIPPED_DOCUMENTATION
       class GaussInput;
@@ -65,4 +65,4 @@ namespace cedar
   }
 }
 
-#endif // CEDAR_PROC_NAMESPACE_H
+#endif // CEDAR_PROC_SOURCES_NAMESPACE_H

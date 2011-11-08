@@ -756,6 +756,12 @@ void cedar::proc::Step::declareOutput(const std::string& name, cedar::aux::DataP
   this->setOutput(name, data);
 }
 
+void cedar::proc::Step::makeInputCollection(const std::string& name, bool isCollection)
+{
+  cedar::proc::DataSlotPtr slot = this->getInputSlot(name);
+  slot->setCollection(isCollection);
+}
+
 void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, bool mandatory)
 {
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
