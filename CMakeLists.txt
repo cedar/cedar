@@ -46,7 +46,7 @@ set(CEDAR_CONF_FILE ${CEDAR_HOME}/cedar.conf CACHE FILEPATH "Default configurati
 
 # check if the config file exists 
 if (NOT EXISTS ${CEDAR_CONF_FILE})
-  message(FATAL_ERROR "The cedar.conf file could not be found. Please create it, e.g., by copying ${CEDAR_HOME}/cedar.conf.example to ${CEDAR_CONF_FILE} and filling out the proper values.")
+  message(FATAL_ERROR "The cedar.conf file could not be found. Please create it, e.g., by copying cedar.conf.example to ${CEDAR_CONF_FILE} and filling out the proper values.")
 endif(NOT EXISTS ${CEDAR_CONF_FILE})
 
 message (STATUS "including ${CEDAR_CONF_FILE} configuration file")
