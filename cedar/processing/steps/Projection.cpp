@@ -60,22 +60,19 @@ cedar::proc::steps::Projection::Projection()
 mInput(new cedar::aux::MatData(cv::Mat())),
 mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::aux::UIntVectorParameter(this, "dimension mapping", 1, 1, 0, 1)),
-_mInputDimensionality(new cedar::aux::UIntParameter(this, "input dimensionality", 1, 0, 10)),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
-_mInputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "input dimension sizes", 1, 10, 1, 1000)),
 _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
 _mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 3))
 {
   this->declareInput("input");
   this->declareOutput("output", mOutput);
 
-  this->initializeInputMatrix();
   this->initializeOutputMatrix();
 
+  this->reconfigure();
+
   QObject::connect(_mDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
-  QObject::connect(_mInputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(inputDimensionalityChanged()));
   QObject::connect(_mOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionalityChanged()));
-  QObject::connect(_mInputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(inputDimensionSizesChanged()));
   QObject::connect(_mOutputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionSizesChanged()));
 }
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,16 +84,6 @@ void cedar::proc::steps::Projection::compute(const cedar::proc::Arguments&)
   (this->*mpProjectionMethod)();
 }
 
-void cedar::proc::steps::Projection::inputDimensionalityChanged()
-{
-  unsigned int new_dimensionality = _mInputDimensionality->getValue();
-  this->_mInputDimensionSizes->resize(new_dimensionality, _mInputDimensionSizes->getDefaultValue());
-  this->initializeInputMatrix();
-
-  this->_mDimensionMappings->resize(new_dimensionality, _mDimensionMappings->getDefaultValue());
-  this->reconfigure();
-}
-
 void cedar::proc::steps::Projection::outputDimensionalityChanged()
 {
   unsigned int new_dimensionality = _mOutputDimensionality->getValue();
@@ -106,11 +93,6 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   this->reconfigure();
 }
 
-void cedar::proc::steps::Projection::inputDimensionSizesChanged()
-{
-  this->initializeInputMatrix();
-}
-
 void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 {
   this->initializeOutputMatrix();
@@ -118,32 +100,31 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 
 void cedar::proc::steps::Projection::reconfigure()
 {
-  unsigned int input_dimensionality = _mInputDimensionality->getValue();
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
 
-  if (input_dimensionality > output_dimensionality)
+  if (mInputDimensionality > output_dimensionality)
   {
-    CEDAR_DEBUG_ASSERT(_mInputDimensionality->getValue() == _mDimensionMappings->getValue().size())
+    CEDAR_DEBUG_ASSERT(mInputDimensionality == _mDimensionMappings->getValue().size())
 
     mIndicesToCompress.clear();
 
-    for (unsigned int index = 0; index < _mInputDimensionality->getValue(); ++index)
+    for (unsigned int index = 0; index < mInputDimensionality; ++index)
     {
-      if (_mDimensionMappings->getValue().at(index) == 10)
+      if (_mDimensionMappings->getValue().at(index) == 1)
       {
         mIndicesToCompress.push_back(index);
       }
     }
 
-    if (input_dimensionality == 3 && output_dimensionality == 2)
+    if (mInputDimensionality == 3 && output_dimensionality == 2)
     {
       mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
     }
-    else if (input_dimensionality == 3 && output_dimensionality == 1)
+    else if (mInputDimensionality == 3 && output_dimensionality == 1)
     {
       mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto1D;
     }
-    else if (input_dimensionality == 2 && output_dimensionality == 1)
+    else if (mInputDimensionality == 2 && output_dimensionality == 1)
     {
       mpProjectionMethod = &cedar::proc::steps::Projection::compress2Dto1D;
     }
@@ -158,7 +139,7 @@ void cedar::proc::steps::Projection::reconfigure()
   }
   else
   {
-    if (input_dimensionality == 0)
+    if (mInputDimensionality == 0)
     {
       this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0D;
     }
@@ -167,28 +148,6 @@ void cedar::proc::steps::Projection::reconfigure()
       this->mpProjectionMethod = &cedar::proc::steps::Projection::expandND;
     }
   }
-}
-
-void cedar::proc::steps::Projection::initializeInputMatrix()
-{
-  int dimensionality = static_cast<int>(_mInputDimensionality->getValue());
-
-  std::vector<int> sizes(dimensionality);
-  for (int dim = 0; dim < dimensionality; ++dim)
-  {
-    sizes[dim] = _mInputDimensionSizes->at(dim);
-  }
-
-  this->lockAll();
-  if (dimensionality == 1)
-  {
-    this->mInput->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
-  }
-  else
-  {
-    this->mInput->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
-  }
-  this->unlockAll();
 }
 
 void cedar::proc::steps::Projection::initializeOutputMatrix()
@@ -246,6 +205,7 @@ void cedar::proc::steps::Projection::expand1Dto2D()
 
 void cedar::proc::steps::Projection::expandND()
 {
+  std::cout << "expanding!\n";
   const cv::Mat& input = mInput->getData();
   cv::Mat& output = mOutput->getData();
 
@@ -262,16 +222,27 @@ void cedar::proc::steps::Projection::expandND()
 
     for (unsigned int i = 0; i < _mDimensionMappings->size(); ++i)
     {
+      std::cout << "mapping: " << i << " -> " << _mDimensionMappings->at(i) << "\n";
       input_indices.push_back(indices.at(_mDimensionMappings->at(i)));
     }
 
-    if (_mInputDimensionality->getValue() == 1)
+    if (mInputDimensionality == 1)
     {
       input_indices.push_back(0);
     }
 
+    if (_mOutputDimensionality->getValue() == 1)
+    {
+      indices.push_back(0);
+    }
+
     output.at<float>(&(indices.front()))
         = input.at<float>(&(input_indices.front()));
+
+    if (_mOutputDimensionality->getValue() == 1)
+    {
+      indices.pop_back();
+    }
 
     indices.front() += 1;
 
@@ -339,10 +310,8 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
-  if (this->mInput)
-  {
-    const cv::Mat& input = this->mInput->getData();
-    // make a copy to create a matrix of the same type, dimensions, ...
-    this->mOutput->setData(input.clone());
-  }
+
+  mInputDimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
+  this->_mDimensionMappings->resize(mInputDimensionality, _mDimensionMappings->getDefaultValue());
+  this->reconfigure();
 }

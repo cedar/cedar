@@ -136,23 +136,9 @@ public:
     this->emitPropertyChangedSignal();
   }
 
-  void setMinimum(const T& value)
-  {
-    this->mMinimum = value;
-
-    this->emitPropertyChangedSignal();
-  }
-
   const T& getMaximum() const
   {
     return this->mMaximum;
-  }
-
-  void setMaximum(const T& value)
-  {
-    this->mMaximum = value;
-
-    this->emitPropertyChangedSignal();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
