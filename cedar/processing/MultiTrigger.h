@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Arguments.h
+    File:        MultiTrigger.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,

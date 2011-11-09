@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -48,6 +49,7 @@
 cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
 :
 mMandatory(isMandatory),
+mIsCollection(false),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
 mRole(role)
@@ -61,6 +63,17 @@ cedar::proc::DataSlot::~DataSlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::DataSlot::setCollection(bool isCollection)
+{
+  CEDAR_ASSERT(this->mRole == cedar::proc::DataRole::INPUT);
+  this->mIsCollection = isCollection;
+}
+
+bool cedar::proc::DataSlot::isCollection() const
+{
+  return this->mIsCollection;
+}
 
 /*!
  * @remarks Set to an empty string ("") to disable the text and use the name instead.
@@ -94,7 +107,43 @@ bool cedar::proc::DataSlot::isMandatory() const
   return this->mMandatory;
 }
 
-void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
+bool cedar::proc::DataSlot::hasData(cedar::aux::ConstDataPtr data) const
+{
+  std::vector<cedar::aux::DataPtr>::const_iterator iter;
+  iter = std::find(this->mData.begin(), this->mData.end(), data);
+  return iter != this->mData.end();
+}
+
+void cedar::proc::DataSlot::removeData(cedar::aux::ConstDataPtr data)
+{
+  // Find the data entry.
+  std::vector<cedar::aux::DataPtr>::iterator iter;
+  iter = std::find(this->mData.begin(), this->mData.end(), data);
+
+  //!@todo Throw a proper exception here.
+  // The data should always be in the vector.
+  CEDAR_ASSERT(iter != this->mData.end());
+
+  // Erase the data.
+  this->mData.erase(iter);
+}
+
+void cedar::proc::DataSlot::addData(cedar::aux::DataPtr data)
+{
+  // check if there is a free slot in the current vector
+  for (size_t i = 0; i < this->mData.size(); ++i)
+  {
+    if (!this->mData.at(i))
+    {
+      this->mData.at(i) = data;
+      return;
+    }
+  }
+  // if there was no free slot, create one
+  this->mData.push_back(data);
+}
+
+void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data, unsigned int index)
 {
   // reset validity when the data changes.
   if (this->mRole == cedar::proc::DataRole::INPUT)
@@ -102,17 +151,36 @@ void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data)
     this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
   }
 
-  this->mData = data;
+  if (this->mData.size() <= index)
+  {
+    this->mData.resize(index + 1);
+  }
+
+  this->mData.at(index) = data;
 }
 
-cedar::aux::DataPtr cedar::proc::DataSlot::getData()
+cedar::aux::DataPtr cedar::proc::DataSlot::getData(unsigned int index)
 {
-  return this->mData;
+  if (index < this->mData.size())
+  {
+    return this->mData.at(index);
+  }
+  else
+  {
+    return cedar::aux::DataPtr();
+  }
 }
 
-cedar::aux::ConstDataPtr cedar::proc::DataSlot::getData() const
+cedar::aux::ConstDataPtr cedar::proc::DataSlot::getData(unsigned int index) const
 {
-  return this->mData;
+  if (index < this->mData.size())
+  {
+    return this->mData.at(index);
+  }
+  else
+  {
+    return cedar::aux::DataPtr();
+  }
 }
 
 cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const

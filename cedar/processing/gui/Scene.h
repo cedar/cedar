@@ -80,7 +80,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Scene(QObject *pParent = NULL, QMainWindow *pMainWindow = NULL);
+  Scene(cedar::proc::gui::View* peParentView, QObject *pParent = NULL, QMainWindow *pMainWindow = NULL);
 
   //!@brief Destructor
   ~Scene();
@@ -162,7 +162,7 @@ private:
   QString mModeParam;
 
   cedar::proc::gui::NetworkFilePtr mNetwork;
-
+  cedar::proc::gui::View *mpeParentView;
   /* connect mode related */
   QGraphicsLineItem *mpNewConnectionIndicator;
   cedar::proc::gui::GraphicsBase *mpConnectionStart;

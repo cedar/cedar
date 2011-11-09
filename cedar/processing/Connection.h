@@ -22,6 +22,8 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
+    File:        Connection.h
+
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
                  Stephan Zibner

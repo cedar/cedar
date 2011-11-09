@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/GroupItem.h"
 #include "cedar/processing/gui/NetworkFile.h"
+#include "cedar/processing/gui/View.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -61,10 +62,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::gui::Scene::Scene(QObject *pParent, QMainWindow *pMainWindow)
+cedar::proc::gui::Scene::Scene(cedar::proc::gui::View* peParentView, QObject *pParent, QMainWindow *pMainWindow)
 :
 QGraphicsScene (pParent),
 mMode(MODE_SELECT),
+mpeParentView(peParentView),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
 mpGroupIndicator(NULL),
@@ -170,8 +172,25 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
   {
     default:
     case MODE_SELECT:
-      QGraphicsScene::mousePressEvent(pMouseEvent);
+    {
+      QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
+      if (items.size() > 0)
+      {
+        // check if the start item is a connectable thing.
+        if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
+             && mpConnectionStart->canConnect())
+        {
+          this->mMode = MODE_CONNECT;
+          mpeParentView->setMode(cedar::proc::gui::Scene::MODE_CONNECT);
+          this->connectModeProcessMousePress(pMouseEvent);
+        }
+        else
+        {
+          QGraphicsScene::mousePressEvent(pMouseEvent);
+        }
+      }
       break;
+    }
 
     case MODE_CONNECT:
       this->connectModeProcessMousePress(pMouseEvent);
@@ -404,9 +423,14 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
             break;
         } // switch (mpConnectionStart->getGroup())
       }
+      else
+      {
+        this->mMode = MODE_SELECT;
+        mpeParentView->setMode(cedar::proc::gui::Scene::MODE_SELECT);
+        QGraphicsScene::mouseReleaseEvent(pMouseEvent);
+      }
     }
   }
-
 
   QList<QGraphicsItem*> all_items = this->items();
   for (int i = 0; i < all_items.size(); ++i)
@@ -426,7 +450,8 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
       }
     }
   }
-
+  this->mMode = MODE_SELECT;
+  mpeParentView->setMode(cedar::proc::gui::Scene::MODE_SELECT);
   mpConnectionStart = NULL;
 }
 

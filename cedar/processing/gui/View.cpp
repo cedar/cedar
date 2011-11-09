@@ -54,7 +54,7 @@ cedar::proc::gui::View::View(QWidget *pParent)
 :
 QGraphicsView(pParent)
 {
-  this->mpScene = new cedar::proc::gui::Scene();
+  this->mpScene = new cedar::proc::gui::Scene(this);
   this->setScene(this->mpScene);
   this->setInteractive(true);
   this->setDragMode(QGraphicsView::RubberBandDrag);
