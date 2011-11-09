@@ -110,7 +110,18 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
   // should only be able to connect to DataSlotItems
   CEDAR_DEBUG_ASSERT(p_target != NULL);
 
-  if (p_target->getSlot()->getData())
+  //!@todo This all seems a bit sketchy
+  // either a slot is a collection ...
+  if (p_target->getSlot()->isCollection())
+  {
+    // ... then we cannot connect only if we are already connected ...
+    if (p_target->getSlot()->hasData(this->getSlot()->getData()))
+    {
+      return cedar::proc::gui::CONNECT_NO;
+    }
+  }
+  // ... or, if it already has data, then it cannot have more.
+  else if (p_target->getSlot()->getData())
   {
     return cedar::proc::gui::CONNECT_NO;
   }
