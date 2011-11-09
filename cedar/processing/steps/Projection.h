@@ -90,11 +90,8 @@ protected slots:
   //!@brief a slot that is triggered if the gain factor is changed
   void reconfigure();
   void inputConnectionChanged(const std::string& inputName);
-  void inputDimensionalityChanged();
   void outputDimensionalityChanged();
-  void inputDimensionSizesChanged();
   void outputDimensionSizesChanged();
-  void initializeInputMatrix();
   void initializeOutputMatrix();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,6 +118,8 @@ private:
   ProjectionFunctionPtr mpProjectionMethod;
 
   std::vector<unsigned int> mIndicesToCompress;
+
+  unsigned int mInputDimensionality;
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -133,14 +132,10 @@ private:
   //! the value at index i represents the corresponding dimension in the output
   cedar::aux::UIntVectorParameterPtr _mDimensionMappings;
 
-  //!@brief dimensionality of the input
-  //!@todo determine when an input step is connected to the projection
-  cedar::aux::UIntParameterPtr _mInputDimensionality;
   //!@brief dimensionality of the output
   //!@todo determine when the projection is connected to an output step
   cedar::aux::UIntParameterPtr _mOutputDimensionality;
 
-  cedar::aux::UIntVectorParameterPtr _mInputDimensionSizes;
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
   cedar::aux::UIntParameterPtr _mCompressionType;
 }; // class cedar::proc::steps::Projection
