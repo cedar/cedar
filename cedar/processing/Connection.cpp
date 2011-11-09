@@ -233,6 +233,7 @@ bool cedar::proc::Connection::contains(cedar::proc::TriggerPtr trigger)
 
 /*! This function removes the connection, i.e., the end result is that there is no longer a connection between the
  *  source and target.
+ *  @todo Should this not be in the destructor rather than a separate function?
  */
 void cedar::proc::Connection::deleteConnection()
 {
@@ -243,7 +244,8 @@ void cedar::proc::Connection::deleteConnection()
 
   if (p_source_step)
   {
-    p_target_step->freeInput(mTargetName);
+    cedar::aux::DataPtr data = p_source_step->getOutput(this->mSourceName);
+    p_target_step->freeInput(mTargetName, data);
     p_source_step->getFinishedTrigger()->removeListener(p_target_step);
   }
   else if (p_source_trigger && p_target_step)
