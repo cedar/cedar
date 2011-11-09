@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        SetParameter.h
+    File:        Preshape.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 20
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 11 08
 
     Description:
 
@@ -38,122 +34,74 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_SET_PARAMETER_H
-#define CEDAR_AUX_SET_PARAMETER_H
+#ifndef CEDAR_DYN_PRESHAPE_H
+#define CEDAR_DYN_PRESHAPE_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
+#include "cedar/dynamics/namespace.h"
+#include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
 
 // SYSTEM INCLUDES
-#include <set>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
  */
-template <typename T>
-class cedar::aux::SetParameter : public cedar::aux::Parameter
+class cedar::dyn::Preshape : public cedar::dyn::Dynamics
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
+  Q_OBJECT
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  SetParameter(cedar::aux::Configurable *pOwner, const std::string& name)
-  :
-  cedar::aux::Parameter(pOwner, name, false)
-  {
-  }
-
-  SetParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::set<T>& defaults)
-  :
-  cedar::aux::Parameter(pOwner, name, true),
-  mDefaults(defaults)
-  {
-    this->makeDefault();
-  }
+  Preshape();
 
   //!@brief Destructor
-  ~SetParameter()
-  {
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setTo(const cedar::aux::ConfigurationNode& root)
-  {
-    this->mValues.clear();
-    for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
-    {
-      this->mValues.insert(iter->second.get_value<T>());
-    }
-  }
+  //!@brief determine if a given Data is a valid input to the field
+  cedar::proc::DataSlot::VALIDITY determineInputValidity(cedar::proc::ConstDataSlotPtr, cedar::aux::DataPtr) const;
 
-  void putTo(cedar::aux::ConfigurationNode& root)
-  {
-    cedar::aux::ConfigurationNode vector_node;
-    for (typename std::set<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
-    {
-      cedar::aux::ConfigurationNode value_node;
-      value_node.put_value(*iter);
-      vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
-    }
-    root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
-  }
-
-  const std::set<T>& get() const
-  {
-    return this->mValues;
-  }
-
-  std::set<T>& get()
-  {
-    return this->mValues;
-  }
-
-  const std::set<T>& getDefaultValues() const
-  {
-    return this->mDefaults;
-  }
-
-  void set(const std::set<T>& values)
-  {
-    this->mValues = values;
-    emit valueChanged();
-  }
-
-  void makeDefault()
-  {
-    this->mValues = mDefaults;
-  }
-
-  void insert(const T& value)
-  {
-    this->mValues.insert(value);
-  }
+public slots:
+  //!@brief handle a change in dimensionality, which leads to creating new matrices
+  void dimensionalityChanged();
+  //!@brief handle a change in size along dimensions, which leads to creating new matrices
+  void dimensionSizeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  /*!@brief compute the euler step of the preshape dynamics
+   *
+   * This is the equation:
+   * \f[
+   *
+   * \f]
+   */
+  void eulerStep(const cedar::unit::Time& time);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief update the size and dimensionality of internal matrices
+  void updateMatrices();
+
+  //!@brief check if input fits to field in dimension and size
+  bool isMatrixCompatibleInput(const cv::Mat& matrix) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -161,10 +109,16 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
+  cedar::dyn::SpaceCodePtr mActivation;
+  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
+  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  //!@brief the field sizes in each dimension
+  cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief time scale
+  cedar::aux::DoubleParameterPtr _mTimeScale;
 private:
-  std::set<T> mValues;
-  std::set<T> mDefaults;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -177,7 +131,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::VectorParameter
+}; // class cedar::dyn::Preshape
 
-#endif // CEDAR_AUX_SET_PARAMETER_H
+#endif // CEDAR_DYN_PRESHAPE_H
 

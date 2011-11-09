@@ -37,6 +37,7 @@
 #include "cedar/dynamics/plugin.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/fields/NeuralField.h"
+#include "cedar/dynamics/fields/Preshape.h"
 #include "cedar/processing/StepDeclaration.h"
 #include "cedar/processing/Manager.h"
 
@@ -52,12 +53,25 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
   (
     new cedar::proc::StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields")
   );
+  field_decl->setIconPath(":/steps/field_temp.svg");
 
 #ifdef LINUX
   cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
 #else
   // cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
   plugin->add(field_decl);
+#endif
+
+  StepDeclarationPtr preshape_decl
+  (
+    new cedar::proc::StepDeclarationT<cedar::dyn::Preshape>("cedar.dynamics.Preshape", "Fields")
+  );
+  preshape_decl->setIconPath(":/steps/preshape.svg");
+
+#ifdef LINUX
+  cedar::proc::Manager::getInstance().steps().declareClass(preshape_decl);
+#else
+  plugin->add(preshape_decl);
   // return plugin;
 #endif
 }

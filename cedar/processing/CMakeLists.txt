@@ -63,7 +63,7 @@ cedar_add_library(cedarproc
   gui/UIntVectorParameter.h
   gui/DirectoryParameter.h
   gui/View.h
-  source/GaussInput.h
+  sources/GaussInput.h
   steps/StaticGain.h
   steps/Projection.h
   steps/Resize.h

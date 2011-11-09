@@ -52,7 +52,7 @@
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/Connection.h"
-#include "cedar/processing/source/GaussInput.h"
+#include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/steps/Resize.h"

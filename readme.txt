@@ -51,4 +51,26 @@ Germany
 
 You can also reach us by phone under +49 234 32-28967.
 
-Installation instructions can be found in the file 'INSTALL'.
+Compact installation instructions (for linux and MacOS):
+
+1. Create a copy of cedar.conf.example (in this folder) and name it cedar.conf
+2. Take a look at 'cedar.conf' and see if you would like to make any changes
+   (e.g., installation prefix, external include paths, ...).
+3. Create an out-of-source build folder and change into it:
+   $ mkdir build
+   $ cd build 
+4. Call cmake to generate UNIX makefiles:
+   $ cmake ..
+5. Compile cedar:
+   $ make # you can append '-j n' to split the compilation process into n threads
+[Optional: Run all unit tests:
+   $ make test
+]
+[Optional: Create the documentation:
+   $ make doxygen
+]
+6a. For all Debian based Linux distributions: Create installation package and install it:
+   $ make package
+   $ sudo dpkg -i cedar-<version>-Linux.deb
+6b. Manual installation:
+   $ make install
