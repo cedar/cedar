@@ -69,8 +69,6 @@ _mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 
 
   this->initializeOutputMatrix();
 
-  this->reconfigure();
-
   QObject::connect(_mDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
   QObject::connect(_mOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionalityChanged()));
   QObject::connect(_mOutputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionSizesChanged()));
@@ -90,7 +88,6 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   this->_mOutputDimensionSizes->resize(new_dimensionality, _mOutputDimensionSizes->getDefaultValue());
   this->_mDimensionMappings->setMaximum(new_dimensionality);
   this->initializeOutputMatrix();
-  this->reconfigure();
 }
 
 void cedar::proc::steps::Projection::outputDimensionSizesChanged()
@@ -310,8 +307,8 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
-
   mInputDimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   this->_mDimensionMappings->resize(mInputDimensionality, _mDimensionMappings->getDefaultValue());
+
   this->reconfigure();
 }
