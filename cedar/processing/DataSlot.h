@@ -84,13 +84,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  inline unsigned int getNumData() const
+  inline unsigned int getDataCount() const
   {
     return this->mData.size();
   }
 
   cedar::aux::DataPtr getData(unsigned int index = 0);
   cedar::aux::ConstDataPtr getData(unsigned int index = 0) const;
+
+  bool hasData(cedar::aux::ConstDataPtr data) const;
+
+  void removeData(cedar::aux::ConstDataPtr data);
 
   cedar::proc::DataRole::Id getRole() const;
 

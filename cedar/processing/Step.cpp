@@ -923,7 +923,6 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
   {
     data->setOwner(this);
     data->connectedSlotName(name);
-
   }
 #ifdef DEBUG_LOCKS
   std::cout << "Data/lock: " << this->getName() << "." << name << "/" << (&data->getLock()) << std::endl;
@@ -938,7 +937,14 @@ void cedar::proc::Step::setData(DataRole::Id role, const std::string& name, ceda
                 " name \"" + name + "\" does not exist.");
     return;
   }
-  map_iterator->second->setData(data);
+  if (map_iterator->second->isCollection())
+  {
+    map_iterator->second->addData(data);
+  }
+  else
+  {
+    map_iterator->second->setData(data);
+  }
   this->checkMandatoryConnections();
 
   if (role == cedar::proc::DataRole::INPUT)
@@ -1006,9 +1012,20 @@ void cedar::proc::Step::setOutput(const std::string& name, cedar::aux::DataPtr d
   this->setData(DataRole::OUTPUT, name, data);
 }
 
-void cedar::proc::Step::freeInput(const std::string& name)
+void cedar::proc::Step::freeInput(const std::string& name, cedar::aux::DataPtr data)
 {
-  this->freeData(DataRole::INPUT, name);
+  cedar::proc::DataSlotPtr slot = this->getInputSlot(name);
+  // the slot for name should always be found
+  CEDAR_ASSERT(slot);
+
+  if (slot->isCollection())
+  {
+    slot->removeData(data);
+  }
+  else
+  {
+    this->freeData(DataRole::INPUT, name);
+  }
 }
 
 void cedar::proc::Step::freeBuffer(const std::string& name)

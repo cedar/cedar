@@ -156,7 +156,7 @@ public:
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Removes a connection to another step's output.
-  void freeInput(const std::string& name);
+  void freeInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Returns a specific data pointer stored in this step.
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);

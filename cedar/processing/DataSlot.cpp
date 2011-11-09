@@ -107,6 +107,42 @@ bool cedar::proc::DataSlot::isMandatory() const
   return this->mMandatory;
 }
 
+bool cedar::proc::DataSlot::hasData(cedar::aux::ConstDataPtr data) const
+{
+  std::vector<cedar::aux::DataPtr>::const_iterator iter;
+  iter = std::find(this->mData.begin(), this->mData.end(), data);
+  return iter != this->mData.end();
+}
+
+void cedar::proc::DataSlot::removeData(cedar::aux::ConstDataPtr data)
+{
+  // Find the data entry.
+  std::vector<cedar::aux::DataPtr>::iterator iter;
+  iter = std::find(this->mData.begin(), this->mData.end(), data);
+
+  //!@todo Throw a proper exception here.
+  // The data should always be in the vector.
+  CEDAR_ASSERT(iter != this->mData.end());
+
+  // Erase the data.
+  this->mData.erase(iter);
+}
+
+void cedar::proc::DataSlot::addData(cedar::aux::DataPtr data)
+{
+  // check if there is a free slot in the current vector
+  for (size_t i = 0; i < this->mData.size(); ++i)
+  {
+    if (!this->mData.at(i))
+    {
+      this->mData.at(i) = data;
+      return;
+    }
+  }
+  // if there was no free slot, create one
+  this->mData.push_back(data);
+}
+
 void cedar::proc::DataSlot::setData(cedar::aux::DataPtr data, unsigned int index)
 {
   // reset validity when the data changes.
