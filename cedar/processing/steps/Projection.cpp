@@ -28,7 +28,8 @@
     Email:       mathis.richter@ini.ruhr-uni-bochum.de
     Date:        2011 11 02
 
-    Description:
+    Description: Processing step, which projects neuronal activation between processing steps of different
+                 dimensionality.
 
     Credits:
 
@@ -138,11 +139,11 @@ void cedar::proc::steps::Projection::reconfigure()
   {
     if (mInputDimensionality == 0)
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0D;
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0DtoND;
     }
     else
     {
-      this->mpProjectionMethod = &cedar::proc::steps::Projection::expandND;
+      this->mpProjectionMethod = &cedar::proc::steps::Projection::expandMDtoND;
     }
   }
 }
@@ -169,7 +170,7 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
   this->unlockAll();
 }
 
-void cedar::proc::steps::Projection::expand0D()
+void cedar::proc::steps::Projection::expand0DtoND()
 {
   this->mOutput->setData((this->mOutput->getData() * 0) + this->mInput->getData());
 }
@@ -200,7 +201,7 @@ void cedar::proc::steps::Projection::expand1Dto2D()
 }
 */
 
-void cedar::proc::steps::Projection::expandND()
+void cedar::proc::steps::Projection::expandMDtoND()
 {
   std::cout << "expanding!\n";
   const cv::Mat& input = mInput->getData();

@@ -28,7 +28,8 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2011 10 31
 
-    Description:
+    Description: Processing step, which projects neuronal activation between processing steps of different
+                 dimensionality.
 
     Credits:
 
@@ -48,13 +49,17 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Processing step, which projects neuronal activation between processing steps of different dimensionality.
  *
- * More detailed description of the class.
+ * This processing step can be set up to project the output activation of a step A onto step B, where A and B may have
+ * a different dimensionality. The projection supports the reduction of dimensionality (A.dims() > B.dims()), the
+ * expansion (A.dims() < B.dims()) and also permutation of dimensions (e.g., for A.dims() == B.dims()).
  */
 class cedar::proc::steps::Projection : public cedar::proc::Step
 {
 private:
+  //! typedef for the projection method function pointer
+  //! (function pointer to a void method in cedar::proc::steps::Projection)
   typedef void (cedar::proc::steps::Projection::*ProjectionFunctionPtr)();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -66,14 +71,14 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  //!@brief standard constructor
   Projection();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief refreshes the internal matrix containing the input multiplied with the gain factor
+  //!@brief computes the projected output whenever this step is triggered
   void compute(const cedar::proc::Arguments& arguments);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,39 +92,56 @@ protected:
                                 ) const;
 
 protected slots:
-  //!@brief a slot that is triggered if the gain factor is changed
-  void reconfigure();
+  //!@brief this slot is triggered whenever a new connection is connected as an input to the projection step
   void inputConnectionChanged(const std::string& inputName);
+  //!@brief this slot is triggered whenever the dimensionality of its output is changed by the user
   void outputDimensionalityChanged();
+  //!@brief this slot is triggered whenever the size of any dimension of the output is changed by the user
   void outputDimensionSizesChanged();
-  void initializeOutputMatrix();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void expand0D();
-  void expandND();
+  //!@brief chooses the appropriate projection method for the current input and output
+  void reconfigure();
+  //!@brief initializes or reconfigures the output matrix
+  void initializeOutputMatrix();
+
+  // projection methods
+
+  //!@brief expands a 0D input to an ND output
+  void expand0DtoND();
+  //!@brief expands and permutes MD input to ND output (M <= N)
+  void expandMDtoND();
+  //!@brief compresses ND input to 0D output
   void compressNDto0D();
+  //!@brief compresses 3D input to 2D output
   void compress3Dto2D();
+  //!@brief compresses 3D input to 1D output
   void compress3Dto1D();
+  //!@brief compresses 2D input to 1D output
   void compress2Dto1D();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief MatrixData representing the input.
+  //!@brief MatrixData representing the input
   cedar::aux::MatDataPtr mInput;
   //!@brief the buffer containing the output
   cedar::aux::MatDataPtr mOutput;
 
 private:
+  //!@brief function pointer to one of the projection member functions
   ProjectionFunctionPtr mpProjectionMethod;
-
+  //!@brief vector holding all indices of dimensions that have to be compressed
+  //! this is only in use when the projection is set up to compress the dimensionality of the input
   std::vector<unsigned int> mIndicesToCompress;
-
+  //!@brief dimensionality of the input
+  //! this is determined when another step is connected to the input of the projection
   unsigned int mInputDimensionality;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -136,7 +158,9 @@ private:
   //!@todo determine when the projection is connected to an output step
   cedar::aux::UIntParameterPtr _mOutputDimensionality;
 
+  //!@brief sizes of all dimensions of the output of the projection
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
+  //!@brief type of compression used when reducing the dimensionality (maximum, minimum, average, sum)
   cedar::aux::UIntParameterPtr _mCompressionType;
 }; // class cedar::proc::steps::Projection
 
