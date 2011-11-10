@@ -113,7 +113,7 @@ protected:
   bool onGrab();
   bool onDeclareParameters();
   std::string onGetSourceInfo(
-                                unsigned int channel
+                               unsigned int channel
                              ) const;
 
   void onCleanUp();
@@ -135,7 +135,7 @@ public:
 protected:
 
 
-  /*! \brief The yarp channels
+  /*! \brief The names of the used yarp channels
    *
    */
   std::vector<std::string> mYarpChannels;

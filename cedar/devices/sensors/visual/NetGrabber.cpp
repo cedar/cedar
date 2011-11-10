@@ -133,6 +133,9 @@ bool NetGrabber::onInit()
   mImageMatVector.clear();
   mYarpReaderVector.clear();
 
+  //cedar::dev::sensors::visual::TestGrabberPtr
+  //      grabber_4(new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_2,CHANNEL_1_NAME ))
+
   //-------------------------------------------------
   //open capture one by one
   cedar::aux::net::NetReader<cv::Mat> *YarpReader = NULL;
@@ -162,7 +165,6 @@ bool NetGrabber::onInit()
           std::cout << "ok" << std::endl;
         #endif
 
-        mYarpReaderVector.push_back(YarpReader);
       }
 
       //ERROR: No Yarp writer with appropriate channel name
@@ -206,7 +208,10 @@ bool NetGrabber::onInit()
                   << std::endl;
                   return false;  //throws an initialization-exception
       }
+
     } while (!YarpReader);
+
+    mYarpReaderVector.push_back(YarpReader);
 
     //Channel i initialized, try to receive the first image
     #ifdef SHOW_INIT_INFORMATION_NETGRABBER
@@ -214,7 +219,7 @@ bool NetGrabber::onInit()
     #endif
 
     cv::Mat frame;
-    bool reading_ok = true;
+    bool reading_ok = false;
     int counter_get_image = 0;
 
     //loop until first image received

@@ -35,10 +35,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-//#include "../../../../../../cedar/devices/sensors/visual/TestGrabber.h"
-//#include "../../../../../../cedar/auxiliaries/LogFile.h"
-#include <devices/sensors/visual/TestGrabber.h>
-#include <auxiliaries/LogFile.h>
+#include "../../../../../cedar/devices/sensors/visual/TestGrabber.h"
+#include "../../../../../cedar/auxiliaries/LogFile.h"
+//#include <devices/sensors/visual/TestGrabber.h>
+//#include <auxiliaries/LogFile.h>
 
 // PROJECT INCLUDES
 
@@ -72,24 +72,31 @@ namespace TEST_GRABBER
     bool  test_framrate(cedar::dev::sensors::visual::TestGrabber& grabber )
     {
       double fps = grabber.getFps();
-      std::cout << "Start thread . . . " << std::flush;
+      std::cout << "Start thread . . . " << std::endl;
 
       //start grabbing and wait
       ptime test_start = microsec_clock::local_time();
       grabber.start();
-      sleep(FPS_TEST_DURATION_IN_SEC);
+
+      //sleep(FPS_TEST_DURATION_IN_SEC);
+
+      while (time_duration(microsec_clock::local_time() - test_start).total_milliseconds() < (FPS_TEST_DURATION_IN_SEC*1000))
+      {
+        usleep(200000);
+        std::cout << "measured fps: "<< grabber.getFpsMeasured()<<std::endl;
+       }
 
       //stop
       grabber.stop();
       ptime test_end = microsec_clock::local_time();
-      std::cout << "test finished - ";
 
       //calculate real diff:
       time_duration test_duration = test_end - test_start;
       unsigned int real_count = grabber.getCounter();
-      double theoretical_count = fps*test_duration.seconds();
+      double theoretical_count = fps * test_duration.total_milliseconds() / 1000.0;
 
-      if (theoretical_count == real_count)
+      std::cout << "test finished - ";
+      if ((unsigned int)theoretical_count == real_count)
       {
         std::cout << "PASSED"<<std::endl;
         return true;
@@ -151,6 +158,7 @@ int main(int , char **)
   grabber_1->setFps(500);
   test_framrate(*grabber_1);
 
+  std::cout << "\nEnforce an error and check the maximum available FPS\n";
   std::cout << "\nSet Fps to \"50000\" and start thread\n";
   grabber_1->setFps(50000);
   test_framrate(*grabber_1);

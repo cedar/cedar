@@ -135,6 +135,9 @@ bool TestGrabber::onInit()
   std::cout << "[TestGrabber::onInit] Initialize... finished" << std::endl;
 
   return true;
+
+  //test the initialize exception
+  //return false;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -142,9 +145,6 @@ void TestGrabber::onCleanUp()
 {
   //do the cleanup of used hardware in this method
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
-  //
-  //be careful: it's possible (but unlikely): onCleanUp() could be evoked multiple times, so please
-  //check dynamic variables or used hardware.
 
   std::cout << "[TestGrabber::onCleanUp] GrabberName: " << getName() << std::endl;
 }

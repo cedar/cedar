@@ -161,7 +161,7 @@ public:
    */
   double getSourceProperty(
                             unsigned int channel,
-                            int          propId
+                            int propId
                           );
 
   /*! \brief Get fps for the given channel. This value will be read from the appropriate video-file.

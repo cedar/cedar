@@ -50,11 +50,11 @@
 
 
 // SYSTEM INCLUDES
-#include <string>
-#include <vector>
-#include <signal.h>
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
+#include <signal.h>               //CTRL-C handler
+#include <boost/utility.hpp>      //boost::noncopyable
+
 
 
 /* \brief Typedef for a vector containing the instances of all used grabbers
@@ -75,9 +75,9 @@ typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInsta
  *   USAGE:
  *     - to set a name for the grabber: getName, setName form cedar::base<br>
  *     - to control the grabbing-thread: <br>
- *             => isRunning(), start() : from QThread<br>
- *             => stop() : from cedar::aux::LoopedThread<br>
- *             => setFps(), getFps() <br>
+ *             => isRunning() : from QThread<br>
+ *             => start(), stop() <br>
+ *             => setFps(), getFps(), getFpsMeasured <br>
  *     - grabbing: <br>
  *             => grab manually a new image: grab()  <br>
  *             => get the image from the internal buffer: getImage() <br>
@@ -95,7 +95,8 @@ typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInsta
  */
 class cedar::dev::sensors::visual::GrabberInterface
 :
-public cedar::aux::LoopedThread
+public cedar::aux::LoopedThread,
+public boost::noncopyable
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -161,10 +162,14 @@ public:
                                        unsigned int channel = 0
                                      ) const;
 
-    /*! \brief Get the framerate of the loopedthread speed for grabbing
+    //------------------------------------------------------------------------
+    //Thread related methods
+    //------------------------------------------------------------------------
+
+    /*! \brief Get the framerate which loopedthread is set for grabbing
      *  \remarks
      *          This value doesn't indicate, if the thread is running or not.
-     *  \see LoopedThread::start(), LoopedThread::stop()
+     *  \see start(), stop(), QThread::isRunning()
      */
     double getFps() const;
 
@@ -173,11 +178,36 @@ public:
      *          This value doesn't indicate, if the thread is running or not.
      *          The LoopedThread have to be restarted for changing the framerate.
      *          This is done in this function, but keep it in mind.
-     *  \see LoopedThread::start(), LoopedThread::stop()
+     *  \see start(), stop()
      */
     void setFps(
                  double fps
                );
+
+    /*! \brief Get the framerate of actual grabbing speed
+     *  \remarks
+     *          Calculates the framerate by counting the invocation of the grab() method
+     *          This value is updated every 5 (default value set in defines.h) grabbed frames
+     */
+    double getFpsMeasured() const;
+
+    /*! \brief Stop the grabbing thread
+     *  \remarks
+     *          This method invokes internally LoopedThread::stop() and does
+     *          some cleanup like stopRecording or set the measured FPS to zero
+     */
+    void stop();
+
+    /*! \brief Start the grabbing thread
+     *  \remarks
+     *          This method invokes internally LoopedThread::start() and does
+     *          some initialization due to the measurement of FPS.
+     *  \par
+     *          To control the grabbing speed (i.e. the FPS) use
+     *          setFps(), getFps() or getFpsMeasured()
+     */
+    void start();
+
 
     //------------------------------------------------------------------------
     //Grabbing methods
@@ -203,7 +233,7 @@ public:
      *      This method is called automatically by the grabber thread.<br>
      *      If you don't use the grabber thread you have to call it by yourself to get new images.
      *  \see 
-     *      cedar::aux::LoopedThread::start()
+     *      start()
      *      setFps()
      *      
      */
@@ -353,11 +383,15 @@ public:
                              ) const;
 
     /*! \brief Initialize and start recording
+     *  \remarks
+     *      If the grabbing thread isn't running, startRecording will start the Thread
+     *      and stopRecording will stop it.
      *
      * Create the VideoWriter structures and set the record flag.
      *  \param
      *      fps Defines the framerate of the recorded avi-file. It is independent from the speed of
-     *      the grabbing thread. The output is encoded accordingly.
+     *      the grabbing thread. But the number of pictures will be the same. So if you grab on a slower speed than 
+     *      this fps-parameter, the recorded video will be shorter.
      *  \param
      *      fourcc 4-character code of codec used to compress the frames.<br>
      *      Examples:<br>
@@ -576,7 +610,13 @@ protected:
      */
     QReadWriteLock* mpReadWriteLock;
     
+    /*! @brief The actual measured fps of grabbing
+     *
+     */
+    double mFpsMeasured;
+
     
+
 private:
     
     /*! @brief Flag which indicates if the GrabberThread was started during startRecording
@@ -586,6 +626,18 @@ private:
     /*! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
      */
     bool mCleanUpAlreadyDone;
+
+    /*! @brief Timestamp at start time to measure the real fps of grabbing
+     */
+    boost::posix_time::ptime mFpsMeasureStart;
+
+    /*! @brief Timestamp at end time to measure the real fps of grabbing
+     */
+    boost::posix_time::ptime mFpsMeasureStop;
+
+    /*! @brief Counter to measure the real fps of grabbing
+     */
+    int mFpsCounter;
 
 
   //--------------------------------------------------------------------------------------------------------------------

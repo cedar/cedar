@@ -224,7 +224,9 @@ std::string CameraGrabber::onGetSourceInfo(unsigned int channel) const
   //  CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::onGetSourceInfo");
   //}
   std::stringstream s;
-  s << "Camera " << mCameraId.at(channel) << ": No informations available";
+  s << "Camera channel " << channel
+    << ": DeviceID: "<< mCameraId.at(channel);
+    //<< " Mode: " << const_cast<double>(mCaptureVector.at(channel).getCameraParam(channel,CV_CAP_PROP_MODE));
   return s.str();
 }
 
@@ -250,14 +252,107 @@ double CameraGrabber::getCameraParam(unsigned int channel,int propId)
 }
 
 //----------------------------------------------------------------------------------------------------
-/*double CameraGrabber::getCameraParamFps (unsigned int channel)
- * {
- * return getCameraParam(channel,CV_CAP_PROP_FPS);
- * }
- */
+bool CameraGrabber::setCameraParam(unsigned int channel,int propId, double value)
+{
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraParam");
+  }
+  return mCaptureVector.at(channel).set(propId, value);
+}
+
 //----------------------------------------------------------------------------------------------------
-/* double CameraGrabber::getCameraParamFourcc (unsigned int channel)
- * {
- * return getCameraParam(channel,CV_CAP_PROP_FOURCC);
- * }
- */
+double CameraGrabber::getCameraParamFps(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_FPS);
+}
+
+//----------------------------------------------------------------------------------------------------
+double CameraGrabber::getCameraParamEncoding(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_FOURCC);
+}
+
+//----------------------------------------------------------------------------------------------------
+double CameraGrabber::getCameraParamBrightness(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_BRIGHTNESS);
+}
+
+//----------------------------------------------------------------------------------------------------
+double CameraGrabber::getCameraParamContrast(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_CONTRAST);
+}
+
+//----------------------------------------------------------------------------------------------------
+double CameraGrabber::getCameraParamSaturation(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_SATURATION);
+}  
+
+//----------------------------------------------------------------------------------------------------
+double CameraGrabber::getCameraParamHue(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_HUE);
+}
+
+//----------------------------------------------------------------------------------------------------
+double CameraGrabber::getCameraParamGain(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_GAIN);
+}
+
+//----------------------------------------------------------------------------------------------------
+double CameraGrabber::getCameraParamExposure(unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_EXPOSURE);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamFps(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_FPS,value);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamEncoding(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_FOURCC,value);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamBrightness(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_BRIGHTNESS,value);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamContrast(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_CONTRAST,value);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamSaturation(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_SATURATION,value);
+}  
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamHue(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_HUE,value);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamGain(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_GAIN,value);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraParamExposure(unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_EXPOSURE,value);
+}

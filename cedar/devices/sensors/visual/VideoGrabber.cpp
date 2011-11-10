@@ -206,9 +206,18 @@ bool VideoGrabber::onGrab()
     //check if the end of a channel is reached
     if (mImageMatVector.at(i).empty())
     {
+
+      unsigned int pos_Abs = mCaptureVector.at(0).get(CV_CAP_PROP_POS_FRAMES);
+
+      #ifdef DEBUG_VIDEOGRABBER
+        std::cout << "[VideoGrabber::onGrab] Channel  :" << i << " empty" << std::endl;
+        std::cout << "[VideoGrabber::onGrab] Frame nr.:" << pos_Abs << std::endl;
+      #endif
+
       //error or end of file?
-      if (getPositionAbs() == mFramesCount)
+      if (getPositionAbs() == (mFramesCount-1))
       {
+
         if (_mLoop)
         {
           //rewind all channels and grab first frame
@@ -218,9 +227,10 @@ bool VideoGrabber::onGrab()
             (mCaptureVector.at(i)) >> mImageMatVector.at(i);
           }
           #ifdef DEBUG_VIDEOGRABBER
-            std::cout << "Video restart\n";
+            std::cout << "[VideoGrabber::onGrab] Video restart\n";
           #endif
 
+          //all Channels grabbed
           return true;
         }
         else
@@ -238,7 +248,7 @@ bool VideoGrabber::onGrab()
       else
       {
         //error while reading
-
+        result = false;
       }
     }
   }
