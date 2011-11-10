@@ -45,6 +45,8 @@
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 
 // PROJECT INCLUDES
 
@@ -106,18 +108,22 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
   }
 
   cv::Mat& mat = this->mData->getData();
+  unsigned int dims = cedar::aux::math::getDimensionalityOf(mat);
 
-  switch (mat.dims)
+  switch (dims)
   {
+    case 0:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData);
+      this->layout()->addWidget(this->mpCurrentPlotWidget);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      break;
+    case 1:
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData);
+      this->layout()->addWidget(this->mpCurrentPlotWidget);
+      connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+      break;
     case 2:
-      if ( (mat.rows == 1 || mat.cols == 1) && mat.rows != mat.cols)
-      {
-        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData);
-      }
-      else
-      {
-        this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData);
-      }
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData);
       this->layout()->addWidget(this->mpCurrentPlotWidget);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;

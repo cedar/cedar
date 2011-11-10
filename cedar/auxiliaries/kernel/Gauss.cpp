@@ -289,8 +289,10 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
 
 void cedar::aux::kernel::Gauss::updateDimensionality()
 {
-  int new_dimensionality = static_cast<int>(_mDimensionality->getValue());
+  mpReadWriteLockOutput->lockForWrite();
+  unsigned int new_dimensionality = _mDimensionality->getValue();
   _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
   _mShifts->resize(new_dimensionality, _mShifts->getDefaultValue());
+  mpReadWriteLockOutput->unlock();
   this->updateKernel();
 }
