@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 
@@ -122,7 +123,7 @@ void cedar::aux::gui::MatrixPlot2D::updateArrayData()
   this->mMatData->lockForRead();
   this->mMatData->getData().convertTo(data, CV_64F);
   this->mMatData->unlock();
-  if (data.rows < 2 || data.cols < 2) // plot is no longer capable of displaying the data
+  if (cedar::aux::math::getDimensionalityOf(data) != 2) // plot is no longer capable of displaying the data
   {
     emit dataChanged();
     return;

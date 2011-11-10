@@ -97,7 +97,9 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::DoubleDataPtr mData;
+  cedar::aux::DataPtr mData;
+  cedar::aux::DoubleDataPtr mDoubleData;
+  cedar::aux::MatDataPtr mMatData;
   QWidget *mpCurrentPlotWidget;
 
   QwtPlot *mpPlot;

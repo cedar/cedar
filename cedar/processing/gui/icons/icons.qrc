@@ -13,6 +13,7 @@
     <file>steps/resize.svg</file>
     <file>steps/field_temp.svg</file>
     <file>steps/preshape.svg</file>
+    <file>steps/noise.svg</file>
     <file>toolbaricons/grid.svg</file>
   </qresource>
 </RCC>

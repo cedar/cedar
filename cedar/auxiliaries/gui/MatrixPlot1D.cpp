@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 
@@ -172,10 +173,9 @@ void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
   {
     return;
   }
-
-  const cv::Mat& mat = this->mMatData->getData();
   this->mMatData->lockForRead();
-  if (mat.rows != 1 && mat.cols != 1) // plot is no longer capable of displaying the data
+  const cv::Mat& mat = this->mMatData->getData();
+  if (cedar::aux::math::getDimensionalityOf(mat) != 1) // plot is no longer capable of displaying the data
   {
     this->mMatData->unlock();
     emit dataChanged();
