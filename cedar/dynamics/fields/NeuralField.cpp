@@ -219,8 +219,14 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
 bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const
 {
-  // special case due to opencv's strange handling of 1d-matrices
-  if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
+  // special cases due to opencv's strange handling of 1d-matrices
+  if(matrix.dims == 2 && matrix.rows == 1 && matrix.cols == 1)
+  {
+    // if this field is set to more dimensions than the input (in this case 1), they are not compatible
+    if (this->_mDimensionality->getValue() != 0)
+      return false;
+  }
+  else if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
   {
     // if this field is set to more dimensions than the input (in this case 1), they are not compatible
     if (this->_mDimensionality->getValue() != 1)
