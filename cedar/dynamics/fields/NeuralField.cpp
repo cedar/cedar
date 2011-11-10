@@ -86,7 +86,7 @@ _mNumberOfKernels(new cedar::aux::UIntParameter(this, "numberOfKernels", 1, 1, 2
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
-  this->declareInput("input");
+  this->declareInput("input", false);
   this->makeInputCollection("input");
 
   this->addConfigurableChild("sigmoid", this->mSigmoid);
