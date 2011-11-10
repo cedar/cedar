@@ -84,7 +84,6 @@ void cedar::proc::gui::UIntVectorParameter::parameterPointerChanged()
 
 void cedar::proc::gui::UIntVectorParameter::propertyChanged()
 {
-  std::cout << "property changed" << std::endl;
   cedar::aux::UIntVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
   //!@todo Don't throw away old spinboxes, reuse them instead
