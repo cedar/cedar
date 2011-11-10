@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="/">
+    <file>toolbaricons/save.svg</file>
+    <file>modeicons/select.svg</file>
+    <file>modeicons/connect.svg</file>
+    <file>modeicons/group.svg</file>
+    <file>triggers/trigger.svg</file>
+    <file>triggers/looped_trigger.svg</file>
+    <file>triggers/multi_trigger.svg</file>
+    <file>steps/no_icon.svg</file>
+    <file>steps/gauss_input.svg</file>
+    <file>steps/static_gain.svg</file>
+    <file>steps/resize.svg</file>
+    <file>steps/field_temp.svg</file>
+    <file>steps/preshape.svg</file>
+    <file>toolbaricons/grid.svg</file>
+  </qresource>
+</RCC>
