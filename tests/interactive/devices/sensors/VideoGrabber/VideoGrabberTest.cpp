@@ -9,7 +9,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Simple application to grab from an AVI-file (stereo-case)
+    Description: Simple application to grab from an AVI-file (mono-case)
 
     Credits:
 
@@ -28,11 +28,11 @@
 //--------------------------------------------------------------------------------------------------------------------
 //constants
 //--------------------------------------------------------------------------------------------------------------------
+//"/opt/matlab/R2010b/toolbox/images/imdemos/traffic.avi";
 #define FILE_NAME_0 "/opt/matlab/R2010b/toolbox/images/imdemos/rhinos.avi"
-#define FILE_NAME_1 "/opt/matlab/R2010b/toolbox/images/imdemos/traffic.avi"
 
-#define GRABBER_NAME_0 "Stereo_Video_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_video_grabber_TestCase.configfile"
+#define GRABBER_NAME_0 "Video_Grabber_TestCase"
+#define CONFIG_FILE_NAME_0 "video_grabber_testcase.configfile"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -46,11 +46,10 @@ int main(int , char **)
 {
   //title of highgui window
   std::string highgui_window_name_0 = (std::string) GRABBER_NAME_0 + ":" + FILE_NAME_0;
-  std::string highgui_window_name_1 = (std::string) GRABBER_NAME_0 + ":" + FILE_NAME_1;
 
 
 
-  std::cout << "\n\nInteractive test of the VideoGrabber class (stereo case)\n";
+  std::cout << "\n\nInteractive test of the VideoGrabber class\n";
   std::cout << "--------------------------------------------\n\n";
 
 
@@ -60,7 +59,7 @@ int main(int , char **)
   cedar::dev::sensors::visual::VideoGrabber *video_grabber=NULL;
   try
   {
-     video_grabber = new cedar::dev::sensors::visual::VideoGrabber( CONFIG_FILE_NAME_0 , FILE_NAME_0, FILE_NAME_1 );
+     video_grabber = new cedar::dev::sensors::visual::VideoGrabber( CONFIG_FILE_NAME_0 , FILE_NAME_0 );
   }
   catch (cedar::aux::exc::InitializationException &e)
   {
@@ -108,42 +107,24 @@ int main(int , char **)
   std::cout << "\nGrab channel 0 from \"" << video_grabber->getSourceInfo(0)<< std::endl;
 
   //Get more Informations from loaded avis
-
-  std::cout << "\nSome informations of the video files:\n";
+  std::cout << "\nSome informations of the video file:\n";
+  std::cout << "\tfourcc : " << video_grabber->getSourceEncoding() << std::endl;
   std::cout << "\tframes : " << video_grabber->getFrameCount() << std::endl;
   std::cout << "\tpos_rel: " << video_grabber->getPositionRel() << std::endl;
   std::cout << "\tpos_abs: " << video_grabber->getPositionAbs() << std::endl;
-
-  std::cout << "\nSome informations on video file (ch0):\n";
-  std::cout << "\tfourcc : " << video_grabber->getSourceEncoding() << std::endl;
   std::cout << "\tFPS    : " << video_grabber->getSourceFps() << std::endl;
-
-  std::cout << "\nSome informations on video file (ch1):\n";
-  std::cout << "\tfourcc : " << video_grabber->getSourceEncoding(1) << std::endl;
-  std::cout << "\tFPS    : " << video_grabber->getSourceFps(1) << std::endl;
-
-
 
   //check framerate of the grabber-thred (thread isn't started yet)
   std::cout << "\nVideoGrabber thread FPS: " << video_grabber->getFps() << std::endl;
 
   //Set the name for the recording file
-  //This function have special cases
-  //In the mono case, filename is used without changes
-  //In the stereo case, the filenames are constructed like
-  //filename[ch0].ext and filename[ch1].ext
-  //If you want to set the names independently, you can use it with the camera-parameter
   //Start recording with startRecording() (thread will be started on startRecording!)
   video_grabber->setRecordName("record.avi");
-  //record-filenames now set to record[ch0].avi and record[ch1].avi
-
 
   //Set Snapshotnames without channel-number (in mono-case: default value is 0)
-  //This is the same behavior as setRecordName()
-  //The type of the file (e.g. bitmap or jpg or something else) depends on extension
-  //look at the documentation of setSnapshotName for details
-  video_grabber->setSnapshotName("snap.bmp");  // snap[ch0].bmp and snap[ch1].bmp
-  video_grabber->setSnapshotName(0,"snap01.jpg"); // rename channel 0 to snap.jpg. Channel 1 isn't altered
+  //Filetype depends on extension
+  video_grabber->setSnapshotName("snap.bmp");
+  video_grabber->setSnapshotName(0,"snap01.jpg");
 
   //Check the constructed filenames
   std::cout << "\nCheck filenames of snapshots and recordings:" << std::endl;
@@ -162,10 +143,8 @@ int main(int , char **)
     std::cout <<e.exceptionInfo()<<std::endl;
   }
 
-  //Save a snapshot of the current image on channel 0
-  //video_grabber->saveSnapshot();
-  //Or on all channels
-  //video_grabber->saveSnapshotAllCams();
+  //Save a snapshot of the current images
+  video_grabber->saveSnapshot();
 
   std::cout << "\nGrabbing and scrolling in the Video-File\n";
 
@@ -209,13 +188,11 @@ int main(int , char **)
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
-  std::cout << "\nDisplay videos in highgui window\n";
+  std::cout << "\nDisplay video in highgui window\n";
   namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-  namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed on initialization
   cv::Mat frame0 = video_grabber->getImage();
-  cv::Mat frame1 = video_grabber->getImage(1);
 
   //start the grabbing-thread 2 times faster then normal
   std::cout << "\nSet speed factor of grabbing-thread to 2\n";
@@ -228,7 +205,7 @@ int main(int , char **)
 
   //recording with actual speed (depends on speed factor)
   //the grabbing thread will be started on startRecorded if isn't running
-  //video_grabber->startRecording(video_grabber->getFps(),CV_FOURCC('M','P','4','2'));
+  video_grabber->startRecording(video_grabber->getFps(),CV_FOURCC('M','P','4','2'));
 
   //recording with speed of avi-file
   //video_grabber->startRecording(video_grabber->getSourceFps(),CV_FOURCC('M','P','4','2'));
@@ -244,9 +221,7 @@ int main(int , char **)
   while (!frame0.empty())
   {
     imshow(highgui_window_name_0,frame0);
-    imshow(highgui_window_name_1,frame1);
-    frame0 = video_grabber->getImage(0);
-    frame1 = video_grabber->getImage(1);
+    frame0 = video_grabber->getImage();
 
     //status
     if (++counter_stat %= 3 )
@@ -270,7 +245,9 @@ int main(int , char **)
   //------------------------------------------------------------------
   //clean up highgui
   destroyWindow(highgui_window_name_0);
-  destroyWindow(highgui_window_name_1);
+
+  //for configfile
+  //video_grabber->setSpeedFactor(1);
 
   std::cout << "finished\n";
 

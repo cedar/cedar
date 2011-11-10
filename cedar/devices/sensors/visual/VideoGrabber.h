@@ -46,7 +46,6 @@
 // SYSTEM INCLUDES
 
 
-
 /*! \class cedar::dev::sensors::visual::VideoGrabber
  *  \brief This grabber grabs images from video-files
  *  \remarks This grabber will grab from all video-files known by OpenCV and/or ffmpeg
@@ -74,7 +73,6 @@ public:
                 const std::string& aviFileName
               );
 
-
   /*!	\brief Constructor for a stereo-file grabber
    *	\param configFileName	Filename for the configuration
    *  \param aviFileName0	Filename to grab from for channel 0
@@ -99,8 +97,6 @@ public:
                 bool loop = true
               );
 
-
-
   /*! \brief set the factor for grabbing speed
    *  \remarks the speed stored in the AVI-File will be multiplied with this factor.<br>
    *		Effective FPS should be SpeedFactor*AVI-Speed<br>
@@ -114,15 +110,11 @@ public:
                        double speedFactor
                      );
 
-
-
   /*! \brief Get the factor for grabbing speed
    *  \remarks the speed stored in the AVI-File will be multiplied with this factor
    *		so effective FPS should be _mSpeedFactor*AVI-Speed
    */
-  double getSpeedFactor();
-
-
+  double getSpeedFactor() const;
 
   /*! \brief Set postion in the AVI-Files relative
    *  \param newPositionRel New position in the range is from 0..1
@@ -134,14 +126,10 @@ public:
                        double newPositionRel
                      );
 
-
-
   /*! \brief Return the actual position relative to the file size.
    *  \return Range is from 0..1
    */
   double getPositionRel();
-
-
 
   /*! \brief Set the position in the avi-files absolute
    *  \param newPositionAbs New position in the range is from 0..FrameCount
@@ -152,39 +140,31 @@ public:
                        unsigned int newPositionAbs
                      );
 
-
-
   /*! \brief Return the position in the file, i.e. the framenumber.
    *  \return Range is from 0..FrameCount
    */
   unsigned int getPositionAbs();
-
-
 
   /*! \brief Get the count of frames in the AVI
    *  \remarks
    *		In the case of a stereo grabber and different length
    *		the shortest avi-file determine the length
    */
-  unsigned int getFrameCount();
-
-
+  unsigned int getFrameCount() const;
 
   /*! \brief This passes the arguments directly to the corresponding capture
    *  \remarks With this Method, it is possible to get Information on any channel.
    *  \param channel This is the index of the source you want parameter value.< br >
    *  \param propId This is any supported property - Id<br>
-   *	If property - id is not supported or unknown, return value will be 0.
-   *  \remarks see OpenCV documentation for VideoCapture::get() details
+   *	  If property-id is not supported or unknown, return value will be 0.
+   *  \remarks Look at the OpenCV documentation for VideoCapture::get() for details
    */
   double getSourceProperty(
                             unsigned int channel,
-                            int          propId
+                            int propId
                           );
 
-
-
-  /*! \brief Get fps for the given camera
+  /*! \brief Get fps for the given channel. This value will be read from the appropriate video-file.
    *  \remarks
    *    Default channel is 0
    */
@@ -192,16 +172,14 @@ public:
                        unsigned int channel = 0
                      );
 
-
-
-  /*! \brief Get fourcc for the given camera
+  /*! \brief Get the codec for the given channel. This value will be read from the appropriate video-file.
    *  \remarks
-   *    Default channel is 0
+   *    Default channel is 0. <br>
+   *    This value is the FOURCC-code from the video-file.
    */
   double getSourceEncoding(
                             unsigned int channel = 0
                           );
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -214,8 +192,6 @@ protected:
 
   bool onInit();
 
-
-
   /*! \brief Grab on all available files
    *  \remarks
    *      The shortest file determine the end
@@ -224,11 +200,8 @@ protected:
   bool onGrab();
 
   bool onDeclareParameters();
-  std::string onGetSourceInfo(
-                               unsigned int channel
-                             ) const;
-
-  virtual bool onDestroy();
+  std::string onGetSourceInfo(unsigned int channel) const;
+  virtual void onCleanUp();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

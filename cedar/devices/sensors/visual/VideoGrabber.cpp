@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: This is the @em cedar::dev::sensors::visual::VideoGrabber class.
+    Description: Implementation of the @em cedar::dev::sensors::visual::VideoGrabber class.
 
     Credits:
 
@@ -65,7 +65,6 @@ GrabberInterface(configFileName)
   doInit(mSourceFileName.size(),"VideoGrabber");
 }
 
-
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-file grabber
 VideoGrabber::VideoGrabber(
@@ -92,38 +91,34 @@ bool VideoGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 VideoGrabber::~VideoGrabber()
 {
-  onDestroy();
+  doCleanUp();
   #ifdef DEBUG_VIDEOGRABBER
     std::cout<<"[VideoGrabber::Destructor]"<< std::endl;
   #endif
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------
 //methods
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool VideoGrabber::onDestroy()
+void VideoGrabber::onCleanUp()
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[VideoGrabber::onDestroy]"<< std::endl;
+    std::cout<<"[VideoGrabber::onCleanUp]"<< std::endl;
   #endif
 
   //close all captures
   mCaptureVector.clear();
-  return true;
 }
 
 //----------------------------------------------------------------------------------------------------
 bool VideoGrabber::onInit()
 {
-
   //local and/or stored Parameters are already initialized
 
   #ifdef SHOW_INIT_INFORMATION_VIDEOGRABBER
     std::cout << "VideoGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
-
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
       std::cout << "Channel " << i << ": capture from: " << mSourceFileName.at(i) << "\n";
@@ -151,10 +146,12 @@ bool VideoGrabber::onInit()
     }
     else
     {
-      std::cout << "[VideoGrabber::onInit] ERROR: Grabbing failed (Channel " << i << ")." << std::endl;
+      std::cout << "[VideoGrabber::onInit] ERROR: Grabbing failed"
+                << "\tChannel " << i << ": "<< mSourceFileName.at(i) << "\n"
+                << std::endl;
 
-      //throws an initialization-exception, so programm will terminate
-      return false;
+      mCaptureVector.clear();
+      return false;  //throws an initialization-exception
     }
   }
   //all grabbers successfully initialized
@@ -162,11 +159,9 @@ bool VideoGrabber::onInit()
   //----------------------------------------
   //search for the smallest avi-file
   unsigned int smallest = UINT_MAX;
-
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
     unsigned int len = mCaptureVector.at(i).get(CV_CAP_PROP_FRAME_COUNT);
-
     if (len < smallest)
     {
       smallest = len;
@@ -174,32 +169,23 @@ bool VideoGrabber::onInit()
   }
   mFramesCount = smallest;
 
-  //rewind
-  //setPositionAbs(0);
-
   //----------------------------------------
   //check for equal FPS
-  double fps = mCaptureVector.at(0).get(CV_CAP_PROP_FPS);
-
-  if (mNumCams > 1)     //remove
+  double fps_ch0 = mCaptureVector.at(0).get(CV_CAP_PROP_FPS);
+  if (mNumCams > 1)
   {
-    for (unsigned int i = 1; i < mNumCams; ++i)
+    double fps_ch1 = mCaptureVector.at(1).get(CV_CAP_PROP_FPS);
+    if (fps_ch0 != fps_ch1)
     {
-      double fps_test = mCaptureVector.at(i).get(CV_CAP_PROP_FPS);
-      if (fps != fps_test)
-      {
-        std::cout << "[VideoGrabber::onInit] ERROR: Different framerate in channel 0 and channel " << i << "."
-                  << std::endl;
-        return false;
-        //throws an initialization-exception, so programm will terminate
-      }
+      std::cout << "[VideoGrabber::onInit] ERROR: Different framerates of channels 0 and 1"
+                << std::endl;
+      return false;  //throws an initialization-exception
     }
   }
 
   //----------------------------------------
   //set stepsize for LoopedThread
-  setFps(fps * _mSpeedFactor);
-
+  setFps(fps_ch0 * _mSpeedFactor);
   #ifdef DEBUG_VIDEOGRABBER
     std::cout << "[VideoGrabber::onInit] Initialize... finished" << std::endl;
   # endif
@@ -207,48 +193,67 @@ bool VideoGrabber::onInit()
   return true;
 } //onInit()
 
-
-
-
 //----------------------------------------------------------------------------------------------------
 bool VideoGrabber::onGrab()
 {
   int result = true;
 
-  for (unsigned int i = 0; i < mNumCams; ++i)                  //grab on all channels
+  //grab on all channels
+  for (unsigned int i = 0; i < mNumCams; ++i)
   {
     (mCaptureVector.at(i)) >> mImageMatVector.at(i);
 
     //check if the end of a channel is reached
     if (mImageMatVector.at(i).empty())
     {
-      if (_mLoop)
+
+      unsigned int pos_Abs = mCaptureVector.at(0).get(CV_CAP_PROP_POS_FRAMES);
+
+      #ifdef DEBUG_VIDEOGRABBER
+        std::cout << "[VideoGrabber::onGrab] Channel  :" << i << " empty" << std::endl;
+        std::cout << "[VideoGrabber::onGrab] Frame nr.:" << pos_Abs << std::endl;
+      #endif
+
+      //error or end of file?
+      if (getPositionAbs() == (mFramesCount-1))
       {
-        setPositionAbs(0);                                  //rewind and grab first frame
 
-        for (unsigned int i = 0; i < mNumCams; ++i)
+        if (_mLoop)
         {
-          (mCaptureVector.at(i)) >> mImageMatVector.at(i);
-        }
-        #ifdef DEBUG_VIDEOGRABBER
-          std::cout << "Video restart\n";
-        #endif
+          //rewind all channels and grab first frame
+          setPositionAbs(0);
+          for (unsigned int i = 0; i < mNumCams; ++i)
+          {
+            (mCaptureVector.at(i)) >> mImageMatVector.at(i);
+          }
+          #ifdef DEBUG_VIDEOGRABBER
+            std::cout << "[VideoGrabber::onGrab] Video restart\n";
+          #endif
 
-        return true;
+          //all Channels grabbed
+          return true;
+        }
+        else
+        {
+          //set all images to empty matrices
+          //for (unsigned int i = 0; i < mNumCams; ++i)
+          //{
+          //  mImageMatVector.at(i) = cv::Mat();
+          //}
+
+          //don't touch last images
+          result = false;
+        }
       }
       else
       {
-        for (unsigned int i = 0; i < mNumCams; ++i)            //set all images to empty matrices
-        {
-          mImageMatVector.at(i) = cv::Mat();
-        }
+        //error while reading
         result = false;
       }
     }
   }
   return result;
 }
-
 
 //----------------------------------------------------------------------------------------------------
 std::string VideoGrabber::onGetSourceInfo(unsigned int channel) const
@@ -260,20 +265,18 @@ std::string VideoGrabber::onGetSourceInfo(unsigned int channel) const
   return mSourceFileName.at(channel);
 }
 
-
-
 //----------------------------------------------------------------------------------------------------
 void VideoGrabber::setSpeedFactor(double speedFactor)
 {
   _mSpeedFactor = speedFactor;
   double fps = mCaptureVector.at(0).get(CV_CAP_PROP_FPS);
 
-  //will restart the thread if running
+  //set fps and restart the thread if running
   setFps(fps * _mSpeedFactor);
 }
 
 //----------------------------------------------------------------------------------------------------
-double VideoGrabber::getSpeedFactor()
+double VideoGrabber::getSpeedFactor() const
 {
   return _mSpeedFactor;
 }
@@ -283,7 +286,6 @@ void VideoGrabber::setLoop(bool loop)
 {
   _mLoop = loop;
 }
-
 
 //----------------------------------------------------------------------------------------------------
 void VideoGrabber::setPositionRel(double newPositionRel)
@@ -330,7 +332,6 @@ void VideoGrabber::setPositionRel(double newPositionRel)
   }
 }
 
-
 //----------------------------------------------------------------------------------------------------
 double VideoGrabber::getPositionRel()
 {
@@ -373,11 +374,10 @@ unsigned int VideoGrabber::getPositionAbs()
 }
 
 //----------------------------------------------------------------------------------------------------
-unsigned int VideoGrabber::getFrameCount()
+unsigned int VideoGrabber::getFrameCount() const
 {
   return mFramesCount;
 }
-
 
 //----------------------------------------------------------------------------------------------------
 double VideoGrabber::getSourceProperty(unsigned int channel,int propId)

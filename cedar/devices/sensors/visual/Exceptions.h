@@ -60,7 +60,8 @@ namespace cedar
       //! @brief An exception for errors on saving a snapshot
       class GrabberSnapshotException;
 
-      //class GrabberGrabException;
+      //! @brief An exception for errors on grabbing
+      class GrabberGrabException;
     }
   }
 }
@@ -74,8 +75,8 @@ namespace cedar
 
 //--------------------------------------------------------------------------------------------------------------------
 /*!@brief Exception for errors while saving a snapshots
- *
- * This exception should be thrown when an error occurs while writing a snapshot to disk
+ * \remarks
+ *    This exception would be thrown when an error occurs while writing a snapshot to disk
  */
 class cedar::aux::exc::GrabberSnapshotException
 :
@@ -90,9 +91,9 @@ public:
 //--------------------------------------------------------------------------------------------------------------------
 
 /*!@brief Exception for errors while recording a stream
- *
- * This exception should be thrown when an error occurs during recording.
-  */
+ * \remarks
+ *    This exception would be thrown when an error occurs during recording.
+ */
 class cedar::aux::exc::GrabberRecordingException
 :
 public cedar::aux::exc::ExceptionBase
@@ -103,5 +104,22 @@ public:
 };
 
 
+//--------------------------------------------------------------------------------------------------------------------
+
+/*!@brief Exception for errors while recording a stream
+ * \remarks
+ *    This exception would be thrown when an error occurs during recording.
+ * \note
+ *    This is a critical exception. The grabber-cleanup is performed right before this exception is thrown.<br>
+ *    In this case, it is not possible to work any longer with this grabber.
+ */
+class cedar::aux::exc::GrabberGrabException
+:
+public cedar::aux::exc::ExceptionBase
+{
+public:
+  //!@brief The standard constructor.
+  GrabberGrabException(void);
+};
 
 #endif /* CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H */

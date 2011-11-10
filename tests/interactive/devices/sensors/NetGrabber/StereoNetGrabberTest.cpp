@@ -3,7 +3,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StereoPictureGrabberTest.cpp
+    File:        Stereopicture_grabberTest.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
@@ -16,9 +16,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
-#include "cedar/devices/sensors/visual/PictureGrabber.h"
-//#include <devices/sensors/visual/PictureGrabber.h>
+#include "../../../../../cedar/auxiliaries/LogFile.h"
+#include "../../../../../cedar/devices/sensors/visual/NetGrabber.h"
+//#include <devices/sensors/visual/NetGrabber.h>
 //#include <auxiliaries/LogFile.h>
 
 // PROJECT INCLUDES
@@ -28,14 +28,15 @@
 #include <opencv2/opencv.hpp>
 
 
+
 //--------------------------------------------------------------------------------------------------------------------
 //constants
 //--------------------------------------------------------------------------------------------------------------------
-#define FILE_NAME_0 "/usr/local/src/OpenCV-2.2.0/samples/c/puzzle.png"
-#define FILE_NAME_1 "/usr/local/src/OpenCV-2.2.0/samples/c/fruits.jpg"
+#define YARP_CHANNEL_0 "Net_Grabber_TestCase_Channel_0"
+#define YARP_CHANNEL_1 "Net_Grabber_TestCase_Channel_1"
 
-#define GRABBER_NAME_0 "Stereo_Picture_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_picture_grabber_TestCase.configfile"
+#define GRABBER_NAME_0 "Stereo_Net_Grabber_TestCase"
+#define CONFIG_FILE_NAME_0 "stereo_net_grabber_TestCase.configfile"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -50,23 +51,37 @@ int main(int , char **)
 {
 
   //title of highgui window
-  std::string highgui_window_name_0 = (std::string) "0 " + GRABBER_NAME_0 + ":" + FILE_NAME_0;
-  std::string highgui_window_name_1 = (std::string) "1 " + GRABBER_NAME_0 + ":" + FILE_NAME_1;
+  std::string highgui_window_name_0 = (std::string) "0 " + GRABBER_NAME_0 + ": " + YARP_CHANNEL_0;
+  std::string highgui_window_name_1 = (std::string) "1 " + GRABBER_NAME_0 + ": " + YARP_CHANNEL_1;
 
 
-  std::cout << "\n\nInteractive test of the PictureGrabber class (stereo)\n";
+  std::cout << "\n\nInteractive test of the NetGrabber class (stereo)\n";
   std::cout << "-----------------------------------------------------\n\n";
-
-
 
   //------------------------------------------------------------------
   //Create the grabber
-  std::cout << "Create a PictureGrabber:\n";
-  cedar::dev::sensors::visual::PictureGrabber picture_grabber(CONFIG_FILE_NAME_0,FILE_NAME_0,FILE_NAME_1);
+  std::cout << "Create a NetGrabber:\n";
+  cedar::dev::sensors::visual::NetGrabber *net_grabber=NULL;
+  try
+  {
+    net_grabber = new cedar::dev::sensors::visual::NetGrabber( CONFIG_FILE_NAME_0 , YARP_CHANNEL_0, YARP_CHANNEL_1 );
+  }
+  catch (cedar::aux::exc::InitializationException &e)
+  {
+    //after an InitializationExeception the net_grabber class isn't initialized correctly
+    //and can't be used
+    std::cout << "Error on creation of the NetGrabber class:\n"
+              << e.exceptionInfo() << std::endl;
 
+    if (net_grabber)
+    {
+      delete net_grabber;
+    }
 
+    return -1;
+  }
   //------------------------------------------------------------------
-  /*After initialization of a picture_grabber:
+  /*After initialization of a net_grabber:
    *
    * ALWAYS:
    *  - the first frame is already grabbed, so you can check the file using
@@ -75,7 +90,7 @@ int main(int , char **)
    * EITHER:
    *  No or new configuration file:
    *  - loopedThread isn't running (start auto-grabbing with start() )
-   *  - grabbername is set to default, i.e. picture_grabber
+   *  - grabbername is set to default, i.e. NetGrabber
    *
    * OR:
    *  Parameters loaded from configfile
@@ -83,30 +98,30 @@ int main(int , char **)
    *  - grabbername is restored from configfile
    */
 
-    picture_grabber.setName(GRABBER_NAME_0);
+    net_grabber->setName(GRABBER_NAME_0);
 
-    std::cout << "\nGrab from (0) " << picture_grabber.getSourceInfo(0)<< std::endl;
-    std::cout << "Grab from (1) " << picture_grabber.getSourceInfo(1)<< std::endl;
+    std::cout << "\nGrab from (0) " << net_grabber->getSourceInfo(0)<< std::endl;
+    std::cout << "Grab from (1) " << net_grabber->getSourceInfo(1)<< std::endl;
 
     //error, because it is only a stereo-grabber
-    //std::cout << "Grab from (3):" << picture_grabber.getSourceInfo(2);
+    //std::cout << "Grab from (3):" << net_grabber->getSourceInfo(2);
 
 
-    std::cout << "\nSize of loaded Pictures:\n";
-    cv::Size ch0_size = picture_grabber.getSize(0);
-    cv::Size ch1_size = picture_grabber.getSize(1);
+    std::cout << "\nSize of received Frames:\n";
+    cv::Size ch0_size = net_grabber->getSize(0);
+    cv::Size ch1_size = net_grabber->getSize(1);
     std::cout << "Channel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
     std::cout << "Channel 1: " << ch1_size.width <<" x " << ch1_size.height << std::endl;
 
 
     //check framerate of the grabber-thred (thread isn't started yet)
-    std::cout << "\nPictureGrabber thread FPS : " << picture_grabber.getFps() << std::endl;
+    std::cout << "\nNetGrabber thread FPS : " << net_grabber->getFps() << std::endl;
 
     //grabberthread don't have to be started. There is no new content to grab.
 
     //Nevertheless you can create an avi file from your picture-grabbing
     //In this case you have to start the thread
-    picture_grabber.setRecordName("RecordedPictureGrabber.avi");
+    net_grabber->setRecordName("RecordedStereoNetGrabber.avi");
 
     //It is possible to create a snaptshot of the pics.
     //In the case, you set another extenstion as in the source, the image will be converted
@@ -115,22 +130,25 @@ int main(int , char **)
     //This is the same behavior as setRecordName()
     //The type of the file (e.g. bitmap or jpg or something else) depend on extension
     //look at the documentation of setSnapshotName for details
-    picture_grabber.setSnapshotName("snap.bmp");  // snap[ch0].bmp and snap[ch1].bmp
-    picture_grabber.setSnapshotName(0,"snap01.jpg"); // rename channel 0 to snap.jpg. Channel 1 isn't altered
+    // StereoNetGrabber_Snapshot[ch0].bmp and StereoNetGrabber_Snapshot[ch1].bmp
+    net_grabber->setSnapshotName("StereoNetGrabber_Snapshot.bmp");
+
+    // rename channel 0 to StereoNetGrabber_Snapshot_0.jpg. Channel 1 isn't altered
+    net_grabber->setSnapshotName(0,"StereoNetGrabber_Snapshot_0.jpg");
 
     //Check the constructed filenames
     std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
 
-    std::cout << "SnapshotName_0:\t" << picture_grabber.getSnapshotName(0) <<std::endl;
-    std::cout << "SnapshotName_1:\t" << picture_grabber.getSnapshotName(1) <<std::endl;
-    std::cout << "RecordName_0:\t" << picture_grabber.getRecordName(0) <<std::endl;
-    std::cout << "RecordName_1:\t" << picture_grabber.getRecordName(1) <<std::endl;
+    std::cout << "SnapshotName_0:\t" << net_grabber->getSnapshotName(0) <<std::endl;
+    std::cout << "SnapshotName_1:\t" << net_grabber->getSnapshotName(1) <<std::endl;
+    std::cout << "RecordName_0:\t" << net_grabber->getRecordName(0) <<std::endl;
+    std::cout << "RecordName_1:\t" << net_grabber->getRecordName(1) <<std::endl;
 
     //enforcing an error and catch it
     try
     {
       std::cout << "\nTry to enforce an exception:\n";
-      std::cout << "SnapshotName_2: " << picture_grabber.getSnapshotName(2) <<std::endl;
+      std::cout << "SnapshotName_2: " << net_grabber->getSnapshotName(2) <<std::endl;
     }
     catch (cedar::aux::exc::ExceptionBase& e)
     {
@@ -141,28 +159,28 @@ int main(int , char **)
     }
 
     // Save a snapshot of the current images
-    //picture_grabber.saveSnapshotAllCams();
+    //net_grabber->saveSnapshotAllCams();
 
     // Save a snapshot from channel 0 only
     // Be aware, that existing files will be overwritten without any question
-    //picture_grabber.saveSnapshot(0);
+    //net_grabber->saveSnapshot(0);
 
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
-  std::cout << "\nShow pictures\n";
+  std::cout << "\nDisplay received pictures\n";
   namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
   namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed on initialization
-  cv::Mat frame0 = picture_grabber.getImage();
-  cv::Mat frame1 = picture_grabber.getImage(1);
+  cv::Mat frame0 = net_grabber->getImage();
+  cv::Mat frame1 = net_grabber->getImage(1);
 
   //start recording
   std::cout << "\nStart Recording\n";
-  picture_grabber.setFps(15);
-  picture_grabber.start();
-  picture_grabber.startRecording(15);
+  net_grabber->setFps(15);
+  net_grabber->start();
+  net_grabber->startRecording(15);
 
 
   //get frames for a while
@@ -174,37 +192,31 @@ int main(int , char **)
     imshow(highgui_window_name_1,frame1);
 
     //it is not necessary to do this, unless a new picture should be used
-    frame0 = picture_grabber.getImage();
-    frame1 = picture_grabber.getImage(1);
+    frame0 = net_grabber->getImage();
+    frame1 = net_grabber->getImage(1);
     counter++;
 
-    //after one second, set new source-pictures
-    if (counter == 10)
+    //after one second, do something
+    if (counter == 100)
     {
-      // Grab from another picture
-      // Be aware, when recording is on:
-      // The size of the video-frames wont't be changed.
-      // So, if the size of the new picture is different from the old one
-      // the new picture will be resized to the dimensions of the old
-      // regardless of the aspect ratio
-      picture_grabber.setSourceFile(0,FILE_NAME_1);
-      picture_grabber.setSourceFile(1,FILE_NAME_0);
+      std::cout << "Actual framerate of grabbing: " << net_grabber->getFpsMeasured() << std::endl;
+
     }
 
     //exit after another second
-    if (counter == 20)
+    if (counter == 200)
     {
       break;
     }
 
-    //wait 100ms (needed for highgui)
-    waitKey(100);
+    //wait 10ms (needed for highgui)
+    waitKey(10);
   }
 
   //stop grabbing-thread if running
-  if (picture_grabber.isRunning())
+  if (net_grabber->isRunning())
   {
-    picture_grabber.stop();
+    net_grabber->stop();
   }
 
   //------------------------------------------------------------------

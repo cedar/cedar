@@ -25,7 +25,7 @@
     File:        PictureGrabber.h
 
     Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@rub.de
+    Email:       georg.hartinger@ini.rub.de
     Date:        2011 01 08
 
     Description: Header for the @em cedar::dev::sensors::visual::PictureGrabber class.

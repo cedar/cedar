@@ -50,14 +50,14 @@
 
 
 // SYSTEM INCLUDES
-#include <string>
-#include <vector>
-#include <signal.h>
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
+#include <signal.h>               //CTRL-C handler
+#include <boost/utility.hpp>      //boost::noncopyable
 
 
-/* \brief Typedef for a vector containing instances of the grabbers
+
+/* \brief Typedef for a vector containing the instances of all used grabbers
  *
  */
 typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
@@ -75,11 +75,12 @@ typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInsta
  *   USAGE:
  *     - to set a name for the grabber: getName, setName form cedar::base<br>
  *     - to control the grabbing-thread: <br>
- *             QThread::isRunning(), cedar::aux::LoopedThread::start() and stop();
- *             setFps(), getFps() <br>
+ *             => isRunning() : from QThread<br>
+ *             => start(), stop() <br>
+ *             => setFps(), getFps(), getFpsMeasured <br>
  *     - grabbing: <br>
- *             grab manually a new image: grab()  <br>
- *             get the image from the internal buffer: getImage() <br>
+ *             => grab manually a new image: grab()  <br>
+ *             => get the image from the internal buffer: getImage() <br>
  *     - recording: startRecording(), stopRecording()  <br>
  *     - snapshots: saveSnapshot(), saveSnapshotAllCams(), getSnapshotName()<br>
  *
@@ -87,14 +88,15 @@ typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInsta
  *      If you would like to create your own derived grabber:
  *      Initialize in the constructor of a derived class the filenames or camera-device-names.
  *      At the end of the constructor, call doInit() with the number of channels you use and with a default name.
- *      At the beginning of the destructor, call onDestroy() and do the cleanup in this function.
+ *      At the beginning of the destructor, call doCleanUp() and do the cleanup in this function.
  *      To get an example look at the VideoGrabber-class. <br><br>
  *
  *
  */
 class cedar::dev::sensors::visual::GrabberInterface
 :
-public cedar::aux::LoopedThread
+public cedar::aux::LoopedThread,
+public boost::noncopyable
 {
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,8 +124,6 @@ public:
   //!@brief Destructor
   virtual ~GrabberInterface();
 
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -134,8 +134,6 @@ public:
      *      Works exactly the same way if image or avi files are used.
      */
     unsigned int getNumCams() const;
-
-
 
     /*! \brief Get the size of a specified camera-channel.
      *   \remarks
@@ -149,8 +147,6 @@ public:
     cv::Size getSize(
                       unsigned int channel = 0
                     ) const;
-
-
 
     /*! \brief Get information about the used device, i.e. the filename or the mount-point
      *   \remarks
@@ -166,35 +162,56 @@ public:
                                        unsigned int channel = 0
                                      ) const;
 
+    //------------------------------------------------------------------------
+    //Thread related methods
+    //------------------------------------------------------------------------
 
-
-    /*! \brief Get the framerate of the loopedthread speed for grabbing
+    /*! \brief Get the framerate which loopedthread is set for grabbing
      *  \remarks
      *          This value doesn't indicate, if the thread is running or not.
-     *  \see LoopedThread::start(), LoopedThread::stop()
+     *  \see start(), stop(), QThread::isRunning()
      */
     double getFps() const;
-
-
 
     /*! \brief Set the framerate of the loopedthread speed for grabbing
      *  \remarks
      *          This value doesn't indicate, if the thread is running or not.
      *          The LoopedThread have to be restarted for changing the framerate.
      *          This is done in this function, but keep it in mind.
-     *  \see LoopedThread::start(), LoopedThread::stop()
+     *  \see start(), stop()
      */
     void setFps(
                  double fps
                );
 
+    /*! \brief Get the framerate of actual grabbing speed
+     *  \remarks
+     *          Calculates the framerate by counting the invocation of the grab() method
+     *          This value is updated every 5 (default value set in defines.h) grabbed frames
+     */
+    double getFpsMeasured() const;
 
+    /*! \brief Stop the grabbing thread
+     *  \remarks
+     *          This method invokes internally LoopedThread::stop() and does
+     *          some cleanup like stopRecording or set the measured FPS to zero
+     */
+    void stop();
+
+    /*! \brief Start the grabbing thread
+     *  \remarks
+     *          This method invokes internally LoopedThread::start() and does
+     *          some initialization due to the measurement of FPS.
+     *  \par
+     *          To control the grabbing speed (i.e. the FPS) use
+     *          setFps(), getFps() or getFpsMeasured()
+     */
+    void start();
 
 
     //------------------------------------------------------------------------
     //Grabbing methods
     //------------------------------------------------------------------------
-
 
     /*! \brief Get an Image in a cv::Mat structure
      *  \remarks
@@ -211,20 +228,16 @@ public:
                     ) const;
 
 
-
     /*! \brief Grab a new image (or images in stereo case) from the source (channel, picture, avi...).
      *  \remarks
      *      This method is called automatically by the grabber thread.<br>
      *      If you don't use the grabber thread you have to call it by yourself to get new images.
      *  \see 
-     *      cedar::aux::LoopedThread::start()
+     *      start()
      *      setFps()
      *      
      */
     bool grab();
-
-
-
 
     /*! \brief Get a pointer to the QReadWriteLock.
      *  \remarks
@@ -233,12 +246,9 @@ public:
     QReadWriteLock *getReadWriteLockPointer() const;
 
 
-
     //------------------------------------------------------------------------
     //Snapshot methods
     //------------------------------------------------------------------------
-
-
 
     /*! \brief Set the snapshot filenames for all defined channels
      *  \param snapshotName This is the filename for the snapshot with extension
@@ -255,8 +265,6 @@ public:
     void setSnapshotName(
                           const std::string& snapshotName
                         );
-
-
 
     /*! \brief Set the snapshot filename for the given channel
      *
@@ -291,14 +299,12 @@ public:
      *
      */
     void setSnapshotName(
-                           unsigned int channel,
-                           const std::string& snapshotName
+                          unsigned int channel,
+                          const std::string& snapshotName
                         );
 
-
-
     /*! \brief Get the current name of the snapshot file.
-     *   \param channel
+     *  \param channel
      *		This is the index of the source you want the snapshot from.<br>
      *      In the mono case you do not need to supply this value. Default is 0.<br>
      *      In the stereo case it may be 0 or 1.
@@ -306,8 +312,6 @@ public:
     std::string getSnapshotName(
                                  unsigned int channel = 0
                                ) const;
-
-
 
     /*! \brief Save a snapshot to a file.
      *  \remarks
@@ -321,8 +325,6 @@ public:
                        unsigned int channel = 0
                      ) const;
 
-
-
     /*! \brief Save snapshots of all channels
      *  \remarks
      *    For every capture-device saveSnapshot() is invoked
@@ -332,12 +334,9 @@ public:
     bool saveSnapshotAllCams() const;
 
 
-
-
     //------------------------------------------------------------------------
     //Record methods
     //------------------------------------------------------------------------
-
 
 
     /*! \brief Set the recording filenames for all defined channels
@@ -356,8 +355,6 @@ public:
                         const std::string& recordName
                       );
 
-
-
     /*! \brief Set the recording filename for the given camera
      *   \param
      *		channel This is the index of the source you want the picture from.<br>
@@ -375,8 +372,6 @@ public:
                         const std::string& recordName
                       );
 
-
-
     /*! \brief Get the current name of the recording file for the given camera
      *   \param
      *      channel This is the index of the source you want the picture from.<br>
@@ -387,18 +382,22 @@ public:
                                unsigned int channel = 0
                              ) const;
 
-
-
     /*! \brief Initialize and start recording
+     *  \remarks
+     *      If the grabbing thread isn't running, startRecording will start the Thread
+     *      and stopRecording will stop it.
      *
      * Create the VideoWriter structures and set the record flag.
      *  \param
-     *      fps Defines the framerate of the avi-file
+     *      fps Defines the framerate of the recorded avi-file. It is independent from the speed of
+     *      the grabbing thread. But the number of pictures will be the same. So if you grab on a slower speed than 
+     *      this fps-parameter, the recorded video will be shorter.
      *  \param
      *      fourcc 4-character code of codec used to compress the frames.<br>
-     *      For example, CV_FOURCC('P','I','M,'1') is a MPEG-1 codec,
-     *		CV_FOURCC('M','J','P','G') is a motion-jpeg code.<br>
-     *      Or CV_FOURCC('M','P','4','2')
+     *      Examples:<br>
+     *      CV_FOURCC('P','I','M,'1') is a MPEG-1 codec<br>
+     *		  CV_FOURCC('M','J','P','G') is a motion-jpeg codec<br>
+     *      CV_FOURCC('M','P','4','2') is also a motion-jpeg codec<br>
      *      Default is 0, for raw recording
      *  \param
      *      color Determins if recording is in color or black/white mode.
@@ -406,24 +405,22 @@ public:
      *
      *  \remarks
      *      Always all cameras recording. To set the filename use setRecordName()<br>
-     *      By default record.avi as filename is used (in the mono case) <br><br>
+     *      By default record.avi is used as filename (in the mono case) <br><br>
      *      The transcoding is entirely done via the opencv-API.<br>
-     *      So see the OPENCV manual to determine the usable FOURCC's
+     *      Look at the OPENCV manual to determine the usable FOURCC's
      *  \par
      *     for supported codecs, have a look at:<br>
      *     /usr/local/src/OpenCV_{YOUR_VERSION}/modules/highgui/src/cap_ffmpeg.cpp<br>
      *     http://www.fourcc.org/codecs.php<br>
      *
      *  \see
-     *      setRecordName
+     *      setRecordName, getFps, VideoGrabber::getSourceFps
      */
     bool startRecording(
                          double fps,
                          int fourcc = 0,
                          bool color = true
                        );
-
-
 
     /*! \brief Stop all recordings
      *  \remarks
@@ -439,7 +436,6 @@ public:
     bool isRecording() const;
 
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -451,11 +447,12 @@ protected:
      *          The initialization is a little bit tricky, but it restores and initializes all
      *          local parameters from the configuration interface before onInit of the
      *          derived class will be invoked.<br>
-     *          The single steps are executed in the following order:
+     *          This is done in three steps:<br>
      *          1. call of declareParameter() from derived class. <br>
      *          2. restore parameter from configfile or set default values. <br>
-     *          3. call onInit() of the derived class (where derived Grabbers should be initialized).<br><br>
-     *          For an example look at VideoGrabber or NetGrabber
+     *          3. call onInit() of the derived class (where derived Grabbers should be initialized).<br>
+     *          If onInit() fails, onCleanUp() will be invoked in order to clean up alread initialized channels.<br><br>
+     *          For an example look at VideoGrabber, NetGrabber or TestGrabber
      *  \see onInit, declareParameter
      *
      *  \param numCams The init-function need to know how many channels there are
@@ -468,8 +465,6 @@ protected:
                  const std::string& defaultGrabberName
                );
 
-
-
     /*! @brief  Periodically call of grab()
      *  \remarks For details have a look at cedar::aux::LoopedThread
      */
@@ -477,8 +472,14 @@ protected:
                double time
              );
 
-
-
+    /*! @brief Call this method at the beginning of the destructor in the derived class
+     *  \remarks This method does the necessary clean up (like stop recording or stop the grabberthread)
+     *      and then it invokes the onCleanUp() method of the derived class.<br><br>
+     *      Note:<br>You have to call this method in the destructor of a derived class.<br><br>
+     *  \see onCleanUp
+     */
+    void doCleanUp();
+    
     //------------------------------------------------------------------------
     //For derived classes
     //------------------------------------------------------------------------
@@ -495,17 +496,19 @@ protected:
      */
     virtual bool onInit() { return true; }
 
-
     /*! @brief  This method is invoked during destruction of the class.
      *  \remarks
-     *      Override this method in the derived classes to do their cleanup.<br>
-     *      For example, use this method instead of the destructor to release dynamic memory. <br><br>
-     *      Note:<br>You have to call this method in the destructor of the derived class.<br><br>
-     *      Background information:<br>This method is invoked by the CTRL-C handler. So it is the only
-     *      possibility to do some necessarily cleanup like hardware-reinit or shutting down cameras.
+     *      This function is invoked by the doCleanUp method in the GrabberInterface.
+     *      Override this method in the derived class and do only the absolutely necessary cleanup here.<br><br>
+     *      
+     *   \note
+     *      This method is invoked by the CTRL-C handler. Therefore, it is the only possibility
+     *      to do the necessarily cleanup like hardware-reinit, shutting down cameras or to close file handles.
+     *
+     *      The dynamic allocated memory of the class should be freed in the standard destructor.  
+     *  \see doCleanUp
      */
-    virtual bool onDestroy() { return true; }
-
+    virtual void onCleanUp() { }
 
     /*! @brief  This is the grabbing method.
      *  \remarks
@@ -513,7 +516,6 @@ protected:
      *      This is where the grabbing takes place.
      */
     virtual bool onGrab() { return true; }
-
 
     /*! @brief  Declare parameters which should be saved in config-file
      *  \remarks
@@ -527,7 +529,7 @@ protected:
     /*! \brief Get information about the used device, i.e. the filename or the mount-point
      *   \remarks
      *		You have to implement this method in the derived class. Set the informations
-     *		about the channels there.
+     *		about the channels there. This is the only true virtual function of the Grabberinterface.
      *   \param channel
      *		This is the index of the source you want the name of the source from.<br>
      *		In the mono case you do not need to supply this value. Default is 0.<br>
@@ -536,7 +538,6 @@ protected:
     virtual std::string onGetSourceInfo(
                                          unsigned int channel = 0
                                        ) const = 0;
-
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -548,13 +549,12 @@ private:
 
     /*! \brief Callback function to respond to a captured CTRL-C event
      *   \remarks
-     *      This function calls the onDetroy() function of all registerd grabbers and then exit().
+     *      This function calls the doCleanUp function of all registerd grabbers and then exit().
      *   \see
-     *      onDestroy
-     *      Exit terminate the process normally, performing the regular cleanup for terminating processes.
-     *   \param sig The captured signal. Only CTRL-C is implemented
+     *      doCleanUp
+     *   \param signalNo The captured signal. Only CTRL-C is implemented
      */
-    static void sigIntHandler(int sig);
+    static void sigIntHandler(int signalNo);
 
     /*! \brief The vector containing the instances of all created grabbers
      *
@@ -610,11 +610,34 @@ protected:
      */
     QReadWriteLock* mpReadWriteLock;
     
-    
-private:
-  // none yet
+    /*! @brief The actual measured fps of grabbing
+     *
+     */
+    double mFpsMeasured;
 
     
+
+private:
+    
+    /*! @brief Flag which indicates if the GrabberThread was started during startRecording
+     */
+    bool mGrabberThreadStartedOnRecording;
+
+    /*! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
+     */
+    bool mCleanUpAlreadyDone;
+
+    /*! @brief Timestamp at start time to measure the real fps of grabbing
+     */
+    boost::posix_time::ptime mFpsMeasureStart;
+
+    /*! @brief Timestamp at end time to measure the real fps of grabbing
+     */
+    boost::posix_time::ptime mFpsMeasureStop;
+
+    /*! @brief Counter to measure the real fps of grabbing
+     */
+    int mFpsCounter;
 
 
   //--------------------------------------------------------------------------------------------------------------------
