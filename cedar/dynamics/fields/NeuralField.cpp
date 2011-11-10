@@ -174,7 +174,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& global_inhibition = mGlobalInhibition->getValue();
 
   sigmoid_u = mSigmoid->compute<float>(u);
-  lateral_interaction = cv::Mat::zeros(u.size(), u.type());
+  lateral_interaction *= 0;
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
   if (this->_mDimensionality->getValue() < 3)
   {
