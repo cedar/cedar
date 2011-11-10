@@ -89,7 +89,11 @@ namespace cedar
 
       inline unsigned int getDimensionalityOf(cv::Mat matrix)
       {
-        if (matrix.rows == 1 || matrix.cols == 1)
+        if (matrix.rows == 1 && matrix.cols == 1)
+        {
+          return 0;
+        }
+        else if (matrix.rows == 1 || matrix.cols == 1)
         {
           return 1;
         }

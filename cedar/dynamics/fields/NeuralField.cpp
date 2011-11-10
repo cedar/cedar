@@ -69,7 +69,7 @@ mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 
 mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
 mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
 _mNumberOfKernels(new cedar::aux::UIntParameter(this, "numberOfKernels", 1, 1, 20))
 {
@@ -86,7 +86,7 @@ _mNumberOfKernels(new cedar::aux::UIntParameter(this, "numberOfKernels", 1, 1, 2
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
-  this->declareInput("input");
+  this->declareInput("input", false);
   this->makeInputCollection("input");
 
   this->addConfigurableChild("sigmoid", this->mSigmoid);
@@ -174,9 +174,19 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& global_inhibition = mGlobalInhibition->getValue();
 
   sigmoid_u = mSigmoid->compute<float>(u);
-  lateral_interaction = cv::Mat::zeros(u.size(), u.type());
+  lateral_interaction *= 0;
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
-  if (this->_mDimensionality->getValue() < 3)
+  if (this->_mDimensionality->getValue() == 0)
+  {
+    for (unsigned int i = 0; i < _mNumberOfKernels->getValue() && i < this->mKernels.size(); i++)
+    {
+      //!@todo Should/does this not use the data->lock*
+      mKernels.at(i)->getReadWriteLock()->lockForRead();
+      lateral_interaction += mKernels.at(i)->getAmplitude() * sigmoid_u;
+      mKernels.at(i)->getReadWriteLock()->unlock();
+    }
+  }
+  else if (this->_mDimensionality->getValue() < 3)
   {
     for (unsigned int i = 0; i < _mNumberOfKernels->getValue() && i < this->mKernels.size(); i++)
     {
@@ -205,8 +215,6 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
   //!\todo deal with units, now: milliseconds
   u += cedar::unit::Milliseconds(time) / cedar::unit::Milliseconds(tau) * d_u;
-  //std::cout << "field: " << u.at<float>(0,0) << std::endl;
-
 }
 
 bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) const
@@ -259,7 +267,13 @@ void cedar::dyn::NeuralField::updateMatrices()
     sizes[dim] = _mSizes->at(dim);
   }
   this->lockAll();
-  if (dimensionality == 1)
+  if (dimensionality == 0)
+  {
+    this->mActivation->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(mRestingLevel->getValue()));
+    this->mSigmoidalActivation->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+    this->mLateralInteraction->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+  }
+  else if (dimensionality == 1)
   {
     this->mActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(mRestingLevel->getValue()));
     this->mSigmoidalActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
@@ -271,11 +285,14 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mSigmoidalActivation->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }
-  for (unsigned int i=0;i<mKernels.size();i++)
-  {
-    this->mKernels.at(i)->setDimensionality(dimensionality);
-  }
   this->unlockAll();
+  for (unsigned int i = 0; i < mKernels.size(); i++)
+  {
+    if (dimensionality > 0)
+    {
+      this->mKernels.at(i)->setDimensionality(dimensionality);
+    }
+  }
 }
 
 void cedar::dyn::NeuralField::numberOfKernelsChanged()
@@ -332,4 +349,18 @@ void cedar::dyn::NeuralField::numberOfKernelsChanged()
 
   // reset mOldNumberOfKernels
   mOldNumberOfKernels = new_number;
+}
+
+void cedar::dyn::NeuralField::onStart()
+{
+  this->_mDimensionality->setConstant(true);
+  this->_mSizes->setConstant(true);
+  this->cedar::proc::Step::onStart();
+}
+
+void cedar::dyn::NeuralField::onStop()
+{
+  this->_mDimensionality->setConstant(false);
+  this->_mSizes->setConstant(false);
+  this->cedar::proc::Step::onStop();
 }

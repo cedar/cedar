@@ -44,6 +44,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 
@@ -111,12 +112,18 @@ void cedar::aux::gui::HistoryPlot0D::init()
 
 void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
 {
-  this->mData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(data);
+  this->mData = data;
+  this->mDoubleData = boost::shared_dynamic_cast<cedar::aux::DoubleData>(this->mData);
 
-  if (!this->mData)
+  if (!this->mDoubleData)
+  {
+    this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(this->mData);
+  }
+
+  if (!this->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::DoubleData in cedar::aux::gui::HistoryPlot0D::display.");
+                "Could not cast to cedar::aux::DoubleData or cedar::aux::MatData in cedar::aux::gui::HistoryPlot0D::display.");
   }
 
   if (this->mpCurve != NULL)
@@ -128,7 +135,23 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
 //  this->setPlotStyle(this->mpCurve);
 
   data->lockForRead();
-  double val = this->mData->getData();
+  double val;
+  if (this->mDoubleData)
+  {
+    val = this->mDoubleData->getData();
+  }
+  else
+  {
+    cv::Mat matrix = this->mMatData->getData();
+    if (matrix.type() == CV_32F)
+    {
+      val = matrix.at<float>(0,0);
+    }
+    else if (matrix.type() == CV_64F)
+    {
+      val = matrix.at<double>(0,0);
+    }
+  }
   data->unlock();
   mpXValues.clear();
   mpYValues.clear();
@@ -166,8 +189,29 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
   cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_LOCKS
 
-  const double& val = this->mData->getData();
-
+  double val;
+  if (this->mDoubleData)
+  {
+    val = this->mDoubleData->getData();
+  }
+  else
+  {
+    cv::Mat matrix = this->mMatData->getData();
+    if (cedar::aux::math::getDimensionalityOf(matrix) != 0) // plot is no longer capable of displaying the data
+    {
+      this->mData->unlock();
+      emit dataChanged();
+      return;
+    }
+    if (matrix.type() == CV_32F)
+    {
+      val = matrix.at<float>(0,0);
+    }
+    else if (matrix.type() == CV_64F)
+    {
+      val = matrix.at<double>(0,0);
+    }
+  }
   mpYValues.push_back(val);
 
 #ifdef DEBUG_LOCKS
