@@ -98,13 +98,13 @@ protected slots:
   void outputDimensionalityChanged();
   //!@brief this slot is triggered whenever the size of any dimension of the output is changed by the user
   void outputDimensionSizesChanged();
+  //!@brief chooses the appropriate projection method for the current input and output
+  void reconfigure();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief chooses the appropriate projection method for the current input and output
-  void reconfigure();
   //!@brief initializes or reconfigures the output matrix
   void initializeOutputMatrix();
 

@@ -60,7 +60,7 @@ cedar::proc::steps::Projection::Projection()
 :
 mInput(new cedar::aux::MatData(cv::Mat())),
 mOutput(new cedar::aux::MatData(cv::Mat())),
-_mDimensionMappings(new cedar::aux::UIntVectorParameter(this, "dimension mapping", 1, 1, 0, 1)),
+_mDimensionMappings(new cedar::aux::UIntVectorParameter(this, "dimension mapping", 1, 1, 0, 10)),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
 _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
 _mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 3))
@@ -74,6 +74,7 @@ _mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 
   QObject::connect(_mOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionalityChanged()));
   QObject::connect(_mOutputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionSizesChanged()));
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
 {
   unsigned int new_dimensionality = _mOutputDimensionality->getValue();
   this->_mOutputDimensionSizes->resize(new_dimensionality, _mOutputDimensionSizes->getDefaultValue());
-  this->_mDimensionMappings->setMaximum(new_dimensionality);
+  //this->_mDimensionMappings->setMaximum(new_dimensionality);
   this->initializeOutputMatrix();
 }
 
@@ -98,6 +99,8 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 
 void cedar::proc::steps::Projection::reconfigure()
 {
+  std::cout << "reconfigure\n";
+
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
 
   if (mInputDimensionality > output_dimensionality)
@@ -108,10 +111,16 @@ void cedar::proc::steps::Projection::reconfigure()
 
     for (unsigned int index = 0; index < mInputDimensionality; ++index)
     {
-      if (_mDimensionMappings->getValue().at(index) == 1)
+      if (_mDimensionMappings->getValue().at(index) == 10)
       {
         mIndicesToCompress.push_back(index);
       }
+    }
+
+    std::cout << "number of indices to compress: " << mIndicesToCompress.size() << "\n";
+    for (unsigned int index = 0; index < mIndicesToCompress.size(); ++index)
+    {
+      std::cout << mIndicesToCompress.at(index) << ", ";
     }
 
     if (mInputDimensionality == 3 && output_dimensionality == 2)
@@ -283,6 +292,10 @@ void cedar::proc::steps::Projection::compress3Dto1D()
 
 void cedar::proc::steps::Projection::compressNDto0D()
 {
+  // iterate over output matrix
+  // map current indices to indices in the input matrix
+  // fill the indices, which are to be compressed, with zeros
+  // from the input matrix get the "maximum" along all dimensions, which are to be compressed
 
 };
 
