@@ -84,12 +84,23 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::aux::DataPtr getData();
-  cedar::aux::ConstDataPtr getData() const;
+  inline unsigned int getDataCount() const
+  {
+    return this->mData.size();
+  }
+
+  cedar::aux::DataPtr getData(unsigned int index = 0);
+  cedar::aux::ConstDataPtr getData(unsigned int index = 0) const;
+
+  bool hasData(cedar::aux::ConstDataPtr data) const;
+
+  void removeData(cedar::aux::ConstDataPtr data);
 
   cedar::proc::DataRole::Id getRole() const;
 
-  void setData(cedar::aux::DataPtr data);
+  void setData(cedar::aux::DataPtr data, unsigned int index = 0);
+
+  void addData(cedar::aux::DataPtr data);
 
   const std::string& getName() const;
 
@@ -102,6 +113,12 @@ public:
 
   VALIDITY getValidlity() const;
   void setValidity(VALIDITY validity);
+
+  /*!
+   * @remarks This function throws unless the role of this slot is input.
+   */
+  void setCollection(bool isCollection);
+  bool isCollection() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -121,8 +138,12 @@ private:
 protected:
   // none yet
 private:
-  cedar::aux::DataPtr mData;
+  std::vector<cedar::aux::DataPtr> mData;
   bool mMandatory;
+
+  //!@brief Whether this slot can have multiple data items.
+  bool mIsCollection;
+
   VALIDITY mValidity;
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.

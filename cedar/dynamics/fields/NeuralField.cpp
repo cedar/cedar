@@ -86,7 +86,8 @@ _mNumberOfKernels(new cedar::aux::UIntParameter(this, "numberOfKernels", 1, 1, 2
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
-  this->declareInput("input", false);
+  this->declareInput("input");
+  this->makeInputCollection("input");
 
   this->addConfigurableChild("sigmoid", this->mSigmoid);
 
@@ -164,6 +165,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
+  cedar::proc::DataSlotPtr input_slot = this->getInputSlot("input");
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
@@ -200,14 +202,15 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   CEDAR_ASSERT(u.size == lateral_interaction.size);
 
   cv::Mat d_u = -u + h + lateral_interaction + global_inhibition * cv::sum(sigmoid_u)[0];;
-  /*!@todo the following is probably slow -- it'd be better to store a pointer in the neural field class and update
-   *       it when the connections change.
-   */
-  if (cedar::aux::DataPtr input = this->getInput("input"))
+  for (size_t i = 0; i < input_slot->getDataCount(); ++i)
   {
-    cv::Mat& input_mat = input->getData<cv::Mat>();
-    CEDAR_ASSERT(input_mat.size == d_u.size);
-    d_u += input_mat;
+    cedar::aux::DataPtr input = input_slot->getData(i);
+    if (input)
+    {
+      cv::Mat& input_mat = input->getData<cv::Mat>();
+      CEDAR_ASSERT(input_mat.size == d_u.size);
+      d_u += input_mat;
+    }
   }
 
   //!\todo deal with units, now: milliseconds
