@@ -96,12 +96,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! \brief This passes the arguments directly to the corresponding capture
+  /*! \brief This passes the arguments directly to the corresponding capture device
    *   \remarks With this Method, it is possible to get Information on any channel.
-   *   \param channel This is the index of the source you want parameter value.<br>
+   *   \param channel This is the index of the source you want to get the parameter value.<br>
    *   \param propId This is any supported property-Id<br>
    *     If property-id is not supported or unknown, return value will be 0.
-   *   \remarks see OpenCV documentation for VideoCapture::get() for details
+   *   \remarks see OpenCV documentation for VideoCapture::get() for details on supported parameters
    */
   double getCameraParam(
                          unsigned int channel,
@@ -110,17 +110,36 @@ public:
 
 
 
-  /*! \brief Get fps for the given camera
+  /*! \brief Get fps of the given camera
    *  \remarks
    *    Default channel is 0
    */
-  //double getSourceFps (unsigned int channel=0) ;
+  double getCameraParamFps (unsigned int channel=0) ;
 
-  /*! \brief Get fourcc for the given camera
+  /*! \brief Get fourcc of the given camera
    *  \remarks
    *    Default channel is 0
    */
-  //double getSourceEncoding (unsigned int channel=0);
+  double getCameraParamEncoding (unsigned int channel=0);
+
+  double getCameraParamBrightness (unsigned int channel=0);
+  double getCameraParamContrast (unsigned int channel=0);
+  double getCameraParamSaturation (unsigned int channel=0);
+  double getCameraParamHue (unsigned int channel=0);
+  double getCameraParamGain (unsigned int channel=0);
+  double getCameraParamExposure (unsigned int channel=0);
+
+
+  bool setCameraParam (unsigned int channel,int propId, double value);
+  
+  bool setCameraParamFps (unsigned int channel, double value);
+  bool setCameraParamEncoding (unsigned int channel, double value);
+  bool setCameraParamBrightness (unsigned int channel, double value);
+  bool setCameraParamContrast (unsigned int channel, double value);
+  bool setCameraParamSaturation (unsigned int channel, double value);
+  bool setCameraParamHue (unsigned int channel, double value);
+  bool setCameraParamGain (unsigned int channel, double value);
+  bool setCameraParamExposure (unsigned int channel, double value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
