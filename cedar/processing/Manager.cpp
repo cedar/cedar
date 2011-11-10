@@ -107,7 +107,7 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   this->steps().declareClass(static_gain_decl);
 
   StepDeclarationPtr projection_decl(new StepDeclarationT<cedar::proc::steps::Projection>("cedar.processing.steps.Projection", "Utilities"));
-  projection_decl->setIconPath(":/steps/static_gain.svg");
+  projection_decl->setIconPath(":/steps/projection.svg");
   this->steps().declareClass(projection_decl);
   
   StepDeclarationPtr resize_decl(new StepDeclarationT<cedar::proc::steps::Resize>("cedar.processing.steps.Resize", "Utilities"));
