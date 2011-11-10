@@ -120,6 +120,10 @@ protected:
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the matrix sizes in each dimension
   cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief the mean of the normal distribution
+  cedar::aux::DoubleParameterPtr _mMean;
+  //!@brief the standard deviation of the normal distribution
+  cedar::aux::DoubleParameterPtr _mStandardDeviation;
 
 private:
   // none yet
