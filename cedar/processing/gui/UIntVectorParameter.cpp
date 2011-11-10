@@ -84,9 +84,9 @@ void cedar::proc::gui::UIntVectorParameter::parameterPointerChanged()
 
 void cedar::proc::gui::UIntVectorParameter::propertyChanged()
 {
+  std::cout << "property changed" << std::endl;
   cedar::aux::UIntVectorParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
-
   //!@todo Don't throw away old spinboxes, reuse them instead
   // Create the appropriate amount of spinboxes
   if (this->mSpinboxes.size() != parameter->size())
@@ -119,6 +119,7 @@ void cedar::proc::gui::UIntVectorParameter::propertyChanged()
   {
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
+    this->mSpinboxes.at(i)->setEnabled(!parameter->isConstant());
   }
 }
 
