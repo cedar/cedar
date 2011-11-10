@@ -65,10 +65,15 @@ LoopedThread(configFileName)
     std::cout << "[GrabberInterface::GrabberInterface]" << std::endl;
   #endif
 
-  //-----------------------------
   //initialize local member
   mpReadWriteLock = new QReadWriteLock();
-  mRecord         = false;                  //by default no recording
+  mRecord = false;                  //by default no recording
+  mGrabberThreadStartedOnRecording = false;
+  mCleanUpAlreadyDone = false;
+  mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
+  mFpsMeasureStop = boost::posix_time::microsec_clock::local_time();
+  mFpsCounter = 0;
+  mFpsMeasured = 0;
 }
 
 
@@ -80,33 +85,15 @@ GrabberInterface::~GrabberInterface()
     std::cout << "[GrabberInterface::~GrabberInterface]" << std::endl;
   #endif
 
-  //stop LoopedThread
-  if (QThread::isRunning())
-  {
-    cedar::aux::LoopedThread::stop();
-  }
-
-  //stop Recording
-  stopRecording();
-
-  //Matrices are released within the vector mImageMatVector
-
   //write out the parameter of the configurationInterface
   cedar::aux::ConfigurationInterface::writeConfiguration();
 
-  if (mpReadWriteLock)
-  {
-    delete mpReadWriteLock;
-    mpReadWriteLock = NULL;
-  }
-
-  //do the cleanup in derived class
-  onDestroy();
+  //Matrices are released within the vector mImageMatVector
 
   //remove this grabber-instance from the InstancesVector
   #ifdef ENABLE_CTRL_C_HANDLER
 
-    std::vector<GrabberInterface*>::iterator it = mInstances.begin();
+    std::vector<GrabberInterface *>::iterator it = mInstances.begin();
 
     while (((*it) != this) && (it != mInstances.end()))
     {
@@ -140,7 +127,7 @@ GrabberInterface::~GrabberInterface()
 #ifdef ENABLE_CTRL_C_HANDLER
 
   //this function handles the ctrl-c (signal: interrupt)
-  void GrabberInterface::sigIntHandler(int sig)
+  void GrabberInterface::sigIntHandler(int signalNo)
   {
       #ifdef DEBUG_GRABBER_INTERFACE
         std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
@@ -148,39 +135,45 @@ GrabberInterface::~GrabberInterface()
 
       for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
       {
-        //(*it)->~GrabberInterface;  //do that with shared-pointers??
-
-        //stop LoopedThread if needed
-        if ((*it)->isRunning())
-        {
-          (*it)->stop();
-          #ifdef DEBUG_GRABBER_INTERFACE
-            std::cout << "[GrabberInterface::sigIntHandler] Thread stopped" << std::endl;
-          #endif
-        }
-
-        //stop recording if needed
-        if ((*it)->mRecord)
-        {
-          (*it)->stopRecording();
-          #ifdef DEBUG_GRABBER_INTERFACE
-            std::cout << "[GrabberInterface::sigIntHandler] Recording stopped" << std::endl;
-          #endif
-        }
-
-        //delete dynamic var's
-        if ((*it)->mpReadWriteLock)
-        {
-          delete (*it)->mpReadWriteLock;
-          (*it)->mpReadWriteLock = NULL;
-        }
-
-        //do cleanup in derived classes
-        (*it)->onDestroy();
+        //only GrabberInterface::doCleanUp() and xxxGrabber::onCleanUp() methods invoked
+        //Note: no destructor involved here
+        (*it)->doCleanUp();
       }
       std::exit(1);
   }
 #endif
+
+//--------------------------------------------------------------------------------------------------------------------
+void GrabberInterface::doCleanUp()
+{
+  if (! mCleanUpAlreadyDone)
+  {
+  
+    #ifdef DEBUG_GRABBER_INTERFACE
+      std::cout << "[GrabberInterface::doCleanUp]" << std::endl;
+    #endif
+
+    mCleanUpAlreadyDone = true;
+
+    //stop LoopedThread
+    if (QThread::isRunning())
+    {
+      cedar::aux::LoopedThread::stop();
+    }
+
+    //stop Recording
+    stopRecording();
+
+    //do the cleanup in derived class
+    onCleanUp();
+
+    if (mpReadWriteLock)
+    {
+      delete mpReadWriteLock;
+      mpReadWriteLock = NULL;
+    }
+  }
+}
 
 //--------------------------------------------------------------------------------------------------------------------
 void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGrabberName )
@@ -192,7 +185,6 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
      mInstances.push_back(this);
   #endif
 
-  //-----------------------------
   //Parameters for all Grabber
   bool result
     = cedar::aux::ConfigurationInterface::addParameter(&_mName,"grabbername",defaultGrabberName) == CONFIG_SUCCESS;
@@ -221,8 +213,11 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
   //initialize derived class
   if (!onInit())
   {
+    //cleanup already initialized channels
+    doCleanUp();
+
     CEDAR_THROW(cedar::aux::exc::InitializationException,
-                "GrabberInterface::doInit - Error in onInit in derived class");
+                "[GrabberInterface::doInit] ERROR: onInit in class"+ this->getName());
   }
 }
 
@@ -231,6 +226,11 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
 unsigned int GrabberInterface::getNumCams() const
 {
   return mNumCams;
+}
+
+double GrabberInterface::getFpsMeasured() const
+{
+  return mFpsMeasured;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -249,7 +249,7 @@ void GrabberInterface::setFps(double fps)
 
   if (wasRunning)
   {
-    LoopedThread::stop();
+    stop();
   }
 
   //cycle time in ms: 1000ms/frames_per_second
@@ -271,11 +271,10 @@ void GrabberInterface::setFps(double fps)
 
   if (wasRunning)
   {
-    LoopedThread::start();
+    start();
   }
 
   #ifdef DEBUG_GRABBER_INTERFACE
-
     //std::cout << "[GrabberInterface::setFps] new values: getFps: " << getFps()
     //         << ", stepsize " << milliseconds << "ms"<< std::endl;
 
@@ -291,19 +290,71 @@ void GrabberInterface::setFps(double fps)
   #endif
 }
 
+//--------------------------------------------------------------------------------------------------------------------
+void GrabberInterface::stop()
+{
+  LoopedThread::stop();
+  mFpsMeasured = 0;
+  if (mRecord)
+  {
+    stopRecording();
+  }
+}
 
+//--------------------------------------------------------------------------------------------------------------------
+void GrabberInterface::start()
+{
+  mFpsMeasured = 0;
+  mFpsCounter = 0;
+  mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
+  LoopedThread::start();
+}
 
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::grab()
 {
   bool result = true;
+  std::string error_info;
 
   mpReadWriteLock->lockForWrite();        //Lock
-  result = onGrab();                      //Grab
+  try
+  {
+    result = onGrab();                    //Grab
+  }
+  catch (std::exception& e)
+  {
+    error_info = e.what();
+    result = false;
+  }
   mpReadWriteLock->unlock();              //Unlock
 
-  //recording
-  if (mRecord && result)
+  if (! result)
+  {
+    doCleanUp();
+    CEDAR_THROW(cedar::aux::exc::GrabberGrabException,"[GrabberInterface::grab] Error in grabber \""
+                + _mName + "\" on grabbing: " + error_info);
+  }
+
+  //grabbing ok, then
+  //calculate fps every 5 (default) grabbing frames
+  if (! (++mFpsCounter %= UPDATE_FPS_MEASURE_FRAME_COUNT))
+  {
+    mFpsMeasureStop = boost::posix_time::microsec_clock::local_time();
+
+    //calculate real diff:
+    boost::posix_time::time_duration measure_duration = mFpsMeasureStop - mFpsMeasureStart;
+    mFpsMeasured = double(UPDATE_FPS_MEASURE_FRAME_COUNT * 1000000. / measure_duration.total_microseconds());
+
+    #ifdef DEBUG_GRABBER_STEP
+      std::cout << "[GrabberInterface::grab] update getFpsMeasured to " << mFpsMeasured << std::endl;
+    #endif
+
+    mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
+  }
+  //std::cout << "[GrabberInterface::grab] mFpsCounter: " << mFpsCounter << std::endl;
+
+  //check if recording is on
+  if (mRecord)
   {
     for (unsigned int channel = 0; channel < mNumCams; ++channel)
     {
@@ -319,10 +370,8 @@ bool GrabberInterface::grab()
       }
     }
   }
-
   return result;
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------
 cv::Mat GrabberInterface::getImage(unsigned int channel) const
@@ -333,7 +382,6 @@ cv::Mat GrabberInterface::getImage(unsigned int channel) const
   }
   return mImageMatVector.at(channel);
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------
 QReadWriteLock* GrabberInterface::getReadWriteLockPointer() const
@@ -350,7 +398,6 @@ std::string GrabberInterface::getSourceInfo(unsigned int channel) const
   }
   return onGetSourceInfo(channel);
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------
 void GrabberInterface::setSnapshotName(const std::string& snapshotName)
@@ -400,9 +447,6 @@ void GrabberInterface::setSnapshotName(const std::string& snapshotName)
   }
 }
 
-
-
-
 //--------------------------------------------------------------------------------------------------------------------
 void GrabberInterface::setSnapshotName(unsigned int channel, const std::string& snapshotName )
 {
@@ -427,8 +471,6 @@ void GrabberInterface::setSnapshotName(unsigned int channel, const std::string& 
   }
 }
 
-
-
 //--------------------------------------------------------------------------------------------------------------------
 std::string GrabberInterface::getSnapshotName(unsigned int channel) const
 {
@@ -438,8 +480,6 @@ std::string GrabberInterface::getSnapshotName(unsigned int channel) const
   }
   return mSnapshotNames.at(channel);
 }
-
-
 
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::saveSnapshot(unsigned int channel) const
@@ -481,8 +521,6 @@ bool GrabberInterface::saveSnapshot(unsigned int channel) const
   return true;
 }
 
-
-
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::saveSnapshotAllCams() const
 {
@@ -495,8 +533,6 @@ bool GrabberInterface::saveSnapshotAllCams() const
   return result;
 }
 
-
-
 //--------------------------------------------------------------------------------------------------------------------
 cv::Size GrabberInterface::getSize(unsigned int channel) const
 {
@@ -506,8 +542,6 @@ cv::Size GrabberInterface::getSize(unsigned int channel) const
   }
   return mImageMatVector.at(channel).size();
 }
-
-
 
 //--------------------------------------------------------------------------------------------------------------------
 void GrabberInterface::setRecordName(const std::string& recordName)
@@ -558,8 +592,6 @@ void GrabberInterface::setRecordName(const std::string& recordName)
   }
 }
 
-
-
 //--------------------------------------------------------------------------------------------------------------------
 void GrabberInterface::setRecordName(unsigned int channel, const std::string& recordName )
 {
@@ -584,8 +616,6 @@ void GrabberInterface::setRecordName(unsigned int channel, const std::string& re
   }
 }
 
-
-
 //--------------------------------------------------------------------------------------------------------------------
 std::string GrabberInterface::getRecordName(unsigned int channel) const
 {
@@ -597,23 +627,26 @@ std::string GrabberInterface::getRecordName(unsigned int channel) const
   return mRecordNames.at(channel);
 }
 
-
-
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
 {
-  //TODO: think about exception
   if (mRecord)
   {
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[GrabberInterface::startRecording] Warning: Grabber is already recording\n";
+    #endif
+
     return true;
   }
+
+  //set the record-flag
+  mRecord = true;
 
   //write the video-file with the actual grabbing-speed
   //this is independet from speed of the avi-file or the camera framerate
   //double fps = getFps();
 
-
-  //if there is already any
+  //if there are already any
   mVideoWriterVector.clear();
 
   for (unsigned int i = 0; i < mNumCams; ++i)
@@ -631,11 +664,19 @@ bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
     CEDAR_THROW(cedar::aux::exc::GrabberRecordingException,"GrabberInterface::startRecording")
   }
 
-  mRecord = true;       //set the record-flag
+  //start the grabberthread if needed
+  if (!QThread::isRunning())
+  {
+    #ifdef DEBUG_GRABBER_INTERFACE
+      std::cout << "[GrabberInterface::startRecording] autostart the grabberthread" << std::endl;
+    #endif
+
+    mGrabberThreadStartedOnRecording = true;
+    start();
+  }
+
   return true;
 }
-
-
 
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::stopRecording()
@@ -643,9 +684,21 @@ bool GrabberInterface::stopRecording()
   if (mRecord)
   {
     mRecord = false;
+    if (mGrabberThreadStartedOnRecording)
+    {
+      #ifdef DEBUG_GRABBER_INTERFACE
+        std::cout << "[GrabberInterface::stopRecording] autostop the grabberthread" << std::endl;
+      #endif
+      stop();
+      mGrabberThreadStartedOnRecording = false;
+    }
     mVideoWriterVector.clear();
+    return true;
   }
-  return true;
+  else
+  {
+    return true;
+  }
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -653,8 +706,6 @@ bool GrabberInterface::isRecording() const
 {
   return mRecord;
 }
-
-
 
 //--------------------------------------------------------------------------------------------------------------------
 //void GrabberInterface::step(double time  __attribute__ ((__unused__))) //only supported by gcc
@@ -664,7 +715,9 @@ void GrabberInterface::step(double)
     std::cout << "GrabberInterface_Thread: step()" << std::endl;
   # endif
 
-  //TODO: think about an exception
+  //if something went wrong on grabbing,
+  //an exception is being thrown in the grab function
+  //right after a cleanup
   if (!grab())
   {
     //LoopedThread::stop();

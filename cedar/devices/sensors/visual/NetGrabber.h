@@ -113,10 +113,10 @@ protected:
   bool onGrab();
   bool onDeclareParameters();
   std::string onGetSourceInfo(
-                                unsigned int channel
+                               unsigned int channel
                              ) const;
 
-  virtual bool onDestroy();
+  void onCleanUp();
 
   //--------------------------------------------------------------------------------------------------------------------
   //private methods
@@ -135,12 +135,12 @@ public:
 protected:
 
 
-  /*! \brief The yarp channels
+  /*! \brief The names of the used yarp channels
    *
    */
   std::vector<std::string> mYarpChannels;
 
-  /*! \brief This vector contains the needed Yarp Reads.
+  /*! \brief This vector contains the needed Yarp Readers.
    *		One for every channel.
    *   \see
    *       mImageMatVector

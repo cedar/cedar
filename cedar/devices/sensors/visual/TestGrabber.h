@@ -135,9 +135,10 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //derived from GrabberInterface:
+
+  //derived from GrabberInterface
   bool onInit();
-  bool onDestroy();
+  void onCleanUp();
   bool onDeclareParameters();
   std::string onGetSourceInfo(unsigned int channel) const;
   bool onGrab();
@@ -156,13 +157,13 @@ public:
 protected:
   // none yet
 private:
-  //!@brief The vector where the Channelnames stored in
+  //!@brief The vector where the channelnames stored in
   std::vector<std::string> mChannelVector;
 
   //!@brief The counter
   unsigned int mCounter;
 
-  //!@brief the test parameter
+  //!@brief The test parameter
   int _mTest;
 
   //--------------------------------------------------------------------------------------------------------------------

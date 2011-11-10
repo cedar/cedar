@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Grabber.h
+    File:        NetGrabber.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@rub.de
     Date:        2011 08 01
 
-    Description: Header for the @em cedar::dev::sensors::visual::NetGrabber class.
+    Description: Implementation of the @em cedar::dev::sensors::visual::NetGrabber class.
 
     Credits:
 
@@ -68,8 +68,6 @@ GrabberInterface(configFileName)
   doInit(mYarpChannels.size(),"NetGrabber");
 }
 
-
-
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-channel grabber
 NetGrabber::NetGrabber(
@@ -88,6 +86,7 @@ GrabberInterface(configFileName)
 //----------------------------------------------------------------------------------------------------
 NetGrabber::~NetGrabber()
 {
+  doCleanUp();
   #ifdef DEBUG_NETGRABBER
     std::cout << "YarpGrabber::Destructor\n";
   #endif
@@ -104,15 +103,14 @@ NetGrabber::~NetGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool NetGrabber::onDestroy()
+void NetGrabber::onCleanUp()
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[NetGrabber::onDestroy]"<< std::endl;
+    std::cout<<"[NetGrabber::onCleanUp]"<< std::endl;
   #endif
 
   //close all captures
   mYarpReaderVector.clear();
-  return true;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -123,9 +121,7 @@ bool NetGrabber::onInit()
   #endif
 
   #ifdef SHOW_INIT_INFORMATION_NETGRABBER
-    //-------------------------------------------------
     std::cout << "YarpGrabber: Initialize Grabber with " << mNumCams << " channels ..." << std::endl;
-
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
       std::cout << "Channel " << i << ": capture from yarpchannel: " << mYarpChannels.at(i) << "\n";
@@ -133,87 +129,140 @@ bool NetGrabber::onInit()
     std::cout << std::flush;
   #endif
 
+  //clear old stuff (if something is there)
   mImageMatVector.clear();
   mYarpReaderVector.clear();
+
+  //cedar::dev::sensors::visual::TestGrabberPtr
+  //      grabber_4(new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_2,CHANNEL_1_NAME ))
 
   //-------------------------------------------------
   //open capture one by one
   cedar::aux::net::NetReader<cv::Mat> *YarpReader = NULL;
 
+  //loop until connection established or an error occurs
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-
-    //loop until connection established
     #ifdef SHOW_INIT_INFORMATION_NETGRABBER
       std::cout << "NetGrabber: Create channel " << i << ": " << mYarpChannels.at(i) << " " << std::flush;
     #endif
 
-      do
-    {
-      try
-      {
-        // std::cout << "." << std::flush;
-        YarpReader = new cedar::aux::net::NetReader<cv::Mat>(mYarpChannels.at(i));
-        // std::cout << "ok" << std::endl;
-
-        mYarpReaderVector.push_back(YarpReader);
-        //std::cout << "push_back ok" << std::endl;
-
-        //grab first frame on initializtion
-      }
-      catch (cedar::aux::exc::NetWaitingForWriterException &E)
-      {
-        //somehow YARP doesnt work ... :( typically fatal.
-        std::cout << "ERROR [NetWaitingForWriterException]: Initialization failed (Channel " << i << ")."
-                  << std::endl;
-        //TODO: undo the already initialized grabbers ???
-
-        //throws an initialization-exception, so programm will terminate
-        return false;
-      }
-      catch (...)
-      {
-        std::cout << "ERROR [undefined]: Initialization failed (Channel " << i << ")." << std::endl;
-
-        //throws an initialization-exception, so programm will terminate
-        return false;
-      }
-    } while (!YarpReader);
-
-
-    //loop until first image received
-    #ifdef SHOW_INIT_INFORMATION_NETGRABBER
-      std::cout << "Yarp-Grabber: Try to read from channel " << i << " ";
-    #endif
-
-    cv::Mat frame   = cv::Mat();
-    bool reading_ok = true;
+    //try to connect for about 1 to 2 minutes per channel
+    int counter_get_writer = 0;
 
     do
     {
       try
       {
-        //std::cout << "." << std::flush;
+        #ifdef SHOW_INIT_INFORMATION_NETGRABBER
+          std::cout << "." << std::flush;
+        #endif
+
+        //establish connection
+        YarpReader = new cedar::aux::net::NetReader<cv::Mat>(mYarpChannels.at(i));
+
+        #ifdef SHOW_INIT_INFORMATION_NETGRABBER
+          std::cout << "ok" << std::endl;
+        #endif
+
+      }
+
+      //ERROR: No Yarp writer with appropriate channel name
+      catch (cedar::aux::exc::NetWaitingForWriterException &E)
+      {
+        #ifndef SHOW_INIT_INFORMATION_NETGRABBER
+          std::cout << "[NetGrabber::onInit] WARNING: waiting for yarp-writer failed\n"
+                    << "\t\tChannel " << i << ": "<< mYarpChannels.at(i) << "\n"
+                    << E.exceptionInfo()
+                    << std::endl;
+        #endif
+        if (++counter_get_writer > 10)
+        {
+          std::cout << "[NetGrabber::onInit] ERROR: Waiting for yarp-writer failed\n"
+                    << "\tChannel " << i << ": "<< mYarpChannels.at(i) << "\n"
+                    << "\t" << E.exceptionInfo()
+                    << std::endl;
+          return false;  //throws an initialization-exception
+        }
+        else
+        {
+          usleep(1000);
+        }
+      }
+
+      //ERROR: Somehow YARP doesnt work ... :( typically fatal.
+      catch (cedar::aux::exc::ExceptionBase &E)
+      {
+        std::cout << "[NetGrabber::onInit] ERROR: Initialization failed\n"
+                  << "\tChannel " << i << ": "<< mYarpChannels.at(i) << "\n"
+                  << "\t" << E.exceptionInfo()
+                  << std::endl;
+        return false;  //throws an initialization-exception
+      }
+
+      //ERROR: Default
+      catch (...)
+      {
+        std::cout << "[NetGrabber::onInit] ERROR: Unknown Error on initialization of yarp-writer\n"
+                  << "\tChannel " << i << ": "<< mYarpChannels.at(i) << "\n"
+                  << std::endl;
+                  return false;  //throws an initialization-exception
+      }
+
+    } while (!YarpReader);
+
+    mYarpReaderVector.push_back(YarpReader);
+
+    //Channel i initialized, try to receive the first image
+    #ifdef SHOW_INIT_INFORMATION_NETGRABBER
+      std::cout << "Yarp-Grabber: Try to read from channel " << i << " ";
+    #endif
+
+    cv::Mat frame;
+    bool reading_ok = false;
+    int counter_get_image = 0;
+
+    //loop until first image received
+    do
+    {
+      try
+      {
+        #ifdef SHOW_INIT_INFORMATION_NETGRABBER
+          std::cout << "." << std::flush;
+        #endif
         frame = mYarpReaderVector.at(i)->read();
-        //std::cout << "ok" << std::endl;
+        #ifdef SHOW_INIT_INFORMATION_NETGRABBER
+          std::cout << "ok" << std::endl;
+        #endif
         mImageMatVector.push_back(frame);
         reading_ok = true;
       }
       catch (cedar::aux::exc::NetUnexpectedDataException &E)
       {
-        //catch(...)
-        //somehow YARP doesnt work ... :( typically fatal.
-        reading_ok = false;
-        usleep(5000);
-        //std::cout << "ERROR: Initialization failed (Channel "<< i << ")." << std::endl;
-        //TODO: undo the already initialized grabbers ???
-        //return false;
+        if (++counter_get_image > 10)
+        {
+          std::cout << "[NetGrabber::onInit] ERROR: Couldn't retrieve an image\n"
+                    << "\tChannel " << i << ": "<< mYarpChannels.at(i) << "\n"
+                    << "\t" << E.exceptionInfo()
+                    << std::endl;
+          return false;  //throws an initialization-exception
+        }
+        else
+        {
+          reading_ok = false;
+          usleep(5000);
+        }
       }
+      catch (...)
+      {
+        std::cout << "[NetGrabber::onInit] ERROR: Couldn't retrieve an image\n"
+                  << "\tChannel " << i << ": "<< mYarpChannels.at(i) << "\n"
+                  << std::endl;
+        return false;  //throws an initialization-exception
+      }
+
     } while (!reading_ok);
-
-    //std::cout << std::endl;
   }
-
 
   //all grabbers successfully initialized
   #ifdef DEBUG_NETGRABBER

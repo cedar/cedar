@@ -54,6 +54,11 @@
 #define GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0 "[ch0]"
 #define GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1 "[ch1]"
 
+//------------------------------------------------------------------------
+// Defines the how often getFpsMeasured() will be updated (in frames).
+// Default value will be every 5 frames
+//------------------------------------------------------------------------
+#define UPDATE_FPS_MEASURE_FRAME_COUNT 5
 
 //------------------------------------------------------------------------
 // Enable the CTRL-C handler.
