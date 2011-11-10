@@ -38,6 +38,7 @@
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/dynamics/fields/Preshape.h"
+#include "cedar/dynamics/sources/Noise.h"
 #include "cedar/processing/StepDeclaration.h"
 #include "cedar/processing/Manager.h"
 
@@ -72,6 +73,19 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
   cedar::proc::Manager::getInstance().steps().declareClass(preshape_decl);
 #else
   plugin->add(preshape_decl);
+  // return plugin;
+#endif
+
+  StepDeclarationPtr noise_decl
+  (
+    new cedar::proc::StepDeclarationT<cedar::dyn::Noise>("cedar.dynamics.Noise", "Sources")
+  );
+  noise_decl->setIconPath(":/steps/noise.svg");
+
+#ifdef LINUX
+  cedar::proc::Manager::getInstance().steps().declareClass(noise_decl);
+#else
+  plugin->add(noise_decl);
   // return plugin;
 #endif
 }
