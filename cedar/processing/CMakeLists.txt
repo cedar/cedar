@@ -59,6 +59,7 @@ cedar_add_library(cedarproc
   gui/StepClassList.h
   gui/StringParameter.h
   gui/ToolBox.h
+  gui/TriggerClassList.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/DirectoryParameter.h

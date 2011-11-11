@@ -81,6 +81,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT StepItem;
       class CEDAR_PROC_LIB_EXPORT StringParameter;
       class CEDAR_PROC_LIB_EXPORT ToolBox;
+      class CEDAR_PROC_LIB_EXPORT TriggerClassList;
       class CEDAR_PROC_LIB_EXPORT TriggerItem;
       class CEDAR_PROC_LIB_EXPORT View;
       class CEDAR_PROC_LIB_EXPORT UIntParameter;
