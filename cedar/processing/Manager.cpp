@@ -101,11 +101,11 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   input_decl->setIconPath(":/steps/gauss_input.svg");
   this->steps().declareClass(input_decl);
 
-  StepDeclarationPtr static_gain_decl(new StepDeclarationT<cedar::proc::steps::StaticGain>("cedar.processing.steps.StaticGain", "Utilities"));
+  StepDeclarationPtr static_gain_decl(new StepDeclarationT<cedar::proc::steps::StaticGain>("cedar.processing.StaticGain", "Utilities"));
   static_gain_decl->setIconPath(":/steps/static_gain.svg");
   this->steps().declareClass(static_gain_decl);
 
-  StepDeclarationPtr resize_decl(new StepDeclarationT<cedar::proc::steps::Resize>("cedar.processing.steps.Resize", "Utilities"));
+  StepDeclarationPtr resize_decl(new StepDeclarationT<cedar::proc::steps::Resize>("cedar.processing.Resize", "Utilities"));
   resize_decl->setIconPath(":/steps/resize.svg");
   this->steps().declareClass(resize_decl);
 }

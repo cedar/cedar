@@ -255,6 +255,12 @@ void cedar::proc::steps::Resize::outputSizeChanged()
 {
   const cv::Mat& input = this->mInput->getData();
   int size = static_cast<int>(this->_mOutputSize->size());
+
+  if (this->_mOutputSize->size() == 0)
+  {
+    return;
+  }
+
   std::vector<int> sizes;
   for (size_t i = 0; i < this->_mOutputSize->size(); ++i)
   {
