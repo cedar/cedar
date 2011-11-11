@@ -54,6 +54,7 @@
 #include "cedar/processing/Connection.h"
 #include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
+#include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/steps/Resize.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -97,7 +98,7 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
   this->triggers().declareClass(looped_trigger_declaration);
 
-  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::sources::GaussInput>("cedar.processing.sources.GaussInput", "Sources"));
+  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::sources::GaussInput>("cedar.processing.sources.GaussInput", "Inputs"));
   input_decl->setIconPath(":/steps/gauss_input.svg");
   this->steps().declareClass(input_decl);
 
@@ -105,6 +106,10 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   static_gain_decl->setIconPath(":/steps/static_gain.svg");
   this->steps().declareClass(static_gain_decl);
 
+  StepDeclarationPtr projection_decl(new StepDeclarationT<cedar::proc::steps::Projection>("cedar.processing.Projection", "Utilities"));
+  projection_decl->setIconPath(":/steps/projection.svg");
+  this->steps().declareClass(projection_decl);
+  
   StepDeclarationPtr resize_decl(new StepDeclarationT<cedar::proc::steps::Resize>("cedar.processing.Resize", "Utilities"));
   resize_decl->setIconPath(":/steps/resize.svg");
   this->steps().declareClass(resize_decl);
