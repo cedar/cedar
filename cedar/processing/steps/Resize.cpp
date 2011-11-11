@@ -255,6 +255,12 @@ void cedar::proc::steps::Resize::outputSizeChanged()
 {
   const cv::Mat& input = this->mInput->getData();
   int size = static_cast<int>(this->_mOutputSize->size());
+
+  if (this->_mOutputSize->size() == 0)
+  {
+    return;
+  }
+
   std::vector<int> sizes;
   for (size_t i = 0; i < this->_mOutputSize->size(); ++i)
   {
@@ -298,7 +304,7 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
 

@@ -120,12 +120,18 @@ public:
                  );
   void connect(
                 cedar::proc::TriggerPtr trigger,
-                cedar::proc::StepPtr target
-              );
-  void connect(
-                cedar::proc::TriggerPtr trigger,
                 cedar::proc::TriggerPtr target
               );
+
+  void connect(
+                cedar::proc::TriggerPtr source,
+                cedar::proc::StepPtr target
+              );
+
+  void disconnect(
+                   cedar::proc::TriggerPtr source,
+                   cedar::proc::StepPtr target
+                 );
 
   void getConnections(
                        cedar::proc::StepPtr source,

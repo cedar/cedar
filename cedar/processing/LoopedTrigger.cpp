@@ -110,6 +110,24 @@ void cedar::proc::LoopedTrigger::loopTimeChanged()
   this->setStepSize(this->mLoopTime->getValue());
 }
 
+void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
+{
+  this->cedar::proc::Trigger::removeListener(step);
+  if (this->isRunning())
+  {
+    step->onStop();
+  }
+}
+
+void cedar::proc::LoopedTrigger::addListener(cedar::proc::StepPtr step)
+{
+  this->cedar::proc::Trigger::addListener(step);
+  if (this->isRunning())
+  {
+    step->onStart();
+  }
+}
+
 void cedar::proc::LoopedTrigger::startTrigger()
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
