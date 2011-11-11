@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/MatrixIterator.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -87,7 +88,15 @@ void cedar::proc::steps::Projection::compute(const cedar::proc::Arguments&)
 void cedar::proc::steps::Projection::outputDimensionalityChanged()
 {
   unsigned int new_dimensionality = _mOutputDimensionality->getValue();
-  this->_mOutputDimensionSizes->resize(new_dimensionality, _mOutputDimensionSizes->getDefaultValue());
+
+  if (new_dimensionality == 0)
+  {
+    this->_mOutputDimensionSizes->resize(1, 1);
+  }
+  else
+  {
+    this->_mOutputDimensionSizes->resize(new_dimensionality, _mOutputDimensionSizes->getDefaultValue());
+  }
   //this->_mDimensionMappings->setMaximum(new_dimensionality);
   this->initializeOutputMatrix();
 }
@@ -161,6 +170,11 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
 {
   int dimensionality = static_cast<int>(_mOutputDimensionality->getValue());
 
+  if (dimensionality == 0)
+  {
+    dimensionality = 1;
+  }
+
   std::vector<int> sizes(dimensionality);
   for (int dim = 0; dim < dimensionality; ++dim)
   {
@@ -168,7 +182,7 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
   }
 
   this->lockAll();
-  if (dimensionality == 1)
+  if (dimensionality == 1) // this includes dimensionality == 0
   {
     this->mOutput->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
   }
@@ -181,7 +195,9 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
 
 void cedar::proc::steps::Projection::expand0DtoND()
 {
-  this->mOutput->setData((this->mOutput->getData() * 0) + this->mInput->getData());
+  CEDAR_DEBUG_ASSERT(mInput->getData().size[0] == 1)
+
+  mOutput->getData() = cv::Scalar(mInput->getData().at<float>(0));
 }
 
 /*
@@ -280,24 +296,64 @@ void cedar::proc::steps::Projection::compress3Dto2D()
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
 
   cedar::aux::math::reduceCvMat3D<float>(mInput->getData(), mOutput->getData(), mIndicesToCompress.at(0), _mCompressionType->getValue());
-};
+}
 
 void cedar::proc::steps::Projection::compress3Dto1D()
 {
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 2);
 
-//  cv::aux::math::cvReduceMat3D(mInput->getValue(), mOutput->getValue(), mIndicesToCompress.at(0), _mCompressionType);
-//  cv::reduce(mOutput->getValue(), mOutput->getValue(), mIndicesToCompress.at(0), _mCompressionType);
-};
+  std::vector<int> sizes;
 
-void cedar::proc::steps::Projection::compressNDto0D()
+  for (unsigned int i = 0; i < mInputDimensionality; ++i)
+  {
+    if (i != mIndicesToCompress.at(0))
+    {
+      sizes.push_back(mInput->getData().size[i]);
+    }
+  }
+
+  cv::Mat tmp_2d(mInputDimensionality - 1, &sizes.front(), CV_32F, cv::Scalar(0.0));
+
+  cedar::aux::math::reduceCvMat3D<float>(mInput->getData(), tmp_2d, mIndicesToCompress.at(0), _mCompressionType->getValue());
+  cv::reduce(tmp_2d, mOutput->getData(), mIndicesToCompress.at(1) - 1, _mCompressionType->getValue());
+}
+
+void cedar::proc::steps::Projection::compressNDtoMD()
 {
   // iterate over output matrix
   // map current indices to indices in the input matrix
   // fill the indices, which are to be compressed, with zeros
   // from the input matrix get the "maximum" along all dimensions, which are to be compressed
 
-};
+}
+
+void cedar::proc::steps::Projection::compressNDto0D()
+{
+  double maximum = 0;
+
+  if (mInputDimensionality < 3)
+  {
+    double minimum;
+    cv::minMaxLoc(mInput->getData(), &minimum, &maximum);
+  }
+  else
+  {
+    cedar::aux::MatrixIterator matrix_iterator(mInput->getData());
+
+    do
+    {
+      double current_value = mInput->getData().at<float>(matrix_iterator.getCurrentIndex());
+
+      if (current_value > maximum)
+      {
+        maximum = current_value;
+      }
+    }
+    while (matrix_iterator.increment());
+  }
+
+  mOutput->getData().at<float>(0) = maximum;
+}
 
 cedar::proc::DataSlot::VALIDITY cedar::proc::steps::Projection::determineInputValidity
                                 (
