@@ -1,22 +1,41 @@
 /*!
 
 @mainpage cedar -- Cognitive, Embodied, and Dynamic Architectures for Robots
-Welcome to cedar! This page will be populated soon.
+Welcome to cedar!
 
 @section Motivation Motivation
-The purpose of cedar...
- 
+cedar is the result of using a powerful, yet incoherent and fragmented for many years. cedar bundles our
+knowledge and ideology of autonomous robotic with emphasis on cognition, embodiment, and dynamics. cedar
+contains code from a multitude of scientific fields. Therefore, we put a lot of effort in keeping the different
+parts of cedar compatible to each other. Linking up perception and motor control of a robot and putting some
+cognitive processing in between should not be constrained by programming issues, but only be a question of
+applied concepts. cedar provides a tool aimed at facilitating the connection of modules to create robotic architectures.
+You can focus on "what" to connect, keeping the effort of "how" to connect it very low.
+
+@section Installation Installing cedar
+cedar uses the cmake build system. To create makefiles or project files for your build environment,
+please first copy the cedar.conf.example in your cedar base directory and name it cedar.conf. Have
+a look at its content and change any configuration entries that you feel are not right for your build
+environment. After preparing this, you can use the standard way of using cmake: create a new build 
+subfolder (e.g. "build"), change to this directory and call cmake in here (e.g. "cmake .." when using linux).
+If cmake encounters any problem, it will prompt some error report (e.g. an external dependency was not found).
+If not, cmake creates make or project files in this folder. Now you are ready to build cedar.
+
+@section Documentation How to Get This Documentation
+This documentation is included in your copy of cedar. cmake will create a Doxyfile in your build folder.
+You need Doxygen to create this documentation from the generated Doxyfile. Doxygen will create an html and
+a pdf output of the code documentation and additional pages like this introductory page. Feel free to browse
+through the class documentation, or just dig into the concepts incorporated in the implementation. You can also
+start with one of our tutorials, to get accustomed to the ways cedar can be used.
+
 @section Concepts Concepts
-Here, we explain general concepts that are used in cedar. 
+Here, we explain general concepts that are used in cedar.
 
-@subsection Threads Threads and Dynamics
-We use QThread and measure time on our own.
+@link Threads Threads and Dynamics @endlink
 
-@subsection Parameters Parameters
-We use libconfig++. It sucks.
+@link Parameters Storing and Loading Parameters @endlink
 
-@subsection InterProcesses Inter-Process Communication
-We use yarp. We really like yarp.
+@link InterProcess Inter process communication using yarp @endlink
 
 @section Testing Testing
 
@@ -26,8 +45,5 @@ We use yarp. We really like yarp.
 
 @section Tutorials Tutorials
 Move along! Nothing to see here!
-
-@section Documentation Documentation
-
  */
 
