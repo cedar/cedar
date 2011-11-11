@@ -193,7 +193,12 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     mNoiseCorrelationKernel->getReadWriteLock()->lockForRead();
     neural_noise = this->mNoiseCorrelationKernel->convolveWith(neural_noise);
     mNoiseCorrelationKernel->getReadWriteLock()->unlock();
-    sigmoid_u = mSigmoid->compute<float>(u + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1000.0)) * neural_noise);
+    //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
+    sigmoid_u = mSigmoid->compute<float>(
+                                          u
+                                          + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1000.0))
+                                            * neural_noise
+                                        );
   }
   else
   {
@@ -360,13 +365,15 @@ void cedar::dyn::NeuralField::numberOfKernelsChanged()
     // create as many kernels as necessary
     for (unsigned int i = mOldNumberOfKernels; i < new_number; i++)
     {
-      cedar::aux::kernel::GaussPtr kernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
-                                                                                                        1.0,
-                                                                                                        sigmas,
-                                                                                                        shifts,
-                                                                                                        5.0,
-                                                                                                        field_dimensionality
-                                                                                                      ));
+      cedar::aux::kernel::GaussPtr kernel
+        = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
+                                                                      1.0,
+                                                                      sigmas,
+                                                                      shifts,
+                                                                      5.0,
+                                                                      field_dimensionality
+                                                                      )
+                                                                    );
       mKernels.push_back(kernel);
       std::string kernel_name("lateralKernel");
       kernel_name += boost::lexical_cast<std::string>(i);
