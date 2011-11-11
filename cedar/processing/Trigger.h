@@ -121,7 +121,7 @@ protected:
   virtual void removeListener(cedar::proc::StepPtr step);
 
   //!@brief adds a listener, which will receive trigger signals from this instance from now on
-  void addListener(cedar::proc::StepPtr step);
+  virtual void addListener(cedar::proc::StepPtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
