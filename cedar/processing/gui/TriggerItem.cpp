@@ -155,7 +155,7 @@ void cedar::proc::gui::TriggerItem::isDocked(bool docked)
 cedar::proc::gui::ConnectValidity
   cedar::proc::gui::TriggerItem::canConnectTo(GraphicsBase* pTarget) const
 {
-  // a trigger cannot connect to its parent
+  // a trigger cannot connect to its parent (e.g., the step that owns it)
   if (pTarget == this->parentItem())
   {
     return cedar::proc::gui::CONNECT_NO;
@@ -168,7 +168,7 @@ cedar::proc::gui::ConnectValidity
 
   if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
   {
-    if(this->mTrigger->isListener(p_step_item->getStep()))
+    if(p_step_item->getStep()->getParentTrigger() || this->mTrigger->isListener(p_step_item->getStep()))
     {
       return cedar::proc::gui::CONNECT_NO;
     }
