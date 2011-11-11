@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Base.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/threadingUtilities.h"
 
 // PROJECT INCLUDES
 
@@ -122,7 +123,15 @@ public:
   //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
   virtual void onStop();
 
-  //!@brief Handles an external trigger signal.
+  /*!@brief    Handles an external trigger signal.
+   *
+   *           This method takes care of locking and unlocking all the data of the step properly and calls the compute method,
+   *           either by spawning a new thread or by calling it directly.
+   *
+   *  @remarks This method does nothing if the step is already running or there are invalid inputs (see
+   *           cedar::proc::DataRole::VALIDITY). It also does nothing if the compute function has previously encountered
+   *           an exception.
+   */
   void onTrigger();
 
   //!@brief Method that is called whenever an input is connected to the step.
@@ -186,8 +195,9 @@ public:
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
 
-  //!@brief Returns the input slot corresponding to the given name.
-  //!@see cedar::proc::Step::getSlot
+  /*!@brief Returns the input slot corresponding to the given name.
+   * @see   cedar::proc::Step::getSlot
+   */
   cedar::proc::DataSlotPtr getInputSlot(const std::string& name);
 
   //!@brief Returns the buffer slot corresponding to the given name.
@@ -226,7 +236,15 @@ public:
   //!@brief Returns the name of this step.
   const std::string& getName() const;
 
-  //!@brief Locks all data of this step.
+  /*!@brief   Locks all data of this step.
+   *
+   *          Locking is done in a special order that prevents deadlocks, therefore you should always use this function to
+   *          lock the step's data.
+   *
+   * @see     cedar::aux::lock for a description on the deadlock-free locking mechanism.
+   *
+   * @remarks Inputs are locked for reading, outputs and buffers for writing.
+   */
   void lockAll();
 
   //!@brief Unlocks all data of this step.
@@ -301,18 +319,23 @@ protected:
   //!@brief Sets the data pointer for the output called name.
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
 
-  //!@brief Sets the data pointer of the buffer
+  //!@brief Sets the data pointer of the buffer to zero.
   void freeBuffer(const std::string& name);
+
+  //!@brief Sets the data pointer of the output to zero.
   void freeOutput(const std::string& name);
 
+  /*!@brief Adds a trigger to the step.
+   *
+   *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
+   *        means that the processingIde will be able to show this trigger and allow to connect it.
+   */
   void addTrigger(cedar::proc::TriggerPtr& trigger);
 
-  void getDataLocks(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
-  void getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
-
-  //!@todo Instead of a DataRole::Id, use some (new) enum (LOCK_WRITE, LOCK_READ) and make a cedar::aux funciton out of this.
-  void lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
-  void unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+  /*!@brief Returns the set of data to be locked for this step during the compute function (or any other processing).
+   */
+  void getDataLocks(cedar::aux::LockSet& locks);
+  void getDataLocks(DataRole::Id role, cedar::aux::LockSet& locks);
 
   //! @brief Method that registers a function of an object so that it can be used by the framework.
   void registerFunction(const std::string& actionName, boost::function<void()> function);
