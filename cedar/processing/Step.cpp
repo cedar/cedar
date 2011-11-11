@@ -359,7 +359,7 @@ void cedar::proc::Step::checkMandatoryConnections()
   }
 }
 
-void cedar::proc::Step::getDataLocks(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
+void cedar::proc::Step::getDataLocks(cedar::aux::LockSet& locks)
 {
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
@@ -372,7 +372,7 @@ void cedar::proc::Step::getDataLocks(std::set<std::pair<QReadWriteLock*, DataRol
 /*!
  * @remarks The locks will be inserted into the set, the set is not cleared beforehand.
  */
-void cedar::proc::Step::getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
+void cedar::proc::Step::getDataLocks(DataRole::Id role, cedar::aux::LockSet& locks)
 {
   std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.find(role);
   if (slot == this->mDataConnections.end())
@@ -381,120 +381,46 @@ void cedar::proc::Step::getDataLocks(DataRole::Id role, std::set<std::pair<QRead
     return;
   }
 
+  cedar::aux::LOCK_TYPE type;
+  switch (role)
+  {
+    case cedar::proc::DataRole::INPUT:
+      type = cedar::aux::LOCK_TYPE_READ;
+      break;
+
+    case cedar::proc::DataRole::OUTPUT:
+    case cedar::proc::DataRole::BUFFER:
+      type = cedar::aux::LOCK_TYPE_WRITE;
+      break;
+
+    default:
+      // should never happen unless a role is
+      CEDAR_THROW(cedar::proc::InvalidRoleException, "The given role is not implemented in cedar::proc::Step::getDataLocks.");
+  }
+
+
   for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
   {
     cedar::aux::DataPtr data = iter->second->getData();
     if (data)
     {
-      locks.insert(std::make_pair(&data->getLock(), role));
+      locks.insert(std::make_pair(&data->getLock(), type));
     }
   }
 }
 
-void cedar::proc::Step::lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
-{
-  //!@todo Instead of DataRold, use a LockType that specifies read/write lock.
-  for (std::set<std::pair<QReadWriteLock*, DataRole::Id> >::iterator iter = locks.begin();
-       iter != locks.end();
-       ++iter)
-  {
-    switch (iter->second)
-    {
-      case cedar::proc::DataRole::INPUT:
-#ifdef DEBUG_LOCKS
-        cedar::aux::System::mCOutLock.tryLockForWrite(100);
-        std::cout << "readlocking lock " << iter->first << std::endl;
-        cedar::aux::System::mCOutLock.unlock();
-        if (!iter->first->tryLockForRead(100))
-        {
-          cedar::aux::System::mCOutLock.tryLockForWrite(100);
-          std::cout << "timeout " << iter->first << std::endl;
-          cedar::aux::System::mCOutLock.unlock();
-          continue;
-        }
-        cedar::aux::System::mCOutLock.tryLockForWrite(100);
-        std::cout << "readlocked " << iter->first << std::endl;
-        cedar::aux::System::mCOutLock.unlock();
-#else
-        iter->first->lockForRead();
-#endif // DEBUG_LOCKS
-        break;
-
-      case cedar::proc::DataRole::OUTPUT:
-      case cedar::proc::DataRole::BUFFER:
-#ifdef DEBUG_LOCKS
-        cedar::aux::System::mCOutLock.tryLockForWrite(100);
-        std::cout << "writelocking lock " << iter->first << std::endl;
-        cedar::aux::System::mCOutLock.unlock();
-        if (!iter->first->tryLockForWrite(100))
-        {
-          cedar::aux::System::mCOutLock.tryLockForWrite(100);
-          std::cout << "timeout " << iter->first << std::endl;
-          cedar::aux::System::mCOutLock.unlock();
-          continue;
-        }
-        cedar::aux::System::mCOutLock.tryLockForWrite(100);
-        std::cout << "writelocked " << iter->first << std::endl;
-        cedar::aux::System::mCOutLock.unlock();
-#else // DEBUG_LOCKS
-        iter->first->lockForWrite();
-#endif // DEBUG_LOCKS
-        break;
-
-      default:
-        // should never happen unless a role is
-        CEDAR_THROW(cedar::proc::InvalidRoleException, "The given role is not implemented in cedar::proc::Step::lock.");
-    }
-  }
-}
-
-void cedar::proc::Step::unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks)
-{
-  for (std::set<std::pair<QReadWriteLock*, DataRole::Id> >::iterator iter = locks.begin();
-       iter != locks.end();
-       ++iter)
-  {
-#ifdef DEBUG_LOCKS
-    cedar::aux::System::mCOutLock.lockForWrite();
-    std::cout << "unlocking lock " << iter->first << std::endl;
-    cedar::aux::System::mCOutLock.unlock();
-#endif // DEBUG_LOCKS
-    iter->first->unlock();
-  }
-}
-
-/*!
- * Locking is done in a special order that prevents deadlocks, therefore you should always use this function to lock the
- * steps data.
- *
- * @remarks Inputs are locked for reading, outputs and buffers for writing.
- */
 void cedar::proc::Step::lockAll()
 {
-  std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
-
-  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
-       slot != this->mDataConnections.end();
-       ++slot)
-  {
-    this->getDataLocks(slot->first, locks);
-  }
-
-  this->lock(locks);
+  cedar::aux::LockSet locks;
+  this->getDataLocks(locks);
+  cedar::aux::unlock(locks);
 }
 
 void cedar::proc::Step::unlockAll()
 {
-  std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
-
-  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
-       slot != this->mDataConnections.end();
-       ++slot)
-  {
-    this->getDataLocks(slot->first, locks);
-  }
-
-  this->unlock(locks);
+  cedar::aux::LockSet locks;
+  this->getDataLocks(locks);
+  cedar::aux::unlock(locks);
 }
 
 void cedar::proc::Step::onStart()
@@ -507,13 +433,6 @@ void cedar::proc::Step::onStop()
   this->setState(cedar::proc::Step::STATE_NONE, "");
 }
 
-/*! This method takes care of locking and unlocking all the data of the step properly and calls the compute method,
- *  either by spawning a new thread or by calling it directly.
- *
- *  @remarks This method does nothing if the step is already running or there are invalid inputs (see
- *           cedar::proc::DataRole::VALIDITY). It also does nothing if the compute function has previously encountered
- *           an exception.
- */
 void cedar::proc::Step::onTrigger()
 {
 #ifdef DEBUG_RUNNING
@@ -528,7 +447,6 @@ void cedar::proc::Step::onTrigger()
     return;
   }
 
-  //!@todo signal to the gui/user somehow when a step becomes inactive due to erroneous connections
   if (!this->allInputsValid())
   {
     this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
@@ -675,10 +593,10 @@ void cedar::proc::Step::run()
   this->mpArgumentsLock->unlock();
 
   //!@todo make the (un)locking optional?
-  std::set<std::pair<QReadWriteLock*, DataRole::Id> > locks;
+  cedar::aux::LockSet locks;
   this->getDataLocks(locks);
-  locks.insert(std::make_pair(arguments->getLock(), DataRole::INPUT));
-  this->lock(locks);
+  locks.insert(std::make_pair(arguments->getLock(), cedar::aux::LOCK_TYPE_READ));
+  cedar::aux::lock(locks);
 
   try
   {
@@ -697,7 +615,7 @@ void cedar::proc::Step::run()
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
-  this->unlock(locks);
+  cedar::aux::unlock(locks);
 
   // remove the argumens, as they have been processed.
   this->mFinished->trigger();
