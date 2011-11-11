@@ -936,13 +936,6 @@ void cedar::proc::Step::freeData(DataRole::Id role, const std::string& name)
     return;
   }
 
-//  // inputs come from a different step
-//  if (role != cedar::proc::DataRole::INPUT)
-//  {
-//    data->setOwner(this);
-//    data->connectedSlotName(name);
-//  }
-
   SlotMap::iterator map_iterator = iter->second.find(name);
   if (map_iterator != iter->second.end())
   {
@@ -1049,16 +1042,3 @@ bool cedar::proc::Step::autoConnectTriggers() const
 {
   return this->mAutoConnectTriggers;
 }
-
-/*
-void cedar::proc::Step::disconnect(
-                                    cedar::proc::StepPtr source,
-                                    const std::string&,
-                                    cedar::proc::StepPtr target,
-                                    const std::string& targetName
-                                  )
-{
-  target->freeInput(targetName);
-  source->getFinishedTrigger()->removeListener(target);
-}
-*/
