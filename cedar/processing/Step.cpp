@@ -468,18 +468,21 @@ void cedar::proc::Step::onTrigger()
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
 #endif // DEBUG_RUNNING
-  // if an exception has happened, do nothing.
+  // if an exception has previously happened, do nothing.
   if (this->mState == cedar::proc::Step::STATE_EXCEPTION)
   {
+    // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
     this->mpArgumentsLock->unlock();
     return;
   }
 
+  // if there are invalid inputs, stop
   if (!this->allInputsValid())
   {
     this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
+    // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
     this->mpArgumentsLock->unlock();
@@ -493,7 +496,7 @@ void cedar::proc::Step::onTrigger()
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   } // this->mMandatoryConnectionsAreSet
 
-  //!@todo Should busy be a part of STATE_*?
+  //!@todo Should busy be a part of STATE_*? Or even a lock?
   if (!this->mBusy)
   {
 #ifdef DEBUG_ARGUMENT_SETTING
@@ -501,15 +504,25 @@ void cedar::proc::Step::onTrigger()
     std::cout << "Evoking the run method of " << this->getName() << std::endl;
     cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_ARGUMENT_SETTING
+
+    // if we get to this point, set the state to running
     this->setState(cedar::proc::Step::STATE_RUNNING, "");
+
     if (this->_mRunInThread->getValue())
     {
+      // if the thread was already running, start() would have no effect, so that should not happen
       CEDAR_DEBUG_NON_CRITICAL_ASSERT(!this->isRunning());
+
+#ifdef DEBUG_ARGUMENT_SETTING
       if (!this->isRunning())
       {
+#endif // DEBUG_ARGUMENT_SETTING
+
+        // start this step's thread (this will eventually call the run method)
         this->start();
-      }
+
 #ifdef DEBUG_ARGUMENT_SETTING
+      }
       else
       {
         cedar::aux::System::mCOutLock.lockForWrite();
@@ -521,6 +534,7 @@ void cedar::proc::Step::onTrigger()
     }
     else
     {
+      // call the run function directly
       this->run();
     }
   }
@@ -594,12 +608,10 @@ void cedar::proc::Step::run()
   cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_ARGUMENT_SETTING
 
+  // check if arguments are set for the step.
   if (!this->mNextArguments)
   {
-//#ifdef DEBUG
-//    std::cout << "processing::Step [debug]> Warning: using default arguments for step " << this->getName() << "."
-//              << " Current argument's address is: " << this->mNextArguments.get() << std::endl;
-//#endif // DEBUG
+    // if not, use empty ones.
     arguments = cedar::proc::ArgumentsPtr(new cedar::proc::Arguments());
 
 #ifdef DEBUG_ARGUMENT_SETTING
@@ -610,6 +622,7 @@ void cedar::proc::Step::run()
   }
   else
   {
+    // read out the next arguments
     arguments = this->mNextArguments;
 
 #ifdef DEBUG_ARGUMENT_SETTING
@@ -630,8 +643,10 @@ void cedar::proc::Step::run()
 
   try
   {
+    // call the compute function with the given arguments
     this->compute(*(arguments.get()));
   }
+  // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::exc::ExceptionBase& e)
   {
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
@@ -698,6 +713,7 @@ void cedar::proc::Step::declareBuffer(const std::string& name, cedar::aux::DataP
 
 void cedar::proc::Step::declareOutput(const std::string& name, cedar::aux::DataPtr data)
 {
+  // if you don't actually want to set data here, call a different function.
   CEDAR_ASSERT(data.get() != NULL);
 
   this->declareOutput(name);
@@ -712,6 +728,7 @@ void cedar::proc::Step::makeInputCollection(const std::string& name, bool isColl
 
 void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, bool mandatory)
 {
+  // first, create a new slot map if necessary
   std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
   if (iter == this->mDataConnections.end())
   {
@@ -721,6 +738,7 @@ void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, 
     CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
   }
 
+  // check for duplicate entries in the slot map
   SlotMap::iterator map_iter = iter->second.find(name);
   if (map_iter != iter->second.end())
   {
@@ -730,15 +748,18 @@ void cedar::proc::Step::declareData(DataRole::Id role, const std::string& name, 
     return;
   }
 
+  // check the name
   if (name.find('.') != std::string::npos)
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Buffer names may not contain the character \".\". \""
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Data names may not contain the character \".\". \""
                                                    + name + "\" in step \"" + this->getName()
                                                    + "\" violates this rule.");
   }
 
+  // finally, insert a new data slot with the given parameters
   iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::DataSlot(role, name, mandatory));
 
+  // since the data has (potentially) changed, re-check the inputs
   this->checkMandatoryConnections();
 }
 
@@ -986,7 +1007,7 @@ void cedar::proc::Step::freeOutput(const std::string& name)
   this->freeData(DataRole::OUTPUT, name);
 }
 
-cedar::aux::DataPtr cedar::proc::Step::getInput(const std::string& name)
+cedar::aux::ConstDataPtr cedar::proc::Step::getInput(const std::string& name) const
 {
   return this->getData(DataRole::INPUT, name);
 }
@@ -1001,9 +1022,9 @@ cedar::aux::DataPtr cedar::proc::Step::getOutput(const std::string& name)
   return this->getData(DataRole::OUTPUT, name);
 }
 
-cedar::aux::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::string& name)
+cedar::aux::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::string& name) const
 {
-  std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  std::map<DataRole::Id, SlotMap>::const_iterator iter = this->mDataConnections.find(role);
   if (iter == this->mDataConnections.end())
   {
     CEDAR_THROW(cedar::proc::InvalidRoleException,
@@ -1012,7 +1033,7 @@ cedar::aux::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::str
                 + " does not exist.");
     return cedar::aux::DataPtr();
   }
-  SlotMap::iterator map_iterator = iter->second.find(name);
+  SlotMap::const_iterator map_iterator = iter->second.find(name);
   if (map_iterator == iter->second.end())
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "The requested "
