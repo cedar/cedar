@@ -88,7 +88,7 @@ public:
   void addTrigger(cedar::proc::TriggerPtr trigger);
 
   //!@brief removes a listener, which will no longer receive trigger signals
-  void removeListener(cedar::proc::StepPtr step);
+  virtual void removeListener(cedar::proc::StepPtr step);
 
   //!@brief removes a Trigger, which will no longer receive trigger signals
   void removeTrigger(cedar::proc::TriggerPtr trigger);

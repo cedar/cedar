@@ -87,6 +87,8 @@ public:
   void startTrigger();
   void stopTrigger();
 
+  void removeListener(cedar::proc::StepPtr step);
+
 public slots:
   void loopModeChanged();
   void loopTimeChanged();

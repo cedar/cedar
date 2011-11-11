@@ -110,6 +110,13 @@ void cedar::proc::LoopedTrigger::loopTimeChanged()
   this->setStepSize(this->mLoopTime->getValue());
 }
 
+void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
+{
+  this->cedar::proc::Trigger::removeListener(step);
+  //!@todo This assumes that the step is only connected to one looped trigger. However, this constraint is not expressed in the framework, yet.
+  step->onStop();
+}
+
 void cedar::proc::LoopedTrigger::startTrigger()
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
