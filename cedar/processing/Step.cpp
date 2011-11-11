@@ -67,6 +67,7 @@
 
 cedar::proc::Step::Step(bool runInThread, bool autoConnectTriggers)
 :
+// initialize members
 mFinished(new cedar::proc::Trigger("processingDone")),
 mAutoConnectTriggers (autoConnectTriggers),
 mBusy(false),
@@ -74,14 +75,17 @@ mpArgumentsLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet (true),
 mState(cedar::proc::Step::STATE_NONE),
 mRegisteredAt(NULL),
+// initialize parameters
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
 #ifdef DEBUG
   std::cout << "> allocated data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
 #endif
 
+  // Add the finished trigger to the list of triggers.
   this->addTrigger(mFinished);
 
+  // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
 }
 
@@ -138,12 +142,18 @@ void cedar::proc::Step::registerFunction(const std::string& actionName, boost::f
 
 void cedar::proc::Step::callAction(const std::string& name)
 {
+  // find the action
   ActionMap::iterator iter = this->mActions.find(name);
   if (iter == this->mActions.end())
   {
+    // if it doesn't exist, throw
     CEDAR_THROW(cedar::proc::InvalidNameException, "Unknown action name: " + name);
   }
+
+  // get the functor
   boost::function<void()>& function = iter->second;
+
+  // call it
   function();
 }
 
@@ -158,13 +168,17 @@ void cedar::proc::Step::onNameChanged()
 {
   if (this->mRegisteredAt != NULL)
   {
+    // update the name
     this->mRegisteredAt->updateObjectName(this);
+
+    // emit a signal to notift anyone interested in this
     emit nameChanged();
   }
 }
 
 void cedar::proc::Step::setRegistry(cedar::proc::StepRegistry* pRegistry)
 {
+  // set the parent registry
   this->mRegisteredAt = pRegistry;
 }
 
@@ -196,6 +210,7 @@ cedar::proc::Step::State cedar::proc::Step::getState() const
 
 void cedar::proc::Step::setState(cedar::proc::Step::State newState, const std::string& annotation)
 {
+  // Only act if the state actually changes.
   if (newState != this->mState || annotation != this->mStateAnnotation)
   {
     this->mState = newState;
@@ -225,30 +240,40 @@ void cedar::proc::Step::inputConnectionChanged(const std::string& /*inputName*/)
  */
 cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(cedar::proc::DataSlotPtr slot)
 {
+  // if the validty is indetermined (unknown), try to find it out
   if (slot->getValidlity() == cedar::proc::DataSlot::VALIDITY_UNKNOWN)
   {
+    // get the data object in the slot.
     cedar::aux::DataPtr data = slot->getData();
 
     cedar::proc::DataSlot::VALIDITY validity;
 
+    // check if the data is non-null.
     if (!data)
     {
       if (slot->isMandatory())
       {
+        // mandatory slots need data, so return error
         validity = cedar::proc::DataSlot::VALIDITY_ERROR;
       }
       else
       {
+        // non-mandatory slots being null is valid
         validity = cedar::proc::DataSlot::VALIDITY_VALID;
       }
     }
     else
     {
+      // get the validity from the user-implemented function
       validity = this->determineInputValidity(slot, data);
     }
+
+    // assign the validity to the slot
     slot->setValidity(validity);
 
   }
+
+  // return the validity stored in the slot
   return slot->getValidlity();
 }
 
@@ -264,6 +289,9 @@ cedar::proc::DataSlot::VALIDITY cedar::proc::Step::getInputValidity(const std::s
 
 /*! This is the default implementation which always returns cedar::proc::DataSlot::VALIDITY_VALID. Override this
  *  function in your subclass to provide custom type checks and other things.
+ *
+ *  If you return any value other than VALIDITY_UNKNOWN, the new value will be cached and only updated by calling
+ *  this function again when necessary.
  *
  *  For example, you can check whether an input matrix has the right dimensionality, or whether the new input is a
  *  matrix at all.
@@ -292,14 +320,14 @@ void cedar::proc::Step::parseDataNameNoRole
                           std::string& dataName
                         )
 {
-  // find the last dot.
+  // find the last dot to split the data name
   size_t dot_idx = instr.rfind('.');
   if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for step. Path is: " + instr);
   }
 
-  // split the string.
+  // Split the string. Step name is everything before the dot, dataName everything after it.
   stepName = instr.substr(0, dot_idx);
   dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
 }
@@ -342,6 +370,8 @@ const std::string& cedar::proc::Step::getName() const
 void cedar::proc::Step::checkMandatoryConnections()
 {
   this->mMandatoryConnectionsAreSet = true;
+
+  // then test every input. If one is false, return that.
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
        ++slot)

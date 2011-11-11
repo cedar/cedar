@@ -46,7 +46,9 @@ namespace cedar
   {
     enum LOCK_TYPE
     {
+      //! The lock should be locked for reading
       LOCK_TYPE_READ,
+      //! The lock should be locked for writing
       LOCK_TYPE_WRITE
     };
 
