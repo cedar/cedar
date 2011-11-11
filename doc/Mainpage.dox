@@ -4,7 +4,13 @@
 Welcome to cedar!
 
 @section Motivation Motivation
-The purpose of cedar...
+cedar is the result of using a powerful, yet incoherent and fragmented for many years. cedar bundles our
+knowledge and ideology of autonomous robotic with emphasis on cognition, embodiment, and dynamics. cedar
+contains code from a multitude of scientific fields. Therefore, we put a lot of effort in keeping the different
+parts of cedar compatible to each other. Linking up perception and motor control of a robot and putting some
+cognitive processing in between should not be constrained by programming issues, but only be a question of
+applied concepts. cedar provides a tool aimed at facilitating the connection of modules to create robotic architectures.
+You can focus on "what" to connect, keeping the effort of "how" to connect it very low.
 
 @section Installation Installing cedar
 cedar uses the cmake build system. To create makefiles or project files for your build environment,
@@ -39,8 +45,5 @@ Here, we explain general concepts that are used in cedar.
 
 @section Tutorials Tutorials
 Move along! Nothing to see here!
-
-@section Documentation Documentation
-
  */
 
