@@ -104,6 +104,18 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::setParentTrigger(cedar::proc::TriggerPtr parent)
+{
+  // If there is already a parent trigger, disconnect it first!
+  CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
+  this->mParentTrigger = parent;
+}
+
+cedar::proc::TriggerPtr cedar::proc::Step::getParentTrigger()
+{
+  return this->mParentTrigger.lock();
+}
+
 /*!
  * As an example, consider a class A that has a function void A::foo():
  *

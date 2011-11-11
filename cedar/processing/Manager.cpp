@@ -119,6 +119,43 @@ cedar::proc::Manager::~Manager()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
+void cedar::proc::Manager::connect(cedar::proc::TriggerPtr source, cedar::proc::StepPtr target)
+{
+  source->addListener(target);
+  target->setParentTrigger(source);
+
+  this->cleanupConnections();
+  mConnections.push_back(new cedar::proc::Connection(source, target));
+}
+
+void cedar::proc::Manager::disconnect(cedar::proc::TriggerPtr source, cedar::proc::StepPtr target)
+{
+  source->removeListener(target);
+  target->setParentTrigger(cedar::proc::TriggerPtr());
+
+  std::vector<cedar::proc::Connection*>::iterator iter = mConnections.begin();
+  while(iter != mConnections.end())
+  {
+    cedar::proc::Connection *p_connection = *iter;
+    try
+    {
+      if (p_connection->getSourceTrigger() == source && p_connection->getTarget() == target)
+      {
+        iter = mConnections.erase(iter);
+      }
+      else
+      {
+        ++iter;
+      }
+    }
+    catch(const cedar::proc::ConnectionMemberDeletedException&)
+    {
+      ++iter;
+    }
+  }
+}
+
 cedar::proc::FrameworkSettings& cedar::proc::Manager::settings()
 {
   return this->mSettings;
@@ -334,16 +371,6 @@ void cedar::proc::Manager::disconnect(
   p_connection->deleteConnection();
   delete p_connection;
   this->mConnections.erase(iter);
-}
-
-void cedar::proc::Manager::connect(
-                                    cedar::proc::TriggerPtr trigger,
-                                    cedar::proc::StepPtr target
-                                  )
-{
-  this->cleanupConnections();
-
-  mConnections.push_back(new cedar::proc::Connection(trigger, target));
 }
 
 void cedar::proc::Manager::connect(
