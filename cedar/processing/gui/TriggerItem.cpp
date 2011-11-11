@@ -176,7 +176,9 @@ cedar::proc::gui::ConnectValidity
 
   if (cedar::proc::gui::TriggerItem *p_trigger_item = dynamic_cast<cedar::proc::gui::TriggerItem*>(pTarget))
   {
-    if(this->mTrigger->isListener(p_trigger_item->getTrigger()))
+    // a trigger cannot be connected to a trigger if the target trigger is owned by a step (i.e., has a parent item) or
+    // if it is already a listener of the target
+    if(p_trigger_item->parentItem() != NULL || this->mTrigger->isListener(p_trigger_item->getTrigger()))
     {
       return cedar::proc::gui::CONNECT_NO;
     }
