@@ -44,6 +44,7 @@
 // PROJECT INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
+#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -78,19 +79,10 @@ int main(int /* argc */, char** /* argv */)
   TriggerPtr trigger (new Trigger());
 
   log_file << "Adding step." << std::endl;
-  trigger->addListener(step);
-
-  log_file << "Adding step again." << std::endl;
-  trigger->addListener(step);
-
-  if (trigger->getListeners().size() != 1)
-  {
-    ++errors;
-    log_file << "Error: same listener was added twice." << std::endl;
-  }
+  cedar::proc::Manager::getInstance().connect(trigger, step);
 
   log_file << "Removing step." << std::endl;
-  trigger->removeListener(step);
+  cedar::proc::Manager::getInstance().disconnect(trigger, step);
   if (trigger->getListeners().size() != 0)
   {
     ++errors;
@@ -98,8 +90,8 @@ int main(int /* argc */, char** /* argv */)
   }
 
   log_file << "Adding a second step." << std::endl;
-  trigger->addListener(step);
-  trigger->addListener(StepTestPtr(new StepTest()));
+  cedar::proc::Manager::getInstance().connect(trigger, step);
+  cedar::proc::Manager::getInstance().connect(trigger, StepTestPtr(new StepTest()));
   if (trigger->getListeners().size() != 2)
   {
     ++errors;

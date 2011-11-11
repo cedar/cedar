@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Base.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/auxiliaries/threadingUtilities.h"
 
 // PROJECT INCLUDES
 
@@ -122,7 +123,15 @@ public:
   //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
   virtual void onStop();
 
-  //!@brief Handles an external trigger signal.
+  /*!@brief    Handles an external trigger signal.
+   *
+   *           This method takes care of locking and unlocking all the data of the step properly and calls the compute method,
+   *           either by spawning a new thread or by calling it directly.
+   *
+   *  @remarks This method does nothing if the step is already running or there are invalid inputs (see
+   *           cedar::proc::DataRole::VALIDITY). It also does nothing if the compute function has previously encountered
+   *           an exception.
+   */
   void onTrigger();
 
   //!@brief Method that is called whenever an input is connected to the step.
@@ -159,7 +168,7 @@ public:
   void freeInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Returns a specific data pointer stored in this step.
-  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
+  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
 
   /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
    *
@@ -172,7 +181,7 @@ public:
   void makeInputCollection(const std::string& name, bool isCollection = true);
 
   //!@brief Returns a specific input data pointer stored in this step.
-  cedar::aux::DataPtr getInput(const std::string& name);
+  cedar::aux::ConstDataPtr getInput(const std::string& name) const;
 
   //!@brief Returns a specific buffer data pointer stored in this step.
   cedar::aux::DataPtr getBuffer(const std::string& name);
@@ -186,8 +195,9 @@ public:
   //!@brief Returns a constant reference to the map of data slots for a given role.
   const cedar::proc::Step::SlotMap& getDataSlots(DataRole::Id role) const;
 
-  //!@brief Returns the input slot corresponding to the given name.
-  //!@see cedar::proc::Step::getSlot
+  /*!@brief Returns the input slot corresponding to the given name.
+   * @see   cedar::proc::Step::getSlot
+   */
   cedar::proc::DataSlotPtr getInputSlot(const std::string& name);
 
   //!@brief Returns the buffer slot corresponding to the given name.
@@ -226,7 +236,15 @@ public:
   //!@brief Returns the name of this step.
   const std::string& getName() const;
 
-  //!@brief Locks all data of this step.
+  /*!@brief   Locks all data of this step.
+   *
+   *          Locking is done in a special order that prevents deadlocks, therefore you should always use this function to
+   *          lock the step's data.
+   *
+   * @see     cedar::aux::lock for a description on the deadlock-free locking mechanism.
+   *
+   * @remarks Inputs are locked for reading, outputs and buffers for writing.
+   */
   void lockAll();
 
   //!@brief Unlocks all data of this step.
@@ -261,6 +279,16 @@ public:
                 std::string& stepName,
                 std::string& dataName
               );
+
+  /*!@brief   Sets this step's parent trigger. Steps may only be triggerd by one trigger.
+   *
+   * @remarks This throws an exception if the step already has a parent trigger. If this happens, disconnect the trigger
+   *          first using the method in cedar::proc::Manager.
+   */
+  void setParentTrigger(cedar::proc::TriggerPtr parent);
+
+  //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
+  cedar::proc::TriggerPtr getParentTrigger();
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
@@ -301,18 +329,23 @@ protected:
   //!@brief Sets the data pointer for the output called name.
   void setOutput(const std::string& name, cedar::aux::DataPtr data);
 
-  //!@brief Sets the data pointer of the buffer
+  //!@brief Sets the data pointer of the buffer to zero.
   void freeBuffer(const std::string& name);
+
+  //!@brief Sets the data pointer of the output to zero.
   void freeOutput(const std::string& name);
 
+  /*!@brief Adds a trigger to the step.
+   *
+   *        After calling this method, this step will be aware that this trigger belongs to it. Among other things, this
+   *        means that the processingIde will be able to show this trigger and allow to connect it.
+   */
   void addTrigger(cedar::proc::TriggerPtr& trigger);
 
-  void getDataLocks(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
-  void getDataLocks(DataRole::Id role, std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
-
-  //!@todo Instead of a DataRole::Id, use some (new) enum (LOCK_WRITE, LOCK_READ) and make a cedar::aux funciton out of this.
-  void lock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
-  void unlock(std::set<std::pair<QReadWriteLock*, DataRole::Id> >& locks);
+  /*!@brief Returns the set of data to be locked for this step during the compute function (or any other processing).
+   */
+  void getDataLocks(cedar::aux::LockSet& locks);
+  void getDataLocks(DataRole::Id role, cedar::aux::LockSet& locks);
 
   //! @brief Method that registers a function of an object so that it can be used by the framework.
   void registerFunction(const std::string& actionName, boost::function<void()> function);
@@ -331,24 +364,47 @@ private:
    */
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
+  /*!@brief Implementation of the thread's main method.
+   *
+   *        This method checks all preconditions for running the step (i.e., are all inputs valid, have proper arguments
+   *        been set, ...). If all these preconditions are met, the compute function is called.
+   */
   void run();
 
+  /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
+   *
+   *        If all mandatory data is set (i.e., the data pointers in the slots are non-zero), the member
+   *        \em mMandatoryConnectionsAreSet is set to true. Otherwise, it is set to false.
+   */
   void checkMandatoryConnections();
+
+  /*!@brief Sets the data pointer for the slot of the given name and role.
+   */
   void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
+
+  /*!@brief Sets the data pointer of the slot with the given name and role to zero.
+   */
   void freeData(DataRole::Id role, const std::string& name);
 
+  /*!@brief Checks all inputs for validity.
+   *
+   * @see cedar::proc::Step::determineInputValidity.
+   */
   bool allInputsValid();
+
+  /*!@brief Sets the current state of the step.
+   *
+   * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
+   *        message of an exception in the STATE_EXCEPTION.
+   */
   void setState(cedar::proc::Step::State newState, const std::string& annotation);
 
   //!@brief Declares a new piece of data in the step.
   void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief the finished trigger, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
@@ -358,15 +414,26 @@ protected:
 private:
   //!@brief Whether the connect function should automatically connect the triggers as well.
   const bool mAutoConnectTriggers;
+
   //!@brief flag that states if step is still computing its latest output
   bool mBusy;
+
+  //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
+
+  //!@brief The arguments for the next cedar::proc::Step::compute call.
   ArgumentsPtr mNextArguments;
+
   //!@brief flag that states if all mandatory connections (i.e. inputs) are set
   bool mMandatoryConnectionsAreSet;
+
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
+
+  //!@brief The annotation string for the current state.
   std::string mStateAnnotation;
+
+  //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
   //!@brief Registry managing the step.
@@ -375,6 +442,9 @@ private:
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
 
+  //!@brief If set, this is the trigger that triggers the step.
+  cedar::proc::TriggerWeakPtr mParentTrigger;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -382,6 +452,7 @@ protected:
   // none yet
 
 private:
+  //!@brief Whether to call the compute function in a separate thread when cedar::proc::Step::onTrigger is called.
   cedar::aux::BoolParameterPtr _mRunInThread;
 
 }; // class cedar::proc::Step

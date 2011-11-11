@@ -45,6 +45,7 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/Step.h"
+#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
@@ -171,7 +172,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
     {
       ComputableTestPtr step (new ComputableTest(i, sequence_buffer, lock, runInThread));
       steps.push_back(step);
-      prev_trigger->addListener(step);
+      cedar::proc::Manager::getInstance().connect(prev_trigger, step);
 
       step->getFinishedTrigger()->addTrigger(multi_trigger);
 
@@ -184,7 +185,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   }
 
   EndStopTestPtr stop_test(new EndStopTest());
-  prev_trigger->addListener(stop_test);
+  cedar::proc::Manager::getInstance().connect(prev_trigger, stop_test);
 
   log_file << "Triggering sequence " << sequenceString << "." << std::endl;
   sequence_trigger->trigger();

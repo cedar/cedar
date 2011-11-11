@@ -193,7 +193,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief MatrixData representing the input. Storing it like this saves time during computation.
-  cedar::aux::MatDataPtr mInput;
+  cedar::aux::ConstMatDataPtr mInput;
 
   //!@brief The data containing the output.
   cedar::aux::MatDataPtr mOutput;

@@ -67,7 +67,7 @@ cedar::proc::Group::~Group()
 void cedar::proc::Group::addStep(cedar::proc::StepPtr step)
 {
   mSteps.insert(step);
-  mGroupTrigger->addListener(step);
+  cedar::proc::Manager::getInstance().connect(mGroupTrigger, step);
 }
 
 void cedar::proc::Group::removeStep(cedar::proc::StepPtr step)

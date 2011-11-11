@@ -87,6 +87,7 @@ public:
   void startTrigger();
   void stopTrigger();
 
+
 public slots:
   void loopModeChanged();
   void loopTimeChanged();
@@ -101,7 +102,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void removeListener(cedar::proc::StepPtr step);
+
+  void addListener(cedar::proc::StepPtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

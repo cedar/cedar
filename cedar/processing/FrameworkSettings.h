@@ -49,9 +49,9 @@
 #include <set>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
  *
- * More detailed description of the class.
+ * @todo  Write a widget for these settings.
  */
 class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
 {
@@ -66,13 +66,16 @@ public:
   //!@brief The standard constructor.
   FrameworkSettings();
 
-  //!@brief Destructor
+  //!@brief The destructor.
   ~FrameworkSettings();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*! @brief
+   *
+   */
   void load();
   void save();
 
@@ -98,8 +101,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:

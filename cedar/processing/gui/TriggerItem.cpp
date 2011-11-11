@@ -117,7 +117,7 @@ void cedar::proc::gui::TriggerItem::disconnect(cedar::proc::gui::GraphicsBase* p
     {
       cedar::proc::gui::StepItem *p_step = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pListener);
       CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_step->getStep()));
-      this->getTrigger()->removeListener(p_step->getStep());
+      cedar::proc::Manager::getInstance().disconnect(this->getTrigger(), p_step->getStep());
       break;
     }
 
@@ -155,7 +155,7 @@ void cedar::proc::gui::TriggerItem::isDocked(bool docked)
 cedar::proc::gui::ConnectValidity
   cedar::proc::gui::TriggerItem::canConnectTo(GraphicsBase* pTarget) const
 {
-  // a trigger cannot connect to its parent
+  // a trigger cannot connect to its parent (e.g., the step that owns it)
   if (pTarget == this->parentItem())
   {
     return cedar::proc::gui::CONNECT_NO;
@@ -168,7 +168,7 @@ cedar::proc::gui::ConnectValidity
 
   if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(pTarget))
   {
-    if(this->mTrigger->isListener(p_step_item->getStep()))
+    if(p_step_item->getStep()->getParentTrigger() || this->mTrigger->isListener(p_step_item->getStep()))
     {
       return cedar::proc::gui::CONNECT_NO;
     }
@@ -176,7 +176,9 @@ cedar::proc::gui::ConnectValidity
 
   if (cedar::proc::gui::TriggerItem *p_trigger_item = dynamic_cast<cedar::proc::gui::TriggerItem*>(pTarget))
   {
-    if(this->mTrigger->isListener(p_trigger_item->getTrigger()))
+    // a trigger cannot be connected to a trigger if the target trigger is owned by a step (i.e., has a parent item) or
+    // if it is already a listener of the target
+    if(p_trigger_item->parentItem() != NULL || this->mTrigger->isListener(p_trigger_item->getTrigger()))
     {
       return cedar::proc::gui::CONNECT_NO;
     }

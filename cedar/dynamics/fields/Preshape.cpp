@@ -76,8 +76,8 @@ _mTimeScale(new cedar::aux::DoubleParameter(this, "timeScale", 0.1, 0.001, 10.0)
 void cedar::dyn::Preshape::eulerStep(const cedar::unit::Time& time)
 {
   cv::Mat& preshape = this->mActivation->getData();
-  cedar::aux::DataPtr input = this->getInput("input");
-  cv::Mat& input_mat = input->getData<cv::Mat>();
+  cedar::aux::ConstDataPtr input = this->getInput("input");
+  const cv::Mat& input_mat = input->getData<cv::Mat>();
   const double& time_scale = this->_mTimeScale->getValue();
 
   // one possible preshape dynamic

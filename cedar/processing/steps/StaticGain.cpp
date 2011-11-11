@@ -106,7 +106,7 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   // Assign the input to the member. This saves us from casting in every computation step.
-  this->mInput = boost::shared_dynamic_cast<cedar::aux::MatData>(this->getInput(inputName));
+  this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   // This should always work since other types should not be accepted.
   CEDAR_DEBUG_ASSERT(this->mInput);
 
