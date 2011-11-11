@@ -113,7 +113,6 @@ void cedar::proc::LoopedTrigger::loopTimeChanged()
 void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
 {
   this->cedar::proc::Trigger::removeListener(step);
-  //!@todo This assumes that the step is only connected to one looped trigger. However, this constraint is not expressed in the framework, yet.
   step->onStop();
 }
 

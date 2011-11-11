@@ -280,6 +280,16 @@ public:
                 std::string& dataName
               );
 
+  /*!@brief   Sets this step's parent trigger. Steps may only be triggerd by one trigger.
+   *
+   * @remarks This throws an exception if the step already has a parent trigger. If this happens, disconnect the trigger
+   *          first using the method in cedar::proc::Manager.
+   */
+  void setParentTrigger(cedar::proc::TriggerPtr parent);
+
+  //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
+  cedar::proc::TriggerPtr getParentTrigger();
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -431,6 +441,9 @@ private:
 
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
+
+  //!@brief If set, this is the trigger that triggers the step.
+  cedar::proc::TriggerWeakPtr mParentTrigger;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

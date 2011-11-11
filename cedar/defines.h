@@ -50,6 +50,8 @@
 
 // SYSTEM INCLUDES
 #include <boost/foreach.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -78,7 +80,9 @@
  */
 #define CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME) \
   typedef boost::shared_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \
-  typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr;
+  typedef boost::shared_ptr<const CLASS_NAME> Const ## CLASS_NAME ## Ptr; \
+  typedef boost::weak_ptr<CLASS_NAME> CLASS_NAME ## WeakPtr; \
+  typedef boost::weak_ptr<const CLASS_NAME> Const ## CLASS_NAME ## WeakPtr;
 
 #define CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME) \
   typedef boost::intrusive_ptr<CLASS_NAME> CLASS_NAME ## Ptr; \

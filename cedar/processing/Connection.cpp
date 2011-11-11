@@ -38,6 +38,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/Connection.h"
+#include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/exceptions.h"
@@ -75,7 +76,7 @@ mTargetName(targetName)
    */
   if (target->autoConnectTriggers())
   {
-    source->getFinishedTrigger()->addListener(target);
+    cedar::proc::Manager::getInstance().connect(source->getFinishedTrigger(), target);
   }
 }
 
@@ -92,7 +93,7 @@ mTarget(target)
 #endif
   if (!source->isListener(target))
   {
-    source->addListener(target);
+    cedar::proc::Manager::getInstance().connect(source, target);
   }
 }
 
@@ -246,11 +247,11 @@ void cedar::proc::Connection::deleteConnection()
   {
     cedar::aux::DataPtr data = p_source_step->getOutput(this->mSourceName);
     p_target_step->freeInput(mTargetName, data);
-    p_source_step->getFinishedTrigger()->removeListener(p_target_step);
+    cedar::proc::Manager::getInstance().disconnect(p_source_step->getFinishedTrigger(), p_target_step);
   }
   else if (p_source_trigger && p_target_step)
   {
-    p_source_trigger->removeListener(p_target_step);
+    cedar::proc::Manager::getInstance().disconnect(p_source_trigger, p_target_step);
   }
   else if (mTrigger.lock() && p_target_trigger)
   {

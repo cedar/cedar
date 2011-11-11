@@ -117,7 +117,7 @@ void cedar::proc::gui::TriggerItem::disconnect(cedar::proc::gui::GraphicsBase* p
     {
       cedar::proc::gui::StepItem *p_step = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pListener);
       CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_step->getStep()));
-      this->getTrigger()->removeListener(p_step->getStep());
+      cedar::proc::Manager::getInstance().disconnect(this->getTrigger(), p_step->getStep());
       break;
     }
 

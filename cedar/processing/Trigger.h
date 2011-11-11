@@ -58,8 +58,9 @@
 class cedar::proc::Trigger : public virtual cedar::aux::NamedConfigurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Manager;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -81,14 +82,8 @@ public:
   //!@brief handles an incoming trigger signal if Trigger instance is listener
   virtual void onTrigger(Trigger*);
 
-  //!@brief adds a listener, which will receive trigger signals from this instance from now on
-  void addListener(cedar::proc::StepPtr step);
-
   //!@brief adds a Trigger, which will receive trigger signals from this instance from now on
   void addTrigger(cedar::proc::TriggerPtr trigger);
-
-  //!@brief removes a listener, which will no longer receive trigger signals
-  virtual void removeListener(cedar::proc::StepPtr step);
 
   //!@brief removes a Trigger, which will no longer receive trigger signals
   void removeTrigger(cedar::proc::TriggerPtr trigger);
@@ -104,7 +99,6 @@ public:
 
   //!@brief returns a list of listening triggers
   const std::vector<cedar::proc::TriggerPtr>& getTriggerListeners() const;
-
 
   virtual void notifyConnected(cedar::proc::Trigger* trigger);
 
@@ -123,7 +117,11 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief removes a listener, which will no longer receive trigger signals
+  virtual void removeListener(cedar::proc::StepPtr step);
+
+  //!@brief adds a listener, which will receive trigger signals from this instance from now on
+  void addListener(cedar::proc::StepPtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
