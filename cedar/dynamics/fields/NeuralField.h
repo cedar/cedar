@@ -122,6 +122,8 @@ protected:
   cedar::dyn::SpaceCodePtr mSigmoidalActivation;
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::dyn::SpaceCodePtr mLateralInteraction;
+  //!@brief this MatData contains the input noise
+  cedar::aux::MatDataPtr mInputNoise;
   //!@brief the resting level of a field
   cedar::aux::DoubleParameterPtr mRestingLevel;
   //!@brief the relaxation rate of the field
@@ -138,6 +140,8 @@ protected:
   cedar::aux::UIntVectorParameterPtr _mSizes;
   //!@brief the number of kernels
   cedar::aux::UIntParameterPtr _mNumberOfKernels;
+  //!@brief input noise gain
+  cedar::aux::DoubleParameterPtr _mInputNoiseGain;
   //!@brief the old number of kernels - needed to deal with changes in number of kernels
   unsigned int mOldNumberOfKernels;
 private:
