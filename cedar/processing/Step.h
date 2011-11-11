@@ -354,24 +354,47 @@ private:
    */
   virtual void compute(const cedar::proc::Arguments& arguments) = 0;
 
+  /*!@brief Implementation of the thread's main method.
+   *
+   *        This method checks all preconditions for running the step (i.e., are all inputs valid, have proper arguments
+   *        been set, ...). If all these preconditions are met, the compute function is called.
+   */
   void run();
 
+  /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
+   *
+   *        If all mandatory data is set (i.e., the data pointers in the slots are non-zero), the member
+   *        \em mMandatoryConnectionsAreSet is set to true. Otherwise, it is set to false.
+   */
   void checkMandatoryConnections();
+
+  /*!@brief Sets the data pointer for the slot of the given name and role.
+   */
   void setData(DataRole::Id role, const std::string& name, cedar::aux::DataPtr data);
+
+  /*!@brief Sets the data pointer of the slot with the given name and role to zero.
+   */
   void freeData(DataRole::Id role, const std::string& name);
 
+  /*!@brief Checks all inputs for validity.
+   *
+   * @see cedar::proc::Step::determineInputValidity.
+   */
   bool allInputsValid();
+
+  /*!@brief Sets the current state of the step.
+   *
+   * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
+   *        message of an exception in the STATE_EXCEPTION.
+   */
   void setState(cedar::proc::Step::State newState, const std::string& annotation);
 
   //!@brief Declares a new piece of data in the step.
   void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief the finished trigger, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
@@ -381,15 +404,26 @@ protected:
 private:
   //!@brief Whether the connect function should automatically connect the triggers as well.
   const bool mAutoConnectTriggers;
+
   //!@brief flag that states if step is still computing its latest output
   bool mBusy;
+
+  //!@brief The lock used for protecting the computation arguments of the step.
   QReadWriteLock* mpArgumentsLock;
+
+  //!@brief The arguments for the next cedar::proc::Step::compute call.
   ArgumentsPtr mNextArguments;
+
   //!@brief flag that states if all mandatory connections (i.e. inputs) are set
   bool mMandatoryConnectionsAreSet;
+
   //!@brief current state of this step, taken from cedar::processing::Step::State
   State mState;
+
+  //!@brief The annotation string for the current state.
   std::string mStateAnnotation;
+
+  //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
   //!@brief Registry managing the step.
@@ -405,6 +439,7 @@ protected:
   // none yet
 
 private:
+  //!@brief Whether to call the compute function in a separate thread when cedar::proc::Step::onTrigger is called.
   cedar::aux::BoolParameterPtr _mRunInThread;
 
 }; // class cedar::proc::Step
