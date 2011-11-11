@@ -65,6 +65,7 @@ mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mSigmoidalActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mLateralInteraction(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
 mInputNoise(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
+mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
 mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 0)),
 mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
@@ -116,6 +117,14 @@ _mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.
     this->mKernels.at(i)->hideDimensionality(true);
     this->addConfigurableChild(kernel_name, this->mKernels.at(i));
   }
+  mNoiseCorrelationKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
+                                                                                        0.0,
+                                                                                        sigmas,
+                                                                                        shifts,
+                                                                                        5.0,
+                                                                                        2
+                                                                                      ));
+  this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
   QObject::connect(_mNumberOfKernels.get(), SIGNAL(valueChanged()), this, SLOT(numberOfKernelsChanged()));
@@ -172,12 +181,25 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();
   cv::Mat& input_noise = this->mInputNoise->getData();
+  cv::Mat& neural_noise = this->mNeuralNoise->getData();
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
 
-  // calculate output
-  sigmoid_u = mSigmoid->compute<float>(u);
+  // if the neural noise correlation kernel has an amplitude != 0, create new random values and convolve
+  if (mNoiseCorrelationKernel->getAmplitude() != 0.0)
+  {
+    cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
+    mNoiseCorrelationKernel->getReadWriteLock()->lockForRead();
+    neural_noise = this->mNoiseCorrelationKernel->convolveWith(neural_noise);
+    mNoiseCorrelationKernel->getReadWriteLock()->unlock();
+    sigmoid_u = mSigmoid->compute<float>(u + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1000.0)) * neural_noise);
+  }
+  else
+  {
+    // calculate output
+    sigmoid_u = mSigmoid->compute<float>(u);
+  }
 
   // calculate the lateral interactions for all kernels
   lateral_interaction = 0.0;
@@ -293,6 +315,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mSigmoidalActivation->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
     this->mInputNoise->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+    this->mNeuralNoise->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
   }
   else if (dimensionality == 1)
   {
@@ -300,6 +323,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mSigmoidalActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
     this->mInputNoise->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
+    this->mNeuralNoise->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
   }
   else
   {
@@ -307,6 +331,7 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mSigmoidalActivation->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mLateralInteraction->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
     this->mInputNoise->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
+    this->mNeuralNoise->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->unlockAll();
   for (unsigned int i = 0; i < mKernels.size(); i++)
@@ -316,6 +341,7 @@ void cedar::dyn::NeuralField::updateMatrices()
       this->mKernels.at(i)->setDimensionality(dimensionality);
     }
   }
+  this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
 }
 
 void cedar::dyn::NeuralField::numberOfKernelsChanged()

@@ -124,6 +124,8 @@ protected:
   cedar::dyn::SpaceCodePtr mLateralInteraction;
   //!@brief this MatData contains the input noise
   cedar::aux::MatDataPtr mInputNoise;
+  //!@brief this MatData contains the neural noise
+  cedar::aux::MatDataPtr mNeuralNoise;
   //!@brief the resting level of a field
   cedar::aux::DoubleParameterPtr mRestingLevel;
   //!@brief the relaxation rate of the field
@@ -132,8 +134,10 @@ protected:
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
   //!@brief any sigmoid function
   cedar::aux::math::SigmoidPtr mSigmoid;
-  //!@brief the lateral interaction kernel, strictly excitatory at the moment
+  //!@brief the lateral interaction kernel
   std::vector<cedar::aux::kernel::GaussPtr> mKernels;
+  //!@brief the noise correlation kernel
+  cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension
