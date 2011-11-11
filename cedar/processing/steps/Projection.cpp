@@ -108,8 +108,6 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 
 void cedar::proc::steps::Projection::reconfigure()
 {
-  std::cout << "reconfigure\n";
-
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
 
   if (mInputDimensionality > output_dimensionality)
@@ -124,12 +122,6 @@ void cedar::proc::steps::Projection::reconfigure()
       {
         mIndicesToCompress.push_back(index);
       }
-    }
-
-    std::cout << "number of indices to compress: " << mIndicesToCompress.size() << "\n";
-    for (unsigned int index = 0; index < mIndicesToCompress.size(); ++index)
-    {
-      std::cout << mIndicesToCompress.at(index) << ", ";
     }
 
     if (mInputDimensionality == 3 && output_dimensionality == 2)
@@ -228,7 +220,6 @@ void cedar::proc::steps::Projection::expand1Dto2D()
 
 void cedar::proc::steps::Projection::expandMDtoND()
 {
-  std::cout << "expanding!\n";
   const cv::Mat& input = mInput->getData();
   cv::Mat& output = mOutput->getData();
 
@@ -245,7 +236,6 @@ void cedar::proc::steps::Projection::expandMDtoND()
 
     for (unsigned int i = 0; i < _mDimensionMappings->size(); ++i)
     {
-      std::cout << "mapping: " << i << " -> " << _mDimensionMappings->at(i) << "\n";
       input_indices.push_back(indices.at(_mDimensionMappings->at(i)));
     }
 
