@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ArchitectureToolBox.cpp
+    File:        TriggerClassList.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 11
+    Date:        2011 07 05
 
     Description:
 
@@ -39,32 +39,27 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/processing/gui/ArchitectureToolBox.h"
-#include "cedar/processing/gui/View.h"
-#include "cedar/processing/Manager.h"
-#include "cedar/auxiliaries/assert.h"
+#include "TriggerClassList.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::ArchitectureToolBox::ArchitectureToolBox(QWidget *pParent)
+cedar::proc::gui::TriggerClassList::TriggerClassList(QWidget *pParent)
 :
-cedar::proc::gui::ToolBox(4, pParent),
-mpView(NULL)
+QListWidget(pParent)
 {
-  this->addItem(":/modeicons/select.svg", "mode.Select", "selection mode");
-  this->addItem(":/modeicons/connect.svg", "mode.Connect", "connection mode");
-  this->addItem(":/modeicons/group.svg", "mode.Group", "grouping mode");
-  QObject::connect(this, SIGNAL(selectionChanged(QString)), this, SLOT(selectionChanged(QString)));
+  this->setViewMode(QListView::IconMode);
+  this->setMovement(QListView::Static);
+  this->setDragEnabled(true);
+  this->setIconSize(QSize(40, 40));
 }
 
-cedar::proc::gui::ArchitectureToolBox::~ArchitectureToolBox()
+cedar::proc::gui::TriggerClassList::~TriggerClassList()
 {
 }
 
@@ -72,37 +67,38 @@ cedar::proc::gui::ArchitectureToolBox::~ArchitectureToolBox()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ArchitectureToolBox::setView(cedar::proc::gui::View *pView)
+void cedar::proc::gui::TriggerClassList::showList(const cedar::proc::TriggerRegistry::CategoryEntries& entries)
 {
-  this->mpView = pView;
-}
+  using cedar::proc::Manager;
+  using cedar::proc::TriggerDeclarationPtr;
 
-void cedar::proc::gui::ArchitectureToolBox::selectionChanged(QString data)
-{
-  QStringList list = data.split(":");
-  const QString& mode = list[0];
-  QString param = "";
+  this->clear();
 
-  if (list.size() > 1)
+  for (cedar::proc::TriggerRegistry::CategoryEntries::const_iterator iter = entries.begin();
+       iter != entries.end();
+       ++iter
+      )
   {
-    param = list[1];
-  }
+    const TriggerDeclarationPtr& class_id = *iter;
+    QString label = class_id->getClassName().c_str();
+    label += "\n(";
+    label += class_id->getNamespaceName().c_str();
+    label += ")";
+    QListWidgetItem *p_item = new QListWidgetItem(label);
+    p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
-  CEDAR_DEBUG_ASSERT(this->mpView != NULL);
+    QIcon icon;
+    if (!class_id->getIconPath().empty())
+    {
+      icon = QIcon(class_id->getIconPath().c_str());
+    }
+    else
+    {
+      icon = QIcon(":/steps/no_icon.svg");
+    }
+    p_item->setIcon(icon);
 
-  cedar::proc::gui::Scene::MODE mode_val;
-  if (mode == "mode.Select")
-  {
-    mode_val = cedar::proc::gui::Scene::MODE_SELECT;
+    p_item->setData(Qt::UserRole, QVariant(class_id->getClassId().c_str()));
+    this->addItem(p_item);
   }
-  else if (mode == "mode.Group")
-  {
-    mode_val = cedar::proc::gui::Scene::MODE_GROUP;
-  }
-  else if (mode == "mode.Connect")
-  {
-    mode_val = cedar::proc::gui::Scene::MODE_CONNECT;
-  }
-
-  this->mpView->setMode(mode_val, param);
 }

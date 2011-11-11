@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepClassList.h"
+#include "cedar/processing/gui/TriggerClassList.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
@@ -146,23 +147,41 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
   StepClassList *tree = dynamic_cast<StepClassList*>(pEvent->source());
 
-  if (!tree)
-    return;
-
-  QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
-  QDataStream stream(&itemData, QIODevice::ReadOnly);
-
-  int r, c;
-  QMap<int, QVariant> v;
-  stream >> r >> c >> v;
-
-  QListWidgetItem *item = tree->item(r);
-
-  if (item)
+  if (tree)
   {
-    QPointF mapped = pEvent->scenePos();
-    QString class_id = item->data(Qt::UserRole).toString();
-    this->addProcessingStep(class_id.toStdString(), mapped);
+    QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
+    QDataStream stream(&itemData, QIODevice::ReadOnly);
+
+    int r, c;
+    QMap<int, QVariant> v;
+    stream >> r >> c >> v;
+
+    QListWidgetItem *item = tree->item(r);
+
+    if (item)
+    {
+      QPointF mapped = pEvent->scenePos();
+      QString class_id = item->data(Qt::UserRole).toString();
+      this->addProcessingStep(class_id.toStdString(), mapped);
+    }
+  }
+  else if (TriggerClassList *tree = dynamic_cast<TriggerClassList*>(pEvent->source()))
+  {
+    QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
+    QDataStream stream(&itemData, QIODevice::ReadOnly);
+
+    int r, c;
+    QMap<int, QVariant> v;
+    stream >> r >> c >> v;
+
+    QListWidgetItem *item = tree->item(r);
+
+    if (item)
+    {
+      QPointF mapped = pEvent->scenePos();
+      QString class_id = item->data(Qt::UserRole).toString();
+      this->addTrigger(class_id.toStdString(), mapped);
+    }
   }
 }
 
@@ -199,9 +218,6 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     case MODE_GROUP:
       this->groupModeProcessMousePress(pMouseEvent);
       break;
-
-    case MODE_CREATE_TRIGGER:
-      break;
   }
 }
 
@@ -219,7 +235,6 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
 
     default:
     case MODE_SELECT:
-    case MODE_CREATE_TRIGGER:
       QGraphicsScene::mouseMoveEvent(pMouseEvent);
       break;
   }
@@ -243,17 +258,6 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     case MODE_GROUP:
       this->groupModeProcessMouseRelease(pMouseEvent);
       break;
-
-    case MODE_CREATE_TRIGGER:
-      if (pMouseEvent->button() == Qt::LeftButton)
-      {
-        this->addTrigger(this->mModeParam.toStdString(), pMouseEvent->scenePos());
-      }
-      else
-      {
-        QGraphicsScene::mouseReleaseEvent(pMouseEvent);
-      }
-      break;
   }
 
   switch (this->mMode)
@@ -263,7 +267,6 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       break;
 
     case MODE_GROUP:
-    case MODE_CREATE_TRIGGER:
       if ( pMouseEvent->button() == Qt::LeftButton && (pMouseEvent->modifiers() & Qt::ShiftModifier) == 0)
       {
         this->setMode(MODE_SELECT);

@@ -143,6 +143,7 @@ protected:
   // none yet
 private:
   std::map<std::string, cedar::proc::gui::StepClassList*> mStepClassListWidgets;
+  std::map<std::string, cedar::proc::gui::TriggerClassList*> mTriggerClassListWidgets;
 
   cedar::proc::gui::NetworkFilePtr mNetwork;
 

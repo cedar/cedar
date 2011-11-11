@@ -77,7 +77,7 @@ public:
   (
     classFactory,
     classId,
-    ""
+    "Trigger"
   )
   {
   }

@@ -98,7 +98,7 @@
     <set>QDockWidget::DockWidgetFeatureMask</set>
    </property>
    <property name="windowTitle">
-    <string>Steps</string>
+    <string>Building Blocks</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>4</number>

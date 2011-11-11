@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Scene.h
+    File:        TriggerClassList.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 11 11
 
     Description:
 
@@ -38,96 +38,46 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_SCENE_H
-#define CEDAR_PROC_SCENE_H
+#ifndef CEDAR_PROC_GUI_TRIGGER_CLASS_LIST_H
+#define CEDAR_PROC_GUI_TRIGGER_CLASS_LIST_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/namespace.h"
+#include "cedar/processing/Manager.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsScene>
-#include <QMainWindow>
+#include <QListWidget>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::Scene : public QGraphicsScene
+class cedar::proc::gui::TriggerClassList : public QListWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros & types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
-
-public:
-  enum MODE
-  {
-    MODE_SELECT,
-    MODE_GROUP,
-    MODE_CONNECT
-  };
-
-  typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
-  typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Scene(cedar::proc::gui::View* peParentView, QObject *pParent = NULL, QMainWindow *pMainWindow = NULL);
+  TriggerClassList(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~Scene();
+  ~TriggerClassList();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void dropEvent(QGraphicsSceneDragDropEvent *pEvent);
-  void dragEnterEvent(QGraphicsSceneDragDropEvent *pEvent);
-  void dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent);
-
-  void mousePressEvent(QGraphicsSceneMouseEvent *pMouseEvent);
-  void mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent);
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
-
-  void addProcessingStep(const std::string& classId, QPointF position);
-  void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
-  void addStepItem(cedar::proc::gui::StepItem *pStep);
-  void removeStepItem(cedar::proc::gui::StepItem *pStep);
-  void addTrigger(const std::string& classId, QPointF position);
-  void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
-  void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
-  void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
-
-  void setMode(MODE mode, const QString& param = "");
-
-  void setMainWindow(QMainWindow *pMainWindow);
-
-  void setNetwork(cedar::proc::gui::NetworkFilePtr network);
-
-  void reset();
-
-  const StepMap& stepMap() const;
-  const TriggerMap& triggerMap() const;
-
-  cedar::proc::gui::StepItem* getStepItemFor(cedar::proc::Step* step);
-  cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
-
-  bool getSnapToGrid() const;
-  void setSnapToGrid(bool snap);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // signals
-  //--------------------------------------------------------------------------------------------------------------------
-  signals:
-    void exception(const QString& message);
-    void modeFinished();
+  //!@brief for a given category, show all registered steps (their icon and name)
+  void showList(const cedar::proc::TriggerRegistry::CategoryEntries& stepEntries);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -139,15 +89,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /* connect mode */
-  void connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
-  void connectModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
-  void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
-
-  /* group mode */
-  void groupModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent);
-  void groupModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent);
-  void groupModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -157,26 +99,7 @@ public:
 protected:
   // none yet
 private:
-  MODE mMode;
-  QString mModeParam;
-
-  cedar::proc::gui::NetworkFilePtr mNetwork;
-  cedar::proc::gui::View *mpeParentView;
-  /* connect mode related */
-  QGraphicsLineItem *mpNewConnectionIndicator;
-  cedar::proc::gui::GraphicsBase *mpConnectionStart;
-
-  /* group mode related */
-  QPointF mGroupStart;
-  QPointF mGroupEnd;
-  QGraphicsRectItem *mpGroupIndicator;
-  QList<QGraphicsItem*> mProspectiveGroupMembers;
-  QMainWindow *mpMainWindow;
-
-  StepMap mStepMap;
-  TriggerMap mTriggerMap;
-
-  bool mSnapToGrid;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -189,7 +112,7 @@ protected:
 private:
   // none yet
 
-}; // class ProcessingScene
+}; // class TriggerClassList
 
-#endif // CEDAR_PROC_SCENE_H
+#endif // CEDAR_PROC_GUI_TRIGGER_CLASS_LIST_H
 
