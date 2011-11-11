@@ -96,6 +96,12 @@ public:
   {
     return dynamic_cast<DataTemplate<T>&>(*this).getData();
   }
+
+  template <typename T>
+  const T& getData() const
+  {
+    return dynamic_cast<const DataTemplate<T>&>(*this).getData();
+  }
   
   template <typename T>
   T& cast()

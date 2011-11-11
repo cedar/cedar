@@ -168,7 +168,7 @@ public:
   void freeInput(const std::string& name, cedar::aux::DataPtr data);
 
   //!@brief Returns a specific data pointer stored in this step.
-  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name);
+  cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
 
   /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
    *
@@ -181,7 +181,7 @@ public:
   void makeInputCollection(const std::string& name, bool isCollection = true);
 
   //!@brief Returns a specific input data pointer stored in this step.
-  cedar::aux::DataPtr getInput(const std::string& name);
+  cedar::aux::ConstDataPtr getInput(const std::string& name) const;
 
   //!@brief Returns a specific buffer data pointer stored in this step.
   cedar::aux::DataPtr getBuffer(const std::string& name);
