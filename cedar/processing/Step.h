@@ -108,7 +108,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Step(bool runInThread = false, bool autoConnectTriggers = true);
+  Step(bool runInThread = false, bool isLooped = false);
 
   //!@brief Destructor
   virtual ~Step();
@@ -228,7 +228,10 @@ public:
   cedar::proc::ConstDataSlotPtr getSlot(DataRole::Id role, const std::string& name) const;
 
   //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  bool autoConnectTriggers() const;
+  inline bool isLooped() const
+  {
+    return this->mIsLooped;
+  }
 
   //!@brief Sets the name of this step.
   void setName(const std::string& name);
@@ -284,6 +287,8 @@ public:
    *
    * @remarks This throws an exception if the step already has a parent trigger. If this happens, disconnect the trigger
    *          first using the method in cedar::proc::Manager.
+   * @remarks Currently, the parent only has meaning if the mIsLooped is true, because only looped steps are restricted
+   *          to a single parent.
    */
   void setParentTrigger(cedar::proc::TriggerPtr parent);
 
@@ -413,7 +418,7 @@ protected:
 
 private:
   //!@brief Whether the connect function should automatically connect the triggers as well.
-  const bool mAutoConnectTriggers;
+  const bool mIsLooped;
 
   //!@brief flag that states if step is still computing its latest output
   bool mBusy;
