@@ -3,7 +3,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StereoVideoGrabberTest.cpp
+    File:        VideoGrabberTest.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
@@ -16,13 +16,13 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-
-// PROJECT INCLUDES
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 
+// PROJECT INCLUDES
+
 // SYSTEM INCLUDES
-#include <iostream>
-#include <exception>
+//#include <iostream>
+//#include <exception>
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 #define FILE_NAME_0 "/opt/matlab/R2010b/toolbox/images/imdemos/rhinos.avi"
 
 #define GRABBER_NAME_0 "Video_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "video_grabber_testcase.configfile"
+#define CONFIG_FILE_NAME_0 "video_grabber_testcase.config"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -243,16 +243,23 @@ int main(int , char **)
 
 
   //------------------------------------------------------------------
-  //clean up highgui
+  //clean up
+
   destroyWindow(highgui_window_name_0);
 
-  //for configfile
-  //video_grabber->setSpeedFactor(1);
+  //stop grabbing-thread if running
+  //recording will also be stopped
+  if (video_grabber->isRunning())
+  {
+    video_grabber->stop();
+  }
+
+  if (video_grabber)
+  {
+   delete video_grabber;
+  }
 
   std::cout << "finished\n";
-
-  delete video_grabber;
-  video_grabber=NULL;
 
   return 0;
 }

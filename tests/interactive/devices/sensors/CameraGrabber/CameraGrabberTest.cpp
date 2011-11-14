@@ -16,16 +16,16 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 //#include <devices/sensors/visual/CameraGrabber.h>
-//#include <auxiliaries/LogFile.h>
 
 // PROJECT INCLUDES
 
-
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+//#include <dc1394/1394.h>  //for all firewire stuff
+#include <dc1394/video.h>  //for video modes like  DC1394_FRAMERATE_15, DC1394_ISO_SPEED_400
+#include <dc1394/types.h>  //for constants like DC1394_VIDEO_MODE_320x240_YUV422
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@
 #define CHANNEL_0_DEVICE 0
 
 #define GRABBER_NAME_0 "Camera_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "camera_grabber_TestCase.configfile"
+#define CONFIG_FILE_NAME_0 "camera_grabber_testcase.config"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ int main(int , char **)
     //Set Snapshotnames without channel-number (in mono-case: default value is 0)
     //The type of the file (e.g. bitmap or jpg or something else) depend on extension
     //look at the documentation of setSnapshotName for details
-    camera_grabber->setSnapshotName("SnapshotFromCameraGrabber(mono).bmp");
+    camera_grabber->setSnapshotName("SnapshotFromCameraGrabber_mono.bmp");
 
     //Check the constructed filenames
     std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
@@ -143,6 +143,16 @@ int main(int , char **)
     // Be aware, that existing files will be overwritten without any question
     //camera_grabber->saveSnapshot(0);
 
+    std::cout << "Channel 0 settings:" << std::endl;
+    std::cout << "\tContrast:    " << camera_grabber->getCameraParamContrast() << std::endl;
+    std::cout << "\tBrightness:  " << camera_grabber->getCameraParamBrightness() << std::endl;
+    std::cout << "\tSaturation:  " << camera_grabber->getCameraParamSaturation() << std::endl;
+    std::cout << "\tHue:         " << camera_grabber->getCameraParamHue() << std::endl;
+    std::cout << "\tGain:        " << camera_grabber->getCameraParamGain() << std::endl;
+    std::cout << "\tExposure:    " << camera_grabber->getCameraParamExposure() << std::endl;
+    std::cout << "\n\tFourCC(Enc): " << camera_grabber->getCameraParamEncoding() << std::endl;
+    std::cout << "\tCamera Mode  : " << camera_grabber->getCameraParamMode() << std::endl;
+    std::cout << "\tCamera FPS  : " << camera_grabber->getCameraParamFps() << std::endl;
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
@@ -153,12 +163,13 @@ int main(int , char **)
   cv::Mat frame0 = camera_grabber->getImage();
 
   //start the grabber-thread for updating camera images
-  camera_grabber->setFps(20);
+  camera_grabber->setFps(15);
+  std::cout << "Start grabbing in the background" << std::endl;
   camera_grabber->start();
 
   //start recording
-  std::cout << "\nStart Recording\n";
-  camera_grabber->startRecording(15);
+  //std::cout << "\nStart Recording\n";
+  //camera_grabber->startRecording(15);
 
   //get frames for a while
   unsigned int counter=0;
@@ -172,31 +183,93 @@ int main(int , char **)
     frame0 = camera_grabber->getImage();
     counter++;
 
+    //every 100 ms
+    if (! (counter % 10)) {
+    }
+
+    //every second
+    if (! (counter % 100)) {
+      std::cout << "Thread FPS: " << camera_grabber->getFpsMeasured() << std::endl;
+    }
+
+
+
     //after one second, set camera options
     if (counter == 100)
     {
-
+      camera_grabber->setCameraParamBrightness(0, 10);
+      double brightness = camera_grabber->getCameraParamBrightness();
+      std::cout << "Brightness: " << brightness << std::endl;
     }
 
-    //exit after another second
+
+    //after another second, set camera options
     if (counter == 200)
+    {
+      camera_grabber->setCameraParamBrightness(0, 200);
+      double brightness = camera_grabber->getCameraParamBrightness();
+      std::cout << "Brightness: " << brightness << std::endl;
+    }
+
+    if (counter == 300)
+    {
+
+      std::cout <<"Set capture size: "<<std::endl;
+
+      cv::Size ch0_size = camera_grabber->getSize(0);
+      std::cout << "\tOld size: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+
+      /* cv::Size newSize;
+      newSize.width = 320;
+      newSize.height = 240;
+      camera_grabber->setCameraParamSize(0, newSize);
+      */
+      camera_grabber->setCameraParam(0,CV_CAP_PROP_MODE,DC1394_VIDEO_MODE_320x240_YUV422);
+
+
+      //camera_grabber->setCameraParamMode(0,(double)2);
+      std::cout << "\tCamera Mode  : " << camera_grabber->getCameraParamMode() << std::endl;
+
+      ch0_size = camera_grabber->getSize(0);
+      std::cout << "\tNew Size: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+    }
+
+    if (counter == 400)
+    {
+      std::cout << "Set Fps to 7.5 FPS" << std::endl;
+      std::cout << "\tOld Camera FPS  : " << camera_grabber->getCameraParamFps() << std::endl;
+      camera_grabber->setCameraParamFps(0,30);
+      //camera_grabber->setFps(7.5);
+      std::cout << "\tNew Camera FPS  : " << camera_grabber->getCameraParamFps() << std::endl;
+    }
+
+    //exit after 10 seconds
+    if (counter == 1000)
     {
       break;
     }
 
-    //wait 100ms (needed for highgui) => get images from thread with 10 fps
+    //wait 10ms (needed for highgui) => get images from thread with 10 fps
     waitKey(10);
   }
 
+  //------------------------------------------------------------------
+  //clean up
+
+  destroyWindow(highgui_window_name_0);
+
   //stop grabbing-thread if running
+  //recording will also be stopped
   if (camera_grabber->isRunning())
   {
     camera_grabber->stop();
   }
 
-  //------------------------------------------------------------------
-  //clean up highgui
-  destroyWindow(highgui_window_name_0);
+  if (camera_grabber)
+  {
+    delete camera_grabber;
+  }
+
   std::cout << "finished\n";
 
   return 0;

@@ -3,23 +3,21 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Stereopicture_grabberTest.cpp
+    File:        StereoNetGrabberTest.cpp
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Simple application to grab from a Picture (stereo-case)
+    Description: Simple application to grab from a Yarp-Server (stereo-case)
 
     Credits:
 
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "../../../../../cedar/auxiliaries/LogFile.h"
-#include "../../../../../cedar/devices/sensors/visual/NetGrabber.h"
+#include "cedar/devices/sensors/visual/NetGrabber.h"
 //#include <devices/sensors/visual/NetGrabber.h>
-//#include <auxiliaries/LogFile.h>
 
 // PROJECT INCLUDES
 
@@ -36,7 +34,7 @@
 #define YARP_CHANNEL_1 "Net_Grabber_TestCase_Channel_1"
 
 #define GRABBER_NAME_0 "Stereo_Net_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_net_grabber_TestCase.configfile"
+#define CONFIG_FILE_NAME_0 "stereo_net_grabber_testcase.config"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -220,9 +218,23 @@ int main(int , char **)
   }
 
   //------------------------------------------------------------------
-  //clean up highgui
+  //clean up
+
   destroyWindow(highgui_window_name_0);
   destroyWindow(highgui_window_name_1);
+
+  //stop grabbing-thread if running
+  //recording will also be stopped
+  if (net_grabber->isRunning())
+  {
+    net_grabber->stop();
+  }
+
+  if (net_grabber)
+  {
+   delete net_grabber;
+  }
+
   std::cout << "finished\n";
 
   return 0;
