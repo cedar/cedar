@@ -339,14 +339,14 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mNeuralNoise->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
   }
   this->unlockAll();
-  for (unsigned int i = 0; i < mKernels.size(); i++)
+  if (dimensionality > 0) // only adapt kernel in non-0D case
   {
-    if (dimensionality > 0)
+    for (unsigned int i = 0; i < mKernels.size(); i++)
     {
       this->mKernels.at(i)->setDimensionality(dimensionality);
     }
+    this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
   }
-  this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
 }
 
 void cedar::dyn::NeuralField::numberOfKernelsChanged()
