@@ -74,7 +74,7 @@ mTargetName(targetName)
    * want to be triggered. E.g., a dynamical system (not auto-connected) may trigger further processing during each
    * iteration.
    */
-  if (target->autoConnectTriggers())
+  if (!target->isLooped())
   {
     cedar::proc::Manager::getInstance().connect(source->getFinishedTrigger(), target);
   }

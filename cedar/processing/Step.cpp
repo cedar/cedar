@@ -65,11 +65,11 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::Step::Step(bool runInThread, bool autoConnectTriggers)
+cedar::proc::Step::Step(bool runInThread, bool isLooped)
 :
 // initialize members
 mFinished(new cedar::proc::Trigger("processingDone")),
-mAutoConnectTriggers (autoConnectTriggers),
+mIsLooped (isLooped),
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
 mMandatoryConnectionsAreSet (true),
@@ -106,8 +106,11 @@ cedar::proc::Step::~Step()
 
 void cedar::proc::Step::setParentTrigger(cedar::proc::TriggerPtr parent)
 {
-  // If there is already a parent trigger, disconnect it first!
-  CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
+  if (this->isLooped())
+  {
+    // If there is already a parent trigger for looped steps, disconnect it first!
+    CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
+  }
   this->mParentTrigger = parent;
 }
 
@@ -1050,7 +1053,3 @@ cedar::aux::DataPtr cedar::proc::Step::getData(DataRole::Id role, const std::str
   return map_iterator->second->getData();
 }
 
-bool cedar::proc::Step::autoConnectTriggers() const
-{
-  return this->mAutoConnectTriggers;
-}
