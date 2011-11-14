@@ -52,7 +52,7 @@
 cedar::dyn::Preshape::Preshape()
 :
 mActivation(new cedar::dyn::SpaceCode(cv::Mat::zeros(10,10,CV_32F))),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
 _mTimeScale(new cedar::aux::DoubleParameter(this, "timeScale", 0.1, 0.001, 10.0))
 {
@@ -168,8 +168,23 @@ void cedar::dyn::Preshape::updateMatrices()
   {
     sizes[dim] = _mSizes->at(dim);
   }
+  // check if matrices become too large
+  double max_size = 1.0;
+  for (int dim = 0; dim < dimensionality; ++dim)
+  {
+    max_size *= sizes[dim];
+    if (max_size > std::numeric_limits<unsigned int>::max()/100.0) // heuristics
+    {
+      CEDAR_THROW(cedar::aux::RangeException, "cannot handle matrices of this size");
+      return;
+    }
+  }
   this->lockAll();
-  if (dimensionality == 1)
+  if (dimensionality == 0)
+  {
+    this->mActivation->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+  }
+  else if (dimensionality == 1)
   {
     this->mActivation->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
   }

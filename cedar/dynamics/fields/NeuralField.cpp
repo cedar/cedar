@@ -313,6 +313,17 @@ void cedar::dyn::NeuralField::updateMatrices()
   {
     sizes[dim] = _mSizes->at(dim);
   }
+  // check if matrices become too large
+  double max_size = 1.0;
+  for (int dim = 0; dim < dimensionality; ++dim)
+  {
+    max_size *= sizes[dim];
+    if (max_size > std::numeric_limits<unsigned int>::max()/500.0) // heuristics
+    {
+      CEDAR_THROW(cedar::aux::RangeException, "cannot handle matrices of this size");
+      return;
+    }
+  }
   this->lockAll();
   if (dimensionality == 0)
   {
