@@ -46,11 +46,12 @@
 //!@todo should the template functions be moved to the header?
 
 using namespace std;
-
+//!@cond SKIPPED_DOCUMENTATION
 double cedar::aux::math::sigmoid(const double x, const double beta, const double threshold)
 {
   return sigmoidExp(x, beta, threshold);
 }
+//!@endcond
 
 double cedar::aux::math::sigmoidExp(const double x, const double beta, const double threshold)
 {

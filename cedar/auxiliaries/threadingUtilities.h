@@ -44,6 +44,7 @@ namespace cedar
 {
   namespace aux
   {
+    //!@brief the role of a lock (either READ lock or WRITE lock)
     enum LOCK_TYPE
     {
       //! The lock should be locked for reading
@@ -52,6 +53,7 @@ namespace cedar
       LOCK_TYPE_WRITE
     };
 
+    //!@brief a set of pairs of QReadWriteLocks and their corresponding lock role from cedar::aux::LOCK_TYPE
     typedef std::set<std::pair<QReadWriteLock*, LOCK_TYPE> > LockSet;
 
     /*! @brief Locks the given locks in a deadlock-free manner.

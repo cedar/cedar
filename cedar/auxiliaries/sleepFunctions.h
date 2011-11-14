@@ -45,8 +45,11 @@ namespace cedar
 {
   namespace aux
   {
+    //!@brief cedar's own sleep function, which requires a Time object as sleep interval
     CEDAR_AUX_LIB_EXPORT void sleep(cedar::unit::Time time);
+    //!@brief Windows does not ship its own usleep function - for compatibility reasons, here's the cedar version
     CEDAR_AUX_LIB_EXPORT void usleep(unsigned int microseconds);
+    //!@brief for compatibility reasons, here's the cedar version of sleep taking a uint
     CEDAR_AUX_LIB_EXPORT void sleep(unsigned int seconds);
   }
 }
