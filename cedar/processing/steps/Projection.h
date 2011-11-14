@@ -112,6 +112,8 @@ private:
 
   //!@brief expands a 0D input to an ND output
   void expand0DtoND();
+  //!@brief expands a 1D input to an 2D output
+  void expand1Dto2D();
   //!@brief expands and permutes MD input to ND output (M <= N)
   void expandMDtoND();
   //!@brief compresses ND input to MD output
