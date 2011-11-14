@@ -115,7 +115,7 @@ void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
   this->cedar::proc::Trigger::removeListener(step);
   if (this->isRunning())
   {
-    step->onStop();
+    step->callOnStop();
   }
 }
 
@@ -124,7 +124,7 @@ void cedar::proc::LoopedTrigger::addListener(cedar::proc::StepPtr step)
   this->cedar::proc::Trigger::addListener(step);
   if (this->isRunning())
   {
-    step->onStart();
+    step->callOnStart();
   }
 }
 
@@ -132,7 +132,7 @@ void cedar::proc::LoopedTrigger::startTrigger()
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->onStart();
+    this->mListeners.at(i)->callOnStart();
   }
   CEDAR_NON_CRITICAL_ASSERT(!this->isRunning());
   this->start();
@@ -144,7 +144,7 @@ void cedar::proc::LoopedTrigger::stopTrigger()
 
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    this->mListeners.at(i)->onStop();
+    this->mListeners.at(i)->callOnStop();
   }
 }
 

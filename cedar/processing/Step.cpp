@@ -104,6 +104,7 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+
 void cedar::proc::Step::setParentTrigger(cedar::proc::TriggerPtr parent)
 {
   if (this->isLooped())
@@ -468,6 +469,25 @@ void cedar::proc::Step::unlockAll()
   cedar::aux::unlock(locks);
 }
 
+void cedar::proc::Step::callOnStart()
+{
+  this->onStart();
+  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+  {
+    this->mFinished->getListeners().at(i)->callOnStart();
+  }
+}
+
+void cedar::proc::Step::callOnStop()
+{
+  this->onStop();
+  this->setState(cedar::proc::Step::STATE_NONE, "");
+  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+  {
+    this->mFinished->getListeners().at(i)->callOnStop();
+  }
+}
+
 void cedar::proc::Step::onStart()
 {
   // empty as a default implementation
@@ -475,7 +495,7 @@ void cedar::proc::Step::onStart()
 
 void cedar::proc::Step::onStop()
 {
-  this->setState(cedar::proc::Step::STATE_NONE, "");
+  // empty as a default implementation
 }
 
 void cedar::proc::Step::onTrigger()

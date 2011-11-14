@@ -55,6 +55,7 @@ QListWidget(pParent)
 {
   this->setViewMode(QListView::IconMode);
   this->setMovement(QListView::Static);
+  this->setResizeMode(QListView::Adjust);
   this->setDragEnabled(true);
   this->setIconSize(QSize(40, 40));
 }
