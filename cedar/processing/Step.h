@@ -428,7 +428,7 @@ private:
 protected:
   //!@brief the finished trigger, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
-  //!@Brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
+  //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mDataConnections;
 
 private:

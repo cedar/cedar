@@ -70,18 +70,24 @@ namespace cedar
     //!@brief smart pointer for IntervalData<int>
     typedef boost::shared_ptr<IntervalData<int> > IntIntervalPtr;
 
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
     CEDAR_DECLARE_AUX_CLASS(Object);
     CEDAR_DECLARE_AUX_CLASS(System);
+    //!@endcond
 
     //!@brief A type for identifying enum entries. Corresponds to the C++ enum int values for each enum entry.
     typedef unsigned int EnumId;
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Enum);
     CEDAR_DECLARE_AUX_CLASS(EnumBase);
+    //!@endcond
     template <class T> class EnumType;
 
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Arguments);
+    //!@endcond
 
     template <class T, typename SmartPointerType> class Factory;
     template <class T, class T2, typename SmartPointerType> class FactoryDerived;
@@ -98,50 +104,67 @@ namespace cedar
     >
     class TypeBasedFactory;
 
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
+    //!@endcond
 
+    //!@brief a template class for parameters
     template <typename T> class ParameterTemplate;
+    //!@brief a template class for numeric parameters, having a minimum and maximum value
     template <typename T> class NumericParameter;
+    //!@brief a template class for vector parameters (of same type)
     template <typename T> class VectorParameter;
+    //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
-    //!@ A concretization of NumericParameter for double values.
+    //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
-    //!@ A concretization of NumericParameter for unsigned int values.
+    //!@brief A concretization of NumericParameter for unsigned int values.
     typedef NumericParameter<unsigned int> UIntParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
-    //!@ A concretization of ParameterTemplate for strings.
+    //!@brief A concretization of ParameterTemplate for strings.
     typedef ParameterTemplate<std::string> StringParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
-    //!@ A concretization of ParameterTemplate for booleans.
+    //!@brief A concretization of ParameterTemplate for booleans.
     typedef ParameterTemplate<bool> BoolParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
-    //!@ A concretization of VectorParameter for booleans.
+    //!@brief A concretization of VectorParameter for booleans.
     typedef VectorParameter<bool> BoolVectorParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
-    //!@ A concretization of VectorParameter for strings.
+    //!@brief A concretization of VectorParameter for strings.
     typedef VectorParameter<std::string> StringVectorParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
-    //!@ A concretization of NumericVectorParameter for double values.
+    //!@brief A concretization of NumericVectorParameter for double values.
     typedef NumericVectorParameter<double> DoubleVectorParameter;
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
-    //!@ A concretization of NumericVectorParameter for unsigned int values.
+    //!@brief A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+    // all intrusive smart pointers
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
+    //!@endcond
+
+    //!@brief a parameter storing a valid directory
     class DirectoryParameter;
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DirectoryParameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(EnumParameter);
+    //!@endcond
 
+    //!@brief a parameter containing a set of type T
     template <typename T> class SetParameter;
+    //!@brief a parameter containing a set of type string
     typedef SetParameter<std::string> StringSetParameter;
+    //!@brief an intrusive pointer to a parameter containing a set of type string
     typedef boost::intrusive_ptr<StringSetParameter> StringSetParameterPtr;
 
+    //!@brief a better name for boost's property tree
     typedef boost::property_tree::ptree ConfigurationNode;
 
 
     /*!@brief Template method that converts simple data types to a string.
      *
-     * @param[in] value The data value that will be converted to a string.
+     * @param value The data value that will be converted to a string.
      */
     template<typename T>
     std::string toString(const T &value)
@@ -153,23 +176,23 @@ namespace cedar
     //!@brief class declaration of Data
     CEDAR_DECLARE_AUX_CLASS(Data);
 
+    //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;
 
-    //!@ A concretization of DataTemplate for simple matrices (cv::Mat).
+    //!@brief A concretization of DataTemplate for simple matrices (cv::Mat).
     typedef DataTemplate<cv::Mat> MatData;
-    CEDAR_GENERATE_POINTER_TYPES(MatData);
 
-    //!@ A concretization of DataTemplate for simple points (cv::Point).
+    //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
-    CEDAR_GENERATE_POINTER_TYPES(CvPointData);
 
-    //!@ A concretization of DataTemplate for double values.
+    //!@brief A concretization of DataTemplate for double values.
     typedef DataTemplate<double> DoubleData;
-    CEDAR_GENERATE_POINTER_TYPES(DoubleData);
 
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_GENERATE_POINTER_TYPES(MatData);
+    CEDAR_GENERATE_POINTER_TYPES(CvPointData);
+    CEDAR_GENERATE_POINTER_TYPES(DoubleData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
-
     /* exceptions */
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
