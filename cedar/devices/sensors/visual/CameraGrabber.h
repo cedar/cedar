@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "GrabberInterface.h"
+#include "tryout/FireWireVideoCapture.h"
 
 // PROJECT INCLUDES
 
@@ -68,23 +69,28 @@ public:
 
   /*! \brief  Constructor for a single-file grabber
    *  \param configFileName Filename for the configuration
-   *  \param Camera    Filename to grab from. Look at OpenCV cv::VideoCapture documentation for details
+   *  \param camera Device to grab from. Look at OpenCV cv::VideoCapture documentation for details
+   *  \remarks
+   *    OpenCV selects the capture framework at the basis of the camera parameter. Use a multiple of 100 to select
+   *    the interface or use the CV_CAP_xxx constants in /usr/local/include/opencv2/highgui/highgui_c.h for a
+   *    base unit (like CV_CAP_FIREWIRE, CV_CAP_ANY)
    */
   CameraGrabber(
                  const std::string& configFileName,
-                 unsigned int Camera
+                 unsigned int camera
                );
 
 
   /*! \brief Constructor for a stereo-file grabber
    *  \param configFileName Filename for the configuration
-   *  \param Camera0 Device to grab from for channel 0. Look at OpenCV cv::VideoCapture documentation for details
-   *  \param Camera1 Device to grab from for channel 1. Look at OpenCV cv::VideoCapture documentation for details
+   *  \param camera0 Device to grab from for channel 0. Look at OpenCV cv::VideoCapture documentation for details
+   *  \param camera1 Device to grab from for channel 1. Look at OpenCV cv::VideoCapture documentation for details
+   *  \see CameraGrabber() for details about the used framework
    */
   CameraGrabber(
                  const std::string& configFileName,
-                 unsigned int Camera0,
-                 unsigned int Camera1
+                 unsigned int camera0,
+                 unsigned int camera1
                );
 
   /*! \brief Destructor */
@@ -122,24 +128,56 @@ public:
    */
   double getCameraParamEncoding (unsigned int channel=0);
 
-  double getCameraParamBrightness (unsigned int channel=0);
-  double getCameraParamContrast (unsigned int channel=0);
-  double getCameraParamSaturation (unsigned int channel=0);
-  double getCameraParamHue (unsigned int channel=0);
-  double getCameraParamGain (unsigned int channel=0);
-  double getCameraParamExposure (unsigned int channel=0);
 
+  double getCameraParamBrightness (unsigned int channel=0);
+
+  double getCameraParamContrast (unsigned int channel=0);
+
+  double getCameraParamSaturation (unsigned int channel=0);
+
+  double getCameraParamHue (unsigned int channel=0);
+
+  double getCameraParamGain (unsigned int channel=0);
+
+  double getCameraParamExposure (unsigned int channel=0); // = shutter in coriander
+
+  double getCameraParamMode (unsigned int channel=0);
 
   bool setCameraParam (unsigned int channel,int propId, double value);
   
+  //sony firewire cam: according to coriander: 3.25 7,5 15 30 fps
   bool setCameraParamFps (unsigned int channel, double value);
   bool setCameraParamEncoding (unsigned int channel, double value);
+
+
+
+  //sony firewire cam: min: 0 max 255
   bool setCameraParamBrightness (unsigned int channel, double value);
+
+  //sony firewire cam: -1 default (nothing to adjust??)
   bool setCameraParamContrast (unsigned int channel, double value);
+
+  //sony firewire cam: min: 0 (greyscale) max 255, default 127;
   bool setCameraParamSaturation (unsigned int channel, double value);
+
+  //sony firewire cam: min: 0 max 255
   bool setCameraParamHue (unsigned int channel, double value);
+
+  //sony firewire cam: min: 0 max 255
   bool setCameraParamGain (unsigned int channel, double value);
+
+  //sony firewire cam: min: 0 max 255
   bool setCameraParamExposure (unsigned int channel, double value);
+
+  //sony firewire cam: not supported
+  bool setCameraParamSize (unsigned int channel, cv::Size size);
+
+  //sony firewire cam: not supported
+  //Mode_3 640 × 480(4:2:2);
+  //Mode_2 640 × 480(4:1:1)
+  //Mode_1 320 × 240(4:2:2)
+  //Mode_0 160 × 120(4:4:4)
+  bool setCameraParamMode (unsigned int channel, double value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -190,7 +228,8 @@ protected:
    *  \see
    *    mCameraId
    */
-  std::vector<cv::VideoCapture> mCaptureVector;
+  //std::vector<cv::VideoCapture> mCaptureVector;
+  std::vector<FireWireVideoCapture> mCaptureVector;
 private:
   // none yet
 

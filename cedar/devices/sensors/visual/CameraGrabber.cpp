@@ -55,7 +55,7 @@ using namespace cedar::dev::sensors::visual;
 //Constructor for single-file grabber
 CameraGrabber::CameraGrabber(
                               const std::string& configFileName,
-                              unsigned int Camera
+                              unsigned int camera
                             )
 :
 GrabberInterface(configFileName)
@@ -64,7 +64,7 @@ GrabberInterface(configFileName)
     std::cout << "[CameraGrabber::CameraGrabber] Create single channel instance" << std::endl;
   #endif
 
-  mCameraId.push_back(Camera);
+  mCameraId.push_back(camera);
   doInit(mCameraId.size(),"CameraGrabber");
 }
 
@@ -73,8 +73,8 @@ GrabberInterface(configFileName)
 //Constructor for stereo-file grabber
 CameraGrabber::CameraGrabber(
                               const std::string& configFileName,
-                              unsigned int Camera0,
-                              unsigned int Camera1
+                              unsigned int camera0,
+                              unsigned int camera1
                             )
 :
 GrabberInterface(configFileName)
@@ -83,8 +83,8 @@ GrabberInterface(configFileName)
     std::cout << "[CameraGrabber::CameraGrabber] Create stereo channel instance" << std::endl;
   #endif
 
-  mCameraId.push_back(Camera0);
-  mCameraId.push_back(Camera1);
+  mCameraId.push_back(camera0);
+  mCameraId.push_back(camera1);
 
   doInit(mCameraId.size(),"CameraGrabber");
 }
@@ -137,7 +137,8 @@ bool CameraGrabber::onInit()
 
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    VideoCapture capture(mCameraId.at(i));
+    //VideoCapture capture(mCameraId.at(i));
+    FireWireVideoCapture capture(mCameraId.at(i));
     if (capture.isOpened())
     {
       mCaptureVector.push_back(capture);
@@ -355,4 +356,22 @@ bool CameraGrabber::setCameraParamGain(unsigned int channel, double value)
 bool CameraGrabber::setCameraParamExposure(unsigned int channel, double value)
 {
   return setCameraParam(channel,CV_CAP_PROP_EXPOSURE,value);
+}
+
+bool CameraGrabber::setCameraParamSize (unsigned int channel, cv::Size size)
+{
+  bool result;
+  result = setCameraParam(channel,CV_CAP_PROP_FRAME_WIDTH, size.width);
+  result = result && setCameraParam(channel,CV_CAP_PROP_FRAME_HEIGHT, size.height);
+  return result;
+}
+
+bool CameraGrabber::setCameraParamMode (unsigned int channel, double value)
+{
+  return setCameraParam(channel,CV_CAP_PROP_MODE, value);
+}
+
+double CameraGrabber::getCameraParamMode (unsigned int channel)
+{
+  return getCameraParam(channel,CV_CAP_PROP_MODE);
 }

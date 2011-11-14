@@ -16,13 +16,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "../../../../../cedar/auxiliaries/LogFile.h"
-#include "../../../../../cedar/devices/sensors/visual/NetGrabber.h"
+#include "cedar/devices/sensors/visual/NetGrabber.h"
 //#include <devices/sensors/visual/NetGrabber.h>
-//#include <auxiliaries/LogFile.h>
 
 // PROJECT INCLUDES
-
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -34,7 +31,7 @@
 #define YARP_CHANNEL_0 "Net_Grabber_TestCase_Channel"
 
 #define GRABBER_NAME_0 "Net_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "Net_grabber_TestCase.configfile"
+#define CONFIG_FILE_NAME_0 "net_grabber_testcase.config"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -183,14 +180,23 @@ int main(int , char **)
     waitKey(10);
   }
 
-  //stop grabbing-thread if running
-  //also stops the grabberthread if started
-  //at startRecording()
-  net_grabber->stopRecording();
-
   //------------------------------------------------------------------
-  //clean up highgui
+  //clean up
+
   destroyWindow(highgui_window_name_0);
+
+  //stop grabbing-thread if running
+  //recording will also be stopped
+  if (net_grabber->isRunning())
+  {
+    net_grabber->stop();
+  }
+
+  if (net_grabber)
+  {
+    delete net_grabber;
+  }
+
   std::cout << "finished\n";
 
   return 0;

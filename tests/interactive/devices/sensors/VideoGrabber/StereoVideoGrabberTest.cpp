@@ -16,13 +16,13 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-
-// PROJECT INCLUDES
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 
+// PROJECT INCLUDES
+
 // SYSTEM INCLUDES
-#include <iostream>
-#include <exception>
+//#include <iostream>
+//#include <exception>
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 #define FILE_NAME_1 "/opt/matlab/R2010b/toolbox/images/imdemos/traffic.avi"
 
 #define GRABBER_NAME_0 "Stereo_Video_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_video_grabber_TestCase.configfile"
+#define CONFIG_FILE_NAME_0 "stereo_video_grabber_testcase.config"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ int main(int , char **)
     if (++counter_stat %= 3 )
     { std::cout << "Measured FPS: " << video_grabber->getFpsMeasured()
       << "\tPos_Rel: "<< video_grabber->getPositionRel()
-      << "\tPos_Abs: "<<video_grabber->getPositionAbs()
+      << "\tPos_Abs: "<< video_grabber->getPositionAbs()
       <<std::endl;
     }
 
@@ -268,14 +268,24 @@ int main(int , char **)
 
 
   //------------------------------------------------------------------
-  //clean up highgui
+  //clean up
+
   destroyWindow(highgui_window_name_0);
   destroyWindow(highgui_window_name_1);
 
-  std::cout << "finished\n";
+  //stop grabbing-thread if running
+  //recording will also be stopped
+  if (video_grabber->isRunning())
+  {
+    video_grabber->stop();
+  }
 
-  delete video_grabber;
-  video_grabber=NULL;
+  if (video_grabber)
+  {
+   delete video_grabber;
+  }
+
+  std::cout << "finished\n";
 
   return 0;
 }

@@ -16,10 +16,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 //#include <devices/sensors/visual/CameraGrabber.h>
-//#include <auxiliaries/LogFile.h>
+
 
 // PROJECT INCLUDES
 
@@ -51,7 +50,7 @@ int main(int , char **)
   std::string highgui_window_name_1 = (std::string) GRABBER_NAME_0 + ": CHANNEL_1_DEVICE" ;
 
 
-  std::cout << "\n\nInteractive test of the CameraGrabber class\n";
+  std::cout << "\n\nInteractive test of the CameraGrabber class (stereo)\n";
   std::cout << "--------------------------------------------\n\n";
 
 
@@ -212,16 +211,24 @@ int main(int , char **)
     waitKey(10);
   }
 
+  //------------------------------------------------------------------
+  //clean up
+
+  destroyWindow(highgui_window_name_0);
+  destroyWindow(highgui_window_name_1);
+
   //stop grabbing-thread if running
+  //recording will also be stopped
   if (camera_grabber->isRunning())
   {
     camera_grabber->stop();
   }
 
-  //------------------------------------------------------------------
-  //clean up highgui
-  destroyWindow(highgui_window_name_0);
-  destroyWindow(highgui_window_name_1);
+  if (camera_grabber)
+  {
+   delete camera_grabber;
+  }
+
   std::cout << "finished\n";
 
   return 0;
