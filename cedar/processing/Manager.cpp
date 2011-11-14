@@ -98,7 +98,7 @@ mTriggerRegistry(new cedar::proc::TriggerRegistry())
   looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
   this->triggers().declareClass(looped_trigger_declaration);
 
-  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::sources::GaussInput>("cedar.processing.sources.GaussInput", "Inputs"));
+  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::sources::GaussInput>("cedar.processing.sources.GaussInput", "Sources"));
   input_decl->setIconPath(":/steps/gauss_input.svg");
   this->steps().declareClass(input_decl);
 
