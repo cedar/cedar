@@ -117,11 +117,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Method that gets called once by cedar::proc::LoopedTrigger once prior starting the trigger.
-  virtual void onStart();
-
-  //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
-  virtual void onStop();
 
   /*!@brief    Handles an external trigger signal.
    *
@@ -295,6 +290,20 @@ public:
   //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
   cedar::proc::TriggerPtr getParentTrigger();
 
+  /*!@brief Calls the (user defined) onStart() method and performs some other tasks.
+   *
+   * @remarks This method makes sure that certain things are done every time the Step is started, e.g., it propagates
+   *          the onStart() call to all Steps connected to the finished trigger of this step.
+   */
+  void callOnStart();
+
+  /*!@brief Calls the (user defined) onStop() method and performs some other tasks.
+   *
+   * @remarks This method makes sure that certain things are done every time the Step is stopped, e.g., it propagates
+   *          the onStop() call to all Steps connected to the finished trigger of this step and resets the step's state.
+   */
+  void callOnStop();
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -406,6 +415,12 @@ private:
 
   //!@brief Declares a new piece of data in the step.
   void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
+
+  //!@brief Method that gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger.
+  virtual void onStart();
+
+  //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
+  virtual void onStop();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

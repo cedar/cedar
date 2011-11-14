@@ -411,12 +411,10 @@ void cedar::dyn::NeuralField::onStart()
 {
   this->_mDimensionality->setConstant(true);
   this->_mSizes->setConstant(true);
-  this->cedar::proc::Step::onStart();
 }
 
 void cedar::dyn::NeuralField::onStop()
 {
   this->_mDimensionality->setConstant(false);
   this->_mSizes->setConstant(false);
-  this->cedar::proc::Step::onStop();
 }
