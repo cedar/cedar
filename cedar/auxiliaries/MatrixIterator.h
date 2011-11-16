@@ -96,7 +96,7 @@ public:
     return this->mIndex;
   }
 
-  /*!
+  /*!@brief increment the matrix iterator
    * @returns False, if the iterator arrived at the end of the matrix, true otherwise.
    */
   inline bool increment()
@@ -133,7 +133,9 @@ private:
 protected:
   // none yet
 private:
+  //!@brief an n-dimensional index for the current iterator
   std::vector<int> mIndex;
+  //!@brief a reference to a cv::Mat
   const cv::Mat& mMatrixRef;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -79,6 +79,7 @@ public:
   {
   }
 
+  //!@brief The constructor.
   NumericVectorParameter(
                           cedar::aux::Configurable *pOwner,
                           const std::string& name,
@@ -117,6 +118,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief set the minimum value of this parameter
   void setMinimum(const T& minimum)
   {
     this->mMinimum = minimum;
@@ -124,11 +126,13 @@ public:
     this->emitPropertyChangedSignal();
   }
 
+  //!@brief get the minimum value of this parameter
   const T& getMinimum() const
   {
     return this->mMinimum;
   }
 
+  //!@brief set the maximum value of this parameter
   void setMaximum(const T& minimum)
   {
     this->mMaximum = minimum;
@@ -136,6 +140,7 @@ public:
     this->emitPropertyChangedSignal();
   }
 
+  //!@brief get the maximum value of this parameter
   const T& getMaximum() const
   {
     return this->mMaximum;
@@ -161,10 +166,10 @@ public:
 protected:
   // none yet
 private:
-  //! The minimum value, if applicable to the type.
+  //!@brief The minimum value, if applicable to the type.
   T mMinimum;
 
-  //! The maximum value, if applicable to the type.
+  //!@brief The maximum value, if applicable to the type.
   T mMaximum;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -105,8 +105,7 @@ public:
     return dynamic_cast<DataTemplate<T>&>(*this).getData();
   }
 
-  /*! @brief  This is the const version of cedar::aux::Data::getData
-   */
+  //!@brief  This is the const version of cedar::aux::Data::getData
   template <typename T>
   const T& getData() const
   {
@@ -123,15 +122,15 @@ public:
     return dynamic_cast<T&>(*this);
   }
   
-  /*! @brief Returns the owner of the data object.
-   */
+  //!@brief Returns the owner of the data object.
   cedar::aux::Configurable* getOwner() const;
 
-  /*! @brief Sets the owner of the data object.
-   */
+  //!@brief Sets the owner of the data object.
   void setOwner(cedar::aux::Configurable* step);
 
+  //!@brief almost deprecated
   const std::string& connectedSlotName() const;
+  //!@brief almost deprecated
   void connectedSlotName(const std::string& name);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -150,6 +149,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief the lock for this data
   QReadWriteLock *mpLock;
 
 private:
