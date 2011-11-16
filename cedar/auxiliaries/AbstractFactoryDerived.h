@@ -66,6 +66,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief allocates an object of type DerivedType and returns a pointer to BaseType
   boost::shared_ptr<BaseType> allocate() const
   {
     return boost::shared_ptr<BaseType> (new DerivedType());
