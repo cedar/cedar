@@ -1,0 +1,230 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        libraries.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description: Setup of cedar and third party libraries.
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+########################################################################################################################
+# third party libraries
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CEDAR_CMAKE_DIR}/findScripts)
+
+if (CEDAR_STOP_ON_MISSING_LIBRARIES)
+  set(CEDAR_LIB_ERROR_TYPE FATAL_ERROR)
+  message("Will stop when missing libraries.")
+else()
+  set(CEDAR_LIB_ERROR_TYPE WARNING)
+  message("Will compile despite missing libraries.")
+endif()
+
+# Qt
+message("Searching for Qt...")
+find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
+include(${QT_USE_FILE})
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
+include_directories(${QT_INCLUDE_DIRS})
+if(QT4_FOUND)
+  include_directories(${QT_INCLUDE_DIRS})
+  message("Qt was found in ${QT_INCLUDE_DIRS}")
+else(QT4_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library qt4 was not found on your system! 
+  You can try to alter the default search paths in cedar.conf.")
+endif()
+
+# Boost
+if (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS ON)
+else (${CMAKE_BUILD_STATIC_LIBS})
+  set(Boost_USE_STATIC_LIBS OFF)
+endif (${CMAKE_BUILD_STATIC_LIBS})
+
+message("Searching for boost...")
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost 1.40.0 COMPONENTS system date_time filesystem)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
+
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+  message("boost was found in ${Boost_INCLUDE_DIRS}")
+  #message("Found the following boost libraries: ${Boost_LIBRARIES}")
+  #message("Found boost includes at ${Boost_INCLUDE_DIRS}")
+else(Boost_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library boost was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif()
+
+# OpenCV
+message("Searching for OpenCV...")
+set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+  message("OpenCV was found in ${OpenCV_INCLUDE_DIRS}")
+if (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
+  message("-- using opencv debug and release libraries.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized opencv_core opencv_highgui opencv_imgproc 
+                                                       debug opencv_cored opencv_highguid opencv_imgprocd)
+else(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
+  message("-- using opencv release libraries.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui opencv_imgproc)
+endif(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
+elseif(OpenCV_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library OpenCV was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif(OpenCV_FOUND)
+# message(STATUS "Found opencv libs ${OpenCV_LIBS}")
+
+# libconfig
+message("Searching for libconfig...")
+find_package(Libconfig REQUIRED)
+if(Libconfig_FOUND)
+  message("libconfig was found in ${Libconfig_INCLUDE_DIRS}")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
+  include_directories(${Libconfig_INCLUDE_DIRS})
+else(Libconfig_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library libconfig was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif(Libconfig_FOUND)
+
+# libQGLViewer
+message("Searching for QGLViewer...")
+find_package(QGLViewer REQUIRED)
+if(QGLViewer_FOUND)
+  message("QGLViewer was found in ${QGLViewer_INCLUDE_DIRS}")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QGLViewer_LIBS})
+  include_directories(${QGLViewer_INCLUDE_DIRS})
+else(QGLViewer_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library QGLViewer was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif(QGLViewer_FOUND)
+
+# libQwt
+message("Searching for qwt...")
+find_package(Qwt REQUIRED)
+if(qwt_FOUND)
+  message("qwt was found in ${qwt_INCLUDE_DIRS}")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
+  include_directories(${qwt_INCLUDE_DIRS})
+else(qwt_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwt was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif(qwt_FOUND)
+
+# qwtplot3d
+message("Searching for qwtplot3d...")
+find_package(QwtPlot3D REQUIRED)
+if(qwtplot3d_FOUND)
+  message("qwtplot3d was found in ${qwtplot3d_INCLUDE_DIRS}")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
+  include_directories(${qwtplot3d_INCLUDE_DIRS})
+else(qwtplot3d_FOUND)
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwtplot3d was not found on your system!
+  You can try to alter the default search paths in cedar.conf.")
+endif(qwtplot3d_FOUND)
+
+# OpenGL
+find_package(OpenGL)
+set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
+
+# libFRI
+option(CEDAR_USE_KUKA_LWR "Include Kuka Fast Research Interface for LWR if possible." ON)
+
+find_library(KUKA_FRI FRI)
+if(KUKA_FRI)
+	message("-- Looking for Kuka Fast Research Interface - found")
+	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} FRI)
+else(KUKA_FRI)
+	message("-- Looking for Kuka Fast Research Interface - not found")
+    set(CEDAR_USE_KUKA_LWR OFF)
+endif(KUKA_FRI)
+
+
+##
+# Amtec device driver
+##
+
+option(CEDAR_USE_AMTEC "Include Amtec related classes and examples if possible." ON)
+
+message("-- Looking for amtecdevice")
+find_library(AMTEC_LIBRARY_DEVICE amtecdevice)
+if(AMTEC_LIBRARY_DEVICE)
+	message("-- Looking for amtecdevice - found")
+else(AMTEC_LIBRARY_DEVICE)
+	message("-- Looking for amtecdevice - not found")
+endif(AMTEC_LIBRARY_DEVICE)
+
+message("-- Looking for amtecutil")
+find_library(AMTEC_LIBRARY_UTIL amtecutil)
+if(AMTEC_LIBRARY_UTIL)
+	message("-- Looking for amtecutil - found")
+else(AMTEC_LIBRARY_UTIL)
+	message("-- Looking for amtecutil - not found")
+endif(AMTEC_LIBRARY_UTIL)
+
+message("-- Looking for ntcan")
+find_library(AMTEC_LIBRARY_NTCAN ntcan)
+if(AMTEC_LIBRARY_NTCAN)
+	message("-- Looking for ntcan - found")
+else(AMTEC_LIBRARY_NTCAN)
+	message("-- Looking for ntcan - not found")
+endif(AMTEC_LIBRARY_NTCAN)
+
+if(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${AMTEC_LIBRARY_DEVICE} ${AMTEC_LIBRARY_UTIL} ${AMTEC_LIBRARY_NTCAN})
+else(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+	message("-- Missing libraries: excluding Amtec dependent files.")
+	set(CEDAR_USE_AMTEC OFF)
+endif(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+
+
+########################################################################################################################
+# cedar libraries
+file(GLOB cedarLibPaths "${CEDAR_SOURCE_DIR}/*/")
+
+# set up the global variable CEDAR_LIBS, which holds the names of all cedar libraries
+set(CEDAR_LIBS CACHE INTERNAL "")
+
+foreach (libPath ${cedarLibPaths})
+  if (IS_DIRECTORY ${libPath} AND EXISTS "${libPath}/CMakeLists.txt")
+
+    # get the name of the libary
+    string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libDirName "${libPath}")
+
+    # add out-of-source directory tree
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}/${CMAKE_BUILD_TYPE}")
+
+    # add the subdirectory
+    add_subdirectory(${libPath} ${subDir})
+
+  endif(IS_DIRECTORY ${libPath} AND EXISTS "${libPath}/CMakeLists.txt")
+endforeach(libPath)
