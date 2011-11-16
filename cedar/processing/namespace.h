@@ -74,6 +74,7 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
+    CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     CEDAR_DECLARE_PROC_CLASS(Connection);
     //!@endcond

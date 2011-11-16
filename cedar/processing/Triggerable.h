@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        MultiTrigger.h
+    File:        Triggerable.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 05 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 11 16
 
     Description:
 
@@ -38,27 +34,20 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_MULTI_TRIGGER_H
-#define CEDAR_PROC_MULTI_TRIGGER_H
+#ifndef CEDAR_PROC_TRIGGERABLE_H
+#define CEDAR_PROC_TRIGGERABLE_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/Trigger.h"
-
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
-#include <map>
 
-/*!@brief A trigger that merges multiple trigger signals into one.
- *
- * This class maintains a list of incoming triggers. Everytime one of the incoming triggers receives a trigger signal,
- * it is marked as triggered. Once all incoming triggers are marked thusly, the MultiTrigger sends a trigger signal to
- * all its listeners.
+
+/*!@brief Interface for all classes that can be triggered.
  */
-class cedar::proc::MultiTrigger : public Trigger
+class cedar::proc::Triggerable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -68,21 +57,18 @@ class cedar::proc::MultiTrigger : public Trigger
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  MultiTrigger();
-
-  //!@brief Destructor
-  virtual ~MultiTrigger();
+  //!@brief The destructor.
+  virtual ~Triggerable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void onTrigger(cedar::proc::TriggerPtr pSender);
-
-  void notifyConnected(cedar::proc::TriggerPtr trigger);
-
-  void notifyDisconnected(cedar::proc::TriggerPtr trigger);
+  /*!@brief    Handles an external trigger signal.
+   *
+   * @param    pSender The trigger that sent the trigger signal.
+   */
+  virtual void onTrigger(cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -95,16 +81,16 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   // none yet
-  void checkCondition();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
 protected:
-
+  // none yet
 private:
-  std::map<cedar::proc::TriggerPtr, bool> mIncoming;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -117,7 +103,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::Trigger
+}; // class cedar::proc::Triggerable
 
-#endif // CEDAR_PROC_TRIGGER_H
+#endif // CEDAR_PROC_TRIGGERABLE_H
 

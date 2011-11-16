@@ -42,6 +42,7 @@
 #define CEDAR_PROC_TRIGGER_H
 
 // LOCAL INCLUDES
+#include "cedar/processing/Triggerable.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
 
@@ -49,13 +50,16 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/enable_shared_from_this.hpp>
 #include <vector>
 
 /*!@brief A base class for all sorts of Trigger. Trigger provides a generic interface for the trigger concept in cedar.
  * Trigger can have listeners, to which they send a trigger signal.
  *
  */
-class cedar::proc::Trigger : public virtual cedar::aux::NamedConfigurable
+class cedar::proc::Trigger : public virtual cedar::aux::NamedConfigurable,
+                             public boost::enable_shared_from_this<cedar::proc::Trigger>,
+                             public cedar::proc::Triggerable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -80,7 +84,7 @@ public:
   void trigger(cedar::proc::ArgumentsPtr arguments = cedar::proc::ArgumentsPtr());
 
   //!@brief handles an incoming trigger signal if Trigger instance is listener
-  virtual void onTrigger(Trigger*);
+  void onTrigger(cedar::proc::TriggerPtr pSender);
 
   //!@brief adds a Trigger, which will receive trigger signals from this instance from now on
   void addTrigger(cedar::proc::TriggerPtr trigger);
@@ -100,9 +104,9 @@ public:
   //!@brief returns a list of listening triggers
   const std::vector<cedar::proc::TriggerPtr>& getTriggerListeners() const;
 
-  virtual void notifyConnected(cedar::proc::Trigger* trigger);
+  virtual void notifyConnected(cedar::proc::TriggerPtr trigger);
 
-  virtual void notifyDisconnected(cedar::proc::Trigger* trigger);
+  virtual void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
   //!@brief reads a configuration from a ConfigurationNode
   void readConfiguration(const cedar::aux::ConfigurationNode& node);

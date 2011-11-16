@@ -46,6 +46,7 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Base.h"
 #include "cedar/auxiliaries/NamedConfigurable.h"
@@ -73,7 +74,9 @@
  * displayed in plots). Each data slot is assigned some data pointer, input slots get external data, buffer and output
  * slots must be assigned by the user, usually during the constructor.
  */
-class cedar::proc::Step : public QThread, public cedar::aux::NamedConfigurable
+class cedar::proc::Step : public QThread,
+                          public cedar::aux::NamedConfigurable,
+                          public cedar::proc::Triggerable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -127,7 +130,7 @@ public:
    *           cedar::proc::DataRole::VALIDITY). It also does nothing if the compute function has previously encountered
    *           an exception.
    */
-  void onTrigger();
+  void onTrigger(cedar::proc::TriggerPtr = cedar::proc::TriggerPtr());
 
   //!@brief Method that is called whenever an input is connected to the step.
   virtual void inputConnectionChanged(const std::string& inputName);

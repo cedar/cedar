@@ -498,7 +498,7 @@ void cedar::proc::Step::onStop()
   // empty as a default implementation
 }
 
-void cedar::proc::Step::onTrigger()
+void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 {
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;

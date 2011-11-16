@@ -115,11 +115,11 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
   }
   for (size_t i = 0; i < this->mTriggers.size(); ++i)
   {
-    this->mTriggers.at(i)->onTrigger(this);
+    this->mTriggers.at(i)->onTrigger(this->shared_from_this());
   }
 }
 
-void cedar::proc::Trigger::onTrigger(Trigger*)
+void cedar::proc::Trigger::onTrigger(cedar::proc::TriggerPtr /* pSender */)
 {
 }
 
@@ -150,7 +150,7 @@ void cedar::proc::Trigger::addTrigger(cedar::proc::TriggerPtr trigger)
   if (iter == this->mTriggers.end())
   {
     this->mTriggers.push_back(trigger);
-    trigger->notifyConnected(this);
+    trigger->notifyConnected(this->shared_from_this());
   }
 }
 
@@ -171,15 +171,15 @@ void cedar::proc::Trigger::removeTrigger(cedar::proc::TriggerPtr trigger)
   if (iter != this->mTriggers.end())
   {
     this->mTriggers.erase(iter);
-    trigger->notifyDisconnected(this);
+    trigger->notifyDisconnected(this->shared_from_this());
   }
 }
 
-void cedar::proc::Trigger::notifyConnected(cedar::proc::Trigger* /* trigger */)
+void cedar::proc::Trigger::notifyConnected(cedar::proc::TriggerPtr /* trigger */)
 {
 }
 
-void cedar::proc::Trigger::notifyDisconnected(cedar::proc::Trigger* /* trigger */)
+void cedar::proc::Trigger::notifyDisconnected(cedar::proc::TriggerPtr /* trigger */)
 {
 }
 
