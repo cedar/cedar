@@ -98,11 +98,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief get the minimum value of this parameter
   const T& getMinimum() const
   {
     return this->mMinimum;
   }
 
+  //!@brief set the minimum value of this parameter
   void setMinimum(const T& value)
   {
     this->mMinimum = value;
@@ -110,11 +112,13 @@ public:
     this->emitPropertyChangedSignal();
   }
 
+  //!@brief get the maximum value of this parameter
   const T& getMaximum() const
   {
     return this->mMaximum;
   }
 
+  //!@brief set the maximum value of this parameter
   void setMaximum(const T& value)
   {
     this->mMaximum = value;
@@ -142,10 +146,10 @@ public:
 protected:
   // none yet
 private:
-  //! The minimum value, if applicable to the type.
+  //!@brief The minimum value, if applicable to the type.
   T mMinimum;
 
-  //! The maximum value, if applicable to the type.
+  //!@brief The maximum value, if applicable to the type.
   T mMaximum;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -157,7 +161,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::Parameter
+}; // class cedar::aux::NumericParameter
 
-#endif // CEDAR_PROC_PARAMETER_H
+#endif // CEDAR_PROC_NUMERIC_PARAMETER_H
 

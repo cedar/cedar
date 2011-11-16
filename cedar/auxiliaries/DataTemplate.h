@@ -50,9 +50,9 @@
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 
-/*!@brief Abstract description of the class.
+/*!@brief A templated version of cedar::aux::Data.
  *
- * More detailed description of the class.
+ * More detailed description of the class coming soon.
  */
 template <typename T>
 class cedar::aux::DataTemplate : public cedar::aux::Data
@@ -70,6 +70,7 @@ public:
   {
   }
 
+  //!@brief This constructor initializes the internal data to a value.
   DataTemplate(const T& value)
   {
     this->mData = value;
@@ -85,16 +86,19 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief returns the internal data
   T& getData()
   {
     return this->mData;
   }
 
+  //!@brief returns the internal data as const
   const T& getData() const
   {
     return this->mData;
   }
 
+  //!@brief sets the internal data to the given data/value
   void setData(const T& data)
   {
     this->mData = data;
@@ -118,6 +122,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief the internal data
   T mData;
 
 private:

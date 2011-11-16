@@ -173,8 +173,9 @@ namespace cedar
       streamOut << value;
       return streamOut.str();
     }
-    //!@brief class declaration of Data
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Data);
+    //!@endcond
 
     //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;

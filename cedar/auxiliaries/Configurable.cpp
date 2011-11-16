@@ -70,7 +70,7 @@ cedar::aux::Configurable::~Configurable()
 
 void cedar::aux::Configurable::configurationLoaded()
 {
-  for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
+  for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
   {
     (*iter)->emitChangedSignal();
   }
@@ -113,25 +113,25 @@ void cedar::aux::Configurable::registerParameter(cedar::aux::ParameterPtr parame
     CEDAR_THROW(cedar::aux::DuplicateNameException, "Duplicate parameter name: \"" + name + "\"");
   }
 
-  this->mParameterOrder.push_back(parameter);
-  ParameterList::iterator last_iter = this->mParameterOrder.end();
+  this->mParameterList.push_back(parameter);
+  ParameterList::iterator last_iter = this->mParameterList.end();
   --last_iter;
   this->mParameterAssociations[name] = last_iter;
 }
 
 const cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters() const
 {
-  return this->mParameterOrder;
+  return this->mParameterList;
 }
 
 cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters()
 {
-  return this->mParameterOrder;
+  return this->mParameterList;
 }
 
 void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode& root)
 {
-  for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
+  for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
   {
     (*iter)->putTo(root);
   }
@@ -146,7 +146,7 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
 
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
-  for (ParameterList::iterator iter = this->mParameterOrder.begin(); iter != this->mParameterOrder.end(); ++iter)
+  for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
   {
     cedar::aux::ParameterPtr& parameter = *iter;
     try

@@ -76,6 +76,7 @@ public:
     return SmartPointerType (new BaseType());
   }
 
+  //!@brief allocate an object without using a shared pointer to store the instance
   virtual BaseType* allocateRaw() const
   {
     return new BaseType();
