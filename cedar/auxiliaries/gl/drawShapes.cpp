@@ -350,12 +350,12 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // bottom
   glNormal3d(0.0, 0.0, -1.0);
   glVertex3d(0, -width/2, 0);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   // top
   glNormal3d(0.0, 0.0, 1.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
   glVertex3d(0, width/2, height);
   glEnd();
   
@@ -363,15 +363,15 @@ void cedar::aux::gl::drawPrism(double width, double height, bool wireFrame)
   // front left
   glNormal3d(.33, -.66, 0.0);
   glVertex3d(0, -width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, -width/2, 0);
   // front right
   glNormal3d(.33, .66, 0.0);
-  glVertex3d(sqrt(3)*width/2, 0, 0);
+  glVertex3d(sqrt(3.0)*width/2, 0, 0);
   glVertex3d(0, width/2, 0);
   glVertex3d(0, width/2, height);
-  glVertex3d(sqrt(3)*width/2, 0, height);
+  glVertex3d(sqrt(3.0)*width/2, 0, height);
   // back
   glNormal3d(-1.0, 0.0, 0.0);
   glVertex3d(0, -width/2, 0);
@@ -413,7 +413,7 @@ void cedar::aux::gl::drawEllipse(
   float b= static_cast<float>(_b);
   float t= static_cast<float>(thickness);
   //  double t = thickness;
-  float d = 4.0/3.0*(sqrt(2)-1);
+  float d = 4.0/3.0*(sqrt(2.0)-1);
 
 
 // approximates the ellipse with 16 3rd order Bezier surfaces, which is not perfect, but almost

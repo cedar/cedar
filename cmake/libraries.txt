@@ -114,6 +114,7 @@ if(Libconfig_FOUND)
 else(Libconfig_FOUND)
   message(${CEDAR_LIB_ERROR_TYPE} "Required library libconfig was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
 endif(Libconfig_FOUND)
 
 # libQGLViewer
@@ -126,6 +127,7 @@ if(QGLViewer_FOUND)
 else(QGLViewer_FOUND)
   message(${CEDAR_LIB_ERROR_TYPE} "Required library QGLViewer was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} release QGLViewer2 debug QGLViewerd2)
 endif(QGLViewer_FOUND)
 
 # libQwt
@@ -138,6 +140,7 @@ if(qwt_FOUND)
 else(qwt_FOUND)
   message(${CEDAR_LIB_ERROR_TYPE} "Required library qwt was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwt)
 endif(qwt_FOUND)
 
 # qwtplot3d
