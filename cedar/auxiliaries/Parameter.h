@@ -87,24 +87,36 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
+  //!@brief get the flag "read automatically"
   bool getReadAutomatically() const;
+  //!@brief set the flag "read automatically"
   void setReadAutomatically(bool value);
 
+  //!@brief return if this parameter has a default value
   bool getHasDefault() const;
+  //!@brief set if this parameter has a default value
   void setHasDefault(bool value);
 
+  //!@brief return if this parameter is constant
   bool isConstant() const;
+  //!@brief set if this parameter is constant
   void setConstant(bool value);
 
+  //!@brief set this parameter to a value, read from a configuration node
   virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
+  //!@brief write value to a configuration node
   virtual void putTo(cedar::aux::ConfigurationNode& root) = 0;
+  //!@brief set parameter to default
   virtual void makeDefault() = 0;
 
+  //!@brief return flag if this parameter is hidden (for GUI)
   bool isHidden() const;
+  //!@brief set flag if this parameter is hidden (for GUI)
   void setHidden(bool hide);
 
+  //!@brief emit the value changed signal
   void emitChangedSignal();
+  //!@brief emit the property changed signal
   void emitPropertyChangedSignal();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -112,9 +124,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-  signals:
-    void valueChanged();
-    void propertyChanged();
+signals:
+  //!@brief a signal that is emitted each time the value of a parameter changes
+  void valueChanged();
+  //!@brief a signal that is emitted each time a characteristic of this parameter changes (for example vector size)
+  void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
