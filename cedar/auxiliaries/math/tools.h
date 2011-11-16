@@ -136,7 +136,6 @@ namespace cedar
        */
       template <typename T>
       void reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator = CV_REDUCE_SUM);
-
     }
   }
 }
