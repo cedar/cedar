@@ -156,6 +156,14 @@ public:
                                             cedar::aux::DataPtr data
                                           ) const;
 
+  //!@brief Parses a data and step name without specifying a role.
+  static void parseDataNameNoRole
+              (
+                const std::string& instr,
+                std::string& stepName,
+                std::string& dataName
+              );
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

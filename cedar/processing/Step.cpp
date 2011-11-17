@@ -232,33 +232,6 @@ void cedar::proc::Step::setState(cedar::proc::Step::State newState, const std::s
   }
 }
 
-/*! This function parses strings of the form "stepName.dataName" and separates the string into "stepName" and
- *  "dataName". In this case, no role is expected to be present in this string.
- *
- *  @returns Nothing, output is written to the parameters @em stepName and @em dataName.
- *
- *  @throws cedar::proc::InvalidNameException if the name cannot be parsed, e.g., if no dot is contained.
- */
-void cedar::proc::Step::parseDataNameNoRole
-                        (
-                          const std::string& instr,
-                          std::string& stepName,
-                          std::string& dataName
-                        )
-{
-  // find the last dot to split the data name
-  size_t dot_idx = instr.rfind('.');
-  if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for step. Path is: " + instr);
-  }
-
-  // Split the string. Step name is everything before the dot, dataName everything after it.
-  stepName = instr.substr(0, dot_idx);
-  dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
-}
-
-
 void cedar::proc::Step::callOnStart()
 {
   this->onStart();

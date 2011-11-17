@@ -90,8 +90,8 @@ const cedar::proc::Connectable::SlotMap& cedar::proc::Connectable::getDataSlots(
 
 /*! This is the default implementation of this function. The function, it does nothing!
  *  In your subclasses of cedar::proc::Connectable you may override this function to react to changes in the connected inputs
- *  of the step. One common use for this method is to store a pointer to the new/changed data in the correct format,
- *  e.g., an image processing step could cast the input data from cedar::aux::Data to cedar::aux::ImageData. This makes
+ *  of the Connectable. One common use for this method is to store a pointer to the new/changed data in the correct format,
+ *  e.g., an image processing Connectable could cast the input data from cedar::aux::Data to cedar::aux::ImageData. This makes
  *  performing the cast in each comoute call unnecessary and thus saves a little bit of time.
  *
  *  @param inputName The name of the input slot whose data was changed.
@@ -313,7 +313,7 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
   if (name.find('.') != std::string::npos)
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "Data names may not contain the character \".\". \""
-                                                   + name + "\" in step \"" + this->getName()
+                                                   + name + "\" in Connectable \"" + this->getName()
                                                    + "\" violates this rule.");
   }
 
@@ -464,13 +464,13 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
     CEDAR_THROW(cedar::proc::InvalidRoleException,
                 "The requested role " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
-                " does not exist in step \""
+                " does not exist in Connectable \""
                 + this->getName() +
                 "\".");
     return;
   }
 
-  // inputs come from a different step
+  // inputs come from a different Connectable
   if (role != cedar::proc::DataRole::INPUT)
   {
     data->setOwner(this);
@@ -513,7 +513,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
     CEDAR_THROW(cedar::proc::InvalidRoleException,
                 "The requested role " +
                 cedar::proc::DataRole::type().get(role).prettyString() +
-                " does not exist in step \""
+                " does not exist in Connectable \""
                 + this->getName() +
                 "\".");
     return;
@@ -614,9 +614,36 @@ cedar::aux::DataPtr cedar::proc::Connectable::getData(DataRole::Id role, const s
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "The requested "
                                                    + cedar::proc::DataRole::type().get(role).prettyString()
-                                                   + " name \"" + name + "\" does not exist in step \""
+                                                   + " name \"" + name + "\" does not exist in Connectable \""
                                                    + this->getName() + "\".");
     return cedar::aux::DataPtr();
   }
   return map_iterator->second->getData();
 }
+
+/*! This function parses strings of the form "connectableName.dataName" and separates the string into "connectableName" and
+ *  "dataName". In this case, no role is expected to be present in this string.
+ *
+ *  @returns Nothing, output is written to the parameters @em connectableName and @em dataName.
+ *
+ *  @throws cedar::proc::InvalidNameException if the name cannot be parsed, e.g., if no dot is contained.
+ */
+void cedar::proc::Connectable::parseDataNameNoRole
+                               (
+                                 const std::string& instr,
+                                 std::string& connectableName,
+                                 std::string& dataName
+                               )
+{
+  // find the last dot to split the data name
+  size_t dot_idx = instr.rfind('.');
+  if (dot_idx == std::string::npos || dot_idx == 0 || dot_idx == instr.length()-1)
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "Invalid data name for Connectable. Path is: " + instr);
+  }
+
+  // Split the string. Step name is everything before the dot, dataName everything after it.
+  connectableName = instr.substr(0, dot_idx);
+  dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
+}
+

@@ -165,14 +165,6 @@ public:
   //!@brief Calls the action with the given name.
   void callAction(const std::string& name);
 
-  //!@brief Parses a data and step name without specifying a role.
-  static void parseDataNameNoRole
-              (
-                const std::string& instr,
-                std::string& stepName,
-                std::string& dataName
-              );
-
   /*!@brief   Sets this step's parent trigger. Steps may only be triggerd by one trigger.
    *
    * @remarks This throws an exception if the step already has a parent trigger. If this happens, disconnect the trigger
