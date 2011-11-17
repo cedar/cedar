@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -112,10 +113,12 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
 
   //!@todo This all seems a bit sketchy
   // either a slot is a collection ...
-  if (p_target->getSlot()->isCollection())
+  cedar::proc::ConstExternalDataPtr target_slot
+                      = boost::shared_dynamic_cast<const cedar::proc::ExternalData>(p_target->getSlot());
+  if (target_slot && target_slot->isCollection())
   {
     // ... then we cannot connect only if we are already connected ...
-    if (p_target->getSlot()->hasData(this->getSlot()->getData()))
+    if (target_slot->hasData(this->getSlot()->getData()))
     {
       return cedar::proc::gui::CONNECT_NO;
     }

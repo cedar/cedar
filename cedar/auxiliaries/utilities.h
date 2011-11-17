@@ -44,6 +44,7 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#include <boost/shared_ptr.hpp>
 
 
 namespace cedar
@@ -65,6 +66,17 @@ namespace cedar
     {
       CEDAR_DEBUG_ASSERT(dynamic_cast<TOut>(pIn) != 0);
       return static_cast<TOut>(pIn);
+    }
+
+    /*!@brief   If you think a dynamic cast can never fail, use this cast instead.
+     *
+     * @see     cedar::aux::asserted_cast.
+     */
+    template <typename TOut, typename TIn>
+    boost::shared_ptr<TOut> shared_asserted_cast(boost::shared_ptr<TIn> pIn)
+    {
+      CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<TOut>(pIn));
+      return boost::static_pointer_cast<TOut>(pIn);
     }
   }
 }

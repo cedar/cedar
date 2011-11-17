@@ -38,7 +38,10 @@
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ExternalData.h"
+#include "cedar/processing/OwnedData.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -318,7 +321,14 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
   }
 
   // finally, insert a new data slot with the given parameters
-  iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::DataSlot(role, name, mandatory));
+  if (role == cedar::proc::DataRole::INPUT)
+  {
+    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, mandatory));
+  }
+  else
+  {
+    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, mandatory));
+  }
 
   // since the data has (potentially) changed, re-check the inputs
   this->checkMandatoryConnections();
@@ -357,8 +367,7 @@ void cedar::proc::Connectable::declareOutput(const std::string& name)
 
 void cedar::proc::Connectable::makeInputCollection(const std::string& name, bool isCollection)
 {
-  cedar::proc::DataSlotPtr slot = this->getInputSlot(name);
-  slot->setCollection(isCollection);
+  this->getInputSlot(name)->setCollection(isCollection);
 }
 
 /*!
@@ -426,9 +435,9 @@ cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::Dat
   return slot_iter->second;
 }
 
-cedar::proc::DataSlotPtr cedar::proc::Connectable::getInputSlot(const std::string& name)
+cedar::proc::ExternalDataPtr cedar::proc::Connectable::getInputSlot(const std::string& name)
 {
-  return this->getSlot(cedar::proc::DataRole::INPUT, name);
+  return cedar::aux::shared_asserted_cast<cedar::proc::ExternalData>(this->getSlot(cedar::proc::DataRole::INPUT, name));
 }
 
 cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getInputSlot(const std::string& name) const
@@ -489,14 +498,16 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
                 " name \"" + name + "\" does not exist.");
     return;
   }
-  if (map_iterator->second->isCollection())
+
+  if (role == cedar::proc::DataRole::INPUT)
   {
-    map_iterator->second->addData(data);
+    cedar::aux::shared_asserted_cast<cedar::proc::ExternalData>(map_iterator->second)->addData(data);
   }
   else
   {
     map_iterator->second->setData(data);
   }
+
   this->checkMandatoryConnections();
 
   if (role == cedar::proc::DataRole::INPUT)
@@ -559,7 +570,7 @@ void cedar::proc::Connectable::setOutput(const std::string& name, cedar::aux::Da
 
 void cedar::proc::Connectable::freeInput(const std::string& name, cedar::aux::DataPtr data)
 {
-  cedar::proc::DataSlotPtr slot = this->getInputSlot(name);
+  cedar::proc::ExternalDataPtr slot = this->getInputSlot(name);
   // the slot for name should always be found
   CEDAR_ASSERT(slot);
 

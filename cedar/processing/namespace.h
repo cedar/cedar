@@ -62,6 +62,7 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
     CEDAR_DECLARE_PROC_CLASS(Element);
+    CEDAR_DECLARE_PROC_CLASS(ExternalData);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
     CEDAR_DECLARE_PROC_CLASS(LoopMode);
     CEDAR_DECLARE_PROC_CLASS(FrameworkSettings);
@@ -73,6 +74,7 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Group);
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
+    CEDAR_DECLARE_PROC_CLASS(OwnedData);
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(StepDeclaration);

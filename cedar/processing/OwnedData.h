@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataSlot.h
+    File:        OwnedData.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 29
+    Date:        2011 11 17
 
     Description:
 
@@ -34,77 +34,47 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_SLOT_H
-#define CEDAR_PROC_DATA_SLOT_H
+#ifndef CEDAR_PROC_OWNED_DATA_H
+#define CEDAR_PROC_OWNED_DATA_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/DataRole.h"
+#include "cedar/processing/DataSlot.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A slot for data that is owned by a Connectable.
  */
-class cedar::proc::DataSlot
+class cedar::proc::OwnedData : public cedar::proc::DataSlot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! Enum describing the validity of the data connected to this slot.
-   */
-  enum VALIDITY
-  {
-    //! The data is valid.
-    VALIDITY_VALID,
-    //! The data may not be valid, but the step using it can be computed nonetheless.
-    VALIDITY_WARNING,
-    //! The data is erroneous, computing the corresponding step may explode things.
-    VALIDITY_ERROR,
-    //! The validity is unknown and needs to be determined before execution.
-    VALIDITY_UNKNOWN
-  };
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  OwnedData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
 
   //!@brief Destructor
-  virtual ~DataSlot();
+  ~OwnedData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  cedar::aux::DataPtr getData();
 
-  virtual cedar::aux::DataPtr getData() = 0;
+  cedar::aux::ConstDataPtr getData() const;
 
-  virtual cedar::aux::ConstDataPtr getData() const = 0;
-
-  virtual void setData(cedar::aux::DataPtr data) = 0;
-
-  cedar::proc::DataRole::Id getRole() const;
-
-  const std::string& getName() const;
-
-  void setText(const std::string& text);
-
-  //!@brief Returns the text to display to the user.
-  const std::string& getText() const;
-
-  bool isMandatory() const;
-
-  VALIDITY getValidlity() const;
-
-  void setValidity(VALIDITY validity);
+  void setData(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -124,18 +94,7 @@ private:
 protected:
   // none yet
 private:
-  bool mMandatory;
-
-  VALIDITY mValidity;
-
-  //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
-  std::string mName;
-
-  //! Text of the slot, i.e., the text that is displayed to the user (ignored if empty).
-  std::string mText;
-
-  //! Role of the slot (input, output, ...)
-  cedar::proc::DataRole::Id mRole;
+  cedar::aux::DataPtr mData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -146,7 +105,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::DataSlot
+}; // class cedar::proc::OwnedData
 
-#endif // CEDAR_PROC_DATA_SLOT_H
+#endif // CEDAR_PROC_OWNED_DATA_H
 
