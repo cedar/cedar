@@ -80,7 +80,6 @@ _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, 0.0, 1000
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
   this->mCenters.resize(dimensionality);
-  this->setNumParts(dimensionality);
   this->mSizes.resize(dimensionality);
   this->onInit();
 }
@@ -115,7 +114,7 @@ void cedar::aux::kernel::Gauss::calculate()
   CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->getValue().size());
   try
   {
-    this->setNumParts(dimensionality);
+    this->mKernelParts.resize(dimensionality);
     mCenters.resize(dimensionality);
     mSizes.resize(dimensionality);
     // calculate the kernel parts for every dimension

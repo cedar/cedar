@@ -81,12 +81,14 @@ namespace cedar
       //!\todo add log file capability
       CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix);
 
+      //!@brief a templated round function
       template <typename T>
       T round(T val)
       {
         return std::floor(val + static_cast<T>(0.5));
       }
 
+      //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(cv::Mat matrix)
       {
         if (matrix.rows == 1 && matrix.cols == 1)
@@ -100,6 +102,7 @@ namespace cedar
         return matrix.dims;
       }
 
+      //!@brief set a matrix entry to a given value without having to check if the matrix is of type double or float
       inline void assignMatrixEntry(cv::Mat& matrix, std::vector<int> index, double value)
       {
         CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
@@ -128,14 +131,19 @@ namespace cedar
 
       /*!\brief Same functionality as cvReduce for 2D->1D.
        *
-       * \param[in] src a 3D matrix source
-       * \param[out] dst a 2D matrix destination (CV_64FC1)
-       * \param[in] dim on which dimension should be reduced?
-       * \param[in] op reduction operator (again, same choices as cvReduce)
+       * \param[in] source a 3D matrix source
+       * \param[out] destination a 2D matrix destination (must be same type as src)
+       * \param[in] dimensionToReduce along which dimension should be reduced?
+       * \param[in] reductionOperator reduction operator (again, same choices as cvReduce)
        *
        */
       template <typename T>
-      void reduceCvMat3D(const cv::Mat& source, cv::Mat& destination, int dimensionToReduce, int reductionOperator = CV_REDUCE_SUM);
+      void reduceCvMat3D(
+                          const cv::Mat& source,
+                          cv::Mat& destination,
+                          int dimensionToReduce,
+                          int reductionOperator = CV_REDUCE_SUM
+                        );
 
     }
   }
