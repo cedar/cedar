@@ -42,9 +42,9 @@
 #define CEDAR_PROC_TRIGGER_H
 
 // LOCAL INCLUDES
+#include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
 
 
 // PROJECT INCLUDES
@@ -57,7 +57,7 @@
  * Trigger can have listeners, to which they send a trigger signal.
  *
  */
-class cedar::proc::Trigger : public virtual cedar::aux::NamedConfigurable,
+class cedar::proc::Trigger : public cedar::proc::Element,
                              public boost::enable_shared_from_this<cedar::proc::Trigger>,
                              public cedar::proc::Triggerable
 {
