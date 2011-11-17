@@ -64,7 +64,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief try to get the home directory from standard environment variables
   static std::string getUserHomeDirectory();
+  //!@brief try to get the directory in which application data of cedar is stored
   static std::string getUserApplicationDataDirectory();
 
   //--------------------------------------------------------------------------------------------------------------------

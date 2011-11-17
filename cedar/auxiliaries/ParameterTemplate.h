@@ -65,7 +65,7 @@ class cedar::aux::ParameterTemplate : public cedar::aux::Parameter
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
+  //!@brief The constructor with default value.
   ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name, const T& defaultValue)
   :
   cedar::aux::Parameter(pOwner, name, true),
@@ -74,6 +74,7 @@ public:
   {
   }
 
+  //!@brief The constructor.
   ParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name)
   :
   cedar::aux::Parameter(pOwner, name, false)
@@ -89,22 +90,26 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief get the current value of type T of this parameter
   const T& getValue() const
   {
     return this->mValue;
   }
 
+  //!@brief set the value of type T of this parameter
   void setValue(const T& value)
   {
     this->mValue = value;
     emit valueChanged();
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
+  //!@brief store the current value of type T in a configuration tree
+  void putTo(cedar::aux::ConfigurationNode& root) const
   {
     root.put(this->getName(), this->mValue);
   }
 
+  //!@brief load a value of type T from a configuration tree
   void setTo(const cedar::aux::ConfigurationNode& node)
   {
 #ifdef DEBUG
@@ -121,6 +126,7 @@ public:
 #endif
   }
 
+  //!@brief set value to default
   void makeDefault()
   {
     this->setValue(mDefault);

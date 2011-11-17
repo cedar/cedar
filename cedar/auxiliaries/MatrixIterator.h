@@ -91,6 +91,7 @@ public:
     return &this->mIndex.front();
   }
 
+  //!@brief return the n-dimensional index of the current iterator position
   inline const std::vector<int>& getCurrentIndexVector()
   {
     return this->mIndex;
