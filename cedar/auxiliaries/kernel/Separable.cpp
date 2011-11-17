@@ -55,6 +55,7 @@ cedar::aux::kernel::Separable::Separable(unsigned int dimensionality, const std:
 :
 cedar::aux::kernel::Kernel(dimensionality, kernelFile)
 {
+  this->mKernelParts.resize(dimensionality);
 }
 
 cedar::aux::kernel::Separable::~Separable()
@@ -66,12 +67,6 @@ cedar::aux::kernel::Separable::~Separable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::kernel::Separable::setNumParts(unsigned int numParts)
-{
-  this->mKernelParts.resize(numParts);
-}
-
 cv::Mat cedar::aux::kernel::Separable::convolveWith(const cv::Mat& mat) const
 {
   cv::Mat tmp = mat.clone();

@@ -419,7 +419,7 @@ void cedar::proc::Step::run()
     this->compute(*(arguments.get()));
   }
   // catch exceptions and translate them to the given state/message
-  catch(const cedar::aux::exc::ExceptionBase& e)
+  catch(const cedar::aux::ExceptionBase& e)
   {
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
   }

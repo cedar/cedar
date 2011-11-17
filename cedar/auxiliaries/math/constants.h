@@ -49,6 +49,7 @@ namespace cedar
   {
     namespace math
     {
+      //!@brief cedar's own pi
       const double pi = 3.14159265358979323846;
     };
   };

@@ -40,7 +40,7 @@
 #include "cedar/devices/robot/ComponentNotAvailableException.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -76,7 +76,7 @@ ComponentPtr& Robot::getComponent(const std::string& rComponentName)
   if(!isComponentAvailable(rComponentName))
   {
     // .. throw an exception
-    CEDAR_THROW(cedar::aux::exc::ExceptionBase,
+    CEDAR_THROW(cedar::dev::robot::ComponentNotAvailableException,
       "Component with name \"" + rComponentName + "\" does not exist in the robot \"" + _mName + "\".\n");
   }
 
@@ -115,7 +115,7 @@ bool Robot::isComponentAvailable(
   if (parent_component_it == _mSubComponentNames.end())
   {
     // .. throw an exception.
-    CEDAR_THROW(cedar::aux::exc::ExceptionBase,
+    CEDAR_THROW(cedar::dev::robot::ComponentNotAvailableException,
       "Parent component with name \"" + rParentComponentName + "\" does not exist in the robot.\n");
   }
 

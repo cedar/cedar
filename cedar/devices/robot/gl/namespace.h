@@ -56,10 +56,12 @@ namespace cedar
       //!@brief Namespace for widget classes.
       namespace gl
       {
+        //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(KinematicChain);
         CEDAR_DECLARE_DEV_CLASS(AmtecChain);
         CEDAR_DECLARE_DEV_CLASS(CoraArm);
         CEDAR_DECLARE_DEV_CLASS(CoraHead);
+        //!@endcond
       }
     }
   }

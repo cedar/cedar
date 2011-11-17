@@ -54,6 +54,7 @@ namespace cedar
     //!@brief Namespace for widget classes.
     namespace gui
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(BaseWidget);
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
@@ -71,6 +72,7 @@ namespace cedar
 
       /* Exceptions */
       class InvalidPlotData;
+      //!@endcond
     }
   }
 }

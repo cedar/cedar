@@ -42,67 +42,67 @@
 #define CEDAR_AUX_EXCEPTIONS_H
 
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */
-class cedar::aux::UnhandledTypeException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::UnhandledTypeException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     UnhandledTypeException();
 }; // class cedar::aux::UnhandledTypeException
 
 /*!@brief Exception that occurs when a value is not handled (e.g. out of bounds).
  */
-class cedar::aux::UnhandledValueException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::UnhandledValueException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     UnhandledValueException();
 }; // class cedar::aux::UnhandledValueException
 
 /*!@brief Exception that occurs when a type is not known.
  */
-class cedar::aux::UnknownTypeException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::UnknownTypeException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     UnknownTypeException();
 }; // class cedar::aux::UnknownTypeException
 
 /*!@brief Exception that occurs when a name is not known.
  */
-class cedar::aux::UnknownNameException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::UnknownNameException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     UnknownNameException();
 }; // class cedar::aux::UnknownNameException
 
 /*!@brief Exception that occurs when a parameter is not found.
  */
-class cedar::aux::ParameterNotFoundException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::ParameterNotFoundException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     ParameterNotFoundException();
 }; // class cedar::aux::ParameterNotFoundException
 
 /*!@brief Exception that occurs when a unique id appears twice.
  */
-class cedar::aux::DuplicateIdException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::DuplicateIdException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     DuplicateIdException();
 }; // class cedar::aux::DuplicateIdException
 
 /*!@brief Exception that occurs when a unique name appears twice.
  */
-class cedar::aux::DuplicateNameException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::DuplicateNameException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     DuplicateNameException();
 }; // class cedar::aux::DuplicateNameException
 
 /*!@brief Exception that occurs when a value leaves a certain range.
  */
-class cedar::aux::RangeException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::RangeException : public cedar::aux::ExceptionBase
 {
 public:
   RangeException();
@@ -110,7 +110,7 @@ public:
 
 /*!@brief Exception that occurs when no default case is present but was reached somehow.
  */
-class cedar::aux::NoDefaultException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::NoDefaultException : public cedar::aux::ExceptionBase
 {
 public:
   NoDefaultException();
@@ -118,18 +118,62 @@ public:
 
 /*!@brief Exception that occurs when a name is not valid (e.g. contains special characters).
  */
-class cedar::aux::InvalidNameException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::InvalidNameException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     InvalidNameException();
 };
 
 /*!@brief Exception that occurs when an given type does not match an expected type.
  */
-class cedar::aux::TypeMismatchException : public cedar::aux::exc::ExceptionBase
+class cedar::aux::TypeMismatchException : public cedar::aux::ExceptionBase
 {
-  public:
+public:
     TypeMismatchException();
+};
+
+/*!@brief Exception thrown when a connection (i.e. a network connection) is too bad to continue.
+ */
+class cedar::aux::BadConnectionException : public cedar::aux::ExceptionBase
+{
+public:
+  BadConnectionException();
+};
+
+/*!@brief A failed assertion exception.
+ */
+class cedar::aux::FailedAssertionException : public cedar::aux::ExceptionBase
+{
+public:
+  FailedAssertionException();
+};
+
+/*!@brief An exception that is thrown each time an index gets out of range.
+ */
+class cedar::aux::IndexOutOfRangeException : public cedar::aux::ExceptionBase
+{
+public:
+  IndexOutOfRangeException();
+};
+
+/*!@brief A null pointer exception.
+ *
+ * Incidentally, this exception should be thrown when a null-pointer is accessed.
+ */
+class cedar::aux::NullPointerException : public cedar::aux::ExceptionBase
+{
+public:
+  NullPointerException();
+};
+
+/*!@brief Exception for initialization errors.
+ *
+ * This exception should be thrown when an error occurs during initialization.
+  */
+class cedar::aux::InitializationException : public cedar::aux::ExceptionBase
+{
+public:
+  InitializationException();
 };
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

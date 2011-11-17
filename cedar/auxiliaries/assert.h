@@ -45,11 +45,11 @@
 #include <iostream>
 #include <string>
 
-#include "cedar/auxiliaries/exceptions/FailedAssertionException.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 /*!@brief This macro replaces the C++ assertion and throws an exception instead, pointing out the line number of the
  * failed assertion. */
-#define CEDAR_ASSERT(expr) if (!(expr)) { std::string info = "Assertion failed: " #expr; CEDAR_THROW(cedar::aux::exc::FailedAssertionException, info); }
+#define CEDAR_ASSERT(expr) if (!(expr)) { std::string info = "Assertion failed: " #expr; CEDAR_THROW(cedar::aux::FailedAssertionException, info); }
 
 /*!@brief This is a mild variant of a cedar assertion, which does not throw an exception. */
 #define CEDAR_NON_CRITICAL_ASSERT(expr) if(!(expr)) { std::cerr << "Non-critical assertion failed: " << #expr << "\n" << "  in file " << __FILE__ << " on line " << __LINE__ << std::endl; }
