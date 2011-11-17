@@ -81,7 +81,7 @@ public:
   //!@brief read from a configuration node
   void setTo(const cedar::aux::ConfigurationNode& root);
   //!@brief write to a configuration node
-  void putTo(cedar::aux::ConfigurationNode& root);
+  void putTo(cedar::aux::ConfigurationNode& root) const;
   //!@brief set enum value to default
   void makeDefault();
   //!@brief return the enum value

@@ -56,7 +56,6 @@ namespace cedar
     namespace exc
     {
       CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
-
       CEDAR_DECLARE_AUX_CLASS(NullPointerException);
       CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
       CEDAR_DECLARE_AUX_CLASS(InitializationException);
