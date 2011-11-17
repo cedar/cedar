@@ -119,7 +119,8 @@ private:
 protected:
   // none yet
 private:
-  std::vector<cedar::aux::DataPtr> mData; //!@todo Make weak_ptr
+  //!@brief Vector of data references connected to this slot.
+  std::vector<cedar::aux::DataWeakPtr> mData;
 
   //!@brief Whether this slot can have multiple data items.
   bool mIsCollection;
