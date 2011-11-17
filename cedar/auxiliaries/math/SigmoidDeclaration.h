@@ -61,6 +61,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
+  //!@brief constructor
   SigmoidDeclaration(
                       cedar::aux::math::SigmoidFactoryPtr classFactory,
                       const std::string& classId,
@@ -73,6 +74,7 @@ public:
   {
   }
 
+  //!@brief destructor
   virtual ~SigmoidDeclaration()
   {
   }
@@ -81,16 +83,19 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief get a factory for this declared sigmoid type
   cedar::aux::math::SigmoidFactoryPtr getObjectFactory()
   {
     return this->mpClassFactory;
   }
 
+  //!@brief get the id of the declared sigmoid class
   const std::string& getClassId() const
   {
     return this->mClassId;
   }
 
+  //!@brief get the category defined in this declaration
   const std::string& getCategory() const
   {
     return this->mCategory;
@@ -150,8 +155,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief pointer to a factory, which can allocate instances of ths declared class
   cedar::aux::math::SigmoidFactoryPtr mpClassFactory;
+  //!@brief a unique class id
   std::string mClassId;
+  //!@brief a category
   std::string mCategory;
 private:
   // none yet
@@ -188,7 +196,7 @@ public:
                     const std::string& category = "misc."
                   )
   :
-    SigmoidDeclaration
+  SigmoidDeclaration
   (
     cedar::aux::math::SigmoidFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::aux::math::Sigmoid, DerivedClass>()),
     classId,
@@ -202,6 +210,7 @@ public:
   {
   }
 
+  //!@brief check if a given ptr to a sigmoid is of this declaration's type
   bool isObjectInstanceOf(cedar::aux::math::SigmoidPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;

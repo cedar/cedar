@@ -42,11 +42,11 @@
 #define CEDAR_PROC_GUI_EXCEPTIONS_H
 
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 /*!@brief TODO
  */
-class cedar::proc::gui::InvalidStepNameException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::gui::InvalidStepNameException : public cedar::aux::ExceptionBase
 {
 public:
   InvalidStepNameException()
@@ -57,7 +57,7 @@ public:
 
 /*!@brief TODO
  */
-class cedar::proc::gui::InvalidTriggerNameException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::gui::InvalidTriggerNameException : public cedar::aux::ExceptionBase
 {
 public:
   InvalidTriggerNameException()

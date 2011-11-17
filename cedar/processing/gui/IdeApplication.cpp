@@ -41,7 +41,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/dynamics/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // PROJECT INCLUDES
 
@@ -95,7 +95,7 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
 
 #ifdef CATCH_EXCEPTIONS_IN_GUI
   }
-  catch(const cedar::aux::exc::ExceptionBase& e)
+  catch(const cedar::aux::ExceptionBase& e)
   {
     QString message("An exception occurred and was caught by the cedar::proc::gui::IdeApplication."
         " This is most likely a bug, please report it. You should probably also save your current work under a different"

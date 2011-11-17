@@ -87,7 +87,7 @@ void cedar::aux::EnumParameter::setTo(const cedar::aux::ConfigurationNode& root)
   emit valueChanged();
 }
 
-void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root)
+void cedar::aux::EnumParameter::putTo(cedar::aux::ConfigurationNode& root) const
 {
   root.put(this->getName(), this->getValue().name());
 }

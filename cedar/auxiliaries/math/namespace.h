@@ -55,20 +55,21 @@ namespace cedar
     /*!@brief Namespace for all math classes. */
     namespace math
     {
+      //!@brief a templated class for representing limits (i.e. an interval) of some type
       template <typename T> struct Limits;
 
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_CLASS(Sigmoid);
-
       CEDAR_DECLARE_CLASS(AbsSigmoid);
-
       CEDAR_DECLARE_CLASS(ExpSigmoid);
-
       CEDAR_DECLARE_CLASS(HeavysideSigmoid);
-
       CEDAR_DECLARE_CLASS(SigmoidDeclaration);
+      //!@endcond
 
+      //!@brief a templated declaration for sigmoid function implementation
       template <class DerivedClass> class SigmoidDeclarationT;
 
+      //!@brief a pointer to a sigmoid factory
       typedef boost::shared_ptr<cedar::aux::AbstractFactory<Sigmoid> > SigmoidFactoryPtr;
     }
   }

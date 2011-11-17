@@ -112,7 +112,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void append(cedar::proc::Step::ParameterList& parameters);
+  void append(cedar::aux::Configurable::ParameterList& parameters);
 
   void addHeadingRow(const std::string& label);
 
