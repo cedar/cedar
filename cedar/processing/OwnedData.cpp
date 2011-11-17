@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataSlot.cpp
+    File:        OwnedData.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 29
+    Date:        2011 11 17
 
     Description:
 
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/OwnedData.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -46,16 +46,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
+cedar::proc::OwnedData::OwnedData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
 :
-mMandatory(isMandatory),
-mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
-mName(name),
-mRole(role)
+cedar::proc::DataSlot(role, name, isMandatory)
 {
 }
 
-cedar::proc::DataSlot::~DataSlot()
+cedar::proc::OwnedData::~OwnedData()
 {
 }
 
@@ -63,44 +60,23 @@ cedar::proc::DataSlot::~DataSlot()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-/*!
- * @remarks Set to an empty string ("") to disable the text and use the name instead.
- */
-void cedar::proc::DataSlot::setText(const std::string& text)
+void cedar::proc::OwnedData::setData(cedar::aux::DataPtr data)
 {
-  this->mText = text;
+  // reset validity when the data changes.
+  if (this->getRole() == cedar::proc::DataRole::INPUT)
+  {
+    this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  }
+
+  this->mData = data;
 }
 
-//!@brief Returns the text to display to the user.
-const std::string& cedar::proc::DataSlot::getText() const
+cedar::aux::DataPtr cedar::proc::OwnedData::getData()
 {
-  if (this->mText.empty())
-    return this->mName;
-  else
-    return this->mText;
+  return this->mData;
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
+cedar::aux::ConstDataPtr cedar::proc::OwnedData::getData() const
 {
-  return this->mValidity;
-}
-
-void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
-{
-  this->mValidity = validity;
-}
-
-bool cedar::proc::DataSlot::isMandatory() const
-{
-  return this->mMandatory;
-}
-
-cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const
-{
-  return this->mRole;
-}
-
-const std::string& cedar::proc::DataSlot::getName() const
-{
-  return this->mName;
+  return this->mData;
 }

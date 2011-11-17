@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataSlot.h
+    File:        ExternalData.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 29
+    Date:        2011 11 17
 
     Description:
 
@@ -34,77 +34,72 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_DATA_SLOT_H
-#define CEDAR_PROC_DATA_SLOT_H
+#ifndef CEDAR_PROC_EXTERNAL_DATA_H
+#define CEDAR_PROC_EXTERNAL_DATA_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/DataRole.h"
+#include "cedar/processing/DataSlot.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A slot for data that is owned by a Connectable.
  */
-class cedar::proc::DataSlot
+class cedar::proc::ExternalData : public cedar::proc::DataSlot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! Enum describing the validity of the data connected to this slot.
-   */
-  enum VALIDITY
-  {
-    //! The data is valid.
-    VALIDITY_VALID,
-    //! The data may not be valid, but the step using it can be computed nonetheless.
-    VALIDITY_WARNING,
-    //! The data is erroneous, computing the corresponding step may explode things.
-    VALIDITY_ERROR,
-    //! The validity is unknown and needs to be determined before execution.
-    VALIDITY_UNKNOWN
-  };
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  ExternalData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
 
   //!@brief Destructor
-  virtual ~DataSlot();
+  ~ExternalData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  cedar::aux::DataPtr getData();
 
-  virtual cedar::aux::DataPtr getData() = 0;
+  cedar::aux::ConstDataPtr getData() const;
 
-  virtual cedar::aux::ConstDataPtr getData() const = 0;
+  cedar::aux::DataPtr getData(unsigned int index);
 
-  virtual void setData(cedar::aux::DataPtr data) = 0;
+  cedar::aux::ConstDataPtr getData(unsigned int index) const;
 
-  cedar::proc::DataRole::Id getRole() const;
+  void setData(cedar::aux::DataPtr data);
 
-  const std::string& getName() const;
+  void setData(cedar::aux::DataPtr data, unsigned int index);
 
-  void setText(const std::string& text);
+  void addData(cedar::aux::DataPtr data);
 
-  //!@brief Returns the text to display to the user.
-  const std::string& getText() const;
+  inline unsigned int getDataCount() const
+  {
+    return this->mData.size();
+  }
 
-  bool isMandatory() const;
+  bool hasData(cedar::aux::ConstDataPtr data) const;
 
-  VALIDITY getValidlity() const;
+  void removeData(cedar::aux::ConstDataPtr data0);
 
-  void setValidity(VALIDITY validity);
+  /*!
+   * @remarks This function throws unless the role of this slot is input.
+   */
+  void setCollection(bool isCollection);
+
+  bool isCollection() const;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -124,18 +119,10 @@ private:
 protected:
   // none yet
 private:
-  bool mMandatory;
+  std::vector<cedar::aux::DataPtr> mData; //!@todo Make weak_ptr
 
-  VALIDITY mValidity;
-
-  //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
-  std::string mName;
-
-  //! Text of the slot, i.e., the text that is displayed to the user (ignored if empty).
-  std::string mText;
-
-  //! Role of the slot (input, output, ...)
-  cedar::proc::DataRole::Id mRole;
+  //!@brief Whether this slot can have multiple data items.
+  bool mIsCollection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -146,7 +133,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::DataSlot
+}; // class cedar::proc::ExternalData
 
-#endif // CEDAR_PROC_DATA_SLOT_H
+#endif // CEDAR_PROC_EXTERNAL_DATA_H
 

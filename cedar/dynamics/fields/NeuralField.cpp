@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/dynamics/SpaceCode.h"
+#include "cedar/processing/ExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
@@ -176,7 +177,7 @@ cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
 void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 {
   // get all members needed for the Euler step
-  cedar::proc::DataSlotPtr input_slot = this->getInputSlot("input");
+  cedar::proc::ExternalDataPtr input_slot = this->getInputSlot("input");
   cv::Mat& u = this->mActivation->getData();
   cv::Mat& sigmoid_u = this->mSigmoidalActivation->getData();
   cv::Mat& lateral_interaction = this->mLateralInteraction->getData();

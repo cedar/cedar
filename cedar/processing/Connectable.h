@@ -92,7 +92,7 @@ public:
   /*!@brief Returns the input slot corresponding to the given name.
    * @see   cedar::proc::Step::getSlot
    */
-  cedar::proc::DataSlotPtr getInputSlot(const std::string& name);
+  cedar::proc::ExternalDataPtr getInputSlot(const std::string& name);
 
   //!@brief Returns the buffer slot corresponding to the given name.
   //!@see cedar::proc::Step::getSlot
