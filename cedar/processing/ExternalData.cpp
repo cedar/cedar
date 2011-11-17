@@ -74,17 +74,30 @@ bool cedar::proc::ExternalData::isCollection() const
 
 bool cedar::proc::ExternalData::hasData(cedar::aux::ConstDataPtr data) const
 {
-  std::vector<cedar::aux::DataPtr>::const_iterator iter;
-  iter = std::find(this->mData.begin(), this->mData.end(), data);
-  return iter != this->mData.end();
+  std::vector<cedar::aux::DataWeakPtr>::const_iterator iter;
+  for (iter = this->mData.begin(); iter != this->mData.end(); ++iter)
+  {
+    cedar::aux::ConstDataPtr item = iter->lock();
+    if (item && item.get() == data.get())
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
 {
   // Find the data entry.
-  std::vector<cedar::aux::DataPtr>::iterator iter;
-  iter = std::find(this->mData.begin(), this->mData.end(), data);
-
+  std::vector<cedar::aux::DataWeakPtr>::iterator iter;
+  for (iter = this->mData.begin(); iter != this->mData.end(); ++iter)
+  {
+    cedar::aux::ConstDataPtr item = iter->lock();
+    if (item && item.get() == data.get())
+    {
+      break;
+    }
+  }
   //!@todo Throw a proper exception here.
   // The data should always be in the vector.
   CEDAR_ASSERT(iter != this->mData.end());
@@ -98,7 +111,7 @@ void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
   // check if there is a free slot in the current vector
   for (size_t i = 0; i < this->mData.size(); ++i)
   {
-    if (!this->mData.at(i))
+    if (!this->mData.at(i).lock())
     {
       this->mData.at(i) = data;
       return;
@@ -143,7 +156,7 @@ cedar::aux::DataPtr cedar::proc::ExternalData::getData(unsigned int index)
 {
   if (index < this->mData.size())
   {
-    return this->mData.at(index);
+    return this->mData.at(index).lock();
   }
   else
   {
@@ -155,7 +168,7 @@ cedar::aux::ConstDataPtr cedar::proc::ExternalData::getData(unsigned int index) 
 {
   if (index < this->mData.size())
   {
-    return this->mData.at(index);
+    return this->mData.at(index).lock();
   }
   else
   {
