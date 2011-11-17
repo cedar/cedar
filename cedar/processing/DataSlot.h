@@ -85,25 +85,34 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  //!@brief get the encapsulated DataPtr managed by this slot
   virtual cedar::aux::DataPtr getData() = 0;
 
+  //!@brief get the encapsulated DataPtr managed by this slot as const
   virtual cedar::aux::ConstDataPtr getData() const = 0;
 
+  //!@brief set the internal DataPtr managed by this slot
   virtual void setData(cedar::aux::DataPtr data) = 0;
 
+  //!@brief get the role (input, output...) of this slot
   cedar::proc::DataRole::Id getRole() const;
 
+  //!@brief get the name of this slot
   const std::string& getName() const;
 
+  //!@brief set some explanatory text for this slot
   void setText(const std::string& text);
 
   //!@brief Returns the text to display to the user.
   const std::string& getText() const;
 
+  //!@brief is this a mandatory connection? i.e. there must be at least one connection using this slot
   bool isMandatory() const;
 
+  //!@brief get the current validity of this slot
   VALIDITY getValidlity() const;
 
+  //!@brief set the current validity of this slot
   void setValidity(VALIDITY validity);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -124,8 +133,10 @@ private:
 protected:
   // none yet
 private:
+  //!@brief flag if this slot must be connected
   bool mMandatory;
 
+  //!@brief the validity of this slot
   VALIDITY mValidity;
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
