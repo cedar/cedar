@@ -58,6 +58,7 @@ namespace cedar
   {
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_PROC_CLASS(Arguments);
+    CEDAR_DECLARE_PROC_CLASS(Connectable);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
     CEDAR_DECLARE_PROC_CLASS(Element);
