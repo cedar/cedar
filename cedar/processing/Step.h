@@ -46,10 +46,10 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Base.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
 
 // PROJECT INCLUDES
@@ -75,7 +75,7 @@
  * slots must be assigned by the user, usually during the constructor.
  */
 class cedar::proc::Step : public QThread,
-                          public cedar::aux::NamedConfigurable,
+                          public cedar::proc::Element,
                           public cedar::proc::Triggerable
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -230,12 +230,6 @@ public:
   {
     return this->mIsLooped;
   }
-
-  //!@brief Sets the name of this step.
-  void setName(const std::string& name);
-
-  //!@brief Returns the name of this step.
-  const std::string& getName() const;
 
   /*!@brief   Locks all data of this step.
    *

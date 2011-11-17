@@ -60,6 +60,7 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Arguments);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
+    CEDAR_DECLARE_PROC_CLASS(Element);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
     CEDAR_DECLARE_PROC_CLASS(LoopMode);
     CEDAR_DECLARE_PROC_CLASS(FrameworkSettings);

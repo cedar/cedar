@@ -373,16 +373,6 @@ const cedar::proc::Step::SlotMap& cedar::proc::Step::getDataSlots(DataRole::Id r
   return iter->second;
 }
 
-void cedar::proc::Step::setName(const std::string& name)
-{
-  this->_mName->setValue(name);
-}
-
-const std::string& cedar::proc::Step::getName() const
-{
-  return this->_mName->getValue();
-}
-
 void cedar::proc::Step::checkMandatoryConnections()
 {
   this->mMandatoryConnectionsAreSet = true;
