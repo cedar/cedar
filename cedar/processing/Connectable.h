@@ -74,13 +74,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Returns a specific input data pointer stored in this step.
+  //!@brief Returns a specific input data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getInput(const std::string& name) const;
 
-  //!@brief Returns a specific buffer data pointer stored in this step.
+  //!@brief Returns a specific buffer data pointer stored in this Connectable.
   cedar::aux::DataPtr getBuffer(const std::string& name);
 
-  //!@brief Returns a specific output data pointer stored in this step.
+  //!@brief Returns a specific output data pointer stored in this Connectable.
   cedar::aux::DataPtr getOutput(const std::string& name);
 
   //!@brief Returns the map of data slots for a given role.
@@ -121,13 +121,13 @@ public:
   //!@see cedar::proc::Step::getSlot
   cedar::proc::ConstDataSlotPtr getSlot(DataRole::Id role, const std::string& name) const;
 
-  //!@brief Provide data to an input slot. This means linking up another step's output to the current step.
+  //!@brief Provide data to an input slot. This means linking up another Connectable's output to the current Connectable.
   void setInput(const std::string& name, cedar::aux::DataPtr data);
 
-  //!@brief Removes a connection to another step's output.
+  //!@brief Removes a connection to another Connectable's output.
   void freeInput(const std::string& name, cedar::aux::DataPtr data);
 
-  //!@brief Returns a specific data pointer stored in this step.
+  //!@brief Returns a specific data pointer stored in this Connectable.
   cedar::aux::DataPtr getData(DataRole::Id role, const std::string& name) const;
 
   /*!@brief   Sets the isCollection member of the corresponding data slot to the given value.
@@ -140,7 +140,7 @@ public:
    */
   void makeInputCollection(const std::string& name, bool isCollection = true);
 
-  //!@brief Method that is called whenever an input is connected to the step.
+  //!@brief Method that is called whenever an input is connected to the Connectable.
   virtual void inputConnectionChanged(const std::string& inputName);
 
   //!@brief Checks the validity of a slot.
@@ -156,11 +156,11 @@ public:
                                             cedar::aux::DataPtr data
                                           ) const;
 
-  //!@brief Parses a data and step name without specifying a role.
+  //!@brief Parses a data and Connectable name without specifying a role.
   static void parseDataNameNoRole
               (
                 const std::string& instr,
-                std::string& stepName,
+                std::string& connectableName,
                 std::string& dataName
               );
 
@@ -169,8 +169,8 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   /*!@brief Declares an input slot.
-   * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the step
-   *                  unless the pointer to this slot (and all other mandatory slots) are non-zero.
+   * @param mandatory If this is set to true, cedar::proc::Step::onTrigger will not run the compute function of the
+   *                  Connectable unless the pointer to this slot (and all other mandatory slots) are non-zero.
    */
   void declareInput(const std::string& name, bool mandatory = true);
 
@@ -198,15 +198,19 @@ protected:
   //!@brief Sets the data pointer of the output to zero.
   void freeOutput(const std::string& name);
 
-  /*!@brief Returns the set of data to be locked for this step during the compute function (or any other processing).
+  /*!@brief Returns the set of data to be locked for this Connectable during the compute function (or any other processing).
    */
   void getDataLocks(cedar::aux::LockSet& locks);
+
+  /*!@brief Returns the set of data to be locked for the given role of this Connectable during the compute function
+   *        (or any other processing).
+   */
   void getDataLocks(DataRole::Id role, cedar::aux::LockSet& locks);
 
   /*!@brief   Locks all data of this Connectable.
    *
    *          Locking is done in a special order that prevents deadlocks, therefore you should always use this function to
-   *          lock the step's data.
+   *          lock the Connectable's data.
    *
    * @see     cedar::aux::lock for a description on the deadlock-free locking mechanism.
    *
@@ -214,7 +218,7 @@ protected:
    */
   void lockAll();
 
-  //!@brief Unlocks all data of this step.
+  //!@brief Unlocks all data of this Connectable.
   void unlockAll();
 
   /*!@brief Checks all inputs for validity.
