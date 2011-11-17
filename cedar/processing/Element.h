@@ -48,6 +48,8 @@
 
 
 /*!@brief Base class for Elements in a processing architecture.
+ *
+ *        Each element is described by a name that uniquely identifies it within a processing module.
  */
 class cedar::proc::Element : public cedar::aux::Configurable
 {
@@ -62,7 +64,7 @@ public:
   //!@brief The standard constructor.
   Element();
 
-  //!@brief Destructor
+  //!@brief The destructor.
   virtual ~Element();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -90,8 +92,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
