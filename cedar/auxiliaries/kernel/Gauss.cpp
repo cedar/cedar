@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
@@ -218,7 +218,7 @@ void cedar::aux::kernel::Gauss::calculate()
     std::cerr << "> Error (kernel::Gauss) :" << error.what() << " in calculate().\n"
         << "  Check your configuration files." << std::endl;
     CEDAR_THROW(
-                 cedar::aux::exc::IndexOutOfRangeException,
+                 cedar::aux::IndexOutOfRangeException,
                  "kernel::Gauss has encountered inconsistent vector sizes, check your configuration file"
                );
   }

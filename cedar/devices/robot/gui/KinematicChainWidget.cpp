@@ -40,7 +40,7 @@
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/InitializationException.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 
@@ -129,7 +129,7 @@ QWidget(parent, f)
     if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
     {
       cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
-      CEDAR_THROW(cedar::aux::exc::InitializationException, "Kinematic chains do not have the same number of joints!");
+      CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
     }
   }
 
@@ -160,7 +160,7 @@ ConfigurationInterface(configFileName)
     if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
     {
       cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
-      CEDAR_THROW(cedar::aux::exc::InitializationException, "Kinematic chains do not have the same number of joints!");
+      CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
     }
   }
 
