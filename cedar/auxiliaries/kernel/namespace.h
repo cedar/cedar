@@ -55,9 +55,11 @@ namespace cedar
   /*!@brief Namespace for all kernel classes. */
     namespace kernel
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Kernel);
       CEDAR_DECLARE_AUX_CLASS(Separable);
       CEDAR_DECLARE_AUX_CLASS(Gauss);
+      //!@endcond
     }
   }
 }

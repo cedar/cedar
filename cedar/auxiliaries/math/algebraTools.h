@@ -83,11 +83,12 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT std::vector<double> solvePolynomial(const std::vector<double>& rCoefficients);
 
+      //!@brief function that calculates the cubic root of a floating point value
       inline double fast_cuberoot(double in)
       {
 #ifdef MSVC
         return std::pow(in, 1.0/3.0);
-#else // MSVC
+#else // not MSVC
         return cbrt(in);
 #endif // MSVC
       }
