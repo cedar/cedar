@@ -576,7 +576,7 @@ void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF pos
 
     this->addTrigger(trigger, position);
   }
-  catch(const cedar::aux::exc::ExceptionBase& e)
+  catch(const cedar::aux::ExceptionBase& e)
   {
     QString message(e.exceptionInfo().c_str());
     emit exception(message);
@@ -638,7 +638,7 @@ void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPoi
 
     this->addProcessingStep(step, position);
   }
-  catch(const cedar::aux::exc::ExceptionBase& e)
+  catch(const cedar::aux::ExceptionBase& e)
   {
     QString message(e.exceptionInfo().c_str());
     emit exception(message);

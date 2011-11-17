@@ -195,18 +195,23 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
+    CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
+    CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
+    CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
+    CEDAR_DECLARE_AUX_CLASS(NullPointerException);
+    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(RangeException);
+    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
-    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
-    CEDAR_DECLARE_AUX_CLASS(RangeException);
-    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
-    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     //!@endcond
   }
 }

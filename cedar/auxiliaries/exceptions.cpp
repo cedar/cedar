@@ -94,3 +94,28 @@ cedar::aux::TypeMismatchException::TypeMismatchException()
 {
   this->mType = "TypeMismatchException";
 }
+
+cedar::aux::BadConnectionException::BadConnectionException()
+{
+  this->mType = "BadConnectionException";
+}
+
+cedar::aux::FailedAssertionException::FailedAssertionException()
+{
+  this->mType = "FailedAssertionException";
+}
+
+cedar::aux::IndexOutOfRangeException::IndexOutOfRangeException()
+{
+  this->mType = "IndexOutOfRangeException";
+}
+
+cedar::aux::NullPointerException::NullPointerException()
+{
+  this->mType = "NullPointerException";
+}
+
+cedar::aux::InitializationException::InitializationException()
+{
+  this->mType = "InitializationException";
+}
