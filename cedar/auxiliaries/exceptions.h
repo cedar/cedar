@@ -176,4 +176,12 @@ public:
   InitializationException();
 };
 
+/*!@brief
+ */
+class cedar::aux::DeadReferenceException : public cedar::aux::ExceptionBase
+{
+public:
+  DeadReferenceException();
+};
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

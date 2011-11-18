@@ -45,6 +45,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Connection.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -114,6 +115,11 @@ const cedar::proc::Network::GroupVector& cedar::proc::Network::groups() const
 cedar::proc::Network::GroupVector& cedar::proc::Network::groups()
 {
   return this->mGroups;
+}
+
+const cedar::proc::Network::ElementVector& cedar::proc::Network::elements() const
+{
+  return this->mElements;
 }
 
 void cedar::proc::Network::add(cedar::proc::StepPtr step)
