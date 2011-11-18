@@ -45,6 +45,12 @@
 # set the project name
 project(cedar)
 
+if (CEDAR_BUILD_DEBUG_VERSION)
+  set (CMAKE_BUILD_TYPE debug)
+else(CEDAR_BUILD_DEBUG_VERSION)
+  set (CMAKE_BUILD_TYPE release)
+endif(CEDAR_BUILD_DEBUG_VERSION)
+
 # set the directory for source code
 set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
 # directory for all tests
