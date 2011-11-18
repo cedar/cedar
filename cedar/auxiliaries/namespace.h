@@ -212,6 +212,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     //!@endcond
   }
 }
