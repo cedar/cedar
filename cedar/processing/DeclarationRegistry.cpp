@@ -47,16 +47,6 @@
 
 // SYSTEM INCLUDES
 
-cedar::proc::ElementPtr cedar::proc::DeclarationRegistry::createInstance(
-                                                                          const std::string& classId,
-                                                                          const std::string& name
-                                                                        )
-{
-  ElementPtr object = this->allocateClass(classId);
-  object->setName(name);
-  return object;
-}
-
 void cedar::proc::DeclarationRegistry::declareClass(cedar::proc::ElementDeclarationPtr pDeclaration)
 {
   const std::string& class_id = pDeclaration->getClassId();

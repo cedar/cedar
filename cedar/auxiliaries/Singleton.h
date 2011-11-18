@@ -116,9 +116,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  Singleton();
-  Singleton(const Singleton&);
-  Singleton& operator=(const Singleton&);
   ~Singleton()
   {
     mDestroyed = true;
@@ -147,6 +144,9 @@ private:
   // none yet
 
 }; // class cedar::aux::Singleton
+
+template <class T> typename cedar::aux::Singleton<T>::InstanceTypePtr cedar::aux::Singleton<T>::mInstance;
+template <class T> bool cedar::aux::Singleton<T>::mDestroyed;
 
 #endif // CEDAR_AUX_SINGLETON_H
 

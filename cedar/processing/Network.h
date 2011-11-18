@@ -54,6 +54,7 @@
  *
  * More detailed description of the class.
  * @todo Change the name of the class to Module
+ * @todo Add a slot, which reacts to name changes of elements (update map of names to ptrs)
  */
 class cedar::proc::Network
 {
@@ -64,7 +65,7 @@ private:
   typedef std::vector<cedar::proc::StepPtr> StepVector;
   typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
   typedef std::vector<cedar::proc::GroupPtr> GroupVector;
-  typedef std::vector<cedar::proc::ElementPtr> ElementVector;
+  typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -101,11 +102,28 @@ public:
   void readFile(const std::string& filename);
   void writeFile(const std::string& filename);
 
-  void add(cedar::proc::StepPtr step);
+//  void add(cedar::proc::StepPtr step);
   void remove(cedar::proc::StepPtr step);
-  void add(cedar::proc::TriggerPtr trigger);
+//  void add(cedar::proc::TriggerPtr trigger);
   void remove(cedar::proc::TriggerPtr trigger);
   void add(cedar::proc::GroupPtr group);
+
+  void add(std::string className, std::string instanceName);
+  void add(cedar::proc::ElementPtr element, std::string instanceName);
+  void add(cedar::proc::ElementPtr element);
+
+  /*!@brief Returns the element with the given name as a pointer of the specified type.
+   */
+  template <class T>
+  boost::shared_ptr<T> getElement(const std::string& name)
+  {
+    return boost::shared_dynamic_cast<T>(this->getElement(name));
+  }
+
+  cedar::proc::ElementPtr getElement(const std::string& name);
+
+  void connect(const std::string& source, const std::string& target);
+  void connect(cedar::proc::ElementPtr source, cedar::proc::ElementPtr target);
 
   const StepVector& steps() const;
   StepVector& steps();
@@ -113,7 +131,7 @@ public:
   TriggerVector& triggers();
   const GroupVector& groups() const;
   GroupVector& groups();
-  const ElementVector& elements() const;
+  const ElementMap& elements() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -136,7 +154,8 @@ private:
   StepVector mSteps;
   TriggerVector mTriggers;
   GroupVector mGroups;
-  ElementVector mElements;
+  ElementMap mElements;
+  std::vector<cedar::proc::ConnectionPtr> mConnections;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

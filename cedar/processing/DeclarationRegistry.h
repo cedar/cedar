@@ -78,7 +78,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cedar::proc::ElementPtr createInstance(const std::string& classId, const std::string& name);
+  cedar::proc::ElementPtr allocateClass(const std::string& classId) const;
 
   void declareClass(cedar::proc::ElementDeclarationPtr pDeclaration);
 
@@ -94,7 +94,6 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  ElementPtr allocateClass(const std::string& classId) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
