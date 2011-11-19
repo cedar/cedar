@@ -39,6 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 #include "cedar/defines.h"
@@ -82,11 +83,11 @@ namespace cedar
 
     /*!@brief Unmangles a c++ name.
      */
-    std::string unmangleName(const char* mangledName);
+    CEDAR_AUX_LIB_EXPORT std::string unmangleName(const char* mangledName);
 
     /*!@brief Unmangles the c++ name of a given typeinfo object.
      */
-    std::string unmangleName(const std::type_info& typeinfo);
+    CEDAR_AUX_LIB_EXPORT std::string unmangleName(const std::type_info& typeinfo);
   }
 }
 

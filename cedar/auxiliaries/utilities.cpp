@@ -82,8 +82,12 @@ std::string cedar::aux::unmangleName(const char* mangledName)
   free(realname);
   return result;
 #else // GCC
-  #error Implement this for your compiler!
-  return std::string(mangledName);
+  std::string name(mangledName);
+  if (name.find("class ") == 0 && name.size() > 6)
+  {
+    name = name.substr(6);
+  }
+  return name;
 #endif // GCC
 }
 
