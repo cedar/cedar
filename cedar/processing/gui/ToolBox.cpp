@@ -81,7 +81,7 @@ cedar::proc::gui::ToolBox::~ToolBox()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::ToolBox::resizeEvent(QResizeEvent */* pEvent */)
+void cedar::proc::gui::ToolBox::resizeEvent(QResizeEvent * /* pEvent */)
 {
   QRect rect = this->mpLayout->contentsRect();
   int effective_area = rect.width();

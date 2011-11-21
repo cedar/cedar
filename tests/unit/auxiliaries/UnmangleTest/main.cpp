@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,72 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        utilities.cpp
+    File:        main.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 08 11
+    Date:        2011 07 24
 
-    Description:
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
+
 // LOCAL INCLUDES
+
+// PROJECT INCLUDES
 #include "cedar/auxiliaries/utilities.h"
-#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
-#ifdef GCC
-#include <cxxabi.h>
-#endif // GCC
+#include <iostream>
+#include <typeinfo>
 
 
-std::string cedar::aux::unmangleName(const std::type_info& typeinfo)
+namespace test
 {
-  return cedar::aux::unmangleName(typeinfo.name());
+  class TestClass
+  {
+    public:
+      void fn()
+      {
+      }
+  };
 }
 
-std::string cedar::aux::unmangleName(const char* mangledName)
+int main()
 {
-#ifdef GCC
-  int status;
-  char *realname = abi::__cxa_demangle(mangledName, 0, 0, &status);
+  using cedar::aux::LogFile;
+  LogFile log_file("UnmangleTest.log");
+  log_file.addTimeStamp();
+  log_file << std::endl;
+  // the number of errors encountered in this test
+  int errors = 0;
 
-  switch (status)
+  std::string unmangled_test_class = cedar::aux::unmangleName(typeid(test::TestClass));
+  if (unmangled_test_class != "test::TestClass")
   {
-    case 0:
-      // result is ok
-      break;
-
-    case -1:
-      CEDAR_THROW(cedar::aux::UnmanglingFailedException, "A memory allocation error occurred.");
-      break;
-
-    case -2:
-      CEDAR_THROW(cedar::aux::UnmanglingFailedException, "The mangled name is not a valid name under the C++ ABI mangling rules.");
-      break;
-
-    case -3:
-      CEDAR_THROW(cedar::aux::UnmanglingFailedException, "One of the arguments to abi::__cxa_demangle is invalid.");
-      break;
-
-    default:
-      CEDAR_THROW(cedar::aux::UnmanglingFailedException, "An unknown error occurred.");
-      break;
+    log_file << "Faild to properly unmangle name for test::TestClass; result is \""
+             << unmangled_test_class << "\"" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    log_file << "Name properly unmangled to \"" << unmangled_test_class << "\"" << std::endl;
   }
 
-  std::string result(realname);
-  free(realname);
-  return result;
-#else // GCC
-  std::string name(mangledName);
-  if (name.find("class ") == 0 && name.size() > 6)
-  {
-    name = name.substr(6);
-  }
-  return name;
-#endif // GCC
+  return errors;
 }
-
