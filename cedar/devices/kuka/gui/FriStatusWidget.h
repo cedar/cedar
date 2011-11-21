@@ -49,7 +49,7 @@
 #ifdef DEBUG
 #include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
 #else
-#include "cedar/devices/kuka/gui/ui_FriStatusWidget.h"
+#include "cedar/devices/release/kuka/gui/ui_FriStatusWidget.h"
 #endif
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 
