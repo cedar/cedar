@@ -44,7 +44,6 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <sstream>
 #include <boost/smart_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <opencv2/opencv.hpp>
@@ -163,18 +162,6 @@ namespace cedar
     //!@brief a better name for boost's property tree
     typedef boost::property_tree::ptree ConfigurationNode;
 
-
-    /*!@brief Template method that converts simple data types to a string.
-     *
-     * @param value The data value that will be converted to a string.
-     */
-    template<typename T>
-    std::string toString(const T &value)
-    {
-      std::ostringstream streamOut;
-      streamOut << value;
-      return streamOut.str();
-    }
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Data);
     //!@endcond
@@ -215,6 +202,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     //!@endcond
   }
 }

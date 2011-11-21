@@ -39,12 +39,14 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
 #include <boost/shared_ptr.hpp>
+#include <typeinfo>
 
 
 namespace cedar
@@ -78,6 +80,14 @@ namespace cedar
       CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<TOut>(pIn));
       return boost::static_pointer_cast<TOut>(pIn);
     }
+
+    /*!@brief Unmangles a c++ name.
+     */
+    CEDAR_AUX_LIB_EXPORT std::string unmangleName(const char* mangledName);
+
+    /*!@brief Unmangles the c++ name of a given typeinfo object.
+     */
+    CEDAR_AUX_LIB_EXPORT std::string unmangleName(const std::type_info& typeinfo);
   }
 }
 

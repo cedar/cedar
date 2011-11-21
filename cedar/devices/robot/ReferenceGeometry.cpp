@@ -39,7 +39,7 @@
 #include "cedar/devices/robot/ReferenceGeometry.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <vector>

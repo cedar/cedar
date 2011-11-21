@@ -176,6 +176,17 @@ public:
   InitializationException();
 };
 
+/*!@brief Exception that is thrown when unmangling of a name fails.
+ */
+class cedar::aux::UnmanglingFailedException : public cedar::aux::ExceptionBase
+{
+public:
+  UnmanglingFailedException()
+  {
+    this->mType = "UnmanglingFailedException";
+  }
+};
+
 /*!@brief
  */
 class cedar::aux::DeadReferenceException : public cedar::aux::ExceptionBase
