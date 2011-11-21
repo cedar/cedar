@@ -151,6 +151,10 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
     {
       val = matrix.at<double>(0,0);
     }
+    else
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "Unhandled matrix type in cedar::aux::gui::HistoryPlot0D::display.");
+    }
   }
   data->unlock();
   mpXValues.clear();
@@ -210,6 +214,10 @@ void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
     else if (matrix.type() == CV_64F)
     {
       val = matrix.at<double>(0,0);
+    }
+    else
+    {
+      CEDAR_THROW(cedar::aux::UnhandledTypeException, "Cannot handle the type of the matrix.");
     }
   }
   mpYValues.push_back(val);
