@@ -43,11 +43,33 @@
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
+#include <sstream>
 
 namespace cedar
 {
   namespace aux
   {
+    /*!@brief Template method that converts simple data types to a string.
+     *
+     * @param value The data value that will be converted to a string.
+     */
+    template<typename T>
+    std::string toString(const T &value)
+    {
+      std::ostringstream streamOut;
+      streamOut << value;
+      return streamOut.str();
+    }
+
+    /*!@brief Splits a string based on the given separator.
+     *
+     *        For example, the string "This is an example" is split into the list ["This", "is", "an", "example"] when
+     *        the separator " " is used.
+     *
+     * @param str The string to split.
+     * @param separator The separator.
+     * @param parts Result vector into which the separated parts of the string are written.
+     */
     CEDAR_AUX_LIB_EXPORT void split(const std::string& str,
                                     const std::string& separator,
                                     std::vector<std::string>& parts)
