@@ -42,6 +42,7 @@ set (CEDAR_BUILD_DIR      "${CEDAR_HOME}/build"       CACHE PATH "Build director
 set (CEDAR_LOG_DIR        "${CEDAR_HOME}/logs"        CACHE PATH "Default directory for all log files.")
 
 set (CEDAR_BUILD_STATIC_LIBS              0           CACHE BOOL "Build all libraries statically (*.a)?")
+set (CEDAR_BUILD_DEBUG_VERSION            0           CACHE BOOL "Build with debug information?")
 set (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS    0           CACHE BOOL "Use opencv debug libraries when building in debug mode?")
 set (CEDAR_BUILD_TESTS                    1           CACHE BOOL "Build unit and interactive tests? (Disabling this can save compile time.")
 

@@ -45,7 +45,7 @@
 #ifdef DEBUG
   #include "cedar/processing/debug/gui/ui_Ide.h"
 #else
-  #include "cedar/processing/gui/ui_Ide.h"
+  #include "cedar/processing/release/gui/ui_Ide.h"
 #endif
 #include "cedar/processing/gui/namespace.h"
 
