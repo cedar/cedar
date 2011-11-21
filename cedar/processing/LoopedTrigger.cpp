@@ -59,6 +59,7 @@
 cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
 :
 cedar::aux::LoopedThread(stepSize),
+cedar::proc::Trigger("", true),
 //!@todo Should these parameters go into cedar::aux::LoopedThread?
 mLoopType(new cedar::aux::EnumParameter(
                                          this,

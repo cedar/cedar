@@ -42,10 +42,62 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/Trigger.h"
+#include "cedar/processing/LoopedTrigger.h"
+#include "cedar/processing/MultiTrigger.h"
+#include "cedar/processing/Group.h"
+#include "cedar/processing/sources/GaussInput.h"
+#include "cedar/processing/steps/StaticGain.h"
+#include "cedar/processing/steps/Projection.h"
+#include "cedar/processing/steps/Resize.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+
+using cedar::proc::ElementDeclarationPtr;
+using cedar::proc::ElementDeclarationT;
+
+cedar::proc::DeclarationRegistry::DeclarationRegistry()
+{
+  ElementDeclarationPtr trigger_declaration(new ElementDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
+  trigger_declaration->setIconPath(":/triggers/trigger.svg");
+  this->declareClass(trigger_declaration);
+
+  ElementDeclarationPtr multi_trigger_declaration(
+                                                   new ElementDeclarationT<cedar::proc::MultiTrigger>
+                                                   (
+                                                     "cedar.processing.MultiTrigger"
+                                                   )
+                                                 );
+  multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
+  this->declareClass(multi_trigger_declaration);
+
+  ElementDeclarationPtr looped_trigger_declaration(
+                                                     new ElementDeclarationT<cedar::proc::LoopedTrigger>
+                                                     (
+                                                       "cedar.processing.LoopedTrigger"
+                                                     )
+                                                  );
+  looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
+  this->declareClass(looped_trigger_declaration);
+
+  ElementDeclarationPtr input_decl(new ElementDeclarationT<cedar::proc::sources::GaussInput>("cedar.processing.sources.GaussInput", "Sources"));
+  input_decl->setIconPath(":/steps/gauss_input.svg");
+  this->declareClass(input_decl);
+
+  ElementDeclarationPtr static_gain_decl(new ElementDeclarationT<cedar::proc::steps::StaticGain>("cedar.processing.StaticGain", "Utilities"));
+  static_gain_decl->setIconPath(":/steps/static_gain.svg");
+  this->declareClass(static_gain_decl);
+
+  ElementDeclarationPtr projection_decl(new ElementDeclarationT<cedar::proc::steps::Projection>("cedar.processing.Projection", "Utilities"));
+  projection_decl->setIconPath(":/steps/projection.svg");
+  this->declareClass(projection_decl);
+
+  ElementDeclarationPtr resize_decl(new ElementDeclarationT<cedar::proc::steps::Resize>("cedar.processing.Resize", "Utilities"));
+  resize_decl->setIconPath(":/steps/resize.svg");
+  this->declareClass(resize_decl);
+}
 
 void cedar::proc::DeclarationRegistry::declareClass(cedar::proc::ElementDeclarationPtr pDeclaration)
 {

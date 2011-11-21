@@ -205,8 +205,8 @@ void cedar::proc::gui::NetworkFile::addTriggersToScene()
 
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
-      cedar::proc::StepPtr target = trigger->getListeners().at(i);
-      cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(target.get());
+      cedar::proc::TriggerablePtr target = trigger->getListeners().at(i);
+      cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(dynamic_cast<cedar::proc::Step*>(target.get()));
       CEDAR_DEBUG_ASSERT(p_target_item);
       p_trigger_item->connectTo(p_target_item);
     }

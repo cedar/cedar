@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Network.h
+    File:        DataConnection.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 11 21
 
     Description:
 
@@ -38,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_NETWORK_H
-#define CEDAR_PROC_NETWORK_H
+#ifndef CEDAR_PROC_DATA_CONNECTION_H
+#define CEDAR_PROC_DATA_CONNECTION_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
@@ -47,95 +43,36 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <vector>
 
 
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
- * @todo Change the name of the class to Module
- * @todo Add a slot, which reacts to name changes of elements (update map of names to ptrs)
+ *
+ * @todo check if source is owned data
  */
-class cedar::proc::Network
+class cedar::proc::DataConnection
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef std::vector<cedar::proc::StepPtr> StepVector;
-  typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
-  typedef std::vector<cedar::proc::GroupPtr> GroupVector;
-  typedef std::vector<cedar::proc::DataConnectionPtr> DataConnectionVector;
-  typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
-  typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Network();
-
+  DataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
   //!@brief Destructor
-  ~Network();
-
+  ~DataConnection();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void readSteps(const cedar::aux::ConfigurationNode& root);
-  void saveSteps(cedar::aux::ConfigurationNode& root);
-
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
-  void saveTriggers(cedar::aux::ConfigurationNode& root);
-
-  void readGroups(const cedar::aux::ConfigurationNode& root);
-  void saveGroups(cedar::aux::ConfigurationNode& root);
-
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
-
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnections(cedar::aux::ConfigurationNode& root);
-
-  void readFrom(const cedar::aux::ConfigurationNode& root);
-  void saveTo(cedar::aux::ConfigurationNode& root);
-
-  void readFile(const std::string& filename);
-  void writeFile(const std::string& filename);
-
-//  void add(cedar::proc::StepPtr step);
-  void remove(cedar::proc::StepPtr step);
-//  void add(cedar::proc::TriggerPtr trigger);
-  void remove(cedar::proc::TriggerPtr trigger);
-  void add(cedar::proc::GroupPtr group);
-
-  void add(std::string className, std::string instanceName);
-  void add(cedar::proc::ElementPtr element, std::string instanceName);
-  void add(cedar::proc::ElementPtr element);
-
-  /*!@brief Returns the element with the given name as a pointer of the specified type.
-   */
-  template <class T>
-  boost::shared_ptr<T> getElement(const std::string& name)
-  {
-    return boost::shared_dynamic_cast<T>(this->getElement(name));
-  }
-
-  cedar::proc::ElementPtr getElement(const std::string& name);
-
-  void connectSlots(const std::string& source, const std::string& target);
-  void connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
-  bool isConnected(const std::string& source, const std::string& target);
-
-  const StepVector& steps() const;
-  StepVector& steps();
-  const TriggerVector& triggers() const;
-  TriggerVector& triggers();
-  const GroupVector& groups() const;
-  GroupVector& groups();
-  const ElementMap& elements() const;
-
+  // none yet
+  bool equals(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  cedar::proc::DataSlotPtr getSource();
+  cedar::proc::DataSlotPtr getTarget();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -151,15 +88,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  // none yet
+  cedar::proc::DataSlotWeakPtr mSource;
+  cedar::proc::DataSlotWeakPtr mTarget;
 private:
-  StepVector mSteps;
-  TriggerVector mTriggers;
-  GroupVector mGroups;
-  ElementMap mElements;
-  DataConnectionVector mDataConnections;
-  TriggerConnectionVector mTriggerConnections;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -172,7 +107,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::Network
+}; // class cedar::proc::DataConnection
 
-#endif // CEDAR_PROC_NETWORK_H
+#endif // CEDAR_PROC_DATA_CONNECTION_H
 

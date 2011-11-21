@@ -154,4 +154,15 @@ public:
   }
 }; // class cedar::proc::ConnectionMemberDeletedException
 
+/*!@brief An exception that is thrown if a connection is duplicated.
+ */
+class cedar::proc::DuplicateConnectionException : public cedar::aux::ExceptionBase
+{
+public:
+  DuplicateConnectionException()
+  {
+    this->mType = "DuplicateConnectionException";
+  }
+}; // class cedar::proc::DuplicateConnectionException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

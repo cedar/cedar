@@ -65,13 +65,15 @@ class cedar::proc::Trigger : public cedar::proc::Element,
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Manager;
+  friend class cedar::proc::Network;
+  friend class cedar::proc::TriggerConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Trigger(const std::string& name = "");
+  Trigger(const std::string& name = "", bool isLooped = false);
 
   //!@brief Destructor
   virtual ~Trigger();
@@ -93,13 +95,13 @@ public:
   void removeTrigger(cedar::proc::TriggerPtr trigger);
 
   //!@brief a boolean check, if a given step is a listener of this Trigger instance
-  bool isListener(cedar::proc::StepPtr step);
+  bool isListener(cedar::proc::TriggerablePtr step);
 
   //!@brief a boolean check, if a given Trigger is a listener of this Trigger instance
   bool isListener(cedar::proc::TriggerPtr trigger);
 
   //!@brief returns a list of listeners
-  const std::vector<cedar::proc::StepPtr>& getListeners() const;
+  const std::vector<cedar::proc::TriggerablePtr>& getListeners() const;
 
   //!@brief returns a list of listening triggers
   const std::vector<cedar::proc::TriggerPtr>& getTriggerListeners() const;
@@ -122,10 +124,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief removes a listener, which will no longer receive trigger signals
-  virtual void removeListener(cedar::proc::StepPtr step);
+  virtual void removeListener(cedar::proc::TriggerablePtr step);
 
   //!@brief adds a listener, which will receive trigger signals from this instance from now on
-  virtual void addListener(cedar::proc::StepPtr step);
+  virtual void addListener(cedar::proc::TriggerablePtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -140,12 +142,12 @@ public:
   // none yet (hopefully never!)
 protected:
   //!@brief list of listeners
-  std::vector<cedar::proc::StepPtr> mListeners;
+  std::vector<cedar::proc::TriggerablePtr> mListeners;
   //!@brief list of listenings triggers
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 private:
   //!@brief find a step in the list of listeners
-  std::vector<cedar::proc::StepPtr>::iterator find(cedar::proc::StepPtr triggerable);
+  std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
   //!@brief find a trigger in the list of trigger listeners
   std::vector<cedar::proc::TriggerPtr>::iterator find(cedar::proc::TriggerPtr triggerableT);
 

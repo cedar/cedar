@@ -61,7 +61,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  OwnedData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  OwnedData(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory = true);
 
   //!@brief Destructor
   ~OwnedData();

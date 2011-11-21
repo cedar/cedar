@@ -65,12 +65,10 @@
 
 cedar::proc::Step::Step(bool runInThread, bool isLooped)
 :
+Triggerable(isLooped),
 // initialize members
-mFinished(new cedar::proc::Trigger("processingDone")),
-mIsLooped (isLooped),
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
-mState(cedar::proc::Step::STATE_NONE),
 mRegisteredAt(NULL),
 // initialize parameters
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
@@ -80,7 +78,7 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 #endif
 
   // Add the finished trigger to the list of triggers.
-  this->addTrigger(mFinished);
+//  this->addTrigger(mFinished);
 
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
@@ -100,17 +98,6 @@ cedar::proc::Step::~Step()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-
-void cedar::proc::Step::setParentTrigger(cedar::proc::TriggerPtr parent)
-{
-  if (this->isLooped())
-  {
-    // If there is already a parent trigger for looped steps, disconnect it first!
-    CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
-  }
-  this->mParentTrigger = parent;
-}
 
 cedar::proc::TriggerPtr cedar::proc::Step::getParentTrigger()
 {
@@ -211,63 +198,13 @@ void cedar::proc::Step::addTrigger(cedar::proc::TriggerPtr& trigger)
   this->mTriggers.push_back(trigger);
 }
 
-const std::string& cedar::proc::Step::getStateAnnotation() const
-{
-  return this->mStateAnnotation;
-}
-
-cedar::proc::Step::State cedar::proc::Step::getState() const
-{
-  return this->mState;
-}
-
-void cedar::proc::Step::setState(cedar::proc::Step::State newState, const std::string& annotation)
-{
-  // Only act if the state actually changes.
-  if (newState != this->mState || annotation != this->mStateAnnotation)
-  {
-    this->mState = newState;
-    this->mStateAnnotation = annotation;
-    emit stateChanged();
-  }
-}
-
-void cedar::proc::Step::callOnStart()
-{
-  this->onStart();
-  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
-  {
-    this->mFinished->getListeners().at(i)->callOnStart();
-  }
-}
-
-void cedar::proc::Step::callOnStop()
-{
-  this->onStop();
-  this->setState(cedar::proc::Step::STATE_NONE, "");
-  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
-  {
-    this->mFinished->getListeners().at(i)->callOnStop();
-  }
-}
-
-void cedar::proc::Step::onStart()
-{
-  // empty as a default implementation
-}
-
-void cedar::proc::Step::onStop()
-{
-  // empty as a default implementation
-}
-
 void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 {
 #ifdef DEBUG_RUNNING
   std::cout << "DEBUG_RUNNING> " << this->getName() << ".onTrigger()" << std::endl;
 #endif // DEBUG_RUNNING
   // if an exception has previously happened, do nothing.
-  if (this->mState == cedar::proc::Step::STATE_EXCEPTION)
+  if (this->mState == cedar::proc::Triggerable::STATE_EXCEPTION)
   {
     // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
@@ -279,7 +216,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
   // if there are invalid inputs, stop
   if (!this->allInputsValid())
   {
-    this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
+    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
     // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
@@ -289,7 +226,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 
   if (!this->mandatoryConnectionsAreSet())
   {
-    this->setState(cedar::proc::Step::STATE_NOT_RUNNING, "Unconnected mandatory inputs prevent the step from running.");
+    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "Unconnected mandatory inputs prevent the step from running.");
     CEDAR_THROW(MissingConnectionException, //!@todo Add to the exception the names of the unset connections
                 "Some mandatory connections are not set for the processing step " + this->getName() + ".");
   } // this->mMandatoryConnectionsAreSet
@@ -304,7 +241,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 #endif // DEBUG_ARGUMENT_SETTING
 
     // if we get to this point, set the state to running
-    this->setState(cedar::proc::Step::STATE_RUNNING, "");
+    this->setState(cedar::proc::Triggerable::STATE_RUNNING, "");
 
     if (this->_mRunInThread->getValue())
     {

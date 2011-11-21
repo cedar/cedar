@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Triggerable.cpp
+    File:        TriggerConnection.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 16
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 11 21
 
     Description:
 
@@ -35,88 +35,75 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/processing/Triggerable.h"
+#include "cedar/processing/TriggerConnection.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/processing/Trigger.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/utilities.h"
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::proc::Triggerable::Triggerable(bool isLooped)
+cedar::proc::TriggerConnection::TriggerConnection(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 :
-mIsLooped(isLooped),
-mState(cedar::proc::Triggerable::STATE_NONE),
-mFinished(new cedar::proc::Trigger("processingDone"))
+mSourceTrigger(source),
+mTarget(target)
 {
+  // add the target to the list of listeners
+  source->addListener(target);
+  // add parent to target
+  target->setParentTrigger(source);
 }
 
-cedar::proc::Triggerable::~Triggerable()
+cedar::proc::TriggerConnection::~TriggerConnection()
 {
-  // empty default implementation
+  cedar::proc::TriggerPtr source_shared = mSourceTrigger.lock();
+  cedar::proc::TriggerablePtr target_shared = mTarget.lock();
+  // first make a check if pointers are valid for source and target
+  if (source_shared && target_shared)
+  {
+    source_shared->removeListener(target_shared);
+  }
 }
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
+bool cedar::proc::TriggerConnection::equals(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 {
-  if (this->isLooped())
+  CEDAR_ASSERT(source);
+  CEDAR_ASSERT(target);
+  cedar::proc::TriggerPtr source_shared = mSourceTrigger.lock();
+  cedar::proc::TriggerablePtr target_shared = mTarget.lock();
+  // first make a check if pointers are valid for source and target
+  if (source_shared == source && target_shared == target)
   {
-    // If there is already a parent trigger for looped steps, disconnect it first!
-    CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
+    return true;
   }
-  this->mParentTrigger = parent;
+  return false;
 }
 
-void cedar::proc::Triggerable::callOnStart()
+cedar::proc::TriggerPtr cedar::proc::TriggerConnection::getSourceTrigger()
 {
-  this->onStart();
-  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+  if (cedar::proc::TriggerPtr source_shared = mSourceTrigger.lock())
   {
-    this->mFinished->getListeners().at(i)->callOnStart();
+    return source_shared;
   }
-}
-
-void cedar::proc::Triggerable::callOnStop()
-{
-  this->onStop();
-  this->setState(cedar::proc::Triggerable::STATE_NONE, "");
-  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+  else
   {
-    this->mFinished->getListeners().at(i)->callOnStop();
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Shared pointer is already deleted.");
   }
 }
 
-void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState, const std::string& annotation)
+cedar::proc::TriggerablePtr cedar::proc::TriggerConnection::getTarget()
 {
-  // Only act if the state actually changes.
-  if (newState != this->mState || annotation != this->mStateAnnotation)
+  if (cedar::proc::TriggerablePtr target_shared = mTarget.lock())
   {
-    this->mState = newState;
-    this->mStateAnnotation = annotation;
-//    emit stateChanged();
+    return target_shared;
   }
-}
-
-cedar::proc::Triggerable::State cedar::proc::Triggerable::getState() const
-{
-  return this->mState;
-}
-
-const std::string& cedar::proc::Triggerable::getStateAnnotation() const
-{
-  return this->mStateAnnotation;
-}
-
-void cedar::proc::Triggerable::onStart()
-{
-  // empty as a default implementation
-}
-
-void cedar::proc::Triggerable::onStop()
-{
-  // empty as a default implementation
+  else
+  {
+    CEDAR_THROW(cedar::proc::ConnectionMemberDeletedException, "Shared pointer is already deleted.");
+  }
 }

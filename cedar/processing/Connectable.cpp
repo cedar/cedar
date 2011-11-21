@@ -323,11 +323,11 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
   // finally, insert a new data slot with the given parameters
   if (role == cedar::proc::DataRole::INPUT)
   {
-    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, mandatory));
+    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this->getName(), mandatory));
   }
   else
   {
-    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, mandatory));
+    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this->getName(), mandatory));
   }
 
   // since the data has (potentially) changed, re-check the inputs

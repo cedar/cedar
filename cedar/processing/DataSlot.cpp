@@ -46,11 +46,12 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
+cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory)
 :
 mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
+mParent(parent),
 mRole(role)
 {
 }
@@ -103,4 +104,9 @@ cedar::proc::DataRole::Id cedar::proc::DataSlot::getRole() const
 const std::string& cedar::proc::DataSlot::getName() const
 {
   return this->mName;
+}
+
+const std::string& cedar::proc::DataSlot::getParent() const
+{
+  return this->mParent;
 }

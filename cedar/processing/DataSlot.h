@@ -75,7 +75,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory = true);
 
   //!@brief Destructor
   virtual ~DataSlot();
@@ -99,6 +99,9 @@ public:
 
   //!@brief get the name of this slot
   const std::string& getName() const;
+
+  //!@brief get the name of this slot's parent
+  const std::string& getParent() const;
 
   //!@brief set some explanatory text for this slot
   void setText(const std::string& text);
@@ -141,6 +144,9 @@ private:
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
   std::string mName;
+
+  //! Name of the parent that owns the slot.
+  std::string mParent;
 
   //! Text of the slot, i.e., the text that is displayed to the user (ignored if empty).
   std::string mText;

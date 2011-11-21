@@ -60,6 +60,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_PROC_CLASS(Arguments);
     CEDAR_DECLARE_PROC_CLASS(Connectable);
+    CEDAR_DECLARE_PROC_CLASS(DataConnection);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
     CEDAR_DECLARE_PROC_CLASS(DeclarationRegistry);
@@ -82,6 +83,7 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
+    CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
     CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     CEDAR_DECLARE_PROC_CLASS(Connection);
     //!@endcond
@@ -116,6 +118,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
     class CEDAR_PROC_LIB_EXPORT ConnectionNotFoundException;
+    class CEDAR_PROC_LIB_EXPORT DuplicateConnectionException;
     class CEDAR_PROC_LIB_EXPORT DuplicateNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidNameException;
     class CEDAR_PROC_LIB_EXPORT InvalidObjectException;

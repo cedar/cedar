@@ -61,7 +61,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExternalData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  ExternalData(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory = true);
 
   //!@brief Destructor
   ~ExternalData();

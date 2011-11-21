@@ -110,7 +110,7 @@ int main(int, char**)
   log_file << "done." << std::endl;
 
   log_file << "Connecting step1 to step2 ... ";
-  network->connect("step1.output", "step2.input");
+  network->connectSlots("step1.output", "step2.input");
   log_file << "done." << std::endl;
 
   log_file << "Creating trigger ... ";
@@ -119,7 +119,7 @@ int main(int, char**)
   log_file << "done." << std::endl;
 
   log_file << "Connecting trigger to step1 ... ";
-  network->connect(trigger, step1);
+  network->connectTrigger(trigger, step1);
   log_file << "done." << std::endl;
 
   log_file << "Network creation completed." << std::endl;
@@ -242,7 +242,7 @@ int main(int, char**)
     log_file << "Listeners of trigger are:" << std::endl;
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
-      log_file << " -- " << trigger->getListeners().at(i)->getName() << std::endl;
+      log_file << " -- " << boost::shared_dynamic_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
     }
   }
 

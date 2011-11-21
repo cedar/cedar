@@ -43,6 +43,7 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/Element.h"
 
 // PROJECT INCLUDES
 
@@ -60,8 +61,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::Trigger::Trigger(const std::string& name)
+cedar::proc::Trigger::Trigger(const std::string& name, bool isLooped)
 :
+Triggerable(isLooped),
 mRegisteredAt(NULL)
 {
   this->setName(name);
@@ -94,24 +96,18 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
     // If the arguments can be set, trigger the step.
     //!@todo For dynamics, this can mean that some step times are discarded rather than accumulated.
     //!@todo cedar::proc::Step::setNextArguments should take a const pointer.
-    if (this->mListeners.at(i)->setNextArguments(arguments))
+    if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(this->mListeners.at(i)))
     {
+      if (step->setNextArguments(arguments))
+      {
 #ifdef DEBUG_TRIGGERING
-      cedar::aux::System::mCOutLock.lockForWrite();
-      std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
-      cedar::aux::System::mCOutLock.unlock();
+        cedar::aux::System::mCOutLock.lockForWrite();
+        std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
+        cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_TRIGGERING
-      this->mListeners.at(i)->onTrigger();
+        this->mListeners.at(i)->onTrigger();
+      }
     }
-    // Otherwise, the step is skipped this time.
-#ifdef DEBUG_TRIGGERING
-    else
-    {
-      cedar::aux::System::mCOutLock.lockForWrite();
-      std::cout << "Trigger " << this->getName() << " failed to trigger " << this->mListeners.at(i)->getName() << std::endl;
-      cedar::aux::System::mCOutLock.unlock();
-    }
-#endif // DEBUG_TRIGGERING
   }
   for (size_t i = 0; i < this->mTriggers.size(); ++i)
   {
@@ -123,9 +119,9 @@ void cedar::proc::Trigger::onTrigger(cedar::proc::TriggerPtr /* pSender */)
 {
 }
 
-void cedar::proc::Trigger::addListener(cedar::proc::StepPtr step)
+void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
 {
-  std::vector<cedar::proc::StepPtr>::iterator iter;
+  std::vector<cedar::proc::TriggerablePtr>::iterator iter;
   iter = this->find(step);
   if (iter == this->mListeners.end())
   {
@@ -133,7 +129,7 @@ void cedar::proc::Trigger::addListener(cedar::proc::StepPtr step)
   }
 }
 
-bool cedar::proc::Trigger::isListener(cedar::proc::StepPtr step)
+bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr step)
 {
   return this->find(step) != this->mListeners.end();
 }
@@ -154,9 +150,9 @@ void cedar::proc::Trigger::addTrigger(cedar::proc::TriggerPtr trigger)
   }
 }
 
-void cedar::proc::Trigger::removeListener(cedar::proc::StepPtr step)
+void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
 {
-  std::vector<cedar::proc::StepPtr>::iterator iter;
+  std::vector<cedar::proc::TriggerablePtr>::iterator iter;
   iter = this->find(step);
   if (iter != this->mListeners.end())
   {
@@ -183,8 +179,8 @@ void cedar::proc::Trigger::notifyDisconnected(cedar::proc::TriggerPtr /* trigger
 {
 }
 
-std::vector<cedar::proc::StepPtr>::iterator
-  cedar::proc::Trigger::find(cedar::proc::StepPtr step)
+std::vector<cedar::proc::TriggerablePtr>::iterator
+  cedar::proc::Trigger::find(cedar::proc::TriggerablePtr step)
 {
   return std::find(this->mListeners.begin(), this->mListeners.end(), step);
 }
@@ -194,7 +190,7 @@ std::vector<cedar::proc::TriggerPtr>::iterator cedar::proc::Trigger::find(cedar:
   return std::find(this->mTriggers.begin(), this->mTriggers.end(), step);
 }
 
-const std::vector<cedar::proc::StepPtr>& cedar::proc::Trigger::getListeners() const
+const std::vector<cedar::proc::TriggerablePtr>& cedar::proc::Trigger::getListeners() const
 {
   return this->mListeners;
 }
@@ -211,8 +207,8 @@ void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node
   cedar::aux::ConfigurationNode listeners;
   for (size_t i = 0; i < this->mListeners.size(); ++i)
   {
-    cedar::proc::StepPtr& step = this->mListeners.at(i);
-    cedar::aux::ConfigurationNode listener(step->getName());
+    cedar::proc::TriggerablePtr& step = this->mListeners.at(i);
+    cedar::aux::ConfigurationNode listener(boost::shared_dynamic_cast<cedar::proc::Element>(step)->getName());
     listeners.push_back(cedar::aux::ConfigurationNode::value_type("", listener));
   }
   if (!listeners.empty())
@@ -247,7 +243,7 @@ void cedar::proc::Trigger::readConfiguration(const cedar::aux::ConfigurationNode
   std::cout << "Adding listener " << listener_name << std::endl;
 #endif // DEBUG_FILE_READING
 
-      cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(listener_name);
+      cedar::proc::TriggerablePtr step = cedar::proc::Manager::getInstance().steps().get(listener_name);
       this->addListener(step);
     }
   }
