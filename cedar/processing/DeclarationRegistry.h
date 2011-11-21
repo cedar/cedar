@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Network.h
+    File:        DeclarationRegistry.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 19
+    Date:        2011 11 18
 
     Description:
 
@@ -38,106 +38,62 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_NETWORK_H
-#define CEDAR_PROC_NETWORK_H
+#ifndef CEDAR_PROC_DECLARATION_REGISTRY_H
+#define CEDAR_PROC_DECLARATION_REGISTRY_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <set>
+#include <map>
 #include <vector>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
- * @todo Change the name of the class to Module
- * @todo Add a slot, which reacts to name changes of elements (update map of names to ptrs)
+/*!@brief This class associates names with pointers to certain objects.
  */
-class cedar::proc::Network
+class cedar::proc::DeclarationRegistry
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // typedefs
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  typedef std::vector<cedar::proc::StepPtr> StepVector;
-  typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
-  typedef std::vector<cedar::proc::GroupPtr> GroupVector;
-  typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
+public:
+  typedef std::map<std::string, cedar::proc::ElementDeclarationPtr> Declarations;
+  typedef std::set<std::string> CategoryList;
+  typedef std::vector<cedar::proc::ElementDeclarationPtr> CategoryEntries;
+  typedef std::map<std::string, CategoryEntries> Categories;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  Network();
-
-  //!@brief Destructor
-  ~Network();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void readSteps(const cedar::aux::ConfigurationNode& root);
-  void saveSteps(cedar::aux::ConfigurationNode& root);
+  cedar::proc::ElementPtr allocateClass(const std::string& classId) const;
 
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
-  void saveTriggers(cedar::aux::ConfigurationNode& root);
+  void declareClass(cedar::proc::ElementDeclarationPtr pDeclaration);
 
-  void readGroups(const cedar::aux::ConfigurationNode& root);
-  void saveGroups(cedar::aux::ConfigurationNode& root);
+  const CategoryList& getCategories() const;
 
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::Connection* connection);
+  const CategoryEntries& getCategoryEntries(const std::string& category) const;
 
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnections(cedar::aux::ConfigurationNode& root);
+  cedar::proc::ElementDeclarationPtr getDeclarationOf(ElementPtr object);
 
-  void readFrom(const cedar::aux::ConfigurationNode& root);
-  void saveTo(cedar::aux::ConfigurationNode& root);
-
-  void readFile(const std::string& filename);
-  void writeFile(const std::string& filename);
-
-//  void add(cedar::proc::StepPtr step);
-  void remove(cedar::proc::StepPtr step);
-//  void add(cedar::proc::TriggerPtr trigger);
-  void remove(cedar::proc::TriggerPtr trigger);
-  void add(cedar::proc::GroupPtr group);
-
-  void add(std::string className, std::string instanceName);
-  void add(cedar::proc::ElementPtr element, std::string instanceName);
-  void add(cedar::proc::ElementPtr element);
-
-  /*!@brief Returns the element with the given name as a pointer of the specified type.
-   */
-  template <class T>
-  boost::shared_ptr<T> getElement(const std::string& name)
-  {
-    return boost::shared_dynamic_cast<T>(this->getElement(name));
-  }
-
-  cedar::proc::ElementPtr getElement(const std::string& name);
-
-  void connect(const std::string& source, const std::string& target);
-  void connect(cedar::proc::ElementPtr source, cedar::proc::ElementPtr target);
-
-  const StepVector& steps() const;
-  StepVector& steps();
-  const TriggerVector& triggers() const;
-  TriggerVector& triggers();
-  const GroupVector& groups() const;
-  GroupVector& groups();
-  const ElementMap& elements() const;
+  const Declarations& declarations() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -148,27 +104,16 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-private:
-  StepVector mSteps;
-  TriggerVector mTriggers;
-  GroupVector mGroups;
-  ElementMap mElements;
-  std::vector<cedar::proc::ConnectionPtr> mConnections;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
 protected:
   // none yet
-
 private:
-  // none yet
+  std::map<std::string, cedar::proc::ElementDeclarationPtr> mDeclarations;
+  CategoryList mCategories;
+  Categories mDeclarationsByCategory;
 
-}; // class cedar::proc::Network
+}; // class cedar::proc::DeclarationRegistry
 
-#endif // CEDAR_PROC_NETWORK_H
+#endif // CEDAR_PROC_DECLARATION_REGISTRY_H
 

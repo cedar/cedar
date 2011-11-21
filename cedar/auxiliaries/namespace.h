@@ -63,6 +63,8 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UserData);
     //!@endcond
 
+    template<class T> class Singleton;
+
     template <typename T> class IntervalData;
     //!@brief smart pointer for IntervalData<double>
     typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;
@@ -184,6 +186,7 @@ namespace cedar
     /* exceptions */
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
+    CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
     CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);

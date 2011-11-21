@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/lib.h"
+#include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
 
 // PROJECT INCLUDES
@@ -61,7 +62,9 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Connectable);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
+    CEDAR_DECLARE_PROC_CLASS(DeclarationRegistry);
     CEDAR_DECLARE_PROC_CLASS(Element);
+    CEDAR_DECLARE_PROC_CLASS(ElementDeclaration);
     CEDAR_DECLARE_PROC_CLASS(ExternalData);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
     CEDAR_DECLARE_PROC_CLASS(LoopMode);
@@ -83,12 +86,18 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Connection);
     //!@endcond
 
+    typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;
+    CEDAR_GENERATE_POINTER_TYPES(DeclarationRegistrySingleton);
+
     template <class BaseClass, class FactoryType> class DeclarationBase;
     
+    template <class DerivedClass> class ElementDeclarationT;
+
     template <class DerivedClass> class StepDeclarationT;
 
     template <class DerivedClass> class TriggerDeclarationT;
 
+    typedef boost::shared_ptr<cedar::aux::AbstractFactory<Element> > ElementFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger, cedar::proc::TriggerPtr> > TriggerFactoryPtr;
 

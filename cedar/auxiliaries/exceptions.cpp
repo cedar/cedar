@@ -119,3 +119,8 @@ cedar::aux::InitializationException::InitializationException()
 {
   this->mType = "InitializationException";
 }
+
+cedar::aux::DeadReferenceException::DeadReferenceException()
+{
+  this->mType = "DeadReferenceException";
+}

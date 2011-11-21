@@ -45,6 +45,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/Connection.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -116,13 +117,18 @@ cedar::proc::Network::GroupVector& cedar::proc::Network::groups()
   return this->mGroups;
 }
 
-void cedar::proc::Network::add(cedar::proc::StepPtr step)
+const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
 {
-#ifdef DEBUG_FILE_WRITING
-    std::cout << "Adding step " << step->getName() << " to network." << std::endl;
-#endif
-  this->mSteps.push_back(step);
+  return this->mElements;
 }
+
+//void cedar::proc::Network::add(cedar::proc::StepPtr step)
+//{
+//#ifdef DEBUG_FILE_WRITING
+//    std::cout << "Adding step " << step->getName() << " to network." << std::endl;
+//#endif
+//  this->mSteps.push_back(step);
+//}
 
 void cedar::proc::Network::remove(cedar::proc::StepPtr step)
 {
@@ -135,13 +141,13 @@ void cedar::proc::Network::remove(cedar::proc::StepPtr step)
   }
 }
 
-void cedar::proc::Network::add(cedar::proc::TriggerPtr trigger)
-{
-#ifdef DEBUG_FILE_WRITING
-    std::cout << "Adding trigger " << trigger->getName() << " to network." << std::endl;
-#endif
-  this->mTriggers.push_back(trigger);
-}
+//void cedar::proc::Network::add(cedar::proc::TriggerPtr trigger)
+//{
+//#ifdef DEBUG_FILE_WRITING
+//    std::cout << "Adding trigger " << trigger->getName() << " to network." << std::endl;
+//#endif
+//  this->mTriggers.push_back(trigger);
+//}
 
 void cedar::proc::Network::remove(cedar::proc::TriggerPtr trigger)
 {
@@ -154,12 +160,65 @@ void cedar::proc::Network::remove(cedar::proc::TriggerPtr trigger)
   }
 }
 
+void cedar::proc::Network::add(std::string className, std::string instanceName)
+{
+  this->add(DeclarationRegistrySingleton::getInstance()->allocateClass(className), instanceName);
+}
+
+void cedar::proc::Network::add(cedar::proc::ElementPtr element, std::string instanceName)
+{
+  element->setName(instanceName);
+  this->add(element);
+}
+
+void cedar::proc::Network::add(cedar::proc::ElementPtr element)
+{
+  std::string instanceName = element->getName();
+  if (instanceName.empty())
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "no name present for given element in this module")
+  }
+  else if (mElements.find(instanceName) != mElements.end())
+  {
+    CEDAR_THROW(cedar::proc::DuplicateNameException, "duplicate entry of elements in this module")
+  }
+  else
+  {
+    mElements[instanceName] = element;
+  }
+}
+
+cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name)
+{
+  ElementMap::iterator iter = this->mElements.find(name);
+
+  if (iter != this->mElements.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "No element of the name " + name + " was found.");
+  }
+}
+
+
 void cedar::proc::Network::add(cedar::proc::GroupPtr group)
 {
 #ifdef DEBUG_FILE_WRITING
     std::cout << "Adding group " << group->getName() << " to network." << std::endl;
 #endif
   this->mGroups.push_back(group);
+}
+
+void cedar::proc::Network::connect(const std::string& source, const std::string& target)
+{
+
+}
+
+void cedar::proc::Network::connect(cedar::proc::ElementPtr source, cedar::proc::ElementPtr target)
+{
+
 }
 
 void cedar::proc::Network::readFile(const std::string& filename)
