@@ -45,7 +45,7 @@
 #ifdef DEBUG
   #include "cedar/devices/debug/kteam/gui/ui_EPuckControlWidget.h"
 #else
-  #include "cedar/devices/kteam/gui/ui_EPuckControlWidget.h"
+  #include "cedar/devices/release/kteam/gui/ui_EPuckControlWidget.h"
 #endif
 #include "cedar/devices/kteam/gui/namespace.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
