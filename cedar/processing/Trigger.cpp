@@ -179,8 +179,7 @@ void cedar::proc::Trigger::notifyDisconnected(cedar::proc::TriggerPtr /* trigger
 {
 }
 
-std::vector<cedar::proc::TriggerablePtr>::iterator
-  cedar::proc::Trigger::find(cedar::proc::TriggerablePtr step)
+std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(cedar::proc::TriggerablePtr step)
 {
   return std::find(this->mListeners.begin(), this->mListeners.end(), step);
 }
@@ -200,7 +199,7 @@ const std::vector<cedar::proc::TriggerPtr>& cedar::proc::Trigger::getTriggerList
   return this->mTriggers;
 }
 
-void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node)
+void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& node)
 {
   this->cedar::aux::Configurable::writeConfiguration(node);
 
@@ -223,57 +222,5 @@ void cedar::proc::Trigger::saveConfiguration(cedar::aux::ConfigurationNode& node
   }
   if (!trigger_listeners.empty())
     node.add_child("triggerListeners", trigger_listeners);
-}
-
-void cedar::proc::Trigger::readConfiguration(const cedar::aux::ConfigurationNode& node)
-{
-  this->cedar::aux::Configurable::readConfiguration(node);
-  // listeners
-  try
-  {
-    const cedar::aux::ConfigurationNode& listeners = node.get_child("listeners");
-
-    for (cedar::aux::ConfigurationNode::const_iterator iter = listeners.begin();
-        iter != listeners.end();
-        ++iter)
-    {
-      std::string listener_name = iter->second.data();
-
-#ifdef DEBUG_FILE_READING
-  std::cout << "Adding listener " << listener_name << std::endl;
-#endif // DEBUG_FILE_READING
-
-      cedar::proc::TriggerablePtr step = cedar::proc::Manager::getInstance().steps().get(listener_name);
-      this->addListener(step);
-    }
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no listeners declared -- this is ok.
-  }
-
-  // trigger listeners
-  try
-  {
-    const cedar::aux::ConfigurationNode& trigger_listeners = node.get_child("triggerListeners");
-
-    for (cedar::aux::ConfigurationNode::const_iterator iter = trigger_listeners.begin();
-        iter != trigger_listeners.end();
-        ++iter)
-    {
-      std::string listener_name = iter->second.data();
-
-#ifdef DEBUG_FILE_READING
-  std::cout << "Adding trigger listener " << listener_name << std::endl;
-#endif // DEBUG_FILE_READING
-
-      cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().get(listener_name);
-      this->addTrigger(trigger);
-    }
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    // no trigger listeners declared -- this is ok.
-  }
 }
 

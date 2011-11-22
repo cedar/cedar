@@ -110,11 +110,8 @@ public:
 
   virtual void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
-  //!@brief reads a configuration from a ConfigurationNode
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-
   //!@brief saves a configuration to a ConfigurationNode
-  void saveConfiguration(cedar::aux::ConfigurationNode& node);
+  void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
   //!@brief sets the TriggerRegistry at which this Trigger instance is stored
   void setRegistry(cedar::proc::TriggerRegistry* pRegistry);

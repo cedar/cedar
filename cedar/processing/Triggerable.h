@@ -122,7 +122,8 @@ public:
   //        exception.
   const std::string& getStateAnnotation() const;
 
-  //!@brief Returns the finished trigger.
+  //!@brief Returns the finished trigger singleton.
+  //!@brief use Singleton template class here
   cedar::proc::TriggerPtr& getFinishedTrigger();
 //
 //signals:
@@ -166,7 +167,8 @@ protected:
   //!@brief The annotation string for the current state.
   std::string mStateAnnotation;
 private:
-  //!@brief the finished trigger, which is triggered once the computation of this step is done
+  //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
+  //!@brief use Singleton template class here
   cedar::proc::TriggerPtr mFinished;
 
   //--------------------------------------------------------------------------------------------------------------------
