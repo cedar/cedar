@@ -116,9 +116,6 @@ public:
   //!@brief Sets the arguments used by the next execution of the run function.
   bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
-  //!@brief Returns the finished trigger.
-  cedar::proc::TriggerPtr& getFinishedTrigger();
-
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
    */

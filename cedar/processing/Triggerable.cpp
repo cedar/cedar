@@ -48,8 +48,7 @@
 cedar::proc::Triggerable::Triggerable(bool isLooped)
 :
 mIsLooped(isLooped),
-mState(cedar::proc::Triggerable::STATE_NONE),
-mFinished(new cedar::proc::Trigger("processingDone"))
+mState(cedar::proc::Triggerable::STATE_NONE)
 {
 }
 
@@ -119,4 +118,13 @@ void cedar::proc::Triggerable::onStart()
 void cedar::proc::Triggerable::onStop()
 {
   // empty as a default implementation
+}
+
+cedar::proc::TriggerPtr& cedar::proc::Triggerable::getFinishedTrigger()
+{
+  if (!this->mFinished)
+  {
+    mFinished = cedar::proc::TriggerPtr(new cedar::proc::Trigger("processingDone"));
+  }
+  return this->mFinished;
 }

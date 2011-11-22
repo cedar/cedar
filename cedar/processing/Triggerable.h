@@ -121,6 +121,9 @@ public:
   //!@brief Returns the annotation of the current state, e.g., the reasons for failing or the message of the last
   //        exception.
   const std::string& getStateAnnotation() const;
+
+  //!@brief Returns the finished trigger.
+  cedar::proc::TriggerPtr& getFinishedTrigger();
 //
 //signals:
 //  //!@brief Signal that is emitted whenever the Triggerable's state is changed.
@@ -162,9 +165,9 @@ protected:
   State mState;
   //!@brief The annotation string for the current state.
   std::string mStateAnnotation;
+private:
   //!@brief the finished trigger, which is triggered once the computation of this step is done
   cedar::proc::TriggerPtr mFinished;
-private:
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
