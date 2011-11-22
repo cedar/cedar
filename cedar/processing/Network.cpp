@@ -223,8 +223,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
                         );
   if (!this->getElement<cedar::proc::Step>(target_name)->isLooped())
   {
-    this->getElement<cedar::proc::Step>(source_name)->getFinishedTrigger()->addListener(this->getElement<cedar::proc::Step>(target_name));
-    this->getElement<cedar::proc::Step>(target_name)->setParentTrigger(this->getElement<cedar::proc::Step>(source_name)->getFinishedTrigger());
+    this->connectTrigger(this->getElement<cedar::proc::Step>(source_name)->getFinishedTrigger(), this->getElement<cedar::proc::Step>(target_name));
   }
 }
 
@@ -411,9 +410,27 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
     std::cout << "Reading trigger of type " << class_id << std::endl;
 #endif // DEBUG_FILE_READING
 
-    cedar::proc::ElementPtr trigger = cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id);
+    cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id));
     trigger->readConfiguration(trigger_node);
     this->mElements[trigger->getName()] = trigger;
+    try
+    {
+      const cedar::aux::ConfigurationNode& listeners = trigger_node.get_child("listeners");
+
+      for (cedar::aux::ConfigurationNode::const_iterator listener_iter = listeners.begin();
+          listener_iter != listeners.end();
+          ++listener_iter)
+      {
+        std::string listener_name = listener_iter->second.data();
+
+        cedar::proc::TriggerablePtr triggerable = this->getElement<Triggerable>(listener_name);
+        this->connectTrigger(trigger, triggerable);
+      }
+    }
+    catch (const boost::property_tree::ptree_bad_path&)
+    {
+      // no listeners declared -- this is ok.
+    }
   }
 }
 
