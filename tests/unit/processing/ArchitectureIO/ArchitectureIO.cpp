@@ -89,7 +89,7 @@ int main(int, char**)
   );
   log_file << "done." << std::endl;
 
-  log_file << "Adding declaration to the manager ... ";
+  log_file << "Adding declaration to the registry ... ";
 //  cedar::proc::Manager::getInstance().steps().declareClass(test_module_decl);
   cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
   log_file << "done." << std::endl;

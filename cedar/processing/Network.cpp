@@ -221,9 +221,9 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
                                                  )
                                                        )
                         );
-  if (!this->getElement<cedar::proc::Step>(target_name)->isLooped())
+  if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
   {
-    this->connectTrigger(this->getElement<cedar::proc::Step>(source_name)->getFinishedTrigger(), this->getElement<cedar::proc::Step>(target_name));
+    this->connectTrigger(this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(), this->getElement<cedar::proc::Step>(target_name));
   }
 }
 
