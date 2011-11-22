@@ -50,8 +50,10 @@
 #include "cedar/processing/StepTime.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
-#include "cedar/processing/StepDeclaration.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ExternalData.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -71,9 +73,15 @@ int main(int /* argc */, char** /* argv */)
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  log_file << "Generating StepDeclaration for Neuron ... ";
-  cedar::proc::StepDeclarationPtr neuron_declaration(new cedar::proc::StepDeclarationT<cedar::Neuron>("Neuron"));
-  Manager::getInstance().steps().declareClass(neuron_declaration);
+  log_file << "Creating step declaration ... ";
+  cedar::proc::ElementDeclarationPtr neuron_declaration
+  (
+    new cedar::proc::ElementDeclarationT<cedar::Neuron>("Neuron")
+  );
+  log_file << "done." << std::endl;
+
+  log_file << "Adding declaration to the registry ... ";
+  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(neuron_declaration);
   log_file << "done." << std::endl;
 
   log_file << "Reading Setup1.json ... ";
@@ -82,13 +90,14 @@ int main(int /* argc */, char** /* argv */)
   log_file << "done." << std::endl;
 
   // Create trigger for the "main loop"
-  NeuronPtr neuron_1 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().steps().get("Neuron 1"));
-  NeuronPtr neuron_2 = boost::dynamic_pointer_cast<cedar::Neuron>(Manager::getInstance().steps().get("Neuron 2"));
-
+  NeuronPtr neuron_1 = network->getElement<cedar::Neuron>("Neuron 1");
+  NeuronPtr neuron_2 = network->getElement<cedar::Neuron>("Neuron 2");
+  std::cout << "input count of 1 " << neuron_1->getInputSlot("input")->getDataCount() << std::endl;
+  std::cout << "input count of 2 " << neuron_2->getInputSlot("input")->getDataCount() << std::endl;
   // start the processing
-  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().triggers().get("Main Trigger"))->start();
+  network->getElement<LoopedTrigger>("Main Trigger")->start();
 
-  // preiodically read out activation values
+  // periodically read out activation values
   for (unsigned int i = 0; i < 1000; i++)
   {
     if (i % 10 == 0)
@@ -102,7 +111,7 @@ int main(int /* argc */, char** /* argv */)
   }
 
   // stop the processing
-  boost::shared_dynamic_cast<LoopedTrigger>(Manager::getInstance().triggers().get("Main Trigger"))->stop();
+  network->getElement<LoopedTrigger>("Main Trigger")->stop();
 
   // return
   log_file << "Done. There were " << errors << " errors." << std::endl;
