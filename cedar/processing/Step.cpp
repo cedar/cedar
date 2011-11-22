@@ -372,13 +372,8 @@ void cedar::proc::Step::run()
   cedar::aux::unlock(locks);
 
   // remove the argumens, as they have been processed.
-  this->mFinished->trigger();
+  this->getFinishedTrigger()->trigger();
   this->mBusy = false;
-}
-
-cedar::proc::TriggerPtr& cedar::proc::Step::getFinishedTrigger()
-{
-  return this->mFinished;
 }
 
 void cedar::proc::Step::setThreaded(bool isThreaded)
