@@ -303,7 +303,6 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_drawer->hide();
       p_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_drawer->getStep());
-      Manager::getInstance().removeStep(p_drawer->getStep());
       this->mpPropertyTable->resetPointer();
       this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
     }
@@ -314,7 +313,6 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_trigger_drawer->hide();
       p_trigger_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
-      Manager::getInstance().removeTrigger(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
     }
   }

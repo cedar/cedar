@@ -104,10 +104,7 @@ public:
   void readFile(const std::string& filename);
   void writeFile(const std::string& filename);
 
-//  void add(cedar::proc::StepPtr step);
-  void remove(cedar::proc::StepPtr step);
-//  void add(cedar::proc::TriggerPtr trigger);
-  void remove(cedar::proc::TriggerPtr trigger);
+  void remove(cedar::proc::ElementPtr element);
   void add(cedar::proc::GroupPtr group);
 
   void add(std::string className, std::string instanceName);
