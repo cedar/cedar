@@ -85,7 +85,7 @@ int main(int, char**)
   log_file << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr test_module_decl
   (
-    new cedar::proc::ElementDeclarationT<TestModule>("TestModule")
+    new cedar::proc::ElementDeclarationTemplate<TestModule>()
   );
   log_file << "done." << std::endl;
 
