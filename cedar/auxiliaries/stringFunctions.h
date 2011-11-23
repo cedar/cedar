@@ -73,9 +73,9 @@ namespace cedar
      * @remark If the separator is not found in \em str (e.g., if \em str is empty), the function will return a list
      *         with the input string as the only element.
      */
-    CEDAR_AUX_LIB_EXPORT void split(const std::string& str,
-                                    const std::string& separator,
-                                    std::vector<std::string>& parts)
+    inline void split(const std::string& str,
+                      const std::string& separator,
+                      std::vector<std::string>& parts)
     {
       parts.clear();
 
