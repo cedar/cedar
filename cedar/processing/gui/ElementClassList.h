@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepClassList.h
+    File:        ElementClassList.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 11 23
 
     Description:
 
@@ -38,14 +38,14 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_STEP_CLASS_LIST_H
-#define CEDAR_PROC_GUI_STEP_CLASS_LIST_H
+#ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+#define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/Manager.h"
 
 // PROJECT INCLUDES
+#include "cedar/processing/DeclarationRegistry.h"
 
 // SYSTEM INCLUDES
 #include <QListWidget>
@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::StepClassList : public QListWidget
+class cedar::proc::gui::ElementClassList : public QListWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -67,17 +67,17 @@ class cedar::proc::gui::StepClassList : public QListWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepClassList(QWidget *pParent = NULL);
+  ElementClassList(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~StepClassList();
+  ~ElementClassList();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const cedar::proc::StepRegistry::CategoryEntries& entries);
+  void showList(const cedar::proc::DeclarationRegistry::CategoryEntries& stepEntries);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -112,7 +112,7 @@ protected:
 private:
   // none yet
 
-}; // class StepClassList
+}; // class ElementClassList
 
-#endif // CEDAR_PROC_GUI_STEP_CLASS_LIST_H
+#endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 

@@ -47,6 +47,7 @@ cedar_add_library(cedarproc
   gui/BoolParameter.h
   gui/DoubleParameter.h
   gui/DoubleVectorParameter.h
+  gui/ElementClassList.h
   gui/EnumParameter.h
   gui/Ide.h
   gui/IdeApplication.h
@@ -56,10 +57,8 @@ cedar_add_library(cedarproc
   gui/PropertyPane.h
   gui/Scene.h
   gui/StepItem.h
-  gui/StepClassList.h
   gui/StringParameter.h
   gui/ToolBox.h
-  gui/TriggerClassList.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/DirectoryParameter.h

@@ -44,8 +44,7 @@
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/StepClassList.h"
-#include "cedar/processing/gui/TriggerClassList.h"
+#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/NetworkFile.h"
 #include "cedar/processing/gui/PluginLoadDialog.h"
 #include "cedar/processing/gui/PluginManagerDialog.h"
@@ -222,47 +221,25 @@ void cedar::proc::gui::Ide::resetStepList()
 {
   using cedar::proc::Manager;
 
-  for (cedar::proc::TriggerRegistry::CategoryList::const_iterator iter
-         = Manager::getInstance().triggers().getCategories().begin();
-       iter != Manager::getInstance().triggers().getCategories().end();
+  for (cedar::proc::DeclarationRegistry::CategoryList::const_iterator iter
+         = DeclarationRegistrySingleton::getInstance()->getCategories().begin();
+       iter != DeclarationRegistrySingleton::getInstance()->getCategories().end();
        ++iter)
   {
     const std::string& category_name = *iter;
-    cedar::proc::gui::TriggerClassList *p_tab;
-    if (mTriggerClassListWidgets.find(category_name) == mTriggerClassListWidgets.end())
+    cedar::proc::gui::ElementClassList *p_tab;
+    if (mElementClassListWidgets.find(category_name) == mElementClassListWidgets.end())
     {
-      p_tab = new cedar::proc::gui::TriggerClassList();
+      p_tab = new cedar::proc::gui::ElementClassList();
       this->mpCategoryList->addTab(p_tab, QString(category_name.c_str()));
-      mTriggerClassListWidgets[category_name] = p_tab;
+      mElementClassListWidgets[category_name] = p_tab;
     }
     else
     {
-      p_tab = mTriggerClassListWidgets[category_name];
+      p_tab = mElementClassListWidgets[category_name];
     }
     p_tab->showList(
-                     Manager::getInstance().triggers().getCategoryEntries(category_name)
-                   );
-  }
-
-  for (cedar::proc::StepRegistry::CategoryList::const_iterator iter
-         = Manager::getInstance().steps().getCategories().begin();
-       iter != Manager::getInstance().steps().getCategories().end();
-       ++iter)
-  {
-    const std::string& category_name = *iter;
-    cedar::proc::gui::StepClassList *p_tab;
-    if (mStepClassListWidgets.find(category_name) == mStepClassListWidgets.end())
-    {
-      p_tab = new cedar::proc::gui::StepClassList();
-      this->mpCategoryList->addTab(p_tab, QString(category_name.c_str()));
-      mStepClassListWidgets[category_name] = p_tab;
-    }
-    else
-    {
-      p_tab = mStepClassListWidgets[category_name];
-    }
-    p_tab->showList(
-                     Manager::getInstance().steps().getCategoryEntries(category_name)
+                     DeclarationRegistrySingleton::getInstance()->getCategoryEntries(category_name)
                    );
   }
 }

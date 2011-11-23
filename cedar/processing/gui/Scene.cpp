@@ -39,16 +39,17 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/StepClassList.h"
-#include "cedar/processing/gui/TriggerClassList.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/GroupItem.h"
 #include "cedar/processing/gui/NetworkFile.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // PROJECT INCLUDES
 
@@ -145,7 +146,7 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  StepClassList *tree = dynamic_cast<StepClassList*>(pEvent->source());
+  ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
 
   if (tree)
   {
@@ -162,25 +163,7 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     {
       QPointF mapped = pEvent->scenePos();
       QString class_id = item->data(Qt::UserRole).toString();
-      this->addProcessingStep(class_id.toStdString(), mapped);
-    }
-  }
-  else if (TriggerClassList *tree = dynamic_cast<TriggerClassList*>(pEvent->source()))
-  {
-    QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
-    QDataStream stream(&itemData, QIODevice::ReadOnly);
-
-    int r, c;
-    QMap<int, QVariant> v;
-    stream >> r >> c >> v;
-
-    QListWidgetItem *item = tree->item(r);
-
-    if (item)
-    {
-      QPointF mapped = pEvent->scenePos();
-      QString class_id = item->data(Qt::UserRole).toString();
-      this->addTrigger(class_id.toStdString(), mapped);
+      this->addElement(class_id.toStdString(), mapped);
     }
   }
 }
@@ -540,49 +523,6 @@ void cedar::proc::gui::Scene::groupModeProcessMouseRelease(QGraphicsSceneMouseEv
   }
 }
 
-void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF position)
-{
-  using cedar::proc::Manager;
-  std::string name = "new trigger";
-
-  if (Manager::getInstance().triggers().testExists(name))
-  {
-    unsigned int new_id = 1;
-    std::string tmp;
-    do
-    {
-      std::stringstream str;
-      str << name << " " << new_id;
-      tmp = str.str();
-      ++new_id;
-    }
-    while (Manager::getInstance().triggers().testExists(tmp));
-    name = tmp;
-  }
-
-  try
-  {
-    cedar::proc::TriggerPtr trigger = Manager::getInstance().triggers().createInstance(classId, name);
-    //!@todo is there a better solution?
-    if (cedar::aux::LoopedThreadPtr looped_thread = boost::shared_dynamic_cast<cedar::aux::LoopedThread>(trigger))
-    {
-      Manager::getInstance().registerThread(looped_thread);
-    }
-
-    if (this->mNetwork)
-    {
-      this->mNetwork->network()->add(trigger);
-    }
-
-    this->addTrigger(trigger, position);
-  }
-  catch(const cedar::aux::ExceptionBase& e)
-  {
-    QString message(e.exceptionInfo().c_str());
-    emit exception(message);
-  }
-}
-
 void cedar::proc::gui::Scene::addTrigger(cedar::proc::TriggerPtr trigger, QPointF position)
 {
   cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
@@ -607,36 +547,47 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem *p
   delete pTrigger;
 }
 
-void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPointF position)
+void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
 {
-  using cedar::proc::Manager;
-  std::string name = "new step";
+  std::vector<std::string> split_class_name;
+  cedar::aux::split(classId, ".", split_class_name);
+  CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
+  std::string name = "new " + split_class_name.back();
 
-  if (Manager::getInstance().steps().testExists(name))
+  try
   {
     unsigned int new_id = 1;
     std::string tmp;
-    do
+    tmp = name;
+    while (mNetwork->network()->getElement(tmp))
     {
       std::stringstream str;
       str << name << " " << new_id;
       tmp = str.str();
       ++new_id;
     }
-    while (Manager::getInstance().steps().testExists(tmp));
     name = tmp;
+  }
+  catch(cedar::proc::InvalidNameException& exc)
+  {
+    // nothing to do here
   }
 
   try
   {
-    cedar::proc::StepPtr step = Manager::getInstance().steps().createInstance(classId, name);
-
-    if (this->mNetwork)
+    mNetwork->network()->add(classId, name);
+    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(name))
     {
-      this->mNetwork->network()->add(step);
+      this->addProcessingStep(step, position);
     }
-
-    this->addProcessingStep(step, position);
+    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(name))
+    {
+      this->addTrigger(trigger, position);
+    }
+    else
+    {
+      CEDAR_THROW(cedar::proc::InvalidNameException, "name not known to network");
+    }
   }
   catch(const cedar::aux::ExceptionBase& e)
   {

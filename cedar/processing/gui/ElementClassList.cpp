@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepClassList.cpp
+    File:        ElementClassList.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,9 +39,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "StepClassList.h"
+#include "cedar/processing/gui/ElementClassList.h"
 
 // PROJECT INCLUDES
+#include "cedar/processing/ElementDeclaration.h"
 
 // SYSTEM INCLUDES
 
@@ -49,7 +50,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::StepClassList::StepClassList(QWidget *pParent)
+cedar::proc::gui::ElementClassList::ElementClassList(QWidget *pParent)
 :
 QListWidget(pParent)
 {
@@ -60,7 +61,7 @@ QListWidget(pParent)
   this->setIconSize(QSize(40, 40));
 }
 
-cedar::proc::gui::StepClassList::~StepClassList()
+cedar::proc::gui::ElementClassList::~ElementClassList()
 {
 }
 
@@ -68,19 +69,19 @@ cedar::proc::gui::StepClassList::~StepClassList()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::StepClassList::showList(const cedar::proc::StepRegistry::CategoryEntries& entries)
+void cedar::proc::gui::ElementClassList::showList(const cedar::proc::DeclarationRegistry::CategoryEntries& entries)
 {
   using cedar::proc::Manager;
-  using cedar::proc::StepDeclarationPtr;
+  using cedar::proc::ElementDeclarationPtr;
 
   this->clear();
 
-  for (cedar::proc::StepRegistry::CategoryEntries::const_iterator iter = entries.begin();
+  for (cedar::proc::DeclarationRegistry::CategoryEntries::const_iterator iter = entries.begin();
        iter != entries.end();
        ++iter
       )
   {
-    const StepDeclarationPtr& class_id = *iter;
+    const ElementDeclarationPtr& class_id = *iter;
     QString label = class_id->getClassName().c_str();
     label += "\n(";
     label += class_id->getNamespaceName().c_str();
