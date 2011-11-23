@@ -126,25 +126,12 @@ const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
   return this->mElements;
 }
 
-void cedar::proc::Network::remove(cedar::proc::StepPtr step)
+void cedar::proc::Network::remove(cedar::proc::ElementPtr element)
 {
-  std::vector<StepPtr>::iterator it;
-  // iterator to vector element:
-  it = std::find (this->mSteps.begin(), this->mSteps.end(), step);
-  if (it != this->mSteps.end())
+  cedar::proc::Network::ElementMap::iterator it = mElements.find(element->getName());
+  if (it != this->mElements.end())
   {
-    mSteps.erase(it);
-  }
-}
-
-void cedar::proc::Network::remove(cedar::proc::TriggerPtr trigger)
-{
-  std::vector<TriggerPtr>::iterator it;
-  // iterator to vector element:
-  it = std::find (this->mTriggers.begin(), this->mTriggers.end(), trigger);
-  if (it != this->mTriggers.end())
-  {
-    mTriggers.erase(it);
+    mElements.erase(it);
   }
 }
 
