@@ -44,7 +44,9 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
+#include <boost/function.hpp>
 
 /*!@brief A slot for data that is owned by a Connectable.
  */
@@ -100,6 +102,10 @@ public:
 
   bool isCollection() const;
 
+  /*!@brief register a function pointer with this function to react to any changes in external data
+   */
+  boost::signals2::connection connectToExternalDataChanged(boost::function<void ()> slot);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -117,7 +123,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief a boost signal that is emitted if a new external data is set
+  boost::signals2::signal<void ()> mExternalDataChanged;
 private:
   //!@brief Vector of data references connected to this slot.
   std::vector<cedar::aux::DataWeakPtr> mData;

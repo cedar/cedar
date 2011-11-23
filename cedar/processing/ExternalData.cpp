@@ -114,16 +114,19 @@ void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
     if (!this->mData.at(i).lock())
     {
       this->mData.at(i) = data;
+      mExternalDataChanged();
       return;
     }
   }
   // if there was no free slot, create one
   this->mData.push_back(data);
+  mExternalDataChanged();
 }
 
 void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data)
 {
   this->setData(data, 0);
+  mExternalDataChanged();
 }
 
 void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data, unsigned int index)
@@ -140,6 +143,7 @@ void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data, unsigned int i
   }
 
   this->mData.at(index) = data;
+  mExternalDataChanged();
 }
 
 cedar::aux::DataPtr cedar::proc::ExternalData::getData()
@@ -174,4 +178,9 @@ cedar::aux::ConstDataPtr cedar::proc::ExternalData::getData(unsigned int index) 
   {
     return cedar::aux::DataPtr();
   }
+}
+
+boost::signals2::connection cedar::proc::ExternalData::connectToExternalDataChanged(boost::function<void ()> slot)
+{
+  return mExternalDataChanged.connect(slot);
 }
