@@ -62,12 +62,18 @@ cedar::proc::Triggerable::~Triggerable()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
 {
+  std::cout << "parent set" << std::endl;
   if (this->isLooped())
   {
     // If there is already a parent trigger for looped steps, disconnect it first!
     CEDAR_ASSERT(!parent || !this->mParentTrigger.lock());
   }
   this->mParentTrigger = parent;
+}
+
+cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
+{
+  return this->mParentTrigger.lock();
 }
 
 void cedar::proc::Triggerable::callOnStart()

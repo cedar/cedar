@@ -217,10 +217,11 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
 
 void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
 {
-//  if (this->isConnected(source, target))
-//  {
-//    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
-//  }
+  // check connection
+  if (this->isConnected(source, target))
+  {
+    CEDAR_THROW(cedar::proc::DuplicateConnectionException, "This connection already exists!")
+  }
   // create connection
   mTriggerConnections.push_back(cedar::proc::TriggerConnectionPtr(new TriggerConnection(source, target)));
 }
@@ -257,11 +258,6 @@ void cedar::proc::Network::saveTo(cedar::aux::ConfigurationNode& root)
   if (!triggers.empty())
     root.add_child("triggers", triggers);
 
-//  cedar::aux::ConfigurationNode groups;
-//  this->saveGroups(groups);
-//  if (!groups.empty())
-//    root.add_child("groups", groups);
-
   cedar::aux::ConfigurationNode connections;
   this->saveDataConnections(connections);
   if (!connections.empty())
@@ -295,19 +291,6 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
     std::cout << "No data connections present while reading configuration." << std::endl;
 #endif // defined DEBUG || defined DEBUG_FILE_READING
   }
-
-//  try
-//  {
-//    const cedar::aux::ConfigurationNode& groups = root.get_child("groups");
-//    this->readGroups(groups);
-//  }
-//  catch (const boost::property_tree::ptree_bad_path&)
-//  {
-//    // no connections declared -- this is ok.
-//#if defined DEBUG || defined DEBUG_FILE_READING
-//    std::cout << "No groups present while reading configuration." << std::endl;
-//#endif // defined DEBUG || defined DEBUG_FILE_READING
-//  }
 
   try
   {
@@ -422,31 +405,6 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
   }
 }
 
-//void cedar::proc::Network::saveGroups(cedar::aux::ConfigurationNode& root)
-//{
-//  for (cedar::proc::Manager::GroupRegistry::iterator iter = cedar::proc::Manager::getInstance().groups().begin();
-//       iter != cedar::proc::Manager::getInstance().groups().end();
-//       ++iter
-//       )
-//  {
-//    cedar::aux::ConfigurationNode group;
-//    (*iter)->saveConfiguration(group);
-//    root.push_back(cedar::aux::ConfigurationNode::value_type("group", group));
-//  }
-//}
-//
-//void cedar::proc::Network::readGroups(const cedar::aux::ConfigurationNode& root)
-//{
-//  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
-//      iter != root.end();
-//      ++iter)
-//  {
-//    //!@todo Should the allocateGroup function be part of the cedar::proc::Network class instead of cedar::proc::Manager?
-//    cedar::proc::GroupPtr group (cedar::proc::Manager::getInstance().allocateGroup());
-//    group->readConfiguration(iter->second);
-//  }
-//}
-
 void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection)
 {
   std::string source_str = connection->getSource()->getParent() + "." + connection->getSource()->getName();
@@ -515,6 +473,18 @@ bool cedar::proc::Network::isConnected(const std::string& source, const std::str
   return false;
 }
 
+bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
+{
+  for (size_t i = 0; i < mTriggerConnections.size(); ++i)
+  {
+    if (mTriggerConnections.at(i)->equals(source, target))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
 {
   //!@todo clean up - very complicated way of finding an object
@@ -531,23 +501,6 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
       mElements.erase(iter);
       return;
     }
-//
-//
-//    SharedObjectPointer object_ptr = iter->second.lock();
-//    if (object_ptr && object_ptr.get() == object)
-//    {
-//      std::string old_name = iter->first;
-//      CEDAR_DEBUG_ASSERT(object_ptr);
-//
-//      if (this->mObjects.find(object->getName()) != this->mObjects.end())
-//      {
-//        CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate element name: " + object->getName());
-//      }
-//
-//      this->mObjects.erase(this->mObjects.find(old_name));
-//      mObjects[object->getName()] = object_ptr;
-//      return;
-//    }
   }
   CEDAR_THROW(cedar::proc::InvalidObjectException, "Element not registered at this network. Current element name: " + object->getName());
 }
