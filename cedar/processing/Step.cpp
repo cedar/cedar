@@ -100,10 +100,6 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::TriggerPtr cedar::proc::Step::getParentTrigger()
-{
-  return this->mParentTrigger.lock();
-}
 
 /*!
  * As an example, consider a class A that has a function void A::foo():

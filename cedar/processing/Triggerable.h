@@ -125,6 +125,9 @@ public:
   //!@brief Returns the finished trigger singleton.
   //!@brief use Singleton template class here
   cedar::proc::TriggerPtr& getFinishedTrigger();
+
+  //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
+  cedar::proc::TriggerPtr getParentTrigger();
 //
 //signals:
 //  //!@brief Signal that is emitted whenever the Triggerable's state is changed.

@@ -124,6 +124,7 @@ public:
   void connectSlots(const std::string& source, const std::string& target);
   void connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
   bool isConnected(const std::string& source, const std::string& target);
+  bool isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
 
   const StepVector& steps() const;
   StepVector& steps();

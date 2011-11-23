@@ -133,9 +133,6 @@ public:
   //!@brief Calls the action with the given name.
   void callAction(const std::string& name);
 
-  //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
-  cedar::proc::TriggerPtr getParentTrigger();
-
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
