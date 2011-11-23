@@ -154,4 +154,27 @@ public:
   }
 }; // class cedar::proc::ConnectionMemberDeletedException
 
+/*!@brief An exception that is thrown by ProjectionMapping when the user wants to add a new mapping, which would destroy
+ * the bijective property of the overall mapping.
+ */
+class cedar::proc::ProjectionMappingNotBijectiveException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  ProjectionMappingNotBijectiveException()
+  {
+    this->mType = "ProjectionMappingNotBijectiveException";
+  }
+}; // class cedar::proc::NoMappingException
+
+/*!@brief An exception that is thrown by ProjectionMapping when a user wants to look up a mapping that does not exist.
+ */
+class cedar::proc::NoMappingException : public cedar::aux::exc::ExceptionBase
+{
+public:
+  NoMappingException()
+  {
+    this->mType = "NoMappingException";
+  }
+}; // class cedar::proc::NoMappingException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H

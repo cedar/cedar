@@ -48,7 +48,9 @@
 #include <boost/smart_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <opencv2/opencv.hpp>
-
+#include <string>
+#include <sstream>
+#include <iostream>
 
 namespace cedar
 {
@@ -161,7 +163,6 @@ namespace cedar
     //!@brief a better name for boost's property tree
     typedef boost::property_tree::ptree ConfigurationNode;
 
-
     /*!@brief Template method that converts simple data types to a string.
      *
      * @param value The data value that will be converted to a string.
@@ -173,6 +174,14 @@ namespace cedar
       streamOut << value;
       return streamOut.str();
     }
+
+    template <class T>
+    bool fromString(T& t, const std::string& s, std::ios_base& (*f)(std::ios_base&))
+    {
+      std::istringstream iss(s);
+      return !(iss >> f >> t).fail();
+    }
+
     //!@brief class declaration of Data
     CEDAR_DECLARE_AUX_CLASS(Data);
 

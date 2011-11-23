@@ -40,9 +40,10 @@
 #include "cedar/processing/steps/Projection.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/processing/ProjectionMappingParameter.h"
+#include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -61,7 +62,7 @@ cedar::proc::steps::Projection::Projection()
 :
 mInput(new cedar::aux::MatData(cv::Mat())),
 mOutput(new cedar::aux::MatData(cv::Mat())),
-_mDimensionMappings(new cedar::aux::UIntVectorParameter(this, "dimension mapping", 1, 1, 0, 10)),
+_mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
 _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
 _mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 3))
@@ -106,7 +107,7 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   }
 
   // the number of mappings from input to output is constrained by the output dimensionality
-  //this->_mDimensionMappings->setMaximum(new_dimensionality);
+  this->_mDimensionMappings->setMaximumNumberOfMappings(new_dimensionality);
   this->initializeOutputMatrix();
 }
 
@@ -129,7 +130,7 @@ void cedar::proc::steps::Projection::reconfigure()
 
     for (unsigned int index = 0; index < mInputDimensionality; ++index)
     {
-      if (_mDimensionMappings->getValue().at(index) == 10)
+      if (_mDimensionMappings->getValue()->isDropped(index))
       {
         mIndicesToCompress.push_back(index);
       }
@@ -224,7 +225,7 @@ void cedar::proc::steps::Projection::expand1Dto2D()
   bool transposed = false;
 
   // if dimension 0 is mapped onto 1
-  if (_mDimensionMappings->size() >= 1 && _mDimensionMappings->at(0) == 1)
+  if (_mDimensionMappings->getValue()->lookUp(0) == 1)
   {
     transposed = true;
     output = output.t();
@@ -254,9 +255,9 @@ void cedar::proc::steps::Projection::expandMDtoND()
 
     // compute the corresponding index in the input matrix
     std::vector<int> input_index;
-    for (unsigned int i = 0; i < _mDimensionMappings->size(); ++i)
+    for (unsigned int i = 0; i < _mDimensionMappings->getValue()->getNumberOfMappings(); ++i)
     {
-      input_index.push_back(output_index.at(_mDimensionMappings->at(i)));
+      input_index.push_back(output_index.at(_mDimensionMappings->getValue()->lookUp(i)));
     }
 
     // if the input dimensionality is 1 ...
@@ -381,7 +382,7 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
 
   this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   mInputDimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
-  this->_mDimensionMappings->resize(mInputDimensionality, _mDimensionMappings->getDefaultValue());
+  //!@todo this->_mDimensionMappings->resize(mInputDimensionality);
 
   this->reconfigure();
 }

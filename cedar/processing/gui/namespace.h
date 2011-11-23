@@ -86,6 +86,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT View;
       class CEDAR_PROC_LIB_EXPORT UIntParameter;
       class CEDAR_PROC_LIB_EXPORT UIntVectorParameter;
+      class CEDAR_PROC_LIB_EXPORT ProjectionMappingParameter;
 
       /* Exceptions */
       class CEDAR_PROC_LIB_EXPORT InvalidStepNameException;

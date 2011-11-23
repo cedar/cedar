@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/AbstractFactory.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -76,6 +77,8 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
     CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     CEDAR_DECLARE_PROC_CLASS(Connection);
+    CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
+    CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
     //!@endcond
 
     template <class BaseClass, class FactoryType> class DeclarationBase;
@@ -98,6 +101,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES(TriggerRegistry);
     //!@endcond
 
+
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;
@@ -112,6 +116,8 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
     class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
+    class CEDAR_PROC_LIB_EXPORT ProjectionMappingNotBijectiveException;
+    class CEDAR_PROC_LIB_EXPORT NoMappingException;
     //!@endcond
   }
 }

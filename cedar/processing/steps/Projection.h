@@ -43,6 +43,8 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 
@@ -154,9 +156,7 @@ protected:
 
 private:
   //!@brief mapping between the input and output dimensions
-  //! each index i of the vector represents the corresponding dimension in the input,
-  //! the value at index i represents the corresponding dimension in the output
-  cedar::aux::UIntVectorParameterPtr _mDimensionMappings;
+  cedar::proc::ProjectionMappingParameterPtr _mDimensionMappings;
 
   //!@brief dimensionality of the output
   //!@todo determine when the projection is connected to an output step
