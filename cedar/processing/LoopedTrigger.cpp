@@ -112,7 +112,7 @@ void cedar::proc::LoopedTrigger::loopTimeChanged()
   this->setStepSize(this->mLoopTime->getValue());
 }
 
-void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
+void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr step)
 {
   this->cedar::proc::Trigger::removeListener(step);
   if (this->isRunning())
@@ -121,7 +121,7 @@ void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
   }
 }
 
-void cedar::proc::LoopedTrigger::addListener(cedar::proc::StepPtr step)
+void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr step)
 {
   this->cedar::proc::Trigger::addListener(step);
   if (this->isRunning())
