@@ -61,14 +61,17 @@ namespace cedar
       return streamOut.str();
     }
 
-    /*!@brief Splits a string based on the given separator.
+    /*!@brief  Splits a string based on the given separator.
      *
-     *        For example, the string "This is an example" is split into the list ["This", "is", "an", "example"] when
-     *        the separator " " is used.
+     *         For example, the string "This is an example" is split into the list ["This", "is", "an", "example"] when
+     *         the separator " " is used.
      *
-     * @param str The string to split.
-     * @param separator The separator.
-     * @param parts Result vector into which the separated parts of the string are written.
+     * @param  str The string to split.
+     * @param  separator The separator.
+     * @param  parts Result vector into which the separated parts of the string are written.
+     *
+     * @remark If the separator is not found in \em str (e.g., if \em str is empty), the function will return a list
+     *         with the input string as the only element.
      */
     CEDAR_AUX_LIB_EXPORT void split(const std::string& str,
                                     const std::string& separator,
@@ -87,6 +90,28 @@ namespace cedar
       }
       std::string chunk = str.substr(last_index, index - last_index);
       parts.push_back(chunk);
+    }
+
+    /*!@brief Replaces all occurrences of needle in a given string with a specified replacement.
+     *
+     */
+    inline std::string replace(const std::string& haystack, const std::string& needle, const std::string& replacement)
+    {
+      std::string result = haystack;
+
+      if (haystack.empty())
+      {
+        return haystack;
+      }
+
+      size_t index = haystack.find(needle);
+      while (index != std::string::npos)
+      {
+        result = result.replace(index, needle.length(), replacement);
+        index = result.find(needle, index + replacement.length());
+      }
+
+      return result;
     }
   }
 }
