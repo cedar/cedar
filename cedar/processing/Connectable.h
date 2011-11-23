@@ -47,7 +47,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <boost/signals2/connection.hpp>
 
 /*!@brief An interface for classes that have data slots that can be connected.
  */
@@ -242,12 +242,6 @@ private:
   //!@brief Declares a new piece of data in the connectable.
   void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
 
-  /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
-   *
-   *        If all mandatory data is set (i.e., the data pointers in the slots are non-zero), the member
-   *        \em mMandatoryConnectionsAreSet is set to true. Otherwise, it is set to false.
-   */
-  void checkMandatoryConnections();
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */
@@ -257,12 +251,21 @@ private:
    */
   void freeData(DataRole::Id role, const std::string& name);
 
+  /*!@brief (Re-)Checks that all mandatory connections are actually set to non-zero data.
+   *
+   *        If all mandatory data is set (i.e., the data pointers in the slots are non-zero), the member
+   *        \em mMandatoryConnectionsAreSet is set to true. Otherwise, it is set to false.
+   */
+  void checkMandatoryConnections();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
+  //!@brief a connection to a signal emitted by an external data slo
+  boost::signals2::connection mSlotConnection;
+
   //!@brief a map of slot maps, sorted by their role (from cedar::proc::DataRole), either input, buffer, or output
   std::map<DataRole::Id, SlotMap> mDataConnections;
 
