@@ -44,7 +44,6 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/Registry.h"
 #include "cedar/processing/StepDeclaration.h"
 #include "cedar/processing/TriggerDeclaration.h"
 #include "cedar/processing/FrameworkSettings.h"
@@ -87,10 +86,6 @@ public:
   static Manager& getInstance();
   cedar::proc::FrameworkSettings& settings();
 
-  //!\brief access to step registry
-  StepRegistry& steps();
-  //!\brief access to trigger registry
-  TriggerRegistry& triggers();
   //!\brief access to thread registry
   ThreadRegistry& threads();
   //!\brief access to group registry
@@ -182,10 +177,6 @@ private:
   //! the manager singleton instance
   static Manager mManager;
 
-  //! a registry for all managed steps
-  StepRegistryPtr mStepRegistry;
-  //! a registry for all managed triggers
-  TriggerRegistryPtr mTriggerRegistry;
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
   //! a registry for all managed groups

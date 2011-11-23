@@ -52,6 +52,10 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/processing/gui/DirectoryParameter.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // PROJECT INCLUDES
 
@@ -94,7 +98,7 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 {
   this->resetContents();
 
-  std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
+  std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pStep)->getClassId();
   this->addLabelRow(label);
   this->mDisplayedConfigurable = pStep;
   this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
@@ -104,7 +108,7 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
 {
   this->resetContents();
 
-  std::string label = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(pTrigger)->getClassId();
+  std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pTrigger)->getClassId();
   this->addLabelRow(label);
   this->mDisplayedConfigurable = pTrigger;
   this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable)); // boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));

@@ -47,6 +47,10 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // PROJECT INCLUDES
 
@@ -190,7 +194,7 @@ cedar::proc::gui::ConnectValidity
 void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->mTrigger = trigger;
-  this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(mTrigger);
+  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(mTrigger);
   
   std::string tool_tip = this->mTrigger->getName() + " (" + this->mClassId->getClassName() + ")";
   this->setToolTip(tool_tip.c_str());
@@ -199,16 +203,6 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 void cedar::proc::gui::TriggerItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
-  try
-  {
-    std::string trigger_name = node.get<std::string>("trigger");
-    cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().get(trigger_name);
-    this->setTrigger(trigger);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    CEDAR_THROW(cedar::proc::gui::InvalidTriggerNameException, "Cannot read TriggerItem from file: no trigger name given.");
-  }
 }
 
 void cedar::proc::gui::TriggerItem::writeConfiguration(cedar::aux::ConfigurationNode& root)

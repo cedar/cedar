@@ -57,6 +57,8 @@
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/steps/Resize.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
 
 // PROJECT INCLUDES
 #include "cedar/defines.h"
@@ -71,48 +73,7 @@ cedar::proc::Manager cedar::proc::Manager::mManager;
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::Manager::Manager()
-:
-mStepRegistry(new cedar::proc::StepRegistry()),
-mTriggerRegistry(new cedar::proc::TriggerRegistry())
 {
-  /*!
-   *@todo find a better way to load declarations here; mostly, this can be a problem, if other modules want to declare
-   *      things as well.
-   *@todo Names?
-   *@todo Make this into a (standard) plugin?
-   */
-  TriggerDeclarationPtr trigger_declaration(new TriggerDeclarationT<cedar::proc::Trigger>("cedar.processing.Trigger"));
-  trigger_declaration->setIconPath(":/triggers/trigger.svg");
-  this->triggers().declareClass(trigger_declaration);
-
-  TriggerDeclarationPtr multi_trigger_declaration(new TriggerDeclarationT<cedar::proc::MultiTrigger>("cedar.processing.MultiTrigger"));
-  multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
-  this->triggers().declareClass(multi_trigger_declaration);
-
-  TriggerDeclarationPtr looped_trigger_declaration(
-                                                     new TriggerDeclarationT<cedar::proc::LoopedTrigger>
-                                                     (
-                                                       "cedar.processing.LoopedTrigger"
-                                                     )
-                                                  );
-  looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
-  this->triggers().declareClass(looped_trigger_declaration);
-
-  StepDeclarationPtr input_decl(new StepDeclarationT<cedar::proc::sources::GaussInput>("cedar.processing.sources.GaussInput", "Sources"));
-  input_decl->setIconPath(":/steps/gauss_input.svg");
-  this->steps().declareClass(input_decl);
-
-  StepDeclarationPtr static_gain_decl(new StepDeclarationT<cedar::proc::steps::StaticGain>("cedar.processing.StaticGain", "Utilities"));
-  static_gain_decl->setIconPath(":/steps/static_gain.svg");
-  this->steps().declareClass(static_gain_decl);
-
-  StepDeclarationPtr projection_decl(new StepDeclarationT<cedar::proc::steps::Projection>("cedar.processing.Projection", "Utilities"));
-  projection_decl->setIconPath(":/steps/projection.svg");
-  this->steps().declareClass(projection_decl);
-  
-  StepDeclarationPtr resize_decl(new StepDeclarationT<cedar::proc::steps::Resize>("cedar.processing.Resize", "Utilities"));
-  resize_decl->setIconPath(":/steps/resize.svg");
-  this->steps().declareClass(resize_decl);
 }
 
 cedar::proc::Manager::~Manager()
@@ -172,9 +133,9 @@ void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
   if (decl)
   {
     // load steps
-    for (size_t i = 0; i < decl->stepDeclarations().size(); ++i)
+    for (size_t i = 0; i < decl->elementDeclarations().size(); ++i)
     {
-      this->steps().declareClass(decl->stepDeclarations().at(i));
+      cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(decl->elementDeclarations().at(i));
     }
   }
 }
@@ -190,11 +151,6 @@ cedar::proc::GroupPtr cedar::proc::Manager::getGroup(const std::string& name)
   }
   CEDAR_THROW(cedar::aux::UnknownNameException, "There is no group here by the name " + name + ".");
   return cedar::proc::GroupPtr();
-}
-
-cedar::proc::StepRegistry& cedar::proc::Manager::steps()
-{
-  return *this->mStepRegistry;
 }
 
 void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)
@@ -254,11 +210,6 @@ void cedar::proc::Manager::stopThreads(bool wait)
       (*iter)->wait();
     }
   }
-}
-
-cedar::proc::TriggerRegistry& cedar::proc::Manager::triggers()
-{
-  return *this->mTriggerRegistry;
 }
 
 cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
@@ -444,16 +395,16 @@ void cedar::proc::Manager::deleteConnection(cedar::proc::Connection* connection)
 void cedar::proc::Manager::removeStep(cedar::proc::StepPtr step)
 {
   this->cleanupConnections();
-
-  this->steps().removeObject(step->getName());
+  //!@todo remove somewhere else
+//  this->steps().removeObject(step->getName());
   this->disconnect(step);
 }
 
 void cedar::proc::Manager::removeTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->cleanupConnections();
-
-  this->triggers().removeObject(trigger->getName());
+  //!@todo remove somewhere else
+//  this->triggers().removeObject(trigger->getName());
   this->disconnect(trigger);
   cedar::proc::LoopedTriggerPtr looped_trigger = boost::shared_dynamic_cast<cedar::proc::LoopedTrigger>(trigger);
   if (looped_trigger)

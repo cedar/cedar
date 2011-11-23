@@ -128,8 +128,8 @@ void cedar::proc::Group::readConfiguration(const cedar::aux::ConfigurationNode& 
     {
       std::string step_name = iter->second.get_value<std::string>();
       //!@todo should this step pointer come from a network?
-      cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(step_name);
-      this->addStep(step);
+//      cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(step_name);
+//      this->addStep(step);
     }
   }
   catch (const boost::property_tree::ptree_bad_path& e)

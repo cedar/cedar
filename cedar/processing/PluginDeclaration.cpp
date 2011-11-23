@@ -58,13 +58,13 @@ cedar::proc::PluginDeclaration::~PluginDeclaration()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::PluginDeclaration::add(cedar::proc::StepDeclarationPtr declaration)
+void cedar::proc::PluginDeclaration::add(cedar::proc::ElementDeclarationPtr declaration)
 {
-  this->mStepDeclarations.push_back(declaration);
+  this->mElementDeclarations.push_back(declaration);
 }
 
-const cedar::proc::PluginDeclaration::StepDeclarations& cedar::proc::PluginDeclaration::stepDeclarations() const
+const cedar::proc::PluginDeclaration::ElementDeclarations& cedar::proc::PluginDeclaration::elementDeclarations() const
 {
-  return this->mStepDeclarations;
+  return this->mElementDeclarations;
 }
 

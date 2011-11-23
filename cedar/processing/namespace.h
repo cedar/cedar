@@ -103,17 +103,6 @@ namespace cedar
     typedef boost::shared_ptr<cedar::aux::AbstractFactory<Step> > StepFactoryPtr;
     typedef boost::shared_ptr<cedar::aux::Factory<Trigger, cedar::proc::TriggerPtr> > TriggerFactoryPtr;
 
-
-    template <class T, class T_Declaration> class Registry;
-    typedef cedar::proc::Registry<Step, StepDeclaration> StepRegistry;
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(StepRegistry);
-    //!@endcond
-    typedef cedar::proc::Registry<Trigger, TriggerDeclaration> TriggerRegistry;
-    //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(TriggerRegistry);
-    //!@endcond
-
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION
     class CEDAR_PROC_LIB_EXPORT ConnectionMemberDeletedException;

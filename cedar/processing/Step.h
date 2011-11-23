@@ -65,7 +65,7 @@
  * The concept of processing steps is explained in @ref ProcessingIntroduction. In short, a processing step represents
  * a computational function that processes some input data into output data. Examples of a processing step could be
  * converting an image to a different color space, approximating the solution of a dynamical system
- * (see cedar::dyn::Dynamics) or raeding data from disk.
+ * (see cedar::dyn::Dynamics) or reading data from disk.
  *
  * Processing steps also have data slots that represent inputs, outputs and buffers (temporary data that can be
  * displayed in plots). Each data slot is assigned some data pointer, input slots get external data, buffer and output
@@ -126,9 +126,6 @@ public:
 
   //!@brief Returns the trigger associated with the given index.
   cedar::proc::TriggerPtr getTrigger(size_t index);
-
-  //!@brief Sets the associated registry for the step.
-  void setRegistry(cedar::proc::StepRegistry* pRegistry);
 
   //!@brief Returns the map of actions defined for this step.
   const ActionMap& getActions() const;
@@ -199,9 +196,6 @@ private:
 
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
-
-  //!@brief Registry managing the step.
-  cedar::proc::StepRegistry* mRegisteredAt;
 
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;

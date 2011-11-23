@@ -113,9 +113,6 @@ public:
   //!@brief saves a configuration to a ConfigurationNode
   void writeConfiguration(cedar::aux::ConfigurationNode& node);
 
-  //!@brief sets the TriggerRegistry at which this Trigger instance is stored
-  void setRegistry(cedar::proc::TriggerRegistry* pRegistry);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -147,9 +144,6 @@ private:
   std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
   //!@brief find a trigger in the list of trigger listeners
   std::vector<cedar::proc::TriggerPtr>::iterator find(cedar::proc::TriggerPtr triggerableT);
-
-  //!@brief Registry managing the trigger.
-  cedar::proc::TriggerRegistry* mRegisteredAt;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
