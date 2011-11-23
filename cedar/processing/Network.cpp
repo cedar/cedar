@@ -161,6 +161,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   {
     mElements[instanceName] = element;
   }
+  element->setNetwork(this);
 }
 
 cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name)
@@ -512,4 +513,41 @@ bool cedar::proc::Network::isConnected(const std::string& source, const std::str
     }
   }
   return false;
+}
+
+void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
+{
+  //!@todo clean up - very complicated way of finding an object
+  if (cedar::proc::ElementPtr elem = mElements[object->getName()])
+  {
+
+  }
+  //!@todo It might be a good idea to clean up invalid pointers here.
+  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    if (iter->second.get() == object) // found
+    {
+      mElements[object->getName()] = iter->second;
+      mElements.erase(iter);
+      return;
+    }
+//
+//
+//    SharedObjectPointer object_ptr = iter->second.lock();
+//    if (object_ptr && object_ptr.get() == object)
+//    {
+//      std::string old_name = iter->first;
+//      CEDAR_DEBUG_ASSERT(object_ptr);
+//
+//      if (this->mObjects.find(object->getName()) != this->mObjects.end())
+//      {
+//        CEDAR_THROW(cedar::proc::InvalidNameException, "Duplicate element name: " + object->getName());
+//      }
+//
+//      this->mObjects.erase(this->mObjects.find(old_name));
+//      mObjects[object->getName()] = object_ptr;
+//      return;
+//    }
+  }
+  CEDAR_THROW(cedar::proc::InvalidObjectException, "Element not registered at this network. Current element name: " + object->getName());
 }

@@ -43,8 +43,10 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 #include "cedar/defines.h"
@@ -69,7 +71,6 @@ Triggerable(isLooped),
 // initialize members
 mBusy(false),
 mpArgumentsLock(new QReadWriteLock()),
-mRegisteredAt(NULL),
 // initialize parameters
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
@@ -166,20 +167,14 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (this->mRegisteredAt != NULL)
+  if (this->mpRegisteredAt != NULL)
   {
     // update the name
-    this->mRegisteredAt->updateObjectName(this);
+    this->mpRegisteredAt->updateObjectName(this);
 
-    // emit a signal to notift anyone interested in this
+    // emit a signal to notify anyone interested in this
     emit nameChanged();
   }
-}
-
-void cedar::proc::Step::setRegistry(cedar::proc::StepRegistry* pRegistry)
-{
-  // set the parent registry
-  this->mRegisteredAt = pRegistry;
 }
 
 size_t cedar::proc::Step::getTriggerCount() const

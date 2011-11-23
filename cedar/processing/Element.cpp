@@ -46,7 +46,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::Element::Element()
 :
-_mName(new cedar::aux::StringParameter(this, "name", "element"))
+_mName(new cedar::aux::StringParameter(this, "name", "element")),
+mpRegisteredAt(NULL)
 {
 }
 
@@ -66,4 +67,10 @@ void cedar::proc::Element::setName(const std::string& name)
 const std::string& cedar::proc::Element::getName() const
 {
   return this->_mName->getValue();
+}
+
+void cedar::proc::Element::setNetwork(cedar::proc::Network* pNetwork)
+{
+  // set the parent registry
+  this->mpRegisteredAt = pNetwork;
 }

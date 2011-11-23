@@ -63,8 +63,7 @@
 
 cedar::proc::Trigger::Trigger(const std::string& name, bool isLooped)
 :
-Triggerable(isLooped),
-mRegisteredAt(NULL)
+Triggerable(isLooped)
 {
   this->setName(name);
 }
@@ -83,12 +82,6 @@ cedar::proc::Trigger::~Trigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void cedar::proc::Trigger::setRegistry(cedar::proc::TriggerRegistry* pRegistry)
-{
-  this->mRegisteredAt = pRegistry;
-}
-
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)

@@ -77,6 +77,9 @@ public:
   //!@brief Get the name of this element.
   const std::string& getName() const;
 
+  //!@brief sets the network at which this element is registered
+  void setNetwork(cedar::proc::Network* pNetwork);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,6 +106,8 @@ private:
 protected:
   //!@brief The name that uniquely identifies the element within its own module.
   cedar::aux::StringParameterPtr _mName;
+  //!@todo make weak ptr
+  cedar::proc::Network* mpRegisteredAt;
 
 private:
   // none yet

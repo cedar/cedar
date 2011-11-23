@@ -334,6 +334,16 @@ void cedar::proc::gui::NetworkFile::readScene(cedar::aux::ConfigurationNode& roo
       {
         cedar::proc::gui::StepItem *p_step = new cedar::proc::gui::StepItem(this->mpMainWindow);
         p_step->readConfiguration(iter->second);
+        try
+        {
+          std::string step_name = iter->second.get<std::string>("step");
+          cedar::proc::StepPtr step = mNetwork->getElement<cedar::proc::Step>(step_name);
+          p_step->setStep(step);
+        }
+        catch (const boost::property_tree::ptree_bad_path&)
+        {
+          CEDAR_THROW(cedar::proc::gui::InvalidStepNameException, "Cannot read StepItem from file: no step name given.");
+        }
         this->mpStepsToAdd.push_back(p_step);
       }
       catch (const cedar::proc::gui::InvalidStepNameException&)
@@ -348,6 +358,16 @@ void cedar::proc::gui::NetworkFile::readScene(cedar::aux::ConfigurationNode& roo
       {
         cedar::proc::gui::TriggerItem *p_trigger = new cedar::proc::gui::TriggerItem();
         p_trigger->readConfiguration(iter->second);
+        try
+        {
+          std::string trigger_name = iter->second.get<std::string>("trigger");
+          cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(trigger_name);
+          p_trigger->setTrigger(trigger);
+        }
+        catch (const boost::property_tree::ptree_bad_path&)
+        {
+          CEDAR_THROW(cedar::proc::gui::InvalidTriggerNameException, "Cannot read TriggerItem from file: no trigger name given.");
+        }
         this->mpTriggersToAdd.push_back(p_trigger);
       }
       catch (const cedar::proc::gui::InvalidTriggerNameException&)

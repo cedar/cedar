@@ -39,8 +39,10 @@
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/dynamics/fields/Preshape.h"
 #include "cedar/dynamics/sources/Noise.h"
-#include "cedar/processing/StepDeclaration.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 #ifdef LINUX
 void cedar::dyn::initialize()
@@ -48,42 +50,42 @@ void cedar::dyn::initialize()
 void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
 #endif
 {
-  using cedar::proc::StepDeclarationPtr;
+  using cedar::proc::ElementDeclarationPtr;
 
-  StepDeclarationPtr field_decl
+  ElementDeclarationPtr field_decl
   (
-    new cedar::proc::StepDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields")
+    new cedar::proc::ElementDeclarationT<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields")
   );
   field_decl->setIconPath(":/steps/field_temp.svg");
 
 #ifdef LINUX
-  cedar::proc::Manager::getInstance().steps().declareClass(field_decl);
+  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(field_decl);
 #else
   // cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
   plugin->add(field_decl);
 #endif
 
-  StepDeclarationPtr preshape_decl
+  ElementDeclarationPtr preshape_decl
   (
-    new cedar::proc::StepDeclarationT<cedar::dyn::Preshape>("cedar.dynamics.Preshape", "Fields")
+    new cedar::proc::ElementDeclarationT<cedar::dyn::Preshape>("cedar.dynamics.Preshape", "Fields")
   );
   preshape_decl->setIconPath(":/steps/preshape.svg");
 
 #ifdef LINUX
-  cedar::proc::Manager::getInstance().steps().declareClass(preshape_decl);
+  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(preshape_decl);
 #else
   plugin->add(preshape_decl);
   // return plugin;
 #endif
 
-  StepDeclarationPtr noise_decl
+  ElementDeclarationPtr noise_decl
   (
-    new cedar::proc::StepDeclarationT<cedar::dyn::Noise>("cedar.dynamics.Noise", "Sources")
+    new cedar::proc::ElementDeclarationT<cedar::dyn::Noise>("cedar.dynamics.Noise", "Sources")
   );
   noise_decl->setIconPath(":/steps/noise.svg");
 
 #ifdef LINUX
-  cedar::proc::Manager::getInstance().steps().declareClass(noise_decl);
+  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(noise_decl);
 #else
   plugin->add(noise_decl);
   // return plugin;
