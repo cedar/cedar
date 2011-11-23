@@ -102,9 +102,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void removeListener(cedar::proc::StepPtr step);
+  void removeListener(cedar::proc::TriggerablePtr step);
 
-  void addListener(cedar::proc::StepPtr step);
+  void addListener(cedar::proc::TriggerablePtr step);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
