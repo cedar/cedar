@@ -67,11 +67,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief allocate an instance of type DerivedType and return this wrapped in a shared pointer of type BaseType
   SmartPointerType allocate() const
   {
     return SmartPointerType (new DerivedType());
   }
 
+  //!@brief allocate an instance of type DerivedType and return it as pointer of type BaseType
   BaseType* allocateRaw() const
   {
     return new DerivedType();

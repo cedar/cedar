@@ -22,48 +22,61 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        main.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 10 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 07 24
 
-    Description: Namespace file for cedar::aux::exc.
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
 
-#ifndef CEDAR_AUX_EXC_NAMESPACE_H
-#define CEDAR_AUX_EXC_NAMESPACE_H
-
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/lib.h"
 
 // PROJECT INCLUDES
-#include "namespace.h"
+#include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#include <iostream>
+#include <typeinfo>
 
 
-namespace cedar
+namespace test
 {
-  namespace aux
+  class TestClass
   {
-    //!@brief Namespace for all exception classes.
-    namespace exc
-    {
-      CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
-
-      CEDAR_DECLARE_AUX_CLASS(NullPointerException);
-      CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
-      CEDAR_DECLARE_AUX_CLASS(InitializationException);
-      CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
-      CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
-    }
-  }
+    public:
+      void fn()
+      {
+      }
+  };
 }
 
-#endif // CEDAR_AUX_EXC_NAMESPACE_H
+int main()
+{
+  using cedar::aux::LogFile;
+  LogFile log_file("UnmangleTest.log");
+  log_file.addTimeStamp();
+  log_file << std::endl;
+  // the number of errors encountered in this test
+  int errors = 0;
+
+  std::string unmangled_test_class = cedar::aux::unmangleName(typeid(test::TestClass));
+  if (unmangled_test_class != "test::TestClass")
+  {
+    log_file << "Faild to properly unmangle name for test::TestClass; result is \""
+             << unmangled_test_class << "\"" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    log_file << "Name properly unmangled to \"" << unmangled_test_class << "\"" << std::endl;
+  }
+
+  return errors;
+}

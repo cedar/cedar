@@ -66,16 +66,19 @@ class cedar::proc::Connection
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief create connection from Step to Step (data connection)
   Connection(
               cedar::proc::StepPtr source,
               const std::string& sourceName,
               cedar::proc::StepPtr target,
               const std::string& targetName
             );
+  //!@brief create connection from Trigger to Step
   Connection(
               cedar::proc::TriggerPtr source,
               cedar::proc::StepPtr target
             );
+  //!@brief create connection from Trigger to Trigger
   Connection(
               cedar::proc::TriggerPtr source,
               cedar::proc::TriggerPtr target

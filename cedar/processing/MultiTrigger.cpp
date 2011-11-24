@@ -64,12 +64,13 @@ cedar::proc::MultiTrigger::~MultiTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::proc::MultiTrigger::onTrigger(Trigger* sender)
+void cedar::proc::MultiTrigger::onTrigger(cedar::proc::TriggerPtr pSender)
 {
-  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(sender);
+  std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.find(pSender);
 
   if (iter != this->mIncoming.end())
   {
+    std::cout << "Multitrigger::onTrigger(" << pSender.get() << ")" << std::endl;
     iter->second = true;
     this->checkCondition();
   }
@@ -78,11 +79,12 @@ void cedar::proc::MultiTrigger::onTrigger(Trigger* sender)
 void cedar::proc::MultiTrigger::checkCondition()
 {
   // Check whether all incoming triggers have triggered the multitrigger
-  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  for (std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
   {
     // if one is false, return and do nothing
     if (!iter->second)
     {
+      std::cout << "Multitrigger::checkCondition(): false: " << iter->first.get() << std::endl;
       return;
     }
   }
@@ -91,20 +93,20 @@ void cedar::proc::MultiTrigger::checkCondition()
   this->trigger();
 
   // reset all triggers
-  for (std::map<Trigger*, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
+  for (std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.begin(); iter != this->mIncoming.end(); ++iter)
   {
     iter->second = false;
   }
 }
 
-void cedar::proc::MultiTrigger::notifyConnected(cedar::proc::Trigger* trigger)
+void cedar::proc::MultiTrigger::notifyConnected(cedar::proc::TriggerPtr trigger)
 {
   mIncoming[trigger] = false;
 }
 
-void cedar::proc::MultiTrigger::notifyDisconnected(cedar::proc::Trigger* trigger)
+void cedar::proc::MultiTrigger::notifyDisconnected(cedar::proc::TriggerPtr trigger)
 {
-  std::map<Trigger*, bool>::iterator iter = this->mIncoming.find(trigger);
+  std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.find(trigger);
   if (iter != this->mIncoming.end())
   {
     this->mIncoming.erase(iter);

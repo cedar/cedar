@@ -40,6 +40,14 @@
 string(TOLOWER "${CMAKE_BUILD_TYPE}" buildTypeLower)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CEDAR_CMAKE_DIR}/findScripts)
 
+if (CEDAR_STOP_ON_MISSING_LIBRARIES)
+  set(CEDAR_LIB_ERROR_TYPE FATAL_ERROR)
+  message("Will stop when missing libraries.")
+else()
+  set(CEDAR_LIB_ERROR_TYPE WARNING)
+  message("Will compile despite missing libraries.")
+endif()
+
 # Qt
 message("Searching for Qt...")
 find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
@@ -50,7 +58,7 @@ if(QT4_FOUND)
   include_directories(${QT_INCLUDE_DIRS})
   message("Qt was found in ${QT_INCLUDE_DIRS}")
 else(QT4_FOUND)
-  message(FATAL_ERROR "Required library qt4 was not found on your system! 
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library qt4 was not found on your system! 
   You can try to alter the default search paths in cedar.conf.")
 endif()
 
@@ -72,7 +80,7 @@ if(Boost_FOUND)
   #message("Found the following boost libraries: ${Boost_LIBRARIES}")
   #message("Found boost includes at ${Boost_INCLUDE_DIRS}")
 else(Boost_FOUND)
-  message(FATAL_ERROR "Required library boost was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library boost was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
 endif()
 
@@ -91,7 +99,7 @@ else(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui opencv_imgproc)
 endif(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
 elseif(OpenCV_FOUND)
-  message(FATAL_ERROR "Required library OpenCV was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library OpenCV was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
 endif(OpenCV_FOUND)
 # message(STATUS "Found opencv libs ${OpenCV_LIBS}")
@@ -104,8 +112,9 @@ if(Libconfig_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
   include_directories(${Libconfig_INCLUDE_DIRS})
 else(Libconfig_FOUND)
-  message(FATAL_ERROR "Required library libconfig was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library libconfig was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
 endif(Libconfig_FOUND)
 
 # libQGLViewer
@@ -116,8 +125,9 @@ if(QGLViewer_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QGLViewer_LIBS})
   include_directories(${QGLViewer_INCLUDE_DIRS})
 else(QGLViewer_FOUND)
-  message(FATAL_ERROR "Required library QGLViewer was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library QGLViewer was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} release QGLViewer2 debug QGLViewerd2)
 endif(QGLViewer_FOUND)
 
 # libQwt
@@ -128,8 +138,9 @@ if(qwt_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
   include_directories(${qwt_INCLUDE_DIRS})
 else(qwt_FOUND)
-  message(FATAL_ERROR "Required library qwt was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwt was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwt)
 endif(qwt_FOUND)
 
 # qwtplot3d
@@ -140,7 +151,7 @@ if(qwtplot3d_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
   include_directories(${qwtplot3d_INCLUDE_DIRS})
 else(qwtplot3d_FOUND)
-  message(FATAL_ERROR "Required library qwtplot3d was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwtplot3d was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
 endif(qwtplot3d_FOUND)
 

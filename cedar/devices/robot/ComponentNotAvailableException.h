@@ -41,13 +41,13 @@
 #include "cedar/devices/robot/namespace.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief Class for an exception, that is thrown when a non-existing component is requested from a robot. */
-class cedar::dev::robot::ComponentNotAvailableException : public cedar::aux::exc::ExceptionBase
+class cedar::dev::robot::ComponentNotAvailableException : public cedar::aux::ExceptionBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

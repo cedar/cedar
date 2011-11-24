@@ -182,7 +182,7 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
   {
     // case 1: end of the recursion
     //         - this part interpolates between the actual values along each combination of dimensions.
-    unsigned int num = pow(2, source.dims - 1);
+    unsigned int num = 1 << (source.dims - 1); // same as 2^(dims - 1)
     interpolatedValues.resize(num);
 
     int lower_index = bounds.at(currentDimension).first;
@@ -225,7 +225,7 @@ void cedar::proc::steps::Resize::linearInterpolationNDRecursion
     double distance = interpolatedIndices.at(currentDimension) - static_cast<double>(lower_index);
 
     // process the result of the recursion
-    size_t num = pow(2, currentDimension);
+    size_t num = 1 << (source.dims - 1); // 2^(dims - 1)
     interpolatedValues.resize(num);
     for (size_t i = 0; i < num; ++i)
     {

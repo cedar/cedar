@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,21 +22,21 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NullPointerException.cpp
+    File:        OwnedData.cpp
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 11 17
 
-    Description: Implementation of the @em cedar::aux::exc::NullPointerException class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/exceptions/NullPointerException.h"
+#include "cedar/processing/OwnedData.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -46,13 +46,37 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//! Constructor
-cedar::aux::exc::NullPointerException::NullPointerException()
+cedar::proc::OwnedData::OwnedData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory)
+:
+cedar::proc::DataSlot(role, name, isMandatory)
 {
-  // Sets the type name.
-  this->mType = "NullPointerException";
+}
+
+cedar::proc::OwnedData::~OwnedData()
+{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::OwnedData::setData(cedar::aux::DataPtr data)
+{
+  // reset validity when the data changes.
+  if (this->getRole() == cedar::proc::DataRole::INPUT)
+  {
+    this->setValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN);
+  }
+
+  this->mData = data;
+}
+
+cedar::aux::DataPtr cedar::proc::OwnedData::getData()
+{
+  return this->mData;
+}
+
+cedar::aux::ConstDataPtr cedar::proc::OwnedData::getData() const
+{
+  return this->mData;
+}

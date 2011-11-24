@@ -63,13 +63,14 @@ namespace cedar
 
     //!@brief a template class tailored for use in all dynamics
     template <typename T> class Activation;
+    //!@brief a specialization for double values
     typedef Activation<double> DoubleActivation;
-    CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
-    //!@brief
+    //!@brief a specialization for cv::Mat
     typedef Activation<cv::Mat> MatActivation;
-    CEDAR_GENERATE_POINTER_TYPES(MatActivation);
 
     //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
+    CEDAR_GENERATE_POINTER_TYPES(MatActivation);
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
     CEDAR_DECLARE_DYN_CLASS(Preshape);

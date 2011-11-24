@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,21 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.cpp
+    File:        Element.cpp
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 01 20
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 11 17
 
-    Description: Implementation of the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/processing/Element.h"
 
 // PROJECT INCLUDES
 
@@ -45,14 +44,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-//! Constructor
-cedar::aux::exc::IndexOutOfRangeException::IndexOutOfRangeException()
+cedar::proc::Element::Element()
+:
+_mName(new cedar::aux::StringParameter(this, "name", "element"))
 {
-  // Sets the type name.
-  this->mType = "IndexOutOfRangeException";
+}
+
+cedar::proc::Element::~Element()
+{
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Element::setName(const std::string& name)
+{
+  this->_mName->setValue(name);
+}
+
+const std::string& cedar::proc::Element::getName() const
+{
+  return this->_mName->getValue();
+}

@@ -52,7 +52,7 @@
 #include <set>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A templated std::set parameter.
  *
  * More detailed description of the class.
  */
@@ -74,6 +74,7 @@ public:
   {
   }
 
+  //!@brief Constructor with default value.
   SetParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::set<T>& defaults)
   :
   cedar::aux::Parameter(pOwner, name, true),
@@ -91,6 +92,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief load a set of type T from a configuration tree
   void setTo(const cedar::aux::ConfigurationNode& root)
   {
     this->mValues.clear();
@@ -100,7 +102,8 @@ public:
     }
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
+  //!@brief store a set of type T to a configuration tree
+  void putTo(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode vector_node;
     for (typename std::set<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
@@ -112,32 +115,38 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
   }
 
+  //!@brief get the current set of type T (const)
   const std::set<T>& get() const
   {
     return this->mValues;
   }
 
+  //!@brief get the current set of type T
   std::set<T>& get()
   {
     return this->mValues;
   }
 
+  //!@brief get the default set
   const std::set<T>& getDefaultValues() const
   {
     return this->mDefaults;
   }
 
+  //!@brief set the current set of type T
   void set(const std::set<T>& values)
   {
     this->mValues = values;
     emit valueChanged();
   }
 
+  //!@brief set the std::set to default
   void makeDefault()
   {
     this->mValues = mDefaults;
   }
 
+  //!@brief insert a new entry into the set
   void insert(const T& value)
   {
     this->mValues.insert(value);
@@ -163,7 +172,9 @@ public:
 protected:
   // none yet
 private:
+  //!@brief std::set of entries of type T
   std::set<T> mValues;
+  //!@brief default set
   std::set<T> mDefaults;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -177,7 +188,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::VectorParameter
+}; // class cedar::aux::SetParameter
 
 #endif // CEDAR_AUX_SET_PARAMETER_H
 

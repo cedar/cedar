@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,36 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        IndexOutOfRangeException.h
+    File:        Element.h
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2010 03 08
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 11 17
 
-    Description: Header for the @em cedar::aux::exc::IndexOutOfRangeException class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_EXC_INDEX_OUT_OF_RANGE_EXCEPTION_H
-#define CEDAR_AUX_EXC_INDEX_OUT_OF_RANGE_EXCEPTION_H
+#ifndef CEDAR_PROC_ELEMENT_H
+#define CEDAR_PROC_ELEMENT_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/exceptions/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A null pointer exception.
+/*!@brief Base class for Elements in a processing architecture.
  *
- * Incidentally, this exception should be thrown when a null-pointer is accessed.
+ *        Each element is described by a name that uniquely identifies it within a processing module.
  */
-class cedar::aux::exc::IndexOutOfRangeException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::Element : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -62,13 +62,20 @@ class cedar::aux::exc::IndexOutOfRangeException : public cedar::aux::exc::Except
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  IndexOutOfRangeException(void);
+  Element();
+
+  //!@brief The destructor.
+  virtual ~Element();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief Set the name of this element.
+  void setName(const std::string& name);
+
+  //!@brief Get the name of this element.
+  const std::string& getName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -85,8 +92,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -95,14 +100,14 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  // none yet
+  //!@brief The name that uniquely identifies the element within its own module.
+  cedar::aux::StringParameterPtr _mName;
+
 private:
   // none yet
 
-}; // class cedar::aux::exc::IndexOutOfRangeException
+}; // class cedar::proc::Element
 
-#endif // CEDAR_AUX_EXC_INDEX_OUT_OF_RANGE_EXCEPTION_H
+#endif // CEDAR_PROC_ELEMENT_H
 

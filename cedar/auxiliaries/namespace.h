@@ -44,13 +44,10 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#include <sstream>
 #include <boost/smart_ptr.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <opencv2/opencv.hpp>
-#include <string>
-#include <sstream>
-#include <iostream>
+
 
 namespace cedar
 {
@@ -163,27 +160,9 @@ namespace cedar
     //!@brief a better name for boost's property tree
     typedef boost::property_tree::ptree ConfigurationNode;
 
-    /*!@brief Template method that converts simple data types to a string.
-     *
-     * @param value The data value that will be converted to a string.
-     */
-    template<typename T>
-    std::string toString(const T &value)
-    {
-      std::ostringstream streamOut;
-      streamOut << value;
-      return streamOut.str();
-    }
-
-    template <class T>
-    bool fromString(T& t, const std::string& s, std::ios_base& (*f)(std::ios_base&))
-    {
-      std::istringstream iss(s);
-      return !(iss >> f >> t).fail();
-    }
-
-    //!@brief class declaration of Data
+    //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(Data);
+    //!@endcond
 
     //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;
@@ -203,18 +182,24 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
+    CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateNameException);
+    CEDAR_DECLARE_AUX_CLASS(FailedAssertionException);
+    CEDAR_DECLARE_AUX_CLASS(IndexOutOfRangeException);
+    CEDAR_DECLARE_AUX_CLASS(InitializationException);
     CEDAR_DECLARE_AUX_CLASS(InvalidNameException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
+    CEDAR_DECLARE_AUX_CLASS(NullPointerException);
+    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
+    CEDAR_DECLARE_AUX_CLASS(RangeException);
+    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
-    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
-    CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(UnknownNameException);
-    CEDAR_DECLARE_AUX_CLASS(RangeException);
-    CEDAR_DECLARE_AUX_CLASS(NoDefaultException);
-    CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
+    CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
+    CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     //!@endcond
   }
 }

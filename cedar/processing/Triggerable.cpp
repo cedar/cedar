@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,21 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FailedAssertionException.cpp
+    File:        Triggerable.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 04
+    Date:        2011 11 16
 
-    Description: Implementation of the cedar::aux:FailedAssertionException
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
 // LOCAL INCLUDES
-#include "FailedAssertionException.h"
+#include "cedar/processing/Triggerable.h"
 
 // PROJECT INCLUDES
 
@@ -46,11 +45,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//! Constructor
-cedar::aux::exc::FailedAssertionException::FailedAssertionException()
+cedar::proc::Triggerable::~Triggerable()
 {
-  // Sets the type name.
-  this->mType = "FailedAssertionException";
+  // empty default implementation
 }
 
 //----------------------------------------------------------------------------------------------------------------------
