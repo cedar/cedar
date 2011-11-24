@@ -123,7 +123,7 @@ void cedar::proc::steps::Projection::reconfigure()
   // if the projection compresses ...
   if (mInputDimensionality > output_dimensionality)
   {
-    CEDAR_DEBUG_ASSERT(mInputDimensionality == _mDimensionMappings->getValue().size())
+    CEDAR_DEBUG_ASSERT(mInputDimensionality == _mDimensionMappings->getValue()->getNumberOfMappings())
 
     // ... compute which indices need to be compressed
     mIndicesToCompress.clear();
