@@ -167,6 +167,9 @@ public:
                 std::string& dataName
               );
 
+  //!@brief This function sets all data slot parents to the current step name.
+  void updateSlotParents();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

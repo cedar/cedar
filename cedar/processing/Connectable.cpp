@@ -662,6 +662,11 @@ void cedar::proc::Connectable::parseDataNameNoRole
 void cedar::proc::Connectable::setName(const std::string& name)
 {
   this->Element::setName(name);
+  this->updateSlotParents();
+}
+
+void cedar::proc::Connectable::updateSlotParents()
+{
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
        ++slot)

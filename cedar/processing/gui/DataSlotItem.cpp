@@ -159,10 +159,8 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
 void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
 {
   cedar::proc::gui::ConnectValidity validity = this->canConnectTo(pTarget);
-  std::cout << "connect" << std::endl;
   if (validity != cedar::proc::gui::CONNECT_NO)
   {
-    std::cout << "to" << std::endl;
     cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
     p_connection->setValidity(validity);
     this->scene()->addItem(p_connection);

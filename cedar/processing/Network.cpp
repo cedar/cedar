@@ -190,8 +190,6 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
   cedar::proc::Connectable::parseDataNameNoRole(target, target_name, target_slot);
   for (DataConnectionVector::iterator it = mDataConnections.begin(); it != mDataConnections.end(); ++it)
   {
-    std::cout << (*it)->getSource()->getParent() + std::string(".") + (*it)->getSource()->getName() << std::endl;
-    std::cout << (*it)->getTarget()->getParent() + std::string(".") + (*it)->getTarget()->getName() << std::endl;
     if ((*it)->equals(
                     this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
                     this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)

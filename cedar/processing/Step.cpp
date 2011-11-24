@@ -163,6 +163,8 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
  */
 void cedar::proc::Step::onNameChanged()
 {
+  // kind of a hack to ensure that all data slots have the right parent (done in set name)
+  this->updateSlotParents();
   if (this->mpRegisteredAt != NULL)
   {
     // update the name
