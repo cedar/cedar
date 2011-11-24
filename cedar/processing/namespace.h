@@ -91,7 +91,7 @@ namespace cedar
 
     template <class BaseClass, class FactoryType> class DeclarationBase;
     
-    template <class DerivedClass> class ElementDeclarationT;
+    template <class DerivedClass> class ElementDeclarationTemplate;
 
     template <class DerivedClass> class StepDeclarationT;
 

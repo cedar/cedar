@@ -67,6 +67,8 @@ int main()
   // the number of errors encountered in this test
   int errors = 0;
 
+  // Split test --------------------------------------------------------------------------------------------------------
+
   std::string to_split = "Split Test";
   log_file << "String to split: " << to_split << std::endl;
   std::vector<std::string> result;
@@ -126,6 +128,44 @@ int main()
       log_file << "Error: split returned the wring result." << std::endl;
       ++errors;
     }
+  }
+
+  // Replace test ------------------------------------------------------------------------------------------------------
+  std::string replace_test_1 = "This is a string.";
+  std::string replaced_test_1 = cedar::aux::replace(replace_test_1, "is a", "was a");
+  if (replaced_test_1 != "This was a string.")
+  {
+    log_file << "Error: replace did not correctly replace \"is a\" by \"was a\" in the string \""
+             << replace_test_1 << "\". It returned \"" << replaced_test_1 << "\""
+             << std::endl;
+    ++errors;
+  }
+
+  std::string replace_test_2 = "Repeat test Repeat test Repeat test";
+  std::string replaced_test_2 = cedar::aux::replace(replace_test_2, "Repeat test", ".");
+  if (replaced_test_2 != ". . .")
+  {
+    log_file << "Error: replace did not correctly replace \"Repeat test \" by \".\" in the string \""
+             << replace_test_2 << "\". It returned \"" << replaced_test_2 << "\""
+             << std::endl;
+    ++errors;
+  }
+
+  log_file << "Trying to replace an empty string." << std::endl;
+  cedar::aux::replace("", "", "");
+
+  log_file << "Trying to a replace something that isn't there." << std::endl;
+  std::string before = "This is a test that doesn't contain the needle.";
+  std::string after = cedar::aux::replace(before, "NOT PRESENT", "replacement");
+  if (before != after)
+  {
+    log_file << "Error: Doing nothing actually did something: \""
+             << before << "\" became \"" << after << "\"" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    log_file << "Doing nothing worked!" << std::endl;
   }
 
   return errors;
