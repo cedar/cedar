@@ -102,6 +102,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief returns the type / specific enum
   boost::shared_ptr<cedar::aux::EnumBase>& type()
   {
     return this->mType;
@@ -111,6 +112,7 @@ public:
   // private members
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief the type / specific enum
   boost::shared_ptr<cedar::aux::EnumBase> mType;
 }; // class cedar::aux::EnumType
 

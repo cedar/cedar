@@ -67,10 +67,11 @@ public:
   {
   }
 
+  //!@brief A variant of the standard constructor, adding a default value
   DirectoryParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::string& defaultValue)
   :
   cedar::aux::Parameter(pOwner, name, true),
-  mDefault(defaultValue.c_str())
+  mDefault(QString::fromStdString(defaultValue))
   {
   }
 
@@ -83,33 +84,39 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief reads a directory from a configuration node
   void setTo(const cedar::aux::ConfigurationNode& node)
   {
-    this->mValue.setPath(QString(node.get_value<std::string>().c_str()));
+    this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
+  //!@brief stores a directory as string in a configuration node
+  void putTo(cedar::aux::ConfigurationNode& root) const
   {
     root.put(this->getName(), this->mValue.absolutePath().toStdString());
   }
 
+  //!@brief sets a new directory from string
   void set(const std::string& value)
   {
-    this->mValue.setPath(QString(value.c_str()));
+    this->mValue.setPath(QString::fromStdString(value));
     emit valueChanged();
   }
 
+  //!@brief sets a new directory from QDir
   void set(const QDir& value)
   {
     this->mValue = value;
     emit valueChanged();
   }
 
+  //!@brief sets directory to default value
   void makeDefault()
   {
     this->set(this->mDefault);
   }
 
+  //!@brief get the directory
   const QDir& get() const
   {
     return this->mValue;
@@ -133,7 +140,9 @@ private:
 protected:
   // none yet
 private:
+  //!@brief a directory
   QDir mValue;
+  //!@brief a default directory
   QDir mDefault;
 
 }; // class cedar::aux::DirectoryParameter

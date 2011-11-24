@@ -22,51 +22,90 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BadConnectionException.h
+    File:        ExceptionBase.h
 
-    Maintainer:  Guido Knips
-    Email:       guido.knips@ini.rub.de
-    Date:        2010 12 08
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2010 01 20
 
-    Description: Header for the @em cedar::aux::exc::BadConnectionException class.
+    Description: Header for the @em cedar::aux::ExceptionBase class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
-#define CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
+
+#ifndef CEDAR_AUX_EXCEPTION_BASE_H
+#define CEDAR_AUX_EXCEPTION_BASE_H
 
 // LOCAL INCLUDES
-#include "ExceptionBase.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-//none yet
+#include <exception>
+#include <string>
 
 
-/*!@brief Exception thrown when a connection (i.e. a network connection) is too bad to continue*/
-class cedar::aux::exc::BadConnectionException : public cedar::aux::exc::ExceptionBase
+/*!@brief Abstract description of the class.
+ *
+ * More detailed description of the class.
+ */
+class cedar::aux::ExceptionBase : public std::exception
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+
+   /*!@def     CEDAR_THROW(Exception_type, message)
+   *
+   *  @brief   Throws an exception of the given \em type with the specified \em message.
+   *
+   *           This macro assigns the correct filename, line and message to a newly generated exception.
+   *           An example use would be:
+   *           CEDAR_THROW(cedar::aux::exc::NullPointerException, "A pointer was null.");
+   *
+   *  @remarks The type passed as \em Exception_type should inherit from \em cedar::aux::exc::ExceptionBase.
+   *           Do not line-break the following macro(s), or the __LINE__ specification will be wrong!
+   */
+  #define CEDAR_THROW(Exception_type, message) { Exception_type exception; exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  BadConnectionException(void);
+  ExceptionBase(void);
 
   /*!@brief The destructor.
    *
    * @remarks The destructor may not throw any exception.
    */
-  virtual ~BadConnectionException(void) throw ();
+  virtual ~ExceptionBase(void) throw ();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //none yet
+
+  //!@brief Compiles the exception info string.
+  virtual const std::string& exceptionInfo() const;
+
+  //!@brief Sets the message for the exception.
+  void setMessage(const std::string& message);
+
+  //!@brief Sets the name of the source file where the exception occurred.
+  void setFile(const std::string& fileName);
+
+  //!@brief Sets the line in the source file where the exception was thrown.
+  void setLine(int lineNumber);
+
+  /*!@brief   Prints the string returned by \em cedar::aux::exc::ExceptionBase::exceptionInfo()
+   *
+   * @remarks The information is printed to \em std::cerr.
+   */
+  void printInfo() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -78,7 +117,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief STL-required function returning the exception info.
+  const char* what(void) const throw();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -86,9 +126,20 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  //! The type-name of the exception.
+  std::string mType;
 private:
-  // none yet
+  //! The message
+  std::string mMessage;
+
+  //! Number of line in the source-file where the exception was thrown.
+  int mLineNumber;
+
+  //! Source-file that threw the exception.
+  std::string mFileName;
+
+  //! Helper for converting the exception info to a const char* string.
+  mutable std::string mExceptionInfo;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -100,6 +151,6 @@ protected:
 private:
   // none yet
 
-}; //class BadConnectionException
+}; // class cedar::aux::ExeptionBase
 
-#endif  //CEDAR_AUX_EXC_BAD_CONNECTION_EXCEPTION_H
+#endif // CEDAR_AUX_EXCEPTION_BASE_H

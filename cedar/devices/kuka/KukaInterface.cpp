@@ -42,7 +42,7 @@
 #include "KukaInterface.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/devices/robot/ReferenceGeometry.h"
 
 // SYSTEM INCLUDES

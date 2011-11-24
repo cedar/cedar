@@ -40,7 +40,7 @@
 
 // PROJECT INCLUDES
 
-#include <cedar/auxiliaries/exceptions/InitializationException.h>
+#include <cedar/auxiliaries/exceptions.h>
 
 // SYSTEM INCLUDES
 
@@ -81,7 +81,7 @@ ForwardInverseWidget::ForwardInverseWidget(const std::vector<KinematicChainPtr> 
     if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
     {
       cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
-      CEDAR_THROW(cedar::aux::exc::InitializationException, "Kinematic chains do not have the same number of joints!");
+      CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
     }
   }
 

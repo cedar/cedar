@@ -39,7 +39,7 @@
 #include "cedar/processing/exceptions.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <climits>

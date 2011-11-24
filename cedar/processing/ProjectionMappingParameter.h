@@ -41,6 +41,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -118,7 +119,7 @@ public:
     }
   }
 
-  void putTo(cedar::aux::ConfigurationNode& root)
+  void putTo(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode map_node;
     for

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,36 +22,32 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        InitializationException.h
+    File:        Triggerable.h
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
-    Date:        2011 01 24
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 11 16
 
-    Description: Header for the @em cedar::aux::exc::InitializationException class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_EXC_INITIALIZATION_EXCEPTION_H
-#define CEDAR_AUX_EXC_INITIALIZATION_EXCEPTION_H
+#ifndef CEDAR_PROC_TRIGGERABLE_H
+#define CEDAR_PROC_TRIGGERABLE_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/exceptions/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/processing/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Exception for initialization errors.
- *
- * This exception should be thrown when an error occurs during initialization.
-  */
-class cedar::aux::exc::InitializationException : public cedar::aux::exc::ExceptionBase
+/*!@brief Interface for all classes that can be triggered.
+ */
+class cedar::proc::Triggerable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -61,14 +57,18 @@ class cedar::aux::exc::InitializationException : public cedar::aux::exc::Excepti
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  InitializationException(void);
+  //!@brief The destructor.
+  virtual ~Triggerable();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  /*!@brief    Handles an external trigger signal.
+   *
+   * @param    pSender The trigger that sent the trigger signal.
+   */
+  virtual void onTrigger(cedar::proc::TriggerPtr pSender = cedar::proc::TriggerPtr()) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,9 +99,11 @@ public:
   // none yet (hopefully never!)
 protected:
   // none yet
+
 private:
   // none yet
 
-}; // class cedar::aux::exc::InitializationException
+}; // class cedar::proc::Triggerable
 
-#endif // CEDAR_AUX_EXC_INITIALIZATION_EXCEPTION_H
+#endif // CEDAR_PROC_TRIGGERABLE_H
+

@@ -52,9 +52,10 @@
 #include <vector>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A parameter class for vectors of type T.
  *
- * More detailed description of the class.
+ * Most of the vector access functions are mirrored by this class. This ensures that a change signal is emitted every
+ * time the content of the represented vector changes.
  */
 template <typename T>
 class cedar::aux::VectorParameter : public cedar::aux::Parameter
@@ -63,7 +64,9 @@ class cedar::aux::VectorParameter : public cedar::aux::Parameter
   // typedef
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief iterator for internal container type
   typedef typename std::vector<T>::iterator iterator;
+  //!@brief const iterator for internal container type
   typedef typename std::vector<T>::const_iterator const_iterator;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -76,7 +79,7 @@ public:
   cedar::aux::Parameter(pOwner, name, false)
   {
   }
-
+  //!@brief Constructor with default container.
   VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, const std::vector<T>& defaults)
   :
   cedar::aux::Parameter(pOwner, name, true),
@@ -85,7 +88,7 @@ public:
   {
     this->makeDefault();
   }
-
+  //!@brief Constructor with default size and value.
   VectorParameter(cedar::aux::Configurable *pOwner, const std::string& name, size_t size, T defaultValue)
   :
   cedar::aux::Parameter(pOwner, name, true),
@@ -104,6 +107,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief set the vector to values gathered from a configuration tree
   void setTo(const cedar::aux::ConfigurationNode& root)
   {
     this->mValues.clear();
@@ -112,13 +116,13 @@ public:
       this->mValues.push_back(iter->second.get_value<T>());
     }
   }
-
-  void putTo(cedar::aux::ConfigurationNode& root)
+  //!@brief store the vector values in a configuration tree
+  void putTo(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode vector_node;
-    for (typename std::vector<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    for (typename std::vector<T>::const_iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
     {
-      T& value = *iter;
+      T value = *iter;
       cedar::aux::ConfigurationNode value_node;
       value_node.put_value(value);
       vector_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
@@ -126,31 +130,31 @@ public:
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), vector_node));
   }
 
+  //!@brief get the current vector (const)
   const std::vector<T>& getValue() const
   {
     return this->mValues;
   }
 
+  //!@brief get the last element of the vector
   const T& back() const
   {
     return this->mValues.back();
   }
 
-  T& back()
-  {
-    return this->mValues.back();
-  }
-
-  iterator begin()
+  //!@brief get the first element of the vector
+  const_iterator begin() const
   {
     return this->mValues.begin();
   }
 
-  iterator end()
+  //!@brief get the sentinel of the vector
+  const_iterator end() const
   {
     return this->mValues.end();
   }
 
+  //!@brief erase an entry of this vector
   iterator erase(iterator iter)
   {
     iterator ret = this->mValues.erase(iter);
@@ -158,12 +162,8 @@ public:
     return ret;
   }
 
-  /*std::vector<T>& get()
-  {
-    return this->mValues;
-  }*/
-
-  T getDefaultValue()
+  //!@brief get the default value - throws an exception if no default value is present
+  T getDefaultValue() const
   {
     if (this->mSize == 0) // there is only a default vector, see if it is of size > 0
     {
@@ -182,9 +182,10 @@ public:
     }
   }
 
-  bool contains(const T& value)
+  //!@brief checks if a value is already contained in this vector
+  bool contains(const T& value) const
   {
-    for (iterator iter = this->begin(); iter != this->end(); ++iter)
+    for (const_iterator iter = this->begin(); iter != this->end(); ++iter)
     {
       if ((*iter) == value)
       {
@@ -195,17 +196,20 @@ public:
     return false;
   }
 
+  //!@brief add an element to the back of the vector
   void pushBack(const T& value)
   {
     this->mValues.push_back(value);
     this->emitChangedSignal();
   }
 
+  //!@brief return the size of the vector
   size_t size() const
   {
     return this->mValues.size();
   }
 
+  //!@brief resize the vector to a new size and initialize new entries to the given value
   void resize(size_t size, const T& value = T())
   {
     if (size == this->size())
@@ -216,16 +220,20 @@ public:
     this->emitPropertyChangedSignal();
   }
 
+  //!@brief get an item of this vector specified by an index
   const T& at(size_t index) const
   {
     return this->mValues.at(index);
   }
 
+  //!@brief set one entry of the vector to a new value
   void set(size_t index, const T& value)
   {
     this->mValues.at(index) = value;
+    emit valueChanged();
   }
 
+  //!@brief get the default vector
   const std::vector<T>& getDefaultValues() const
   {
     if (this->mSize != 0) // there is only a default dimensionality and one value, construct vector
@@ -239,12 +247,15 @@ public:
     return this->mDefaults;
   }
 
+  //!@brief set the internal vector to a given vector
   void set(const std::vector<T>& values)
   {
     this->mValues = values;
     emit valueChanged();
+    //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
   }
 
+  //!@brief set vector to default
   void makeDefault()
   {
     if (mSize == 0)
@@ -283,9 +294,13 @@ public:
 protected:
   // none yet
 private:
+  //!@brief internal storage container of vector
   std::vector<T> mValues;
+  //!@brief a default vector
   std::vector<T> mDefaults;
+  //!@brief a default size
   size_t mSize;
+  //!@brief a default value, which is used together with size to create a default vector, or used for new entries
   T mDefaultValue;
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -48,10 +48,8 @@
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/UserData.h"
 
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
-#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
-#include "cedar/auxiliaries/exceptions/namespace.h"
-#include "cedar/auxiliaries/exceptions/NullPointerException.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 #include "cedar/auxiliaries/math/algebraTools.h"
 #include "cedar/auxiliaries/math/coordinateTransformations.h"

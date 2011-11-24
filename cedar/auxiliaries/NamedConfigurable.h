@@ -67,7 +67,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief set the name of this NamedConfigurable
   void setName(const std::string& name);
+  //!@brief get the name of this NamedConfigurable
   const std::string& getName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,6 +96,7 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
+  //!@brief the name of this parameter
   StringParameterPtr _mName;
 
 private:

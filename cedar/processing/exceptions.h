@@ -42,12 +42,12 @@
 #define CEDAR_PROC_EXCEPTIONS_H
 
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 /*!@brief An exception that occurs when a name is used as an index that is not known.
  * @todo  There is already an InvalidNameException in aux, so remove this one.
  */
-class cedar::proc::InvalidNameException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::InvalidNameException : public cedar::aux::ExceptionBase
 {
   public:
     InvalidNameException();
@@ -55,7 +55,7 @@ class cedar::proc::InvalidNameException : public cedar::aux::exc::ExceptionBase
 
 /*!@brief An exception that occurs when an object is not found in a Registry.
  */
-class cedar::proc::InvalidObjectException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::InvalidObjectException : public cedar::aux::ExceptionBase
 {
   public:
     InvalidObjectException();
@@ -63,7 +63,7 @@ class cedar::proc::InvalidObjectException : public cedar::aux::exc::ExceptionBas
 
 /*!@brief An exception that occurs when a role is used as an index that is not known.
  */
-class cedar::proc::InvalidRoleException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::InvalidRoleException : public cedar::aux::ExceptionBase
 {
   public:
     InvalidRoleException();
@@ -71,7 +71,7 @@ class cedar::proc::InvalidRoleException : public cedar::aux::exc::ExceptionBase
 
 /*!@brief An exception that occurs when a category is used as an index that is not known.
  */
-class cedar::proc::InvalidCategoryException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::InvalidCategoryException : public cedar::aux::ExceptionBase
 {
   public:
     InvalidCategoryException();
@@ -80,7 +80,7 @@ class cedar::proc::InvalidCategoryException : public cedar::aux::exc::ExceptionB
 
 /*!@brief An exception that occurs when a name is used as an index that is not known.
  */
-class cedar::proc::InvalidArgumentsException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::InvalidArgumentsException : public cedar::aux::ExceptionBase
 {
   public:
     InvalidArgumentsException();
@@ -89,7 +89,7 @@ class cedar::proc::InvalidArgumentsException : public cedar::aux::exc::Exception
 
 /*!@brief An exception that occurs when a name is used as an index that is not known.
  */
-class cedar::proc::DuplicateNameException: public cedar::aux::exc::ExceptionBase
+class cedar::proc::DuplicateNameException: public cedar::aux::ExceptionBase
 {
   public:
     DuplicateNameException();
@@ -99,7 +99,7 @@ class cedar::proc::DuplicateNameException: public cedar::aux::exc::ExceptionBase
 /*!@brief An exception that is thrown, when a processing step would be executed while some mandatory connections are
  *        still missing.
  */
-class cedar::proc::MissingConnectionException: public cedar::aux::exc::ExceptionBase
+class cedar::proc::MissingConnectionException: public cedar::aux::ExceptionBase
 {
   public:
     MissingConnectionException();
@@ -107,7 +107,7 @@ class cedar::proc::MissingConnectionException: public cedar::aux::exc::Exception
 
 /*!@brief An exception that is thrown, when a registry cannot find the declaration to which an object belongs
  */
-class cedar::proc::MissingDeclarationException: public cedar::aux::exc::ExceptionBase
+class cedar::proc::MissingDeclarationException: public cedar::aux::ExceptionBase
 {
   public:
   MissingDeclarationException();
@@ -115,7 +115,7 @@ class cedar::proc::MissingDeclarationException: public cedar::aux::exc::Exceptio
 
 /*!@brief An exception that is thrown, when a plugin file cannot be found.
  */
-class cedar::proc::PluginException: public cedar::aux::exc::ExceptionBase
+class cedar::proc::PluginException: public cedar::aux::ExceptionBase
 {
 public:
   PluginException();
@@ -124,7 +124,7 @@ public:
 /*!@brief An exception that is thrown, when FrameworkSettings encounters a parsing error during loading or saving
  * of settings.
  */
-class cedar::proc::ParseException: public cedar::aux::exc::ExceptionBase
+class cedar::proc::ParseException: public cedar::aux::ExceptionBase
 {
 public:
   ParseException();
@@ -133,7 +133,7 @@ public:
 /*!@brief An exception that is thrown by the Manager, if a connection that is marked for deletion, cannot be found in
  * the list of connections.
  */
-class cedar::proc::ConnectionNotFoundException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::ConnectionNotFoundException : public cedar::aux::ExceptionBase
 {
 public:
   ConnectionNotFoundException()
@@ -145,7 +145,7 @@ public:
 /*!@brief An exception that is thrown by Connection, if a weak-pointer check fails. This means the connected item does
  * not longer exist.
  */
-class cedar::proc::ConnectionMemberDeletedException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::ConnectionMemberDeletedException : public cedar::aux::ExceptionBase
 {
 public:
   ConnectionMemberDeletedException()
@@ -157,7 +157,7 @@ public:
 /*!@brief An exception that is thrown by ProjectionMapping when the user wants to add a new mapping, which would destroy
  * the bijective property of the overall mapping.
  */
-class cedar::proc::ProjectionMappingNotBijectiveException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::ProjectionMappingNotBijectiveException : public cedar::aux::ExceptionBase
 {
 public:
   ProjectionMappingNotBijectiveException()
@@ -168,7 +168,7 @@ public:
 
 /*!@brief An exception that is thrown by ProjectionMapping when a user wants to look up a mapping that does not exist.
  */
-class cedar::proc::NoMappingException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
 {
 public:
   NoMappingException()

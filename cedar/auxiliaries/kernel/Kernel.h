@@ -79,6 +79,10 @@ class cedar::aux::kernel::Kernel : public QObject, public cedar::aux::Configurab
 public:
   //!@brief The standard constructor.
   Kernel();
+  /*!@brief Constructor with some parameters.
+   * @param dimensionality the dimensionality of a kernel
+   * @param kernelFile a file from which to load and to which to store the kernel matrix
+   */
   Kernel(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
   //!@brief Destructor
   virtual ~Kernel();
@@ -92,52 +96,54 @@ public:
   //!@todo deal with boost PropertyTree here
   virtual void onInit(){};
 
-  /*!\brief load a kernel matrix from file determined by _mKernelMatrixFile*/
+  /*!@brief load a kernel matrix from file determined by _mKernelMatrixFile*/
   virtual void loadKernelFromFile();
-  /*!\brief save a kernel matrix to a file determined by _mKernelMatrixFile*/
+  /*!@brief save a kernel matrix to a file determined by _mKernelMatrixFile*/
   virtual void saveKernelToFile() const;
 
   /*! virtual function for accessing the kernel matrix, in the 1d case this is the default
    * function to use, in the 2d case this function should return the combined 2d kernel
-   *\return the kernel matrix
+   * @return the kernel matrix
    */
   virtual const cv::Mat& getKernel() const;
+  //!@brief get the internal DataPtr
   const cedar::aux::DataPtr getKernelRaw() const;
 
   //!@brief Calculates the convolution of the kernel and the matrix.
   virtual cv::Mat convolveWith(const cv::Mat& mat) const;
 
-  /*!\brief get access to the write lock when in an asynchronous mode
-   * \return pointer to the QReadWriteLock
+  /*!@brief get access to the write lock when in an asynchronous mode
+   * @return pointer to the QReadWriteLock
    */
   QReadWriteLock* getReadWriteLock();
 
-  /*!\brief get the dimensionality of the kernel matrix
-   * \return dimensionality
+  /*!@brief get the dimensionality of the kernel matrix
+   * @return dimensionality
    */
   unsigned int getDimensionality() const;
 
-  /*!\brief sets the dimensionality of the kernel matrix
-   * \param dimensionality the new desired dimensionality
+  /*!@brief sets the dimensionality of the kernel matrix
+   * @param dimensionality the new desired dimensionality
    */
   void setDimensionality(unsigned int dimensionality);
 
-  /*!\brief Hides the dimensionality parameter.
+  /*!@brief Hides the dimensionality parameter.
    */
   void hideDimensionality(bool hide);
 
 public slots:
-  //!\todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
+  //!@todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
   void updateKernel();
 
 signals:
+  //!@brief signal that is emitted once the internal matrices have been updated (e.g. for plotting widgets)
   void kernelUpdated();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!\brief virtual function to calculate the kernel matrix
+  /*!@brief virtual function to calculate the kernel matrix
    */
   virtual void calculate() = 0;
 
@@ -151,8 +157,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cedar::aux::MatDataPtr mKernel; //!< matrix containing the kernel
-  QReadWriteLock *mpReadWriteLockOutput;//!< read and write lock to protect the kernel when calculating its values
+  //!@brief matrix containing the kernel
+  cedar::aux::MatDataPtr mKernel;
+  //!@brief read and write lock to protect the kernel when calculating its values
+  QReadWriteLock *mpReadWriteLockOutput;
 private:
   // none yet
 
@@ -160,7 +168,9 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief dimensionality of this kernel
   cedar::aux::UIntParameterPtr _mDimensionality;
+  //!@brief a file from which the kernel matrix can be loaded
   cedar::aux::StringParameterPtr _mKernelMatrixFile;
 
 private:

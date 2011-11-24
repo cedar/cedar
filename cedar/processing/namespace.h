@@ -43,7 +43,6 @@
 #include "cedar/auxiliaries/AbstractFactory.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -59,8 +58,11 @@ namespace cedar
   {
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_PROC_CLASS(Arguments);
+    CEDAR_DECLARE_PROC_CLASS(Connectable);
     CEDAR_DECLARE_PROC_CLASS(DataRole);
     CEDAR_DECLARE_PROC_CLASS(DataSlot);
+    CEDAR_DECLARE_PROC_CLASS(Element);
+    CEDAR_DECLARE_PROC_CLASS(ExternalData);
     CEDAR_DECLARE_PROC_CLASS(LoopArguments);
     CEDAR_DECLARE_PROC_CLASS(LoopMode);
     CEDAR_DECLARE_PROC_CLASS(FrameworkSettings);
@@ -72,9 +74,11 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Group);
     CEDAR_DECLARE_PROC_CLASS(Manager);
     CEDAR_DECLARE_PROC_CLASS(Network);
+    CEDAR_DECLARE_PROC_CLASS(OwnedData);
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
+    CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     CEDAR_DECLARE_PROC_CLASS(Connection);
     CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
@@ -100,7 +104,6 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES(TriggerRegistry);
     //!@endcond
-
 
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION

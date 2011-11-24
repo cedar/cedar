@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,53 +22,59 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FailedAssertionException.h
+    File:        OwnedData.h
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.rub.de
-    Date:        2011 10 04
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 11 17
 
-    Description: Header for the @em cedar::aux::exc::FailedAssertionException class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-#ifndef CEDAR_AUX_EXC_FAILED_ASSERTION_EXCEPTION_H
-#define CEDAR_AUX_EXC_FAILED_ASSERTION_EXCEPTION_H
+#ifndef CEDAR_PROC_OWNED_DATA_H
+#define CEDAR_PROC_OWNED_DATA_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/exceptions/namespace.h"
-#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/processing/DataSlot.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A null pointer exception.
- *
- * Incidentally, this exception should be thrown when a null-pointer is accessed.
+/*!@brief A slot for data that is owned by a Connectable.
  */
-class cedar::aux::exc::FailedAssertionException : public cedar::aux::exc::ExceptionBase
+class cedar::proc::OwnedData : public cedar::proc::DataSlot
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FailedAssertionException(void);
+  OwnedData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+
+  //!@brief Destructor
+  ~OwnedData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  cedar::aux::DataPtr getData();
+
+  cedar::aux::ConstDataPtr getData() const;
+
+  void setData(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -85,23 +91,21 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  cedar::aux::DataPtr mData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
+
 private:
   // none yet
 
-}; // class cedar::aux::exc::FailedAssertionException
+}; // class cedar::proc::OwnedData
 
-#endif // CEDAR_AUX_EXC_FAILED_ASSERTION_EXCEPTION_H
+#endif // CEDAR_PROC_OWNED_DATA_H
+

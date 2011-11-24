@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        BadConnectionException.cpp
+    File:        ExceptionBase.cpp
 
-    Maintainer:  Guido Knips
-    Email:       guido.knips@ini.rub.de
-    Date:        2010 12 08
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2010 01 20
 
-    Description: Implementation of the @em cedar::aux:BadConnectionException
+    Description: Implementation of the @em cedar::aux::ExceptionBase class.
 
     Credits:
 
@@ -36,28 +36,81 @@
 
 
 // LOCAL INCLUDES
-#include "BadConnectionException.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! Constructor
-cedar::aux::exc::BadConnectionException::BadConnectionException()
+cedar::aux::ExceptionBase::ExceptionBase(void)
+:
+mType("ExceptionBase")
 {
-  // Sets the type name.
-  this->mType = "BadConnectionException";
 }
 
-//! Deconstructor
-cedar::aux::exc::BadConnectionException::~BadConnectionException(void) throw()
+//! Destructor
+cedar::aux::ExceptionBase::~ExceptionBase(void) throw ()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+const std::string& cedar::aux::ExceptionBase::exceptionInfo(void) const
+{
+  std::string info = "";
+
+  // If a message is present, append it to the info string.
+  if ( ! this->mMessage.empty() )
+  {
+    info += "Exception: " + this->mMessage;
+    info += "\n";
+  }
+
+  // Add the typename, file and line information
+  info += "Type: " + this->mType;
+  info += "\nFile: " + this->mFileName;
+  info += "\nLine: ";
+  std::stringstream input_stream;
+  input_stream << this->mLineNumber;
+  info += input_stream.str();
+
+  this->mExceptionInfo = info;
+  // return the compiled string.
+  return this->mExceptionInfo;
+}
+
+void cedar::aux::ExceptionBase::printInfo(void) const
+{
+  // Output the exception to std::cerr
+  std::cerr << this->exceptionInfo() << "\n";
+}
+
+void cedar::aux::ExceptionBase::setMessage(const std::string& message)
+{
+  this->mMessage = message;
+}
+
+void cedar::aux::ExceptionBase::setFile(const std::string& fileName)
+{
+  this->mFileName = fileName;
+}
+
+void cedar::aux::ExceptionBase::setLine(int lineNumber)
+{
+  this->mLineNumber = lineNumber;
+}
+
+const char* cedar::aux::ExceptionBase::what(void) const throw()
+{
+  // Just use the exception info here.
+  return this->exceptionInfo().c_str();
+}

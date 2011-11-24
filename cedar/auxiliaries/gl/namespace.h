@@ -55,6 +55,7 @@ namespace cedar
     /*!@brief Namespace for all gl classes. */
     namespace gl
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Scene);
       CEDAR_DECLARE_AUX_CLASS(Object);
       CEDAR_DECLARE_AUX_CLASS(Block);
@@ -66,6 +67,7 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(Torus);
       CEDAR_DECLARE_AUX_CLASS(Ellipse);
       CEDAR_DECLARE_AUX_CLASS(Chessboard);
+      //!@endcond
     }
   }
 }

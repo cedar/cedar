@@ -78,11 +78,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void onTrigger(Trigger* sender);
+  void onTrigger(cedar::proc::TriggerPtr pSender);
 
-  void notifyConnected(cedar::proc::Trigger* trigger);
+  void notifyConnected(cedar::proc::TriggerPtr trigger);
 
-  void notifyDisconnected(cedar::proc::Trigger* trigger);
+  void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -104,7 +104,7 @@ public:
 protected:
 
 private:
-  std::map<Trigger*, bool> mIncoming;
+  std::map<cedar::proc::TriggerPtr, bool> mIncoming;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

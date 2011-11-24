@@ -65,6 +65,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief allocates an object of a derived type and returns a pointer to the base type - this function must be
+   * implemented by AbstractFactoryDerived
+   */
   virtual boost::shared_ptr<BaseType> allocate() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------

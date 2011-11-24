@@ -84,41 +84,36 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  inline unsigned int getDataCount() const
-  {
-    return this->mData.size();
-  }
 
-  cedar::aux::DataPtr getData(unsigned int index = 0);
-  cedar::aux::ConstDataPtr getData(unsigned int index = 0) const;
+  //!@brief get the encapsulated DataPtr managed by this slot
+  virtual cedar::aux::DataPtr getData() = 0;
 
-  bool hasData(cedar::aux::ConstDataPtr data) const;
+  //!@brief get the encapsulated DataPtr managed by this slot as const
+  virtual cedar::aux::ConstDataPtr getData() const = 0;
 
-  void removeData(cedar::aux::ConstDataPtr data);
+  //!@brief set the internal DataPtr managed by this slot
+  virtual void setData(cedar::aux::DataPtr data) = 0;
 
+  //!@brief get the role (input, output...) of this slot
   cedar::proc::DataRole::Id getRole() const;
 
-  void setData(cedar::aux::DataPtr data, unsigned int index = 0);
-
-  void addData(cedar::aux::DataPtr data);
-
+  //!@brief get the name of this slot
   const std::string& getName() const;
 
+  //!@brief set some explanatory text for this slot
   void setText(const std::string& text);
 
   //!@brief Returns the text to display to the user.
   const std::string& getText() const;
 
+  //!@brief is this a mandatory connection? i.e. there must be at least one connection using this slot
   bool isMandatory() const;
 
+  //!@brief get the current validity of this slot
   VALIDITY getValidlity() const;
-  void setValidity(VALIDITY validity);
 
-  /*!
-   * @remarks This function throws unless the role of this slot is input.
-   */
-  void setCollection(bool isCollection);
-  bool isCollection() const;
+  //!@brief set the current validity of this slot
+  void setValidity(VALIDITY validity);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -138,12 +133,10 @@ private:
 protected:
   // none yet
 private:
-  std::vector<cedar::aux::DataPtr> mData;
+  //!@brief flag if this slot must be connected
   bool mMandatory;
 
-  //!@brief Whether this slot can have multiple data items.
-  bool mIsCollection;
-
+  //!@brief the validity of this slot
   VALIDITY mValidity;
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
