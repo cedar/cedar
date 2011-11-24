@@ -1,0 +1,236 @@
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+ 
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        PropertyPane.cpp
+
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2011 03 09
+
+    Description:
+
+    Credits:
+
+======================================================================================================================*/
+
+// LOCAL INCLUDES
+#include "cedar/processing/gui/PropertyPane.h"
+#include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/gui/BoolParameter.h"
+#include "cedar/processing/gui/DoubleParameter.h"
+#include "cedar/processing/gui/DoubleVectorParameter.h"
+#include "cedar/processing/gui/UIntParameter.h"
+#include "cedar/processing/gui/UIntVectorParameter.h"
+#include "cedar/processing/gui/StringParameter.h"
+#include "cedar/processing/gui/EnumParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/processing/gui/DirectoryParameter.h"
+#include "cedar/processing/Manager.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
+
+// PROJECT INCLUDES
+
+// SYSTEM INCLUDES
+#include <QLabel>
+#include <QLineEdit>
+#include <QDoubleSpinBox>
+#include <QApplication>
+#include <boost/bind.hpp>
+
+
+cedar::proc::gui::PropertyPane::DataWidgetTypes cedar::proc::gui::PropertyPane::mDataWidgetTypes;
+
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::proc::gui::PropertyPane::PropertyPane(QWidget *pParent)
+:
+QTableWidget(pParent)
+{
+}
+
+cedar::proc::gui::PropertyPane::~PropertyPane()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::PropertyPane::resetContents()
+{
+  this->clearContents();
+  this->setRowCount(0);
+  this->mParameterRowIndex.clear();
+}
+
+void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
+{
+  this->resetContents();
+
+  std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pStep)->getClassId();
+  this->addLabelRow(label);
+  this->mDisplayedConfigurable = pStep;
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
+}
+
+void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
+{
+  this->resetContents();
+
+  std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pTrigger)->getClassId();
+  this->addLabelRow(label);
+  this->mDisplayedConfigurable = pTrigger;
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable)); // boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));
+}
+
+void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
+{
+  if (mSlotConnection.connected())
+  {
+    mSlotConnection.disconnect();
+  }
+  this->append(pConfigurable->getParameters());
+  mSlotConnection = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::proc::gui::PropertyPane::redraw, this));
+  for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
+       iter != pConfigurable->configurableChildren().end();
+       ++iter)
+  {
+    this->addHeadingRow(iter->first);
+    this->append(iter->second->getParameters());
+  }
+}
+
+void cedar::proc::gui::PropertyPane::addHeadingRow(const std::string& label)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  QLabel *p_label = new QLabel();
+
+  QFont font = p_label->font();
+  font.setBold(true);
+  font.setPointSize(font.pointSize() + 1);
+  p_label->setFont(font);
+
+  p_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+  p_label->setText(label.c_str());
+  p_label->setAutoFillBackground(true);
+  p_label->setBackgroundRole(QPalette::Dark);
+  p_label->setForegroundRole(QPalette::Light);
+  this->setCellWidget(row, 0, p_label);
+  this->setSpan(row, 0, 1, 2);
+}
+
+void cedar::proc::gui::PropertyPane::addLabelRow(const std::string& label)
+{
+  int row = this->rowCount();
+  this->insertRow(row);
+  QLabel *p_label = new QLabel();
+  p_label->setText(label.c_str());
+  this->setCellWidget(row, 0, p_label);
+  this->setSpan(row, 0, 1, 2);
+}
+
+void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterList& parameters)
+{
+  for (cedar::aux::Configurable::ParameterList::iterator iter = parameters.begin(); iter != parameters.end(); ++iter)
+  {
+    this->addPropertyRow(*iter);
+  }
+}
+
+void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr parameter)
+{
+  if (!parameter->isHidden())
+  {
+    int row = this->rowCount();
+    this->insertRow(row);
+    QLabel *p_label = new QLabel();
+    p_label->setText(parameter->getName().c_str());
+    this->setCellWidget(row, 0, p_label);
+
+    cedar::proc::gui::Parameter *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    p_widget->setParent(this);
+    p_widget->setParameter(parameter);
+    p_widget->setEnabled(!parameter->isConstant());
+    this->setCellWidget(row, 1, p_widget);
+    this->resizeRowToContents(row);
+
+    this->mParameterRowIndex[p_widget] = row;
+    QObject::connect(p_widget, SIGNAL(heightChanged()), this, SLOT(rowSizeChanged()));
+  }
+}
+
+cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane::dataWidgetTypes()
+{
+  if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
+  {
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::proc::gui::UIntParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleVectorParameter, cedar::proc::gui::DoubleVectorParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DirectoryParameter, cedar::proc::gui::DirectoryParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::proc::gui::EnumParameter>();
+  }
+  return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
+}
+
+void cedar::proc::gui::PropertyPane::rowSizeChanged()
+{
+  cedar::proc::gui::Parameter *p_parameter = dynamic_cast<cedar::proc::gui::Parameter*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_parameter != NULL);
+
+  CEDAR_DEBUG_ASSERT(this->mParameterRowIndex.find(p_parameter) != this->mParameterRowIndex.end());
+  int row = this->mParameterRowIndex.find(p_parameter)->second;
+
+  // the process-events call is only necessary because qt does otherwise not detect the new size properly.
+  // should this bug ever be fixed, this can be removed.
+  QApplication::processEvents();
+
+  this->resizeRowToContents(row);
+}
+
+void cedar::proc::gui::PropertyPane::resetPointer()
+{
+  this->mDisplayedConfigurable.reset();
+  this->clearContents();
+  this->setRowCount(0);
+}
+
+void cedar::proc::gui::PropertyPane::redraw()
+{
+  this->resetContents();
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
+}

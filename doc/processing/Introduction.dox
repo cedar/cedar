@@ -1,0 +1,176 @@
+/*!
+
+@page ProcessingIntroduction An Introduction to cedar's Processing Framework
+
+@todo Mention where the UI executable can be found
+@todo Enrich this page with some screenshots to visualize concepts.
+
+This page gives an overview of the functionalities of the processing framework contained in cedar. Documentation of the
+relevant classes can be found in the namespace cedar::proc.
+
+
+@section ProcessingGeneralDescription The Processing Framework
+
+The processing framework is a library that can be used for dynamically creating architectures of classes that perform
+some sort of processing. One of the basic assumptions of the framework is that at least parts of the processing taking
+place are executed in a continuous loop.
+
+There are three modes of setting up a processing architecture in this framework. One is simply via code, by calling the
+various functions offered in the cedar::proc namespace. The second method is to use configuration a file to load an
+architecture from a file. The third option is to use a graphical user interface provided with the framework. This
+interface constructs the aforementioned configuration files.
+
+
+@section concepts Concepts
+
+@subsection ProcessingIntroduction_TriggersAndSteps Steps and Triggers
+
+Any architecture in the processing framework consists of so-called processing steps. These steps perform some kind of
+computation, e.g., the iteration of a dynamical system, or a filtering operation on an image.
+
+These examples already demonstrate two fundamentally different steps: iterating a dynamical system is a process that
+must be called as often as possible, while the filtering of an image only needs to be executed when the image changes.
+In order to cope with these differences, the processing framework uses the concept of triggers. A Trigger is an entity
+that triggers a process at some connected entity. This can be a step, in which case the computation is triggered, or it
+can be another trigger which then can be connected to entities in the same way. In terms of the example, this translates
+into two different kinds of triggers: the looped trigger (cedar::proc::LoopedTrigger) which sends out trigger signals as
+often as possible, and plain triggers (cedar::proc::Trigger) which doesn't send any trigger signals on it's own.
+
+One trigger of the latter kind is contained in each processing step: the "done" trigger. It is triggered everytime the
+step successfully completes its computation. This allows the realization of the image processing example: when a step
+providing an input image is done loading it, it triggers "done". If the filter operation is connected to the
+"done"-trigger, it will subsequently be computed as well.
+
+Looped triggers on the other hand can be started and stopped, thus causing actual computations to take place repeatedly.
+
+
+@subsection ProcessingIntroduction_DataAndConnections Data and Connections
+
+The second important concept of the framework is Data. Each step can declare a set of inputs, outputs and buffers
+(buffers represent internal, temporary data that you might be interested in inspecting, e.g., by plotting it). 
+
+
+@section ProcessingTutorialFirstStep Beginner's Tutorial: One Small Step
+
+In this section, we will give a brief introduction on how to create a new processing step that adheres to the principles
+of the processing framework.
+
+@subsection ProcessingTutorialFirstStep_Planning Planning
+
+The first thing to do when developing a new processing step (cedar::proc::Step) is to think about what the new step is
+supposed to do. For now, we pick a fairly simple example: we will create a processing step that receives two matrices
+and adds them together.
+
+@subsection ProcessingTutorialFirstStep_NewClass A New Class
+
+First, let's decide to call our class SimpleSumation. In order for it to work within the framework, it has to inherit
+cedar::proc::Step, so the class header looks something like this
+
+@code
+// ...
+class SimpleSummation : public cedar::proc::Step
+{
+  // we assume that you declare all members and functions used throughout the tutorial here
+};
+// ...
+@endcode
+
+Let's begin by implementing the constructor. From our planning stage, we already know what the inputs and outputs of the
+step are going to be: we need two inputs (the matrices we plan to add up) and one output (the sum). In terms of the
+processing framework, this is expressed in the constructor:
+
+@code
+SimpleSummation::SimpleSummation()
+:
+// mOutput is a member, its type is cedar::aux::MatDataPtr 
+mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
+{
+  /* Declare both inputs; the "false" means that the inputs are not mandatory, i.e.,
+   * the step will be able to run even if one or more of the inputs are not connected
+   * to any data. 
+   */
+  this->declareInput("operand1", false);
+  this->declareInput("operand2", false);
+  
+  // Declare the output
+  this->declareOutput("sum");
+  // Also, set the output to the output matrix defined above.
+  this->setOutput("sum", mOutput);
+}
+@endcode
+
+That's all we need to do in the constructor for now. In order to be able to use the step, we also have to tell it what
+to compute; for this, we implement the compute function:
+
+@code
+// The arguments are unused here
+void SimpleSummation::compute(const cedar::proc::Arguments&)
+{
+  // Using data like this is more convenient 
+  cv::Mat& sum = mOutput->getData();
+  
+  // set the sum to zero
+  sum = cv::Scalar(0);
+
+  // check if the first operand is connected
+  if (this->getInputSlot("operand1")->getData())
+  {
+    // if it is, cast it to the correct type. 
+    cedar::aux::DataPtr op1 = this->getInputSlot("operand1")->getData();
+    if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(op1))
+    {
+      // if the type matches, add the matrix to the sum
+      sum += mat_data->getData();
+    }
+  }
+
+  if (this->getInputSlot("operand2")->getData())
+  {
+    cedar::aux::DataPtr op2 = this->getInputSlot("operand2")->getData();
+    if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(op2))
+    {
+      sum += mat_data->getData();
+    }
+    else if (cedar::aux::ImageDataPtr img_data = boost::shared_dynamic_cast<cedar::aux::ImageData>(op2))
+    {
+      sum += img_data->getData();
+    }
+  }
+}
+@endcode
+
+@todo Show how to implement a main method to actually connect and use the SimpleSummation step. Also, need an examples
+      folder into which to put this code
+
+
+
+@subsection ProcessingTutorialFirstStep_DeclaringData Declaring Data
+
+@section ProcessingTutorialPlugin Beginner's Tutorial: Plug In and Play
+
+Here we show how to transform the step that is developed in the previous tutorial into a plugin. This plugin can then
+be loaded in the processing framework. While this can also be done in the code approach, it is most useful for cases
+where configuration files or the user interface are used. 
+
+ 
+@section ProcessingTutorialFirstStep Beginner's Tutorial: Dynamics
+
+
+@section ProcessingTutorialDataValidation Advanced Tutorial: Data Validation
+
+
+@section ProcessingBestPractices Best Practices for the Processing Framework
+
+
+@subsection ProcessingBestPractices_StoringInputs Storing Input Pointers to Save Time
+
+@todo Explain here why it makes sense to overload inputChanged and store pointers to the input
+
+
+@subsection ProcessingBestPractices_MakingCodeSafer Safer Code: Exceptions and Assertions Instead of SegFaults
+
+While this is not an issue specific to the processing framework, it is of great importance here.
+
+@todo Explain that using exceptions is important so the framework can intercept errors.
+
+*/
