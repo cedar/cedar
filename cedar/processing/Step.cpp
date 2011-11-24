@@ -164,6 +164,7 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
 void cedar::proc::Step::onNameChanged()
 {
   // kind of a hack to ensure that all data slots have the right parent (done in set name)
+  //!@todo this should be moved to Connectable, but Connectable is not a QObject...
   this->updateSlotParents();
   if (this->mpRegisteredAt != NULL)
   {
