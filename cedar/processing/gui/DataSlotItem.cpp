@@ -159,25 +159,23 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
 void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
 {
   cedar::proc::gui::ConnectValidity validity = this->canConnectTo(pTarget);
+  std::cout << "connect" << std::endl;
   if (validity != cedar::proc::gui::CONNECT_NO)
   {
-    cedar::proc::StepPtr source, target;
-    source = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
-    target = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pTarget->parentItem())->getStep();
-    cedar::proc::Manager::getInstance().connect(source, this->getName(), target, pTarget->getName());
+    std::cout << "to" << std::endl;
     cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
     p_connection->setValidity(validity);
     this->scene()->addItem(p_connection);
   }
 }
 
-void cedar::proc::gui::DataSlotItem::disconnect(cedar::proc::gui::GraphicsBase* pTarget)
+void cedar::proc::gui::DataSlotItem::disconnect(cedar::proc::gui::GraphicsBase* /*pTarget*/)
 {
-  cedar::proc::gui::DataSlotItem* p_target = cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
-  cedar::proc::StepPtr source, target;
-  source = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
-  target = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(p_target->parentItem())->getStep();
-  cedar::proc::Manager::getInstance().disconnect(source, this->getName(), target, p_target->getName());
+//  cedar::proc::gui::DataSlotItem* p_target = cedar::aux::asserted_cast<cedar::proc::gui::DataSlotItem*>(pTarget);
+//  cedar::proc::StepPtr source, target;
+//  source = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(this->parentItem())->getStep();
+//  target = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(p_target->parentItem())->getStep();
+//  cedar::proc::Manager::getInstance().disconnect(source, this->getName(), target, p_target->getName());
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)

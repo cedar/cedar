@@ -110,3 +110,8 @@ const std::string& cedar::proc::DataSlot::getParent() const
 {
   return this->mParent;
 }
+
+void cedar::proc::DataSlot::setParent(const std::string& parent)
+{
+  this->mParent = parent;
+}

@@ -125,6 +125,14 @@ public:
   void connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
   bool isConnected(const std::string& source, const std::string& target);
   bool isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+  void disconnectSlots(const std::string& source, const std::string& target);
+  void disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+
+  void getDataConnections(
+                           cedar::proc::StepPtr source,
+                           const std::string& sourceDataName,
+                           std::vector<cedar::proc::DataConnectionPtr>& connections
+                         );
 
   const StepVector& steps() const;
   StepVector& steps();

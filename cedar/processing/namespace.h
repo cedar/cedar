@@ -85,7 +85,6 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
     CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
-    CEDAR_DECLARE_PROC_CLASS(Connection);
     //!@endcond
 
     typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;

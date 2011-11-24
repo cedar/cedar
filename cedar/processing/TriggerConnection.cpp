@@ -65,6 +65,7 @@ cedar::proc::TriggerConnection::~TriggerConnection()
   if (source_shared && target_shared)
   {
     source_shared->removeListener(target_shared);
+    target_shared->setParentTrigger(cedar::proc::TriggerPtr());
   }
 }
 //----------------------------------------------------------------------------------------------------------------------

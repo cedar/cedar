@@ -74,6 +74,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Set the name of this Connectable and updates all slots.
+  void setName(const std::string& name);
+
   //!@brief Returns a specific input data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getInput(const std::string& name) const;
 

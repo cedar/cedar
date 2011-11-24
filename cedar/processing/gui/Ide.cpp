@@ -48,6 +48,7 @@
 #include "cedar/processing/gui/NetworkFile.h"
 #include "cedar/processing/gui/PluginLoadDialog.h"
 #include "cedar/processing/gui/PluginManagerDialog.h"
+#include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -281,12 +282,41 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
   for (int i = 0; i < items.size(); ++i)
   {
     // delete connections
+    //!@todo maybe create gui::TriggerConnection and gui::DataConnection
+    //!@todo maybe wrap this in connection
     if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
     {
-      //!@todo: The disconnect call should be in the Connection destructor and deleting the connection should suffice
+      if (cedar::proc::gui::DataSlotItem* source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getSource()))
+      {
+        if (cedar::proc::gui::DataSlotItem* target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
+        {
+          std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
+          std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
+          this->mNetwork->network()->disconnectSlots(source_slot, target_slot);
+        }
+      }
+      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
+      {
+        if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
+        {
+          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getStep());
+        }
+      }
+      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
+      {
+        if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
+        {
+          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+        }
+      }
+      else
+      {
+        CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
+      }
       p_connection->disconnect();
       delete p_connection;
       items[i] = NULL;
+
     }
   }
   for (int i = 0; i < items.size(); ++i)

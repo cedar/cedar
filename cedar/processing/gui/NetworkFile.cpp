@@ -49,8 +49,8 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Group.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Connection.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -140,27 +140,21 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
                                                                         );
         CEDAR_DEBUG_ASSERT(p_source_slot != NULL);
 
-        std::vector<cedar::proc::Connection*> connections;
-        cedar::proc::Manager::getInstance().getConnections(step, slot_name, connections);
-
-//        std::cout << "Step " << step->getName() << " has " << connections.size() << std::endl;
+        std::vector<cedar::proc::DataConnectionPtr> connections;
+        mNetwork->getDataConnections(step, slot_name, connections);
 
         for(size_t c = 0; c < connections.size(); ++c)
         {
-          cedar::proc::Connection* p_con = connections.at(c);
-
-          cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(p_con->getTarget().get());
+          cedar::proc::DataConnectionPtr con = connections.at(c);
+          cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(mNetwork->getElement<cedar::proc::Step>(con->getTarget()->getParent()).get());
           CEDAR_DEBUG_ASSERT(p_target_step != NULL);
 
           cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step->getSlotItem
                                                                           (
                                                                             cedar::proc::DataRole::INPUT,
-                                                                            p_con->getTargetName()
+                                                                            con->getTarget()->getName()
                                                                           );
           CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
-
-//          std::cout << "connecting " << step->getName() << "." << p_source_slot->getName() << " to "
-//                    << p_con->getTargetName() << "." << p_target_slot->getName() << std::endl;
 
           cedar::proc::gui::Connection *p_ui_con = new cedar::proc::gui::Connection(p_source_slot, p_target_slot);
           this->mpScene->addItem(p_ui_con);

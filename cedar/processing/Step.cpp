@@ -78,8 +78,8 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
   std::cout << "> allocated data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
 #endif
 
-  // Add the finished trigger to the list of triggers.
-//  this->addTrigger(mFinished);
+  // create the finished trigger singleton.
+  this->getFinishedTrigger();
 
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));

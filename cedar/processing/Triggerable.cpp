@@ -62,7 +62,6 @@ cedar::proc::Triggerable::~Triggerable()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
 {
-  std::cout << "parent set" << std::endl;
   if (this->isLooped())
   {
     // If there is already a parent trigger for looped steps, disconnect it first!
@@ -79,9 +78,12 @@ cedar::proc::TriggerPtr cedar::proc::Triggerable::getParentTrigger()
 void cedar::proc::Triggerable::callOnStart()
 {
   this->onStart();
-  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+  if (mFinished)
   {
-    this->mFinished->getListeners().at(i)->callOnStart();
+    for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+    {
+      this->mFinished->getListeners().at(i)->callOnStart();
+    }
   }
 }
 
@@ -89,9 +91,12 @@ void cedar::proc::Triggerable::callOnStop()
 {
   this->onStop();
   this->setState(cedar::proc::Triggerable::STATE_NONE, "");
-  for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+  if (mFinished)
   {
-    this->mFinished->getListeners().at(i)->callOnStop();
+    for (size_t i = 0; i < this->mFinished->getListeners().size(); ++i)
+    {
+      this->mFinished->getListeners().at(i)->callOnStop();
+    }
   }
 }
 

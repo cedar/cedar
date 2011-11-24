@@ -44,7 +44,7 @@
 // PROJECT INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
@@ -78,11 +78,14 @@ int main(int /* argc */, char** /* argv */)
   log_file << "Creating trigger." << std::endl;
   TriggerPtr trigger (new Trigger());
 
+  log_file << "Creating network." << std::endl;
+  cedar::proc::NetworkPtr network (new cedar::proc::Network());
+
   log_file << "Adding step." << std::endl;
-  cedar::proc::Manager::getInstance().connect(trigger, step);
+  network->connectTrigger(trigger, step);
 
   log_file << "Removing step." << std::endl;
-  cedar::proc::Manager::getInstance().disconnect(trigger, step);
+  network->disconnectTrigger(trigger, step);
   if (trigger->getListeners().size() != 0)
   {
     ++errors;
@@ -90,12 +93,15 @@ int main(int /* argc */, char** /* argv */)
   }
 
   log_file << "Adding a second step." << std::endl;
-  cedar::proc::Manager::getInstance().connect(trigger, step);
-  cedar::proc::Manager::getInstance().connect(trigger, StepTestPtr(new StepTest()));
+  log_file << "Creating step 2." << std::endl;
+  StepTestPtr step_2(new StepTest());
+  network->connectTrigger(trigger, step);
+  network->connectTrigger(trigger, step_2);
+
   if (trigger->getListeners().size() != 2)
   {
     ++errors;
-    log_file << "Error: adding two triggers doesn't work." << std::endl;
+    log_file << "Error: adding two steps doesn't work." << std::endl;
   }
 
   log_file << "Done. There were " << errors << " errors." << std::endl;

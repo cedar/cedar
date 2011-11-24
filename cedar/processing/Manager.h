@@ -101,57 +101,11 @@ public:
 
   void startThreads();
   void stopThreads(bool wait = false);
-  void connect(
-                cedar::proc::StepPtr source,
-                const std::string& sourceName,
-                cedar::proc::StepPtr target,
-                const std::string& targetName
-              );
-  void disconnect(
-                   cedar::proc::StepPtr source,
-                   const std::string& sourceName,
-                   cedar::proc::StepPtr target,
-                   const std::string& targetName
-                 );
-  void connect(
-                cedar::proc::TriggerPtr trigger,
-                cedar::proc::TriggerPtr target
-              );
-
-  void connect(
-                cedar::proc::TriggerPtr source,
-                cedar::proc::StepPtr target
-              );
-
-  void disconnect(
-                   cedar::proc::TriggerPtr source,
-                   cedar::proc::StepPtr target
-                 );
-
-  void getConnections(
-                       cedar::proc::StepPtr source,
-                       const std::string& sourceDataName,
-                       std::vector<cedar::proc::Connection*>& connections //!@todo should be const pointers?
-                     );
-
-  const std::vector<cedar::proc::Connection*>& getConnections() const
-  {
-    return this->mConnections;
-  }
-
-  //!\ remove and disconnect a step
-  void removeStep(cedar::proc::StepPtr step);
-  //!\ remove and disconnect a trigger
-  void removeTrigger(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!\brief this function disconnects all incoming and outgoing connections of a single step
-  void disconnect(cedar::proc::StepPtr deletedStep);
-  //!\brief this function disconnects all incoming and outgoing connections of a single trigger
-  void disconnect(cedar::proc::TriggerPtr deletedTrigger);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -159,12 +113,6 @@ protected:
 private:
   //!@brief The standard constructor.
   Manager();
-  /*!\brief this deletes a single connection from the mConnections vector. Afterwards, previously obtained iterators
-   * will become invalid, so watch out.*/
-  void deleteConnection(cedar::proc::Connection* connection);
-
-  //!@brief Removes any "dead" connections from the manager.
-  void cleanupConnections();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -183,7 +131,6 @@ private:
   GroupRegistry mGroupRegistry;
 
   cedar::proc::FrameworkSettings mSettings;
-  std::vector<cedar::proc::Connection*> mConnections;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
