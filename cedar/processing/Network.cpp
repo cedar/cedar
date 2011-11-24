@@ -45,7 +45,6 @@
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Group.h"
-#include "cedar/processing/Connection.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -226,6 +225,45 @@ void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar:
   mTriggerConnections.push_back(cedar::proc::TriggerConnectionPtr(new TriggerConnection(source, target)));
 }
 
+void cedar::proc::Network::disconnectSlots(const std::string& source, const std::string& target)
+{
+  // parse element and slot name
+  std::string source_name;
+  std::string source_slot;
+  std::string target_name;
+  std::string target_slot;
+  cedar::proc::Connectable::parseDataNameNoRole(source, source_name, source_slot);
+  cedar::proc::Connectable::parseDataNameNoRole(target, target_name, target_slot);
+  for (DataConnectionVector::iterator it = mDataConnections.begin(); it != mDataConnections.end(); ++it)
+  {
+    std::cout << (*it)->getSource()->getParent() + std::string(".") + (*it)->getSource()->getName() << std::endl;
+    std::cout << (*it)->getTarget()->getParent() + std::string(".") + (*it)->getTarget()->getName() << std::endl;
+    if ((*it)->equals(
+                    this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
+                    this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
+                  )
+       )
+    {
+      mDataConnections.erase(it);
+      return;
+    }
+  }
+  CEDAR_THROW(cedar::proc::MissingConnectionException, "This data connection does not exist!");
+}
+
+void cedar::proc::Network::disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
+{
+  for (TriggerConnectionVector::iterator it = mTriggerConnections.begin(); it != mTriggerConnections.end(); ++it)
+  {
+    if ((*it)->equals(source, target))
+    {
+      mTriggerConnections.erase(it);
+      return;
+    }
+  }
+  CEDAR_THROW(cedar::proc::MissingConnectionException, "This trigger connection does not exist!");
+}
+
 void cedar::proc::Network::readFile(const std::string& filename)
 {
 #ifdef DEBUG_FILE_READING
@@ -342,6 +380,8 @@ void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
 
     cedar::proc::ElementPtr step = cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id);
     step->readConfiguration(step_node);
+    // quick fix
+    step->setName(step->getName());
     mElements[step->getName()] = step;
   }
 }
@@ -503,4 +543,22 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
     }
   }
   CEDAR_THROW(cedar::proc::InvalidObjectException, "Element not registered at this network. Current element name: " + object->getName());
+}
+
+void cedar::proc::Network::getDataConnections(
+                                               cedar::proc::StepPtr source,
+                                               const std::string& sourceDataName,
+                                               std::vector<cedar::proc::DataConnectionPtr>& connections
+                                             )
+{
+  connections.clear();
+  for (size_t i = 0; i < this->mDataConnections.size(); ++i)
+  {
+    cedar::proc::DataConnectionPtr con = this->mDataConnections.at(i);
+    std::cout << con->getSource()->getParent() << std::endl;
+    if (this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source && con->getSource()->getName() == sourceDataName)
+    {
+      connections.push_back(con);
+    }
+  }
 }

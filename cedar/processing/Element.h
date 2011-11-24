@@ -72,7 +72,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Set the name of this element.
-  void setName(const std::string& name);
+  virtual void setName(const std::string& name);
 
   //!@brief Get the name of this element.
   const std::string& getName() const;

@@ -103,6 +103,9 @@ public:
   //!@brief get the name of this slot's parent
   const std::string& getParent() const;
 
+  //!@brief get the name of this slot's parent
+  void setParent(const std::string& parent);
+
   //!@brief set some explanatory text for this slot
   void setText(const std::string& text);
 

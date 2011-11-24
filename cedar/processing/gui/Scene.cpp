@@ -369,6 +369,9 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               {
                 cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem *>(target);
                 p_source->connectTo(p_data_target);
+                std::string source_name = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
+                std::string target_name = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
+                mNetwork->network()->connectSlots(source_name, target_name);
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
             }
@@ -388,6 +391,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               {
                 cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
                 source->connectTo(p_trigger);
+                mNetwork->network()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
                 break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
               }
 
@@ -395,6 +399,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               {
                 cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
                 source->connectTo(p_step_item);
+                mNetwork->network()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 
@@ -554,33 +559,32 @@ void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF pos
   CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
   std::string name = "new " + split_class_name.back();
 
+  std::string adjusted_name;
   try
   {
     unsigned int new_id = 1;
-    std::string tmp;
-    tmp = name;
-    while (mNetwork->network()->getElement(tmp))
+    adjusted_name = name;
+    while (mNetwork->network()->getElement(adjusted_name))
     {
       std::stringstream str;
       str << name << " " << new_id;
-      tmp = str.str();
+      adjusted_name = str.str();
       ++new_id;
     }
-    name = tmp;
   }
   catch(cedar::proc::InvalidNameException& exc)
   {
-    // nothing to do here
+    // nothing to do here, name not duplicate, use this as a name
   }
 
   try
   {
-    mNetwork->network()->add(classId, name);
-    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(name))
+    mNetwork->network()->add(classId, adjusted_name);
+    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(adjusted_name))
     {
       this->addProcessingStep(step, position);
     }
-    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(name))
+    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(adjusted_name))
     {
       this->addTrigger(trigger, position);
     }
