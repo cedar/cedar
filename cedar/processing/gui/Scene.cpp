@@ -44,7 +44,6 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/GroupItem.h"
 #include "cedar/processing/gui/NetworkFile.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/exceptions.h"
@@ -197,10 +196,6 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     case MODE_CONNECT:
       this->connectModeProcessMousePress(pMouseEvent);
       break;
-
-    case MODE_GROUP:
-      this->groupModeProcessMousePress(pMouseEvent);
-      break;
   }
 }
 
@@ -210,10 +205,6 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   {
     case MODE_CONNECT:
       this->connectModeProcessMouseMove(pMouseEvent);
-      break;
-
-    case MODE_GROUP:
-      this->groupModeProcessMouseMove(pMouseEvent);
       break;
 
     default:
@@ -235,26 +226,6 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
 
     case MODE_CONNECT:
       this->connectModeProcessMouseRelease(pMouseEvent);
-      break;
-
-
-    case MODE_GROUP:
-      this->groupModeProcessMouseRelease(pMouseEvent);
-      break;
-  }
-
-  switch (this->mMode)
-  {
-    case MODE_CONNECT:
-    default:
-      break;
-
-    case MODE_GROUP:
-      if ( pMouseEvent->button() == Qt::LeftButton && (pMouseEvent->modifiers() & Qt::ShiftModifier) == 0)
-      {
-        this->setMode(MODE_SELECT);
-        emit modeFinished();
-      }
       break;
   }
 }
@@ -444,88 +415,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
   this->mMode = MODE_SELECT;
   mpeParentView->setMode(cedar::proc::gui::Scene::MODE_SELECT);
   mpConnectionStart = NULL;
-}
-
-void cedar::proc::gui::Scene::groupModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)
-{
-  this->mGroupStart = this->mGroupEnd = pMouseEvent->scenePos();
-  QRectF rect(this->mGroupStart, this->mGroupEnd);
-
-  if (mpGroupIndicator != NULL)
-  {
-    delete mpGroupIndicator;
-  }
-  mpGroupIndicator = this->addRect(rect);
-}
-
-void cedar::proc::gui::Scene::groupModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent)
-{
-  if (mpGroupIndicator != NULL)
-  {
-    this->mGroupEnd = pMouseEvent->scenePos();
-    QRectF rect(this->mGroupStart, this->mGroupEnd);
-    mpGroupIndicator->setRect(rect.normalized());
-
-    // remove highlighting of previous items
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      }
-    }
-
-    mProspectiveGroupMembers = this->items(rect.normalized(), Qt::ContainsItemBoundingRect);
-
-    // highlight prospective group members
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        if (ptr->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP)
-        {
-          ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-        }
-      }
-    }
-  }
-}
-
-void cedar::proc::gui::Scene::groupModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent)
-{
-  if (mpGroupIndicator != NULL)
-  {
-    this->mGroupEnd = pMouseEvent->scenePos();
-    QRectF rect(this->mGroupStart, this->mGroupEnd);
-    delete mpGroupIndicator;
-    mpGroupIndicator = NULL;
-
-    cedar::proc::gui::GroupItem *p_group = new cedar::proc::gui::GroupItem(rect.size());
-    p_group->setPos(rect.topLeft());
-    this->addItem(p_group);
-
-    // remove highlighting from all prospective group members
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      }
-    }
-
-    mProspectiveGroupMembers.clear();
-
-    // add stuff to the group
-    mProspectiveGroupMembers = this->items(rect.normalized(), Qt::ContainsItemBoundingRect);
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        p_group->addGroupItem(ptr);
-      }
-    }
-    mProspectiveGroupMembers.clear();
-  }
 }
 
 void cedar::proc::gui::Scene::addTrigger(cedar::proc::TriggerPtr trigger, QPointF position)

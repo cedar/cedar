@@ -45,7 +45,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
-#include "cedar/processing/Group.h"
 #include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/steps/Projection.h"

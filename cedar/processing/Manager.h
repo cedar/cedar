@@ -69,7 +69,6 @@ class cedar::proc::Manager
   //--------------------------------------------------------------------------------------------------------------------
 public:
   typedef std::set<cedar::aux::LoopedThreadPtr> ThreadRegistry; //!<@todo Use a name?
-  typedef std::set<cedar::proc::GroupPtr> GroupRegistry; //!<@todo Use a name instead?
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -88,14 +87,8 @@ public:
 
   //!\brief access to thread registry
   ThreadRegistry& threads();
-  //!\brief access to group registry
-  GroupRegistry& groups();
 
   void registerThread(cedar::aux::LoopedThreadPtr thread);
-  cedar::proc::GroupPtr allocateGroup();
-  void removeGroup(cedar::proc::GroupPtr group);
-
-  cedar::proc::GroupPtr getGroup(const std::string& name);
 
   void load(cedar::proc::PluginProxyPtr plugin);
 
@@ -127,8 +120,6 @@ private:
 
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
-  //! a registry for all managed groups
-  GroupRegistry mGroupRegistry;
 
   cedar::proc::FrameworkSettings mSettings;
 
