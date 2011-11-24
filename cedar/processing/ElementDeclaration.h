@@ -46,6 +46,8 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
 #include "cedar/auxiliaries/AbstractFactoryDerived.h"
+#include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // PROJECT INCLUDES
 
@@ -140,7 +142,7 @@ private:
  * More detailed description of the class with templates.
  */
 template <class DerivedClass>
-class cedar::proc::ElementDeclarationT : public ElementDeclaration
+class cedar::proc::ElementDeclarationTemplate : public ElementDeclaration
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -150,11 +152,15 @@ class cedar::proc::ElementDeclarationT : public ElementDeclaration
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  ElementDeclarationT(
-                    const std::string& classId,
-                    const std::string& category = "misc."
-                  )
+  /*!@brief The constructor.
+   *
+   * @param classId  Identifier of the class. If this is left empty, the name will be determined automatically. For
+   *                 example, a class test::namespaceName::ClassName will result in the name
+   *                 test.namespaceName.ClassName.
+   * @param category Category for the element.
+   */
+
+  ElementDeclarationTemplate(const std::string& classId = "", const std::string& category = "misc.")
   :
   ElementDeclaration
   (
@@ -163,10 +169,17 @@ public:
     category
   )
   {
+    // if no class name is specified,
+    if (classId.empty())
+    {
+      std::string class_name = cedar::aux::unmangleName(typeid(DerivedClass));
+      class_name = cedar::aux::replace(class_name, "::", ".");
+      this->setClassId(class_name);
+    }
   }
 
   //!@brief Destructor
-  ~ElementDeclarationT()
+  ~ElementDeclarationTemplate()
   {
   }
 

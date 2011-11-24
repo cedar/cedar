@@ -76,7 +76,7 @@ int main(int /* argc */, char** /* argv */)
   log_file << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr neuron_declaration
   (
-    new cedar::proc::ElementDeclarationT<cedar::Neuron>("Neuron")
+    new cedar::proc::ElementDeclarationTemplate<cedar::Neuron>()
   );
   log_file << "done." << std::endl;
 
