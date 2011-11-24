@@ -44,7 +44,6 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Group.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -78,48 +77,12 @@ cedar::proc::Network::~Network()
 {
 #ifdef DEBUG
   std::cout << "> freeing data (cedar::proc::Network, " << this << ")" << std::endl;
-
-  for (size_t i = 0; i < this->steps().size(); ++i)
-  {
-    std::cout << "> [freeing data] Use count of step " << this->mSteps[i] << " is " << this->mSteps[i].use_count() << std::endl;
-  }
 #endif // DEBUG
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::proc::Network::StepVector& cedar::proc::Network::steps()
-{
-  return this->mSteps;
-}
-
-const cedar::proc::Network::StepVector& cedar::proc::Network::steps() const
-{
-  return this->mSteps;
-}
-
-const cedar::proc::Network::TriggerVector& cedar::proc::Network::triggers() const
-{
-  return this->mTriggers;
-}
-
-cedar::proc::Network::TriggerVector& cedar::proc::Network::triggers()
-{
-  return this->mTriggers;
-}
-
-const cedar::proc::Network::GroupVector& cedar::proc::Network::groups() const
-{
-  return this->mGroups;
-}
-
-cedar::proc::Network::GroupVector& cedar::proc::Network::groups()
-{
-  return this->mGroups;
-}
-
 const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
 {
   return this->mElements;
@@ -175,15 +138,6 @@ cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "No element of the name " + name + " was found.");
   }
-}
-
-
-void cedar::proc::Network::add(cedar::proc::GroupPtr group)
-{
-#ifdef DEBUG_FILE_WRITING
-    std::cout << "Adding group " << group->getName() << " to network." << std::endl;
-#endif
-  this->mGroups.push_back(group);
 }
 
 void cedar::proc::Network::connectSlots(const std::string& source, const std::string& target)

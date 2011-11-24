@@ -67,7 +67,6 @@ public:
   enum MODE
   {
     MODE_SELECT,
-    MODE_GROUP,
     MODE_CONNECT
   };
 

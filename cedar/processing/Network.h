@@ -62,12 +62,12 @@ class cedar::proc::Network
   // types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef std::vector<cedar::proc::StepPtr> StepVector;
-  typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
-  typedef std::vector<cedar::proc::GroupPtr> GroupVector;
   typedef std::vector<cedar::proc::DataConnectionPtr> DataConnectionVector;
   typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
+public:
+  typedef ElementMap::iterator ElementMapIterator;
+  typedef ElementMap::const_iterator ElementMapConstIterator;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -105,7 +105,6 @@ public:
   void writeFile(const std::string& filename);
 
   void remove(cedar::proc::ElementPtr element);
-  void add(cedar::proc::GroupPtr group);
 
   void add(std::string className, std::string instanceName);
   void add(cedar::proc::ElementPtr element, std::string instanceName);
@@ -134,12 +133,6 @@ public:
                            std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
 
-  const StepVector& steps() const;
-  StepVector& steps();
-  const TriggerVector& triggers() const;
-  TriggerVector& triggers();
-  const GroupVector& groups() const;
-  GroupVector& groups();
   const ElementMap& elements() const;
 
   void updateObjectName(cedar::proc::Element* object);
@@ -162,9 +155,6 @@ private:
 protected:
   // none yet
 private:
-  StepVector mSteps;
-  TriggerVector mTriggers;
-  GroupVector mGroups;
   ElementMap mElements;
   DataConnectionVector mDataConnections;
   TriggerConnectionVector mTriggerConnections;

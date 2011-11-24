@@ -48,7 +48,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
-#include "cedar/processing/Group.h"
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/sources/GaussInput.h"
@@ -101,19 +100,6 @@ void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
   }
 }
 
-cedar::proc::GroupPtr cedar::proc::Manager::getGroup(const std::string& name)
-{
-  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
-  {
-    if ((*iter)->getName() == name)
-    {
-      return *iter;
-    }
-  }
-  CEDAR_THROW(cedar::aux::UnknownNameException, "There is no group here by the name " + name + ".");
-  return cedar::proc::GroupPtr();
-}
-
 void cedar::proc::Manager::registerThread(cedar::aux::LoopedThreadPtr thread)
 {
   this->mThreadRegistry.insert(thread);
@@ -133,10 +119,6 @@ void cedar::proc::Manager::startThreads()
       (*iter)->start();
     }
   }
-  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
-  {
-    (*iter)->start();
-  }
 }
 
 void cedar::proc::Manager::stopThreads(bool wait)
@@ -154,19 +136,11 @@ void cedar::proc::Manager::stopThreads(bool wait)
       (*iter)->stop();
     }
   }
-  for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
-  {
-    (*iter)->stop();
-  }
 
   // wait for all threads to finish
   if (wait)
   {
     for (ThreadRegistry::iterator iter = this->mThreadRegistry.begin(); iter != this->mThreadRegistry.end(); ++iter)
-    {
-      (*iter)->wait();
-    }
-    for (GroupRegistry::iterator iter = this->mGroupRegistry.begin(); iter != this->mGroupRegistry.end(); ++iter)
     {
       (*iter)->wait();
     }
@@ -176,23 +150,6 @@ void cedar::proc::Manager::stopThreads(bool wait)
 cedar::proc::Manager::ThreadRegistry& cedar::proc::Manager::threads()
 {
   return this->mThreadRegistry;
-}
-
-cedar::proc::Manager::GroupRegistry& cedar::proc::Manager::groups()
-{
-  return this->mGroupRegistry;
-}
-
-cedar::proc::GroupPtr cedar::proc::Manager::allocateGroup()
-{
-  GroupPtr new_group(new cedar::proc::Group("new group"));
-  this->mGroupRegistry.insert(new_group);
-  return new_group;
-}
-
-void cedar::proc::Manager::removeGroup(cedar::proc::GroupPtr group)
-{
-  this->mGroupRegistry.erase(group);
 }
 
 cedar::proc::Manager& cedar::proc::Manager::getInstance()

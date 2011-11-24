@@ -90,7 +90,6 @@ void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const Q
   switch (mode)
   {
     case cedar::proc::gui::Scene::MODE_CONNECT:
-    case cedar::proc::gui::Scene::MODE_GROUP:
       this->setDragMode(QGraphicsView::NoDrag);
       break;
 
