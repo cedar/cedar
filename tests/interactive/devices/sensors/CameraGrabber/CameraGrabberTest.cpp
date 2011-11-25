@@ -22,16 +22,16 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
+//#include <opencv2/opencv.hpp>
 //#include <dc1394/1394.h>  //for all firewire stuff
-#include <dc1394/video.h>  //for video modes like  DC1394_FRAMERATE_15, DC1394_ISO_SPEED_400
+//#include <dc1394/video.h>  //for video modes like  DC1394_FRAMERATE_15, DC1394_ISO_SPEED_400
 #include <dc1394/types.h>  //for constants like DC1394_VIDEO_MODE_320x240_YUV422
 
 
 //--------------------------------------------------------------------------------------------------------------------
 //constants
 //--------------------------------------------------------------------------------------------------------------------
-#define CHANNEL_0_DEVICE 0
+#define CHANNEL_0_DEVICE (unsigned int) 0
 
 #define GRABBER_NAME_0 "Camera_Grabber_TestCase"
 #define CONFIG_FILE_NAME_0 "camera_grabber_testcase.config"
@@ -60,7 +60,7 @@ int main(int , char **)
   cedar::dev::sensors::visual::CameraGrabber *camera_grabber=NULL;
   try
   {
-    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber( CONFIG_FILE_NAME_0 , CHANNEL_0_DEVICE );
+    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber( CONFIG_FILE_NAME_0 , CHANNEL_0_DEVICE , true);
   }
   catch (cedar::aux::exc::InitializationException &e)
   {
@@ -144,15 +144,15 @@ int main(int , char **)
     //camera_grabber->saveSnapshot(0);
 
     std::cout << "Channel 0 settings:" << std::endl;
-    std::cout << "\tContrast:    " << camera_grabber->getCameraParamContrast() << std::endl;
-    std::cout << "\tBrightness:  " << camera_grabber->getCameraParamBrightness() << std::endl;
-    std::cout << "\tSaturation:  " << camera_grabber->getCameraParamSaturation() << std::endl;
-    std::cout << "\tHue:         " << camera_grabber->getCameraParamHue() << std::endl;
-    std::cout << "\tGain:        " << camera_grabber->getCameraParamGain() << std::endl;
-    std::cout << "\tExposure:    " << camera_grabber->getCameraParamExposure() << std::endl;
-    std::cout << "\n\tFourCC(Enc): " << camera_grabber->getCameraParamEncoding() << std::endl;
-    std::cout << "\tCamera Mode  : " << camera_grabber->getCameraParamMode() << std::endl;
-    std::cout << "\tCamera FPS  : " << camera_grabber->getCameraParamFps() << std::endl;
+    std::cout << "\tContrast:    " << camera_grabber->getCameraProperty(CV_CAP_PROP_CONTRAST) << std::endl;
+    std::cout << "\tBrightness:  " << camera_grabber->getCameraProperty(CV_CAP_PROP_BRIGHTNESS) << std::endl;
+    std::cout << "\tSaturation:  " << camera_grabber->getCameraProperty(CV_CAP_PROP_SATURATION) << std::endl;
+    std::cout << "\tHue:         " << camera_grabber->getCameraProperty(CV_CAP_PROP_HUE) << std::endl;
+    std::cout << "\tGain:        " << camera_grabber->getCameraProperty(CV_CAP_PROP_GAIN) << std::endl;
+    std::cout << "\tExposure:    " << camera_grabber->getCameraProperty(CV_CAP_PROP_EXPOSURE) << std::endl;
+    std::cout << "\n\tFourCC(Enc): " << camera_grabber->getCameraProperty(CV_CAP_PROP_FOURCC) << std::endl;
+    std::cout << "\tCamera Mode  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_MODE) << std::endl;
+    std::cout << "\tCamera FPS  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_FPS) << std::endl;
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
@@ -197,8 +197,8 @@ int main(int , char **)
     //after one second, set camera options
     if (counter == 100)
     {
-      camera_grabber->setCameraParamBrightness(0, 10);
-      double brightness = camera_grabber->getCameraParamBrightness();
+      camera_grabber->setCameraProperty(CV_CAP_PROP_BRIGHTNESS, 10);
+      double brightness = camera_grabber->getCameraProperty(CV_CAP_PROP_BRIGHTNESS);
       std::cout << "Brightness: " << brightness << std::endl;
     }
 
@@ -206,8 +206,8 @@ int main(int , char **)
     //after another second, set camera options
     if (counter == 200)
     {
-      camera_grabber->setCameraParamBrightness(0, 200);
-      double brightness = camera_grabber->getCameraParamBrightness();
+      camera_grabber->setCameraProperty(CV_CAP_PROP_BRIGHTNESS, 200);
+      double brightness = camera_grabber->getCameraProperty(CV_CAP_PROP_BRIGHTNESS);
       std::cout << "Brightness: " << brightness << std::endl;
     }
 
@@ -224,11 +224,13 @@ int main(int , char **)
       newSize.height = 240;
       camera_grabber->setCameraParamSize(0, newSize);
       */
-      camera_grabber->setCameraParam(0,CV_CAP_PROP_MODE,DC1394_VIDEO_MODE_320x240_YUV422);
+
+      //does nothing
+      camera_grabber->setCameraProperty(0,CV_CAP_PROP_MODE,DC1394_VIDEO_MODE_320x240_YUV422);
 
 
       //camera_grabber->setCameraParamMode(0,(double)2);
-      std::cout << "\tCamera Mode  : " << camera_grabber->getCameraParamMode() << std::endl;
+      std::cout << "\tCamera Mode  : " << camera_grabber-> getCameraProperty(CV_CAP_PROP_MODE) << std::endl;
 
       ch0_size = camera_grabber->getSize(0);
       std::cout << "\tNew Size: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
@@ -237,10 +239,10 @@ int main(int , char **)
     if (counter == 400)
     {
       std::cout << "Set Fps to 7.5 FPS" << std::endl;
-      std::cout << "\tOld Camera FPS  : " << camera_grabber->getCameraParamFps() << std::endl;
-      camera_grabber->setCameraParamFps(0,30);
+      std::cout << "\tOld Camera FPS  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_FPS) << std::endl;
+      camera_grabber->setCameraProperty(CV_CAP_PROP_FPS,30);
       //camera_grabber->setFps(7.5);
-      std::cout << "\tNew Camera FPS  : " << camera_grabber->getCameraParamFps() << std::endl;
+      std::cout << "\tNew Camera FPS  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_FPS) << std::endl;
     }
 
     //exit after 10 seconds

@@ -64,5 +64,6 @@ CTestTestfile.cmake
 */lib.h
 *.iproj3
 
-syntax: regexp
-^tests/unit/processing/ArchitectureIO/architecture1\.json$
+tests/unit/processing/ArchitectureIO/architecture1\.json$
+
+cedar/cedar.pro.user

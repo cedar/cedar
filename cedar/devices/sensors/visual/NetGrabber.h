@@ -145,7 +145,7 @@ protected:
    *   \see
    *       mImageMatVector
    */
-  std::vector<cedar::aux::net::NetReader<cv::Mat>*> mYarpReaderVector;
+  std::vector<cedar::aux::net::NetReader<cv::Mat>*> mNetReaders;
 
 private:
   //none yet

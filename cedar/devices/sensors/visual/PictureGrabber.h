@@ -159,7 +159,7 @@ public:
 protected:
 
   //! \brief The filenames
-  std::vector<std::string> mSourceFileName;
+  std::vector<std::string> mSourceFileNames;
 
 private:
   // none yet

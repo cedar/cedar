@@ -61,8 +61,8 @@ PictureGrabber::PictureGrabber(
 :
 GrabberInterface(configFileName)
 {
-  mSourceFileName.push_back(pictureFileName);
-  doInit(mSourceFileName.size(),"PictureGrabber");
+  mSourceFileNames.push_back(pictureFileName);
+  doInit(mSourceFileNames.size(),"PictureGrabber");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -75,9 +75,9 @@ PictureGrabber::PictureGrabber(
 :
 GrabberInterface(configFileName)
 {
-  mSourceFileName.push_back(pictureFileName0);
-  mSourceFileName.push_back(pictureFileName1);
-  doInit(mSourceFileName.size(),"PictureGrabber");
+  mSourceFileNames.push_back(pictureFileName0);
+  mSourceFileNames.push_back(pictureFileName1);
+  doInit(mSourceFileNames.size(),"PictureGrabber");
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ bool PictureGrabber::onInit()
     std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
-      std::cout << "Channel " << i << ": capture from Picture: " << mSourceFileName.at(i) << "\n";
+      std::cout << "Channel " << i << ": capture from Picture: " << mSourceFileNames.at(i) << "\n";
     }
     std::cout << std::flush;
   #endif
@@ -111,7 +111,7 @@ bool PictureGrabber::onInit()
   //for every channel, read from image-file
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    cv::Mat frame = cv::imread(mSourceFileName.at(i));
+    cv::Mat frame = cv::imread(mSourceFileNames.at(i));
 
     if (!frame.empty())
     {
@@ -120,7 +120,7 @@ bool PictureGrabber::onInit()
     else
     {
       std::cout << "[PictureGrabber::onInit] ERROR: Grabbing failed\n"
-                << "\tChannel " << i << ": \"" << mSourceFileName.at(i) << "\"."
+                << "\tChannel " << i << ": \"" << mSourceFileNames.at(i) << "\"."
                 << std::endl;
       return false; //throws initialization exception
     }
@@ -147,7 +147,7 @@ std::string PictureGrabber::onGetSourceInfo(unsigned int channel) const
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::onGetSourceInfo");
   }
-  return mSourceFileName.at(channel);
+  return mSourceFileNames.at(channel);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -171,7 +171,7 @@ bool PictureGrabber::setSourceFile(unsigned int channel, const std::string& File
 
   //lock image-matrix while writing
   mpReadWriteLock->lockForWrite();
-  mSourceFileName.at(channel) = FileName;
+  mSourceFileNames.at(channel) = FileName;
   mImageMatVector.at(channel) = cv::imread(FileName);
   mpReadWriteLock->unlock();
 

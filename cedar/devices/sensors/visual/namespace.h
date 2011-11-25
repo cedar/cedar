@@ -90,7 +90,20 @@ namespace cedar
         //! @brief smart pointer for PictureGrabber
         typedef boost::shared_ptr<CameraGrabber> CameraGrabberPtr;
         
+        //! @brief An enum for the ISO-speed of the IEEE1394/firewire bus
+        class CameraIsoSpeed;
 
+        //! @brief An enum for the framerate of the camera
+        class CameraFrameRate;
+
+        //! @brief An enum for the camera properties
+        class CameraProperty;
+
+        //! @brief An enum for the video modes of the camera
+        class CameraVideoMode;
+
+        //! @brief An enum for the camera settings
+        class CameraSetting;
       }
     }
   }
