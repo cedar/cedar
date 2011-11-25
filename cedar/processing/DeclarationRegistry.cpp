@@ -59,14 +59,21 @@ using cedar::proc::ElementDeclarationTemplate;
 
 cedar::proc::DeclarationRegistry::DeclarationRegistry()
 {
-  ElementDeclarationPtr trigger_declaration(new ElementDeclarationTemplate<cedar::proc::Trigger>("cedar.processing.Trigger"));
+  ElementDeclarationPtr trigger_declaration(
+                                             new ElementDeclarationTemplate<cedar::proc::Trigger>
+                                                                                           (
+                                                                                             "cedar.processing.Trigger",
+                                                                                             "Triggers"
+                                                                                           )
+                                           );
   trigger_declaration->setIconPath(":/triggers/trigger.svg");
   this->declareClass(trigger_declaration);
 
   ElementDeclarationPtr multi_trigger_declaration(
                                                    new ElementDeclarationTemplate<cedar::proc::MultiTrigger>
                                                    (
-                                                     "cedar.processing.MultiTrigger"
+                                                     "cedar.processing.MultiTrigger",
+                                                     "Triggers"
                                                    )
                                                  );
   multi_trigger_declaration->setIconPath(":/triggers/multi_trigger.svg");
@@ -75,7 +82,8 @@ cedar::proc::DeclarationRegistry::DeclarationRegistry()
   ElementDeclarationPtr looped_trigger_declaration(
                                                      new ElementDeclarationTemplate<cedar::proc::LoopedTrigger>
                                                      (
-                                                       "cedar.processing.LoopedTrigger"
+                                                       "cedar.processing.LoopedTrigger",
+                                                       "Triggers"
                                                      )
                                                   );
   looped_trigger_declaration->setIconPath(":/triggers/looped_trigger.svg");
