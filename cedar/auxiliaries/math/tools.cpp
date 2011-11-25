@@ -76,6 +76,15 @@ double cedar::aux::math::min(const cv::Mat matrix)
   return min;
 }
 
+template <typename T>
+T cedar::aux::math::round(T val)
+{
+  return std::floor(val + static_cast<T>(0.5));
+}
+
+template CEDAR_AUX_LIB_EXPORT float cedar::aux::math::round<float>(float val);
+template CEDAR_AUX_LIB_EXPORT double cedar::aux::math::round<double>(double val);
+
 void cedar::aux::math::write(cv::Mat matrix)
 {
   switch (matrix.type())

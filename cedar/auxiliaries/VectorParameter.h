@@ -162,6 +162,25 @@ public:
     return ret;
   }
 
+  void eraseFirst(const T& entry)
+  {
+    iterator it = std::find(this->mValues.begin(), this->mValues.end(), entry);
+    if (it != this->mValues.end())
+    {
+      this->erase(it);
+    }
+  }
+
+  void eraseAll(const T& entry)
+  {
+    iterator it = std::find(this->mValues.begin(), this->mValues.end(), entry);
+    while (it != this->mValues.end())
+    {
+      it = this->erase(it);
+      it = std::find(it, this->mValues.end(), entry);
+    }
+  }
+
   //!@brief get the default value - throws an exception if no default value is present
   T getDefaultValue() const
   {

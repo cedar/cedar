@@ -88,6 +88,7 @@ public slots:
   void sceneItemSelected();
 
   void exception(const QString& message);
+  void notify(const QString& message);
   void error(const QString& message);
   void message(const QString& message);
 

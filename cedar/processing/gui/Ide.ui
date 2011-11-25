@@ -52,7 +52,7 @@
      <x>0</x>
      <y>0</y>
      <width>988</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -164,8 +164,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>130</width>
-          <height>304</height>
+          <width>121</width>
+          <height>310</height>
          </rect>
         </property>
         <attribute name="label">
@@ -285,6 +285,9 @@
    </property>
   </action>
   <action name="mpThreadsStartAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Start</string>
    </property>
