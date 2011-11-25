@@ -52,16 +52,20 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <QReadWriteLock>
-#include <signal.h>               //CTRL-C handler
 #include <boost/utility.hpp>      //boost::noncopyable
 
+#ifdef ENABLE_CTRL_C_HANDLER
+  #include <signal.h>               //CTRL-C handler
+#endif
 
 
-/* \brief Typedef for a vector containing the instances of all used grabbers
- *
- */
-typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
+#ifdef ENABLE_CTRL_C_HANDLER
 
+  /* \brief Typedef for a vector containing the instances of all used grabbers
+   *
+   */
+  typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
+#endif
 
 
 /*! \class cedar::dev::sensors::visual::GrabberInterface
@@ -130,8 +134,6 @@ public:
 public:
 
     /*! \brief Get the number of currently used channels (sources).
-     *  \remarks
-     *      Works exactly the same way if image or avi files are used.
      */
     unsigned int getNumCams() const;
 
@@ -332,6 +334,12 @@ public:
      *    saveSnapshot
      */
     bool saveSnapshotAllCams() const;
+    
+    /*! \brief Write the actual used parameters to configuration
+     *  \remarks
+     *    The configuration have to be saved manually with this function.
+     */
+    bool writeConfiguration();
 
 
     //------------------------------------------------------------------------
@@ -502,7 +510,7 @@ protected:
      *      Override this method in the derived class and do only the absolutely necessary cleanup here.<br><br>
      *      
      *   \note
-     *      This method is invoked by the CTRL-C handler. Therefore, it is the only possibility
+     *      This method is also invoked by the CTRL-C handler. Therefore, it is the only possibility
      *      to do the necessarily cleanup like hardware-reinit, shutting down cameras or to close file handles.
      *
      *      The dynamic allocated memory of the class should be freed in the standard destructor.  
@@ -626,7 +634,7 @@ private:
     /*! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
      */
     bool mCleanUpAlreadyDone;
-
+    
     /*! @brief Timestamp at start time to measure the real fps of grabbing
      */
     boost::posix_time::ptime mFpsMeasureStart;

@@ -218,7 +218,7 @@ protected:
   
   /*! \brief The filenames
    */
-  std::vector<std::string> mSourceFileName;
+  std::vector<std::string> mSourceFileNames;
 
   /*! \brief Indicates if looping is on
    */
@@ -243,7 +243,7 @@ protected:
    *   \see
    *       mImageMatVector
    */
-  std::vector<cv::VideoCapture> mCaptureVector;
+  std::vector<cv::VideoCapture> mVideoCaptures;
 
 
 

@@ -85,9 +85,6 @@ GrabberInterface::~GrabberInterface()
     std::cout << "[GrabberInterface::~GrabberInterface]" << std::endl;
   #endif
 
-  //write out the parameter of the configurationInterface
-  cedar::aux::ConfigurationInterface::writeConfiguration();
-
   //Matrices are released within the vector mImageMatVector
 
   //remove this grabber-instance from the InstancesVector
@@ -127,7 +124,8 @@ GrabberInterface::~GrabberInterface()
 #ifdef ENABLE_CTRL_C_HANDLER
 
   //this function handles the ctrl-c (signal: interrupt)
-  void GrabberInterface::sigIntHandler(int signalNo)
+  //void GrabberInterface::sigIntHandler(int signalNo)
+  void GrabberInterface::sigIntHandler(int)
   {
       #ifdef DEBUG_GRABBER_INTERFACE
         std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
@@ -221,6 +219,19 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
   }
 }
 
+//--------------------------------------------------------------------------------------------------------------------
+bool GrabberInterface::writeConfiguration()
+{    
+  //write out the parameter of the configurationInterface
+  bool result = cedar::aux::ConfigurationInterface::writeConfiguration();
+
+  #ifdef DEBUG_GRABBER_INTERFACE
+    std::cout << "[GrabberInterface::writeConfiguration] Configuration saved" << std::endl;
+  #endif
+  
+  return result;
+      
+}
 
 //--------------------------------------------------------------------------------------------------------------------
 unsigned int GrabberInterface::getNumCams() const

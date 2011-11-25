@@ -110,7 +110,7 @@ void NetGrabber::onCleanUp()
   #endif
 
   //close all captures
-  mYarpReaderVector.clear();
+  mNetReaders.clear();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ bool NetGrabber::onInit()
 
   //clear old stuff (if something is there)
   mImageMatVector.clear();
-  mYarpReaderVector.clear();
+  mNetReaders.clear();
 
   //cedar::dev::sensors::visual::TestGrabberPtr
   //      grabber_4(new cedar::dev::sensors::visual::TestGrabber(CONFIG_FILE_NAME_2,CHANNEL_1_NAME ))
@@ -211,7 +211,7 @@ bool NetGrabber::onInit()
 
     } while (!YarpReader);
 
-    mYarpReaderVector.push_back(YarpReader);
+    mNetReaders.push_back(YarpReader);
 
     //Channel i initialized, try to receive the first image
     #ifdef SHOW_INIT_INFORMATION_NETGRABBER
@@ -230,7 +230,7 @@ bool NetGrabber::onInit()
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "." << std::flush;
         #endif
-        frame = mYarpReaderVector.at(i)->read();
+        frame = mNetReaders.at(i)->read();
         #ifdef SHOW_INIT_INFORMATION_NETGRABBER
           std::cout << "ok" << std::endl;
         #endif
@@ -309,7 +309,7 @@ bool NetGrabber::onGrab()
     //on exception leave programm, so we don't catch it here
     //try
     //{
-    mImageMatVector.at(i) = mYarpReaderVector.at(i)->read();
+    mImageMatVector.at(i) = mNetReaders.at(i)->read();
     /* }
      * catch (cedar::aux::exc::NetUnexpectedDataException &E)
      * {

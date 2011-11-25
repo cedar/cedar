@@ -53,7 +53,7 @@
 #include "cedar/devices/robot/gl/AmtecChain.h"
 #include "cedar/devices/robot/gl/CoraArm.h"
 
-
+#include "cedar/devices/sensors/visual.h"
 
 // SYSTEM INCLUDES
 

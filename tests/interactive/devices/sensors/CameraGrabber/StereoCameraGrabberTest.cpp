@@ -63,7 +63,9 @@ int main(int , char **)
     camera_grabber = new cedar::dev::sensors::visual::CameraGrabber(
                           CONFIG_FILE_NAME_0,
                           CHANNEL_0_DEVICE,
-                          CHANNEL_1_DEVICE
+                          CHANNEL_1_DEVICE,
+                          false,
+                          true
                         );
   }
   catch (cedar::aux::exc::InitializationException &e)
