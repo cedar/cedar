@@ -61,7 +61,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  OwnedData(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory = true);
+  OwnedData(
+             cedar::proc::DataRole::Id role,
+             const std::string& name,
+             cedar::proc::Connectable* pParent,
+             bool isMandatory = true
+           );
 
   //!@brief Destructor
   ~OwnedData();
@@ -74,13 +79,11 @@ public:
 
   cedar::aux::ConstDataPtr getData() const;
 
-  void setData(cedar::aux::DataPtr data);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void setData(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

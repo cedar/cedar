@@ -323,12 +323,12 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
   // finally, insert a new data slot with the given parameters
   if (role == cedar::proc::DataRole::INPUT)
   {
-    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this->getName(), mandatory));
+    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this, mandatory));
     mSlotConnection = boost::shared_dynamic_cast<cedar::proc::ExternalData>(iter->second[name])->connectToExternalDataChanged(boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this));
   }
   else
   {
-    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this->getName(), mandatory));
+    iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::OwnedData(role, name, this, mandatory));
   }
 
   // since the data has (potentially) changed, re-check the inputs
@@ -502,19 +502,11 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
 
   if (role == cedar::proc::DataRole::INPUT)
   {
-    cedar::aux::shared_asserted_cast<cedar::proc::ExternalData>(map_iterator->second)->addData(data);
+    CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(map_iterator->second));
   }
-  else
-  {
-    map_iterator->second->setData(data);
-  }
+  map_iterator->second->setData(data);
 
   this->checkMandatoryConnections();
-
-  if (role == cedar::proc::DataRole::INPUT)
-  {
-    this->inputConnectionChanged(name);
-  }
 }
 
 void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& name)
@@ -557,6 +549,7 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
 void cedar::proc::Connectable::setInput(const std::string& name, cedar::aux::DataPtr data)
 {
   this->setData(DataRole::INPUT, name, data);
+  this->inputConnectionChanged(name);
 }
 
 void cedar::proc::Connectable::setBuffer(const std::string& name, cedar::aux::DataPtr data)
@@ -657,23 +650,4 @@ void cedar::proc::Connectable::parseDataNameNoRole
   // Split the string. Step name is everything before the dot, dataName everything after it.
   connectableName = instr.substr(0, dot_idx);
   dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
-}
-
-void cedar::proc::Connectable::setName(const std::string& name)
-{
-  this->Element::setName(name);
-  this->updateSlotParents();
-}
-
-void cedar::proc::Connectable::updateSlotParents()
-{
-  for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
-       slot != this->mDataConnections.end();
-       ++slot)
-  {
-    for (SlotMap::iterator iter = slot->second.begin(); iter != slot->second.end(); ++iter)
-    {
-      iter->second->setParent(this->getName());
-    }
-  }
 }

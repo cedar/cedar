@@ -49,9 +49,16 @@
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
+ * @todo The design of having a parent and returning a shared pointer to connect two slots is not perfect.
  */
 class cedar::proc::DataSlot
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Connectable;
+  friend class cedar::proc::DataConnection;
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -75,7 +82,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataSlot(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory = true);
+  DataSlot(
+            cedar::proc::DataRole::Id role,
+            const std::string& name,
+            cedar::proc::Connectable* pParent,
+            bool isMandatory = true
+          );
 
   //!@brief Destructor
   virtual ~DataSlot();
@@ -91,8 +103,6 @@ public:
   //!@brief get the encapsulated DataPtr managed by this slot as const
   virtual cedar::aux::ConstDataPtr getData() const = 0;
 
-  //!@brief set the internal DataPtr managed by this slot
-  virtual void setData(cedar::aux::DataPtr data) = 0;
 
   //!@brief get the role (input, output...) of this slot
   cedar::proc::DataRole::Id getRole() const;
@@ -102,9 +112,6 @@ public:
 
   //!@brief get the name of this slot's parent
   const std::string& getParent() const;
-
-  //!@brief get the name of this slot's parent
-  void setParent(const std::string& parent);
 
   //!@brief set some explanatory text for this slot
   void setText(const std::string& text);
@@ -131,13 +138,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief set the internal DataPtr managed by this slot
+  virtual void setData(cedar::aux::DataPtr data) = 0;
+  //!@brief get the pointer of this slot's parent
+  cedar::proc::Connectable* getParentPtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! The parent that owns the slot.
+  cedar::proc::Connectable* mpParent;
+
 private:
   //!@brief flag if this slot must be connected
   bool mMandatory;
@@ -147,9 +159,6 @@ private:
 
   //! Name of the slot, used to uniquely identify it among other slots of the same type in a step.
   std::string mName;
-
-  //! Name of the parent that owns the slot.
-  std::string mParent;
 
   //! Text of the slot, i.e., the text that is displayed to the user (ignored if empty).
   std::string mText;

@@ -46,9 +46,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::OwnedData::OwnedData(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory)
+cedar::proc::OwnedData::OwnedData(
+                                   cedar::proc::DataRole::Id role,
+                                   const std::string& name,
+                                   cedar::proc::Connectable* pParent,
+                                   bool isMandatory
+                                 )
 :
-cedar::proc::DataSlot(role, name, parent, isMandatory)
+cedar::proc::DataSlot(role, name, pParent, isMandatory)
 {
 }
 

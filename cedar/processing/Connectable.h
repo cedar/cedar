@@ -74,9 +74,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Set the name of this Connectable and updates all slots.
-  void setName(const std::string& name);
-
   //!@brief Returns a specific input data pointer stored in this Connectable.
   cedar::aux::ConstDataPtr getInput(const std::string& name) const;
 
@@ -167,9 +164,6 @@ public:
                 std::string& dataName
               );
 
-  //!@brief This function sets all data slot parents to the current step name.
-  void updateSlotParents();
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -247,7 +241,6 @@ protected:
 private:
   //!@brief Declares a new piece of data in the connectable.
   void declareData(DataRole::Id role, const std::string& name, bool mandatory = true);
-
 
   /*!@brief Sets the data pointer for the slot of the given name and role.
    */

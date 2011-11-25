@@ -36,6 +36,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -46,12 +47,17 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::DataSlot::DataSlot(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory)
+cedar::proc::DataSlot::DataSlot(
+                                 cedar::proc::DataRole::Id role,
+                                 const std::string& name,
+                                 cedar::proc::Connectable* pParent,
+                                 bool isMandatory
+                               )
 :
+mpParent(pParent),
 mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
-mParent(parent),
 mRole(role)
 {
 }
@@ -108,10 +114,12 @@ const std::string& cedar::proc::DataSlot::getName() const
 
 const std::string& cedar::proc::DataSlot::getParent() const
 {
-  return this->mParent;
+  // lock does always work since parent exists as long as slot exists
+  return this->mpParent->getName();
 }
 
-void cedar::proc::DataSlot::setParent(const std::string& parent)
+cedar::proc::Connectable* cedar::proc::DataSlot::getParentPtr()
 {
-  this->mParent = parent;
+  // lock does always work since parent exists as long as slot exists
+  return mpParent;
 }

@@ -37,6 +37,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/ExternalData.h"
+#include "cedar/processing/Connectable.h"
 #include "cedar/processing/exceptions.h"
 
 // PROJECT INCLUDES
@@ -51,10 +52,8 @@ cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr source, ced
 mSource(source),
 mTarget(target)
 {
-  // pointers are valid, now try to cast the target to ExternalData
-  cedar::proc::ExternalDataPtr target_ex = cedar::aux::shared_asserted_cast<cedar::proc::ExternalData>(target);
   // add the source data to target
-  target_ex->addData(source->getData());
+  target->getParentPtr()->setInput(target->getName(), source->getData());
 }
 
 cedar::proc::DataConnection::~DataConnection()
@@ -64,10 +63,8 @@ cedar::proc::DataConnection::~DataConnection()
   // first make a check if pointers are valid for source and target
   if (source_shared && target_shared)
   {
-    // pointers are valid, now try to cast the target to ExternalData
-    cedar::proc::ExternalDataPtr target_ex = boost::static_pointer_cast<cedar::proc::ExternalData>(target_shared);
-    // add the source data to target
-    target_ex->removeData(source_shared->getData());
+    // remove the source data from target
+    target_shared->getParentPtr()->freeInput(target_shared->getName(), source_shared->getData());
   }
 }
 //----------------------------------------------------------------------------------------------------------------------
