@@ -60,6 +60,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <boost/property_tree/detail/json_parser_error.hpp>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -355,6 +356,11 @@ void cedar::proc::gui::Ide::exception(const QString& message)
                         message);
 }
 
+void cedar::proc::gui::Ide::notify(const QString& message)
+{
+  QMessageBox::critical(this,"Notification", message);
+}
+
 void cedar::proc::gui::Ide::error(const QString& message)
 {
   //!@todo Colors!
@@ -472,7 +478,20 @@ void cedar::proc::gui::Ide::recentFileItemTriggered()
   CEDAR_DEBUG_ASSERT(p_sender != NULL);
 
   const QString& file = p_sender->text();
-  this->loadFile(file);
+  try
+  {
+    this->loadFile(file);
+  }
+  catch(boost::property_tree::json_parser::json_parser_error& exc)
+  {
+    // remove this file from list of recent architectures
+    cedar::aux::StringVectorParameterPtr entries = cedar::proc::gui::Settings::instance().getArchitectureFileHistory();
+    entries->eraseAll(file.toStdString());
+    std::string message = "File "
+                          + file.toStdString()
+                          + " does not seem to exist. It was therefore removed from the list of recent architectures.";
+    this->notify(QString::fromStdString(message));
+  }
 }
 
 void cedar::proc::gui::Ide::fillRecentFilesList()

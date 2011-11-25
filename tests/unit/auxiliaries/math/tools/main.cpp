@@ -93,6 +93,33 @@ int main()
     log_file << "error in normalizeAngle(double)" << std::endl;
     errors++;
   }
+  // test getDimensionalityOf
+  cv::Mat matrix_0D(1, 1, CV_32F);
+  unsigned int dim = cedar::aux::math::getDimensionalityOf(matrix_0D);
+  if (dim != 0)
+  {
+    log_file << "error in getDimensionalityOf(cv::Mat), expected dimensionality 0, got " << dim << std::endl;
+  }
+  cv::Mat matrix_1D(11, 1, CV_32F);
+  dim = cedar::aux::math::getDimensionalityOf(matrix_1D);
+  if (dim != 0)
+  {
+    log_file << "error in getDimensionalityOf(cv::Mat), expected dimensionality 1, got " << dim << std::endl;
+  }
+  dim = cedar::aux::math::getDimensionalityOf(matrix_1D.t());
+  if (dim != 0)
+  {
+    log_file << "error in getDimensionalityOf(cv::Mat), expected dimensionality 1, got " << dim << std::endl;
+  }
+  cv::Mat matrix_2D(11, 30, CV_32F);
+  dim = cedar::aux::math::getDimensionalityOf(matrix_2D);
+  if (dim != 0)
+  {
+    log_file << "error in getDimensionalityOf(cv::Mat), expected dimensionality 2, got " << dim << std::endl;
+  }
+
+  // test round
+
 
   log_file << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)

@@ -82,11 +82,7 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT void write(cv::Mat matrix);
 
       //!@brief a templated round function
-      template <typename T>
-      T round(T val)
-      {
-        return std::floor(val + static_cast<T>(0.5));
-      }
+      template <typename T> T round(T val);
 
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(cv::Mat matrix)
