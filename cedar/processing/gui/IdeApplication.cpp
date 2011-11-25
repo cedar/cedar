@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // PROJECT INCLUDES
 
@@ -107,7 +108,11 @@ bool cedar::proc::gui::IdeApplication::notify(QObject* pReceiver, QEvent* pEvent
   {
     QString message("An exception occurred and was caught by the cedar::proc::gui::IdeApplication."
         " This is most likely a bug, please report it. You should probably also save your current work under a different"
-        " name and restart the application.\nException info:\n");
+        " name and restart the application.");
+
+    message += "\nException type:";
+    message += QString::fromStdString(cedar::aux::unmangleName(typeid(e)));
+    message += "\nException info:\n";
     message += e.what();
     emit exception(message);
   }
