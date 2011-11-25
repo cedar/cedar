@@ -53,6 +53,10 @@
 class cedar::proc::ExternalData : public cedar::proc::DataSlot
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Connectable;
+  //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -63,7 +67,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExternalData(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory = true);
+  ExternalData(
+                cedar::proc::DataRole::Id role,
+                const std::string& name,
+                cedar::proc::Connectable* pParent,
+                bool isMandatory = true
+              );
 
   //!@brief Destructor
   ~ExternalData();
@@ -80,11 +89,6 @@ public:
 
   cedar::aux::ConstDataPtr getData(unsigned int index) const;
 
-  void setData(cedar::aux::DataPtr data);
-
-  void setData(cedar::aux::DataPtr data, unsigned int index);
-
-  void addData(cedar::aux::DataPtr data);
 
   inline unsigned int getDataCount() const
   {
@@ -117,7 +121,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setData(cedar::aux::DataPtr data);
+
+  void setData(cedar::aux::DataPtr data, unsigned int index);
+
+  void addData(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

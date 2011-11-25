@@ -46,9 +46,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::ExternalData::ExternalData(cedar::proc::DataRole::Id role, const std::string& name, const std::string& parent, bool isMandatory)
+cedar::proc::ExternalData::ExternalData(
+                                         cedar::proc::DataRole::Id role,
+                                         const std::string& name,
+                                         cedar::proc::Connectable* pParent,
+                                         bool isMandatory
+                                       )
 :
-cedar::proc::DataSlot(role, name, parent, isMandatory),
+cedar::proc::DataSlot(role, name, pParent, isMandatory),
 mIsCollection(false)
 {
 }
@@ -125,7 +130,14 @@ void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
 
 void cedar::proc::ExternalData::setData(cedar::aux::DataPtr data)
 {
-  this->setData(data, 0);
+  if (this->isCollection())
+  {
+    this->addData(data);
+  }
+  else
+  {
+    this->setData(data, 0);
+  }
   mExternalDataChanged();
 }
 
