@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/StepDeclaration.h"
 
 // PROJECT INCLUDES
 

@@ -80,10 +80,8 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(OwnedData);
     CEDAR_DECLARE_PROC_CLASS(PluginProxy);
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
-    CEDAR_DECLARE_PROC_CLASS(StepDeclaration);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
-    CEDAR_DECLARE_PROC_CLASS(TriggerDeclaration);
     //!@endcond
 
     typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;

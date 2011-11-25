@@ -44,8 +44,6 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/StepDeclaration.h"
-#include "cedar/processing/TriggerDeclaration.h"
 #include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/Step.h"
 
