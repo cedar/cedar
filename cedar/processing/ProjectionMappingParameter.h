@@ -41,9 +41,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 #include "cedar/processing/ProjectionMapping.h"
@@ -71,132 +69,37 @@ public:
   //!@brief The standard constructor.
   ProjectionMappingParameter(
                               cedar::aux::Configurable *pOwner,
-                              const std::string& name,
-                              unsigned int minimumNumberOfMappings = 0,
-                              unsigned int maximumNumberOfMappings = UINT_MAX
-                            )
-  :
-  cedar::aux::Parameter(pOwner, name, false),
-  mMinimumNumberOfMappings(minimumNumberOfMappings),
-  mMaximumNumberOfMappings(maximumNumberOfMappings)
-  {
-  }
+                              const std::string& name
+                            );
 
   ProjectionMappingParameter(
                               cedar::aux::Configurable *pOwner,
                               const std::string& name,
-                              const cedar::proc::ProjectionMappingPtr& defaults,
-                              unsigned int minimumNumberOfMappings = 0,
-                              unsigned int maximumNumberOfMappings = UINT_MAX
-                            )
-  :
-  cedar::aux::Parameter(pOwner, name, true),
-  mValues(defaults),
-  mMinimumNumberOfMappings(minimumNumberOfMappings),
-  mMaximumNumberOfMappings(maximumNumberOfMappings)
-  {
-  }
+                              const cedar::proc::ProjectionMappingPtr& defaults
+                            );
 
   //!@brief Destructor
-  ~ProjectionMappingParameter()
-  {
-  }
+  ~ProjectionMappingParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void setTo(const cedar::aux::ConfigurationNode& root)
-  {
-    this->mValues->clear();
-    for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin(); iter != root.end(); ++iter)
-    {
-      unsigned int key;
-      cedar::aux::fromString<unsigned int>(key, iter->first, std::dec);
-      unsigned int value = iter->second.get_value<unsigned int>();
+  void setTo(const cedar::aux::ConfigurationNode& root);
 
-      this->mValues->addMapping(key, value);
-    }
-  }
+  void putTo(cedar::aux::ConfigurationNode& root) const;
 
-  void putTo(cedar::aux::ConfigurationNode& root) const
-  {
-    cedar::aux::ConfigurationNode map_node;
-    for
-    (
-      std::map<unsigned int, unsigned int>::iterator iter = this->mValues->begin();
-      iter != this->mValues->end();
-      ++iter
-    )
-    {
-      cedar::aux::ConfigurationNode value_node;
-      value_node.put_value(iter->second);
-      map_node.push_back(cedar::aux::ConfigurationNode::value_type(cedar::aux::toString<unsigned int>(iter->first), value_node));
-    }
-    root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), map_node));
-  }
+  void initialize(unsigned int numberOfMappings);
 
-  const cedar::proc::ProjectionMappingPtr& getValue() const
-  {
-    return this->mValues;
-  }
+  void changeMapping(unsigned int inputIndex, unsigned int outputIndex);
 
-  void addMapping(unsigned int inputIndex, unsigned int outputIndex)
-  {
-    if (!this->mValues->mappingExists(inputIndex))
-    {
-      if (this->mValues->getNumberOfMappings() < this->mMaximumNumberOfMappings)
-      {
-        this->mValues->addMapping(inputIndex, outputIndex);
-        emitPropertyChangedSignal();
-      }
-    }
-  }
+  void drop(unsigned int inputIndex);
 
-  void dropDimension(unsigned int inputIndex)
-  {
-    if (this->mValues->mappingExists(inputIndex))
-    {
-      if (this->mValues->getNumberOfMappings() < this->mMaximumNumberOfMappings)
-      {
-        this->mValues->dropDimension(inputIndex);
-        emitPropertyChangedSignal();
-      }
-    }
-  }
+  void setOutputDimensionality(unsigned int dimensionality);
 
-  void removeMapping(unsigned int inputIndex)
-  {
-    if (this->mValues->getNumberOfMappings() > this->mMinimumNumberOfMappings)
-    {
-      this->mValues->removeMapping(inputIndex);
-      emitPropertyChangedSignal();
-    }
-  }
+  const cedar::proc::ProjectionMappingPtr& getValue() const;
 
-  void setMinimumNumberOfMappings(unsigned int minimumNumberOfMappings)
-  {
-    mMinimumNumberOfMappings = minimumNumberOfMappings;
-  }
-
-  void setMaximumNumberOfMappings(unsigned int maximumNumberOfMappings)
-  {
-    mMaximumNumberOfMappings = maximumNumberOfMappings;
-  }
-
-  unsigned int getMinimumNumberOfMappings() const
-  {
-    return mMinimumNumberOfMappings;
-  }
-
-  unsigned int getMaximumNumberOfMappings() const
-  {
-    return mMaximumNumberOfMappings;
-  }
-
-  void makeDefault()
-  {
-  }
+  void makeDefault();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

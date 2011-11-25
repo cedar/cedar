@@ -129,6 +129,11 @@ private:
   //!@brief compresses 2D input to 1D output
   void compress2Dto1D();
 
+  //!@brief gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger
+  virtual void onStart();
+  //!@brief gets called once by cedar::proc::LoopedTrigger after it stops
+  virtual void onStop();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

@@ -103,7 +103,6 @@ protected:
   // none yet
 private:
   std::vector<QComboBox*> mComboBoxes;
-  std::vector<bool> mOutputDimensionUsed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

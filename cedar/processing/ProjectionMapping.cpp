@@ -39,10 +39,13 @@
 #include "cedar/processing/exceptions.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <climits>
+//@todo
+#include <iostream>
 
 unsigned int cedar::proc::ProjectionMapping::msDropIndex = UINT_MAX;
 
@@ -50,56 +53,92 @@ unsigned int cedar::proc::ProjectionMapping::msDropIndex = UINT_MAX;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
+cedar::proc::ProjectionMapping::ProjectionMapping()
+{}
+
+cedar::proc::ProjectionMapping::~ProjectionMapping()
+{}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::ProjectionMapping::addMapping(unsigned int inputIndex, unsigned int outputIndex)
+void cedar::proc::ProjectionMapping::changeMapping(unsigned int inputIndex, unsigned int outputIndex)
 {
-  if (!this->isMappingBijective(inputIndex, outputIndex))
+  if (checkInputIndex(inputIndex) && checkOutputIndex(outputIndex))
   {
-    CEDAR_THROW(cedar::proc::ProjectionMappingNotBijectiveException, "With the mapping you want to add, the overall mapping does not stay bijective.");
+    mMapping[inputIndex] = outputIndex;
+    updateState();
+  }
+}
+
+void cedar::proc::ProjectionMapping::updateState()
+{
+  mValidity = VALIDITY_VALID;
+
+  // count the number of dimension drops
+  unsigned int number_of_drops = 0;
+
+  // check whether different input dimensions are mapped onto the same output dimension
+  std::vector<unsigned int> output_dimension_histogram(mOutputDimensionality, 0);
+  for
+  (
+    cedar::proc::ProjectionMapping::iterator iter = mMapping.begin();
+    iter != mMapping.end();
+    ++iter
+  )
+  {
+    if (isDropped(iter->first))
+    {
+      ++number_of_drops;
+    }
+    else
+    {
+      if (++(output_dimension_histogram[iter->second]) > 1)
+      {
+        mValidity = VALIDITY_ERROR;
+      }
+    }
   }
 
-  mMapping[inputIndex] = outputIndex;
+  // if the input dimensionality is smaller or equal to the output dimensionality ...
+  if (getNumberOfMappings() <= mOutputDimensionality)
+  {
+    // ... none of the dimensions should be dropped.
+    if (number_of_drops > 0)
+    {
+      mValidity = VALIDITY_ERROR;
+    }
+  }
+  // if the input dimensionality is larger than the output dimensionality ...
+  else
+  {
+    // ... the mapping should drop the correct number of excess dimensions.
+    if (number_of_drops != (getNumberOfMappings() - mOutputDimensionality))
+    {
+      mValidity = VALIDITY_ERROR;
+    }
+  }
 }
 
-void cedar::proc::ProjectionMapping::dropDimension(unsigned int inputIndex)
+void cedar::proc::ProjectionMapping::drop(unsigned int inputIndex)
 {
-  mMapping[inputIndex] = msDropIndex;
+  if (checkInputIndex(inputIndex))
+  {
+    mMapping[inputIndex] = msDropIndex;
+  }
 }
 
-void cedar::proc::ProjectionMapping::removeMapping(unsigned int inputIndex)
+void cedar::proc::ProjectionMapping::initialize(unsigned int numberOfMappings)
 {
-  mMapping.erase(inputIndex);
-}
-
-void cedar::proc::ProjectionMapping::clear()
-{
+  std::cout << "initializing mapping with " << numberOfMappings << " mappings\n";
   mMapping.clear();
-}
 
-unsigned int cedar::proc::ProjectionMapping::lookUp(unsigned int inputIndex)
-{
-  std::map<unsigned int, unsigned int>::const_iterator iter = mMapping.find(inputIndex);
-
-  if (iter == mMapping.end())
+  for (unsigned int i = 0; i < numberOfMappings; ++i)
   {
-    CEDAR_THROW(cedar::proc::NoMappingException, "There is no mapping defined for the index of the input dimension you supplied.");
-
-    return inputIndex;
+    mMapping[i] = msDropIndex;
   }
-
-  return iter->second;
-}
-
-unsigned int cedar::proc::ProjectionMapping::getNumberOfMappings()
-{
-  return mMapping.size();
-}
-
-bool cedar::proc::ProjectionMapping::isMappingBijective(unsigned int inputIndex, unsigned int outputIndex)
-{
+  std::cout << "mappings:\n";
   for
   (
     std::map<unsigned int, unsigned int>::const_iterator iter = mMapping.begin();
@@ -107,13 +146,25 @@ bool cedar::proc::ProjectionMapping::isMappingBijective(unsigned int inputIndex,
     ++iter
   )
   {
-    if (iter->second == outputIndex && !iter->first == inputIndex)
-    {
-      return false;
-    }
+    std::cout << iter->first << " -> " << iter->second << "\n";
+  }
+}
+
+unsigned int cedar::proc::ProjectionMapping::lookUp(unsigned int inputIndex)
+{
+  if (isDropped(inputIndex) || !mappingExists(inputIndex))
+  {
+    CEDAR_THROW(cedar::proc::NoMappingException, "There is no mapping defined for the index of the input dimension you supplied.");
+
+    return inputIndex;
   }
 
-  return true;
+  return mMapping[inputIndex];
+}
+
+unsigned int cedar::proc::ProjectionMapping::getNumberOfMappings()
+{
+  return mMapping.size();
 }
 
 bool cedar::proc::ProjectionMapping::mappingExists(unsigned int inputIndex)
@@ -122,10 +173,10 @@ bool cedar::proc::ProjectionMapping::mappingExists(unsigned int inputIndex)
 
   if (iter == mMapping.end())
   {
-    return true;
+    return false;
   }
 
-  return false;
+  return true;
 }
 
 bool cedar::proc::ProjectionMapping::isDropped(unsigned int inputIndex)
@@ -143,6 +194,49 @@ bool cedar::proc::ProjectionMapping::isDropped(unsigned int inputIndex)
   }
 
   return false;
+}
+
+void cedar::proc::ProjectionMapping::setOutputDimensionality(unsigned int dimensionality)
+{
+  mOutputDimensionality = dimensionality;
+}
+
+unsigned int cedar::proc::ProjectionMapping::getOutputDimensionality()
+{
+  return mOutputDimensionality;
+}
+
+bool cedar::proc::ProjectionMapping::checkInputIndex(unsigned int inputIndex)
+{
+  bool input_index_okay = true;
+
+  if (inputIndex >= getNumberOfMappings())
+  {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "The index you supplied for the input dimension is too large,\
+                                                       given the input dimensionality of the projection.");
+    input_index_okay = false;
+  }
+
+  return input_index_okay;
+}
+
+bool cedar::proc::ProjectionMapping::checkOutputIndex(unsigned int outputIndex)
+{
+  bool output_index_okay = true;
+
+  if (outputIndex >= mOutputDimensionality)
+  {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "The index you supplied for the output dimension is too large,\
+                                                       given the output dimensionality of the projection.");
+    output_index_okay = false;
+  }
+
+  return output_index_okay;
+}
+
+cedar::proc::ProjectionMapping::VALIDITY cedar::proc::ProjectionMapping::getValidity()
+{
+  return mValidity;
 }
 
 cedar::proc::ProjectionMapping::iterator cedar::proc::ProjectionMapping::begin()

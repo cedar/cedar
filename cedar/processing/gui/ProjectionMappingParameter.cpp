@@ -42,7 +42,7 @@
 // PROJECT INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -85,38 +85,54 @@ void cedar::proc::gui::ProjectionMappingParameter::parameterPointerChanged()
 
 void cedar::proc::gui::ProjectionMappingParameter::propertyChanged()
 {
-  cedar::proc::ProjectionMappingParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::proc::ProjectionMappingParameter>(this->getParameter());
+  // get the parameter
+  cedar::proc::ProjectionMappingParameterPtr parameter
+    = boost::dynamic_pointer_cast<cedar::proc::ProjectionMappingParameter>(this->getParameter());
 
-  //!@todo Don't throw away old spinboxes, reuse them instead
-  // Create the appropriate amount of spinboxes
-  if (this->mComboBoxes.size() != parameter->getValue()->getNumberOfMappings())
+  // delete all the combo boxes
+  for (size_t i = 0; i < this->mComboBoxes.size(); ++i)
   {
-    for (size_t i = 0; i < this->mComboBoxes.size(); ++i)
+    delete this->mComboBoxes.at(i);
+  }
+  this->mComboBoxes.clear();
+
+  // create a list of options to which output dimensions each input can be mapped,
+  // including the option to drop an input
+  QStringList output_dimensions;
+  output_dimensions.push_back("drop");
+  for (unsigned int i = 0; i < parameter->getValue()->getOutputDimensionality(); ++i)
+  {
+    output_dimensions.push_back(cedar::aux::toString<unsigned int>(i).c_str());
+  }
+
+  for (size_t i = 0; i < parameter->getValue()->getNumberOfMappings(); ++i)
+  {
+    QComboBox *p_widget = new QComboBox();
+    this->mComboBoxes.push_back(p_widget);
+    this->layout()->addWidget(p_widget);
+    p_widget->setMinimumHeight(20);
+
+    this->mComboBoxes.at(i)->addItems(output_dimensions);
+
+    unsigned int current_index;
+
+    if (parameter->getValue()->isDropped(i))
     {
-      delete this->mComboBoxes.at(i);
+      current_index = 0;
+      std::cout << "current index " << current_index << "\n";
     }
-    this->mComboBoxes.clear();
-
-    QStringList output_dimensions;
-    output_dimensions.push_back("drop");
-    for (unsigned int i = 0; i < parameter->getMaximumNumberOfMappings(); ++i)
+    else
     {
-      output_dimensions.push_back(cedar::aux::toString<unsigned int>(i).c_str());
+      current_index = parameter->getValue()->lookUp(i) + 1;
+      std::cout << "look up " << parameter->getValue()->lookUp(i) << "\n";
+      std::cout << "current index " << current_index << "\n";
     }
 
-    for (size_t i = 0; i < parameter->getMaximumNumberOfMappings(); ++i)
-    {
-      QComboBox *p_widget = new QComboBox();
-      this->mComboBoxes.push_back(p_widget);
-      this->layout()->addWidget(p_widget);
-      p_widget->setMinimumHeight(20);
+    std::cout << "current index " << current_index << "\n";
 
-      this->mComboBoxes.at(i)->addItems(output_dimensions);
-
-      p_widget->setCurrentIndex(parameter->getValue()->lookUp(i));
-      QObject::connect(p_widget, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
-    }
+    p_widget->setCurrentIndex(current_index);
+    p_widget->setDisabled(parameter->isConstant());
+    QObject::connect(p_widget, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
 
     emit heightChanged();
   }
@@ -127,18 +143,18 @@ void cedar::proc::gui::ProjectionMappingParameter::currentIndexChanged(int)
   cedar::proc::ProjectionMappingParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::ProjectionMappingParameter>(this->getParameter());
 
-//  CEDAR_DEBUG_ASSERT(this->mComboBoxes.size() == values.size());
   for (size_t i = 0; i < this->mComboBoxes.size(); ++i)
   {
-    if (this->mComboBoxes.at(i)->currentText().compare("drop"))
+    if (this->mComboBoxes.at(i)->currentIndex() == 0)
     {
-      parameter->dropDimension(i);
+      std::cout << "current index 0\n";
+      parameter->drop(i);
     }
     else
     {
+      std::cout << "current index not 0\n";
       unsigned int output_dimension = static_cast<unsigned int>(this->mComboBoxes.at(i)->currentIndex() - 1);
-      parameter->addMapping(i, output_dimension);
+      parameter->changeMapping(i, output_dimension);
     }
   }
 }
-
