@@ -84,6 +84,16 @@ _mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::steps::Projection::onStart()
+{
+  this->_mDimensionMappings->setConstant(true);
+}
+
+void cedar::proc::steps::Projection::onStop()
+{
+  this->_mDimensionMappings->setConstant(false);
+}
+
 void cedar::proc::steps::Projection::compute(const cedar::proc::Arguments&)
 {
   // call the appropriate projection method via the function pointer
@@ -107,7 +117,7 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   }
 
   // the number of mappings from input to output is constrained by the output dimensionality
-  this->_mDimensionMappings->setMaximumNumberOfMappings(new_dimensionality);
+  this->_mDimensionMappings->setOutputDimensionality(new_dimensionality);
   this->initializeOutputMatrix();
 }
 
@@ -132,9 +142,21 @@ void cedar::proc::steps::Projection::reconfigure()
     {
       if (_mDimensionMappings->getValue()->isDropped(index))
       {
+        std::cout << "dimension " << index << " is dropped\n";
         mIndicesToCompress.push_back(index);
       }
+      else
+      {
+        std::cout << "dimension " << index << " is not dropped\n";
+      }
     }
+
+    std::cout << "indices to compress:\n";
+    for (unsigned int i = 0; i < mIndicesToCompress.size(); ++i)
+    {
+      std::cout << mIndicesToCompress[i] << ", ";
+    }
+    std::cout << "\n";
 
     // set up the appropriate function pointer for different combinations of
     // input and output dimensionality
@@ -159,7 +181,7 @@ void cedar::proc::steps::Projection::reconfigure()
       std::cout << "Not implemented yet.\n";
     }
   }
-  // if the projectoin expands ...
+  // if the projection expands ...
   else
   {
     // ... set up the appropriate function pointer
@@ -382,7 +404,7 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
 
   this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
   mInputDimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
-  //!@todo this->_mDimensionMappings->resize(mInputDimensionality);
+  this->_mDimensionMappings->initialize(mInputDimensionality);
 
   this->reconfigure();
 }
