@@ -83,6 +83,18 @@ cedar::proc::Network::~Network()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Network::reset()
+{
+  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    if (cedar::proc::StepPtr step = boost::shared_dynamic_cast<cedar::proc::Step>(iter->second))
+    {
+      step->callReset();
+    }
+  }
+}
+
 const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
 {
   return this->mElements;

@@ -83,6 +83,8 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 
   // When the name changes, we need to tell the manager about this.
   QObject::connect(this->_mName.get(), SIGNAL(valueChanged()), this, SLOT(onNameChanged()));
+
+  this->registerFunction("reset", boost::bind(&cedar::proc::Step::callReset, this));
 }
 
 cedar::proc::Step::~Step()
@@ -100,6 +102,26 @@ cedar::proc::Step::~Step()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::Step::callReset()
+{
+  // collect all locks that belong to this step
+  cedar::aux::LockSet locks;
+  this->getDataLocks(locks);
+
+  // lock everything
+  cedar::aux::lock(locks);
+
+  // reset the step
+  this->reset();
+
+  // unlock everything
+  cedar::aux::unlock(locks);
+}
+
+void cedar::proc::Step::reset()
+{
+  // empty as default implementation
+}
 
 /*!
  * As an example, consider a class A that has a function void A::foo():

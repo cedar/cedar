@@ -138,6 +138,14 @@ _mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dyn::NeuralField::reset()
+{
+  this->mActivation->getData() = mRestingLevel->getValue();
+  this->mSigmoidalActivation->getData() = cv::Scalar(0);
+  this->mLateralInteraction->getData() = cv::Scalar(0);
+  this->mInputNoise->getData() = cv::Scalar(0);
+  this->mNeuralNoise->getData() = cv::Scalar(0);
+}
 
 cedar::proc::DataSlot::VALIDITY cedar::dyn::NeuralField::determineInputValidity
                                                          (
