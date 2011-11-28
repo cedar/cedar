@@ -159,6 +159,21 @@ endif(qwtplot3d_FOUND)
 find_package(OpenGL)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
 
+# FFTW
+option(CEDAR_USE_FFTW "Include fast Fourier transform convolution using FFTW." OFF)
+if(CEDAR_USE_FFTW)
+message("Searching for FFTW...")
+find_library(FFTW fftw3 fftw3_threads)
+if(FFTW)
+    message("FFTW was found.")
+    add_definitions(-DCEDAR_FFTW)
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} fftw3 fftw3_threads)
+else(FFTW)
+    message("Optional library FFTW was not found on your system!")
+    set(FFTW OFF)
+endif(FFTW)
+endif(CEDAR_USE_FFTW)
+
 # libFRI
 option(CEDAR_USE_KUKA_LWR "Include Kuka Fast Research Interface for LWR if possible." ON)
 
