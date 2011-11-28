@@ -96,7 +96,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@todo make weak ptr
+  cedar::proc::Network* mpRegisteredAt;
 private:
   // none yet
 
@@ -106,8 +107,6 @@ private:
 protected:
   //!@brief The name that uniquely identifies the element within its own module.
   cedar::aux::StringParameterPtr _mName;
-  //!@todo make weak ptr
-  cedar::proc::Network* mpRegisteredAt;
 
 private:
   // none yet

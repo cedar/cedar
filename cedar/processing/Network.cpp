@@ -238,6 +238,11 @@ void cedar::proc::Network::writeFile(const std::string& filename)
 
 void cedar::proc::Network::saveTo(cedar::aux::ConfigurationNode& root)
 {
+  cedar::aux::ConfigurationNode meta;
+  this->writeMetaData(meta);
+  if (!meta.empty())
+    root.add_child("meta", meta);
+
   cedar::aux::ConfigurationNode steps;
   this->saveSteps(steps);
   if (!steps.empty())
@@ -254,7 +259,37 @@ void cedar::proc::Network::saveTo(cedar::aux::ConfigurationNode& root)
     root.add_child("connections", connections);
 }
 
+void cedar::proc::Network::writeMetaData(cedar::aux::ConfigurationNode& meta)
+{
+  meta.put("format", 1);
+}
+
 void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
+{
+  unsigned int format_version = 1; // default value is the current format
+  try
+  {
+    const cedar::aux::ConfigurationNode& meta = root.get_child("meta");
+    format_version = meta.get<unsigned int>("format");
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    //!@todo Write this to a proper log once we have such a structure
+    std::cout << "Error recognizing file format. Defaulting to current file format version." << std::endl;
+  }
+
+  switch (format_version)
+  {
+    default:
+      //!@todo Write this to a proper log once we have such a structure
+      std::cout << "Unknown format version " << format_version << ". Defaulting to the current version." << std::endl;
+    case 1:
+      this->readFromV1(root);
+      break;
+  }
+}
+
+void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
 {
   try
   {
