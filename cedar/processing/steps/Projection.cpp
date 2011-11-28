@@ -50,6 +50,7 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -72,7 +73,7 @@ _mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 
   this->declareOutput("output", mOutput);
 
   // initialize the output buffer to the correct size
-  this->initializeOutputMatrix();
+  this->outputDimensionalityChanged();
 
   // connect signals and slots
   QObject::connect(_mDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
@@ -118,6 +119,7 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
 
   // the number of mappings from input to output is constrained by the output dimensionality
   this->_mDimensionMappings->setOutputDimensionality(new_dimensionality);
+
   this->initializeOutputMatrix();
 }
 
@@ -128,47 +130,36 @@ void cedar::proc::steps::Projection::outputDimensionSizesChanged()
 
 void cedar::proc::steps::Projection::reconfigure()
 {
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
   unsigned int output_dimensionality = _mOutputDimensionality->getValue();
 
   // if the projection compresses ...
-  if (mInputDimensionality > output_dimensionality)
+  if (input_dimensionality > output_dimensionality)
   {
-    CEDAR_DEBUG_ASSERT(mInputDimensionality == _mDimensionMappings->getValue()->getNumberOfMappings())
+    CEDAR_DEBUG_ASSERT(input_dimensionality == _mDimensionMappings->getValue()->getNumberOfMappings())
 
     // ... compute which indices need to be compressed
     mIndicesToCompress.clear();
 
-    for (unsigned int index = 0; index < mInputDimensionality; ++index)
+    for (unsigned int index = 0; index < input_dimensionality; ++index)
     {
       if (_mDimensionMappings->getValue()->isDropped(index))
       {
-        std::cout << "dimension " << index << " is dropped\n";
         mIndicesToCompress.push_back(index);
       }
-      else
-      {
-        std::cout << "dimension " << index << " is not dropped\n";
-      }
     }
-
-    std::cout << "indices to compress:\n";
-    for (unsigned int i = 0; i < mIndicesToCompress.size(); ++i)
-    {
-      std::cout << mIndicesToCompress[i] << ", ";
-    }
-    std::cout << "\n";
 
     // set up the appropriate function pointer for different combinations of
     // input and output dimensionality
-    if (mInputDimensionality == 3 && output_dimensionality == 2)
+    if (input_dimensionality == 3 && output_dimensionality == 2)
     {
       mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto2D;
     }
-    else if (mInputDimensionality == 3 && output_dimensionality == 1)
+    else if (input_dimensionality == 3 && output_dimensionality == 1)
     {
       mpProjectionMethod = &cedar::proc::steps::Projection::compress3Dto1D;
     }
-    else if (mInputDimensionality == 2 && output_dimensionality == 1)
+    else if (input_dimensionality == 2 && output_dimensionality == 1)
     {
       mpProjectionMethod = &cedar::proc::steps::Projection::compress2Dto1D;
     }
@@ -185,7 +176,7 @@ void cedar::proc::steps::Projection::reconfigure()
   else
   {
     // ... set up the appropriate function pointer
-    if (mInputDimensionality == 0)
+    if (input_dimensionality == 0)
     {
       this->mpProjectionMethod = &cedar::proc::steps::Projection::expand0DtoND;
     }
@@ -193,6 +184,23 @@ void cedar::proc::steps::Projection::reconfigure()
     {
       this->mpProjectionMethod = &cedar::proc::steps::Projection::expandMDtoND;
     }
+  }
+
+  // @todo this should be handled by a more suitable mechanism for users
+  if (this->_mDimensionMappings->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
+  {
+    this->setState(
+                    cedar::proc::Step::STATE_EXCEPTION,
+                    "The projection, as you have set it up, does not work in the given context.\
+                    Please revise the mapping parameters."
+                  );
+  }
+  else
+  {
+    this->setState(
+                    cedar::proc::Step::STATE_NONE,
+                    "Projection mapping is set up correctly."
+                  );
   }
 }
 
@@ -266,6 +274,8 @@ void cedar::proc::steps::Projection::expand1Dto2D()
 
 void cedar::proc::steps::Projection::expandMDtoND()
 {
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
+
   // create an iterator for the output matrix
   cedar::aux::MatrixIterator output_iterator(mOutput->getData());
 
@@ -283,7 +293,7 @@ void cedar::proc::steps::Projection::expandMDtoND()
     }
 
     // if the input dimensionality is 1 ...
-    if (mInputDimensionality == 1)
+    if (input_dimensionality == 1)
     {
       // ... we still need to have an index tuple because of OpenCV limitations
       input_index.push_back(0);
@@ -301,6 +311,11 @@ void cedar::proc::steps::Projection::compress2Dto1D()
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 1);
 
   cv::reduce(mInput->getData(), mOutput->getData(), mIndicesToCompress.at(0), _mCompressionType->getValue());
+
+  if (mOutput->getData().rows == 1)
+  {
+    mOutput->getData() = mOutput->getData().t();
+  }
 }
 
 void cedar::proc::steps::Projection::compress3Dto2D()
@@ -314,13 +329,15 @@ void cedar::proc::steps::Projection::compress3Dto1D()
 {
   CEDAR_DEBUG_ASSERT(mIndicesToCompress.size() == 2);
 
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
+
   // the compression from 3D to 1D first compresses the input
   // cube to a temporary 2D matrix and then compresses that to 1D
 
   // in order to do that, we first have to find a vector containing
   // the sizes of the temporary 2D matrix ...
   std::vector<int> sizes;
-  for (unsigned int i = 0; i < mInputDimensionality; ++i)
+  for (unsigned int i = 0; i < input_dimensionality; ++i)
   {
     if (i != mIndicesToCompress.at(0))
     {
@@ -329,12 +346,18 @@ void cedar::proc::steps::Projection::compress3Dto1D()
   }
 
   // ... and create the temporary 2D matrix with those sizes
-  cv::Mat tmp_2d(mInputDimensionality - 1, &sizes.front(), CV_32F, cv::Scalar(0.0));
+  cv::Mat tmp_2d(input_dimensionality - 1, &sizes.front(), CV_32F, cv::Scalar(0.0));
 
   // reduce the 3D input to the (temporary) 2D matrix
   cedar::aux::math::reduceCvMat3D<float>(mInput->getData(), tmp_2d, mIndicesToCompress.at(0), _mCompressionType->getValue());
+
   // reduce the temporary 2D matrix to the final 1D output of the projection
   cv::reduce(tmp_2d, mOutput->getData(), mIndicesToCompress.at(1) - 1, _mCompressionType->getValue());
+
+  if (mOutput->getData().rows == 1)
+  {
+    mOutput->getData() = mOutput->getData().t();
+  }
 }
 
 void cedar::proc::steps::Projection::compressNDtoMD()
@@ -349,9 +372,10 @@ void cedar::proc::steps::Projection::compressNDtoMD()
 void cedar::proc::steps::Projection::compressNDto0D()
 {
   double maximum = 0;
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
 
   // for a dimensionality below 3 ...
-  if (mInputDimensionality < 3)
+  if (input_dimensionality < 3)
   {
     // ... we can use an OpenCV function to determine the maximum
     double minimum;
@@ -403,8 +427,13 @@ void cedar::proc::steps::Projection::inputConnectionChanged(const std::string& i
   CEDAR_DEBUG_ASSERT(inputName == "input");
 
   this->mInput = boost::shared_dynamic_cast<const cedar::aux::MatData>(this->getInput(inputName));
-  mInputDimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
-  this->_mDimensionMappings->initialize(mInputDimensionality);
+
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
+
+  if (input_dimensionality != this->_mDimensionMappings->getValue()->getNumberOfMappings())
+  {
+    this->_mDimensionMappings->initialize(input_dimensionality);
+  }
 
   this->reconfigure();
 }

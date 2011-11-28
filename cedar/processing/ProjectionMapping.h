@@ -52,6 +52,8 @@
  */
 class cedar::proc::ProjectionMapping
 {
+  friend class cedar::proc::ProjectionMappingParameter;
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -60,6 +62,7 @@ class cedar::proc::ProjectionMapping
   typedef MappingType::iterator iterator;
   typedef MappingType::const_iterator const_iterator;
 
+public:
   //! Enum describing the validity of the mapping.
   enum VALIDITY
   {
@@ -181,7 +184,10 @@ private:
    * When adding a new mapping, this method checks whether the new overall mapping still
    * makes sense in the given context and updates the state of the mapping accordingly.
    */
-  void updateState();
+  void updateValidity();
+
+  //@todo write documentation
+  void addMapping(unsigned int inputIndex, unsigned int outputIndex);
 
   /*!@brief Check whether the index of the output dimension is out of bounds.
    *
