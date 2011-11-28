@@ -49,6 +49,8 @@
  *
  * BaseType must offer at least a constructor accepting an argument of type const cedar::aux::Arguments&.
  *
+ * @param BaseType Type being returned by the allocate functions.
+ *
  * @remarks If the BaseType is abstract, use cedar::aux::AbstractFactory instead.
  */
 template <typename BaseType, typename SmartPointerType>
