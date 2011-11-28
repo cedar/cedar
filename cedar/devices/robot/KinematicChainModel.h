@@ -63,7 +63,7 @@ class cedar::dev::robot::KinematicChainModel : public cedar::aux::Object
 {
 private:
 
-  Q_OBJECT;
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

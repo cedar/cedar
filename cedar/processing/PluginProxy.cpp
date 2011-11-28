@@ -135,7 +135,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
 
-  p_interface = (PluginInterfaceMethod) (dlsym(this->mpLibHandle, "pluginDeclaration"));
+  p_interface = reinterpret_cast<PluginInterfaceMethod>(dlsym(this->mpLibHandle, "pluginDeclaration"));
   if (!p_interface)
   {
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: dlsym returned NULL.");

@@ -73,7 +73,7 @@ namespace cedar
       {
         return static_cast<float>(static_cast<int32_t>(val + 0.5));
       }
-    };
-  };
-};
+    }
+  }
+}
 #endif  // CEDAR_AUX_MATH_FUNCTIONS_H

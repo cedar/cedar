@@ -92,7 +92,7 @@ namespace cedar
         return cbrt(in);
 #endif // MSVC
       }
-    };
-  };
-};
+    }
+  }
+}
 #endif // CEDAR_AUX_MATH_ALGEBRA_TOOLS_H

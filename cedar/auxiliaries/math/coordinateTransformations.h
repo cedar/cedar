@@ -106,7 +106,7 @@ namespace cedar
 //                                               CvMAT& pointCartesian,
 //                                               CvMAT& timeDerivativeSpherical
 //                                             );
-    };
-  };
-};
+    }
+  }
+}
 #endif  // CEDAR_AUX_MATH_COORDNIATE_TRANSFORMATIONS_H
