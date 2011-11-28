@@ -400,9 +400,11 @@ void cedar::proc::gui::Ide::save()
 
 void cedar::proc::gui::Ide::saveAs()
 {
+  cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to save", // caption
-                                              "", // initial directory; //!@todo save/restore with window settings
+                                              last_dir->get().absolutePath(), // initial directory;
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
@@ -418,6 +420,11 @@ void cedar::proc::gui::Ide::saveAs()
     cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
 
     this->mpActionSave->setEnabled(true);
+
+    cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
+    QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
+    cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
+    last_dir->set(path);
   }
 }
 
