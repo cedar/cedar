@@ -149,9 +149,6 @@ private:
   //!@brief vector holding all indices of dimensions that have to be compressed
   //! this is only in use when the projection is set up to compress the dimensionality of the input
   std::vector<unsigned int> mIndicesToCompress;
-  //!@brief dimensionality of the input
-  //! this is determined when another step is connected to the input of the projection
-  unsigned int mInputDimensionality;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

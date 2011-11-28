@@ -81,6 +81,10 @@ public slots:
 
   void currentIndexChanged(int index);
 
+
+  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  void valueChanged();
+
   //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
   void propertyChanged();
 
@@ -94,7 +98,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void updateValidity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

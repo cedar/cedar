@@ -68,13 +68,18 @@ void cedar::proc::ProjectionMapping::changeMapping(unsigned int inputIndex, unsi
   if (checkInputIndex(inputIndex) && checkOutputIndex(outputIndex))
   {
     mMapping[inputIndex] = outputIndex;
-    updateState();
+    updateValidity();
   }
 }
 
-void cedar::proc::ProjectionMapping::updateState()
+void cedar::proc::ProjectionMapping::addMapping(unsigned int inputIndex, unsigned int outputIndex)
 {
-  mValidity = VALIDITY_VALID;
+  mMapping[inputIndex] = outputIndex;
+}
+
+void cedar::proc::ProjectionMapping::updateValidity()
+{
+  mValidity = cedar::proc::ProjectionMapping::VALIDITY_VALID;
 
   // count the number of dimension drops
   unsigned int number_of_drops = 0;
@@ -96,7 +101,7 @@ void cedar::proc::ProjectionMapping::updateState()
     {
       if (++(output_dimension_histogram[iter->second]) > 1)
       {
-        mValidity = VALIDITY_ERROR;
+        mValidity = cedar::proc::ProjectionMapping::VALIDITY_ERROR;
       }
     }
   }
@@ -107,7 +112,7 @@ void cedar::proc::ProjectionMapping::updateState()
     // ... none of the dimensions should be dropped.
     if (number_of_drops > 0)
     {
-      mValidity = VALIDITY_ERROR;
+      mValidity = cedar::proc::ProjectionMapping::VALIDITY_ERROR;
     }
   }
   // if the input dimensionality is larger than the output dimensionality ...
@@ -116,7 +121,7 @@ void cedar::proc::ProjectionMapping::updateState()
     // ... the mapping should drop the correct number of excess dimensions.
     if (number_of_drops != (getNumberOfMappings() - mOutputDimensionality))
     {
-      mValidity = VALIDITY_ERROR;
+      mValidity = cedar::proc::ProjectionMapping::VALIDITY_ERROR;
     }
   }
 }
@@ -126,28 +131,20 @@ void cedar::proc::ProjectionMapping::drop(unsigned int inputIndex)
   if (checkInputIndex(inputIndex))
   {
     mMapping[inputIndex] = msDropIndex;
+    updateValidity();
   }
 }
 
 void cedar::proc::ProjectionMapping::initialize(unsigned int numberOfMappings)
 {
-  std::cout << "initializing mapping with " << numberOfMappings << " mappings\n";
   mMapping.clear();
 
   for (unsigned int i = 0; i < numberOfMappings; ++i)
   {
     mMapping[i] = msDropIndex;
   }
-  std::cout << "mappings:\n";
-  for
-  (
-    std::map<unsigned int, unsigned int>::const_iterator iter = mMapping.begin();
-    iter != mMapping.end();
-    ++iter
-  )
-  {
-    std::cout << iter->first << " -> " << iter->second << "\n";
-  }
+
+  updateValidity();
 }
 
 unsigned int cedar::proc::ProjectionMapping::lookUp(unsigned int inputIndex)

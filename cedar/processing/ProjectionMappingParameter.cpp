@@ -89,8 +89,12 @@ void cedar::proc::ProjectionMappingParameter::setTo(const cedar::aux::Configurat
     cedar::aux::fromString<unsigned int>(key, iter->first, std::dec);
     unsigned int value = iter->second.get_value<unsigned int>();
 
-    mValues->changeMapping(key, value);
+    mValues->addMapping(key, value);
   }
+
+  mValues->updateValidity();
+  emitChangedSignal();
+  emitPropertyChangedSignal();
 }
 
 void cedar::proc::ProjectionMappingParameter::putTo(cedar::aux::ConfigurationNode& root) const

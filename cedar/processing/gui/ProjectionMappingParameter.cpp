@@ -42,12 +42,15 @@
 // PROJECT INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
+#include "cedar/processing/ProjectionMapping.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
+#include <QColor>
+#include <QPalette>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -61,6 +64,7 @@ cedar::proc::gui::Parameter(pParent)
   this->setLayout(new QVBoxLayout());
   this->layout()->setContentsMargins(0, 0, 0, 0);
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
+  updateValidity();
 }
 
 //!@brief Destructor
@@ -79,8 +83,43 @@ void cedar::proc::gui::ProjectionMappingParameter::parameterPointerChanged()
   cedar::proc::ProjectionMappingParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::proc::ProjectionMappingParameter>(this->getParameter());
 
+  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(valueChanged()));
   QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
   this->propertyChanged();
+}
+
+void cedar::proc::gui::ProjectionMappingParameter::valueChanged()
+{
+  updateValidity();
+}
+
+void cedar::proc::gui::ProjectionMappingParameter::updateValidity()
+{
+  QColor color;
+
+  cedar::proc::ProjectionMappingParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::proc::ProjectionMappingParameter>(this->getParameter());
+
+  for
+  (
+    std::vector<QComboBox*>::iterator iter = mComboBoxes.begin();
+    iter != mComboBoxes.end();
+    ++iter
+  )
+  {
+    if (parameter->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
+    {
+      (*iter)->setStyleSheet("background-color: red");
+    }
+    else if (parameter->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_WARNING)
+    {
+      (*iter)->setStyleSheet("background-color: yellow");
+    }
+    else if (parameter->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_VALID)
+    {
+      (*iter)->setStyleSheet("background-color: green");
+    }
+  }
 }
 
 void cedar::proc::gui::ProjectionMappingParameter::propertyChanged()
@@ -119,23 +158,21 @@ void cedar::proc::gui::ProjectionMappingParameter::propertyChanged()
     if (parameter->getValue()->isDropped(i))
     {
       current_index = 0;
-      std::cout << "current index " << current_index << "\n";
     }
     else
     {
       current_index = parameter->getValue()->lookUp(i) + 1;
-      std::cout << "look up " << parameter->getValue()->lookUp(i) << "\n";
-      std::cout << "current index " << current_index << "\n";
     }
-
-    std::cout << "current index " << current_index << "\n";
 
     p_widget->setCurrentIndex(current_index);
     p_widget->setDisabled(parameter->isConstant());
+
     QObject::connect(p_widget, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
 
     emit heightChanged();
   }
+
+  updateValidity();
 }
 
 void cedar::proc::gui::ProjectionMappingParameter::currentIndexChanged(int)
@@ -147,12 +184,10 @@ void cedar::proc::gui::ProjectionMappingParameter::currentIndexChanged(int)
   {
     if (this->mComboBoxes.at(i)->currentIndex() == 0)
     {
-      std::cout << "current index 0\n";
       parameter->drop(i);
     }
     else
     {
-      std::cout << "current index not 0\n";
       unsigned int output_dimension = static_cast<unsigned int>(this->mComboBoxes.at(i)->currentIndex() - 1);
       parameter->changeMapping(i, output_dimension);
     }

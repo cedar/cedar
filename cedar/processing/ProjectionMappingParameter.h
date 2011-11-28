@@ -122,8 +122,6 @@ protected:
   // none yet
 private:
   cedar::proc::ProjectionMappingPtr mValues;
-  unsigned int mMinimumNumberOfMappings;
-  unsigned int mMaximumNumberOfMappings;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

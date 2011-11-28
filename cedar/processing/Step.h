@@ -90,7 +90,7 @@ public:
   //! Enum that represents the current state of the step.
   enum State
   {
-    //! The state is indetermined.
+    //! The state is undetermined.
     STATE_NONE,
     //! The step is not running.
     STATE_NOT_RUNNING,
@@ -216,6 +216,14 @@ protected:
   //! @brief Method that registers a function of an object so that it can be used by the framework.
   void registerFunction(const std::string& actionName, boost::function<void()> function);
 
+  /*!@brief Sets the current state of the step.
+   *
+   * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
+   *        message of an exception in the STATE_EXCEPTION.
+   *
+   * @todo should be made private again, once we have a mechanism for users to set the "state" of parameters
+   */
+  void setState(cedar::proc::Step::State newState, const std::string& annotation);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -237,12 +245,6 @@ private:
    */
   void run();
 
-  /*!@brief Sets the current state of the step.
-   *
-   * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
-   *        message of an exception in the STATE_EXCEPTION.
-   */
-  void setState(cedar::proc::Step::State newState, const std::string& annotation);
 
   //!@brief Method that gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger.
   virtual void onStart();
