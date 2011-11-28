@@ -46,9 +46,13 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief This is an implementation of the factory pattern that returns a new object of DerivedType as a BaseType
+ *        pointer.
  *
- * More detailed description of the class.
+ * @param BaseType         Type of the pointer returned by the allocate functions.
+ * @param DerivedType      Type of the object being allocated.
+ * @param SmartPointerType The smart pointer base type. This can be used to decide whether you want to use shared_ptr,
+ *                         intrusive_ptr or others.
  */
 template <typename BaseType, typename DerivedType, typename SmartPointerType >
 class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseType, SmartPointerType>

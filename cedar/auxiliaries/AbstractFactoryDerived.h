@@ -46,9 +46,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Version of cedar::aux::FactoryDerived that works for abstract types.
  *
- * More detailed description of the class.
+ * @see cedar::aux::FactoryDerived
  */
 template <typename BaseType, typename DerivedType>
 class cedar::aux::AbstractFactoryDerived : public AbstractFactory<BaseType>
