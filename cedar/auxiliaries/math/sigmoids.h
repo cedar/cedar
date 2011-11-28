@@ -95,7 +95,7 @@ namespace cedar
 
       //! a sigmoid for a vector of doubles
       CEDAR_AUX_LIB_EXPORT std::vector<double> sigmoid(const std::vector<double>& x, const double beta, const double threshold = 0);
-    };
-  };
-};
+    }
+  }
+}
 #endif  // CEDAR_AUX_MATH_SIGMOIDS_H

@@ -63,7 +63,7 @@ public cedar::aux::ConfigurationInterface
   // macros
   //----------------------------------------------------------------------------
 
-  Q_OBJECT;
+  Q_OBJECT
 
   //----------------------------------------------------------------------------
   // constructors and destructor

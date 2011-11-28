@@ -79,7 +79,7 @@ class cedar::aux::gui::SceneWidget : public cedar::aux::gui::BaseWidget, private
 {
 private:
 
-	Q_OBJECT;
+	Q_OBJECT
 
 public:
   //--------------------------------------------------------------------------------------------------------------------

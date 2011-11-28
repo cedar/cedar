@@ -51,7 +51,7 @@ namespace cedar
     {
       //!@brief cedar's own pi
       const double pi = 3.14159265358979323846;
-    };
-  };
-};
+    }
+  }
+}
 #endif // CEDAR_AUX_MATH_ALGEBRA_TOOLS_H

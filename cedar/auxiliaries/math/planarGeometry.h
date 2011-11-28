@@ -58,7 +58,7 @@ namespace cedar
       //! @param[out] p_x    optional first coordinate of closest point on ellipse
       //! @param[out] p_y    optional second coordinate of closest point on ellipse
       double distancePointEllipse(double a, double b, double u, double v, double* p_x = 0, double* p_y = 0);
-    };
-  };
-};
+    }
+  }
+}
 #endif  // CEDAR_AUX_MATH_PLANAR_GEOMETRY_H

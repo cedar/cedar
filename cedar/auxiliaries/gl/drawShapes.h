@@ -216,7 +216,7 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT
       void drawAxes(double length);
-    };
-  };
-};
+    }
+  }
+}
 #endif // CEDAR_AUX_GL_DRAW_SHAPES_H

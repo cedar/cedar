@@ -57,7 +57,7 @@ class cedar::aux::Object : public QObject, public cedar::aux::ConfigurationInter
 {
 private:
 
-  Q_OBJECT;
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

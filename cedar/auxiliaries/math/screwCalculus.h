@@ -221,8 +221,8 @@ namespace cedar
       cv::Mat twistCoordinates(const cv::Mat& rSupportPoint, const cv::Mat& rAxis);
 
 
-    };
-  };
-};
+    }
+  }
+}
 
 #endif  // CEDAR_AUX_MATH_SCREW_CALCULUS_H
