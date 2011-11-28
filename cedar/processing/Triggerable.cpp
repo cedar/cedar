@@ -60,6 +60,12 @@ cedar::proc::Triggerable::~Triggerable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+boost::signals2::connection cedar::proc::Triggerable::connectToStateChanged(boost::function<void ()> slot)
+{
+  return mStateChanged.connect(slot);
+}
+
 void cedar::proc::Triggerable::setParentTrigger(cedar::proc::TriggerPtr parent)
 {
   if (this->isLooped())
@@ -107,6 +113,7 @@ void cedar::proc::Triggerable::setState(cedar::proc::Triggerable::State newState
   {
     this->mState = newState;
     this->mStateAnnotation = annotation;
+    mStateChanged();
 //    emit stateChanged();
   }
 }
