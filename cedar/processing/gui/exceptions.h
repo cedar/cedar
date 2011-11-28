@@ -66,4 +66,15 @@ public:
   }
 }; // class cedar::proc::InvalidTriggerNameException
 
+/*!@brief This exception is thrown whenever a mode is not known to cedar.
+ */
+class cedar::proc::gui::InvalidModeException : public cedar::aux::ExceptionBase
+{
+public:
+  InvalidModeException()
+  {
+    this->mType = "InvalidModeException";
+  }
+}; // class cedar::proc::InvalidModeException
+
 #endif // CEDAR_PROC_GUI_EXCEPTIONS_H

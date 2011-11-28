@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/gui/ArchitectureToolBox.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/gui/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -95,6 +96,10 @@ void cedar::proc::gui::ArchitectureToolBox::selectionChanged(QString data)
   else if (mode == "mode.Connect")
   {
     mode_val = cedar::proc::gui::Scene::MODE_CONNECT;
+  }
+  else
+  {
+    CEDAR_THROW(cedar::proc::gui::InvalidModeException, "This mode is not known.");
   }
 
   this->mpView->setMode(mode_val, param);
