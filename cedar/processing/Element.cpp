@@ -46,8 +46,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::proc::Element::Element()
 :
-_mName(new cedar::aux::StringParameter(this, "name", "element")),
-mpRegisteredAt(NULL)
+mpRegisteredAt(NULL),
+_mName(new cedar::aux::StringParameter(this, "name", "element"))
 {
 }
 
