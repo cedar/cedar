@@ -43,6 +43,8 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 
@@ -127,6 +129,11 @@ private:
   //!@brief compresses 2D input to 1D output
   void compress2Dto1D();
 
+  //!@brief gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger
+  virtual void onStart();
+  //!@brief gets called once by cedar::proc::LoopedTrigger after it stops
+  virtual void onStop();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -142,9 +149,6 @@ private:
   //!@brief vector holding all indices of dimensions that have to be compressed
   //! this is only in use when the projection is set up to compress the dimensionality of the input
   std::vector<unsigned int> mIndicesToCompress;
-  //!@brief dimensionality of the input
-  //! this is determined when another step is connected to the input of the projection
-  unsigned int mInputDimensionality;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -154,9 +158,7 @@ protected:
 
 private:
   //!@brief mapping between the input and output dimensions
-  //! each index i of the vector represents the corresponding dimension in the input,
-  //! the value at index i represents the corresponding dimension in the output
-  cedar::aux::UIntVectorParameterPtr _mDimensionMappings;
+  cedar::proc::ProjectionMappingParameterPtr _mDimensionMappings;
 
   //!@brief dimensionality of the output
   //!@todo determine when the projection is connected to an output step

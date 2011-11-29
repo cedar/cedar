@@ -133,6 +133,9 @@ public:
   //!@brief Calls the action with the given name.
   void callAction(const std::string& name);
 
+  //!@brief Calls the reset signal in a thread-safe manner.
+  void callReset();
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
@@ -175,6 +178,13 @@ private:
    *        been set, ...). If all these preconditions are met, the compute function is called.
    */
   void run();
+
+
+  /*!@brief This is the reset method.
+   *
+   *        Implement this method if you want to react to a reset signal.
+   */
+  virtual void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

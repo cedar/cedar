@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/processing/gui/BoolParameter.h"
 #include "cedar/processing/gui/DoubleParameter.h"
 #include "cedar/processing/gui/DoubleVectorParameter.h"
@@ -49,6 +50,7 @@
 #include "cedar/processing/gui/UIntVectorParameter.h"
 #include "cedar/processing/gui/StringParameter.h"
 #include "cedar/processing/gui/EnumParameter.h"
+#include "cedar/processing/gui/ProjectionMappingParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/processing/gui/DirectoryParameter.h"
 #include "cedar/processing/Manager.h"
@@ -195,6 +197,7 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
 {
   if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
   {
+    // parameter types in auxiliaries
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::proc::gui::UIntParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
@@ -203,6 +206,8 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DirectoryParameter, cedar::proc::gui::DirectoryParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::proc::gui::EnumParameter>();
+    // parameter types in processing
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::proc::ProjectionMappingParameter, cedar::proc::gui::ProjectionMappingParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }

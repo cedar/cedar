@@ -52,9 +52,7 @@
 #include <QMainWindow>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief This is a QGraphicsScene specifically designed for drawing processing networks.
  */
 class cedar::proc::gui::Scene : public QGraphicsScene
 {
@@ -131,7 +129,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -179,8 +177,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 

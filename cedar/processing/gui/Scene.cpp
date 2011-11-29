@@ -58,6 +58,8 @@
 #include <QMap>
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
+#include <QMenu>
+#include <QAction>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -228,6 +230,30 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
       this->connectModeProcessMouseRelease(pMouseEvent);
       break;
   }
+}
+
+void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
+{
+  this->QGraphicsScene::contextMenuEvent(pContextMenuEvent);
+
+  if (pContextMenuEvent->isAccepted())
+    return;
+
+  QMenu menu;
+  QAction *p_reset = menu.addAction("reset network");
+
+  QAction *a = menu.exec(pContextMenuEvent->screenPos());
+
+  if (a == p_reset)
+  {
+    this->mNetwork->network()->reset();
+  }
+  else
+  {
+    std::cout << "Unmatched action in cedar::proc::gui::Scene::contextMenuEvent." << std::endl;
+  }
+
+  pContextMenuEvent->accept();
 }
 
 void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)

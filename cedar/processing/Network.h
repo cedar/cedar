@@ -83,21 +83,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void readSteps(const cedar::aux::ConfigurationNode& root);
-  void saveSteps(cedar::aux::ConfigurationNode& root);
-
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
-  void saveTriggers(cedar::aux::ConfigurationNode& root);
-
-//  void readGroups(const cedar::aux::ConfigurationNode& root);
-//  void saveGroups(cedar::aux::ConfigurationNode& root);
-
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
-
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnections(cedar::aux::ConfigurationNode& root);
-
   void readFrom(const cedar::aux::ConfigurationNode& root);
   void saveTo(cedar::aux::ConfigurationNode& root);
 
@@ -137,6 +122,8 @@ public:
 
   void updateObjectName(cedar::proc::Element* object);
 
+  void reset();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -147,7 +134,26 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*!@brief Reads the network from a configuration node using the first version of the format.
+   */
+  void readFromV1(const cedar::aux::ConfigurationNode& root);
+
+  void writeMetaData(cedar::aux::ConfigurationNode& root);
+
+  void readSteps(const cedar::aux::ConfigurationNode& root);
+  void saveSteps(cedar::aux::ConfigurationNode& root);
+
+  void readTriggers(const cedar::aux::ConfigurationNode& root);
+  void saveTriggers(cedar::aux::ConfigurationNode& root);
+
+//  void readGroups(const cedar::aux::ConfigurationNode& root);
+//  void saveGroups(cedar::aux::ConfigurationNode& root);
+
+  void readDataConnection(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
+
+  void readDataConnections(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnections(cedar::aux::ConfigurationNode& root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -158,17 +164,6 @@ private:
   ElementMap mElements;
   DataConnectionVector mDataConnections;
   TriggerConnectionVector mTriggerConnections;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::Network
 

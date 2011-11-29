@@ -43,6 +43,8 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QObject>
+#include <boost/signals2.hpp>
 
 /*!@brief Interface for all classes that can be triggered.
  */
@@ -128,7 +130,9 @@ public:
 
   //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
   cedar::proc::TriggerPtr getParentTrigger();
-//
+
+  boost::signals2::connection connectToStateChanged(boost::function<void ()> slot);
+
 //signals:
 //  //!@brief Signal that is emitted whenever the Triggerable's state is changed.
 //  void stateChanged();
@@ -169,6 +173,10 @@ protected:
   State mState;
   //!@brief The annotation string for the current state.
   std::string mStateAnnotation;
+
+  //!@brief Signal that is emitted whenever the Triggerable's state is changed.
+  boost::signals2::signal<void ()> mStateChanged;
+
 private:
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
   //!@brief use Singleton template class here

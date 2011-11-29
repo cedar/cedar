@@ -41,7 +41,7 @@
 #ifdef CEDAR_USE_AMTEC
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions/InitializationException.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/m5apiw32.h"
@@ -68,7 +68,7 @@ cedar::dev::robot::KinematicChain(rpReferenceGeometry)
   if(!initDevice())
   {
     cout << "Error initializing the Amtec module!" << endl;
-    CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
+    CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
   }
 
   return;
@@ -86,7 +86,7 @@ cedar::dev::robot::KinematicChain(configFileName)
   if(!initDevice())
   {
     cout << "Error initializing the Amtec module!" << endl;
-    CEDAR_THROW(cedar::aux::exc::InitializationException, "Error initializing the Amtec module!");
+    CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
   }
 
   return;

@@ -49,9 +49,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
- *
- * More detailed description of the sigmoid base class.
+/*!@brief Basic interface for all sigmoid functions.
  */
 class cedar::aux::math::Sigmoid : public Configurable
 {

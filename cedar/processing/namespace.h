@@ -82,6 +82,8 @@ namespace cedar
     CEDAR_DECLARE_PROC_CLASS(PluginDeclaration);
     CEDAR_DECLARE_PROC_CLASS(Triggerable);
     CEDAR_DECLARE_PROC_CLASS(TriggerConnection);
+    CEDAR_DECLARE_PROC_CLASS(ProjectionMapping);
+    CEDAR_DECLARE_PROC_CLASS_INTRUSIVE(ProjectionMappingParameter);
     //!@endcond
 
     typedef cedar::aux::Singleton<cedar::proc::DeclarationRegistry> DeclarationRegistrySingleton;
@@ -114,6 +116,7 @@ namespace cedar
     class CEDAR_PROC_LIB_EXPORT MissingDeclarationException;
     class CEDAR_PROC_LIB_EXPORT ParseException;
     class CEDAR_PROC_LIB_EXPORT PluginException;
+    class CEDAR_PROC_LIB_EXPORT NoMappingException;
     //!@endcond
   }
 }
