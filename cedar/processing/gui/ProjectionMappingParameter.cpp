@@ -109,15 +109,93 @@ void cedar::proc::gui::ProjectionMappingParameter::updateValidity()
   {
     if (parameter->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_ERROR)
     {
-      (*iter)->setStyleSheet("background-color: red");
+      std::string style_red =
+      "QComboBox {\
+           border: 1px solid gray;\
+           border-radius: 3px;\
+           padding: 1px 18px 1px 3px;\
+           min-width: 6em;\
+       }\
+       QComboBox:editable {\
+           background: white;\
+       }\
+       QComboBox:!editable, QComboBox::drop-down:editable {\
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
+                                        stop: 0 #ff0000, stop: 0.4 #ee1111,\
+                                        stop: 0.5 #dd1111, stop: 1.0 #bb3333);\
+       }\
+      QComboBox::drop-down {\
+           subcontrol-origin: padding;\
+           subcontrol-position: top right;\
+           width: 15px;\
+           border-left-width: 0px;\
+           border-left-color: darkgray;\
+           border-left-style: solid;\
+           border-top-right-radius: 3px;\
+           border-bottom-right-radius: 3px;\
+       }";
+
+      (*iter)->setStyleSheet(style_red.c_str());
     }
     else if (parameter->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_WARNING)
     {
-      (*iter)->setStyleSheet("background-color: yellow");
+      std::string style_yellow =
+      "QComboBox {\
+           border: 1px solid gray;\
+           border-radius: 3px;\
+           padding: 1px 18px 1px 3px;\
+           min-width: 6em;\
+       }\
+       QComboBox:editable {\
+           background: white;\
+       }\
+       QComboBox:!editable, QComboBox::drop-down:editable {\
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
+                                  stop: 0 #ffcc00, stop: 0.4 #fac800,\
+                                  stop: 0.5 #e6b800, stop: 1.0 #e6b800);\
+       }\
+      QComboBox::drop-down {\
+           subcontrol-origin: padding;\
+           subcontrol-position: top right;\
+           width: 15px;\
+           border-left-width: 0px;\
+           border-left-color: darkgray;\
+           border-left-style: solid;\
+           border-top-right-radius: 3px;\
+           border-bottom-right-radius: 3px;\
+       }";
+
+      (*iter)->setStyleSheet(style_yellow.c_str());
     }
     else if (parameter->getValue()->getValidity() == cedar::proc::ProjectionMapping::VALIDITY_VALID)
     {
-      (*iter)->setStyleSheet("background-color: green");
+      std::string style_green =
+      "QComboBox {\
+           border: 1px solid gray;\
+           border-radius: 3px;\
+           padding: 1px 18px 1px 3px;\
+           min-width: 6em;\
+       }\
+       QComboBox:editable {\
+           background: white;\
+       }\
+       QComboBox:!editable, QComboBox::drop-down:editable {\
+            background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\
+                                        stop: 0 #00ff00, stop: 0.4 #11ee11,\
+                                        stop: 0.5 #11dd11, stop: 1.0 #33bb33);\
+       }\
+      QComboBox::drop-down {\
+           subcontrol-origin: padding;\
+           subcontrol-position: top right;\
+           width: 15px;\
+           border-left-width: 0px;\
+           border-left-color: darkgray;\
+           border-left-style: solid;\
+           border-top-right-radius: 3px;\
+           border-bottom-right-radius: 3px;\
+       }";
+
+      (*iter)->setStyleSheet(style_green.c_str());
     }
   }
 }
