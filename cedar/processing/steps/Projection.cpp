@@ -106,16 +106,8 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   // get the new output dimensionality
   unsigned int new_dimensionality = _mOutputDimensionality->getValue();
 
-  if (new_dimensionality == 0)
-  {
-    // dimensionality of zero is represented as a 1x1 matrix
-    this->_mOutputDimensionSizes->resize(1, 1);
-  }
-  else
-  {
-    // resize the dimensionality of the output buffer
-    this->_mOutputDimensionSizes->resize(new_dimensionality, _mOutputDimensionSizes->getDefaultValue());
-  }
+  // resize the dimensionality of the output buffer
+  this->_mOutputDimensionSizes->resize(new_dimensionality, _mOutputDimensionSizes->getDefaultValue());
 
   // the number of mappings from input to output is constrained by the output dimensionality
   this->_mDimensionMappings->setOutputDimensionality(new_dimensionality);
@@ -210,30 +202,24 @@ void cedar::proc::steps::Projection::initializeOutputMatrix()
 
   if (dimensionality == 0)
   {
-    // as a dimensionality of zero is handled by a 1x1 matrix, the "correct"
-    // dimensionality value has to be faked temporarily
-    dimensionality = 1;
-  }
-
-  // convert the sizes of the output dimensions to signed integers so that
-  // OpenCV can handle it
-  std::vector<int> sizes(dimensionality);
-  for (int dim = 0; dim < dimensionality; ++dim)
-  {
-    sizes[dim] = _mOutputDimensionSizes->at(dim);
-  }
-
-  // initialize the output buffer
-  this->lockAll();
-  if (dimensionality == 1) // this includes dimensionality == 0
-  {
-    this->mOutput->getData() = cv::Mat(sizes[0], 1, CV_32F, cv::Scalar(0));
+    this->lockAll();
+    this->mOutput->getData() = cv::Mat(1, 1, CV_32F, cv::Scalar(0));
+    this->unlockAll();
   }
   else
   {
+    // convert the sizes of the output dimensions to signed integers so that
+    // OpenCV can handle it
+    std::vector<int> sizes(dimensionality);
+    for (int dim = 0; dim < dimensionality; ++dim)
+    {
+      sizes[dim] = _mOutputDimensionSizes->at(dim);
+    }
+
+    this->lockAll();
     this->mOutput->getData() = cv::Mat(dimensionality, &sizes.at(0), CV_32F, cv::Scalar(0));
+    this->unlockAll();
   }
-  this->unlockAll();
 }
 
 void cedar::proc::steps::Projection::expand0DtoND()
