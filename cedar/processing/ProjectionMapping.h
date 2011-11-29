@@ -28,36 +28,36 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2011 11 18
 
-    Description:
+    Description: Description of a mapping between dimensions.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_PROJECTION_MAP_H
-#define CEDAR_PROC_PROJECTION_MAP_H
+#ifndef CEDAR_PROC_PROJECTION_MAPPING_H
+#define CEDAR_PROC_PROJECTION_MAPPING_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Description of a mapping between dimensions.
  *
- * More detailed description of the class.
+ * This class is used by the projection to store the mapping between the dimensions of two steps.
  */
 class cedar::proc::ProjectionMapping
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::ProjectionMappingParameter;
 
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-
   typedef std::map<unsigned int, unsigned int> MappingType;
   typedef MappingType::iterator iterator;
   typedef MappingType::const_iterator const_iterator;
@@ -75,10 +75,6 @@ public:
   };
 
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -90,24 +86,6 @@ public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected methods
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // private methods
-  //--------------------------------------------------------------------------------------------------------------------
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief Initialize or reinitialize the mapping with the given number of mappings,
@@ -176,8 +154,15 @@ public:
   //!@brief Return a const iterator to the end of the map (one after the last element).
   cedar::proc::ProjectionMapping::const_iterator end() const;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // private methods
+  //--------------------------------------------------------------------------------------------------------------------
 private:
   /*!@brief Update the state (clean or erroneous) of the mapping.
    *
@@ -186,7 +171,14 @@ private:
    */
   void updateValidity();
 
-  //@todo write documentation
+  /*!@brief Add a mapping without any checks.
+   *
+   * This method is used by the associated parameter when loading a saved mapping from a
+   * configuration file.
+   *
+   * @param inputIndex index of the input dimension
+   * @param outputIndex index of the output dimension
+   */
   void addMapping(unsigned int inputIndex, unsigned int outputIndex);
 
   /*!@brief Check whether the index of the output dimension is out of bounds.
@@ -202,10 +194,8 @@ private:
   bool checkInputIndex(unsigned int inputIndex);
 
   //--------------------------------------------------------------------------------------------------------------------
-  // parameters
+  // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -220,4 +210,4 @@ private:
 
 }; // class cedar::proc::ProjectionMapping
 
-#endif // CEDAR_PROC_PROJECTION_MAP_H
+#endif // CEDAR_PROC_PROJECTION_MAPPING_H

@@ -23,9 +23,7 @@
                  Institut fuer Neuroinformatik
 
     File:        ProjectionMappingParameter.cpp
-
     Maintainer:  Mathis Richter
-
     Email:       mathis.richter@ini.rub.de
 
     Date:        2011 11 16
@@ -36,10 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ProjectionMappingParameter.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/processing/ProjectionMapping.h"
@@ -75,8 +71,6 @@ cedar::proc::gui::ProjectionMappingParameter::~ProjectionMappingParameter()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-//!@todo A lot of this code is almost the same as cedar::proc::gui::UIntVectorParameter.
 
 void cedar::proc::gui::ProjectionMappingParameter::parameterPointerChanged()
 {

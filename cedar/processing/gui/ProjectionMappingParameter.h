@@ -25,12 +25,10 @@
     File:        ProjectionMappingParameter.h
 
     Maintainer:  Mathis Richter
-
     Email:       mathis.richter@ini.rub.de
-
     Date:        2011 11 16
 
-    Description:
+    Description: GUI elements for the projection mapping parameter.
 
     Credits:
 
@@ -39,20 +37,23 @@
 #ifndef CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
 #define CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Parameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QComboBox>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief GUI elements for the projection mapping parameter.
  *
- * More detailed description of the class.
+ * The mapping of each input dimension is visualized by a combo box, from which the index of the corresponding
+ * output dimension can be selected. For compressing projections (i.e., input dim > output dim), the excess input
+ * dimensions can be configured to be dropped (by selecting "drop"). If the mapping configured by the user is
+ * erroneous in the given context, the combo boxes will be colored red and the associated projection will be in
+ * an exception state (i.e., the architecture cannot be run). The combo boxes will turn green as soon as the
+ * configuration is corrected.
  */
 class cedar::proc::gui::ProjectionMappingParameter : public cedar::proc::gui::Parameter
 {
@@ -77,10 +78,11 @@ public:
 public:
 
 public slots:
+  //!@brief Handles changes in the parameter.
   void parameterPointerChanged();
 
+  //!@brief Handles the change of a value in one of the combo boxes.
   void currentIndexChanged(int index);
-
 
   //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
   void valueChanged();
@@ -98,6 +100,9 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Update the validity of the mapping based on the current setting in the GUI
+   * and the context (i.e., the connected steps).
+   */
   void updateValidity();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,18 +111,9 @@ private:
 protected:
   // none yet
 private:
+  //! the combo boxes making up the GUI
   std::vector<QComboBox*> mComboBoxes;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::gui::ProjectionMappingParameter
 
 #endif // CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
-
