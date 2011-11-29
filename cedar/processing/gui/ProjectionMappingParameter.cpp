@@ -135,44 +135,47 @@ void cedar::proc::gui::ProjectionMappingParameter::propertyChanged()
   }
   this->mComboBoxes.clear();
 
-  // create a list of options to which output dimensions each input can be mapped,
-  // including the option to drop an input
-  QStringList output_dimensions;
-  output_dimensions.push_back("drop");
-  for (unsigned int i = 0; i < parameter->getValue()->getOutputDimensionality(); ++i)
+  if (parameter->getValue()->getOutputDimensionality() > 0)
   {
-    output_dimensions.push_back(cedar::aux::toString<unsigned int>(i).c_str());
-  }
-
-  for (size_t i = 0; i < parameter->getValue()->getNumberOfMappings(); ++i)
-  {
-    QComboBox *p_widget = new QComboBox();
-    this->mComboBoxes.push_back(p_widget);
-    this->layout()->addWidget(p_widget);
-    p_widget->setMinimumHeight(20);
-
-    this->mComboBoxes.at(i)->addItems(output_dimensions);
-
-    unsigned int current_index;
-
-    if (parameter->getValue()->isDropped(i))
+    // create a list of options to which output dimensions each input can be mapped,
+    // including the option to drop an input
+    QStringList output_dimensions;
+    output_dimensions.push_back("drop");
+    for (unsigned int i = 0; i < parameter->getValue()->getOutputDimensionality(); ++i)
     {
-      current_index = 0;
-    }
-    else
-    {
-      current_index = parameter->getValue()->lookUp(i) + 1;
+      output_dimensions.push_back(cedar::aux::toString<unsigned int>(i).c_str());
     }
 
-    p_widget->setCurrentIndex(current_index);
-    p_widget->setDisabled(parameter->isConstant());
+    for (size_t i = 0; i < parameter->getValue()->getNumberOfMappings(); ++i)
+    {
+      QComboBox *p_widget = new QComboBox();
+      this->mComboBoxes.push_back(p_widget);
+      this->layout()->addWidget(p_widget);
+      p_widget->setMinimumHeight(20);
 
-    QObject::connect(p_widget, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
+      this->mComboBoxes.at(i)->addItems(output_dimensions);
 
-    emit heightChanged();
+      unsigned int current_index;
+
+      if (parameter->getValue()->isDropped(i))
+      {
+        current_index = 0;
+      }
+      else
+      {
+        current_index = parameter->getValue()->lookUp(i) + 1;
+      }
+
+      p_widget->setCurrentIndex(current_index);
+      p_widget->setDisabled(parameter->isConstant());
+
+      QObject::connect(p_widget, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
+
+      emit heightChanged();
+    }
+
+    updateValidity();
   }
-
-  updateValidity();
 }
 
 void cedar::proc::gui::ProjectionMappingParameter::currentIndexChanged(int)
