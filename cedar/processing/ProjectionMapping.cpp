@@ -34,19 +34,16 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/processing/ProjectionMapping.h"
 #include "cedar/processing/exceptions.h"
 
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/ExceptionBase.h"
-
 // SYSTEM INCLUDES
 #include <climits>
-//@todo
-#include <iostream>
 
+// this number is used to represent a dimension that is to be dropped
 unsigned int cedar::proc::ProjectionMapping::msDropIndex = UINT_MAX;
 
 //----------------------------------------------------------------------------------------------------------------------

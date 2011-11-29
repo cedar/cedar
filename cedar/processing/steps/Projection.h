@@ -38,13 +38,11 @@
 #ifndef CEDAR_PROC_STEPS_PROJECTION_H
 #define CEDAR_PROC_STEPS_PROJECTION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/Parameter.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
+#include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 
@@ -60,6 +58,9 @@
 class cedar::proc::steps::Projection : public cedar::proc::Step
 {
 private:
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
   //! typedef for the projection method function pointer
   //! (function pointer to a void method in cedar::proc::steps::Projection)
   typedef void (cedar::proc::steps::Projection::*ProjectionFunctionPtr)();
@@ -118,8 +119,6 @@ private:
   void expand1Dto2D();
   //!@brief expands and permutes MD input to ND output (M <= N)
   void expandMDtoND();
-  //!@brief compresses ND input to MD output
-  void compressNDtoMD();
   //!@brief compresses ND input to 0D output
   void compressNDto0D();
   //!@brief compresses 3D input to 2D output
@@ -171,4 +170,3 @@ private:
 }; // class cedar::proc::steps::Projection
 
 #endif // CEDAR_PROC_STEPS_PROJECTION_H
-

@@ -28,16 +28,14 @@
     Email:       mathis.richter@ini.rub.de
     Date:        2011 11 24
 
-    Description:
+    Description: Parameter type for the projection mapping.
 
     Credits:
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/ProjectionMappingParameter.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -146,4 +144,3 @@ const cedar::proc::ProjectionMappingPtr& cedar::proc::ProjectionMappingParameter
 {
   return mValues;
 }
-
