@@ -45,6 +45,7 @@
 // SYSTEM INCLUDES
 #include <string>
 #include <QReadWriteLock>
+#include <fstream>
 
 
 /*!@brief Wrapper for some functions that depend on the operating system.
@@ -68,6 +69,11 @@ public:
   static std::string getUserHomeDirectory();
   //!@brief try to get the directory in which application data of cedar is stored
   static std::string getUserApplicationDataDirectory();
+
+  /*!@brief This function opens a crash report file in a standardized location.
+   */
+  static void openCrashFile(std::ofstream& stream, std::string& fileName);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

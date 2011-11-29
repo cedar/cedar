@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_UTILITIES_H
 #define CEDAR_AUX_UTILITIES_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -88,6 +86,58 @@ namespace cedar
     /*!@brief Unmangles the c++ name of a given typeinfo object.
      */
     CEDAR_AUX_LIB_EXPORT std::string unmangleName(const std::type_info& typeinfo);
+
+
+    /*!@brief Structure holding information about an entry in the stack trace.
+     */
+    struct CEDAR_AUX_LIB_EXPORT StackEntry
+    {
+      public:
+        const std::string& symbol() const
+        {
+          return this->mSymbol;
+        }
+
+        const std::string& file() const
+        {
+          return this->mFile;
+        }
+
+        void setRawString(const std::string& rawString);
+
+        friend std::ostream& operator<< (std::ostream& stream, const StackEntry& trace);
+
+      private:
+        std::string mFile;
+        std::string mSymbol;
+        std::string mAddress;
+        std::string mSymbolOffset;
+    };
+
+    /*!@brief Structure holding information about an entire stack trace.
+     *
+     *        The stack trace is always generated at the moment the object is created.
+     */
+    struct CEDAR_AUX_LIB_EXPORT StackTrace
+    {
+      public:
+        StackTrace();
+
+        size_t size() const
+        {
+          return this->mStackTrace.size();
+        }
+
+        const cedar::aux::StackEntry& at(size_t index) const
+        {
+          return this->mStackTrace.at(index);
+        }
+
+        friend std::ostream& operator<< (std::ostream& stream, const StackTrace& trace);
+
+      private:
+        std::vector<cedar::aux::StackEntry> mStackTrace;
+    };
   }
 }
 
