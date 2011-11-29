@@ -40,13 +40,18 @@
 SET(CPACK_PACKAGE_NAME "cedar")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "cedar - Cognition, Embodiment, and Dynamics ARchitecture")
 SET(CPACK_PACKAGE_VENDOR "Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum")
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Mathis Richter")
+
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Mathis Richter <mathis.richter@ini.rub.de>")
+SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "cmake (>= 2.8.2), libboost-all-dev (>= 1.47), libcv2.2 (>= 2.2), libqt4-dev (>= 4.6.2), libqwt5-qt4 (<= 5.2.0), libqwtplot3d-qt4-dev (>= 0.3), libqglviewer-qt4-dev (>= 2.4.6), libconfig8-dev (>= 1.4), doxygen (>= 1.7.1)")
+
 SET(CPACK_GENERATOR "DEB;TBZ2")
 SET(CPACK_SOURCE_GENERATOR "TBZ2")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CEDAR_HOME}/readme.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CEDAR_HOME}/license/LGPL.txt")
+
 SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "1")
+SET(CPACK_PACKAGE_VERSION_MINOR "5")
 SET(CPACK_PACKAGE_VERSION_PATCH "0")
 
 INCLUDE(CPack)
