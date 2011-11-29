@@ -48,7 +48,7 @@
 
 /*! \class cedar::dev::sensors::visual::PictureGrabber
  *  \brief This grabber grabs images from a picture-file
- *  \remarks This functionality is implemented by using the OpenCV classes
+ *  \remarks This functionality is implemented by using the OpenCV class
  *		cv::ImRead. See their documentation for details about
  *		supported image types.
  */
