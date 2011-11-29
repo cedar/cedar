@@ -40,6 +40,9 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/date_time.hpp>
+#include <boost/filesystem.hpp>
+
 #if defined LINUX || defined APPLE
 #include <stdlib.h>
 #endif
@@ -60,6 +63,17 @@ QReadWriteLock cedar::aux::System::mCOutLock;
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::System::openCrashFile(std::ofstream& stream, std::string& crash_file)
+{
+  crash_file = cedar::aux::System::getUserHomeDirectory() + "/.cedar/crashes/";
+  boost::filesystem::create_directories(crash_file);
+  const boost::posix_time::ptime now = boost::posix_time::second_clock::local_time();
+  crash_file += "processingIde.";
+  crash_file += boost::posix_time::to_iso_string(now);
+  crash_file += ".stacktrace";
+  stream.open(crash_file.c_str());
+}
 
 std::string cedar::aux::System::getUserHomeDirectory()
 {
