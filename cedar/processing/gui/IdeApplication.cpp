@@ -38,15 +38,19 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
-
-// PROJECT INCLUDES
+#include "cedar/auxiliaries/System.h"
 
 // SYSTEM INCLUDES
+#include <fstream>
+#include <cstdlib>
+#ifdef GCC
+  #include <csignal>
+#endif // GCC
 
 #define CATCH_EXCEPTIONS_IN_GUI
 
@@ -77,10 +81,44 @@ cedar::proc::gui::IdeApplication::~IdeApplication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+#ifdef GCC
+void cedar::proc::gui::IdeApplication::signalHandler(int signal)
+{
+  std::string signal_name;
+  switch (signal)
+  {
+    case SIGSEGV:
+      signal_name = "SIGSEGV";
+      break;
+
+    default:
+      signal_name = "(unknown signal id)";
+  }
+
+  std::ofstream stream;
+  std::string file_path;
+  cedar::aux::System::openCrashFile(stream, file_path);
+  stream << "Application received signal " << signal_name << std::endl;
+  stream << cedar::aux::StackTrace() << std::endl;
+
+  std::cout << "Application received signal " << signal_name << std::endl;
+  std::cout << "A stack trace has been written to " << file_path << std::endl;
+  abort();
+}
+#endif // GCC
+
 int cedar::proc::gui::IdeApplication::exec()
 {
+#ifdef GCC
+  signal(SIGSEGV, &cedar::proc::gui::IdeApplication::signalHandler);
+#endif // GCC
+
   this->mpIde->show();
   int ret = this->QApplication::exec();
+
+#ifdef GCC
+  signal(SIGSEGV, SIG_DFL);
+#endif // GCC
   return ret;
 }
 
