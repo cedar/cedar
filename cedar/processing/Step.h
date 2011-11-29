@@ -179,6 +179,7 @@ private:
    */
   void run();
 
+
   /*!@brief This is the reset method.
    *
    *        Implement this method if you want to react to a reset signal.

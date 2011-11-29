@@ -54,6 +54,7 @@ cedar_add_library(cedarproc
   gui/Parameter.h
   gui/PluginLoadDialog.h
   gui/PluginManagerDialog.h
+  gui/ProjectionMappingParameter.h
   gui/PropertyPane.h
   gui/Scene.h
   gui/StepItem.h

@@ -165,4 +165,15 @@ public:
   }
 }; // class cedar::proc::DuplicateConnectionException
 
+/*!@brief An exception that is thrown by ProjectionMapping when a user wants to look up a mapping that does not exist.
+ */
+class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
+{
+public:
+  NoMappingException()
+  {
+    this->mType = "NoMappingException";
+  }
+}; // class cedar::proc::NoMappingException
+
 #endif // CEDAR_PROC_EXCEPTIONS_H
