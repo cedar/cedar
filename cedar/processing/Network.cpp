@@ -209,6 +209,14 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
        )
     {
       mDataConnections.erase(it);
+      // if target is not looped, also delete the trigger connection
+      if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
+      {
+        this->disconnectTrigger(
+                                 this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
+                                 this->getElement<cedar::proc::Triggerable>(target_name)
+                               );
+      }
       return;
     }
   }
