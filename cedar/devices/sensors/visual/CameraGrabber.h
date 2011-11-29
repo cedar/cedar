@@ -139,12 +139,51 @@ ABS  - absolute capable
     NOT AVAILABLE
 */
 
+/*! \brief The internal buffer for the camera settings
+ *  \remarks This is only needed for the configuration interface
+ */
+/*typedef struct CamPropertiesStruct
+{
+  //settings
+
+  
+  //and properties
+  int brightness;
+  int saturation;
+  int hue;
+  int gain;
+  int white_balance_blue_u;
+  int sharpness;
+  int auto_exposure; 
+  int gamma;
+  int temperature;
+  int trigger;
+  int trigger_delay;
+  int white_balance_red_v;
+  int zoom;
+  int focus;
+  int guid;
+} CamProperties;
+*/
+//maps property enum id to value of the property
+typedef std::map<unsigned int,int> CameraProperties;
+
+
+typedef struct CameraSettingsStruct
+{
+  int frame_width;
+  int frame_height;
+  std::string fps;
+  std::string mode;
+  std::string iso_speed;
+} CameraSettings;
+
+#define CAMERA_PROPERTY_MODE_AUTO -1
+
 
 /*! \class cedar::dev::sensors::visual::CameraGrabber
- *  \brief This grabber grabs images from firewire cameras
- *  \remarks This functionality is implemented by using OpenCV's
- *           cv::VideoCapture class. See their documentation for details about
- *           supported cameras.
+ *  \brief This grabber grabs images from a camera
+ *  \remarks This functionality is implemented by using the OpenCV class cv::VideoCapture
  */
 class cedar::dev::sensors::visual::CameraGrabber
 :
@@ -451,8 +490,10 @@ protected:
    *  \see
    *    mCameraIds
    */
-  //std::vector<cv::VideoCapture> mVideoCaptures;
   std::vector<cv::VideoCapture> mVideoCaptures;
+  
+  std::vector<CameraProperties> mCamProperties;
+  std::vector<CameraSettings> mCamSettings;
 private:
 
   bool mFinishInitialization;
