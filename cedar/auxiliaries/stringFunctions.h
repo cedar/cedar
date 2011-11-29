@@ -110,12 +110,24 @@ namespace cedar
         result = result.replace(index, needle.length(), replacement);
         index = result.find(needle, index + replacement.length());
       }
-
+      
       return result;
+    }
+
+    /*!@brief Template function that converts an STL string to a simple data type.
+     *
+     * @param value The data value that will be converted to a string.
+     * @param string The string the value will be extracted from.
+     * @param encoding The encoding of the string (e.g., the base of the number (i.e., decimal, hexadecimal, etc.))
+     *        (see http://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-3.3/classstd_1_1ios__base.html)
+     */
+    template <class T>
+    bool fromString(T& value, const std::string& string, std::ios_base& (*encoding)(std::ios_base&))
+    {
+      std::istringstream stream(string);
+      return !(stream >> encoding >> value).fail();
     }
   }
 }
 
-
 #endif // CEDAR_AUX_STRING_FUNCTIONS_H
-

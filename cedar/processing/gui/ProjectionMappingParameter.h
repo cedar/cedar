@@ -22,11 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.h
+    File:        ProjectionMappingParameter.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Maintainer:  Mathis Richter
+
+    Email:       mathis.richter@ini.rub.de
+
+    Date:        2011 11 16
 
     Description:
 
@@ -34,51 +36,57 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_H
-#define CEDAR_PROC_ELEMENT_H
+#ifndef CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
+#define CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/Parameter.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QComboBox>
 
 
-/*!@brief Base class for Elements in a processing architecture.
+/*!@brief Abstract description of the class.
  *
- *        Each element is described by a name that uniquely identifies it within a processing module.
+ * More detailed description of the class.
  */
-class cedar::proc::Element : public cedar::aux::Configurable
+class cedar::proc::gui::ProjectionMappingParameter : public cedar::proc::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Element();
+  ProjectionMappingParameter(QWidget *pParent = NULL);
 
-  //!@brief The destructor.
-  virtual ~Element();
+  //!@brief Destructor
+  virtual ~ProjectionMappingParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Set the name of this element.
-  virtual void setName(const std::string& name);
 
-  //!@brief Get the name of this element.
-  const std::string& getName() const;
+public slots:
+  void parameterPointerChanged();
 
-  //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::Network* pNetwork);
+  void currentIndexChanged(int index);
+
+
+  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  void valueChanged();
+
+  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -90,28 +98,26 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void updateValidity();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@todo make weak ptr
-  cedar::proc::Network* mpRegisteredAt;
-private:
   // none yet
+private:
+  std::vector<QComboBox*> mComboBoxes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief The name that uniquely identifies the element within its own module.
-  cedar::aux::StringParameterPtr _mName;
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::Element
+}; // class cedar::proc::gui::ProjectionMappingParameter
 
-#endif // CEDAR_PROC_ELEMENT_H
+#endif // CEDAR_PROC_GUI_PROJECTION_MAPPING_PARAMETER_H
 

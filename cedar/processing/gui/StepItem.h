@@ -128,6 +128,7 @@ public:
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void stepStateChanged();
+
   //!@brief handles a redraw of the graphical representation
   void redraw();
 

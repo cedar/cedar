@@ -22,11 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Element.h
+    File:        ProjectionMapParameter.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 11 17
+    Maintainer:  Mathis Richter
+
+    Email:       mathis.richter@ini.rub.de
+
+    Date:        2011 11 21
 
     Description:
 
@@ -34,51 +36,70 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_ELEMENT_H
-#define CEDAR_PROC_ELEMENT_H
+#ifndef CEDAR_PROC_PROJECTION_MAPPING_PARAMETER_H
+#define CEDAR_PROC_PROJECTION_MAPPING_PARAMETER_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // PROJECT INCLUDES
+#include "cedar/processing/ProjectionMapping.h"
 
 // SYSTEM INCLUDES
+#include <climits>
 
 
-/*!@brief Base class for Elements in a processing architecture.
+/*!@brief Abstract description of the class.
  *
- *        Each element is described by a name that uniquely identifies it within a processing module.
+ * More detailed description of the class.
  */
-class cedar::proc::Element : public cedar::aux::Configurable
+class cedar::proc::ProjectionMappingParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // typedef
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Element();
+  ProjectionMappingParameter(
+                              cedar::aux::Configurable *pOwner,
+                              const std::string& name
+                            );
 
-  //!@brief The destructor.
-  virtual ~Element();
+  ProjectionMappingParameter(
+                              cedar::aux::Configurable *pOwner,
+                              const std::string& name,
+                              const cedar::proc::ProjectionMappingPtr& defaults
+                            );
+
+  //!@brief Destructor
+  ~ProjectionMappingParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Set the name of this element.
-  virtual void setName(const std::string& name);
+  void setTo(const cedar::aux::ConfigurationNode& root);
 
-  //!@brief Get the name of this element.
-  const std::string& getName() const;
+  void putTo(cedar::aux::ConfigurationNode& root) const;
 
-  //!@brief sets the network at which this element is registered
-  void setNetwork(cedar::proc::Network* pNetwork);
+  void initialize(unsigned int numberOfMappings);
+
+  void changeMapping(unsigned int inputIndex, unsigned int outputIndex);
+
+  void drop(unsigned int inputIndex);
+
+  void setOutputDimensionality(unsigned int dimensionality);
+
+  const cedar::proc::ProjectionMappingPtr& getValue() const;
+
+  void makeDefault();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -95,23 +116,25 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  //!@todo make weak ptr
-  cedar::proc::Network* mpRegisteredAt;
-private:
   // none yet
+private:
+  cedar::proc::ProjectionMappingPtr mValues;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  //!@brief The name that uniquely identifies the element within its own module.
-  cedar::aux::StringParameterPtr _mName;
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::Element
+}; // class cedar::proc::ProjectionMappingParameter
 
-#endif // CEDAR_PROC_ELEMENT_H
+#endif // CEDAR_PROC_PROJECTION_MAPPING_PARAMETER_H
 

@@ -47,9 +47,7 @@
 #include <string>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@deprecated This class will be removed soon.
  */
 class cedar::aux::Base
 {

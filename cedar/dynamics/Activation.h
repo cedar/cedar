@@ -49,9 +49,7 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Data representing neural activation.
  */
 template <typename T>
 class cedar::dyn::Activation : public cedar::aux::DataTemplate<T>
