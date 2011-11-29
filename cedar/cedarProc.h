@@ -48,7 +48,7 @@
 #include "cedar/processing/Step.h"
 
 // GUI CLASSES
-#include "cedar/processing/gui/StepClassList.h"
+#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/View.h"
 
 #endif // CEDAR_CEDAR_PROC_H

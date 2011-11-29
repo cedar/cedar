@@ -41,7 +41,7 @@
 #ifdef DEBUG
   #include "cedar/processing/debug/gui/ui_PluginLoadDialog.h"
 #else
-  #include "cedar/processing/gui/ui_PluginLoadDialog.h"
+  #include "cedar/processing/release/gui/ui_PluginLoadDialog.h"
 #endif
 
 #include "cedar/processing/gui/namespace.h"

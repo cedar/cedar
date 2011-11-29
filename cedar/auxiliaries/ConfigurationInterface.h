@@ -57,6 +57,8 @@
 #include <libconfig.h++>
 
 /*!@brief Interface for classes with configuration parameters.
+ *
+ * @deprecated This interface will be removed in one of the next versions of cedar. Use cedar::aux::Configurable instead.
  */
 class cedar::aux::ConfigurationInterface : public virtual cedar::aux::Base
 {

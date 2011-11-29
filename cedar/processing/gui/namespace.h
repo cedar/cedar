@@ -63,9 +63,9 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT DirectoryParameter;
       class CEDAR_PROC_LIB_EXPORT DoubleParameter;
       class CEDAR_PROC_LIB_EXPORT DoubleVectorParameter;
+      class CEDAR_PROC_LIB_EXPORT ElementClassList;
       class CEDAR_PROC_LIB_EXPORT EnumParameter;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
-      class CEDAR_PROC_LIB_EXPORT GroupItem;
       class CEDAR_PROC_LIB_EXPORT Ide;
       class CEDAR_PROC_LIB_EXPORT IdeApplication;
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
@@ -77,11 +77,9 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
-      class CEDAR_PROC_LIB_EXPORT StepClassList;
       class CEDAR_PROC_LIB_EXPORT StepItem;
       class CEDAR_PROC_LIB_EXPORT StringParameter;
       class CEDAR_PROC_LIB_EXPORT ToolBox;
-      class CEDAR_PROC_LIB_EXPORT TriggerClassList;
       class CEDAR_PROC_LIB_EXPORT TriggerItem;
       class CEDAR_PROC_LIB_EXPORT View;
       class CEDAR_PROC_LIB_EXPORT UIntParameter;

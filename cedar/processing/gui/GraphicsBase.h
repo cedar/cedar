@@ -68,8 +68,7 @@ public:
   const static GraphicsGroup GRAPHICS_GROUP_NONE = 0;
   const static GraphicsGroup GRAPHICS_GROUP_STEP = 1 << 0;
   const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
-  const static GraphicsGroup GRAPHICS_GROUP_GROUP = 1 << 2;
-  const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 3;
+  const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 2;
   const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
 
   enum HighlightMode

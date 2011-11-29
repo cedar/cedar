@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        GroupItem.h
+    File:        DeclarationRegistry.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Date:        2011 11 18
 
     Description:
 
@@ -38,88 +38,86 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GROUP_ITEM_H
-#define CEDAR_PROC_GROUP_ITEM_H
+#ifndef CEDAR_PROC_DECLARATION_REGISTRY_H
+#define CEDAR_PROC_DECLARATION_REGISTRY_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QGraphicsItemGroup>
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <set>
+#include <map>
+#include <vector>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief This class associates names with pointers to certain objects.
  */
-class cedar::proc::gui::GroupItem : public cedar::proc::gui::GraphicsBase
+class cedar::proc::DeclarationRegistry
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friends
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::Singleton<cedar::proc::DeclarationRegistry>;
+  //--------------------------------------------------------------------------------------------------------------------
+  // typedefs
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef std::map<std::string, cedar::proc::ElementDeclarationPtr> Declarations;
+  typedef std::set<std::string> CategoryList;
+  typedef std::vector<cedar::proc::ElementDeclarationPtr> CategoryEntries;
+  typedef std::map<std::string, CategoryEntries> Categories;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  GroupItem(QSizeF size = QSizeF(10, 10), cedar::proc::GroupPtr group = cedar::proc::GroupPtr());
-
-  //!@brief Destructor
-  ~GroupItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
+  cedar::proc::ElementPtr allocateClass(const std::string& classId) const;
 
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+  void declareClass(cedar::proc::ElementDeclarationPtr pDeclaration);
 
-  void addGroupItem(cedar::proc::gui::GraphicsBase* item, bool transformCoordinates = true);
+  const CategoryList& getCategories() const;
 
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+  const CategoryEntries& getCategoryEntries(const std::string& category) const;
 
-  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  cedar::proc::ElementDeclarationPtr getDeclarationOf(ElementPtr object);
 
-  cedar::proc::GroupPtr getGroup();
-
-  void updateChildConnections();
-
-  void disconnect(){}; //!\todo implement deleting all children elements inside this group
+  const Declarations& declarations() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setGroup(cedar::proc::GroupPtr group);
+  DeclarationRegistry();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  cedar::proc::GroupPtr mGroup;
+  std::map<std::string, cedar::proc::ElementDeclarationPtr> mDeclarations;
+  CategoryList mCategories;
+  Categories mDeclarationsByCategory;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
+}; // class cedar::proc::DeclarationRegistry
 
-private:
-
-}; // class StepItem
-
-#endif // CEDAR_PROC_GROUP_ITEM_H
+#endif // CEDAR_PROC_DECLARATION_REGISTRY_H
 

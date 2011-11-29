@@ -37,10 +37,12 @@
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/StepDeclaration.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 
 class TestModule : public cedar::proc::Step
 {
@@ -80,14 +82,15 @@ int main(int, char**)
   log_file << std::endl;
 
   log_file << "Creating step declaration ... ";
-  cedar::proc::StepDeclarationPtr test_module_decl
+  cedar::proc::ElementDeclarationPtr test_module_decl
   (
-      new cedar::proc::StepDeclarationT<TestModule>("TestModule")
+    new cedar::proc::ElementDeclarationTemplate<TestModule>()
   );
   log_file << "done." << std::endl;
 
-  log_file << "Adding declaration to the manager ... ";
-  cedar::proc::Manager::getInstance().steps().declareClass(test_module_decl);
+  log_file << "Adding declaration to the registry ... ";
+//  cedar::proc::Manager::getInstance().steps().declareClass(test_module_decl);
+  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
   log_file << "done." << std::endl;
 
   log_file << "Creating network ... " << std::endl;
@@ -106,7 +109,7 @@ int main(int, char**)
   log_file << "done." << std::endl;
 
   log_file << "Connecting step1 to step2 ... ";
-  cedar::proc::Manager::getInstance().connect(step1, "output", step2, "input");
+  network->connectSlots("step1.output", "step2.input");
   log_file << "done." << std::endl;
 
   log_file << "Creating trigger ... ";
@@ -115,7 +118,7 @@ int main(int, char**)
   log_file << "done." << std::endl;
 
   log_file << "Connecting trigger to step1 ... ";
-  cedar::proc::Manager::getInstance().connect(trigger, step1);
+  network->connectTrigger(trigger, step1);
   log_file << "done." << std::endl;
 
   log_file << "Network creation completed." << std::endl;
@@ -157,7 +160,7 @@ int main(int, char**)
   try
   {
     log_file << "Looking for step1 ... ";
-    step1 = boost::shared_dynamic_cast<TestModule>(cedar::proc::Manager::getInstance().steps().get("step1"));
+    step1 = network->getElement<TestModule>("step1");
     CEDAR_ASSERT(step1);
     log_file << "found." << std::endl;
 
@@ -182,7 +185,7 @@ int main(int, char**)
   try
   {
     log_file << "Looking for step2 ... ";
-    step2 = boost::shared_dynamic_cast<TestModule>(cedar::proc::Manager::getInstance().steps().get("step2"));
+    step2 = network->getElement<TestModule>("step2");
     CEDAR_ASSERT(step2);
     log_file << "found." << std::endl;
 
@@ -207,7 +210,7 @@ int main(int, char**)
   try
   {
     log_file << "Looking for trigger ... ";
-    trigger = cedar::proc::Manager::getInstance().triggers().get("trigger");
+    trigger = network->getElement<cedar::proc::Trigger>("trigger");
     CEDAR_ASSERT(trigger);
     log_file << "found." << std::endl;
   }
@@ -238,7 +241,7 @@ int main(int, char**)
     log_file << "Listeners of trigger are:" << std::endl;
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
-      log_file << " -- " << trigger->getListeners().at(i)->getName() << std::endl;
+      log_file << " -- " << boost::shared_dynamic_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
     }
   }
 

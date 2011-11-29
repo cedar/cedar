@@ -46,6 +46,7 @@
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopMode.h"
 #include "cedar/auxiliaries/System.h"
+#include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
 
@@ -59,6 +60,7 @@
 cedar::proc::LoopedTrigger::LoopedTrigger(double stepSize)
 :
 cedar::aux::LoopedThread(stepSize),
+cedar::proc::Trigger("", true),
 //!@todo Should these parameters go into cedar::aux::LoopedThread?
 mLoopType(new cedar::aux::EnumParameter(
                                          this,
@@ -110,7 +112,7 @@ void cedar::proc::LoopedTrigger::loopTimeChanged()
   this->setStepSize(this->mLoopTime->getValue());
 }
 
-void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
+void cedar::proc::LoopedTrigger::removeListener(cedar::proc::TriggerablePtr step)
 {
   this->cedar::proc::Trigger::removeListener(step);
   if (this->isRunning())
@@ -119,7 +121,7 @@ void cedar::proc::LoopedTrigger::removeListener(cedar::proc::StepPtr step)
   }
 }
 
-void cedar::proc::LoopedTrigger::addListener(cedar::proc::StepPtr step)
+void cedar::proc::LoopedTrigger::addListener(cedar::proc::TriggerablePtr step)
 {
   this->cedar::proc::Trigger::addListener(step);
   if (this->isRunning())

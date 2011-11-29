@@ -43,14 +43,12 @@
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/GroupItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Group.h"
 #include "cedar/processing/DataSlot.h"
-#include "cedar/processing/Connection.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/DataConnection.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
@@ -91,7 +89,6 @@ void cedar::proc::gui::NetworkFile::addToScene()
   //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.
   this->addStepsToScene();
   this->addTriggersToScene();
-  this->addGroupsToScene();
 }
 
 void cedar::proc::gui::NetworkFile::addStepsToScene()
@@ -108,13 +105,19 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
 
   /* restore steps  that don't have a gui description */
   // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
-  for (size_t i = 0; i < this->mNetwork->steps().size(); ++i)
+  for (
+        cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
+        it != this->mNetwork->elements().end();
+        ++it
+      )
   {
-    cedar::proc::StepPtr& step = this->mNetwork->steps().at(i);
-    if (this->mpScene->stepMap().find(step.get()) == this->mpScene->stepMap().end())
+    if (cedar::proc::StepPtr step = mNetwork->getElement<cedar::proc::Step>(it->second->getName()))
     {
-      this->mpScene->addProcessingStep(step, QPointF(0, 0));
-      steps_to_connect.push_back(step);
+      if (this->mpScene->stepMap().find(step.get()) == this->mpScene->stepMap().end())
+      {
+        this->mpScene->addProcessingStep(step, QPointF(0, 0));
+        steps_to_connect.push_back(step);
+      }
     }
   }
 
@@ -140,27 +143,21 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
                                                                         );
         CEDAR_DEBUG_ASSERT(p_source_slot != NULL);
 
-        std::vector<cedar::proc::Connection*> connections;
-        cedar::proc::Manager::getInstance().getConnections(step, slot_name, connections);
-
-//        std::cout << "Step " << step->getName() << " has " << connections.size() << std::endl;
+        std::vector<cedar::proc::DataConnectionPtr> connections;
+        mNetwork->getDataConnections(step, slot_name, connections);
 
         for(size_t c = 0; c < connections.size(); ++c)
         {
-          cedar::proc::Connection* p_con = connections.at(c);
-
-          cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(p_con->getTarget().get());
+          cedar::proc::DataConnectionPtr con = connections.at(c);
+          cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(mNetwork->getElement<cedar::proc::Step>(con->getTarget()->getParent()).get());
           CEDAR_DEBUG_ASSERT(p_target_step != NULL);
 
           cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step->getSlotItem
                                                                           (
                                                                             cedar::proc::DataRole::INPUT,
-                                                                            p_con->getTargetName()
+                                                                            con->getTarget()->getName()
                                                                           );
           CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
-
-//          std::cout << "connecting " << step->getName() << "." << p_source_slot->getName() << " to "
-//                    << p_con->getTargetName() << "." << p_target_slot->getName() << std::endl;
 
           cedar::proc::gui::Connection *p_ui_con = new cedar::proc::gui::Connection(p_source_slot, p_target_slot);
           this->mpScene->addItem(p_ui_con);
@@ -188,13 +185,15 @@ void cedar::proc::gui::NetworkFile::addTriggersToScene()
   this->mpTriggersToAdd.clear();
 
   // add TriggerItems for Triggers that don't have one yet (i.e., for which none was present in the configuration tree)
-  for (size_t i = 0; i < this->mNetwork->triggers().size(); ++i)
+  for (cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin(); it != this->mNetwork->elements().end(); ++it)
   {
-    cedar::proc::TriggerPtr& trigger = this->mNetwork->triggers().at(i);
-    if (this->mpScene->triggerMap().find(trigger.get()) == this->mpScene->triggerMap().end())
+    if (cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(it->second->getName()))
     {
-      this->mpScene->addTrigger(trigger, QPointF(0, 0));
-      triggers_to_connect.push_back(trigger);
+      if (this->mpScene->triggerMap().find(trigger.get()) == this->mpScene->triggerMap().end())
+      {
+        this->mpScene->addTrigger(trigger, QPointF(0, 0));
+        triggers_to_connect.push_back(trigger);
+      }
     }
   }
 
@@ -205,8 +204,8 @@ void cedar::proc::gui::NetworkFile::addTriggersToScene()
 
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
-      cedar::proc::StepPtr target = trigger->getListeners().at(i);
-      cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(target.get());
+      cedar::proc::TriggerablePtr target = trigger->getListeners().at(i);
+      cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(dynamic_cast<cedar::proc::Step*>(target.get()));
       CEDAR_DEBUG_ASSERT(p_target_item);
       p_trigger_item->connectTo(p_target_item);
     }
@@ -219,26 +218,6 @@ void cedar::proc::gui::NetworkFile::addTriggersToScene()
       p_trigger_item->connectTo(p_target_item);
     }
   }
-}
-
-void cedar::proc::gui::NetworkFile::addGroupsToScene()
-{
-  //!@todo add groups that don't have an associated ui item too
-  for (size_t i = 0; i < this->mpGroupsToAdd.size(); ++i)
-  {
-    cedar::proc::gui::GroupItem *p_group = this->mpGroupsToAdd.at(i);
-    this->mpScene->addItem(p_group);
-    cedar::proc::Group::ChildSteps& steps = p_group->getGroup()->steps();
-    for (cedar::proc::Group::ChildSteps::iterator i = steps.begin(); i != steps.end(); ++i)
-    {
-      cedar::proc::StepPtr child = *i;
-      cedar::proc::gui::StepItem *p_item = this->mpScene->getStepItemFor(child.get());
-      // move the step item into the group's coordinate system
-      p_item->setParentItem(p_group);
-    }
-    p_group->updateChildConnections();
-  }
-  this->mpGroupsToAdd.clear();
 }
 
 cedar::proc::NetworkPtr cedar::proc::gui::NetworkFile::network()
@@ -301,10 +280,6 @@ void cedar::proc::gui::NetworkFile::writeScene(cedar::aux::ConfigurationNode& ro
           node.put("type", "trigger");
           break;
 
-        case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_GROUP:
-          node.put("type", "group");
-          break;
-
         default:
           continue;
       }
@@ -334,6 +309,16 @@ void cedar::proc::gui::NetworkFile::readScene(cedar::aux::ConfigurationNode& roo
       {
         cedar::proc::gui::StepItem *p_step = new cedar::proc::gui::StepItem(this->mpMainWindow);
         p_step->readConfiguration(iter->second);
+        try
+        {
+          std::string step_name = iter->second.get<std::string>("step");
+          cedar::proc::StepPtr step = mNetwork->getElement<cedar::proc::Step>(step_name);
+          p_step->setStep(step);
+        }
+        catch (const boost::property_tree::ptree_bad_path&)
+        {
+          CEDAR_THROW(cedar::proc::gui::InvalidStepNameException, "Cannot read StepItem from file: no step name given.");
+        }
         this->mpStepsToAdd.push_back(p_step);
       }
       catch (const cedar::proc::gui::InvalidStepNameException&)
@@ -348,6 +333,16 @@ void cedar::proc::gui::NetworkFile::readScene(cedar::aux::ConfigurationNode& roo
       {
         cedar::proc::gui::TriggerItem *p_trigger = new cedar::proc::gui::TriggerItem();
         p_trigger->readConfiguration(iter->second);
+        try
+        {
+          std::string trigger_name = iter->second.get<std::string>("trigger");
+          cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(trigger_name);
+          p_trigger->setTrigger(trigger);
+        }
+        catch (const boost::property_tree::ptree_bad_path&)
+        {
+          CEDAR_THROW(cedar::proc::gui::InvalidTriggerNameException, "Cannot read TriggerItem from file: no trigger name given.");
+        }
         this->mpTriggersToAdd.push_back(p_trigger);
       }
       catch (const cedar::proc::gui::InvalidTriggerNameException&)
@@ -355,12 +350,6 @@ void cedar::proc::gui::NetworkFile::readScene(cedar::aux::ConfigurationNode& roo
         //!@todo warn in the gui
         std::cout << "Invalid trigger item found in " << this->mFileName << std::endl;
       }
-    }
-    else if (type == "group")
-    {
-      cedar::proc::gui::GroupItem *p_group = new cedar::proc::gui::GroupItem();
-      p_group->readConfiguration(iter->second);
-      this->mpGroupsToAdd.push_back(p_group);
     }
     else
     {

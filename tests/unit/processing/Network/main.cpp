@@ -46,8 +46,9 @@
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/StepDeclaration.h"
 #include "cedar/processing/Arguments.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -79,18 +80,25 @@ public:
 
 int main(int /* argc */, char** /* argv */)
 {
-  using cedar::proc::Manager;
+  using cedar::proc::Network;
   using cedar::proc::StepPtr;
+  using cedar::proc::Step;
 
   unsigned int errors = 0;
 
-  LogFile log_file("StepManager.log");
+  LogFile log_file("Network.log");
   log_file.addTimeStamp();
   log_file << std::endl;
 
-  log_file << "Creating TestModule declaration ... ";
-  cedar::proc::StepDeclarationPtr test_module_declaration (new cedar::proc::StepDeclarationT<TestModule>("TestModule"));
-  Manager::getInstance().steps().declareClass(test_module_declaration);
+  log_file << "Creating step declaration ... ";
+  cedar::proc::ElementDeclarationPtr test_module_decl
+  (
+    new cedar::proc::ElementDeclarationTemplate<TestModule>()
+  );
+  log_file << "done." << std::endl;
+
+  log_file << "Adding declaration to the registry ... ";
+  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
   log_file << "done." << std::endl;
 
   log_file << "Reading Sample.json ... ";
@@ -99,10 +107,10 @@ int main(int /* argc */, char** /* argv */)
   log_file << "done." << std::endl;
 
   log_file << "Trying to call compute functions ... ";
-  StepPtr step_a = Manager::getInstance().steps().get("stepA");
+  StepPtr step_a = network->getElement<Step>("stepA");
   step_a->onTrigger();
 
-  StepPtr step_b = Manager::getInstance().steps().get("stepB");
+  StepPtr step_b = network->getElement<Step>("stepB");
   step_b->onTrigger();
   log_file << "done." << std::endl;
 

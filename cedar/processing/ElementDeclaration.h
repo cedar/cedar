@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepDeclarationT.h
+    File:        ElementDeclaration.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 06 24
+    Date:        2011 11 18
 
     Description:
 
@@ -38,14 +38,16 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_STEP_DECLARATION_H
-#define CEDAR_PROC_STEP_DECLARATION_H
+#ifndef CEDAR_PROC_ELEMENT_DECLARATION_H
+#define CEDAR_PROC_ELEMENT_DECLARATION_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/DeclarationBase.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
 #include "cedar/auxiliaries/AbstractFactoryDerived.h"
+#include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // PROJECT INCLUDES
 
@@ -55,11 +57,11 @@
  * create a step of this id. It is a concretization of DeclarationBase.
  *
  */
-class cedar::proc::StepDeclaration : public cedar::proc::DeclarationBase
-                                            <
-                                              cedar::proc::Step,
-                                              cedar::aux::AbstractFactory<cedar::proc::Step>
-                                            >
+class cedar::proc::ElementDeclaration : public cedar::proc::DeclarationBase
+                                               <
+                                                 cedar::proc::Element,
+                                                 cedar::aux::AbstractFactory<cedar::proc::Element>
+                                               >
 {
 public:
 
@@ -67,18 +69,22 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   //!@brief The standard constructor.
-  StepDeclaration(
-                   cedar::proc::StepFactoryPtr classFactory,
-                   const std::string& classId,
-                   const std::string& category = "misc."
-                 )
+  ElementDeclaration(
+                      cedar::proc::ElementFactoryPtr classFactory,
+                      const std::string& classId,
+                      const std::string& category = "misc."
+                    )
   :
-  DeclarationBase<cedar::proc::Step, cedar::aux::AbstractFactory<cedar::proc::Step> >(classFactory, classId, category)
+  DeclarationBase<cedar::proc::Element, cedar::aux::AbstractFactory<cedar::proc::Element> >(
+                                                                                             classFactory,
+                                                                                             classId,
+                                                                                             category
+                                                                                           )
   {
   }
 
   //!@brief Destructor
-  ~StepDeclaration()
+  ~ElementDeclaration()
   {
   }
 
@@ -87,13 +93,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //!@brief set path to icon included in the graphical representation of this step
+  //!@brief set path to icon included in the graphical representation of this element
   void setIconPath(const std::string& path)
   {
     this->mIconPath = path;
   }
 
-  //!@brief get path to icon included in the graphical representation of this step
+  //!@brief get path to icon included in the graphical representation of this element
   const std::string& getIconPath()
   {
     return this->mIconPath;
@@ -136,7 +142,7 @@ private:
  * More detailed description of the class with templates.
  */
 template <class DerivedClass>
-class cedar::proc::StepDeclarationT : public StepDeclaration
+class cedar::proc::ElementDeclarationTemplate : public ElementDeclaration
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -146,33 +152,44 @@ class cedar::proc::StepDeclarationT : public StepDeclaration
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-  StepDeclarationT(
-                    const std::string& classId,
-                    const std::string& category = "misc."
-                  )
+  /*!@brief The constructor.
+   *
+   * @param classId  Identifier of the class. If this is left empty, the name will be determined automatically. For
+   *                 example, a class test::namespaceName::ClassName will result in the name
+   *                 test.namespaceName.ClassName.
+   * @param category Category for the element.
+   */
+
+  ElementDeclarationTemplate(const std::string& classId = "", const std::string& category = "misc.")
   :
-  StepDeclaration
+  ElementDeclaration
   (
-    cedar::proc::StepFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::proc::Step, DerivedClass>()),
+    cedar::proc::ElementFactoryPtr(new cedar::aux::AbstractFactoryDerived<cedar::proc::Element, DerivedClass>()),
     classId,
     category
   )
   {
+    // if no class name is specified,
+    if (classId.empty())
+    {
+      std::string class_name = cedar::aux::unmangleName(typeid(DerivedClass));
+      class_name = cedar::aux::replace(class_name, "::", ".");
+      this->setClassId(class_name);
+    }
   }
 
   //!@brief Destructor
-  ~StepDeclarationT()
+  ~ElementDeclarationTemplate()
   {
   }
 
-  //!@brief checks if a generic Step is of a given child type (the template parameter of StepDeclarationT)
+  //!@brief checks if a generic Element is of a given child type (the template parameter of ElementDeclarationT)
   //!@param pointer step instance that is checked
-  bool isObjectInstanceOf(cedar::proc::StepPtr pointer)
+  bool isObjectInstanceOf(cedar::proc::ElementPtr pointer)
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
   }
-}; // class cedar::proc::StepDeclarationT
+}; // class cedar::proc::ElementDeclarationT
 
-#endif // CEDAR_PROC_STEP_DECLARATION_H
+#endif // CEDAR_PROC_ELEMENT_DECLARATION_H
 

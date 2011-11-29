@@ -1,14 +1,14 @@
 {
   "steps":
   {
-    "Neuron":
+    "cedar.Neuron":
     {
       "name": "Neuron 1",
       "threaded": false,
       "interactionWeight": 100,
       "restingLevel": 10
     },
-    "Neuron":
+    "cedar.Neuron":
     {
       "name": "Neuron 2",
       "threaded": false,

@@ -72,10 +72,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Set the name of this element.
-  void setName(const std::string& name);
+  virtual void setName(const std::string& name);
 
   //!@brief Get the name of this element.
   const std::string& getName() const;
+
+  //!@brief sets the network at which this element is registered
+  void setNetwork(cedar::proc::Network* pNetwork);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,7 +96,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@todo make weak ptr
+  cedar::proc::Network* mpRegisteredAt;
 private:
   // none yet
 

@@ -39,16 +39,16 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Scene.h"
-#include "cedar/processing/gui/StepClassList.h"
-#include "cedar/processing/gui/TriggerClassList.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/GroupItem.h"
 #include "cedar/processing/gui/NetworkFile.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // PROJECT INCLUDES
 
@@ -58,6 +58,8 @@
 #include <QMap>
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
+#include <QMenu>
+#include <QAction>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -145,7 +147,7 @@ void cedar::proc::gui::Scene::dragMoveEvent(QGraphicsSceneDragDropEvent *pEvent)
 
 void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
 {
-  StepClassList *tree = dynamic_cast<StepClassList*>(pEvent->source());
+  ElementClassList *tree = dynamic_cast<ElementClassList*>(pEvent->source());
 
   if (tree)
   {
@@ -162,25 +164,7 @@ void cedar::proc::gui::Scene::dropEvent(QGraphicsSceneDragDropEvent *pEvent)
     {
       QPointF mapped = pEvent->scenePos();
       QString class_id = item->data(Qt::UserRole).toString();
-      this->addProcessingStep(class_id.toStdString(), mapped);
-    }
-  }
-  else if (TriggerClassList *tree = dynamic_cast<TriggerClassList*>(pEvent->source()))
-  {
-    QByteArray itemData = pEvent->mimeData()->data("application/x-qabstractitemmodeldatalist");
-    QDataStream stream(&itemData, QIODevice::ReadOnly);
-
-    int r, c;
-    QMap<int, QVariant> v;
-    stream >> r >> c >> v;
-
-    QListWidgetItem *item = tree->item(r);
-
-    if (item)
-    {
-      QPointF mapped = pEvent->scenePos();
-      QString class_id = item->data(Qt::UserRole).toString();
-      this->addTrigger(class_id.toStdString(), mapped);
+      this->addElement(class_id.toStdString(), mapped);
     }
   }
 }
@@ -214,10 +198,6 @@ void cedar::proc::gui::Scene::mousePressEvent(QGraphicsSceneMouseEvent *pMouseEv
     case MODE_CONNECT:
       this->connectModeProcessMousePress(pMouseEvent);
       break;
-
-    case MODE_GROUP:
-      this->groupModeProcessMousePress(pMouseEvent);
-      break;
   }
 }
 
@@ -227,10 +207,6 @@ void cedar::proc::gui::Scene::mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEve
   {
     case MODE_CONNECT:
       this->connectModeProcessMouseMove(pMouseEvent);
-      break;
-
-    case MODE_GROUP:
-      this->groupModeProcessMouseMove(pMouseEvent);
       break;
 
     default:
@@ -253,27 +229,31 @@ void cedar::proc::gui::Scene::mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouse
     case MODE_CONNECT:
       this->connectModeProcessMouseRelease(pMouseEvent);
       break;
-
-
-    case MODE_GROUP:
-      this->groupModeProcessMouseRelease(pMouseEvent);
-      break;
   }
+}
 
-  switch (this->mMode)
+void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
+{
+  this->QGraphicsScene::contextMenuEvent(pContextMenuEvent);
+
+  if (pContextMenuEvent->isAccepted())
+    return;
+
+  QMenu menu;
+  QAction *p_reset = menu.addAction("reset network");
+
+  QAction *a = menu.exec(pContextMenuEvent->screenPos());
+
+  if (a == p_reset)
   {
-    case MODE_CONNECT:
-    default:
-      break;
-
-    case MODE_GROUP:
-      if ( pMouseEvent->button() == Qt::LeftButton && (pMouseEvent->modifiers() & Qt::ShiftModifier) == 0)
-      {
-        this->setMode(MODE_SELECT);
-        emit modeFinished();
-      }
-      break;
+    this->mNetwork->network()->reset();
   }
+  else
+  {
+    std::cout << "Unmatched action in cedar::proc::gui::Scene::contextMenuEvent." << std::endl;
+  }
+
+  pContextMenuEvent->accept();
 }
 
 void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)
@@ -386,6 +366,9 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               {
                 cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem *>(target);
                 p_source->connectTo(p_data_target);
+                std::string source_name = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
+                std::string target_name = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
+                mNetwork->network()->connectSlots(source_name, target_name);
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
             }
@@ -405,6 +388,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               {
                 cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
                 source->connectTo(p_trigger);
+                mNetwork->network()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
                 break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
               }
 
@@ -412,6 +396,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               {
                 cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
                 source->connectTo(p_step_item);
+                mNetwork->network()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 
@@ -458,131 +443,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
   mpConnectionStart = NULL;
 }
 
-void cedar::proc::gui::Scene::groupModeProcessMousePress(QGraphicsSceneMouseEvent *pMouseEvent)
-{
-  this->mGroupStart = this->mGroupEnd = pMouseEvent->scenePos();
-  QRectF rect(this->mGroupStart, this->mGroupEnd);
-
-  if (mpGroupIndicator != NULL)
-  {
-    delete mpGroupIndicator;
-  }
-  mpGroupIndicator = this->addRect(rect);
-}
-
-void cedar::proc::gui::Scene::groupModeProcessMouseMove(QGraphicsSceneMouseEvent *pMouseEvent)
-{
-  if (mpGroupIndicator != NULL)
-  {
-    this->mGroupEnd = pMouseEvent->scenePos();
-    QRectF rect(this->mGroupStart, this->mGroupEnd);
-    mpGroupIndicator->setRect(rect.normalized());
-
-    // remove highlighting of previous items
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      }
-    }
-
-    mProspectiveGroupMembers = this->items(rect.normalized(), Qt::ContainsItemBoundingRect);
-
-    // highlight prospective group members
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        if (ptr->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP)
-        {
-          ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_POTENTIAL_GROUP_MEMBER);
-        }
-      }
-    }
-  }
-}
-
-void cedar::proc::gui::Scene::groupModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent)
-{
-  if (mpGroupIndicator != NULL)
-  {
-    this->mGroupEnd = pMouseEvent->scenePos();
-    QRectF rect(this->mGroupStart, this->mGroupEnd);
-    delete mpGroupIndicator;
-    mpGroupIndicator = NULL;
-
-    cedar::proc::gui::GroupItem *p_group = new cedar::proc::gui::GroupItem(rect.size());
-    p_group->setPos(rect.topLeft());
-    this->addItem(p_group);
-
-    // remove highlighting from all prospective group members
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        ptr->setHighlightMode(cedar::proc::gui::GraphicsBase::HIGHLIGHTMODE_NONE);
-      }
-    }
-
-    mProspectiveGroupMembers.clear();
-
-    // add stuff to the group
-    mProspectiveGroupMembers = this->items(rect.normalized(), Qt::ContainsItemBoundingRect);
-    for (int i = 0; i < mProspectiveGroupMembers.size(); ++i)
-    {
-      if (cedar::proc::gui::GraphicsBase* ptr = dynamic_cast<cedar::proc::gui::GraphicsBase*>(mProspectiveGroupMembers.at(i)))
-      {
-        p_group->addGroupItem(ptr);
-      }
-    }
-    mProspectiveGroupMembers.clear();
-  }
-}
-
-void cedar::proc::gui::Scene::addTrigger(const std::string& classId, QPointF position)
-{
-  using cedar::proc::Manager;
-  std::string name = "new trigger";
-
-  if (Manager::getInstance().triggers().testExists(name))
-  {
-    unsigned int new_id = 1;
-    std::string tmp;
-    do
-    {
-      std::stringstream str;
-      str << name << " " << new_id;
-      tmp = str.str();
-      ++new_id;
-    }
-    while (Manager::getInstance().triggers().testExists(tmp));
-    name = tmp;
-  }
-
-  try
-  {
-    cedar::proc::TriggerPtr trigger = Manager::getInstance().triggers().createInstance(classId, name);
-    //!@todo is there a better solution?
-    if (cedar::aux::LoopedThreadPtr looped_thread = boost::shared_dynamic_cast<cedar::aux::LoopedThread>(trigger))
-    {
-      Manager::getInstance().registerThread(looped_thread);
-    }
-
-    if (this->mNetwork)
-    {
-      this->mNetwork->network()->add(trigger);
-    }
-
-    this->addTrigger(trigger, position);
-  }
-  catch(const cedar::aux::ExceptionBase& e)
-  {
-    QString message(e.exceptionInfo().c_str());
-    emit exception(message);
-  }
-}
-
 void cedar::proc::gui::Scene::addTrigger(cedar::proc::TriggerPtr trigger, QPointF position)
 {
   cedar::proc::gui::TriggerItem *p_drawer = new cedar::proc::gui::TriggerItem(trigger);
@@ -607,36 +467,46 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem *p
   delete pTrigger;
 }
 
-void cedar::proc::gui::Scene::addProcessingStep(const std::string& classId, QPointF position)
+void cedar::proc::gui::Scene::addElement(const std::string& classId, QPointF position)
 {
-  using cedar::proc::Manager;
-  std::string name = "new step";
+  std::vector<std::string> split_class_name;
+  cedar::aux::split(classId, ".", split_class_name);
+  CEDAR_DEBUG_ASSERT(split_class_name.size() > 0);
+  std::string name = "new " + split_class_name.back();
 
-  if (Manager::getInstance().steps().testExists(name))
+  std::string adjusted_name;
+  try
   {
     unsigned int new_id = 1;
-    std::string tmp;
-    do
+    adjusted_name = name;
+    while (mNetwork->network()->getElement(adjusted_name))
     {
       std::stringstream str;
       str << name << " " << new_id;
-      tmp = str.str();
+      adjusted_name = str.str();
       ++new_id;
     }
-    while (Manager::getInstance().steps().testExists(tmp));
-    name = tmp;
+  }
+  catch(cedar::proc::InvalidNameException& exc)
+  {
+    // nothing to do here, name not duplicate, use this as a name
   }
 
   try
   {
-    cedar::proc::StepPtr step = Manager::getInstance().steps().createInstance(classId, name);
-
-    if (this->mNetwork)
+    mNetwork->network()->add(classId, adjusted_name);
+    if (cedar::proc::StepPtr step = mNetwork->network()->getElement<cedar::proc::Step>(adjusted_name))
     {
-      this->mNetwork->network()->add(step);
+      this->addProcessingStep(step, position);
     }
-
-    this->addProcessingStep(step, position);
+    else if (cedar::proc::TriggerPtr trigger = mNetwork->network()->getElement<cedar::proc::Trigger>(adjusted_name))
+    {
+      this->addTrigger(trigger, position);
+    }
+    else
+    {
+      CEDAR_THROW(cedar::proc::InvalidNameException, "name not known to network");
+    }
   }
   catch(const cedar::aux::ExceptionBase& e)
   {

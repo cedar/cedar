@@ -39,7 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/processing/StepDeclaration.h"
 
 // PROJECT INCLUDES
 
@@ -74,7 +73,7 @@ class cedar::proc::PluginDeclaration
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  typedef std::vector<cedar::proc::StepDeclarationPtr> StepDeclarations;
+  typedef std::vector<cedar::proc::ElementDeclarationPtr> ElementDeclarations;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -90,9 +89,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void add(cedar::proc::StepDeclarationPtr declaration);
+  void add(cedar::proc::ElementDeclarationPtr declaration);
 
-  const StepDeclarations& stepDeclarations() const;
+  const ElementDeclarations& elementDeclarations() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -112,7 +111,7 @@ private:
 protected:
   // none yet
 private:
-  StepDeclarations mStepDeclarations;
+  ElementDeclarations mElementDeclarations;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

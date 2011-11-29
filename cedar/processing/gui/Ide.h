@@ -45,7 +45,7 @@
 #ifdef DEBUG
   #include "cedar/processing/debug/gui/ui_Ide.h"
 #else
-  #include "cedar/processing/gui/ui_Ide.h"
+  #include "cedar/processing/release/gui/ui_Ide.h"
 #endif
 #include "cedar/processing/gui/namespace.h"
 
@@ -88,6 +88,7 @@ public slots:
   void sceneItemSelected();
 
   void exception(const QString& message);
+  void notify(const QString& message);
   void error(const QString& message);
   void message(const QString& message);
 
@@ -142,8 +143,7 @@ public:
 protected:
   // none yet
 private:
-  std::map<std::string, cedar::proc::gui::StepClassList*> mStepClassListWidgets;
-  std::map<std::string, cedar::proc::gui::TriggerClassList*> mTriggerClassListWidgets;
+  std::map<std::string, cedar::proc::gui::ElementClassList*> mElementClassListWidgets;
 
   cedar::proc::gui::NetworkFilePtr mNetwork;
 

@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Group.h
+    File:        ElementClassList.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 13
+    Date:        2011 11 23
 
     Description:
 
@@ -38,58 +38,46 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GROUP_H
-#define CEDAR_PROC_GROUP_H
+#ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
+#define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/NamedConfigurable.h"
+#include "cedar/processing/gui/namespace.h"
 
 // PROJECT INCLUDES
+#include "cedar/processing/DeclarationRegistry.h"
 
 // SYSTEM INCLUDES
-#include <set>
+#include <QListWidget>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
  *
  * More detailed description of the class.
  */
-class cedar::proc::Group : public cedar::aux::NamedConfigurable
+class cedar::proc::gui::ElementClassList : public QListWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // types
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef std::set<StepPtr> ChildSteps;
-  typedef std::set<GroupPtr> ChildGroups;
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Group(const std::string& name);
+  ElementClassList(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~Group();
+  ~ElementClassList();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void addStep(cedar::proc::StepPtr step);
-  void removeStep(cedar::proc::StepPtr step);
-  void addGroup(cedar::proc::GroupPtr group);
-  void removeGroup(cedar::proc::GroupPtr group);
-  void start();
-  void stop();
-  void wait();
-
-  void readConfiguration(const cedar::aux::ConfigurationNode& node);
-  void saveConfiguration(cedar::aux::ConfigurationNode& root);
-
-  ChildSteps& steps();
+  //!@brief for a given category, show all registered steps (their icon and name)
+  void showList(const cedar::proc::DeclarationRegistry::CategoryEntries& stepEntries);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -106,10 +94,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
 protected:
-  cedar::proc::LoopedTriggerPtr mGroupTrigger;
-  ChildSteps mSteps;
-  ChildGroups mGroups;
+  // none yet
 private:
   // none yet
 
@@ -124,7 +112,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::Group
+}; // class ElementClassList
 
-#endif // CEDAR_PROC_GROUP_H
+#endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 

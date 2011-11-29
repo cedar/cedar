@@ -65,7 +65,7 @@
  * The concept of processing steps is explained in @ref ProcessingIntroduction. In short, a processing step represents
  * a computational function that processes some input data into output data. Examples of a processing step could be
  * converting an image to a different color space, approximating the solution of a dynamical system
- * (see cedar::dyn::Dynamics) or raeding data from disk.
+ * (see cedar::dyn::Dynamics) or reading data from disk.
  *
  * Processing steps also have data slots that represent inputs, outputs and buffers (temporary data that can be
  * displayed in plots). Each data slot is assigned some data pointer, input slots get external data, buffer and output
@@ -86,19 +86,6 @@ class cedar::proc::Step : public QThread,
 public:
   //! Map from action names to their corresponding functions.
   typedef std::map<std::string, boost::function<void()> > ActionMap;
-
-  //! Enum that represents the current state of the step.
-  enum State
-  {
-    //! The state is undetermined.
-    STATE_NONE,
-    //! The step is not running.
-    STATE_NOT_RUNNING,
-    //! The step is currently running.
-    STATE_RUNNING,
-    //! There was an exception thrown in the step's compute function.
-    STATE_EXCEPTION
-  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -129,26 +116,10 @@ public:
   //!@brief Sets the arguments used by the next execution of the run function.
   bool setNextArguments(cedar::proc::ArgumentsPtr arguments);
 
-  //!@brief Returns the finished trigger.
-  cedar::proc::TriggerPtr& getFinishedTrigger();
-
   /*!@brief Toggles if a step is executed as its own thread, or if the run() function is called in the same thread as
    *        the source of the trigger signal.
    */
   void setThreaded(bool isThreaded);
-
-  //!@brief Returns whether this step should automatically be connected to done triggers when data is connected.
-  inline bool isLooped() const
-  {
-    return this->mIsLooped;
-  }
-
-  //!@brief Returns the current cedar::proc::Step::STATE of the step.
-  State getState() const;
-
-  //!@brief Returns the annotation of the current state, e.g., the reasons for failing or the message of the last
-  //        exception.
-  const std::string& getStateAnnotation() const;
 
   //!@brief Gets the amount of triggers stored in this step.
   size_t getTriggerCount() const;
@@ -156,49 +127,20 @@ public:
   //!@brief Returns the trigger associated with the given index.
   cedar::proc::TriggerPtr getTrigger(size_t index);
 
-  //!@brief Sets the associated registry for the step.
-  void setRegistry(cedar::proc::StepRegistry* pRegistry);
-
   //!@brief Returns the map of actions defined for this step.
   const ActionMap& getActions() const;
 
   //!@brief Calls the action with the given name.
   void callAction(const std::string& name);
 
-  /*!@brief   Sets this step's parent trigger. Steps may only be triggerd by one trigger.
-   *
-   * @remarks This throws an exception if the step already has a parent trigger. If this happens, disconnect the trigger
-   *          first using the method in cedar::proc::Manager.
-   * @remarks Currently, the parent only has meaning if the mIsLooped is true, because only looped steps are restricted
-   *          to a single parent.
-   */
-  void setParentTrigger(cedar::proc::TriggerPtr parent);
-
-  //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
-  cedar::proc::TriggerPtr getParentTrigger();
-
-  /*!@brief Calls the (user defined) onStart() method and performs some other tasks.
-   *
-   * @remarks This method makes sure that certain things are done every time the Step is started, e.g., it propagates
-   *          the onStart() call to all Steps connected to the finished trigger of this step.
-   */
-  void callOnStart();
-
-  /*!@brief Calls the (user defined) onStop() method and performs some other tasks.
-   *
-   * @remarks This method makes sure that certain things are done every time the Step is stopped, e.g., it propagates
-   *          the onStop() call to all Steps connected to the finished trigger of this step and resets the step's state.
-   */
-  void callOnStop();
+  //!@brief Calls the reset signal in a thread-safe manner.
+  void callReset();
 
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
 
 signals:
-  //!@brief Signal that is emitted whenever the step's state is changed.
-  void stateChanged();
-
   //!@brief Signal that is emitted whenever the step's name is changed.
   void nameChanged();
 
@@ -216,14 +158,6 @@ protected:
   //! @brief Method that registers a function of an object so that it can be used by the framework.
   void registerFunction(const std::string& actionName, boost::function<void()> function);
 
-  /*!@brief Sets the current state of the step.
-   *
-   * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
-   *        message of an exception in the STATE_EXCEPTION.
-   *
-   * @todo should be made private again, once we have a mechanism for users to set the "state" of parameters
-   */
-  void setState(cedar::proc::Step::State newState, const std::string& annotation);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -246,23 +180,18 @@ private:
   void run();
 
 
-  //!@brief Method that gets called once by cedar::proc::LoopedTrigger once prior to starting the trigger.
-  virtual void onStart();
-
-  //!@brief Method that gets called once by cedar::proc::LoopedTrigger after it stops.
-  virtual void onStop();
+  /*!@brief This is the reset method.
+   *
+   *        Implement this method if you want to react to a reset signal.
+   */
+  virtual void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief the finished trigger, which is triggered once the computation of this step is done
-  cedar::proc::TriggerPtr mFinished;
 
 private:
-  //!@brief Whether the connect function should automatically connect the triggers as well.
-  const bool mIsLooped;
-
   //!@brief flag that states if step is still computing its latest output
   bool mBusy;
 
@@ -272,23 +201,11 @@ private:
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ArgumentsPtr mNextArguments;
 
-  //!@brief current state of this step, taken from cedar::processing::Step::State
-  State mState;
-
-  //!@brief The annotation string for the current state.
-  std::string mStateAnnotation;
-
   //!@brief List of triggers belonging to this Step.
   std::vector<cedar::proc::TriggerPtr> mTriggers;
 
-  //!@brief Registry managing the step.
-  cedar::proc::StepRegistry* mRegisteredAt;
-
   //!@brief Map of all actions defined for this step.
   ActionMap mActions;
-
-  //!@brief If set, this is the trigger that triggers the step.
-  cedar::proc::TriggerWeakPtr mParentTrigger;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

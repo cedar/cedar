@@ -102,14 +102,12 @@ private:
 
   std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
   std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
-  std::vector<cedar::proc::gui::GroupItem*> mpGroupsToAdd;
 
   void writeScene(cedar::aux::ConfigurationNode& root);
   void readScene(cedar::aux::ConfigurationNode& root);
 
   void addStepsToScene();
   void addTriggersToScene();
-  void addGroupsToScene();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

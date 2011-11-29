@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StepClassList.h
+    File:        DataConnection.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 05
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
+    Date:        2011 11 21
 
     Description:
 
@@ -38,47 +34,45 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_STEP_CLASS_LIST_H
-#define CEDAR_PROC_GUI_STEP_CLASS_LIST_H
+#ifndef CEDAR_PROC_DATA_CONNECTION_H
+#define CEDAR_PROC_DATA_CONNECTION_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/namespace.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <QListWidget>
 
 
-/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
+/*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
+ *
+ * @todo check if source is owned data
  */
-class cedar::proc::gui::StepClassList : public QListWidget
+class cedar::proc::DataConnection
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StepClassList(QWidget *pParent = NULL);
-
+  DataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
   //!@brief Destructor
-  ~StepClassList();
-
+  ~DataConnection();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const cedar::proc::StepRegistry::CategoryEntries& entries);
-
+  // none yet
+  bool equals(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  cedar::proc::DataSlotPtr getSource();
+  cedar::proc::DataSlotPtr getTarget();
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,7 +91,8 @@ private:
 public:
   // none yet (hopefully never!)
 protected:
-  // none yet
+  cedar::proc::DataSlotWeakPtr mSource;
+  cedar::proc::DataSlotWeakPtr mTarget;
 private:
   // none yet
 
@@ -112,7 +107,7 @@ protected:
 private:
   // none yet
 
-}; // class StepClassList
+}; // class cedar::proc::DataConnection
 
-#endif // CEDAR_PROC_GUI_STEP_CLASS_LIST_H
+#endif // CEDAR_PROC_DATA_CONNECTION_H
 

@@ -44,12 +44,18 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
+#include <boost/function.hpp>
 
 /*!@brief A slot for data that is owned by a Connectable.
  */
 class cedar::proc::ExternalData : public cedar::proc::DataSlot
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::Connectable;
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -61,7 +67,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ExternalData(cedar::proc::DataRole::Id role, const std::string& name, bool isMandatory = true);
+  ExternalData(
+                cedar::proc::DataRole::Id role,
+                const std::string& name,
+                cedar::proc::Connectable* pParent,
+                bool isMandatory = true
+              );
 
   //!@brief Destructor
   ~ExternalData();
@@ -78,11 +89,6 @@ public:
 
   cedar::aux::ConstDataPtr getData(unsigned int index) const;
 
-  void setData(cedar::aux::DataPtr data);
-
-  void setData(cedar::aux::DataPtr data, unsigned int index);
-
-  void addData(cedar::aux::DataPtr data);
 
   inline unsigned int getDataCount() const
   {
@@ -100,6 +106,10 @@ public:
 
   bool isCollection() const;
 
+  /*!@brief register a function pointer with this function to react to any changes in external data
+   */
+  boost::signals2::connection connectToExternalDataChanged(boost::function<void ()> slot);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -111,13 +121,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setData(cedar::aux::DataPtr data);
+
+  void setData(cedar::aux::DataPtr data, unsigned int index);
+
+  void addData(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief a boost signal that is emitted if a new external data is set
+  boost::signals2::signal<void ()> mExternalDataChanged;
 private:
   //!@brief Vector of data references connected to this slot.
   std::vector<cedar::aux::DataWeakPtr> mData;

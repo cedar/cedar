@@ -54,6 +54,10 @@
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/processing/gui/DirectoryParameter.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // PROJECT INCLUDES
 
@@ -96,7 +100,7 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
 {
   this->resetContents();
 
-  std::string label = cedar::proc::Manager::getInstance().steps().getDeclarationOf(pStep)->getClassId();
+  std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pStep)->getClassId();
   this->addLabelRow(label);
   this->mDisplayedConfigurable = pStep;
   this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
@@ -106,7 +110,7 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
 {
   this->resetContents();
 
-  std::string label = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(pTrigger)->getClassId();
+  std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pTrigger)->getClassId();
   this->addLabelRow(label);
   this->mDisplayedConfigurable = pTrigger;
   this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable)); // boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));
@@ -193,16 +197,16 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
 {
   if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
   {
-    // parameter types in auxiliaries (sorted alphabetically)
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
+    // parameter types in auxiliaries
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::proc::gui::UIntParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleVectorParameter, cedar::proc::gui::DoubleVectorParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DirectoryParameter, cedar::proc::gui::DirectoryParameter>();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::proc::gui::EnumParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::proc::gui::UIntParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
-    // parameter types in processing (sorted alphabetically)
+    // parameter types in processing
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::proc::ProjectionMappingParameter, cedar::proc::gui::ProjectionMappingParameter>();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;

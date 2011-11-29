@@ -53,7 +53,8 @@
 /*!@brief Abstract description of the class.
  *
  * More detailed description of the class.
- * @todo Change the name of the class to Architecture?
+ * @todo Change the name of the class to Module
+ * @todo Add a slot, which reacts to name changes of elements (update map of names to ptrs)
  */
 class cedar::proc::Network
 {
@@ -61,9 +62,12 @@ class cedar::proc::Network
   // types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  typedef std::vector<cedar::proc::StepPtr> StepVector;
-  typedef std::vector<cedar::proc::TriggerPtr> TriggerVector;
-  typedef std::vector<cedar::proc::GroupPtr> GroupVector;
+  typedef std::vector<cedar::proc::DataConnectionPtr> DataConnectionVector;
+  typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
+  typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
+public:
+  typedef ElementMap::iterator ElementMapIterator;
+  typedef ElementMap::const_iterator ElementMapConstIterator;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -79,39 +83,46 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void readSteps(const cedar::aux::ConfigurationNode& root);
-  void saveSteps(cedar::aux::ConfigurationNode& root);
-
-  void readTriggers(const cedar::aux::ConfigurationNode& root);
-  void saveTriggers(cedar::aux::ConfigurationNode& root);
-
-  void readGroups(const cedar::aux::ConfigurationNode& root);
-  void saveGroups(cedar::aux::ConfigurationNode& root);
-
-  void readDataConnection(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::Connection* connection);
-
-  void readDataConnections(const cedar::aux::ConfigurationNode& root);
-  void saveDataConnections(cedar::aux::ConfigurationNode& root);
-
   void readFrom(const cedar::aux::ConfigurationNode& root);
   void saveTo(cedar::aux::ConfigurationNode& root);
 
   void readFile(const std::string& filename);
   void writeFile(const std::string& filename);
 
-  void add(cedar::proc::StepPtr step);
-  void remove(cedar::proc::StepPtr step);
-  void add(cedar::proc::TriggerPtr trigger);
-  void remove(cedar::proc::TriggerPtr trigger);
-  void add(cedar::proc::GroupPtr group);
+  void remove(cedar::proc::ElementPtr element);
 
-  const StepVector& steps() const;
-  StepVector& steps();
-  const TriggerVector& triggers() const;
-  TriggerVector& triggers();
-  const GroupVector& groups() const;
-  GroupVector& groups();
+  void add(std::string className, std::string instanceName);
+  void add(cedar::proc::ElementPtr element, std::string instanceName);
+  void add(cedar::proc::ElementPtr element);
+
+  /*!@brief Returns the element with the given name as a pointer of the specified type.
+   */
+  template <class T>
+  boost::shared_ptr<T> getElement(const std::string& name)
+  {
+    return boost::shared_dynamic_cast<T>(this->getElement(name));
+  }
+
+  cedar::proc::ElementPtr getElement(const std::string& name);
+
+  void connectSlots(const std::string& source, const std::string& target);
+  void connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+  bool isConnected(const std::string& source, const std::string& target);
+  bool isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+  void disconnectSlots(const std::string& source, const std::string& target);
+  void disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+
+  void getDataConnections(
+                           cedar::proc::StepPtr source,
+                           const std::string& sourceDataName,
+                           std::vector<cedar::proc::DataConnectionPtr>& connections
+                         );
+
+  const ElementMap& elements() const;
+
+  void updateObjectName(cedar::proc::Element* object);
+
+  void reset();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -123,7 +134,26 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*!@brief Reads the network from a configuration node using the first version of the format.
+   */
+  void readFromV1(const cedar::aux::ConfigurationNode& root);
+
+  void writeMetaData(cedar::aux::ConfigurationNode& root);
+
+  void readSteps(const cedar::aux::ConfigurationNode& root);
+  void saveSteps(cedar::aux::ConfigurationNode& root);
+
+  void readTriggers(const cedar::aux::ConfigurationNode& root);
+  void saveTriggers(cedar::aux::ConfigurationNode& root);
+
+//  void readGroups(const cedar::aux::ConfigurationNode& root);
+//  void saveGroups(cedar::aux::ConfigurationNode& root);
+
+  void readDataConnection(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
+
+  void readDataConnections(const cedar::aux::ConfigurationNode& root);
+  void saveDataConnections(cedar::aux::ConfigurationNode& root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -131,20 +161,9 @@ private:
 protected:
   // none yet
 private:
-  StepVector mSteps;
-  TriggerVector mTriggers;
-  GroupVector mGroups;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
+  ElementMap mElements;
+  DataConnectionVector mDataConnections;
+  TriggerConnectionVector mTriggerConnections;
 
 }; // class cedar::proc::Network
 

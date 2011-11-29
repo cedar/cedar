@@ -45,7 +45,7 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/Step.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
@@ -144,11 +144,13 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   }
   log_file << "threaded." << std::endl;
 
-  TriggerPtr sequence_trigger(new Trigger());
+  TriggerPtr sequence_trigger(new Trigger("sequence_trigger"));
 
   TriggerPtr prev_trigger = sequence_trigger;
   std::string desired_sequence = "";
 
+  log_file << "Creating network ... " << std::endl;
+  cedar::proc::NetworkPtr network (new cedar::proc::Network());
   /*
    * Generate the sequence in the processing framework
    */
@@ -172,7 +174,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
     {
       ComputableTestPtr step (new ComputableTest(i, sequence_buffer, lock, runInThread));
       steps.push_back(step);
-      cedar::proc::Manager::getInstance().connect(prev_trigger, step);
+      network->connectTrigger(prev_trigger, step);
 
       step->getFinishedTrigger()->addTrigger(multi_trigger);
 
@@ -185,7 +187,8 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   }
 
   EndStopTestPtr stop_test(new EndStopTest());
-  cedar::proc::Manager::getInstance().connect(prev_trigger, stop_test);
+  network->add(stop_test);
+  network->connectTrigger(prev_trigger, stop_test);
 
   log_file << "Triggering sequence " << sequenceString << "." << std::endl;
   sequence_trigger->trigger();

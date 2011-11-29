@@ -47,6 +47,10 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/processing/Trigger.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // PROJECT INCLUDES
 
@@ -109,31 +113,31 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::TriggerItem::disconnect(cedar::proc::gui::GraphicsBase* pListener)
+void cedar::proc::gui::TriggerItem::disconnect(cedar::proc::gui::GraphicsBase* /*pListener*/)
 {
-  switch (pListener->getGroup())
-  {
-    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
-    {
-      cedar::proc::gui::StepItem *p_step = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pListener);
-      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_step->getStep()));
-      cedar::proc::Manager::getInstance().disconnect(this->getTrigger(), p_step->getStep());
-      break;
-    }
-
-    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-    {
-      cedar::proc::gui::TriggerItem *p_trigger = cedar::aux::asserted_cast<cedar::proc::gui::TriggerItem*>(pListener);
-      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_trigger->getTrigger()));
-      this->getTrigger()->removeTrigger(p_trigger->getTrigger());
-      break;
-    }
-
-    default:
-      // should never happen: triggers can only be connected to steps and other triggers.
-      CEDAR_DEBUG_ASSERT(false);
-      break;
-  }
+//  switch (pListener->getGroup())
+//  {
+//    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
+//    {
+//      cedar::proc::gui::StepItem *p_step = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pListener);
+//      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_step->getStep()));
+//      cedar::proc::Manager::getInstance().disconnect(this->getTrigger(), p_step->getStep());
+//      break;
+//    }
+//
+//    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
+//    {
+//      cedar::proc::gui::TriggerItem *p_trigger = cedar::aux::asserted_cast<cedar::proc::gui::TriggerItem*>(pListener);
+//      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_trigger->getTrigger()));
+//      this->getTrigger()->removeTrigger(p_trigger->getTrigger());
+//      break;
+//    }
+//
+//    default:
+//      // should never happen: triggers can only be connected to steps and other triggers.
+//      CEDAR_DEBUG_ASSERT(false);
+//      break;
+//  }
 }
 
 void cedar::proc::gui::TriggerItem::isDocked(bool docked)
@@ -190,7 +194,7 @@ cedar::proc::gui::ConnectValidity
 void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 {
   this->mTrigger = trigger;
-  this->mClassId = cedar::proc::Manager::getInstance().triggers().getDeclarationOf(mTrigger);
+  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(mTrigger);
   
   std::string tool_tip = this->mTrigger->getName() + " (" + this->mClassId->getClassName() + ")";
   this->setToolTip(tool_tip.c_str());
@@ -199,16 +203,6 @@ void cedar::proc::gui::TriggerItem::setTrigger(cedar::proc::TriggerPtr trigger)
 void cedar::proc::gui::TriggerItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
-  try
-  {
-    std::string trigger_name = node.get<std::string>("trigger");
-    cedar::proc::TriggerPtr trigger = cedar::proc::Manager::getInstance().triggers().get(trigger_name);
-    this->setTrigger(trigger);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    CEDAR_THROW(cedar::proc::gui::InvalidTriggerNameException, "Cannot read TriggerItem from file: no trigger name given.");
-  }
 }
 
 void cedar::proc::gui::TriggerItem::writeConfiguration(cedar::aux::ConfigurationNode& root)
@@ -263,7 +257,6 @@ cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
 
 void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarget)
 {
-  cedar::proc::Manager::getInstance().connect(this->getTrigger(), pTarget->getStep());
   /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
    *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
    *       this function.
@@ -273,7 +266,6 @@ void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::StepItem *pTarge
 
 void cedar::proc::gui::TriggerItem::connectTo(cedar::proc::gui::TriggerItem *pTarget)
 {
-  cedar::proc::Manager::getInstance().connect(this->getTrigger(), pTarget->getTrigger());
   /*!@todo check that this connection isn't added twice; the check above doesn't to this because during file loading,
    *       the "real" connections are already read via cedar::proc::Network, and then added to the ui afterwards using
    *       this function.

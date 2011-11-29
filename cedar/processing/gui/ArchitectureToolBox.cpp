@@ -41,7 +41,6 @@
 // LOCAL INCLUDES
 #include "cedar/processing/gui/ArchitectureToolBox.h"
 #include "cedar/processing/gui/View.h"
-#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES
@@ -55,12 +54,10 @@
 
 cedar::proc::gui::ArchitectureToolBox::ArchitectureToolBox(QWidget *pParent)
 :
-cedar::proc::gui::ToolBox(4, pParent),
+cedar::proc::gui::ToolBox(1, pParent),
 mpView(NULL)
 {
   this->addItem(":/modeicons/select.svg", "mode.Select", "selection mode");
-  this->addItem(":/modeicons/connect.svg", "mode.Connect", "connection mode");
-  this->addItem(":/modeicons/group.svg", "mode.Group", "grouping mode");
   QObject::connect(this, SIGNAL(selectionChanged(QString)), this, SLOT(selectionChanged(QString)));
 }
 
@@ -94,10 +91,6 @@ void cedar::proc::gui::ArchitectureToolBox::selectionChanged(QString data)
   if (mode == "mode.Select")
   {
     mode_val = cedar::proc::gui::Scene::MODE_SELECT;
-  }
-  else if (mode == "mode.Group")
-  {
-    mode_val = cedar::proc::gui::Scene::MODE_GROUP;
   }
   else if (mode == "mode.Connect")
   {

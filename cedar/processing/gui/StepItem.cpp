@@ -49,6 +49,10 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // PROJECT INCLUDES
 
@@ -146,7 +150,7 @@ void cedar::proc::gui::StepItem::redraw()
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
   this->mStep = step;
-  this->mClassId = cedar::proc::Manager::getInstance().steps().getDeclarationOf(this->mStep);
+  this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
 
   this->mStepIcon = QIcon(this->mClassId->getIconPath().c_str());
   if (this->mStepIcon.isNull())
@@ -157,23 +161,14 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addDataItems();
   this->addTriggerItems();
 
-  QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
+//  QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
+  step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 }
 
 void cedar::proc::gui::StepItem::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::gui::GraphicsBase::readConfiguration(node);
-  try
-  {
-    std::string step_name = node.get<std::string>("step");
-    cedar::proc::StepPtr step = cedar::proc::Manager::getInstance().steps().get(step_name);
-    this->setStep(step);
-  }
-  catch (const boost::property_tree::ptree_bad_path&)
-  {
-    CEDAR_THROW(cedar::proc::gui::InvalidStepNameException, "Cannot read StepItem from file: no step name given.");
-  }
 }
 
 void cedar::proc::gui::StepItem::writeConfiguration(cedar::aux::ConfigurationNode& root)

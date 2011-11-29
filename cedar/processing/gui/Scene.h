@@ -52,9 +52,7 @@
 #include <QMainWindow>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief This is a QGraphicsScene specifically designed for drawing processing networks.
  */
 class cedar::proc::gui::Scene : public QGraphicsScene
 {
@@ -67,7 +65,6 @@ public:
   enum MODE
   {
     MODE_SELECT,
-    MODE_GROUP,
     MODE_CONNECT
   };
 
@@ -96,11 +93,10 @@ public:
   void mouseMoveEvent(QGraphicsSceneMouseEvent *pMouseEvent);
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *pMouseEvent);
 
-  void addProcessingStep(const std::string& classId, QPointF position);
+  void addElement(const std::string& classId, QPointF position);
   void addProcessingStep(cedar::proc::StepPtr step, QPointF position);
   void addStepItem(cedar::proc::gui::StepItem *pStep);
   void removeStepItem(cedar::proc::gui::StepItem *pStep);
-  void addTrigger(const std::string& classId, QPointF position);
   void addTrigger(cedar::proc::TriggerPtr trigger, QPointF position);
   void addTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
   void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
@@ -133,7 +129,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -181,8 +177,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 

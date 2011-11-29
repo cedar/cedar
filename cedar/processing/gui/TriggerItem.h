@@ -59,6 +59,10 @@
 class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::NetworkFile;
+  //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -150,7 +154,7 @@ protected:
 
 private:
   //!@brief the class id of the internal trigger, used for a tooltip
-  cedar::proc::TriggerDeclarationPtr mClassId;
+  cedar::proc::ElementDeclarationPtr mClassId;
 
 }; // class TriggerItem
 

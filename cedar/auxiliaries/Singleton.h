@@ -22,62 +22,89 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TriggerClassList.h
+    File:        Singleton.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 11 11
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2011 10 28
 
-    Description:
+    Description: Template implementation of the Singleton pattern (Gamma et al., 1995).
 
-    Credits:
+    Credits: Minor parts are based on the implementation by Alexandrescu (2001).
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_TRIGGER_CLASS_LIST_H
-#define CEDAR_PROC_GUI_TRIGGER_CLASS_LIST_H
+#ifndef CEDAR_AUX_SINGLETON_H
+#define CEDAR_AUX_SINGLETON_H
 
 // LOCAL INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/ExceptionBase.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <QListWidget>
+#include <QMutex>
 
 
-/*!@brief A widget showing a list of steps that can be dragged into the architecture area.
+/*!@brief Singleton pattern
  *
- * More detailed description of the class.
+ * This class implements the Singleton pattern (Gamma et al., 1995) for a template type T. A Singleton class allows the
+ * creation of a single instance only. This instance is created by calling the static getInstance() method of the class
+ * directly. The instance is returned, or created and returned if it does not exist yet. The constructor, destructor,
+ * and copy-constructor are defined as private to forbid a different method of instantiation.
+ *
+ * This specific implementation is thread-safe and returns a boost shared pointer to the Singleton instance.
+ *
+ * \todo Separate into policies according to Alexandrescu (2001) [threading model, lifetime policy].
  */
-class cedar::proc::gui::TriggerClassList : public QListWidget
+template<class T>
+class cedar::aux::Singleton
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-  Q_OBJECT
+public:
+  typedef T InstanceType;
+  typedef typename boost::shared_ptr<InstanceType> InstanceTypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  TriggerClassList(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  ~TriggerClassList();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief for a given category, show all registered steps (their icon and name)
-  void showList(const cedar::proc::TriggerRegistry::CategoryEntries& stepEntries);
+  static InstanceTypePtr getInstance()
+  {
+    // this implements the double-checked locking pattern, an efficient way
+    // to prevent a race condition on the creation of the singleton instance.
+    if (mInstance.get() == 0)
+    {
+      QMutex mutex;
+      mutex.lock();
+      if (mInstance.get() == 0)
+      {
+        if (mDestroyed)
+        {
+          //  There are ways to handle this problem without throwing. See Alexandrescu2001.
+          CEDAR_THROW(cedar::aux::DeadReferenceException, "A dead-reference occurred in a singleton.")
+          mDestroyed = false;
+        }
+
+        mInstance = InstanceTypePtr(new T);
+      }
+      mutex.unlock();
+    }
+
+    return mInstance;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,7 +116,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  ~Singleton()
+  {
+    mDestroyed = true;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -99,7 +129,8 @@ public:
 protected:
   // none yet
 private:
-  // none yet
+  static InstanceTypePtr mInstance;
+  static bool mDestroyed;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -112,7 +143,10 @@ protected:
 private:
   // none yet
 
-}; // class TriggerClassList
+}; // class cedar::aux::Singleton
 
-#endif // CEDAR_PROC_GUI_TRIGGER_CLASS_LIST_H
+template <class T> typename cedar::aux::Singleton<T>::InstanceTypePtr cedar::aux::Singleton<T>::mInstance;
+template <class T> bool cedar::aux::Singleton<T>::mDestroyed;
+
+#endif // CEDAR_AUX_SINGLETON_H
 

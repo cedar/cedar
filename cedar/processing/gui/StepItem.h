@@ -64,6 +64,10 @@ class cedar::proc::gui::StepItem : public QObject, public cedar::proc::gui::Grap
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::NetworkFile;
+  //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -124,6 +128,7 @@ public:
 public slots:
   //!@brief handles changes in the state of a step (e.g. from error to non-error state)
   void stepStateChanged();
+
   //!@brief handles a redraw of the graphical representation
   void redraw();
 
@@ -141,9 +146,9 @@ private:
   void addDataItems();
   //!@brief adds graphical representations for all triggers contained in the step
   void addTriggerItems();
-
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -165,7 +170,7 @@ protected:
 
 private:
   //!@brief the class id of the step
-  cedar::proc::StepDeclarationPtr mClassId;
+  cedar::proc::ElementDeclarationPtr mClassId;
   //!@brief the main window in which the current graphical representation is embedded
   QMainWindow* mpMainWindow;
   //!@brief the icon representing the contained step
