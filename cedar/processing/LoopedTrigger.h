@@ -81,15 +81,27 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Step method implemented from the superclass.
+   */
   void step(double time);
 
-  //!@todo Make the start/stop methods in LoopedThread virtual?
+  /*!@brief Starts the trigger loop.
+   * @todo Make the start/stop methods in LoopedThread virtual and overload them in LoopedTrigger instead?
+   */
   void startTrigger();
+
+  /*!@brief Stops the trigger loop.
+   */
   void stopTrigger();
 
 
 public slots:
+  /*!@brief Slot that reacts to a change in the loop mode parameter.
+   */
   void loopModeChanged();
+
+  /*!@brief Slot that reacts to a change in the loop time parameter.
+   */
   void loopTimeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -102,19 +114,22 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void removeListener(cedar::proc::TriggerablePtr step);
+  /*!@brief Removes the triggerable from the list of listeners of this trigger.
+   */
+  void removeListener(cedar::proc::TriggerablePtr triggerable);
 
-  void addListener(cedar::proc::TriggerablePtr step);
+  /*!@brief Adds the triggerable to the listeners of this of this trigger.
+   */
+  void addListener(cedar::proc::TriggerablePtr triggerable);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  // none yet
 
 private:
-
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -123,7 +138,10 @@ protected:
   // none yet
 
 private:
+  //!@brief The loop mode.
   cedar::aux::EnumParameterPtr mLoopType;
+
+  //!@brief The loop time.
   cedar::aux::DoubleParameterPtr mLoopTime;
 
 }; // class cedar::proc::LoopedTrigger
