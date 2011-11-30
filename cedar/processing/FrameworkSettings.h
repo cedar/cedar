@@ -73,17 +73,30 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! @brief
-   *
+  /*!@brief Loads the settings from a file in the user's home directory.
    */
   void load();
+
+  /*!@brief Saves the settings to a file in the user's home directory.
+   */
   void save();
 
+  /*!@brief Adds a plugin to the list of plugins known by the processing framework.
+   */
   void addKnownPlugin(const std::string& file);
+
+  /*!@brief Returns the set of plugins known by the processing framework.
+   */
   const std::set<std::string>& getKnownPlugins();
 
+  /*!@brief Returns the set of plugin directories known by the processing framework.
+   */
   const std::set<std::string>& getPluginDirectories();
 
+  /*!@brief Returns the plugin workspace directory.
+   *
+   *        This is the first directoriy searched for a plugin.
+   */
   std::string getPluginWorkspace() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,8 +123,13 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief Parameter representing the plugin workspace.
   cedar::aux::DirectoryParameterPtr mPluginWorkspace;
+
+  //!@brief List of directories to use when looking for plugins.
   cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
+
+  //!@brief List of known plugins.
   cedar::aux::StringSetParameterPtr mKnownPlugins;
 
 private:

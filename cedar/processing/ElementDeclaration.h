@@ -72,7 +72,7 @@ public:
   ElementDeclaration(
                       cedar::proc::ElementFactoryPtr classFactory,
                       const std::string& classId,
-                      const std::string& category = "misc."
+                      const std::string& category
                     )
   :
   DeclarationBase<cedar::proc::Element, cedar::aux::AbstractFactory<cedar::proc::Element> >(
@@ -154,13 +154,13 @@ class cedar::proc::ElementDeclarationTemplate : public ElementDeclaration
 public:
   /*!@brief The constructor.
    *
+   * @param category Category for the element.
    * @param classId  Identifier of the class. If this is left empty, the name will be determined automatically. For
    *                 example, a class test::namespaceName::ClassName will result in the name
    *                 test.namespaceName.ClassName.
-   * @param category Category for the element.
    */
 
-  ElementDeclarationTemplate(const std::string& classId = "", const std::string& category = "misc.")
+  ElementDeclarationTemplate(const std::string& category, const std::string& classId = "")
   :
   ElementDeclaration
   (
