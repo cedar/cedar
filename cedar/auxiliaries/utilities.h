@@ -93,19 +93,39 @@ namespace cedar
     struct CEDAR_AUX_LIB_EXPORT StackEntry
     {
       public:
-        const std::string& symbol() const
+        inline const std::string& symbol() const
         {
           return this->mSymbol;
         }
 
-        const std::string& file() const
+        inline const std::string& file() const
         {
           return this->mFile;
         }
 
+        inline void setSymbol(const std::string& symbol)
+        {
+          this->mSymbol = symbol;
+        }
+
+        inline void setFile(const std::string& file)
+        {
+          this->mFile = file;
+        }
+
+        inline void setAddress(const std::string& address)
+        {
+          this->mAddress = address;
+        }
+
+        inline void setSymbolOffset(const std::string& offset)
+        {
+          this->mSymbolOffset = offset;
+        }
+
         void setRawString(const std::string& rawString);
 
-        friend std::ostream& operator<< (std::ostream& stream, const StackEntry& trace);
+        friend CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackEntry& trace);
 
       private:
         std::string mFile;
@@ -123,21 +143,22 @@ namespace cedar
       public:
         StackTrace();
 
-        size_t size() const
+        inline size_t size() const
         {
           return this->mStackTrace.size();
         }
 
-        const cedar::aux::StackEntry& at(size_t index) const
+        inline const cedar::aux::StackEntry& at(size_t index) const
         {
           return this->mStackTrace.at(index);
         }
 
-        friend std::ostream& operator<< (std::ostream& stream, const StackTrace& trace);
+        friend CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackTrace& trace);
 
       private:
         std::vector<cedar::aux::StackEntry> mStackTrace;
     };
+    
   }
 }
 

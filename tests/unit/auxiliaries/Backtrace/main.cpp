@@ -45,6 +45,24 @@
 #include <iostream>
 #include <typeinfo>
 
+namespace test
+{
+  int subFunction(cedar::aux::LogFile& file)
+  {
+    cedar::aux::StackTrace backtrace;
+
+    file << backtrace << std::endl;
+    std::cout << backtrace << std::endl;
+
+    if (backtrace.size() == 0)
+    {
+      file << "Error: backtrace is empty." << std::endl;
+      std::cout << "Error: backtrace is empty." << std::endl;
+      return 1;
+    }
+    return 0;
+  }
+}
 
 
 int main()
@@ -67,6 +85,8 @@ int main()
     log_file << "Error: backtrace is empty." << std::endl;
     std::cout << "Error: backtrace is empty." << std::endl;
   }
+
+  errors += test::subFunction(log_file);
 
   return errors;
 }
