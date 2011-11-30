@@ -46,9 +46,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief   Enum class for the loop mode.
  *
- * More detailed description of the class.
+ * @see     @ref EnumClasses for an explanation of the concepts.
+ * @remarks This is used as a parameter for cedar::proc::LoopedTrigger.
  */
 class cedar::proc::LoopMode
 {
@@ -56,25 +57,31 @@ class cedar::proc::LoopMode
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Type to be used when storing enum ids of this enum class.
   typedef cedar::aux::EnumId Id;
-public:
+
+  //!@brief Pointer to this enum's enum base type.
   typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief A static construct method that gets called by @em TypePtr.
+   */
   static void construct();
 
+  /*!@brief Returns a const reference to the enum base object.
+   */
   static const cedar::aux::EnumBase& type();
+
+  /*!@brief Returns a pointer to the enum base object.
+   */
   static const cedar::proc::LoopMode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,25 +100,20 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Step time that gets bigger when the calculations attached to the loop are too slow.
   static const Id FIXED_ADAPTIVE = 0;
+
+  //!@brief Fixed step time.
   static const Id FIXED = 1;
+
+  //!@brief Step time is determined by measuring.
   static const Id REALTIME = 2;
 
 protected:
   // none yet
 private:
+  //!@brief The type pointer of the enum.
   static cedar::aux::EnumType<cedar::proc::LoopMode> mType;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::DataRole
 

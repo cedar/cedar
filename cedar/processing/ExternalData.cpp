@@ -113,6 +113,8 @@ void cedar::proc::ExternalData::removeData(cedar::aux::ConstDataPtr data)
 
 void cedar::proc::ExternalData::addData(cedar::aux::DataPtr data)
 {
+  CEDAR_DEBUG_ASSERT(this->isCollection());
+
   // check if there is a free slot in the current vector
   for (size_t i = 0; i < this->mData.size(); ++i)
   {

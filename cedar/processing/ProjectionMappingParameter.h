@@ -22,15 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ProjectionMapParameter.h
+    File:        ProjectionMappingParameter.h
 
     Maintainer:  Mathis Richter
-
     Email:       mathis.richter@ini.rub.de
-
     Date:        2011 11 21
 
-    Description:
+    Description: Parameter type for the projection mapping.
 
     Credits:
 
@@ -39,29 +37,21 @@
 #ifndef CEDAR_PROC_PROJECTION_MAPPING_PARAMETER_H
 #define CEDAR_PROC_PROJECTION_MAPPING_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/ProjectionMapping.h"
 
 // SYSTEM INCLUDES
 #include <climits>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Parameter type for the projection mapping.
  *
- * More detailed description of the class.
+ * This class wraps the projection mapping type and supplies functions for using it as a parameter.
  */
 class cedar::proc::ProjectionMappingParameter : public cedar::aux::Parameter
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // typedef
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -72,6 +62,7 @@ public:
                               const std::string& name
                             );
 
+  //!@brief A constructor taking a default mapping.
   ProjectionMappingParameter(
                               cedar::aux::Configurable *pOwner,
                               const std::string& name,
@@ -85,20 +76,53 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  /*!@brief Read a configuration mapping from a configuration tree.
+   *
+   * @param root root of the configuration node holding the mapping information
+   */
   void setTo(const cedar::aux::ConfigurationNode& root);
 
+  /*!@brief Write the current mapping into a configuration tree.
+   *
+   * @param root root of the configuration node the mapping information will be written to
+   */
   void putTo(cedar::aux::ConfigurationNode& root) const;
 
+  /*!@brief Initialize the mapping with a given number of mappings.
+   *
+   * @param numberOfMappings number of initial mappings
+   */
   void initialize(unsigned int numberOfMappings);
 
+  /*!@brief Change the mapping from inputIndex to the new outputIndex.
+   *
+   * This method does bounds checking on both indices supplied.
+   *
+   * @param inputIndex index of input dimension
+   * @param outputIndex index of the output dimension
+   */
   void changeMapping(unsigned int inputIndex, unsigned int outputIndex);
 
+  /*!@brief Configure the mapping to drop the dimension with the given input index.
+   *
+   * @param inputIndex index of the dimension to be dropped
+   */
   void drop(unsigned int inputIndex);
 
+  /*!@brief Inform the mapping about the output dimensionality of the projection.
+   *
+   * @param dimensionality the new output dimensionality of the projection
+   */
   void setOutputDimensionality(unsigned int dimensionality);
 
+  //!@brief Return the projection mapping.
   const cedar::proc::ProjectionMappingPtr& getValue() const;
 
+  /*!@brief Create a default mapping.
+   *
+   * This method is empty.
+   */
   void makeDefault();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,25 +140,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
+  //! the actual mapping
   cedar::proc::ProjectionMappingPtr mValues;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::ProjectionMappingParameter
 
 #endif // CEDAR_PROC_PROJECTION_MAPPING_PARAMETER_H
-

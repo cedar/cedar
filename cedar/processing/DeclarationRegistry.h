@@ -68,9 +68,16 @@ class cedar::proc::DeclarationRegistry
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Map of declaration ids to declaration pointers.
   typedef std::map<std::string, cedar::proc::ElementDeclarationPtr> Declarations;
+
+  //! Set of category names.
   typedef std::set<std::string> CategoryList;
+
+  //! List of element declarations in a category.
   typedef std::vector<cedar::proc::ElementDeclarationPtr> CategoryEntries;
+
+  //! Map of strings to CategoryEntries.
   typedef std::map<std::string, CategoryEntries> Categories;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -82,16 +89,32 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief   Allocates a class using the declaration identified by the given classId.
+   *
+   * @throws  cedar::proc::InvalidNameException if no declaration can be found for the given classId.
+   */
   cedar::proc::ElementPtr allocateClass(const std::string& classId) const;
 
+  /*!@brief   Adds a class declaration to the registry.
+   *
+   *          After this call, the declaration will be retrievable by its classId.
+   */
   void declareClass(cedar::proc::ElementDeclarationPtr pDeclaration);
 
+  /*!@brief   Returns the list of categories stored in the registry.
+   */
   const CategoryList& getCategories() const;
 
+  /*!@brief   Returns the entries for a given category.
+   */
   const CategoryEntries& getCategoryEntries(const std::string& category) const;
 
-  cedar::proc::ElementDeclarationPtr getDeclarationOf(ElementPtr object);
+  /*!@brief   Returns the declaration that generates objects of the same type as the given object.
+   */
+  cedar::proc::ElementDeclarationPtr getDeclarationOf(cedar::proc::ElementPtr object);
 
+  /*!@brief   Returns the list of declarations in this registry.
+   */
   const Declarations& declarations() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,6 +126,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief   Constructor. This is private because it follows the singleton pattern.
+   */
   DeclarationRegistry();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,8 +138,13 @@ public:
 protected:
   // none yet
 private:
+  //! Member that stores the declarations.
   std::map<std::string, cedar::proc::ElementDeclarationPtr> mDeclarations;
+
+  //! List of categories.
   CategoryList mCategories;
+
+  //! Association of categories and declarations.
   Categories mDeclarationsByCategory;
 
 }; // class cedar::proc::DeclarationRegistry

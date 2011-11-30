@@ -45,11 +45,11 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief   This is a class that represents a connection between two data items.
  *
- * More detailed description of the class.
+ * @remarks This class is used internally in the processing framework, do not use it directly.
  *
- * @todo check if source is owned data
+ * @todo    Check if source is owned data.
  */
 class cedar::proc::DataConnection
 {
