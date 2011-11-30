@@ -50,6 +50,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cv::Mat cedar::aux::conv::FastConvolution::convolve(const cv::Mat& matrix, const cv::Mat& kernel) const
 {
+  CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) == cedar::aux::math::getDimensionalityOf(kernel));
+  for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
+  {
+    CEDAR_ASSERT(matrix.size[dim] >= kernel.size[dim])
+  }
   cv::Mat output = matrix.clone();
   output = 0.0;
   cv::Mat padded_kernel = this->padKernel(matrix, kernel);
@@ -104,16 +109,10 @@ cv::Mat cedar::aux::conv::FastConvolution::padKernel(const cv::Mat& matrix, cons
   for (size_t dim = 0; dim < cedar::aux::math::getDimensionalityOf(matrix); ++dim)
   {
     int kernel_center = kernel.size[dim]/2;
-//    int adjusted_start = matrix.size[dim] / 2 - kernel_center;
-//    if (matrix.size[dim] % 2 != 0)
-//    {
-//      ++adjusted_start;
-//    }
     regions.at(0).push_back(cv::Range(0, kernel_center + 1)); // lower limit
     regions.at(1).push_back(cv::Range(matrix.size[dim] - kernel_center, matrix.size[dim])); // upper limit
     kernel_regions.at(0).push_back(cv::Range(0, kernel_center)); // lower limit
     kernel_regions.at(1).push_back(cv::Range(kernel_center, kernel.size[dim])); // upper limit
-//    region.push_back(cv::Range(adjusted_start, adjusted_start + kernel.size[dim]));
   }
   for (size_t part = 0; part < static_cast<unsigned int>((1 << cedar::aux::math::getDimensionalityOf(matrix))); ++part)
   {
@@ -136,7 +135,6 @@ cv::Mat cedar::aux::conv::FastConvolution::padKernel(const cv::Mat& matrix, cons
   // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
     output(output_index) = 1.0 * kernel(kernel_index);
   }
-//  output(&region.at(0)) = 1.0 * kernel;
   return output;
 }
 #endif // CEDAR_FFTW
