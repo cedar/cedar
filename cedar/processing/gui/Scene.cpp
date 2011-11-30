@@ -248,7 +248,7 @@ void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* p
   {
     this->mNetwork->network()->reset();
   }
-  else
+  else if (a != NULL)
   {
     std::cout << "Unmatched action in cedar::proc::gui::Scene::contextMenuEvent." << std::endl;
   }
