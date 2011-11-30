@@ -49,7 +49,10 @@
 // SYSTEM INCLUDES
 #include <boost/signals2/connection.hpp>
 
-/*!@brief An interface for classes that have data slots that can be connected.
+/*!@brief   An interface for classes that have data slots that can be connected.
+ *
+ * @remarks Do not inherit from this class directly, because this is a class that is used for managing the internals of
+ *          the processing framework. In most circumstances, you probably want to inherit cedar::proc::Step.
  */
 class cedar::proc::Connectable : public cedar::proc::Element
 {
