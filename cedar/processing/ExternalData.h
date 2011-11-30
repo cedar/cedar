@@ -48,7 +48,13 @@
 #include <boost/signals2/connection.hpp>
 #include <boost/function.hpp>
 
-/*!@brief A slot for data that is owned by a Connectable.
+/*!@brief   A slot for data that is not owned by a Connectable.
+ *
+ *          I.e., this is a slot that receives a pointer to a data object that is stored in a cedar::proc::OwnedData
+ *          slot somewhere.
+ *
+ * @remarks If cedar::proc::ExternalData::isCollection is true, then this slot can store pointers to more than one data
+ *          object.
  */
 class cedar::proc::ExternalData : public cedar::proc::DataSlot
 {
@@ -81,29 +87,48 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the data object stored in this slot.
+   */
   cedar::aux::DataPtr getData();
 
+  /*!@brief Returns the data object stored in this slot as a const pointer.
+   */
   cedar::aux::ConstDataPtr getData() const;
 
+  /*!@brief   Returns the data pointer stored in this slot under @em index.
+   *
+   * @remarks Note, that index can only be greater than zero if cedar::proc::ExternalData::isCollection is true.
+   */
   cedar::aux::DataPtr getData(unsigned int index);
 
+  /*!@brief   Const variant of cedar::proc::ExternalData:getData.
+   */
   cedar::aux::ConstDataPtr getData(unsigned int index) const;
 
-
+  /*!@brief   Returns the count of data.
+   *
+   * @remarks Note, that index can only be greater than zero if cedar::proc::ExternalData::isCollection is true.
+   */
   inline unsigned int getDataCount() const
   {
     return this->mData.size();
   }
 
+  /*!@brief   Checks if the data pointer is already stored in this slot's collection.
+   */
   bool hasData(cedar::aux::ConstDataPtr data) const;
 
+  /*!@brief   Removes the data pointer from the slot's collection.
+   */
   void removeData(cedar::aux::ConstDataPtr data0);
 
-  /*!
+  /*!@brief   Sets whether or not this slot is a collection, i.e., accepts multiple data pointers.
    * @remarks This function throws unless the role of this slot is input.
    */
   void setCollection(bool isCollection);
 
+  /*!@brief   Returns whether this slot is a collection of multiple data pointers.
+   */
   bool isCollection() const;
 
   /*!@brief register a function pointer with this function to react to any changes in external data
@@ -121,10 +146,20 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief   Sets the data pointer of this slot.
+   *
+   * @remarks If the step is a collection, this function calls addData. Otherwise, it calls setData(data, 0).
+   */
   void setData(cedar::aux::DataPtr data);
 
+  /*!@brief   Sets the data pointer of the given index.
+   */
   void setData(cedar::aux::DataPtr data, unsigned int index);
 
+  /*!@brief   Appends a data pointer to the list of data.
+   *
+   * @remarks This function only makes sense when the slot is a collection.
+   */
   void addData(cedar::aux::DataPtr data);
 
   //--------------------------------------------------------------------------------------------------------------------
