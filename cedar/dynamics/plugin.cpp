@@ -54,7 +54,7 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
 
   ElementDeclarationPtr field_decl
   (
-    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("cedar.dynamics.NeuralField", "Fields")
+    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::NeuralField>("Fields", "cedar.dynamics.NeuralField")
   );
   field_decl->setIconPath(":/steps/field_temp.svg");
 
@@ -67,7 +67,7 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
 
   ElementDeclarationPtr preshape_decl
   (
-    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("cedar.dynamics.Preshape", "Fields")
+    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Preshape>("Fields", "cedar.dynamics.Preshape")
   );
   preshape_decl->setIconPath(":/steps/preshape.svg");
 
@@ -80,7 +80,7 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
 
   ElementDeclarationPtr noise_decl
   (
-    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Noise>("cedar.dynamics.Noise", "Sources")
+    new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Noise>("Sources", "cedar.dynamics.Noise")
   );
   noise_decl->setIconPath(":/steps/noise.svg");
 

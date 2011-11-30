@@ -35,19 +35,17 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/steps/Projection.h"
-
-// PROJECT INCLUDES
+#include "cedar/processing/ProjectionMappingParameter.h"
+#include "cedar/processing/DataSlot.h"
+#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
-#include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/auxiliaries/DataTemplate.h"
-#include "cedar/processing/DataSlot.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -344,15 +342,6 @@ void cedar::proc::steps::Projection::compress3Dto1D()
   {
     mOutput->getData() = mOutput->getData().t();
   }
-}
-
-void cedar::proc::steps::Projection::compressNDtoMD()
-{
-  // iterate over output matrix
-  // map current indices to indices in the input matrix
-  // fill the indices, which are to be compressed, with zeros
-  // from the input matrix get the "maximum" along all dimensions, which are to be compressed
-
 }
 
 void cedar::proc::steps::Projection::compressNDto0D()

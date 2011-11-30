@@ -66,21 +66,23 @@ class cedar::aux::Singleton
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type of the instance.
   typedef T InstanceType;
+
+  //! Pointer to the instance type.
   typedef typename boost::shared_ptr<InstanceType> InstanceTypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the singleton instance.
+   */
   static InstanceTypePtr getInstance()
   {
     // this implements the double-checked locking pattern, an efficient way
@@ -116,8 +118,10 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief The destructor.
   ~Singleton()
   {
+    // set the static member to true.
     mDestroyed = true;
   }
 
@@ -129,7 +133,10 @@ public:
 protected:
   // none yet
 private:
+  //! The singleton instance.
   static InstanceTypePtr mInstance;
+
+  //! Whether the singleton object has already been destroyed.
   static bool mDestroyed;
 
   //--------------------------------------------------------------------------------------------------------------------

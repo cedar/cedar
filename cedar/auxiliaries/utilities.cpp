@@ -40,7 +40,10 @@
 
 // SYSTEM INCLUDES
 #ifdef GCC
-#include <cxxabi.h>
+  // for name unmangling/undecorating
+  #include <cxxabi.h>
+  // for generating stack traces
+  #include <execinfo.h>
 #endif // GCC
 
 
@@ -66,8 +69,11 @@ std::string cedar::aux::unmangleName(const char* mangledName)
       break;
 
     case -2:
-      CEDAR_THROW(cedar::aux::UnmanglingFailedException, "The mangled name is not a valid name under the C++ ABI mangling rules.");
+    {
+      std::string mangled_name = mangledName;
+      CEDAR_THROW(cedar::aux::UnmanglingFailedException, "The mangled name \"" + mangled_name + "\" is not a valid name under the C++ ABI mangling rules.");
       break;
+    }
 
     case -3:
       CEDAR_THROW(cedar::aux::UnmanglingFailedException, "One of the arguments to abi::__cxa_demangle is invalid.");
@@ -88,6 +94,117 @@ std::string cedar::aux::unmangleName(const char* mangledName)
     name = name.substr(6);
   }
   return name;
+#endif // GCC
+}
+
+std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::StackTrace& trace)
+{
+  stream << "Backtrace generated with ";
+#ifdef GCC
+  stream << "GCC";
+#else
+  stream << "unsupported compiler";
+#endif // GCC
+  stream << "." << std::endl;
+  stream << "Backtrace contains " << trace.size() << " items:" << std::endl;
+
+  for (size_t i = 0; i < trace.size(); ++i)
+  {
+    stream << "  [" << i << "] " << trace.at(i) << std::endl;
+  }
+
+  return stream;
+}
+
+std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::StackEntry& entry)
+{
+  stream << entry.mFile;
+  if (!entry.mSymbol.empty())
+  {
+    stream << " (" << entry.mSymbol;
+    if (!entry.mSymbolOffset.empty())
+    {
+      stream << " + " << entry.mSymbolOffset;
+    }
+    stream << ")";
+  }
+  if (!entry.mAddress.empty())
+    stream << ": " << entry.mAddress;
+  return stream;
+}
+
+void cedar::aux::StackEntry::setRawString(const std::string& rawString)
+{
+#ifdef GCC
+  std::string tmp = rawString;
+  size_t idx = rawString.find('(');
+  if (idx == std::string::npos)
+  {
+    this->mFile = rawString;
+    return;
+  }
+  this->mFile = tmp.substr(0, idx);
+  tmp = tmp.substr(idx + 1);
+
+  idx = tmp.find_first_of("+)");
+  if (idx == std::string::npos)
+    return;
+
+  this->mSymbol = tmp.substr(0, idx);
+  tmp = tmp.substr(idx + 1);
+  try
+  {
+    this->mSymbol = cedar::aux::unmangleName(this->mSymbol.c_str());
+  }
+  catch (const cedar::aux::UnmanglingFailedException&)
+  {
+    // nothing to do, just use the mangled name.
+  }
+
+  idx = tmp.find(")");
+  if (idx != std::string::npos)
+  {
+    this->mSymbolOffset = tmp.substr(0, idx);
+    tmp = tmp.substr(idx + 1);
+  }
+
+  idx = tmp.find("[");
+  size_t idx2 = tmp.find("]");
+  if (idx != std::string::npos && idx2 != std::string::npos)
+  {
+    this->mAddress = tmp.substr(idx + 1, idx2 - idx - 1);
+  }
+#else
+#warning Implement for MSVC
+#endif // GCC
+}
+
+cedar::aux::StackTrace::StackTrace()
+{
+#ifdef GCC
+  // array for the backtraces
+  void *array[10];
+  size_t size;
+  // array for the backtrace symbols
+  char **strings;
+  size_t i;
+
+  // get the backtrace
+  size = backtrace(array, 10);
+
+  // transform the backtrace into symbols
+  strings = backtrace_symbols(array, size);
+
+  for (i = 0; i < size; i++)
+  {
+    cedar::aux::StackEntry entry;
+    entry.setRawString(strings[i]);
+    this->mStackTrace.push_back(entry);
+  }
+
+  free (strings);
+#else
+#warning Stack trace not implemented for this compiler!
 #endif // GCC
 }
 

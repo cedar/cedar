@@ -562,7 +562,6 @@ void cedar::proc::Network::getDataConnections(
   for (size_t i = 0; i < this->mDataConnections.size(); ++i)
   {
     cedar::proc::DataConnectionPtr con = this->mDataConnections.at(i);
-    std::cout << con->getSource()->getParent() << std::endl;
     if (this->getElement<cedar::proc::Step>(con->getSource()->getParent()) == source && con->getSource()->getName() == sourceDataName)
     {
       connections.push_back(con);

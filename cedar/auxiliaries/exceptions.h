@@ -187,7 +187,7 @@ public:
   }
 };
 
-/*!@brief
+/*!@brief Exception that is thrown when a singleton object does not exist any more.
  */
 class cedar::aux::DeadReferenceException : public cedar::aux::ExceptionBase
 {

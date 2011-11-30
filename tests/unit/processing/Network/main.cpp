@@ -93,7 +93,7 @@ int main(int /* argc */, char** /* argv */)
   log_file << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr test_module_decl
   (
-    new cedar::proc::ElementDeclarationTemplate<TestModule>()
+    new cedar::proc::ElementDeclarationTemplate<TestModule>("Test")
   );
   log_file << "done." << std::endl;
 
