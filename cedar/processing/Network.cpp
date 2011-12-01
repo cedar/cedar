@@ -252,11 +252,11 @@ void cedar::proc::Network::writeFile(const std::string& filename)
   std::cout << "Writing configuration file " << filename << std::endl;
 #endif // DEBUG_FILE_READING
   cedar::aux::ConfigurationNode cfg;
-  this->saveTo(cfg);
+  this->writeTo(cfg);
   boost::property_tree::write_json(filename, cfg);
 }
 
-void cedar::proc::Network::saveTo(cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::writeTo(cedar::aux::ConfigurationNode& root)
 {
   cedar::aux::ConfigurationNode meta;
   this->writeMetaData(meta);
@@ -534,18 +534,16 @@ bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::pr
 
 void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
 {
-  //!@todo clean up - very complicated way of finding an object
-  if (cedar::proc::ElementPtr elem = mElements[object->getName()])
-  {
-
-  }
   //!@todo It might be a good idea to clean up invalid pointers here.
   for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
     if (iter->second.get() == object) // found
     {
+      // exchange the object in the map - put object at key (new name) and erase old entry
       mElements[object->getName()] = iter->second;
       mElements.erase(iter);
+      // there can never be two instances of the same object in this structure. It's safe to return (and avoids
+      // mischief with the iterator)
       return;
     }
   }

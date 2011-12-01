@@ -105,7 +105,7 @@ public:
    *
    * @todo Rename to writeTo.
    */
-  void saveTo(cedar::aux::ConfigurationNode& root);
+  void writeTo(cedar::aux::ConfigurationNode& root);
 
   /*!@brief Reads the network from a given json file.
    *
