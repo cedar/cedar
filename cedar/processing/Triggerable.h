@@ -74,6 +74,8 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief Standard constructor
+  //!@param isLooped flag if this is a triggerable that is supposed to be executed in a loop
   Triggerable(bool isLooped);
   //!@brief The destructor.
   virtual ~Triggerable();
@@ -131,6 +133,7 @@ public:
   //!@brief Returns this step's parent trigger. Steps may only be triggerd by one trigger.
   cedar::proc::TriggerPtr getParentTrigger();
 
+  //!@brief function that connects up a function to Triggerable's state changed signal
   boost::signals2::connection connectToStateChanged(boost::function<void ()> slot);
 
 //signals:
@@ -143,6 +146,7 @@ public:
 protected:
   /*!@brief Sets the current state of the step.
    *
+   * @param newState a new state from enum State
    * @param annotation A string to be displayed to the user that gives additional information to the state, e.g., the
    *        message of an exception in the STATE_EXCEPTION.
    */
@@ -181,18 +185,6 @@ private:
   //!@brief the finished trigger singleton, which is triggered once the computation of this step is done
   //!@brief use Singleton template class here
   cedar::proc::TriggerPtr mFinished;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::Triggerable
 
 #endif // CEDAR_PROC_TRIGGERABLE_H

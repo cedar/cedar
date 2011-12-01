@@ -74,6 +74,7 @@ private:
 public:
   //!@brief The standard constructor.
   PluginProxy();
+  //!@brief Some other constructor.
   PluginProxy(const std::string& file);
 
   //!@brief Destructor
@@ -83,8 +84,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief loaded a shared/dynamic library from a file path
   void load(const std::string& file);
 
+  //!@brief get declaration of this proxy
   cedar::proc::PluginDeclarationPtr getDeclaration();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,6 +100,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief search known directories for this plugin
   std::string findPluginFile(const std::string& file);
 
 #ifdef WINDOWS
@@ -109,7 +113,9 @@ private:
 protected:
   // none yet
 private:
+  //!@brief plugin declaration
   cedar::proc::PluginDeclarationPtr mDeclaration;
+  //!@brief file path to plugin
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
@@ -120,18 +126,6 @@ private:
 #else
 #error Implement me for your os!
 #endif
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::PluginProxy
 
 #endif // CEDAR_PROC_PLUGIN_PROXY_H

@@ -89,8 +89,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief add an ElementDeclaration to this plugin
   void add(cedar::proc::ElementDeclarationPtr declaration);
 
+  //!@brief access all ElementDeclarations
   const ElementDeclarations& elementDeclarations() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -111,6 +113,7 @@ private:
 protected:
   // none yet
 private:
+  //!@brief internal storage of all registered ElementDeclarations
   ElementDeclarations mElementDeclarations;
 
   //--------------------------------------------------------------------------------------------------------------------

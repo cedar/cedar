@@ -85,7 +85,7 @@ bool cedar::proc::TriggerConnection::equals(cedar::proc::TriggerPtr source, ceda
   return false;
 }
 
-cedar::proc::TriggerPtr cedar::proc::TriggerConnection::getSourceTrigger()
+cedar::proc::ConstTriggerPtr cedar::proc::TriggerConnection::getSourceTrigger() const
 {
   if (cedar::proc::TriggerPtr source_shared = mSourceTrigger.lock())
   {
@@ -97,7 +97,7 @@ cedar::proc::TriggerPtr cedar::proc::TriggerConnection::getSourceTrigger()
   }
 }
 
-cedar::proc::TriggerablePtr cedar::proc::TriggerConnection::getTarget()
+cedar::proc::ConstTriggerablePtr cedar::proc::TriggerConnection::getTarget() const
 {
   if (cedar::proc::TriggerablePtr target_shared = mTarget.lock())
   {

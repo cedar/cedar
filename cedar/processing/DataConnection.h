@@ -69,10 +69,15 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief test if the given source and target are the same for this connection (i.e. are those two DataSlots connected
+  // via this DataConnection
   bool equals(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
-  cedar::proc::DataSlotPtr getSource();
-  cedar::proc::DataSlotPtr getTarget();
+
+  //!@brief get the source of this connection
+  cedar::proc::ConstDataSlotPtr getSource() const;
+
+  //!@brief get the target of this connection
+  cedar::proc::ConstDataSlotPtr getTarget() const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,25 +93,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  //!@brief the source DataSlot of this connection
   cedar::proc::DataSlotWeakPtr mSource;
+  //!@brief the target DataSlot of this connection
   cedar::proc::DataSlotWeakPtr mTarget;
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::DataConnection
 
 #endif // CEDAR_PROC_DATA_CONNECTION_H

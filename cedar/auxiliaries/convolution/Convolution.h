@@ -58,20 +58,19 @@ class cedar::aux::conv::Convolution
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief the convolution functor
   cv::Mat operator()(const cv::Mat& matrix, const cv::Mat& kernel) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief the internal convolution method, which must be implemented by all children
   virtual cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel) const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
