@@ -41,19 +41,17 @@
 #ifndef CEDAR_PROC_GUI_CONNECTION_H
 #define CEDAR_PROC_GUI_CONNECTION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QGraphicsPathItem>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Graphical representation of connections.
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
  */
 class cedar::proc::gui::Connection : public QGraphicsPathItem
 {
@@ -75,17 +73,22 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief access the source of this connection
   cedar::proc::gui::GraphicsBase* getSource();
+  //!@brief access the target of this connection
   cedar::proc::gui::GraphicsBase* getTarget();
 
+  //!@brief set the validity (i.e. the color) of this instance
   void setValidity(cedar::proc::gui::ConnectValidity validity);
 
+  //!@brief paint this connection
   void paint(QPainter *pPainter, const QStyleOptionGraphicsItem*, QWidget*);
 
-  //! @brief Removes the underlying connection in the processing framework.
+  //!@brief Removes the underlying connection in the processing framework.
   void disconnect();
 
 public slots:
+  //!@brief update the position of this connection, depending on anchor points of source and target
   void update();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,20 +111,10 @@ public:
 protected:
   // none yet
 private:
+  //!@brief source of connection
   cedar::proc::gui::GraphicsBase *mpSource;
+  //!@brief target of connection
   cedar::proc::gui::GraphicsBase *mpTarget;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H
