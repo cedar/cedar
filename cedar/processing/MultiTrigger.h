@@ -78,10 +78,13 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief process trigger event
   void onTrigger(cedar::proc::TriggerPtr pSender);
 
+  //!@brief if a trigger connects to the MultiTrigger, add it to the internal storage of sources
   void notifyConnected(cedar::proc::TriggerPtr trigger);
 
+  //!@brief if a trigger disconnects from a MultiTrigger, remove it from internal storage of sources
   void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,7 +97,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief check if all incoming triggers are triggered at least once before sending own trigger signal
   void checkCondition();
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,6 +107,7 @@ public:
 protected:
 
 private:
+  //!@brief internal storage of incoming triggers
   std::map<cedar::proc::TriggerPtr, bool> mIncoming;
 
   //--------------------------------------------------------------------------------------------------------------------

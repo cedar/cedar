@@ -106,8 +106,10 @@ public:
   //!@brief returns a list of listening triggers
   const std::vector<cedar::proc::TriggerPtr>& getTriggerListeners() const;
 
+  //!@brief empty implementation of a function that gets called if a trigger connects to this instance
   virtual void notifyConnected(cedar::proc::TriggerPtr trigger);
 
+  //!@brief empty implementation of a function that gets called if a trigger disconnects from this instance
   virtual void notifyDisconnected(cedar::proc::TriggerPtr trigger);
 
   //!@brief saves a configuration to a ConfigurationNode
@@ -144,18 +146,6 @@ private:
   std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
   //!@brief find a trigger in the list of trigger listeners
   std::vector<cedar::proc::TriggerPtr>::iterator find(cedar::proc::TriggerPtr triggerableT);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

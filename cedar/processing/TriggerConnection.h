@@ -69,10 +69,15 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief test if the given source and target are the same for this connection (i.e. are source and target connected
+  // via this TriggerConnection)
   bool equals(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
-  cedar::proc::TriggerPtr getSourceTrigger();
-  cedar::proc::TriggerablePtr getTarget();
+
+  //!@brief get the source of this connection
+  cedar::proc::ConstTriggerPtr getSourceTrigger() const;
+
+  //!@brief get the target of this connection
+  cedar::proc::ConstTriggerablePtr getTarget() const;
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,25 +93,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
+  //!@brief source of this connection
   cedar::proc::TriggerWeakPtr mSourceTrigger;
+  //!@brief target of this connection
   cedar::proc::TriggerableWeakPtr mTarget;
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::TriggerConnection
 
 #endif // CEDAR_PROC_TRIGGER_CONNECTION_H

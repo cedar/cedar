@@ -162,6 +162,7 @@ public:
     return ret;
   }
 
+  //!@brief Erase first occurrence of T entry
   void eraseFirst(const T& entry)
   {
     iterator it = std::find(this->mValues.begin(), this->mValues.end(), entry);
@@ -171,6 +172,7 @@ public:
     }
   }
 
+  //!@brief Erase all occurrences of T entry
   void eraseAll(const T& entry)
   {
     iterator it = std::find(this->mValues.begin(), this->mValues.end(), entry);

@@ -59,8 +59,6 @@ namespace cedar
   /*!@brief Namespace for all dyn classes. */
   namespace dyn
   {
-    CEDAR_DECLARE_DYN_CLASS(Dynamics);
-
     //!@brief a template class tailored for use in all dynamics
     template <typename T> class Activation;
     //!@brief a specialization for double values
@@ -71,6 +69,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
     CEDAR_GENERATE_POINTER_TYPES(MatActivation);
+    CEDAR_DECLARE_DYN_CLASS(Dynamics);
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
     CEDAR_DECLARE_DYN_CLASS(Preshape);

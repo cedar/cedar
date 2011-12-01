@@ -84,7 +84,7 @@ bool cedar::proc::DataConnection::equals(cedar::proc::DataSlotPtr source, cedar:
   return false;
 }
 
-cedar::proc::DataSlotPtr cedar::proc::DataConnection::getSource()
+cedar::proc::ConstDataSlotPtr cedar::proc::DataConnection::getSource() const
 {
   if (cedar::proc::DataSlotPtr source_shared = mSource.lock())
   {
@@ -96,7 +96,7 @@ cedar::proc::DataSlotPtr cedar::proc::DataConnection::getSource()
   }
 }
 
-cedar::proc::DataSlotPtr cedar::proc::DataConnection::getTarget()
+cedar::proc::ConstDataSlotPtr cedar::proc::DataConnection::getTarget() const
 {
   if (cedar::proc::DataSlotPtr target_shared = mTarget.lock())
   {

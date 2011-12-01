@@ -79,18 +79,24 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief get the singleton instance of Manager
+  //!@brief get the singleton instance of Manager
   static Manager& getInstance();
+  //!@brief access the FrameworkSettings
   cedar::proc::FrameworkSettings& settings();
 
   //!\brief access to thread registry
   ThreadRegistry& threads();
 
+  //!@brief register a thread (Manager holds a collection of threads, which can be started at once)
   void registerThread(cedar::aux::LoopedThreadPtr thread);
 
+  //!@brief load a plugin
   void load(cedar::proc::PluginProxyPtr plugin);
 
+  //!@brief start all registered threads
   void startThreads();
+
+  //!@brief stop all threads
   void stopThreads(bool wait = false);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -119,6 +125,7 @@ private:
   //! a registry for all managed threads, which can be globally started or stopped (e.g., LoopedTrigger)
   ThreadRegistry mThreadRegistry;
 
+  //!@brief the framework settings
   cedar::proc::FrameworkSettings mSettings;
 
   //--------------------------------------------------------------------------------------------------------------------
