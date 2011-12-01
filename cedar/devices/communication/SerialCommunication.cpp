@@ -161,7 +161,7 @@ int SerialCommunication::init()
 
 #ifndef WIN32
   // initialize communication on Linux
-  if(_mOS == "Linux") //!@todo Switch this to a #ifdef block?
+  if(_mOS == "Linux") //!@todo Switch this to a #ifdef block
   {
     mFileDescriptor = open(_mDevicePath.c_str(), O_RDWR | O_NOCTTY);
 

@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // PROJECT INCLUDES
 
@@ -131,7 +132,7 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
     default:
     {
       std::string message = "The matrix plot widget can not handle a matrix with the given dimensionality (";
-      message += QString("%1).").arg(mat.dims).toStdString(); //!@todo replace QString with proper aux function.
+      message += cedar::aux::toString(mat.dims);
       message += "\nPress here to refresh the plot after you have changed the dimensionality.";
       this->mpCurrentPlotWidget = new QPushButton(QString::fromStdString(message));
       this->layout()->addWidget(this->mpCurrentPlotWidget);

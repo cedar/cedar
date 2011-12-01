@@ -102,8 +102,6 @@ public:
   void readFrom(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes the network to a configuration node.
-   *
-   * @todo Rename to writeTo.
    */
   void writeTo(cedar::aux::ConfigurationNode& root);
 
@@ -242,36 +240,32 @@ private:
   void readSteps(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes the steps in the network to the configuration node.
-   * @todo Should be write*.
    */
-  void saveSteps(cedar::aux::ConfigurationNode& root);
+  void writeSteps(cedar::aux::ConfigurationNode& root);
 
   /*!@brief Reads triggers from a configuration node and adds them to the network.
    */
   void readTriggers(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes the triggers in the network to the configuration node.
-   * @todo Should be write*.
    */
-  void saveTriggers(cedar::aux::ConfigurationNode& root);
+  void writeTriggers(cedar::aux::ConfigurationNode& root);
 
   /*!@brief Reads a data connection from a configuration node and adds it to the network.
    */
   void readDataConnection(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes a data connection to the configuration node.
-   * @todo Should be write*.
    */
-  void saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
+  void writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection);
 
   /*!@brief Reads data connections from a configuration node and adds them to the network.
    */
   void readDataConnections(const cedar::aux::ConfigurationNode& root);
 
   /*!@brief Writes the data connections in the network to the configuration node.
-   * @todo Should be write*.
    */
-  void saveDataConnections(cedar::aux::ConfigurationNode& root);
+  void writeDataConnections(cedar::aux::ConfigurationNode& root);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

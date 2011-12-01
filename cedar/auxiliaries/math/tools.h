@@ -119,9 +119,9 @@ namespace cedar
         }
       }
       
-      /*!@brief This function convolves a matrix with a given kernel and returns the resulting matrix.
-       * @todo  Make a parameter for border handling etc. (at least wrap, constant)
-       * @todo  Write unit tests for this method.
+      /*!@brief      This function convolves a matrix with a given kernel and returns the resulting matrix.
+       * @deprecated This method is deprecated. It will be replaced by cedar::aux::conv::Convolution in the long run.
+       * @todo       Remove this function.
        */
       cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel);
 
