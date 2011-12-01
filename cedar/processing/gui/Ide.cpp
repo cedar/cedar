@@ -206,7 +206,7 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
   delete p_dialog;
 }
 
-void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkFilePtr network)
+void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork = network;

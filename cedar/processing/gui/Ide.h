@@ -139,7 +139,7 @@ public slots:
 
   /*!@brief Resets the current scene and displays the new network.
    */
-  void resetTo(cedar::proc::gui::NetworkFilePtr network);
+  void resetTo(cedar::proc::gui::NetworkPtr network);
 
   /*!@brief Opens the load plugin dialog.
    */
@@ -212,7 +212,7 @@ private:
   std::map<std::string, cedar::proc::gui::ElementClassList*> mElementClassListWidgets;
 
   //! The network currently displayed.
-  cedar::proc::gui::NetworkFilePtr mNetwork;
+  cedar::proc::gui::NetworkPtr mNetwork;
 
 }; // class cedar::MainWindow
 
