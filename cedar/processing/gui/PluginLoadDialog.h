@@ -53,9 +53,7 @@
 #include <QDialog>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A dialog for loading a plugin.
  */
 class cedar::proc::gui::PluginLoadDialog : public QDialog, public Ui_PluginLoadDialog
 {
@@ -71,16 +69,20 @@ public:
   //!@brief The standard constructor.
   PluginLoadDialog(QWidget *pParent = NULL);
 
-  //!@brief Destructor
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Returns the (loaded) plugin.
   cedar::proc::PluginProxyPtr plugin();
 
 public slots:
+  /*!@brief Opens a file browser to locate the plugin to load.
+   */
   void browseFile();
+
+  /*!@brief Reacts to a change in the plugin file line edit.
+   */
   void pluginFileChanged(const QString& file);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,28 +95,18 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Loads a plugin file.
+   */
   void loadFile(const std::string& file);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
+  //! The loaded plugin.
   cedar::proc::PluginProxyPtr mPlugin;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::PluginLoadDialog
 

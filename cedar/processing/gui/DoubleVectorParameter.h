@@ -51,9 +51,7 @@
 #include <QDoubleSpinBox>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A widget for manipulating cedar::aux::DoubleVectorParameters.
  */
 class cedar::proc::gui::DoubleVectorParameter : public cedar::proc::gui::Parameter
 {
@@ -78,11 +76,16 @@ public:
 public:
 
 public slots:
+  /*!@brief Slot that reacts to a change of the parameter pointer.
+   */
   void parameterPointerChanged();
 
+  /*!@brief Slot that reacts to a change of the value the parameter.
+   */
   void valueChanged(double value);
 
-  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  /*!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+   */
   void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -103,6 +106,7 @@ private:
 protected:
   // none yet
 private:
+  //! Vector of the spinboxes used for displaying and manipulating the parameter values.
   std::vector<QDoubleSpinBox*> mSpinboxes;
 
   //--------------------------------------------------------------------------------------------------------------------
