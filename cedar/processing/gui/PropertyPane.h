@@ -50,9 +50,11 @@
 #include <boost/signals2/connection.hpp>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A widget for displaying the parameters of configurables.
  *
- * More detailed description of the class.
+ *        This widget offers a quick way of creating a user interface for classes that implement the
+ *        cedar::aux::Configurable interface. Parameters of the configurable are displayed in a tabular widget by their
+ *        name and have an edit widget associated with them.
  */
 class cedar::proc::gui::PropertyPane : public QTableWidget
 {
@@ -62,6 +64,7 @@ class cedar::proc::gui::PropertyPane : public QTableWidget
   Q_OBJECT
 
 private:
+  //! Type of a factory that creates control widgets based on parameter types.
   typedef
       cedar::aux::TypeBasedFactory
       <
@@ -75,31 +78,53 @@ private:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  /*!@brief The standard constructor.
+   */
   PropertyPane(QWidget *pParent = NULL);
 
-  //!@brief Destructor
+  //!@brief Destructor.
   ~PropertyPane();
 
-  //!@todo change from step to configuragle when the change is made in cedar::processing.
+  /*!@brief Displays the parameters for a cedar::proc::Step.
+   *
+   * @todo  Remove this function, use name undecorating instead.
+   */
   void display(cedar::proc::StepPtr pStep);
 
+
+  /*!@brief Displays the parameters for a cedar::proc::Trigger.
+   *
+   * @todo  Remove this function, use name undecorating instead.
+   */
   void display(cedar::proc::TriggerPtr pTrigger);
 
+  /*!@brief Displays the parameters for a given configurable.
+   */
   void display(cedar::aux::ConfigurablePtr pConfigurable);
 
+  /*!@brief Resets the contents of the widget.
+   */
   void resetContents();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Returns the factory used for creating widgets based on the data types.
+   */
   DataWidgetTypes& dataWidgetTypes();
 
 public slots:
+  /*!@brief Resets the pointer to the configurable displayed in this widget.
+   */
   void resetPointer();
+
+  /*!@brief Recreates the widget.
+   */
   void redraw();
 
+  /*!@brief Slot that reacts to a change in row size.
+   */
   void rowSizeChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -112,12 +137,20 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Appends the representation for a parameter to the table.
+   */
   void append(cedar::aux::Configurable::ParameterList& parameters);
 
+  /*!@brief Adds a row containing a heading.
+   */
   void addHeadingRow(const std::string& label);
 
+  /*!@brief Adds a row that contains only a label.
+   */
   void addLabelRow(const std::string& label);
 
+  /*!@brief Adds a row that displays a given parameter.
+   */
   void addPropertyRow(cedar::aux::ParameterPtr parameter);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -126,21 +159,17 @@ private:
 protected:
   // none yet
 private:
+  //! Factory that associates parameter types with the widgets used to display them.
   static DataWidgetTypes mDataWidgetTypes;
-  //!@todo this should be one configurable pointer
+
+  //! Weak pointer to the configurable being displayed by this property pane.
   boost::weak_ptr<cedar::aux::Configurable> mDisplayedConfigurable;
 
+  //! Association from parameters to rows.
   std::map<cedar::proc::gui::Parameter*, int> mParameterRowIndex;
 
+  //! Connection to the configurable's tree changed signal.
   boost::signals2::connection mSlotConnection;
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::gui::PropertyPane
 
