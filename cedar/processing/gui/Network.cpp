@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetworkFile.cpp
+    File:        Network.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/processing/gui/NetworkFile.h"
+#include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
@@ -63,7 +63,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::NetworkFile::NetworkFile(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene)
+cedar::proc::gui::Network::Network(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene)
 :
 mNetwork(new cedar::proc::Network()),
 mpScene(pScene),
@@ -71,7 +71,7 @@ mpMainWindow(pMainWindow)
 {
 }
 
-cedar::proc::gui::NetworkFile::~NetworkFile()
+cedar::proc::gui::Network::~Network()
 {
 }
 
@@ -79,19 +79,19 @@ cedar::proc::gui::NetworkFile::~NetworkFile()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const std::string& cedar::proc::gui::NetworkFile::getFileName() const
+const std::string& cedar::proc::gui::Network::getFileName() const
 {
   return this->mFileName;
 }
 
-void cedar::proc::gui::NetworkFile::addToScene()
+void cedar::proc::gui::Network::addToScene()
 {
   //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.
   this->addStepsToScene();
   this->addTriggersToScene();
 }
 
-void cedar::proc::gui::NetworkFile::addStepsToScene()
+void cedar::proc::gui::Network::addStepsToScene()
 {
   // todo should connecting be moved into the step class?
   std::vector<cedar::proc::StepPtr> steps_to_connect;
@@ -175,7 +175,7 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
   }
 }
 
-void cedar::proc::gui::NetworkFile::addTriggersToScene()
+void cedar::proc::gui::Network::addTriggersToScene()
 {
   /* restore triggers that don't have a gui description */
   std::vector<cedar::proc::TriggerPtr> triggers_to_connect;
@@ -223,17 +223,17 @@ void cedar::proc::gui::NetworkFile::addTriggersToScene()
   }
 }
 
-cedar::proc::NetworkPtr cedar::proc::gui::NetworkFile::network()
+cedar::proc::NetworkPtr cedar::proc::gui::Network::network()
 {
   return this->mNetwork;
 }
 
-void cedar::proc::gui::NetworkFile::write()
+void cedar::proc::gui::Network::write()
 {
   this->write(this->mFileName);
 }
 
-void cedar::proc::gui::NetworkFile::write(const std::string& destination)
+void cedar::proc::gui::Network::write(const std::string& destination)
 {
   this->mFileName = destination;
 
@@ -249,7 +249,7 @@ void cedar::proc::gui::NetworkFile::write(const std::string& destination)
   write_json(destination, root);
 }
 
-void cedar::proc::gui::NetworkFile::read(const std::string& source)
+void cedar::proc::gui::Network::read(const std::string& source)
 {
   this->mFileName = source;
 
@@ -260,7 +260,7 @@ void cedar::proc::gui::NetworkFile::read(const std::string& source)
   this->readScene(root);
 }
 
-void cedar::proc::gui::NetworkFile::writeScene(cedar::aux::ConfigurationNode& root)
+void cedar::proc::gui::Network::writeScene(cedar::aux::ConfigurationNode& root)
 {
   QList<QGraphicsItem *> items = this->mpScene->items();
   for (int i = 0; i < items.size(); ++i)
@@ -293,7 +293,7 @@ void cedar::proc::gui::NetworkFile::writeScene(cedar::aux::ConfigurationNode& ro
 }
 
 
-void cedar::proc::gui::NetworkFile::readScene(cedar::aux::ConfigurationNode& root)
+void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
 {
   this->mpStepsToAdd.clear();
   this->mpTriggersToAdd.clear();
