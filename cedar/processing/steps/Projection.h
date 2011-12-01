@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -57,13 +58,66 @@
  */
 class cedar::proc::steps::Projection : public cedar::proc::Step
 {
-private:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
   //! typedef for the projection method function pointer
   //! (function pointer to a void method in cedar::proc::steps::Projection)
   typedef void (cedar::proc::steps::Projection::*ProjectionFunctionPtr)();
+
+public:
+  /*!@brief The type of compression used by the projection.
+   */
+  class CompressionType
+  {
+  public:
+    //! Type of the enum's identifiers.
+    typedef cedar::aux::EnumId Id;
+
+    //! Pointer to the enum's base type.
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+
+    /*!@brief Static construction method that defines all values.
+     */
+    static void construct()
+    {
+      mType.type()->def(cedar::aux::Enum(SUM, "SUM", "Sum"));
+      mType.type()->def(cedar::aux::Enum(AVERAGE, "AVERAGE", "Average"));
+      mType.type()->def(cedar::aux::Enum(MAXIMUM, "MAXIMUM", "Maximum"));
+      mType.type()->def(cedar::aux::Enum(MINIMUM, "MINIMUM", "Minimum"));
+    }
+
+    //!@brief Returns the base object of the enum.
+    static const cedar::aux::EnumBase& type()
+    {
+      return *mType.type();
+    }
+
+    //!@brief Returns a pointer to the base object of the enum.
+    static const TypePtr& typePtr()
+    {
+      return mType.type();
+    }
+
+  public:
+
+    //! Compression is done by calculating the sum along the compressed direction.
+    static const Id SUM = CV_REDUCE_SUM;
+
+    //! Compression is done by averaging along the compressed direction.
+    static const Id AVERAGE = CV_REDUCE_AVG;
+
+    //! Compression is done by calculating the maximum along the compressed direction.
+    static const Id MAXIMUM = CV_REDUCE_MAX;
+
+    //! Compression is done by calculating the minimum along the compressed direction.
+    static const Id MINIMUM = CV_REDUCE_MIN;
+
+  private:
+    //!@brief The type object of the enum.
+    static cedar::aux::EnumType<CompressionType> mType;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -167,7 +221,7 @@ private:
   //!@brief sizes of all dimensions of the output of the projection
   cedar::aux::UIntVectorParameterPtr _mOutputDimensionSizes;
   //!@brief type of compression used when reducing the dimensionality (maximum, minimum, average, sum)
-  cedar::aux::UIntParameterPtr _mCompressionType;
+  cedar::aux::EnumParameterPtr _mCompressionType;
 }; // class cedar::proc::steps::Projection
 
 #endif // CEDAR_PROC_STEPS_PROJECTION_H
