@@ -49,9 +49,9 @@
 #include <typeinfo>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A factory that creates objects based on types.
  *
- * More detailed description of the class.
+ * @todo This concept needs far more explanation.
  */
 template
 <
@@ -66,25 +66,32 @@ class cedar::aux::TypeBasedFactory
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type for a smart pointer to the key type.
   typedef KeySmartPointerType KeyBaseTypePtr;
+
+  //! Type for the factory.
   typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType, ValueSmartPointerType> > FactoryPtr;
 
 private:
+  //! A pair linking a type info to a factory.
   typedef std::pair<const std::type_info*, FactoryPtr> Pair;
+
+  //! Type for the list of pairs.
   typedef std::vector<Pair> KeyTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Adds an association into the factory.
+   *
+   *        After calling this function, the type Key can be used to create objects of the type Value.
+   */
   template <class Key, class Value>
   void add()
   {
@@ -93,6 +100,8 @@ public:
     mKeyTypes.push_back(Pair(type, factory));
   }
 
+  /*!@brief Returns the factory associated with the type of the object pointed to by the parameter.
+   */
   FactoryPtr get(KeyBaseTypePtr pointer)
   {
     for(typename KeyTypes::iterator iter = this->mKeyTypes.begin(); iter != this->mKeyTypes.end(); ++iter)
@@ -109,6 +118,10 @@ public:
     return FactoryPtr();
   }
 
+  /*!@brief Checks, whether the factory is empty.
+   *
+   * @returns True, if no associations are stored in this factory, false otherwise.
+   */
   bool empty()
   {
     return this->mKeyTypes.empty();
@@ -132,20 +145,10 @@ private:
 protected:
   // none yet
 private:
+  //! List of associations for this factory.
   KeyTypes mKeyTypes;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::aux::TypeBasedFactory
 
-#endif // CEDAR_XXX_XXX_H
+#endif // CEDAR_AUX_TYPE_BASED_FACTORY_H
 

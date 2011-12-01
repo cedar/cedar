@@ -143,9 +143,9 @@ std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::St
   return stream;
 }
 
+#ifdef GCC
 void cedar::aux::StackEntry::setRawString(const std::string& rawString)
 {
-#ifdef GCC
   std::string tmp = rawString;
   size_t idx = rawString.find('(');
   if (idx == std::string::npos)
@@ -184,10 +184,8 @@ void cedar::aux::StackEntry::setRawString(const std::string& rawString)
   {
     this->mAddress = tmp.substr(idx + 1, idx2 - idx - 1);
   }
-#else
-//#warning Implement for MSVC
-#endif // GCC
 }
+#endif // GCC
 
 cedar::aux::StackTrace::StackTrace()
 {
