@@ -232,7 +232,7 @@ void cedar::proc::Connectable::lockAll()
 {
   cedar::aux::LockSet locks;
   this->getDataLocks(locks);
-  cedar::aux::unlock(locks);
+  cedar::aux::lock(locks);
 }
 
 void cedar::proc::Connectable::unlockAll()
