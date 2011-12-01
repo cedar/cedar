@@ -54,6 +54,17 @@
 #include <iostream>
 #include <vector>
 
+
+cedar::aux::EnumType<cedar::proc::steps::Projection::CompressionType>
+  cedar::proc::steps::Projection::CompressionType::mType;
+
+#ifndef MSVC
+const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::SUM;
+const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::AVERAGE;
+const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::MAXIMUM;
+const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::MINIMUM;
+#endif
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +75,12 @@ mOutput(new cedar::aux::MatData(cv::Mat())),
 _mDimensionMappings(new cedar::proc::ProjectionMappingParameter(this, "dimension mapping")),
 _mOutputDimensionality(new cedar::aux::UIntParameter(this, "output dimensionality", 1, 0, 10)),
 _mOutputDimensionSizes(new cedar::aux::UIntVectorParameter(this, "output dimension sizes", 1, 10, 1, 1000)),
-_mCompressionType(new cedar::aux::UIntParameter(this, "compression type", 0, 0, 3))
+_mCompressionType(new cedar::aux::EnumParameter(
+                                                 this,
+                                                 "compression type",
+                                                 cedar::proc::steps::Projection::CompressionType::typePtr(),
+                                                 cedar::proc::steps::Projection::CompressionType::SUM
+                 ))
 {
   // declare input and output
   this->declareInput("input");
