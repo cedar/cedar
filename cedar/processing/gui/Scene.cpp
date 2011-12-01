@@ -72,7 +72,6 @@ mMode(MODE_SELECT),
 mpeParentView(peParentView),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
-mpGroupIndicator(NULL),
 mpMainWindow(pMainWindow),
 mSnapToGrid(false)
 {
