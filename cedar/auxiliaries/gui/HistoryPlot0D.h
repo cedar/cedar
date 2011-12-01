@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT_0D_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT_0D_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <qwt/qwt_plot.h>
@@ -49,7 +47,7 @@
 #include <deque>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.
  *
  * More detailed description of the class.
  */
@@ -67,6 +65,7 @@ public:
   //!@brief The standard constructor.
   HistoryPlot0D(QWidget *pParent = NULL);
 
+  //!@brief Constructor that expects a DataPtr
   HistoryPlot0D(cedar::aux::DataPtr matData, QWidget *pParent = NULL);
 
   //!@brief Destructor
@@ -76,7 +75,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief display data
   void display(cedar::aux::DataPtr data);
+  //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,6 +90,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief initialize the plot
   void init();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -97,31 +99,29 @@ private:
 protected:
   // none yet
 private:
+  //!@brief generic data pointer
   cedar::aux::DataPtr mData;
+  //!@brief use this if data is of type DoubleData
   cedar::aux::DoubleDataPtr mDoubleData;
+  //!@brief use this if data is of type MatData
   cedar::aux::MatDataPtr mMatData;
+  //!@brief the current widget that holds the plot
   QWidget *mpCurrentPlotWidget;
 
+  //!@brief a plot
   QwtPlot *mpPlot;
+  //!@brief a curve inside the plot
   QwtPlotCurve *mpCurve;
+  //!@brief x values of plot, stored as double-ended queue
   std::deque<double> mpXValues;
+  //!@brief y values of plot, stored as double-ended queue
   std::deque<double> mpYValues;
+  //!@brief x values of plot, stored as vector
   std::vector<double> mXArray;
+  //!@brief y values of plot, stored as vector
   std::vector<double> mYArray;
-
+  //!@brief number of steps in the past, which are still plotted
   size_t mMaxHistorySize; //!@todo Make a parameter/configurable somehow.
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::HistoryPlot0D
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_0D_H

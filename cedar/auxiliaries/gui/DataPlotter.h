@@ -41,20 +41,18 @@
 #ifndef CEDAR_PROC_GUI_DATA_PLOTTER_H
 #define CEDAR_PROC_GUI_DATA_PLOTTER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Data.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QDockWidget>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for a dockable plot.
  *
- * More detailed description of the class.
+ * This class decides, which plot fits best the given data and instantiate a plot of the right type.
  */
 class cedar::aux::gui::DataPlotter : public QDockWidget
 {
@@ -64,6 +62,7 @@ class cedar::aux::gui::DataPlotter : public QDockWidget
   Q_OBJECT
 
 public:
+  //!@brief a factory, which is currently not used
   typedef cedar::aux::TypeBasedFactory<cedar::aux::Data, QWidget> WidgetFactory;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -80,11 +79,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief plot data
   void plot(cedar::aux::DataPtr data);
 
+  //!@brief access the widget factory (not implemented)
   static WidgetFactory& getWidgetFactory();
 
 public slots:
+  //!@brief slot that induces a redraw if data changes
   void dataChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,21 +109,10 @@ public:
 protected:
   // none yet
 private:
+  //!@brief the displayed data
   cedar::aux::DataPtr mData;
-
+  //!@brief factory from data to fitting plot - not used
   static WidgetFactory mTypePlotters;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::DataPlotter
 
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
