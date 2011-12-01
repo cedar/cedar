@@ -63,9 +63,7 @@
 # define CEDAR_END_PLUGIN_DECLARATION
 #endif*/
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Collection of declarations from a plugin.
  */
 class cedar::proc::PluginDeclaration
 {
@@ -73,6 +71,7 @@ class cedar::proc::PluginDeclaration
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //! Type of the element declaration list.
   typedef std::vector<cedar::proc::ElementDeclarationPtr> ElementDeclarations;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,7 +112,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief internal storage of all registered ElementDeclarations
+  //!@brief internal storage of all registered ElementDeclarations.
   ElementDeclarations mElementDeclarations;
 
   //--------------------------------------------------------------------------------------------------------------------
