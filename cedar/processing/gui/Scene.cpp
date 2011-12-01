@@ -112,7 +112,7 @@ const cedar::proc::gui::Scene::TriggerMap& cedar::proc::gui::Scene::triggerMap()
   return this->mTriggerMap;
 }
 
-void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkFilePtr network)
+void cedar::proc::gui::Scene::setNetwork(cedar::proc::gui::NetworkPtr network)
 {
   this->mNetwork = network;
 }

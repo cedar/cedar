@@ -166,7 +166,7 @@ public:
 
   /*!@brief Sets the network that is displayed by this scene.
    */
-  void setNetwork(cedar::proc::gui::NetworkFilePtr network);
+  void setNetwork(cedar::proc::gui::NetworkPtr network);
 
   /*!@brief Resets the network.
    */
@@ -244,7 +244,7 @@ private:
   QString mModeParam;
 
   //! The network displayed by the scene.
-  cedar::proc::gui::NetworkFilePtr mNetwork;
+  cedar::proc::gui::NetworkPtr mNetwork;
 
   //! The view displaying the scene.
   cedar::proc::gui::View *mpeParentView;
