@@ -41,11 +41,9 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_PLOT_H
 #define CEDAR_AUX_GUI_MATRIX_PLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -54,9 +52,9 @@
 #include <qwtplot3d/qwt3d_types.h>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for plots that can display matrices.
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
  */
 class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::DataPlotInterface
 {
@@ -79,8 +77,10 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief display a MatData
   void display(cedar::aux::DataPtr data);
 
+  //!@brief return vector of standard colors
   static const Qwt3D::ColorVector& getStandardColorVector();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,23 +101,14 @@ private:
 protected:
   // none yet
 private:
+  //!@brief the displayed MatData
   cedar::aux::MatDataPtr mData;
+  //!@brief the plot widget
   QWidget *mpCurrentPlotWidget;
+  //!@brief window title
   QString mWindowTitle;
-
+  //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::MatrixPlot
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_H

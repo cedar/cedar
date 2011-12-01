@@ -41,11 +41,9 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
 #define CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -56,10 +54,9 @@
 #include <qwtplot3d/qwt3d_plot3d.h>
 #include <qwtplot3d/qwt3d_io.h>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Matrix plot that can display 2D matrices (i.e. vectors).
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
  */
 class cedar::aux::gui::MatrixPlot2D : public DataPlotInterface
 {
@@ -103,6 +100,7 @@ public:
   //!@brief The standard constructor.
   MatrixPlot2D(QWidget *pParent = NULL);
 
+  //!@brief Constructor expecting a DataPtr.
   MatrixPlot2D(cedar::aux::DataPtr matData, QWidget *pParent = NULL);
 
   //!@brief Destructor
@@ -112,55 +110,53 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief display data
   void display(cedar::aux::DataPtr matData);
+  //!@brief show or hide the plot grid
   void showGrid(bool show);
+  //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief create and handle the context menu
   void contextMenuEvent(QContextMenuEvent * pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief initialize
   void init();
+  //!@brief reset the perspective of the plot
   void resetPerspective(size_t perspectiveIndex = 0);
+  //!@brief delete the allocated array data
   void deleteArrayData();
+  //!@brief update the allocated array data
   void updateArrayData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
+  //!@brief the displayed MatData
   cedar::aux::MatDataPtr mMatData;
+  //!@brief flag if plot grid should be displayed
   bool mShowGridLines;
-
+  //!@biref the plot object
   Qwt3D::GridPlot *mpPlot;
-
+  //!@brief vector of possible perspectives
   std::vector<Perspective> mPerspectives;
-
+  //!@brief row count of data
   size_t mDataRows;
+  //!@brief column count of data
   size_t mDataCols;
+  //!@brief 2D array data
   Qwt3D::Triple** mppArrayData;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::MatrixPlot2D
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_2D_H

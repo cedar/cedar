@@ -41,11 +41,9 @@
 #ifndef CEDAR_AUX_GUI_MATRIX_PLOT_1D_H
 #define CEDAR_AUX_GUI_MATRIX_PLOT_1D_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -54,10 +52,9 @@
 #include <qwt/qwt_plot_curve.h>
 #include <opencv2/opencv.hpp>
 
-
-/*!@brief Abstract description of the class.
+/*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
  */
 class cedar::aux::gui::MatrixPlot1D : public DataPlotInterface
 {
@@ -77,6 +74,7 @@ public:
   //!@brief The standard constructor.
   MatrixPlot1D(QWidget *pParent = NULL);
 
+  //!@brief Constructor expecting a DataPtr.
   MatrixPlot1D(cedar::aux::DataPtr matData, QWidget *pParent = NULL);
 
   //!@brief Destructor
@@ -86,20 +84,25 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief display data
   void display(cedar::aux::DataPtr matData);
+  //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief create and handle the context menu
   void contextMenuEvent(QContextMenuEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //!@brief initialize
   void init();
+  //!@brief set the plot style
   void setPlotStyle(QwtPlotCurve *pCurve);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,23 +113,16 @@ public:
 protected:
   // none yet
 private:
+  //!@brief the displayed data
   cedar::aux::MatDataPtr mMatData;
+  //!@brief a plot
   QwtPlot *mpPlot;
+  //!@brief a curve inside the plot
   QwtPlotCurve *mpCurve;
-  std::vector<double> mpXValues;
-  std::vector<double> mpYValues;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
+  //!@brief the x values of the plot
+  std::vector<double> mXValues;
+  //!@brief the y values of the plot
+  std::vector<double> mYValues;
 }; // class cedar::aux::gui::MatrixPlot1D
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_1D_H

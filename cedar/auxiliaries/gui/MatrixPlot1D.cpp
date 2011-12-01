@@ -107,16 +107,16 @@ void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
     num = static_cast<size_t>(mat.cols);
   }
   data->unlock();
-  mpXValues.resize(num);
-  mpYValues.resize(num);
+  mXValues.resize(num);
+  mYValues.resize(num);
 
   for (size_t i = 0; i < num; ++i)
   {
-    mpXValues.at(i) = static_cast<double>(i);
+    mXValues.at(i) = static_cast<double>(i);
   }
 
-  this->mpCurve->setData(&this->mpXValues.at(0),
-                         &this->mpYValues.at(0),
+  this->mpCurve->setData(&this->mXValues.at(0),
+                         &this->mYValues.at(0),
                          num);
 
   this->mpCurve->attach(this->mpPlot);
@@ -181,17 +181,17 @@ void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
     emit dataChanged();
     return;
   }
-  CEDAR_DEBUG_ASSERT(mpXValues.size() == mpYValues.size());
-  for (size_t i = 0; i < mpXValues.size(); ++i)
+  CEDAR_DEBUG_ASSERT(mXValues.size() == mYValues.size());
+  for (size_t i = 0; i < mXValues.size(); ++i)
   {
     switch (mat.type())
     {
       case CV_32F:
-        mpYValues.at(i) = mat.at<float>(static_cast<int>(i));
+        mYValues.at(i) = mat.at<float>(static_cast<int>(i));
         break;
 
       case CV_64F:
-        mpYValues.at(i) = mat.at<double>(static_cast<int>(i));
+        mYValues.at(i) = mat.at<double>(static_cast<int>(i));
         break;
 
       default:
@@ -201,8 +201,8 @@ void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
   }
   this->mMatData->unlock();
 
-  this->mpCurve->setData(&this->mpXValues.at(0),
-                         &this->mpYValues.at(0),
-                         static_cast<int>(this->mpXValues.size()));
+  this->mpCurve->setData(&this->mXValues.at(0),
+                         &this->mYValues.at(0),
+                         static_cast<int>(this->mXValues.size()));
   this->mpPlot->replot();
 }
