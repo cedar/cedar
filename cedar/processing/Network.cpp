@@ -264,17 +264,17 @@ void cedar::proc::Network::writeTo(cedar::aux::ConfigurationNode& root)
     root.add_child("meta", meta);
 
   cedar::aux::ConfigurationNode steps;
-  this->saveSteps(steps);
+  this->writeSteps(steps);
   if (!steps.empty())
     root.add_child("steps", steps);
 
   cedar::aux::ConfigurationNode triggers;
-  this->saveTriggers(triggers);
+  this->writeTriggers(triggers);
   if (!triggers.empty())
     root.add_child("triggers", triggers);
 
   cedar::aux::ConfigurationNode connections;
-  this->saveDataConnections(connections);
+  this->writeDataConnections(connections);
   if (!connections.empty())
     root.add_child("connections", connections);
 }
@@ -350,7 +350,7 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
   }
 }
 
-void cedar::proc::Network::saveSteps(cedar::aux::ConfigurationNode& steps)
+void cedar::proc::Network::writeSteps(cedar::aux::ConfigurationNode& steps)
 {
   for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
@@ -393,7 +393,7 @@ void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
   }
 }
 
-void cedar::proc::Network::saveTriggers(cedar::aux::ConfigurationNode& triggers)
+void cedar::proc::Network::writeTriggers(cedar::aux::ConfigurationNode& triggers)
 {
   for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
@@ -452,7 +452,7 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
   }
 }
 
-void cedar::proc::Network::saveDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection)
+void cedar::proc::Network::writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection)
 {
   std::string source_str = connection->getSource()->getParent() + "." + connection->getSource()->getName();
   std::string target_str = connection->getTarget()->getParent() + "." + connection->getTarget()->getName();
@@ -475,11 +475,11 @@ void cedar::proc::Network::readDataConnection(const cedar::aux::ConfigurationNod
   this->connectSlots(source, target);
 }
 
-void cedar::proc::Network::saveDataConnections(cedar::aux::ConfigurationNode& root)
+void cedar::proc::Network::writeDataConnections(cedar::aux::ConfigurationNode& root)
 {
   for (DataConnectionVector::const_iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
   {
-    this->saveDataConnection(root, *iter);
+    this->writeDataConnection(root, *iter);
   }
 }
 
