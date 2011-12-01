@@ -52,9 +52,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief User-Interface representation of a cedar::proc::DataSlot.
  *
- * More detailed description of the class.
+ *        This class implements a cedar::proc::gui::GraphicsBase that is used to display a cedar::proc::DataSlot inside
+ *        a cedar::proc::gui::Scene.
  */
 class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
 {
@@ -66,28 +67,52 @@ class cedar::proc::gui::DataSlotItem : public cedar::proc::gui::GraphicsBase
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  /*!@brief The constructor.
+   *
+   * @param pParent The parent item to which the data slot belongs.
+   * @param slot    The slot displayed by this item.
+   */
   DataSlotItem(cedar::proc::gui::StepItem *pParent, cedar::proc::DataSlotPtr slot);
 
-  //!@brief Destructor
+  //!@brief Destructor.
   ~DataSlotItem();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Implements the drawing of the slot.
+   */
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
+  /*!@brief Creates the context menu for the item.
+   */
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
+  /*!@brief Connects the UI item and the underlying data slot to the target.
+   */
   void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
+
+  /*!@brief Disconnects the UI item and the underlying data slot from the target.
+   */
   void disconnect(cedar::proc::gui::GraphicsBase* pTarget);
 
+  /*!@brief Returns the name of the data slot.
+   */
   const std::string& getName() const;
 
+  /*!@brief Returns a const pointer to the data slot displayed by this item.
+   */
   cedar::proc::ConstDataSlotPtr getSlot() const;
 
+  /*!@brief Returns whether this slot can connect to somewhere else.
+   *
+   * @returns False, if the slot is already connected (and not a collection), true otherwise.
+   */
   bool canConnect() const;
+
+  /*!@brief Checks, whether the slot can be connected to the target.
+   */
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,8 +133,12 @@ private:
 protected:
   // none yet
 private:
+  //! The step item that this slot belongs to.
   cedar::proc::gui::StepItem *mpStep;
+
+  //! The slot itself.
   cedar::proc::DataSlotPtr mSlot;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
