@@ -257,13 +257,15 @@ private:
    *
    *        If all mandatory data is set (i.e., the data pointers in the slots are non-zero), the member
    *        \em mMandatoryConnectionsAreSet is set to true. Otherwise, it is set to false.
+   * @returns list of failed mandatory connections
    */
   void checkMandatoryConnections();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief vector with a stirng name of all missing mandatory connections
+  std::vector<std::string> mMissingMandatoryConnections;
 private:
   //!@brief a connection to a signal emitted by an external data slo
   boost::signals2::connection mSlotConnection;

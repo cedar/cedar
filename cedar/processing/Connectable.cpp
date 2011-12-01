@@ -271,7 +271,7 @@ bool cedar::proc::Connectable::allInputsValid()
 void cedar::proc::Connectable::checkMandatoryConnections()
 {
   this->mMandatoryConnectionsAreSet = true;
-
+  mMissingMandatoryConnections.clear();
   // then test every input. If one is false, return that.
   for (std::map<DataRole::Id, SlotMap>::iterator slot = this->mDataConnections.begin();
        slot != this->mDataConnections.end();
@@ -284,7 +284,12 @@ void cedar::proc::Connectable::checkMandatoryConnections()
       if (iter->second->isMandatory() && iter->second->getData().get() == NULL)
       {
         this->mMandatoryConnectionsAreSet = false;
-        return;
+        mMissingMandatoryConnections.push_back(
+                                                "slot type: "
+                                                + cedar::proc::DataRole::type().get(slot->first).name()
+                                                + " name: "
+                                                + iter->second->getName()
+                                              );
       }
     }
   }

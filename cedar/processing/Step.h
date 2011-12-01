@@ -193,6 +193,7 @@ protected:
 
 private:
   //!@brief flag that states if step is still computing its latest output
+  //!@todo Should busy be a part of STATE_*? Or even a lock?
   bool mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.

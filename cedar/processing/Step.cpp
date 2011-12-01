@@ -240,11 +240,16 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
   if (!this->mandatoryConnectionsAreSet())
   {
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "Unconnected mandatory inputs prevent the step from running.");
-    CEDAR_THROW(MissingConnectionException, //!@todo Add to the exception the names of the unset connections
-                "Some mandatory connections are not set for the processing step " + this->getName() + ".");
+    std::string errors;
+    for (size_t i = 0; i < mMissingMandatoryConnections.size(); ++i)
+    {
+      errors += "\n" + mMissingMandatoryConnections.at(i);
+    }
+    CEDAR_THROW(MissingConnectionException,
+                "Some mandatory connections are not set for the processing step " + this->getName()
+                + ". The following mandatory connections are not set:" + errors);
   } // this->mMandatoryConnectionsAreSet
 
-  //!@todo Should busy be a part of STATE_*? Or even a lock?
   if (!this->mBusy)
   {
 #ifdef DEBUG_ARGUMENT_SETTING
