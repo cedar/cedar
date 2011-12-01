@@ -50,9 +50,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief This is the toolbox that contains the architecture tools.
  *
- * More detailed description of the class.
+ *        This widget can be found in the processingIde.
  */
 class cedar::proc::gui::ArchitectureToolBox : public cedar::proc::gui::ToolBox
 {
@@ -68,15 +68,20 @@ public:
   //!@brief The standard constructor.
   ArchitectureToolBox(QWidget *pParent = NULL);
 
-  //!@brief Destructor
+  //!@brief Destructor.
   ~ArchitectureToolBox();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Sets the view that is controlled by this toolbox.
+   */
   void setView(cedar::proc::gui::View *pView);
+
 public slots:
+  /*!@brief Slot that reacts to a change in the selected tool.
+   */
   void selectionChanged(QString data);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,23 +99,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
+  //! View that is controlled by this toolbox.
   cedar::proc::gui::View *mpView;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::gui::ArchitectureToolBox
 

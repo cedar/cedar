@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_IDE_APPLICATION_XXX_H
-#define CEDAR_PROC_GUI_IDE_APPLICATION_XXX_H
+#ifndef CEDAR_PROC_GUI_IDE_APPLICATION_H
+#define CEDAR_PROC_GUI_IDE_APPLICATION_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/namespace.h"
@@ -51,9 +51,7 @@
 #include <QApplication>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief The application for the processingIde.
  */
 class cedar::proc::gui::IdeApplication : public QApplication
 {
@@ -68,15 +66,21 @@ class cedar::proc::gui::IdeApplication : public QApplication
 public:
   //!@brief The standard constructor.
   IdeApplication(int& argc, char** argv);
+
+  //!@brief Destructor.
   ~IdeApplication();
 
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Executes the main loop.
+   */
   int exec();
+
+  /*!@brief Handles notifications.
+   */
   bool notify(QObject* pReceiver, QEvent* pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -85,6 +89,8 @@ public:
 protected:
 
 signals:
+  /*!@brief Signal that is sent when cedar::proc::gui::Ide::notify catches an otherwise unhandled exception.
+   */
   void exception(const QString& message);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,6 +98,8 @@ signals:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 #ifdef GCC
+  /*!@brief Handler for SEGV and other signals.
+   */
   static void signalHandler(int signal);
 #endif // GCC
 
@@ -101,18 +109,10 @@ private:
 protected:
   // none yet
 private:
+  //! The main window.
   cedar::proc::gui::Ide* mpIde;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::proc::gui::IdeApplication
 
-private:
-  // none yet
-
-}; // class cedar::xxx
-
-#endif // CEDAR_PROC_GUI_IDE_APPLICATION_XXX_H
+#endif // CEDAR_PROC_GUI_IDE_APPLICATION_H
 

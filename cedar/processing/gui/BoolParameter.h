@@ -51,9 +51,7 @@
 #include <QCheckBox>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A widget for manipulating cedar::aux::BoolParameters.
  */
 class cedar::proc::gui::BoolParameter : public cedar::proc::gui::Parameter
 {
@@ -78,7 +76,12 @@ public:
 public:
 
 public slots:
+  /*!@brief Slot that reacts to a new parameter pointer.
+   */
   void parameterPointerChanged();
+
+  /*!@brief Slot that reacts to a change of the state of the QChecBox.
+   */
   void stateChanged(int state);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,6 +102,7 @@ private:
 protected:
   // none yet
 private:
+  //! Checkbox used for displaying the parameter.
   QCheckBox *mpCheckBox;
 
   //--------------------------------------------------------------------------------------------------------------------

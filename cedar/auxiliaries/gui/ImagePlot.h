@@ -50,9 +50,7 @@
 #include <qwtplot3d/qwt3d_types.h>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A plot for images.
  */
 class cedar::aux::gui::ImagePlot : public DataPlotInterface
 {
@@ -68,7 +66,7 @@ public:
   //!@brief The standard constructor.
   ImagePlot(QWidget *pParent = NULL);
 
-  //!@brief Destructor
+  //!@brief Destructor.
   ~ImagePlot();
 
   //--------------------------------------------------------------------------------------------------------------------
