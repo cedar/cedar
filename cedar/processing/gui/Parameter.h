@@ -41,19 +41,17 @@
 #ifndef CEDAR_PROC_GUI_PARAMETER_H
 #define CEDAR_PROC_GUI_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QWidget>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief An abstract base widget for graphical representation of Parameter.
  *
- * More detailed description of the class.
+ * @todo Write more detailed description of the class here.
  */
 class cedar::proc::gui::Parameter : public QWidget
 {
@@ -76,11 +74,16 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief set the parameter, which is graphically represented by this instance
   void setParameter(cedar::aux::ParameterPtr pParameter);
+  //!@brief get the parameter, which is graphically represented by this instance
   cedar::aux::ParameterPtr getParameter();
 
 signals:
+  //!@brief this signal is emitted whenever a new parameter is linked to this graphical representation
   void parameterPointerChanged();
+  //!@brief this signal is emitted if the height of the graphical representation changed due to size changes of
+  //        the represented parameter
   void heightChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,17 +104,8 @@ private:
 protected:
   // none yet
 private:
+  //!@brief parameter, which is graphically represented by this instance
   cedar::aux::ParameterPtr mParameter;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::gui::Parameter
 
 #endif // CEDAR_PROC_GUI_PARAMETER_H

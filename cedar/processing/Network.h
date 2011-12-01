@@ -135,7 +135,7 @@ public:
    */
   void add(cedar::proc::ElementPtr element, std::string instanceName);
 
-  /*!@param    Adds a given element to the network.
+  /*!@brief    Adds a given element to the network.
    *
    * @param    element The element to add to the network.
    *
