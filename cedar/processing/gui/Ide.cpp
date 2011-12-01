@@ -45,7 +45,7 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/ElementClassList.h"
-#include "cedar/processing/gui/NetworkFile.h"
+#include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/PluginLoadDialog.h"
 #include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/DataSlotItem.h"
@@ -389,7 +389,7 @@ void cedar::proc::gui::Ide::stopThreads()
 
 void cedar::proc::gui::Ide::newFile()
 {
-  this->resetTo(cedar::proc::gui::NetworkFilePtr(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene())));
+  this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
 }
 
 void cedar::proc::gui::Ide::save()
@@ -447,7 +447,7 @@ void cedar::proc::gui::Ide::load()
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
   this->newFile();
-  cedar::proc::gui::NetworkFilePtr network(new cedar::proc::gui::NetworkFile(this, this->mpProcessingDrawer->getScene()));
+  cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene()));
   network->read(file.toStdString());
   this->mpActionSave->setEnabled(true);
   this->resetTo(network);

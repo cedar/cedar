@@ -44,7 +44,7 @@
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
-#include "cedar/processing/gui/NetworkFile.h"
+#include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
