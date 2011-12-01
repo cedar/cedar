@@ -51,9 +51,7 @@
 #include <QDoubleSpinBox>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Widget for manipulating cedar::aux::DoubleParameters.
  */
 class cedar::proc::gui::DoubleParameter : public cedar::proc::gui::Parameter
 {
@@ -78,7 +76,12 @@ public:
 public:
 
 public slots:
+  /*!@brief Reacts to a change of the parameter pointer.
+   */
   void parameterPointerChanged();
+
+  /*!@brief Reacts to a change of the parameter's value.
+   */
   void valueChanged(double value);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,16 +102,8 @@ private:
 protected:
   // none yet
 private:
+  //! QDoubleSpinBox used for displaying and manipulating the parameter's value.
   QDoubleSpinBox *mpSpinbox;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::gui::DoubleParameter
 

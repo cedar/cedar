@@ -47,9 +47,7 @@
 #include <QComboBox>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Widget for displaying cedar::aux::EnumParameters.
  */
 class cedar::proc::gui::EnumParameter : public cedar::proc::gui::Parameter
 {
@@ -71,10 +69,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-
 public slots:
+  /*!@brief Reacts to a change of the parameter pointer.
+   */
   void parameterPointerChanged();
+
+  /*!@brief Writes the new value to the parameter when the user makes a selection.
+   */
   void currentIndexChanged(const QString& text);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,16 +96,8 @@ private:
 protected:
   // none yet
 private:
+  //! QComboBox used for displaying all available options.
   QComboBox *mpEdit;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::gui::EnumParameter
 

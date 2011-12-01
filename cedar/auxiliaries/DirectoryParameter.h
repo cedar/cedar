@@ -46,9 +46,7 @@
 #include <string>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A parameter for directories on the file system.
  */
 class cedar::aux::DirectoryParameter : public cedar::aux::Parameter
 {

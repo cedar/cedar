@@ -51,9 +51,7 @@
 #include <QLineEdit>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A widget for a cedar::aux::DirectoryParameter.
  */
 class cedar::proc::gui::DirectoryParameter : public cedar::proc::gui::Parameter
 {
@@ -78,8 +76,16 @@ public:
 public:
 
 public slots:
+  /*!@brief Handles a click on the browse button.
+   */
   void onBrowseClicked();
+
+  /*!@brief Handles a changed parameter pointer.
+   */
   void parameterPointerChanged();
+
+  /*!@brief Handles a change in the value of the parameter.
+   */
   void parameterValueChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -100,6 +106,7 @@ private:
 protected:
   // none yet
 private:
+  //! QLineEdit used for displaying the parameter value.
   QLineEdit *mpEdit;
 
   //--------------------------------------------------------------------------------------------------------------------
