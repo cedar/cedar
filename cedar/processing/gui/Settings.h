@@ -62,8 +62,6 @@ class cedar::proc::gui::Settings : public cedar::aux::Configurable
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief The docking behavior of a widget.
-   *
-   * More detailed description of the class.
    */
   class DockSettings : public cedar::aux::Configurable
   {
@@ -83,8 +81,9 @@ public:
       cedar::aux::BoolParameterPtr mFloating;
   };
 
-  //!@brief the smart pointers of class DockSettings
+  //!@cond SKIPPED_DOCUMENTATION
   CEDAR_GENERATE_POINTER_TYPES(DockSettings);
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
