@@ -73,24 +73,40 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Displays the data.
+   *
+   * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
+   *             throws.
+   */
   void display(cedar::aux::DataPtr data);
+
+  /*!@brief Updates the plot periodically.
+   */
   void timerEvent(QTimerEvent *pEvent);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // to make sure the image aspect ratio is kept correct
+  /*!@brief Reacts to a resize of the plot.
+   */
   void resizeEvent(QResizeEvent *event);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  /*!@brief Resizes the pixmap used to display the image data.
+   */
   void resizePixmap();
 
+  /*!@brief Converts a one-channel input matrix to a three-channel matrix that contains the one-channel matrix in all
+   *        channels.
+   */
   cv::Mat threeChannelGrayscale(const cv::Mat& in) const;
 
+  /*!@brief Creates the image based on the matrix.
+   */
   void imageFromMat(const cv::Mat& mat);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,19 +115,17 @@ private:
 protected:
   // none yet
 private:
+  //! Label used for displaying the image.
   QLabel *mpImageDisplay;
+
+  //! Data displayed by the plot.
   cedar::aux::ImageDataPtr mData;
+
+  //! Converted image.
   QImage mImage;
+
+  //! Id of the timer used for updating the plot.
   int mTimerId;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::aux::gui::ImagePlot
 
