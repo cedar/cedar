@@ -553,7 +553,7 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
 }
 
 void cedar::proc::Network::getDataConnections(
-                                               cedar::proc::StepPtr source,
+                                               cedar::proc::ConnectablePtr source,
                                                const std::string& sourceDataName,
                                                std::vector<cedar::proc::DataConnectionPtr>& connections
                                              )

@@ -149,14 +149,17 @@ void cedar::proc::gui::NetworkFile::addStepsToScene()
         for(size_t c = 0; c < connections.size(); ++c)
         {
           cedar::proc::DataConnectionPtr con = connections.at(c);
-          cedar::proc::gui::StepItem* p_target_step = this->mpScene->getStepItemFor(mNetwork->getElement<cedar::proc::Step>(con->getTarget()->getParent()).get());
-          CEDAR_DEBUG_ASSERT(p_target_step != NULL);
+          cedar::proc::StepPtr target_step
+            = mNetwork->getElement<cedar::proc::Step>(con->getTarget()->getParent());
 
-          cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step->getSlotItem
-                                                                          (
-                                                                            cedar::proc::DataRole::INPUT,
-                                                                            con->getTarget()->getName()
-                                                                          );
+          cedar::proc::gui::StepItem* p_target_step_item = this->mpScene->getStepItemFor(target_step.get());
+          CEDAR_DEBUG_ASSERT(p_target_step_item != NULL);
+
+          cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step_item->getSlotItem
+                                                                              (
+                                                                                cedar::proc::DataRole::INPUT,
+                                                                                con->getTarget()->getName()
+                                                                              );
           CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
 
           cedar::proc::gui::Connection *p_ui_con = new cedar::proc::gui::Connection(p_source_slot, p_target_slot);
