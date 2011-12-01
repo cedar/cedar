@@ -70,15 +70,21 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief Displays the data in the plot widget.
+   *
+   *        This is the main method that is called whenever a data plotter is requested to plot a different data.
+   *
+   * @param data The data to display.
+   */
   virtual void display(cedar::aux::DataPtr data) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  signals:
-    void dataChanged();
-
+signals:
+  //! Signal that is emitted when the plotter detects a change in data that it cannot handle.
+  void dataChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -89,8 +95,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -99,8 +103,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
