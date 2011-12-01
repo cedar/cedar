@@ -88,6 +88,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  //!@brief check if all inputs are valid, e.g. have the right size and dimensionality
   cedar::proc::DataSlot::VALIDITY determineInputValidity
                                 (
                                   cedar::proc::ConstDataSlotPtr slot,
