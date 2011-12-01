@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetworkFile.h
+    File:        Network.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_NETWORK_FILE_H
-#define CEDAR_PROC_GUI_NETWORK_FILE_H
+#ifndef CEDAR_PROC_GUI_NETWORK_H
+#define CEDAR_PROC_GUI_NETWORK_H
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/namespace.h"
@@ -55,7 +55,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::proc::gui::NetworkFile
+class cedar::proc::gui::Network
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -66,23 +66,29 @@ class cedar::proc::gui::NetworkFile
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  NetworkFile(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene);
+  Network(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene);
 
   //!@brief Destructor
-  ~NetworkFile();
+  ~Network();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief write network to file
   void write();
+  //!@brief write network to file given by destination
   void write(const std::string& destination);
+  //!@brief read network from given file
   void read(const std::string& source);
 
+  //!@brief access the underlying cedar::proc::Network
   cedar::proc::NetworkPtr network();
 
+  //!@brief add all elements contained in this network to the scene
   void addToScene();
 
+  //!@brief get the current file, to which the network configuration can be saved
   const std::string& getFileName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -95,41 +101,38 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  cedar::proc::NetworkPtr mNetwork;
-  cedar::proc::gui::Scene* mpScene;
-  std::string mFileName;
-  QMainWindow *mpMainWindow;
 
-  std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
-  std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
-
+  //!@brief write scene to a node
   void writeScene(cedar::aux::ConfigurationNode& root);
+  //!@brief read scene from a node
   void readScene(cedar::aux::ConfigurationNode& root);
 
+  //!@brief add all steps contained in this network to a scene
   void addStepsToScene();
+
+  //!@brief add all triggers contained in this network to a scene
   void addTriggersToScene();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  //!@brief represented network
+  cedar::proc::NetworkPtr mNetwork;
+  //!@brief a scene, which displays the elements contained in this network
+  cedar::proc::gui::Scene* mpScene;
+  //!@brief a filename from which to load a network configuration, or to which to save a configuration
+  std::string mFileName;
+  //!@brief a main window
+  QMainWindow *mpMainWindow;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
+  //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
+  std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
+  //!@brief a vector of triggers, which contains all steps that should be added to the scene
+  //        after reading a configuration
+  std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
 }; // class cedar::proc::gui::NetworkFile
 
 #endif // CEDAR_PROC_GUI_NETWORK_FILE_H
