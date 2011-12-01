@@ -239,7 +239,7 @@ void cedar::proc::gui::NetworkFile::write(const std::string& destination)
 
   cedar::aux::ConfigurationNode root;
 
-  this->mNetwork->saveTo(root);
+  this->mNetwork->writeTo(root);
 
   cedar::aux::ConfigurationNode scene;
   this->writeScene(scene);
