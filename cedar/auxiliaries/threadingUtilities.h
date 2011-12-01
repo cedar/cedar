@@ -53,8 +53,14 @@ namespace cedar
       LOCK_TYPE_WRITE
     };
 
-    //!@brief a set of pairs of QReadWriteLocks and their corresponding lock role from cedar::aux::LOCK_TYPE
+    //!@brief A set of pairs of QReadWriteLocks and their corresponding lock role from cedar::aux::LOCK_TYPE.
     typedef std::set<std::pair<QReadWriteLock*, LOCK_TYPE> > LockSet;
+
+    //!@brief Appends a new lock to the lock set.
+    inline void append(LockSet& lockSet, QReadWriteLock* pLock, LOCK_TYPE lockType)
+    {
+      lockSet.insert(std::make_pair(pLock, lockType));
+    }
 
     /*! @brief Locks the given locks in a deadlock-free manner.
      *
