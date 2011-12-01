@@ -460,6 +460,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)
 {
+  //!@todo Move this to the graphics scene (or another more appropriate place)
   switch (pEvent->key())
   {
     case Qt::Key_Delete:
