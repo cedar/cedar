@@ -102,9 +102,16 @@ public:
 
   public:
 
+    //! Compression is done by calculating the sum along the compressed direction.
     static const Id SUM = CV_REDUCE_SUM;
+
+    //! Compression is done by averaging along the compressed direction.
     static const Id AVERAGE = CV_REDUCE_AVG;
+
+    //! Compression is done by calculating the maximum along the compressed direction.
     static const Id MAXIMUM = CV_REDUCE_MAX;
+
+    //! Compression is done by calculating the minimum along the compressed direction.
     static const Id MINIMUM = CV_REDUCE_MIN;
 
   private:
