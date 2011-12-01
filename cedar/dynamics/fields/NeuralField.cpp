@@ -50,6 +50,8 @@
 #include "cedar/auxiliaries/math/AbsSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/convolution/FastConvolution.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // PROJECT INCLUDES
 
@@ -237,8 +239,31 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
       cv::Mat convolution_buffer = this->mKernels.at(i)->convolveWith(sigmoid_u);
       mKernels.at(i)->getReadWriteLock()->unlock();
       lateral_interaction += convolution_buffer;
+
     }
   }
+#ifdef FFTW
+  else if (this->_mDimensionality->getValue() < 8)
+  {
+    for (unsigned int i = 0; i < _mNumberOfKernels->getValue() && i < this->mKernels.size(); i++)
+    {
+      //!@todo Should/does this not use the data->lock*
+      mKernels.at(i)->getReadWriteLock()->lockForRead();
+      //cv::Mat convolution_buffer = this->mKernels.at(i)->convolveWith(sigmoid_u);
+      cedar::aux::conv::FastConvolution myConvolution;
+      cv::Mat sigmoid_64;
+      sigmoid_u.convertTo(sigmoid_64, CV_64F);
+      cv::Mat kernel_64;
+      this->mKernels.at(i)->getKernel().convertTo(kernel_64, CV_64F);
+      cv::Mat convolution_buffer = myConvolution(sigmoid_64, kernel_64);
+      mKernels.at(i)->getReadWriteLock()->unlock();
+      cv::Mat buffer_32;
+      convolution_buffer.convertTo(buffer_32, CV_32F);
+//      lateral_interaction += convolution_buffer;
+      lateral_interaction += buffer_32;
+    }
+  }
+#endif
 
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);

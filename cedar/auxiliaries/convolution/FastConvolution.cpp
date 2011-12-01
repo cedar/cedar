@@ -50,6 +50,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 cv::Mat cedar::aux::conv::FastConvolution::convolve(const cv::Mat& matrix, const cv::Mat& kernel) const
 {
+  CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) == cedar::aux::math::getDimensionalityOf(kernel));
+  for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
+  {
+    CEDAR_ASSERT(matrix.size[dim] >= kernel.size[dim])
+  }
   cv::Mat output = matrix.clone();
   output = 0.0;
   cv::Mat padded_kernel = this->padKernel(matrix, kernel);
@@ -76,8 +81,10 @@ cv::Mat cedar::aux::conv::FastConvolution::convolve(const cv::Mat& matrix, const
   for (unsigned int xyz = 0 ; xyz < transformed_elements; ++xyz)
   {
     // complex multiplication (lateral)
-    result_fourier[xyz][0] = (matrix_fourier[xyz][0]*kernel_fourier[xyz][0]-matrix_fourier[xyz][1]*kernel_fourier[xyz][1])  / number_of_elements;
-    result_fourier[xyz][1] = (matrix_fourier[xyz][1]*kernel_fourier[xyz][0]+matrix_fourier[xyz][0]*kernel_fourier[xyz][1])  / number_of_elements;
+//    result_fourier[xyz][0] = (matrix_fourier[xyz][0]*kernel_fourier[xyz][0]-matrix_fourier[xyz][1]*kernel_fourier[xyz][1]) / number_of_elements;
+//    result_fourier[xyz][1] = (matrix_fourier[xyz][1]*kernel_fourier[xyz][0]+matrix_fourier[xyz][0]*kernel_fourier[xyz][1]) / number_of_elements;
+    result_fourier[xyz][0] = (kernel_fourier[xyz][0]*matrix_fourier[xyz][0]-kernel_fourier[xyz][1]*matrix_fourier[xyz][1]) / number_of_elements;
+    result_fourier[xyz][1] = (kernel_fourier[xyz][1]*matrix_fourier[xyz][0]+kernel_fourier[xyz][0]*matrix_fourier[xyz][1]) / number_of_elements;
   }
 
   // transform interaction back to time domain (ifft)
@@ -86,7 +93,7 @@ cv::Mat cedar::aux::conv::FastConvolution::convolve(const cv::Mat& matrix, const
   fftw_free(matrix_fourier);
   fftw_free(result_fourier);
   fftw_free(kernel_fourier);
-  return matrix;
+  return output;
 }
 
 cv::Mat cedar::aux::conv::FastConvolution::padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const
@@ -95,17 +102,39 @@ cv::Mat cedar::aux::conv::FastConvolution::padKernel(const cv::Mat& matrix, cons
   cv::Mat output = matrix.clone();
   output = 0.0;
   std::vector<cv::Range> region;
+  std::vector<std::vector<cv::Range> > regions;
+  regions.resize(2);
+  std::vector<std::vector<cv::Range> > kernel_regions;
+  kernel_regions.resize(2);
   for (size_t dim = 0; dim < cedar::aux::math::getDimensionalityOf(matrix); ++dim)
   {
     int kernel_center = kernel.size[dim]/2;
-    int adjusted_start = matrix.size[dim] / 2 - kernel_center;
-    if (matrix.size[dim] % 2 != 0)
-    {
-      ++adjusted_start;
-    }
-    region.push_back(cv::Range(adjusted_start, adjusted_start + kernel.size[dim]));
+    regions.at(0).push_back(cv::Range(0, kernel_center + 1)); // lower limit
+    regions.at(1).push_back(cv::Range(matrix.size[dim] - kernel_center, matrix.size[dim])); // upper limit
+    kernel_regions.at(0).push_back(cv::Range(0, kernel_center)); // lower limit
+    kernel_regions.at(1).push_back(cv::Range(kernel_center, kernel.size[dim])); // upper limit
   }
-  output(&region.at(0)) = kernel;
+  for (size_t part = 0; part < static_cast<unsigned int>((1 << cedar::aux::math::getDimensionalityOf(matrix))); ++part)
+  {
+    cv::Range output_index[cedar::aux::math::getDimensionalityOf(matrix)];
+    cv::Range kernel_index[cedar::aux::math::getDimensionalityOf(matrix)];
+    for (size_t dim = 0; dim < cedar::aux::math::getDimensionalityOf(matrix); ++dim)
+    {
+      if (part & (1 << dim))
+      {
+        output_index[dim] = regions.at(0).at(dim);
+        kernel_index[dim] = kernel_regions.at(1).at(dim);
+      }
+      else
+      {
+        output_index[dim] = regions.at(1).at(dim);
+        kernel_index[dim] = kernel_regions.at(0).at(dim);
+      }
+    }
+  // if 1.0 is missing, the temporary cv::Mat view onto output is replaced by kernel, instead of setting the values
+  // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
+    output(output_index) = 1.0 * kernel(kernel_index);
+  }
   return output;
 }
 #endif // CEDAR_FFTW

@@ -175,6 +175,8 @@ private:
   QMainWindow* mpMainWindow;
   //!@brief the icon representing the contained step
   QIcon mStepIcon;
+  //!@brief connection to state changed signal of step
+  boost::signals2::connection mStateChangedConnection;
 
 }; // class StepItem
 

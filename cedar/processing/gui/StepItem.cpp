@@ -111,6 +111,7 @@ cedar::proc::gui::StepItem::~StepItem()
 #ifdef DEBUG
   std::cout << "> freeing data (cedar::proc::gui::StepItem, " << this << ")" << std::endl;
 #endif // DEBUG
+  mStateChangedConnection.disconnect();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -162,7 +163,7 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addTriggerItems();
 
 //  QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
-  step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
+  mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 }
 
