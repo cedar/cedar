@@ -35,14 +35,14 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <list>
+#include <set>
 #include <string>
 
 void logVector(cedar::aux::LogFile& log, const std::vector<std::string>& vector)
@@ -129,6 +129,43 @@ int main()
       ++errors;
     }
   }
+
+  // Join test ---------------------------------------------------------------------------------------------------------
+  log_file << "Testing joining of lists of strings." << std::endl;
+
+  // This tests for proper joining of the string with an ordered list (vector)
+  std::vector<std::string> str_vec;
+  str_vec.push_back("test1");
+  str_vec.push_back("test2");
+  log_file << "Testing joining of std::vector." << std::endl;
+  std::string res = cedar::aux::join(str_vec, ", ");
+  std::string expected = "test1, test2";
+  if (res != "test1, test2")
+  {
+    ++errors;
+    log_file << "String list was not joined properly:"
+             << " expected \"" << expected << "\", got \"" << res << "\"." << std::endl;
+  }
+
+  // Test an empty list
+  log_file << "Testing joining of empty string list." << std::endl;
+  std::vector<std::string> str_vec_empty;
+
+  // these are mostly to test compilation of the template function with different container types
+  std::set<std::string> str_set;
+  str_set.insert("test2");
+  str_set.insert("test1");
+  log_file << "Testing joining of std::set ... ";
+  res = cedar::aux::join(str_set, ", ");
+  log_file << "Done: " << res << std::endl;
+
+  std::list<std::string> str_list;
+  str_list.push_back("test2");
+  str_list.push_back("test1");
+  log_file << "Testing joining of std::list ... ";
+  res = cedar::aux::join(str_list, ", ");
+  log_file << "Done: " << res << std::endl;
+
 
   // Replace test ------------------------------------------------------------------------------------------------------
   std::string replace_test_1 = "This is a string.";

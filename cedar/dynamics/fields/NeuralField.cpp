@@ -91,8 +91,7 @@ _mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.
   this->declareOutput("sigmoid(activation)");
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
-  this->declareInput("input", false);
-  this->makeInputCollection("input");
+  this->declareInputCollection("input");
 
   this->addConfigurableChild("sigmoid", this->mSigmoid);
 

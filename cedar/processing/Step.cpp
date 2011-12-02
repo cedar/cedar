@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // PROJECT INCLUDES
 #include "cedar/defines.h"
@@ -229,7 +230,10 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
   // if there are invalid inputs, stop
   if (!this->allInputsValid())
   {
-    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "Invalid inputs prevent the step from running.");
+    std::string invalid_inputs = cedar::aux::join(mInvalidInputNames, ", ");
+
+    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
+                   "Invalid inputs prevent the step from running. These are:" + invalid_inputs);
     // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
@@ -239,15 +243,10 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 
   if (!this->mandatoryConnectionsAreSet())
   {
-    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING, "Unconnected mandatory inputs prevent the step from running.");
-    std::string errors;
-    for (size_t i = 0; i < mMissingMandatoryConnections.size(); ++i)
-    {
-      errors += "\n" + mMissingMandatoryConnections.at(i);
-    }
-    CEDAR_THROW(MissingConnectionException,
-                "Some mandatory connections are not set for the processing step " + this->getName()
-                + ". The following mandatory connections are not set:" + errors);
+    std::string errors = cedar::aux::join(mInvalidInputNames, ", ");
+
+    this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
+                   "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
   } // this->mMandatoryConnectionsAreSet
 
   if (!this->mBusy)
@@ -307,20 +306,6 @@ void cedar::proc::Step::run()
     std::cout << "Running step " << this->getName() << "." << std::endl;
     cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_ARGUMENT_SETTING
-
-  // the step is not executed when it has invalid inputs or it is in a state of an unhandled exception.
-  if (!this->allInputsValid())
-  {
-#ifdef DEBUG_ARGUMENT_SETTING
-    cedar::aux::System::mCOutLock.lockForWrite();
-    std::cout << "Cancelling step execution of " << this->getName() << " because of invalid inputs." << std::endl;
-    cedar::aux::System::mCOutLock.unlock();
-#endif // DEBUG_ARGUMENT_SETTING
-    this->mpArgumentsLock->lockForWrite();
-    this->mNextArguments.reset();
-    this->mpArgumentsLock->unlock();
-    return;
-  }
 
   this->mBusy = true;
 

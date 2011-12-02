@@ -178,6 +178,12 @@ protected:
    */
   void declareInput(const std::string& name, bool mandatory = true);
 
+  /*!@brief Declares an input collection.
+   *
+   * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
+   */
+  void declareInputCollection(const std::string& name);
+
   //!@brief Declares a buffer slot.
   void declareBuffer(const std::string& name);
 
@@ -264,8 +270,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief vector with a stirng name of all missing mandatory connections
+  //!@brief Vector with a string name of all missing mandatory connections.
   std::vector<std::string> mMissingMandatoryConnections;
+
+  //!@brief Vector with the names of all invalid input data.
+  std::vector<std::string> mInvalidInputNames;
 private:
   //!@brief a connection to a signal emitted by an external data slo
   boost::signals2::connection mSlotConnection;
