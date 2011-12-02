@@ -178,6 +178,12 @@ protected:
    */
   void declareInput(const std::string& name, bool mandatory = true);
 
+  /*!@brief Declares an input collection.
+   *
+   * @remarks This is equivalent to calling declareInput(name, false) and makeInputCollection(name).
+   */
+  void declareInputCollection(const std::string& name);
+
   //!@brief Declares a buffer slot.
   void declareBuffer(const std::string& name);
 
