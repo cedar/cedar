@@ -51,9 +51,9 @@
 #include <set>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for components of robots.
  *
- * More detailed description of the class.
+ * @todo More detailed description of the class.
  */
 class cedar::dev::robot::Component : public virtual cedar::aux::Base
 {

@@ -318,8 +318,9 @@ And that's it!
 
 @section ProcessingTutorialPlugin Beginner's Tutorial: Plug In and Play
 
-As a prepraration for using the processinIde, we first have to group our declarations into a plugin. These plugins can
-then be loaded from the processingIde and used for creating architecture files in a comfortable way.
+As a prepraration for using the SimpleSummation step in the processingIde, we first have to group our declarations into
+a plugin. These plugins can then be loaded from the processingIde and used for creating architecture files in a
+comfortable way.
 
 The first step towards this is to move the SimpleSummation step into a separate project that is compiled as a library
 (i.e., .so, .dylib or .dll, depending on your operating system). Let us assume that our library compiles to
@@ -373,7 +374,7 @@ the plugin is ready for use!
 
 @section ProcessingTutorialUsingTheProcessingIde Beginner's Tutorial: Using the processingIde
 
-In the folder \em cedar/bin, you can find an application called processingIde. If you run it, you can generate the
+In the folder @em cedar/bin, you can find an application called @em processingIde. If you run it, you can generate the
 configuration files described in @ref ProcessingTutorialFirstStepArchitectureFile using a visual representation.
 
 @todo Screenshots and explanations.
@@ -383,11 +384,39 @@ configuration files described in @ref ProcessingTutorialFirstStepArchitectureFil
 
 @section ProcessingTutorialDataValidation Intermediate Tutorial: Data Validation
 
+In the comput function of the SimpleSummaton step inroduced in @ref ProcessingTutorialFirstStep_NewClass, we assumed
+that the data we receive is always of the type cedar::aux::MatData. However, when we expose our step to users who might
+not be aware of this assumption, they might connect a different kind of data, likely resulting in a crash. However, the
+processing framework offers functionality that allows us to automatically check the data before the compute function is
+ever executed. This is done by overriding the method cedar::proc::Connectable::determineInputValidity in our step:
+@code
+cedar::proc::DataSlot::VALIDITY SimpleSummation::determineInputValidity(cedar::proc::ConstDataSlotPtr,
+                                                                        cedar::aux::DataPtr data)
+                                                                        const
+{
+  if (boost::shared_dynamic_cast<cedar::aux::MatData>(data))
+  {
+    return cedar::proc::DataSlot::VALIDITY_VALID;
+  }
+  else
+  {
+    return cedar::proc::DataSlot::VALIDITY_ERROR;
+  }
+}
+@endcode
+Note, that the slot parameter is not used here because the same conditions must be met for all of our slots. This is
+just a simple check, and a real-world summation step should probably also check that the matrix has a compatible size
+in this function, however, the principle still remains the same.
+
+@remarks In the future, we plan to provide a system for at least partly automated checks, thus making the implementation
+         of this function unnecessary in many cases. Of course, there will always be some checks that just have to be
+         done manually.
+
 
 @section ProcessingTutorialInputCollections Intermediate Tutorial: Input Collections
 
-\"Dear tutorial-writer-person, way back in @ref ProcessingTutorialFirstStep_NewClass we wrote a summation class that only
- has two inputs. Doesn't this get annoying if one wants to sum up a lot of matrices?\"
+\"Dear tutorial-writer-person, way back in @ref ProcessingTutorialFirstStep_NewClass we wrote a summation class that
+ only has two inputs. Doesn't this get annoying if one wants to sum up a lot of matrices?\"
 Why yes, it does. Therefore, we have a special solution for this sort of problem: input collections. Instead of having
 an input that can only be associated with a single data object, these collections can receive an indetermined number of
 data. Defining an input as a collection can be done by declaring it in a step's constructor like this:

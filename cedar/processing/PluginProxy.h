@@ -37,10 +37,8 @@
 #ifndef CEDAR_PROC_PLUGIN_PROXY_H
 #define CEDAR_PROC_PLUGIN_PROXY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
@@ -50,9 +48,7 @@
 #endif
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
  */
 class cedar::proc::PluginProxy
 {
@@ -60,13 +56,7 @@ class cedar::proc::PluginProxy
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-//#ifdef LINUX
   typedef void (*PluginInterfaceMethod)(cedar::proc::PluginDeclarationPtr);
-/*#elif defined WINDOWS
-  typedef cedar::proc::PluginDeclarationPtr (*PluginInterfaceMethod)();
-#else
-#error Implement me for your OS!
-#endif*/
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

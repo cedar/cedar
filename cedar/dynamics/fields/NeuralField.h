@@ -41,7 +41,7 @@
 #ifndef CEDAR_DYN_NEURAL_FIELD_H
 #define CEDAR_DYN_NEURAL_FIELD_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/math/namespace.h"
@@ -49,14 +49,12 @@
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief An implementation of Neural Fields for the processing framework.
  *
- * More detailed description of the class.
+ * @todo Put a detailed description here, including the equation of the field dynamics and references to the relevant paper(s)
  */
 class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
 {
@@ -70,8 +68,6 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
 public:
   //!@brief The standard constructor.
   NeuralField();
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

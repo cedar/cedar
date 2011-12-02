@@ -47,9 +47,7 @@
 #include <QWidget>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A plot that records and displays the history of numerical data.
  */
 class cedar::aux::gui::HistoryPlot : public cedar::aux::gui::DataPlotInterface
 {

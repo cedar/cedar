@@ -46,9 +46,7 @@
 // SYSTEM INCLUDES
 #include <QWidget>
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A unified interface for widgets that plot instances of cedar::proc::Data.
  */
 class cedar::aux::gui::DataPlotInterface : public QWidget
 {
