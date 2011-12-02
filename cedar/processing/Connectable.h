@@ -264,8 +264,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief vector with a stirng name of all missing mandatory connections
+  //!@brief Vector with a string name of all missing mandatory connections.
   std::vector<std::string> mMissingMandatoryConnections;
+
+  //!@brief Vector with the names of all invalid input data.
+  std::vector<std::string> mInvalidInputNames;
 private:
   //!@brief a connection to a signal emitted by an external data slo
   boost::signals2::connection mSlotConnection;

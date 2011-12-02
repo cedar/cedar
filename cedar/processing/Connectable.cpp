@@ -241,8 +241,12 @@ void cedar::proc::Connectable::unlockAll()
   this->getDataLocks(locks);
   cedar::aux::unlock(locks);
 }
+
 bool cedar::proc::Connectable::allInputsValid()
 {
+  // clear the list of invalid input names
+  mInvalidInputNames.clear();
+
   //!@todo Lock these inputs properly?
   std::map<DataRole::Id, SlotMap>::iterator slot_map_iter = this->mDataConnections.find(cedar::proc::DataRole::INPUT);
   if (slot_map_iter == mDataConnections.end())
@@ -258,14 +262,17 @@ bool cedar::proc::Connectable::allInputsValid()
     switch(this->getInputValidity(slot->second))
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
-        return false;
+        // If the input is invalid, push its name into the list of invalid inputs.
+        mInvalidInputNames.push_back(slot->first);
+        break;
 
       default:
         break;
     }
   }
 
-  return true;
+  // If no inputs are in the invalid list, all must be valid.
+  return mInvalidInputNames.empty();
 }
 
 void cedar::proc::Connectable::checkMandatoryConnections()
