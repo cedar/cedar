@@ -94,7 +94,7 @@ namespace cedar
 
     /*!@brief  Joins an iterable list of strings together.
      *
-     * @param  T               type of the container. This container should have a const_iterator where ++const_iterator
+     * @tparam T               type of the container. This container should have a const_iterator where ++const_iterator
      *                         is possible and *const_iterator is a std::string. The container should also have a begin
      *                         and an end method for returning const_iterators to the begin and end, respectively.
      *
