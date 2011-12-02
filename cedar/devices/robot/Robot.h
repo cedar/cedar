@@ -50,9 +50,9 @@
 #include <map>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for robots.
  *
- * More detailed description of the class.
+ * @todo More detailed description of the class.
  */
 class cedar::dev::robot::Robot : public cedar::aux::Base
 {

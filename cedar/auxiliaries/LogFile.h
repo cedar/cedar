@@ -49,9 +49,9 @@
 #include <string>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A class for logging messages in a file.
  *
- * More detailed description of the class.
+ * @todo more descriptions.
  */
 class cedar::aux::LogFile : public std::ofstream
 {

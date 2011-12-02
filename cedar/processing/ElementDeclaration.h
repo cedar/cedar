@@ -137,9 +137,7 @@ private:
 };
 
 
-/*!@brief Abstract description of the class with templates.
- *
- * More detailed description of the class with templates.
+/*!@brief This is a template class for comfortably generating element declarations.
  */
 template <class DerivedClass>
 class cedar::proc::ElementDeclarationTemplate : public ElementDeclaration

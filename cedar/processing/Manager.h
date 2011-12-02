@@ -56,9 +56,10 @@
 #include <QObject>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A manager for processing architectures.
  *
- * More detailed description of the class.
+ * @deprecated This class will probably be removed.
+ * @todo Remove this class?
  */
 class cedar::proc::Manager
 {

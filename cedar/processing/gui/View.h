@@ -52,9 +52,7 @@
 #include <QGraphicsRectItem>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Class that displays a cedar::proc::gui::Scene.
  */
 class cedar::proc::gui::View : public QGraphicsView
 {
@@ -102,8 +100,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:

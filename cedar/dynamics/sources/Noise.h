@@ -49,9 +49,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A step that generates noise.
  *
- * More detailed description of the class.
+ * @todo More descriptions
+ * @todo Does this take the sqrt(dt) problem into account? (may need to divide the output by dt/sqrt(dt))
  */
 class cedar::dyn::Noise : public cedar::dyn::Dynamics
 {

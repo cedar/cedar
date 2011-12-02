@@ -54,9 +54,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Generates a matrix with a Gaussian.
  *
- * More detailed description of the class.
+ * @todo More detailed description.
  */
 class cedar::proc::sources::GaussInput : public cedar::proc::Step
 {

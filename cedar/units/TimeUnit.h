@@ -51,11 +51,13 @@
 #include <iostream>
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Template class for time units.
  *
- * More detailed description of the class.
+ * @todo Describe this.
  *
  * @todo Read units from strings.
+ *
+ * @see @ref IntroductionToCedarUnits
  */
 template <unsigned int T_factor, const char* T_suffix>
 class cedar::unit::TimeUnit : public Time

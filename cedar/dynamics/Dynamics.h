@@ -51,9 +51,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A cedar::proc::Step that approximates the solution of some dynamical system.
  *
- * More detailed description of the class.
+ * @todo Describe the concept more.
  */
 class cedar::dyn::Dynamics : public cedar::proc::Step
 {
@@ -67,8 +67,6 @@ class cedar::dyn::Dynamics : public cedar::proc::Step
 public:
   //!@brief The standard constructor.
   Dynamics();
-
-  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -95,8 +93,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -105,8 +101,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 

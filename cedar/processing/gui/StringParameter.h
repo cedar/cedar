@@ -51,9 +51,7 @@
 #include <QLineEdit>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Widget for displaying and manipulating cedar::aux::StringParameters.
  */
 class cedar::proc::gui::StringParameter : public cedar::proc::gui::Parameter
 {
