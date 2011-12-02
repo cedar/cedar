@@ -92,6 +92,48 @@ namespace cedar
       parts.push_back(chunk);
     }
 
+    /*!@brief  Joins an iterable list of strings together.
+     *
+     * @param  T               type of the container. This container should have a const_iterator where ++const_iterator
+     *                         is possible and *const_iterator is a std::string. The container should also have a begin
+     *                         and an end method for returning const_iterators to the begin and end, respectively.
+     *
+     * @param  stringList      A list of strings that are joined by the function.
+     * @param  separator       Separator that is inserted between the items in the list.
+     * @param  outJoinedString String to which the result is written.
+     */
+    template <typename T>
+    inline void join(const T& stringList,
+                     const std::string& separator,
+                     std::string& outJoinedString
+                     )
+    {
+      outJoinedString = "";
+      for (typename T::const_iterator iter = stringList.begin(); iter != stringList.end(); ++iter)
+      {
+        if (iter != stringList.begin())
+        {
+          outJoinedString += separator;
+        }
+        outJoinedString += *iter;
+      }
+    }
+
+    /*!@brief Joins an iterable list of strings together.
+     *
+     *        This method works like cedar::aux::join, however, it returns the string instead of writing to a reference.
+     * @see   cedar::aux::join for a detailed description.
+     */
+    template <typename T>
+    inline std::string join(const T& stringList,
+                            const std::string& separator
+                            )
+    {
+      std::string result;
+      cedar::aux::join(stringList, separator, result);
+      return result;
+    }
+
     /*!@brief Replaces all occurrences of needle in a given string with a specified replacement.
      *
      */
