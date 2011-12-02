@@ -41,12 +41,10 @@
 #ifndef CEDAR_PROC_PARAMETER_H
 #define CEDAR_PROC_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Base.h"
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -56,9 +54,11 @@ extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pO
 extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
 
-/*!@brief Abstract description of the class.
+/*!@brief Base class for all parameters.
  *
- * More detailed description of the class.
+ *        This is the base class for all parameters that can be registered in the cedar::aux::Configurable class.
+ *
+ * @see @ref Parameters for a description of the parameters concept.
  */
 class cedar::aux::Parameter : public QObject, public cedar::aux::Base
 {

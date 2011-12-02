@@ -50,9 +50,10 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
-/*!@brief Abstract description of the class.
+/*!@brief A generic template for parameters stored in a cedar::aux::Configurable.
  *
- * More detailed description of the class.
+ *        This class stores the value of a parameter and offers access to the value via standard functions. All
+ *        parameter implementations should inherit this as a base class.
  */
 template <typename T>
 class cedar::aux::ParameterTemplate : public cedar::aux::Parameter

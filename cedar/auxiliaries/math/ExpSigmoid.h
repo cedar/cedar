@@ -49,9 +49,9 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
+/*!@brief Sigmoid function that is based on the exponential function.
  *
- * More detailed description of the sigmoid base class.
+ * @todo Put the equation in here, describe it.
  */
 class cedar::aux::math::ExpSigmoid : public cedar::aux::math::Sigmoid
 {

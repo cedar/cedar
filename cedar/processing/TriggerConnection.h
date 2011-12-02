@@ -45,10 +45,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A connection from a cedar::proc::Trigger to a cedar::proc::Triggerable.
  *
- * More detailed description of the class.
- *
+ * @todo Describe this more.
  * @todo check if source is owned data
  */
 class cedar::proc::TriggerConnection

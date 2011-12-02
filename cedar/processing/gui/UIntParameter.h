@@ -41,19 +41,15 @@
 #ifndef CEDAR_PROC_GUI_UINT_PARAMETER_H
 #define CEDAR_PROC_GUI_UINT_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Parameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Widget for representing and manipulating a cedar::aux::UIntParameter.
  */
 class cedar::proc::gui::UIntParameter : public cedar::proc::gui::Parameter
 {

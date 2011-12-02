@@ -49,9 +49,9 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
+/*!@brief A sigmoid that is a linear function when the input exceeds the threshold.
  *
- * More detailed description of the sigmoid base class.
+ * @todo More detailed description.
  */
 class cedar::aux::math::HeavysideSigmoid : public cedar::aux::math::Sigmoid
 {

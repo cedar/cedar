@@ -41,17 +41,13 @@
 #ifndef CEDAR_PROC_NUMERIC_PARAMETER_H
 #define CEDAR_PROC_NUMERIC_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/ParameterTemplate.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A base class template for numeric parameters.
  */
 template <typename T>
 class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
@@ -141,8 +137,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -151,15 +145,6 @@ private:
 
   //!@brief The maximum value, if applicable to the type.
   T mMaximum;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::aux::NumericParameter
 

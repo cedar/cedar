@@ -53,11 +53,7 @@
 #include <map>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
- *
- * @todo Calculate the number of columns based on the widget size and a provided button width.
+/*!@brief This is a base class for widgets that contain little boxes that represent some tools.
  */
 class cedar::proc::gui::ToolBox : public QWidget
 {
@@ -117,8 +113,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -136,8 +130,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 

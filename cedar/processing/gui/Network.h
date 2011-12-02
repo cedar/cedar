@@ -51,9 +51,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *
- * More detailed description of the class.
+ * @todo More descriptions.
  */
 class cedar::proc::gui::Network
 {

@@ -41,17 +41,13 @@
 #ifndef CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
 #define CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/VectorParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A template for parameters that are vectors of numbers.
  */
 template <typename T>
 class cedar::aux::NumericVectorParameter : public cedar::aux::VectorParameter<T>
@@ -161,8 +157,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -171,15 +165,6 @@ private:
 
   //!@brief The maximum value, if applicable to the type.
   T mMaximum;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::aux::NumericVectorParameter
 

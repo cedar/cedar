@@ -49,9 +49,9 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the class.
+/*!@brief A data type representing space code activation.
  *
- * More detailed description of the class.
+ * @todo Explain the concept of space code.
  */
 class cedar::dyn::SpaceCode : public cedar::dyn::MatActivation
 {
