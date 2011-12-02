@@ -44,6 +44,8 @@ Here, we explain general concepts that are used in cedar.
 @subsection Interactive Interactive Tests
 
 @section Tutorials Tutorials
-Move along! Nothing to see here!
+
+Tutorials on how to use cedar's processing framework can be found in @ref ProcessingTutorials.
+
  */
 
