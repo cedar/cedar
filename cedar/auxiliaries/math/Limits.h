@@ -46,9 +46,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the struct.
- *
- * More detailed description of the struct.
+/*!@brief Structure representing the limits of an interval.
  */
 template <typename T>
 struct cedar::aux::math::Limits

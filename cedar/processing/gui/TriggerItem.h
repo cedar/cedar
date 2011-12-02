@@ -52,9 +52,7 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Representation of a cedar::proc::Trigger in a cedar::proc::gui::Scene.
  */
 class cedar::proc::gui::TriggerItem : public cedar::proc::gui::GraphicsBase
 {

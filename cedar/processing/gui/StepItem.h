@@ -55,9 +55,7 @@
 #include <map>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief A representation of a cedar::proc::Step object in a cedar::proc::gui::Scene.
  */
 class cedar::proc::gui::StepItem : public QObject, public cedar::proc::gui::GraphicsBase
 {

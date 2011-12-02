@@ -48,9 +48,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief Abstract description of the class.
+/*!@brief A step that implements preshape dynamics.
  *
- * More detailed description of the class.
+ * @todo More descriptions, including equations and references to relevant papers.
  */
 class cedar::dyn::Preshape : public cedar::dyn::Dynamics
 {

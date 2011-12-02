@@ -48,9 +48,7 @@
 #include <string>
 
 
-/*!@brief Abstract description of the class.
- *
- * More detailed description of the class.
+/*!@brief Base class for exceptions in cedar.
  */
 class cedar::aux::ExceptionBase : public std::exception
 {

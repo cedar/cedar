@@ -49,9 +49,11 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the sigmoid base class.
+/*!@brief Sigmoid function that is based on absolute values.
  *
- * More detailed description of the sigmoid base class.
+ *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.
+ *
+ * @todo Put the equation in here, describe it.
  */
 class cedar::aux::math::AbsSigmoid : public cedar::aux::math::Sigmoid
 {
