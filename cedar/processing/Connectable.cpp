@@ -367,6 +367,13 @@ void cedar::proc::Connectable::declareInput(const std::string& name, bool mandat
   this->declareData(DataRole::INPUT, name, mandatory);
 }
 
+void cedar::proc::Connectable::declareInputCollection(const std::string& name)
+{
+  this->declareInput(name, false);
+  this->makeInputCollection(name);
+}
+
+
 void cedar::proc::Connectable::declareBuffer(const std::string& name)
 {
   this->declareData(DataRole::BUFFER, name, false);
