@@ -50,6 +50,10 @@
 #include <cstdlib>
 #ifdef GCC
   #include <csignal>
+#elif defined MSVC
+  #include <signal.h>
+#else
+  #error Please implement signal handling for your compiler.
 #endif // GCC
 
 #define CATCH_EXCEPTIONS_IN_GUI
@@ -81,7 +85,7 @@ cedar::proc::gui::IdeApplication::~IdeApplication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifdef GCC
+//!@todo Generalize signal handling; allow the user to set a callback that receives a stacktrace on crash
 void cedar::proc::gui::IdeApplication::signalHandler(int signal)
 {
   std::string signal_name;
@@ -99,26 +103,62 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal)
   std::string file_path;
   cedar::aux::System::openCrashFile(stream, file_path);
   stream << "Application received signal " << signal_name << std::endl;
-  stream << cedar::aux::StackTrace() << std::endl;
+  cedar::aux::StackTrace trace;
+  stream << trace << std::endl;
 
   std::cout << "Application received signal " << signal_name << std::endl;
   std::cout << "A stack trace has been written to " << file_path << std::endl;
   abort();
 }
-#endif // GCC
+
+#ifdef MSVC
+LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS exceptions)
+{
+  std::ofstream stream;
+  std::string file_path;
+  cedar::aux::System::openCrashFile(stream, file_path);
+  stream << "Application crash reason: ";
+  
+  switch(exceptions->ExceptionRecord->ExceptionCode)
+  {
+    case EXCEPTION_ACCESS_VIOLATION:
+      stream << "EXCEPTION_ACCESS_VIOLATION";
+      break;
+
+    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+      stream << "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
+      break;
+
+    case EXCEPTION_STACK_OVERFLOW:
+      stream << "EXCEPTION_STACK_OVERFLOW";
+      break;
+
+    default:
+      stream << "(unknown error type: " << exceptions->ExceptionRecord->ExceptionCode << ")";
+  }
+  stream << std::endl;
+
+  cedar::aux::StackTrace trace(exceptions->ContextRecord);
+  stream << trace << std::endl;
+
+  std::cout << "A stack trace has been written to " << file_path << std::endl;
+  LONG retval = EXCEPTION_CONTINUE_SEARCH;
+  return retval;
+}
+#endif // MSVC
 
 int cedar::proc::gui::IdeApplication::exec()
 {
-#ifdef GCC
+#ifdef MSVC
+  SetUnhandledExceptionFilter(&cedar::proc::gui::IdeApplication::vcCrashHandler);
+#else
   signal(SIGSEGV, &cedar::proc::gui::IdeApplication::signalHandler);
-#endif // GCC
+#endif // MSCV
 
   this->mpIde->show();
   int ret = this->QApplication::exec();
 
-#ifdef GCC
   signal(SIGSEGV, SIG_DFL);
-#endif // GCC
   return ret;
 }
 
