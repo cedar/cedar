@@ -97,11 +97,13 @@ signals:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-#ifdef GCC
   /*!@brief Handler for SEGV and other signals.
    */
   static void signalHandler(int signal);
-#endif // GCC
+
+#ifdef MSVC
+  static LONG WINAPI vcCrashHandler(LPEXCEPTION_POINTERS);
+#endif
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

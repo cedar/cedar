@@ -187,31 +187,16 @@ void cedar::aux::StackEntry::setRawString(const std::string& rawString)
 }
 #endif // GCC
 
-cedar::aux::StackTrace::StackTrace()
+#ifdef MSVC
+cedar::aux::StackTrace::StackTrace(PCONTEXT context)
 {
-#ifdef GCC
-  // array for the backtraces
-  void *array[10];
-  size_t size;
-  // array for the backtrace symbols
-  char **strings;
-  size_t i;
+  this->init(context);
+}
 
-  // get the backtrace
-  size = backtrace(array, 10);
+void cedar::aux::StackTrace::init(PCONTEXT context)
+{
+  CONTEXT& context_record = *context;
 
-  // transform the backtrace into symbols
-  strings = backtrace_symbols(array, size);
-
-  for (i = 0; i < size; i++)
-  {
-    cedar::aux::StackEntry entry;
-    entry.setRawString(strings[i]);
-    this->mStackTrace.push_back(entry);
-  }
-
-  free (strings);
-#else
   SYSTEM_INFO sys_info; // we need this to determine the processor architecture.
   GetSystemInfo(&sys_info);
   DWORD machine_type;
@@ -230,10 +215,8 @@ cedar::aux::StackTrace::StackTrace()
     //!@todo Throw an exception.
     return;
   }
-  STACKFRAME stack_frame;
-  memset(&stack_frame, 0, sizeof(STACKFRAME));
-  CONTEXT context_record;
-  RtlCaptureContext(&context_record);
+  STACKFRAME64 stack_frame;
+  memset(&stack_frame, 0, sizeof(STACKFRAME64));
   stack_frame.AddrPC.Offset = context_record.Eip;
   stack_frame.AddrPC.Mode = AddrModeFlat;
   stack_frame.AddrFrame.Offset = context_record.Ebp;
@@ -242,8 +225,9 @@ cedar::aux::StackTrace::StackTrace()
   stack_frame.AddrStack.Mode = AddrModeFlat;
 
   // initialize  the stack_frame variable
+  SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
   SymInitialize(GetCurrentProcess(), NULL, TRUE);
-  while (StackWalk(machine_type, GetCurrentProcess(), GetCurrentThread(), &stack_frame, &context_record, NULL, NULL, NULL, NULL))
+  while (StackWalk64(machine_type, GetCurrentProcess(), GetCurrentThread(), &stack_frame, &context_record, NULL, NULL, NULL, NULL))
   {
     // Warning: ugly windows code ahead. Read at your own peril!
     char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
@@ -292,6 +276,39 @@ cedar::aux::StackTrace::StackTrace()
       //!@todo: process error message
     }
   }
+}
+
+void init(CONTEXT context);
+#endif // MSVC
+
+cedar::aux::StackTrace::StackTrace()
+{
+#ifdef GCC
+  // array for the backtraces
+  void *array[10];
+  size_t size;
+  // array for the backtrace symbols
+  char **strings;
+  size_t i;
+
+  // get the backtrace
+  size = backtrace(array, 10);
+
+  // transform the backtrace into symbols
+  strings = backtrace_symbols(array, size);
+
+  for (i = 0; i < size; i++)
+  {
+    cedar::aux::StackEntry entry;
+    entry.setRawString(strings[i]);
+    this->mStackTrace.push_back(entry);
+  }
+
+  free (strings);
+#else
+  CONTEXT context_record;
+  RtlCaptureContext(&context_record);
+  this->init(&context_record);
 #endif // GCC
 }
 
