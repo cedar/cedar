@@ -174,6 +174,11 @@ namespace cedar
          *        StackEntries.
          */
         StackTrace();
+#ifdef MSVC
+        /*!@brief Generates a stack trace for a specific context.
+         */
+        StackTrace(PCONTEXT context);
+#endif // MSVC
 
         /*!@brief Returns the number of entries in the stack trace.
          */
@@ -197,15 +202,21 @@ namespace cedar
          * @remarks This list is stored in the same order as the stack.
          */
         std::vector<cedar::aux::StackEntry> mStackTrace;
+
+#ifdef MSVC
+        /*!@brief Initializes the stack trace from the given context.
+         */
+        void init(PCONTEXT context);
+#endif // MSVC
     };
 
     /*!@brief Returns the stack entry at the given index.
      */
-    std::ostream& operator<< (std::ostream& stream, const StackEntry& trace);
+    CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackEntry& trace);
 
     /*!@brief Operator that writes the stack trace to the stream.
      */
-    std::ostream& operator<< (std::ostream& stream, const StackTrace& trace);
+    CEDAR_AUX_LIB_EXPORT std::ostream& operator<< (std::ostream& stream, const StackTrace& trace);
     
   }
 }
