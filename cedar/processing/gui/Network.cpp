@@ -208,17 +208,18 @@ void cedar::proc::gui::Network::addTriggersToScene()
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
       cedar::proc::TriggerablePtr target = trigger->getListeners().at(i);
-      cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(dynamic_cast<cedar::proc::Step*>(target.get()));
-      CEDAR_DEBUG_ASSERT(p_target_item);
-      p_trigger_item->connectTo(p_target_item);
-    }
-
-    for (size_t i = 0; i < trigger->getTriggerListeners().size(); ++i)
-    {
-      cedar::proc::TriggerPtr target = trigger->getTriggerListeners().at(i);
-      cedar::proc::gui::TriggerItem *p_target_item = this->mpScene->getTriggerItemFor(target.get());
-      CEDAR_DEBUG_ASSERT(p_target_item);
-      p_trigger_item->connectTo(p_target_item);
+      if (cedar::proc::Step* step_pointer = dynamic_cast<cedar::proc::Step*>(target.get()))
+      {
+        cedar::proc::gui::StepItem *p_target_item = this->mpScene->getStepItemFor(step_pointer);
+        CEDAR_DEBUG_ASSERT(p_target_item);
+        p_trigger_item->connectTo(p_target_item);
+      }
+      else if (cedar::proc::Trigger* trigger_pointer = dynamic_cast<cedar::proc::Trigger*>(target.get()))
+      {
+        cedar::proc::gui::TriggerItem *p_target_item = this->mpScene->getTriggerItemFor(trigger_pointer);
+        CEDAR_DEBUG_ASSERT(p_target_item);
+        p_trigger_item->connectTo(p_target_item);
+      }
     }
   }
 }

@@ -141,6 +141,14 @@ int main(int, char**)
     ++errors;
   }
 
+  log_file << "Creating a second trigger ... ";
+  cedar::proc::TriggerPtr trigger_2(new cedar::proc::Trigger("trigger2"));
+  network->add(trigger_2);
+
+  log_file << "Connecting trigger to trigger2 ... ";
+  network->connectTrigger(trigger, trigger_2);
+  log_file << "done." << std::endl;
+
   log_file << "Saving network ... ";
   network->writeFile("architecture1.json");
   log_file << "done." << std::endl;

@@ -50,6 +50,7 @@
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/processing/Element.h"
 
 // PROJECT INCLUDES
 
@@ -473,8 +474,16 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
     cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id));
     trigger->readConfiguration(trigger_node);
     this->mElements[trigger->getName()] = trigger;
+  }
+
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+      iter != root.end();
+      ++iter)
+  {
     try
     {
+      const cedar::aux::ConfigurationNode& trigger_node = iter->second;
+      cedar::proc::TriggerPtr trigger = this->getElement<cedar::proc::Trigger>(trigger_node.get_child("name").get_value<std::string>());
       const cedar::aux::ConfigurationNode& listeners = trigger_node.get_child("listeners");
 
       for (cedar::aux::ConfigurationNode::const_iterator listener_iter = listeners.begin();

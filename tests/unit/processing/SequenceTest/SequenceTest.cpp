@@ -175,8 +175,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
       ComputableTestPtr step (new ComputableTest(i, sequence_buffer, lock, runInThread));
       steps.push_back(step);
       network->connectTrigger(prev_trigger, step);
-
-      step->getFinishedTrigger()->addTrigger(multi_trigger);
+      network->connectTrigger(step->getFinishedTrigger(), multi_trigger);
 
       std::stringstream strstr;
       strstr << i;
