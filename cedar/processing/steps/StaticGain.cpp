@@ -114,7 +114,4 @@ void cedar::proc::steps::StaticGain::inputConnectionChanged(const std::string& i
   const cv::Mat& input = this->mInput->getData();
   // Make a copy to create a matrix of the same type, dimensions, ...
   this->mOutput->setData(input.clone());
-
-  // Finally, this also requires a recomputation of the output.
-  this->onTrigger();
 }

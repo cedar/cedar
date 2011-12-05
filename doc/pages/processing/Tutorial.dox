@@ -158,8 +158,6 @@ Now it is time to connect things up:
 @endcode
 And that's it, if you compile and run this program your step should now be computed.
 
-@todo compute wouldn't actually be called here, even though it should.
-
 By the way, if you dislike writing this main method, you can use plugins and architecture files instead (see the next
 two sections, @ref ProcessingTutorialDeclarations and @ref ProcessingTutorialFirstStepArchitectureFile) or just use the
 processingIde to do it all in a user interface (see @ref ProcessingTutorialUsingTheProcessingIde).
