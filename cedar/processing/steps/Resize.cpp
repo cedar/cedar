@@ -253,6 +253,12 @@ cv::Size cedar::proc::steps::Resize::getOutputSize() const
 
 void cedar::proc::steps::Resize::outputSizeChanged()
 {
+  this->updateOutputMatrixSize();
+  this->onTrigger();
+}
+
+void cedar::proc::steps::Resize::updateOutputMatrixSize()
+{
   const cv::Mat& input = this->mInput->getData();
   int size = static_cast<int>(this->_mOutputSize->size());
 
@@ -268,8 +274,6 @@ void cedar::proc::steps::Resize::outputSizeChanged()
   }
   cv::Mat new_output_mat = cv::Mat(size, &sizes.at(0), input.type(), cv::Scalar(0));
   this->mOutput->setData(new_output_mat);
-
-  this->onTrigger();
 }
 
 void cedar::proc::steps::Resize::recompute()
@@ -315,5 +319,5 @@ void cedar::proc::steps::Resize::inputConnectionChanged(const std::string& input
   this->_mOutputSize->resize(cedar::aux::math::getDimensionalityOf(input), 1);
 
   // Finally, this also requires a recomputation of the output.
-  this->outputSizeChanged();
+  this->updateOutputMatrixSize();
 }

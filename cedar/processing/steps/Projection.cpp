@@ -53,7 +53,7 @@
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
-
+#include <limits>
 
 cedar::aux::EnumType<cedar::proc::steps::Projection::CompressionType>
   cedar::proc::steps::Projection::CompressionType::mType;
@@ -91,6 +91,7 @@ _mCompressionType(new cedar::aux::EnumParameter(
 
   // connect signals and slots
   QObject::connect(_mDimensionMappings.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
+  QObject::connect(_mCompressionType.get(), SIGNAL(valueChanged()), this, SLOT(reconfigure()));
   QObject::connect(_mOutputDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionalityChanged()));
   QObject::connect(_mOutputDimensionSizes.get(), SIGNAL(valueChanged()), this, SLOT(outputDimensionSizesChanged()));
 }
@@ -171,7 +172,22 @@ void cedar::proc::steps::Projection::reconfigure()
     }
     else if (output_dimensionality == 0)
     {
-      mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0D;
+      if (_mCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MAXIMUM)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmax;
+      }
+      else if (_mCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::MINIMUM)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmin;
+      }
+      else if (_mCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::AVERAGE)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dmean;
+      }
+      else if (_mCompressionType->getValue() == cedar::proc::steps::Projection::CompressionType::SUM)
+      {
+        mpProjectionMethod = &cedar::proc::steps::Projection::compressNDto0Dsum;
+      }
     }
     else
     {
@@ -360,9 +376,55 @@ void cedar::proc::steps::Projection::compress3Dto1D()
   }
 }
 
-void cedar::proc::steps::Projection::compressNDto0D()
+void cedar::proc::steps::Projection::compressNDto0Dsum()
 {
-  double maximum = 0;
+  mOutput->getData().at<float>(0) = cv::sum(mInput->getData())[0];
+}
+
+void cedar::proc::steps::Projection::compressNDto0Dmean()
+{
+  mOutput->getData().at<float>(0) = cv::mean(mInput->getData())[0];
+}
+
+void cedar::proc::steps::Projection::compressNDto0Dmin()
+{
+  double minimum = std::numeric_limits<double>::max();
+  unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
+
+  // for a dimensionality below 3 ...
+  if (input_dimensionality < 3)
+  {
+    // ... we can use an OpenCV function to determine the minimum
+    double maximum;
+    cv::minMaxLoc(mInput->getData(), &minimum, &maximum);
+  }
+  // for all other dimensionalities, we have to iterate through the
+  // input matrix and find the minimum ourselves
+  else
+  {
+    // create an iterator for the input matrix
+    cedar::aux::MatrixIterator matrix_iterator(mInput->getData());
+
+    // iterate over input matrix and find the maximum value
+    do
+    {
+      double current_value = mInput->getData().at<float>(matrix_iterator.getCurrentIndex());
+
+      if (current_value < minimum)
+      {
+        minimum = current_value;
+      }
+    }
+    while (matrix_iterator.increment());
+  }
+
+  // set the minimum of the input matrix as the output of the projection
+  mOutput->getData().at<float>(0) = minimum;
+}
+
+void cedar::proc::steps::Projection::compressNDto0Dmax()
+{
+  double maximum = std::numeric_limits<double>::min();
   unsigned int input_dimensionality = cedar::aux::math::getDimensionalityOf(this->mInput->getData());
 
   // for a dimensionality below 3 ...
