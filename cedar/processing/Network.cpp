@@ -100,8 +100,50 @@ const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
   return this->mElements;
 }
 
-void cedar::proc::Network::remove(cedar::proc::ElementPtr element)
+void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
 {
+  // first, delete all data connections to and from this Element
+  for (
+        cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
+        data_con != mDataConnections.end();
+        // empty
+      )
+  {
+    if ((*data_con)->getSource()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element))
+        || (*data_con)->getTarget()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element)))
+    {
+      // if target is not looped, delete the trigger connection
+      if (!this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())->isLooped())
+      {
+        this->disconnectTrigger(
+                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getSource()->getParent())->getFinishedTrigger(),
+                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())
+                               );
+      data_con = mDataConnections.erase(data_con);
+      }
+    }
+    else
+    {
+      ++data_con;
+    }
+  }
+  // then, delete all trigger connections to and from this Element
+  for (
+        cedar::proc::Network::TriggerConnectionVector::iterator trigger_con = mTriggerConnections.begin();
+        trigger_con != mTriggerConnections.end();
+        // empty
+      )
+  {
+    if ((*trigger_con)->getSourceTrigger() == boost::shared_dynamic_cast<const cedar::proc::Trigger>(element)
+        || (*trigger_con)->getTarget() == boost::shared_dynamic_cast<const cedar::proc::Triggerable>(element))
+    {
+      trigger_con = mTriggerConnections.erase(trigger_con);
+    }
+    else
+    {
+      ++trigger_con;
+    }
+  }
   cedar::proc::Network::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
   {

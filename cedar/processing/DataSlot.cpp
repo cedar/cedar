@@ -123,3 +123,8 @@ cedar::proc::Connectable* cedar::proc::DataSlot::getParentPtr()
   // lock does always work since parent exists as long as slot exists
   return mpParent;
 }
+
+bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) const
+{
+  return (parent.get() == mpParent);
+}

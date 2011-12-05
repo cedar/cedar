@@ -61,6 +61,7 @@
  *
  * @todo Change the name of the class to Module?
  * @todo Add a slot which reacts to name changes of elements (update map of names to ptrs)
+ * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
  */
 class cedar::proc::Network
 {
@@ -117,9 +118,9 @@ public:
 
   /*!@brief Removes an element from the network.
    *
-   * @remark Before calling this function, you should remove all connection to the element.
+   * @remark Before calling this function, you should remove all connections to the element.
    */
-  void remove(cedar::proc::ElementPtr element);
+  void remove(cedar::proc::ConstElementPtr element);
 
   /*!@brief Adds a new element with the type given by className and the name instanceName.
    *

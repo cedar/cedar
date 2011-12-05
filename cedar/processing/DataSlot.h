@@ -60,6 +60,7 @@ class cedar::proc::DataSlot
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
+  friend class cedar::proc::Network;
 
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -129,6 +130,9 @@ public:
 
   //!@brief set the current validity of this slot
   void setValidity(VALIDITY validity);
+
+  //!@brief checks if this Connectable is the parent of this DataSlotItem
+  bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
