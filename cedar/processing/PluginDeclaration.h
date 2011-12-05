@@ -50,7 +50,7 @@
 // macros
 //--------------------------------------------------------------------------------------------------------------------
 
-//#ifdef GCC
+//!@todo Should CEDAR_BEGIN_PLUGIN_DECLARATION be in cedar/defines.h?
 # ifdef __cplusplus
 #   define CEDAR_BEGIN_PLUGIN_DECLARATION extern "C" {
 #   define CEDAR_END_PLUGIN_DECLARATION }
@@ -58,10 +58,18 @@
 #   define CEDAR_BEGIN_PLUGIN_DECLARATION
 #   define CEDAR_END_PLUGIN_DECLARATION
 # endif
-/*#else // GCC
-# define CEDAR_BEGIN_PLUGIN_DECLARATION
-# define CEDAR_END_PLUGIN_DECLARATION
-#endif*/
+
+#ifdef MSVC
+#  define CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(function_declaration) \
+          CEDAR_BEGIN_PLUGIN_DECLARATION \
+          __declspec(dllexport) function_declaration; \
+          CEDAR_END_PLUGIN_DECLARATION
+#else
+#  define CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(function_declaration) \
+          CEDAR_BEGIN_PLUGIN_DECLARATION \
+          function_declaration; \
+          CEDAR_END_PLUGIN_DECLARATION
+#endif // MSVC
 
 /*!@brief Collection of declarations from a plugin.
  */
