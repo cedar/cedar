@@ -41,10 +41,10 @@
 #include "cedar/processing/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <climits>
+#include <limits>
 
 // this number is used to represent a dimension that is to be dropped
-unsigned int cedar::proc::ProjectionMapping::msDropIndex = UINT_MAX;
+unsigned int cedar::proc::ProjectionMapping::msDropIndex = std::numeric_limits<unsigned int>::max();
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
