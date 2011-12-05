@@ -1,0 +1,1 @@
+cedar_add_unit_test(KinematicChainModel main.cpp)
