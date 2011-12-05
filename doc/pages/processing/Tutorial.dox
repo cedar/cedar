@@ -333,14 +333,7 @@ The first step towards this is to move the SimpleSummation step into a separate 
 
 #include <cedar/processing/PluginDeclaration.h>
 
-CEDAR_BEGIN_PLUGIN_DECLARATION
-
-#ifdef MSVC
-__declspec(dllexport)
-#endif
-void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin);
-
-CEDAR_END_PLUGIN_DECLARATION
+CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin));
 
 #endif // SIMPLE_SUMMATION_PLUGIN_H
 @endcode
