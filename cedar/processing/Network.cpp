@@ -174,9 +174,15 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
                                                  )
                                                        )
                         );
-  if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
+  cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(target_name);
+  CEDAR_DEBUG_ASSERT(p_target);
+  if (!p_target->isLooped())
   {
-    this->connectTrigger(this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(), this->getElement<cedar::proc::Step>(target_name));
+    this->connectTrigger(
+                          this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
+                          p_target
+                        );
+    p_target->onTrigger();
   }
 }
 
@@ -202,20 +208,24 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
   cedar::proc::Connectable::parseDataNameNoRole(target, target_name, target_slot);
   for (DataConnectionVector::iterator it = mDataConnections.begin(); it != mDataConnections.end(); ++it)
   {
+    cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
     if ((*it)->equals(
-                    this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-                    this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
-                  )
+                       this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
+                       target_connectable->getInputSlot(target_slot)
+                     )
        )
     {
       mDataConnections.erase(it);
       // if target is not looped, also delete the trigger connection
+      cedar::proc::TriggerablePtr triggerable_target = this->getElement<cedar::proc::Triggerable>(target_name);
+      CEDAR_DEBUG_ASSERT(triggerable_target);
       if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
       {
         this->disconnectTrigger(
                                  this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
                                  this->getElement<cedar::proc::Triggerable>(target_name)
                                );
+        triggerable_target->onTrigger();
       }
       return;
     }
