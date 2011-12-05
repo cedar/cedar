@@ -49,10 +49,10 @@
 
 namespace cedar
 {
-  /*!@brief Namespace for all aux classes. */
   namespace aux
   {
-  /*!@brief Namespace for all kernel classes. */
+    /*!@brief Namespace for all classes related to cedar's convolution framework.
+     */
     namespace conv
     {
       //!@cond SKIPPED_DOCUMENTATION
