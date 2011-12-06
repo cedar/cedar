@@ -65,7 +65,6 @@ cedar::proc::MultiTrigger::~MultiTrigger()
 //----------------------------------------------------------------------------------------------------------------------
 void cedar::proc::MultiTrigger::onTrigger(cedar::proc::TriggerPtr pSender)
 {
-  std::cout << "onTrigger called" << std::endl;
   std::map<cedar::proc::TriggerPtr, bool>::iterator iter = this->mIncoming.find(pSender);
 
   if (iter != this->mIncoming.end())
