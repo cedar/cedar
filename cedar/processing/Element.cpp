@@ -34,10 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Element.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

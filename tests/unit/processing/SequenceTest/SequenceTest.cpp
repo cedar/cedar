@@ -39,14 +39,11 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
 // SYSTEM INCLUDES
@@ -113,8 +110,6 @@ typedef boost::shared_ptr<EndStopTest> EndStopTestPtr;
 
 // =====================================================================================================================
 
-cedar::aux::LogFile log_file ("SequenceTest.log");
-
 /*
  * Tests the correct generation of a sequence.
  *
@@ -133,23 +128,22 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   QReadWriteLock lock;
   std::vector<unsigned int> sequence_buffer;
 
-  log_file << "Creating computation chain for sequence string \"" << sequenceString << "\"." << std::endl;
+  std::cout << "Creating computation chain for sequence string \"" << sequenceString << "\"." << std::endl;
 
-
-  log_file << "This test is ";
+  std::cout << "This test is ";
 
   if (!runInThread)
   {
-    log_file << "not ";
+    std::cout << "not ";
   }
-  log_file << "threaded." << std::endl;
+  std::cout << "threaded." << std::endl;
 
   TriggerPtr sequence_trigger(new Trigger("sequence_trigger"));
 
   TriggerPtr prev_trigger = sequence_trigger;
   std::string desired_sequence = "";
 
-  log_file << "Creating network ... " << std::endl;
+  std::cout << "Creating network ... " << std::endl;
   cedar::proc::NetworkPtr network (new cedar::proc::Network());
   /*
    * Generate the sequence in the processing framework
@@ -164,7 +158,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
     int no_steps = atoi(chr.c_str());
     if (no_steps <= 0)
     {
-      log_file << "Malformed sequence string \"" << sequenceString << "\" at position " << i <<
+      std::cout << "Malformed sequence string \"" << sequenceString << "\" at position " << i <<
           ": Cannot convert to number, or number is less than 1." << std::endl;
       return;
     }
@@ -175,8 +169,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
       ComputableTestPtr step (new ComputableTest(i, sequence_buffer, lock, runInThread));
       steps.push_back(step);
       network->connectTrigger(prev_trigger, step);
-
-      step->getFinishedTrigger()->addTrigger(multi_trigger);
+      network->connectTrigger(step->getFinishedTrigger(), multi_trigger);
 
       std::stringstream strstr;
       strstr << i;
@@ -190,7 +183,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   network->add(stop_test);
   network->connectTrigger(prev_trigger, stop_test);
 
-  log_file << "Triggering sequence " << sequenceString << "." << std::endl;
+  std::cout << "Triggering sequence " << sequenceString << "." << std::endl;
   sequence_trigger->trigger();
 
   unsigned int wait_time_in_sec = 3;
@@ -204,7 +197,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
 
   if (!stop_test->mFinished)
   {
-    log_file << "The test timed out." << std::endl;
+    std::cout << "The test timed out." << std::endl;
     ++errors;
     return;
   }
@@ -213,7 +206,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
   /*
    * Test the sequence for correctness
    */
-  log_file << "Checking sequence " << sequenceString << "." << std::endl;
+  std::cout << "Checking sequence " << sequenceString << "." << std::endl;
   unsigned int prev_stage_no = sequence_buffer.at(0);
   std::string sequence = "";
   for (size_t i = 0; i < sequence_buffer.size(); ++i)
@@ -222,7 +215,7 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
     // an error occurs if the stage number is more than one bigger than the last one
     if (stage_no != prev_stage_no + 1 && stage_no != prev_stage_no)
     {
-      log_file << "Wrong order detected in sequence " << sequenceString << "." << std::endl;
+      std::cout << "Wrong order detected in sequence " << sequenceString << "." << std::endl;
       ++errors;
     }
     prev_stage_no = stage_no;
@@ -234,34 +227,30 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
 
   if (desired_sequence != sequence)
   {
-    log_file << "Wrong sequence generated for " << sequenceString << "." << std::endl;
-    log_file << "Generated sequence is: " << sequence << "." << std::endl;
-    log_file << "Desired sequence is: " << desired_sequence << "." << std::endl;
+    std::cout << "Wrong sequence generated for " << sequenceString << "." << std::endl;
+    std::cout << "Generated sequence is: " << sequence << "." << std::endl;
+    std::cout << "Desired sequence is: " << desired_sequence << "." << std::endl;
     ++errors;
   }
   else
   {
-    log_file << "Generated sequence is ok! *thumbs up*" << std::endl;
+    std::cout << "Generated sequence is ok! *thumbs up*" << std::endl;
   }
 }
 
 
 int main(int /* argc */, char** /* argv */)
 {
-  using cedar::aux::LogFile;
   using cedar::proc::Trigger;
   using cedar::proc::TriggerPtr;
 
   unsigned int errors = 0;
 
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
   testSequence("112319", errors, false);
 
   testSequence("112319", errors, true);
 
-  log_file << "Done. There were " << errors << " errors." << std::endl;
+  std::cout << "Done. There were " << errors << " errors." << std::endl;
 
   return errors;
 }

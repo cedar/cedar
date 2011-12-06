@@ -65,12 +65,12 @@ LogFile::~LogFile()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void LogFile::addSeparatorLine(void)
+void LogFile::addSeparatorLine()
 {
   *this << std::string(120, '-') << "\n";
 }
 
-void LogFile::addTimeStamp(void)
+void LogFile::addTimeStamp()
 {
   ptime time_stamp = second_clock::local_time();
 

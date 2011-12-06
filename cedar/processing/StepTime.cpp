@@ -39,10 +39,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "StepTime.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

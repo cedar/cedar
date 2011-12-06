@@ -41,12 +41,10 @@
 #ifndef CEDAR_AUX_VECTOR_PARAMETER_H
 #define CEDAR_AUX_VECTOR_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>

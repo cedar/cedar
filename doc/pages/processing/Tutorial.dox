@@ -158,8 +158,6 @@ Now it is time to connect things up:
 @endcode
 And that's it, if you compile and run this program your step should now be computed.
 
-@todo compute wouldn't actually be called here, even though it should.
-
 By the way, if you dislike writing this main method, you can use plugins and architecture files instead (see the next
 two sections, @ref ProcessingTutorialDeclarations and @ref ProcessingTutorialFirstStepArchitectureFile) or just use the
 processingIde to do it all in a user interface (see @ref ProcessingTutorialUsingTheProcessingIde).
@@ -365,14 +363,45 @@ The declaration code should look familiar from @ref ProcessingTutorialFirstStepA
 the plugin is ready for use!
 
 
+
 @section ProcessingTutorialUsingTheProcessingIde Beginner's Tutorial: Using the processingIde
 
 In the folder @em cedar/bin, you can find an application called @em processingIde. If you run it, you can generate the
-configuration files described in @ref ProcessingTutorialFirstStepArchitectureFile using a visual representation.
+configuration files described in @ref ProcessingTutorialFirstStepArchitectureFile using a visual representation. After
+starting the program, yous should see something like this:
 
-@todo Screenshots and explanations.
+@todo Screenshot of the empty applcation
+
+@subsection ProcessingTutorialUsingTheProcessingIdePartsOfTheUi Different Parts of the User Interface 
+
+The main user interface of the processingIde consists of a few important elements.
+
+@todo Screenshot highlighting the various UI elements  
+
+
+@subsection ProcessingTutorialUsingTheProcessingIdeSummationStep Integrating the Summation Step 
+
+Now it is time to include the summation plugin we created in @ref ProcessingTutorialPlugin. First, click on "Plugins" in
+the main menu, then click on "Load plugin ...". In the dialog that opens up, click "browse", navigate to the library of
+our plugin and "open" it. The box in the middle of the plugin dialog should now display the names of all the steps that
+the plugin declares. In our case, this should be "yourNamespace.SimpleSummation". Once you click "ok", the plugins are
+loaded into the framework. Now, in the "Elements" tab, you should be able to find our plugin in the category
+"Utilities". If you want to create the architecture from previous sections, simply drag our summation step and two Gauss
+inputs into the white drawing field. Then connect the Gauss inputs to the summation step by dragging a line from the
+data slot (little circle) of the Gauss inputs to the input of the summation steps (also little cricles).  
+
+
 
 @section ProcessingTutorialFirstStepDynamics Beginner's Tutorial: Dynamics
+
+Steps that run in a loop have a special place in the processing framework. Instead of being triggered by normal
+cedar::proc::Triggers, e.g., when a new image is loaded, looped steps are triggered by cedar::proc::LoopedTriggers. This
+means that the compute function of such a step receives cedar::proc::StepTime as argument.
+
+Because one of the main purposes of cedar is to simulate dynamical system, there is a special class
+cedar::dyn::Dynamics. Whenever simulating a dynamical system, it is recommended that you inherit this class. Instead of
+implementing the compute function as for other cedar::proc::Steps, classes derived from cedar::dyn::Dynamics must
+implement the cedar::dyn::Dynamics::eulerStep method.   
 
 
 @section ProcessingTutorialDataValidation Intermediate Tutorial: Data Validation

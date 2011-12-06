@@ -39,7 +39,6 @@
 #include "cedar/auxiliaries/Object.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -49,9 +48,6 @@ using namespace cedar::aux;
 
 int main()
 {
-  LogFile log_file("Object.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
   
@@ -61,7 +57,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // position
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: position" << std::endl;
+  std::cout << "test: position" << std::endl;
   object.setPosition(1337, 0, cedar::aux::math::pi);
   if (
       object.getPositionX() != 1337.0
@@ -70,7 +66,7 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with setPosition(double, double, double) or getPositionX/Y/Z()" << std::endl;
+    std::cout << "ERROR with setPosition(double, double, double) or getPositionX/Y/Z()" << std::endl;
   }
 
   cv::Mat p1 = cv::Mat::ones(4, 1, CV_64FC1);
@@ -87,13 +83,13 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with setPosition(Mat) or getPosition()" << std::endl;
+    std::cout << "ERROR with setPosition(Mat) or getPosition()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // orientation
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: orientation" << std::endl;
+  std::cout << "test: orientation" << std::endl;
   cv::Mat q1 = cv::Mat::zeros(4, 1, CV_64FC1);
   q1.at<double>(1, 0) = 3.3;
   q1.at<double>(2, 0) = 4.4;
@@ -108,13 +104,13 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with setOrientationQuaternion(Mat) or getOrientationQuaternion()" << std::endl;
+    std::cout << "ERROR with setOrientationQuaternion(Mat) or getOrientationQuaternion()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // transformation
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: transformation" << std::endl;
+  std::cout << "test: transformation" << std::endl;
   object.setPosition(1, 10, 100);
   cv::Mat q3 = cv::Mat::zeros(4, 1, CV_64FC1);
   q3.at<double>(0, 0) = -0.923879532511287;
@@ -142,13 +138,13 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with getTransformation()" << std::endl;
+    std::cout << "ERROR with getTransformation()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // rotate
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: rotate" << std::endl;
+  std::cout << "test: rotate" << std::endl;
   object.setPosition(0, 0, 0);
   cv::Mat q4 = cv::Mat::zeros(4, 1, CV_64FC1);
   q4.at<double>(0, 0) = 1.0;
@@ -180,13 +176,13 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with rotate()" << std::endl;
+    std::cout << "ERROR with rotate()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // configuration file constructor
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: configuration file constructor" << std::endl;
+  std::cout << "test: configuration file constructor" << std::endl;
   cedar::aux::Object configured_object("test.conf");
   cv::Mat C = configured_object.getTransformation();
   if (
@@ -209,10 +205,10 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with configured_object(const std::string& configFileName)" << std::endl;
+    std::cout << "ERROR with configured_object(const std::string& configFileName)" << std::endl;
   }
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

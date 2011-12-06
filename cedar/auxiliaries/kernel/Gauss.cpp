@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/DataTemplate.h"
@@ -43,8 +43,6 @@
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>

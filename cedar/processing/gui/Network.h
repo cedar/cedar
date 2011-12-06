@@ -41,12 +41,10 @@
 #ifndef CEDAR_PROC_GUI_NETWORK_H
 #define CEDAR_PROC_GUI_NETWORK_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Network.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

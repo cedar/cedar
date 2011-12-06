@@ -43,7 +43,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/cedarUnits.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -62,77 +61,72 @@ void testStreamOutput(cedar::unit::Time time)
 
 int main(int /* argc */, char** /* argv */)
 {
-  using namespace cedar::aux;
   unsigned int errors = 0;
-
-  LogFile log_file("Time.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
 
   cedar::unit::Milliseconds ms(50);
 
   // ---- Conversion tests ---------------------------------------------------------------------------------------------
-  log_file << "Conversion from milliseconds to microseconds ";
+  std::cout << "Conversion from milliseconds to microseconds ";
 
   cedar::unit::Microseconds us = ms;
   if (ms.getRawTime() != us.getRawTime())
   {
-    log_file << "failed";
+    std::cout << "failed";
     ++errors;
   }
   else
   {
-    log_file << "succeeded";
+    std::cout << "succeeded";
   }
-  log_file << ": ms ~ " << ms.getRawTime() << ", us ~ " << us.getRawTime() << std::endl;
+  std::cout << ": ms ~ " << ms.getRawTime() << ", us ~ " << us.getRawTime() << std::endl;
 
 
   // ---- String tests -------------------------------------------------------------------------------------------------
-  log_file << "Testing stream operator & function argument passing ... ";
+  std::cout << "Testing stream operator & function argument passing ... ";
   testStreamOutput(cedar::unit::Microseconds(12345));
-  log_file << "succeeded." << std::endl;
+  std::cout << "succeeded." << std::endl;
 
   // ---- operator tests -----------------------------------------------------------------------------------------------
-  log_file << "Testing operators ... " << std::endl;
+  std::cout << "Testing operators ... " << std::endl;
   cedar::unit::Milliseconds ms_once(50);
   cedar::unit::Milliseconds ms_twice = 2.0 * ms_once;
 
-  log_file << "Multiplication operator ... ";
+  std::cout << "Multiplication operator ... ";
   if (2.0 * ms_once.getRawTime() != ms_twice.getRawTime())
   {
-    log_file << "failed: twice " << ms_once.getRawTime() << " is " << ms_twice.getRawTime() << std::endl;
+    std::cout << "failed: twice " << ms_once.getRawTime() << " is " << ms_twice.getRawTime() << std::endl;
     ++errors;
   }
   else
   {
-    log_file << "succeeded." << std::endl;
+    std::cout << "succeeded." << std::endl;
   }
 
-  log_file << "Division operator time/time with milliseconds... ";
+  std::cout << "Division operator time/time with milliseconds... ";
   double division = ms_once/ms_twice;
   if (fabs(division - 0.5) > 0.00001)
   {
-    log_file << "failed: operator / returns " << division << " instead of 0.5" << std::endl;
+    std::cout << "failed: operator / returns " << division << " instead of 0.5" << std::endl;
     ++errors;
   }
   else
   {
-    log_file << "succeeded." << std::endl;
+    std::cout << "succeeded." << std::endl;
   }
 
-  log_file << "Division operator time/time with seconds/milliseconds... ";
+  std::cout << "Division operator time/time with seconds/milliseconds... ";
   division = cedar::unit::Seconds(0.05)/ms_twice;
   if (fabs(division - 0.5) > 0.00001)
   {
-    log_file << "failed: operator / returns " << division << " instead of 0.5" << std::endl;
+    std::cout << "failed: operator / returns " << division << " instead of 0.5" << std::endl;
     ++errors;
   }
   else
   {
-    log_file << "succeeded." << std::endl;
+    std::cout << "succeeded." << std::endl;
   }
 
 
-  log_file << "Done. There were " << errors << " errors." << std::endl;
+  std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
 }

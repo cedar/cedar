@@ -39,10 +39,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Data.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

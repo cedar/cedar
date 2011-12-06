@@ -39,25 +39,21 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/kernel/Gauss.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
 using namespace cedar::aux;
 
-int main()
+int main(int, char**)
 {
-  LogFile log_file("UnitTestKernels.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
   // the current test number
   int test_number = 0;
 
   // test stuff
-  log_file << "test no" << test_number++ << std::endl;
+  std::cout << "test no" << test_number++ << std::endl;
   std::vector<double> sigmas;
   std::vector<double> shifts;
   for (unsigned int dim = 1; dim <= 7; dim++)
@@ -67,7 +63,7 @@ int main()
     cedar::aux::kernel::GaussPtr gaussian(new cedar::aux::kernel::Gauss(1.0, sigmas, shifts, 3, dim));
   }
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

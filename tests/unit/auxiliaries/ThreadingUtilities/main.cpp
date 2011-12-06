@@ -39,19 +39,14 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/threadingUtilities.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <vector>
 #include <string>
+#include <iostream>
 
 int main()
 {
-  using cedar::aux::LogFile;
-  LogFile log_file("ThreadingUtilities.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
   // the number of errors encountered in this test
   int errors = 0;
 
@@ -74,7 +69,7 @@ int main()
     if (iter->first->tryLockForWrite())
     {
       // if the attempt to lock succeeds, something must have gone wrong.
-      log_file << "Error: Lock " << iter->first << " could be locked even though it should not be possible."
+      std::cout << "Error: Lock " << iter->first << " could be locked even though it should not be possible."
           << std::endl;
       iter->first->unlock();
       ++errors;
@@ -88,7 +83,7 @@ int main()
     if (!iter->first->tryLockForWrite())
     {
       // if the attempt to lock succeeds, something must have gone wrong.
-      log_file << "Error: Lock " << iter->first << " could not be locked even though it should be possible."
+      std::cout << "Error: Lock " << iter->first << " could not be locked even though it should be possible."
           << std::endl;
       ++errors;
     }
@@ -98,7 +93,7 @@ int main()
     }
   }
 
-  log_file << "Done. There were " << errors << " errors." << std::endl;
+  std::cout << "Done. There were " << errors << " errors." << std::endl;
 
   // cleanup
   for (cedar::aux::LockSet::iterator iter = locks.begin(); iter != locks.end(); ++iter)

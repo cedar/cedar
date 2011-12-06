@@ -39,13 +39,14 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/MultiTrigger.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <algorithm>
+
+// MACROS
+//#define DEBUG_TRIGGERING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -59,8 +60,6 @@ cedar::proc::MultiTrigger::~MultiTrigger()
 {
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,7 +69,9 @@ void cedar::proc::MultiTrigger::onTrigger(cedar::proc::TriggerPtr pSender)
 
   if (iter != this->mIncoming.end())
   {
+#ifdef DEBUG_TRIGGERING
     std::cout << "Multitrigger::onTrigger(" << pSender.get() << ")" << std::endl;
+#endif
     iter->second = true;
     this->checkCondition();
   }
@@ -84,12 +85,14 @@ void cedar::proc::MultiTrigger::checkCondition()
     // if one is false, return and do nothing
     if (!iter->second)
     {
+#ifdef DEBUG_TRIGGERING
       std::cout << "Multitrigger::checkCondition(): false: " << iter->first.get() << std::endl;
+#endif
       return;
     }
   }
 
-  // if we got here, all triggers have triggere
+  // if we got here, all triggers have triggered
   this->trigger();
 
   // reset all triggers

@@ -41,13 +41,11 @@
 #ifndef CEDAR_PROC_MANAGER_H
 #define CEDAR_PROC_MANAGER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/FrameworkSettings.h"
 #include "cedar/processing/Step.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
@@ -115,8 +113,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -128,17 +124,6 @@ private:
 
   //!@brief the framework settings
   cedar::proc::FrameworkSettings mSettings;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::Manager
 

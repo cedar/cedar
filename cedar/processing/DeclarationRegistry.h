@@ -41,12 +41,10 @@
 #ifndef CEDAR_PROC_DECLARATION_REGISTRY_H
 #define CEDAR_PROC_DECLARATION_REGISTRY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/shared_ptr.hpp>
@@ -54,7 +52,6 @@
 #include <set>
 #include <map>
 #include <vector>
-
 
 /*!@brief This class associates names with pointers to certain objects.
  */
@@ -133,8 +130,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:

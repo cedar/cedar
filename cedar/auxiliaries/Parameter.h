@@ -159,16 +159,6 @@ private:
 
   //! Reference counter for boost intrusive pointer.
   unsigned int mReferenceCount;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Parameter
 
 #endif // CEDAR_PROC_PARAMETER_H

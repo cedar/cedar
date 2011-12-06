@@ -37,13 +37,11 @@
 #ifndef CEDAR_PROC_FRAMEWORK_SETTINGS_H
 #define CEDAR_PROC_FRAMEWORK_SETTINGS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/SetParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <set>
@@ -87,11 +85,11 @@ public:
 
   /*!@brief Returns the set of plugins known by the processing framework.
    */
-  const std::set<std::string>& getKnownPlugins();
+  const std::set<std::string>& getKnownPlugins() const;
 
   /*!@brief Returns the set of plugin directories known by the processing framework.
    */
-  const std::set<std::string>& getPluginDirectories();
+  const std::set<std::string>& getPluginDirectories() const;
 
   /*!@brief Returns the plugin workspace directory.
    *

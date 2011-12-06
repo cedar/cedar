@@ -34,12 +34,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -122,4 +120,9 @@ cedar::proc::Connectable* cedar::proc::DataSlot::getParentPtr()
 {
   // lock does always work since parent exists as long as slot exists
   return mpParent;
+}
+
+bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) const
+{
+  return (parent.get() == mpParent);
 }

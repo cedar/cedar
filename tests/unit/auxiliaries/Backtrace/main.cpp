@@ -39,7 +39,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/utilities.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -47,16 +46,14 @@
 
 namespace test
 {
-  int subFunction(cedar::aux::LogFile& file)
+  int subFunction()
   {
     cedar::aux::StackTrace backtrace;
 
-    file << backtrace << std::endl;
     std::cout << backtrace << std::endl;
 
     if (backtrace.size() == 0)
     {
-      file << "Error: backtrace is empty." << std::endl;
       std::cout << "Error: backtrace is empty." << std::endl;
       return 1;
     }
@@ -67,26 +64,20 @@ namespace test
 
 int main()
 {
-  using cedar::aux::LogFile;
-  LogFile log_file("BacktraceTest.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
 
   cedar::aux::StackTrace backtrace;
 
-  log_file << backtrace << std::endl;
   std::cout << backtrace << std::endl;
 
   if (backtrace.size() == 0)
   {
     ++errors;
-    log_file << "Error: backtrace is empty." << std::endl;
     std::cout << "Error: backtrace is empty." << std::endl;
   }
 
-  errors += test::subFunction(log_file);
+  errors += test::subFunction();
 
   return errors;
 }

@@ -38,11 +38,9 @@
 #ifndef CEDAR_AUX_LOOPED_THREAD_H
 #define CEDAR_AUX_LOOPED_THREAD_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "ConfigurationInterface.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <string>

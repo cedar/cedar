@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/processing/namespace.h"
@@ -77,146 +76,150 @@ int main(int, char**)
 
   unsigned int errors = 0;
 
-  LogFile log_file("ArchitectureIO.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
-  log_file << "Creating step declaration ... ";
+  std::cout << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr test_module_decl
   (
     new cedar::proc::ElementDeclarationTemplate<TestModule>("Test")
   );
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Adding declaration to the registry ... ";
+  std::cout << "Adding declaration to the registry ... ";
 //  cedar::proc::Manager::getInstance().steps().declareClass(test_module_decl);
   cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Creating network ... " << std::endl;
+  std::cout << "Creating network ... " << std::endl;
   cedar::proc::NetworkPtr network (new cedar::proc::Network());
 
-  log_file << "Creating step1 ... ";
+  std::cout << "Creating step1 ... ";
   TestModulePtr step1 (new TestModule("step1"));
   network->add(step1);
   step1->_mParam->setValue(1);
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Creating step2 ... ";
+  std::cout << "Creating step2 ... ";
   TestModulePtr step2 (new TestModule("step2"));
   network->add(step2);
   step2->_mParam->setValue(2);
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Connecting step1 to step2 ... ";
+  std::cout << "Connecting step1 to step2 ... ";
   network->connectSlots("step1.output", "step2.input");
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Creating trigger ... ";
+  std::cout << "Creating trigger ... ";
   cedar::proc::TriggerPtr trigger(new cedar::proc::Trigger("trigger"));
   network->add(trigger);
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Connecting trigger to step1 ... ";
+  std::cout << "Connecting trigger to step1 ... ";
   network->connectTrigger(trigger, step1);
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Network creation completed." << std::endl;
+  std::cout << "Network creation completed." << std::endl;
 
-  log_file << "Triggering ... ";
+  std::cout << "Triggering ... ";
   trigger->trigger();
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
   if (step1->mData->getData() == 0.0)
   {
-    log_file << "step1 was not triggered properly: Expected value different from 0.0, got " << step1->mData->getData()
+    std::cout << "step1 was not triggered properly: Expected value different from 0.0, got " << step1->mData->getData()
         << std::endl;
     ++errors;
   }
 
   if (step2->mData->getData() == 0.0)
   {
-    log_file << "step2 was not triggered properly: Expected value different from 0.0, got " << step2->mData->getData()
+    std::cout << "step2 was not triggered properly: Expected value different from 0.0, got " << step2->mData->getData()
         << std::endl;
     ++errors;
   }
 
-  log_file << "Saving network ... ";
-  network->writeFile("architecture1.json");
-  log_file << "done." << std::endl;
+  std::cout << "Creating a second trigger ... ";
+  cedar::proc::TriggerPtr trigger_2(new cedar::proc::Trigger("trigger2"));
+  network->add(trigger_2);
 
-  log_file << "Resetting ... ";
+  std::cout << "Connecting trigger to trigger2 ... ";
+  network->connectTrigger(trigger, trigger_2);
+  std::cout << "done." << std::endl;
+
+  std::cout << "Saving network ... ";
+  network->writeFile("architecture1.json");
+  std::cout << "done." << std::endl;
+
+  std::cout << "Resetting ... ";
   network.reset();
   step1.reset();
   step2.reset();
   trigger.reset();
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Loading network ... ";
+  std::cout << "Loading network ... ";
   network = cedar::proc::NetworkPtr(new cedar::proc::Network());
   network->readFile("architecture1.json");
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
   try
   {
-    log_file << "Looking for step1 ... ";
+    std::cout << "Looking for step1 ... ";
     step1 = network->getElement<TestModule>("step1");
     CEDAR_ASSERT(step1);
-    log_file << "found." << std::endl;
+    std::cout << "found." << std::endl;
 
-    log_file << "Checking parameter ... ";
+    std::cout << "Checking parameter ... ";
     unsigned int value = step1->_mParam->getValue();
     if (value != 1)
     {
-      log_file << "wrong value: expected 1, got " << value << std::endl;
+      std::cout << "wrong value: expected 1, got " << value << std::endl;
       ++errors;
     }
     else
     {
-      log_file << "done." << std::endl;
+      std::cout << "done." << std::endl;
     }
   }
   catch (const cedar::proc::InvalidNameException&)
   {
-    log_file << "NOT FOUND." << std::endl;
+    std::cout << "NOT FOUND." << std::endl;
     ++errors;
   }
 
   try
   {
-    log_file << "Looking for step2 ... ";
+    std::cout << "Looking for step2 ... ";
     step2 = network->getElement<TestModule>("step2");
     CEDAR_ASSERT(step2);
-    log_file << "found." << std::endl;
+    std::cout << "found." << std::endl;
 
-    log_file << "Checking parameter ... ";
+    std::cout << "Checking parameter ... ";
     unsigned int value = step2->_mParam->getValue();
     if (value != 2)
     {
-      log_file << "wrong value: expected 2, got " << value << std::endl;
+      std::cout << "wrong value: expected 2, got " << value << std::endl;
       ++errors;
     }
     else
     {
-      log_file << "done." << std::endl;
+      std::cout << "done." << std::endl;
     }
   }
   catch (const cedar::proc::InvalidNameException&)
   {
-    log_file << "NOT FOUND." << std::endl;
+    std::cout << "NOT FOUND." << std::endl;
     ++errors;
   }
 
   try
   {
-    log_file << "Looking for trigger ... ";
+    std::cout << "Looking for trigger ... ";
     trigger = network->getElement<cedar::proc::Trigger>("trigger");
     CEDAR_ASSERT(trigger);
-    log_file << "found." << std::endl;
+    std::cout << "found." << std::endl;
   }
   catch (const cedar::proc::InvalidNameException&)
   {
-    log_file << "NOT FOUND." << std::endl;
+    std::cout << "NOT FOUND." << std::endl;
     ++errors;
   }
 
@@ -224,24 +227,24 @@ int main(int, char**)
 
   if (step1->mData->getData() == 0.0)
   {
-    log_file << "Loaded step1 was not triggered properly: Expected value different from 0.0, got "
+    std::cout << "Loaded step1 was not triggered properly: Expected value different from 0.0, got "
         << step1->mData->getData() << std::endl;
     ++errors;
   }
 
   if (step2->mData->getData() == 0.0)
   {
-    log_file << "Loaded step1 was not triggered properly: Expected value different from 0.0, got "
+    std::cout << "Loaded step1 was not triggered properly: Expected value different from 0.0, got "
         << step2->mData->getData() << std::endl;
     ++errors;
   }
 
   if (step1->mData->getData() == 0.0 || step2->mData->getData() == 0.0)
   {
-    log_file << "Listeners of trigger are:" << std::endl;
+    std::cout << "Listeners of trigger are:" << std::endl;
     for (size_t i = 0; i < trigger->getListeners().size(); ++i)
     {
-      log_file << " -- " << boost::shared_dynamic_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
+      std::cout << " -- " << boost::shared_dynamic_cast<cedar::proc::Element>(trigger->getListeners().at(i))->getName() << std::endl;
     }
   }
 
