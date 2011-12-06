@@ -34,11 +34,9 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumBase.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

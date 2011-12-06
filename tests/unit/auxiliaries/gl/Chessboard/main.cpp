@@ -46,11 +46,8 @@ using namespace cedar::aux;
 using namespace cedar::aux::gl;
 using namespace std;
 
-int main()
+int main(int, char**)
 {
-  LogFile log_file("UnitTestChessboard.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
 
@@ -62,62 +59,62 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // length
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: length" << std::endl;
+  std::cout << "test: length" << std::endl;
   chessboard.setLength(10.1);
   if (chessboard.length() != 10.1)
   {
     errors++;
-    log_file << "ERROR with setLength() or length()" << std::endl;
+    std::cout << "ERROR with setLength() or length()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // width
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: width" << std::endl;
+  std::cout << "test: width" << std::endl;
   chessboard.setWidth(11.1);
   if (chessboard.width() != 11.1)
   {
     errors++;
-    log_file << "ERROR with setWidth() or width()" << std::endl;
+    std::cout << "ERROR with setWidth() or width()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // height
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: height" << std::endl;
+  std::cout << "test: height" << std::endl;
   chessboard.setHeight(111);
   if (chessboard.height() != 111.0)
   {
     errors++;
-    log_file << "ERROR with setHeight() or height()" << std::endl;
+    std::cout << "ERROR with setHeight() or height()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // rows
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: rows" << std::endl;
+  std::cout << "test: rows" << std::endl;
   chessboard.setNumberOfRows(32);
   if (chessboard.numberOfRows() != 32)
   {
     errors++;
-    log_file << "ERROR with setNumberOfRows() or numberOfRows()" << std::endl;
+    std::cout << "ERROR with setNumberOfRows() or numberOfRows()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // columns
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: columns" << std::endl;
+  std::cout << "test: columns" << std::endl;
   chessboard.setNumberOfColumns(32);
   if (chessboard.numberOfColumns() != 32)
   {
     errors++;
-    log_file << "ERROR with setNumberOfColumns() or numberOfColumns()" << std::endl;
+    std::cout << "ERROR with setNumberOfColumns() or numberOfColumns()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // second color
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: second color" << std::endl;
+  std::cout << "test: second color" << std::endl;
   chessboard.setSecondColor(0.3, 1, sqrt(2.0)/2);
   if (
       chessboard.secondColorR() != 0.3
@@ -126,10 +123,10 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with setSecondColor or secondColorR/G/B" << std::endl;
+    std::cout << "ERROR with setSecondColor or secondColorR/G/B" << std::endl;
   }
   
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

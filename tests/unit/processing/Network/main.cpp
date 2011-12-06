@@ -42,7 +42,6 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Step.h"
@@ -86,35 +85,31 @@ int main(int /* argc */, char** /* argv */)
 
   unsigned int errors = 0;
 
-  LogFile log_file("Network.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
-  log_file << "Creating step declaration ... ";
+  std::cout << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr test_module_decl
   (
     new cedar::proc::ElementDeclarationTemplate<TestModule>("Test")
   );
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Adding declaration to the registry ... ";
+  std::cout << "Adding declaration to the registry ... ";
   cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Reading Sample.json ... ";
+  std::cout << "Reading Sample.json ... ";
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   network->readFile("Sample.json");
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Trying to call compute functions ... ";
+  std::cout << "Trying to call compute functions ... ";
   StepPtr step_a = network->getElement<Step>("stepA");
   step_a->onTrigger();
 
   StepPtr step_b = network->getElement<Step>("stepB");
   step_b->onTrigger();
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
   // return
-  log_file << "Done. There were " << errors << " errors." << std::endl;
+  std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
 }

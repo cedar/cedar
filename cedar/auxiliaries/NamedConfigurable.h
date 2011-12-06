@@ -37,12 +37,10 @@
 #ifndef CEDAR_AUX_NAMED_CONFIGURABLE_H
 #define CEDAR_AUX_NAMED_CONFIGURABLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/Configurable.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -93,8 +91,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief the name of this parameter
   StringParameterPtr _mName;

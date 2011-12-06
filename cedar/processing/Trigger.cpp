@@ -39,13 +39,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Element.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <algorithm>
@@ -74,10 +72,7 @@ cedar::proc::Trigger::~Trigger()
   std::cout << "> freeing data (Trigger)" << std::endl;
 #endif
   this->mListeners.clear();
-  this->mTriggers.clear();
 }
-
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -98,13 +93,13 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
         std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
         cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_TRIGGERING
-        this->mListeners.at(i)->onTrigger();
+        this->mListeners.at(i)->onTrigger(this->shared_from_this());
       }
     }
-  }
-  for (size_t i = 0; i < this->mTriggers.size(); ++i)
-  {
-    this->mTriggers.at(i)->onTrigger(this->shared_from_this());
+    else
+    {
+      this->mListeners.at(i)->onTrigger(this->shared_from_this());
+    }
   }
 }
 
@@ -119,28 +114,16 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
   if (iter == this->mListeners.end())
   {
     this->mListeners.push_back(step);
+    if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
+    {
+      trigger->notifyConnected(this->shared_from_this());
+    }
   }
 }
 
-bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr step)
+bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr step) const
 {
   return this->find(step) != this->mListeners.end();
-}
-
-bool cedar::proc::Trigger::isListener(cedar::proc::TriggerPtr trigger)
-{
-  return this->find(trigger) != this->mTriggers.end();
-}
-
-void cedar::proc::Trigger::addTrigger(cedar::proc::TriggerPtr trigger)
-{
-  std::vector<cedar::proc::TriggerPtr>::iterator iter;
-  iter = this->find(trigger);
-  if (iter == this->mTriggers.end())
-  {
-    this->mTriggers.push_back(trigger);
-    trigger->notifyConnected(this->shared_from_this());
-  }
 }
 
 void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
@@ -149,18 +132,11 @@ void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
   iter = this->find(step);
   if (iter != this->mListeners.end())
   {
+    if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
+    {
+      trigger->notifyDisconnected(this->shared_from_this());
+    }
     this->mListeners.erase(iter);
-  }
-}
-
-void cedar::proc::Trigger::removeTrigger(cedar::proc::TriggerPtr trigger)
-{
-  std::vector<cedar::proc::TriggerPtr>::iterator iter;
-  iter = this->find(trigger);
-  if (iter != this->mTriggers.end())
-  {
-    this->mTriggers.erase(iter);
-    trigger->notifyDisconnected(this->shared_from_this());
   }
 }
 
@@ -177,19 +153,15 @@ std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(ce
   return std::find(this->mListeners.begin(), this->mListeners.end(), step);
 }
 
-std::vector<cedar::proc::TriggerPtr>::iterator cedar::proc::Trigger::find(cedar::proc::TriggerPtr step)
+std::vector<cedar::proc::TriggerablePtr>::const_iterator
+  cedar::proc::Trigger::find(cedar::proc::TriggerablePtr step) const
 {
-  return std::find(this->mTriggers.begin(), this->mTriggers.end(), step);
+  return std::find(this->mListeners.begin(), this->mListeners.end(), step);
 }
 
 const std::vector<cedar::proc::TriggerablePtr>& cedar::proc::Trigger::getListeners() const
 {
   return this->mListeners;
-}
-
-const std::vector<cedar::proc::TriggerPtr>& cedar::proc::Trigger::getTriggerListeners() const
-{
-  return this->mTriggers;
 }
 
 void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& node)
@@ -205,15 +177,5 @@ void cedar::proc::Trigger::writeConfiguration(cedar::aux::ConfigurationNode& nod
   }
   if (!listeners.empty())
     node.add_child("listeners", listeners);
-
-  cedar::aux::ConfigurationNode trigger_listeners;
-  for (size_t i = 0; i < this->mTriggers.size(); ++i)
-  {
-    cedar::proc::TriggerPtr& trigger = this->mTriggers.at(i);
-    cedar::aux::ConfigurationNode trigger_listener(trigger->getName());
-    trigger_listeners.push_back(cedar::aux::ConfigurationNode::value_type("", trigger_listener));
-  }
-  if (!trigger_listeners.empty())
-    node.add_child("triggerListeners", trigger_listeners);
 }
 

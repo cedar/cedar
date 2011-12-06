@@ -34,14 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/FrameworkSettings.h"
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/System.h"
 #include "cedar/processing/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -141,12 +139,12 @@ void cedar::proc::FrameworkSettings::addKnownPlugin(const std::string& file)
   this->mKnownPlugins->insert(modified_path);
 }
 
-const std::set<std::string>& cedar::proc::FrameworkSettings::getKnownPlugins()
+const std::set<std::string>& cedar::proc::FrameworkSettings::getKnownPlugins() const
 {
   return this->mKnownPlugins->get();
 }
 
-const std::set<std::string>& cedar::proc::FrameworkSettings::getPluginDirectories()
+const std::set<std::string>& cedar::proc::FrameworkSettings::getPluginDirectories() const
 {
   return this->mPluginIncludeDirectories->get();
 }

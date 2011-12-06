@@ -37,10 +37,8 @@
 #ifndef CEDAR_PROC_TRIGGER_CONNECTION_H
 #define CEDAR_PROC_TRIGGER_CONNECTION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -70,7 +68,7 @@ public:
 public:
   //!@brief test if the given source and target are the same for this connection (i.e. are source and target connected
   // via this TriggerConnection)
-  bool equals(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+  bool equals(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const;
 
   //!@brief get the source of this connection
   cedar::proc::ConstTriggerPtr getSourceTrigger() const;

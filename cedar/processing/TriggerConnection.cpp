@@ -71,7 +71,7 @@ cedar::proc::TriggerConnection::~TriggerConnection()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::proc::TriggerConnection::equals(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
+bool cedar::proc::TriggerConnection::equals(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const
 {
   CEDAR_ASSERT(source);
   CEDAR_ASSERT(target);

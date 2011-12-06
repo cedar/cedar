@@ -41,14 +41,11 @@
 #ifndef CEDAR_PROC_DATA_ROLE_H
 #define CEDAR_PROC_DATA_ROLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/processing/namespace.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief This is an enum class for the roles data can have in a cedar::proc::Step.
  *
@@ -112,7 +109,6 @@ public:
 private:
   //! The base enum object.
   static cedar::aux::EnumType<cedar::proc::DataRole> mType;
-
 }; // class cedar::proc::DataRole
 
 #endif // CEDAR_PROC_DATA_ROLE_H

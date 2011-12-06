@@ -41,15 +41,12 @@
 #ifndef CEDAR_PROC_STEP_TIME_H
 #define CEDAR_PROC_STEP_TIME_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/units/Time.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief Derived from Arguments, StepTime contains the time that has passed since the last call of a Step.
  *
@@ -99,18 +96,6 @@ protected:
 private:
   //!@brief last step duration
   cedar::unit::Time mStepTime;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::StepTime
 
 #endif // CEDAR_PROC_STEP_TIME_H

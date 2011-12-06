@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/Manager.h"
@@ -48,8 +48,6 @@
 #include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES

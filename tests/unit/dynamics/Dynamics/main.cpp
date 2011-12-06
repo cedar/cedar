@@ -42,7 +42,6 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/processing/Arguments.h"
 #include "Neuron.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -62,32 +61,28 @@ using namespace cedar::aux;
 
 typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
 
-int main(int /* argc */, char** /* argv */)
+int main(int, char**)
 {
   using cedar::proc::LoopedTrigger;
   using cedar::proc::Manager;
 
   unsigned int errors = 0;
 
-  LogFile log_file("Dynamics.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
-  log_file << "Creating step declaration ... ";
+  std::cout << "Creating step declaration ... ";
   cedar::proc::ElementDeclarationPtr neuron_declaration
   (
     new cedar::proc::ElementDeclarationTemplate<cedar::Neuron>("Test")
   );
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Adding declaration to the registry ... ";
+  std::cout << "Adding declaration to the registry ... ";
   cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(neuron_declaration);
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
-  log_file << "Reading Setup1.json ... ";
+  std::cout << "Reading Setup1.json ... ";
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   network->readFile("Setup1.json");
-  log_file << "done." << std::endl;
+  std::cout << "done." << std::endl;
 
   // Create trigger for the "main loop"
   NeuronPtr neuron_1 = network->getElement<cedar::Neuron>("Neuron 1");
@@ -102,7 +97,7 @@ int main(int /* argc */, char** /* argv */)
   {
     if (i % 10 == 0)
     {
-      log_file << neuron_1->getActivity()
+      std::cout << neuron_1->getActivity()
                << " "
                << neuron_2->getActivity()
                << std::endl;
@@ -114,6 +109,6 @@ int main(int /* argc */, char** /* argv */)
   network->getElement<LoopedTrigger>("Main Trigger")->stop();
 
   // return
-  log_file << "Done. There were " << errors << " errors." << std::endl;
+  std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
 }

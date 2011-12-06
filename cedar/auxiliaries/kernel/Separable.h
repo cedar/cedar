@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_KERNEL_SEPARABLE_H
 #define CEDAR_AUX_KERNEL_SEPARABLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

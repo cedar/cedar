@@ -35,10 +35,8 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/MatrixIterator.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

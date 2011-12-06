@@ -24,7 +24,6 @@
 
     File:        Arguments.cpp
 
-
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
                  Stephan Zibner
@@ -39,10 +38,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "Arguments.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

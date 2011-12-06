@@ -37,14 +37,11 @@
 #ifndef CEDAR_PROC_DATA_SLOT_H
 #define CEDAR_PROC_DATA_SLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataRole.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief This class represents data slots in connectable objects.
  *
@@ -60,6 +57,7 @@ class cedar::proc::DataSlot
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
+  friend class cedar::proc::Network;
 
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -98,13 +96,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   //!@brief get the encapsulated DataPtr managed by this slot
   virtual cedar::aux::DataPtr getData() = 0;
 
   //!@brief get the encapsulated DataPtr managed by this slot as const
   virtual cedar::aux::ConstDataPtr getData() const = 0;
-
 
   //!@brief get the role (input, output...) of this slot
   cedar::proc::DataRole::Id getRole() const;
@@ -129,6 +125,9 @@ public:
 
   //!@brief set the current validity of this slot
   void setValidity(VALIDITY validity);
+
+  //!@brief checks if this Connectable is the parent of this DataSlotItem
+  bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -167,16 +166,6 @@ private:
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::DataSlot
 
 #endif // CEDAR_PROC_DATA_SLOT_H

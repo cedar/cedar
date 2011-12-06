@@ -41,10 +41,8 @@
 #ifndef CEDAR_PROC_DECLARATION_BASE_H
 #define CEDAR_PROC_DECLARATION_BASE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

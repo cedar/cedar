@@ -41,7 +41,6 @@
 #include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 
@@ -51,9 +50,6 @@ using namespace cv;
 
 int main()
 {
-  LogFile log_file("KinematicChainModel.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
   
@@ -83,17 +79,17 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // number of joints
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: getNumberOfJoints" << std::endl;
+  std::cout << "test: getNumberOfJoints" << std::endl;
   if (test_arm_model.getNumberOfJoints() != 4)
   {
     errors++;
-    log_file << "ERROR with getNumberOfJoints()" << std::endl;
+    std::cout << "ERROR with getNumberOfJoints()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // transformation
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: transformations" << std::endl;
+  std::cout << "test: transformations" << std::endl;
   cv::Mat joint_transformation_1 = test_arm_model.getJointTransformation(1);
   cv::Mat joint_transformation_3 = test_arm_model.getJointTransformation(3);
   if (
@@ -138,13 +134,13 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with calculateTransformations() or transformation()" << std::endl;
+    std::cout << "ERROR with calculateTransformations() or transformation()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // Jacobians
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: Jacobians" << std::endl;
+  std::cout << "test: Jacobians" << std::endl;
   cv::Mat origin = Mat::zeros( 4, 1, CV_64FC1 );
   origin.at<double>( 3, 0 ) = 1;
   cv::Mat jacobian_1 = Mat::zeros(3, 4, CV_64FC1);
@@ -183,10 +179,10 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateCartesianJacobian()" << std::endl;
+    std::cout << "ERROR with calculateCartesianJacobian()" << std::endl;
   }
   
-  log_file << "test: calculateSpatialJacobian" << std::endl;
+  std::cout << "test: calculateSpatialJacobian" << std::endl;
   cv::Mat spatial_jacobian = test_arm_model.calculateSpatialJacobian(test_arm_model.getNumberOfJoints()-1);
   if (
       !IsZero(spatial_jacobian.at<double>(0, 0) - 0)
@@ -219,14 +215,14 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with spatialJacobian()" << std::endl;
+    std::cout << "ERROR with spatialJacobian()" << std::endl;
   }
   
 
   //--------------------------------------------------------------------------------------------------------------------
   // velocity
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateVelocity" << std::endl;
+  std::cout << "test: calculateVelocity" << std::endl;
   cv::Mat p = cv::Mat::zeros(4, 1, CV_64FC1);
   p.at<double>(2, 0) = 1.0;
   p.at<double>(3, 0) = 1.0;
@@ -250,13 +246,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateVelocity()" << std::endl;
+    std::cout << "ERROR with calculateVelocity()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // temporal derivative of spatial Jacobian
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
+  std::cout << "test: calculateSpatialJacobianTemporalDerivative" << std::endl;
   cv::Mat spatial_jacobian_dot = acceleration_test_arm_model.calculateSpatialJacobianTemporalDerivative(acceleration_test_arm_model.getNumberOfJoints()-1);
   if (
       !IsZero(spatial_jacobian_dot.at<double>(0, 0) - 0)
@@ -274,7 +270,7 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateSpatialJacobianTemporalDerivative()" << std::endl;
+    std::cout << "ERROR with calculateSpatialJacobianTemporalDerivative()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -283,7 +279,7 @@ int main()
   p_acceleration_test_arm->setJointAcceleration(0, 2.1);
   p_acceleration_test_arm->setJointAcceleration(1, 2.2);
   acceleration_test_arm_model.update();
-  log_file << "test: calculateAcceleration" << std::endl;
+  std::cout << "test: calculateAcceleration" << std::endl;
   cv::Mat a0 = acceleration_test_arm_model.calculateAcceleration(p, 0, KinematicChainModel::LOCAL_COORDINATES);
   cv::Mat a1 = acceleration_test_arm_model.calculateAcceleration(p, 1, KinematicChainModel::LOCAL_COORDINATES);
   double s0 = sin(p_acceleration_test_arm->getJointAngle(0));
@@ -318,13 +314,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateAcceleration()" << std::endl;
+    std::cout << "ERROR with calculateAcceleration()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // temporal derivative of Cartesian Jacobian
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
+  std::cout << "test: calculateCartesianJacobianTemporalDerivative" << std::endl;
   cv::Mat t = acceleration_test_arm_model.calculateEndEffectorPosition();
   cv::Mat cartesian_jacobian_dot = acceleration_test_arm_model.calculateCartesianJacobianTemporalDerivative(t, acceleration_test_arm_model.getNumberOfJoints()-1, KinematicChainModel::WORLD_COORDINATES);
   if (
@@ -337,13 +333,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateCartesianJacobianTemporalDerivative()" << std::endl;
+    std::cout << "ERROR with calculateCartesianJacobianTemporalDerivative()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector position
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateEndEffectorPosition" << std::endl;
+  std::cout << "test: calculateEndEffectorPosition" << std::endl;
   cv::Mat end_effector_position = test_arm_model.calculateEndEffectorPosition();
   if (
       !IsZero(end_effector_position.at<double>(0, 0) - 0)
@@ -353,13 +349,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateEndEffectorPosition()" << std::endl;
+    std::cout << "ERROR with calculateEndEffectorPosition()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector transformation
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateEndEffectorTransformation" << std::endl;
+  std::cout << "test: calculateEndEffectorTransformation" << std::endl;
   cv::Mat end_effector_transformation = test_arm_model.calculateEndEffectorTransformation();
   if (
       !IsZero(end_effector_transformation.at<double>(0, 0) - 0)
@@ -381,13 +377,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateEndEffectorTransformation()" << std::endl;
+    std::cout << "ERROR with calculateEndEffectorTransformation()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector jacobian
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateEndEffectorJacobian" << std::endl;
+  std::cout << "test: calculateEndEffectorJacobian" << std::endl;
   cv::Mat end_effector_jacobian = test_arm_model.calculateEndEffectorJacobian();
   if (
       !IsZero(end_effector_jacobian.at<double>(0, 0) - 0)
@@ -405,13 +401,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateEndEffectorJacobian()" << std::endl;
+    std::cout << "ERROR with calculateEndEffectorJacobian()" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector velocity
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateEndEffectorVelocity" << std::endl;
+  std::cout << "test: calculateEndEffectorVelocity" << std::endl;
   cv::Mat v4 = test_arm_model.calculateEndEffectorVelocity();
   if (
       !IsZero(v4.at<double>(0, 0) - 0)
@@ -420,13 +416,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateEndEffectorVelocity()" << std::endl;
+    std::cout << "ERROR with calculateEndEffectorVelocity()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // end-effector acceleration
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: calculateEndEffectorAcceleration" << std::endl;
+  std::cout << "test: calculateEndEffectorAcceleration" << std::endl;
   cv::Mat a2 = acceleration_test_arm_model.calculateEndEffectorAcceleration();
   if (
       !IsZero(a2.at<double>(0, 0) - 0)
@@ -435,11 +431,11 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
+    std::cout << "ERROR with calculateEndEffectorAcceleration()" << std::endl;
   }
 
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

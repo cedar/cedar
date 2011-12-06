@@ -36,17 +36,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/ProjectionMapping.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 
 int main()
 {
-  // create log file
-  cedar::aux::LogFile log_file("ProjectionMapping.log");
-  log_file.addTimeStamp();
-  log_file << "\n";
-
   // count the number of errors
   unsigned int number_of_errors = 0;
 
@@ -59,7 +53,7 @@ int main()
   // check that it got initialized with five elements
   if (mapping.getNumberOfMappings() != 2)
   {
-    log_file << "The mapping was not initialized with the correct number of mappings.\n";
+    std::cout << "The mapping was not initialized with the correct number of mappings.\n";
     ++number_of_errors;
   }
 
@@ -74,14 +68,14 @@ int main()
   }
   if (!initialized_to_drop)
   {
-    log_file << "Not all mappings were initialized to \"drop\" the input dimension\n";
+    std::cout << "Not all mappings were initialized to \"drop\" the input dimension\n";
     ++number_of_errors;
   }
 
   // check that the initial validity of the mapping is VALIDITY_ERROR
   if (mapping.getValidity() != cedar::proc::ProjectionMapping::VALIDITY_ERROR)
   {
-    log_file << "The initial validity of the mapping is not VALIDITY_ERROR.\n";
+    std::cout << "The initial validity of the mapping is not VALIDITY_ERROR.\n";
     ++number_of_errors;
   }
 
@@ -90,7 +84,7 @@ int main()
 
   if (mapping.lookUp(0) != 0)
   {
-    log_file << "Failed to change a mapping.\n";
+    std::cout << "Failed to change a mapping.\n";
     ++number_of_errors;
   }
 
@@ -98,14 +92,14 @@ int main()
   mapping.setOutputDimensionality(2);
   if (mapping.getOutputDimensionality() != 2)
   {
-    log_file << "Mapping returned incorrect output dimensionality.\n";
+    std::cout << "Mapping returned incorrect output dimensionality.\n";
     ++number_of_errors;
   }
 
   // check that the validity of the mapping remains VALIDITY_ERROR
   if (mapping.getValidity() != cedar::proc::ProjectionMapping::VALIDITY_ERROR)
   {
-    log_file << "For an invalid mapping, the validity is not updated to VALIDITY_ERROR.\n";
+    std::cout << "For an invalid mapping, the validity is not updated to VALIDITY_ERROR.\n";
     ++number_of_errors;
   }
 
@@ -113,14 +107,14 @@ int main()
   mapping.changeMapping(1, 1);
   if (mapping.lookUp(1) != 1)
   {
-    log_file << "Failed to change a mapping.\n";
+    std::cout << "Failed to change a mapping.\n";
     ++number_of_errors;
   }
 
   // check that the validity of the mapping is updated to VALIDITY_VALID
   if (mapping.getValidity() != cedar::proc::ProjectionMapping::VALIDITY_VALID)
   {
-    log_file << "The for a valid mapping, the validity of the mapping is not updated to VALIDITY_VALID.\n";
+    std::cout << "The for a valid mapping, the validity of the mapping is not updated to VALIDITY_VALID.\n";
     ++number_of_errors;
   }
 
@@ -128,11 +122,11 @@ int main()
   mapping.drop(0);
   if (!mapping.isDropped(0))
   {
-    log_file << "Dropping a dimension failed.\n";
+    std::cout << "Dropping a dimension failed.\n";
     ++number_of_errors;
   }
 
-  log_file << "Done. There were " << number_of_errors << " errors.\n";
+  std::cout << "Done. There were " << number_of_errors << " errors.\n";
 
   return number_of_errors;
 }

@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/ElementDeclaration.h"
@@ -49,8 +49,6 @@
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/steps/Resize.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

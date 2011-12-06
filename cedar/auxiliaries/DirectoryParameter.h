@@ -37,7 +37,7 @@
 #ifndef CEDAR_AUX_DIRECTORY_PARAMETER_H
 #define CEDAR_AUX_DIRECTORY_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/namespace.h"
 
@@ -50,10 +50,6 @@
  */
 class cedar::aux::DirectoryParameter : public cedar::aux::Parameter
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -142,7 +138,6 @@ private:
   QDir mValue;
   //!@brief a default directory
   QDir mDefault;
-
 }; // class cedar::aux::DirectoryParameter
 
 #endif // CEDAR_AUX_DIRECTORY_PARAMETER_H

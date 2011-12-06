@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
@@ -50,8 +50,6 @@
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -100,8 +98,50 @@ const cedar::proc::Network::ElementMap& cedar::proc::Network::elements() const
   return this->mElements;
 }
 
-void cedar::proc::Network::remove(cedar::proc::ElementPtr element)
+void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
 {
+  // first, delete all data connections to and from this Element
+  for (
+        cedar::proc::Network::DataConnectionVector::iterator data_con = mDataConnections.begin();
+        data_con != mDataConnections.end();
+        // empty
+      )
+  {
+    if ((*data_con)->getSource()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element))
+        || (*data_con)->getTarget()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element)))
+    {
+      // if target is not looped, delete the trigger connection
+      if (!this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())->isLooped())
+      {
+        this->disconnectTrigger(
+                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getSource()->getParent())->getFinishedTrigger(),
+                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())
+                               );
+      data_con = mDataConnections.erase(data_con);
+      }
+    }
+    else
+    {
+      ++data_con;
+    }
+  }
+  // then, delete all trigger connections to and from this Element
+  for (
+        cedar::proc::Network::TriggerConnectionVector::iterator trigger_con = mTriggerConnections.begin();
+        trigger_con != mTriggerConnections.end();
+        // empty
+      )
+  {
+    if ((*trigger_con)->getSourceTrigger() == boost::shared_dynamic_cast<const cedar::proc::Trigger>(element)
+        || (*trigger_con)->getTarget() == boost::shared_dynamic_cast<const cedar::proc::Triggerable>(element))
+    {
+      trigger_con = mTriggerConnections.erase(trigger_con);
+    }
+    else
+    {
+      ++trigger_con;
+    }
+  }
   cedar::proc::Network::ElementMap::iterator it = mElements.find(element->getName());
   if (it != this->mElements.end())
   {
@@ -138,9 +178,9 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   element->setNetwork(this);
 }
 
-cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name)
+cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
 {
-  ElementMap::iterator iter = this->mElements.find(name);
+  ElementMap::const_iterator iter = this->mElements.find(name);
 
   if (iter != this->mElements.end())
   {
@@ -150,6 +190,11 @@ cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "No element of the name " + name + " was found.");
   }
+}
+
+cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name)
+{
+  return boost::const_pointer_cast<Element>(static_cast<const Network*>(this)->getElement(name));
 }
 
 void cedar::proc::Network::connectSlots(const std::string& source, const std::string& target)
@@ -174,9 +219,15 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
                                                  )
                                                        )
                         );
-  if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
+  cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(target_name);
+  CEDAR_DEBUG_ASSERT(p_target);
+  if (!p_target->isLooped())
   {
-    this->connectTrigger(this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(), this->getElement<cedar::proc::Step>(target_name));
+    this->connectTrigger(
+                          this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
+                          p_target
+                        );
+    p_target->onTrigger();
   }
 }
 
@@ -202,20 +253,24 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
   cedar::proc::Connectable::parseDataNameNoRole(target, target_name, target_slot);
   for (DataConnectionVector::iterator it = mDataConnections.begin(); it != mDataConnections.end(); ++it)
   {
+    cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
     if ((*it)->equals(
-                    this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
-                    this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
-                  )
+                       this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
+                       target_connectable->getInputSlot(target_slot)
+                     )
        )
     {
       mDataConnections.erase(it);
       // if target is not looped, also delete the trigger connection
+      cedar::proc::TriggerablePtr triggerable_target = this->getElement<cedar::proc::Triggerable>(target_name);
+      CEDAR_DEBUG_ASSERT(triggerable_target);
       if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
       {
         this->disconnectTrigger(
                                  this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
                                  this->getElement<cedar::proc::Triggerable>(target_name)
                                );
+        triggerable_target->onTrigger();
       }
       return;
     }
@@ -431,8 +486,16 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
     cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id));
     trigger->readConfiguration(trigger_node);
     this->mElements[trigger->getName()] = trigger;
+  }
+
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+      iter != root.end();
+      ++iter)
+  {
     try
     {
+      const cedar::aux::ConfigurationNode& trigger_node = iter->second;
+      cedar::proc::TriggerPtr trigger = this->getElement<cedar::proc::Trigger>(trigger_node.get_child("name").get_value<std::string>());
       const cedar::aux::ConfigurationNode& listeners = trigger_node.get_child("listeners");
 
       for (cedar::aux::ConfigurationNode::const_iterator listener_iter = listeners.begin();
@@ -497,7 +560,7 @@ void cedar::proc::Network::readDataConnections(const cedar::aux::ConfigurationNo
   }
 }
 
-bool cedar::proc::Network::isConnected(const std::string& source, const std::string& target)
+bool cedar::proc::Network::isConnected(const std::string& source, const std::string& target) const
 {
   // parse element and slot name
   std::string source_name;
@@ -520,7 +583,7 @@ bool cedar::proc::Network::isConnected(const std::string& source, const std::str
   return false;
 }
 
-bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
+bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const
 {
   for (size_t i = 0; i < mTriggerConnections.size(); ++i)
   {

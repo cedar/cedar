@@ -37,14 +37,11 @@
 #ifndef CEDAR_PROC_LOOP_MODE_H
 #define CEDAR_PROC_LOOP_MODE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/processing/namespace.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief   Enum class for the loop mode.
  *
