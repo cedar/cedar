@@ -277,7 +277,6 @@ void cedar::proc::gui::Ide::deleteSelectedElements()
 
 void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
 {
-  std::cout << "delete Elements" << std::endl;
   /* remove connnections first -- otherwise they might get deleted multiple times because
      they get deleted by a step and are still in the list of items.
    */

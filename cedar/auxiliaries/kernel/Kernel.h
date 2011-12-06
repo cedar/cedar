@@ -37,12 +37,10 @@
 #ifndef CEDAR_AUX_KERNEL_KERNEL_H
 #define CEDAR_AUX_KERNEL_KERNEL_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>

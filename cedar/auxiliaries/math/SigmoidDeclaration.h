@@ -41,12 +41,10 @@
 #ifndef CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
 #define CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
 #include "cedar/auxiliaries/AbstractFactoryDerived.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -160,15 +158,6 @@ protected:
   std::string mClassId;
   //!@brief a category
   std::string mCategory;
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 };
