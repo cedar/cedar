@@ -39,7 +39,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/sleepFunctions.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -47,12 +46,8 @@
 #include <time.h>
 #include <vector>
 
-int main()
+int main(int, char**)
 {
-  using cedar::aux::LogFile;
-  LogFile log_file("SleepFunctions.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
 
@@ -61,12 +56,11 @@ int main()
   wait_times_seconds.push_back(1);
   wait_times_seconds.push_back(10);
   
-  log_file << "Testing waiting for seconds." << std::endl;
+  std::cout << "Testing waiting for seconds." << std::endl;
   for (size_t i = 0; i < wait_times_seconds.size(); ++i)
   {
     cedar::unit::Seconds wait_time(wait_times_seconds.at(i));
-    log_file.addTimeStamp();
-    log_file << "Waiting for " << wait_time << std::endl;
+    std::cout << "Waiting for " << wait_time << std::endl;
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
     cedar::aux::sleep(wait_time);
     boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
@@ -74,12 +68,12 @@ int main()
     boost::posix_time::time_duration expired_time = end - start;
     if (expired_time.total_milliseconds() < static_cast<long>(1000.0 * wait_times_seconds.at(i)))
     {
-      log_file << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
+      std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
       errors++;
     }
     else
     {
-      log_file << "Ok: " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
+      std::cout << "Ok: " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
     }
   }
 
@@ -88,12 +82,11 @@ int main()
   wait_times_milliseconds.push_back(100);
   wait_times_milliseconds.push_back(1000);
 
-  log_file << "Testing waiting for milliseconds." << std::endl;
+  std::cout << "Testing waiting for milliseconds." << std::endl;
   for (size_t i = 0; i < wait_times_milliseconds.size(); ++i)
   {
     cedar::unit::Milliseconds wait_time(wait_times_milliseconds.at(i));
-    log_file.addTimeStamp();
-    log_file << "Waiting for " << wait_time << std::endl;
+    std::cout << "Waiting for " << wait_time << std::endl;
     boost::posix_time::ptime start = boost::posix_time::microsec_clock::universal_time();
     cedar::aux::sleep(wait_time);
     boost::posix_time::ptime end = boost::posix_time::microsec_clock::universal_time();
@@ -101,17 +94,17 @@ int main()
     boost::posix_time::time_duration expired_time = end - start;
     if (expired_time.total_milliseconds() < static_cast<long>(wait_times_milliseconds.at(i)))
     {
-      log_file << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed."
+      std::cout << "Sleep didn't wait long enough; only " << expired_time.total_milliseconds() << " milliseconds have passed."
                << " (should have been " << wait_times_milliseconds.at(i) / 1000.0 << ")" << std::endl;
       errors++;
     }
     else
     {
-      log_file << "Ok: " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
+      std::cout << "Ok: " << expired_time.total_milliseconds() << " milliseconds have passed." << std::endl;
     }
   }
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

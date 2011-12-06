@@ -45,7 +45,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Network.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -68,32 +67,28 @@ int main(int /* argc */, char** /* argv */)
 
   unsigned int errors = 0;
 
-  LogFile log_file("ListenerManagement.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
-  log_file << "Creating step." << std::endl;
+  std::cout << "Creating step." << std::endl;
   StepTestPtr step (new StepTest());
 
-  log_file << "Creating trigger." << std::endl;
+  std::cout << "Creating trigger." << std::endl;
   TriggerPtr trigger (new Trigger());
 
-  log_file << "Creating network." << std::endl;
+  std::cout << "Creating network." << std::endl;
   cedar::proc::NetworkPtr network (new cedar::proc::Network());
 
-  log_file << "Adding step." << std::endl;
+  std::cout << "Adding step." << std::endl;
   network->connectTrigger(trigger, step);
 
-  log_file << "Removing step." << std::endl;
+  std::cout << "Removing step." << std::endl;
   network->disconnectTrigger(trigger, step);
   if (trigger->getListeners().size() != 0)
   {
     ++errors;
-    log_file << "Error: listener was not removed correctly." << std::endl;
+    std::cout << "Error: listener was not removed correctly." << std::endl;
   }
 
-  log_file << "Adding a second step." << std::endl;
-  log_file << "Creating step 2." << std::endl;
+  std::cout << "Adding a second step." << std::endl;
+  std::cout << "Creating step 2." << std::endl;
   StepTestPtr step_2(new StepTest());
   network->connectTrigger(trigger, step);
   network->connectTrigger(trigger, step_2);
@@ -101,10 +96,10 @@ int main(int /* argc */, char** /* argv */)
   if (trigger->getListeners().size() != 2)
   {
     ++errors;
-    log_file << "Error: adding two steps doesn't work." << std::endl;
+    std::cout << "Error: adding two steps doesn't work." << std::endl;
   }
 
-  log_file << "Done. There were " << errors << " errors." << std::endl;
+  std::cout << "Done. There were " << errors << " errors." << std::endl;
 
   return errors;
 }

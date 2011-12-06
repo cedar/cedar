@@ -130,7 +130,6 @@ void testSequence(const std::string& sequenceString, unsigned int& errors, bool 
 
   std::cout << "Creating computation chain for sequence string \"" << sequenceString << "\"." << std::endl;
 
-
   std::cout << "This test is ";
 
   if (!runInThread)

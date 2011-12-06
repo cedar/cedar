@@ -39,7 +39,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/robot/ReferenceGeometry.h"
-#include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -50,30 +49,26 @@ using namespace cedar::dev::robot;
 
 int main()
 {
-  LogFile log_file("ReferenceGeometry.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
-
   // the number of errors encountered in this test
   int errors = 0;
 
   ReferenceGeometry reference_geometry("test.conf");
-  log_file << "name: " << reference_geometry.getName() << "\n";
+  std::cout << "name: " << reference_geometry.getName() << "\n";
 
   //--------------------------------------------------------------------------------------------------------------------
   // number of joints
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: getNumberOfJoints" << std::endl;
+  std::cout << "test: getNumberOfJoints" << std::endl;
   if (reference_geometry.getNumberOfJoints() != 4)
   {
     errors++;
-    log_file << "ERROR with getNumberOfJoints()" << std::endl;
+    std::cout << "ERROR with getNumberOfJoints()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // getJoint
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: getJoint" << std::endl;
+  std::cout << "test: getJoint" << std::endl;
   if (
        // transformation to joint 1 frame
        !IsZero(reference_geometry.getJoint(0)->position[0] - 0)
@@ -98,13 +93,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with getJoint()" << std::endl;
+    std::cout << "ERROR with getJoint()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // getEndEffector
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: getEndEffector" << std::endl;
+  std::cout << "test: getEndEffector" << std::endl;
   if (
        // transformation to joint 1 frame
        !IsZero(reference_geometry.getEndEffector()->position[0] - 0)
@@ -122,13 +117,13 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with getEndEffector()" << std::endl;
+    std::cout << "ERROR with getEndEffector()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // getLinkSegment
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: getJoint" << std::endl;
+  std::cout << "test: getJoint" << std::endl;
   if (
        // transformation to joint 1 frame
        !IsZero(reference_geometry.getLinkSegment(0)->centerOfMassPosition[0] - 0)
@@ -158,7 +153,7 @@ int main()
      )
   {
     errors++;
-    log_file << "ERROR with getJoint()" << std::endl;
+    std::cout << "ERROR with getJoint()" << std::endl;
   }
 
 
