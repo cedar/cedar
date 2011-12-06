@@ -45,7 +45,6 @@
 // SYSTEM INCLUDES
 #include <climits>
 
-
 /*!@brief Parameter type for the projection mapping.
  *
  * This class wraps the projection mapping type and supplies functions for using it as a parameter.

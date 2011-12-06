@@ -34,12 +34,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Trigger.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/assert.h"
+
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------

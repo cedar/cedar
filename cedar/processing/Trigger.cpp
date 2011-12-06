@@ -121,7 +121,7 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
   }
 }
 
-bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr step)
+bool cedar::proc::Trigger::isListener(cedar::proc::TriggerablePtr step) const
 {
   return this->find(step) != this->mListeners.end();
 }
@@ -149,6 +149,12 @@ void cedar::proc::Trigger::notifyDisconnected(cedar::proc::TriggerPtr /* trigger
 }
 
 std::vector<cedar::proc::TriggerablePtr>::iterator cedar::proc::Trigger::find(cedar::proc::TriggerablePtr step)
+{
+  return std::find(this->mListeners.begin(), this->mListeners.end(), step);
+}
+
+std::vector<cedar::proc::TriggerablePtr>::const_iterator
+  cedar::proc::Trigger::find(cedar::proc::TriggerablePtr step) const
 {
   return std::find(this->mListeners.begin(), this->mListeners.end(), step);
 }

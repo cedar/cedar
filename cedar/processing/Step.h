@@ -41,15 +41,13 @@
 #ifndef CEDAR_PROC_STEP_H
 #define CEDAR_PROC_STEP_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Base.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QThread>
@@ -179,7 +177,6 @@ private:
    */
   void run();
 
-
   /*!@brief This is the reset method.
    *
    *        Implement this method if you want to react to a reset signal.
@@ -197,7 +194,7 @@ private:
   bool mBusy;
 
   //!@brief The lock used for protecting the computation arguments of the step.
-  QReadWriteLock* mpArgumentsLock;
+  QReadWriteLock *mpArgumentsLock;
 
   //!@brief The arguments for the next cedar::proc::Step::compute call.
   ArgumentsPtr mNextArguments;

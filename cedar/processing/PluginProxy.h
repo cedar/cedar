@@ -47,7 +47,6 @@
 #include <Windows.h>
 #endif
 
-
 /*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
  */
 class cedar::proc::PluginProxy
@@ -91,7 +90,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief search known directories for this plugin
-  std::string findPluginFile(const std::string& file);
+  std::string findPluginFile(const std::string& file) const;
 
 #ifdef WINDOWS
   std::string getLastError();

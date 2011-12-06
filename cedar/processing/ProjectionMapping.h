@@ -43,7 +43,6 @@
 // SYSTEM INCLUDES
 #include <map>
 
-
 /*!@brief Description of a mapping between dimensions.
  *
  * This class is used by the projection to store the mapping between the dimensions of two steps.
@@ -125,13 +124,13 @@ public:
    *
    * @param inputIndex index of the input dimension that is to be tested
    */
-  bool isDropped(unsigned int inputIndex);
+  bool isDropped(unsigned int inputIndex) const;
 
   /*!@brief Tests whether a mapping exists for a given input dimension.
    *
    * @param inputIndex index of the input dimension, whose mapping is to be checked for existence
    */
-  bool mappingExists(unsigned int inputIndex);
+  bool mappingExists(unsigned int inputIndex) const;
 
   /*!@brief Set the output dimensionality of the mapping.
    *
@@ -140,10 +139,10 @@ public:
   void setOutputDimensionality(unsigned int dimensionality);
 
   //!@brief Get the output dimensionality of the mapping.
-  unsigned int getOutputDimensionality();
+  unsigned int getOutputDimensionality() const;
 
   //!@brief Return the validity of the mapping.
-  VALIDITY getValidity();
+  VALIDITY getValidity() const;
 
   //!@brief Return an iterator to the first mapping.
   cedar::proc::ProjectionMapping::iterator begin();

@@ -37,13 +37,10 @@
 #ifndef CEDAR_PROC_DATA_CONNECTION_H
 #define CEDAR_PROC_DATA_CONNECTION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief   This is a class that represents a connection between two data items.
  *
@@ -53,10 +50,6 @@
  */
 class cedar::proc::DataConnection
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -71,7 +64,7 @@ public:
 public:
   //!@brief test if the given source and target are the same for this connection (i.e. are those two DataSlots connected
   // via this DataConnection
-  bool equals(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target);
+  bool equals(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target) const;
 
   //!@brief get the source of this connection
   cedar::proc::ConstDataSlotPtr getSource() const;
