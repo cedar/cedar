@@ -51,16 +51,13 @@ using namespace cedar::aux;
 
 int main()
 {
-  LogFile log_file("UnitTestConvolution.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
   // the current test number
   int test_number = 0;
 
   // test stuff
-  log_file << "test no" << test_number++ << std::endl;
+  std::cout << "test no " << test_number++ << std::endl;
   cedar::aux::conv::FastConvolution my_convolution;
   cv::Mat matrix = cv::Mat::ones(50,71, CV_64F);
   cv::Mat kernel = cv::Mat::ones(7,7, CV_64F);
@@ -78,7 +75,7 @@ int main()
   cv::Mat kernel_4D(4, sizes_kernel_4D, CV_64F);
   cv::Mat result_4D = my_convolution(matrix_4D, kernel_4D);
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

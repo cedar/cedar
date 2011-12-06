@@ -39,7 +39,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/utilities.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -59,23 +58,19 @@ namespace test
 
 int main()
 {
-  using cedar::aux::LogFile;
-  LogFile log_file("UnmangleTest.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
 
   std::string unmangled_test_class = cedar::aux::unmangleName(typeid(test::TestClass));
   if (unmangled_test_class != "test::TestClass")
   {
-    log_file << "Faild to properly unmangle name for test::TestClass; result is \""
+    std::cout << "Faild to properly unmangle name for test::TestClass; result is \""
              << unmangled_test_class << "\"" << std::endl;
     ++errors;
   }
   else
   {
-    log_file << "Name properly unmangled to \"" << unmangled_test_class << "\"" << std::endl;
+    std::cout << "Name properly unmangled to \"" << unmangled_test_class << "\"" << std::endl;
   }
 
   return errors;

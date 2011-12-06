@@ -39,7 +39,6 @@
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/Object.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -48,11 +47,8 @@
 using namespace cedar::tests::unit::aux::gl::Object;
 using namespace cedar::aux;
 
-int main()
+int main(int, char**)
 {
-  LogFile log_file("Object.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
   
@@ -63,29 +59,29 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   // wire frame
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: wire frame" << std::endl;
+  std::cout << "test: wire frame" << std::endl;
   gl_object.drawAsWireFrame(true);
   if (!gl_object.isDrawnAsWireFrame())
   {
     errors++;
-    log_file << "ERROR with wire frame" << std::endl;
+    std::cout << "ERROR with wire frame" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // resolution
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: resolution" << std::endl;
+  std::cout << "test: resolution" << std::endl;
   gl_object.setResolution(55);
   if (gl_object.resolution() != 55)
   {
     errors++;
-    log_file << "ERROR with setResolution or resolution" << std::endl;
+    std::cout << "ERROR with setResolution or resolution" << std::endl;
   }
   
   //--------------------------------------------------------------------------------------------------------------------
   // color
   //--------------------------------------------------------------------------------------------------------------------
-  log_file << "test: color" << std::endl;
+  std::cout << "test: color" << std::endl;
   gl_object.setColor(0.3, 1, sqrt(2.0)/2);
   if (
       gl_object.colorR() != 0.3
@@ -94,10 +90,10 @@ int main()
       )
   {
     errors++;
-    log_file << "ERROR with setColor or color" << std::endl;
+    std::cout << "ERROR with setColor or color" << std::endl;
   }
   
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;

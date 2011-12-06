@@ -211,11 +211,11 @@ void TestClass::tryToReadManually(void)
   if (readConfiguration() != ConfigurationInterface::CONFIG_SUCCESS)
     mFails.push_back("readConfiguration(void) failed");
 }
-void TestClass::printErrors(cedar::aux::LogFile& rLogFile)
+void TestClass::printErrors()
 {
   for (unsigned int i = 0; i < mFails.size(); i++)
   {
-    rLogFile << mFails.at(i) << std::endl;
+    std::cout << mFails.at(i) << std::endl;
   }
 }
 

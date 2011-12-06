@@ -39,7 +39,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/math/algebraTools.h"
-#include "cedar/auxiliaries/LogFile.h"
 
 // SYSTEM INCLUDES
 
@@ -49,13 +48,10 @@ using namespace std;
 
 int main()
 {
-  LogFile log_file("UnitTestAlgebraicTools.log");
-  log_file.addTimeStamp();
-  log_file << std::endl;
   // the number of errors encountered in this test
   int errors = 0;
 
-  log_file << "test: solveQuadric" << std::endl;
+  std::cout << "test: solveQuadric" << std::endl;
   std::vector<double> quadric_coefficients;
   quadric_coefficients.resize(3);
   quadric_coefficients[0] = -2;
@@ -68,15 +64,15 @@ int main()
         && (IsZero(solutions_quadric[1] + 1.0))
     )
   {
-    log_file << "working correctly: solveQuadric" << endl;
+    std::cout << "working correctly: solveQuadric" << endl;
   }
   else
   {
     errors++;
-    log_file << "NOT working correctly: solveQuadric!" << endl;
+    std::cout << "NOT working correctly: solveQuadric!" << endl;
   }
 
-  log_file << "test: int solveCubic" << std::endl;
+  std::cout << "test: int solveCubic" << std::endl;
   std::vector<double> cubic_coefficients;
   cubic_coefficients.resize(4);
   cubic_coefficients[0] = 8;
@@ -91,14 +87,14 @@ int main()
        && (IsZero(solutions_cubic[2] + 1.0))
     )
   {
-    log_file << "working correctly: solveCubic" << endl;
+    std::cout << "working correctly: solveCubic" << endl;
   }
   else
   {
-    log_file << "NOT working correctly: solveCubic!" << endl;
+    std::cout << "NOT working correctly: solveCubic!" << endl;
   }
 
-  log_file << "test: int solveQuartic" << std::endl;
+  std::cout << "test: int solveQuartic" << std::endl;
   std::vector<double> quartic_coefficients;
   quartic_coefficients.resize(5);
   quartic_coefficients[0] = -4;
@@ -115,14 +111,14 @@ int main()
        && (IsZero(solutions_quartic[2] + 0.5))
      )
   {
-    log_file << "working correctly: solveQuartic" << endl;
+    std::cout << "working correctly: solveQuartic" << endl;
   }
   else
   {
-    log_file << "NOT working correctly: solveQuartic!" << endl;
+    std::cout << "NOT working correctly: solveQuartic!" << endl;
   }
 
-  log_file << "test finished, there were " << errors << " errors" << std::endl;
+  std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {
     errors = 255;
