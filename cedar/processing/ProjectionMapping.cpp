@@ -161,7 +161,7 @@ unsigned int cedar::proc::ProjectionMapping::getNumberOfMappings()
   return mMapping.size();
 }
 
-bool cedar::proc::ProjectionMapping::mappingExists(unsigned int inputIndex)
+bool cedar::proc::ProjectionMapping::mappingExists(unsigned int inputIndex) const
 {
   std::map<unsigned int, unsigned int>::const_iterator iter = mMapping.find(inputIndex);
 
@@ -173,7 +173,7 @@ bool cedar::proc::ProjectionMapping::mappingExists(unsigned int inputIndex)
   return true;
 }
 
-bool cedar::proc::ProjectionMapping::isDropped(unsigned int inputIndex)
+bool cedar::proc::ProjectionMapping::isDropped(unsigned int inputIndex) const
 {
   std::map<unsigned int, unsigned int>::const_iterator iter = mMapping.find(inputIndex);
 
@@ -195,7 +195,7 @@ void cedar::proc::ProjectionMapping::setOutputDimensionality(unsigned int dimens
   mOutputDimensionality = dimensionality;
 }
 
-unsigned int cedar::proc::ProjectionMapping::getOutputDimensionality()
+unsigned int cedar::proc::ProjectionMapping::getOutputDimensionality() const
 {
   return mOutputDimensionality;
 }
@@ -228,7 +228,7 @@ bool cedar::proc::ProjectionMapping::checkOutputIndex(unsigned int outputIndex)
   return output_index_okay;
 }
 
-cedar::proc::ProjectionMapping::VALIDITY cedar::proc::ProjectionMapping::getValidity()
+cedar::proc::ProjectionMapping::VALIDITY cedar::proc::ProjectionMapping::getValidity() const
 {
   return mValidity;
 }

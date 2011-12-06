@@ -41,15 +41,12 @@
 #ifndef CEDAR_PROC_LOOPED_TRIGGER_H
 #define CEDAR_PROC_LOOPED_TRIGGER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>

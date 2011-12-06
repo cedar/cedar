@@ -34,16 +34,13 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_PROC_NAMESPACE_H
 #define CEDAR_PROC_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

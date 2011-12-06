@@ -41,12 +41,9 @@
 #ifndef CEDAR_PROC_MULTI_TRIGGER_H
 #define CEDAR_PROC_MULTI_TRIGGER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
-
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>

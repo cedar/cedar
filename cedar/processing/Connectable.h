@@ -37,14 +37,12 @@
 #ifndef CEDAR_PROC_CONNECTABLE_H
 #define CEDAR_PROC_CONNECTABLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Element.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/auxiliaries/threadingUtilities.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/signals2/connection.hpp>
@@ -81,10 +79,10 @@ public:
   cedar::aux::ConstDataPtr getInput(const std::string& name) const;
 
   //!@brief Returns a specific buffer data pointer stored in this Connectable.
-  cedar::aux::DataPtr getBuffer(const std::string& name);
+  cedar::aux::ConstDataPtr getBuffer(const std::string& name) const;
 
   //!@brief Returns a specific output data pointer stored in this Connectable.
-  cedar::aux::DataPtr getOutput(const std::string& name);
+  cedar::aux::ConstDataPtr getOutput(const std::string& name) const;
 
   //!@brief Returns the map of data slots for a given role.
   cedar::proc::Connectable::SlotMap& getDataSlots(DataRole::Id role);

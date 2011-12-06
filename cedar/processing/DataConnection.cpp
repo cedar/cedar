@@ -70,7 +70,10 @@ cedar::proc::DataConnection::~DataConnection()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-bool cedar::proc::DataConnection::equals(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target)
+bool cedar::proc::DataConnection::equals(
+                                          cedar::proc::ConstDataSlotPtr source,
+                                          cedar::proc::ConstDataSlotPtr target
+                                        ) const
 {
   CEDAR_ASSERT(source);
   CEDAR_ASSERT(target);

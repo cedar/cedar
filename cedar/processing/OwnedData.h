@@ -37,25 +37,16 @@
 #ifndef CEDAR_PROC_OWNED_DATA_H
 #define CEDAR_PROC_OWNED_DATA_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataSlot.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief A slot for data that is owned by a Connectable.
  */
 class cedar::proc::OwnedData : public cedar::proc::DataSlot
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -98,16 +89,6 @@ protected:
   // none yet
 private:
   cedar::aux::DataPtr mData;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::OwnedData
 
 #endif // CEDAR_PROC_OWNED_DATA_H
