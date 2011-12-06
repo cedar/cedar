@@ -34,12 +34,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>

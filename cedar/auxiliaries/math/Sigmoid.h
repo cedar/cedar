@@ -40,12 +40,10 @@
 #ifndef CEDAR_AUX_MATH_SIGMOID_H
 #define CEDAR_AUX_MATH_SIGMOID_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/NumericParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -96,7 +94,7 @@ public:
    * function
    */
   template<typename T>
-  cv::Mat compute(const cv::Mat& values)
+  cv::Mat compute(const cv::Mat& values) const
   {
     cv::Mat result = values.clone();
     cv::MatConstIterator_<T> iter_src = values.begin<T>();
@@ -126,15 +124,6 @@ private:
 protected:
   //!@brief threshold of the sigmoid
   cedar::aux::DoubleParameterPtr mThreshold;
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 };

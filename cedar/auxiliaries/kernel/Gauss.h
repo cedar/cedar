@@ -37,12 +37,10 @@
 #ifndef CEDAR_AUX_KERNEL_GAUSS_H
 #define CEDAR_AUX_KERNEL_GAUSS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
