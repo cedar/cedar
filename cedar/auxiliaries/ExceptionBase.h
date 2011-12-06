@@ -93,6 +93,9 @@ public:
   //!@brief Sets the message for the exception.
   void setMessage(const std::string& message);
 
+  //!@brief Gets the message of the exception.
+  const std::string& getMessage() const;
+
   //!@brief Sets the name of the source file where the exception occurred.
   void setFile(const std::string& fileName);
 

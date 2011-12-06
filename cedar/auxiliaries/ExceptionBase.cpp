@@ -99,6 +99,11 @@ void cedar::aux::ExceptionBase::setMessage(const std::string& message)
   this->mMessage = message;
 }
 
+const std::string& cedar::aux::ExceptionBase::getMessage() const
+{
+  return this->mMessage;
+}
+
 void cedar::aux::ExceptionBase::setFile(const std::string& fileName)
 {
   this->mFileName = fileName;
