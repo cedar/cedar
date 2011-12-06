@@ -39,13 +39,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Element.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <algorithm>
@@ -76,8 +74,6 @@ cedar::proc::Trigger::~Trigger()
   this->mListeners.clear();
 }
 
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -100,6 +96,10 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
         this->mListeners.at(i)->onTrigger(this->shared_from_this());
       }
     }
+    else
+    {
+      this->mListeners.at(i)->onTrigger(this->shared_from_this());
+    }
   }
 }
 
@@ -114,6 +114,10 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
   if (iter == this->mListeners.end())
   {
     this->mListeners.push_back(step);
+    if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
+    {
+      trigger->notifyConnected(this->shared_from_this());
+    }
   }
 }
 
@@ -128,6 +132,10 @@ void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
   iter = this->find(step);
   if (iter != this->mListeners.end())
   {
+    if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
+    {
+      trigger->notifyDisconnected(this->shared_from_this());
+    }
     this->mListeners.erase(iter);
   }
 }
