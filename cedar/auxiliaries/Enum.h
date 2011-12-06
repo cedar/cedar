@@ -37,10 +37,8 @@
 #ifndef CEDAR_AUX_ENUM_H
 #define CEDAR_AUX_ENUM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
@@ -70,7 +68,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief comparison operator
-  bool operator== (const Enum& other);
+  bool operator== (const Enum& other) const;
 
   //!@brief returns the identification number of this enum entry
   cedar::aux::EnumId id() const;
@@ -111,18 +109,6 @@ private:
   std::string mName;
   //!@brief the beautified name of this enum entry
   std::string mPrettyString;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Enum
 
 #endif // CEDAR_AUX_ENUM_H

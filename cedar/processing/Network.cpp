@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Network.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
@@ -50,8 +50,6 @@
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -180,9 +178,9 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   element->setNetwork(this);
 }
 
-cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name)
+cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
 {
-  ElementMap::iterator iter = this->mElements.find(name);
+  ElementMap::const_iterator iter = this->mElements.find(name);
 
   if (iter != this->mElements.end())
   {
@@ -192,6 +190,11 @@ cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name
   {
     CEDAR_THROW(cedar::proc::InvalidNameException, "No element of the name " + name + " was found.");
   }
+}
+
+cedar::proc::ElementPtr cedar::proc::Network::getElement(const std::string& name)
+{
+  return boost::const_pointer_cast<Element>(static_cast<const Network*>(this)->getElement(name));
 }
 
 void cedar::proc::Network::connectSlots(const std::string& source, const std::string& target)
@@ -557,7 +560,7 @@ void cedar::proc::Network::readDataConnections(const cedar::aux::ConfigurationNo
   }
 }
 
-bool cedar::proc::Network::isConnected(const std::string& source, const std::string& target)
+bool cedar::proc::Network::isConnected(const std::string& source, const std::string& target) const
 {
   // parse element and slot name
   std::string source_name;
@@ -580,7 +583,7 @@ bool cedar::proc::Network::isConnected(const std::string& source, const std::str
   return false;
 }
 
-bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
+bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const
 {
   for (size_t i = 0; i < mTriggerConnections.size(); ++i)
   {

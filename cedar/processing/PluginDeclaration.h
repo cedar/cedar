@@ -37,10 +37,8 @@
 #ifndef CEDAR_PROC_PLUGIN_DECLARATION_H
 #define CEDAR_PROC_PLUGIN_DECLARATION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
@@ -122,18 +120,6 @@ protected:
 private:
   //!@brief internal storage of all registered ElementDeclarations.
   ElementDeclarations mElementDeclarations;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::PluginDeclaration
 
 #endif // CEDAR_PROC_PLUGIN_DECLARATION_H

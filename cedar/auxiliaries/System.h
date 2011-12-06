@@ -37,10 +37,8 @@
 #ifndef CEDAR_AUX_SYSTEM_H
 #define CEDAR_AUX_SYSTEM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
@@ -91,23 +89,12 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
   //!@brief For debugging only.
   static QReadWriteLock mCOutLock;
 protected:
   // none yet
-
 private:
-
+  // none yet
 }; // class cedar::aux::System
 
 #endif // CEDAR_AUX_SYSTEM_H

@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_PARAMETER_TEMPLATE_H
 #define CEDAR_PROC_PARAMETER_TEMPLATE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -158,16 +156,6 @@ private:
 
   //! The default value of the parameter. Ignored if mHasDefault is false.
   T mDefault;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::ParameterTemplate
 
 #endif // CEDAR_PROC_PARAMETER_TEMPLATE_H

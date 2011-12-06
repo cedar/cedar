@@ -35,14 +35,10 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-//#include <QTime>
-
 
 using namespace std;
 using namespace boost::posix_time;

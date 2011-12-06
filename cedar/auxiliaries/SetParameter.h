@@ -41,12 +41,10 @@
 #ifndef CEDAR_AUX_SET_PARAMETER_H
 #define CEDAR_AUX_SET_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <set>
@@ -167,8 +165,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -176,18 +172,6 @@ private:
   std::set<T> mValues;
   //!@brief default set
   std::set<T> mDefaults;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::SetParameter
 
 #endif // CEDAR_AUX_SET_PARAMETER_H

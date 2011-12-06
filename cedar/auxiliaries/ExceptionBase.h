@@ -38,10 +38,8 @@
 #ifndef CEDAR_AUX_EXCEPTION_BASE_H
 #define CEDAR_AUX_EXCEPTION_BASE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <exception>
@@ -138,17 +136,6 @@ private:
 
   //! Helper for converting the exception info to a const char* string.
   mutable std::string mExceptionInfo;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-private:
-  // none yet
-
 }; // class cedar::aux::ExeptionBase
 
 #endif // CEDAR_AUX_EXCEPTION_BASE_H

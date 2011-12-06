@@ -41,11 +41,9 @@
 #ifndef CEDAR_AUX_CONFIGURABLE_H
 #define CEDAR_AUX_CONFIGURABLE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>

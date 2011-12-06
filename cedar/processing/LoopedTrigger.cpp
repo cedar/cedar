@@ -39,7 +39,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/units/TimeUnit.h"
@@ -47,8 +47,6 @@
 #include "cedar/processing/LoopMode.h"
 #include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <algorithm>

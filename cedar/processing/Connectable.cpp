@@ -336,7 +336,12 @@ void cedar::proc::Connectable::declareData(DataRole::Id role, const std::string&
   if (role == cedar::proc::DataRole::INPUT)
   {
     iter->second[name] = cedar::proc::DataSlotPtr(new cedar::proc::ExternalData(role, name, this, mandatory));
-    mSlotConnection = boost::shared_dynamic_cast<cedar::proc::ExternalData>(iter->second[name])->connectToExternalDataChanged(boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this));
+    mSlotConnection
+      = boost::shared_dynamic_cast<cedar::proc::ExternalData>(
+                                                               iter->second[name]
+                                                             )->connectToExternalDataChanged(
+                                                 boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
+                                                                                            );
   }
   else
   {
@@ -612,12 +617,12 @@ cedar::aux::ConstDataPtr cedar::proc::Connectable::getInput(const std::string& n
   return this->getData(DataRole::INPUT, name);
 }
 
-cedar::aux::DataPtr cedar::proc::Connectable::getBuffer(const std::string& name)
+cedar::aux::ConstDataPtr cedar::proc::Connectable::getBuffer(const std::string& name) const
 {
   return this->getData(DataRole::BUFFER, name);
 }
 
-cedar::aux::DataPtr cedar::proc::Connectable::getOutput(const std::string& name)
+cedar::aux::ConstDataPtr cedar::proc::Connectable::getOutput(const std::string& name) const
 {
   return this->getData(DataRole::OUTPUT, name);
 }

@@ -37,15 +37,12 @@
 #ifndef CEDAR_PROC_ELEMENT_H
 #define CEDAR_PROC_ELEMENT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/Configurable.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief Base class for Elements in a processing architecture.
  *
@@ -53,10 +50,6 @@
  */
 class cedar::proc::Element : public cedar::aux::Configurable
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------

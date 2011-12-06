@@ -38,13 +38,10 @@
 #ifndef CEDAR_AUX_MATH_LIMITS_H
 #define CEDAR_AUX_MATH_LIMITS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
 
 /*!@brief Structure representing the limits of an interval.
  */
@@ -84,7 +81,6 @@ struct cedar::aux::math::Limits
   T min;
   //! maximum limit
   T max;
-
 }; // class cedar::aux::math::Limits
 
 

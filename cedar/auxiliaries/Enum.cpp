@@ -48,7 +48,7 @@ mPrettyString (prettyString)
 {
 }
 
-bool cedar::aux::Enum::operator== (const cedar::aux::Enum& other)
+bool cedar::aux::Enum::operator== (const cedar::aux::Enum& other) const
 {
   return this->mId == other.mId;
 }

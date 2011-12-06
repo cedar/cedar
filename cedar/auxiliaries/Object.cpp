@@ -34,10 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-#include "Object.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/Object.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -152,7 +150,7 @@ double Object::getOrientationQuaternion(unsigned int component) const
   return mOrientationQuaternion.at<double>(component, 0);
 }
 
-cv::Mat Object::getTransformation()
+cv::Mat Object::getTransformation() const
 {
   return mTransformation.clone();
 }

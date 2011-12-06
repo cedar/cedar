@@ -78,7 +78,7 @@ cedar::proc::PluginProxy::~PluginProxy()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file)
+std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) const
 {
   std::string searched_locs;
 

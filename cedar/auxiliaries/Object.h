@@ -37,12 +37,10 @@
 #ifndef CEDAR_AUX_OBJECT_H
 #define CEDAR_AUX_OBJECT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "namespace.h"
 #include "Base.h"
 #include "ConfigurationInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -93,7 +91,7 @@ public:
   cv::Mat getOrientationQuaternion() const;
 
   //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
-  cv::Mat getTransformation();
+  cv::Mat getTransformation() const;
 
 public slots:
   /*!@brief set the position of the object frame origin in the world frame

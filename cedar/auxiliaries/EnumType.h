@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_ENUM_TYPE_H
 #define CEDAR_AUX_ENUM_TYPE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/EnumBase.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
