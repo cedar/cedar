@@ -38,10 +38,8 @@
 #ifndef CEDAR_AUX_MATRIX_ITERATOR_H
 #define CEDAR_AUX_MATRIX_ITERATOR_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -86,13 +84,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Returns
-  inline const int* getCurrentIndex()
+  inline const int* getCurrentIndex() const
   {
     return &this->mIndex.front();
   }
 
   //!@brief return the n-dimensional index of the current iterator position
-  inline const std::vector<int>& getCurrentIndexVector()
+  inline const std::vector<int>& getCurrentIndexVector() const
   {
     return this->mIndex;
   }
@@ -138,15 +136,6 @@ private:
   std::vector<int> mIndex;
   //!@brief a reference to a cv::Mat
   const cv::Mat& mMatrixRef;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-
-private:
-  // none yet
-
 }; // class cedar::aux::MatrixIterator
 
 #endif // CEDAR_AUX_MATRIX_ITERATOR_H

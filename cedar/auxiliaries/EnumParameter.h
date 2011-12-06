@@ -37,17 +37,14 @@
 #ifndef CEDAR_AUX_ENUM_PARAMETER_H
 #define CEDAR_AUX_ENUM_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/EnumBase.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 #include <set>
-
 
 /*!@brief A parameter storing an enum value.
  *
@@ -55,10 +52,6 @@
  */
 class cedar::aux::EnumParameter : public cedar::aux::Parameter
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -120,18 +113,6 @@ private:
   cedar::aux::EnumId mDefault;
   //!@brief a pointer to the enum used by this parameter
   boost::shared_ptr<cedar::aux::EnumBase> mEnumDeclaration;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::VectorParameter
 
 #endif // CEDAR_AUX_ENUM_PARAMETER_H

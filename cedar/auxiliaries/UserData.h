@@ -38,11 +38,9 @@
 #ifndef CEDAR_AUX_USER_DATA_H
 #define CEDAR_AUX_USER_DATA_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Base.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
@@ -90,23 +88,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
-private:
-  // none yet
-
 }; // class cedar::aux::UserData
 
 #endif // CEDAR_AUX_USER_DATA_H

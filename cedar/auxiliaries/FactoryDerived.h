@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_FACTORY_DERIVED_H
 #define CEDAR_AUX_FACTORY_DERIVED_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Factory.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -57,10 +55,6 @@
 template <typename BaseType, typename DerivedType, typename SmartPointerType >
 class cedar::aux::FactoryDerived : public cedar::aux::Factory<BaseType, SmartPointerType>
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -104,18 +98,6 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::FactoryDerived
 
 #endif // CEDAR_AUX_FACTORY_DERIVED_H

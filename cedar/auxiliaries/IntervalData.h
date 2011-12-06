@@ -37,12 +37,11 @@
 #ifndef CEDAR_AUX_INTERVAL_DATA_H
 #define CEDAR_AUX_INTERVAL_DATA_H
 
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/UserData.h"
+
 // SYSTEM INCLUDES
 
-// PROJECT INCLUDES
-
-// LOCAL INCLUDES
-#include "cedar/auxiliaries/UserData.h"
 /*!
  * @brief Class for interval data mainly used by automated gui creation.
  */
