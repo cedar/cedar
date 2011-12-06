@@ -37,11 +37,9 @@
 #ifndef CEDAR_PROC_EXTERNAL_DATA_H
 #define CEDAR_PROC_EXTERNAL_DATA_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/DataSlot.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/signals2/signal.hpp>
@@ -62,11 +60,6 @@ class cedar::proc::ExternalData : public cedar::proc::DataSlot
   // friends
   //--------------------------------------------------------------------------------------------------------------------
   friend class cedar::proc::Connectable;
-  //--------------------------------------------------------------------------------------------------------------------
-  // types
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -174,16 +167,6 @@ private:
 
   //!@brief Whether this slot can have multiple data items.
   bool mIsCollection;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::ExternalData
 
 #endif // CEDAR_PROC_EXTERNAL_DATA_H

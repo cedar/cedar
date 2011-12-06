@@ -34,15 +34,13 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>

@@ -138,18 +138,6 @@ private:
 
   //! Whether the singleton object has already been destroyed.
   static bool mDestroyed;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Singleton
 
 template <class T> typename cedar::aux::Singleton<T>::InstanceTypePtr cedar::aux::Singleton<T>::mInstance;

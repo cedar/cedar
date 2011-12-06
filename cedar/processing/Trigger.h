@@ -41,13 +41,10 @@
 #ifndef CEDAR_PROC_TRIGGER_H
 #define CEDAR_PROC_TRIGGER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Element.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/namespace.h"
-
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/enable_shared_from_this.hpp>
@@ -89,7 +86,7 @@ public:
   void onTrigger(cedar::proc::TriggerPtr pSender);
 
   //!@brief a boolean check, if a given step is a listener of this Trigger instance
-  bool isListener(cedar::proc::TriggerablePtr step);
+  bool isListener(cedar::proc::TriggerablePtr step) const;
 
   //!@brief returns a list of listeners
   const std::vector<cedar::proc::TriggerablePtr>& getListeners() const;
@@ -130,6 +127,7 @@ protected:
 private:
   //!@brief find a step in the list of listeners
   std::vector<cedar::proc::TriggerablePtr>::iterator find(cedar::proc::TriggerablePtr triggerable);
+  std::vector<cedar::proc::TriggerablePtr>::const_iterator find(cedar::proc::TriggerablePtr triggerable) const;
 }; // class cedar::proc::Trigger
 
 #endif // CEDAR_PROC_TRIGGER_H

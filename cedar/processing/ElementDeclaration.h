@@ -41,15 +41,13 @@
 #ifndef CEDAR_PROC_ELEMENT_DECLARATION_H
 #define CEDAR_PROC_ELEMENT_DECLARATION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/DeclarationBase.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
 #include "cedar/auxiliaries/AbstractFactoryDerived.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -100,7 +98,7 @@ public:
   }
 
   //!@brief get path to icon included in the graphical representation of this element
-  const std::string& getIconPath()
+  const std::string& getIconPath() const
   {
     return this->mIconPath;
   }
@@ -125,15 +123,6 @@ protected:
 private:
   //!@brief path to icon included in the graphical representation of this step
   std::string mIconPath;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 };
 
 
@@ -187,7 +176,7 @@ public:
   {
     return dynamic_cast<DerivedClass*>(pointer.get()) != NULL;
   }
-}; // class cedar::proc::ElementDeclarationT
+}; // class cedar::proc::ElementDeclarationTemplate
 
 #endif // CEDAR_PROC_ELEMENT_DECLARATION_H
 

@@ -40,12 +40,10 @@
 #ifndef CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H
 #define CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -106,16 +104,6 @@ protected:
 
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 };
 
 

@@ -41,11 +41,9 @@
 #ifndef CEDAR_AUX_DATA_TEMPLATE_H
 #define CEDAR_AUX_DATA_TEMPLATE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Data.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -119,25 +117,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief the internal data
   T mData;
-
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
 private:
   // none yet
-
 }; // class cedar::aux::DataTemplate
 
 #endif // CEDAR_AUX_DATA_TEMPLATE_H

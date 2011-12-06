@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -51,8 +51,6 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES

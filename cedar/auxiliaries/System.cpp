@@ -34,10 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/System.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/date_time.hpp>

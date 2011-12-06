@@ -37,12 +37,10 @@
 #ifndef CEDAR_AUX_TYPE_BASED_FACTORY_H
 #define CEDAR_AUX_TYPE_BASED_FACTORY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -122,7 +120,7 @@ public:
    *
    * @returns True, if no associations are stored in this factory, false otherwise.
    */
-  bool empty()
+  bool empty() const
   {
     return this->mKeyTypes.empty();
   }

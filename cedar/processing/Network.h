@@ -41,14 +41,11 @@
 #ifndef CEDAR_PROC_NETWORK_H
 #define CEDAR_PROC_NETWORK_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>
-
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -152,11 +149,25 @@ public:
     return boost::shared_dynamic_cast<T>(this->getElement(name));
   }
 
-  /*!@brief  Returns a pointer to the element with the given name.
+  /*!@brief Returns the element with the given name as a const pointer of the specified type.
+   */
+  template <class T>
+  boost::shared_ptr<const T> getElement(const std::string& name) const
+  {
+    return boost::shared_dynamic_cast<const T>(this->getElement(name));
+  }
+
+  /*!@brief  Returns a pointer to the element with the given name. Uses the const function getElement.
    *
    * @throws cedar::proc::InvalidNameException if no element is found with the given name.
    */
   cedar::proc::ElementPtr getElement(const std::string& name);
+
+  /*!@brief  Returns a const pointer to the element with the given name.
+   *
+   * @throws cedar::proc::InvalidNameException if no element is found with the given name.
+   */
+  cedar::proc::ConstElementPtr getElement(const std::string& name) const;
 
   /*!@brief Connects data slots of two cedar::proc::Connectable elements.
    *
@@ -177,11 +188,11 @@ public:
    * @param source Identifier of the source data slot. This must be of the form "elementName.outputSlotName".
    * @param target Identifier of the target data slot. This must be of the form "elementName.inputSlotName".
    */
-  bool isConnected(const std::string& source, const std::string& target);
+  bool isConnected(const std::string& source, const std::string& target) const;
 
   /*!@brief Returns, whether target receives trigger signals from the source trigger.
    */
-  bool isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target);
+  bool isConnected(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target) const;
 
   /*!@brief Deletes the connection between the data slots.
    *
