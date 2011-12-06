@@ -41,11 +41,9 @@
 #ifndef CEDAR_AUX_DATA_H
 #define CEDAR_AUX_DATA_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Base.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -56,10 +54,6 @@
  */
 class cedar::aux::Data : public cedar::aux::Base
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -130,6 +124,7 @@ public:
 
   //!@brief almost deprecated
   const std::string& connectedSlotName() const;
+
   //!@brief almost deprecated
   void connectedSlotName(const std::string& name);
 
@@ -157,16 +152,6 @@ private:
   cedar::aux::Configurable* mpeOwner;
   //!@todo This should be removed, if possible.
   std::string mConnectedSlotName;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::Data
 
 #endif // CEDAR_AUX_DATA_H

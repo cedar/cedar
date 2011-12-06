@@ -46,7 +46,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@brief A base class template for numeric parameters.
  */
 template <typename T>

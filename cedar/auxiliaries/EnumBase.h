@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_ENUM_BASE_H
 #define CEDAR_AUX_ENUM_BASE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Enum.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <map>
@@ -58,10 +56,6 @@
  */
 class cedar::aux::EnumBase
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -126,18 +120,6 @@ private:
 
   //! Value for undefined/invalid enums (needed for returning a reference).
   cedar::aux::Enum mUndefined;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::EnumBase
 
 #endif // CEDAR_AUX_ENUM_BASE_H
