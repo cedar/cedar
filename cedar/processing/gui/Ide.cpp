@@ -363,8 +363,7 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 
 void cedar::proc::gui::Ide::error(const QString& message)
 {
-  //!@todo Colors!
-  this->mpLog->append("Error: " + message + "\n");
+  this->mpLog->append("<font color=\"red\"><b>Error: " + message + "</b></font>\n");
 }
 
 void cedar::proc::gui::Ide::message(const QString& message)

@@ -63,7 +63,7 @@ double cedar::aux::math::sigmoidAbs(const double x, const double beta, const dou
   return 0.5 * (1. + beta * (x - threshold) / (1. + beta * fabs(x - threshold)));
 }
 
-double cedar::aux::math::sigmoidHeavyside(const double x, const double threshold)
+double cedar::aux::math::sigmoidHeaviside(const double x, const double threshold)
 {
   if (x < threshold)
     return 0.0;
