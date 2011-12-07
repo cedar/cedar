@@ -34,14 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/sigmoids.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/AbsSigmoid.h"
 #include "cedar/auxiliaries/math/ExpSigmoid.h"
-#include "cedar/auxiliaries/math/HeavysideSigmoid.h"
+#include "cedar/auxiliaries/math/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/SigmoidDeclaration.h"
 
@@ -108,9 +106,9 @@ int main()
 
   my_values = cv::Mat::ones(1, 1, CV_32F);
   my_values_double = cv::Mat::ones(1, 1, CV_64F);
-  cedar::aux::math::SigmoidPtr heavyside_sigmoid(new cedar::aux::math::HeavysideSigmoid(0.0));
-  sigmoid_my_values = heavyside_sigmoid->compute<float>(my_values);
-  sigmoid_my_values_double = heavyside_sigmoid->compute<double>(my_values_double);
+  cedar::aux::math::SigmoidPtr heaviside_sigmoid(new cedar::aux::math::HeavisideSigmoid(0.0));
+  sigmoid_my_values = heaviside_sigmoid->compute<float>(my_values);
+  sigmoid_my_values_double = heaviside_sigmoid->compute<double>(my_values_double);
   cedar::aux::math::write(sigmoid_my_values);
   cedar::aux::math::write(sigmoid_my_values_double);
 
