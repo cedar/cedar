@@ -37,9 +37,7 @@
 #ifndef CEDAR_DYN_PRESHAPE_H
 #define CEDAR_DYN_PRESHAPE_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/NumericParameter.h"
@@ -111,6 +109,13 @@ public:
 protected:
   //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
   cedar::dyn::SpaceCodePtr mActivation;
+private:
+  // none yet
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
   //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
   //!@brief the field sizes in each dimension
@@ -120,18 +125,6 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dyn::Preshape
 
 #endif // CEDAR_DYN_PRESHAPE_H
-

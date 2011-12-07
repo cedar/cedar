@@ -41,11 +41,9 @@
 #ifndef CEDAR_DYN_SPACE_CODE_H
 #define CEDAR_DYN_SPACE_CODE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Activation.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -64,7 +62,6 @@ class cedar::dyn::SpaceCode : public cedar::dyn::MatActivation
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-
   SpaceCode(const cv::Mat& value) : cedar::dyn::MatActivation(value)
   {
   }
@@ -94,19 +91,9 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
   // none yet
-
 private:
   // none yet
-
 }; // class cedar::dyn::SpaceCode
 
 #endif // CEDAR_DYN_SPACE_CODE_H
-

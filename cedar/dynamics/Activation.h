@@ -41,11 +41,9 @@
 #ifndef CEDAR_DYN_ACTIVATION_H
 #define CEDAR_DYN_ACTIVATION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/DataTemplate.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -91,24 +89,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-
-private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
-
 private:
   // none yet
-
 }; // class cedar::dyn::Activation
 
 #endif // CEDAR_DYN_ACTIVATION_H
-

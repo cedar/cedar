@@ -42,12 +42,9 @@
 #ifndef CEDAR_DYN_NAMESPACE_H
 #define CEDAR_DYN_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
-
 #include "cedar/processing/PluginDeclaration.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

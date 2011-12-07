@@ -81,7 +81,7 @@ void cedar::aux::Configurable::readJson(const std::string& filename)
   this->readConfiguration(configuration);
 }
 
-void cedar::aux::Configurable::writeJson(const std::string& filename)
+void cedar::aux::Configurable::writeJson(const std::string& filename) const
 {
   std::string dir = filename;
 
@@ -127,14 +127,24 @@ cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters
   return this->mParameterList;
 }
 
-void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode& root)
+void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
-  for (ParameterList::iterator iter = this->mParameterList.begin(); iter != this->mParameterList.end(); ++iter)
+  for
+  (
+    ParameterList::const_iterator iter = this->mParameterList.begin();
+    iter != this->mParameterList.end();
+    ++iter
+  )
   {
     (*iter)->putTo(root);
   }
 
-  for (Children::iterator child = this->mChildren.begin(); child != this->mChildren.end(); ++child)
+  for
+  (
+    Children::const_iterator child = this->mChildren.begin();
+    child != this->mChildren.end();
+    ++child
+  )
   {
     cedar::aux::ConfigurationNode child_node;
     child->second->writeConfiguration(child_node);
