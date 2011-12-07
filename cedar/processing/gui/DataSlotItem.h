@@ -93,10 +93,6 @@ public:
    */
   void connectTo(cedar::proc::gui::DataSlotItem *pTarget);
 
-  /*!@brief Disconnects the UI item and the underlying data slot from the target.
-   */
-  void disconnect(cedar::proc::gui::GraphicsBase* pTarget);
-
   /*!@brief Returns the name of the data slot.
    */
   const std::string& getName() const;

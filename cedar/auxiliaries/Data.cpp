@@ -78,13 +78,3 @@ void cedar::aux::Data::setOwner(cedar::aux::Configurable* step)
 {
   this->mpeOwner = step;
 }
-
-const std::string& cedar::aux::Data::connectedSlotName() const
-{
-  return this->mConnectedSlotName;
-}
-
-void cedar::aux::Data::connectedSlotName(const std::string& name)
-{
-  this->mConnectedSlotName = name;
-}

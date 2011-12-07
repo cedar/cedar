@@ -508,7 +508,6 @@ void cedar::proc::Connectable::setData(DataRole::Id role, const std::string& nam
   if (role != cedar::proc::DataRole::INPUT)
   {
     data->setOwner(this);
-    data->connectedSlotName(name);
   }
 #ifdef DEBUG_LOCKS
   std::cout << "Data/lock: " << this->getName() << "." << name << "/" << (&data->getLock()) << std::endl;
@@ -551,7 +550,6 @@ void cedar::proc::Connectable::freeData(DataRole::Id role, const std::string& na
   if (map_iterator != iter->second.end())
   {
     cedar::proc::DataSlotPtr& slot = map_iterator->second;
-    slot->getData()->connectedSlotName("");
     slot->setData(cedar::aux::DataPtr());
   }
   else

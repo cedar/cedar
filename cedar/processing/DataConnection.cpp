@@ -34,14 +34,14 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
+#include "cedar/processing/OwnedData.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/exceptions.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/utilities.h"
+
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,6 +52,7 @@ cedar::proc::DataConnection::DataConnection(cedar::proc::DataSlotPtr source, ced
 mSource(source),
 mTarget(target)
 {
+  CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::OwnedData>(source));
   // add the source data to target
   target->getParentPtr()->setInput(target->getName(), source->getData());
 }

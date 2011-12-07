@@ -45,8 +45,6 @@
 /*!@brief   This is a class that represents a connection between two data items.
  *
  * @remarks This class is used internally in the processing framework, do not use it directly.
- *
- * @todo    Check if source is owned data.
  */
 class cedar::proc::DataConnection
 {

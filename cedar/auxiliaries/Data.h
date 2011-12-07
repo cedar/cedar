@@ -122,12 +122,6 @@ public:
   //!@brief Sets the owner of the data object.
   void setOwner(cedar::aux::Configurable* step);
 
-  //!@brief almost deprecated
-  const std::string& connectedSlotName() const;
-
-  //!@brief almost deprecated
-  void connectedSlotName(const std::string& name);
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -150,8 +144,6 @@ protected:
 private:
   //!@todo This should be a base*, however, right now Configurable can't be used with Base* because base has a (differently realized) name.
   cedar::aux::Configurable* mpeOwner;
-  //!@todo This should be removed, if possible.
-  std::string mConnectedSlotName;
 }; // class cedar::aux::Data
 
 #endif // CEDAR_AUX_DATA_H
