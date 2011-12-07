@@ -62,7 +62,7 @@ namespace cedar
       CEDAR_DECLARE_CLASS(Sigmoid);
       CEDAR_DECLARE_CLASS(AbsSigmoid);
       CEDAR_DECLARE_CLASS(ExpSigmoid);
-      CEDAR_DECLARE_CLASS(HeavysideSigmoid);
+      CEDAR_DECLARE_CLASS(HeavisideSigmoid);
       CEDAR_DECLARE_CLASS(SigmoidDeclaration);
       //!@endcond
 

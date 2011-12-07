@@ -72,7 +72,7 @@ namespace cedar
       CEDAR_AUX_LIB_EXPORT double sigmoidAbs(const double x, const double beta, const double threshold = 0);
 
       //! Heavyside function for a single double value
-      CEDAR_AUX_LIB_EXPORT double sigmoidHeavyside(const double x, const double threshold = 0);
+      CEDAR_AUX_LIB_EXPORT double sigmoidHeaviside(const double x, const double threshold = 0);
 
       //! a sigmoid that rises smoothly in an interval and is exactly zero resp. one outside that interval
       CEDAR_AUX_LIB_EXPORT double sigmoidInterval(const double value, const double t1, const double t2, const bool decreasing = false);

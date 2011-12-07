@@ -37,8 +37,8 @@
     Credits:
 
 ======================================================================================================================*/
-#ifndef CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H
-#define CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H
+#ifndef CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
+#define CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
@@ -47,29 +47,25 @@
 
 // SYSTEM INCLUDES
 
-/*!@brief A sigmoid that is a linear function when the input exceeds the threshold.
+/*!@brief A sigmoid step function, going from 0.0 to 1.0 when the input reaches or exceeds the threshold.
  *
- * @todo More detailed description.
+ * This class internally calls the free function cedar::aux::math::sigmoidHeaviside.
  */
-class cedar::aux::math::HeavysideSigmoid : public cedar::aux::math::Sigmoid
+class cedar::aux::math::HeavisideSigmoid : public cedar::aux::math::Sigmoid
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  HeavysideSigmoid(double threshold)
+  HeavisideSigmoid(double threshold)
   :
   cedar::aux::math::Sigmoid(threshold)
   {
   }
 
   //!@brief Destructor
-  virtual ~HeavysideSigmoid()
+  virtual ~HeavisideSigmoid()
   {
   }
 
@@ -77,11 +73,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief this function calculates the Heavyside function for a given double value.
+  /*!@brief this function calculates the Heaviside function for a given double value.
    */
   virtual double compute(double value) const
   {
-    return cedar::aux::math::sigmoidHeavyside(value, mThreshold->getValue());
+    return cedar::aux::math::sigmoidHeaviside(value, mThreshold->getValue());
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -107,4 +103,4 @@ private:
 };
 
 
-#endif  // CEDAR_AUX_MATH_HEAVYSIDE_SIGMOID_H
+#endif  // CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
