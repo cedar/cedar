@@ -115,10 +115,10 @@ public:
    *
    * @param inputIndex index of the input dimension, whose corresponding output dimension is to be looked up
    */
-  unsigned int lookUp(unsigned int inputIndex);
+  unsigned int lookUp(unsigned int inputIndex) const;
 
   //!@brief Return the current number of mappings.
-  unsigned int getNumberOfMappings();
+  unsigned int getNumberOfMappings() const;
 
   /*!@brief Test whether an input dimension is dropped.
    *
@@ -184,13 +184,13 @@ private:
    *
    * @param outputIndex the index of the output dimension
    */
-  bool checkOutputIndex(unsigned int outputIndex);
+  bool checkOutputIndex(unsigned int outputIndex) const;
 
   /*!@brief Check whether the index of the input dimension is out of bounds.
    *
    * @param inputIndex the index of the input dimension
    */
-  bool checkInputIndex(unsigned int inputIndex);
+  bool checkInputIndex(unsigned int inputIndex) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

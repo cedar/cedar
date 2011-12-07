@@ -51,6 +51,8 @@ unsigned int cedar::proc::ProjectionMapping::msDropIndex = std::numeric_limits<u
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::ProjectionMapping::ProjectionMapping()
+:
+  mOutputDimensionality(0)
 {}
 
 cedar::proc::ProjectionMapping::~ProjectionMapping()
@@ -134,6 +136,7 @@ void cedar::proc::ProjectionMapping::drop(unsigned int inputIndex)
 
 void cedar::proc::ProjectionMapping::initialize(unsigned int numberOfMappings)
 {
+  mOutputDimensionality = 2;
   mMapping.clear();
 
   for (unsigned int i = 0; i < numberOfMappings; ++i)
@@ -144,19 +147,20 @@ void cedar::proc::ProjectionMapping::initialize(unsigned int numberOfMappings)
   updateValidity();
 }
 
-unsigned int cedar::proc::ProjectionMapping::lookUp(unsigned int inputIndex)
+unsigned int cedar::proc::ProjectionMapping::lookUp(unsigned int inputIndex) const
 {
-  if (isDropped(inputIndex) || !mappingExists(inputIndex))
+  std::map<unsigned int, unsigned int>::const_iterator iter = mMapping.find(inputIndex);
+
+  // if no mapping exists for the input index or the input dimension is dropped
+  if (iter == mMapping.end() || iter->second == msDropIndex)
   {
     CEDAR_THROW(cedar::proc::NoMappingException, "There is no mapping defined for the index of the input dimension you supplied.");
-
-    return inputIndex;
   }
 
-  return mMapping[inputIndex];
+  return iter->second;
 }
 
-unsigned int cedar::proc::ProjectionMapping::getNumberOfMappings()
+unsigned int cedar::proc::ProjectionMapping::getNumberOfMappings() const
 {
   return mMapping.size();
 }
@@ -200,7 +204,7 @@ unsigned int cedar::proc::ProjectionMapping::getOutputDimensionality() const
   return mOutputDimensionality;
 }
 
-bool cedar::proc::ProjectionMapping::checkInputIndex(unsigned int inputIndex)
+bool cedar::proc::ProjectionMapping::checkInputIndex(unsigned int inputIndex) const
 {
   bool input_index_okay = true;
 
@@ -214,7 +218,7 @@ bool cedar::proc::ProjectionMapping::checkInputIndex(unsigned int inputIndex)
   return input_index_okay;
 }
 
-bool cedar::proc::ProjectionMapping::checkOutputIndex(unsigned int outputIndex)
+bool cedar::proc::ProjectionMapping::checkOutputIndex(unsigned int outputIndex) const
 {
   bool output_index_okay = true;
 
