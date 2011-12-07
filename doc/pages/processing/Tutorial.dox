@@ -370,13 +370,29 @@ In the folder @em cedar/bin, you can find an application called @em processingId
 configuration files described in @ref ProcessingTutorialFirstStepArchitectureFile using a visual representation. After
 starting the program, yous should see something like this:
 
-@todo Screenshot of the empty applcation
+@image html doc/pages/processing/images/processingIde.png
 
 @subsection ProcessingTutorialUsingTheProcessingIdePartsOfTheUi Different Parts of the User Interface 
 
-The main user interface of the processingIde consists of a few important elements.
+The main user interface of the processingIde consists of a few important elements, highlighted red in the following
+picture. Note, that the elements can be reordered freely, so your interface might look slightly different.
 
-@todo Screenshot highlighting the various UI elements  
+@image html doc/pages/processing/images/processingIde_areas.png
+
+The elements are:
+<ul>
+  <li>
+    @em Elements     A list of all the steps and other elements that can currently be used for building architectures.
+  </li>
+  <li>
+    @em Architecture This is where you construct your architecture. Items from the @em Elements pane can be dragged and
+                     dropped in here. Once they are in, you can right-click them to get various context-dependent
+                     actions. For example, you can display data of a processing step. 
+  </li>
+  <li>
+    @em Properties   When an element is selected in the architecture pane, its parameters are displayed here. 
+  </li>
+</ul>  
 
 
 @subsection ProcessingTutorialUsingTheProcessingIdeSummationStep Integrating the Summation Step 
@@ -472,9 +488,26 @@ void SimpleSummation::compute(const cedar::proc::Arguments&)
 
 @section ProcessingTutorialOwnParameters Advanced Tutorial: Writing your own Parameter Type
 
-When the standard parameter types that cedar provides just don't suffice for expressing settings of your class, you have
-the option of implementing your own parameter type. 
+@todo This tutorial must be improved a lot!
 
+When the standard parameter types that cedar provides just don't suffice for expressing settings of your class, you have
+the option of implementing your own parameter type.
+
+This involves writing (at least) two classes: the actual (data) representation of the parameter and a widget for
+manipulating this data.
+
+First, let us take a look at the data class. This class must inherit cedar::aux::Parameter class. For details on the
+concepts of parameters and the configurable interface, see @ref Parameters.
+
+The widget class must implement cedar::proc::gui::Parameter. This class already takes care of storing a pointer to the
+parameter to be displayed. What must be implemented by you is a method that reacts when the parameter pointer stored in
+the superclass is changed. This means, that this function must adapt all previous widgets it created (if any), or
+allocate new widgets for the newly set parameter.
+
+Finally, the new parameter widget must be associated with the parameter type.
+
+@todo There is currently no proper way to associate a parameter with the widget outside of cedar.
+ 
 
 @section ProcessingTutorialSummary Summary
 
