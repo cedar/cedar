@@ -47,8 +47,12 @@ int main()
   // create a projection mapping
   cedar::proc::ProjectionMapping mapping;
 
-  // initialize the mapping with five elements
+  std::cout << "Created the mapping.\n";
+
+  // initialize the mapping with two elements
   mapping.initialize(2);
+
+  std::cout << "Initialized the mapping.\n";
 
   // check that it got initialized with five elements
   if (mapping.getNumberOfMappings() != 2)
