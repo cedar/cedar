@@ -50,6 +50,10 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 
+#ifdef MSVC
+#include <Windows.h>
+#endif // MSVC
+
 
 /*!@brief The application for the processingIde.
  */

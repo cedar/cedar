@@ -34,9 +34,10 @@
 
 ======================================================================================================================*/
 
+#define NOMINMAX // to avoid Windows issues
+
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "CoraHead.h"
+#include "cedar/devices/robot/gl/CoraHead.h"
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/gl.h"

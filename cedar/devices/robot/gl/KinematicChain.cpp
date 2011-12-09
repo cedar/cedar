@@ -33,13 +33,15 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
+#define NOMINMAX // avoids Windows issues with cedar's min/max functions
+
 // LOCAL INCLUDES
 #include "KinematicChain.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 

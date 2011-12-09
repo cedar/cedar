@@ -46,6 +46,10 @@
 #include <boost/shared_ptr.hpp>
 #include <typeinfo>
 
+#ifdef MSVC
+  #define NOMINMAX // don't add min and max macros!
+  #include <Windows.h>
+#endif
 
 namespace cedar
 {
@@ -177,7 +181,7 @@ namespace cedar
 #ifdef MSVC
         /*!@brief Generates a stack trace for a specific context.
          */
-        StackTrace(PCONTEXT context);
+        StackTrace(CONTEXT* context);
 #endif // MSVC
 
         /*!@brief Returns the number of entries in the stack trace.
@@ -206,7 +210,7 @@ namespace cedar
 #ifdef MSVC
         /*!@brief Initializes the stack trace from the given context.
          */
-        void init(PCONTEXT context);
+        void init(CONTEXT* context);
 #endif // MSVC
     };
 

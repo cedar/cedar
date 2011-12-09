@@ -104,7 +104,7 @@ public:
   void putTo(cedar::aux::ConfigurationNode& root) const
   {
     cedar::aux::ConfigurationNode vector_node;
-    for (typename std::set<T>::iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
+    for (typename std::set<T>::const_iterator iter = this->mValues.begin(); iter != this->mValues.end(); ++iter)
     {
       cedar::aux::ConfigurationNode value_node;
       value_node.put_value(*iter);
