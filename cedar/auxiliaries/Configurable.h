@@ -88,13 +88,13 @@ public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
   /*!@brief create a tree of type cedar::aux::ConfigurationNode from a json file and try to read the configuration
-   * afterwards
+   * afterward
    */
   void readJson(const std::string& filename);
   //!@brief write a configuration for all registered parameters to a root node of type cedar::aux::ConfigurationNode
-  virtual void writeConfiguration(cedar::aux::ConfigurationNode& root);
-  //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and stroe this tree in a json file
-  void writeJson(const std::string& filename);
+  virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+  //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
+  void writeJson(const std::string& filename) const;
   //!@brief get a map of all children of the current Configurable
   const Children& configurableChildren() const;
 

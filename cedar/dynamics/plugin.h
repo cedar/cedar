@@ -37,7 +37,7 @@
 #ifndef CEDAR_DYN_PLUGIN_H
 #define CEDAR_DYN_PLUGIN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/lib.h"
 #include "cedar/processing/PluginDeclaration.h"
 

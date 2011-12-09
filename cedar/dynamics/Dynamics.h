@@ -41,12 +41,10 @@
 #ifndef CEDAR_DYN_H
 #define CEDAR_DYN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/units/TimeUnit.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -98,16 +96,6 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dyn::Dynamics
 
 #endif // CEDAR_DYN_H
-
