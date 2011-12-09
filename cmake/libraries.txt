@@ -153,6 +153,7 @@ if(qwtplot3d_FOUND)
 else(qwtplot3d_FOUND)
   message(${CEDAR_LIB_ERROR_TYPE} "Required library qwtplot3d was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
+  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwtplot3d)
 endif(qwtplot3d_FOUND)
 
 # OpenGL
