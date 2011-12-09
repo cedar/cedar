@@ -65,6 +65,7 @@ namespace cedar
 
     template<class T> class Singleton;
 
+    //!@todo This class may be obsolete once the ConfigurationInterface is removed.
     template <typename T> class IntervalData;
     //!@brief smart pointer for IntervalData<double>
     typedef boost::shared_ptr<IntervalData<double> > DoubleIntervalPtr;

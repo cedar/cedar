@@ -44,7 +44,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 

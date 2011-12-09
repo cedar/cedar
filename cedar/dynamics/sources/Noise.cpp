@@ -40,7 +40,7 @@
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES

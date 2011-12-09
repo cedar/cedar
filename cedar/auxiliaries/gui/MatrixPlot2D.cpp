@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"

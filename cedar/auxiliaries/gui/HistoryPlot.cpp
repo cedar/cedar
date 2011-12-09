@@ -43,7 +43,7 @@
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/DoubleData.h"
 
 // PROJECT INCLUDES
 
