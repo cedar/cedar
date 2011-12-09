@@ -48,6 +48,10 @@ cedar::proc::Step, so the class header looks something like this
 
 @code
 // ...
+#include <cedar/processing/Step.h>
+#include <cedar/processing/ExternalData.h>
+#include <cedar/auxiliaries/DataTemplate.h>
+// ...
 class SimpleSummation : public cedar::proc::Step
 {
   // we assume that you declare all members and functions used throughout the tutorial here
@@ -76,8 +80,9 @@ mOutput(new cedar::aux::MatData(cv::Mat::zeros(1, 1, CV_32F)))
 }
 @endcode
 
-That's all we need to do in the constructor for now. In order to be able to use the step, we also have to tell it what
-to compute; for this, we implement the compute function:
+Don't forget to declare a member variable \b mOutput of type cedar::aux::MatDataPtr. That's all we need to do in the 
+constructor for now. In order to be able to use the step, we also have to tell it what to compute; for this, we 
+implement the compute function:
 
 @code
 // The arguments are unused here
@@ -91,11 +96,11 @@ void SimpleSummation::compute(const cedar::proc::Arguments&)
   /* Retreive its stored data and add it to the sum. 
      Note, that we assume that op1 can be cast to MatData!
    */
-  sum = op1->getData<cedar::aux::MatData>();
+  sum = op1->getData<cv::Mat>();
 
   // Same as above for the second input.
   cedar::aux::ConstDataPtr op2 = this->getInputSlot("operand2")->getData();
-  sum += op2->getData<cedar::aux::MatData>();
+  sum += op2->getData<cv::Mat>();
   
   // In a console application, this lets us see that the computation is actually happening.
   std::cout << "A sum was computed!" << std::endl;
@@ -124,7 +129,7 @@ We now write a main method that connects up our architecture:
 #include <cedar/processing/sources/GaussInput.h>
 #include "SimpleSummation.h" // header for the class we have written above
 
-int main(int argc, char**) // we don't use the arguments here
+int main(int, char**) // we don't use the arguments here
 {
 @endcode
 
@@ -153,7 +158,7 @@ Now it is time to connect things up:
   // connect the first gauss to the sum
   network->connectSlots("gauss1.Gauss input", "sum.operand1");
   // connect the second gauss to the sum
-  network->connectSlots("gauss1.Gauss input", "sum.operand2");
+  network->connectSlots("gauss2.Gauss input", "sum.operand2");
   
   return 0;
 }
