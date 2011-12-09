@@ -38,10 +38,8 @@
 #ifndef CEDAR_AUX_GUI_BASE_WIDGET_H
 #define CEDAR_AUX_GUI_BASE_WIDGET_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
@@ -64,9 +62,9 @@ private:
 public:
   // constructors
   /*!
-   * @brief   Constructor that takes the widget name as argument.
+   * @brief Constructor that takes the widget name as argument.
    *
-   *          To read the window settings, call readWindowSettings().
+   * To read the window settings, call readWindowSettings().
    */
   BaseWidget(const std::string& widgetName = "", QWidget *pParent = NULL);
 
@@ -75,39 +73,27 @@ public:
 
 protected:
 
-  /*!
-   * @brief the widget sends out a signal when it is shown
-   */
+  /*!@brief the widget sends out a signal when it is shown*/
   virtual void showEvent(QShowEvent*);
-  /*!
-   * @brief the widget sends out a signal when it is hidden
-   */
+
+  /*!@brief the widget sends out a signal when it is hidden*/
   virtual void hideEvent(QHideEvent*);
 
-  /*!
-   * Overwrite this to read custom window settings.
-   */
+  /*!@brief Overwrite this to read custom window settings.*/
   virtual void readCustomSettings(QSettings&);
 
-  /*!
-   * Overwrite this to write custom window settings.
-   */
+  /*!@brief Overwrite this to write custom window settings.*/
   virtual void writeCustomSettings(QSettings&);
 
-  /*!
-   * @brief Reads the window settings using the QSettings class.
-   */
+  /*!@brief Reads the window settings using the QSettings class.*/
   virtual void readWindowSettings();
 
-  /*!
-   * @brief Writes the window settings using the QSettings class.
-   */
+  /*!@brief Writes the window settings using the QSettings class.*/
   virtual void writeWindowSettings();
 
-  /*!
-   * @brief Processes key events.
+  /*!@brief Processes key events.
    *
-   *        This function handles ctrl+G, which saves the window settings.
+   * This function handles ctrl+G, which saves the window settings.
    */
   virtual void keyPressEvent(QKeyEvent* pEvent);
 
@@ -120,5 +106,4 @@ private:
   //! Unique identifier for each instance. This is used to associate the window settings with the instance.
   std::string mWidgetName;
 };
-
 #endif  // CEDAR_AUX_GUI_BASE_WIDGET_H
