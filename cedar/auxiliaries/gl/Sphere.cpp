@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-#include "drawShapes.h"
-#include "Sphere.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
 
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Sphere::Sphere(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Sphere::Sphere(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -60,13 +54,13 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Sphere";
 }
 
-Sphere::Sphere(
-                cedar::aux::ObjectPtr pObject,
-                const double radius,
-                const double R,
-                const double G,
-                const double B
-              )
+cedar::aux::gl::Sphere::Sphere(
+                                cedar::aux::ObjectPtr pObject,
+                                double radius,
+                                double R,
+                                double G,
+                                double B
+                              )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -81,17 +75,17 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Sphere::setRadius(double value)
+void cedar::aux::gl::Sphere::setRadius(double value)
 {
   mRadius = value;
 }
 
-double Sphere::radius()
+double cedar::aux::gl::Sphere::radius() const
 {
   return mRadius;
 }
 
-void Sphere::draw()
+void cedar::aux::gl::Sphere::draw()
 {
   // move to origin
   glPopMatrix();

@@ -38,11 +38,9 @@
 #ifndef CEDAR_AUX_GUI_NAMESPACE_H
 #define CEDAR_AUX_GUI_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
-#include "namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

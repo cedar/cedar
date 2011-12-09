@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Pyramid.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Pyramid::Pyramid(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Pyramid::Pyramid(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -62,15 +56,15 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Pyramid";
 }
 
-Pyramid::Pyramid(
-                  cedar::aux::ObjectPtr pObject,
-                  const double length,
-                  const double width,
-                  const double height,
-                  const double R,
-                  const double G,
-                  const double B
-                )
+cedar::aux::gl::Pyramid::Pyramid(
+                                  cedar::aux::ObjectPtr pObject,
+                                  double length,
+                                  double width,
+                                  double height,
+                                  double R,
+                                  double G,
+                                  double B
+                                )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -87,7 +81,7 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Pyramid::draw()
+void cedar::aux::gl::Pyramid::draw()
 {
   // move to origin
   glPopMatrix();
@@ -105,51 +99,32 @@ void Pyramid::draw()
   }
 }
 
-void Pyramid::setLength(double value)
+void cedar::aux::gl::Pyramid::setLength(double value)
 {
   mLength = value;
 }
 
-void Pyramid::setWidth(double value)
+void cedar::aux::gl::Pyramid::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Pyramid::setHeight(double value)
+void cedar::aux::gl::Pyramid::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Pyramid::length()
+double cedar::aux::gl::Pyramid::length() const
 {
   return mLength;
 }
 
-double Pyramid::width()
+double cedar::aux::gl::Pyramid::width() const
 {
   return mWidth;
 }
 
-double Pyramid::height()
+double cedar::aux::gl::Pyramid::height() const
 {
   return mHeight;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
