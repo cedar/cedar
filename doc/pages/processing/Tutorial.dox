@@ -3,6 +3,7 @@
 @page ProcessingTutorials Tutorials for the Processing Framework
 
 @todo Most of the code on this page hasn't yet been tested directly; we need to make an examples folder and put it there.
+@todo There should also be an (advanced) tutorial on creating a custom data type (and visualizing it).
 
 This page offers several tutorials for using cedar's processing framework. A detailed description of the framework can
 be found at @ref ProcessingIntroduction. 
