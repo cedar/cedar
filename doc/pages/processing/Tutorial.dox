@@ -47,6 +47,9 @@ and adds them together.
 First, let's decide to call our class SimpleSummation. In order for it to work within the framework, it has to inherit
 cedar::proc::Step, so the class header looks something like this
 
+@todo sadly, snippet is only available in Doxygen version 1.7.5 or later...
+#@snippet processingTutorial/SimpleSummation.h [Includes]
+
 @code
 // ...
 #include <cedar/processing/Step.h>
