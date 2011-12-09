@@ -36,11 +36,9 @@
 #ifndef CEDAR_AUX_GL_CONE_H
 #define CEDAR_AUX_GL_CONE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "namespace.h"
 #include "Object.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -63,20 +61,20 @@ public:
   Cone(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param radius    radius of the cone
-   * @param height    height of the cone
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pObject pointer to the aux::Object being visualized
+   * @param radius radius of the cone
+   * @param height height of the cone
+   * @param R color, value for red channel in RGB
+   * @param G color, value for green channel in RGB
+   * @param B color, value for blue channel in RGB
    */
   Cone(
         cedar::aux::ObjectPtr pObject,
-        const double radius,
-        const double height,
-        const double R=1,
-        const double G=0,
-        const double B=0
+        double radius,
+        double height,
+        double R = 1,
+        double G = 0,
+        double B = 0
       );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,24 +85,24 @@ public:
   void draw();
 
   /*!@brief set radius of the cone at the base
-   * @param value    new radius
+   * @param value new radius
    */
   void setRadius(double value);
 
   /*!@brief set height of the cone, i.e. distance from base to tip
-   * @param value    new height
+   * @param value new height
    */
   void setHeight(double value);
 
   /*!@brief get radius of the cone at the base
-   * @return    radius
+   * @return radius
    */
-  double radius();
+  double radius() const;
 
   /*!@brief get height of the cone, i.e. distance from base to tip
-   * @return    height
+   * @return height
    */
-  double height();
+  double height() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

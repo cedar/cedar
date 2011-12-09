@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Cylinder.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Cylinder::Cylinder(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Cylinder::Cylinder(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -61,14 +55,14 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Cylinder";
 }
 
-Cylinder::Cylinder(
-                    cedar::aux::ObjectPtr pObject,
-                    const double radius,
-                    const double height,
-                    const double R,
-                    const double G,
-                    const double B
-                  )
+cedar::aux::gl::Cylinder::Cylinder(
+                                    cedar::aux::ObjectPtr pObject,
+                                    double radius,
+                                    double height,
+                                    double R,
+                                    double G,
+                                    double B
+                                  )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -84,7 +78,7 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Cylinder::draw()
+void cedar::aux::gl::Cylinder::draw()
 {
   // move to origin
   glPopMatrix();
@@ -106,30 +100,22 @@ void Cylinder::draw()
   }
 }
 
-void Cylinder::setRadius(double value)
+void cedar::aux::gl::Cylinder::setRadius(double value)
 {
   mRadius = value;
 }
 
-void Cylinder::setHeight(double value)
+void cedar::aux::gl::Cylinder::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Cylinder::radius()
+double cedar::aux::gl::Cylinder::radius() const
 {
   return mRadius;
 }
 
-double Cylinder::height()
+double cedar::aux::gl::Cylinder::height() const
 {
   return mHeight;
 }
-
-
-
-
-
-
-
-
