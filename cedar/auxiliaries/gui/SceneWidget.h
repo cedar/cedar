@@ -43,10 +43,8 @@
 #ifndef CEDAR_AUX_GUI_SCENE_WIDGET_H
 #define CEDAR_AUX_GUI_SCENE_WIDGET_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gl/Object.h"
 #include "cedar/auxiliaries/gl/Block.h"
@@ -78,14 +76,14 @@ class cedar::aux::gui::SceneWidget : public cedar::aux::gui::BaseWidget, private
 {
 private:
 
-	Q_OBJECT
+  Q_OBJECT
 
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief constructor with parent widget */
-	SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget* parent=0);
+  SceneWidget(cedar::aux::gl::ScenePtr p_scene, QWidget* parent=0);
   
   /*!@brief the destructor */
   ~SceneWidget();
@@ -95,11 +93,11 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
   /*!@brief sets the wire frame state of the current object according to the widget control */
-	void setWireFrame(int state);
+  void setWireFrame(int state);
 
   /*!@brief sets the position of the current object according to the widget control */
-	void setPosition();
-	
+  void setPosition();
+
   /*!@brief sets the orientation of the current object according to the widget control */
   void setOrientationQuaternion();
 
@@ -108,54 +106,54 @@ public slots:
 
   /*!@brief sets the color of the current object according to the widget control */
   void setColor();
-	
+
   /*!@brief sets the second color of the current object according to the widget control */
   void setSecondColor();
-	
+
   /*!@brief sets the length of the current object
    * @param value    new length
    */
   void setLength(double value);
-	
+
   /*!@brief sets the width of the current object according to the widget control
    * @param value    new width
    */
   void setWidth(double value);
-	
+
   /*!@brief sets the height of the current object according to the widget control
    * @param value    new height
    */
   void setHeight(double value);
-	
+
   /*!@brief sets the radius of the current object according to the widget control
    * @param value    new radius
    */
   void setRadius(double value);
-	
+
   /*!@brief sets the thickness of the current object according to the widget control
    * @param value    new thickness
    */
   void setThickness(double value);
-	
+
   /*!@brief sets the number of rows of the current object according to the widget control
    * @param value    new number of rows
    */
   void setNumberOfRows(int value);
-	
+
   /*!@brief sets the number of columns of the current object according to the widget control
    * @param value    new number of columns
    */
   void setNumberOfColumns(int value);
-	
+
   /*!@brief creates an object with type and name specified by the widget controls */
   void createObject();
-	
+
   /*!@brief deletes the currently selected object */
   void deleteObject();
-	
+
   /*!@brief deletes all objects in the scene */
   void deleteAllObjects();
-	
+
   /*!@brief set the current object according to combo box status */
   void setActiveObject();
 
@@ -170,20 +168,20 @@ public:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-	void init();
+  void init();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! pointer to the scene being displayed
-	cedar::aux::gl::ScenePtr mpScene;
+  cedar::aux::gl::ScenePtr mpScene;
 
-	// pointer to the currently selected object
+  // pointer to the currently selected object
   cedar::aux::gl::ObjectPtr mpActiveObject;
 
   //! checks whether the widget is currently being changed due to a switch in the selected object
-	bool mSwitchingSelectedObject;
+  bool mSwitchingSelectedObject;
 };
 
 #endif // CEDAR_AUX_GUI_SCENE_WIDGET_H

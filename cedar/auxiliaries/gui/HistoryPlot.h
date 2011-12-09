@@ -37,15 +37,12 @@
 #ifndef CEDAR_AUX_GUI_HISTORY_PLOT_H
 #define CEDAR_AUX_GUI_HISTORY_PLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/DataPlotInterface.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 #include <QWidget>
-
 
 /*!@brief A plot that records and displays the history of numerical data.
  */
@@ -92,18 +89,6 @@ protected:
 private:
   cedar::aux::DataPtr mData;
   QWidget *mpCurrentPlotWidget;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::HistoryPlot
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_H

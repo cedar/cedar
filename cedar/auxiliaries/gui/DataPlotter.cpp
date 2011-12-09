@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/auxiliaries/DoubleData.h"
 #include "cedar/auxiliaries/MatData.h"
@@ -46,8 +46,6 @@
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -57,7 +55,6 @@ cedar::aux::gui::DataPlotter::WidgetFactory cedar::aux::gui::DataPlotter::mTypeP
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::aux::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
 :
 QDockWidget(title.c_str(), pParent)

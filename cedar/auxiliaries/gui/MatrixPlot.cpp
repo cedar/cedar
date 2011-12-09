@@ -40,7 +40,7 @@
 
 #define NOMINMAX // prevents MSVC conflicts
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/MatrixPlot1D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
@@ -50,8 +50,6 @@
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/stringFunctions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -87,7 +85,6 @@ cedar::aux::gui::MatrixPlot::~MatrixPlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
 {
   this->mData= boost::shared_dynamic_cast<cedar::aux::MatData>(data);

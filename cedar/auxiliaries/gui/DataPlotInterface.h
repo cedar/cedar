@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
 #define CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -97,16 +95,6 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::DataPlotInterface
 
 #endif // CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
