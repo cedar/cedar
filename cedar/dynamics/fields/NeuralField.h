@@ -137,14 +137,6 @@ protected:
   std::vector<cedar::aux::kernel::GaussPtr> mKernels;
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
-  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
-  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
-  //!@brief the field sizes in each dimension
-  cedar::aux::UIntVectorParameterPtr _mSizes;
-  //!@brief the number of kernels
-  cedar::aux::UIntParameterPtr _mNumberOfKernels;
-  //!@brief input noise gain
-  cedar::aux::DoubleParameterPtr _mInputNoiseGain;
   //!@brief the old number of kernels - needed to deal with changes in number of kernels
   unsigned int mOldNumberOfKernels;
 private:
@@ -154,7 +146,14 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief the field dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
+  cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
+  //!@brief the field sizes in each dimension
+  cedar::aux::UIntVectorParameterPtr _mSizes;
+  //!@brief the number of kernels
+  cedar::aux::UIntParameterPtr _mNumberOfKernels;
+  //!@brief input noise gain
+  cedar::aux::DoubleParameterPtr _mInputNoiseGain;
 
 private:
   // none yet
@@ -162,4 +161,3 @@ private:
 }; // class cedar::dyn::NeuralField
 
 #endif // CEDAR_DYN_NEURAL_FIELD_H
-

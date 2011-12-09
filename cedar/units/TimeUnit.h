@@ -41,11 +41,9 @@
 #ifndef CEDAR_UNITS_TIME_UNIT_H
 #define CEDAR_UNITS_TIME_UNIT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/units/namespace.h"
 #include "cedar/units/Time.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -69,7 +67,6 @@ class cedar::unit::TimeUnit : public Time
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
-
   friend std::ostream& operator <<(std::ostream &stream, const TimeUnit& unit)
   {
     stream << unit.mAmountInMicroSeconds / static_cast<double>(T_factor) << " " << T_suffix;
@@ -207,25 +204,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::unit::TimeUnit
 
 #endif // CEDAR_UNITS_TIME_UNIT_H
-

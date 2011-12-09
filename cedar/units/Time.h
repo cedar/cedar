@@ -41,10 +41,8 @@
 #ifndef CEDAR_UNITS_TIME_H
 #define CEDAR_UNITS_TIME_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/units/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -97,26 +95,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief the internal representation of time, currently expressed in microseconds
   double mAmountInMicroSeconds;
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::unit::Time
 
 #endif // CEDAR_UNITS_TIME_H
-
