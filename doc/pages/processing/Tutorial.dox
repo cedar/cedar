@@ -1,3 +1,5 @@
+//Insert this below: @snippet processingTutorial/SimpleSummation.h [Includes]
+//@todo sadly, snippet is only available in Doxygen version 1.7.5 or later...
 /*!
 
 @page ProcessingTutorials Tutorials for the Processing Framework
@@ -47,14 +49,10 @@ and adds them together.
 First, let's decide to call our class SimpleSummation. In order for it to work within the framework, it has to inherit
 cedar::proc::Step, so the class header looks something like this
 
-@todo sadly, snippet is only available in Doxygen version 1.7.5 or later...
-#@snippet processingTutorial/SimpleSummation.h [Includes]
-
 @code
 // ...
-#include <cedar/processing/Step.h>
-#include <cedar/processing/ExternalData.h>
-#include <cedar/auxiliaries/DataTemplate.h>
+#include <cedar/processing/Step.h> // if we are going to inherit from cedar::proc::Step, we have to include the header
+#include <cedar/auxiliaries/namespace.h> // forward declaration of all classes in cedar::aux
 // ...
 class SimpleSummation : public cedar::proc::Step
 {
@@ -68,6 +66,11 @@ step are going to be: we need two inputs (the matrices we plan to add up) and on
 processing framework, this is expressed in the constructor:
 
 @code
+// CEDAR INCLUDES
+#include "SimpleSummation.h"
+#include <cedar/processing/ExternalData.h> // getInputSlot() returns ExternalData
+#include <cedar/auxiliaries/MatData.h> // this is the class MatData, used internally in this step
+
 SimpleSummation::SimpleSummation()
 :
 // mOutput is a member, its type is cedar::aux::MatDataPtr 
