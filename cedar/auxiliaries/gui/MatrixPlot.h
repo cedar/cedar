@@ -51,7 +51,6 @@
 #include <opencv2/opencv.hpp>
 #include <qwtplot3d/qwt3d_types.h>
 
-
 /*!@brief Base class for plots that can display matrices.
  *
  * @todo Write more detailed description of the class here.
@@ -110,6 +109,5 @@ private:
   //!@brief vector filled with standard colors
   static Qwt3D::ColorVector mStandardColorVector;
 }; // class cedar::aux::gui::MatrixPlot
-
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_H
 

@@ -35,23 +35,17 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Object.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Object::Object(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Object::Object(cedar::aux::ObjectPtr pObject)
 :
 mpObject(pObject),
 mTransformationTranspose(4, 4, CV_64FC1)
@@ -59,12 +53,12 @@ mTransformationTranspose(4, 4, CV_64FC1)
   init();
 }
 
-Object::~Object()
+cedar::aux::gl::Object::~Object()
 {
 
 }
 
-void Object::init()
+void cedar::aux::gl::Object::init()
 {
   mObjectType = std::string("no type");
   mIsVisible = true;
@@ -79,69 +73,64 @@ void Object::init()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string Object::getObjectName()
+std::string cedar::aux::gl::Object::getObjectName()
 {
   return mpObject->getName();
 }
 
-std::string Object::getObjectType()
+std::string cedar::aux::gl::Object::getObjectType()
 {
   return mObjectType;
 }
 
-int Object::resolution()
+int cedar::aux::gl::Object::resolution()
 {
   return mResolution;
 }
 
-double Object::colorR()
+double cedar::aux::gl::Object::colorR()
 {
   return mColorR;
 }
 
-double Object::colorG()
+double cedar::aux::gl::Object::colorG()
 {
   return mColorG;
 }
 
-double Object::colorB()
+double cedar::aux::gl::Object::colorB()
 {
   return mColorB;
 }
 
-void Object::drawAsWireFrame(bool state)
+void cedar::aux::gl::Object::drawAsWireFrame(bool state)
 {
   mIsDrawnAsWireFrame = state;
 }
 
-bool Object::isDrawnAsWireFrame()
+bool cedar::aux::gl::Object::isDrawnAsWireFrame()
 {
   return mIsDrawnAsWireFrame;
 }
 
-void Object::setResolution(int value)
+void cedar::aux::gl::Object::setResolution(int value)
 {
   mResolution = value;
 }
 
-void Object::setColor(double R, double G, double B)
+void cedar::aux::gl::Object::setColor(double R, double G, double B)
 {
   mColorR = R;
   mColorG = G;
   mColorB = B;
 }
 
-cedar::aux::ObjectPtr Object::getObject()
+cedar::aux::ObjectPtr cedar::aux::gl::Object::getObject()
 {
   return mpObject;
 }
 
-void Object::setVisibility(bool state)
+void cedar::aux::gl::Object::setVisibility(bool state)
 { 
   mIsVisible = state;
 }
-
-
-
-
-

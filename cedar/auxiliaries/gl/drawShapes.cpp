@@ -34,14 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -133,8 +131,8 @@ void cedar::aux::gl::drawCone(
 
 template<typename T>
 void cedar::aux::gl::drawCone(
-                               const cv::Mat start,
-                               const cv::Mat end,
+                               const cv::Mat& start,
+                               const cv::Mat& end,
                                double radiusStart,
                                double radiusEnd,
                                int slices,
@@ -172,8 +170,8 @@ void cedar::aux::gl::drawCone(
 }
 template CEDAR_AUX_LIB_EXPORT
   void cedar::aux::gl::drawCone<double>(
-                                          const cv::Mat,
-                                          const cv::Mat,
+                                          const cv::Mat&,
+                                          const cv::Mat&,
                                           double,
                                           double,
                                           int,
@@ -182,8 +180,8 @@ template CEDAR_AUX_LIB_EXPORT
 
 template CEDAR_AUX_LIB_EXPORT
   void cedar::aux::gl::drawCone<float>(
-                                         const cv::Mat,
-                                         const cv::Mat,
+                                         const cv::Mat&,
+                                         const cv::Mat&,
                                          double,
                                          double,
                                          int,
@@ -192,8 +190,8 @@ template CEDAR_AUX_LIB_EXPORT
 
 template<typename T>
 void cedar::aux::gl::drawArrow(
-                                const cv::Mat start,
-                                const cv::Mat end,
+                                const cv::Mat& start,
+                                const cv::Mat& end,
                                 double shaftRadius,
                                 double headRadius,
                                 double headLength,
@@ -220,26 +218,26 @@ void cedar::aux::gl::drawArrow(
 
 }
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<float>(
-                                                const cv::Mat start,
-                                                const cv::Mat end,
-                                                double shaftRadius,
-                                                double headRadius,
-                                                double headLength,
-                                                int patches,
-                                                bool wireFrame
-                                              );
+                                                                     const cv::Mat& start,
+                                                                     const cv::Mat& end,
+                                                                     double shaftRadius,
+                                                                     double headRadius,
+                                                                     double headLength,
+                                                                     int patches,
+                                                                     bool wireFrame
+                                                                   );
 template CEDAR_AUX_LIB_EXPORT void cedar::aux::gl::drawArrow<double>(
-                                                 const cv::Mat start,
-                                                 const cv::Mat end,
-                                                 double shaftRadius,
-                                                 double headRadius,
-                                                 double headLength,
-                                                 int patches,
-                                                 bool wireFrame
-                                               );
+                                                                      const cv::Mat& start,
+                                                                      const cv::Mat& end,
+                                                                      double shaftRadius,
+                                                                      double headRadius,
+                                                                      double headLength,
+                                                                      int patches,
+                                                                      bool wireFrame
+                                                                    );
 
 void cedar::aux::gl::drawSphere(
-                                 const  double radius,
+                                 double radius,
                                  int slices,
                                  int stacks,
                                  bool wireFrame

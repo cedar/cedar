@@ -36,11 +36,9 @@
 #ifndef CEDAR_AUX_GL_PYRAMID_H
 #define CEDAR_AUX_GL_PYRAMID_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "namespace.h"
 #include "Object.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -58,27 +56,27 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor.
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pObject pointer to the aux::Object being visualized
    */
-	Pyramid(cedar::aux::ObjectPtr pObject);
+  Pyramid(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param length    extension of the pyramid's base in x-direction of object coordinate frame
-   * @param width    extension of the pyramid's base in y-direction of object coordinate frame
-   * @param height    height of the pyramid, i.e. distance from base to tip
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pObject pointer to the aux::Object being visualized
+   * @param length extension of the pyramid's base in x-direction of object coordinate frame
+   * @param width extension of the pyramid's base in y-direction of object coordinate frame
+   * @param height height of the pyramid, i.e. distance from base to tip
+   * @param R color, value for red channel in RGB
+   * @param G color, value for green channel in RGB
+   * @param B color, value for blue channel in RGB
    */
-	Pyramid(
-      	   cedar::aux::ObjectPtr pObject,
-           const double length,
-           const double width,
-           const double height,
-           const double R=1,
-           const double G=0,
-           const double B=0
+  Pyramid(
+           cedar::aux::ObjectPtr pObject,
+           double length,
+           double width,
+           double height,
+           double R=1,
+           double G=0,
+           double B=0
          );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -86,37 +84,37 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-	void draw();
+  void draw();
 
   /*!@brief set extension of the pyramid's base in x-direction of the object coordinate frame
    * @param value    new extension value
    */
-	void setLength(double value);
-	
+  void setLength(double value);
+
   /*!@brief set extension of the pyramid's base in y-direction of the object coordinate frame
    * @param value    new extension value
    */
   void setWidth(double value);
-	
+
   /*!@brief set height of the pyramid, i.e. the distance from the base to the tip
    * @param value    new height value
    */
   void setHeight(double value);
-	
+
   /*!@brief get extension of the pyramid's base in x-direction of the object coordinate frame
    * @return    extension value
    */
-  double length();
-	
+  double length() const;
+
   /*!@brief get extension of the pyramid's base in y-direction of the object coordinate frame
    * @return    extension value
    */
-  double width();
-	
+  double width() const;
+
   /*!@brief get height of the pyramid, i.e. the distance from the base to the tip
    * @return    height value
    */
-  double height();
+  double height() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -35,27 +35,20 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Scene.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-Scene::Scene()
+cedar::aux::gl::Scene::Scene()
 {
   init();
 }
 
-Scene::~Scene()
+cedar::aux::gl::Scene::~Scene()
 {
 
 }
@@ -64,22 +57,22 @@ Scene::~Scene()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Scene::drawFloor(bool state)
+void cedar::aux::gl::Scene::drawFloor(bool state)
 {
   mIsDrawingFloor = state;
 }
 
-void Scene::setSceneLimit(double value)
+void cedar::aux::gl::Scene::setSceneLimit(double value)
 {
   mSceneLimit = value;
 }
 
-double Scene::getSceneLimit()
+double cedar::aux::gl::Scene::getSceneLimit() const
 {
   return mSceneLimit;
 }
 
-int Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
+int cedar::aux::gl::Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
 {
   //!\todo prevent different objects with same names
 //  if (object name exists)
@@ -90,17 +83,17 @@ int Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
   return mObjects.size() - 1;
 }
 
-void Scene::deleteObject(int index)
+void cedar::aux::gl::Scene::deleteObject(int index)
 {
   mObjects.removeAt(index);
 }
 
-void Scene::clear()
+void cedar::aux::gl::Scene::clear()
 {
   mObjects.clear();
 }
 
-void Scene::draw()
+void cedar::aux::gl::Scene::draw()
 {
   // save origin transformation to stack
   glPushMatrix();
@@ -140,28 +133,28 @@ void Scene::draw()
   }
 }
 
-int Scene::numberOfObjects()
+int cedar::aux::gl::Scene::numberOfObjects() const
 {
   return mObjects.size();
 }
 
-bool Scene::isEmpty()
+bool cedar::aux::gl::Scene::isEmpty() const
 {
   return (mObjects.size() == 0);
 }
 
-cedar::aux::gl::ObjectPtr Scene::getObject(int index)
+cedar::aux::gl::ObjectPtr cedar::aux::gl::Scene::getObject(int index)
 {
   return mObjects[index];
 }
 
-void Scene::initGl()
+void cedar::aux::gl::Scene::initGl()
 {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_MAP2_VERTEX_3);
   glEnable(GL_AUTO_NORMAL);
 
-  //!\todo this somehow sets the light relative to the camera, which might not be wanted. check!
+  //!@todo this somehow sets the light relative to the camera, which might not be wanted. check!
   // set light
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
@@ -179,12 +172,8 @@ void Scene::initGl()
   glLightfv(GL_LIGHT0, GL_POSITION, position);
 }
 
-void Scene::init()
+void cedar::aux::gl::Scene::init()
 {
   mIsDrawingFloor = true;
   mSceneLimit = 10;
 }
-
-
-
-

@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Prism.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Prism::Prism(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Prism::Prism(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -61,14 +55,14 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Prism";
 }
 
-Prism::Prism(
-              cedar::aux::ObjectPtr pObject,
-              const double width,
-              const double height,
-              const double R,
-              const double G,
-              const double B
-            )
+cedar::aux::gl::Prism::Prism(
+                              cedar::aux::ObjectPtr pObject,
+                              double width,
+                              double height,
+                              double R,
+                              double G,
+                              double B
+                            )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -84,7 +78,7 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Prism::draw()
+void cedar::aux::gl::Prism::draw()
 {
   // move to origin
   glPopMatrix();
@@ -102,41 +96,22 @@ void Prism::draw()
   }
 }
 
-void Prism::setWidth(double value)
+void cedar::aux::gl::Prism::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Prism::setHeight(double value)
+void cedar::aux::gl::Prism::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Prism::width()
+double cedar::aux::gl::Prism::width() const
 {
   return mWidth;
 }
 
-double Prism::height()
+double cedar::aux::gl::Prism::height() const
 {
   return mHeight;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
