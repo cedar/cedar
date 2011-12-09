@@ -38,7 +38,7 @@
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/Data.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
 
@@ -50,7 +50,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::kernel::Kernel::Kernel()
 :
-mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
+mKernel(new cedar::aux::MatData()),
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
 _mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", "dummy_matrix_file.yml"))
 {

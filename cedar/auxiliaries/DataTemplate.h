@@ -32,7 +32,7 @@
                  stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 05 23
 
-    Description:
+    Description: Header for the cedar::aux::DataTemplate.
 
     Credits:
 
@@ -50,7 +50,10 @@
 
 /*!@brief A templated version of cedar::aux::Data.
  *
- * More detailed description of the class coming soon.
+ * @todo More detailed description of the class.
+ *
+ * @remarks Usually, you should not include the header for this class directly. Rather, include the headers of its
+ *          instantiations: e.g., for cedar::aux::MatData, include cedar/auxiliaries/MatData.h.
  */
 template <typename T>
 class cedar::aux::DataTemplate : public cedar::aux::Data

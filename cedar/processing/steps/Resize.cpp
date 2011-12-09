@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

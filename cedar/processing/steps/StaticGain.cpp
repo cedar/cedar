@@ -39,6 +39,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 

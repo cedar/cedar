@@ -38,10 +38,9 @@
 #include "cedar/dynamics/fields/Preshape.h"
 
 // PROJECT INCLUDES
+#include "cedar/dynamics/SpaceCode.h"
 #include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/NumericVectorParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
-#include "cedar/dynamics/SpaceCode.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES

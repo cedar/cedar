@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 #include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/DoubleData.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Manager.h"

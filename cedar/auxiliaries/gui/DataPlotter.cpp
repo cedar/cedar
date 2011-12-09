@@ -40,7 +40,8 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/DoubleData.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
