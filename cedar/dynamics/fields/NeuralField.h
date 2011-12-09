@@ -44,6 +44,9 @@
 // CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/namespace.h"

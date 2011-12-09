@@ -41,16 +41,15 @@
 // CEDAR INCLUDES
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
-#include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
-#include "cedar/auxiliaries/assert.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/assert.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES

@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/assert.h"
 

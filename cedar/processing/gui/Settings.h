@@ -40,8 +40,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES
 

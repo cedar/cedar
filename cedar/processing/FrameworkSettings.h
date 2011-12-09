@@ -40,8 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/SetParameter.h"
 
 // SYSTEM INCLUDES
 #include <set>
