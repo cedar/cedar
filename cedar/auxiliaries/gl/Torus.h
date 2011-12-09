@@ -36,11 +36,9 @@
 #ifndef CEDAR_AUX_GL_TORUS_H
 #define CEDAR_AUX_GL_TORUS_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "Object.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
 
@@ -58,27 +56,27 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pObject pointer to the aux::Object being visualized
    */
   Torus(cedar::aux::ObjectPtr pObject);
+
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param radius    the radius of the circle in the xy-plane
-   * @param thickness    distance of the torus walls to the circle
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pObject pointer to the aux::Object being visualized
+   * @param radius the radius of the circle in the xy-plane
+   * @param thickness distance of the torus walls to the circle
+   * @param R color, value for red channel in RGB
+   * @param G color, value for green channel in RGB
+   * @param B color, value for blue channel in RGB
    */
   Torus(
          cedar::aux::ObjectPtr pObject,
-         const double radius,
-         const double thickness,
-         const double R=1,
-         const double G=0,
-         const double B=0
+         double radius,
+         double thickness,
+         double R = 1,
+         double G = 0,
+         double B = 0
        );
-  
-  
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,24 +85,24 @@ public:
   void draw();
 
   /*!@brief set the radius of the circle in the xy-plane
-   * @param value    new radius value
+   * @param value new radius value
    */
   void setRadius(double value);
 
   /*!@brief set the distance of the torus walls to the circle
-   * @param value    new thickness value
+   * @param value new thickness value
    */
   void setThickness(double value);
 
   /*!@brief get the radius of the circle in the xy-plane
-   * @return    radius value
+   * @return radius value
    */
-  double radius();
+  double radius() const;
 
   /*!@brief get the distance of the torus walls to the circle
-   * @return    thickness value
+   * @return thickness value
    */
-  double thickness();
+  double thickness() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

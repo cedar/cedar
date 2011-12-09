@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Chessboard.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Chessboard::Chessboard(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Chessboard::Chessboard(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -67,20 +61,20 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Chessboard";
 }
 
-Chessboard::Chessboard(
-                        cedar::aux::ObjectPtr pObject,
-                        const double length,
-                        const double width,
-                        const double height,
-                        const int rows,
-                        const int cols,
-                        const double R1,
-                        const double G1,
-                        const double B1,
-                        const double R2,
-                        const double G2,
-                        const double B2
-                      )
+cedar::aux::gl::Chessboard::Chessboard(
+                                        cedar::aux::ObjectPtr pObject,
+                                        double length,
+                                        double width,
+                                        double height,
+                                        int rows,
+                                        int cols,
+                                        double R1,
+                                        double G1,
+                                        double B1,
+                                        double R2,
+                                        double G2,
+                                        double B2
+                                      )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -98,7 +92,7 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Chessboard";
 }
 
-void Chessboard::draw()
+void cedar::aux::gl::Chessboard::draw()
 {
   // move to origin
   glPopMatrix();
@@ -134,84 +128,75 @@ void Chessboard::draw()
   }
 }
 
-void Chessboard::setLength(double value)
+void cedar::aux::gl::Chessboard::setLength(double value)
 {
   mLength = value;
 }
 
-void Chessboard::setWidth(double value)
+void cedar::aux::gl::Chessboard::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Chessboard::setHeight(double value)
+void cedar::aux::gl::Chessboard::setHeight(double value)
 {
   mHeight = value;
 }
 
-void Chessboard::setNumberOfRows(int value)
+void cedar::aux::gl::Chessboard::setNumberOfRows(int value)
 {
   mNumberOfRows = value;
 }
 
-void Chessboard::setNumberOfColumns(int value)
+void cedar::aux::gl::Chessboard::setNumberOfColumns(int value)
 {
   mNumberOfColumns = value;
 }
 
-void Chessboard::setSecondColor(double R, double G, double B)
+void cedar::aux::gl::Chessboard::setSecondColor(double R, double G, double B)
 {
   mSecondColorR = R;
   mSecondColorG = G;
   mSecondColorB = B;
 }
 
-double Chessboard::length()
+double cedar::aux::gl::Chessboard::length() const
 {
   return mLength;
 }
 
-double Chessboard::width()
+double cedar::aux::gl::Chessboard::width() const
 {
   return mWidth;
 }
 
-double Chessboard::height()
+double cedar::aux::gl::Chessboard::height() const
 {
   return mHeight;
 }
 
-int Chessboard::numberOfRows()
+int cedar::aux::gl::Chessboard::numberOfRows() const
 {
   return mNumberOfRows;
 }
 
-int Chessboard::numberOfColumns()
+int cedar::aux::gl::Chessboard::numberOfColumns() const
 {
   return mNumberOfColumns;
 }
 
-double Chessboard::secondColorR()
+double cedar::aux::gl::Chessboard::secondColorR() const
 {
   return mSecondColorR;
 }
 
-double Chessboard::secondColorG()
+double cedar::aux::gl::Chessboard::secondColorG() const
 {
   return mSecondColorG;
 }
 
-double Chessboard::secondColorB()
+double cedar::aux::gl::Chessboard::secondColorB() const
 {
   return mSecondColorB;
 }
-
-
-
-
-
-
-
-
-
 

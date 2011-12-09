@@ -38,10 +38,8 @@
 #ifndef CEDAR_AUX_GUI_VIEWER_H
 #define CEDAR_AUX_GUI_VIEWER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 
@@ -94,7 +92,5 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
   cedar::aux::gl::ScenePtr const mpScene;
-
 };
-
 #endif  // CEDAR_AUX_GUI_VIEWER_H

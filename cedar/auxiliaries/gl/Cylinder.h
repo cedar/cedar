@@ -37,8 +37,8 @@
 #define CEDAR_AUX_GL_CYLINDER_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
-#include "Object.h"
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // PROJECT INCLUDES
 
@@ -72,11 +72,11 @@ public:
    */
   Cylinder(
             cedar::aux::ObjectPtr pObject,
-            const double radius,
-            const double height,
-            const double R=1,
-            const double G=0,
-            const double B=0
+            double radius,
+            double height,
+            double R = 1,
+            double G = 0,
+            double B = 0
           );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,12 +99,12 @@ public:
   /*!@brief get radius of the cylinder
    * @return    radius
    */
-  double radius();
+  double radius() const;
 
   /*!@brief get height of the cylinder
    * @return    height
    */
-  double height();
+  double height() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

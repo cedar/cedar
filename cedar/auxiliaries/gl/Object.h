@@ -78,7 +78,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief draws a visualization of the object in the current GL context
-  virtual void draw()=0;
+  virtual void draw() = 0;
   
   //!@brief returns name of the object
   std::string getObjectName();
