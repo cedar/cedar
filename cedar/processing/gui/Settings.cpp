@@ -40,7 +40,7 @@
 #include "cedar/auxiliaries/SetParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/VectorParameter.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/System.h"
 
 // PROJECT INCLUDES

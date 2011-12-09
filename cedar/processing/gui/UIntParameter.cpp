@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/UIntParameter.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES

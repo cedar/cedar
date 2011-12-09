@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 

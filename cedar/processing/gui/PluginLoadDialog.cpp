@@ -44,6 +44,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/assert.h"
 
 // PROJECT INCLUDES

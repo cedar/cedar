@@ -42,10 +42,10 @@
 #include "cedar/processing/steps/namespace.h"
 #include "cedar/processing/Step.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
-#include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 
