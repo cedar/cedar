@@ -49,7 +49,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <boost/foreach.hpp>
+//#include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
@@ -59,7 +59,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 // foreach loop from boost
-#define cedar_foreach BOOST_FOREACH
+//#define cedar_foreach BOOST_FOREACH
 
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -38,6 +38,8 @@
 
 ======================================================================================================================*/
 
+#define NOMINMAX // prevents MSVC conflicts
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"

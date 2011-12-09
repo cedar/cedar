@@ -45,7 +45,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/Scene.h"
@@ -59,6 +58,7 @@
 #include "cedar/auxiliaries/gl/Torus.h"
 #include "cedar/auxiliaries/gl/Ellipse.h"
 #include "cedar/auxiliaries/gl/Chessboard.h"
+#include "cedar/auxiliaries/gui/BaseWidget.h"
 #ifdef DEBUG
   #include "cedar/auxiliaries/debug/gui/ui_SceneWidget.h"
 #else
@@ -66,7 +66,6 @@
 #endif
 
 // SYSTEM INCLUDES
-#include <Qt>
 
 /*!@brief Widget to observe and change a scene of geometric objects
  *

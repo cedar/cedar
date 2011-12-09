@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 #if defined WIN32
+  #define NOMINMAX
   #include <Windows.h>
   #include <gl/GL.h>
 #elif defined APPLE

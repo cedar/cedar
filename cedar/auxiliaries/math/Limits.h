@@ -38,6 +38,8 @@
 #ifndef CEDAR_AUX_MATH_LIMITS_H
 #define CEDAR_AUX_MATH_LIMITS_H
 
+#define NOMINMAX // to avoid Windows issues
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 
