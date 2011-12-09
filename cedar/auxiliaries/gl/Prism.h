@@ -36,11 +36,9 @@
 #ifndef CEDAR_AUX_GL_PRISM_H
 #define CEDAR_AUX_GL_PRISM_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "Object.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
 
@@ -63,20 +61,20 @@ public:
   Prism(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param width    edge length of the prism's triangular base
-   * @param height    height of the prism, i.e. distance between floor (=base) and ceiling
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pObject pointer to the aux::Object being visualized
+   * @param width edge length of the prism's triangular base
+   * @param height height of the prism, i.e. distance between floor (=base) and ceiling
+   * @param R color, value for red channel in RGB
+   * @param G color, value for green channel in RGB
+   * @param B color, value for blue channel in RGB
    */
   Prism(
          cedar::aux::ObjectPtr pObject,
-         const double width,
-         const double height,
-         const double R=1,
-         const double G=0,
-         const double B=0
+         double width,
+         double height,
+         double R = 1,
+         double G = 0,
+         double B = 0
        );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,31 +85,30 @@ public:
   void draw();
 
   /*!@brief set edge length of the prism's triangular base
-   * @param value    new edge length value
+   * @param value new edge length value
    */
   void setWidth(double value);
 
   /*!@brief set height of the prism, i.e. distance between floor (=base) and ceiling
-   * @param value    new height value
+   * @param value new height value
    */
   void setHeight(double value);
 
   /*!@brief get edge length of the prism's triangular base
-   * @return    edge length value
+   * @return edge length value
    */
-  double width();
+  double width() const;
 
   /*!@brief get height of the prism, i.e. distance between floor (=base) and ceiling
-   * @return    height value
+   * @return height value
    */
-  double height();
+  double height() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
   double mWidth;
-  
   double mHeight;
 };
 

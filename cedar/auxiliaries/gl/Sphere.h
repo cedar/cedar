@@ -36,11 +36,9 @@
 #ifndef CEDAR_AUX_GL_SPHERE_H
 #define CEDAR_AUX_GL_SPHERE_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "Object.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
 
@@ -63,18 +61,18 @@ public:
   Sphere(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param radius    radius of the sphere
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pObject pointer to the aux::Object being visualized
+   * @param radius radius of the sphere
+   * @param R color, value for red channel in RGB
+   * @param G color, value for green channel in RGB
+   * @param B color, value for blue channel in RGB
    */
   Sphere(
           cedar::aux::ObjectPtr pObject,
-          const double radius,
-          const double R=1,
-          const double G=0,
-          const double B=0
+          double radius,
+          double R = 1,
+          double G = 0,
+          double B = 0
         );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -92,7 +90,7 @@ public:
   /*!@brief get radius of the sphere
    * @return    radius
    */
-  double radius();
+  double radius() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

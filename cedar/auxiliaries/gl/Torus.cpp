@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Torus.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Torus::Torus(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Torus::Torus(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -61,14 +55,14 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Torus";
 }
 
-Torus::Torus(
-              cedar::aux::ObjectPtr pObject,
-              const double radius,
-              const double thickness,
-              const double R,
-              const double G,
-              const double B
-            )
+cedar::aux::gl::Torus::Torus(
+                              cedar::aux::ObjectPtr pObject,
+                              double radius,
+                              double thickness,
+                              double R,
+                              double G,
+                              double B
+                            )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -84,27 +78,27 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Torus::setRadius(double value)
+void cedar::aux::gl::Torus::setRadius(double value)
 {
   mRadius = value;
 }
 
-void Torus::setThickness(double value)
+void cedar::aux::gl::Torus::setThickness(double value)
 {
   mThickness = value;
 }
 
-double Torus::radius()
+double cedar::aux::gl::Torus::radius() const
 {
   return mRadius;
 }
 
-double Torus::thickness()
+double cedar::aux::gl::Torus::thickness() const
 {
   return mThickness;
 }
 
-void Torus::draw()
+void cedar::aux::gl::Torus::draw()
 {
   // move to origin
   glPopMatrix();

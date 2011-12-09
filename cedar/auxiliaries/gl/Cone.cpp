@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-#include "drawShapes.h"
-#include "Cone.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/Cone.h"
 
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Cone::Cone(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Cone::Cone(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -61,14 +55,14 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Cone";
 }
 
-Cone::Cone(
-            cedar::aux::ObjectPtr pObject,
-            const double radius,
-            const double height,
-            const double R,
-            const double G,
-            const double B
-          )
+cedar::aux::gl::Cone::Cone(
+                            cedar::aux::ObjectPtr pObject,
+                            double radius,
+                            double height,
+                            double R,
+                            double G,
+                            double B
+                          )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -84,7 +78,7 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Cone::draw()
+void cedar::aux::gl::Cone::draw()
 {
   // move to origin
   glPopMatrix();
@@ -102,22 +96,22 @@ void Cone::draw()
   }
 }
 
-void Cone::setRadius(double value)
+void cedar::aux::gl::Cone::setRadius(double value)
 {
   mRadius = value;
 }
 
-void Cone::setHeight(double value)
+void cedar::aux::gl::Cone::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Cone::radius()
+double cedar::aux::gl::Cone::radius() const
 {
   return mRadius;
 }
 
-double Cone::height()
+double cedar::aux::gl::Cone::height() const
 {
   return mHeight;
 }

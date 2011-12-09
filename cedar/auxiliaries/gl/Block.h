@@ -38,11 +38,9 @@
 #ifndef CEDAR_AUX_GL_BLOCK_H
 #define CEDAR_AUX_GL_BLOCK_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Object.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Object.h"
 
@@ -62,27 +60,27 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pObject pointer to the aux::Object being visualized
    */
   Block(cedar::aux::ObjectPtr pObject);
 
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
-   * @param length    extension of the block in x-direction of the object coordinate frame
-   * @param width    extension of the block in y-direction of the object coordinate frame
-   * @param height    extension of the block in z-direction of the object coordinate frame
-   * @param R    color, value for red channel in RGB
-   * @param G    color, value for green channel in RGB
-   * @param B    color, value for blue channel in RGB
+   * @param pObject pointer to the aux::Object being visualized
+   * @param length extension of the block in x-direction of the object coordinate frame
+   * @param width extension of the block in y-direction of the object coordinate frame
+   * @param height extension of the block in z-direction of the object coordinate frame
+   * @param R color, value for red channel in RGB
+   * @param G color, value for green channel in RGB
+   * @param B color, value for blue channel in RGB
    */
   Block(
          cedar::aux::ObjectPtr pObject,
-         const double length,
-         const double width,
-         const double height,
-         const double R=1,
-         const double G=0,
-         const double B=0
+         double length,
+         double width,
+         double height,
+         double R=1,
+         double G=0,
+         double B=0
        );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,34 +91,34 @@ public:
   void draw();
 
   /*!@brief set extension of the block in x-direction of the object coordinate frame
-   * @param value    new extension value
+   * @param value new extension value
    */
   void setLength(double value);
 
   /*!@brief set extension of the block in y-direction of the object coordinate frame
-   * @param value    new extension value
+   * @param value new extension value
    */
   void setWidth(double value);
 
   /*!@brief set extension of the block in z-direction of the object coordinate frame
-   * @param value    new extension value
+   * @param value new extension value
    */
   void setHeight(double value);
 
   /*!@brief get extension of the block in x-direction of the object coordinate frame
-   * @return    extension value
+   * @return extension value
    */
-  double length();
+  double length() const;
 
   /*!@brief get extension of the block in y-direction of the object coordinate frame
-   * @return    extension value
+   * @return extension value
    */
-  double width();
+  double width() const;
 
   /*!@brief get extension of the block in z-direction of the object coordinate frame
-   * @return    extension value
+   * @return extension value
    */
-  double height();
+  double height() const;
   
   //--------------------------------------------------------------------------------------------------------------------
   // members
