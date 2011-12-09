@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "SimpleSummation.h"
 #include <cedar/processing/ExternalData.h> // getInputSlot() returns ExternalData
-#include <cedar/auxiliaries/DataTemplate.h> // this is the template class for MatData
+#include <cedar/auxiliaries/MatData.h> // this is the class MatData, used internally in this step
 
 // SYSTEM INCLUDES
 
