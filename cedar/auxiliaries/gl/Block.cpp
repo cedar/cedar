@@ -35,23 +35,17 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/Block.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Block::Block(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Block::Block(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -64,14 +58,14 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Block";
 }
 
-Block::Block(
+cedar::aux::gl::Block::Block(
               cedar::aux::ObjectPtr pObject,
-              const double length,
-              const double width,
-              const double height,
-              const double R,
-              const double G,
-              const double B
+              double length,
+              double width,
+              double height,
+              double R,
+              double G,
+              double B
             )
 :
 cedar::aux::gl::Object(pObject)
@@ -89,7 +83,7 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Block::draw()
+void cedar::aux::gl::Block::draw()
 {
   // move to origin
   glPopMatrix();
@@ -107,51 +101,32 @@ void Block::draw()
   }
 }
 
-void Block::setLength(double value)
+void cedar::aux::gl::Block::setLength(double value)
 {
   mLength = value;
 }
 
-void Block::setWidth(double value)
+void cedar::aux::gl::Block::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Block::setHeight(double value)
+void cedar::aux::gl::Block::setHeight(double value)
 {
   mHeight = value;
 }
 
-double Block::length()
+double cedar::aux::gl::Block::length() const
 {
   return mLength;
 }
 
-double Block::width()
+double cedar::aux::gl::Block::width() const
 {
   return mWidth;
 }
 
-double Block::height()
+double cedar::aux::gl::Block::height() const
 {
   return mHeight;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -46,8 +46,6 @@
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -66,7 +64,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::aux::gui::HistoryPlot0D::HistoryPlot0D(QWidget *pParent)
 :
 cedar::aux::gui::DataPlotInterface(pParent),
@@ -91,7 +88,6 @@ cedar::aux::gui::HistoryPlot0D::~HistoryPlot0D()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::aux::gui::HistoryPlot0D::init()
 {
   mMaxHistorySize = 500;
@@ -169,7 +165,6 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
                          1);
 
   this->mpCurve->attach(this->mpPlot);
-
 
   this->startTimer(30); //!@todo make the refresh time configurable.
 }

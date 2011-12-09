@@ -33,23 +33,17 @@
  ----- Credits:     
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "drawShapes.h"
 #include "Ellipse.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-Ellipse::Ellipse(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Ellipse::Ellipse(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -62,15 +56,15 @@ cedar::aux::gl::Object(pObject)
   mObjectType = "Ellipse";
 }
 
-Ellipse::Ellipse(
-                  cedar::aux::ObjectPtr pObject,
-                  const double length,
-                  const double width,
-                  const double thickness,
-                  const double R,
-                  const double G,
-                  const double B
-                )
+cedar::aux::gl::Ellipse::Ellipse(
+                                  cedar::aux::ObjectPtr pObject,
+                                  double length,
+                                  double width,
+                                  double thickness,
+                                  double R,
+                                  double G,
+                                  double B
+                                )
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -87,37 +81,37 @@ cedar::aux::gl::Object(pObject)
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void Ellipse::setLength(double value)
+void cedar::aux::gl::Ellipse::setLength(double value)
 {
   mLength = value;
 }
 
-void Ellipse::setWidth(double value)
+void cedar::aux::gl::Ellipse::setWidth(double value)
 {
   mWidth = value;
 }
 
-void Ellipse::setThickness(double value)
+void cedar::aux::gl::Ellipse::setThickness(double value)
 {
   mThickness = value;
 }
 
-double Ellipse::length()
+double cedar::aux::gl::Ellipse::length() const
 {
   return mLength;
 }
 
-double Ellipse::width()
+double cedar::aux::gl::Ellipse::width() const
 {
   return mWidth;
 }
 
-double Ellipse::thickness()
+double cedar::aux::gl::Ellipse::thickness() const
 {
   return mThickness;
 }
 
-void Ellipse::draw()
+void cedar::aux::gl::Ellipse::draw()
 {
   // move to origin
   glPopMatrix();

@@ -46,7 +46,6 @@
 #include <qwt/qwt_plot_curve.h>
 #include <deque>
 
-
 /*!@brief A time-based plot for 0D values. Displays a history of this value from a certain point in the past up to now.
  *
  * More detailed description of the class.

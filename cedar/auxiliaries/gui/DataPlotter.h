@@ -49,7 +49,6 @@
 // SYSTEM INCLUDES
 #include <QDockWidget>
 
-
 /*!@brief Base class for a dockable plot.
  *
  * This class decides, which plot fits best the given data and instantiate a plot of the right type.
@@ -114,6 +113,5 @@ private:
   //!@brief factory from data to fitting plot - not used
   static WidgetFactory mTypePlotters;
 }; // class cedar::aux::gui::DataPlotter
-
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
 
