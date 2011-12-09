@@ -172,7 +172,7 @@ processingIde to do it all in a user interface (see @ref ProcessingTutorialUsing
 In the previous tutorials we have demonstrated how to write a simple processing step. So far, it may not have been clear
 what the actual advantage of writing all the code described above for a simple matrix addition is. However, in this
 section, we will start to use the actual emergent power of this added code. Note that we won't have to modify the 
-SimpleSummation code we have written @ref ProcessingTutorialFirstStep_NewClass "above" @endref for this!
+SimpleSummation code we have written @ref ProcessingTutorialFirstStep_NewClass "above" for this!
 
 We start out by turning the SimpleSummation step into a class that is actually known by the framework. One way of doing
 this is by simply adding a declaration for the step in the main method of our program:
