@@ -45,7 +45,6 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Trigger.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 
 // SYSTEM INCLUDES

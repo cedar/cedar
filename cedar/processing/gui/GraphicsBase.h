@@ -45,7 +45,6 @@
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/NumericParameter.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsItem>

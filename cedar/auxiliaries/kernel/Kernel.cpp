@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Kernel.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"

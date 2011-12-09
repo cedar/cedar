@@ -46,8 +46,6 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/NumericParameter.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
 
 // PROJECT INCLUDES
 

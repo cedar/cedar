@@ -42,7 +42,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES

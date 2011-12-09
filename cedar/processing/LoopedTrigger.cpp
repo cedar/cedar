@@ -45,6 +45,7 @@
 #include "cedar/units/TimeUnit.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopMode.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/assert.h"
 
