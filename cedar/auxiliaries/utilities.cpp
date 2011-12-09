@@ -48,8 +48,6 @@
 
 #ifdef MSVC
   #include "cedar/auxiliaries/stringFunctions.h"
-
-  #include <Windows.h>
   #include <Dbghelp.h>
   #pragma comment(lib, "Dbghelp.lib")
 #endif // MSVC
@@ -188,12 +186,12 @@ void cedar::aux::StackEntry::setRawString(const std::string& rawString)
 #endif // GCC
 
 #ifdef MSVC
-cedar::aux::StackTrace::StackTrace(PCONTEXT context)
+cedar::aux::StackTrace::StackTrace(CONTEXT* context)
 {
   this->init(context);
 }
 
-void cedar::aux::StackTrace::init(PCONTEXT context)
+void cedar::aux::StackTrace::init(CONTEXT* context)
 {
   CONTEXT& context_record = *context;
 

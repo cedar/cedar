@@ -39,7 +39,7 @@
 #define CEDAR_AUX_MATH_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "namespace.h"
+#include "cedar/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // PROJECT INCLUDES

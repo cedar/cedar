@@ -49,7 +49,6 @@
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
-#include <stdint.h>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -162,7 +162,7 @@ void cedar::proc::gui::Ide::restoreSettings()
 void cedar::proc::gui::Ide::loadDefaultPlugins()
 {
   const std::set<std::string>& plugins = cedar::proc::gui::Settings::instance().pluginsToLoad();
-  for (std::set<std::string>::iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
+  for (std::set<std::string>::const_iterator iter = plugins.begin(); iter != plugins.end(); ++ iter)
   {
     try
     {

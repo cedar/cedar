@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+#define NOMINMAX // to avoid Windows issues
+
 // LOCAL INCLUDES
 #include "namespace.h"
 #include "AmtecChain.h"
