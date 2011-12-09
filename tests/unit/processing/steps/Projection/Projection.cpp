@@ -40,6 +40,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/steps/Projection.h"
 #include "cedar/processing/Triggerable.h"
+#include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/dynamics/namespace.h"
 
@@ -126,7 +127,10 @@ int main()
 
   std::cout << "number of errors initialized to zero...\n";
 
-  cedar::dyn::initialize();
+  // Load the dynamics plugin
+  cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
+  cedar::dyn::getPluginDesciption(plugin);
+  cedar::proc::Manager::getInstance().load(plugin);
 
   //===================================================================================================================
   // 1D to 0D

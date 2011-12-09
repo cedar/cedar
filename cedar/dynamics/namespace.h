@@ -73,10 +73,8 @@ namespace cedar
     CEDAR_DECLARE_DYN_CLASS(Noise);
     //!@endcond
 
-#ifdef LINUX
-    // for msvc, this is replaced by the plugin stuff below, currently as a workaround.
-    CEDAR_DYN_LIB_EXPORT void initialize();
-#endif // GCC
+    //!@brief A function for loading the declarations of the dynamics namespace as plugin.
+    CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin);
   }
 }
 

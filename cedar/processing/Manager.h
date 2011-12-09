@@ -92,6 +92,9 @@ public:
   //!@brief load a plugin
   void load(cedar::proc::PluginProxyPtr plugin);
 
+  //!@brief Loads the declarations from a plugin declaration.
+  void load(cedar::proc::PluginDeclarationPtr declaration);
+
   //!@brief start all registered threads
   void startThreads();
 
