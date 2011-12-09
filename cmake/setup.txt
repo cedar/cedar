@@ -61,6 +61,8 @@ set (CEDAR_UNIT_TEST_DIR        "${CEDAR_TEST_DIR}/unit")
 set (CEDAR_INTERACTIVE_TEST_DIR "${CEDAR_TEST_DIR}/interactive")
 # directory for all tools
 set (CEDAR_EXECUTABLES_DIR            "${CEDAR_HOME}/executables")
+# directory for examples
+set (CEDAR_EXAMPLES_DIR            "${CEDAR_HOME}/examples")
 
 # default output directory for lib files
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CEDAR_LIB_DIR}")

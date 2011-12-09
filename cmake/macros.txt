@@ -45,7 +45,7 @@ macro(cedar_add_executable)
   # find all cpp source files in the current source folder and save them in a list
   file(GLOB sourceFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 
-  parse_arguments(executable "MOC_HEADERS" "" ${ARGN})
+  parse_arguments(executable "PREFIX;MOC_HEADERS" "" ${ARGN})
   car(executableName ${executable_DEFAULT_ARGS})
 
   qt4_wrap_cpp(executableMocSources ${executable_MOC_HEADERS})
@@ -58,8 +58,7 @@ macro(cedar_add_executable)
 
   # temporarily change the directory where executables are created, so that we can have appropriate subdirectories
   set(originalRuntimeOutputDirectory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${executableSubdirectory})
-
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CEDAR_EXE_DIR}/${executable_PREFIX}${executableSubdirectory})
   # compose the name of the executable from a 'demo_' prefix and the demo name
   set(executableExecutableName ${executableName})
   
