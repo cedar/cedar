@@ -41,8 +41,6 @@
 #include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Arguments.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"

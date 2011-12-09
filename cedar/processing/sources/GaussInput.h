@@ -41,13 +41,16 @@
 #ifndef CEDAR_PROC_SOURCES_GAUSS_INPUT_H
 #define CEDAR_PROC_SOURCES_GAUSS_INPUT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
+#include "cedar/dynamics/namespace.h"
 #include "cedar/processing/sources/namespace.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/dynamics/namespace.h"
 #include "cedar/processing/Step.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

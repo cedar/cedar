@@ -38,9 +38,6 @@
 #include "cedar/dynamics/sources/Noise.h"
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 

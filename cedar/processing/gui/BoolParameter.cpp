@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/BoolParameter.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // PROJECT INCLUDES
 
