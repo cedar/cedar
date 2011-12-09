@@ -40,7 +40,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/StringParameter.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/StringParameter.h"
 
 // PROJECT INCLUDES
 

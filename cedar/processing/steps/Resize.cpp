@@ -34,16 +34,15 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/Resize.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/DataSlot.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatrixIterator.h"
 #include "cedar/auxiliaries/MatData.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <iostream>

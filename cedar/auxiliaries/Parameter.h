@@ -49,10 +49,6 @@
 // SYSTEM INCLUDES
 #include <QObject>
 
-// Functions for boost intrusive pointer.
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
-extern CEDAR_AUX_LIB_EXPORT void intrusive_ptr_release(cedar::aux::Parameter *pObject);
-
 
 /*!@brief Base class for all parameters.
  *

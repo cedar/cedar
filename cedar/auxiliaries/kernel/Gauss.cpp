@@ -36,11 +36,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/kernel/Gauss.h"
-#include "cedar/auxiliaries/NumericParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 

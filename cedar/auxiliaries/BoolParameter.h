@@ -22,44 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NamedConfigurable.cpp
+    File:        BoolParameter.h
 
-    Maintainer:  Oliver Lomp,
+    Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 10 14
+    Date:        2011 12 09
 
-    Description:
+    Description: This is a dummy header for the typedef BoolParameter (which is actually a
+                 cedar::aux::ParameterTemplate<bool>).
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_STRING_PARAMETER_H
+#define CEDAR_AUX_STRING_PARAMETER_H
+
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/NamedConfigurable.h"
-#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ParameterTemplate.h"
 
-// SYSTEM INCLUDES
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::NamedConfigurable::NamedConfigurable()
-:
-_mName(new cedar::aux::StringParameter(this, "name", ""))
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-void cedar::aux::NamedConfigurable::setName(const std::string& name)
-{
-  this->_mName->setValue(name);
-}
-
-const std::string& cedar::aux::NamedConfigurable::getName() const
-{
-  return this->_mName->getValue();
-}
+#endif // CEDAR_AUX_STRING_PARAMETER_H

@@ -52,7 +52,8 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/LoopedTrigger.h"
-#include "cedar/auxiliaries/VectorParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/StringVectorParameter.h"
 
 // PROJECT INCLUDES
 

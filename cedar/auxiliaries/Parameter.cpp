@@ -40,10 +40,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
-#include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES

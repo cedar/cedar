@@ -39,8 +39,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/ParameterTemplate.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 

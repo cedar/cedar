@@ -41,13 +41,11 @@
 // LOCAL INCLUDES
 #include "cedar/processing/sources/GaussInput.h"
 #include "cedar/dynamics/Activation.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/NumericParameter.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/processing/Arguments.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/math/tools.h"
-#include "cedar/auxiliaries/NumericVectorParameter.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
