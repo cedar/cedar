@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/IdeApplication.h"
+#include "cedar/processing/Manager.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -68,7 +69,9 @@ QApplication(argc, argv),
 mpIde (NULL)
 {
 #ifdef LINUX
-  cedar::dyn::initialize();
+  cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
+  cedar::dyn::getPluginDesciption(plugin);
+  cedar::proc::Manager::getInstance().load(plugin);
 #endif // MSVC
 
   this->mpIde = new cedar::proc::gui::Ide();

@@ -85,10 +85,16 @@ void cedar::proc::Manager::load(cedar::proc::PluginProxyPtr plugin)
   if (decl)
   {
     // load steps
-    for (size_t i = 0; i < decl->elementDeclarations().size(); ++i)
-    {
-      cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(decl->elementDeclarations().at(i));
-    }
+    this->load(decl);
+  }
+}
+
+void cedar::proc::Manager::load(cedar::proc::PluginDeclarationPtr declaration)
+{
+  // load steps
+  for (size_t i = 0; i < declaration->elementDeclarations().size(); ++i)
+  {
+    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(declaration->elementDeclarations().at(i));
   }
 }
 
