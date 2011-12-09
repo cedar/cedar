@@ -44,11 +44,8 @@
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 
-#ifdef LINUX
-void cedar::dyn::initialize()
-#else  // workaround for circular linking
+
 void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
-#endif
 {
   using cedar::proc::ElementDeclarationPtr;
 
@@ -58,12 +55,8 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
   );
   field_decl->setIconPath(":/steps/field_temp.svg");
 
-#ifdef LINUX
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(field_decl);
-#else
   // cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
   plugin->add(field_decl);
-#endif
 
   ElementDeclarationPtr preshape_decl
   (
@@ -71,12 +64,8 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
   );
   preshape_decl->setIconPath(":/steps/preshape.svg");
 
-#ifdef LINUX
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(preshape_decl);
-#else
   plugin->add(preshape_decl);
   // return plugin;
-#endif
 
   ElementDeclarationPtr noise_decl
   (
@@ -84,10 +73,12 @@ void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
   );
   noise_decl->setIconPath(":/steps/noise.svg");
 
-#ifdef LINUX
-  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(noise_decl);
-#else
   plugin->add(noise_decl);
   // return plugin;
-#endif
 }
+
+void cedar::dyn::getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin)
+{
+  ::pluginDeclaration(plugin);
+}
+
