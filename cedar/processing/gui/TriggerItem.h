@@ -115,7 +115,7 @@ public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //!@brief save configuration to a node
-  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief checks for a target, if Trigger can connect to this target
   cedar::proc::gui::ConnectValidity canConnectTo(GraphicsBase* pTarget) const;

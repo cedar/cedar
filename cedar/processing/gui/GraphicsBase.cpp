@@ -168,7 +168,7 @@ void cedar::proc::gui::GraphicsBase::readConfiguration(const cedar::aux::Configu
   this->setPos(x, y);
 }
 
-void cedar::proc::gui::GraphicsBase::writeConfiguration(cedar::aux::ConfigurationNode& root)
+void cedar::proc::gui::GraphicsBase::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   this->cedar::aux::Configurable::writeConfiguration(root);
 

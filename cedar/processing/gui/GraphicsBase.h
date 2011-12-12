@@ -182,7 +182,7 @@ public:
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
   //!@brief write configuration to a node (e.g. the position in a scene)
-  void writeConfiguration(cedar::aux::ConfigurationNode& root);
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
   //!@brief redraw the connections if GraphicsBase instance is moved around
   void updateConnections();
