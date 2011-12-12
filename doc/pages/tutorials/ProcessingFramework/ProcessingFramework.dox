@@ -2,13 +2,13 @@
 //@todo sadly, snippet is only available in Doxygen version 1.7.5 or later...
 /*!
 
-@page ProcessingTutorials Tutorials for the Processing Framework
+@page ProcessingFrameworkTutorial Tutorials for the Processing Framework
 
 @todo Most of the code on this page hasn't yet been tested directly; we need to make an examples folder and put it there.
 @todo There should also be an (advanced) tutorial on creating a custom data type (and visualizing it).
 
 This page offers several tutorials for using cedar's processing framework. A detailed description of the framework can
-be found at @ref ProcessingIntroduction. 
+be found at @ref ProcessingFrameworkConcept. 
 
 This page contains the following sections:
 
@@ -387,14 +387,14 @@ In the folder @em cedar/bin, you can find an application called @em processingId
 configuration files described in @ref ProcessingTutorialFirstStepArchitectureFile using a visual representation. After
 starting the program, yous should see something like this:
 
-@image html doc/pages/processing/images/processingIde.png
+@image html doc/pages/tutorials/ProcessingFramework/images/processingIde.png
 
 @subsection ProcessingTutorialUsingTheProcessingIdePartsOfTheUi Different Parts of the User Interface 
 
 The main user interface of the processingIde consists of a few important elements, highlighted red in the following
 picture. Note, that the elements can be reordered freely, so your interface might look slightly different.
 
-@image html doc/pages/processing/images/processingIde_areas.png
+@image html doc/pages/tutorials/ProcessingFramework/images/processingIde_areas.png
 
 The elements are:
 <ul>
@@ -516,7 +516,7 @@ This involves writing (at least) two classes: the actual (data) representation o
 manipulating this data.
 
 First, let us take a look at the data class. This class must inherit cedar::aux::Parameter class. For details on the
-concepts of parameters and the configurable interface, see @ref Parameters.
+concepts of parameters and the configurable interface, see @ref ParametersConcept.
 
 The widget class must implement cedar::proc::gui::Parameter. This class already takes care of storing a pointer to the
 parameter to be displayed. What must be implemented by you is a method that reacts when the parameter pointer stored in
@@ -533,7 +533,7 @@ Finally, the new parameter widget must be associated with the parameter type.
 "But dear tutorial-writer-person, is this really everything?" you ask? No, it is not. By nature, a tutorial can only
 introduce so many features. If you have read all of the advanced tutorials, you should know a great deal about the
 processing framework, but there is probably still more to learn, e.g., by reading the documentation on the classes in
-cedar::proc and getting to grips with all the details in @ref ProcessingIntroduction. In addition, we still have a giant
+cedar::proc and getting to grips with all the details in @ref ProcessingFrameworkConcept. In addition, we still have a giant
 pile of features that we want to implement (and that we wish we already had), so keep your eyes open for new releases!
 
 */

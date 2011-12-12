@@ -64,6 +64,9 @@ public:
   // via this DataConnection
   bool equals(cedar::proc::ConstDataSlotPtr source, cedar::proc::ConstDataSlotPtr target) const;
 
+  //!@brief test if the given source and target are parents of the slots of this DataConnection
+  bool connects(cedar::proc::ConstConnectablePtr source, cedar::proc::ConstConnectablePtr target) const;
+
   //!@brief get the source of this connection
   cedar::proc::ConstDataSlotPtr getSource() const;
 

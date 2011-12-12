@@ -1,12 +1,12 @@
 /*!
 
-@page ProcessingIntroduction An Introduction to cedar's Processing Framework
+@page ProcessingFrameworkConcept An introduction to cedar's processing framework
 
 @todo Mention where the UI executable can be found
 @todo Enrich this page with some screenshots to visualize concepts.
 
 This page gives an overview of the functionalities of the processing framework contained in cedar. Documentation of the
-relevant classes can be found in the namespace cedar::proc. Tutorials are available at @ref ProcessingTutorials. 
+relevant classes can be found in the namespace cedar::proc. Tutorials are available at @ref ProcessingFrameworkTutorial. 
 
 
 @section ProcessingGeneralDescription The Processing Framework
