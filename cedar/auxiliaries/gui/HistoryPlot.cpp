@@ -38,24 +38,20 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
 
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::aux::gui::HistoryPlot::HistoryPlot(QWidget *pParent)
 :
 cedar::aux::gui::DataPlotInterface(pParent),
@@ -73,7 +69,6 @@ cedar::aux::gui::HistoryPlot::~HistoryPlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::aux::gui::HistoryPlot::display(cedar::aux::DataPtr data)
 {
   //!@todo implement for matrices and more dimensions

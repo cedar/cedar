@@ -73,9 +73,9 @@ dfn { font-style: italic; }
 
 hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin: 1em 0; padding: 0; }
 
-ins { background: #ff9; color: #000; text-decoration: none; }
+ins { background: #ff9; color: #000305; text-decoration: none; }
 
-mark { background: #ff0; color: #000; font-style: italic; font-weight: bold; }
+mark { background: #ff0; color: #000305; font-style: italic; font-weight: bold; }
 
 /* Redeclare monospace font family: h5bp.com/j */
 pre, code, kbd, samp { font-family: monospace, monospace; _font-family: 'courier new', monospace; font-size: 1em; }
@@ -368,7 +368,7 @@ aside, nav, article, figure {
 #banner nav .active a:link, #banner nav .active a:visited {
 /*	background: #C74451; */
 	background: #ff9600;
-	color: #000;
+	color: #000305;
 	text-shadow: none !important;
 }
 
@@ -553,8 +553,8 @@ aside, nav, article, figure {
 }
 
 #doxygen pre.fragment {
-	border: 1px solid #C4CFE5;
-	background-color: #FBFCFD;
+	border: 1px solid #dedede;
+	background-color: #fdfcfb;
 	padding: 4px 6px;
 	margin: 4px 8px 4px 2px;
 	overflow: auto;
@@ -576,8 +576,8 @@ aside, nav, article, figure {
 	-moz-border-radius: .5em;
 	-webkit-box-shadow: 2px 2px 3px #999;
 	-moz-box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#000),color-stop(0.3, #444));
-	background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000);
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#000305),color-stop(0.3, #444));
+	background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000305);
 }
 
 #doxygen div.groupHeader {
@@ -818,9 +818,11 @@ input.search {
 }
 
 #doxygen .memproto {
-        border-top: 1px solid #A8B8D9;
-        border-left: 1px solid #A8B8D9;
-        border-right: 1px solid #A8B8D9;
+        border-top: 1px solid #ff9600;
+        border-left: 1px solid #ff9600;
+        border-right: 1px solid #ff9600;
+        border-bottom: 1px solid #dedede;
+        background-color: #f3f3f3;
         padding: 6px 0px 6px 0px;
         color: #253555;
         font-weight: bold;
@@ -833,29 +835,21 @@ input.search {
         -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
         -webkit-border-top-right-radius: 8px;
         -webkit-border-top-left-radius: 8px;
-        background-image:url('nav_f.png');
-        background-repeat:repeat-x;
-        background-color: #E2E8F2;
-
 }
 
 #doxygen .memdoc {
-        border-bottom: 1px solid #A8B8D9;      
-        border-left: 1px solid #A8B8D9;      
-        border-right: 1px solid #A8B8D9; 
+        border: 1px solid #ff9600;
         padding: 2px 5px;
-        background-color: #FBFCFD;
+        background-color: #fdfcfb;
         border-top-width: 0;
         /* firefox specific markup */
-        -moz-border-radius-bottomleft: 8px;
-        -moz-border-radius-bottomright: 8px;
         -moz-box-shadow: rgba(0, 0, 0, 0.15) 5px 5px 5px;
-        background-image: -moz-linear-gradient(center top, #FFFFFF 0%, #FFFFFF 60%, #F7F8FB 95%, #EEF1F7);
+        -moz-border-radius-bottomright: 8px;
+        -moz-border-radius-bottomleft: 8px;
         /* webkit specific markup */
-        -webkit-border-bottom-left-radius: 8px;
-        -webkit-border-bottom-right-radius: 8px;
         -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
-        background-image: -webkit-gradient(linear,center top,center bottom,from(#FFFFFF), color-stop(0.6,#FFFFFF), color-stop(0.60,#FFFFFF), color-stop(0.95,#F7F8FB), to(#EEF1F7));
+        -webkit-border-bottom-right-radius: 8px;
+        -webkit-border-bottom-left-radius: 8px;
 }
 
 #doxygen .paramkey {
@@ -1008,8 +1002,6 @@ proper pixel height of your image.
 #doxygen .navpath ul
 {
 	font-size: 11px;
-	background-image:url('tab_b.png');
-	background-repeat:repeat-x;
 	height:30px;
 	line-height:30px;
 	color:#8AA0CC;
@@ -1025,10 +1017,8 @@ proper pixel height of your image.
 	float:left;
 	padding-left:10px;
 	padding-right: 15px;
-	background-image:url('bc_s.png');
-	background-repeat:no-repeat;
 	background-position:right;
-	color:#364D7C;
+	color: #000305;
 }
 
 #doxygen .navpath a
@@ -1041,7 +1031,7 @@ proper pixel height of your image.
 
 #doxygen .navpath a:hover
 {
-	color:#6884BD;
+  text-decoration: underline;
 }
 
 #doxygen div.summary

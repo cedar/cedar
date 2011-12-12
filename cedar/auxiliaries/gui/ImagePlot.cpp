@@ -38,13 +38,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/ImageData.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -53,7 +51,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
 cedar::aux::gui::DataPlotInterface(pParent),
@@ -77,7 +74,6 @@ cedar::aux::gui::ImagePlot::~ImagePlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 {
   cv::Mat& mat = this->mData->getData();

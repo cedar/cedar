@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_GUI_IMAGE_PLOT_H
 #define CEDAR_AUX_GUI_IMAGE_PLOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/DataPlotInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -126,8 +124,6 @@ private:
 
   //! Id of the timer used for updating the plot.
   int mTimerId;
-
 }; // class cedar::aux::gui::ImagePlot
-
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
 

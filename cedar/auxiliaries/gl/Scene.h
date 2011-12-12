@@ -38,11 +38,9 @@
 #ifndef CEDAR_AUX_GL_SCENE_H
 #define CEDAR_AUX_GL_SCENE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Object.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>
@@ -72,28 +70,28 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief tells the scene whether a simple floor in the xy-plane should be drawn or not
-   * @param state    truth value of 'floor being drawn'
+   * @param state truth value of 'floor being drawn'
    */
   void drawFloor(bool state=true);
 
   /*!@brief sets a rough delimiter of the scene within which things are guaranteed to be visualized
-   * @param value    new scene delimiter
+   * @param value new scene delimiter
    */
   void setSceneLimit(double value);
   
   /*!@brief returns the rough delimiter of the scene within which things are guaranteed to be visualized
-   * @return    scene limit
+   * @return scene limit
    */
-  double getSceneLimit();
+  double getSceneLimit() const;
   
   /*!@brief adds an object to the scene
-   * @param rpObject    pointer to the object
-   * @return    index of the object in the scene
+   * @param rpObject pointer to the object
+   * @return index of the object in the scene
    */
   int addObject(cedar::aux::gl::ObjectPtr& rpObject);
   
   /*!@brief removes an object from the scene
-   * @param index    index of the object in the scene
+   * @param index index of the object in the scene
    */
   void deleteObject(int index);
   
@@ -104,19 +102,19 @@ public:
   void draw();
   
   /*!@brief convenience function to check whether a scene containts any objects
-   * @return    true if there is no object in the scene
+   * @return true if there is no object in the scene
    */
-  bool isEmpty();
+  bool isEmpty() const;
   
-  //! \todo rename getNumberOfObjects
-  /*!@brief gives the number of objects currently in the scene
-   * @return    number of objects currently in the scene
+  /*!@todo rename getNumberOfObjects
+   * @brief gives the number of objects currently in the scene
+   * @return number of objects currently in the scene
    */
-  int numberOfObjects();
+  int numberOfObjects() const;
   
   /*!@brief access to a single object in the scene
-   * @param index    index of the desired object within the scene
-   * @return    pointer to the object with the specified index
+   * @param index index of the desired object within the scene
+   * @return pointer to the object with the specified index
    */
   cedar::aux::gl::ObjectPtr getObject(int index);
   
