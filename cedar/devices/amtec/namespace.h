@@ -54,7 +54,9 @@ namespace cedar
     namespace amtec
     {
 #ifdef CEDAR_USE_AMTEC
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_DEV_CLASS(KinematicChain);
+      //!@endcond
 #endif // CEDAR_USE_AMTEC
     }
   }

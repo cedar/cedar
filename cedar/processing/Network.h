@@ -279,6 +279,13 @@ private:
    */
   void writeDataConnections(cedar::aux::ConfigurationNode& root);
 
+  /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
+   * @returns return the next iterator
+   */
+  cedar::proc::Network::DataConnectionVector::iterator removeDataConnection
+                                                       (
+                                                         cedar::proc::Network::DataConnectionVector::iterator it
+                                                       );
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

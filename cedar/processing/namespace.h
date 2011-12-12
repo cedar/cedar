@@ -50,7 +50,7 @@ namespace cedar
   /*!
    *  @brief Namespace containing main elements of cedar's processing framework.
    *
-   *  @see   @ref ProcessingIntroduction for an introduction and code tutorials.
+   *  @see   @ref ProcessingFrameworkConcept for an introduction into the concepts using within the processing framework.
    */
   namespace proc
   {

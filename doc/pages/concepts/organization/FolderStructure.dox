@@ -1,6 +1,6 @@
 /*!
 
-@page Folder structure
+@page FolderStructureConcept Folder structure
 
 @section cedar
 This folder contains the complete source code of the library. Inside, each module of cedar (see the section "cedar modules") is contained within its own subdirectory (e.g., auxiliaries). The only source code that you will find outside of the cedar directory, is in form of the unit- and interactive tests in "tests". There is also some minor code in "executables".

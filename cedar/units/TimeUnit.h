@@ -55,7 +55,7 @@
  *
  * @todo Read units from strings.
  *
- * @see @ref IntroductionToCedarUnits
+ * @see @ref UnitsConcept
  */
 template <unsigned int T_factor, const char* T_suffix>
 class cedar::unit::TimeUnit : public Time
