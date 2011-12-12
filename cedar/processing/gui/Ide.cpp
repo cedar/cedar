@@ -446,7 +446,6 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
-  this->newFile();
   cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene()));
   network->read(file.toStdString());
   this->mpActionSave->setEnabled(true);

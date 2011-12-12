@@ -283,14 +283,15 @@ cedar::aux::StackTrace::StackTrace()
 {
 #ifdef GCC
   // array for the backtraces
-  void *array[10];
+  const size_t max_stack_size = 100;
+  void *array[max_stack_size];
   size_t size;
   // array for the backtrace symbols
   char **strings;
   size_t i;
 
   // get the backtrace
-  size = backtrace(array, 10);
+  size = backtrace(array, max_stack_size);
 
   // transform the backtrace into symbols
   strings = backtrace_symbols(array, size);
