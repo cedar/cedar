@@ -454,7 +454,11 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   }
   catch(const cedar::aux::ExceptionBase& e)
   {
-    this->exception(QString::fromStdString(e.getMessage()));
+    QString message = "An exception occurred during loading of the architecture."
+                      " Your architecture has probably not been loaded correctly!"
+                      " The exception is:\n";
+    message += QString::fromStdString(e.exceptionInfo());
+    this->exception(message);
   }
   this->mpActionSave->setEnabled(true);
   this->resetTo(network);
