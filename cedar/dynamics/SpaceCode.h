@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
-#include "cedar/dynamics/Activation.h"
+#include "cedar/dynamics/MatActivation.h"
 
 // SYSTEM INCLUDES
 
