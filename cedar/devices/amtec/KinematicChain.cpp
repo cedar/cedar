@@ -57,7 +57,7 @@ using namespace cedar::dev::robot;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::amtec::KinematicChain::KinematicChain(const ReferenceGeometryPtr& rpReferenceGeometry)
+cedar::dev::amtec::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
 cedar::dev::robot::KinematicChain(rpReferenceGeometry)
 {
