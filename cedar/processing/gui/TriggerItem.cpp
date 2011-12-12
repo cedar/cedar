@@ -41,6 +41,7 @@
 // LOCAL INCLUDES
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/Manager.h"
@@ -99,10 +100,13 @@ void cedar::proc::gui::TriggerItem::construct()
                                | QGraphicsItem::ItemSendsGeometryChanges
                                );
 
-  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
-  p_effect->setBlurRadius(5.0);
-  p_effect->setOffset(3.0, 3.0);
-  this->setGraphicsEffect(p_effect);
+  if (cedar::proc::gui::Settings::instance().useGraphicsItemShadowEffects())
+  {
+    QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+    p_effect->setBlurRadius(5.0);
+    p_effect->setOffset(3.0, 3.0);
+    this->setGraphicsEffect(p_effect);
+  }
 }
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
