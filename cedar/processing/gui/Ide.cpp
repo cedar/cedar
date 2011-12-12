@@ -352,6 +352,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
 
 void cedar::proc::gui::Ide::exception(const QString& message)
 {
+  this->logError("Exception: " + message.toStdString());
   QMessageBox::critical(this,
                         "An exception has occurred.",
                         message);
@@ -364,13 +365,19 @@ void cedar::proc::gui::Ide::notify(const QString& message)
 
 void cedar::proc::gui::Ide::error(const QString& message)
 {
-  this->mpLog->append("<font color=\"red\"><b>Error: " + message + "</b></font>\n");
+  this->logError("Error: " + message.toStdString());
 }
 
 void cedar::proc::gui::Ide::message(const QString& message)
 {
   this->mpLog->append(message + "\n");
 }
+
+void cedar::proc::gui::Ide::logError(const std::string& message)
+{
+  this->mpLog->append("<font color=\"red\"><b>" + QString::fromStdString(message) + "</b></font>\n");
+}
+
 
 
 void cedar::proc::gui::Ide::startThreads()
