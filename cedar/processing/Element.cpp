@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/Element.h"
+#include "cedar/processing/Network.h"
 
 // SYSTEM INCLUDES
 
@@ -60,6 +61,14 @@ cedar::proc::Element::~Element()
 void cedar::proc::Element::setName(const std::string& name)
 {
   this->_mName->setValue(name);
+
+  /*!@todo The following should actually be done, however, due to multiple inheritance from QObject in Step, this
+   *       wouldn't work with Qt.
+  if (this->mpRegisteredAt != NULL)
+  {
+    this->mpRegisteredAt->updateObjectName(this);
+  }
+  */
 }
 
 const std::string& cedar::proc::Element::getName() const
