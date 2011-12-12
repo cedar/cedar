@@ -592,7 +592,6 @@ bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::pr
 
 void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
 {
-  std::cout << "Updating object's name." << std::endl;
   //!@todo It might be a good idea to clean up invalid pointers here.
   for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
   {
@@ -604,7 +603,6 @@ void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
       // erase the iterator
       mElements.erase(iter);
       // now we can reinsert the element (this invalidates the iterator)
-      std::cout << "Updating object name to " << object->getName() << std::endl;
       mElements[object->getName()] = element;
       // there can never be two instances of the same object in this structure. It's safe to return (and avoids
       // mischief with the iterator)
