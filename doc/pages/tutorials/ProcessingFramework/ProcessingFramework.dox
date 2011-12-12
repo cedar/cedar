@@ -2,7 +2,7 @@
 //@todo sadly, snippet is only available in Doxygen version 1.7.5 or later...
 /*!
 
-@page ProcessingTutorials Tutorials for the Processing Framework
+@page ProcessingFrameworkTutorial Tutorials for the Processing Framework
 
 @todo Most of the code on this page hasn't yet been tested directly; we need to make an examples folder and put it there.
 @todo There should also be an (advanced) tutorial on creating a custom data type (and visualizing it).
