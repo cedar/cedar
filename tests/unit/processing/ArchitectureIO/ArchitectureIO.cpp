@@ -44,6 +44,9 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 
+/*!
+ * This is a generic class for testing. When compute is called, its data is set from zero to one.
+ */
 class TestModule : public cedar::proc::Step
 {
   public:
@@ -69,7 +72,35 @@ class TestModule : public cedar::proc::Step
     cedar::aux::DoubleDataPtr mData;
 };
 
+/*!
+ * This class is used for testing double connections between steps.
+ */
+class TestModuleDoubleConnection : public cedar::proc::Step
+{
+  public:
+    TestModuleDoubleConnection(const std::string& name = "")
+    :
+    mData1(new cedar::aux::DoubleData(0.0)),
+    mData2(new cedar::aux::DoubleData(0.0))
+    {
+      this->setName(name);
+
+      this->declareInput("input1", false);
+      this->declareInput("input2", false);
+      this->declareOutput("output1", this->mData1);
+      this->declareOutput("output2", this->mData2);
+    }
+
+    void compute(const cedar::proc::Arguments&)
+    {
+    }
+
+    cedar::aux::DoubleDataPtr mData1;
+    cedar::aux::DoubleDataPtr mData2;
+};
+
 CEDAR_GENERATE_POINTER_TYPES(TestModule);
+CEDAR_GENERATE_POINTER_TYPES(TestModuleDoubleConnection);
 
 int main(int, char**)
 {
@@ -77,16 +108,20 @@ int main(int, char**)
 
   unsigned int errors = 0;
 
-  std::cout << "Creating step declaration ... ";
+  std::cout << "Creating step declarations ... ";
   cedar::proc::ElementDeclarationPtr test_module_decl
   (
     new cedar::proc::ElementDeclarationTemplate<TestModule>("Test")
   );
+  cedar::proc::ElementDeclarationPtr double_test_module_decl
+  (
+    new cedar::proc::ElementDeclarationTemplate<TestModuleDoubleConnection>("Test")
+  );
   std::cout << "done." << std::endl;
 
-  std::cout << "Adding declaration to the registry ... ";
-//  cedar::proc::Manager::getInstance().steps().declareClass(test_module_decl);
+  std::cout << "Adding declarations to the registry ... ";
   cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(test_module_decl);
+  cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(double_test_module_decl);
   std::cout << "done." << std::endl;
 
   std::cout << "Creating network ... " << std::endl;
@@ -115,6 +150,18 @@ int main(int, char**)
 
   std::cout << "Connecting trigger to step1 ... ";
   network->connectTrigger(trigger, step1);
+  std::cout << "done." << std::endl;
+
+  std::cout << "Creating double connection steps ... ";
+  TestModuleDoubleConnectionPtr double_step1 (new TestModuleDoubleConnection("doubleStep1"));
+  TestModuleDoubleConnectionPtr double_step2 (new TestModuleDoubleConnection("doubleStep2"));
+  network->add(double_step1);
+  network->add(double_step2);
+  std::cout << "done." << std::endl;
+
+  std::cout << "Connecting double connection steps ... ";
+  network->connectSlots("doubleStep1.output1", "doubleStep2.input1");
+  network->connectSlots("doubleStep1.output2", "doubleStep2.input2");
   std::cout << "done." << std::endl;
 
   std::cout << "Network creation completed." << std::endl;
