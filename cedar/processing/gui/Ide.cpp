@@ -447,7 +447,15 @@ void cedar::proc::gui::Ide::load()
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
   cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene()));
-  network->read(file.toStdString());
+
+  try
+  {
+    network->read(file.toStdString());
+  }
+  catch(const cedar::aux::ExceptionBase& e)
+  {
+    this->exception(QString::fromStdString(e.getMessage()));
+  }
   this->mpActionSave->setEnabled(true);
   this->resetTo(network);
 
