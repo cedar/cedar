@@ -89,13 +89,17 @@ cedar::proc::gui::IdeApplication::~IdeApplication()
 //----------------------------------------------------------------------------------------------------------------------
 
 //!@todo Generalize signal handling; allow the user to set a callback that receives a stacktrace on crash
-void cedar::proc::gui::IdeApplication::signalHandler(int signal)
+void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
 {
   std::string signal_name;
-  switch (signal)
+  switch (signal_id)
   {
     case SIGSEGV:
       signal_name = "SIGSEGV";
+      break;
+
+    case SIGABRT:
+      signal_name = "SIGABRT";
       break;
 
     default:
@@ -111,6 +115,9 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal)
 
   std::cout << "Application received signal " << signal_name << std::endl;
   std::cout << "A stack trace has been written to " << file_path << std::endl;
+
+  // reset the abort signal to avoid infinite recursion
+  signal(SIGABRT, SIG_DFL);
   abort();
 }
 
@@ -156,6 +163,7 @@ int cedar::proc::gui::IdeApplication::exec()
   SetUnhandledExceptionFilter(&cedar::proc::gui::IdeApplication::vcCrashHandler);
 #else
   signal(SIGSEGV, &cedar::proc::gui::IdeApplication::signalHandler);
+  signal(SIGABRT, &cedar::proc::gui::IdeApplication::signalHandler);
 #endif // MSCV
 
   this->mpIde->show();

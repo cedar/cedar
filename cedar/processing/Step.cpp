@@ -91,6 +91,14 @@ cedar::proc::Step::~Step()
 #ifdef DEBUG
   std::cout << "> freeing data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
 #endif
+
+  if (!this->wait(5000))
+  {
+#ifdef DEBUG
+    std::cout << "> Warning: step " << this->getName() << " is being destroyed while it is still running!" << std::endl;
+#endif
+  }
+
   if (mpArgumentsLock != NULL)
   {
     delete mpArgumentsLock;
@@ -247,6 +255,7 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
                    "Unconnected mandatory inputs prevent the step from running. These inputs are:" + errors);
   } // this->mMandatoryConnectionsAreSet
 
+  //!@todo Busy should be a lock object
   if (!this->mBusy)
   {
 #ifdef DEBUG_ARGUMENT_SETTING

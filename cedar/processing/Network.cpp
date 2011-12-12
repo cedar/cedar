@@ -223,10 +223,17 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   CEDAR_DEBUG_ASSERT(p_target);
   if (!p_target->isLooped())
   {
-    this->connectTrigger(
-                          this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
-                          p_target
-                        );
+    try
+    {
+      this->connectTrigger(
+                            this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
+                            p_target
+                          );
+    }
+    catch(const cedar::proc::DuplicateConnectionException&)
+    {
+      // if the triggers are already connected, that's ok.
+    }
     p_target->onTrigger();
   }
 }
