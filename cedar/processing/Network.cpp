@@ -111,14 +111,15 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
         || (*data_con)->getTarget()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element)))
     {
       // if target is not looped, delete the trigger connection
-      if (!this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())->isLooped())
-      {
-        this->disconnectTrigger(
-                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getSource()->getParent())->getFinishedTrigger(),
-                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())
-                               );
-      data_con = mDataConnections.erase(data_con);
-      }
+//      if (!this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())->isLooped())
+//      {
+//        this->disconnectTrigger(
+//                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getSource()->getParent())->getFinishedTrigger(),
+//                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())
+//                               );
+//      data_con = mDataConnections.erase(data_con);
+//      }
+        data_con = this->removeDataConnection(data_con);
     }
     else
     {
@@ -267,18 +268,7 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
                      )
        )
     {
-      mDataConnections.erase(it);
-      // if target is not looped, also delete the trigger connection
-      cedar::proc::TriggerablePtr triggerable_target = this->getElement<cedar::proc::Triggerable>(target_name);
-      CEDAR_DEBUG_ASSERT(triggerable_target);
-      if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
-      {
-        this->disconnectTrigger(
-                                 this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
-                                 this->getElement<cedar::proc::Triggerable>(target_name)
-                               );
-        triggerable_target->onTrigger();
-      }
+      this->removeDataConnection(it);
       return;
     }
   }
@@ -639,4 +629,41 @@ void cedar::proc::Network::getDataConnections(
       connections.push_back(con);
     }
   }
+}
+
+cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::removeDataConnection
+                                                     (
+                                                       cedar::proc::Network::DataConnectionVector::iterator it
+                                                     )
+{
+  std::string source_name = (*it)->getSource()->getParent();
+  std::string target_name = (*it)->getTarget()->getParent();
+  it = mDataConnections.erase(it);
+  // if target is not looped, also delete the trigger connection
+  cedar::proc::TriggerablePtr triggerable_target = this->getElement<cedar::proc::Triggerable>(target_name);
+  CEDAR_DEBUG_ASSERT(triggerable_target);
+  if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
+  {
+    // check that both Connectables are not connected through some other DataSlots
+    for (DataConnectionVector::iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
+    {
+      cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
+      if ((*iter)->connects(
+                             this->getElement<cedar::proc::Connectable>(source_name),
+                             target_connectable
+                           )
+         )
+      {
+        // found another connection between those two Connectables, do not delete done trigger and return
+        return it;
+      }
+    }
+    // found no other connection, delete the TriggerConnection as well
+    this->disconnectTrigger(
+                             this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
+                             this->getElement<cedar::proc::Triggerable>(target_name)
+                           );
+    triggerable_target->onTrigger();
+  }
+  return it;
 }

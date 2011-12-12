@@ -88,6 +88,23 @@ bool cedar::proc::DataConnection::equals(
   return false;
 }
 
+bool cedar::proc::DataConnection::connects(
+                                            cedar::proc::ConstConnectablePtr source,
+                                            cedar::proc::ConstConnectablePtr target
+                                          ) const
+{
+  CEDAR_ASSERT(source);
+  CEDAR_ASSERT(target);
+  cedar::proc::DataSlotPtr source_shared = mSource.lock();
+  cedar::proc::DataSlotPtr target_shared = mTarget.lock();
+  // first make a check if pointers are valid for source and target
+  if (source_shared->isParent(source) && target_shared->isParent(target))
+  {
+    return true;
+  }
+  return false;
+}
+
 cedar::proc::ConstDataSlotPtr cedar::proc::DataConnection::getSource() const
 {
   if (cedar::proc::DataSlotPtr source_shared = mSource.lock())
