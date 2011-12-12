@@ -39,6 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/processing/gui/namespace.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/namespace.h"
 
@@ -139,6 +140,12 @@ public:
   //!@brief returns a history of architecture files
   cedar::aux::StringVectorParameterPtr getArchitectureFileHistory();
 
+  //!@brief Whether the graphics item shadow effects are used.
+  bool useGraphicsItemShadowEffects() const;
+
+  //!@brief Sets whether the graphics item shadow effects are used.
+  void setUseGraphicsItemShadowEffects(bool useShadows);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -192,6 +199,9 @@ private:
 
   //!@brief History of architecture files recently loaded.
   cedar::aux::StringVectorParameterPtr mRecentArchitectureFiles;
+
+  //!@brief Disables or enables graphics item shadows.
+  cedar::aux::BoolParameterPtr mUseGraphicsItemShadowEffects;
 
 }; // class cedar::proc::gui::Settings
 
