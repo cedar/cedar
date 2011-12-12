@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/dynamics/Dynamics.h"
-#include "cedar/dynamics/Activation.h"
+#include "cedar/dynamics/DoubleActivation.h"
 
 // PROJECT INCLUDES
 
