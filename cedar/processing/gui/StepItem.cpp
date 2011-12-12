@@ -38,11 +38,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
+#include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Manager.h"
@@ -53,8 +54,6 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -97,10 +96,13 @@ void cedar::proc::gui::StepItem::construct()
                                | QGraphicsItem::ItemIsMovable
                                );
 
-  QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
-  p_effect->setBlurRadius(5.0);
-  p_effect->setOffset(3.0, 3.0);
-  this->setGraphicsEffect(p_effect);
+  if (cedar::proc::gui::Settings::instance().useGraphicsItemShadowEffects())
+  {
+    QGraphicsDropShadowEffect *p_effect = new QGraphicsDropShadowEffect();
+    p_effect->setBlurRadius(5.0);
+    p_effect->setOffset(3.0, 3.0);
+    this->setGraphicsEffect(p_effect);
+  }
 #ifdef DEBUG
   std::cout << "> allocated data (cedar::proc::gui::StepItem, " << this << ")" << std::endl;
 #endif // DEBUG

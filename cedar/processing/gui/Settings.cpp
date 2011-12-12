@@ -88,6 +88,18 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
 
+  cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
+  this->addConfigurableChild("displaySettings", display_settings);
+  mUseGraphicsItemShadowEffects = cedar::aux::BoolParameterPtr
+                                  (
+                                    new cedar::aux::BoolParameter
+                                    (
+                                      display_settings.get(),
+                                      "useGraphicsItemShadowEffects",
+                                      false
+                                    )
+                                  );
+
   cedar::aux::ConfigurablePtr recent_files(new cedar::aux::Configurable());
   this->addConfigurableChild("fileHistory", recent_files);
   this->mPluginLoadDialogLocation = cedar::aux::DirectoryParameterPtr
@@ -136,6 +148,16 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Settings::useGraphicsItemShadowEffects() const
+{
+  return this->mUseGraphicsItemShadowEffects->getValue();
+}
+
+void cedar::proc::gui::Settings::setUseGraphicsItemShadowEffects(bool useShadows)
+{
+  this->mUseGraphicsItemShadowEffects->setValue(useShadows);
+}
 
 void cedar::proc::gui::Settings::appendArchitectureFileToHistory(const std::string& filePath)
 {
