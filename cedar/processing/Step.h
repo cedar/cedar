@@ -59,9 +59,9 @@
 
 /*!@brief This class represents a processing step in the processing framework.
  *
- * The concept of processing steps is explained in @ref ProcessingIntroduction. In short, a processing step represents
- * a computational function that processes some input data into output data. Examples of a processing step could be
- * converting an image to a different color space, approximating the solution of a dynamical system
+ * The concept of processing steps is explained in @ref ProcessingFrameworkConcept. In short, a processing step
+ * represents a computational function that processes some input data into output data. Examples of a processing step
+ * could be converting an image to a different color space, approximating the solution of a dynamical system
  * (see cedar::dyn::Dynamics) or reading data from disk.
  *
  * Processing steps also have data slots that represent inputs, outputs and buffers (temporary data that can be

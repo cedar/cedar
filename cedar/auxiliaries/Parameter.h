@@ -54,7 +54,7 @@
  *
  *        This is the base class for all parameters that can be registered in the cedar::aux::Configurable class.
  *
- * @see @ref Parameters for a description of the parameters concept.
+ * @see @ref ParametersConcept for a description of the parameters concept.
  */
 class cedar::aux::Parameter : public QObject, public cedar::aux::Base
 {

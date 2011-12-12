@@ -45,7 +45,7 @@
 
 /*!@brief   Enum class for the loop mode.
  *
- * @see     @ref EnumClasses for an explanation of the concepts.
+ * @see     @ref EnumConcept for an explanation of the concepts.
  * @remarks This is used as a parameter for cedar::proc::LoopedTrigger.
  */
 class cedar::proc::LoopMode
