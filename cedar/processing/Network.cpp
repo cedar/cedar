@@ -592,26 +592,44 @@ bool cedar::proc::Network::isConnected(cedar::proc::TriggerPtr source, cedar::pr
 
 void cedar::proc::Network::updateObjectName(cedar::proc::Element* object)
 {
-  std::cout << "Updating object's name." << std::endl;
+  ElementMap::iterator old_iter;
   //!@todo It might be a good idea to clean up invalid pointers here.
-  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  for (old_iter = this->mElements.begin(); old_iter != this->mElements.end(); ++old_iter)
   {
-    if (iter->second.get() == object) // found
+    if (old_iter->second.get() == object) // found
     {
-      // exchange the object in the map - put object at key (new name) and erase old entry
-      // make a copy of the element pointer
-      cedar::proc::ElementPtr element = iter->second;
-      // erase the iterator
-      mElements.erase(iter);
-      // now we can reinsert the element (this invalidates the iterator)
-      std::cout << "Updating object name to " << object->getName() << std::endl;
-      mElements[object->getName()] = element;
-      // there can never be two instances of the same object in this structure. It's safe to return (and avoids
-      // mischief with the iterator)
-      return;
+      break;
     }
   }
-  CEDAR_THROW(cedar::proc::InvalidObjectException, "Element not registered at this network. Current element name: " + object->getName());
+
+  if (old_iter == this->mElements.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidObjectException, "Element not registered at this network. Current element name: " + object->getName());
+  }
+
+  // exchange the object in the map - put object at key (new name) and erase old entry
+  // make a copy of the element pointer
+  cedar::proc::ElementPtr element = old_iter->second;
+
+  // if new and old name are the same, do nothing
+  if (element->getName() == old_iter->first)
+  {
+    return;
+  }
+
+  // check that the new name is not already in use
+  if (this->mElements.find(object->getName()) != this->mElements.end())
+  {
+    // if it is, restore the old name.
+    object->setName(old_iter->first);
+    CEDAR_THROW(cedar::proc::DuplicateNameException, "Element name is already in use."
+         " Old name of the element: \"" + old_iter->first + "\", requested name: \"" + object->getName() + "\".");
+  }
+
+  // erase the iterator
+  mElements.erase(old_iter);
+  // now we can reinsert the element (this invalidates the iterator)
+  mElements[object->getName()] = element;
 }
 
 void cedar::proc::Network::getDataConnections(
