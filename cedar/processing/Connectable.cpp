@@ -454,7 +454,9 @@ cedar::proc::ConstDataSlotPtr cedar::proc::Connectable::getSlot(cedar::proc::Dat
     message += cedar::proc::DataRole::type().get(role).name();
     message += ", \"";
     message += name;
-    message += "\").";
+    message += "\")";
+    message += " in connectable " + this->getName();
+    message += ".";
     CEDAR_THROW(cedar::proc::InvalidNameException, message);
   }
   return slot_iter->second;
