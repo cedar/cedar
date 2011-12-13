@@ -220,6 +220,7 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
                                                  )
                                                        )
                         );
+  cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(source_name);
   cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(target_name);
   CEDAR_DEBUG_ASSERT(p_target);
   if (!p_target->isLooped())
@@ -235,7 +236,11 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
     {
       // if the triggers are already connected, that's ok.
     }
-    p_target->onTrigger();
+    // looped elements send trigger signals only when the architecture is running
+    if (!p_source || !p_source->isLooped())
+    {
+      p_target->onTrigger();
+    }
   }
 }
 
