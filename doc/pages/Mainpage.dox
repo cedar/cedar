@@ -6,15 +6,15 @@ Welcome to cedar!
 @section Motivation Motivation
 cedar is a C++ library that provides tools for scientific work in the fields of cognition, embodiment, dynamical
 systems, and autonomous robotics. cedar is primarily being developed at the Institut fuer Neuroinformatik in Bochum,
-Germany. It is a complete rewrite of a collection of powerful code, yet somewhat fragmented code. cedar now captures
-our scientific knowledge and ideology in a coherent framework. A lot of effort goes into keeping the different parts
-of cedar compatible to each other. Linking up perception and motor control of a robot and putting some cognitive
-processing in between should not be constrained by programming issues, but only be a question of applied concepts.
-cedar provides a tool aimed at facilitating the connection of modules to create robotic architectures. You can focus
-on "what" to connect, keeping the effort of "how" to connect it very low.
+Germany. It is a complete rewrite of a collection of powerful, yet somewhat fragmented code. cedar captures our
+scientific knowledge and ideology in a coherent framework. A lot of effort goes into keeping the different parts of
+cedar compatible to each other. Linking up perception and motor control of a robot and putting some cognitive processing
+in between should not be constrained by programming issues, but only be a question of applied concepts. cedar provides a
+tool aimed at facilitating the connection of modules to create robotic architectures. You can focus on "what" to
+connect, keeping the effort of "how" to connect it very low.
 
 @section ProgrammingConcepts Programming concepts
-In the following papes you can find out about general programming concepts we used throughout the framework.
+In the following pages you can find out about general programming concepts we used throughout the framework.
 - @link EnumConcept Threads and dynamics @endlink
 - @link InterProcessCommunicationConcept Inter-process communication using YARP @endlink
 - @link ParametersConcept Storing and loading parameters @endlink
