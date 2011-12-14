@@ -115,12 +115,12 @@ void cedar::aux::gui::HistoryPlot0D::display(cedar::aux::DataPtr data)
   if (!this->mDoubleData)
   {
     this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(this->mData);
-  }
 
-  if (!this->mMatData)
-  {
-    CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::DoubleData or cedar::aux::MatData in cedar::aux::gui::HistoryPlot0D::display.");
+    if (!this->mMatData)
+    {
+      CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
+                  "Could not cast to cedar::aux::DoubleData or cedar::aux::MatData in cedar::aux::gui::HistoryPlot0D::display.");
+    }
   }
 
   if (this->mpCurve != NULL)
