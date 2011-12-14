@@ -98,6 +98,20 @@ namespace cedar
         return matrix.dims;
       }
 
+      //!@brief Determines the size of a 1d matrix.
+      inline unsigned int get1DMatrixSize(const cv::Mat& mat)
+      {
+        CEDAR_DEBUG_ASSERT(mat.rows == 1 || mat.cols == 1);
+        if (mat.rows == 1)
+        {
+          return mat.cols;
+        }
+        else
+        {
+          return mat.rows;
+        }
+      }
+
       //!@brief set a matrix entry to a given value without having to check if the matrix is of type double or float
       inline void assignMatrixEntry(cv::Mat& matrix, std::vector<int> index, double value)
       {
