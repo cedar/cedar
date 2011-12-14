@@ -1,0 +1,40 @@
+{
+  "steps":
+  {
+    "cedar.Neuron":
+    {
+      "name": "Neuron 1",
+      "threaded": false,
+      "interactionWeight": 100,
+      "restingLevel": 10
+    },
+    "cedar.Neuron":
+    {
+      "name": "Neuron 2",
+      "threaded": false,
+      "interactionWeight": -10,
+      "restingLevel": -10
+    }
+  },
+  
+  "triggers":
+  {
+  	"cedar.processing.LoopedTrigger":
+  	{
+  	  "name": "Main Trigger",
+  	  "listeners": ["Neuron 1", "Neuron 2"]
+  	}
+  },
+  
+  "connections":
+  [
+    {
+      "source": "Neuron 1.output",
+      "target": "Neuron 2.input"
+    },
+    {
+      "source": "Neuron 2.output",
+      "target": "Neuron 1.input"
+    }
+  ]
+}
