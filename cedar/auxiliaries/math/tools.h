@@ -203,24 +203,24 @@ namespace cedar
                           int dimensionToReduce,
                           int reductionOperator = CV_REDUCE_SUM
                         );
-    }
 
-    /*!@brief Creates a matrix containing a one-dimensional ramp.
-     */
-    template <typename T>
-    cv::Mat ramp(int mat_type, int size, T lower, T upper)
-    {
-      cv::Mat result(size, 1, mat_type);
-      T difference = upper - lower;
-      T step = difference / static_cast<T>(size);
-      int index;
-      T value;
-      for (index = 0, value = lower; index < size; ++index, value += step)
+      /*!@brief Creates a matrix containing a one-dimensional ramp.
+       */
+      template <typename T>
+      cv::Mat ramp(int mat_type, int size, T lower, T upper)
       {
-        cedar::aux::math::assignMatrixEntry(result, index, value);
+        cv::Mat result(size, 1, mat_type);
+        T difference = upper - lower;
+        T step = difference / static_cast<T>(size);
+        int index;
+        T value;
+        for (index = 0, value = lower; index < size; ++index, value += step)
+        {
+          cedar::aux::math::assignMatrixEntry(result, index, value);
+        }
+        return result;
       }
-      return result;
-    }
-  }
-}
+    } // namespace math
+  } // namespace aux
+} // namespace cedar
 #endif // CEDAR_AUX_MATH_TOOLS_H
