@@ -132,6 +132,54 @@ namespace cedar
             CEDAR_ASSERT(false);
         }
       }
+
+      /*!@brief Set a 1D or 0D matrix entry to a given value without having to check if the matrix is of type double or
+       *        float.
+       */
+      inline void assignMatrixEntry(cv::Mat& matrix, int index, double value)
+      {
+        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
+
+        switch (matrix.type())
+        {
+          case CV_32F:
+            matrix.at<float>(index) = static_cast<float>(value);
+            break;
+
+          case CV_64F:
+            matrix.at<double>(index) = static_cast<double>(value);
+            break;
+
+          default:
+            // this should never happen due to the assert above.
+            CEDAR_ASSERT(false);
+        }
+      }
+
+      /*!@brief Returns the value of a 1D or 0D matrix entry as the specified type.
+       */
+      template <typename T>
+      inline T getMatrixEntry(const cv::Mat& matrix, int index)
+      {
+        CEDAR_ASSERT(matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 1);
+
+        switch (matrix.type())
+        {
+          case CV_32F:
+            return static_cast<T>(matrix.at<float>(index));
+            break;
+
+          case CV_64F:
+            return static_cast<T>(matrix.at<double>(index));
+            break;
+
+          default:
+            // this should never happen due to the assert above.
+            CEDAR_ASSERT(false);
+        }
+      }
       
       /*!@brief      This function convolves a matrix with a given kernel and returns the resulting matrix.
        * @deprecated This method is deprecated. It will be replaced by cedar::aux::conv::Convolution in the long run.
