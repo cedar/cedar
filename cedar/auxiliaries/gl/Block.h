@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_GL_BLOCK_H
 #define CEDAR_AUX_GL_BLOCK_H
 
@@ -45,6 +44,7 @@
 #include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief Simple OpenGL visualization of a block, i.e. a parallelepiped with rectangular sides
  *
@@ -130,7 +130,5 @@ private:
   
   double mHeight;
 };
-
-
 
 #endif // CEDAR_AUX_GL_BLOCK_H

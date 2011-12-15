@@ -175,4 +175,3 @@ private:
 }; // class cedar::aux::SetParameter
 
 #endif // CEDAR_AUX_SET_PARAMETER_H
-

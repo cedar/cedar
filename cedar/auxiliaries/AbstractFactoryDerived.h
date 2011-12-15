@@ -37,11 +37,9 @@
 #ifndef CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
 #define CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -87,8 +85,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -97,8 +93,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
@@ -108,4 +102,3 @@ private:
 }; // class cedar::aux::AbstractFactoryDerived
 
 #endif // CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
-

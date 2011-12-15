@@ -141,4 +141,3 @@ private:
 }; // class cedar::aux::DirectoryParameter
 
 #endif // CEDAR_AUX_DIRECTORY_PARAMETER_H
-

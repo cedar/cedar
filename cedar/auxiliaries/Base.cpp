@@ -35,10 +35,8 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Base.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

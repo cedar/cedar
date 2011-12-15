@@ -19,25 +19,27 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Sphere.cpp
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 28
- 
- ----- Description: visualization for a sphere
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Sphere.cpp
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a sphere
+
+    Credits:
+
+======================================================================================================================*/
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
 
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

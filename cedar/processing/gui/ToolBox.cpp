@@ -38,12 +38,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ToolBox.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVariant>

@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -61,8 +61,6 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QLabel>

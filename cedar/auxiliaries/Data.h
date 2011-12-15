@@ -147,4 +147,3 @@ private:
 }; // class cedar::aux::Data
 
 #endif // CEDAR_AUX_DATA_H
-

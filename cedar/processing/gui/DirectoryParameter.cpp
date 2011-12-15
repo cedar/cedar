@@ -38,11 +38,9 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/DirectoryParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

@@ -146,8 +146,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -159,4 +157,3 @@ private:
 }; // class cedar::aux::ParameterTemplate
 
 #endif // CEDAR_PROC_PARAMETER_TEMPLATE_H
-

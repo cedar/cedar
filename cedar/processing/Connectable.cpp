@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Connectable.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DataSlot.h"
@@ -43,8 +43,6 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

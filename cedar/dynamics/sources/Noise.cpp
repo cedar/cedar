@@ -34,14 +34,13 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/sources/Noise.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -37,10 +37,8 @@
 #ifndef CEDAR_AUX_SINGLETON_H
 #define CEDAR_AUX_SINGLETON_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/ExceptionBase.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -128,8 +126,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -144,4 +140,3 @@ template <class T> typename cedar::aux::Singleton<T>::InstanceTypePtr cedar::aux
 template <class T> bool cedar::aux::Singleton<T>::mDestroyed;
 
 #endif // CEDAR_AUX_SINGLETON_H
-

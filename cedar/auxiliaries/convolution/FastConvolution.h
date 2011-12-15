@@ -36,7 +36,9 @@
 
 #ifndef CEDAR_AUX_CONV_FAST_CONVOLUTION_H
 #define CEDAR_AUX_CONV_FAST_CONVOLUTION_H
+
 #ifdef CEDAR_FFTW
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/Convolution.h"
@@ -86,15 +88,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
 private:
   // none yet
 

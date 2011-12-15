@@ -43,4 +43,3 @@
 #else
   #include <GL/gl.h>
 #endif
-

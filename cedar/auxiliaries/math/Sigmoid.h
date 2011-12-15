@@ -37,6 +37,7 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_SIGMOID_H
 #define CEDAR_AUX_MATH_SIGMOID_H
 
@@ -46,6 +47,7 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief Basic interface for all sigmoid functions.
  */
@@ -127,6 +129,5 @@ protected:
 private:
   // none yet
 };
-
 
 #endif  // CEDAR_AUX_MATH_SIGMOID_H

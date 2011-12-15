@@ -181,5 +181,6 @@ const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
       cedar::aux::gui::MatrixPlot::mStandardColorVector.push_back(rgb);
     }
   }
+
   return cedar::aux::gui::MatrixPlot::mStandardColorVector;
 }

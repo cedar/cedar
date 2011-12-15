@@ -124,4 +124,3 @@ private:
 }; // class cedar::aux::gui::HistoryPlot0D
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_0D_H
-

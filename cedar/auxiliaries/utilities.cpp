@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -310,4 +310,3 @@ cedar::aux::StackTrace::StackTrace()
   this->init(&context_record);
 #endif // GCC
 }
-

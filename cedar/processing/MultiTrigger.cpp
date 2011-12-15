@@ -45,8 +45,6 @@
 // SYSTEM INCLUDES
 #include <algorithm>
 
-// MACROS
-//#define DEBUG_TRIGGERING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -143,4 +143,3 @@ private:
 }; // class cedar::proc::LoopedTrigger
 
 #endif // CEDAR_PROC_LOOPED_TRIGGER_H
-

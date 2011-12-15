@@ -41,8 +41,12 @@
 #ifndef CEDAR_AUX_EXCEPTIONS_H
 #define CEDAR_AUX_EXCEPTIONS_H
 
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+
+// SYSTEM INCLUDES
+
 
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */

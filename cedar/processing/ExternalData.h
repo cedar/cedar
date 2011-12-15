@@ -170,4 +170,3 @@ private:
 }; // class cedar::proc::ExternalData
 
 #endif // CEDAR_PROC_EXTERNAL_DATA_H
-

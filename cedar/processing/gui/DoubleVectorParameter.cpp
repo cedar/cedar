@@ -38,13 +38,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>

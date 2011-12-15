@@ -104,16 +104,6 @@ private:
   //!@brief a spinbox for the represented parameter
   QSpinBox *mpSpinbox;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::gui::UIntParameter
 
 #endif // CEDAR_PROC_GUI_UINT_PARAMETER_H
-

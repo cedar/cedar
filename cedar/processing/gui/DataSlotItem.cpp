@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/DataSlot.h"
@@ -47,8 +47,6 @@
 #include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QPainter>

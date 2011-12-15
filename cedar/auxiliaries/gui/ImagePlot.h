@@ -126,4 +126,3 @@ private:
   int mTimerId;
 }; // class cedar::aux::gui::ImagePlot
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
-

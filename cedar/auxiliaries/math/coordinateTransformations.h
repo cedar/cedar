@@ -37,10 +37,8 @@
 #ifndef CEDAR_AUX_MATH_COORDNIATE_TRANSFORMATIONS_H
 #define CEDAR_AUX_MATH_COORDNIATE_TRANSFORMATIONS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -90,23 +88,8 @@ namespace cedar
        */
       template<typename T>
       void cartesianToSpherical(const cv::Mat& cartesian, cv::Mat& spherical);
-//
-//      //! transforms a vector at a point, both given in spherical coords, to a vector in cartesian coords
-//      //! spherical = r, phi, theta -- radius, azimuth, zenith
-//      void timeDerivativeSphericalToCartesian(
-//                                               CvMAT& timeDerivativeSpherical,
-//                                               CvMAT& pointSpherical,
-//                                               CvMAT& timeDerivativeCartesian
-//                                             );
-//
-//      //! transforms a vector at a point, both given in cartesian coords, to a vector in spherical coords
-//      //! spherical = r, phi, theta -- radius, azimuth, zenith
-//      void timeDerivativeCartesianToSpherical(
-//                                               CvMAT& timeDerivativeCartesian,
-//                                               CvMAT& pointCartesian,
-//                                               CvMAT& timeDerivativeSpherical
-//                                             );
     }
   }
 }
+
 #endif  // CEDAR_AUX_MATH_COORDNIATE_TRANSFORMATIONS_H

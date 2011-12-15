@@ -37,6 +37,7 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_ABS_SIGMOID_H
 #define CEDAR_AUX_MATH_ABS_SIGMOID_H
 
@@ -46,6 +47,7 @@
 #include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief Sigmoid function that is based on absolute values.
  *
@@ -108,4 +110,5 @@ protected:
 private:
   // none yet
 };
+
 #endif  // CEDAR_AUX_MATH_ABS_SIGMOID_H

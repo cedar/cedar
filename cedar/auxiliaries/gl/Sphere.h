@@ -19,19 +19,20 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Sphere.h
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 28
- 
- ----- Description: visualization for a sphere
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Sphere.h
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a sphere
+
+    Credits:
+
+======================================================================================================================*/
 
 #ifndef CEDAR_AUX_GL_SPHERE_H
 #define CEDAR_AUX_GL_SPHERE_H
@@ -41,6 +42,7 @@
 #include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief Simple OpenGL visualization of a sphere
  *

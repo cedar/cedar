@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief A base class template for numeric parameters.
  */
 template <typename T>
@@ -148,4 +149,3 @@ private:
 }; // class cedar::aux::NumericParameter
 
 #endif // CEDAR_PROC_NUMERIC_PARAMETER_H
-

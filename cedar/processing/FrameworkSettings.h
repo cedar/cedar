@@ -134,4 +134,3 @@ private:
 }; // class cedar::proc::FrameworkSettings
 
 #endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H
-

@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/dynamics/SpaceCode.h"
 #include "cedar/processing/ExternalData.h"
@@ -50,8 +50,6 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/convolution/FastConvolution.h"
 #include "cedar/auxiliaries/math/tools.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>

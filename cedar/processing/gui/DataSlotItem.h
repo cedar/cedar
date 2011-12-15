@@ -41,13 +41,11 @@
 #ifndef CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
 #define CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/DataRole.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -135,15 +133,6 @@ private:
   //! The slot itself.
   cedar::proc::DataSlotPtr mSlot;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-
 }; // class DataSlotItem
 
 #endif // CEDAR_PROC_GUI_DATA_SLOT_ITEM_H
-

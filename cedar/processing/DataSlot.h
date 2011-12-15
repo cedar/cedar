@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief This class represents data slots in connectable objects.
  *
  *        Connectable objects can have a number of DataSlots associated with them. These slots represent, e.g., inputs
@@ -169,4 +170,3 @@ private:
 }; // class cedar::proc::DataSlot
 
 #endif // CEDAR_PROC_DATA_SLOT_H
-

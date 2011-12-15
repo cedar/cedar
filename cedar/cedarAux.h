@@ -34,13 +34,10 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_CEDAR_AUX_H
 #define CEDAR_CEDAR_AUX_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/Base.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "cedar/auxiliaries/LogFile.h"
@@ -61,6 +58,7 @@
 
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
+
 // SYSTEM INCLUDES
 
 #endif // CEDAR_CEDAR_AUX_H

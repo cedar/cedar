@@ -34,13 +34,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/PluginProxy.h"
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #ifdef UNIX

@@ -38,13 +38,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ArchitectureToolBox.h"
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>

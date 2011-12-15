@@ -47,6 +47,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief This is an enum class for the roles data can have in a cedar::proc::Step.
  *
  * Currently, data can be input, output or a buffer, i.e., internal data that should be plottable nonetheless.
@@ -112,4 +113,3 @@ private:
 }; // class cedar::proc::DataRole
 
 #endif // CEDAR_PROC_DATA_ROLE_H
-

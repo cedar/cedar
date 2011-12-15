@@ -37,11 +37,10 @@
 #ifndef CEDAR_AUX_MATH_PLANAR_GEOMETRY_H
 #define CEDAR_AUX_MATH_PLANAR_GEOMETRY_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
+
 
 namespace cedar
 {
@@ -61,4 +60,5 @@ namespace cedar
     }
   }
 }
+
 #endif  // CEDAR_AUX_MATH_PLANAR_GEOMETRY_H

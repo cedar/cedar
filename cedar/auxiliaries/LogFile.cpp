@@ -34,14 +34,12 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/date_time/posix_time/posix_time.hpp>
+
 
 using namespace cedar::aux;
 using namespace boost::posix_time;

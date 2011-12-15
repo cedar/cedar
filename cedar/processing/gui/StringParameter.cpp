@@ -38,11 +38,9 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/StringParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

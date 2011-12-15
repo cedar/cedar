@@ -34,13 +34,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/PluginManagerDialog.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QCheckBox>

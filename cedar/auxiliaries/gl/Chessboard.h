@@ -19,19 +19,20 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        Chessboard.h
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 10 29
- 
- ----- Description: visualization for a chessboard
- 
- ----- Credits:     
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        Chessboard.cpp
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 29
+
+    Description: Visualization of a chessboard
+
+    Credits:
+
+======================================================================================================================*/
 
 #ifndef CEDAR_AUX_GL_CHESSBOARD_H
 #define CEDAR_AUX_GL_CHESSBOARD_H
@@ -41,6 +42,7 @@
 #include "Object.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief Simple OpenGL visualization of a chess board
  *
@@ -167,19 +169,12 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   double mLength;
-  
   double mWidth;
-  
   double mHeight;
-  
   double mSecondColorR;
-  
   double mSecondColorG;
-  
   double mSecondColorB;
-  
   int mNumberOfRows;
-  
   int mNumberOfColumns;
 };
 
