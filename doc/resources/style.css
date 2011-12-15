@@ -321,6 +321,8 @@ aside, nav, article, figure {
 /* Banner */
 #banner h1 {font-size: 3.571em; line-height: .6;}
 #banner h1 a:link, #banner h1 a:visited {
+  font-size: 92%;
+  font-family: 'Signika', sans-serif;
 	color: #000305;
 	display: block;
 	font-weight: bold;
@@ -358,6 +360,7 @@ aside, nav, article, figure {
 #banner nav li {float: left; display: inline; margin: 0;}
 
 #banner nav a:link, #banner nav a:visited {
+  font-family: 'Signika', sans-serif;
 	color: #fff;
 	display: inline-block;
 	height: 20px;
@@ -527,7 +530,7 @@ aside, nav, article, figure {
 }
 
 #doxygen a.el {
-	font-weight: bold;
+	font-weight: normal;
 }
 
 #doxygen a.elRef {

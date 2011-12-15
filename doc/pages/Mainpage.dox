@@ -34,7 +34,7 @@ beneficial or even necessary.
 - @link ProcessingFrameworkTutorial Processing framework @endlink
 
 @section CodingStyle Coding Style
-cedar sticks to a strict @link CodingStyle coding style @endlink.
+cedar sticks to a strict @link CodingStyle coding style@endlink.
 
 @section Installation Installing cedar
 Please refer to the "readme.txt" file in the root of the repository to find instructions on how to install cedar.
