@@ -102,8 +102,12 @@ protected:
 private:
   //!@brief initialize
   void init();
+
   //!@brief set the plot style
   void setPlotStyle(QwtPlotCurve *pCurve);
+
+  //!@brief (Re-)initializes the x and y value arrays.
+  void buildArrays(unsigned int new_size);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
