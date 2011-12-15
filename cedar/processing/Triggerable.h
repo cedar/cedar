@@ -146,6 +146,17 @@ protected:
    */
   void setState(cedar::proc::Triggerable::State newState, const std::string& annotation);
 
+  /*!@brief Resets the state of the Triggerable to the default state.
+   *
+   * @remarks Currently, calling this function may be necessary if your step is in an invalid state due to bad
+   *          parameters; once they are changed by the used, you may need to reset the state to allow the step to be
+   *          computed again.
+   */
+  inline void resetState()
+  {
+    this->setState(cedar::proc::Triggerable::STATE_NONE, "");
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

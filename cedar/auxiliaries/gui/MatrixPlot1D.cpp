@@ -99,19 +99,10 @@ void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
 
   data->lockForRead();
   const cv::Mat& mat = this->mMatData->getData();
-  size_t num = static_cast<size_t>(mat.rows);
-  if (num == 1)
-  {
-    num = static_cast<size_t>(mat.cols);
-  }
+  size_t num = cedar::aux::math::get1DMatrixSize(mat);
   data->unlock();
-  mXValues.resize(num);
-  mYValues.resize(num);
 
-  for (size_t i = 0; i < num; ++i)
-  {
-    mXValues.at(i) = static_cast<double>(i);
-  }
+  this->buildArrays(num);
 
   this->mpCurve->setData(&this->mXValues.at(0),
                          &this->mYValues.at(0),
@@ -164,6 +155,20 @@ void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
   }
 }
 
+void cedar::aux::gui::MatrixPlot1D::buildArrays(unsigned int new_size)
+{
+  CEDAR_DEBUG_ASSERT(this->mXValues.size() == this->mYValues.size());
+
+  unsigned int old_size = this->mXValues.size();
+
+  mXValues.resize(new_size);
+  mYValues.resize(new_size);
+
+  for (unsigned int i = old_size; i < new_size; ++i)
+  {
+    mXValues.at(i) = static_cast<double>(i);
+  }
+}
 
 void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
 {
@@ -180,6 +185,14 @@ void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
     return;
   }
   CEDAR_DEBUG_ASSERT(mXValues.size() == mYValues.size());
+
+  // Check if the size of the matrix has changed
+  unsigned int size = cedar::aux::math::get1DMatrixSize(mat);
+  if (this->mXValues.size() != size)
+  {
+    this->buildArrays(size);
+  }
+
   for (size_t i = 0; i < mXValues.size(); ++i)
   {
     switch (mat.type())
