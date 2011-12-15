@@ -78,7 +78,8 @@ _mCompressionType(new cedar::aux::EnumParameter(
                                                  "compression type",
                                                  cedar::proc::steps::Projection::CompressionType::typePtr(),
                                                  cedar::proc::steps::Projection::CompressionType::SUM
-                 ))
+                                               )
+                  )
 {
   // declare input and output
   this->declareInput("input");
@@ -126,6 +127,8 @@ void cedar::proc::steps::Projection::outputDimensionalityChanged()
   this->_mDimensionMappings->setOutputDimensionality(new_dimensionality);
 
   this->initializeOutputMatrix();
+
+  this->reconfigure();
 }
 
 void cedar::proc::steps::Projection::outputDimensionSizesChanged()

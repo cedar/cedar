@@ -51,6 +51,7 @@ int main()
 
   // initialize the mapping with two elements
   mapping.initialize(2);
+  mapping.setOutputDimensionality(2);
 
   std::cout << "Initialized the mapping.\n";
 

@@ -91,8 +91,6 @@ void cedar::proc::ProjectionMappingParameter::setTo(const cedar::aux::Configurat
   }
 
   mValues->updateValidity();
-  emitChangedSignal();
-  emitPropertyChangedSignal();
 }
 
 void cedar::proc::ProjectionMappingParameter::putTo(cedar::aux::ConfigurationNode& root) const
