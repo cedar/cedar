@@ -132,8 +132,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief a boost signal that is emitted if a change in the tree structure appears
   boost::signals2::signal<void ()> mTreeChanged;
@@ -156,4 +154,3 @@ private:
 }; // class cedar::aux::Configurable
 
 #endif // CEDAR_AUX_CONFIGURABLE_H
-

@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_PROC_STEPS_NAMESPACE_H
 #define CEDAR_PROC_STEPS_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

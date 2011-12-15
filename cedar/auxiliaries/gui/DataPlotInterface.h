@@ -98,4 +98,3 @@ private:
 }; // class cedar::aux::gui::DataPlotInterface
 
 #endif // CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
-

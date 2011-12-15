@@ -38,13 +38,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ElementClassList.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/ElementDeclaration.h"
 
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

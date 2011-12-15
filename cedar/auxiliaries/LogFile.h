@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_LOG_FILE_H
 #define CEDAR_AUX_LOG_FILE_H
 
@@ -92,4 +91,3 @@ private:
 }; // class cedar::aux::LogFile
 
 #endif // CEDAR_AUX_LOG_FILE_H
-

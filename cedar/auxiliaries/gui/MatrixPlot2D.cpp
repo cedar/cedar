@@ -65,7 +65,6 @@ cedar::aux::gui::DataPlotInterface(pParent)
   this->init();
 }
 
-
 cedar::aux::gui::MatrixPlot2D::Perspective::Perspective(const std::string& name,
                                                         double rotationX, double rotationY, double rotationZ,
                                                         double scaleX, double scaleY, double scaleZ,

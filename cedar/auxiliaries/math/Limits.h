@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_MATH_LIMITS_H
 #define CEDAR_AUX_MATH_LIMITS_H
 
@@ -44,6 +43,7 @@
 #include "cedar/auxiliaries/math/namespace.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief Structure representing the limits of an interval.
  */
@@ -84,6 +84,5 @@ struct cedar::aux::math::Limits
   //! maximum limit
   T max;
 }; // class cedar::aux::math::Limits
-
 
 #endif // CEDAR_AUX_MATH_LIMITS_H

@@ -39,13 +39,11 @@
 #ifndef CEDAR_AUX_CONFIGURATION_INTERFACE_H
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Base.h"
 #include "cedar/auxiliaries/UserData.h"
 #include "cedar/auxiliaries/IntervalData.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>

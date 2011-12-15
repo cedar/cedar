@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        DataPlotInterface.cpp
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2011 07 28
 
     Description:
 

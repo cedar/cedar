@@ -48,6 +48,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief A SigmoidDeclaration contains the relation of a unique class id (as string) and the corresponding factory to
  *        create a sigmoid of this id. It is a concretization of DeclarationBase.
  */
@@ -162,7 +163,6 @@ private:
   // none yet
 };
 
-
 /*!@brief Template for convenient declaration of sigmoid classes.
  */
 template <class DerivedClass>
@@ -204,4 +204,3 @@ public:
 }; // class cedar::aux::math::SigmoidDeclarationT
 
 #endif // CEDAR_AUX_MATH_SIGMOID_DECLARATION_H
-

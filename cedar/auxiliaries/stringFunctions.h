@@ -37,7 +37,7 @@
 #ifndef CEDAR_AUX_STRING_FUNCTIONS_H
 #define CEDAR_AUX_STRING_FUNCTIONS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES

@@ -37,9 +37,7 @@
 #ifndef CEDAR_DYN_NOISE_H
 #define CEDAR_DYN_NOISE_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -104,8 +102,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief this MatData matrix contains the current random numbers
   cedar::aux::MatDataPtr mRandomMatrix;
@@ -115,8 +111,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief the matrix dimensionality - may range from 1 to 16 in principle, but more like 6 or 7 in reality
   cedar::aux::UIntParameterPtr _mDimensionality; //!@todo not the only class needing this - think about parent class
@@ -133,4 +127,3 @@ private:
 }; // class cedar::dyn::Noise
 
 #endif // CEDAR_DYN_NOISE_H
-

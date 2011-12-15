@@ -38,10 +38,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/View.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QResizeEvent>

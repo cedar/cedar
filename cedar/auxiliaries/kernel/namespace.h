@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_KERNEL_NAMESPACE_H
 #define CEDAR_AUX_KERNEL_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES

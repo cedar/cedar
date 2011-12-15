@@ -37,6 +37,7 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
 #define CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H
 
@@ -46,6 +47,7 @@
 #include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
+
 
 /*!@brief A sigmoid step function, going from 0.0 to 1.0 when the input reaches or exceeds the threshold.
  *
@@ -101,6 +103,5 @@ protected:
 private:
   // none yet
 };
-
 
 #endif  // CEDAR_AUX_MATH_HEAVISIDE_SIGMOID_H

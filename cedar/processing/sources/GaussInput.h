@@ -51,7 +51,6 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 
-
 // SYSTEM INCLUDES
 
 
@@ -124,4 +123,3 @@ private:
 }; // class cedar::proc::source::GaussInput
 
 #endif // CEDAR_PROC_SOURCES_GAUSS_INPUT_H
-

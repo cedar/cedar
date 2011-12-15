@@ -38,14 +38,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_UNITS_NAMESPACE_H
 #define CEDAR_UNITS_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/units/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <string>

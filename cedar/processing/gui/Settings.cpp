@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/SetParameter.h"
@@ -42,8 +42,6 @@
 #include "cedar/auxiliaries/VectorParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 #include "cedar/auxiliaries/System.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>

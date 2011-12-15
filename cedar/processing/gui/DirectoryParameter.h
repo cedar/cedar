@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_GUI_DIRECTORY_PARAMETER_H
 #define CEDAR_PROC_GUI_DIRECTORY_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Parameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QLineEdit>
@@ -108,15 +106,6 @@ protected:
 private:
   //! QLineEdit used for displaying the parameter value.
   QLineEdit *mpEdit;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 
 }; // class cedar::proc::gui::DirectoryParameter
 

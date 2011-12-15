@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/Settings.h"
@@ -52,8 +52,6 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QPainter>

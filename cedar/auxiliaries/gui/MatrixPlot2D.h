@@ -160,4 +160,3 @@ private:
 }; // class cedar::aux::gui::MatrixPlot2D
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_2D_H
-

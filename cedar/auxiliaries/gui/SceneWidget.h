@@ -19,26 +19,27 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet-Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        SceneWidget.h
- 
- ----- Maintainer:  Hendrik Reimann
- ------Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 11 27
- 
- ----- Description: widget for cedar::aux::gl::Scene
- 
- ----- Credits:     initially designed by Denis Hakenberg
- 
-  small guide to add other DrawableObjects in the widget
-  1.) in function init() add 'mpComboBoxType->addItem("Your_ObjectType");'
-  2.) add in the functions setRadius(), setLength(), setWidth() and setHeight()
-      your ObjectType (which paramaters you need)
-  3.) add in the function createObject() your ObjectType
-  4.) add in the function setWidgetObjectParameters() your ObjectType
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        SceneWidget.h
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2010 11 27
+
+    Description: Visualization of a cylinder
+
+    Credits: initially designed by Denis Hakenberg
+
+    small guide to add other DrawableObjects in the widget
+      1.) in function init() add 'mpComboBoxType->addItem("Your_ObjectType");'
+      2.) add in the functions setRadius(), setLength(), setWidth() and setHeight()
+          your ObjectType (which paramaters you need)
+      3.) add in the function createObject() your ObjectType
+      4.) add in the function setWidgetObjectParameters() your ObjectType
+
+======================================================================================================================*/
 
 #ifndef CEDAR_AUX_GUI_SCENE_WIDGET_H
 #define CEDAR_AUX_GUI_SCENE_WIDGET_H
@@ -65,6 +66,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief Widget to observe and change a scene of geometric objects
  *
  * The widget gives a list of all Objects currently in the scene. The dimensions and other attributes of each
@@ -75,7 +77,6 @@
 class cedar::aux::gui::SceneWidget : public cedar::aux::gui::BaseWidget, private Ui_SceneWidget
 {
 private:
-
   Q_OBJECT
 
 public:

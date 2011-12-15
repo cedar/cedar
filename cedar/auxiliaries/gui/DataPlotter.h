@@ -103,8 +103,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -114,4 +112,3 @@ private:
   static WidgetFactory mTypePlotters;
 }; // class cedar::aux::gui::DataPlotter
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H
-

@@ -38,11 +38,9 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QPainter>

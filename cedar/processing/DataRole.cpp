@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 
+
 cedar::aux::EnumType<cedar::proc::DataRole> cedar::proc::DataRole::mType("cedar::proc::DataRole::");
 
 #ifndef MSVC

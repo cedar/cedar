@@ -33,14 +33,13 @@
     Credits:
 
 ======================================================================================================================*/
+
 #ifndef CEDAR_AUX_MATH_SIGMOIDS_H
 #define CEDAR_AUX_MATH_SIGMOIDS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -98,4 +97,5 @@ namespace cedar
     }
   }
 }
+
 #endif  // CEDAR_AUX_MATH_SIGMOIDS_H

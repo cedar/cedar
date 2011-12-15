@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
 #define CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ToolBox.h"
 #include "cedar/processing/gui/Scene.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -108,4 +106,3 @@ private:
 }; // class cedar::proc::gui::ArchitectureToolBox
 
 #endif // CEDAR_PROC_GUI_ARCHITECTURE_TOOLBOX_H
-

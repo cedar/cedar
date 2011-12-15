@@ -221,4 +221,3 @@ private:
 }; // class cedar::MainWindow
 
 #endif // CEDAR_PROC_GUI_MAIN_WINDOW_H
-

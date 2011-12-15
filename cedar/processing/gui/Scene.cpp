@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/StepItem.h"
@@ -49,8 +49,6 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QByteArray>

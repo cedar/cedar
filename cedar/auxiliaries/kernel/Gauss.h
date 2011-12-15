@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief Gauss kernel class.
  *
  */
@@ -149,4 +150,3 @@ private:
 }; // class cedar::aux::kernel::Gauss
 
 #endif // CEDAR_AUX_KERNEL_GAUSS_H
-

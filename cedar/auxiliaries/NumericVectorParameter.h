@@ -169,4 +169,3 @@ private:
 }; // class cedar::aux::NumericVectorParameter
 
 #endif // CEDAR_PROC_NUMERIC_VECTOR_PARAMETER_H
-

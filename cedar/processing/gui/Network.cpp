@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
@@ -52,8 +52,6 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>

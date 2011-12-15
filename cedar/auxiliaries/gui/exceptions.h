@@ -37,8 +37,12 @@
 #ifndef CEDAR_AUX_GUI_EXCEPTIONS_H
 #define CEDAR_AUX_GUI_EXCEPTIONS_H
 
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
+
+// SYSTEM INCLUDES
+
 
 /*!@brief Exception that occurs when a type is not handled.
  */

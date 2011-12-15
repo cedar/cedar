@@ -40,11 +40,9 @@
 #ifndef CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 #define CEDAR_AUX_MATH_ALGEBRA_TOOLS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <vector>

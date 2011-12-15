@@ -97,13 +97,6 @@ protected:
   std::vector<cv::Mat> mKernelParts; //!< the separate parts of a separable kernel
 
 private:
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-
-private:
   // none yet
 
 }; // class cedar::aux::kernel::Separable

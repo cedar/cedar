@@ -55,7 +55,7 @@
 
 // MACROS
 // Enable to show information on locking/unlocking
-// #define DEBUG_LOCKS
+//#define DEBUG_LOCKS
 //#define DEBUG_ARGUMENT_SETTING
 // Show information about execution/triggering of steps
 //#define DEBUG_RUNNING

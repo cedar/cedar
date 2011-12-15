@@ -34,17 +34,13 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_CEDAR_UNITS_H
 #define CEDAR_CEDAR_UNITS_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/units/namespace.h"
 #include "cedar/units/Time.h"
 #include "cedar/units/TimeUnit.h"
-
 
 // SYSTEM INCLUDES
 

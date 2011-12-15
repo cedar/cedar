@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_VIEW_H
 #define CEDAR_PROC_VIEW_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QGraphicsView>
@@ -106,18 +104,6 @@ private:
   //!@brief a pointer to a scene displayed by the view
   cedar::proc::gui::Scene* mpScene;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class ProcessingView
 
 #endif // CEDAR_PROC_VIEW_H
-
