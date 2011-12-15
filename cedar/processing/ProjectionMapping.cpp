@@ -85,6 +85,7 @@ void cedar::proc::ProjectionMapping::updateValidity()
 
   // check whether different input dimensions are mapped onto the same output dimension
   std::vector<unsigned int> output_dimension_histogram(mOutputDimensionality, 0);
+
   for
   (
     cedar::proc::ProjectionMapping::iterator iter = mMapping.begin();
@@ -98,7 +99,7 @@ void cedar::proc::ProjectionMapping::updateValidity()
     }
     else
     {
-      if (++(output_dimension_histogram[iter->second]) > 1)
+      if (mOutputDimensionality > 0 && ++(output_dimension_histogram[iter->second]) > 1)
       {
         mValidity = cedar::proc::ProjectionMapping::VALIDITY_ERROR;
       }
@@ -136,7 +137,6 @@ void cedar::proc::ProjectionMapping::drop(unsigned int inputIndex)
 
 void cedar::proc::ProjectionMapping::initialize(unsigned int numberOfMappings)
 {
-  mOutputDimensionality = 2;
   mMapping.clear();
 
   for (unsigned int i = 0; i < numberOfMappings; ++i)
@@ -197,6 +197,7 @@ bool cedar::proc::ProjectionMapping::isDropped(unsigned int inputIndex) const
 void cedar::proc::ProjectionMapping::setOutputDimensionality(unsigned int dimensionality)
 {
   mOutputDimensionality = dimensionality;
+  updateValidity();
 }
 
 unsigned int cedar::proc::ProjectionMapping::getOutputDimensionality() const
