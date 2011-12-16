@@ -199,4 +199,12 @@ public:
   DeadReferenceException();
 };
 
+/*!@brief Exception that is thrown when a singleton object does not exist any more.
+ */
+class cedar::aux::MatrixMismatchException : public cedar::aux::ExceptionBase
+{
+public:
+  MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB);
+};
+
 #endif // CEDAR_AUX_EXCEPTIONS_H
