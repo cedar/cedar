@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // PROJECT INCLUDES
 
@@ -207,7 +208,7 @@ namespace cedar
       /*!@brief Creates a matrix containing a one-dimensional ramp.
        */
       template <typename T>
-      cv::Mat ramp(int mat_type, int size, T lower, T upper)
+      inline cv::Mat ramp(int mat_type, int size, T lower, T upper)
       {
         cv::Mat result(size, 1, mat_type);
         T difference = upper - lower;
@@ -220,6 +221,90 @@ namespace cedar
         }
         return result;
       }
+
+      /*! @brief   Compares the sizes of two matrices.
+       *
+       *           This function also takes into account the special case of 1D matrices.
+       *
+       *  @returns True, if both sizes are equal, false otherwise.
+       *
+       *  @remarks Note, that this function also considers an n x 1 matrix and an 1 x n matrix to be of the same size.
+       */
+      inline bool matrixSizesEqual(const cv::Mat& matrixA, const cv::Mat& matrixB)
+      {
+        unsigned int dim_a = cedar::aux::math::getDimensionalityOf(matrixA);
+        unsigned int dim_b = cedar::aux::math::getDimensionalityOf(matrixB);
+
+        if (dim_a != dim_b)
+        {
+          return false;
+        }
+
+        if (dim_a <= 1)
+        {
+          unsigned int size_a = get1DMatrixSize(matrixA);
+          unsigned int size_b = get1DMatrixSize(matrixB);
+          return size_a == size_b;
+        }
+
+        return matrixA.size == matrixB.size;
+      }
+
+      /*! @brief Writes the size of a matrix to a string.
+       */
+      inline std::string matrixSizeToString(const cv::Mat& matrix)
+      {
+        std::string res;
+
+        switch (cedar::aux::math::getDimensionalityOf(matrix))
+        {
+          case 0:
+            res = "1x1";
+          case 1:
+            res = cedar::aux::toString(cedar::aux::math::get1DMatrixSize(matrix)) + "x1";
+            break;
+          case 2:
+            res = cedar::aux::toString(matrix.rows) + "x" + cedar::aux::toString(matrix.cols);
+            break;
+          default:
+            for (int d = 0; d < matrix.dims; ++d)
+            {
+              if (d > 0)
+              {
+                res += "x";
+              }
+              res += cedar::aux::toString(matrix.size[d]);
+            }
+            break;
+        }
+
+        return res;
+      }
+
+      /*! @brief This function puts vectors in a canonical orientation (i.e., makes all vectors column vectors).
+       */
+      inline cv::Mat canonicalColVector(const cv::Mat& mat)
+      {
+        cv::Mat res = mat;
+        if (res.cols == 1)
+        {
+          res = res.t();
+        }
+        return res;
+      }
+
+      /*! @brief This function puts vectors in a canonical orientation (i.e., makes all vectors row vectors).
+       */
+      inline cv::Mat canonicalRowVector(const cv::Mat& mat)
+      {
+        cv::Mat res = mat;
+        if (res.rows == 1)
+        {
+          res = res.t();
+        }
+        return res;
+      }
+
     } // namespace math
   } // namespace aux
 } // namespace cedar

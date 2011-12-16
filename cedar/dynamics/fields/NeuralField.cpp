@@ -270,12 +270,27 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   // add all inputs to d_u
   for (size_t i = 0; i < input_slot->getDataCount(); ++i)
   {
+    std::cout << "d_u: " << cedar::aux::math::matrixSizeToString(d_u) << std::endl;
     cedar::aux::DataPtr input = input_slot->getData(i);
     if (input)
     {
       cv::Mat& input_mat = input->getData<cv::Mat>();
-      CEDAR_ASSERT(input_mat.size == d_u.size);
-      d_u += input_mat;
+      std::cout << "input_mat: " << cedar::aux::math::matrixSizeToString(input_mat) << std::endl;
+      std::cout << "input_mat: " << input_mat.rows << "x" << input_mat.cols << std::endl;
+
+      if (!cedar::aux::math::matrixSizesEqual(input_mat, d_u))
+      {
+        CEDAR_THROW_EXCEPTION(cedar::aux::MatrixMismatchException(input_mat, d_u));
+      }
+
+      if (this->_mDimensionality->getValue() == 1)
+      {
+        d_u += cedar::aux::math::canonicalRowVector(input_mat);
+      }
+      else
+      {
+        d_u += input_mat;
+      }
     }
   }
   /* add input noise, but use the squared time only for Euler integration (divide by sqrt(time) here, because
