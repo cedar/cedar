@@ -41,10 +41,8 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
-// LOCAL INCLUDES (includes from this project)
-#include "namespace.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/kuka/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
@@ -160,8 +158,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -187,8 +183,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
 protected:
   // none yet
 private:
@@ -197,6 +191,5 @@ private:
   //!local server port
   int _mServerPort;
 };
-
 #endif // CEDAR_USE_KUKA_FRI
 #endif /* CEDAR_DEV_ROBOT_KUKA_KUKA_INTERFACE_H */

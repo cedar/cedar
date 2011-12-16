@@ -38,22 +38,17 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
-// LOCAL INCLUDES
-#include "KukaInterface.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/kuka/KukaInterface.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/devices/robot/ReferenceGeometry.h"
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::kuka;
-using namespace std;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-KukaInterface::KukaInterface(const std::string& configFileName)
+cedar::dev::kuka::KukaInterface::KukaInterface(const std::string& configFileName)
 :
 KinematicChain(configFileName),
 mCommandedJointPosition(LBR_MNJ),
@@ -63,7 +58,8 @@ mMeasuredJointPosition(LBR_MNJ)
   mpFriRemote = 0;
   init();
 }
-KukaInterface::~KukaInterface()
+
+cedar::dev::kuka::KukaInterface::~KukaInterface()
 {
   if(mIsInit)
   {
@@ -84,7 +80,7 @@ KukaInterface::~KukaInterface()
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
-void KukaInterface::init()
+void cedar::dev::kuka::KukaInterface::init()
 {
   //The number of joints the KUKA LBR has
   //Load Parameters from the configuration file
@@ -101,7 +97,7 @@ void KukaInterface::init()
   _mRemoteHost = "NULL";
 
   //create a new Instance of the friRemote
-  if (_mRemoteHost != string("NULL"))
+  if (_mRemoteHost != std::string("NULL"))
   {
     mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
   }
@@ -122,8 +118,7 @@ void KukaInterface::init()
   mIsInit = true;
 }
 
-
-double KukaInterface::getJointAngle(unsigned int index)
+double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index)
 {
   double a = 0;
   try
@@ -132,7 +127,7 @@ double KukaInterface::getJointAngle(unsigned int index)
     a = mMeasuredJointPosition.at(index);
     mLock.unlock();
   }
-  catch (out_of_range& e)
+  catch (std::out_of_range& e)
   {
     //properly unlock, before throwing
     mLock.unlock();
@@ -143,7 +138,7 @@ double KukaInterface::getJointAngle(unsigned int index)
 }
 
 
-void KukaInterface::setJointAngle(unsigned int index, double angle)
+void cedar::dev::kuka::KukaInterface::setJointAngle(unsigned int index, double angle)
 {
   try
   {
@@ -151,7 +146,7 @@ void KukaInterface::setJointAngle(unsigned int index, double angle)
     mCommandedJointPosition.at(index) = angle;
     mLock.unlock();
   }
-  catch (out_of_range& e)
+  catch (std::out_of_range& e)
   {
     //properly unlock, before throwing
       mLock.unlock();
@@ -160,7 +155,7 @@ void KukaInterface::setJointAngle(unsigned int index, double angle)
 }
 
 
-void KukaInterface::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
+void cedar::dev::kuka::KukaInterface::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType actionType)
 {
   //Set the desired working mode
   KinematicChain::setWorkingMode(actionType);
@@ -169,11 +164,12 @@ void KukaInterface::setWorkingMode(cedar::dev::robot::KinematicChain::ActionType
   //restart the thread, since it was stopped by KinematicChain::setWorkingMode()
   this ->start();
 }
+
 /*
  * Overwritten start function of KinematicChain
  * the function inherited from KinematicChain does some things we do not want.
  */
-void KukaInterface::start(Priority priority)
+void cedar::dev::kuka::KukaInterface::start(Priority priority)
 {
   if(isRunning())
   {
@@ -185,7 +181,7 @@ void KukaInterface::start(Priority priority)
 //----------------------------------------------------------------------------------------------------------------------
 // private member functions
 //----------------------------------------------------------------------------------------------------------------------
-void KukaInterface::step(double)
+void cedar::dev::kuka::KukaInterface::step(double)
 {
   //if the thread has not been initialized, do nothing
   if (mIsInit)
@@ -195,7 +191,7 @@ void KukaInterface::step(double)
     float commanded_joint[LBR_MNJ];
     //initialize it with current measured position. This value will be overwritten in any case
     //so this is just for safety
-    for (unsigned i=0; i<LBR_MNJ; i++)
+    for (unsigned i = 0; i < LBR_MNJ; i++)
     {
       commanded_joint[i] = mMeasuredJointPosition.at(i);
     }
@@ -218,16 +214,16 @@ void KukaInterface::step(double)
           for(unsigned i=0; i<LBR_MNJ; i++)
           {
             //if the joint position exceeds the one in the reference geometry, reset the angle
-            mCommandedJointPosition.at(i) = max<double>(mCommandedJointPosition.at(i),
-                                                        getReferenceGeometry()->getJoint(i)->angleLimits.min);
-            mCommandedJointPosition.at(i) = min<double>(mCommandedJointPosition.at(i),
-                                                        getReferenceGeometry()->getJoint(i)->angleLimits.max);
+            mCommandedJointPosition.at(i)
+              = std::max<double>(mCommandedJointPosition.at(i), getReferenceGeometry()->getJoint(i)->angleLimits.min);
+            mCommandedJointPosition.at(i)
+              = std::min<double>(mCommandedJointPosition.at(i), getReferenceGeometry()->getJoint(i)->angleLimits.max);
             //copy commanded joint position
             commanded_joint[i] = float(mCommandedJointPosition[i]);
           }
           break;
         default:
-          cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << endl;
+          std::cerr << "Invalid working mode in KukaInterface::step(double). I'm afraid I can't do that." << std::endl;
       }
     }
     mLock.unlock();
@@ -242,8 +238,7 @@ void KukaInterface::step(double)
   }
 }
 
-
-void KukaInterface::copyFromFRI()
+void cedar::dev::kuka::KukaInterface::copyFromFRI()
 {
   mFriState = mpFriRemote->getState();
   mFriQuality = mpFriRemote->getQuality();
@@ -264,7 +259,7 @@ void KukaInterface::copyFromFRI()
 //----------------------------------------------------------------------------------------------------------------------
 // wrapped fri-functions
 //----------------------------------------------------------------------------------------------------------------------
-FRI_STATE KukaInterface::getFriState()
+FRI_STATE cedar::dev::kuka::KukaInterface::getFriState()
 {
   mLock.lockForRead();
   FRI_STATE s = mFriState;
@@ -272,8 +267,7 @@ FRI_STATE KukaInterface::getFriState()
   return s;
 }
 
-
-FRI_QUALITY KukaInterface::getFriQuality()
+FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality()
 {
   mLock.lockForRead();
   FRI_QUALITY q = mFriQuality;
@@ -281,8 +275,7 @@ FRI_QUALITY KukaInterface::getFriQuality()
   return q;
 }
 
-
-float KukaInterface::getSampleTime()
+float cedar::dev::kuka::KukaInterface::getSampleTime()
 {
   mLock.lockForRead();
   float t = mSampleTime;
@@ -290,14 +283,12 @@ float KukaInterface::getSampleTime()
   return t;
 }
 
-
-bool KukaInterface::isPowerOn()
+bool cedar::dev::kuka::KukaInterface::isPowerOn()
 {
   mLock.lockForRead();
   bool on = mPowerOn;
   mLock.unlock();
   return on;
 }
-
 #endif // CEDAR_USE_KUKA_FRI
 

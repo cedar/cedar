@@ -36,21 +36,12 @@
 
 #define NOMINMAX // to avoid Windows issues
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "AmtecChain.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/gl/namespace.h"
+#include "cedar/devices/robot/gl/AmtecChain.h"
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::robot;
-using namespace cedar::dev::robot::gl;
-using namespace cedar::aux::gl;
-using namespace std;
-using namespace cv;
-
 
 const float cedar::dev::robot::gl::AmtecChain::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
 
@@ -94,14 +85,14 @@ const float cedar::dev::robot::gl::AmtecChain::mChrome_Shininess[1] = {0.078125f
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-AmtecChain::AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::AmtecChain::AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
 :
-gl::KinematicChain(rpKinematicChainModel)
+cedar::dev::robot::gl::KinematicChain(rpKinematicChainModel)
 {
 
 }
 
-AmtecChain::~AmtecChain()
+cedar::dev::robot::gl::AmtecChain::~AmtecChain()
 {
 
 }
@@ -110,7 +101,7 @@ AmtecChain::~AmtecChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void AmtecChain::setMaterial(int material)
+void cedar::dev::robot::gl::AmtecChain::setMaterial(int material)
 {
   switch (material)
   {
