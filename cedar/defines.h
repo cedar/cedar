@@ -117,5 +117,4 @@
 #error CEDAR_DECLARE_DEPRECATED is not implemented for this compiler.
 #endif
 
-
 #endif // CEDAR_DEFINES_H
