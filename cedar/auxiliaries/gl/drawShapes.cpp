@@ -35,11 +35,15 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#ifdef DEBUG
+  #include "cedar/auxiliaries/debug/lib.h"
+#else
+  #include "cedar/auxiliaries/release/lib.h"
+#endif
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/constants.h"
-#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
 

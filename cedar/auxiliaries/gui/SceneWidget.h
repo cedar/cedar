@@ -61,7 +61,7 @@
 #ifdef DEBUG
   #include "cedar/auxiliaries/debug/gui/ui_SceneWidget.h"
 #else
-  #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
+  #include "cedar/auxiliaries/release/gui/ui_SceneWidget.h"
 #endif
 
 // SYSTEM INCLUDES

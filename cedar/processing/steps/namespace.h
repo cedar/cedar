@@ -38,7 +38,11 @@
 #define CEDAR_PROC_STEPS_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#ifdef DEBUG
+  #include "cedar/processing/debug/lib.h"
+#else
+  #include "cedar/processing/release/lib.h"
+#endif
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

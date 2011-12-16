@@ -38,8 +38,12 @@
 #define CEDAR_AUX_MATH_SIGMOIDS_H
 
 // CEDAR INCLUDES
+#ifdef DEBUG
+  #include "cedar/auxiliaries/debug/lib.h"
+#else
+  #include "cedar/auxiliaries/release/lib.h"
+#endif
 #include "cedar/auxiliaries/math/namespace.h"
-#include "cedar/auxiliaries/lib.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES

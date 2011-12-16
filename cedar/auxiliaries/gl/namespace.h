@@ -38,7 +38,11 @@
 #define CEDAR_AUX_GL_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
+#ifdef DEBUG
+  #include "cedar/auxiliaries/debug/lib.h"
+#else
+  #include "cedar/auxiliaries/release/lib.h"
+#endif
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES

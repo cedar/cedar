@@ -39,7 +39,11 @@
 #define CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 
 // LOCAL INCLUDES
-#include "cedar/devices/lib.h"
+#ifdef DEBUG
+  #include "cedar/devices/debug/lib.h"
+#else
+  #include "cedar/devices/release/lib.h"
+#endif
 
 // PROJECT INCLUDES
 #include "namespace.h"
