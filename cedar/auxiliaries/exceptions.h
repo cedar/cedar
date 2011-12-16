@@ -44,6 +44,8 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ExceptionBase.h"
 
+#include <opencv2/core/mat.hpp>
+
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */
 class cedar::aux::UnhandledTypeException : public cedar::aux::ExceptionBase
@@ -193,6 +195,14 @@ class cedar::aux::DeadReferenceException : public cedar::aux::ExceptionBase
 {
 public:
   DeadReferenceException();
+};
+
+/*!@brief Exception that is thrown when two matrices mismatch in size or type.
+ */
+class cedar::aux::MatrixMismatchException : public cedar::aux::ExceptionBase
+{
+public:
+  MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB);
 };
 
 #endif // CEDAR_AUX_EXCEPTIONS_H
