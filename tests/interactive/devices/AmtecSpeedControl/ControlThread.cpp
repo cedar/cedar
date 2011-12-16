@@ -58,7 +58,7 @@ cedar::aux::LoopedThread(100, 0.01, configFileName)
 }
 
 
-void ControlThread::step(double stepSize)
+void ControlThread::step(double)
 {
   double current_pos = mpKinematicChain->getJointAngle(JOINT);
   double current_vel = mpKinematicChain->getJointVelocity(JOINT);
