@@ -34,43 +34,36 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/communication/gui/CommunicationWidget.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::com::gui;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::dev::com::gui::CommunicationWidget::CommunicationWidget(cedar::dev::com::Communication *peCommunication)
+{
+  mpeCommunication = peCommunication;
+  setupUi(this);
+  connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
+}
 
-  CommunicationWidget::CommunicationWidget(cedar::dev::com::Communication *peCommunication)
-  {
-    mpeCommunication = peCommunication;
-    setupUi(this);
-    connect(pushButtonSend, SIGNAL(pressed()), this, SLOT(send()));
-  }
+cedar::dev::com::gui::CommunicationWidget::~CommunicationWidget()
+{
 
-  CommunicationWidget::~CommunicationWidget()
-  {
-
-  }
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-  void CommunicationWidget::send()
-  {
-    mpeCommunication->lock();
-    mpeCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
-    std::string answer;
-    QString q_answer;
-    mpeCommunication->receive(answer);
-    mpeCommunication->unlock();
-    boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
-  }
+void cedar::dev::com::gui::CommunicationWidget::send()
+{
+  mpeCommunication->lock();
+  mpeCommunication->send(boxCommand->text().toStdString()); //send the text typed into boxCommand
+  std::string answer;
+  QString q_answer;
+  mpeCommunication->receive(answer);
+  mpeCommunication->unlock();
+  boxAnswer->setText(q_answer.fromStdString(answer)); //type received string into boxAnswer
+}
