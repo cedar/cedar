@@ -259,6 +259,11 @@ void cedar::proc::steps::Resize::outputSizeChanged()
 
 void cedar::proc::steps::Resize::updateOutputMatrixSize()
 {
+  if (!this->mInput)
+  {
+    return;
+  }
+
   const cv::Mat& input = this->mInput->getData();
   int size = static_cast<int>(this->_mOutputSize->size());
 
