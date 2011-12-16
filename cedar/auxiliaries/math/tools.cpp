@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR_INCLUDES
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>

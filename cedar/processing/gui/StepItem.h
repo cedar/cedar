@@ -41,12 +41,10 @@
 #ifndef CEDAR_PROC_STEP_ITEM_H
 #define CEDAR_PROC_STEP_ITEM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -179,4 +177,3 @@ private:
 }; // class StepItem
 
 #endif // CEDAR_PROC_STEP_ITEM_H
-

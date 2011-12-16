@@ -41,13 +41,11 @@
 #ifndef CEDAR_PROC_GUI_TRIGGER_ITEM_H
 #define CEDAR_PROC_GUI_TRIGGER_ITEM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/GraphicsBase.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -157,4 +155,3 @@ private:
 }; // class TriggerItem
 
 #endif // CEDAR_PROC_GUI_TRIGGER_ITEM_H
-

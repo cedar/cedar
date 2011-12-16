@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/gl/Block.h"

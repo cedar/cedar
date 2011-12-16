@@ -37,10 +37,8 @@
 #ifndef CEDAR_PROC_STEPS_RESIZE_H
 #define CEDAR_PROC_STEPS_RESIZE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/steps/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/Step.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"

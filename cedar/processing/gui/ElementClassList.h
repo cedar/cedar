@@ -41,15 +41,12 @@
 #ifndef CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 #define CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/processing/DeclarationRegistry.h"
 
 // SYSTEM INCLUDES
 #include <QListWidget>
-
 
 /*!@brief A widget showing a list of steps that can be dragged into the architecture area.
  *
@@ -94,25 +91,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
-private:
-  // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
 private:
   // none yet
 
 }; // class ElementClassList
 
 #endif // CEDAR_PROC_GUI_ELEMENT_CLASS_LIST_H
-

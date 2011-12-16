@@ -38,17 +38,17 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_CEDAR_PROC_H
 #define CEDAR_CEDAR_PROC_H
 
-// CLASSES
+// CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Step.h"
 
-// GUI CLASSES
 #include "cedar/processing/gui/ElementClassList.h"
 #include "cedar/processing/gui/View.h"
+
+// SYSTEM INCLUDES
 
 #endif // CEDAR_CEDAR_PROC_H

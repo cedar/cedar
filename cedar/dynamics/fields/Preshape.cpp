@@ -34,10 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/fields/Preshape.h"
-
-// PROJECT INCLUDES
 #include "cedar/dynamics/SpaceCode.h"
 #include "cedar/auxiliaries/assert.h"
 

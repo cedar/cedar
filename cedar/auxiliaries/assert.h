@@ -42,10 +42,13 @@
 #ifndef CEDAR_ASSERT_H
 #define CEDAR_ASSERT_H
 
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/exceptions.h"
+
+// SYSTEM INCLUDES
 #include <iostream>
 #include <string>
 
-#include "cedar/auxiliaries/exceptions.h"
 
 /*!@brief This macro replaces the C++ assertion and throws an exception instead, pointing out the line number of the
  * failed assertion. */
@@ -75,4 +78,3 @@
 #endif // DEBUG
 
 #endif // CEDAR_ASSERT_H
-

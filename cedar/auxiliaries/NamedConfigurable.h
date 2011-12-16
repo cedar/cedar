@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 
+
 /*!@brief This is a Configurable with a name.
  *
  * This class is provided for convenience, because many classes derived from cedar::aux::Configurable use a name.
@@ -100,4 +101,3 @@ private:
 }; // class cedar::aux::NamedConfigurable
 
 #endif // CEDAR_AUX_NAMED_CONFIGURABLE_H
-

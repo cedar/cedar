@@ -34,9 +34,11 @@
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/sleepFunctions.h"
 #include "cedar/defines.h"
 
+// SYSTEM INCLUDES
 #ifdef WINDOWS
   #include <Windows.h>
 #else

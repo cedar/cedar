@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_GUI_STRING_PARAMETER_H
 #define CEDAR_PROC_GUI_STRING_PARAMETER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Parameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QLineEdit>
@@ -114,4 +112,3 @@ private:
 }; // class cedar::proc::gui::StringParameter
 
 #endif // CEDAR_PROC_GUI_STRING_PARAMETER_H
-

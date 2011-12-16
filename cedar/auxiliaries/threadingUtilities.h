@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cedar/auxiliaries/threadingUtilities.h
+    File:        threadingUtilities.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -37,6 +37,9 @@
 #ifndef CEDAR_AUX_THREADING_UTILITIES_H
 #define CEDAR_AUX_THREADING_UTILITIES_H
 
+// CEDAR INCLUDES
+
+// SYSTEM INCLUDES
 #include <set>
 #include <QReadWriteLock>
 
@@ -127,6 +130,4 @@ namespace cedar
   }
 }
 
-
 #endif // CEDAR_AUX_THREADING_UTILITIES_H
-

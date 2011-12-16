@@ -34,12 +34,12 @@
 
 ======================================================================================================================*/
 
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gl/namespace.h"
 
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -79,4 +79,3 @@ void cedar::aux::gui::Viewer::timerEvent(QTimerEvent*)
     update();
   }
 }
-

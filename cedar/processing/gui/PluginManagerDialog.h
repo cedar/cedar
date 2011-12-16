@@ -37,7 +37,7 @@
 #ifndef CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
 #define CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #ifdef DEBUG
   #include "cedar/processing/debug/gui/ui_PluginManagerDialog.h"
 #else
@@ -46,8 +46,6 @@
 
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/PluginProxy.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QDialog>
@@ -107,4 +105,3 @@ private:
 }; // class cedar::PluginManagerDialog
 
 #endif // CEDAR_PROC_GUI_PLUGIN_MANAGER_DIALOG_H
-

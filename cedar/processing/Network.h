@@ -304,4 +304,3 @@ private:
 }; // class cedar::proc::Network
 
 #endif // CEDAR_PROC_NETWORK_H
-

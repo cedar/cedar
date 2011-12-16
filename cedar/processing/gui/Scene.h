@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_SCENE_H
 #define CEDAR_PROC_SCENE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -270,4 +268,3 @@ private:
 }; // class ProcessingScene
 
 #endif // CEDAR_PROC_SCENE_H
-

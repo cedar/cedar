@@ -37,13 +37,11 @@
 #ifndef CEDAR_PROC_PROPERTY_PANE_H
 #define CEDAR_PROC_PROPERTY_PANE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/processing/Step.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QTableWidget>
@@ -174,4 +172,3 @@ private:
 }; // class cedar::proc::gui::PropertyPane
 
 #endif // CEDAR_PROC_PROPERTY_PANE_H
-

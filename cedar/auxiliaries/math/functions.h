@@ -34,14 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_MATH_FUNCTIONS_H
 #define CEDAR_AUX_MATH_FUNCTIONS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <math.h>
@@ -75,4 +72,5 @@ namespace cedar
     }
   }
 }
+
 #endif  // CEDAR_AUX_MATH_FUNCTIONS_H

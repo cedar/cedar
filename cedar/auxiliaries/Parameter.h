@@ -158,4 +158,3 @@ private:
 }; // class cedar::aux::Parameter
 
 #endif // CEDAR_PROC_PARAMETER_H
-

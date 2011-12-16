@@ -38,13 +38,11 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/UIntVectorParameter.h"
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
@@ -135,4 +133,3 @@ void cedar::proc::gui::UIntVectorParameter::valueChanged(int)
 
   parameter->set(values);
 }
-

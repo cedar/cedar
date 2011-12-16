@@ -134,4 +134,3 @@ private:
 }; // class cedar::proc::gui::NetworkFile
 
 #endif // CEDAR_PROC_GUI_NETWORK_FILE_H
-

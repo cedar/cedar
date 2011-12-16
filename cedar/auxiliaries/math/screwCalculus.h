@@ -37,9 +37,7 @@
 #ifndef CEDAR_AUX_MATH_SCREW_CALCULUS_H
 #define CEDAR_AUX_MATH_SCREW_CALCULUS_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -219,8 +217,6 @@ namespace cedar
        */
       template<typename T>
       cv::Mat twistCoordinates(const cv::Mat& rSupportPoint, const cv::Mat& rAxis);
-
-
     }
   }
 }

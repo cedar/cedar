@@ -34,15 +34,11 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_GL_OBJECT_H
 #define CEDAR_AUX_GL_OBJECT_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Object.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -53,6 +49,7 @@
 #include <opencv2/opencv.hpp>
 #include <QObject>
 #include <QGLViewer/qglviewer.h>
+
 
 /*!@brief Base class for simple OpenGL visualizations of geometric objects
  *

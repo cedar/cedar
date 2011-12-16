@@ -149,4 +149,3 @@ private:
 }; // class cedar::aux::TypeBasedFactory
 
 #endif // CEDAR_AUX_TYPE_BASED_FACTORY_H
-

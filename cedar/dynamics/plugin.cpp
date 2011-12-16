@@ -34,6 +34,7 @@
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
 #include "cedar/dynamics/plugin.h"
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/fields/NeuralField.h"
@@ -43,6 +44,8 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
+
+// SYSTEM INCLUDES
 
 
 void pluginDeclaration(cedar::proc::PluginDeclarationPtr plugin)
@@ -81,4 +84,3 @@ void cedar::dyn::getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin)
 {
   ::pluginDeclaration(plugin);
 }
-

@@ -40,16 +40,12 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEFINES_H
 #define CEDAR_DEFINES_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
-//#include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
@@ -58,14 +54,9 @@
 // defines
 //----------------------------------------------------------------------------------------------------------------------
 
-// foreach loop from boost
-//#define cedar_foreach BOOST_FOREACH
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // macros
 //----------------------------------------------------------------------------------------------------------------------
-
 
 /*! @def     CEDAR_GENERATE_POINTER_TYPES(CLASS_NAME)
  *
@@ -125,8 +116,6 @@
 #else
 #error CEDAR_DECLARE_DEPRECATED is not implemented for this compiler.
 #endif
-
-
 
 
 #endif // CEDAR_DEFINES_H

@@ -145,4 +145,3 @@ private:
 }; // class cedar::proc::DeclarationRegistry
 
 #endif // CEDAR_PROC_DECLARATION_REGISTRY_H
-

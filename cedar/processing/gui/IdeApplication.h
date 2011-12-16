@@ -41,11 +41,9 @@
 #ifndef CEDAR_PROC_GUI_IDE_APPLICATION_H
 #define CEDAR_PROC_GUI_IDE_APPLICATION_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Ide.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QApplication>

@@ -92,4 +92,3 @@ private:
 }; // class cedar::aux::gui::HistoryPlot
 
 #endif // CEDAR_AUX_GUI_HISTORY_PLOT_H
-

@@ -34,20 +34,15 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_CEDAR_DYN_H
 #define CEDAR_CEDAR_DYN_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Activation.h"
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/dynamics/SpaceCode.h"
 #include "cedar/dynamics/fields/NeuralField.h"
-
-
 
 // SYSTEM INCLUDES
 

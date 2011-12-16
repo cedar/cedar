@@ -177,4 +177,3 @@ private:
 }; // class cedar::aux::kernel::Kernel
 
 #endif // CEDAR_AUX_KERNEL_KERNEL_H
-

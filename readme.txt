@@ -39,9 +39,9 @@
 # CEDAR
 #=======================================================================================================================
 
-[Insert warm welcoming message here.] :)
+Welcome to cedar!
 
-While being an open source library, cedar is developed by the Autonomous
+While being an open source library, cedar is developed primarily by the Autonomous
 Robotics group at the Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum
 in Germany. If you would like to contact us, write an email to cedar@ini.rub.de.
 
@@ -61,7 +61,7 @@ You can also reach us by phone under +49 234 32-28967.
 # INSTALLING CEDAR
 #=======================================================================================================================
 
-=== Dependencies ===
+=== Install all dependencies ===
 
 cedar comes with a bunch of dependencies on other libraries. Here is what you
 have to install before you can compile our library. The version numbers are
@@ -71,7 +71,7 @@ the oldest versions supported, unless noted otherwise.
    * Boost 1.47
    * OpenCV 2.2
    * Qt 4.6.2
-   * qwt <=5.2.1 (no newer versions)
+   * qwt <= 5.2.1 (no newer versions)
    * qwtplot3d 0.3
    * libqglviewer 2.3.6
    * libconfig 1.4
@@ -112,7 +112,7 @@ hg clone https://bitbucket.org/cedar/testing
    $ make install
 
 
-=== Playing around with the processing framework ===
+=== Play around with the processing framework ===
 
 If you don't want to start coding right away, you can have a look at our processing framework:
 

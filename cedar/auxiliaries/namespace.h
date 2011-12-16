@@ -39,8 +39,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/lib.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES

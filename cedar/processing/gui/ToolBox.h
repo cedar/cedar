@@ -41,10 +41,8 @@
 #ifndef CEDAR_PROC_GUI_TOOLBOX_H
 #define CEDAR_PROC_GUI_TOOLBOX_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -127,16 +125,6 @@ private:
   //!@brief map of all buttons in the widget
   std::map<std::string, QToolButton*> mButtons;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::proc::gui::ToolBox
 
 #endif // CEDAR_PROC_GUI_TOOLBOX_H
-

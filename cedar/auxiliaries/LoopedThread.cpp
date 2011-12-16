@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LoopedThread.h"
 
@@ -43,7 +42,6 @@
 using namespace std;
 using namespace boost::posix_time;
 
-// #define SHOW_TIMING_HELPERS
 
 //------------------------------------------------------------------------------
 // constructors and destructor

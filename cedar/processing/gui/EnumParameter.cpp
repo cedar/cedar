@@ -34,11 +34,9 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/EnumParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
-
-// PROJECT INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -104,4 +102,3 @@ void cedar::proc::gui::EnumParameter::currentIndexChanged(const QString&)
     parameter->set(value.toStdString());
   }
 }
-

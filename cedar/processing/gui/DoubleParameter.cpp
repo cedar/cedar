@@ -38,11 +38,9 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/DoubleParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>

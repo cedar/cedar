@@ -38,8 +38,10 @@
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/exceptions.h"
 
+// SYSTEM INCLUDES
 #include "cedar/auxiliaries/math/tools.h"
 
 cedar::aux::UnhandledTypeException::UnhandledTypeException()

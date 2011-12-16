@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_USER_DATA_H
 #define CEDAR_AUX_USER_DATA_H
 
@@ -95,4 +94,3 @@ private:
 }; // class cedar::aux::UserData
 
 #endif // CEDAR_AUX_USER_DATA_H
-

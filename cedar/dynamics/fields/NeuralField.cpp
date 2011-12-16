@@ -38,7 +38,7 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/fields/NeuralField.h"
 #include "cedar/dynamics/SpaceCode.h"
 #include "cedar/processing/ExternalData.h"
@@ -50,8 +50,6 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/convolution/FastConvolution.h"
 #include "cedar/auxiliaries/math/tools.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -270,13 +268,10 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   // add all inputs to d_u
   for (size_t i = 0; i < input_slot->getDataCount(); ++i)
   {
-    std::cout << "d_u: " << cedar::aux::math::matrixSizeToString(d_u) << std::endl;
     cedar::aux::DataPtr input = input_slot->getData(i);
     if (input)
     {
       cv::Mat& input_mat = input->getData<cv::Mat>();
-      std::cout << "input_mat: " << cedar::aux::math::matrixSizeToString(input_mat) << std::endl;
-      std::cout << "input_mat: " << input_mat.rows << "x" << input_mat.cols << std::endl;
 
       if (!cedar::aux::math::matrixSizesEqual(input_mat, d_u))
       {

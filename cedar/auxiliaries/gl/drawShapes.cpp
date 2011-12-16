@@ -43,9 +43,7 @@
 
 // SYSTEM INCLUDES
 
-
-using namespace std;
-using namespace cv;
+//using namespace cv;
 
 void cedar::aux::gl::setColor(double R, double G, double B)
 {
@@ -144,7 +142,7 @@ void cedar::aux::gl::drawCone(
   //error: "class cv::MatExpr" has no member named "clone"
   //Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
 	
-  Mat line = (end-start)(Rect(0, 0, 1, 3));
+  cv::Mat line = (end-start)(cv::Rect(0, 0, 1, 3));
   // if start = end do nothing
   if (cv::norm(line) == 0)
   {
@@ -155,12 +153,12 @@ void cedar::aux::gl::drawCone(
   // move to start of line
   glTranslated(start.at<T>(0, 0), start.at<T>(1, 0), start.at<T>(2, 0));
   // make z-axis collinear with the cone center line
-  Mat z = Mat::zeros(3, 1, start.type());
+  cv::Mat z = cv::Mat::zeros(3, 1, start.type());
   z.at<T>(2, 0) = 1;
   double alpha = acos( line.dot(z) / cv::norm(line) );
   if (alpha != 0)
   {
-    Mat axis = z.cross(line);
+    cv::Mat axis = z.cross(line);
     glRotated(alpha*180/cedar::aux::math::pi, axis.at<T>(0, 0), axis.at<T>(1, 0), axis.at<T>(2, 0));
   }
   // draw the cone

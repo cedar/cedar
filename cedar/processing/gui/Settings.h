@@ -37,13 +37,11 @@
 #ifndef CEDAR_PROC_GUI_SETTINGS_H
 #define CEDAR_PROC_GUI_SETTINGS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/BoolParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QDockWidget>

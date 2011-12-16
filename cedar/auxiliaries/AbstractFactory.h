@@ -37,10 +37,8 @@
 #ifndef CEDAR_AUX_ABSTRACT_FACTORY_H
 #define CEDAR_AUX_ABSTRACT_FACTORY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -85,8 +83,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -95,8 +91,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
@@ -106,4 +100,3 @@ private:
 }; // class cedar::aux::AbstractFactory
 
 #endif // CEDAR_AUX_ABSTRACT_FACTORY_H
-

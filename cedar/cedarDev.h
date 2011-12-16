@@ -34,13 +34,10 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_CEDAR_DEV_H
 #define CEDAR_CEDAR_DEV_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/Component.h"
 #include "cedar/devices/robot/ComponentNotAvailableException.h"
 #include "cedar/devices/robot/KinematicChain.h"
@@ -52,8 +49,6 @@
 #include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/devices/robot/gl/AmtecChain.h"
 #include "cedar/devices/robot/gl/CoraArm.h"
-
-
 
 // SYSTEM INCLUDES
 

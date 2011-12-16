@@ -38,13 +38,10 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_PROC_SOURCES_NAMESPACE_H
 #define CEDAR_PROC_SOURCES_NAMESPACE_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

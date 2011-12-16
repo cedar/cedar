@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_LOOPED_THREAD_H
 #define CEDAR_AUX_LOOPED_THREAD_H
 
@@ -258,8 +257,6 @@ private:
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief desired length of a single step, in milliseconds
   boost::posix_time::time_duration mStepSize;
@@ -281,17 +278,6 @@ private:
   // remeber time stamps of last step
   boost::posix_time::ptime mLastTimeStepStart;
   boost::posix_time::ptime mLastTimeStepEnd;
-
-
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
-private:
-  // none yet
 
 }; // class cedar::aux::Thread
 

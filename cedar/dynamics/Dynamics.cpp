@@ -38,12 +38,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/dynamics/Dynamics.h"
 #include "cedar/processing/StepTime.h"
 #include "cedar/processing/exceptions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <iostream>

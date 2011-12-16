@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Object.h"
 #include "cedar/auxiliaries/math/tools.h"

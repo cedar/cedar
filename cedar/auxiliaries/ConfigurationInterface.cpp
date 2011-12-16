@@ -34,18 +34,15 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "cedar/auxiliaries/UserData.h"
 #include "cedar/auxiliaries/exceptions.h"
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <libconfig.h++>
 #include <sys/types.h> // for checking if directory exists
 #include <sys/stat.h> // for checking if directory exists
-//#include <process.h> // for portable mkdir
 #include <stdio.h>  // FILENAME_MAX needed for char array
 #ifdef WINDOWS
     #include <direct.h>

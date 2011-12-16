@@ -109,4 +109,3 @@ private:
 }; // class cedar::proc::gui::Parameter
 
 #endif // CEDAR_PROC_GUI_PARAMETER_H
-

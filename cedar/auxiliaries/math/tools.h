@@ -34,18 +34,15 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_MATH_TOOLS_H
 #define CEDAR_AUX_MATH_TOOLS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -308,4 +305,5 @@ namespace cedar
     } // namespace math
   } // namespace aux
 } // namespace cedar
+
 #endif // CEDAR_AUX_MATH_TOOLS_H

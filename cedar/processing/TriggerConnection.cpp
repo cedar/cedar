@@ -34,13 +34,12 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/Trigger.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/utilities.h"
+
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------

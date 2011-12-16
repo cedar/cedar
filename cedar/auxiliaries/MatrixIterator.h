@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_AUX_MATRIX_ITERATOR_H
 #define CEDAR_AUX_MATRIX_ITERATOR_H
 
@@ -139,4 +138,3 @@ private:
 }; // class cedar::aux::MatrixIterator
 
 #endif // CEDAR_AUX_MATRIX_ITERATOR_H
-
