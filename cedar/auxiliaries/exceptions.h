@@ -46,7 +46,7 @@
 #include "cedar/auxiliaries/ExceptionBase.h"
 
 // SYSTEM INCLUDES
-
+#include <opencv2/core/mat.hpp>
 
 /*!@brief Exception that occurs when a data type is not handled (e.g. by a generic plotter).
  */

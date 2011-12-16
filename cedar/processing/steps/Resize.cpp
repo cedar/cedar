@@ -96,31 +96,45 @@ void cedar::proc::steps::Resize::compute(const cedar::proc::Arguments&)
   const cv::Mat& input = this->mInput->getData();
   cv::Mat& output = this->mOutput->getData();
 
-  if (this->_mOutputSize->size() <= 2)
+  switch (this->_mOutputSize->size()) // switch based on the dimensionality of the input/output
   {
-    cv::Size size = this->getOutputSize();
-    cv::resize(input, output, size, 0, 0, this->_mInterpolationType->getValue());
-  }
-  else
-  {
-    CEDAR_ASSERT(this->_mInterpolationType->getValue() == cedar::proc::steps::Resize::Interpolation::LINEAR);
-
-    switch (this->_mInterpolationType->getValue())
+    case 0:
+    case 1:
     {
-      default:
-        std::cout << "Unimplemented interpolation type in cedar::proc::steps::Resize::compute. "
-                  << "Defaulting to linear interpolation."
-                  << std::endl;
-      case cedar::proc::steps::Resize::Interpolation::LINEAR:
+      cv::Size size = this->getOutputSize();
+      cv::Mat src = cedar::aux::math::canonicalColVector(input);
+      cv::resize(src, output, size, 0, 0, this->_mInterpolationType->getValue());
+      break;
+    }
+
+    case 2:
+    {
+      cv::Size size = this->getOutputSize();
+      cv::resize(input, output, size, 0, 0, this->_mInterpolationType->getValue());
+      break;
+    }
+
+    default:
+    {
+      CEDAR_ASSERT(this->_mInterpolationType->getValue() == cedar::proc::steps::Resize::Interpolation::LINEAR);
+
+      switch (this->_mInterpolationType->getValue())
       {
-        cedar::aux::MatrixIterator iter(output);
-        do
+        default:
+          std::cout << "Unimplemented interpolation type in cedar::proc::steps::Resize::compute. "
+                    << "Defaulting to linear interpolation."
+                    << std::endl;
+        case cedar::proc::steps::Resize::Interpolation::LINEAR:
         {
-          double interpolated_value = this->linearInterpolationND(input, output, iter.getCurrentIndexVector());
-          cedar::aux::math::assignMatrixEntry(output, iter.getCurrentIndexVector(), interpolated_value);
+          cedar::aux::MatrixIterator iter(output);
+          do
+          {
+            double interpolated_value = this->linearInterpolationND(input, output, iter.getCurrentIndexVector());
+            cedar::aux::math::assignMatrixEntry(output, iter.getCurrentIndexVector(), interpolated_value);
+          }
+          while (iter.increment());
+          break;
         }
-        while (iter.increment());
-        break;
       }
     }
   }
@@ -259,6 +273,11 @@ void cedar::proc::steps::Resize::outputSizeChanged()
 
 void cedar::proc::steps::Resize::updateOutputMatrixSize()
 {
+  if (!this->mInput)
+  {
+    return;
+  }
+
   const cv::Mat& input = this->mInput->getData();
   int size = static_cast<int>(this->_mOutputSize->size());
 
