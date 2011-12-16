@@ -37,7 +37,7 @@
 #ifndef CEDAR_AUX_NAMESPACE_H
 #define CEDAR_AUX_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/defines.h"
 
