@@ -37,15 +37,13 @@
 #ifndef CEDAR_DEV_AMTEC_NAMESPACE_H
 #define CEDAR_DEV_AMTEC_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #ifdef DEBUG
   #include "cedar/devices/debug/lib.h"
 #else
   #include "cedar/devices/release/lib.h"
 #endif
 #include "cedar/devices/robot/CMakeDefines.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

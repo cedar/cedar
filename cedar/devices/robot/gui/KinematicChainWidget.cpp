@@ -34,37 +34,28 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-
 #include "stdio.h"
 #include <iostream>
-
 #include <QtGui/QApplication>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QLabel>
 #include <QtGui/QRadioButton>
 
-using namespace std;
-using namespace cedar::dev::robot;
-
-
 //----------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
-                                                                    const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-                                                                    QWidget * parent,
-                                                                    Qt::WindowFlags f
-                                                                  )
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
+(
+  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+  QWidget * parent,
+  Qt::WindowFlags f
+)
 :
 QWidget(parent, f)
 {
@@ -78,15 +69,16 @@ QWidget(parent, f)
 }
 
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
-                                                                    const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-                                                                    const std::string& configFileName,
-                                                                    QWidget *parent,
-                                                                    Qt::WindowFlags
-                                                                  )
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
+(
+  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+  const std::string& configFileName,
+  QWidget *parent,
+  Qt::WindowFlags
+)
 :
 QWidget(parent),
-ConfigurationInterface(configFileName)
+cedar::aux::ConfigurationInterface(configFileName)
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
@@ -99,12 +91,12 @@ ConfigurationInterface(configFileName)
 
   if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
   {
-    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << endl;
+    std::cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << std::endl;
   }
 
   if(addParameter(&mSingleStep, "kinematicChainWidgetSingleStep", 0.01) != CONFIG_SUCCESS)
   {
-    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << endl;
+    std::cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << std::endl;
   }
 
   readOrDefaultConfiguration();
@@ -114,11 +106,12 @@ ConfigurationInterface(configFileName)
 }
 
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
-                                                                    const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-                                                                    QWidget * parent,
-                                                                    Qt::WindowFlags f
-                                                                  )
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
+(
+  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
+  QWidget * parent,
+  Qt::WindowFlags f
+)
 :
 QWidget(parent, f)
 {
@@ -128,7 +121,7 @@ QWidget(parent, f)
     // here, at least we make sure that the number of joints is the same
     if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
     {
-      cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
+      std::cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << std::endl;
       CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
     }
   }
@@ -143,12 +136,13 @@ QWidget(parent, f)
 }
 
 
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget(
-                                                                    const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-                                                                    const std::string& configFileName,
-                                                                    QWidget *parent,
-                                                                    Qt::WindowFlags
-                                                                  )
+cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
+(
+  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
+  const std::string& configFileName,
+  QWidget *parent,
+  Qt::WindowFlags
+)
 :
 QWidget(parent),
 ConfigurationInterface(configFileName)
@@ -159,7 +153,7 @@ ConfigurationInterface(configFileName)
     // here, at least we make sure that the number of joints is the same
     if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
     {
-      cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
+      std::cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << std::endl;
       CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
     }
   }
@@ -175,12 +169,12 @@ ConfigurationInterface(configFileName)
 
   if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
   {
-    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << endl;
+    std::cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << std::endl;
   }
 
   if(addParameter(&mSingleStep, "kinematicChainWidgetSingleStep", 0.01) != CONFIG_SUCCESS)
   {
-    cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << endl;
+    std::cout << "KinematicChainWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << std::endl;
   }
 
   readOrDefaultConfiguration();
@@ -335,7 +329,8 @@ void cedar::dev::robot::gui::KinematicChainWidget::updateJointValue()
     break;
 
   default:
-    cout << "Error: I was not able to determine the corresponding working mode for this signal. This should never happen!" << endl;
+    std::cout << "Error: I was not able to determine the corresponding working mode for this signal. "
+              << "This should never happen!" << std::endl;
   }
 
   return;

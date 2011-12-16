@@ -35,10 +35,8 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/ReferenceGeometry.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
@@ -47,14 +45,12 @@
 #include <iostream>
 #include <libconfig.h++>
 
-using namespace cedar::dev::robot;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-ReferenceGeometry::ReferenceGeometry(const std::string& configFileName)
+cedar::dev::robot::ReferenceGeometry::ReferenceGeometry(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName)
 {
@@ -65,7 +61,7 @@ cedar::aux::ConfigurationInterface(configFileName)
 }
 
 //! destructor
-ReferenceGeometry::~ReferenceGeometry()
+cedar::dev::robot::ReferenceGeometry::~ReferenceGeometry()
 {
 }
 
@@ -73,7 +69,7 @@ ReferenceGeometry::~ReferenceGeometry()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void ReferenceGeometry::init()
+void cedar::dev::robot::ReferenceGeometry::init()
 {
   //! \todo this will be moved to configurationInterface, when this is done, remove here
   addParameter(&_mName, "Name", "<name>");
@@ -86,7 +82,7 @@ void ReferenceGeometry::init()
 
   for (unsigned int i = 0; i < number_of_joints; ++i)
   {
-    ReferenceGeometry::JointPtr p_joint(new ReferenceGeometry::Joint());
+    cedar::dev::robot::ReferenceGeometry::JointPtr p_joint(new cedar::dev::robot::ReferenceGeometry::Joint());
     _mJoints.push_back(p_joint);
 
     std::string parameter_path = joint_path + ".[" + cedar::aux::toString<unsigned int>(i) + "].";
@@ -100,7 +96,10 @@ void ReferenceGeometry::init()
   }
   
   // add parameter for end effector information
-  ReferenceGeometry::EndEffectorPtr p_end_effector(new ReferenceGeometry::EndEffector());
+  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr p_end_effector
+  (
+    new cedar::dev::robot::ReferenceGeometry::EndEffector()
+  );
   _mpEndEffector = p_end_effector;
   addParameter(&(_mpEndEffector->position), "endEffector.position", 0.0);
   addParameter(&(_mpEndEffector->orientation), "endEffector.orientation", 0.0);
@@ -124,22 +123,28 @@ void ReferenceGeometry::init()
   }
 }
 
-unsigned int ReferenceGeometry::getNumberOfJoints() const
+unsigned int cedar::dev::robot::ReferenceGeometry::getNumberOfJoints() const
 {
   return _mJoints.size();
 }
 
-const ReferenceGeometry::JointPtr& ReferenceGeometry::getJoint(const unsigned int index) const
+const cedar::dev::robot::ReferenceGeometry::JointPtr& cedar::dev::robot::ReferenceGeometry::getJoint
+                                                      (
+                                                        unsigned int index
+                                                      ) const
 {
   return _mJoints[index];
 }
 
-const ReferenceGeometry::EndEffectorPtr& ReferenceGeometry::getEndEffector() const
+const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& cedar::dev::robot::ReferenceGeometry::getEndEffector() const
 {
   return _mpEndEffector;
 }
 
-const ReferenceGeometry::LinkSegmentPtr& ReferenceGeometry::getLinkSegment(const unsigned int index) const
+const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& cedar::dev::robot::ReferenceGeometry::getLinkSegment
+                                                            (
+                                                              unsigned int index
+                                                            ) const
 {
   return _mLinkSegments[index];
 }

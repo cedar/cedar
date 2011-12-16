@@ -36,10 +36,8 @@
 #ifndef CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H
 #define CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Object.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
 
@@ -96,7 +94,5 @@ protected:
 protected:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
   cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
-  
 }; // class cedar::dev::robot::KinematicChainSimulation
-
 #endif // CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H

@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-
+#include "cedar/auxiliaries/math/tools.h"
 
 cedar::aux::UnhandledTypeException::UnhandledTypeException()
 {
@@ -127,4 +127,19 @@ cedar::aux::InitializationException::InitializationException()
 cedar::aux::DeadReferenceException::DeadReferenceException()
 {
   this->mType = "DeadReferenceException";
+}
+
+cedar::aux::MatrixMismatchException::MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB)
+{
+  this->mType = "cedar::aux::MatrixMismatchException";
+
+  unsigned int dim_a = cedar::aux::math::getDimensionalityOf(matA);
+  unsigned int dim_b = cedar::aux::math::getDimensionalityOf(matA);
+
+  std::string message = "The sizes or types of the matrices mismatch.\n";
+  message += "First matrix is:\ndim: ";
+  message += cedar::aux::toString(dim_a) + ", size: " + cedar::aux::math::matrixSizeToString(matA);
+  message += "Second matrix is:\ndim: ";
+  message += cedar::aux::toString(dim_b) + ", size: " + cedar::aux::math::matrixSizeToString(matB);
+  this->setMessage(message);
 }

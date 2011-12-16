@@ -53,7 +53,7 @@ class cedar::aux::ExceptionBase : public std::exception
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
-   /*!@def     CEDAR_THROW(Exception_type, message)
+  /*! @def     CEDAR_THROW(Exception_type, message)
    *
    *  @brief   Throws an exception of the given \em type with the specified \em message.
    *
@@ -65,6 +65,14 @@ class cedar::aux::ExceptionBase : public std::exception
    *           Do not line-break the following macro(s), or the __LINE__ specification will be wrong!
    */
   #define CEDAR_THROW(Exception_type, message) { Exception_type exception; exception.setMessage(message); exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
+
+  /*! @def     CEDAR_THROW_EXCEPTION(Exception_type)
+   *
+   *  @brief   Throws the given object and adds the line and source file.
+   *
+   *  @remarks The type thrown should be an object, not a pointer.
+   */
+  #define CEDAR_THROW_EXCEPTION(exception) { exception.setLine(__LINE__); exception.setFile(__FILE__); throw exception; }
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

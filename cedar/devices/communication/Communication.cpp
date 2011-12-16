@@ -34,26 +34,20 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/communication/Communication.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::com;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-Communication::Communication()
+cedar::dev::com::Communication::Communication()
 {
 
 }
 
-Communication::~Communication()
+cedar::dev::com::Communication::~Communication()
 {
 
 }
@@ -61,13 +55,12 @@ Communication::~Communication()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-void Communication::lock()
+void cedar::dev::com::Communication::lock()
 {
   mLock.lockForWrite();
 }
 
-void Communication::unlock()
+void cedar::dev::com::Communication::unlock()
 {
   mLock.unlock();
 }

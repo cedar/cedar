@@ -37,8 +37,7 @@
 #ifndef CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
 #define CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/communication/Communication.h"
 #ifdef DEBUG
   #include "cedar/devices/debug/communication/gui/ui_CommunicationWidget.h"
@@ -46,13 +45,9 @@
   #include "cedar/devices/release/communication/gui/ui_CommunicationWidget.h"
 #endif
 #include "cedar/devices/communication/gui/namespace.h"
-
-// PROJECT INCLUDES
-
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
-
 #include <Qt>
 #include <QString>
 
@@ -65,17 +60,13 @@ class cedar::dev::com::gui::CommunicationWidget : public cedar::aux::gui::BaseWi
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   //!@brief Constructs the GUI.
   //!@param peCommunication Pointer to the communication-class to be tested.
   CommunicationWidget(cedar::dev::com::Communication *peCommunication);
@@ -86,9 +77,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public slots:
-
   /*!@brief Sends the string.
    *
    * This function calls 'send' of the linked communication class with the string typed into 'command' as parameter.
@@ -98,53 +87,24 @@ public slots:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   // pointer to the Communication-class.
   cedar::dev::com::Communication *mpeCommunication;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
-protected:
-
-  // none yet
-
-private:
-
-  // none yet
-
 }; // class cedar::dev::com::gui::CommunicationWidget
-
 #endif // CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
 

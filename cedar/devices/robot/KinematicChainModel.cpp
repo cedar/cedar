@@ -34,25 +34,20 @@
  ----- Credits:     Mathematics from Murray, Lee, Sastry: A mathematical introduction to robotic manipulation
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-#include "KinematicChainModel.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::robot;
 using namespace cedar::aux::math;
-using namespace std;
-using namespace cv;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain)
+cedar::dev::robot::KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain)
 :
 cedar::aux::Object(rpKinematicChain->getReferenceGeometry()->getConfigFileName()),
 mpKinematicChain(rpKinematicChain)
@@ -60,7 +55,7 @@ mpKinematicChain(rpKinematicChain)
   init();
 }
 
-KinematicChainModel::~KinematicChainModel()
+cedar::dev::robot::KinematicChainModel::~KinematicChainModel()
 {
 
 }
@@ -69,39 +64,40 @@ KinematicChainModel::~KinematicChainModel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void KinematicChainModel::timerEvent(QTimerEvent*)
+void cedar::dev::robot::KinematicChainModel::timerEvent(QTimerEvent*)
 {
   update();
 }
 
-void KinematicChainModel::update()
+void cedar::dev::robot::KinematicChainModel::update()
 {
   calculateTransformations();
 }
 
-unsigned int KinematicChainModel::getNumberOfJoints()
+unsigned int cedar::dev::robot::KinematicChainModel::getNumberOfJoints()
 {
   return mpKinematicChain->getNumberOfJoints();
 }
 
-cv::Mat KinematicChainModel::getJointTransformation(const unsigned int index)
+cv::Mat cedar::dev::robot::KinematicChainModel::getJointTransformation(unsigned int index)
 {
-  Mat T;
+  cv::Mat T;
   mTransformationsLock.lockForRead();
   T = mTransformation * mJointTransformations[index];
   mTransformationsLock.unlock();
   return T;
 }
 
-void KinematicChainModel::calculateCartesianJacobian(
-                                                      const cv::Mat& point,
-                                                      const unsigned int jointIndex,
-                                                      cv::Mat& result,
-                                                      const unsigned int coordinateFrame
-                                                    )
+void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobian
+     (
+       const cv::Mat& point,
+       unsigned int jointIndex,
+       cv::Mat& result,
+       unsigned int coordinateFrame
+     )
 {
   // transform to local coordinates if necessary
-  Mat point_local;
+  cv::Mat point_local;
   switch (coordinateFrame)
   {
     case WORLD_COORDINATES :
@@ -122,41 +118,43 @@ void KinematicChainModel::calculateCartesianJacobian(
   }
   
   // calculate Jacobian column by column
-  Mat column;
+  cv::Mat column;
   mTransformationsLock.lockForRead();
-	for (unsigned int j = 0; j <=  jointIndex; j++)
-	{
+  for (unsigned int j = 0; j <=  jointIndex; j++)
+  {
     column = wedgeTwist<double>(rigidToAdjointTransformation<double>(mTransformation)*mJointTwists[j])
              * mTransformation
              * mJointTransformations[jointIndex]
              * point_local;
-		// export
-		result.at<double>(0, j) = column.at<double>(0, 0);
-		result.at<double>(1, j) = column.at<double>(1, 0);
-		result.at<double>(2, j) = column.at<double>(2, 0);
-	}
-	mTransformationsLock.unlock();
+    // export
+    result.at<double>(0, j) = column.at<double>(0, 0);
+    result.at<double>(1, j) = column.at<double>(1, 0);
+    result.at<double>(2, j) = column.at<double>(2, 0);
+  }
+  mTransformationsLock.unlock();
 }
 
-cv::Mat KinematicChainModel::calculateCartesianJacobian(
-                                                         const cv::Mat& point,
-                                                         const unsigned int jointIndex,
-                                                         const unsigned int coordinateFrame
-                                                       )
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateCartesianJacobian
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
 {
-  cv::Mat J = Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
+  cv::Mat J = cv::Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
   calculateCartesianJacobian(point, jointIndex, J, coordinateFrame);
   return J;
 }
 
-void KinematicChainModel::calculateCartesianJacobianTemporalDerivative(
-                                                                        const cv::Mat& point,
-                                                                        const unsigned int jointIndex,
-                                                                        cv::Mat& result,
-                                                                        const unsigned int coordinateFrame
-                                                                      )
+void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobianTemporalDerivative
+     (
+       const cv::Mat& point,
+       unsigned int jointIndex,
+       cv::Mat& result,
+       unsigned int coordinateFrame
+     )
 {
-  Mat point_world;
+  cv::Mat point_world;
   switch (coordinateFrame)
   {
     case WORLD_COORDINATES :
@@ -178,9 +176,9 @@ void KinematicChainModel::calculateCartesianJacobianTemporalDerivative(
   }
 
   // calculate Jacobian temporal derivative column by column
-  Mat column;
-  Mat S1;
-  Mat S2;
+  cv::Mat column;
+  cv::Mat S1;
+  cv::Mat S2;
   mTransformationsLock.lockForRead();
   for (unsigned int j = 0; j <= jointIndex; j++)
   {
@@ -197,24 +195,26 @@ void KinematicChainModel::calculateCartesianJacobianTemporalDerivative(
   mTransformationsLock.unlock();
 }
 
-cv::Mat KinematicChainModel::calculateCartesianJacobianTemporalDerivative(
-                                                                           const cv::Mat& point,
-                                                                           const unsigned int jointIndex,
-                                                                           const unsigned int coordinateFrame
-                                                                         )
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateCartesianJacobianTemporalDerivative
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
 {
-  cv::Mat J = Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
+  cv::Mat J = cv::Mat::zeros(3, getNumberOfJoints(), CV_64FC1);
   calculateCartesianJacobianTemporalDerivative(point, jointIndex, J, coordinateFrame);
   return J;
 }
 
-cv::Mat KinematicChainModel::calculateVelocity(
-                                                const cv::Mat& point,
-                                                const unsigned int jointIndex,
-                                                const unsigned int coordinateFrame
-                                              )
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateVelocity
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
 {
-  Mat point_world;
+  cv::Mat point_world;
   switch (coordinateFrame)
   {
     case WORLD_COORDINATES :
@@ -237,13 +237,14 @@ cv::Mat KinematicChainModel::calculateVelocity(
   return wedgeTwist<double>(calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocitiesMatrix()) * point_world;
 }
 
-cv::Mat KinematicChainModel::calculateAcceleration(
-                                                    const cv::Mat& point,
-                                                    const unsigned int jointIndex,
-                                                    const unsigned int coordinateFrame
-                                                  )
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateAcceleration
+        (
+          const cv::Mat& point,
+          unsigned int jointIndex,
+          unsigned int coordinateFrame
+        )
 {
-  Mat point_world;
+  cv::Mat point_world;
   switch (coordinateFrame)
   {
     case WORLD_COORDINATES :
@@ -263,32 +264,32 @@ cv::Mat KinematicChainModel::calculateAcceleration(
       break;
     }
   }
-  Mat J = calculateSpatialJacobian(jointIndex);
-  Mat J_dot = calculateSpatialJacobianTemporalDerivative(jointIndex);
-  Mat T1 = J_dot * mpKinematicChain->getJointVelocitiesMatrix();
-  Mat T2 = J * mpKinematicChain->getJointAccelerationsMatrix();
-  Mat S1 = wedgeTwist<double>(T1 + T2) * point_world;
-  Mat S2 = wedgeTwist<double>(calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocitiesMatrix())
+  cv::Mat J = calculateSpatialJacobian(jointIndex);
+  cv::Mat J_dot = calculateSpatialJacobianTemporalDerivative(jointIndex);
+  cv::Mat T1 = J_dot * mpKinematicChain->getJointVelocitiesMatrix();
+  cv::Mat T2 = J * mpKinematicChain->getJointAccelerationsMatrix();
+  cv::Mat S1 = wedgeTwist<double>(T1 + T2) * point_world;
+  cv::Mat S2 = wedgeTwist<double>(calculateSpatialJacobian(jointIndex) * mpKinematicChain->getJointVelocitiesMatrix())
            * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
   return S1 + S2;
 }
 
-cv::Mat KinematicChainModel::calculateSpatialJacobian(unsigned int index)
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateSpatialJacobian(unsigned int index)
 {
-  Mat jacobian = Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
-	mTransformationsLock.lockForRead();
-	for (unsigned int j = 0; j <= index; j++)
-	{
+  cv::Mat jacobian = cv::Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
+  mTransformationsLock.lockForRead();
+  for (unsigned int j = 0; j <= index; j++)
+  {
     for (int i = 0; i < 6; i++)
     {
       jacobian.at<double>(i, j) = mJointTwists[j].at<double>(i, 0);
     }
   }
-	mTransformationsLock.unlock();
+  mTransformationsLock.unlock();
   return rigidToAdjointTransformation<double>(mTransformation)*jacobian;
 }
 
-cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned int index)
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned int index)
 {
   // create k-th column
   cv::Mat J = cv::Mat::zeros(6, getNumberOfJoints(), CV_64FC1);
@@ -306,17 +307,17 @@ cv::Mat KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned
   return J;
 }
 
-cv::Mat KinematicChainModel::calculateTwistTemporalDerivative(unsigned int j)
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateTwistTemporalDerivative(unsigned int j)
 {
   // calculate transformation to (j-1)-th joint frame
   cv::Mat g = cv::Mat::zeros(4, 4, CV_64FC1);
   // g is a product of j-1 exponentials, so the temporal derivative is a sum with j-1 summands
-  for (unsigned int k=0; k<j; k++)
+  for (unsigned int k = 0; k < j; k++)
   {
     // for the k-th summand, we derive the k-th factor and leave the other ones
     cv::Mat s_k = cv::Mat::eye(4, 4, CV_64FC1); // k-th summand
     // factors before the k-th
-    for (unsigned int i=0; i<k; i++)
+    for (unsigned int i = 0; i < k; i++)
     {
       // i-th factor stays the same for i < k
       s_k = s_k * mTwistExponentials[i];
@@ -326,7 +327,7 @@ cv::Mat KinematicChainModel::calculateTwistTemporalDerivative(unsigned int j)
               * mTwistExponentials[k]
               * mpKinematicChain->getJointVelocity(k);
     // factors after the k-th
-    for (unsigned int i=k+1; i<j-1; i++)
+    for (unsigned int i = k+1; i < j-1; i++)
     {
       // i-th factor stays the same for i > k
       s_k = s_k * mTwistExponentials[i];
@@ -338,77 +339,77 @@ cv::Mat KinematicChainModel::calculateTwistTemporalDerivative(unsigned int j)
   return rigidToAdjointTransformation<double>(g) * mReferenceJointTwists[j];
  }
 
-cv::Mat KinematicChainModel::calculateEndEffectorPosition()
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorPosition()
 {
-  Mat position;
-	mTransformationsLock.lockForRead();
-  position = (mTransformation*mEndEffectorTransformation)(Rect(3, 0, 1, 4));
-	mTransformationsLock.unlock();
+  cv::Mat position;
+  mTransformationsLock.lockForRead();
+  position = (mTransformation*mEndEffectorTransformation)(cv::Rect(3, 0, 1, 4));
+  mTransformationsLock.unlock();
   return position;
 }
 
-cv::Mat KinematicChainModel::calculateEndEffectorTransformation()
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorTransformation()
 {
-  Mat T;
+  cv::Mat T;
   mTransformationsLock.lockForRead();
   T = mTransformation * mEndEffectorTransformation;
   mTransformationsLock.unlock();
   return T;
 }
 
-cv::Mat KinematicChainModel::calculateEndEffectorJacobian()
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorJacobian()
 {
-  Mat p = calculateEndEffectorPosition();
+  cv::Mat p = calculateEndEffectorPosition();
   return calculateCartesianJacobian(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 
-cv::Mat KinematicChainModel::calculateEndEffectorVelocity()
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorVelocity()
 {
-  Mat p = calculateEndEffectorPosition();
+  cv::Mat p = calculateEndEffectorPosition();
   return calculateVelocity(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 
-cv::Mat KinematicChainModel::calculateEndEffectorAcceleration()
+cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorAcceleration()
 {
-  Mat p = calculateEndEffectorPosition();
+  cv::Mat p = calculateEndEffectorPosition();
   return calculateAcceleration(p, getNumberOfJoints()-1, WORLD_COORDINATES);
 }
 
-void KinematicChainModel::init()
+void cedar::dev::robot::KinematicChainModel::init()
 {
 
-  Mat xi;
-  Mat T;
-  Mat p;
-  Mat omega = Mat::zeros(3, 1, CV_64FC1);
+  cv::Mat xi;
+  cv::Mat T;
+  cv::Mat p;
+  cv::Mat omega = cv::Mat::zeros(3, 1, CV_64FC1);
   omega.at<double>(0, 0) = 1;
   for (unsigned int j=0; j<getNumberOfJoints(); j++)
   {
     cedar::dev::robot::ReferenceGeometry::JointPtr joint = mpKinematicChain->getReferenceGeometry()->getJoint(j);
-    p = Mat::zeros(3, 1, CV_64FC1);
+    p = cv::Mat::zeros(3, 1, CV_64FC1);
     p.at<double>(0, 0) = joint->position[0];
     p.at<double>(1, 0) = joint->position[1];
     p.at<double>(2, 0) = joint->position[2];
-    omega = Mat::zeros(3, 1, CV_64FC1);
+    omega = cv::Mat::zeros(3, 1, CV_64FC1);
     omega.at<double>(0, 0) = joint->axis[0];
     omega.at<double>(1, 0) = joint->axis[1];
     omega.at<double>(2, 0) = joint->axis[2];
     xi = twistCoordinates<double>(p, omega);
-    
+
     mReferenceJointTwists.push_back(xi.clone());
-    T = Mat::eye(4, 4, CV_64FC1);
+    T = cv::Mat::eye(4, 4, CV_64FC1);
     T.at<double>(0, 3) = joint->position[0];
     T.at<double>(1, 3) = joint->position[1];
     T.at<double>(2, 3) = joint->position[2];
     mReferenceJointTransformations.push_back(T.clone());
-    mTwistExponentials.push_back(Mat::zeros(4, 4, CV_64FC1));
-    mProductsOfExponentials.push_back(Mat::zeros(4, 4, CV_64FC1));
-    mJointTransformations.push_back(Mat::zeros(4, 4, CV_64FC1));
-    mJointTwists.push_back(Mat::zeros(6, 1, CV_64FC1));
+    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
   }
 
   // end effector
-  mReferenceEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
+  mReferenceEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
   cedar::dev::robot::ReferenceGeometry::EndEffectorPtr endEffector
     = mpKinematicChain->getReferenceGeometry()->getEndEffector();
   
@@ -428,27 +429,27 @@ void KinematicChainModel::init()
 
   mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
 
-  mEndEffectorTransformation = Mat::zeros(4, 4, CV_64FC1);
+  mEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
   update();
 }
 
-void KinematicChainModel::calculateTransformations()
+void cedar::dev::robot::KinematicChainModel::calculateTransformations()
 {
   mTransformationsLock.lockForWrite();
-	// first joint
-	expTwist<double>(mReferenceJointTwists[0], mpKinematicChain->getJointAngle(0), mTwistExponentials[0]);
-	mProductsOfExponentials[0] = mTwistExponentials[0].clone();
-	mJointTransformations[0] = mProductsOfExponentials[0] * mReferenceJointTransformations[0];
-	mJointTwists[0] = mReferenceJointTwists[0];
+  // first joint
+  expTwist<double>(mReferenceJointTwists[0], mpKinematicChain->getJointAngle(0), mTwistExponentials[0]);
+  mProductsOfExponentials[0] = mTwistExponentials[0].clone();
+  mJointTransformations[0] = mProductsOfExponentials[0] * mReferenceJointTransformations[0];
+  mJointTwists[0] = mReferenceJointTwists[0];
   // other joints
   for (unsigned int i = 1; i < getNumberOfJoints(); i++)
-	{
+  {
     expTwist<double>(mReferenceJointTwists[i], mpKinematicChain->getJointAngle(i), mTwistExponentials[i]);
-		mProductsOfExponentials[i] = mProductsOfExponentials[i - 1] * mTwistExponentials[i];
-		mJointTransformations[i] = mProductsOfExponentials[i] * mReferenceJointTransformations[i];
+    mProductsOfExponentials[i] = mProductsOfExponentials[i - 1] * mTwistExponentials[i];
+    mJointTransformations[i] = mProductsOfExponentials[i] * mReferenceJointTransformations[i];
     mJointTwists[i] = rigidToAdjointTransformation<double>(mProductsOfExponentials[i]) * mReferenceJointTwists[i];
-	}
+  }
   // end-effector
   mEndEffectorTransformation = mProductsOfExponentials[getNumberOfJoints()-1] * mReferenceEndEffectorTransformation;
-	mTransformationsLock.unlock();
+  mTransformationsLock.unlock();
 }

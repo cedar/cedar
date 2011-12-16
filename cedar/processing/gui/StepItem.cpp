@@ -139,7 +139,12 @@ void cedar::proc::gui::StepItem::stepStateChanged()
   QString tool_tip = "";
   if (!annotation.empty())
   {
-    tool_tip = QString("<FONT COLOR=BLACK>") + annotation.c_str() + QString("</FONT>");
+    // Replace any non-html characters in the annotation string by their html equivalents.
+    QString escaped_annotation = QString::fromStdString(annotation)
+                                     .replace("&","&amp;")
+                                     .replace(">","&gt;")
+                                     .replace("<","&lt;");
+    tool_tip = QString("<font color=\"black\">") + escaped_annotation + QString("</font>");
   }
   this->setToolTip(tool_tip);
   this->update();

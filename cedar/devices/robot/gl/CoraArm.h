@@ -37,11 +37,9 @@
 #ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 #define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/AmtecChain.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -54,10 +52,6 @@
  */
 class cedar::dev::robot::gl::CoraArm : public cedar::dev::robot::gl::AmtecChain
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,29 +88,13 @@ private:
 
   void drawTriangleLink(int link);
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::robot::gl::CoraArm
-
 #endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 
