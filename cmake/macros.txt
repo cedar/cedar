@@ -176,7 +176,6 @@ macro(cedar_get_subdirectories path)
   list(LENGTH returnedSubdirectories localNumberOfSubdirectories)
 
   if (localNumberOfSubdirectories GREATER 0)
-    list(REMOVE_ITEM returnedSubdirectories "${path}/.svn")
     foreach (subdirectory ${returnedSubdirectories})
       if (NOT IS_DIRECTORY ${subdirectory})
         list(REMOVE_ITEM returnedSubdirectories "${subdirectory}")
@@ -218,6 +217,12 @@ macro(cedar_add_library)
   cedar_qt4_wrap_ui(generatedUiHeaders ${uiFiles})
   set(headerFiles ${headerFiles} ${generatedUiHeaders})
 
+  # generate lib.h files
+  string(TOUPPER "${libraryName}" CAP_LIB_NAME)
+  string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
+  message(STATUS "${CMAKE_CURRENT_BUILD_DIR}/lib.h")
+  configure_file("${CEDAR_SOURCE_DIR}/lib.h.in" "${CMAKE_CURRENT_BINARY_DIR}/lib.h")
+
   foreach(headerFile ${headerFiles})
     # get the path of the file
     get_filename_component(headerFilePath ${headerFile} PATH)
@@ -232,10 +237,6 @@ macro(cedar_add_library)
   # add the library and link it to all relevant cedar and third party libraries
   set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")
   add_library(${libraryName} ${CEDAR_LIB_TYPE} ${sourceFiles} ${headerFiles} ${recourceCompilerSrcs})
-  
-  string(TOUPPER "${libraryName}" CAP_LIB_NAME)
-  string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
-  configure_file("${CEDAR_SOURCE_DIR}/lib.h.in" "${CMAKE_CURRENT_SOURCE_DIR}/lib.h")
   
   if (MSVC)
     set(LIB_EXPORTS "CEDAR_LIB_EXPORTS_${CAP_LIB_NAME}")
