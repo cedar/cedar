@@ -34,16 +34,13 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_MODEL_H
 #define CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_MODEL_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
 #include "ReferenceGeometry.h"
 #include "KinematicChain.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/Object.h"
 
 // SYSTEM INCLUDES
@@ -62,8 +59,23 @@
 class cedar::dev::robot::KinematicChainModel : public cedar::aux::Object
 {
 private:
-
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  //TODO: these are needed in more situations and should be a global cedar thing, check where to put them
+public:
+  //!@brief an enum defining coordinate systems
+  enum COORDINATE_SYSTEM
+  {
+    WORLD_COORDINATES,
+    BASE_COORDINATES,
+    LOCAL_COORDINATES
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -106,7 +118,7 @@ public:
    * @param index    index of the joint to which the transformation is given
    * @return    rigid transformation matrix, 4 \f$\times\f$ 4
    */
-  cv::Mat getJointTransformation(const unsigned int index);
+  cv::Mat getJointTransformation(unsigned int index);
   
   /*!@brief calculates cartesian Jacobian of a point/vector
    *
@@ -117,9 +129,9 @@ public:
    */
   void calculateCartesianJacobian(
                                    const cv::Mat& point,
-                                   const unsigned int jointIndex,
+                                   unsigned int jointIndex,
                                    cv::Mat& result,
-                                   const unsigned int coordinateFrame
+                                   unsigned int coordinateFrame
                                  );
   
   /*!@brief calculates Cartesian Jacobian of a point/vector
@@ -132,8 +144,8 @@ public:
    */
   cv::Mat calculateCartesianJacobian(
                                       const cv::Mat& point,
-                                      const unsigned int jointIndex,
-                                      const unsigned int coordinateFrame
+                                      unsigned int jointIndex,
+                                      unsigned int coordinateFrame
                                     );
 
   //! \todo explain coordinate system enum and give default
@@ -146,9 +158,9 @@ public:
    */
   void calculateCartesianJacobianTemporalDerivative(
                                                      const cv::Mat& point,
-                                                     const unsigned int jointIndex,
+                                                     unsigned int jointIndex,
                                                      cv::Mat& result,
-                                                     const unsigned int coordinateFrame
+                                                     unsigned int coordinateFrame
                                                    );
 
   /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector given in homogeneous
@@ -161,8 +173,8 @@ public:
    */
   cv::Mat calculateCartesianJacobianTemporalDerivative(
                                                         const cv::Mat& point,
-                                                        const unsigned int jointIndex,
-                                                        const unsigned int coordinateFrame
+                                                        unsigned int jointIndex,
+                                                        unsigned int coordinateFrame
                                                       );
 
   /*!@brief calculates cartesian velocity of a point
@@ -174,8 +186,8 @@ public:
    */
   cv::Mat calculateVelocity(
                              const cv::Mat& point,
-                             const unsigned int jointIndex,
-                             const unsigned int coordinateFrame
+                             unsigned int jointIndex,
+                             unsigned int coordinateFrame
                            );
 
   /*!@brief gives the spatial Jacobian in the current configuration
@@ -201,8 +213,8 @@ public:
    */
   cv::Mat calculateAcceleration(
                              const cv::Mat& point,
-                             const unsigned int jointIndex,
-                             const unsigned int coordinateFrame
+                             unsigned int jointIndex,
+                             unsigned int coordinateFrame
                            );
 
   /*!@brief gives the end-effector position in the current configuration
@@ -251,40 +263,24 @@ private:
    * @return    derivative of the joint twist, 6 \f$\times\f$ 1 matrix
    */
   cv::Mat calculateTwistTemporalDerivative(unsigned int index);
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // public members
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  //TODO: these are needed in more situations and should be a global cedar thing, check where to put them
-  enum {
-         WORLD_COORDINATES,
-         BASE_COORDINATES,
-         LOCAL_COORDINATES
-       };
   
-  //--------------------------------------------------------------------------------------------------------------------
-  // protected members
-  //--------------------------------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  // members
+  //----------------------------------------------------------------------------
 protected:
   //!@brief pointer to the kinematic chain that is being modelled
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // private members
-  //--------------------------------------------------------------------------------------------------------------------
 private:
   // locks
   QReadWriteLock mTransformationsLock;
-  
   //! twist coordinates for the transformations induced by rotating the joints (assuming reference configurations)
   std::vector<cv::Mat> mReferenceJointTwists;
   //! transformations to the joint frames (assuming reference configurations)
   std::vector<cv::Mat> mReferenceJointTransformations;
   //! transformations to the end-effector frame (assuming reference configurations)
   cv::Mat mReferenceEndEffectorTransformation;
-  
-  //! exponentials of joint twists with specified joint angle
+    //! exponentials of joint twists with specified joint angle
   std::vector<cv::Mat> mTwistExponentials;
   //! transformation matrices between joints, generated by exponential map of joint twists
   std::vector<cv::Mat> mProductsOfExponentials;
@@ -295,6 +291,5 @@ private:
   //! twist coordinates for the transformations induced by rotating the joints in the curent configuration
   std::vector<cv::Mat> mJointTwists;
 }; // class cedar::dev::robot::KinematicChainModel
-
 #endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_MODEL_H
 

@@ -34,44 +34,34 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
-#include "cedar/devices/amtec/KinematicChain.h"
 // MAKE AMTEC OPTIONAL
+#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_AMTEC
 
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/amtec/KinematicChain.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/m5apiw32.h"
 #include <QMutexLocker>
 
-
-using namespace std;
-using namespace cv;
-using namespace cedar::dev::robot;
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
 cedar::dev::amtec::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
 cedar::dev::robot::KinematicChain(rpReferenceGeometry)
 {
   mpDevice = 0;
-  mInitString = string("ESD:0,450");
+  mInitString = std::string("ESD:0,450");
   readParamsFromConfigFile();
 
   if(!initDevice())
   {
-    cout << "Error initializing the Amtec module!" << endl;
+    std::cout << "Error initializing the Amtec module!" << std::endl;
     CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
   }
-
-  return;
 }
 
 
@@ -80,18 +70,15 @@ cedar::dev::amtec::KinematicChain::KinematicChain(const std::string& configFileN
 cedar::dev::robot::KinematicChain(configFileName)
 {
   mpDevice = 0;
-  mInitString = string("ESD:0,450");
+  mInitString = std::string("ESD:0,450");
   readParamsFromConfigFile();
 
   if(!initDevice())
   {
-    cout << "Error initializing the Amtec module!" << endl;
+    std::cout << "Error initializing the Amtec module!" << std::endl;
     CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
   }
-
-  return;
 }
-
 
 cedar::dev::amtec::KinematicChain::~KinematicChain()
 {
@@ -111,7 +98,6 @@ cedar::dev::amtec::KinematicChain::~KinematicChain()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 
 bool cedar::dev::amtec::KinematicChain::initDevice()
 {
@@ -133,11 +119,11 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
   case CLD_OK:
     break;
   case CLDERR_INITIALIZATIONERROR:
-    cout << "Amtec Device: Initialization error!" << endl;
+    std::cout << "Amtec Device: Initialization error!" << std::endl;
     return false;
     break;
   default:
-    cout << "Amtec Device: Unknown initialization error!" << endl;
+    std::cout << "Amtec Device: Unknown initialization error!" << std::endl;
     return false;
   }
 
@@ -149,15 +135,15 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   if(mModules.size() <= 0)
   {
-    cout << "No Amtec modules found!" << endl;
+    std::cout << "No Amtec modules found!" << std::endl;
     return false;
   }
 
   if(mModules.size() != getNumberOfJoints())
   {
-    cout << "Found " << mModules.size() << " Amtec modules but "
-        << getNumberOfJoints()
-        << " are specified by reference geometry!" << endl;
+    std::cout << "Found " << mModules.size() << " Amtec modules but "
+      << getNumberOfJoints()
+      << " are specified by reference geometry!" << std::endl;
     return false;
   }
 
@@ -167,7 +153,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   if(addParameter(&mModules, "amtecModuleMap", mModules) != CONFIG_SUCCESS)
   {
-    cout << "KinematicChain: Error reading 'amtecModuleMap' from config file!" << endl;
+    std::cout << "KinematicChain: Error reading 'amtecModuleMap' from config file!" << std::endl;
   }
 
   readOrDefaultConfiguration();
@@ -176,13 +162,13 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
   // print module mapping to console
   //
 
-  cout << "Mapping of joints to modules:" << endl;
-  cout << "amtecModuleMap = [ " << mModules[0];
+  std::cout << "Mapping of joints to modules:" << std::endl;
+  std::cout << "amtecModuleMap = [ " << mModules[0];
   for (unsigned int i = 1; i < mModules.size(); ++i)
   {
-    cout << ", " << mModules[i];
+    std::cout << ", " << mModules[i];
   }
-  cout << " ];" << endl;
+  std::cout << " ];" << std::endl;
 
   //
   // calibrate and configure the modules
@@ -222,14 +208,14 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint)
 
   if(!mpDevice)
   {
-    cout << "Error: No Amtec device!" << endl;
+    std::cout << "Error: No Amtec device!" << std::endl;
     return 0.0;
   }
 
   if(joint >= mModules.size())
   {
-    cout << "Error: Trying to access the " << joint << ". module while only "
-        << mModules.size() << " were found." << endl;
+    std::cout << "Error: Trying to access the " << joint << ". module while only "
+      << mModules.size() << " were found." << std::endl;
     return 0.0;
   }
 
@@ -248,14 +234,14 @@ double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint)
 
   if(!mpDevice)
   {
-    cout << "Error: No Amtec device!" << endl;
+    std::cout << "Error: No Amtec device!" << std::endl;
     return 0.0;
   }
 
   if(joint >= mModules.size())
   {
-    cout << "Error: Trying to access the " << joint << ". module while only "
-        << mModules.size() << " were found." << endl;
+    std::cout << "Error: Trying to access the " << joint << ". module while only "
+      << mModules.size() << " were found." << std::endl;
     return 0.0;
   }
 
@@ -274,14 +260,14 @@ void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double
 
   if(!mpDevice)
   {
-    cout << "Error: No Amtec device!" << endl;
+    std::cout << "Error: No Amtec device!" << std::endl;
     return;
   }
 
   if(index >= mModules.size())
   {
-    cout << "Error: Trying to access the " << index << ". module while only "
-        << mModules.size() << " were found." << endl;
+    std::cout << "Error: Trying to access the " << index << ". module while only "
+      << mModules.size() << " were found." << std::endl;
     return;
   }
 
@@ -298,19 +284,19 @@ bool cedar::dev::amtec::KinematicChain::setJointVelocity(unsigned int index, dou
 
   if(!mpDevice)
   {
-    cout << "Error: No Amtec device!" << endl;
+    std::cout << "Error: No Amtec device!" << std::endl;
     return true;
   }
 
   if(index >= mModules.size())
   {
-    cout << "Error: Trying to access the " << index << ". module while only "
-        << mModules.size() << " were found." << endl;
+    std::cout << "Error: Trying to access the " << index << ". module while only "
+      << mModules.size() << " were found." << std::endl;
     return true;
   }
 
-  velocity = max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
-  velocity = min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
+  velocity = std::max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
+  velocity = std::min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
 
   int module = mModules[index];
   mpDevice->moveVel(module, velocity);
@@ -325,7 +311,7 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
   if(!mpDevice)
   {
-    cout << "Trying to calibrate but no device initialized. This should never happen!" << endl;
+    std::cout << "Trying to calibrate but no device initialized. This should never happen!" << std::endl;
     return false;
   }
 
@@ -334,7 +320,7 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    cout << "Error halting Amtec module " << module << ": " << ret_val << endl;
+    std::cout << "Error halting Amtec module " << module << ": " << ret_val << std::endl;
     return false;
   }
 
@@ -343,7 +329,7 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    cout << "Error homing Amtec module " << module << ": " << ret_val << endl;
+    std::cout << "Error homing Amtec module " << module << ": " << ret_val << std::endl;
     return false;
   }
 
@@ -356,7 +342,7 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
     if(ret_val != CLD_OK)
     {
-      cout << "Error homing Amtec module " << module << ": " << ret_val << endl;
+      std::cout << "Error homing Amtec module " << module << ": " << ret_val << std::endl;
       return false;
     }
   }
@@ -367,7 +353,7 @@ bool cedar::dev::amtec::KinematicChain::calibrateModule(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    cout << "Error resetting Amtec module " << module << ": " << ret_val << endl;
+    std::cout << "Error resetting Amtec module " << module << ": " << ret_val << std::endl;
     return false;
   }
 
@@ -379,7 +365,7 @@ void cedar::dev::amtec::KinematicChain::readParamsFromConfigFile()
 {
   if(addParameter(&mInitString, "amtecInitString", "ESD:0,450") != CONFIG_SUCCESS)
   {
-    cout << "KinematicChain: Error reading 'amtecInitString' from config file!" << endl;
+    std::cout << "KinematicChain: Error reading 'amtecInitString' from config file!" << std::endl;
   }
 
   readOrDefaultConfiguration();
@@ -393,7 +379,7 @@ bool cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int module)
 
   if(!mpDevice)
   {
-    cout << "Trying to read calibration state but no device initialized!" << endl;
+    std::cout << "Trying to read calibration state but no device initialized!" << std::endl;
     return false;
   }
 
@@ -405,7 +391,7 @@ bool cedar::dev::amtec::KinematicChain::isCalibrated(unsigned int module)
 
   if(ret_val != CLD_OK)
   {
-    cout << "Error reading state of Amtec module " << module << ": " << ret_val << endl;
+    std::cout << "Error reading state of Amtec module " << module << ": " << ret_val << std::endl;
     return false;
   }
 
@@ -421,14 +407,14 @@ float cedar::dev::amtec::KinematicChain::getMaxAcceleration(unsigned int index)
 
   if(!mpDevice)
   {
-    cout << "Trying to read max acceleration but no device initialized!" << endl;
+    std::cout << "Trying to read max acceleration but no device initialized!" << std::endl;
     return 0.0;
   }
 
   if(index >= mModules.size())
   {
-    cout << "Error: Trying to access the " << index << ". module while only "
-        << mModules.size() << " were found." << endl;
+    std::cout << "Error: Trying to access the " << index << ". module while only "
+      << mModules.size() << " were found." << std::endl;
     return 0.0;
   }
 
@@ -445,14 +431,14 @@ void cedar::dev::amtec::KinematicChain::setMaxAcceleration(unsigned int index, f
 
   if(!mpDevice)
   {
-    cout << "Trying to set max acceleration but no device initialized!" << endl;
+    std::cout << "Trying to set max acceleration but no device initialized!" << std::endl;
     return;
   }
 
   if(index >= mModules.size())
   {
-    cout << "Error: Trying to access the " << index << ". module while only "
-        << mModules.size() << " were found." << endl;
+    std::cout << "Error: Trying to access the " << index << ". module while only "
+      << mModules.size() << " were found." << std::endl;
     return;
   }
 

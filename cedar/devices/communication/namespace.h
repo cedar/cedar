@@ -37,10 +37,8 @@
 #ifndef CEDAR_DEV_COM_NAMESPACE_H
 #define CEDAR_DEV_COM_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -49,10 +47,13 @@ namespace cedar
 {
   namespace dev
   {
+    /*! @brief Namespace for communication classes. */
     namespace com
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_DEV_CLASS(Communication);
       CEDAR_DECLARE_DEV_CLASS(SerialCommunication);
+      //!@endcond
     }
   }
 }

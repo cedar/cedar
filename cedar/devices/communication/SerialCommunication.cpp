@@ -34,16 +34,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/communication/SerialCommunication.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-
-using namespace cedar::dev::com;
 
 #define clear_my(var, mask)    var &= (~(mask))
 #define set(var, mask)      var |= (mask)
@@ -52,13 +46,13 @@ using namespace cedar::dev::com;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-SerialCommunication::SerialCommunication(const std::string config) : cedar::aux::ConfigurationInterface(config)
+cedar::dev::com::SerialCommunication::SerialCommunication(const std::string config) : cedar::aux::ConfigurationInterface(config)
 {
   mInitialized = false;
   init();
 }
 
-SerialCommunication::~SerialCommunication()
+cedar::dev::com::SerialCommunication::~SerialCommunication()
 {
   if (mInitialized)
   {
@@ -74,52 +68,52 @@ SerialCommunication::~SerialCommunication()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool SerialCommunication::isInitialized() const
+bool cedar::dev::com::SerialCommunication::isInitialized() const
 {
   return mInitialized;
 }
 
-int SerialCommunication::getFileDescriptor() const
+int cedar::dev::com::SerialCommunication::getFileDescriptor() const
 {
   return mFileDescriptor;
 }
 
-const std::string& SerialCommunication::getName() const
+const std::string& cedar::dev::com::SerialCommunication::getName() const
 {
   return _mName;
 }
 
-const std::string& SerialCommunication::getDevicePath() const
+const std::string& cedar::dev::com::SerialCommunication::getDevicePath() const
 {
   return _mDevicePath;
 }
 
-const std::string& SerialCommunication::getEndOfCommandString() const
+const std::string& cedar::dev::com::SerialCommunication::getEndOfCommandString() const
 {
   return _mEndOfCommandString;
 }
 
-int SerialCommunication::getCFlag() const
+int cedar::dev::com::SerialCommunication::getCFlag() const
 {
   return _mCFlag;
 }
 
-unsigned int SerialCommunication::getBaudrate() const
+unsigned int cedar::dev::com::SerialCommunication::getBaudrate() const
 {
   return _mBaudrate;
 }
 
-unsigned int SerialCommunication::getTimeOut() const
+unsigned int cedar::dev::com::SerialCommunication::getTimeOut() const
 {
   return _mTimeOut;
 }
 
-unsigned int SerialCommunication::getLatency() const
+unsigned int cedar::dev::com::SerialCommunication::getLatency() const
 {
   return _mLatency;
 }
 
-int SerialCommunication::init()
+int cedar::dev::com::SerialCommunication::init()
 {
   if (mInitialized)
   {
@@ -298,7 +292,7 @@ int SerialCommunication::init()
 #endif // WIN32
 }
 
-int SerialCommunication::send(const std::string& command)
+int cedar::dev::com::SerialCommunication::send(const std::string& command)
 {
 #ifndef WIN32
   if (!mInitialized)
@@ -344,7 +338,7 @@ int SerialCommunication::send(const std::string& command)
 #endif // WIN32
 }
 
-int SerialCommunication::receive(std::string& answer)
+int cedar::dev::com::SerialCommunication::receive(std::string& answer)
 {
 #ifndef WIN32
   if (!mInitialized)
@@ -433,12 +427,12 @@ int SerialCommunication::receive(std::string& answer)
 #endif // WIN32
 }
 
-void SerialCommunication::setEndOfCommandString(const std::string& eocString)
+void cedar::dev::com::SerialCommunication::setEndOfCommandString(const std::string& eocString)
 {
   _mEndOfCommandString = eocString;
 }
 
-void SerialCommunication::close()
+void cedar::dev::com::SerialCommunication::close()
 {
 #ifndef WIN32
   int s = ::close(mFileDescriptor);
