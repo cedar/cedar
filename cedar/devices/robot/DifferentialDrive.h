@@ -37,11 +37,8 @@
 #ifndef CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H
 #define CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/robot/Locomotion.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -53,13 +50,8 @@
 class cedar::dev::robot::DifferentialDrive : public cedar::dev::robot::Locomotion
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
 
   //!@brief Constructs an object which represents the differential drive of a robot.
@@ -118,7 +110,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
 
   /*!@brief This function calculates forward velocity and turning rate from wheel speeds of differential drive robots.
@@ -138,7 +129,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
 
   // none yet
@@ -146,13 +136,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   //!@brief Vector including the current left (1st element) and right (2nd element) wheel's speed [both in m/s].
   std::vector<double> mWheelSpeed;
 
@@ -160,17 +144,11 @@ protected:
   double mMaximalWheelSpeed;
 
 private:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
 
   //!@brief The distance between the 2 wheels [in m].
@@ -180,9 +158,6 @@ protected:
   double _mWheelRadius;
 
 private:
-
   // none yet
-
 }; // class cedar::dev::robot::mobile::DifferentialDrive
-
 #endif // CEDAR_DEV_ROBOT_MOBILE_DIFFERENTIAL_DRIVE_H

@@ -37,12 +37,9 @@
 #ifndef CEDAR_DEV_ROBOT_LOCOMOTION_H
 #define CEDAR_DEV_ROBOT_LOCOMOTION_H
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -53,10 +50,6 @@
  */
 class cedar::dev::robot::Locomotion : public cedar::dev::robot::Component
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -113,7 +106,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
 
   // none yet
@@ -121,7 +113,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
 
   // none yet
@@ -135,7 +126,6 @@ public:
   // none yet (hopefully never!)
 
 protected:
-
   //!@brief Vector with forward velocity as 1st and turning rate as 2nd element [both in m/s].
   std::vector<double> mVelocity;
 
@@ -146,22 +136,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   /*!@brief The Debug-Flag.
    *If true, error-messages and received strings from the robot are displayed on Console, else not.
    */
   bool _mDebug;
 
 private:
-
   // none yet
-
 }; // class cedar::dev::robot::Locomotion
-
 #endif // CEDAR_DEV_ROBOT_LOCOMOTION_H

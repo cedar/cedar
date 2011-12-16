@@ -37,10 +37,8 @@
 #ifndef CEDAR_DEV_ROBOT_ROBOT_H
 #define CEDAR_DEV_ROBOT_ROBOT_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
@@ -49,17 +47,12 @@
 #include <set>
 #include <map>
 
-
 /*!@brief Base class for robots.
  *
  * @todo More detailed description of the class.
  */
 class cedar::dev::robot::Robot : public cedar::aux::Base
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -116,8 +109,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //! map of pointers to all sub components
   std::map<std::string, ComponentPtr> mComponents;
@@ -126,18 +117,5 @@ protected:
 
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::robot::Robot
-
 #endif // CEDAR_DEV_ROBOT_ROBOT_H

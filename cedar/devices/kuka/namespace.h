@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_KUKA_NAMESPACE_H
 #define CEDAR_DEV_KUKA_NAMESPACE_H
 
@@ -42,10 +41,8 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/lib.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -54,12 +51,14 @@ namespace cedar
 {
   namespace dev
   {
+    /*! @brief Namespace for KinematicChain implementation for Kuka LWR. */
     namespace kuka
     {
+      //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_DEV_CLASS(KukaInterface);
+      //!@endcond
     }
   }
 }
-
 #endif // CEDAR_USE_KUKA_FRI
 #endif // CEDAR_DEV_KUKA_NAMESPACE_H

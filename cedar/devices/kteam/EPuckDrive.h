@@ -37,17 +37,12 @@
 #ifndef CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
 #define CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/kteam/Drive.h"
-
-// PROJECT INCLUDES
-
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "cedar/devices/communication/SerialCommunication.h"
 
 // SYSTEM INCLUDES
-
 #include <math.h>
 
 /*!@brief An object of this class represents the drive of the E-Puck, a differential drive mobile robot.
@@ -60,15 +55,9 @@ class cedar::dev::kteam::EPuckDrive
 :
 public cedar::dev::kteam::Drive, public cedar::aux::ConfigurationInterface
 {
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
 
   /*!@brief Constructs an object which represents the drive of an E-Puck robot.
@@ -83,7 +72,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
 
   /*!@brief Initializes the E-Puck drive.
@@ -122,7 +110,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
 
   // none yet
@@ -130,7 +117,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
 
   /*!@brief Sets both encoder values.
@@ -143,37 +129,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   //!@brief The initialization status of EPuckDrive
   //!true if initialized, else false
   bool mInitialized;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
-protected:
-
-  // none yet
-
-private:
-
-  // none yet
-
 }; // class cedar::dev::kteam::EPuckDrive
-
 #endif // CEDAR_DEV_ROBOT_MOBILE_EPUCK_DRIVE_H

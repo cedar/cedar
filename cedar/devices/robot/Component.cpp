@@ -34,12 +34,9 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/Component.h"
 #include "cedar/devices/robot/Robot.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

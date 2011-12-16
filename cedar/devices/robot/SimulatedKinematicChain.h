@@ -36,12 +36,10 @@
 #ifndef CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
 #define CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-#include "ReferenceGeometry.h"
-#include "KinematicChain.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/robot/namespace.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -94,7 +92,5 @@ private:
 private:
   //! vector of joint angles, in radians
   cv::Mat mJointAngles;
-  
 }; // class cedar::dev::robot::SimulatedKinematicChain
-
 #endif // CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H

@@ -37,10 +37,7 @@
 #ifndef CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
 #define CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/kteam/EPuckDrive.h"
 #ifdef DEBUG
   #include "cedar/devices/debug/kteam/gui/ui_EPuckControlWidget.h"
@@ -51,7 +48,6 @@
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 
 // SYSTEM INCLUDES
-
 #include <Qt>
 
 /*!@brief Graphical User Interface for controlling the E-Puck.
@@ -89,7 +85,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public slots:
 
   /*!@brief Sets the velocity of the robot.
@@ -107,7 +102,6 @@ public slots:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
 
   // none yet
@@ -115,7 +109,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
 
   /*!@brief The timer-event.
@@ -130,36 +123,11 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   //!@brief Pointer to the controlled robot.
   cedar::dev::kteam::EPuckDrive *mpeDrive;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
-protected:
-
-  // none yet
-
-private:
-
-  // none yet
-
 }; // class cedar::dev::robot::mobile::gui::EPuckControlWidget
-
 #endif // CEDAR_DEV_KTEAM_GUI_EPUCK_CONTROL_WIDGET_H

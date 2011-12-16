@@ -34,22 +34,18 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
 #define CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <string>
-
 
 /*!@brief Interface for a chain of joints
  *
@@ -61,10 +57,6 @@
  */
 class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
 {
-  //----------------------------------------------------------------------------
-  // macros
-  //----------------------------------------------------------------------------
-
   //----------------------------------------------------------------------------
   // parameters
   //----------------------------------------------------------------------------
@@ -319,8 +311,6 @@ private:
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   //!@brief geometry in reference configuration
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
@@ -330,8 +320,6 @@ private:
   cv::Mat mJointVelocities;
   cv::Mat mJointAccelerations;
   ActionType mCurrentWorkingMode;
-
 }; // class cedar::dev::robot::KinematicChain
-
 #endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
 

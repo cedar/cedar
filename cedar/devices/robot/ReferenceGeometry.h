@@ -38,10 +38,8 @@
 #ifndef CEDAR_DEV_ROBOT_REFERENCE_GEOMETRY_H
 #define CEDAR_DEV_ROBOT_REFERENCE_GEOMETRY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 #include "cedar/auxiliaries/math/Limits.h"
 
@@ -50,7 +48,6 @@
 #include <string>
 #include <boost/smart_ptr.hpp>
 #include <opencv2/opencv.hpp>
-
 
 /*!@brief Encapsulates values that describe the physical properties of a kinematic chain.
  *
@@ -129,7 +126,7 @@ public:
    * @return    pointer to joint struct
    * @param index    index of the joint
    */
-  const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(const unsigned int index) const;
+  const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(unsigned int index) const;
 
   /*!@brief Returns a pointer to the end-effector transformation
    *
@@ -142,7 +139,7 @@ public:
    * @return    pointer to link segment struct
    * @param index    index of the link segment
    */
-  const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& getLinkSegment(const unsigned int index) const;
+  const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& getLinkSegment(unsigned int index) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -171,7 +168,6 @@ protected:
   cedar::dev::robot::ReferenceGeometry::EndEffectorPtr _mpEndEffector;
   //! vector of all link segments
   std::vector<cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr> _mLinkSegments;
-
 }; // class cedar::dev:robot::ReferenceGeometry
 
 #endif // CEDAR_DEV_ROBOT_REFERENCE_GEOMETRY_H

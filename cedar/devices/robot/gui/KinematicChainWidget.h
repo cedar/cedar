@@ -34,17 +34,14 @@
 
 ======================================================================================================================*/
 
-
 #ifndef KINEMATICCHAINWIDGET_H_
 #define KINEMATICCHAINWIDGET_H_
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/lib.h"
 #include "cedar/devices/robot/gui/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <QtCore/QTimer>
@@ -62,7 +59,6 @@ public cedar::aux::ConfigurationInterface
   //----------------------------------------------------------------------------
   // macros
   //----------------------------------------------------------------------------
-
   Q_OBJECT
 
   //----------------------------------------------------------------------------
@@ -140,39 +136,18 @@ private slots:
   //----------------------------------------------------------------------------
 
 public:
-
   // none yet (hopefully never!)
 
 protected:
-
   // none yet
 
 private:
-
   static const int mUpdateInterval = 100;
-
   std::vector<cedar::dev::robot::KinematicChainPtr> mpKinematicChains;
   QGridLayout *mpGridLayout;
   QTimer *mpTimer;
   int mDecimals;
   double mSingleStep;
-
-  //----------------------------------------------------------------------------
-  // parameters
-  //----------------------------------------------------------------------------
-
-public:
-
-  // none yet
-
-protected:
-
-  // none yet
-
-private:
-
-  // none yet
-
 };
 
 #endif /* KINEMATICCHAINWIDGET_H_ */

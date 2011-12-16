@@ -42,9 +42,7 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -55,13 +53,15 @@ namespace cedar
   {
     namespace kuka
     {
+      /*! @brief Namespace for gui's of KinematicChain implementation for Kuka LWR. */
       namespace gui
       {
+        //!@cond SKIPPED_DOCUMENTATION
         class FriStatusWidget;
+        //!@endcond
       }
     }
   }
 }
-
 #endif // CEDAR_USE_KUKA_FRI
 #endif // CEDAR_DEV_KUKA_GUI_NAMESPACE_H

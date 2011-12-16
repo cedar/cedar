@@ -41,26 +41,19 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_AMTEC
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/amtec/namespace.h"
 #include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/devices/robot/KinematicChain.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include "AmtecDeviceDriver/Device/Device.h"
 #include <QMutex>
 
-
 /*!@brief KinematicChain implementation for Amtec modules
  */
 class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicChain
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -77,7 +70,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
   /*!@brief returns the max. acceleration of a joint
    *
    * @param index
@@ -116,8 +108,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -126,18 +116,6 @@ private:
   int mInit;
   std::vector<int> mModules;
   QMutex mCanBusMutex;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-private:
-  // none yet
-
 }; // class cedar::dev::amtec::KinematicChain
-
 #endif // CEDAR_USE_AMTEC
 #endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H

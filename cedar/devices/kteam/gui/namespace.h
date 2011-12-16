@@ -34,13 +34,10 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_KTEAM_GUI_NAMESPACE_H
 #define CEDAR_DEV_KTEAM_GUI_NAMESPACE_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -52,12 +49,14 @@ namespace cedar
   {
     namespace kteam
     {
+      /*! @brief Namespace for gui's of kteam implementations of MobileRobot. */
       namespace gui
       {
+        //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(EPuckControlWidget);
+        //!@endcond
       }
     }
   }
 }
-
-#endif // CEDAR_DEV_ROBOT_MOBILE_GUI_NAMESPACE_H
+#endif // CEDAR_DEV_KTEAM_GUI_NAMESPACE_H

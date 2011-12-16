@@ -37,11 +37,9 @@
 #ifndef CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
 #define CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -177,16 +175,5 @@ protected:
   static const float mChrome_Specular[3];
   //!@brief material information
   static const float mChrome_Shininess[1];
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::robot::gl::AmtecChain
-
 #endif // CEDAR_DEV_ROBOT_GL_AMTEC_CHAIN_H
