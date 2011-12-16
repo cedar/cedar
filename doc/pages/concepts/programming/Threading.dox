@@ -45,5 +45,5 @@ displaying the data translates to locking the data for read access only. In the 
 functionality with its member functions \b lockForRead, \b lockForWrite, and \b unlock.
 
 @subsection ThreadsTimeDynamicsConcept Threads, time, and dynamics
-
+Coming soon...
 */

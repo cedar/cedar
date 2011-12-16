@@ -34,17 +34,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/kteam/Drive.h"
-
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 #include <iostream>
-
-using namespace cedar::dev::kteam;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,33 +45,32 @@ using namespace cedar::dev::kteam;
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-double Drive::getPulsesPerRevolution() const
+double cedar::dev::kteam::Drive::getPulsesPerRevolution() const
 {
   return _mPulsesPerRevolution;
 }
 
-int Drive::getMaximalEncoderValue() const
+int cedar::dev::kteam::Drive::getMaximalEncoderValue() const
 {
   return _mMaximalEncoderValue;
 }
 
-int Drive::getMinimalEncoderValue() const
+int cedar::dev::kteam::Drive::getMinimalEncoderValue() const
 {
   return _mMinimalEncoderValue;
 }
 
-double Drive::getDistancePerPulse() const
+double cedar::dev::kteam::Drive::getDistancePerPulse() const
 {
   return mDistancePerPulse;
 }
 
-int Drive::getMaximalNumberPulsesPerSecond() const
+int cedar::dev::kteam::Drive::getMaximalNumberPulsesPerSecond() const
 {
   return _mMaximalNumberPulsesPerSecond;
 }
 
-int Drive::resetEncoder()
+int cedar::dev::kteam::Drive::resetEncoder()
 {
   int s = setEncoder(0,0);
   if (s == 0 && _mDebug) //setting encoder failed
@@ -88,7 +80,7 @@ int Drive::resetEncoder()
   return s;
 }
 
-int Drive::reset()
+int cedar::dev::kteam::Drive::reset()
 {
   int s = setWheelSpeed(0,0); // = 1 if setting wheel speed successful, else 0
   s = s * resetEncoder(); // = 1 if setting both wheel speed and resetting encoder successful, else 0

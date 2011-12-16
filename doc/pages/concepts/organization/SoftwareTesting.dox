@@ -77,7 +77,7 @@ While unit tests are a great tool for testing classes or deterministic processes
 work well for complex, noisy architectures, for behaviors of robots or other processes that require
 monitoring or interaction from a user. Instead, we use "interactive tests". They are set up in the exact
 same way as unit tests but reside in "tests/interactive" within the source tree of cedar. Usually, they
-feature some sort of console-based or graphical user interface to allows the user to monitoring or interact
+feature some sort of console-based or graphical user interface to allows the user to monitor or interact
 with the test.
 
 */

@@ -34,27 +34,21 @@
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/devices/robot/ReferenceGeometry.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace std;
-using namespace cedar::dev::robot;
-using namespace cv;
 
 //------------------------------------------------------------------------------
 // constructors and destructor
 //------------------------------------------------------------------------------
 
 //! constructor
-KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+cedar::dev::robot::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
 :
-LoopedThread(12, 0.01), //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
+//!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
+LoopedThread(12, 0.01),
 mpReferenceGeometry(rpReferenceGeometry)
 {
   setWorkingMode(ANGLE);
@@ -62,7 +56,7 @@ mpReferenceGeometry(rpReferenceGeometry)
   init();
 }
 
-KinematicChain::KinematicChain(const std::string& configFileName)
+cedar::dev::robot::KinematicChain::KinematicChain(const std::string& configFileName)
 :
 LoopedThread(configFileName),
 mpReferenceGeometry(new ReferenceGeometry(configFileName))
@@ -73,7 +67,7 @@ mpReferenceGeometry(new ReferenceGeometry(configFileName))
 }
 
 //! destructor
-KinematicChain::~KinematicChain()
+cedar::dev::robot::KinematicChain::~KinematicChain()
 {
 }
 
@@ -81,25 +75,25 @@ KinematicChain::~KinematicChain()
 // methods
 //------------------------------------------------------------------------------
 
-const ReferenceGeometryPtr& KinematicChain::getReferenceGeometry() const
+const cedar::dev::robot::ReferenceGeometryPtr& cedar::dev::robot::KinematicChain::getReferenceGeometry() const
 {
   return mpReferenceGeometry;
 }
 
 
-unsigned int KinematicChain::getNumberOfJoints() const
+unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
 {
   return mpReferenceGeometry->getNumberOfJoints();
 }
 
 
-void KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)
+void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)
 {
   mpReferenceGeometry = rpGeometry;
 }
 
 
-std::vector<double> KinematicChain::getJointAngles()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles()
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -112,11 +106,11 @@ std::vector<double> KinematicChain::getJointAngles()
 }
 
 
-Mat KinematicChain::getJointAnglesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix()
 {
-  Mat dummy = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  cv::Mat dummy = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     dummy.at<double>(i,0) = getJointAngle(i);
   }
@@ -125,9 +119,9 @@ Mat KinematicChain::getJointAnglesMatrix()
 }
 
 
-double KinematicChain::getJointVelocity(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index)
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
     return 0.0;
   }
@@ -136,11 +130,11 @@ double KinematicChain::getJointVelocity(unsigned int index)
 }
 
 
-std::vector<double> KinematicChain::getJointVelocities()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities()
 {
   std::vector<double> dummy(getNumberOfJoints());
 
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     dummy[i] = mJointVelocities.at<double>(i,0);
   }
@@ -149,15 +143,15 @@ std::vector<double> KinematicChain::getJointVelocities()
 }
 
 
-Mat KinematicChain::getJointVelocitiesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix()
 {
   return mJointVelocities.clone();
 }
 
 
-double KinematicChain::getJointAcceleration(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index)
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
     return 0.0;
   }
@@ -166,11 +160,11 @@ double KinematicChain::getJointAcceleration(unsigned int index)
 }
 
 
-std::vector<double> KinematicChain::getJointAccelerations()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations()
 {
   std::vector<double> dummy(getNumberOfJoints());
 
-  for(unsigned int i = 0; i < getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < getNumberOfJoints(); ++i)
   {
     dummy[i] = mJointAccelerations.at<double>(i,0);
   }
@@ -179,31 +173,31 @@ std::vector<double> KinematicChain::getJointAccelerations()
 }
 
 
-cv::Mat KinematicChain::getJointAccelerationsMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix()
 {
   return mJointAccelerations.clone();
 }
 
 
-KinematicChain::ActionType KinematicChain::getWorkingMode()
+cedar::dev::robot::KinematicChain::ActionType cedar::dev::robot::KinematicChain::getWorkingMode()
 {
   return mCurrentWorkingMode;
 }
 
-void KinematicChain::setJointAngles(const std::vector<double>& angles)
+void cedar::dev::robot::KinematicChain::setJointAngles(const std::vector<double>& angles)
 {
   if(angles.size() != getNumberOfJoints())
   {
-    cout << "Error: You provided an vector of angles with the wrong size ("
-        << angles.size() << " != " << getNumberOfJoints() << ")!" << endl;
+    std::cout << "Error: You provided an vector of angles with the wrong size ("
+      << angles.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
     return;
   }
 
   for(unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     double angle = angles[i];
-    angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-    angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+    angle = std::max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+    angle = std::min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
 
     setJointAngle(i, angle);
   }
@@ -212,22 +206,22 @@ void KinematicChain::setJointAngles(const std::vector<double>& angles)
 }
 
 
-void KinematicChain::setJointAngles(const cv::Mat& angles)
+void cedar::dev::robot::KinematicChain::setJointAngles(const cv::Mat& angles)
 {
-  if(angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
+  if (angles.size().height != (int)getNumberOfJoints() || angles.size().width != 1)
   {
-    cout << "Error: You provided an matrix of angles with the wrong size [("
-        << angles.size().height << "," << angles.size().width
-        << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
+    std::cout << "Error: You provided an matrix of angles with the wrong size [("
+      << angles.size().height << "," << angles.size().width
+      << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
     return;
   }
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     //TODO: use applyAngleLimits() ?
     double angle = angles.at<double>(i,0);
-    angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-    angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+    angle = std::max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+    angle = std::min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
 
     setJointAngle(i, angle);
   }
@@ -236,16 +230,16 @@ void KinematicChain::setJointAngles(const cv::Mat& angles)
 }
 
 
-bool KinematicChain::setJointVelocity(unsigned int index, double velocity)
+bool cedar::dev::robot::KinematicChain::setJointVelocity(unsigned int index, double velocity)
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
-    cout << "Error: Trying to set velocity for joint " << index << "!" << endl;
+    std::cout << "Error: Trying to set velocity for joint " << index << "!" << std::endl;
     return false;
   }
   //TODO use applyVelocityLimits()?
-  velocity = max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
-  velocity = min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
+  velocity = std::max<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.min);
+  velocity = std::min<double>(velocity, mpReferenceGeometry->getJoint(index)->velocityLimits.max);
 
   mJointVelocities.at<double>(index,0) = velocity;
 
@@ -253,12 +247,12 @@ bool KinematicChain::setJointVelocity(unsigned int index, double velocity)
 }
 
 
-bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
+bool cedar::dev::robot::KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 {
-  if(velocities.size() != getNumberOfJoints())
+  if (velocities.size() != getNumberOfJoints())
   {
-    cout << "Error: You provided an vector of velocities with the wrong size ("
-        << velocities.size() << " != " << getNumberOfJoints() << ")!" << endl;
+    std::cout << "Error: You provided an vector of velocities with the wrong size ("
+      << velocities.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
     return false;
   }
 
@@ -276,21 +270,21 @@ bool KinematicChain::setJointVelocities(const std::vector<double>& velocities)
 }
 
 
-bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
+bool cedar::dev::robot::KinematicChain::setJointVelocities(const cv::Mat& velocities)
 {
   if(velocities.size().height != (int)getNumberOfJoints() || velocities.size().width != 1)
   {
-    cout << "Error: You provided an matrix of velocities with the wrong size [("
+    std::cout << "Error: You provided an matrix of velocities with the wrong size [("
         << velocities.size().height << "," << velocities.size().width
-        << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
+        << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
     return false;
   }
 
   bool hardware_velocity = true;
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
-    if(!setJointVelocity(i, velocities.at<double>(i, 0)))
+    if (!setJointVelocity(i, velocities.at<double>(i, 0)))
     {
       hardware_velocity = false;
     }
@@ -300,11 +294,11 @@ bool KinematicChain::setJointVelocities(const cv::Mat& velocities)
 }
 
 
-bool KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
+bool cedar::dev::robot::KinematicChain::setJointAcceleration(unsigned int index, double acceleration)
 {
-  if(index >= getNumberOfJoints())
+  if (index >= getNumberOfJoints())
   {
-    cout << "Error: Trying to set acceleration for joint " << index << "!" << endl;
+    std::cout << "Error: Trying to set acceleration for joint " << index << "!" << std::endl;
     return false;
   }
 
@@ -313,12 +307,12 @@ bool KinematicChain::setJointAcceleration(unsigned int index, double acceleratio
 }
 
 
-bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
+bool cedar::dev::robot::KinematicChain::setJointAccelerations(const std::vector<double>& accelerations)
 {
   if(accelerations.size() != getNumberOfJoints())
   {
-    cout << "Error: You provided an matrix of accelerations with the wrong size ("
-        << accelerations.size() << " != " << getNumberOfJoints() << ")!" << endl;
+    std::cout << "Error: You provided an matrix of accelerations with the wrong size ("
+      << accelerations.size() << " != " << getNumberOfJoints() << ")!" << std::endl;
     return false;
   }
 
@@ -331,13 +325,13 @@ bool KinematicChain::setJointAccelerations(const std::vector<double>& accelerati
 }
 
 
-bool KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
+bool cedar::dev::robot::KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 {
   if(accelerations.size().height != (int)getNumberOfJoints() || accelerations.size().width != 1)
   {
-    cout << "Error: You provided an matrix of accelerations with the wrong size [("
-        << accelerations.size().height << "," << accelerations.size().width
-        << ") != (" << getNumberOfJoints() << ",1)]!" << endl;
+    std::cout << "Error: You provided an matrix of accelerations with the wrong size [("
+      << accelerations.size().height << "," << accelerations.size().width
+      << ") != (" << getNumberOfJoints() << ",1)]!" << std::endl;
     return false;
   }
 
@@ -346,11 +340,11 @@ bool KinematicChain::setJointAccelerations(const cv::Mat& accelerations)
 }
 
 
-void KinematicChain::step(double time)
+void cedar::dev::robot::KinematicChain::step(double time)
 {
 
   // update the angle according to working mode
-  switch(mCurrentWorkingMode)
+  switch (mCurrentWorkingMode)
   {
     case ANGLE:
 
@@ -384,21 +378,22 @@ void KinematicChain::step(double time)
       break;
 
     default:
-      cerr << "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!" << endl;
+      std::cerr << "Oh oh, something went terribly wrong in cedar::dev::robot::KinematicChain::step(double)!"
+        << std::endl;
   }
 
   return;
 }
 
 
-void KinematicChain::setWorkingMode(ActionType actionType)
+void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 {
   stop();
 
-  Mat zeros = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  cv::Mat zeros = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
   // need to stop something?
-  switch(mCurrentWorkingMode)
+  switch (mCurrentWorkingMode)
   {
     case ACCELERATION:
       setJointAccelerations(zeros);
@@ -411,12 +406,12 @@ void KinematicChain::setWorkingMode(ActionType actionType)
   mCurrentWorkingMode = actionType;
 
   // want to reset something?
-  switch(mCurrentWorkingMode)
+  switch (mCurrentWorkingMode)
   {
     case ACCELERATION:
-      mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
     case VELOCITY:
-      mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
     case ANGLE:
       break;
   }
@@ -425,24 +420,24 @@ void KinematicChain::setWorkingMode(ActionType actionType)
 }
 
 
-void KinematicChain::init()
+void cedar::dev::robot::KinematicChain::init()
 {
   stop();
-  mJointAngles = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointVelocities = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
-  mJointAccelerations = Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+  mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
   return;
 }
 
 
-void KinematicChain::applyAngleLimits(cv::Mat &angles)
+void cedar::dev::robot::KinematicChain::applyAngleLimits(cv::Mat &angles)
 {
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     double angle = angles.at<double>(i, 0);
-    angle = max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
-    angle = min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
+    angle = std::max<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.min);
+    angle = std::min<double>(angle, mpReferenceGeometry->getJoint(i)->angleLimits.max);
     angles.at<double>(i, 0) = angle;
   }
 
@@ -450,35 +445,34 @@ void KinematicChain::applyAngleLimits(cv::Mat &angles)
 }
 
 
-void KinematicChain::applyVelocityLimits(cv::Mat &velocities)
+void cedar::dev::robot::KinematicChain::applyVelocityLimits(cv::Mat &velocities)
 {
 
-  for(unsigned i = 0; i < getNumberOfJoints(); i++)
+  for (unsigned i = 0; i < getNumberOfJoints(); i++)
   {
     double velocity = velocities.at<double>(i, 0);
-    velocity = max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
-    velocity = min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
+    velocity = std::max<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.min);
+    velocity = std::min<double>(velocity, mpReferenceGeometry->getJoint(i)->velocityLimits.max);
     velocities.at<double>(i, 0) = velocity;
   }
 
   return;
 }
 
-
 /*
  * Overwritten start function of QThread
  */
-void KinematicChain::start(Priority priority)
+void cedar::dev::robot::KinematicChain::start(Priority priority)
 {
-  if(isRunning())
+  if (isRunning())
   {
     return;
   }
 
-  switch(mCurrentWorkingMode)
+  switch (mCurrentWorkingMode)
   {
   case ANGLE:
-    cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << endl;
+    std::cout << "Error: KinematicChain refuses to work as a thread in ANGLE mode!" << std::endl;
     return;
   case VELOCITY:
   case ACCELERATION:
@@ -490,8 +484,7 @@ void KinematicChain::start(Priority priority)
   return;
 }
 
-
-void KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
+void cedar::dev::robot::KinematicChain::useCurrentHardwareValues(bool useCurrentHardwareValues)
 {
   mUseCurrentHardwareValues = useCurrentHardwareValues;
 }

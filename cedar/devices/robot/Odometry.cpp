@@ -34,11 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/robot/Odometry.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

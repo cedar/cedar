@@ -38,16 +38,11 @@
 #define CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
 //!@todo Serial communication needs implementation for windows.
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/communication/Communication.h"
-
-// PROJECT INCLUDES
-
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
-
 #ifndef WIN32
   #include <termios.h>
   #include <errno.h>
@@ -67,17 +62,10 @@
  */
 class cedar::dev::com::SerialCommunication : public Communication, public cedar::aux::ConfigurationInterface
 {
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   //!@brief Initiates a new communication with an external device per Serial Port.
   //!@param config Location and name of the Configuration-File to be used.
   SerialCommunication(const std::string config);
@@ -88,9 +76,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   //!@brief Initializes the communication and opens the channel.
   //!@return 1 if initialization was successful, else 0.
   int init();
@@ -153,34 +139,23 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
   //!@brief  Closes the channel.
   void close();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   //!@brief File Descriptor of the communication.
   int mFileDescriptor;
 
@@ -206,17 +181,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   /*!@brief Name of the communication.
    *Default is "Serial Communication".
    */
@@ -260,7 +228,5 @@ private:
 
   //!brief The user's Operating System ("Linux" (Default) or "Apple")
   std::string _mOS;
-
 }; // class cedar::dev::com::SerialCommunication
-
 #endif // CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_

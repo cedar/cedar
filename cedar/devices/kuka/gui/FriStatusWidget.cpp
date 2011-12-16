@@ -38,10 +38,8 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
-// LOCAL INCLUDES
-#include "FriStatusWidget.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/kuka/gui/FriStatusWidget.h"
 
 // SYSTEM INCLUDES
 #include <sstream>
@@ -49,14 +47,13 @@
 #include <iostream>
 #endif
 
-using namespace cedar::dev::kuka::gui;
 using namespace cedar::dev::kuka;
 using namespace std;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-FriStatusWidget::FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
+cedar::dev::kuka::gui::FriStatusWidget::FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("FriStatusWidget", parent)
 {
@@ -67,28 +64,29 @@ cedar::aux::gui::BaseWidget("FriStatusWidget", parent)
   init();
 }
 
-FriStatusWidget::~FriStatusWidget()
+cedar::dev::kuka::gui::FriStatusWidget::~FriStatusWidget()
 {
   //nothing yet
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void FriStatusWidget::init()
+void cedar::dev::kuka::gui::FriStatusWidget::init()
 {
   updateInformation();
   mIsInit = true;
 }
 
-void FriStatusWidget::updateInformation()
+void cedar::dev::kuka::gui::FriStatusWidget::updateInformation()
 {
-  //Translations from status-/quality-values to text
-  string quality_names[] = { string("BAD (0)"), string("UNACCEPTABLE (1)"), string("GOOD (2)"), string("PERFECT (3)") };
-  string state_names[] = { string("OFF (0)"), string("Monitor Mode"), string("Command Mode") };
-  //set Text for Fri state and Fri quality
+  // Translations from status-/quality-values to text
+  std::string quality_names[]
+    = { string("BAD (0)"), string("UNACCEPTABLE (1)"), string("GOOD (2)"), string("PERFECT (3)") };
+  std::string state_names[] = { string("OFF (0)"), string("Monitor Mode"), string("Command Mode") };
+  // set Text for Fri state and Fri quality
   mpLabelStateData->setText(state_names[mpKukaIn->getFriState()].c_str());
   mpLabelQualData->setText(quality_names[mpKukaIn->getFriQuality()].c_str());
-  //set text for power status
+  // set text for power status
   if (mpKukaIn->isPowerOn())
   {
     mpLabelPowerData->setText("ON");
@@ -97,16 +95,15 @@ void FriStatusWidget::updateInformation()
   {
     mpLabelPowerData->setText("OFF");
   }
-  //set text for sample time
-  stringstream s;
-  s <<mpKukaIn->getSampleTime()<<"s";
+  // set text for sample time
+  std::stringstream s;
+  s << mpKukaIn->getSampleTime() << "s";
   mpLabelSampleTimeData->setText(s.str().c_str());
 }
 
-void FriStatusWidget::timerEvent(QTimerEvent* /* pEvent */)
+void cedar::dev::kuka::gui::FriStatusWidget::timerEvent(QTimerEvent* /* pEvent */)
 {
   //set the displayed data
   updateInformation();
 }
-
 #endif // CEDAR_USE_KUKA_FRI

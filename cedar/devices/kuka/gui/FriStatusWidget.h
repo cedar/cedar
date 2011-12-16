@@ -41,10 +41,8 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_KUKA_LWR
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "namespace.h"
-
-// PROJECT INCLUDES
 #include "cedar/devices/kuka/KukaInterface.h"
 #ifdef DEBUG
   #include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
@@ -61,8 +59,7 @@
  *
  * This includes the status, the connection quality, the sample time and if the robot is powered
  */
-class cedar::dev::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget,
-                                                      private Ui_FriStatusWidget
+class cedar::dev::kuka::gui::FriStatusWidget : public cedar::aux::gui::BaseWidget, private Ui_FriStatusWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -110,27 +107,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
   bool mIsInit; //!<true, if object has been initialized
   cedar::dev::kuka::KukaInterfacePtr mpKukaIn; //!<this is an external reference
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::kuka::gui::FriStatusWidget
 
 #endif // CEDAR_USE_KUKA_FRI
 #endif // CEDAR_DEV_KUKA_GUI_STATUS_WIDGET_H
-

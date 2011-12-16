@@ -37,12 +37,9 @@
 #ifndef CEDAR_DEV_KTEAM_DRIVE_MODEL_H
 #define CEDAR_DEV_KTEAM_DRIVE_MODEL_H
 
-// LOCAL INCLUDES
-
+// CEDAR INCLUDES
 #include "cedar/devices/robot/Odometry.h"
 #include "cedar/devices/kteam/Drive.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -54,13 +51,8 @@
 class cedar::dev::kteam::DriveModel : public cedar::dev::robot::Odometry
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
-  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
 
   //!@brief Constructs the model of the K-Team robot.
@@ -73,7 +65,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
 
   /*!@brief Initializes the model.
@@ -90,7 +81,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
 
   // none yet
@@ -98,7 +88,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
 
   /*!@brief Calculates the current position and orientation of the robot based on its current encoder-values.
@@ -120,8 +109,13 @@ private:
    *@param oldRightEncoder The last encoder-value of the right wheel.
    *@return The distance the robot has moved [in m].
    */
-  double calculateDifferencePosition(int newLeftEncoder, int oldLeftEncoder,
-                                   int newRightEncoder, int oldRightEncoder);
+  double calculateDifferencePosition
+         (
+           int newLeftEncoder,
+           int oldLeftEncoder,
+           int newRightEncoder,
+           int oldRightEncoder
+         ) const;
 
   /*!@brief This function implements the calculation of the angle the robot has turned since the last update.
    *@param newLeftEncoder The current encoder-value of the left wheel.
@@ -130,23 +124,21 @@ private:
    *@param oldRightEncoder The last encoder-value of the right wheel.
    *@return The angle the robot has turned [in rad].
    */
-  double calculateDifferenceOrientation(int newLeftEncoder, int oldLeftEncoder,
-                                      int newRightEncoder, int oldRightEncoder);
+  double calculateDifferenceOrientation
+         (
+           int newLeftEncoder,
+           int oldLeftEncoder,
+           int newRightEncoder,
+           int oldRightEncoder
+         ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   // none yet
 
 private:
-
   //!@brief The initialization-status
   bool mInitialized;
 
@@ -157,24 +149,6 @@ private:
   /*!@brief Stores the last encoder-values (needed to calculate the distance the robot has moved).
    */
   cv::Mat mOldEncoder;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
-protected:
-
-  // none yet
-
-private:
-
-  // none yet
-
 }; // class cedar::dev::kteam::KTeamDriveModel
-
 #endif // CEDAR_DEV_KTEAM_DRIVE_MODEL_H
 

@@ -34,19 +34,15 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 #define CEDAR_DEV_ROBOT_GL_NAMESPACE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #ifdef DEBUG
   #include "cedar/devices/debug/lib.h"
 #else
   #include "cedar/devices/release/lib.h"
 #endif
-
-// PROJECT INCLUDES
-#include "namespace.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

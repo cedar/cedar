@@ -37,11 +37,9 @@
 #ifndef CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
 #define CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/DifferentialDrive.h"
 #include "cedar/devices/kteam/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -52,11 +50,6 @@
  */
 class cedar::dev::kteam::Drive : public cedar::dev::robot::DifferentialDrive
 {
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -65,9 +58,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-
 public:
-
   /*!@brief The get-function of the number of pulses per wheel-revolution.
    *@return Number of Pulses per Revolution.
    */
@@ -115,9 +106,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-
 protected:
-
   /*!@brief Sets both encoder values.
    *@param leftEncoder The left encoder value to be set.
    *@param rightEncoder The right encoder value to be set.
@@ -128,38 +117,23 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
-
 private:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   //!@brief Distance the wheel moves each pulse [in m].
   double mDistancePerPulse;
 
 private:
-
   // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-
-public:
-
-  // none yet (hopefully never!)
-
 protected:
-
   //!@brief Number of pulses per revolution of wheel.
   double _mPulsesPerRevolution;
 
@@ -173,9 +147,6 @@ protected:
   int _mMaximalNumberPulsesPerSecond;
 
 private:
-
   // none yet
-
 }; // class cedar::dev::kteam::KTeamDrive
-
 #endif // CEDAR_DEV_ROBOT_MOBILE_KTEAM_DRIVE_H

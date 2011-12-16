@@ -37,11 +37,9 @@
 #ifndef CEDAR_DEV_ROBOT_GL_CORA_HEAD_H
 #define CEDAR_DEV_ROBOT_GL_CORA_HEAD_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/AmtecChain.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -54,10 +52,6 @@
  */
 class cedar::dev::robot::gl::CoraHead : public cedar::dev::robot::gl::AmtecChain
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -105,19 +99,6 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::dev::robot::gl::CoraHead
-
 #endif // CEDAR_DEV_ROBOT_GL_CORA_HEAD_H
 
