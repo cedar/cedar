@@ -47,9 +47,9 @@
 // PROJECT INCLUDES
 #include "cedar/devices/kuka/KukaInterface.h"
 #ifdef DEBUG
-#include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
+  #include "cedar/devices/debug/kuka/gui/ui_FriStatusWidget.h"
 #else
-#include "cedar/devices/release/kuka/gui/ui_FriStatusWidget.h"
+  #include "cedar/devices/release/kuka/gui/ui_FriStatusWidget.h"
 #endif
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 

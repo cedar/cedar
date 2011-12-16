@@ -38,7 +38,11 @@
 #define CEDAR_PROC_NAMESPACE_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/lib.h"
+#ifdef DEBUG
+  #include "cedar/processing/debug/lib.h"
+#else
+  #include "cedar/processing/release/lib.h"
+#endif
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/AbstractFactory.h"
 
