@@ -45,4 +45,5 @@ install(DIRECTORY "${CEDAR_BUILD_DIR}/doc/latex" DESTINATION ${CEDAR_DOC_INSTALL
 #todo install all executable files here
 file(GLOB cedarExecutables "${CEDAR_EXE_DIR}/processingIde")
 install(FILES ${cedarExecutables} DESTINATION ${CEDAR_EXE_INSTALL_DIR})
+install(CODE "execute_process(COMMAND chmod 755 ${CMAKE_INSTALL_PREFIX}/${CEDAR_EXE_INSTALL_DIR}/processingIde)")
 
