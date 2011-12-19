@@ -42,6 +42,11 @@
 #define CEDAR_PROC_SOURCES_NAMESPACE_H
 
 // CEDAR INCLUDES
+#ifdef DEBUG
+  #include "cedar/processing/debug/lib.h"
+#else
+  #include "cedar/processing/release/lib.h"
+#endif
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -55,8 +60,7 @@ namespace cedar
     namespace sources
     {
       //!@cond SKIPPED_DOCUMENTATION
-      class GaussInput;
-      typedef boost::shared_ptr<GaussInput> GaussInputPtr;
+      CEDAR_DECLARE_PROC_CLASS(GaussInput);
       //!@endcond
     }
   }
