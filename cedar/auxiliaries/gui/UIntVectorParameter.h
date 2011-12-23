@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleParameter.h
+    File:        UIntVectorParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2011 07 21
 
     Description:
 
@@ -38,20 +38,25 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_UINT_PARAMETER_H
-#define CEDAR_PROC_GUI_UINT_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_UINT_VECTOR_PARAMETER_H
+#define CEDAR_AUX_GUI_UINT_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QSpinBox>
 
 
-/*!@brief Widget for representing and manipulating a cedar::aux::UIntParameter.
+/*!@brief Widget for manipulating vectors of unsigned integer values.
+ *
+ * @todo This should be abstracted, probably in a template class:
+ *       template <class ParameterType, class WidgetType> NumericVectorParameter,
+ *       where, e.g., ParameterType = UIntVector and WidgetType = QSpinBox. Otherwise, a lot of code might get
+ *       duplicated
  */
-class cedar::proc::gui::UIntParameter : public cedar::proc::gui::Parameter
+class cedar::aux::gui::UIntVectorParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,10 +68,10 @@ class cedar::proc::gui::UIntParameter : public cedar::proc::gui::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  UIntParameter(QWidget *pParent = NULL);
+  UIntVectorParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~UIntParameter();
+  virtual ~UIntVectorParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -74,14 +79,14 @@ public:
 public:
 
 public slots:
-  //!@brief handles a change of the associated parameter
+  //!@brief handles a change of the associated parameters
   void parameterPointerChanged();
 
-  //!@brief handles a change in the parameter
+  //!@brief handles a change in the parameters
   void valueChanged(int value);
 
-  //!@brief Handles changes in the displayed parameter's properties.
-  void propertiesChanged();
+  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -101,9 +106,18 @@ private:
 protected:
   // none yet
 private:
-  //!@brief a spinbox for the represented parameter
-  QSpinBox *mpSpinbox;
+  //!@brief a vector of spinboxes for displaying and changing the associated parameters
+  std::vector<QSpinBox*> mSpinboxes;
 
-}; // class cedar::proc::gui::UIntParameter
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_UINT_PARAMETER_H
+private:
+  // none yet
+
+}; // class cedar::aux::gui::UIntVectorParameter
+
+#endif // CEDAR_AUX_GUI_UINT_VECTOR_PARAMETER_H

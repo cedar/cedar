@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EnumParameter.h
+    File:        DirectoryParameter.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 22
 
     Description:
 
@@ -34,20 +38,20 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_ENUM_PARAMETER_H
-#define CEDAR_PROC_GUI_ENUM_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_DIRECTORY_PARAMETER_H
+#define CEDAR_AUX_GUI_DIRECTORY_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QComboBox>
+#include <QLineEdit>
 
 
-/*!@brief Widget for displaying cedar::aux::EnumParameters.
+/*!@brief A widget for a cedar::aux::DirectoryParameter.
  */
-class cedar::proc::gui::EnumParameter : public cedar::proc::gui::Parameter
+class cedar::aux::gui::DirectoryParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -59,22 +63,28 @@ class cedar::proc::gui::EnumParameter : public cedar::proc::gui::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  EnumParameter(QWidget *pParent = NULL);
+  DirectoryParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~EnumParameter();
+  virtual ~DirectoryParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+public:
+
 public slots:
-  /*!@brief Reacts to a change of the parameter pointer.
+  /*!@brief Handles a click on the browse button.
+   */
+  void onBrowseClicked();
+
+  /*!@brief Handles a changed parameter pointer.
    */
   void parameterPointerChanged();
 
-  /*!@brief Writes the new value to the parameter when the user makes a selection.
+  /*!@brief Handles a change in the value of the parameter.
    */
-  void currentIndexChanged(const QString& text);
+  void parameterValueChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,9 +104,10 @@ private:
 protected:
   // none yet
 private:
-  //! QComboBox used for displaying all available options.
-  QComboBox *mpEdit;
+  //! QLineEdit used for displaying the parameter value.
+  QLineEdit *mpEdit;
 
-}; // class cedar::proc::gui::EnumParameter
+}; // class cedar::aux::gui::DirectoryParameter
 
-#endif // CEDAR_PROC_GUI_ENUM_PARAMETER_H
+#endif // CEDAR_AUX_GUI_DIRECTORY_PARAMETER_H
+

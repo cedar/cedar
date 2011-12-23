@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleParameter.h
+    File:        BoolParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2011 07 12
 
     Description:
 
@@ -38,20 +38,20 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_DOUBLE_PARAMETER_H
-#define CEDAR_PROC_GUI_DOUBLE_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_BOOL_PARAMETER_H
+#define CEDAR_AUX_GUI_BOOL_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QDoubleSpinBox>
+#include <QCheckBox>
 
 
-/*!@brief Widget for manipulating cedar::aux::DoubleParameters.
+/*!@brief A widget for manipulating cedar::aux::BoolParameters.
  */
-class cedar::proc::gui::DoubleParameter : public cedar::proc::gui::Parameter
+class cedar::aux::gui::BoolParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,10 +63,10 @@ class cedar::proc::gui::DoubleParameter : public cedar::proc::gui::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DoubleParameter(QWidget *pParent = NULL);
+  BoolParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~DoubleParameter();
+  virtual ~BoolParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -74,13 +74,13 @@ public:
 public:
 
 public slots:
-  /*!@brief Reacts to a change of the parameter pointer.
+  /*!@brief Slot that reacts to a new parameter pointer.
    */
   void parameterPointerChanged();
 
-  /*!@brief Reacts to a change of the parameter's value.
+  /*!@brief Slot that reacts to a change of the state of the QChecBox.
    */
-  void valueChanged(double value);
+  void stateChanged(int state);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,9 +100,19 @@ private:
 protected:
   // none yet
 private:
-  //! QDoubleSpinBox used for displaying and manipulating the parameter's value.
-  QDoubleSpinBox *mpSpinbox;
+  //! Checkbox used for displaying the parameter.
+  QCheckBox *mpCheckBox;
 
-}; // class cedar::proc::gui::DoubleParameter
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-#endif // CEDAR_PROC_GUI_DOUBLE_PARAMETER_H
+private:
+  // none yet
+
+}; // class cedar::aux::gui::BoolParameter
+
+#endif // CEDAR_AUX_GUI_BOOL_PARAMETER_H
+

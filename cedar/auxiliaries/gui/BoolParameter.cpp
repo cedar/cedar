@@ -22,11 +22,15 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        EnumParameter.cpp
+    File:        BoolParameter.cpp
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 28
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 07 12
 
     Description:
 
@@ -35,9 +39,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/EnumParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/gui/BoolParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
@@ -47,20 +50,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::EnumParameter::EnumParameter(QWidget *pParent)
+cedar::aux::gui::BoolParameter::BoolParameter(QWidget *pParent)
 :
-cedar::proc::gui::Parameter(pParent)
+cedar::aux::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
-  this->mpEdit = new QComboBox();
+  this->mpCheckBox = new QCheckBox();
   this->layout()->setContentsMargins(0, 0, 0, 0);
-  this->layout()->addWidget(this->mpEdit);
+  this->layout()->addWidget(this->mpCheckBox);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
 //!@brief Destructor
-cedar::proc::gui::EnumParameter::~EnumParameter()
+cedar::aux::gui::BoolParameter::~BoolParameter()
 {
 }
 
@@ -68,37 +71,18 @@ cedar::proc::gui::EnumParameter::~EnumParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::EnumParameter::parameterPointerChanged()
+void cedar::aux::gui::BoolParameter::parameterPointerChanged()
 {
-  cedar::aux::EnumParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
-
-  this->mpEdit->clear();
-  int select_index = -1;
-  for (size_t i = 0; i < parameter->getEnumDeclaration().list().size(); ++i)
-  {
-    const cedar::aux::Enum& enum_val = parameter->getEnumDeclaration().list().at(i);
-    if (enum_val == parameter->getValue())
-    {
-      select_index = static_cast<int>(i);
-    }
-    this->mpEdit->addItem(enum_val.prettyString().c_str(), QVariant(QString(enum_val.name().c_str())));
-  }
-  if(select_index != -1)
-  {
-    this->mpEdit->setCurrentIndex(select_index);
-  }
-
-  QObject::connect(this->mpEdit, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentIndexChanged(const QString&)));
+  cedar::aux::BoolParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
+  this->mpCheckBox->setChecked(parameter->getValue());
+  QObject::connect(this->mpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
 }
 
-void cedar::proc::gui::EnumParameter::currentIndexChanged(const QString&)
+void cedar::aux::gui::BoolParameter::stateChanged(int state)
 {
-  if (this->mpEdit->currentIndex() != -1)
-  {
-    cedar::aux::EnumParameterPtr parameter;
-    parameter = boost::dynamic_pointer_cast<cedar::aux::EnumParameter>(this->getParameter());
-    QString value = this->mpEdit->itemData(this->mpEdit->currentIndex(), Qt::UserRole).toString();
-    parameter->set(value.toStdString());
-  }
+  cedar::aux::BoolParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::BoolParameter>(this->getParameter());
+  parameter->setValue(state == Qt::Checked);
 }
+

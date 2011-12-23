@@ -39,7 +39,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/StringParameter.h"
+#include "cedar/auxiliaries/gui/StringParameter.h"
 #include "cedar/auxiliaries/StringParameter.h"
 
 // SYSTEM INCLUDES
@@ -50,9 +50,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::StringParameter::StringParameter(QWidget *pParent)
+cedar::aux::gui::StringParameter::StringParameter(QWidget *pParent)
 :
-cedar::proc::gui::Parameter(pParent)
+cedar::aux::gui::Parameter(pParent)
 {
   this->setLayout(new QHBoxLayout());
   this->mpEdit = new QLineEdit();
@@ -63,7 +63,7 @@ cedar::proc::gui::Parameter(pParent)
 }
 
 //!@brief Destructor
-cedar::proc::gui::StringParameter::~StringParameter()
+cedar::aux::gui::StringParameter::~StringParameter()
 {
 }
 
@@ -71,7 +71,7 @@ cedar::proc::gui::StringParameter::~StringParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::StringParameter::parameterPointerChanged()
+void cedar::aux::gui::StringParameter::parameterPointerChanged()
 {
   cedar::aux::StringParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());
@@ -79,7 +79,7 @@ void cedar::proc::gui::StringParameter::parameterPointerChanged()
   QObject::connect(this->mpEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEdited(const QString&)));
 }
 
-void cedar::proc::gui::StringParameter::textEdited(const QString& text)
+void cedar::aux::gui::StringParameter::textEdited(const QString& text)
 {
   cedar::aux::StringParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::StringParameter>(this->getParameter());

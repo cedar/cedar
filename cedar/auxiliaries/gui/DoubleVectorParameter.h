@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Parameter.h
+    File:        DoubleVectorParameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2011 07 20
 
     Description:
 
@@ -38,22 +38,20 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_PARAMETER_H
-#define CEDAR_PROC_GUI_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_DOUBLE_VECTOR_PARAMETER_H
+#define CEDAR_AUX_GUI_DOUBLE_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
+#include <QDoubleSpinBox>
 
 
-/*!@brief An abstract base widget for graphical representation of Parameter.
- *
- * @todo Write more detailed description of the class here.
+/*!@brief A widget for manipulating cedar::aux::DoubleVectorParameters.
  */
-class cedar::proc::gui::Parameter : public QWidget
+class cedar::aux::gui::DoubleVectorParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -65,26 +63,28 @@ class cedar::proc::gui::Parameter : public QWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Parameter(QWidget *pParent = NULL);
+  DoubleVectorParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~Parameter();
+  virtual ~DoubleVectorParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief set the parameter, which is graphically represented by this instance
-  void setParameter(cedar::aux::ParameterPtr pParameter);
-  //!@brief get the parameter, which is graphically represented by this instance
-  cedar::aux::ParameterPtr getParameter();
 
-signals:
-  //!@brief this signal is emitted whenever a new parameter is linked to this graphical representation
+public slots:
+  /*!@brief Slot that reacts to a change of the parameter pointer.
+   */
   void parameterPointerChanged();
-  //!@brief this signal is emitted if the height of the graphical representation changed due to size changes of
-  //        the represented parameter
-  void heightChanged();
+
+  /*!@brief Slot that reacts to a change of the value the parameter.
+   */
+  void valueChanged(double value);
+
+  /*!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+   */
+  void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -104,8 +104,9 @@ private:
 protected:
   // none yet
 private:
-  //!@brief parameter, which is graphically represented by this instance
-  cedar::aux::ParameterPtr mParameter;
-}; // class cedar::proc::gui::Parameter
+  //! Vector of the spinboxes used for displaying and manipulating the parameter values.
+  std::vector<QDoubleSpinBox*> mSpinboxes;
 
-#endif // CEDAR_PROC_GUI_PARAMETER_H
+}; // class cedar::aux::gui::DoubleVectorParameter
+
+#endif // CEDAR_AUX_GUI_DOUBLE_VECTOR_PARAMETER_H

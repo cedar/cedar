@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/processing/Step.h"
 
@@ -67,7 +68,7 @@ private:
       cedar::aux::TypeBasedFactory
       <
         cedar::aux::Parameter,
-        cedar::proc::gui::Parameter,
+        cedar::aux::gui::Parameter,
         cedar::aux::ParameterPtr
       >
       DataWidgetTypes;
@@ -164,7 +165,7 @@ private:
   boost::weak_ptr<cedar::aux::Configurable> mDisplayedConfigurable;
 
   //! Association from parameters to rows.
-  std::map<cedar::proc::gui::Parameter*, int> mParameterRowIndex;
+  std::map<cedar::aux::gui::Parameter*, int> mParameterRowIndex;
 
   //! Connection to the configurable's tree changed signal.
   boost::signals2::connection mSlotConnection;

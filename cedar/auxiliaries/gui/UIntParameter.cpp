@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DirectoryParameter.cpp
+    File:        DoubleParameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 22
+    Date:        2011 07 06
 
     Description:
 
@@ -39,44 +39,34 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/DirectoryParameter.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/gui/UIntParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
-#include <QPushButton>
 #include <iostream>
-#include <QFileDialog>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DirectoryParameter::DirectoryParameter(QWidget *pParent)
+cedar::aux::gui::UIntParameter::UIntParameter(QWidget *pParent)
 :
-cedar::proc::gui::Parameter(pParent)
+cedar::aux::gui::Parameter(pParent)
 {
-  QHBoxLayout *p_layout = new QHBoxLayout();
-  this->setLayout(p_layout);
-  this->mpEdit = new QLineEdit();
-  this->mpEdit->setReadOnly(true);
-  p_layout->addWidget(this->mpEdit);
+  this->setLayout(new QHBoxLayout());
+  this->mpSpinbox = new QSpinBox();
+  this->layout()->setContentsMargins(0, 0, 0, 0);
+  this->layout()->addWidget(this->mpSpinbox);
+  this->mpSpinbox->setMinimum(0.0);
+  this->mpSpinbox->setMaximum(100.0);
 
-  QPushButton *p_button = new QPushButton(">");
-  p_button->setMinimumWidth(20);
-  p_button->setMaximumWidth(30);
-  p_layout->addWidget(p_button);
-
-  p_layout->setContentsMargins(0, 0, 0, 0);
-  p_layout->setStretch(0, 1);
-  p_layout->setStretch(1, 0);
-
-  QObject::connect(p_button, SIGNAL(clicked()), this, SLOT(onBrowseClicked()));
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
 //!@brief Destructor
-cedar::proc::gui::DirectoryParameter::~DirectoryParameter()
+cedar::aux::gui::UIntParameter::~UIntParameter()
 {
 }
 
@@ -84,30 +74,28 @@ cedar::proc::gui::DirectoryParameter::~DirectoryParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::DirectoryParameter::parameterPointerChanged()
+void cedar::aux::gui::UIntParameter::parameterPointerChanged()
 {
-  cedar::aux::DirectoryParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
-  this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->get().absolutePath());
-  this->mpEdit->setReadOnly(true);
+  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
 
-  QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
+  this->propertiesChanged();
+
+  this->mpSpinbox->setValue(parameter->getValue());
+  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
+
+  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
 }
 
-void cedar::proc::gui::DirectoryParameter::parameterValueChanged()
+void cedar::aux::gui::UIntParameter::propertiesChanged()
 {
-  cedar::aux::DirectoryParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
-  this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->get().absolutePath());
-  this->mpEdit->setReadOnly(true);
+  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
+  this->mpSpinbox->setMinimum(parameter->getMinimum());
+  this->mpSpinbox->setMaximum(parameter->getMaximum());
+  this->mpSpinbox->setDisabled(parameter->isConstant());
 }
 
-void cedar::proc::gui::DirectoryParameter::onBrowseClicked()
+void cedar::aux::gui::UIntParameter::valueChanged(int value)
 {
-  cedar::aux::DirectoryParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
-  QString value = QFileDialog::getExistingDirectory(this, "Select a directory", parameter->get().absolutePath());
-  parameter->set(value.toStdString());
+  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
+  parameter->setValue(value);
 }

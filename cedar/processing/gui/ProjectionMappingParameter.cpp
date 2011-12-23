@@ -55,7 +55,7 @@
 
 cedar::proc::gui::ProjectionMappingParameter::ProjectionMappingParameter(QWidget *pParent)
 :
-cedar::proc::gui::Parameter(pParent)
+cedar::aux::gui::Parameter(pParent)
 {
   this->setLayout(new QVBoxLayout());
   this->layout()->setContentsMargins(0, 0, 0, 0);

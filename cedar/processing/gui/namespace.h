@@ -59,32 +59,23 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       class CEDAR_PROC_LIB_EXPORT ArchitectureToolBox;
-      class CEDAR_PROC_LIB_EXPORT BoolParameter;
       class CEDAR_PROC_LIB_EXPORT Connection;
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
-      class CEDAR_PROC_LIB_EXPORT DirectoryParameter;
-      class CEDAR_PROC_LIB_EXPORT DoubleParameter;
-      class CEDAR_PROC_LIB_EXPORT DoubleVectorParameter;
       class CEDAR_PROC_LIB_EXPORT ElementClassList;
-      class CEDAR_PROC_LIB_EXPORT EnumParameter;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
       class CEDAR_PROC_LIB_EXPORT Ide;
       class CEDAR_PROC_LIB_EXPORT IdeApplication;
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
       CEDAR_DECLARE_PROC_CLASS(Network);
-      class CEDAR_PROC_LIB_EXPORT Parameter;
       class CEDAR_PROC_LIB_EXPORT PluginLoadDialog;
       class CEDAR_PROC_LIB_EXPORT PropertyPane;
       class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
       class CEDAR_PROC_LIB_EXPORT StepItem;
-      class CEDAR_PROC_LIB_EXPORT StringParameter;
       class CEDAR_PROC_LIB_EXPORT ToolBox;
       class CEDAR_PROC_LIB_EXPORT TriggerItem;
       class CEDAR_PROC_LIB_EXPORT View;
-      class CEDAR_PROC_LIB_EXPORT UIntParameter;
-      class CEDAR_PROC_LIB_EXPORT UIntVectorParameter;
       class CEDAR_PROC_LIB_EXPORT ProjectionMappingParameter;
 
       /* Exceptions */

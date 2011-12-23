@@ -46,16 +46,16 @@
 #include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
-#include "cedar/processing/gui/BoolParameter.h"
-#include "cedar/processing/gui/DoubleParameter.h"
-#include "cedar/processing/gui/DoubleVectorParameter.h"
-#include "cedar/processing/gui/UIntParameter.h"
-#include "cedar/processing/gui/UIntVectorParameter.h"
-#include "cedar/processing/gui/StringParameter.h"
-#include "cedar/processing/gui/EnumParameter.h"
+#include "cedar/auxiliaries/gui/BoolParameter.h"
+#include "cedar/auxiliaries/gui/DoubleParameter.h"
+#include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/gui/UIntParameter.h"
+#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
+#include "cedar/auxiliaries/gui/StringParameter.h"
+#include "cedar/auxiliaries/gui/EnumParameter.h"
 #include "cedar/processing/gui/ProjectionMappingParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/processing/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/gui/DirectoryParameter.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
@@ -111,7 +111,8 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
 {
   this->resetContents();
 
-  std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pTrigger)->getClassId();
+  std::string label
+    = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pTrigger)->getClassId();
   this->addLabelRow(label);
   this->mDisplayedConfigurable = pTrigger;
   this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable)); // boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));
@@ -124,7 +125,8 @@ void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfig
     mSlotConnection.disconnect();
   }
   this->append(pConfigurable->getParameters());
-  mSlotConnection = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::proc::gui::PropertyPane::redraw, this));
+  mSlotConnection
+    = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::proc::gui::PropertyPane::redraw, this));
   for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
        iter != pConfigurable->configurableChildren().end();
        ++iter)
@@ -182,7 +184,7 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr par
     p_label->setText(parameter->getName().c_str());
     this->setCellWidget(row, 0, p_label);
 
-    cedar::proc::gui::Parameter *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
+    cedar::aux::gui::Parameter *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
     p_widget->setParent(this);
     p_widget->setParameter(parameter);
     p_widget->setEnabled(!parameter->isConstant());
@@ -199,23 +201,58 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
   if (cedar::proc::gui::PropertyPane::mDataWidgetTypes.empty())
   {
     // parameter types in auxiliaries
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleParameter, cedar::proc::gui::DoubleParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::proc::gui::UIntParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::StringParameter, cedar::proc::gui::StringParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::BoolParameter, cedar::proc::gui::BoolParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DoubleVectorParameter, cedar::proc::gui::DoubleVectorParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntVectorParameter, cedar::proc::gui::UIntVectorParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::DirectoryParameter, cedar::proc::gui::DirectoryParameter>();
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::proc::gui::EnumParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::aux::DoubleParameter,
+      cedar::aux::gui::DoubleParameter
+    >
+    ();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::aux::gui::UIntParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::aux::StringParameter,
+      cedar::aux::gui::StringParameter
+    >
+    ();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::aux::BoolParameter,
+      cedar::aux::gui::BoolParameter
+    >
+    ();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::aux::DoubleVectorParameter,
+      cedar::aux::gui::DoubleVectorParameter
+    >
+    ();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::aux::UIntVectorParameter,
+      cedar::aux::gui::UIntVectorParameter
+    >
+    ();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::aux::DirectoryParameter,
+      cedar::aux::gui::DirectoryParameter
+    >
+    ();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::aux::gui::EnumParameter>();
     // parameter types in processing
-    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::proc::ProjectionMappingParameter, cedar::proc::gui::ProjectionMappingParameter>();
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::proc::ProjectionMappingParameter,
+      cedar::proc::gui::ProjectionMappingParameter
+    >
+    ();
   }
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }
 
 void cedar::proc::gui::PropertyPane::rowSizeChanged()
 {
-  cedar::proc::gui::Parameter *p_parameter = dynamic_cast<cedar::proc::gui::Parameter*>(QObject::sender());
+  cedar::aux::gui::Parameter *p_parameter = dynamic_cast<cedar::aux::gui::Parameter*>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != NULL);
 
   CEDAR_DEBUG_ASSERT(this->mParameterRowIndex.find(p_parameter) != this->mParameterRowIndex.end());

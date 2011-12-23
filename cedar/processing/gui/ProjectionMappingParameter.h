@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 #include <QComboBox>
@@ -55,7 +55,7 @@
  * an exception state (i.e., the architecture cannot be run). The combo boxes will turn green as soon as the
  * configuration is corrected.
  */
-class cedar::proc::gui::ProjectionMappingParameter : public cedar::proc::gui::Parameter
+class cedar::proc::gui::ProjectionMappingParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros

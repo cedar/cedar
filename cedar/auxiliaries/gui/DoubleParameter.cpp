@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ParameterBase.cpp
+    File:        DoubleParameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -39,23 +39,34 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/Parameter.h"
-#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/gui/DoubleParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
+#include <QHBoxLayout>
+#include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Parameter::Parameter(QWidget *pParent)
+cedar::aux::gui::DoubleParameter::DoubleParameter(QWidget *pParent)
 :
-QWidget(pParent)
+cedar::aux::gui::Parameter(pParent)
 {
+  this->setLayout(new QHBoxLayout());
+  this->mpSpinbox = new QDoubleSpinBox();
+  this->layout()->setContentsMargins(0, 0, 0, 0);
+  this->layout()->addWidget(this->mpSpinbox);
+  this->mpSpinbox->setMinimum(-100.0);
+  this->mpSpinbox->setMaximum(+100.0);
+  this->mpSpinbox->setDecimals(4); //!@todo Make this an option in NumericParameter
+
+  QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
 }
 
 //!@brief Destructor
-cedar::proc::gui::Parameter::~Parameter()
+cedar::aux::gui::DoubleParameter::~DoubleParameter()
 {
 }
 
@@ -63,13 +74,20 @@ cedar::proc::gui::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
+void cedar::aux::gui::DoubleParameter::parameterPointerChanged()
 {
-  this->mParameter = pParameter;
-  emit parameterPointerChanged();
+  cedar::aux::DoubleParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
+  this->mpSpinbox->setMinimum(parameter->getMinimum());
+  this->mpSpinbox->setMaximum(parameter->getMaximum());
+  this->mpSpinbox->setValue(parameter->getValue());
+  QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
 }
 
-cedar::aux::ParameterPtr cedar::proc::gui::Parameter::getParameter()
+void cedar::aux::gui::DoubleParameter::valueChanged(double value)
 {
-  return this->mParameter;
+  cedar::aux::DoubleParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
+  parameter->setValue(value);
 }
+

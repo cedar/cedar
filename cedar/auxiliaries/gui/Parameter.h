@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        StringParameter.h
+    File:        Parameter.h
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -38,20 +38,22 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_STRING_PARAMETER_H
-#define CEDAR_PROC_GUI_STRING_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_PARAMETER_H
+#define CEDAR_AUX_GUI_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <QLineEdit>
+#include <QWidget>
 
 
-/*!@brief Widget for displaying and manipulating cedar::aux::StringParameters.
+/*!@brief An abstract base widget for graphical representation of Parameter.
+ *
+ * @todo Write more detailed description of the class here.
  */
-class cedar::proc::gui::StringParameter : public cedar::proc::gui::Parameter
+class cedar::aux::gui::Parameter : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,21 +65,26 @@ class cedar::proc::gui::StringParameter : public cedar::proc::gui::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  StringParameter(QWidget *pParent = NULL);
+  Parameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~StringParameter();
+  virtual ~Parameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief set the parameter, which is graphically represented by this instance
+  void setParameter(cedar::aux::ParameterPtr pParameter);
+  //!@brief get the parameter, which is graphically represented by this instance
+  cedar::aux::ParameterPtr getParameter();
 
-public slots:
-  //!@brief handles a change of the associated parameter
+signals:
+  //!@brief this signal is emitted whenever a new parameter is linked to this graphical representation
   void parameterPointerChanged();
-  //!@brief handles a change in the text box
-  void textEdited(const QString& text);
+  //!@brief this signal is emitted if the height of the graphical representation changed due to size changes of
+  //        the represented parameter
+  void heightChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,18 +104,8 @@ private:
 protected:
   // none yet
 private:
-  //!@brief a text edit for the represented parameter
-  QLineEdit *mpEdit;
+  //!@brief parameter, which is graphically represented by this instance
+  cedar::aux::ParameterPtr mParameter;
+}; // class cedar::aux::gui::Parameter
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
-}; // class cedar::proc::gui::StringParameter
-
-#endif // CEDAR_PROC_GUI_STRING_PARAMETER_H
+#endif // CEDAR_AUX_GUI_PARAMETER_H

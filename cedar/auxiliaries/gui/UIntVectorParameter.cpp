@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DoubleVectorParameter.cpp
+    File:        UIntVectorParameter.cpp
 
     Maintainer:  Oliver Lomp,
                  Mathis Richter,
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 20
+    Date:        2011 07 21
 
     Description:
 
@@ -39,9 +39,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -52,9 +51,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DoubleVectorParameter::DoubleVectorParameter(QWidget *pParent)
+cedar::aux::gui::UIntVectorParameter::UIntVectorParameter(QWidget *pParent)
 :
-cedar::proc::gui::Parameter(pParent)
+cedar::aux::gui::Parameter(pParent)
 {
   this->setLayout(new QVBoxLayout());
   this->layout()->setContentsMargins(0, 0, 0, 0);
@@ -62,7 +61,7 @@ cedar::proc::gui::Parameter(pParent)
 }
 
 //!@brief Destructor
-cedar::proc::gui::DoubleVectorParameter::~DoubleVectorParameter()
+cedar::aux::gui::UIntVectorParameter::~UIntVectorParameter()
 {
 }
 
@@ -70,22 +69,20 @@ cedar::proc::gui::DoubleVectorParameter::~DoubleVectorParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-//!@todo A lot of this code is almost the same as cedar::proc::gui::UIntVectorParameter.
 
-void cedar::proc::gui::DoubleVectorParameter::parameterPointerChanged()
+void cedar::aux::gui::UIntVectorParameter::parameterPointerChanged()
 {
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
+  cedar::aux::UIntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
 
   QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
   this->propertyChanged();
 }
 
-void cedar::proc::gui::DoubleVectorParameter::propertyChanged()
+void cedar::aux::gui::UIntVectorParameter::propertyChanged()
 {
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-
+  cedar::aux::UIntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
   //!@todo Don't throw away old spinboxes, reuse them instead
   // Create the appropriate amount of spinboxes
   if (this->mSpinboxes.size() != parameter->size())
@@ -98,17 +95,16 @@ void cedar::proc::gui::DoubleVectorParameter::propertyChanged()
 
     for (size_t i = 0; i < parameter->size(); ++i)
     {
-      QDoubleSpinBox *p_widget = new QDoubleSpinBox();
+      QSpinBox *p_widget = new QSpinBox();
       this->mSpinboxes.push_back(p_widget);
       this->layout()->addWidget(p_widget);
       p_widget->setMinimumHeight(20);
 
-      // The limits have to be set here already so that the value is set properly.
+      // the limits have to be set here already so the value is set properly.
       this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
       this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
-
       p_widget->setValue(parameter->at(i));
-      QObject::connect(p_widget, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
+      QObject::connect(p_widget, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
     }
 
     emit heightChanged();
@@ -119,19 +115,20 @@ void cedar::proc::gui::DoubleVectorParameter::propertyChanged()
   {
     this->mSpinboxes.at(i)->setMinimum(parameter->getMinimum());
     this->mSpinboxes.at(i)->setMaximum(parameter->getMaximum());
+    this->mSpinboxes.at(i)->setEnabled(!parameter->isConstant());
   }
 }
 
-void cedar::proc::gui::DoubleVectorParameter::valueChanged(double)
+void cedar::aux::gui::UIntVectorParameter::valueChanged(int)
 {
-  cedar::aux::DoubleVectorParameterPtr parameter;
-  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleVectorParameter>(this->getParameter());
-  std::vector<double> values = parameter->getValue();
+  cedar::aux::UIntVectorParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::UIntVectorParameter>(this->getParameter());
+  std::vector<unsigned int> values = parameter->getValue();
   CEDAR_DEBUG_ASSERT(this->mSpinboxes.size() == values.size());
   for (size_t i = 0; i < values.size(); ++i)
   {
     values.at(i) = this->mSpinboxes.at(i)->value();
   }
+
   parameter->set(values);
 }
-

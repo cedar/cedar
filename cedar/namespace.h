@@ -46,7 +46,6 @@
 /*!@brief Namespace for cedar (top level). */
 namespace cedar
 {
-
 }
 
 #endif // CEDAR_NAMESPACE_H
