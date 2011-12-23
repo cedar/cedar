@@ -113,6 +113,8 @@ private:
   cedar::proc::gui::GraphicsBase *mpSource;
   //!@brief target of connection
   cedar::proc::gui::GraphicsBase *mpTarget;
+  //!@brief arrow that points out the direction of the line
+  QGraphicsPolygonItem *mpArrow;
 }; // class cedar::proc::gui::TriggerConnection
 
 #endif // CEDAR_PROC_GUI_CONNECTION_H
