@@ -235,10 +235,16 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
     if (a == p_start)
     {
       p_looped_trigger->startTrigger();
+//      QGraphicsColorizeEffect *effect = new QGraphicsColorizeEffect();
+//      effect->setColor(QColor(0, 192, 0));
+      this->setFillColor(mValidityColorValid);
     }
     else if (a == p_stop)
     {
       p_looped_trigger->stopTrigger();
+//      QGraphicsColorizeEffect *effect = new QGraphicsColorizeEffect();
+//      effect->setColor(QColor(0, 0, 0));
+      this->setFillColor(mDefaultFillColor);
     }
   }
 }
