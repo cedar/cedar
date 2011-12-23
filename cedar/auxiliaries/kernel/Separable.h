@@ -60,7 +60,7 @@ public:
   //!@brief The standard constructor.
   Separable();
   //!@brief Construct an instance of a separable kernel with some parameters.
-  Separable(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
+  Separable(unsigned int dimensionality);
   //!@brief Destructor
   virtual ~Separable();
   //--------------------------------------------------------------------------------------------------------------------

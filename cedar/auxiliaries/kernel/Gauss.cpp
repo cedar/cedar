@@ -67,11 +67,10 @@ cedar::aux::kernel::Gauss::Gauss(
                                   std::vector<double> sigmas,
                                   std::vector<double> shifts,
                                   double limit,
-                                  unsigned int dimensionality,
-                                  const std::string& kernelFile
+                                  unsigned int dimensionality
                                 )
 :
-cedar::aux::kernel::Separable(dimensionality, kernelFile),
+cedar::aux::kernel::Separable(dimensionality),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", amplitude, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", sigmas, 0.0, 10000)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, 0.0, 10000)),

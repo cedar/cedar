@@ -51,19 +51,17 @@
 cedar::aux::kernel::Kernel::Kernel()
 :
 mKernel(new cedar::aux::MatData()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
-_mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", "dummy_matrix_file.yml"))
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 {
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setConstant(true);
 }
 
-cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality, const std::string& kernelFile)
+cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality)
 :
 cedar::aux::Configurable(),
 mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000)),
-_mKernelMatrixFile(new cedar::aux::StringParameter(this, "kernelMatrixFile", kernelFile))
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 1, 1000))
 {
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
@@ -108,22 +106,6 @@ const cv::Mat& cedar::aux::kernel::Kernel::getKernel() const
 const cedar::aux::DataPtr cedar::aux::kernel::Kernel::getKernelRaw() const
 {
   return this->mKernel;
-}
-
-void cedar::aux::kernel::Kernel::loadKernelFromFile()
-{
-  mpReadWriteLockOutput->lockForWrite();
-  cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::READ);
-  fs["kernel"] >> mKernel->getData();
-  mpReadWriteLockOutput->unlock();
-}
-
-void cedar::aux::kernel::Kernel::saveKernelToFile() const
-{
-  mpReadWriteLockOutput->lockForRead();
-  cv::FileStorage fs(_mKernelMatrixFile->getValue(), cv::FileStorage::WRITE);
-  fs << "kernel" << mKernel->getData();
-  mpReadWriteLockOutput->unlock();
 }
 
 unsigned int cedar::aux::kernel::Kernel::getDimensionality() const
