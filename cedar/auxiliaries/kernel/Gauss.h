@@ -66,8 +66,7 @@ public:
          std::vector<double> sigmas,
          std::vector<double> shifts,
          double limit,
-         unsigned int dimensionality,
-         const std::string& kernelFile = "dummy_matrix_file.yml"
+         unsigned int dimensionality
        );
   //!@brief Destructor
   virtual ~Gauss();

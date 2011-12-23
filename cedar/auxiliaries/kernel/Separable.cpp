@@ -49,9 +49,9 @@ cedar::aux::kernel::Separable::Separable()
 {
 }
 
-cedar::aux::kernel::Separable::Separable(unsigned int dimensionality, const std::string& kernelFile)
+cedar::aux::kernel::Separable::Separable(unsigned int dimensionality)
 :
-cedar::aux::kernel::Kernel(dimensionality, kernelFile)
+cedar::aux::kernel::Kernel(dimensionality)
 {
   this->mKernelParts.resize(dimensionality);
 }

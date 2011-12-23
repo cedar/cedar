@@ -81,7 +81,7 @@ public:
    * @param dimensionality the dimensionality of a kernel
    * @param kernelFile a file from which to load and to which to store the kernel matrix
    */
-  Kernel(unsigned int dimensionality, const std::string& kernelFile = "dummy_matrix_file.yml");
+  Kernel(unsigned int dimensionality);
   //!@brief Destructor
   virtual ~Kernel();
   //--------------------------------------------------------------------------------------------------------------------
@@ -93,11 +93,6 @@ public:
    */
   //!@todo deal with boost PropertyTree here
   virtual void onInit(){};
-
-  /*!@brief load a kernel matrix from file determined by _mKernelMatrixFile*/
-  virtual void loadKernelFromFile();
-  /*!@brief save a kernel matrix to a file determined by _mKernelMatrixFile*/
-  virtual void saveKernelToFile() const;
 
   /*! virtual function for accessing the kernel matrix, in the 1d case this is the default
    * function to use, in the 2d case this function should return the combined 2d kernel
@@ -168,8 +163,9 @@ private:
 protected:
   //!@brief dimensionality of this kernel
   cedar::aux::UIntParameterPtr _mDimensionality;
-  //!@brief a file from which the kernel matrix can be loaded
-  cedar::aux::StringParameterPtr _mKernelMatrixFile;
+  //!@todo put this to a separate kernel implementation
+  // a file from which the kernel matrix can be loaded
+  //cedar::aux::StringParameterPtr _mKernelMatrixFile;
 
 private:
   // none yet
