@@ -62,7 +62,8 @@ PictureGrabber::PictureGrabber(
 GrabberInterface(configFileName)
 {
   mSourceFileNames.push_back(pictureFileName);
-  doInit(mSourceFileNames.size(),"PictureGrabber");
+  readInit(mSourceFileNames.size(),"PictureGrabber");
+  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -77,7 +78,9 @@ GrabberInterface(configFileName)
 {
   mSourceFileNames.push_back(pictureFileName0);
   mSourceFileNames.push_back(pictureFileName1);
-  doInit(mSourceFileNames.size(),"PictureGrabber");
+
+  readInit(mSourceFileNames.size(),"PictureGrabber");
+  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,64 +22,86 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraFrameRate.h
+    File:        <filename>
 
-    Maintainer:  Georg Hartinger
-    Email:       georg.hartinger@ini.rub.de
-    Date:        2011 08 01
+    Maintainer:  <first name> <last name>
+    Email:       <email address>
+    Date:        <creation date YYYY MM DD>
 
-    Description:  Header for CameraFrameRate enum-type class
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
-#define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_FILE_STORAGE_H
+#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_FILE_STORAGE_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/EnumType.h"
-#include "namespace.h"
+#include "CameraGrabber.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <set>
 
-/*!@brief Enum class for firewire camera fps setting mapped from dc1394/video.h
+//set to store all supported properties in
+typedef std::set<cedar::dev::sensors::visual::CameraProperty::Id> SupportedPropertiesSet;
+
+//maps property enum id to value of the property
+typedef std::map<unsigned int,int> CameraPropertyValues;
+typedef std::pair<unsigned int, int> CameraPropertyValuesPair;
+
+
+
+#define PROPERTY_VALUE_PAIR(A,B) std::pair<unsigned int,int>((A),(B))
+
+
+typedef struct CameraSettingsStruct
+{
+  std::string fps;
+  std::string mode;
+  std::string iso_speed;
+  std::string capability_config_file_name;
+} CameraSettings;
+
+
+/*!@brief Stores the properties and the settings of one camera in a configuration file
  *
- * Use this type for the CameraGrabber::setCameraInitFps() and getCameraInitFps() method.
- *
- * This enumeration is used for non-Format_7 modes. The framerate can be lower than expected if the
- * exposure time is longer than the requested frame period. Framerate can be controlled in a number of
- * other ways: framerate feature, external trigger, software trigger, shutter throttling and packet size
- * (Format_7)
+ * More detailed description of the class.
  */
-class cedar::dev::sensors::visual::CameraFrameRate
+class cedar::dev::sensors::visual::CameraConfigFileStorage
+:
+public cedar::aux::ConfigurationInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // typedefs
+  // macros
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef cedar::aux::EnumId Id;
-public:
-  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-
+  CameraConfigFileStorage(
+                           cv::VideoCapture& videoCapture,
+                           const std::string& channelPrefix,
+                           SupportedPropertiesSet supportedProperties,
+                           const std::string& configFileName
+                         );
   //!@brief Destructor
+  ~CameraConfigFileStorage();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static void construct();
+  // Saves the configuration in config-file
+   bool writeConfiguration();
 
-  static const cedar::aux::EnumBase& type();
-  static const cedar::dev::sensors::visual::CameraFrameRate::TypePtr& typePtr();
+   // declares the supported properties
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -91,24 +113,44 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  static cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate> mType;
+  /// @cond SKIPPED_DOCUMENTATION
+  /* This Method reads all parameters and settings from the camera and stores them inside the buffers
+   *  This is needed for the configurationInterface
+   *  The parameters and settings will be stored within the mCamProperties and mCamSettings vectors
+   */
+  void getAllParametersFromCam();
+
+  /*  This Method sets all parameters and settings read from the configfile to the camera
+   *  This is needed for the configurationInterface
+   *  The parameters and settings will be synchronized from the mCamProperties and mCamSettings vector
+   */
+  bool setAllParametersToCam();
+
+  // create local buffer for camera properties and settings
+  // needed for the ConfigurationInterface class
+  void createParameterStorage();
+
+  // Interface to ConfigurationInterface class;
+  bool declareParameter();
+
+
+
+  /// @endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  static const Id FRAMERATE_1_875 = 2;
-  static const Id FRAMERATE_3_75 = 4;
-  static const Id FRAMERATE_7_5 = 8;
-  static const Id FRAMERATE_15 = 15;
-  static const Id FRAMERATE_30 = 30;
-  static const Id FRAMERATE_60 = 60;
-  static const Id FRAMERATE_120 = 120;
-  static const Id FRAMERATE_240 = 240;
+  // none yet (hopefully never!)
 protected:
   // none yet
 private:
-  // none yet
+  /*! \brief stores all camera settings local (needed for configurationInterface) */
+  CameraSettings mCamSettings;
+
+  /*! \brief stores supported camera properties local (needed for configurationInterface)
+   */
+  CameraPropertyValues mCamPropertyValues;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -119,9 +161,15 @@ protected:
   // none yet
 
 private:
-  // none yet
+  //the channel prefix used in the configuration file.
+  //Essential if more than one camera saved in config-file
+  std::string mChannelPrefix;
 
-}; // class cedar::xxx
+  cv::VideoCapture& mVideoCapture;
 
-#endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
+  SupportedPropertiesSet mSupportedProperties;
+
+}; // cedar::dev::sensors::visual::CameraConfigFileStorage
+
+#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_FILE_STORAGE_H
 

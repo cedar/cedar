@@ -62,7 +62,8 @@ VideoGrabber::VideoGrabber(
 GrabberInterface(configFileName)
 {
   mSourceFileNames.push_back(aviFileName);
-  doInit(mSourceFileNames.size(),"VideoGrabber");
+  readInit(mSourceFileNames.size(),"VideoGrabber");
+  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -77,7 +78,8 @@ GrabberInterface(configFileName)
 {
   mSourceFileNames.push_back(aviFileName0);
   mSourceFileNames.push_back(aviFileName1);
-  doInit(mSourceFileNames.size(),"VideoGrabber");
+  readInit(mSourceFileNames.size(),"VideoGrabber");
+  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------

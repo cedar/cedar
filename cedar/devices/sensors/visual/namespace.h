@@ -104,6 +104,18 @@ namespace cedar
 
         //! @brief An enum for the camera settings
         class CameraSetting;
+
+        //! @brief A class which manages all supported properties and settings of a camera
+        class CameraConfiguration;
+        typedef boost::shared_ptr<CameraConfiguration> CameraConfigurationPtr;
+
+        //! @brief A class to store the capabilities of a specific camera model
+        class CameraCapabilities;
+        typedef boost::shared_ptr<CameraCapabilities> CameraCapabilitiesPtr;
+
+        //! @brief A class which manages the properties and settings of a camera
+        class CameraConfigFileStorage;
+        typedef boost::shared_ptr<CameraConfigFileStorage> CameraConfigFileStoragePtr;
       }
     }
   }

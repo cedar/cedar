@@ -43,6 +43,8 @@
 
 // SYSTEM INCLUDES
 //#include <dc1394/dc1394.h> //for camera-settings
+#include <boost/lexical_cast.hpp> //for reading values from the configfile
+#include <boost/math/special_functions/round.hpp> //rounding from double to int in cv::VideoCapture get and set methods
 
 
 using namespace cv;
@@ -62,37 +64,37 @@ CameraGrabber::CameraGrabber(
                               bool finishInitialization
                             )
 :
-GrabberInterface(configFileName),
-mFinishInitialization(finishInitialization),
-mCreateGrabberByGuid(isGuid)
+GrabberInterface(configFileName)
+//mCreateFromConfigFile(false)
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraGrabber::CameraGrabber] Create single channel instance" << std::endl;
   #endif
 
-  mCameraIds.push_back(camera);  
+  mFinishInitialization = finishInitialization;
+  mCreateGrabberByGuid = isGuid;
 
-  //create local buffer for camera properties and settings
-  //needed for the ConfigurationInterface class
-  CameraProperties camProperties_ch0;
+  CameraId cam_id = {0,0};
+  mCamIds.push_back(cam_id);
 
-  for (unsigned int i=0; i<CameraProperty::type().list().size(); i++)
-  {
-    unsigned int id = CameraProperty::type().list().at(i).id();
-    camProperties_ch0.insert(std::pair<unsigned int,int>(id,-1));
-  }
-  mCamProperties.push_back(camProperties_ch0);
+  //do all declareParameters and read it from configfile
+  readInit(mCamIds.size(),"CameraGrabber");
 
-  CameraSettings camSettings_ch0;
-  mCamSettings.push_back(camSettings_ch0);
-
-  //todo: is that needed??
+  //change/overwrite camera-ids with new parameters from constructor here
+  mCreateGrabberByGuid = isGuid;
   if (isGuid)
   {
-    //mCamProperties.at(0)::.CameraProperty::type().get(param_id).name(); = camera;
+    mCamIds.at(0).guid = camera;
+    mCamIds.at(0).busId = 0;
+  }
+  else
+  {
+    mCamIds.at(0).guid = 0;
+    mCamIds.at(0).busId = camera;
   }
 
-  doInit(mCameraIds.size(),"CameraGrabber");
+  //now apply the values, also invoke the onInit() member function
+  applyInit();
 }
 
 
@@ -106,70 +108,93 @@ CameraGrabber::CameraGrabber(
                               bool finishInitialization
                             )
 :
-GrabberInterface(configFileName),
-mFinishInitialization(finishInitialization),
-mCreateGrabberByGuid(isGuid)
+GrabberInterface(configFileName)
+//mCreateFromConfigFile(false)
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraGrabber::CameraGrabber] Create stereo channel instance" << std::endl;
   #endif
 
-  mCameraIds.push_back(camera0);
-  mCameraIds.push_back(camera1);
-  
-  //create local buffer for camera properties and settings
-  //needed for the ConfigurationInterface class
-  CameraProperties camProperties_ch0;
-  CameraProperties camProperties_ch1;
+  mFinishInitialization = finishInitialization;
+  mCreateGrabberByGuid = isGuid;
 
-  for (unsigned int i=0; i<CameraProperty::type().list().size(); i++)
-  {
-    unsigned int id = CameraProperty::type().list().at(i).id();
-    camProperties_ch0.insert(std::pair<unsigned int,int>(id,-1));
-    camProperties_ch1.insert(std::pair<unsigned int,int>(id,-1));
-  }
-  mCamProperties.push_back(camProperties_ch0);
-  mCamProperties.push_back(camProperties_ch1);
+  CameraId cam_id_0 = {0,0};
+  mCamIds.push_back(cam_id_0);
 
-  CameraSettings camSettings_ch0;
-  CameraSettings camSettings_ch1;
-  mCamSettings.push_back(camSettings_ch0);
-  mCamSettings.push_back(camSettings_ch1);
+  CameraId cam_id_1 = {0,0};
+  mCamIds.push_back(cam_id_1);
 
-  //todo: is that needed??
+  //do all declareParameters and read it from configfile
+  readInit(mCamIds.size(),"CameraGrabber");
+
+  //change/overwrite camera-ids with new parameters from constructor here
+  mCreateGrabberByGuid = isGuid;
   if (isGuid)
   {
-    mCamProperties.at(0)[CameraProperty::PROP_GUID] = camera0;
-    mCamProperties.at(1)[CameraProperty::PROP_GUID] = camera1;
+    mCamIds.at(0).guid = camera0;
+    mCamIds.at(1).guid = camera1;
+    mCamIds.at(0).busId = 0;
+    mCamIds.at(1).busId = 0;
+  }
+  else
+  {
+    mCamIds.at(0).guid = 0;
+    mCamIds.at(1).guid = 0;
+    mCamIds.at(0).busId = camera0;
+    mCamIds.at(1).busId = camera1;
   }
 
-  doInit(mCameraIds.size(),"CameraGrabber");
+  readInit(mCamIds.size(),"CameraGrabber");
+  applyInit();
+
 }
 
 //----------------------------------------------------------------------------------------------------
 //constructor that reads configuration only from configuration file
-/*CameraGrabber::CameraGrabber(
+CameraGrabber::CameraGrabber(
                const std::string& configFileName,
-               unsigned int numCameras,
-               bool finishInitialization
+               unsigned int numChannels
              )
 :
-GrabberInterface(configFileName),
-mFinishInitialization(finishInitialization)
+GrabberInterface(configFileName)
 {
-  doInit(numCameras,"CameraGrabber");
+  //in case of configuration file, always finish the initialization and grab the first frame
+  mFinishInitialization = true;
+  //mCreateFromConfigFile = true;
+
+  //will be overwritten with values from configfile
+  mCreateGrabberByGuid = false;
+
+  for(unsigned int channel = 0; channel < numChannels; channel++)
+  {
+    CameraId cam_id = {0,0};
+    mCamIds.push_back(cam_id);
+  }
+  readInit(mCamIds.size(),"CameraGrabber");
+  applyInit();
 }
-*/
+
 
 //----------------------------------------------------------------------------------------------------
 CameraGrabber::~CameraGrabber()
 {
   doCleanUp();
 
+  //done by shared_pointer
+  /*for (unsigned int channel = 0; channel < mNumCams ; ++channel)
+  {
+    delete mCamCapabilities.at(channel);
+    mCamCapabilities.at(channel) = 0;
+  }
+  mCamCapabilities.clear();
+  */
+
   #ifdef DEBUG_CAMERAGRABBER
     std::cout<<"[CameraGrabber::Destructor]"<< std::endl;
   #endif
-  //VideoCaptures are released automatically within the Vector mVideoCaptures
+
+
+
 }
 
 
@@ -178,76 +203,45 @@ CameraGrabber::~CameraGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 
+
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::onDeclareParameters()
 {
-
-  /*
-  //Params from old grabber
-  Name= "ieee camera settings";
-  Channel=     0;
-  UseCameraChannel= true;
-  Brightness=   128;
-  AutoExposure=   128;
-  Sharpness=   128;
-  WhiteBalanceBlue=   135;
-  WhiteBalanceRed=   209;
-  Hue=   128;
-  Saturation=   128;
-  Gamma=   128;
-  Shutter=  2048;
-  Gain=     0;
-  Iris=  2816;
-  Focus=   256;
-  Zoom=    64;
-  Filter=     0;
-  */
-
+  // The cameragrabber stores only 3 values : guid, busId and createbyguid
+  // the rest will be managed by the CameraConfiguration class
 
   bool result = true;
 
-
-  //map local buffer of camera properties and settings
-  //to the variables of the  ConfigurationInterface class
-
+  bool byGuid = mCreateGrabberByGuid;
+  result = result && (addParameter(&mCreateGrabberByGuid, "createByGuid",byGuid) == CONFIG_SUCCESS);
 
   for (unsigned int channel=0; channel<mNumCams; channel++)
   {
-    //settings for each channel
-    std::string param_value;
+    //channel string
+    std::string ch = "ch"+boost::lexical_cast<std::string>(channel)+"_";
 
-    param_value = CameraVideoMode::type().get(CameraVideoMode::MODE_NOT_SET).name();
-    result = result && (addParameter(&mCamSettings.at(channel).mode,"ch0_cam_mode",param_value) == CONFIG_SUCCESS);
-
-    param_value = CameraFrameRate::type().get(CameraFrameRate::FRAMERATE_15).name();
-    result = result && (addParameter(&mCamSettings.at(channel).mode,"ch0_cam_framerate",param_value) == CONFIG_SUCCESS);
-
-    param_value = CameraVideoMode::type().get(CameraIsoSpeed::ISO_400).name();
-    result = result && (addParameter(&mCamSettings.at(channel).mode,"ch0_cam_iso_speed",param_value) == CONFIG_SUCCESS);
-
-    result = result && (addParameter(&mCamSettings.at(channel).frame_width,
-                                    "ch0_cam_frame_width",CAMERA_PROPERTY_MODE_AUTO) == CONFIG_SUCCESS);
-    result = result && (addParameter(&mCamSettings.at(channel).frame_height,
-                                    "ch0_cam_frame_height",CAMERA_PROPERTY_MODE_AUTO) == CONFIG_SUCCESS);
-
-    //properties for each channel
-    //our map from prop-id to value
-    std::map<unsigned int,int>::iterator it;
-
-    for ( it=mCamProperties.at(channel).begin(); it != mCamProperties.at(channel).end(); it++ )
-    {
-      int *param_adr = &(it->second);
-      cedar::aux::EnumId param_id = static_cast<cedar::aux::EnumId>(it->first);
-      std::string param_name = CameraProperty::type().get(param_id).name();
-
-      std::stringstream param_name_ch;
-      param_name_ch<<"ch"<<channel<<"_"<<param_name;
-
-      result = result && (addParameter(param_adr, param_name_ch.str(), CAMERA_PROPERTY_MODE_AUTO) == CONFIG_SUCCESS);
-    }
+    //get default value from constructor-value
+    CameraId cam_Id = mCamIds.at(channel);
+    result = result && (addParameter(&mCamIds.at(channel).guid,ch+"guid",cam_Id.guid)== CONFIG_SUCCESS);
+    result = result && (addParameter(&mCamIds.at(channel).busId,ch+"busId",cam_Id.busId) == CONFIG_SUCCESS);
   }
 
-  result = result && (addParameter(&mCreateGrabberByGuid, "createByGuid",false) == CONFIG_SUCCESS);
+  return result;
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::onWriteConfiguration()
+{
+  bool result = true;
+
+  //write local resources (guid, busid and createByGuid
+  result = result && ConfigurationInterface::writeConfiguration();
+
+  //write properties of the cameras
+  for (unsigned int channel=0; channel<mNumCams; channel++)
+  {
+    result = result && mCamConfigurations.at(channel)->writeConfiguration();
+  }
   return result;
 }
 
@@ -260,131 +254,178 @@ bool CameraGrabber::onInit()
     std::cout<<"[CameraGrabber::onInit]"<< std::endl;
   #endif
 
+  //----------------------------------------
+  //open capture one by one, and create storage (cv::Mat) for the frames
+  mImageMatVector.clear();
+  mVideoCaptures.clear();
+  mCamConfigurations.clear();
+
   #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
-    std::cout << "CameraGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
+    std::cout << "CameraGrabber: Initialize Grabber with " << mNumCams << " camera(s) ..." << std::endl;
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
-      std::cout << "Channel " << i << ": capture from: camera " << mCameraIds.at(i) << "\n";
+      std::cout << "Channel " << i << ": capture from ";
+
+      if (mCreateGrabberByGuid)
+      {
+        std::cout << "GUID: "<< mCamIds.at(i).guid << "\n";
+      }
+      else
+      {
+        std::cout << "bus-ID " << mCamIds.at(i).busId << "\n";
+      }
     }
     std::cout << std::flush;
   #endif
 
-  //----------------------------------------
-  //open capture one by one, and create storage (cv::Mat) for it
-  mImageMatVector.clear();
-  mVideoCaptures.clear();
-
-  //todo: check construction is by guid or by cameraId
-
-  //todo: restore from configfile => check if values stored in guid
+  //if create by grabber id, search all cameras and get the device-nr on the bus
+  //todo: change this, to open a camera only once
 
   if (mCreateGrabberByGuid)
   {
-    std::vector<int> found_cams;
-
     //search for each channel
-    for (unsigned int channel = 0; channel < mNumCams; ++channel)
+    cv::VideoCapture *capture=NULL;
+
+    // search for the right guid, so open it one by one
+    unsigned int cam = 0;
+    unsigned int found_cams=0;
+    bool all_cams_found = false;
+    bool no_more_cams = false;
+
+    //search all cams
+    while (! (all_cams_found || no_more_cams))
     {
 
-      // search for the right guid, so open it one by one
-      int cam_id = 0;
-      bool cam_found = false;
-      bool no_more_cams = false;
-
-      //search call cams
-      do
+      //open one by one
+      capture = new cv::VideoCapture(cam);
+      if (capture->isOpened())
       {
-        //first, check, if actual cam already opened
-        int i = 0;
-        bool already_opened = false;
+        //todo: check
+        unsigned int guid = capture->get((int)CV_CAP_PROP_GUID);
 
-        while (i<found_cams.size())
+        //check if guid of camera is in our guid-vector
+        for (unsigned int channel = 0; channel < mNumCams; ++channel)
         {
-          if (found_cams.at(i)=cam_id)
+          unsigned int wanted_guid = mCamIds.at(channel).guid;//wanted-guid rename to test_guid
+          if (guid == wanted_guid )
           {
-            already_opened = true;
-            break;
-          }
-          i++;
-        }
-
-        //next cam
-        if (already_opened)
-        {
-          continue;
-        }
-
-        //not opened until now
-        cv::VideoCapture capture(cam_id);
-        if (capture.isOpened())
-        {
-          if (capture.get((int)CameraProperty::PROP_GUID) == mCameraIds.at(cam_id))
-          {
-            //found
-            mVideoCaptures.push_back(capture);
-            found_cams.push_back(cam_id);
-            cam_found=true;
-          }
-          else
-          {
-            cam_id++;
+            //yes: store bus_id
+            mCamIds.at(channel).busId = cam;
+            found_cams++;
           }
         }
-        else
+
+        //check if all cams found
+        if (found_cams == mCamIds.size())
         {
-          //no more cams
-          no_more_cams = true;
+          all_cams_found = true;
         }
-      } while (! (cam_found || no_more_cams));
+
+      }
+      else
+      {
+        //there are no more cams connected
+        no_more_cams = true;
+      }
+
+      delete capture;
+      capture = NULL;
+      cam++;
     }
 
-    if (mVideoCaptures.size() != mNumCams)
+    #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
+      std::cout << "Bus mapping:" << std::endl;
+      for (unsigned int i = 0; i < mNumCams; ++i)
+      {
+        std::cout << "bus-ID " << mCamIds.at(i).busId << ": GUID "<< mCamIds.at(i).guid << "\n";
+      }
+      std::cout << std::flush;
+    #endif
+
+    if (found_cams != mNumCams)
     {
       std::cout << "ERROR: Camera not found" << std::endl;
       return false; //throws an initialization-exception
     }
 
+    //wait to settle cameras
+    #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
+      std::cout << "[CameraGrabber::onInit] Waiting "<< CAMERA_GRABBER_WAIT_ON_OPEN_BYGUID
+                << " seconds to settle cameras" << std::endl;
+
+    #endif
+    sleep(CAMERA_GRABBER_WAIT_ON_OPEN_BYGUID);
   }
-  else  //create by ongoing number
+
+  //now create by ongoing number
+  for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    for (unsigned int i = 0; i < mNumCams; ++i)
+
+    //open the camera
+    cv::VideoCapture capture(mCamIds.at(channel).busId);
+    if (! capture.isOpened())
     {
-      //VideoCapture capture(mCameraIds.at(i));
-      cv::VideoCapture capture(mCameraIds.at(i));
-      if (capture.isOpened())
-      {
-        mVideoCaptures.push_back(capture);
+      std::cout << "ERROR: Couldn't open camera (Channel " << channel << ")." << std::endl;
+      return false; //throws an initialization-exception
+    }
 
-        //here is the only chance to set camera properties
-        //capture.set(CV_CAP_PROP_FRAME_WIDTH, 320);
-        //capture.set(CV_CAP_PROP_MODE,1);
-        //capture.set(CV_CAP_PROP_FPS,7.5);
+    //store it in our vector
+    mVideoCaptures.push_back(capture);
 
-        //grab first frame to initialize the camera-memory
-        cv::Mat frame = cv::Mat();
-        //this starts the grabbing-mode inside the OpenCV-CvCaptureCAM_DC1394_v2
-        //and it isn't possible to change the mode or the framerate.
-        //so capture the first frame in your main-programm
-        //mVideoCaptures.at(i) >> frame;
-        mImageMatVector.push_back(frame);
-      }
-      else
-      {
-        std::cout << "ERROR: Grabbing failed (Channel " << i << ")." << std::endl;
-        return false; //throws an initialization-exception
-      }
+    //initialize the image buffer
+    cv::Mat frame = cv::Mat();
+    mImageMatVector.push_back(frame);
+
+    //read guid (guid could be zero, if grabber created by busId)
+    mCamIds.at(channel).guid = static_cast<unsigned int>(capture.get(static_cast<int>(CV_CAP_PROP_GUID)));
+
+    //create and load the camera capabilities
+    std::string conf_file_name = ConfigurationInterface::getConfigFileName();
+    std::string cap_file_name = CAMERAGRABBER_CAM_CAPABILITIES_FILENAME(mCamIds.at(channel).guid);
+    std::string channel_prefix = "ch"+boost::lexical_cast<std::string>(channel) + "_";
+
+    try
+    {
+      CameraConfigurationPtr cam_conf( new CameraConfiguration
+                                           (
+                                             mVideoCaptures.at(channel),
+                                             channel_prefix,
+                                             conf_file_name,
+                                             cap_file_name
+                                           )
+                                     );
+      mCamConfigurations.push_back(cam_conf);
+    }
+    catch (...)
+    {
+      return false; //throws an initialization exception
     }
 
   }
 
-  //Check if Initialization should be finished.
+
+  //Check if initialization should be finished.
   if (mFinishInitialization)
   {
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
       mVideoCaptures.at(i) >> mImageMatVector.at(i);
+      if (mImageMatVector.at(i).empty())
+      {
+        std::cout << "ERROR: Couldn't retrieve frame from camera (Channel " << i << ")." << std::endl;
+        return false; //throws an initialization-exception
+      }
     }
   }
+
+  #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
+    std::cout << "Camera opened:" << std::endl;
+    for (unsigned int i = 0; i < mNumCams; ++i)
+    {
+      std::cout << "Channel " << i << ": GUID: "<< mCamIds.at(i).guid << "\n";
+    }
+    std::cout << std::flush;
+  #endif
 
   //all grabbers successfully initialized
 
@@ -401,7 +442,6 @@ bool CameraGrabber::onInit()
     }
   }
 
-  //----------------------------------------
   //set stepsize for LoopedThread
   setFps(fps);
 
@@ -411,6 +451,85 @@ bool CameraGrabber::onInit()
 
   return true;
 } //onInit()
+
+
+//----------------------------------------------------------------------------------------------------
+void CameraGrabber::printAllSettings(unsigned int channel)
+{
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::printAllSettings");
+  }
+
+  std::cout << "\nAll settings of channel "<< channel<<" :" << std::endl;
+  std::string mode = CameraVideoMode::type().get(getCameraSetting(channel,CameraSetting::SETTING_MODE )).name();
+  std::string fps = CameraFrameRate::type().get(getCameraSetting(channel,CameraSetting::SETTING_FPS )).name();
+  std::string iso = CameraIsoSpeed::type().get(getCameraSetting(channel,CameraSetting::SETTING_ISO_SPEED )).name();
+  unsigned int width = getCameraSetting(channel, CameraSetting::SETTING_FRAME_WIDTH);
+  unsigned int height = getCameraSetting(channel, CameraSetting::SETTING_FRAME_HEIGHT);
+
+  std::cout << "Camera video mode:\t" << mode << std::endl;
+  std::cout << "Camera framerate:\t" << fps << std::endl;
+  std::cout << "Camera ISO-speed:\t" << iso << std::endl;
+  std::cout << "Camera frame size:\t" << width << " x " << height << std::endl;
+}
+
+
+//----------------------------------------------------------------------------------------------------
+void CameraGrabber::printAllProperties(unsigned int channel)
+{
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::printAllProperties");
+  }
+
+  //write out all properties directly read from cam
+  std::cout << "\nAll properties of channel "<< channel<<" :" << std::endl;
+  int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
+  for (int i=0; i<num_properties; i++)
+  {
+    cedar::dev::sensors::visual::CameraProperty::Id prop_id = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
+    std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).name();
+    std::string prop_description = cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).prettyString();
+    int prop_value = getCameraProperty(channel,prop_id);
+
+    std::stringstream prop_value_text;
+    if (prop_value == CAMERA_PROPERTY_NOT_SUPPORTED)
+    {
+      prop_value_text << "CAMERA_PROPERTY_NOT_SUPPORTED";
+    }
+    else
+    {
+      prop_value_text << prop_value;
+
+    }
+
+    std::cout << "\tId: " << prop_id
+              << "\tName: " << prop_name
+              << "\tValue: " << prop_value_text.str()
+              << "\tDescription: " << prop_description
+              << std::endl;
+  }
+/*
+  #ifdef DEBUG_CAMERAGRABBER
+    //show internal stored values
+    std::cout << "\nInternal stored values :\n";
+    std::map<unsigned int,int>::iterator it;
+
+    for ( it=mCamProperties.at(channel).begin(); it != mCamProperties.at(channel).end(); it++ )
+    {
+      cedar::aux::EnumId param_id = static_cast<cedar::aux::EnumId>(it->first);
+      std::stringstream param_name;
+      param_name << "ch" << channel << "_"+CameraProperty::type().get(param_id).name();
+
+      int param_value = it->second;
+      std::cout << "Param: " << param_id << "\tName: " << param_name.str() << "\tValue: " << param_value << std::endl;
+    }
+  #endif
+  */
+}
+
+
 
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::onGrab()
@@ -457,10 +576,14 @@ std::string CameraGrabber::onGetSourceInfo(unsigned int channel) const
   //{
   //  CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::onGetSourceInfo");
   //}
+
+  //std::string cam_mode = CameraVideoMode::type().get(getCameraSetting(channel,CameraSetting::SETTING_MODE )).name();
+
   std::stringstream s;
   s << "Camera channel " << channel
-    << ": DeviceID: "<< mCameraIds.at(channel);
-    //<< " Mode: " << const_cast<double>(mVideoCaptures.at(channel).getCameraProperty(channel,CV_CAP_PROP_MODE));
+    << ": DeviceID: " << mCamIds.at(channel).busId
+    << ", GUID> " << mCamIds.at(channel).guid;
+  //  << ", Mode: " << cam_mode;
   return s.str();
 }
 
@@ -476,19 +599,36 @@ void CameraGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
+unsigned int CameraGrabber::getCameraGuid(unsigned int channel)
+{
+  if (channel >= mNumCams)
+  {
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::getCameraProperty");
+  }
+  //return mVideoCaptures.at(channel).get((int)CV_CAP_PROP_GUID);
+  return mCamIds.at(channel).guid;
+}
+//----------------------------------------------------------------------------------------------------
 double CameraGrabber::getCameraProperty(unsigned int channel,CameraProperty::Id propId)
 {
   if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::getCameraProperty");
   }
-  return mVideoCaptures.at(channel).get(propId);
+  if (mCamConfigurations.at(channel)->isSupported(propId))
+  {
+    if (mCamConfigurations.at(channel)->isReadable(propId))
+    {
+      return mVideoCaptures.at(channel).get(static_cast<unsigned int>(propId));
+    }
+  }
+  return CAMERA_PROPERTY_NOT_SUPPORTED;
 }
 
 //----------------------------------------------------------------------------------------------------
 double CameraGrabber::getCameraProperty(CameraProperty::Id propId)
 {
-  return mVideoCaptures.at(0).get(propId);
+  return mVideoCaptures.at(0).get(static_cast<unsigned int>(propId));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -499,238 +639,278 @@ bool CameraGrabber::setCameraProperty(unsigned int channel,CameraProperty::Id pr
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraProperty");
   }
 
+  int wanted_value = boost::math::iround(value);// static_cast<int>(value);
+
+  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+    std::string prop_name = CameraProperty::type().get(propId).name();
+    int prop_id = static_cast<int>(propId);
+  #endif
+
+  //------------------------------------------------------
+  //check if undefined properties
+  if ( (propId == cedar::aux::Enum::UNDEFINED) || (value == CAMERA_PROPERTY_NOT_SUPPORTED))
+  {
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraProperty] Undefined or unsupported property \""
+                << prop_name << "\" (ID: "<< prop_id << ")" << std::endl;
+    #endif
+
+    return false;
+  }
+
+  //------------------------------------------------------
+  //check if property is supported from the cam
+  if (!mCamConfigurations.at(channel)->isSupported(propId))
+  {
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraProperty] Property \"" << prop_name
+                << "\" unsupported on channel " << channel << std::endl;
+    #endif
+
+    return false;
+  }
+
+  //------------------------------------------------------
+  //check property modes
+  bool special_mode = false;
+  if (wanted_value == CAMERA_PROPERTY_MODE_AUTO)
+  {
+    if (mCamConfigurations.at(channel)->isAutoCapable(propId))
+    {
+      special_mode = true;
+    }
+    else
+    {
+      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                << "\" doesn't support \"CAMERA_PROPERTY_MODE_AUTO\""  << std::endl;
+      #endif
+      return false;
+    }
+  }
+  else if (wanted_value == CAMERA_PROPERTY_MODE_OFF)
+  {
+    if (mCamConfigurations.at(channel)->isOnOffCapable(propId))
+    {
+      special_mode = true;
+    }
+    else
+    {
+      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                << "\" is not on/off capable"  << std::endl;
+      #endif
+      return false;
+    }
+  }
+  else if (wanted_value == CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO)
+  {
+    if (mCamConfigurations.at(channel)->isOnePushCapable(propId))
+    {
+      special_mode = true;
+    }
+    else
+    {
+      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                << "\" is not \"one push auto\" capable"  << std::endl;
+      #endif
+      return false;
+    }
+  }
+
+
+  //decide if special mode or manual setting
+  if (special_mode)
+  {
+
+  }
+  else
+  {
+    //manual setting of property value
+    if (! (mCamConfigurations.at(channel)->isManualCapable(propId)
+           || mCamConfigurations.at(channel)->isAbsoluteCapable(propId)
+          )
+       )
+    {
+      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                << "\" couldn't set to manual mode"  << std::endl;
+      #endif
+      return false;
+    }
+
+    //check lower and upper boundaries for manual settings
+    int max_value = mCamConfigurations.at(channel)->getMaxValue(propId);
+    int min_value = mCamConfigurations.at(channel)->getMinValue(propId);
+
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      if ( (wanted_value > max_value) || (wanted_value < min_value))
+      {
+          std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                    << "\" has a range of [" << min_value << ","<< max_value << "]" << std::endl;
+          std::cout << "[CameraGrabber::setCameraProperty] Your value of "<< value
+                    << " exceeds this boundaries" << std::endl;
+      }
+    #endif
+
+    if (value > max_value)
+    {
+      wanted_value = max_value;
+    }
+    else if (value < min_value)
+    {
+      wanted_value = min_value;
+    }
+
+  }
+
+
+
   //check if already set
-  double old_value = getCameraProperty(channel,propId);
-  if ( old_value == value)
+  int old_value = boost::math::iround(getCameraProperty(channel,propId));
+  if ( old_value == wanted_value)
   {
     return true;
   }
 
-  if (mVideoCaptures.at(channel).set(propId, value))
+  //not set, set it
+  int new_value = 0;
+  if (mVideoCaptures.at(channel).set(propId, static_cast<double>(wanted_value)))
   {
-    double new_value = getCameraProperty(channel,propId);
-    if (new_value == value)
+    //and check if successful
+    new_value = boost::math::iround(getCameraProperty(channel,propId));
+    if (new_value == wanted_value)
     {
-      //changes done, save it for configurationInterface
-      mCamProperties.at(channel).find(propId)->second = value;
       return true;
     }
   }
+
+  // an error occurred
   #ifdef ENABLE_GRABBER_WARNING_OUTPUT
     std::cout << "[CameraGrabber::setCameraProperty] Couldn't set Property "
-              << CameraProperty::type().get(propId).name()
-              << " to " << value << std::endl;
+              << prop_name
+              << " to " << value << ". " << std::endl;
   #endif
+  return false;
 }
 
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::setCameraProperty(CameraProperty::Id propId, double value)
 {
-  return mVideoCaptures.at(0).set(propId, value);
+  return setCameraProperty(0,propId, value);
 }
 
 
 //----------------------------------------------------------------------------------------------------
-bool CameraGrabber::setCameraSetting( unsigned int channel, CameraSetting::Id setting,double value)
+bool CameraGrabber::setCameraSetting( unsigned int channel, CameraSetting::Id settingId, double value)
 {
   if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraSetting");
   }
 
+  unsigned int setting_id = static_cast<unsigned int>(settingId);
+  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+    std::string setting_name = CameraSetting::type().get(settingId).name();
+  #endif
+
+  //check if undefined settings
+  if ( (settingId == cedar::aux::Enum::UNDEFINED) )
+  {
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraSetting] Channel "<< channel
+                << ": Undefined or unsupported settings \""
+                << setting_name << "\" (ID: "<< setting_id << ")" << std::endl;
+    #endif
+    return false;
+  }
+
+
   #ifdef ENABLE_GRABBER_WARNING_OUTPUT
     if( !getImage(channel).empty() )
     {
       std::cout << "[CameraGrabber::setCameraSetting] Camera is already in grabbing mode. "
                 << "Settings can only be changed on initialization of the grabber."<<std::endl
-                << "To take changes effect, you have to save your settings (writeConfiguration())"
+                << "To take changes effect, you have to save your settings (writeConfiguration()) "
                 << "and then restart (i.e delete and create a new one) your grabber."<<std::endl;
     }
   #endif
-
-  bool result = false;
-  cedar::aux::Enum val;
-
-  //save setting to internal buffer for ConfigurationInterface
-  switch ( setting )
-  {
-    case CameraSetting::SETTING_FRAME_WIDTH:
-      mCamSettings.at(channel).frame_width = value;
-      result=true;
-      break;
-
-    case CameraSetting::SETTING_FRAME_HEIGHT:
-      mCamSettings.at(channel).frame_height = value;
-      result=true;
-      break;
-
-    case CameraSetting::SETTING_FPS:
-      //fractional fps are coded as integers
-      val = CameraFrameRate::type().get((unsigned int) value);
-      if (val != cedar::aux::Enum::UNDEFINED)
-      {
-        mCamSettings.at(channel).fps = val.name();
-        result=true;
-      }
-      break;
-
-    case CameraSetting::SETTING_MODE:
-      val = CameraVideoMode::type().get((int)value);
-      if (val != cedar::aux::Enum::UNDEFINED)
-      {
-        mCamSettings.at(channel).mode = val.name();
-        result=true;
-      }
-      break;
-
-    case CameraSetting::SETTING_ISO_SPEED:
-      val = CameraIsoSpeed::type().get((int)value);
-      if (val != cedar::aux::Enum::UNDEFINED)
-      {
-        mCamSettings.at(channel).iso_speed = val.name();
-        result=true;
-      }
-      break;
-  }
-  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-    if ( !result )
-    {
-       std::cout << "[CameraGrabber::setCameraSetting] Couldn't set setting "
-                 << CameraSetting::type().get(setting).name()
-                 << " to " << value << std::endl;
-       return false;
-    }
-  #endif
-
-    return mVideoCaptures.at(0).set((int)setting, value);
+  return mVideoCaptures.at(channel).set(setting_id, value);
 }
 
 
 //----------------------------------------------------------------------------------------------------
-double CameraGrabber::getCameraSetting( unsigned int channel, CameraSetting::Id setting)
-{
-  return mVideoCaptures.at(channel).get((int)setting);
-}
-
-//----------------------------------------------------------------------------------------------------
-bool CameraGrabber::setCameraMode(unsigned int channel, CameraVideoMode::Id mode)
+double CameraGrabber::getCameraSetting( unsigned int channel, CameraSetting::Id settingId)
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraInitMode");
+    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::getCameraSetting");
   }
 
-  //check if there is already a grabbed image in the buffer,
-  //if so, firewire-grabbing is already initialized and therefore it isn't possible to change this prop.
-  if (!getImage(channel).empty())
+  unsigned int setting_id = static_cast<unsigned int>(settingId);
+  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+    std::string setting_name = CameraSetting::type().get(settingId).name();
+  #endif
+
+  //check if undefined settings
+  if ( (settingId == cedar::aux::Enum::UNDEFINED) )
   {
-
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraInitMode] To set the Mode, you have to reinitialize "
-                << "(i.e. restart) your grabber!!" << std::endl;
+      std::cout << "[CameraGrabber::getCameraSetting] Channel "<< channel
+                << ": Undefined or unsupported settings \""
+                << setting_name << "\" (ID: "<< setting_id << ")" << std::endl;
     #endif
-    return false;
+    return -1;
   }
-  return mVideoCaptures.at(channel).set(CameraSetting::SETTING_MODE, (int) mode);
 
+  return mVideoCaptures.at(channel).get(setting_id);
+}
+
+//----------------------------------------------------------------------------------------------------
+bool CameraGrabber::setCameraMode(unsigned int channel, CameraVideoMode::Id modeId)
+{
+  return setCameraSetting(channel,CameraSetting::SETTING_MODE,static_cast<unsigned int>(modeId));
 }
 
 
 //----------------------------------------------------------------------------------------------------
 CameraVideoMode::Id CameraGrabber::getCameraMode(unsigned int channel)
 {
-  return static_cast<CameraVideoMode::Id> (mVideoCaptures.at(channel).get((int)CameraSetting::SETTING_MODE));
+  return static_cast<CameraVideoMode::Id> (getCameraSetting(channel,CameraSetting::SETTING_MODE));
 }
 
 //----------------------------------------------------------------------------------------------------
-bool CameraGrabber::setCameraFps(unsigned int channel,CameraFrameRate::Id fps)
+bool CameraGrabber::setCameraFps(unsigned int channel,CameraFrameRate::Id fpsId)
 {
-  if (channel >= mNumCams)
-  {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraInitFps");
-  }
-
-  //check if there is already a grabbed image in the buffer,
-  //if so, firewire-grabbing is already initialized and therefore it isn't possible to change this prop.
-  if (!getImage(channel).empty())
-  {
-
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraInitFps] To set the FPS, you have to reinitialize "
-                << "(i.e. restart) your grabber!!" << std::endl;
-    #endif
-    return false;
-  }
-  return mVideoCaptures.at(channel).set(CV_CAP_PROP_FPS, (int) fps);
+  return setCameraSetting(channel,CameraSetting::SETTING_FPS,static_cast<unsigned int>(fpsId));
 }
 
 
 //----------------------------------------------------------------------------------------------------
 CameraFrameRate::Id CameraGrabber::getCameraFps(unsigned int channel)
 {
-  return static_cast<CameraVideoMode::Id> (mVideoCaptures.at(channel).get((int)CameraSetting::SETTING_FPS));
+  return static_cast<CameraVideoMode::Id> (getCameraSetting(channel,CameraSetting::SETTING_FPS));
 }
 
 //----------------------------------------------------------------------------------------------------
-bool CameraGrabber::setCameraIsoSpeed( unsigned int channel,CameraIsoSpeed::Id isoSpeed )
+bool CameraGrabber::setCameraIsoSpeed( unsigned int channel,CameraIsoSpeed::Id isoSpeedId )
 {
-  if (channel >= mNumCams)
-  {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraInitIsoSpeed");
-  }
-
-  if (!getImage(channel).empty())
-  {
-
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraInitIsoSpeed] To set the ISO-Speed, you have to save"
-                << "the configuration and then reinitialize "
-                << "(i.e. restart) your grabber!!" << std::endl;
-    #endif
-    return false;
-  }
-
-  return mVideoCaptures.at(channel).set(/*CV_CAP_PROP_ISO_SPEED*/30, isoSpeed);
+  setCameraSetting(channel,CameraSetting::SETTING_ISO_SPEED, static_cast<unsigned int>(isoSpeedId));
 }
 
 
 //----------------------------------------------------------------------------------------------------
 CameraIsoSpeed::Id CameraGrabber::getCameraIsoSpeed(unsigned int channel)
 {
-  return static_cast<CameraVideoMode::Id> (mVideoCaptures.at(channel).get((int)CameraSetting::SETTING_ISO_SPEED));
+  return static_cast<CameraVideoMode::Id> (getCameraSetting(channel,CameraSetting::SETTING_ISO_SPEED));
 }
-
-//----------------------------------------------------------------------------------------------------
-bool CameraGrabber::setCameraFrameSize(unsigned int channel, cv::Size size)
-{
-  if (channel >= mNumCams)
-  {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraInitFrameSize");
-  }
-
-  //check if there is already a grabbed image in the buffer,
-  //if so, firewire-grabbing is already initialized and therefore it isn't possible to change this prop.
-  if (!getImage(channel).empty())
-  {
-
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraInitFrameSize] To set the size of the frames, you have to reinitialize "
-                << "(i.e. restart) your grabber!!" << std::endl;
-    #endif
-    return false;
-  }
-  bool result = false;
-  result = result && mVideoCaptures.at(channel).set(CameraSetting::SETTING_FRAME_WIDTH, size.width);
-  result = result && mVideoCaptures.at(channel).set(CameraSetting::SETTING_FRAME_HEIGHT, size.height);
-  return result;
-}
-
 
 //----------------------------------------------------------------------------------------------------
 cv::Size CameraGrabber::getCameraFrameSize( unsigned int channel)
 {
   cv::Size size;
-  size.width = (int) mVideoCaptures.at(channel).get((int)CameraSetting::SETTING_FRAME_WIDTH);
-  size.height = (int) mVideoCaptures.at(channel).get((int)CameraSetting::SETTING_FRAME_HEIGHT);
+  size.width = boost::math::iround(getCameraSetting(channel,CameraSetting::SETTING_FRAME_WIDTH));
+  size.height = boost::math::iround(getCameraSetting(channel,CameraSetting::SETTING_FRAME_HEIGHT));
   return size;
 }

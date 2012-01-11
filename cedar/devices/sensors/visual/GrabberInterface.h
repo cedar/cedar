@@ -120,7 +120,7 @@ protected:
    *    configFileName The filename where the configuration parameters should be stored in
    */
   GrabberInterface(
-                    const std::string& configFileName = ""
+                    const std::string& configFileName// = ""
                   );
 
 public:
@@ -338,6 +338,8 @@ public:
     /*! \brief Write the actual used parameters to configuration
      *  \remarks
      *    The configuration have to be saved manually with this function.
+     *    This method evokes onWriteConfiguration of the grabber
+     *  \see onWriteConfiguration
      */
     bool writeConfiguration();
 
@@ -452,26 +454,32 @@ protected:
 
     /*! @brief  This function initialize the common grabber.
      *  \remarks  Have to be called at the end of the constructor of the derived class. <br><br>
+     *          This is the first part of the initialization.
      *          The initialization is a little bit tricky, but it restores and initializes all
      *          local parameters from the configuration interface before onInit of the
-     *          derived class will be invoked.<br>
-     *          This is done in three steps:<br>
-     *          1. call of declareParameter() from derived class. <br>
-     *          2. restore parameter from configfile or set default values. <br>
-     *          3. call onInit() of the derived class (where derived Grabbers should be initialized).<br>
+     *          derived class will be invoked.<br><br>
+     *          On the other side, it is possible to change restored parameter in the constructor of a
+     *          derived class between this two steps (i.e. readInit(...); YOUR_PARAMETER_CHANGE; applyInit() )
+     *
+     *  \par
      *          If onInit() fails, onCleanUp() will be invoked in order to clean up alread initialized channels.<br><br>
      *          For an example look at VideoGrabber, NetGrabber or TestGrabber
-     *  \see onInit, declareParameter
+     *  \see onInit, declareParameter, onCleanUp
      *
      *  \param numCams The init-function need to know how many channels there are
      *  \param defaultGrabberName This name is used as a default name, which will
      *         be stored in the configuration file. To change the name
      *  \see cedar::aux::ConfigurationInterface::setName
      */
-    void doInit(
+    void readInit(
                  unsigned int       numCams,
                  const std::string& defaultGrabberName
                );
+    /*! @brief This function applies the former read initialization and then it calls onInit in derived class
+     *
+     *   \see onInit()
+     */
+    void applyInit();
 
     /*! @brief  Periodically call of grab()
      *  \remarks For details have a look at cedar::aux::LoopedThread
@@ -534,6 +542,18 @@ protected:
      */
     virtual bool onDeclareParameters() { return true; };
 
+    /*! @brief  In this method you can re-check or modify parameters
+     *  \remarks
+     *    Should be overrided in derived class.<br>
+     *    Modify or actualize parameters declared in onDeclareParameters.<br>
+     *    This method only will be evoked right before the parameters are saved with
+     *    cedar::aux::ConfigurationInterface::writeConfiguration().<br>
+     *    Save your Parameters with GrabberInterface::writeConfiguration()
+     *  \see onDeclareParameters, writeConfiguration
+     */
+    virtual bool onWriteConfiguration() { return true; };
+
+
     /*! \brief Get information about the used device, i.e. the filename or the mount-point
      *   \remarks
      *		You have to implement this method in the derived class. Set the informations
@@ -546,6 +566,8 @@ protected:
     virtual std::string onGetSourceInfo(
                                          unsigned int channel = 0
                                        ) const = 0;
+
+
 
 
   //--------------------------------------------------------------------------------------------------------------------

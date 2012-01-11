@@ -174,7 +174,7 @@ void GrabberInterface::doCleanUp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGrabberName )
+void GrabberInterface::readInit(unsigned int numCams, const std::string& defaultGrabberName )
 {
   mNumCams = numCams;
 
@@ -202,7 +202,10 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
 
   //restore configuration from config-file
   cedar::aux::ConfigurationInterface::readOrDefaultConfiguration();
+}
 
+void GrabberInterface::applyInit()
+{
   //initialize the snapshot and recording names with default values
   //depends on no. of cameras
   setSnapshotName("snapshot.jpg");
@@ -222,6 +225,14 @@ void GrabberInterface::doInit(unsigned int numCams, const std::string& defaultGr
 //--------------------------------------------------------------------------------------------------------------------
 bool GrabberInterface::writeConfiguration()
 {    
+  //update the parameters (if needed) in derived class
+  if (!onWriteConfiguration())
+  {
+    std::cout << "[GrabberInterface::writeConfiguration] Error while updating the parameters in the derived class. "
+              << "Configuration NOT saved!!";
+    return false;
+  }
+
   //write out the parameter of the configurationInterface
   bool result = cedar::aux::ConfigurationInterface::writeConfiguration();
 

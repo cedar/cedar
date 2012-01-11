@@ -65,7 +65,8 @@ NetGrabber::NetGrabber(
 GrabberInterface(configFileName)
 {
   mYarpChannels.push_back(YarpChannel);
-  doInit(mYarpChannels.size(),"NetGrabber");
+  readInit(mYarpChannels.size(),"NetGrabber");
+  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -80,7 +81,8 @@ GrabberInterface(configFileName)
 {
   mYarpChannels.push_back(YarpChannel0);
   mYarpChannels.push_back(YarpChannel1);
-  doInit( mYarpChannels.size(),"NetGrabber");
+  readInit( mYarpChannels.size(),"NetGrabber");
+  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -45,140 +45,43 @@
 #include "CameraVideoMode.h"
 #include "CameraFrameRate.h"
 #include "CameraSetting.h"
+#include "CameraCapabilities.h"
+#include "CameraConfiguration.h"
+#include "CameraConfigFileStorage.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
+//--------------------------------------------------------------------------------------------------------------------
+//mappings from OpenCv constants
+//return value, if a property is not supported from the actual device
+#define CAMERA_PROPERTY_NOT_SUPPORTED -1
 
-/* Sony firewire camera capabilities:
+//sets a feature to auto-mode. The propery have to be auto_capable.
+//Assigning a value to a feature, sets its mode to manual
+#define CAMERA_PROPERTY_MODE_AUTO CV_CAP_PROP_DC1394_MODE_AUTO // =-2
 
-OP   - one push capable
-RC   - readout capable
-O/OC - on/off capable
-AC   - auto capable
-MC   - manual capable
-ABS  - absolute capable
+//if a feature is on/off capable, this value turns it off
+#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF //=-4
 
- *
-  Brightness:
-    RC  MC  (active is: MAN)
-    min: 0 max 255
-    current value is: 200
-  Exposure:
-    RC  O/OC  MC  (active is: MAN)
-    Feature: OFF  min: 1 max 255
-    current value is: 1
-  Sharpness:
-    RC  MC  (active is: MAN)
-    min: 0 max 255
-    current value is: 0
-  White Balance:
-    RC  MC  (active is: AUTO)  AC  (active is: AUTO)  OP  (active is: AUTO)
-    min: 1 max 255
-    B/U value: 146 R/V value: 156
-  Hue:
-    RC  MC  (active is: MAN)
-    min: 0 max 255
-    current value is: 121
-  Saturation:
-    RC  MC  (active is: MAN)
-    min: 0 max 255
-    current value is: 123
-  Gamma:
-    RC  MC  (active is: MAN)
-    min: 128 max 130
-    current value is: 128
-  Shutter:
-    RC  MC  (active is: AUTO)  AC  (active is: AUTO)
-    min: 1952 max 2575
-    current value is: 2048
-  Gain:
-    RC  MC  (active is: AUTO)  AC  (active is: AUTO)
-    min: 0 max 18
-    current value is: 0
-  Iris:
-    RC  MC  (active is: AUTO)  AC  (active is: AUTO)
-    min: 0 max 4095
-    current value is: 2048
-  Focus:
-    RC  MC  (active is: MAN)
-    min: 0 max 447
-    current value is: 261
-  Temperature:
-    NOT AVAILABLE
-  Trigger:
-    RC  O/OC
-    Feature: OFF
-    AvailableTriggerModes: 384
-    AvailableTriggerSources: none
-    Polarity Change Capable: False
-    Current Polarity: POS
-    current mode: 384
-  Trigger Delay:
-    NOT AVAILABLE
-  White Shading:
-    NOT AVAILABLE
-  Frame Rate:
-    NOT AVAILABLE
-  Zoom:
-    RC  MC  (active is: MAN)
-    min: 40 max 1432
-    current value is: 40
-  Pan:
-    NOT AVAILABLE
-  Tilt:
-    NOT AVAILABLE
-  Optical Filter:
-    RC  MC  (active is: MAN)
-    min: 0 max 1
-    current value is: 0
-  Capture Size:
-    NOT AVAILABLE
-  Capture Quality:
-    NOT AVAILABLE
-*/
+//this sets a property to its one_push_auto mode. The feature have to be one_push_auto capable.
+//one_push_auto: set the property to the wanted value and then to one_push_auto.
+//the camera will try to automatically hold this value
+#define CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO CV_CAP_PROP_DC1394_MODE_ONE_PUSH_AUTO //-1
+//--------------------------------------------------------------------------------------------------------------------
 
-/*! \brief The internal buffer for the camera settings
- *  \remarks This is only needed for the configuration interface
- */
-/*typedef struct CamPropertiesStruct
+
+//--------------------------------------------------------------------------------------------------------------------
+  /*! \brief The Id's of the cameras
+   *
+   */
+typedef struct CameraIdStruct
 {
-  //settings
-
-  
-  //and properties
-  int brightness;
-  int saturation;
-  int hue;
-  int gain;
-  int white_balance_blue_u;
-  int sharpness;
-  int auto_exposure; 
-  int gamma;
-  int temperature;
-  int trigger;
-  int trigger_delay;
-  int white_balance_red_v;
-  int zoom;
-  int focus;
-  int guid;
-} CamProperties;
-*/
-//maps property enum id to value of the property
-typedef std::map<unsigned int,int> CameraProperties;
-
-
-typedef struct CameraSettingsStruct
-{
-  int frame_width;
-  int frame_height;
-  std::string fps;
-  std::string mode;
-  std::string iso_speed;
-} CameraSettings;
-
-#define CAMERA_PROPERTY_MODE_AUTO -1
+  unsigned int busId;
+  unsigned int guid;
+} CameraId;
+//--------------------------------------------------------------------------------------------------------------------
 
 
 /*! \class cedar::dev::sensors::visual::CameraGrabber
@@ -218,7 +121,7 @@ public:
   CameraGrabber(
                  const std::string& configFileName,
                  unsigned int camera,
-                 bool isGuid = false,
+                 bool isGuid,
                  bool finishInitialization = true
                );
 
@@ -236,7 +139,7 @@ public:
                  const std::string& configFileName,
                  unsigned int camera0,
                  unsigned int camera1,
-                 bool isGuid = false,
+                 bool isGuid,
                  bool finishInitialization = true
                );
 
@@ -247,14 +150,15 @@ public:
    *  \param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
    *          Constructor for details
    *  \remarks
-   *        If the system can't find the wanted camera, initialization will fail
+   *        If the system can't find the wanted camera, initialization will fail.
+   *  \par
+   *        The camera always will be initialized (i.e. the first frame is already grabbed on initialization)
    */
-  /*CameraGrabber(
+  CameraGrabber(
                  const std::string& configFileName,
-                 unsigned int numCameras,
-                 bool finishInitialization = true
+                 unsigned int numCameras
                );
-  */
+
 
   /*! \brief Destructor */
   ~CameraGrabber();
@@ -325,7 +229,7 @@ public:
    */
   bool setCameraSetting(
                          unsigned int channel,
-                         CameraSetting::Id setting,
+                         CameraSetting::Id settingId,
                          double value
                        );
 
@@ -340,7 +244,7 @@ public:
    */
   double getCameraSetting(
                            unsigned int channel,
-                           CameraSetting::Id setting
+                           CameraSetting::Id settingId
                          );
 
   /*! \brief Set the video mode of the camera.
@@ -353,7 +257,7 @@ public:
    */
   bool setCameraMode(
                       unsigned int channel,
-                      CameraVideoMode::Id mode
+                      CameraVideoMode::Id modeId
                     );
 
   /*! \brief Gets the actual mode.
@@ -376,7 +280,7 @@ public:
    */
   bool setCameraFps(
                      unsigned int channel,
-                     CameraFrameRate::Id fps
+                     CameraFrameRate::Id fpsId
                    );
 
   /*! \brief Gets the actual fps of the camera.
@@ -399,7 +303,7 @@ public:
    */
   bool setCameraIsoSpeed(
                           unsigned int channel,
-                          CameraIsoSpeed::Id isoSpeed
+                          CameraIsoSpeed::Id isoSpeedId
                         );
 
   /*! \brief Gets the actual ISO-Speed of the IEEE1394/firewire bus.
@@ -409,35 +313,38 @@ public:
                                         unsigned int channel
                                       );
 
-   /*! \brief Set the framesize of the camera.
-    *  \param channel This is the index of the source you want to set the parameter value.
-    *  \param size The new value
-    *
-    * \remarks
-    *   This can only be done, if the first frame wasn't already grabbed
-    * \par
-    *   If the framesize isn't supported by the actual video mode, a similar mode
-    *   will be used. The return value will also be true in this case.
-    *
-    *   The framesize depends also on the video mode. So, you can adjust the size either
-    *   by setting the frame-size or by the video-mode
-    * \see getCameraFrameSize
-    */
+  /*! \brief Gets the GUID of the camera
+   *  \param channel This is the index of the source channel
+   */
+  unsigned int getCameraGuid(
+                              unsigned int channel
+                            );
 
-  bool setCameraFrameSize(
-                           unsigned int channel,
-                           cv::Size size
-                         );
 
   /*! \brief Gets the actual framesize.
-   *  \param channel This is the index of the source you want to set the parameter value.
+   *  \param channel This is the index of the source channel.
    */
-cv::Size getCameraFrameSize(
-                             unsigned int channel
-                           );
+  cv::Size getCameraFrameSize(
+                               unsigned int channel
+                             );
 
+  /*! \brief Write out all properties
+   *  \remarks
+   *      The properties are read directly from cam
+   *  \param channel This is the index of the source you want to print the properties.
+   */
+  void printAllProperties(
+                           unsigned int channel
+                         );
 
-
+  /*! \brief Write out all settings
+   *  \remarks
+   *      The settings are read directly from cam
+   *  \param channel This is the index of the source you want to print the settings.
+   */
+  void printAllSettings(
+                         unsigned int channel
+                       );
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -451,11 +358,6 @@ protected:
 
   bool onInit();
 
-  /*! \brief Grab on all available files
-   *  \remarks
-   *      The shortest file determine the end
-   *      In case of looping through the files, the shortest file define the restart moment
-   */
   bool onGrab();
 
   bool onDeclareParameters();
@@ -463,17 +365,23 @@ protected:
                                unsigned int channel
                              ) const;
 
+  ///! \brief Sync all Parameters from cameras with the local buffer
+  bool onWriteConfiguration();
+
   void onCleanUp();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+
 public:
   // none yet (hopefully never!)
 
@@ -481,9 +389,10 @@ public:
 protected:
 
   /*! \brief The Id's of the cameras
-   *
+   *  \remarks
+   *      this contains the device number on the bus and the guid
    */
-  std::vector<unsigned int> mCameraIds;
+  std::vector<CameraId> mCamIds;
 
   /*! \brief This vector contains the needed captures.
    *    One for every camera.
@@ -492,12 +401,17 @@ protected:
    */
   std::vector<cv::VideoCapture> mVideoCaptures;
   
-  std::vector<CameraProperties> mCamProperties;
-  std::vector<CameraSettings> mCamSettings;
+
+  //the manager of all settings and properties. One for each camera
+  //std::vector<CameraConfiguration> mCamConfigurations;
+  std::vector<CameraConfigurationPtr> mCamConfigurations;
+
+
 private:
 
   bool mFinishInitialization;
   bool mCreateGrabberByGuid;
+  //bool mCreateFromConfigFile; // get guid/busId from configfile
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
