@@ -61,7 +61,7 @@ const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visua
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_RED_V;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_ZOOM;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS;
-const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_GUID;
+//const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_GUID;
 #endif // MSVC
 
 
@@ -109,7 +109,7 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_AUTO_EXPOSURE,
                                       "PROP_AUTO_EXPOSURE",
-                                      "exposure control done by camera, user can adjust reference level using this feature"
+                                      "Exposure control done by camera, adjust reference level using this feature"
                                     ));
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_GAMMA,
@@ -121,7 +121,7 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
                                       "PROP_TEMPERATURE",
                                       "Temperature"
                                     ));
-  mType.type()->def(cedar::aux::Enum(
+ mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER,
                                       "PROP_TRIGGER",
                                       "Trigger"
@@ -131,6 +131,7 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
                                       "PROP_TRIGGER_DELAY",
                                       "Trigger delay"
                                     ));
+
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_RED_V,
                                       "PROP_WHITE_BALANCE_RED_V",
@@ -146,11 +147,11 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
                                       "PROP_FOCUS",
                                       "Focus"
                                     ));
-  mType.type()->def(cedar::aux::Enum(
-                                      cedar::dev::sensors::visual::CameraProperty::PROP_GUID,
-                                      "PROP_GUID",
-                                      "The unique ID of the device"
-                                    ));
+ // mType.type()->def(cedar::aux::Enum(
+ //                                     cedar::dev::sensors::visual::CameraProperty::PROP_GUID,
+ //                                     "PROP_GUID",
+ //                                     "The unique ID of the device"
+ //                                   ));
 
 }
 //----------------------------------------------------------------------------------------------------------------------

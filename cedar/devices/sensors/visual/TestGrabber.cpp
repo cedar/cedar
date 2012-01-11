@@ -62,7 +62,8 @@ TestGrabber::TestGrabber(
   mChannelVector.push_back(ChannelName);
 
   //call of doInit with number of channels and a default grabbername
-  doInit( mChannelVector.size(),"TestGrabber");
+  readInit( mChannelVector.size(),"TestGrabber");
+  applyInit();
 }
 
 
@@ -83,7 +84,8 @@ GrabberInterface(configFileName)
   mChannelVector.push_back(ChannelName1);
 
   //call of doInit with number of channels and a default grabbername
-  doInit( mChannelVector.size(),"TestGrabber");
+  readInit( mChannelVector.size(),"TestGrabber");
+  applyInit();
 }
 
 //----------------------------------------------------------------------------------------------------

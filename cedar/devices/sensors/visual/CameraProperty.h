@@ -47,11 +47,21 @@
 
 // SYSTEM INCLUDES
 
+//(re)defines of our new introduced properties in OpenCv:
+//comment this out, if the patched OpenCv is available
+#define CV_CAP_PROP_ZOOM 27
+#define CV_CAP_PROP_FOCUS 28
+#define CV_CAP_PROP_GUID 29
+
 
 /*!@brief Enum class for camera properties direct mapped from opencv2/highgui/highui_c.h
  * (also in dc1394/control.h)
  *
- * Use this type for the CameraGrabber::setCameraProperty() and getCameraProperty() method
+ * \remarks
+ *    Use this type for the CameraGrabber::setCameraProperty() and getCameraProperty() method
+ * \par
+ *    Until now, only properties supported by the opencv backend are implemented
+ *
  */
 class cedar::dev::sensors::visual::CameraProperty
 {
@@ -109,9 +119,9 @@ public:
   static const Id PROP_TRIGGER       = CV_CAP_PROP_TRIGGER; // 24;
   static const Id PROP_TRIGGER_DELAY = CV_CAP_PROP_TRIGGER_DELAY; // 25;
   static const Id PROP_WHITE_BALANCE_RED_V = CV_CAP_PROP_WHITE_BALANCE_RED_V; // 26;
-  static const Id PROP_ZOOM          = 27; //CV_CAP_PROP_ZOOM; // 27;
-  static const Id PROP_FOCUS         = 28; //CV_CAP_PROP_FOCUS; // 28;
-  static const Id PROP_GUID          = 29; //CV_CAP_PROP_GUID; // 29;
+  static const Id PROP_ZOOM          = CV_CAP_PROP_ZOOM; // 27;
+  static const Id PROP_FOCUS         = CV_CAP_PROP_FOCUS; // 28;
+  //static const Id PROP_GUID          = 29; //CV_CAP_PROP_GUID; // 29;
 
 protected:
   // none yet
