@@ -79,7 +79,6 @@ public:
   Kernel();
   /*!@brief Constructor with some parameters.
    * @param dimensionality the dimensionality of a kernel
-   * @param kernelFile a file from which to load and to which to store the kernel matrix
    */
   Kernel(unsigned int dimensionality);
   //!@brief Destructor
