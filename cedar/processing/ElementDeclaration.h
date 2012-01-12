@@ -104,6 +104,16 @@ public:
     return this->mIconPath;
   }
 
+  /*!@brief Reads some values such as the icon path from the configuration node.
+   */
+  virtual void read(const cedar::aux::ConfigurationNode& node)
+  {
+    if (node.find("icon") != node.not_found())
+    {
+      this->mIconPath = node.get_child("icon").get_value<std::string>();
+    }
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

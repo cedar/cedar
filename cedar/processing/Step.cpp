@@ -300,7 +300,8 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
 #ifdef DEBUG
   else
   {
-    std::cout << "I'm busy" << std::endl;
+    std::cout << "Step \"" << this->getName() << "\" was busy during its onTrigger() call, computation skipped."
+              << std::endl;
   }
 #endif // DEBUG
 }
