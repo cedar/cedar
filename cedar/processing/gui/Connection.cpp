@@ -60,7 +60,8 @@ cedar::proc::gui::Connection::Connection
 )
 :
 mpSource(pSource),
-mpTarget(pTarget)
+mpTarget(pTarget),
+mpArrow(0)
 {
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
   pSource->addConnection(this);
@@ -79,22 +80,22 @@ mpTarget(pTarget)
   }
   this->setPen(pen);
 
-  QVector<QPointF> arrow;
-  arrow.push_back(QPointF(5.0, 0.0));
-  arrow.push_back(QPointF(-5.0, 0.0));
-  arrow.push_back(QPointF(0.0, 8.0));
-  mpArrow = new QGraphicsPolygonItem(this);
-  mpArrow->setPolygon(QPolygonF(arrow));
   if (pSource->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
       || pTarget->getGroup() == cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER)
   {
     pen.setColor(QColor(180, 180, 180));
+    QVector<QPointF> arrow;
+    arrow.push_back(QPointF(5.0, 0.0));
+    arrow.push_back(QPointF(-5.0, 0.0));
+    arrow.push_back(QPointF(0.0, 8.0));
+    mpArrow = new QGraphicsPolygonItem(this);
+    mpArrow->setPolygon(QPolygonF(arrow));
+    mpArrow->setPen(pen);
+    QBrush brush = this->brush();
+    brush.setColor(QColor(180, 180, 180));
+    brush.setStyle(Qt::SolidPattern);
+    mpArrow->setBrush(brush);
   }
-  else
-  {
-    pen.setColor(cedar::proc::gui::GraphicsBase::mValidityColorValid);
-  }
-  mpArrow->setPen(pen);
   this->update();
 }
 
@@ -121,6 +122,23 @@ void cedar::proc::gui::Connection::setValidity(cedar::proc::gui::ConnectValidity
   QPen pen = this->pen();
   pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
   this->setPen(pen);
+
+  QVector<QPointF> arrow;
+  arrow.push_back(QPointF(5.0, 0.0));
+  arrow.push_back(QPointF(-5.0, 0.0));
+  arrow.push_back(QPointF(0.0, 8.0));
+  if (mpArrow == 0)
+  {
+    mpArrow = new QGraphicsPolygonItem(this);
+    mpArrow->setPolygon(QPolygonF(arrow));
+    pen.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
+    mpArrow->setPen(pen);
+    QBrush brush = this->brush();
+    brush.setColor(cedar::proc::gui::GraphicsBase::getValidityColor(validity));
+    brush.setStyle(Qt::SolidPattern);
+    mpArrow->setBrush(brush);
+  }
+  this->update();
 }
 
 void cedar::proc::gui::Connection::update()
@@ -136,10 +154,13 @@ void cedar::proc::gui::Connection::update()
   path.lineTo(this->mpTarget->getConnectionAnchorInScene());
 
   this->setPath(path);
-  QTransform matrix;
-  matrix.translate(middle_point.x(), middle_point.y());
-  matrix.rotate(atan2(vector_src_tar.y(), vector_src_tar.x()) * 180 / cedar::aux::math::pi - 90);
-  mpArrow->setTransform(matrix);
+  if (mpArrow != 0)
+  {
+    QTransform matrix;
+    matrix.translate(middle_point.x(), middle_point.y());
+    matrix.rotate(atan2(vector_src_tar.y(), vector_src_tar.x()) * 180 / cedar::aux::math::pi - 90);
+    mpArrow->setTransform(matrix);
+  }
 
 }
 
