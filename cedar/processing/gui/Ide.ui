@@ -384,7 +384,7 @@
    <sender>mpActionExit</sender>
    <signal>triggered()</signal>
    <receiver>Ide</receiver>
-   <slot>hide()</slot>
+   <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
