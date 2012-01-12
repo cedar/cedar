@@ -100,6 +100,12 @@ public:
   //!@brief access all ElementDeclarations
   const ElementDeclarations& elementDeclarations() const;
 
+  /*!@brief Reads parts of the plugin description from the given file.
+   *
+   * @remarks This function should only be called after all declarations have been added.
+   */
+  void readDescription(const std::string& filePath);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -110,7 +116,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void readDeclarations(const cedar::aux::ConfigurationNode& declarations);
+  void readElementDeclaration(const cedar::aux::ConfigurationNode& declarations);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
