@@ -70,6 +70,31 @@
 #endif // MSVC
 
 /*!@brief Collection of declarations from a plugin.
+ *
+ * Some information about the declaration can also be stored in a file accompanying the plugin binary. The file should
+ * be located in the same folder as the binary, or one level above and must have the same name as the plugin.
+ * Example:
+ * if your plugin binary is located in /home/you/src/MyPluginLib/build/libMyPlugin.so, then the plugin description file can
+ * be either /home/you/src/MyPluginLib/build/MyPlugin.xml or /home/you/src/MyPluginLib/MyPlugin.xml.
+ *
+ * The contents of the file should look like this:
+ * @code
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<plugin>
+  <declarations>
+
+    <!-- the following declares properties of the class yourNamespace::YourClassName that you should
+         have added to the plugin declaration in your plugin.cpp -->
+    <element class="yourNamespace.YourClassName">
+      <icon>:/icons/the_icon.svg</icon>
+    </element>
+
+  </declarations>
+</plugin>
+ * @endcode
+ * Note, that you should always use Qt's resource system to store icons and other resources in order to avoid confusion
+ * about filepaths.
  */
 class cedar::proc::PluginDeclaration
 {
