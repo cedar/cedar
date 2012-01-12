@@ -79,6 +79,10 @@ public:
   //!@brief get declaration of this proxy
   cedar::proc::PluginDeclarationPtr getDeclaration();
 
+  /*!@brief Returns the canonical name of a plugin based on its filepath
+   */
+  static std::string getPluginNameFromPath(const std::string& path);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -89,8 +93,11 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief search known directories for this plugin
+  //!@brief search known directories for this plugin.
   std::string findPluginFile(const std::string& file) const;
+
+  //!@brief Searches for the plugin description file.
+  std::string findPluginDescription(const std::string& plugin_path) const;
 
 #ifdef WINDOWS
   std::string getLastError();
