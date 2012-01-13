@@ -161,6 +161,22 @@ public slots:
    */
   void recentFileItemTriggered();
 
+  /*!@brief Reacts to changes in the zoom level.
+   */
+  void zoomLevelSet(double zoomLevel);
+
+  /*!@brief Resets the zoom level to 100%.
+   */
+  void resetZoomLevel();
+
+  /*!@brief Increases the zoom level.
+   */
+  void increaseZoomLevel();
+
+  /*!@brief Decreases the zoom level.
+   */
+  void decreaseZoomLevel();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
