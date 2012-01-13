@@ -176,7 +176,19 @@ void cedar::proc::gui::Ide::resetZoomLevel()
 
 void cedar::proc::gui::Ide::zoomLevelSet(double zoomLevel)
 {
-  this->mpZoomDisplay->setText(QString("%1%").arg(zoomLevel * 100.0));
+  int zoom_level = static_cast<int>(zoomLevel * 100.0);
+  this->mpZoomDisplay->setText(QString("%1%").arg(zoom_level));
+
+  if (this->mpZoomSlider->value() != zoom_level)
+  {
+    this->mpZoomSlider->setValue(zoom_level);
+
+    // if the slider's value wasn't changed, apply the slider's value (this happens when the new value is out of range)
+    if (this->mpZoomSlider->value() != zoom_level)
+    {
+      this->mpProcessingDrawer->setZoomLevel(this->mpZoomSlider->value());
+    }
+  }
 }
 
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
