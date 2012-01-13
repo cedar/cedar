@@ -146,6 +146,8 @@ void cedar::proc::gui::Ide::storeSettings()
   cedar::proc::gui::Settings::instance().stepsSettings()->getFrom(this->mpItemsWidget);
 
   cedar::proc::gui::Settings::instance().storeMainWindow(this);
+
+  cedar::proc::gui::Settings::instance().snapToGrid(this->mpProcessingDrawer->getScene()->getSnapToGrid());
 }
 
 void cedar::proc::gui::Ide::restoreSettings()
@@ -156,6 +158,8 @@ void cedar::proc::gui::Ide::restoreSettings()
   cedar::proc::gui::Settings::instance().stepsSettings()->setTo(this->mpItemsWidget);
 
   cedar::proc::gui::Settings::instance().restoreMainWindow(this);
+
+  mpActionShowHideGrid->setChecked(cedar::proc::gui::Settings::instance().snapToGrid());
 }
 
 void cedar::proc::gui::Ide::loadDefaultPlugins()
