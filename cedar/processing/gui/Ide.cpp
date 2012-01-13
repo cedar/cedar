@@ -93,6 +93,45 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
 
+  QObject::connect
+  (
+    this->mpZoomSlider,
+    SIGNAL(valueChanged(int)),
+    this->mpProcessingDrawer,
+    SLOT(setZoomLevel(int))
+  );
+
+  QObject::connect
+  (
+    this->mpProcessingDrawer,
+    SIGNAL(zoomLevelChanged(double)),
+    this,
+    SLOT(zoomLevelSet(double))
+  );
+
+  QObject::connect
+  (
+    this->mpResetZoom,
+    SIGNAL(clicked()),
+    this,
+    SLOT(resetZoomLevel())
+  );
+
+  QObject::connect
+  (
+    this->mpZoomPlus,
+    SIGNAL(clicked()),
+    this,
+    SLOT(increaseZoomLevel())
+  );
+
+  QObject::connect
+  (
+    this->mpZoomMinus,
+    SIGNAL(clicked()),
+    this,
+    SLOT(decreaseZoomLevel())
+  );
 
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -106,6 +145,8 @@ cedar::proc::gui::Ide::Ide()
                    this,
                    SLOT(fillRecentFilesList()));
   fillRecentFilesList();
+
+  this->zoomLevelSet(this->mpProcessingDrawer->getZoomLevel());
 }
 
 cedar::proc::gui::Ide::~Ide()
@@ -115,6 +156,28 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::increaseZoomLevel()
+{
+  int delta = this->mpZoomSlider->pageStep();
+  this->mpZoomSlider->setValue(this->mpZoomSlider->value() + delta);
+}
+
+void cedar::proc::gui::Ide::decreaseZoomLevel()
+{
+  int delta = this->mpZoomSlider->pageStep();
+  this->mpZoomSlider->setValue(this->mpZoomSlider->value() - delta);
+}
+
+void cedar::proc::gui::Ide::resetZoomLevel()
+{
+  this->mpZoomSlider->setValue(100);
+}
+
+void cedar::proc::gui::Ide::zoomLevelSet(double zoomLevel)
+{
+  this->mpZoomDisplay->setText(QString("%1%").arg(zoomLevel * 100.0));
+}
 
 void cedar::proc::gui::Ide::toggleGrid(bool triggered)
 {
