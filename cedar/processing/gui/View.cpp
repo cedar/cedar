@@ -50,7 +50,8 @@
 
 cedar::proc::gui::View::View(QWidget *pParent)
 :
-QGraphicsView(pParent)
+QGraphicsView(pParent),
+mCurrentZoomLevel(1)
 {
   this->mpScene = new cedar::proc::gui::Scene(this);
   this->setScene(this->mpScene);
@@ -61,6 +62,8 @@ QGraphicsView(pParent)
                                            | QPainter::SmoothPixmapTransform
                                            | QPainter::HighQualityAntialiasing
                                            );
+
+  this->setZoomLevel(100);
 }
 
 cedar::proc::gui::View::~View()
@@ -71,6 +74,16 @@ cedar::proc::gui::View::~View()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::View::setZoomLevel(int newLevel)
+{
+  qreal target_zoom = static_cast<qreal>(newLevel)/static_cast<qreal>(100.0);
+  qreal factor = target_zoom / mCurrentZoomLevel;
+  this->scale(factor, factor);
+  mCurrentZoomLevel = target_zoom;
+
+  emit zoomLevelChanged(static_cast<double>(mCurrentZoomLevel));
+}
 
 cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
 {
