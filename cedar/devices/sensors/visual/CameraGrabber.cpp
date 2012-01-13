@@ -77,6 +77,9 @@ GrabberInterface(configFileName)
   CameraId cam_id = {0,0};
   mCamIds.push_back(cam_id);
 
+  //storage for filenames from config-file
+  mCameraCapabilitiesFileNames.push_back("camera_default.capabilities");
+
   //do all declareParameters and read it from configfile
   readInit(mCamIds.size(),"CameraGrabber");
 
@@ -124,6 +127,10 @@ GrabberInterface(configFileName)
   CameraId cam_id_1 = {0,0};
   mCamIds.push_back(cam_id_1);
 
+  //storage for filenames from config-file
+  mCameraCapabilitiesFileNames.push_back("camera_default.capabilities");
+  mCameraCapabilitiesFileNames.push_back("camera_default.capabilities");
+
   //do all declareParameters and read it from configfile
   readInit(mCamIds.size(),"CameraGrabber");
 
@@ -167,8 +174,12 @@ GrabberInterface(configFileName)
 
   for(unsigned int channel = 0; channel < numChannels; channel++)
   {
+    //storage for id's
     CameraId cam_id = {0,0};
     mCamIds.push_back(cam_id);
+
+    //storage for filenames from config-file
+    mCameraCapabilitiesFileNames.push_back("camera_default.capabilities");
   }
   readInit(mCamIds.size(),"CameraGrabber");
   applyInit();
@@ -207,7 +218,7 @@ CameraGrabber::~CameraGrabber()
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::onDeclareParameters()
 {
-  // The cameragrabber stores only 3 values : guid, busId and createbyguid
+  // The cameragrabber stores only 4 values : guid, busId, createbyguid and the capability-filename for the camera
   // the rest will be managed by the CameraConfiguration class
 
   bool result = true;
@@ -224,6 +235,10 @@ bool CameraGrabber::onDeclareParameters()
     CameraId cam_Id = mCamIds.at(channel);
     result = result && (addParameter(&mCamIds.at(channel).guid,ch+"guid",cam_Id.guid)== CONFIG_SUCCESS);
     result = result && (addParameter(&mCamIds.at(channel).busId,ch+"busId",cam_Id.busId) == CONFIG_SUCCESS);
+
+    std::string prop_name = ch+"cameraCapabilityFileName";
+    std::string prop_default = CAMERAGRABBER_CAM_CAPABILITIES_FILENAME(cam_Id.guid);
+    result = result && (addParameter(&mCameraCapabilitiesFileNames.at(channel),prop_name,prop_default)== CONFIG_SUCCESS);
   }
 
   return result;
@@ -279,12 +294,19 @@ bool CameraGrabber::onInit()
   #endif
 
   //if create by grabber id, search all cameras and get the device-nr on the bus
-  //todo: change this, to open a camera only once
-
   if (mCreateGrabberByGuid)
   {
+
+    //create all videocaptures needed, but don't open them
+    for (unsigned int channel = 0; channel < mNumCams; ++channel)
+    {
+      cv::VideoCapture capture;
+      mVideoCaptures.push_back(capture);
+    }
+
+
     //search for each channel
-    cv::VideoCapture *capture=NULL;
+    //cv::VideoCapture *capture=NULL;
 
     // search for the right guid, so open it one by one
     unsigned int cam = 0;
@@ -292,25 +314,34 @@ bool CameraGrabber::onInit()
     bool all_cams_found = false;
     bool no_more_cams = false;
 
-    //search all cams
+    //search all cams, i.e. all bus-ids
+    #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
+      std::cout << "Searching for cameras on the bus..." << std::endl;
+    #endif
+
     while (! (all_cams_found || no_more_cams))
     {
 
+
       //open one by one
-      capture = new cv::VideoCapture(cam);
-      if (capture->isOpened())
+      cv::VideoCapture capture(cam);
+      if (capture.isOpened())
       {
-        //todo: check
-        unsigned int guid = capture->get((int)CV_CAP_PROP_GUID);
+        unsigned int guid = capture.get((int)CV_CAP_PROP_GUID);
+
+        #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
+          std::cout << "\tFound at Bus-Id " << cam << ": GUID " << guid << std::endl;
+        #endif
 
         //check if guid of camera is in our guid-vector
         for (unsigned int channel = 0; channel < mNumCams; ++channel)
         {
-          unsigned int wanted_guid = mCamIds.at(channel).guid;//wanted-guid rename to test_guid
-          if (guid == wanted_guid )
+          unsigned int test_guid = mCamIds.at(channel).guid;
+          if (guid == test_guid )
           {
-            //yes: store bus_id
+            //yes: store bus_id and videocapture
             mCamIds.at(channel).busId = cam;
+            mVideoCaptures.at(channel) = capture;
             found_cams++;
           }
         }
@@ -319,6 +350,9 @@ bool CameraGrabber::onInit()
         if (found_cams == mCamIds.size())
         {
           all_cams_found = true;
+          #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
+            std::cout << "All needed cameras found. Stop searching." << std::endl;
+          #endif
         }
 
       }
@@ -328,12 +362,18 @@ bool CameraGrabber::onInit()
         no_more_cams = true;
       }
 
-      delete capture;
-      capture = NULL;
       cam++;
     }
 
-    #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
+    if (! all_cams_found)
+    {
+      std::cout << "ERROR: Camera not found!" << std::endl;
+              //  << "There are only "
+              //  << found_cams << " of " << mNumCams << " available" << std::endl;
+      return false; //throws an initialization-exception
+    }
+
+   /* #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
       std::cout << "Bus mapping:" << std::endl;
       for (unsigned int i = 0; i < mNumCams; ++i)
       {
@@ -341,47 +381,48 @@ bool CameraGrabber::onInit()
       }
       std::cout << std::flush;
     #endif
-
-    if (found_cams != mNumCams)
+  */
+  }
+  else
+  {
+  // create by ongoing number
+    for (unsigned int channel = 0; channel < mNumCams; ++channel)
     {
-      std::cout << "ERROR: Camera not found" << std::endl;
-      return false; //throws an initialization-exception
+
+      //open the camera
+      cv::VideoCapture capture(mCamIds.at(channel).busId);
+      if (! capture.isOpened())
+      {
+        std::cout << "ERROR: Couldn't open camera (Channel " << channel << ")." << std::endl;
+        return false; //throws an initialization-exception
+      }
+
+      //store it in our vector
+      mVideoCaptures.push_back(capture);
     }
-
-    //wait to settle cameras
-    #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
-      std::cout << "[CameraGrabber::onInit] Waiting "<< CAMERA_GRABBER_WAIT_ON_OPEN_BYGUID
-                << " seconds to settle cameras" << std::endl;
-
-    #endif
-    sleep(CAMERA_GRABBER_WAIT_ON_OPEN_BYGUID);
   }
 
-  //now create by ongoing number
+
+  //now initialize all videocaptures
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
-  {
-
-    //open the camera
-    cv::VideoCapture capture(mCamIds.at(channel).busId);
-    if (! capture.isOpened())
-    {
-      std::cout << "ERROR: Couldn't open camera (Channel " << channel << ")." << std::endl;
-      return false; //throws an initialization-exception
-    }
-
-    //store it in our vector
-    mVideoCaptures.push_back(capture);
+   {
 
     //initialize the image buffer
     cv::Mat frame = cv::Mat();
     mImageMatVector.push_back(frame);
 
-    //read guid (guid could be zero, if grabber created by busId)
-    mCamIds.at(channel).guid = static_cast<unsigned int>(capture.get(static_cast<int>(CV_CAP_PROP_GUID)));
+    //if grabber created by busId, guid is zero, so read it
+    if (!mCreateGrabberByGuid)
+    {
+      mCamIds.at(channel).guid = static_cast<unsigned int>
+                                 (
+                                   mVideoCaptures.at(channel).get(static_cast<int>(CV_CAP_PROP_GUID))
+                                 );
+    }
 
     //create and load the camera capabilities
     std::string conf_file_name = ConfigurationInterface::getConfigFileName();
-    std::string cap_file_name = CAMERAGRABBER_CAM_CAPABILITIES_FILENAME(mCamIds.at(channel).guid);
+    std::string cap_file_name = mCameraCapabilitiesFileNames.at(channel);
     std::string channel_prefix = "ch"+boost::lexical_cast<std::string>(channel) + "_";
 
     try
@@ -431,12 +472,12 @@ bool CameraGrabber::onInit()
 
   //default initialization
   //----------------------------------------
-  //check for smallest FPS
+  //check for largest FPS
   double fps = mVideoCaptures.at(0).get(CV_CAP_PROP_FPS);
   for (unsigned int i = 1; i < mNumCams; ++i)
   {
     double fps_test = mVideoCaptures.at(i).get(CV_CAP_PROP_FPS);
-    if (fps_test < fps)
+    if (fps_test > fps)
     {
       fps = fps_test;
     }
@@ -896,7 +937,7 @@ CameraFrameRate::Id CameraGrabber::getCameraFps(unsigned int channel)
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::setCameraIsoSpeed( unsigned int channel,CameraIsoSpeed::Id isoSpeedId )
 {
-  setCameraSetting(channel,CameraSetting::SETTING_ISO_SPEED, static_cast<unsigned int>(isoSpeedId));
+  return setCameraSetting(channel,CameraSetting::SETTING_ISO_SPEED, static_cast<unsigned int>(isoSpeedId));
 }
 
 

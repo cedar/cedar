@@ -40,14 +40,14 @@
 
 // LOCAL INCLUDES
 #include "GrabberInterface.h"
-#include "CameraIsoSpeed.h"
-#include "CameraProperty.h"
-#include "CameraVideoMode.h"
-#include "CameraFrameRate.h"
-#include "CameraSetting.h"
-#include "CameraCapabilities.h"
-#include "CameraConfiguration.h"
-#include "CameraConfigFileStorage.h"
+#include "camera/CameraIsoSpeed.h"
+#include "camera/CameraProperty.h"
+#include "camera/CameraVideoMode.h"
+#include "camera/CameraFrameRate.h"
+#include "camera/CameraSetting.h"
+#include "camera/CameraCapabilities.h"
+#include "camera/CameraConfiguration.h"
+#include "camera/CameraState.h"
 
 // PROJECT INCLUDES
 
@@ -406,6 +406,10 @@ protected:
   //std::vector<CameraConfiguration> mCamConfigurations;
   std::vector<CameraConfigurationPtr> mCamConfigurations;
 
+  /*! \brief This vector contains the filenames of the config-files of the camaera capabilities
+   *
+   */
+  std::vector<std::string> mCameraCapabilitiesFileNames;
 
 private:
 

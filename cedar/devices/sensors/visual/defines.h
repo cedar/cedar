@@ -81,12 +81,6 @@
 #define CAMERA_DEFAULT_FRAMERATE CameraFrameRate::FRAMERATE_15
 #define CAMERA_DEFAULT_ISO_SPEED CameraIsoSpeed::ISO_200
 
-// If cameras opened by guid, first every camera have to be opened in order
-// to search their bus-ID
-// After this search, all cameras will be closed and reopened by their bus-ID
-// Between this two steps a short pause should be inserted to settle the cameras
-// This value defines the time in seconds
-#define CAMERA_GRABBER_WAIT_ON_OPEN_BYGUID 5
 
 //------------------------------------------------------------------------
 // Enable this, if you want to see some informations on initialization

@@ -113,9 +113,9 @@ namespace cedar
         class CameraCapabilities;
         typedef boost::shared_ptr<CameraCapabilities> CameraCapabilitiesPtr;
 
-        //! @brief A class which manages the properties and settings of a camera
-        class CameraConfigFileStorage;
-        typedef boost::shared_ptr<CameraConfigFileStorage> CameraConfigFileStoragePtr;
+        //! @brief A class which manages the properties and settings of a camera, i.e. the actual state
+        class CameraState;
+        typedef boost::shared_ptr<CameraState> CameraStatePtr;
       }
     }
   }
