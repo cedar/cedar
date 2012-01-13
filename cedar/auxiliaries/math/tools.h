@@ -184,6 +184,34 @@ namespace cedar
         }
       }
       
+      /*!@brief Returns the value of a 2D matrix entry as the specified type.
+       */
+      template <typename T>
+      inline T getMatrixEntry(const cv::Mat& matrix, int row, int col)
+      {
+        CEDAR_ASSERT(matrix.type() == CV_8U || matrix.type() == CV_32F || matrix.type() == CV_64F);
+        CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) == 2);
+
+        switch (matrix.type())
+        {
+          case CV_8U:
+            return static_cast<T>(matrix.at<unsigned char>(row, col));
+            break;
+
+          case CV_32F:
+            return static_cast<T>(matrix.at<float>(row, col));
+            break;
+
+          case CV_64F:
+            return static_cast<T>(matrix.at<double>(row, col));
+            break;
+
+          default:
+            // this should never happen due to the assert above.
+            CEDAR_ASSERT(false);
+        }
+      }
+
       /*!@brief      This function convolves a matrix with a given kernel and returns the resulting matrix.
        * @deprecated This method is deprecated. It will be replaced by cedar::aux::conv::Convolution in the long run.
        * @todo       Remove this function.
