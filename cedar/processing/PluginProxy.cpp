@@ -76,6 +76,50 @@ cedar::proc::PluginProxy::~PluginProxy()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::PluginProxy::getPluginNameFromPath(const std::string& path)
+{
+  boost::filesystem::path plugin_path(path);
+  std::string name = plugin_path.filename();
+  if (name.substr(0, 3) == "lib")
+  {
+    name = name.substr(3);
+  }
+  size_t ext_idx = name.rfind('.');
+  if (ext_idx != std::string::npos)
+  {
+    name = name.substr(0, ext_idx);
+  }
+  return name;
+}
+
+std::string cedar::proc::PluginProxy::findPluginDescription(const std::string& plugin_path) const
+{
+  std::string plugin_name = cedar::proc::PluginProxy::getPluginNameFromPath(plugin_path);
+  plugin_name += ".xml";
+
+  std::cout << plugin_name << std::endl;
+
+  // extract the path only
+  boost::filesystem::path plugin_dir(plugin_path);
+  plugin_dir.remove_filename();
+  plugin_dir /= plugin_name;
+
+  if (boost::filesystem::exists(plugin_dir))
+  {
+    return plugin_dir.string();
+  }
+
+  // remove filename and current directory (i.e., cd ..)
+  plugin_dir = plugin_dir.parent_path().parent_path();
+  plugin_dir /= plugin_name;
+  if (boost::filesystem::exists(plugin_dir))
+  {
+    return plugin_dir.string();
+  }
+
+  return "";
+}
+
 std::string cedar::proc::PluginProxy::findPluginFile(const std::string& file) const
 {
   std::string searched_locs;
@@ -158,6 +202,20 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   
   this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
   (*p_interface)(this->mDeclaration);
+
+  // try to load the plugin description file
+  std::string description = this->findPluginDescription(this->mFileName);
+
+  if (!description.empty())
+  {
+    this->getDeclaration()->readDescription(description);
+  }
+#ifdef DEBUG
+  else
+  {
+    std::cout << "> no plugin description found for " << file << std::endl;
+  }
+#endif // DEBUG
 
   // Finally, if nothing failed, add the plugin to the list of known plugins.
   cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);
