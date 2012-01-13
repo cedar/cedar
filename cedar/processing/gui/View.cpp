@@ -75,6 +75,19 @@ cedar::proc::gui::View::~View()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::View::wheelEvent(QWheelEvent *pEvent)
+{
+  if (pEvent->modifiers() & Qt::ControlModifier)
+  {
+    double delta = static_cast<double>(pEvent->delta()) / 6000.0;
+    this->setZoomLevel( static_cast<int>((this->getZoomLevel() + delta) * 100.0) );
+  }
+  else
+  {
+    SuperClass::wheelEvent(pEvent);
+  }
+}
+
 void cedar::proc::gui::View::setZoomLevel(int newLevel)
 {
   qreal target_zoom = static_cast<qreal>(newLevel)/static_cast<qreal>(100.0);

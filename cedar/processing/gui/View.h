@@ -60,6 +60,11 @@ class cedar::proc::gui::View : public QGraphicsView
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+  typedef QGraphicsView SuperClass;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -100,6 +105,9 @@ public slots:
 protected:
   //!@brief handles resize events
   void resizeEvent(QResizeEvent *pEvent);
+
+  //!@brief Handles certain mouse events.
+  void wheelEvent(QWheelEvent *pEvent);
 
 signals:
   void zoomLevelChanged(double newZoomLevel);
