@@ -144,6 +144,12 @@ public:
   //!@brief Sets whether the graphics item shadow effects are used.
   void setUseGraphicsItemShadowEffects(bool useShadows);
 
+  //!@brief Get the snap to grid state.
+  bool snapToGrid() const;
+
+  //!@brief Set the snap to grid state.
+  void snapToGrid(bool snap);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -200,6 +206,9 @@ private:
 
   //!@brief Disables or enables graphics item shadows.
   cedar::aux::BoolParameterPtr mUseGraphicsItemShadowEffects;
+
+  //!@brief Disables or enables graphics item shadows.
+  cedar::aux::BoolParameterPtr mSnapToGrid;
 
 }; // class cedar::proc::gui::Settings
 
