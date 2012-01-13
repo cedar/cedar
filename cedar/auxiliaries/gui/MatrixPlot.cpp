@@ -174,7 +174,7 @@ const Qwt3D::ColorVector& cedar::aux::gui::MatrixPlot::getStandardColorVector()
       }
       else if(i < 256.0)
       {
-        rgb.r = 1.0 - (i - 224.0) / 32.0;
+        rgb.r = 1.0 - (i - 224.0) / 64.0;
         rgb.g = 0.0;
         rgb.b = 0.0;
       }
