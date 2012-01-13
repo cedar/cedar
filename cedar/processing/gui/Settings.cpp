@@ -86,6 +86,16 @@ mMainWindowState(new cedar::aux::StringParameter(this, "mainWindowState", ""))
   ui_settings->addConfigurableChild("tools", mTools);
   ui_settings->addConfigurableChild("properties", mProperties);
 
+  this->mSnapToGrid = cedar::aux::BoolParameterPtr
+                      (
+                        new cedar::aux::BoolParameter
+                        (
+                          ui_settings.get(),
+                          "snapToGrid",
+                          false
+                        )
+                      );
+
   cedar::aux::ConfigurablePtr display_settings(new cedar::aux::Configurable());
   this->addConfigurableChild("displaySettings", display_settings);
   mUseGraphicsItemShadowEffects = cedar::aux::BoolParameterPtr
@@ -146,6 +156,16 @@ cedar::proc::gui::Settings::~Settings()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::proc::gui::Settings::snapToGrid() const
+{
+  return this->mSnapToGrid->getValue();
+}
+
+void cedar::proc::gui::Settings::snapToGrid(bool snap)
+{
+  this->mSnapToGrid->setValue(snap);
+}
 
 bool cedar::proc::gui::Settings::useGraphicsItemShadowEffects() const
 {

@@ -60,6 +60,11 @@ class cedar::proc::gui::View : public QGraphicsView
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+  typedef QGraphicsView SuperClass;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -82,12 +87,30 @@ public:
    */
   void setMode(cedar::proc::gui::Scene::MODE mode, const QString& param = "");
 
+  /*!@brief Returns the current zoom level.
+   */
+  double getZoomLevel() const
+  {
+    return this->mCurrentZoomLevel;
+  }
+
+public slots:
+  /*!@brief Changes the current zoom level of the architecture.
+   */
+  void setZoomLevel(int newLevel);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief handles resize events
   void resizeEvent(QResizeEvent *pEvent);
+
+  //!@brief Handles certain mouse events.
+  void wheelEvent(QWheelEvent *pEvent);
+
+signals:
+  void zoomLevelChanged(double newZoomLevel);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -103,6 +126,9 @@ protected:
 private:
   //!@brief a pointer to a scene displayed by the view
   cedar::proc::gui::Scene* mpScene;
+
+  //!@brief Variable to keep track of the current zoom level.
+  qreal mCurrentZoomLevel;
 
 }; // class ProcessingView
 
