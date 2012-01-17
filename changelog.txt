@@ -46,6 +46,7 @@
   - The IDE now remembers whether or not snap to grid is active.
   - Implemented zooming in the IDE; apart from the controls that are directly visible, scrolling is also possible with
     the mouse wheel (hold down ctrl)
+  - The property pane now indicates when parameters have been changed since the last save. 
 
 == Version 0.5 ==
 
