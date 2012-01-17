@@ -79,7 +79,6 @@ mSlot(slot)
   {
     if (ext_data->isCollection())
     {
-      std::cout << "Diamond!" << std::endl;
       this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
     }
   }
