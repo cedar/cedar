@@ -75,6 +75,14 @@ mSlot(slot)
 {
   this->setParentItem(pParent);
   this->generateTooltip();
+  if (cedar::proc::ExternalDataPtr ext_data = boost::shared_dynamic_cast<cedar::proc::ExternalData>(slot))
+  {
+    if (ext_data->isCollection())
+    {
+      std::cout << "Diamond!" << std::endl;
+      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
+    }
+  }
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
