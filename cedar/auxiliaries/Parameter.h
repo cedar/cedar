@@ -135,6 +135,7 @@ protected:
 signals:
   //!@brief a signal that is emitted each time the value of a parameter changes
   void valueChanged();
+
   //!@brief a signal that is emitted each time a characteristic of this parameter changes (for example vector size)
   void propertyChanged();
 
