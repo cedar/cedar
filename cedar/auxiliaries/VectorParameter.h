@@ -249,7 +249,7 @@ public:
   void set(size_t index, const T& value)
   {
     this->mValues.at(index) = value;
-    emit valueChanged();
+    this->emitChangedSignal();
   }
 
   //!@brief get the default vector
@@ -270,7 +270,7 @@ public:
   void set(const std::vector<T>& values)
   {
     this->mValues = values;
-    emit valueChanged();
+    this->emitChangedSignal();
     //!@todo emit a porperty changed signal here as well, as the new vector may have a different size
   }
 

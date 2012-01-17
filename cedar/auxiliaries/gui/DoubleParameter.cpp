@@ -76,12 +76,28 @@ cedar::aux::gui::DoubleParameter::~DoubleParameter()
 
 void cedar::aux::gui::DoubleParameter::parameterPointerChanged()
 {
+  this->applyProperties();
+
   cedar::aux::DoubleParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
-  this->mpSpinbox->setMinimum(parameter->getMinimum());
-  this->mpSpinbox->setMaximum(parameter->getMaximum());
   this->mpSpinbox->setValue(parameter->getValue());
   QObject::connect(this->mpSpinbox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
+  QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+}
+
+void cedar::aux::gui::DoubleParameter::propertyChanged()
+{
+  this->applyProperties();
+}
+
+void cedar::aux::gui::DoubleParameter::applyProperties()
+{
+  cedar::aux::DoubleParameterPtr parameter;
+  parameter = boost::dynamic_pointer_cast<cedar::aux::DoubleParameter>(this->getParameter());
+
+  this->mpSpinbox->setMinimum(parameter->getMinimum());
+  this->mpSpinbox->setMaximum(parameter->getMaximum());
+  this->mpSpinbox->setDisabled(parameter->isConstant());
 }
 
 void cedar::aux::gui::DoubleParameter::valueChanged(double value)

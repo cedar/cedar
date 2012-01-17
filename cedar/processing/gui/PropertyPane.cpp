@@ -92,9 +92,40 @@ cedar::proc::gui::PropertyPane::~PropertyPane()
 
 void cedar::proc::gui::PropertyPane::resetContents()
 {
+  if (mSlotConnection.connected())
+  {
+    mSlotConnection.disconnect();
+  }
+
+  // disconnect all signals from the configurable
+  cedar::aux::ConfigurablePtr configurable = this->mDisplayedConfigurable.lock();
+  if (configurable)
+  {
+    this->disconnect(configurable);
+  }
+
   this->clearContents();
   this->setRowCount(0);
+  this->mParameterWidgetRowIndex.clear();
   this->mParameterRowIndex.clear();
+}
+
+void cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConfigurable)
+{
+  for (cedar::aux::Configurable::ParameterList::iterator iter = pConfigurable->getParameters().begin();
+      iter != pConfigurable->getParameters().end();
+      ++iter)
+  {
+    // disconnect everything between the parameter and this
+    QObject::disconnect(iter->get(), 0, this, 0);
+  }
+
+  for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
+       iter != pConfigurable->configurableChildren().end();
+       ++iter)
+  {
+    this->disconnect(iter->second);
+  }
 }
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
@@ -104,7 +135,7 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::StepPtr pStep)
   std::string label = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pStep)->getClassId();
   this->addLabelRow(label);
   this->mDisplayedConfigurable = pStep;
-  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable));
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable), false);
 }
 
 void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
@@ -115,15 +146,16 @@ void cedar::proc::gui::PropertyPane::display(cedar::proc::TriggerPtr pTrigger)
     = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(pTrigger)->getClassId();
   this->addLabelRow(label);
   this->mDisplayedConfigurable = pTrigger;
-  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable)); // boost::shared_polymorphic_downcast<cedar::aux::Configurable>(pTrigger));
+  this->display(cedar::aux::ConfigurablePtr(this->mDisplayedConfigurable), false);
 }
 
-void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
+void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable, bool reset)
 {
-  if (mSlotConnection.connected())
+  if (reset)
   {
-    mSlotConnection.disconnect();
+    this->resetContents();
   }
+
   this->append(pConfigurable->getParameters());
   mSlotConnection
     = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::proc::gui::PropertyPane::redraw, this));
@@ -174,6 +206,13 @@ void cedar::proc::gui::PropertyPane::append(cedar::aux::Configurable::ParameterL
   }
 }
 
+void cedar::proc::gui::PropertyPane::indicateChange(QLabel *pLabel, bool changed)
+{
+  QFont font = pLabel->font();
+  font.setBold(changed);
+  pLabel->setFont(font);
+}
+
 void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr parameter)
 {
   if (!parameter->isHidden())
@@ -184,6 +223,8 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr par
     p_label->setText(parameter->getName().c_str());
     this->setCellWidget(row, 0, p_label);
 
+    this->indicateChange(p_label, parameter->isChanged());
+
     cedar::aux::gui::Parameter *p_widget = dataWidgetTypes().get(parameter)->allocateRaw();
     p_widget->setParent(this);
     p_widget->setParameter(parameter);
@@ -191,8 +232,10 @@ void cedar::proc::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr par
     this->setCellWidget(row, 1, p_widget);
     this->resizeRowToContents(row);
 
-    this->mParameterRowIndex[p_widget] = row;
+    this->mParameterWidgetRowIndex[p_widget] = row;
+    this->mParameterRowIndex[parameter.get()] = row;
     QObject::connect(p_widget, SIGNAL(heightChanged()), this, SLOT(rowSizeChanged()));
+    QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
   }
 }
 
@@ -250,13 +293,40 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
   return cedar::proc::gui::PropertyPane::mDataWidgetTypes;
 }
 
-void cedar::proc::gui::PropertyPane::rowSizeChanged()
+int cedar::proc::gui::PropertyPane::getSenderParameterRowWidget() const
 {
   cedar::aux::gui::Parameter *p_parameter = dynamic_cast<cedar::aux::gui::Parameter*>(QObject::sender());
   CEDAR_DEBUG_ASSERT(p_parameter != NULL);
 
+  CEDAR_DEBUG_ASSERT(this->mParameterWidgetRowIndex.find(p_parameter) != this->mParameterWidgetRowIndex.end());
+  return this->mParameterWidgetRowIndex.find(p_parameter)->second;
+}
+
+int cedar::proc::gui::PropertyPane::getSenderParameterRow() const
+{
+  cedar::aux::Parameter *p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_parameter != NULL);
+
   CEDAR_DEBUG_ASSERT(this->mParameterRowIndex.find(p_parameter) != this->mParameterRowIndex.end());
-  int row = this->mParameterRowIndex.find(p_parameter)->second;
+  return this->mParameterRowIndex.find(p_parameter)->second;
+}
+
+void cedar::proc::gui::PropertyPane::parameterChangeFlagChanged()
+{
+  cedar::aux::Parameter *p_parameter = dynamic_cast<cedar::aux::Parameter*>(QObject::sender());
+  CEDAR_DEBUG_ASSERT(p_parameter != NULL);
+
+  int row = this->getSenderParameterRow();
+
+  QLabel *p_label = dynamic_cast<QLabel*>(this->cellWidget(row, 0)); // column 0 contains the label
+  CEDAR_DEBUG_ASSERT(p_label != NULL);
+
+  this->indicateChange(p_label, p_parameter->isChanged());
+}
+
+void cedar::proc::gui::PropertyPane::rowSizeChanged()
+{
+  int row = this->getSenderParameterRowWidget();
 
   // the process-events call is only necessary because qt does otherwise not detect the new size properly.
   // should this bug ever be fixed, this can be removed.
