@@ -46,6 +46,7 @@
 
 // SYSTEM INCLUDES
 #include <QTableWidget>
+#include <QLabel>
 #include <boost/signals2/connection.hpp>
 
 
@@ -98,8 +99,10 @@ public:
   void display(cedar::proc::TriggerPtr pTrigger);
 
   /*!@brief Displays the parameters for a given configurable.
+   *
+   * @param reset Whether or not the resetContents() function should be called.
    */
-  void display(cedar::aux::ConfigurablePtr pConfigurable);
+  void display(cedar::aux::ConfigurablePtr pConfigurable, bool reset = true);
 
   /*!@brief Resets the contents of the widget.
    */
@@ -125,6 +128,10 @@ public slots:
   /*!@brief Slot that reacts to a change in row size.
    */
   void rowSizeChanged();
+
+  /*!@brief Slot that reacts when one of the parameters displayed by this widget changes its changed flag.
+   */
+  void parameterChangeFlagChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -152,6 +159,23 @@ private:
    */
   void addPropertyRow(cedar::aux::ParameterPtr parameter);
 
+  /*!@brief Sets the label style to indicate that the parameter was changed.
+   */
+  void indicateChange(QLabel *pLabel, bool changed);
+
+  /*!@brief In events sent by cedar::aux::gui::Parameters, this function returns the row displaying the sender.
+   */
+  int getSenderParameterRowWidget() const;
+
+  /*!@brief In events sent by cedar::aux::Parameters, this function returns the row displaying the sender.
+   */
+  int getSenderParameterRow() const;
+
+  /*!@brief Disconnects all relevant signals of the given parameters.
+   */
+  void disconnect(cedar::aux::ConfigurablePtr pConfigurable);
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -164,8 +188,11 @@ private:
   //! Weak pointer to the configurable being displayed by this property pane.
   boost::weak_ptr<cedar::aux::Configurable> mDisplayedConfigurable;
 
-  //! Association from parameters to rows.
-  std::map<cedar::aux::gui::Parameter*, int> mParameterRowIndex;
+  //! Association from cedar::aux::gui::Parameters to rows.
+  std::map<cedar::aux::gui::Parameter*, int> mParameterWidgetRowIndex;
+
+  //! Association from cedar::aux::Parameters to rows.
+  std::map<cedar::aux::Parameter*, int> mParameterRowIndex;
 
   //! Connection to the configurable's tree changed signal.
   boost::signals2::connection mSlotConnection;

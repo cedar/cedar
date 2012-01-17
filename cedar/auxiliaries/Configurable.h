@@ -113,6 +113,10 @@ public:
    */
   boost::signals2::connection connectToTreeChangedSignal(boost::function<void ()> slot);
 
+  /*!@brief Resets the changed flag of all parameters associated with this Configurable.
+   */
+  void resetChangedStates(bool newChangedFlagValue) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
