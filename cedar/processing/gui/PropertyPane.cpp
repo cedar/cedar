@@ -99,7 +99,7 @@ void cedar::proc::gui::PropertyPane::resetContents()
 
   // disconnect all signals from the configurable
   cedar::aux::ConfigurablePtr configurable = this->mDisplayedConfigurable.lock();
-  if(configurable)
+  if (configurable)
   {
     this->disconnect(configurable);
   }
@@ -124,7 +124,7 @@ void cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pCon
        iter != pConfigurable->configurableChildren().end();
        ++iter)
   {
-    this->disconnect(pConfigurable);
+    this->disconnect(iter->second);
   }
 }
 
