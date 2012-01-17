@@ -45,6 +45,8 @@
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -72,12 +74,7 @@ mpStep(pParent),
 mSlot(slot)
 {
   this->setParentItem(pParent);
-
-  QString tool_tip;
-  tool_tip += cedar::proc::DataRole::type().get(mSlot->getRole()).prettyString().c_str();
-  tool_tip += ": ";
-  tool_tip += mSlot->getName().c_str();
-  this->setToolTip(tool_tip);
+  this->generateTooltip();
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
@@ -176,6 +173,8 @@ const std::string& cedar::proc::gui::DataSlotItem::getName() const
 
 void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
 {
+  //todo: move this out of here and let it be called by a signal
+  this->generateTooltip();
   painter->save(); // save current painter settings
 
   this->paintFrame(painter, style, widget);
@@ -183,4 +182,31 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   //! @todo make drawing pretty.
 
   painter->restore(); // restore saved painter settings
+}
+
+void cedar::proc::gui::DataSlotItem::generateTooltip()
+{
+  QString tool_tip("");
+  tool_tip += cedar::proc::DataRole::type().get(mSlot->getRole()).prettyString().c_str();
+  tool_tip += ": ";
+  tool_tip += mSlot->getName().c_str();
+  // mat info
+  if (cedar::aux::MatDataPtr mat_data = boost::shared_dynamic_cast<cedar::aux::MatData>(this->mSlot->getData()))
+  {
+    tool_tip += "<br />";
+    unsigned int dimensionality = cedar::aux::math::getDimensionalityOf(mat_data->getData());
+    tool_tip += QString("Dimensionality: %1").arg(dimensionality);
+    tool_tip += "<br />Sizes:";
+    for (unsigned int dim = 0; dim < dimensionality; ++dim)
+    {
+      tool_tip += QString(" %1").arg(mat_data->getData().size[dim]);
+    }
+  }
+  // type info
+  if (this->mSlot->getData())
+  {
+    tool_tip
+      += QString("<br />") + QString::fromStdString(cedar::aux::unmangleName(typeid(*(this->mSlot->getData().get()))));
+  }
+  this->setToolTip(tool_tip);
 }
