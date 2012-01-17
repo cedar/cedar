@@ -106,6 +106,7 @@ void cedar::aux::Parameter::emitChangedSignal()
 
 void cedar::aux::Parameter::emitPropertyChangedSignal()
 {
+  this->setChangedFlag(true);
   emit propertyChanged();
 }
 
