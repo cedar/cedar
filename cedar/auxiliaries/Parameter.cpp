@@ -57,6 +57,7 @@ mpOwner(pOwner),
 mHasDefault(hasDefault),
 mConstant(false),
 mIsHidden(false),
+mChanged(false),
 mReferenceCount(0)
 {
   CEDAR_ASSERT(this->mpOwner != NULL);
@@ -88,13 +89,24 @@ void intrusive_ptr_release(cedar::aux::Parameter *pObject)
   }
 }
 
+void cedar::aux::Parameter::setChangedFlag(bool changed)
+{
+  if (this->mChanged != changed)
+  {
+    this->mChanged = changed;
+    emit changedFlagChanged();
+  }
+}
+
 void cedar::aux::Parameter::emitChangedSignal()
 {
+  this->setChangedFlag(true);
   emit valueChanged();
 }
 
 void cedar::aux::Parameter::emitPropertyChangedSignal()
 {
+  this->setChangedFlag(true);
   emit propertyChanged();
 }
 

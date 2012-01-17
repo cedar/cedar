@@ -70,6 +70,8 @@ class cedar::aux::Parameter : public QObject, public cedar::aux::Base
   //--------------------------------------------------------------------------------------------------------------------
   // friends
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::Configurable;
+
   friend void ::intrusive_ptr_add_ref(cedar::aux::Parameter *pObject);
   friend void ::intrusive_ptr_release(cedar::aux::Parameter *pObject);
 
@@ -119,6 +121,12 @@ public:
   //!@brief emit the property changed signal
   void emitPropertyChangedSignal();
 
+  //!@brief Returns the value of the @em mChanged flag.
+  bool isChanged() const
+  {
+    return this->mChanged;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -127,14 +135,18 @@ protected:
 signals:
   //!@brief a signal that is emitted each time the value of a parameter changes
   void valueChanged();
+
   //!@brief a signal that is emitted each time a characteristic of this parameter changes (for example vector size)
   void propertyChanged();
+
+  //!@brief Signal that is emitted when mChanged is changed.
+  void changedFlagChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setChangedFlag(bool changed);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -156,6 +168,9 @@ private:
 
   //! Whether this parameter is hidden. This is relevant, e.g., for the gui.
   bool mIsHidden;
+
+  //! Flag that indicates whether this parameter was changed since the last file reading.
+  bool mChanged;
 
   //! Reference counter for boost intrusive pointer.
   unsigned int mReferenceCount;

@@ -99,7 +99,7 @@ public:
   void setValue(const T& value)
   {
     this->mValue = value;
-    emit valueChanged();
+    this->emitChangedSignal();
   }
 
   //!@brief store the current value of type T in a configuration tree
