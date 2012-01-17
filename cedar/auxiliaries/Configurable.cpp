@@ -126,6 +126,30 @@ cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters
   return this->mParameterList;
 }
 
+void cedar::aux::Configurable::resetChangedStates(bool newChangedFlagValue) const
+{
+  for
+  (
+    ParameterList::const_iterator iter = this->mParameterList.begin();
+    iter != this->mParameterList.end();
+    ++iter
+  )
+  {
+    // reset the changed flag of the parameter
+    (*iter)->setChangedFlag(newChangedFlagValue);
+  }
+
+  for
+  (
+    Children::const_iterator child = this->mChildren.begin();
+    child != this->mChildren.end();
+    ++child
+  )
+  {
+    child->second->resetChangedStates(newChangedFlagValue);
+  }
+}
+
 void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode& root) const
 {
   for
@@ -135,6 +159,7 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
     ++iter
   )
   {
+    // write the parameter to the configuration
     (*iter)->putTo(root);
   }
 
@@ -149,7 +174,10 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
     child->second->writeConfiguration(child_node);
     root.push_back(cedar::aux::ConfigurationNode::value_type(child->first, child_node));
   }
+
+  this->resetChangedStates(false);
 }
+
 
 void cedar::aux::Configurable::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
@@ -159,7 +187,12 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
     try
     {
       const cedar::aux::ConfigurationNode& value = node.get_child(parameter->getName());
+
+      // set the parameter to the value read from the file
       parameter->setTo(value);
+
+      // reset the changed flag of the parameter
+      (*iter)->setChangedFlag(false);
     }
     catch (const boost::property_tree::ptree_bad_path& e)
     {

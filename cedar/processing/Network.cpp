@@ -152,7 +152,8 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
 
 void cedar::proc::Network::add(std::string className, std::string instanceName)
 {
-  this->add(DeclarationRegistrySingleton::getInstance()->allocateClass(className), instanceName);
+  cedar::proc::ElementPtr element = DeclarationRegistrySingleton::getInstance()->allocateClass(className);
+  this->add(element, instanceName);
 }
 
 void cedar::proc::Network::add(cedar::proc::ElementPtr element, std::string instanceName)
@@ -175,6 +176,7 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   else
   {
     mElements[instanceName] = element;
+    element->resetChangedStates(true);
   }
   element->setNetwork(this);
 }
@@ -445,6 +447,7 @@ void cedar::proc::Network::readSteps(const cedar::aux::ConfigurationNode& root)
     cedar::proc::ElementPtr step = cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id);
     step->readConfiguration(step_node);
     this->add(step);
+    step->resetChangedStates(false);
   }
 }
 
@@ -486,6 +489,7 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
     cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass(class_id));
     trigger->readConfiguration(trigger_node);
     this->add(trigger);
+    trigger->resetChangedStates(false);
   }
 
   for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
