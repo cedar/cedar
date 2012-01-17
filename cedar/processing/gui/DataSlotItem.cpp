@@ -81,7 +81,13 @@ mSlot(slot)
     {
       this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
     }
+
+    if (!ext_data->isMandatory())
+    {
+      this->setOutlineColor(QColor(140, 140, 140));
+    }
   }
+
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
