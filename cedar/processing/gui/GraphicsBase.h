@@ -91,7 +91,8 @@ public:
   enum BaseShape
   {
     BASE_SHAPE_RECT,
-    BASE_SHAPE_ROUND
+    BASE_SHAPE_ROUND,
+    BASE_SHAPE_DIAMOND
   };
 
 
@@ -202,10 +203,17 @@ protected:
   //!@brief deal with changes to this instance (e.g. position changes)
   QVariant itemChange(GraphicsItemChange change, const QVariant & value);
 
+  /*!@brief Sets the base shape of the item.
+   *
+   * @remarks This method should only be called during construction.
+   */
+  void setBaseShape(BaseShape shape);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -238,6 +246,9 @@ private:
   QColor mOutlineColor;
   //!@brief the current fill color
   QColor mFillColor;
+
+  //!@brief The path used for drawing this shape.
+  QPainterPath mPath;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -73,7 +73,6 @@ cedar::proc::gui::GraphicsBase::GraphicsBase(qreal width,
 :
 mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
-mShape(shape),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
 mWidth(new cedar::aux::DoubleParameter(this, "width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
@@ -87,6 +86,8 @@ mAllowedConnectTargets(canConnectTo)
   this->mHeight->setValue(height);
 
   this->setFlags(this->flags() | QGraphicsItem::ItemSendsGeometryChanges);
+
+  this->setBaseShape(shape);
 }
 
 cedar::proc::gui::GraphicsBase::~GraphicsBase()
@@ -97,6 +98,31 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
+{
+  this->mShape = shape;
+
+  mPath = QPainterPath();
+  switch (shape)
+  {
+    case BASE_SHAPE_DIAMOND:
+      mPath.moveTo(0, this->height() / static_cast<qreal>(2));
+      mPath.lineTo(this->width() / static_cast<qreal>(2), this->height());
+      mPath.lineTo(this->width(), this->height() / static_cast<qreal>(2));
+      mPath.lineTo(this->width() / static_cast<qreal>(2), 0);
+      mPath.lineTo(0, this->height() / static_cast<qreal>(2));
+      break;
+
+    case BASE_SHAPE_RECT:
+    case BASE_SHAPE_ROUND:
+      // no custom path is used
+      break;
+
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledValueException, "Unhandled shape in cedar::proc::gui::GraphicsBase::setBaseShape");
+  }
+}
 
 void cedar::proc::gui::GraphicsBase::setHeight(qreal height)
 {
@@ -298,32 +324,47 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
   qreal roundedness = 4;
 
   // draw the base shape
-  painter->setPen(this->getOutlinePen());
-  switch (this->mShape)
+  if (mDrawBackground)
   {
-    case BASE_SHAPE_RECT:
-      if (mDrawBackground)
-      {
-        painter->save();
-        painter->setPen(QPen(Qt::NoPen));
-        painter->setBrush(this->mFillColor);
+    painter->save();
+    painter->setPen(QPen(Qt::NoPen));
+    painter->setBrush(this->mFillColor);
+    switch (this->mShape)
+    {
+      case BASE_SHAPE_RECT:
         painter->drawRoundedRect(bounds, roundedness, roundedness);
-        painter->restore();
-      }
-      painter->drawRoundedRect(bounds, roundedness, roundedness);
-      break;
+        break;
 
-    case BASE_SHAPE_ROUND:
-      if (mDrawBackground)
-      {
-        painter->save();
-        painter->setPen(QPen(Qt::NoPen));
-        painter->setBrush(this->mFillColor);
+      case BASE_SHAPE_ROUND:
         painter->drawEllipse(bounds);
-        painter->restore();
-      }
-      painter->drawEllipse(bounds);
-      break;
+        break;
+
+      case BASE_SHAPE_DIAMOND:
+        painter->drawPath(mPath);
+        break;
+    }
+    painter->restore();
+  }
+
+  if (mDrawBackground)
+  {
+    painter->save();
+    painter->setPen(this->getOutlinePen());
+    switch (this->mShape)
+    {
+      case BASE_SHAPE_RECT:
+        painter->drawRoundedRect(bounds, roundedness, roundedness);
+        break;
+
+      case BASE_SHAPE_ROUND:
+        painter->drawEllipse(bounds);
+        break;
+
+      case BASE_SHAPE_DIAMOND:
+        painter->drawPath(mPath);
+        break;
+    }
+    painter->restore();
   }
 
   // draw the highlight
@@ -362,6 +403,10 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
 
       case BASE_SHAPE_ROUND:
         painter->drawEllipse(highlight_bounds);
+        break;
+
+      case BASE_SHAPE_DIAMOND:
+        painter->drawPath(mPath);
         break;
     }
   }
