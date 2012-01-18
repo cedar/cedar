@@ -116,5 +116,8 @@ void cedar::aux::gui::FileParameter::onBrowseClicked()
       value = QFileDialog::getSaveFileName(this, "Select a file to write", parameter->getValue().absolutePath());
       break;
   }
-  parameter->set(value.toStdString());
+  if (!value.isEmpty())
+  {
+    parameter->set(value.toStdString());
+  }
 }
