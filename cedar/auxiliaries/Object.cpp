@@ -41,14 +41,11 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-using namespace cv;
-using namespace cedar::aux;
-using namespace cedar::aux::math;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-Object::Object()
+cedar::aux::Object::Object()
 :
 mTransformation(4, 4, CV_64FC1),
 mPosition(4, 1, CV_64FC1),
@@ -58,7 +55,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
   init();
 }
 
-Object::Object(const std::string& configFileName)
+cedar::aux::Object::Object(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName),
 mTransformation(4, 4, CV_64FC1),
@@ -111,7 +108,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
   updateTransformation();
 }
 
-Object::~Object()
+cedar::aux::Object::~Object()
 {
 
 }
@@ -120,42 +117,42 @@ Object::~Object()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat Object::getPosition()
+cv::Mat cedar::aux::Object::getPosition()
 {
   return mPosition.clone();
 }
 
-double Object::getPositionX() const
+double cedar::aux::Object::getPositionX() const
 {
   return mPosition.at<double>(0, 0);
 }
 
-double Object::getPositionY() const
+double cedar::aux::Object::getPositionY() const
 {
   return mPosition.at<double>(1, 0);
 }
 
-double Object::getPositionZ() const
+double cedar::aux::Object::getPositionZ() const
 {
   return mPosition.at<double>(2, 0);
 }
 
-cv::Mat Object::getOrientationQuaternion() const
+cv::Mat cedar::aux::Object::getOrientationQuaternion() const
 {
   return mOrientationQuaternion.clone();
 }
 
-double Object::getOrientationQuaternion(unsigned int component) const
+double cedar::aux::Object::getOrientationQuaternion(unsigned int component) const
 {
   return mOrientationQuaternion.at<double>(component, 0);
 }
 
-cv::Mat Object::getTransformation() const
+cv::Mat cedar::aux::Object::getTransformation() const
 {
   return mTransformation.clone();
 }
 
-void Object::setPosition(double x, double y, double z)
+void cedar::aux::Object::setPosition(double x, double y, double z)
 {
   mPosition.at<double>(0, 0) = x;
   mPosition.at<double>(1, 0) = y;
@@ -163,21 +160,21 @@ void Object::setPosition(double x, double y, double z)
   updateTransformation();
 }
 
-void Object::setPosition(const cv::Mat& position)
+void cedar::aux::Object::setPosition(const cv::Mat& position)
 {
   assert(position.type() == mPosition.type());
   mPosition = position.clone();
   updateTransformation();
 }
 
-void Object::setOrientationQuaternion(const cv::Mat quaternion)
+void cedar::aux::Object::setOrientationQuaternion(const cv::Mat quaternion)
 {
   assert(quaternion.type() == mOrientationQuaternion.type());
   mOrientationQuaternion = quaternion.clone();
   updateTransformation();
 }
 
-void Object::rotate(unsigned int axis, double angle)
+void cedar::aux::Object::rotate(unsigned int axis, double angle)
 {
   // rotation quaternion
   cv::Mat q_rot = cv::Mat::zeros(4, 1, CV_64FC1);
@@ -204,7 +201,7 @@ void Object::rotate(unsigned int axis, double angle)
   updateTransformation();
 }
 
-void Object::updateTransformation()
+void cedar::aux::Object::updateTransformation()
 {
   // now using quaternions
   double a = mOrientationQuaternion.at<double>(0, 0);
@@ -231,7 +228,7 @@ void Object::updateTransformation()
 
 }
 
-void Object::init()
+void cedar::aux::Object::init()
 {
   mPosition = 0.0;
   mPosition.at<double>(3, 0) = 1.0;

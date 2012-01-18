@@ -52,16 +52,14 @@
     #define getCurrentDir getcwd
  #endif
 
-using namespace std;
 using namespace libconfig;
-using namespace cedar::aux;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 // Constructors
-ConfigurationInterface::ConfigurationInterface()
+cedar::aux::ConfigurationInterface::ConfigurationInterface()
 :
 mConfigFileName("")
 {
@@ -69,7 +67,7 @@ mConfigFileName("")
   readConfigurationFile();
 }
 
-ConfigurationInterface::ConfigurationInterface(const std::string& configFileName)
+cedar::aux::ConfigurationInterface::ConfigurationInterface(const std::string& configFileName)
 :
 mConfigFileName(configFileName)
 {
@@ -77,7 +75,7 @@ mConfigFileName(configFileName)
   readConfigurationFile();
 }
 
-ConfigurationInterface::ConfigurationInterface(const char* pConfigFileName)
+cedar::aux::ConfigurationInterface::ConfigurationInterface(const char* pConfigFileName)
 :
 mConfigFileName(std::string(pConfigFileName))
 {
@@ -86,7 +84,7 @@ mConfigFileName(std::string(pConfigFileName))
 }
 
 // Destructor
-ConfigurationInterface::~ConfigurationInterface()
+cedar::aux::ConfigurationInterface::~ConfigurationInterface()
 {
   for (ParameterInfoVector::iterator iter = this->mParameterInfos.begin();
        iter != this->mParameterInfos.end();
@@ -101,14 +99,14 @@ ConfigurationInterface::~ConfigurationInterface()
 }
 
 // Destructor for ParameterInfo
-ConfigurationInterface::ParameterInfo::ParameterInfo()
+cedar::aux::ConfigurationInterface::ParameterInfo::ParameterInfo()
 :
 mpUserData(NULL)
 {
 }
 
 // Destructor for ParameterInfo
-ConfigurationInterface::ParameterInfo::~ParameterInfo()
+cedar::aux::ConfigurationInterface::ParameterInfo::~ParameterInfo()
 {
 }
 
@@ -116,7 +114,7 @@ ConfigurationInterface::ParameterInfo::~ParameterInfo()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           bool* pMember,
                                           const std::string& name,
                                           const bool& defaultValue,
@@ -127,7 +125,7 @@ int ConfigurationInterface::addParameter(
   ParameterInfo& parameter_info = mParameterInfos.back();
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
-  parameter_info.mDefaultValues.at(0) = ConfigurationInterface::toString(defaultValue);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
   parameter_info.mMembersType = Setting::TypeBoolean;
   parameter_info.mName = name;
   parameter_info.mIsVectorOfType = Setting::TypeNone;
@@ -135,7 +133,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           int* pMember,
                                           const std::string& name,
                                           const int& defaultValue,
@@ -155,7 +153,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           unsigned int* pMember,
                                           const std::string& name,
                                           const unsigned int& defaultValue,
@@ -175,7 +173,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           double* pMember,
                                           const std::string& name,
                                           const double& defaultValue,
@@ -194,7 +192,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::string* pMember,
                                           const std::string& name,
                                           const std::string& defaultValue,
@@ -212,7 +210,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<bool>* pMember,
                                           const std::string& name,
                                           const bool& defaultValue
@@ -221,7 +219,7 @@ int ConfigurationInterface::addParameter(
   ParameterInfo parameter_info;
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
-  parameter_info.mDefaultValues.at(0) = ConfigurationInterface::toString(defaultValue);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
   parameter_info.mMembersType = Setting::TypeArray;
   parameter_info.mName = name;
   parameter_info.mIsVectorOfType = Setting::TypeBoolean;
@@ -229,7 +227,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<bool>* pMember,
                                           const std::string& name,
                                           const std::vector<bool>& defaultValues
@@ -249,7 +247,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<int>* pMember,
                                           const std::string& name,
                                           const int& defaultValue
@@ -258,7 +256,7 @@ int ConfigurationInterface::addParameter(
   ParameterInfo parameter_info;
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
-  parameter_info.mDefaultValues.at(0) = ConfigurationInterface::toString(defaultValue);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
   parameter_info.mMembersType = Setting::TypeArray;
   parameter_info.mIsUnsigned = false;
   parameter_info.mName = name;
@@ -267,7 +265,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<unsigned int>* pMember,
                                           const std::string& name,
                                           const unsigned int& defaultValue
@@ -276,7 +274,7 @@ int ConfigurationInterface::addParameter(
   ParameterInfo parameter_info;
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
-  parameter_info.mDefaultValues.at(0) = ConfigurationInterface::toString(defaultValue);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
   parameter_info.mMembersType = Setting::TypeArray;
   parameter_info.mIsUnsigned = true;
   parameter_info.mName = name;
@@ -285,7 +283,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<int>* pMember,
                                           const std::string& name,
                                           const std::vector<int>& defaultValues
@@ -306,7 +304,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<unsigned int>* pMember,
                                           const std::string& name,
                                           const std::vector<unsigned int>& defaultValues
@@ -327,7 +325,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<double>* pMember,
                                           const std::string& name,
                                           const double& defaultValue
@@ -336,7 +334,7 @@ int ConfigurationInterface::addParameter(
   ParameterInfo parameter_info;
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
-  parameter_info.mDefaultValues.at(0) = ConfigurationInterface::toString(defaultValue);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
   parameter_info.mMembersType = Setting::TypeArray;
   parameter_info.mName = name;
   parameter_info.mIsVectorOfType = Setting::TypeFloat;
@@ -344,7 +342,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<double>* pMember,
                                           const std::string& name,
                                           const std::vector<double>& defaultValues
@@ -364,7 +362,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<std::string>* pMember,
                                           const std::string& name,
                                           const std::string& defaultValue
@@ -381,7 +379,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::addParameter(
+int cedar::aux::ConfigurationInterface::addParameter(
                                           std::vector<std::string>* pMember,
                                           const std::string& name,
                                           const std::vector<std::string>& defaultValues
@@ -401,7 +399,7 @@ int ConfigurationInterface::addParameter(
   return CONFIG_SUCCESS;
 }
 
-void ConfigurationInterface::addParameter(int* pMember,
+void cedar::aux::ConfigurationInterface::addParameter(int* pMember,
                                   const std::string& name,
                                   int defaultValue,
                                   int min,
@@ -413,7 +411,7 @@ void ConfigurationInterface::addParameter(int* pMember,
   this->addParameter(pMember, name, defaultValue, new cedar::aux::IntervalData<int>(min, max, step, readOnly));
 }
 
-void ConfigurationInterface::addParameter(double* pMember,
+void cedar::aux::ConfigurationInterface::addParameter(double* pMember,
                                   const std::string& name,
                                   double defaultValue,
                                   double min,
@@ -425,7 +423,7 @@ void ConfigurationInterface::addParameter(double* pMember,
   this->addParameter(pMember, name, defaultValue, new cedar::aux::IntervalData<double>(min, max, step, readOnly));
 }
 
-int ConfigurationInterface::readConfigurationFile()
+int cedar::aux::ConfigurationInterface::readConfigurationFile()
 {
   // check if file was specified
   if (!mConfigFileName.compare(""))
@@ -491,7 +489,7 @@ int ConfigurationInterface::readConfigurationFile()
   return CONFIG_SUCCESS;
 }
 
-int ConfigurationInterface::readConfiguration()
+int cedar::aux::ConfigurationInterface::readConfiguration()
 {
   int info = CONFIG_SUCCESS;
 
@@ -559,8 +557,8 @@ int ConfigurationInterface::readConfiguration()
     {
       try
       {
-        string temp = mConfig.lookup(iter->mName);
-        *(static_cast<string*> (iter->mpMember)) = temp;
+        std::string temp = mConfig.lookup(iter->mName);
+        *(static_cast<std::string*> (iter->mpMember)) = temp;
       }
       catch(const SettingNotFoundException &nfex)
       {
@@ -622,10 +620,10 @@ int ConfigurationInterface::readConfiguration()
   return info;
 }
 
-int ConfigurationInterface::handleTypeException(const ConfigurationInterface::ParameterInfo& info)
+int cedar::aux::ConfigurationInterface::handleTypeException(const cedar::aux::ConfigurationInterface::ParameterInfo& info)
 {
-  cerr << "> error in " << mConfigFileName << ": Wrong type for '"
-      << info.mName << "' setting in configuration file." << endl;
+  std::cerr << "> error in " << mConfigFileName << ": Wrong type for '"
+      << info.mName << "' setting in configuration file." << std::endl;
   Setting &root = mConfig.getRoot();
   root.remove(info.mName);
   createNewGroupEntry(info.mName, info.mMembersType, root);
@@ -633,14 +631,14 @@ int ConfigurationInterface::handleTypeException(const ConfigurationInterface::Pa
   return CONFIG_TYPE_ERROR;
 }
 
-int ConfigurationInterface::handleSettingNotFoundException(const ConfigurationInterface::ParameterInfo& info)
+int cedar::aux::ConfigurationInterface::handleSettingNotFoundException(const cedar::aux::ConfigurationInterface::ParameterInfo& info)
 {
-  cerr << "> error in " << mConfigFileName << ": No '" << info.mName << "' setting in configuration file." << endl;
+  std::cerr << "> error in " << mConfigFileName << ": No '" << info.mName << "' setting in configuration file." << std::endl;
   setParameterToDefault(info);
   return CONFIG_MISSING_ITEM_ERROR;
 }
 
-int ConfigurationInterface::writeConfiguration()
+int cedar::aux::ConfigurationInterface::writeConfiguration()
 {
   // export current values of the parameters into the config object
   Setting &root = mConfig.getRoot();
@@ -708,12 +706,12 @@ int ConfigurationInterface::writeConfiguration()
     {
       try
       {
-        mConfig.lookup(iter->mName) = *(static_cast<string*> (iter->mpMember));
+        mConfig.lookup(iter->mName) = *(static_cast<std::string*> (iter->mpMember));
       }
       catch(const SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
-        mConfig.lookup(iter->mName) = *(static_cast<string*> (iter->mpMember));
+        mConfig.lookup(iter->mName) = *(static_cast<std::string*> (iter->mpMember));
       }
       break;
     } // END case TypeString
@@ -751,7 +749,7 @@ int ConfigurationInterface::writeConfiguration()
       }
       default:
       {
-        std::cerr << "Unsupported data type in: " << (mConfigFileName.c_str()) << endl;
+        std::cerr << "Unsupported data type in: " << (mConfigFileName.c_str()) << std::endl;
         break;
       }
       } // END switch array types
@@ -759,7 +757,7 @@ int ConfigurationInterface::writeConfiguration()
     } // END case TypeArray
     default:
     {
-      std::cerr << "Unsupported data type in: " << (mConfigFileName.c_str()) << endl;
+      std::cerr << "Unsupported data type in: " << (mConfigFileName.c_str()) << std::endl;
       break;
     }
     } // END switch types
@@ -769,7 +767,7 @@ int ConfigurationInterface::writeConfiguration()
   {
     mConfig.writeFile(mConfigFileName.c_str());
 #ifdef DEBUG
-    cout << "New configuration successfully written to: " << (mConfigFileName.c_str()) << endl;
+    std::cout << "New configuration successfully written to: " << (mConfigFileName.c_str()) << std::endl;
 #endif
   }
   catch(const FileIOException &fioex)
@@ -782,7 +780,7 @@ int ConfigurationInterface::writeConfiguration()
       std::string fullPath;
       if (!getCurrentDir(currentPath, sizeof(currentPath)))
       {
-        cout << "> error (ConfigurationInterface) - cannot determine current path" << std::endl;
+        std::cout << "> error (ConfigurationInterface) - cannot determine current path" << std::endl;
       }
       struct stat st;
       if(stat(mConfigFileName.c_str(),&st) != 0) // path does not exist
@@ -798,17 +796,17 @@ int ConfigurationInterface::writeConfiguration()
     catch(const FileIOException &directoryException)
     {
       // we tried to create a directory to store the file, but it failed
-      cerr << "I/O error while writing file: " << (mConfigFileName.c_str())
-          << ", please check file permissions" << endl;
+      std::cerr << "I/O error while writing file: " << (mConfigFileName.c_str())
+          << ", please check file permissions" << std::endl;
       return CONFIG_FILE_ERROR;
     }
-    cerr << "I/O error while writing file: " << (mConfigFileName.c_str()) << ", please check file permissions" << endl;
+    std::cerr << "I/O error while writing file: " << (mConfigFileName.c_str()) << ", please check file permissions" << std::endl;
     return CONFIG_FILE_ERROR;
   }
   return CONFIG_SUCCESS;
 }
 
-void ConfigurationInterface::setParameterToDefault(
+void cedar::aux::ConfigurationInterface::setParameterToDefault(
                                                     void* pParameter,
                                                     std::vector<std::string> defaultValues,
                                                     int type,
@@ -820,17 +818,17 @@ void ConfigurationInterface::setParameterToDefault(
   {
   case (Setting::TypeBoolean):
   {
-    *(static_cast<bool*> (pParameter)) = ConfigurationInterface::to<bool>(defaultValues.at(0));
+    *(static_cast<bool*> (pParameter)) = cedar::aux::ConfigurationInterface::to<bool>(defaultValues.at(0));
     break;
   }
   case (Setting::TypeInt):
   {
-    *(static_cast<int*> (pParameter)) = ConfigurationInterface::to<int>(defaultValues.at(0));
+    *(static_cast<int*> (pParameter)) = cedar::aux::ConfigurationInterface::to<int>(defaultValues.at(0));
     break;
   }
   case (Setting::TypeFloat):
   {
-      *(static_cast<double*> (pParameter)) = ConfigurationInterface::to<double>(defaultValues.at(0));
+      *(static_cast<double*> (pParameter)) = cedar::aux::ConfigurationInterface::to<double>(defaultValues.at(0));
     break;
   }
   case (Setting::TypeString):
@@ -890,22 +888,22 @@ void ConfigurationInterface::setParameterToDefault(
   return;
 }
 
-void ConfigurationInterface::setParameterToDefault(const ParameterInfo& info)
+void cedar::aux::ConfigurationInterface::setParameterToDefault(const ParameterInfo& info)
 {
   this->setParameterToDefault(info.mpMember, info.mDefaultValues, info.mMembersType, info.mIsVectorOfType);
 }
 
-const ConfigurationInterface::ParameterInfoVector& ConfigurationInterface::getParameterList() const
+const cedar::aux::ConfigurationInterface::ParameterInfoVector& cedar::aux::ConfigurationInterface::getParameterList() const
 {
   return this->mParameterInfos;
 }
 
-const std::string& ConfigurationInterface::getConfigFileName() const
+const std::string& cedar::aux::ConfigurationInterface::getConfigFileName() const
 {
   return this->mConfigFileName;
 }
 
-void ConfigurationInterface::adjustVectorSize(
+void cedar::aux::ConfigurationInterface::adjustVectorSize(
                                                void* pVector,
                                                const libconfig::Setting::Type type,
                                                libconfig::Setting& element
@@ -935,22 +933,22 @@ void ConfigurationInterface::adjustVectorSize(
   }
   default:
   {
-    std::cerr << "Unsupported data type in: " << (mConfigFileName.c_str()) << endl;
+    std::cerr << "Unsupported data type in: " << (mConfigFileName.c_str()) << std::endl;
   }
   }
   return;
 }
 
-void ConfigurationInterface::readOrDefaultConfiguration()
+void cedar::aux::ConfigurationInterface::readOrDefaultConfiguration()
 {
   // try to read in parameters - on fail, try to write all missing parameters
   int result = this->readConfiguration();
-  if (result != ConfigurationInterface::CONFIG_SUCCESS)
+  if (result != cedar::aux::ConfigurationInterface::CONFIG_SUCCESS)
   {
    std::cerr << "> error (" << mConfigFileName << "): Some parameters missing or corrupt,"
        " writing additional parameters to file." << std::endl;
    result = this->writeConfiguration();
-   if(result != ConfigurationInterface::CONFIG_SUCCESS)
+   if(result != cedar::aux::ConfigurationInterface::CONFIG_SUCCESS)
    {
      std::cerr << "> error (" << mConfigFileName << "): Could not write config file, "
          "please check file permissions." << std::endl;
@@ -965,7 +963,7 @@ void ConfigurationInterface::readOrDefaultConfiguration()
  * the cut-off path. When this call returns, the current path is created with
  * system("mkdir " + cut_off_pathname).
  */
-void ConfigurationInterface::createConfigPath(std::string path)
+void cedar::aux::ConfigurationInterface::createConfigPath(std::string path)
 {
   struct stat st;
   unsigned int last_slash = path.rfind("/");
@@ -973,7 +971,7 @@ void ConfigurationInterface::createConfigPath(std::string path)
   if (last_slash == 0)
     return;
   // check if this is the last level in the folder tree (i.e. no slash included)
-  if (last_slash == (unsigned int)string::npos)
+  if (last_slash == static_cast<unsigned int>(std::string::npos))
   {
     int result = system(path.c_str());
     //@todo handle errors with mkdir
@@ -995,7 +993,7 @@ void ConfigurationInterface::createConfigPath(std::string path)
 }
 
 //!Recursively add groups to the setting tree until we reach a leaf. The leaf is created with
-void ConfigurationInterface::createNewGroupEntry(
+void cedar::aux::ConfigurationInterface::createNewGroupEntry(
                                                   const std::string& name,
                                                   const libconfig::Setting::Type type,
                                                   libconfig::Setting& tree
@@ -1003,7 +1001,7 @@ void ConfigurationInterface::createNewGroupEntry(
 {
   unsigned int first_dot = name.find(".");
   // check if this is the leaf
-  if (first_dot == (unsigned int)string::npos)
+  if (first_dot == static_cast<unsigned int>(std::string::npos))
   {
     // create an entry
     tree.add(name,type);
@@ -1025,7 +1023,7 @@ void ConfigurationInterface::createNewGroupEntry(
 }
 
 template<typename T>
-void ConfigurationInterface::writeArray(
+void cedar::aux::ConfigurationInterface::writeArray(
                                          void* pVector,
                                          const std::string& name,
                                          const libconfig::Setting::Type vectorType
@@ -1059,7 +1057,7 @@ void ConfigurationInterface::writeArray(
   }
 }
 
-void ConfigurationInterface::writeArrayUInt(
+void cedar::aux::ConfigurationInterface::writeArrayUInt(
                                              void* pVector,
                                              const std::string& name,
                                              const libconfig::Setting::Type vectorType
@@ -1094,7 +1092,7 @@ void ConfigurationInterface::writeArrayUInt(
 }
 
 template<typename T>
-void ConfigurationInterface::adjustVector(
+void cedar::aux::ConfigurationInterface::adjustVector(
                                            void* pVector,
                                            const libconfig::Setting::Type& type,
                                            libconfig::Setting& element
@@ -1123,7 +1121,7 @@ void ConfigurationInterface::adjustVector(
 }
 
 template<typename T>
-int ConfigurationInterface::readArray(ParameterInfo& info)
+int cedar::aux::ConfigurationInterface::readArray(ParameterInfo& info)
 {
   int result = CONFIG_SUCCESS;
   try
@@ -1150,8 +1148,8 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
   }
   catch(const SettingTypeException &nfex)
   {
-    cerr << "> error in " << mConfigFileName << ": Wrong type for '"
-        << info.mName << "' setting in configuration file." << endl;
+    std::cerr << "> error in " << mConfigFileName << ": Wrong type for '"
+        << info.mName << "' setting in configuration file." << std::endl;
     std::vector<T>* p_vector = static_cast<std::vector<T>*> (info.mpMember);
     removeItem(info.mName);
     createNewGroupEntry(info.mName, Setting::TypeArray, mConfig.getRoot());
@@ -1165,7 +1163,7 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
   }
   catch(const cedar::aux::TypeMismatchException& e)
   {
-    cerr << "> error in " << mConfigFileName << ": array '" << info.mName << "' is corrupt" << std::endl;
+    std::cerr << "> error in " << mConfigFileName << ": array '" << info.mName << "' is corrupt" << std::endl;
     removeItem(info.mName);
     createNewGroupEntry(info.mName, Setting::TypeArray, mConfig.getRoot());
     Setting &array = mConfig.lookup(info.mName);
@@ -1176,12 +1174,12 @@ int ConfigurationInterface::readArray(ParameterInfo& info)
   return result;
 }
 
-void ConfigurationInterface::removeItem(const std::string& name)
+void cedar::aux::ConfigurationInterface::removeItem(const std::string& name)
 {
   // find a dot
   unsigned int last_dot = name.rfind(".");
   // check if there is a group path - if not, delete at root
-  if (last_dot == (unsigned int)string::npos)
+  if (last_dot == static_cast<unsigned int>(std::string::npos))
   {
     mConfig.getRoot().remove(name);
   }
@@ -1195,7 +1193,7 @@ void ConfigurationInterface::removeItem(const std::string& name)
   }
 }
 
-const std::vector<std::string>& ConfigurationInterface::getErrors()
+const std::vector<std::string>& cedar::aux::ConfigurationInterface::getErrors()
 {
   return mConfigurationErrors;
 }

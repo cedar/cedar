@@ -42,8 +42,6 @@
 // SYSTEM INCLUDES
 
 
-using namespace std;
-
 std::vector<double> cedar::aux::math::solveQuadric(const std::vector<double>& rCoefficients)
 {
   std::vector<double> solutions;

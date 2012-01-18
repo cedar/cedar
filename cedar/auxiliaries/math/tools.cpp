@@ -44,7 +44,6 @@
 #include <iostream>
 #include <math.h>
 
-using namespace std;
 
 double cedar::aux::math::normalizeAngle(double value)
 {
@@ -93,14 +92,14 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         if (IsZero(matrix.at<unsigned char>(i, j)))
         {
-          cout << "0" << " ";
+          std::cout << "0" << " ";
         }
         else
         {
-          cout << matrix.at<unsigned char>(i, j) << " ";
+          std::cout << matrix.at<unsigned char>(i, j) << " ";
         }
       }
-      cout << "\n";
+      std::cout << "\n";
     }
   break;
   case CV_8S:
@@ -110,14 +109,14 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         if (IsZero(matrix.at<char>(i, j)))
         {
-          cout << "0" << " ";
+          std::cout << "0" << " ";
         }
         else
         {
-          cout << matrix.at<char>(i, j) << " ";
+          std::cout << matrix.at<char>(i, j) << " ";
         }
       }
-      cout << "\n";
+      std::cout << "\n";
     }
   break;
   case CV_16U:
@@ -127,14 +126,14 @@ void cedar::aux::math::write(cv::Mat matrix)
         {
           if (IsZero(matrix.at<unsigned short int>(i, j)))
           {
-            cout << "0" << " ";
+            std::cout << "0" << " ";
           }
           else
           {
-            cout << matrix.at<unsigned short int>(i, j) << " ";
+            std::cout << matrix.at<unsigned short int>(i, j) << " ";
           }
         }
-        cout << "\n";
+        std::cout << "\n";
       }
     break;
   case CV_16S:
@@ -144,14 +143,14 @@ void cedar::aux::math::write(cv::Mat matrix)
         {
           if (IsZero(matrix.at<short int>(i, j)))
           {
-            cout << "0" << " ";
+            std::cout << "0" << " ";
           }
           else
           {
-            cout << matrix.at<short int>(i, j) << " ";
+            std::cout << matrix.at<short int>(i, j) << " ";
           }
         }
-        cout << "\n";
+        std::cout << "\n";
       }
     break;
   case CV_32S:
@@ -161,14 +160,14 @@ void cedar::aux::math::write(cv::Mat matrix)
         {
           if (IsZero(matrix.at<int>(i, j)))
           {
-            cout << "0" << " ";
+            std::cout << "0" << " ";
           }
           else
           {
-            cout << matrix.at<int>(i, j) << " ";
+            std::cout << matrix.at<int>(i, j) << " ";
           }
         }
-        cout << "\n";
+        std::cout << "\n";
       }
     break;
   case CV_32F:
@@ -178,14 +177,14 @@ void cedar::aux::math::write(cv::Mat matrix)
       {
         if (IsZero(matrix.at<float>(i, j)))
         {
-          cout << "0" << " ";
+          std::cout << "0" << " ";
         }
         else
         {
-          cout << matrix.at<float>(i, j) << " ";
+          std::cout << matrix.at<float>(i, j) << " ";
         }
       }
-      cout << "\n";
+      std::cout << "\n";
     }
   break;
   case CV_64F:
@@ -195,19 +194,19 @@ void cedar::aux::math::write(cv::Mat matrix)
     {
       if (IsZero(matrix.at<double>(i, j)))
       {
-        cout << "0" << " ";
+        std::cout << "0" << " ";
       }
       else
       {
-        cout << matrix.at<double>(i, j) << " ";
+        std::cout << matrix.at<double>(i, j) << " ";
       }
     }
-    cout << "\n";
+    std::cout << "\n";
   }
   default:
     break;
   }
-  cout << "\n";
+  std::cout << "\n";
 }
 
 cv::Mat cedar::aux::math::convolve(const cv::Mat& matrix, const cv::Mat& kernel)
