@@ -80,7 +80,7 @@ int main()
   {
     if (result.at(0) != "Split" || result.at(1) != "Test")
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
@@ -100,7 +100,7 @@ int main()
   {
     if (result.at(0) != to_split)
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
@@ -120,12 +120,13 @@ int main()
   {
     if (result.at(0) != to_split)
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
 
-  std::cout << "Testing splitFirst." <<std::endl;
+  std::cout << "Testing splitFirst." << std::endl;
+
   to_split = "Split Test Normal Case";
   std::cout << "String to split: " << to_split << std::endl;
   std::string first;
@@ -143,7 +144,7 @@ int main()
   {
     if (first != "Split" || rest != "Test Normal Case")
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
@@ -156,16 +157,16 @@ int main()
   std::cout << "Result with separator \" \": ";
   std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
   std::cout << std::endl;
-  if (first.length() == 0 || rest.length() == 0)
+  if (first.length() != to_split.length() - 1 || rest.length() != 0)
   {
     std::cout << "Error: split result has the wrong size." << std::endl;
     ++errors;
   }
   else
   {
-    if (first != "Split" || rest != "Test Normal Case")
+    if (first != "SplitTestSeparatorAtEnd" || rest != "")
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
@@ -178,16 +179,16 @@ int main()
   std::cout << "Result with separator \" \": ";
   std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
   std::cout << std::endl;
-  if (first.length() == 0 || rest.length() == 0)
+  if (first.length() != to_split.length() || rest.length() != 0)
   {
     std::cout << "Error: split result has the wrong size." << std::endl;
     ++errors;
   }
   else
   {
-    if (first != "Split" || rest != "Test Normal Case")
+    if (first != "SplitTestHasNoSeparator" || rest != "")
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }

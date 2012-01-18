@@ -127,6 +127,7 @@ int main(int /* argc */, char** /* argv */)
   network_nested->getElement<Step>("parent step");
   std::cout << network_nested->getElement<Network>("network child")->getElement<Step>("child step")->getName()
     << std::endl;
+  std::cout << network_nested->getElement<Step>("network child.child step")->getName() << std::endl;
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;

@@ -183,7 +183,18 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
 {
-  ElementMap::const_iterator iter = this->mElements.find(name);
+  ElementMap::const_iterator iter;
+  std::string first;
+  std::string rest;
+  cedar::aux::splitFirst(name, ".", first, rest);
+  if (first.length() != 0 && rest.length() != 0)
+  {
+    return this->getElement<Network>(first)->getElement(rest);
+  }
+  else
+  {
+    iter = this->mElements.find(name);
+  }
 
   if (iter != this->mElements.end())
   {
