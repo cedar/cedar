@@ -85,7 +85,7 @@ void cedar::aux::gui::FileParameter::parameterPointerChanged()
   cedar::aux::FileParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter());
   this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->get().absolutePath());
+  this->mpEdit->setText(parameter->getValue().absolutePath());
   this->mpEdit->setReadOnly(true);
 
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
@@ -96,7 +96,7 @@ void cedar::aux::gui::FileParameter::parameterValueChanged()
   cedar::aux::FileParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::FileParameter>(this->getParameter());
   this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->get().absolutePath());
+  this->mpEdit->setText(parameter->getValue().absolutePath());
   this->mpEdit->setReadOnly(true);
 }
 
@@ -109,11 +109,11 @@ void cedar::aux::gui::FileParameter::onBrowseClicked()
   switch (parameter->getMode())
   {
     case cedar::aux::FileParameter::READ:
-      value = QFileDialog::getOpenFileName(this, "Select a file to read", parameter->get().absolutePath());
+      value = QFileDialog::getOpenFileName(this, "Select a file to read", parameter->getValue().absolutePath());
       break;
 
     case cedar::aux::FileParameter::WRITE:
-      value = QFileDialog::getSaveFileName(this, "Select a file to write", parameter->get().absolutePath());
+      value = QFileDialog::getSaveFileName(this, "Select a file to write", parameter->getValue().absolutePath());
       break;
   }
   parameter->set(value.toStdString());

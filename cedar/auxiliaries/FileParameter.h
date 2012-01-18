@@ -128,7 +128,7 @@ public:
   }
 
   //!@brief get the directory
-  const QDir& get() const
+  const QDir& getValue() const
   {
     return this->mValue;
   }
