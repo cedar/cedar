@@ -88,8 +88,8 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
   if ( (index = dir.rfind("/")) != std::string::npos )
   {
     dir = dir.substr(0, index);
+    boost::filesystem::create_directory(dir);
   }
-  boost::filesystem::create_directory(dir);
 
   cedar::aux::ConfigurationNode configuration;
   this->writeConfiguration(configuration);
