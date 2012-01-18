@@ -46,6 +46,7 @@ cedar_add_library(cedaraux
   gui/DoubleParameter.h
   gui/DoubleVectorParameter.h
   gui/EnumParameter.h
+  gui/FileParameter.h
   gui/Parameter.h
   gui/Viewer.h
   gui/SceneWidget.h
