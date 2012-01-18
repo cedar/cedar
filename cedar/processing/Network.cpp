@@ -57,8 +57,8 @@
 #include <algorithm>
 
 // Define that helps to debug file reading.
-//#define DEBUG_FILE_READING
-//#define DEBUG_FILE_WRITING
+#define DEBUG_FILE_READING
+#define DEBUG_FILE_WRITING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -332,6 +332,11 @@ void cedar::proc::Network::writeTo(cedar::aux::ConfigurationNode& root)
   if (!triggers.empty())
     root.add_child("triggers", triggers);
 
+  cedar::aux::ConfigurationNode networks;
+  this->writeNetworks(networks);
+  if (!networks.empty())
+    root.add_child("networks", networks);
+
   cedar::aux::ConfigurationNode connections;
   this->writeDataConnections(connections);
   if (!connections.empty())
@@ -380,6 +385,19 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
     // no steps declared -- this is ok.
 #if defined DEBUG || defined DEBUG_FILE_READING
     std::cout << "No steps present while reading configuration." << std::endl;
+#endif // defined DEBUG || defined DEBUG_FILE_READING
+  }
+
+  try
+  {
+    const cedar::aux::ConfigurationNode& networks = root.get_child("networks");
+    this->readNetworks(networks);
+  }
+  catch (const boost::property_tree::ptree_bad_path&)
+  {
+    // no networks declared -- this is ok.
+#if defined DEBUG || defined DEBUG_FILE_READING
+    std::cout << "No networks present while reading configuration." << std::endl;
 #endif // defined DEBUG || defined DEBUG_FILE_READING
   }
 
@@ -516,6 +534,55 @@ void cedar::proc::Network::readTriggers(const cedar::aux::ConfigurationNode& roo
     {
       // no listeners declared -- this is ok.
     }
+  }
+}
+
+void cedar::proc::Network::writeNetworks(cedar::aux::ConfigurationNode& networks)
+{
+  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    // if this is a network, write this to the configuration tree
+    if (cedar::proc::NetworkPtr network = boost::shared_dynamic_cast<cedar::proc::Network>(iter->second))
+    {
+#ifdef DEBUG_FILE_WRITING
+      std::cout << "Saving " << iter->first << "." << std::endl;
+#endif
+      //cedar::proc::ElementDeclarationPtr decl = DeclarationRegistrySingleton::getInstance()->getDeclarationOf(trigger);
+      cedar::aux::ConfigurationNode network_node;
+      network->writeTo(network_node);
+      networks.push_back(cedar::aux::ConfigurationNode::value_type(iter->first, network_node));
+    }
+  }
+}
+
+void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& root)
+{
+#ifdef DEBUG_FILE_READING
+  std::cout << "Reading networks." << std::endl;
+#endif // DEBUG_FILE_READING
+
+  for (cedar::aux::ConfigurationNode::const_iterator iter = root.begin();
+      iter != root.end();
+      ++iter)
+  {
+    //const std::string& class_id = iter->first;
+    const std::string& network_name = iter->first;
+    const cedar::aux::ConfigurationNode& network_node = iter->second;
+
+#ifdef DEBUG_FILE_READING
+    std::cout << "Reading network named " << network_name << std::endl;
+#endif // DEBUG_FILE_READING
+
+    cedar::proc::NetworkPtr network
+      = boost::shared_dynamic_cast<cedar::proc::Network>
+        (
+          cedar::proc::DeclarationRegistrySingleton::getInstance()->allocateClass("cedar.processing.Network")
+        );
+    network->readFrom(network_node);
+    network->setName(network_name);
+    // is this enough to recursively read in the network?
+    this->add(network);
+    network->resetChangedStates(false);
   }
 }
 

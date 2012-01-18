@@ -42,6 +42,7 @@
 #define CEDAR_PROC_NETWORK_H
 
 // CEDAR INCLUDES
+#include "cedar/processing/Connectable.h"
 #include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
@@ -60,7 +61,7 @@
  * @todo Add a slot which reacts to name changes of elements (update map of names to ptrs)
  * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
  */
-class cedar::proc::Network
+class cedar::proc::Network : public cedar::proc::Connectable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -74,6 +75,7 @@ private:
 
   //! Type of the map of elements.
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
+
 public:
   //! Iterator type of the element map.
   typedef ElementMap::iterator ElementMapIterator;
@@ -262,6 +264,14 @@ private:
   /*!@brief Writes the triggers in the network to the configuration node.
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root);
+
+  /*!@brief Reads networks from a configuration node and adds them to the parent network.
+   */
+  void readNetworks(const cedar::aux::ConfigurationNode& root);
+
+  /*!@brief Writes the child networks in the network to the configuration node.
+   */
+  void writeNetworks(cedar::aux::ConfigurationNode& root);
 
   /*!@brief Reads a data connection from a configuration node and adds it to the network.
    */

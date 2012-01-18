@@ -75,7 +75,7 @@ public:
   std::string _mMessage;
 };
 
-
+CEDAR_GENERATE_POINTER_TYPES(TestModule);
 
 int main(int /* argc */, char** /* argv */)
 {
@@ -108,6 +108,25 @@ int main(int /* argc */, char** /* argv */)
   StepPtr step_b = network->getElement<Step>("stepB");
   step_b->onTrigger();
   std::cout << "done." << std::endl;
+
+  // test nested networks
+  std::cout << "Test nested network." << std::endl;
+  cedar::proc::NetworkPtr network_parent(new cedar::proc::Network());
+  TestModulePtr step_parent (new TestModule());
+  network_parent->add(step_parent, "parent step");
+  cedar::proc::NetworkPtr network_child(new cedar::proc::Network());
+  network_child->setName("network child");
+  TestModulePtr step_child (new TestModule());
+  network_child->add(step_child, "child step");
+  network_parent->add(network_child);
+  std::cout << "Write nested network." << std::endl;
+  network_parent->writeFile("Nested.json");
+  std::cout << "Read nested network." << std::endl;
+  cedar::proc::NetworkPtr network_nested(new cedar::proc::Network());
+  network_nested->readFile("Nested.json");
+  network_nested->getElement<Step>("parent step");
+  std::cout << network_nested->getElement<Network>("network child")->getElement<Step>("child step")->getName()
+    << std::endl;
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
