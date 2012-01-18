@@ -39,9 +39,6 @@
 
 // SYSTEM INCLUDES
 
-using namespace std;
-using namespace boost::posix_time;
-
 
 //------------------------------------------------------------------------------
 // constructors and destructor
@@ -52,10 +49,10 @@ cedar::aux::LoopedThread::LoopedThread(double stepSize, double idleTime,const st
   mStop  = false;
   initStatistics();
 
-  mStepSize = microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
+  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * stepSize + 0.5));
   mIdleTime = static_cast<unsigned int>(1000 * idleTime + 0.5);
   mUseFixedStepSize = true;
-  mSimulatedTime = microseconds(0);
+  mSimulatedTime = boost::posix_time::microseconds(0);
 }
 
 cedar::aux::LoopedThread::LoopedThread(const std::string& configFileName)
@@ -91,16 +88,16 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
 
     if(isRunning())
     {
-      cout << "Warning: Thread is still running after call of stop()!" << endl;
+      std::cout << "Warning: Thread is still running after call of stop()!" << std::endl;
     }
 
     if(suppressWarning == false && mMaxStepsTaken > 1.01 && mSimulatedTime.total_microseconds() == 0)
     {
-      cout << "Warning: The system was not fast enough to stay to scheduled thread timing. ";
-      cout << "Consider using a larger step size." << endl;
-      cout << "Execution stats:" << endl;
-      cout << "  avg. time steps between execution: " << (double) mSumOfStepsTaken / (double) mNumberOfSteps << endl;
-      cout << "  max. time steps between execution: " << mMaxStepsTaken << endl;
+      std::cout << "Warning: The system was not fast enough to stay to scheduled thread timing. ";
+      std::cout << "Consider using a larger step size." << std::endl;
+      std::cout << "Execution stats:" << std::endl;
+      std::cout << "  avg. time steps between execution: " << (double) mSumOfStepsTaken / (double) mNumberOfSteps << std::endl;
+      std::cout << "  max. time steps between execution: " << mMaxStepsTaken << std::endl;
     }
   }
   return;
@@ -109,7 +106,7 @@ void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
 void cedar::aux::LoopedThread::run(void)
 {
   // we do not want to change the step size while running
-  time_duration step_size = mStepSize;
+  boost::posix_time::time_duration step_size = mStepSize;
   bool use_fixed_step_size = mUseFixedStepSize;
   initStatistics();
 
@@ -118,15 +115,15 @@ void cedar::aux::LoopedThread::run(void)
   {
     // fast running mode
 
-    mLastTimeStepStart = microsec_clock::universal_time();
-    mLastTimeStepEnd = microsec_clock::universal_time();
-    time_duration time_difference;
+    mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
+    mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+    boost::posix_time::time_duration time_difference;
 
     while(!mStop)
     {
       usleep(mIdleTime);
       mLastTimeStepStart = mLastTimeStepEnd;
-      mLastTimeStepEnd = microsec_clock::universal_time();
+      mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
 
       if(mSimulatedTime.total_microseconds() == 0)
       {
@@ -144,19 +141,19 @@ void cedar::aux::LoopedThread::run(void)
     // regular mode with time slots
 
     // initialization
-    mLastTimeStepStart = microsec_clock::universal_time();
-    mLastTimeStepEnd = microsec_clock::universal_time();
-    ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
-    srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
+    mLastTimeStepStart = boost::posix_time::microsec_clock::universal_time();
+    mLastTimeStepEnd = boost::posix_time::microsec_clock::universal_time();
+    boost::posix_time::ptime scheduled_wakeup = mLastTimeStepEnd + step_size;
+    srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
 
     // some auxiliary variables
-    time_duration sleep_duration = microseconds(0);
-    time_duration step_duration = microseconds(0);
+    boost::posix_time::time_duration sleep_duration = boost::posix_time::microseconds(0);
+    boost::posix_time::time_duration step_duration = boost::posix_time::microseconds(0);
 
     while(!mStop)
     {
       // sleep until next wake up time
-      sleep_duration = scheduled_wakeup - microsec_clock::universal_time();
+      sleep_duration = scheduled_wakeup - boost::posix_time::microsec_clock::universal_time();
       usleep(std::max<int>(0, sleep_duration.total_microseconds()));
 
       // determine time since last run
@@ -171,10 +168,10 @@ void cedar::aux::LoopedThread::run(void)
       #if defined DEBUG && defined SHOW_TIMING_HELPERS
       // print warning if time steps have been skipped
       if( steps_taken > 1.01 )
-        cerr << "WARNING: " << steps_taken << " time steps taken at once! "
+        std::cerr << "WARNING: " << steps_taken << " time steps taken at once! "
         << "Your system might be too slow for an execution interval of "
         << step_size.total_microseconds() << " microseconds. Consider using a "
-        << "longer interval!" << endl;
+        << "longer interval!" << std::endl;
       #endif
 
       // here we have to distinguish between the different working modes of the
@@ -196,7 +193,7 @@ void cedar::aux::LoopedThread::run(void)
         }
 
         // schedule the next wake up
-        while(scheduled_wakeup < microsec_clock::universal_time())
+        while(scheduled_wakeup < boost::posix_time::microsec_clock::universal_time())
         {
           scheduled_wakeup = scheduled_wakeup + step_size;
         }
@@ -218,7 +215,11 @@ void cedar::aux::LoopedThread::run(void)
         }
 
         // schedule the next wake up
-        scheduled_wakeup = max<ptime>(scheduled_wakeup + step_size, microsec_clock::universal_time());
+        scheduled_wakeup = std::max<boost::posix_time::ptime>
+                           (
+                             scheduled_wakeup + step_size,
+                             boost::posix_time::microsec_clock::universal_time()
+                           );
 
       } // if(mUseFixedStepSize)
 
@@ -251,7 +252,7 @@ void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
 
   if(old_sum > mSumOfStepsTaken)
   {
-    cerr << "Warning: Value overflow in thread statistics. Statistics will be reseted." << endl;
+    std::cerr << "Warning: Value overflow in thread statistics. Statistics will be reseted." << std::endl;
     initStatistics();
   }
 
@@ -293,35 +294,35 @@ void cedar::aux::LoopedThread::readParamsFromConfigFile()
 
   if(addParameter(&_mStepSize, "threadStepSize", 100.0) != CONFIG_SUCCESS)
   {
-    cout << "LoopedThread: Error reading parameter 'stepSize' from config file!" << endl;
+    std::cout << "LoopedThread: Error reading parameter 'stepSize' from config file!" << std::endl;
   }
 
   // mIdleTime
 
   if(addParameter(&_mIdleTime, "threadIdleTime", 0.001) != CONFIG_SUCCESS)
   {
-    cout << "LoopedThread: Error reading parameter 'idleTime' from config file!" << endl;
+    std::cout << "LoopedThread: Error reading parameter 'idleTime' from config file!" << std::endl;
   }
 
   // mUseFixedStepSize
 
   if(addParameter(&mUseFixedStepSize, "threadUseFixedStepSize", true) != CONFIG_SUCCESS)
   {
-    cout << "LoopedThread: Error reading parameter 'useFixedStepSize' from config file!" << endl;
+    std::cout << "LoopedThread: Error reading parameter 'useFixedStepSize' from config file!" << std::endl;
   }
 
   // mSimulatedTime
 
   if(addParameter(&_mSimulatedTime, "threadSimulatedTime", 0.0) != CONFIG_SUCCESS)
   {
-    cout << "LoopedThread: Error reading parameter 'simulatedTime' from config file!" << endl;
+    std::cout << "LoopedThread: Error reading parameter 'simulatedTime' from config file!" << std::endl;
   }
 
   readOrDefaultConfiguration();
 
-  mStepSize = microseconds(static_cast<unsigned int>(1000 * _mStepSize + 0.5));
+  mStepSize = boost::posix_time::microseconds(static_cast<unsigned int>(1000 * _mStepSize + 0.5));
   mIdleTime = static_cast<unsigned int>(1000 * _mIdleTime + 0.5);
-  mSimulatedTime = microseconds(static_cast<unsigned>(1000 * _mSimulatedTime + 0.5));
+  mSimulatedTime = boost::posix_time::microseconds(static_cast<unsigned>(1000 * _mSimulatedTime + 0.5));
 
   return;
 }

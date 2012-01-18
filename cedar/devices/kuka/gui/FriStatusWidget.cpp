@@ -47,6 +47,7 @@
 #include <iostream>
 #endif
 
+//!@todo Remove these using namespaces.
 using namespace cedar::dev::kuka;
 using namespace std;
 

@@ -47,8 +47,6 @@
 
 // SYSTEM INCLUDES
 
-//using namespace cv;
-
 void cedar::aux::gl::setColor(double R, double G, double B)
 {
   glColor4d(R, G, B, 0);

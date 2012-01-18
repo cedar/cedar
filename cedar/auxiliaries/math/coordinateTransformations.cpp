@@ -41,7 +41,6 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
-using namespace std;
 
 void cartesianToPolar(const double x, const double y, double& rho, double& theta)
 {
