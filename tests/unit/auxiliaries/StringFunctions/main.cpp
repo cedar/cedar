@@ -125,6 +125,73 @@ int main()
     }
   }
 
+  std::cout << "Testing splitFirst." <<std::endl;
+  to_split = "Split Test Normal Case";
+  std::cout << "String to split: " << to_split << std::endl;
+  std::string first;
+  std::string rest;
+  cedar::aux::splitFirst(to_split, " ", first, rest);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
+  std::cout << std::endl;
+  if (first.length() == 0 || rest.length() == 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (first != "Split" || rest != "Test Normal Case")
+    {
+      std::cout << "Error: split returned the wring result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = "SplitTestSeparatorAtEnd ";
+  std::cout << "String to split: " << to_split << std::endl;
+  first;
+  rest;
+  cedar::aux::splitFirst(to_split, " ", first, rest);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
+  std::cout << std::endl;
+  if (first.length() == 0 || rest.length() == 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (first != "Split" || rest != "Test Normal Case")
+    {
+      std::cout << "Error: split returned the wring result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = "SplitTestHasNoSeparator";
+  std::cout << "String to split: " << to_split << std::endl;
+  first;
+  rest;
+  cedar::aux::splitFirst(to_split, " ", first, rest);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
+  std::cout << std::endl;
+  if (first.length() == 0 || rest.length() == 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (first != "Split" || rest != "Test Normal Case")
+    {
+      std::cout << "Error: split returned the wring result." << std::endl;
+      ++errors;
+    }
+  }
+
   // Join test ---------------------------------------------------------------------------------------------------------
   std::cout << "Testing joining of lists of strings." << std::endl;
 
