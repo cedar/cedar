@@ -152,6 +152,7 @@ namespace cedar
     class DirectoryParameter;
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DirectoryParameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(FileParameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(EnumParameter);
     //!@endcond
 

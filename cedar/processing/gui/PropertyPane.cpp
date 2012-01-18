@@ -37,29 +37,31 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/PropertyPane.h"
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/processing/ProjectionMappingParameter.h"
-#include "cedar/auxiliaries/gui/BoolParameter.h"
-#include "cedar/auxiliaries/gui/DoubleParameter.h"
-#include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/gui/UIntParameter.h"
-#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
-#include "cedar/auxiliaries/gui/StringParameter.h"
-#include "cedar/auxiliaries/gui/EnumParameter.h"
 #include "cedar/processing/gui/ProjectionMappingParameter.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/gui/DirectoryParameter.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/BoolParameter.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/FileParameter.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/UIntVectorParameter.h"
+#include "cedar/auxiliaries/gui/BoolParameter.h"
+#include "cedar/auxiliaries/gui/DoubleParameter.h"
+#include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/gui/EnumParameter.h"
+#include "cedar/auxiliaries/gui/FileParameter.h"
+#include "cedar/auxiliaries/gui/StringParameter.h"
+#include "cedar/auxiliaries/gui/UIntParameter.h"
+#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
+#include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/gui/DirectoryParameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
@@ -282,6 +284,14 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     >
     ();
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::aux::gui::EnumParameter>();
+
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
+    <
+      cedar::aux::FileParameter,
+      cedar::aux::gui::FileParameter
+    >
+    ();
+
     // parameter types in processing
     cedar::proc::gui::PropertyPane::mDataWidgetTypes.add
     <
