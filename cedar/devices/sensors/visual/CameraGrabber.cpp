@@ -321,8 +321,6 @@ bool CameraGrabber::onInit()
 
     while (! (all_cams_found || no_more_cams))
     {
-
-
       //open one by one
       cv::VideoCapture capture(cam);
       if (capture.isOpened())
