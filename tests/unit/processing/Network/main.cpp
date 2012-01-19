@@ -48,6 +48,7 @@
 #include "cedar/processing/Arguments.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/LoopedTrigger.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -118,16 +119,35 @@ int main(int /* argc */, char** /* argv */)
   network_child->setName("network child");
   TestModulePtr step_child (new TestModule());
   network_child->add(step_child, "child step");
+  cedar::proc::LoopedTriggerPtr trigger(new cedar::proc::LoopedTrigger());
+  network_child->add(trigger, "looped_trigger");
+  network_child->connectTrigger(trigger, step_child);
+  cedar::proc::NetworkPtr network_grand_child(new cedar::proc::Network());
+  network_grand_child->setName("network grand child");
+  network_child->add(network_grand_child);
   network_parent->add(network_child);
+
   std::cout << "Write nested network." << std::endl;
   network_parent->writeFile("Nested.json");
   std::cout << "Read nested network." << std::endl;
   cedar::proc::NetworkPtr network_nested(new cedar::proc::Network());
   network_nested->readFile("Nested.json");
   network_nested->getElement<Step>("parent step");
-  std::cout << network_nested->getElement<Network>("network child")->getElement<Step>("child step")->getName()
-    << std::endl;
-  std::cout << network_nested->getElement<Step>("network child.child step")->getName() << std::endl;
+  if (network_nested->getElement<Network>("network child")->getElement<Step>("child step")->getName() != "child step")
+  {
+    ++errors;
+    std::cout << "child step was not found in nested network" << std::endl;
+  }
+  if (network_nested->getElement<Step>("network child.child step")->getName() != "child step")
+  {
+    ++errors;
+    std::cout << "child step was not found in nested network using dot notation" << std::endl;
+  }
+  if (network_nested->getElement<Network>("network child.network grand child")->getName() != "network grand child")
+  {
+    ++errors;
+    std::cout << "child step was not found in nested network using dot notation" << std::endl;
+  }
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
