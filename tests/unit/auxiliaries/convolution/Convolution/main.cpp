@@ -47,7 +47,6 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-using namespace cedar::aux;
 
 int main()
 {

@@ -45,9 +45,6 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-using namespace cedar::aux;
-using namespace cedar::aux::math;
-using namespace std;
 // floats need smaller zero threshold
 #ifdef EQN_EPS
 #undef EQN_EPS
@@ -82,7 +79,7 @@ int main()
   vec3_double.at<double>(0, 0) = 3;
   vec3_double.at<double>(1, 0) = 5;
   vec3_double.at<double>(2, 0) = 7;
-  wedgeAxis<double>(vec3_double, mat33_double);
+  cedar::aux::math::wedgeAxis<double>(vec3_double, mat33_double);
   if (!
        (
         IsZero(mat33_double.at<double>(0, 0) - 0.0)
@@ -100,17 +97,17 @@ int main()
     errors++;
     std::cout << "ERROR in function wedgeAxis<double>(cv::Mat& axis, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat33_double - wedgeAxis<double>(vec3_double))))
+  if (!IsZero(cv::norm(mat33_double - cedar::aux::math::wedgeAxis<double>(vec3_double))))
   {
     errors++;
-    std::cout << "ERROR in function wedgeAxis<double>(cv::Mat& axis)" << endl;
+    std::cout << "ERROR in function wedgeAxis<double>(cv::Mat& axis)" << std::endl;
   }
 
   std::cout << "test: wedgeAxis" << std::endl;
   vec3_float.at<float>(0, 0) = 5;
   vec3_float.at<float>(1, 0) = 55;
   vec3_float.at<float>(2, 0) = 555;
-  wedgeAxis<float>(vec3_float, mat33_float);
+  cedar::aux::math::wedgeAxis<float>(vec3_float, mat33_float);
   if (!
        (
         mat33_float.at<float>(0, 0) == 0.0
@@ -128,10 +125,10 @@ int main()
     errors++;
     std::cout << "ERROR in function wedgeAxis<float>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat33_float - wedgeAxis<float>(vec3_float))))
+  if (!IsZero(cv::norm(mat33_float - cedar::aux::math::wedgeAxis<float>(vec3_float))))
   {
     errors++;
-    std::cout << "ERROR in function wedgeAxis<float>(cv::Mat& vector)" << endl;
+    std::cout << "ERROR in function wedgeAxis<float>(cv::Mat& vector)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,7 +136,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: veeAxis" << std::endl;
   vec3_double *= 0;
-  veeAxis<double>(mat33_double, vec3_double);
+  cedar::aux::math::veeAxis<double>(mat33_double, vec3_double);
   if (!
        (
         vec3_double.at<double>(0, 0) == 3.0
@@ -149,17 +146,17 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function veeAxis<double>(cv::Mat& vector, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function veeAxis<double>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(vec3_double - veeAxis<double>(mat33_double))))
+  if (!IsZero(cv::norm(vec3_double - cedar::aux::math::veeAxis<double>(mat33_double))))
   {
     errors++;
-    std::cout << "ERROR in function veeAxis<double>(cv::Mat& matrix)" << endl;
+    std::cout << "ERROR in function veeAxis<double>(cv::Mat& matrix)" << std::endl;
   }
 
   std::cout << "test: veeAxis" << std::endl;
   vec3_float *= 0;
-  veeAxis<float>(mat33_float, vec3_float);
+  cedar::aux::math::veeAxis<float>(mat33_float, vec3_float);
   if (!
        (
         vec3_float.at<float>(0, 0) == 5.0
@@ -169,12 +166,12 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(vec3_float - veeAxis<float>(mat33_float))))
+  if (!IsZero(cv::norm(vec3_float - cedar::aux::math::veeAxis<float>(mat33_float))))
   {
     errors++;
-    std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix)" << endl;
+    std::cout << "ERROR in function veeAxis<float>(cv::Mat& matrix)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -187,7 +184,7 @@ int main()
   vec6_double.at<double>(3, 0) = 7;
   vec6_double.at<double>(4, 0) = 11;
   vec6_double.at<double>(5, 0) = 13;
-  wedgeTwist<double>(vec6_double, mat44_double);
+  cedar::aux::math::wedgeTwist<double>(vec6_double, mat44_double);
   if (!
        (
         IsZero(mat44_double.at<double>(0, 0) - 0.0)
@@ -212,10 +209,10 @@ int main()
     errors++;
     std::cout << "ERROR in function wedgeTwist<double>(cv::Mat& twist, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat44_double - wedgeTwist<double>(vec6_double))))
+  if (!IsZero(cv::norm(mat44_double - cedar::aux::math::wedgeTwist<double>(vec6_double))))
   {
     errors++;
-    std::cout << "ERROR in function wedgeTwist<double>(cv::Mat& twist)" << endl;
+    std::cout << "ERROR in function wedgeTwist<double>(cv::Mat& twist)" << std::endl;
   }
 
   std::cout << "test: wedgeTwist" << std::endl;
@@ -225,7 +222,7 @@ int main()
   vec6_float.at<float>(3, 0) = 7;
   vec6_float.at<float>(4, 0) = 11;
   vec6_float.at<float>(5, 0) = 13;
-  wedgeTwist<float>(vec6_float, mat44_float);
+  cedar::aux::math::wedgeTwist<float>(vec6_float, mat44_float);
   if (!
        (
         IsZero(mat44_float.at<float>(0, 0) - 0.0)
@@ -250,10 +247,10 @@ int main()
     errors++;
     std::cout << "ERROR in function wedgeTwist<float>(cv::Mat& twist, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat44_float - wedgeTwist<float>(vec6_float))))
+  if (!IsZero(cv::norm(mat44_float - cedar::aux::math::wedgeTwist<float>(vec6_float))))
   {
     errors++;
-    std::cout << "ERROR in function wedgeTwist<float>(cv::Mat& twist)" << endl;
+    std::cout << "ERROR in function wedgeTwist<float>(cv::Mat& twist)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -261,7 +258,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: veeTwist" << std::endl;
   vec6_double *= 0;
-  veeTwist<double>(mat44_double, vec6_double);
+  cedar::aux::math::veeTwist<double>(mat44_double, vec6_double);
   if (!
        (
         vec6_double.at<double>(0, 0) == 2.0
@@ -274,17 +271,17 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function veeTwist<double>(cv::Mat& vector, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function veeTwist<double>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(vec6_double - veeTwist<double>(mat44_double))))
+  if (!IsZero(cv::norm(vec6_double - cedar::aux::math::veeTwist<double>(mat44_double))))
   {
     errors++;
-    std::cout << "ERROR in function veeTwist<double>(cv::Mat& matrix)" << endl;
+    std::cout << "ERROR in function veeTwist<double>(cv::Mat& matrix)" << std::endl;
   }
 
   std::cout << "test: veeTwist" << std::endl;
   vec6_float *= 0;
-  veeTwist<float>(mat44_float, vec6_float);
+  cedar::aux::math::veeTwist<float>(mat44_float, vec6_float);
   if (!
        (
         vec6_float.at<float>(0, 0) == 2.0
@@ -297,12 +294,12 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function veeTwist<float>(cv::Mat& vector, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function veeTwist<float>(cv::Mat& vector, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(vec6_float - veeTwist<float>(mat44_float))))
+  if (!IsZero(cv::norm(vec6_float - cedar::aux::math::veeTwist<float>(mat44_float))))
   {
     errors++;
-    std::cout << "ERROR in function veeTwist<float>(cv::Mat& matrix)" << endl;
+    std::cout << "ERROR in function veeTwist<float>(cv::Mat& matrix)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -313,7 +310,7 @@ int main()
   vec3_double.at<double>(1, 0) = 2;
   vec3_double.at<double>(2, 0) = 3;
   vec3_double = vec3_double * (1 / cv::norm(vec3_double));
-  expAxis<double>(vec3_double, 1, mat33_double);
+  cedar::aux::math::expAxis<double>(vec3_double, 1, mat33_double);
   if (!
        (
         IsZero(mat33_double.at<double>(0, 0) - 0.57313785544898699)
@@ -329,12 +326,12 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat33_double - expAxis<double>(vec3_double, 1))))
+  if (!IsZero(cv::norm(mat33_double - cedar::aux::math::expAxis<double>(vec3_double, 1))))
   {
     errors++;
-    std::cout << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta)" << endl;
+    std::cout << "ERROR in function expAxis<double>(const cv::Mat& matrix, double theta)" << std::endl;
   }
 
   std::cout << "test: expAxis" << std::endl;
@@ -342,7 +339,7 @@ int main()
   vec3_float.at<float>(1, 0) = 2;
   vec3_float.at<float>(2, 0) = 3;
   vec3_float = vec3_float * (1 / cv::norm(vec3_float));
-  expAxis<float>(vec3_float, 1, mat33_float);
+  cedar::aux::math::expAxis<float>(vec3_float, 1, mat33_float);
   if (!
        (
         IsZero(mat33_float.at<float>(0, 0) - 0.57313785544898699)
@@ -358,12 +355,12 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function expAxis<float>(const cv::Mat& matrix, float theta, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function expAxis<float>(const cv::Mat& matrix, float theta, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat33_float - expAxis<float>(vec3_float, 1))))
+  if (!IsZero(cv::norm(mat33_float - cedar::aux::math::expAxis<float>(vec3_float, 1))))
   {
     errors++;
-    std::cout << "ERROR in function expAxis<float>(const cv::Mat& matrix, double theta)" << endl;
+    std::cout << "ERROR in function expAxis<float>(const cv::Mat& matrix, double theta)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -371,7 +368,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: logAxis" << std::endl;
   vec3_double *= 0;
-  logAxis<double>(mat33_double, vec3_double, theta);
+  cedar::aux::math::logAxis<double>(mat33_double, vec3_double, theta);
   if (!
        (
         IsZero(vec3_double.at<double>(0, 0) - 0.2672612419124244)
@@ -382,12 +379,12 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function logAxis<double>(const cv::Mat& rotation, cv::Mat& omega, "
-              << "double& theta, bool optionalThetaChoice = false)" << endl;
+              << "double& theta, bool optionalThetaChoice = false)" << std::endl;
   }
 
   std::cout << "test: logAxis" << std::endl;
   vec3_float *= 0;
-  logAxis<float>(mat33_float, vec3_float, theta);
+  cedar::aux::math::logAxis<float>(mat33_float, vec3_float, theta);
   if (!
        (
         IsZero(vec3_float.at<float>(0, 0) - 0.2672612419124244)
@@ -398,7 +395,7 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function logAxis<float>(const cv::Mat& rotation, cv::Mat& omega, "
-              << "double& theta, bool optionalThetaChoice = false)" << endl;
+              << "double& theta, bool optionalThetaChoice = false)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -411,7 +408,7 @@ int main()
   vec6_double.at<double>(3, 0) = vec3_double.at<double>(0, 0);
   vec6_double.at<double>(4, 0) = vec3_double.at<double>(1, 0);
   vec6_double.at<double>(5, 0) = vec3_double.at<double>(2, 0);
-  expTwist<double>(vec6_double, cedar::aux::math::pi, mat44_double);
+  cedar::aux::math::expTwist<double>(vec6_double, cedar::aux::math::pi, mat44_double);
   if (!
        (
         IsZero(mat44_double.at<double>(0, 0) - -0.85714285714285676)
@@ -434,12 +431,12 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat44_double - expTwist<double>(vec6_double, cedar::aux::math::pi))))
+  if (!IsZero(cv::norm(mat44_double - cedar::aux::math::expTwist<double>(vec6_double, cedar::aux::math::pi))))
   {
     errors++;
-    std::cout << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function expTwist<double>(const cv::Mat& xi, double theta, cv::Mat& result)" << std::endl;
   }
 
   std::cout << "test: expTwist" << std::endl;
@@ -449,7 +446,7 @@ int main()
   vec6_float.at<float>(3, 0) = vec3_float.at<float>(0, 0);
   vec6_float.at<float>(4, 0) = vec3_float.at<float>(1, 0);
   vec6_float.at<float>(5, 0) = vec3_float.at<float>(2, 0);
-  expTwist<float>(vec6_float, cedar::aux::math::pi, mat44_float);
+  cedar::aux::math::expTwist<float>(vec6_float, cedar::aux::math::pi, mat44_float);
   if (!
        (
         IsZero(mat44_float.at<float>(0, 0) - -0.85714285714285676)
@@ -472,12 +469,12 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat44_float - expTwist<float>(vec6_float, cedar::aux::math::pi))))
+  if (!IsZero(cv::norm(mat44_float - cedar::aux::math::expTwist<float>(vec6_float, cedar::aux::math::pi))))
   {
     errors++;
-    std::cout << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << endl;
+    std::cout << "ERROR in function expTwist<float>(const cv::Mat& xi, float theta, cv::Mat& result)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -485,7 +482,7 @@ int main()
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: logTwist" << std::endl;
   vec6_double *= 0;
-  logTwist<double>(mat44_double, vec6_double, theta);
+  cedar::aux::math::logTwist<double>(mat44_double, vec6_double, theta);
   if (!
        (
         IsZero(vec3_double.at<double>(0, 0) - 0.2672612419124244)
@@ -496,12 +493,12 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function logTwist<double>(const cv::Mat& transformation, "
-              << "cv::Mat& xi, double& theta, bool optionalThetaChoice = false)" << endl;
+              << "cv::Mat& xi, double& theta, bool optionalThetaChoice = false)" << std::endl;
   }
 
   std::cout << "test: logTwist" << std::endl;
   vec6_float *= 0;
-  logTwist<float>(mat44_float, vec6_float, theta);
+  cedar::aux::math::logTwist<float>(mat44_float, vec6_float, theta);
   if (!
        (
         IsZero(vec3_float.at<float>(0, 0) - 0.2672612419124244)
@@ -512,14 +509,14 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function logTwist<float>(const cv::Mat& transformation, "
-              << "cv::Mat& xi, float& theta, bool optionalThetaChoice = false)" << endl;
+              << "cv::Mat& xi, float& theta, bool optionalThetaChoice = false)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // rigidToAdjointTransformation
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: rigidToAdjointTransformation" << std::endl;
-  rigidToAdjointTransformation<double>(mat44_double, mat66_double);
+  cedar::aux::math::rigidToAdjointTransformation<double>(mat44_double, mat66_double);
   if (!
        (
         IsZero(mat66_double.at<double>(0, 0) - -0.85714285714285676)
@@ -566,16 +563,16 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function rigidToAdjointTransformation<double>(const cv::Mat& rigidTransformation, "
-              << "cv::Mat& adjointTransformation)" << endl;
+              << "cv::Mat& adjointTransformation)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat66_double - rigidToAdjointTransformation<double>(mat44_double))))
+  if (!IsZero(cv::norm(mat66_double - cedar::aux::math::rigidToAdjointTransformation<double>(mat44_double))))
   {
     errors++;
-    std::cout << "ERROR in function rigidToAdjointTransformation<double>(const cv::Mat& rigidTransformation)" << endl;
+    std::cout << "ERROR in function rigidToAdjointTransformation<double>(const cv::Mat& rigidTransformation)" << std::endl;
   }
 
   std::cout << "test: rigidToAdjointTransformation" << std::endl;
-  rigidToAdjointTransformation<float>(mat44_float, mat66_float);
+  cedar::aux::math::rigidToAdjointTransformation<float>(mat44_float, mat66_float);
   if (!
        (
         IsZero(mat66_float.at<float>(0, 0) - -0.85714285714285676)
@@ -622,19 +619,19 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function rigidToAdjointTransformation<float>(const cv::Mat& rigidTransformation, "
-              << "cv::Mat& adjointTransformation)" << endl;
+              << "cv::Mat& adjointTransformation)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat66_float - rigidToAdjointTransformation<float>(mat44_float))))
+  if (!IsZero(cv::norm(mat66_float - cedar::aux::math::rigidToAdjointTransformation<float>(mat44_float))))
   {
     errors++;
-    std::cout << "ERROR in function rigidToAdjointTransformation<float>(const cv::Mat& rigidTransformation)" << endl;
+    std::cout << "ERROR in function rigidToAdjointTransformation<float>(const cv::Mat& rigidTransformation)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // adjointToRigidTransformation
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: adjointToRigidTransformation" << std::endl;
-  adjointToRigidTransformation<double>(mat66_double, mat44_double);
+  cedar::aux::math::adjointToRigidTransformation<double>(mat66_double, mat44_double);
   if (!
        (
         IsZero(mat44_double.at<double>(0, 0) - -0.85714285714285676)
@@ -658,16 +655,16 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function adjointToRigidTransformation<double>(const cv::Mat& adjointTransformation, "
-             << "cv::Mat& rigidTransformation)" << endl;
+             << "cv::Mat& rigidTransformation)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat44_double - adjointToRigidTransformation<double>(mat66_double))))
+  if (!IsZero(cv::norm(mat44_double - cedar::aux::math::adjointToRigidTransformation<double>(mat66_double))))
   {
     errors++;
-    std::cout << "ERROR in function adjointToRigidTransformation<double>(const cv::Mat& adjointTransformation)" << endl;
+    std::cout << "ERROR in function adjointToRigidTransformation<double>(const cv::Mat& adjointTransformation)" << std::endl;
   }
 
   std::cout << "test: adjointToRigidTransformation" << std::endl;
-  adjointToRigidTransformation<float>(mat66_float, mat44_float);
+  cedar::aux::math::adjointToRigidTransformation<float>(mat66_float, mat44_float);
   if (!
        (
         IsZero(mat44_float.at<float>(0, 0) - -0.85714285714285676)
@@ -691,12 +688,12 @@ int main()
   {
     errors++;
     std::cout << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation, "
-              << "cv::Mat& rigidTransformation)" << endl;
+              << "cv::Mat& rigidTransformation)" << std::endl;
   }
-  if (!IsZero(cv::norm(mat44_float - adjointToRigidTransformation<float>(mat66_float))))
+  if (!IsZero(cv::norm(mat44_float - cedar::aux::math::adjointToRigidTransformation<float>(mat66_float))))
   {
     errors++;
-    std::cout << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation)" << endl;
+    std::cout << "ERROR in function adjointToRigidTransformation<float>(const cv::Mat& adjointTransformation)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -709,19 +706,19 @@ int main()
   vec6_double.at<double>(3, 0) = 0;
   vec6_double.at<double>(4, 0) = 0;
   vec6_double.at<double>(5, 0) = 1;
-  expTwist<double>(vec6_double, 1, mat44_double);
-  rigidToAdjointTransformation<double>(mat44_double, mat66_double);
-  invertAdjointTransformation<double>(mat66_double, inverse66_double);
+  cedar::aux::math::expTwist<double>(vec6_double, 1, mat44_double);
+  cedar::aux::math::rigidToAdjointTransformation<double>(mat44_double, mat66_double);
+  cedar::aux::math::invertAdjointTransformation<double>(mat66_double, inverse66_double);
   if (!IsZero(cv::norm(inverse66_double - mat66_double.inv())))
   {
     errors++;
     std::cout << "ERROR in function invertAdjointTransformation<double>(const cv::Mat& adjointTransformation, "
-             << "cv::Mat& inverse)" << endl;
+             << "cv::Mat& inverse)" << std::endl;
   }
-  if (!IsZero(cv::norm(invertAdjointTransformation<double>(mat66_double) - mat66_double.inv())))
+  if (!IsZero(cv::norm(cedar::aux::math::invertAdjointTransformation<double>(mat66_double) - mat66_double.inv())))
   {
     errors++;
-    std::cout << "ERROR in function invertAdjointTransformation<double>(const cv::Mat& adjointTransformation)" << endl;
+    std::cout << "ERROR in function invertAdjointTransformation<double>(const cv::Mat& adjointTransformation)" << std::endl;
   }
 
   std::cout << "test: invertAdjointTransformation" << std::endl;
@@ -731,19 +728,19 @@ int main()
   vec6_float.at<float>(3, 0) = 0;
   vec6_float.at<float>(4, 0) = 0;
   vec6_float.at<float>(5, 0) = 1;
-  expTwist<float>(vec6_float, 1, mat44_float);
-  rigidToAdjointTransformation<float>(mat44_float, mat66_float);
-  invertAdjointTransformation<float>(mat66_float, inverse66_float);
+  cedar::aux::math::expTwist<float>(vec6_float, 1, mat44_float);
+  cedar::aux::math::rigidToAdjointTransformation<float>(mat44_float, mat66_float);
+  cedar::aux::math::invertAdjointTransformation<float>(mat66_float, inverse66_float);
   if (!IsZero(cv::norm(inverse66_float - mat66_float.inv())))
   {
     errors++;
     std::cout << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation, "
-              << "cv::Mat& inverse)" << endl;
+              << "cv::Mat& inverse)" << std::endl;
   }
-  if (!IsZero(cv::norm(invertAdjointTransformation<float>(mat66_float) - mat66_float.inv())))
+  if (!IsZero(cv::norm(cedar::aux::math::invertAdjointTransformation<float>(mat66_float) - mat66_float.inv())))
   {
     errors++;
-    std::cout << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation)" << endl;
+    std::cout << "ERROR in function invertAdjointTransformation<float>(const cv::Mat& adjointTransformation)" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -754,7 +751,7 @@ int main()
   p_double.at<double>(2, 0) = 1;
   cv::Mat omega_double = cv::Mat::zeros(3, 1, CV_64FC1);
   omega_double.at<double>(0, 0) = 1;
-  vec6_double = twistCoordinates<double>(p_double, omega_double);
+  vec6_double = cedar::aux::math::twistCoordinates<double>(p_double, omega_double);
   if (!
        (
         vec6_double.at<double>(0, 0) == 0.0
@@ -767,7 +764,7 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function twistCoordinates<double>(const cv::Mat& supportPoint, const cv::Mat& axis)" << endl;
+    std::cout << "ERROR in function twistCoordinates<double>(const cv::Mat& supportPoint, const cv::Mat& axis)" << std::endl;
   }
 
   std::cout << "test: twistCoordinates" << std::endl;
@@ -775,7 +772,7 @@ int main()
   p_float.at<float>(2, 0) = 1;
   cv::Mat omega_float = cv::Mat::zeros(3, 1, CV_32FC1);
   omega_float.at<float>(0, 0) = 1;
-  vec6_float = twistCoordinates<float>(p_float, omega_float);
+  vec6_float = cedar::aux::math::twistCoordinates<float>(p_float, omega_float);
   if (!
        (
         vec6_float.at<float>(0, 0) == 0.0
@@ -788,7 +785,7 @@ int main()
      )
   {
     errors++;
-    std::cout << "ERROR in function twistCoordinates<float>(const cv::Mat& supportPoint, const cv::Mat& axis)" << endl;
+    std::cout << "ERROR in function twistCoordinates<float>(const cv::Mat& supportPoint, const cv::Mat& axis)" << std::endl;
   }
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;

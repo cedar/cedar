@@ -44,9 +44,6 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 
-using namespace cedar::dev::robot;
-using namespace cedar::aux;
-using namespace cv;
 
 int main()
 {
@@ -55,8 +52,8 @@ int main()
   
   // create instance of test class
   std::cout << "reading kinematic chain from conig file ..." << std::endl;
-  ReferenceGeometryPtr p_reference_geometry(new ReferenceGeometry("test.conf"));
-  SimulatedKinematicChain test_arm(p_reference_geometry);
+  cedar::dev::robot::ReferenceGeometryPtr p_reference_geometry(new cedar::dev::robot::ReferenceGeometry("test.conf"));
+  cedar::dev::robot::SimulatedKinematicChain test_arm(p_reference_geometry);
   
   //--------------------------------------------------------------------------------------------------------------------
   // single angle

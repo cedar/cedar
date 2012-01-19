@@ -41,10 +41,6 @@
 // SYSTEM INCLUDES
 #include <string>
 
-//!@todo remove these using directives -- they create ambiguities on windows.
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
 
 int main(int, char**)
 {

@@ -62,6 +62,7 @@
 #define EQN_EPS 1e-9
 #endif
 
+//!@todo The IsZero macros should be called IS_ZERO; maybe this should even be an inline function
 #ifndef IsZero
 #define IsZero(x) ((x) > -EQN_EPS && (x) < EQN_EPS)
 #endif

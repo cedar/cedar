@@ -67,14 +67,14 @@ public:
   TestComponent(const std::string& rTestParameter);
 
   //!@brief Destructor
-  virtual ~TestComponent(void);
+  virtual ~TestComponent();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief returns test name
-  const std::string& getTestName(void) const;
+  const std::string& getTestName() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

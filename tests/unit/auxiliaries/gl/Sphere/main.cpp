@@ -41,9 +41,6 @@
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
 
 int main(int, char**)
 {
@@ -52,13 +49,13 @@ int main(int, char**)
 
   // test constructors
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Sphere testSphere(p_object);
-  Sphere sphere(p_object, 1);
+  cedar::aux::gl::Sphere testSphere(p_object);
+  cedar::aux::gl::Sphere sphere(p_object, 1);
 
   //--------------------------------------------------------------------------------------------------------------------
   // radius
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout<< "test: radius" << std::endl;
+  std::cout << "test: radius" << std::endl;
   sphere.setRadius(10.1);
   if (sphere.radius() != 10.1)
   {

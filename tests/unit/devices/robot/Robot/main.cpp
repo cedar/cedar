@@ -45,11 +45,9 @@
 #include <string>
 
 
-using namespace cedar::tests::unit::dev::robot::Robot;
-
 int main()
 {
-  TestRobot robot;
+  cedar::tests::unit::dev::robot::Robot::TestRobot robot;
   robot.getComponent("TestComponent1");
   robot.getComponent("TestComponent2");
 

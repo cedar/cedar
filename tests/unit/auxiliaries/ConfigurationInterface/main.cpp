@@ -43,11 +43,11 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
-using namespace cedar::tests::unit::aux::ConfigurationInterface;
-using namespace cedar::aux;
 
 int main()
 {
+  using cedar::tests::unit::aux::ConfigurationInterface::TestClass;
+
   // the number of errors encountered in this test
   int errors = 0;
   // the current test number

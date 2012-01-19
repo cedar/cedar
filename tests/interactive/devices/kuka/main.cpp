@@ -44,8 +44,6 @@
 #include <QApplication>
 #include <iostream>
 
-using namespace std;
-using namespace cedar::dev::kuka;
 using cedar::dev::kuka::gui::FriStatusWidget;
 using cedar::dev::robot::KinematicChainPtr;
 
@@ -53,7 +51,7 @@ int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-  KukaInterfacePtr p_kukain(new KukaInterface("../../tests/interactive/devices/kuka/test_arm.conf"));
+  cedar::dev::kuka::KukaInterfacePtr p_kukain(new cedar::dev::kuka::KukaInterface("../../tests/interactive/devices/kuka/test_arm.conf"));
   FriStatusWidget * p_fri_status_widget = new FriStatusWidget(p_kukain);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
