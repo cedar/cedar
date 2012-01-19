@@ -57,7 +57,6 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
-using namespace cedar::aux;
 
 typedef boost::shared_ptr<cedar::Neuron> NeuronPtr;
 

@@ -42,9 +42,6 @@
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
 
 int main(int, char**)
 {
@@ -53,8 +50,8 @@ int main(int, char**)
 
   // test constructors
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Block test_block(p_object);
-  Block block(p_object, 1, 2, 3);
+  cedar::aux::gl::Block test_block(p_object);
+  cedar::aux::gl::Block block(p_object, 1, 2, 3);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

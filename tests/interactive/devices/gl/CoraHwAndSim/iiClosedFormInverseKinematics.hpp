@@ -34,6 +34,8 @@
 
 ======================================================================================================================*/
 
+//!@todo This file and its corresponding cpp probably need to be removed
+
 #ifndef IICLOSEDFORMINVERSEKINEMATICS_HPP_
 #define IICLOSEDFORMINVERSEKINEMATICS_HPP_
 //!@todo delete this file or completely revamp it to the bare minimum of cedar compliance

@@ -44,7 +44,6 @@
 #include <string>
 #include <math.h>
 
-using namespace cedar::aux;
 
 int main()
 {

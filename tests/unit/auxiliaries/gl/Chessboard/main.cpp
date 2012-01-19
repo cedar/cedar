@@ -42,9 +42,6 @@
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
 
 int main(int, char**)
 {
@@ -53,8 +50,8 @@ int main(int, char**)
 
   // test constructors
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Chessboard test_chessboard(p_object);
-  Chessboard chessboard(p_object, 1, 2, 3, 5, 500);
+  cedar::aux::gl::Chessboard test_chessboard(p_object);
+  cedar::aux::gl::Chessboard chessboard(p_object, 1, 2, 3, 5, 500);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

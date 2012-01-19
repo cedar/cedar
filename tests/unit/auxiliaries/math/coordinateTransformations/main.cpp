@@ -43,9 +43,6 @@
 
 // SYSTEM INCLUDES
 
-using namespace cedar::aux;
-using namespace cedar::aux::math;
-using namespace std;
 #ifdef EQN_EPS
 #undef EQN_EPS
 #endif
@@ -63,7 +60,7 @@ int main(int, char**)
   horst.at<double>(1, 0) = cedar::aux::math::pi/2.0;
   horst.at<double>(2, 0) = cedar::aux::math::pi/4.0;
   cv::Mat kevin(3, 1, CV_64FC1);
-  sphericalToCartesian<double>(horst, kevin);
+  cedar::aux::math::sphericalToCartesian<double>(horst, kevin);
   if (
        IsZero(kevin.at<double>(0, 0) -1.0)
        && IsZero(kevin.at<double>(1, 0) -1.0)
@@ -86,7 +83,7 @@ int main(int, char**)
   chantalle.at<float>(1, 0) = cedar::aux::math::pi/4.0;
   chantalle.at<float>(2, 0) = cedar::aux::math::pi/4.0;
   cv::Mat jaqueline(3, 1, CV_32FC1);
-  sphericalToCartesian<float>(chantalle, jaqueline);
+  cedar::aux::math::sphericalToCartesian<float>(chantalle, jaqueline);
   if (
        IsZero(jaqueline.at<float>(0, 0) - 0.5)
        && IsZero(jaqueline.at<float>(1, 0) - 0.5)
@@ -104,7 +101,7 @@ int main(int, char**)
 
 
   std::cout << "test: cartesianToSpherical<double>" << std::endl;
-  cartesianToSpherical<double>(kevin, horst);
+  cedar::aux::math::cartesianToSpherical<double>(kevin, horst);
   if (
        IsZero(horst.at<double>(0, 0) -sqrt(2.0))
        && IsZero(horst.at<double>(1, 0) - cedar::aux::math::pi/2.0)

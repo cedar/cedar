@@ -41,9 +41,6 @@
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
 
 int main(int, char**)
 {
@@ -52,8 +49,8 @@ int main(int, char**)
 
   // test constructors
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Pyramid testPyramid(p_object);
-  Pyramid pyramid(p_object, 1, 2, 3);
+  cedar::aux::gl::Pyramid testPyramid(p_object);
+  cedar::aux::gl::Pyramid pyramid(p_object, 1, 2, 3);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

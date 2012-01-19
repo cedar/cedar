@@ -51,12 +51,6 @@
 // SYSTEM INCLUDES
 
 
-using namespace std;
-using namespace cedar::aux::gl;
-using namespace cedar::aux::gui;
-using namespace cedar::dev::robot::gl;
-using namespace cedar::dev::robot;
-
 bool useHardware = true;
 
 int main(int argc, char **argv)
@@ -64,21 +58,24 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_cora_arm_sim(new SimulatedKinematicChain(string("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")));
+  cedar::dev::robot::KinematicChainPtr p_cora_arm_sim
+  (
+    new cedar::dev::robot::SimulatedKinematicChain("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")
+  );
   cedar::dev::robot::KinematicChainPtr p_cora_arm_hw;
   if(useHardware)
   {
-    p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr(new cedar::dev::amtec::KinematicChain(string("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")));
+    p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr(new cedar::dev::amtec::KinematicChain("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf"));
   }
 
   // create models calculation of the transformation
-  KinematicChainModelPtr p_cora_arm_model(new KinematicChainModel(p_cora_arm_sim));
+  cedar::dev::robot::KinematicChainModelPtr p_cora_arm_model(new cedar::dev::robot::KinematicChainModel(p_cora_arm_sim));
 
   // create gl visualization objects
   cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_cora_arm_model));
 
   // create scene and viewer to display the arm
-  ScenePtr p_scene(new cedar::aux::gl::Scene);
+  cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
 
@@ -87,7 +84,7 @@ int main(int argc, char **argv)
   p_scene->addObject(p_object);
 
   // create a simple viewer for the scene
-  Viewer viewer(p_scene);
+  cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
 
@@ -96,7 +93,7 @@ int main(int argc, char **argv)
   //p_scene_widget->show();
 
   // create control widgets
-  vector<cedar::dev::robot::KinematicChainPtr> kinematic_chains;
+  std::vector<cedar::dev::robot::KinematicChainPtr> kinematic_chains;
   kinematic_chains.push_back(p_cora_arm_sim);
   if(useHardware)
   {

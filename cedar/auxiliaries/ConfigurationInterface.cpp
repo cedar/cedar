@@ -52,7 +52,6 @@
     #define getCurrentDir getcwd
  #endif
 
-using namespace libconfig;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -126,9 +125,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeBoolean;
+  parameter_info.mMembersType = libconfig::Setting::TypeBoolean;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeNone;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeNone;
   parameter_info.mpUserData = pUserData;
   return CONFIG_SUCCESS;
 }
@@ -145,10 +144,10 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = this->toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeInt;
+  parameter_info.mMembersType = libconfig::Setting::TypeInt;
   parameter_info.mIsUnsigned = false;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeNone;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeNone;
   parameter_info.mpUserData = pUserData;
   return CONFIG_SUCCESS;
 }
@@ -165,10 +164,10 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = this->toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeInt;
+  parameter_info.mMembersType = libconfig::Setting::TypeInt;
   parameter_info.mIsUnsigned = true;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeNone;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeNone;
   parameter_info.mpUserData = pUserData;
   return CONFIG_SUCCESS;
 }
@@ -185,9 +184,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = this->toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeFloat;
+  parameter_info.mMembersType = libconfig::Setting::TypeFloat;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeNone;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeNone;
   parameter_info.mpUserData = pUserData;
   return CONFIG_SUCCESS;
 }
@@ -204,9 +203,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = defaultValue;
-  parameter_info.mMembersType = Setting::TypeString;
+  parameter_info.mMembersType = libconfig::Setting::TypeString;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeNone;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeNone;
   return CONFIG_SUCCESS;
 }
 
@@ -220,9 +219,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeBoolean;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeBoolean;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -240,9 +239,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   {
     parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
   }
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeBoolean;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeBoolean;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -257,10 +256,10 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mIsUnsigned = false;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeInt;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -275,10 +274,10 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mIsUnsigned = true;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeInt;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -296,9 +295,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   {
     parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
   }
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeInt;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
   parameter_info.mIsUnsigned = false;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
@@ -317,9 +316,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   {
     parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
   }
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeInt;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
   parameter_info.mIsUnsigned = true;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
@@ -335,9 +334,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeFloat;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeFloat;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -355,9 +354,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   {
     parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
   }
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeFloat;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeFloat;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -372,9 +371,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   parameter_info.mpMember = static_cast<void*> (pMember);
   parameter_info.mDefaultValues.resize(1);
   parameter_info.mDefaultValues.at(0) = defaultValue;
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeString;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeString;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -392,9 +391,9 @@ int cedar::aux::ConfigurationInterface::addParameter(
   {
     parameter_info.mDefaultValues.push_back(defaultValues.at(i));
   }
-  parameter_info.mMembersType = Setting::TypeArray;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
   parameter_info.mName = name;
-  parameter_info.mIsVectorOfType = Setting::TypeString;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeString;
   mParameterInfos.push_back(parameter_info);
   return CONFIG_SUCCESS;
 }
@@ -436,7 +435,7 @@ int cedar::aux::ConfigurationInterface::readConfigurationFile()
   {
     mConfig.readFile(mConfigFileName.c_str());
   }
-  catch(const FileIOException &fioex) // general IO error, file not readable
+  catch(const libconfig::FileIOException &fioex) // general IO error, file not readable
   {
     std::cerr << "> error in " << mConfigFileName << ": I/O error while reading file." << std::endl;
     for (ParameterInfoVector::iterator iter = this->mParameterInfos.begin();
@@ -449,7 +448,7 @@ int cedar::aux::ConfigurationInterface::readConfigurationFile()
     mConfigurationErrors.push_back("error in " + mConfigFileName + ": I/O error while reading file.");
     return CONFIG_FILE_ERROR;
   }
-  catch(const ParseException &pex) // parser error - some errors can be fixed
+  catch(const libconfig::ParseException &pex) // parser error - some errors can be fixed
   {
     std::cerr << "> error in " << mConfigFileName << ": Parse error at "
         << pex.getFile() << ":" << pex.getLine() << " - " << pex.getError()
@@ -465,13 +464,13 @@ int cedar::aux::ConfigurationInterface::readConfigurationFile()
     {
       setParameterToDefault(*iter);
     }
-    Setting &root = mConfig.getRoot();
+    libconfig::Setting &root = mConfig.getRoot();
     for (int i = 0; i < root.getLength(); i++)
     {
       std::string parameter_name = this->mParameterInfos.at(i).mName;
-      if (root.exists(parameter_name) && root[parameter_name].getType() == Setting::TypeArray)
+      if (root.exists(parameter_name) && root[parameter_name].getType() == libconfig::Setting::TypeArray)
       {
-        Setting &temp = root[parameter_name];
+        libconfig::Setting &temp = root[parameter_name];
         for (int j = 0; j < root[parameter_name].getLength(); j++)
         {
           temp.remove(j);
@@ -498,39 +497,39 @@ int cedar::aux::ConfigurationInterface::readConfiguration()
   {
     switch (iter->mMembersType)
     {
-    case (Setting::TypeFloat):
+    case (libconfig::Setting::TypeFloat):
     {
       try
       {
         *(static_cast<double*> (iter->mpMember)) = mConfig.lookup(iter->mName);
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
       }
-      catch(const SettingTypeException &nfex)
+      catch(const libconfig::SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
       break;
     } // END case TypeFloat
-    case (Setting::TypeBoolean):
+    case (libconfig::Setting::TypeBoolean):
     {
       try
       {
         *(static_cast<bool*> (iter->mpMember)) = mConfig.lookup(iter->mName);
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
       }
-      catch(const SettingTypeException &nfex)
+      catch(const libconfig::SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
       break;
     } // END case TypeBoolean
-    case (Setting::TypeInt):
+    case (libconfig::Setting::TypeInt):
     {
       try
       {
@@ -543,38 +542,38 @@ int cedar::aux::ConfigurationInterface::readConfiguration()
           *(static_cast<int*> (iter->mpMember)) = mConfig.lookup(iter->mName);
         }
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
       }
-      catch(const SettingTypeException &nfex)
+      catch(const libconfig::SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
       break;
     } // END case TypeInt
-    case (Setting::TypeString):
+    case (libconfig::Setting::TypeString):
     {
       try
       {
         std::string temp = mConfig.lookup(iter->mName);
         *(static_cast<std::string*> (iter->mpMember)) = temp;
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         info = handleSettingNotFoundException(*iter);
       }
-      catch(const SettingTypeException &nfex)
+      catch(const libconfig::SettingTypeException &nfex)
       {
         info = this->handleTypeException(*iter);
       }
       break;
     } // END case TypeString
-    case (Setting::TypeArray):
+    case (libconfig::Setting::TypeArray):
     {
       switch (iter->mIsVectorOfType)
       {
-      case (Setting::TypeInt):
+      case (libconfig::Setting::TypeInt):
       {
         if (iter->mIsUnsigned)
         {
@@ -586,17 +585,17 @@ int cedar::aux::ConfigurationInterface::readConfiguration()
         }
         break;
       } // END array case int
-      case (Setting::TypeFloat):
+      case (libconfig::Setting::TypeFloat):
       {
         readArray<double>(*iter);
         break;
       } // END array case float
-      case (Setting::TypeBoolean):
+      case (libconfig::Setting::TypeBoolean):
       {
         readArray<bool>(*iter);
         break;
       } // END array case bool
-      case (Setting::TypeString):
+      case (libconfig::Setting::TypeString):
       {
         readArray<std::string>(*iter);
         break;
@@ -624,7 +623,7 @@ int cedar::aux::ConfigurationInterface::handleTypeException(const cedar::aux::Co
 {
   std::cerr << "> error in " << mConfigFileName << ": Wrong type for '"
       << info.mName << "' setting in configuration file." << std::endl;
-  Setting &root = mConfig.getRoot();
+  libconfig::Setting &root = mConfig.getRoot();
   root.remove(info.mName);
   createNewGroupEntry(info.mName, info.mMembersType, root);
   setParameterToDefault(info);
@@ -641,26 +640,26 @@ int cedar::aux::ConfigurationInterface::handleSettingNotFoundException(const ced
 int cedar::aux::ConfigurationInterface::writeConfiguration()
 {
   // export current values of the parameters into the config object
-  Setting &root = mConfig.getRoot();
+  libconfig::Setting &root = mConfig.getRoot();
   for (ParameterInfoVector::iterator iter = this->mParameterInfos.begin(); iter != this->mParameterInfos.end(); ++iter)
   {
     switch (iter->mMembersType)
     // switch for first type - either basic data type or array
     {
-    case (Setting::TypeFloat):
+    case (libconfig::Setting::TypeFloat):
     {
       try
       {
         mConfig.lookup(iter->mName) = *(static_cast<double*> (iter->mpMember));
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         mConfig.lookup(iter->mName) = *(static_cast<double*> (iter->mpMember));
       }
       break;
     } // END case TypeFloat
-    case (Setting::TypeInt):
+    case (libconfig::Setting::TypeInt):
     {
       try
       {
@@ -674,7 +673,7 @@ int cedar::aux::ConfigurationInterface::writeConfiguration()
           mConfig.lookup(iter->mName) = *(static_cast<int*> (iter->mpMember));
         }
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         if (iter->mIsUnsigned)
@@ -689,43 +688,43 @@ int cedar::aux::ConfigurationInterface::writeConfiguration()
       }
       break;
     } // END case TypeInt
-    case (Setting::TypeBoolean):
+    case (libconfig::Setting::TypeBoolean):
     {
       try
       {
         mConfig.lookup(iter->mName) = *(static_cast<bool*> (iter->mpMember));
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         mConfig.lookup(iter->mName) = *(static_cast<bool*> (iter->mpMember));
       }
       break;
     } // END case TypeBoolean
-    case (Setting::TypeString):
+    case (libconfig::Setting::TypeString):
     {
       try
       {
         mConfig.lookup(iter->mName) = *(static_cast<std::string*> (iter->mpMember));
       }
-      catch(const SettingNotFoundException &nfex)
+      catch(const libconfig::SettingNotFoundException &nfex)
       {
         createNewGroupEntry(iter->mName, iter->mMembersType, root);
         mConfig.lookup(iter->mName) = *(static_cast<std::string*> (iter->mpMember));
       }
       break;
     } // END case TypeString
-    case (Setting::TypeArray):
+    case (libconfig::Setting::TypeArray):
     {
       switch (iter->mIsVectorOfType)
       // switch for second type - only available in arrays
       {
-        case (Setting::TypeBoolean):
+        case (libconfig::Setting::TypeBoolean):
         {
           writeArray<bool>(iter->mpMember, iter->mName, iter->mIsVectorOfType);
           break;
         } // END case array bool
-      case (Setting::TypeInt):
+      case (libconfig::Setting::TypeInt):
       {
         if (iter->mIsUnsigned)
         {
@@ -737,12 +736,12 @@ int cedar::aux::ConfigurationInterface::writeConfiguration()
         }
         break;
       }
-      case (Setting::TypeFloat):
+      case (libconfig::Setting::TypeFloat):
       {
         writeArray<double>(iter->mpMember, iter->mName, iter->mIsVectorOfType);
         break;
       }
-      case (Setting::TypeString):
+      case (libconfig::Setting::TypeString):
       {
         writeArray<std::string>(iter->mpMember, iter->mName, iter->mIsVectorOfType);
         break;
@@ -770,7 +769,7 @@ int cedar::aux::ConfigurationInterface::writeConfiguration()
     std::cout << "New configuration successfully written to: " << (mConfigFileName.c_str()) << std::endl;
 #endif
   }
-  catch(const FileIOException &fioex)
+  catch(const libconfig::FileIOException &fioex)
   {
     // check if path exists - if not, try to fix it
     try
@@ -793,7 +792,7 @@ int cedar::aux::ConfigurationInterface::writeConfiguration()
       }
       // else: path already exists, move on to next error (file permissions)
     }
-    catch(const FileIOException &directoryException)
+    catch(const libconfig::FileIOException &directoryException)
     {
       // we tried to create a directory to store the file, but it failed
       std::cerr << "I/O error while writing file: " << (mConfigFileName.c_str())
@@ -816,32 +815,32 @@ void cedar::aux::ConfigurationInterface::setParameterToDefault(
   switch (type)
   // switch for first type (either basic data type or array)
   {
-  case (Setting::TypeBoolean):
+  case (libconfig::Setting::TypeBoolean):
   {
     *(static_cast<bool*> (pParameter)) = cedar::aux::ConfigurationInterface::to<bool>(defaultValues.at(0));
     break;
   }
-  case (Setting::TypeInt):
+  case (libconfig::Setting::TypeInt):
   {
     *(static_cast<int*> (pParameter)) = cedar::aux::ConfigurationInterface::to<int>(defaultValues.at(0));
     break;
   }
-  case (Setting::TypeFloat):
+  case (libconfig::Setting::TypeFloat):
   {
       *(static_cast<double*> (pParameter)) = cedar::aux::ConfigurationInterface::to<double>(defaultValues.at(0));
     break;
   }
-  case (Setting::TypeString):
+  case (libconfig::Setting::TypeString):
   {
     *(static_cast<std::string*> (pParameter)) = defaultValues.at(0);
     break;
   }
-  case (Setting::TypeArray):
+  case (libconfig::Setting::TypeArray):
   {
     // second level switch - array can be of each basic data type
     switch (arrayType)
     {
-    case (Setting::TypeBoolean):
+    case (libconfig::Setting::TypeBoolean):
     {
       std::vector<bool>* p_vector = static_cast<std::vector<bool>*> (pParameter);
       p_vector->clear();
@@ -851,7 +850,7 @@ void cedar::aux::ConfigurationInterface::setParameterToDefault(
       }
       break;
     }
-    case (Setting::TypeInt):
+    case (libconfig::Setting::TypeInt):
     {
       std::vector<int>* p_vector = static_cast<std::vector<int>*> (pParameter);
       p_vector->clear();
@@ -861,7 +860,7 @@ void cedar::aux::ConfigurationInterface::setParameterToDefault(
       }
       break;
     }
-    case (Setting::TypeFloat):
+    case (libconfig::Setting::TypeFloat):
     {
       std::vector<double>* p_vector = static_cast<std::vector<double>*> (pParameter);
       p_vector->clear();
@@ -871,7 +870,7 @@ void cedar::aux::ConfigurationInterface::setParameterToDefault(
       }
       break;
     }
-    case (Setting::TypeString):
+    case (libconfig::Setting::TypeString):
     {
       std::vector<std::string>* p_vector = static_cast<std::vector<std::string>*> (pParameter);
       p_vector->clear();
@@ -911,22 +910,22 @@ void cedar::aux::ConfigurationInterface::adjustVectorSize(
 {
   switch (type)
   {
-  case (Setting::TypeBoolean):
+  case (libconfig::Setting::TypeBoolean):
   {
     adjustVector<bool>(pVector,type,element);
     break;
   }
-  case (Setting::TypeInt):
+  case (libconfig::Setting::TypeInt):
   {
     adjustVector<int>(pVector,type,element);
     break;
   }
-  case (Setting::TypeFloat):
+  case (libconfig::Setting::TypeFloat):
   {
     adjustVector<double>(pVector,type,element);
     break;
   }
-  case (Setting::TypeString):
+  case (libconfig::Setting::TypeString):
   {
     adjustVector<std::string>(pVector,type,element);
     break;
@@ -1016,7 +1015,7 @@ void cedar::aux::ConfigurationInterface::createNewGroupEntry(
   }
   else
   {
-    Setting& new_group = tree.add(cut_off, Setting::TypeGroup);
+    libconfig::Setting& new_group = tree.add(cut_off, libconfig::Setting::TypeGroup);
     createNewGroupEntry(rest, type, new_group);
   }
   return;
@@ -1126,7 +1125,7 @@ int cedar::aux::ConfigurationInterface::readArray(ParameterInfo& info)
   int result = CONFIG_SUCCESS;
   try
   {
-    if (mConfig.lookup(info.mName).getType() != Setting::TypeArray)
+    if (mConfig.lookup(info.mName).getType() != libconfig::Setting::TypeArray)
     {
       CEDAR_THROW(cedar::aux::TypeMismatchException, "Expected type does not match real type.");
     }
@@ -1134,7 +1133,7 @@ int cedar::aux::ConfigurationInterface::readArray(ParameterInfo& info)
     p_vector->clear();
     for (int j = 0; j < mConfig.lookup(info.mName).getLength(); j++)
     {
-      Setting &setting = mConfig.lookup(info.mName)[j];
+      libconfig::Setting &setting = mConfig.lookup(info.mName)[j];
       if (setting.getType() != info.mIsVectorOfType)
       {
         CEDAR_THROW(cedar::aux::TypeMismatchException, "Expected type does not match real type.");
@@ -1142,18 +1141,18 @@ int cedar::aux::ConfigurationInterface::readArray(ParameterInfo& info)
       p_vector->push_back(mConfig.lookup(info.mName)[j]);
     }
   }
-  catch(const SettingNotFoundException &nfex)
+  catch(const libconfig::SettingNotFoundException &nfex)
   {
     result = handleSettingNotFoundException(info);
   }
-  catch(const SettingTypeException &nfex)
+  catch(const libconfig::SettingTypeException &nfex)
   {
     std::cerr << "> error in " << mConfigFileName << ": Wrong type for '"
         << info.mName << "' setting in configuration file." << std::endl;
     std::vector<T>* p_vector = static_cast<std::vector<T>*> (info.mpMember);
     removeItem(info.mName);
-    createNewGroupEntry(info.mName, Setting::TypeArray, mConfig.getRoot());
-    Setting &array = mConfig.lookup(info.mName);
+    createNewGroupEntry(info.mName, libconfig::Setting::TypeArray, mConfig.getRoot());
+    libconfig::Setting &array = mConfig.lookup(info.mName);
     for (unsigned int j = 0; j < p_vector->size(); j++)
     {
       array.add(info.mIsVectorOfType);
@@ -1165,8 +1164,8 @@ int cedar::aux::ConfigurationInterface::readArray(ParameterInfo& info)
   {
     std::cerr << "> error in " << mConfigFileName << ": array '" << info.mName << "' is corrupt" << std::endl;
     removeItem(info.mName);
-    createNewGroupEntry(info.mName, Setting::TypeArray, mConfig.getRoot());
-    Setting &array = mConfig.lookup(info.mName);
+    createNewGroupEntry(info.mName, libconfig::Setting::TypeArray, mConfig.getRoot());
+    libconfig::Setting &array = mConfig.lookup(info.mName);
     array.add(info.mIsVectorOfType);
     setParameterToDefault(info);
     result = CONFIG_TYPE_ERROR;
@@ -1188,7 +1187,7 @@ void cedar::aux::ConfigurationInterface::removeItem(const std::string& name)
   {
     std::string group_name = name.substr(0,last_dot);
     std::string leaf_name = name.substr(last_dot+1, name.length() - last_dot - 1);
-    Setting& group = mConfig.lookup(group_name);
+    libconfig::Setting& group = mConfig.lookup(group_name);
     group.remove(leaf_name);
   }
 }
