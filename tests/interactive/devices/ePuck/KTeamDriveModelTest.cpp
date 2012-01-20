@@ -72,9 +72,8 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
 
   //open the channel to the robot
-  cedar::dev::com::SerialCommunication *pCommunication;
-  pCommunication
-  = new cedar::dev::com::SerialCommunication("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
+  cedar::dev::com::SerialCommunication *pCommunication = new cedar::dev::com::SerialCommunication();
+  pCommunication->readJson("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.json");
 
   //initialize the e-puck
   cedar::dev::kteam::EPuckDrive *pDrive;

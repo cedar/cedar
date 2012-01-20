@@ -40,7 +40,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/communication/Communication.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/StringParameter.h"
+#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/IntParameter.h"
+#include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
 #ifndef WIN32
@@ -57,10 +61,12 @@
  *
  * This includes opening and closing the Serial Port as well as sending and receiving strings. Examples for such
  * devices are mobile robots (E-Puck, Khepera). It is also possible to lock the channel to prevent read-/write-errors
- * if multiple threads are accessing the device (Implemented in Communication.h). The parameters of the communication
- * are read from a configuration-file.
+ * if multiple threads are accessing the device (Implemented in Communication.h).
+ *
+ * The parameters of the communication must be read from a configuration-file using the
+ * cedar::aux::Configurable::readJson method right after construction of the object.
  */
-class cedar::dev::com::SerialCommunication : public Communication, public cedar::aux::ConfigurationInterface
+class cedar::dev::com::SerialCommunication : public Communication, public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -68,7 +74,7 @@ class cedar::dev::com::SerialCommunication : public Communication, public cedar:
 public:
   //!@brief Initiates a new communication with an external device per Serial Port.
   //!@param config Location and name of the Configuration-File to be used.
-  SerialCommunication(const std::string config);
+  SerialCommunication();
 
   //!@brief Ends the communication with the device and closes the channel.
   ~SerialCommunication();
@@ -77,9 +83,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Initializes the communication and opens the channel.
-  //!@return 1 if initialization was successful, else 0.
-  int init();
 
   //!@brief The get-function of the initialization-status.
   //!@return true if initialized, else false
@@ -149,6 +152,10 @@ private:
   //!@brief  Closes the channel.
   void close();
 
+  //!@brief Initializes the communication and opens the channel.
+  //!@return 1 if initialization was successful, else 0.
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -178,6 +185,11 @@ private:
   //!@brief Time elapsed since start of send-/receive-operation.
   int mTime;
 
+  /*!@brief Translated version of the end of command string, i.e., the user's input with "\r" and "\n" replaced by the
+   *        appropriate characters.
+   */
+  std::string mTranslatedEndOfCommandString;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -188,45 +200,47 @@ private:
   /*!@brief Name of the communication.
    *Default is "Serial Communication".
    */
-  std::string _mName;
+  cedar::aux::StringParameterPtr _mName;
 
   /*!@brief Path of the Serial Port.
    *Default is "/dev/rfcomm0" (Bluetooth).
    */
-  std::string _mDevicePath;
+  cedar::aux::StringParameterPtr _mDevicePath;
 
   /*!@brief The End-Of-Command-String.
    *Marks the end of the sent/received string. Default is "\r\n" (carriage return + line feed).
    */
-  std::string _mEndOfCommandString;
+  cedar::aux::StringParameterPtr _mEndOfCommandString;
 
   /*!@brief The Country-Flag.
    *C-Flag is an identifier of the user's country. Set CFlag to 0 if in Germany (Default) or 1 if in USA.
    */
-  int _mCFlag;
+  cedar::aux::IntParameterPtr _mCFlag;
 
   /*!@brief The Baudrate which shall be used by the Serial Port (in Bit/s).
-   *Set it to 15 for 38400 Bit/s or to 4098 for 115200 Bit/s (Default).
+   *        Set it to 15 for 38400 Bit/s or to 4098 for 115200 Bit/s (Default).
+   *
+   * @todo  This should be an enum of all possible values rather than an arbitrary integer.
    */
-  unsigned int _mBaudrate;
+  cedar::aux::UIntParameterPtr _mBaudrate;
 
   /*!@brief Time in microsecs until current read-/write-operation times out.
    *The TimeOut prevents deadlocks that occur if the device does not respond. Default is 250000 microsecs.
    */
-  unsigned int _mTimeOut;
+  cedar::aux::UIntParameterPtr _mTimeOut;
 
   /*!@brief Delay of next operation after send (in microsecs).
    *Shouldn't be set too low to prevent reading-/writing-interference. Default is 10000 microsecs.
    */
-  unsigned int _mLatency;
+  cedar::aux::UIntParameterPtr _mLatency;
 
   /*!@brief The Debug-Flag.
    *If true, error-messages, sending-/receiving-times and number of sent/received bytes per message are displayed on
    *Console, else not.
    */
-  bool _mDebug;
+  cedar::aux::BoolParameterPtr _mDebug;
 
   //!brief The user's Operating System ("Linux" (Default) or "Apple")
-  std::string _mOS;
+  cedar::aux::StringParameterPtr _mOS;
 }; // class cedar::dev::com::SerialCommunication
 #endif // CEDAR_DEV_COM_SERIAL_COMMUNICATION_H_
