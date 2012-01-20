@@ -55,9 +55,8 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   //open the channel to the e-puck
-  cedar::dev::com::SerialCommunication *p_communication;
-  p_communication
-  = new cedar::dev::com::SerialCommunication("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
+  cedar::dev::com::SerialCommunication *p_communication = new cedar::dev::com::SerialCommunication();
+  p_communication->readJson("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.json");
 
   //initialize e-puck-drive
   cedar::dev::kteam::EPuckDrive *p_drive;
