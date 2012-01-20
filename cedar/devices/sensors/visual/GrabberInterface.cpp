@@ -128,7 +128,7 @@ GrabberInterface::~GrabberInterface()
   void GrabberInterface::sigIntHandler(int)
   {
       #ifdef DEBUG_GRABBER_INTERFACE
-        std::cout << "[GrabberInterface::sigIntHandler] CTRL-C catched" << std::endl;
+        std::cout << "[GrabberInterface::sigIntHandler] Abnormal program termination catched" << std::endl;
       #endif
 
       for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
@@ -179,7 +179,9 @@ void GrabberInterface::readInit(unsigned int numCams, const std::string& default
   mNumCams = numCams;
 
   #ifdef ENABLE_CTRL_C_HANDLER
+     //if (signal((int) SIGINT, &GrabberInterface::sigIntHandler) == SIG_ERR)
      signal(SIGINT,&GrabberInterface::sigIntHandler);
+     signal(SIGABRT,&GrabberInterface::sigIntHandler);
      mInstances.push_back(this);
   #endif
 
@@ -204,6 +206,7 @@ void GrabberInterface::readInit(unsigned int numCams, const std::string& default
   cedar::aux::ConfigurationInterface::readOrDefaultConfiguration();
 }
 
+//--------------------------------------------------------------------------------------------------------------------
 void GrabberInterface::applyInit()
 {
   //initialize the snapshot and recording names with default values

@@ -17,23 +17,22 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
-//#include <devices/sensors/visual/CameraGrabber.h>
+
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-//#include <opencv2/opencv.hpp>
-//#include <dc1394/1394.h>  //for all firewire stuff
-//#include <dc1394/video.h>  //for video modes like  DC1394_FRAMERATE_15, DC1394_ISO_SPEED_400
-#include <dc1394/types.h>  //for constants like DC1394_VIDEO_MODE_320x240_YUV422
 
 
 //--------------------------------------------------------------------------------------------------------------------
 //constants
 //--------------------------------------------------------------------------------------------------------------------
-#define CHANNEL_0_DEVICE (unsigned int) 0
+#define CHANNEL_0_DEVICE 0
+//#define CHANNEL_0_DEVICE 197055
+#define FINISH_INITIALIZATION false
+#define IS_GUID false
 
-#define GRABBER_NAME_0 "Camera_Grabber_TestCase"
+#define GRABBER_NAME "Camera_Grabber_TestCase"
 #define CONFIG_FILE_NAME_0 "camera_grabber_testcase.config"
 
 
@@ -47,7 +46,7 @@ using namespace cv;
 int main(int , char **)
 {
   //title of highgui window
-  std::string highgui_window_name_0 = (std::string) GRABBER_NAME_0 + ": CHANNEL_0_DEVICE" ;
+  std::string highgui_window_name = (std::string) GRABBER_NAME + ": CHANNEL_0_DEVICE" ;
 
 
   std::cout << "\n\nInteractive test of the CameraGrabber class\n";
@@ -60,7 +59,12 @@ int main(int , char **)
   cedar::dev::sensors::visual::CameraGrabber *camera_grabber=NULL;
   try
   {
-    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber( CONFIG_FILE_NAME_0 , CHANNEL_0_DEVICE , true);
+    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber(
+                                                                     CONFIG_FILE_NAME_0,
+                                                                     CHANNEL_0_DEVICE,
+                                                                     IS_GUID,
+                                                                     FINISH_INITIALIZATION
+                                                                   );
   }
   catch (cedar::aux::exc::InitializationException &e)
   {
@@ -77,16 +81,27 @@ int main(int , char **)
     return -1;
   }
 
+
+
   //------------------------------------------------------------------
   /*After initialization of a CameraGrabber:
    *
    * ALWAYS:
-   *  - the first frame is already grabbed, so you can check the size or display the image
-   *    getImage(), getSize() or something else
+   *  - finishInitialization is true:
+   *      - the first frame is already grabbed, so you can check the size or display the image
+   *        getImage(), getSize() or something else
+   *  - finishInitialization is false:
+   *      - you can adjust the camera with following functions:
+   *         setCameraFps()
+   *         setCameraMode()
+   *         setCameraIsoSpeed() (for Firewire cameras)
+   *         or all Settings available with setCameraSetting()
+   *
+   *
    *
    * EITHER:
    *  No or new configuration file:
-   *  - loopedThread isn't running (start auto-grabbing with start() )
+   *  - loopedThread isn't running (start threaded background grabbing with start() )
    *  - grabbername is set to default, i.e. CameraGrabber
    *
    * OR:
@@ -95,19 +110,102 @@ int main(int , char **)
    *  - grabbername is restored from configfile
    */
 
-    camera_grabber->setName(GRABBER_NAME_0);
+    //a new name for our grabber
+    camera_grabber->setName(GRABBER_NAME);
     std::cout << "\nGrab channel 0 from \"" << camera_grabber->getSourceInfo()<< "\"" << std::endl;
 
-    //Size of camera images
-    std::cout << "\nSize of loaded frame:\n";
-    cv::Size ch0_size = camera_grabber->getSize(0);
-    std::cout << "\tChannel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+    //in this example initialization isn't finished (i.e. the first picture isn't already grabbed)
 
-    //check framerate of the grabber-thread (thread isn't started yet)
-    //remember: grabberthread have to be started to get new content.
-    //          or call CameraGrabber.grab() manually
-    std::cout << "CameraGrabber thread default FPS : " << camera_grabber->getFps() << std::endl;
 
+    //------------------------------------------------------------------------------------
+    //so we can adjust the camera
+
+    //these settings are only setable on initialization:
+    std::cout << "\tCamera Mode : " << (int) camera_grabber->getCameraMode(0) << std::endl;
+    cedar::dev::sensors::visual::CameraVideoMode::Id mode = camera_grabber->getCameraMode(0);
+    std::cout << "\tCamera Mode : " << cedar::dev::sensors::visual::CameraVideoMode::type().get(mode).name() << std::endl;
+
+    std::cout << "\tCamera FPS  : " << camera_grabber->getCameraFps(0) << std::endl;
+    cedar::dev::sensors::visual::CameraFrameRate::Id fps = camera_grabber->getCameraFps(0);
+    std::cout << "\tCamera FPS  : " << cedar::dev::sensors::visual::CameraFrameRate::type().get(fps).name() << std::endl;
+
+    cv::Size size = camera_grabber->getCameraFrameSize(0);
+    std::cout << "\tChannel 0: " << size.width <<" x " << size.height << std::endl;
+
+    std::cout << "\tCamera Frame Width  : " << size.width << std::endl;
+    std::cout << "\tCamera Frame Height : " << size.height << std::endl;
+
+    std::cout << "\tCamera ISO-Speed    : " << camera_grabber->getCameraIsoSpeed(0) << std::endl;
+    cedar::dev::sensors::visual::CameraIsoSpeed::Id iso_speed = camera_grabber->getCameraIsoSpeed(0);
+    std::cout << "\tCamera ISO-Speed    :" << cedar::dev::sensors::visual::CameraIsoSpeed::type().get(iso_speed).name() << std::endl;
+
+    //Set the wanted mode for grabbing
+    std::cout << "\n\nSet camera Fps to 7.5 FPS" << std::endl;
+    camera_grabber->setCameraFps(0,cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_7_5);
+    std::cout << "Set ISO-speed to 200" << std::endl;
+    camera_grabber->setCameraIsoSpeed(0,cedar::dev::sensors::visual::CameraIsoSpeed::ISO_200);
+    std::cout << "Set camera mode to \"MODE_160x120_YUV444\"" << std::endl;
+    //set camera mode to DC1394_VIDEO_MODE_160x120_YUV444 (is supported by sony firewire cam
+    camera_grabber->setCameraMode(0,cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_160x120_YUV444);
+
+
+    //This finish the initialization.
+    //After this, there is no possibility to change the framerate or the camera mode
+    camera_grabber->grab();
+
+    std::cout << "\nChannel 0 settings:" << std::endl;
+    std::cout << "\tCamera Mode      : " << cedar::dev::sensors::visual::CameraVideoMode::type().get(camera_grabber->getCameraMode(0)).name() << std::endl;
+    std::cout << "\tCamera FPS       : " << cedar::dev::sensors::visual::CameraFrameRate::type().get(camera_grabber->getCameraFps(0)).name() << std::endl;
+    std::cout << "\tCamera ISO-Speed : " << cedar::dev::sensors::visual::CameraIsoSpeed::type().get(camera_grabber->getCameraIsoSpeed(0)).name() << std::endl;
+
+
+    std::cout << "\n\nChannel 0 properties: Values of -1 means, that the feature is not supported by the actual used camera" << std::endl;
+
+    //it is possible to use opencv constants.
+    //std::cout << "\tContrast:    " << camera_grabber->getCameraProperty(CV_CAP_PROP_CONTRAST) << std::endl;
+
+    //better use the enum-types from cedar
+    std::cout << "\tBrightness: " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS) << std::endl;
+    std::cout << "\tSaturation: " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_SATURATION) << std::endl;
+    std::cout << "\tHue:        " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_HUE) << std::endl;
+    std::cout << "\tGain:       " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_GAIN) << std::endl;
+    //std::cout << "\tGamma:      " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_GAMMA) << std::endl;
+    std::cout << "\tTemperature:" << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_TEMPERATURE) << std::endl;
+
+    std::cout << "\n\tZoom:       " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_ZOOM) << std::endl;
+    std::cout << "\tFocus:      " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS) << std::endl;
+
+    std::cout << "\n\tExposure:      " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_EXPOSURE) << std::endl;
+    std::cout << "\tAuto-Exposure: " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_AUTO_EXPOSURE) << std::endl;
+
+    std::cout << "\tTrigger:       " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER) << std::endl;
+    std::cout << "\tTrigger-Delay: " << camera_grabber->getCameraProperty(cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER_DELAY) << std::endl;
+
+    //for all Properties, you can use a loop
+    std::cout << "\n----------------------------\n" << std::endl;
+    std::cout << "All properties of channel 0:" << std::endl;
+
+    //camera_grabber->printAllSettings(0);
+
+
+    int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
+    for (int i=0; i<num_properties; i++)
+    {
+      cedar::dev::sensors::visual::CameraProperty::Id prop_id;
+      prop_id = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
+      std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).name();
+      std::string prop_description = cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).prettyString();
+      int prop_value = camera_grabber->getCameraProperty(prop_id);
+
+      std::cout << "\tId: " << prop_id
+                << "\tName: " << prop_name
+                << "\tValue: " << prop_value
+                << "\tDescription: " << prop_description
+                << std::endl;
+    }
+
+
+    //------------------------------------------------------------------------------------
     //You can create an avi file from your grabbing
     camera_grabber->setRecordName("Camera_Grabber_TestCase_Recording.avi");
 
@@ -121,49 +219,45 @@ int main(int , char **)
 
     //Check the constructed filenames
     std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
-
     std::cout << "SnapshotName:\t" << camera_grabber->getSnapshotName() <<std::endl;
     std::cout << "RecordName:\t" << camera_grabber->getRecordName() <<std::endl;
 
-    //enforcing an error and catch it
-    try
-    {
-      std::cout << "\nTry to enforce an exception:\n";
-      std::cout << "SnapshotName_1: " << camera_grabber->getSnapshotName(1) <<std::endl;
-    }
-    catch (cedar::aux::exc::ExceptionBase& e)
-    {
-      //std::cout << "Exception: " <<e.what() << std::endl; //until now: buggy cedar implementation
-      //all grabber exceptions (look at cedar/devices/sensors/visual/exceptions/namespace.h)
-      //can be used without separate include-files
-      std::cout <<e.exceptionInfo()<<std::endl;
-    }
+
+
+    //------------------------------------------------------------------
+    //grab first image. After this, settings couldn't be set any more
+    std::cout << "\n----------------------------\n" << std::endl;
+    std::cout << "Grab first image" << std::endl;
+    camera_grabber->grab();
+
+    //now first image is grabbed from the camera.
 
     // Save a snapshot from channel 0 only
     // Be aware, that existing files will be overwritten without any question
     //camera_grabber->saveSnapshot(0);
 
-    std::cout << "Channel 0 settings:" << std::endl;
-    std::cout << "\tContrast:    " << camera_grabber->getCameraProperty(CV_CAP_PROP_CONTRAST) << std::endl;
-    std::cout << "\tBrightness:  " << camera_grabber->getCameraProperty(CV_CAP_PROP_BRIGHTNESS) << std::endl;
-    std::cout << "\tSaturation:  " << camera_grabber->getCameraProperty(CV_CAP_PROP_SATURATION) << std::endl;
-    std::cout << "\tHue:         " << camera_grabber->getCameraProperty(CV_CAP_PROP_HUE) << std::endl;
-    std::cout << "\tGain:        " << camera_grabber->getCameraProperty(CV_CAP_PROP_GAIN) << std::endl;
-    std::cout << "\tExposure:    " << camera_grabber->getCameraProperty(CV_CAP_PROP_EXPOSURE) << std::endl;
-    std::cout << "\n\tFourCC(Enc): " << camera_grabber->getCameraProperty(CV_CAP_PROP_FOURCC) << std::endl;
-    std::cout << "\tCamera Mode  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_MODE) << std::endl;
-    std::cout << "\tCamera FPS  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_FPS) << std::endl;
+
+    //------------------------------------------------------------------
+    //Size of camera images
+    std::cout << "\nSize of loaded frame:\n";
+    cv::Size ch0_size = camera_grabber->getSize(0);
+
+    //check framerate of the grabber-thread (thread isn't started yet)
+    //remember: grabberthread have to be started to get new content.
+    //          or call CameraGrabber.grab() manually
+    std::cout << "CameraGrabber FPS : " << camera_grabber->getFps() << std::endl;
+
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
   std::cout << "\nDisplay camera\n";
-  namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
+  namedWindow(highgui_window_name,CV_WINDOW_KEEPRATIO);
 
-  //the first frame is already grabbed on initialization
-  cv::Mat frame0 = camera_grabber->getImage();
+  //the first frame is already grabbed
+  cv::Mat frame = camera_grabber->getImage();
 
   //start the grabber-thread for updating camera images
-  camera_grabber->setFps(15);
+  //camera_grabber->setFps(15);
   std::cout << "Start grabbing in the background" << std::endl;
   camera_grabber->start();
 
@@ -174,21 +268,24 @@ int main(int , char **)
   //get frames for a while
   unsigned int counter=0;
 
-  while (!frame0.empty())
+  while (!frame.empty())
   {
-    imshow(highgui_window_name_0,frame0);
+    //to reset values to default-value
+    int shutter_orig=0;
+
+    //the wanted Property to change
+    cedar::dev::sensors::visual::CameraProperty::Id prop_id;
+
+    imshow(highgui_window_name,frame);
 
     //get new images, this is independent from camera-thread
     //if camera-thread is faster than your processing, images will be skipped
-    frame0 = camera_grabber->getImage();
+    frame = camera_grabber->getImage();
     counter++;
-
-    //every 100 ms
-    if (! (counter % 10)) {
-    }
 
     //every second
     if (! (counter % 100)) {
+      //display real reached fps
       std::cout << "Thread FPS: " << camera_grabber->getFpsMeasured() << std::endl;
     }
 
@@ -197,56 +294,56 @@ int main(int , char **)
     //after one second, set camera options
     if (counter == 100)
     {
-      camera_grabber->setCameraProperty(CV_CAP_PROP_BRIGHTNESS, 10);
-      double brightness = camera_grabber->getCameraProperty(CV_CAP_PROP_BRIGHTNESS);
-      std::cout << "Brightness: " << brightness << std::endl;
+      prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS;
+
+      double brightness = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "Brightness before: " << brightness << std::endl;
+      bool test = camera_grabber->setCameraProperty(prop_id, 300);
+      std::cout << "Set Brightness to 300. Result = " << std::boolalpha << test << std::endl;
+      brightness = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "Brightness after: " << brightness << std::endl;
     }
 
 
     //after another second, set camera options
     if (counter == 200)
     {
-      camera_grabber->setCameraProperty(CV_CAP_PROP_BRIGHTNESS, 200);
-      double brightness = camera_grabber->getCameraProperty(CV_CAP_PROP_BRIGHTNESS);
-      std::cout << "Brightness: " << brightness << std::endl;
+      prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS;
+
+      double brightness = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "Brightness before: " << brightness << std::endl;
+      bool test = camera_grabber->setCameraProperty(prop_id, 10);
+      std::cout << "Set Brightness to 10. Result = " << test << std::endl;
+      brightness = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "Brightness after: " << brightness << std::endl;
     }
 
     if (counter == 300)
     {
+      //wanted id to change
+      prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_EXPOSURE;
 
-      std::cout <<"Set capture size: "<<std::endl;
-
-      cv::Size ch0_size = camera_grabber->getSize(0);
-      std::cout << "\tOld size: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
-
-      /* cv::Size newSize;
-      newSize.width = 320;
-      newSize.height = 240;
-      camera_grabber->setCameraParamSize(0, newSize);
-      */
-
-      //does nothing
-      camera_grabber->setCameraProperty(0,CV_CAP_PROP_MODE,DC1394_VIDEO_MODE_320x240_YUV422);
-
-
-      //camera_grabber->setCameraParamMode(0,(double)2);
-      std::cout << "\tCamera Mode  : " << camera_grabber-> getCameraProperty(CV_CAP_PROP_MODE) << std::endl;
-
-      ch0_size = camera_grabber->getSize(0);
-      std::cout << "\tNew Size: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+      //check old value with new one
+      shutter_orig = static_cast<int>(camera_grabber->getCameraProperty(prop_id));
+      std::cout << "Shutter before: " << shutter_orig << std::endl;
+      bool test = camera_grabber->setCameraProperty(prop_id, 10);
+      std::cout << "Set Shutter to 10. Result = " <<  test << std::endl;
+      double shutter = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "Shutter after: " << shutter << std::endl;
     }
 
     if (counter == 400)
     {
-      std::cout << "Set Fps to 7.5 FPS" << std::endl;
-      std::cout << "\tOld Camera FPS  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_FPS) << std::endl;
-      camera_grabber->setCameraProperty(CV_CAP_PROP_FPS,30);
-      //camera_grabber->setFps(7.5);
-      std::cout << "\tNew Camera FPS  : " << camera_grabber->getCameraProperty(CV_CAP_PROP_FPS) << std::endl;
+      prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_EXPOSURE;
+
+      bool test = camera_grabber->setCameraProperty(prop_id, shutter_orig);
+      std::cout << "Set Shutter to " << shutter_orig<<". Result = " <<  test << std::endl;
+      double shutter = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "Shutter after: " << shutter << std::endl;
     }
 
-    //exit after 10 seconds
-    if (counter == 1000)
+    //exit after 5 seconds
+    if (counter == 500)
     {
       break;
     }
@@ -258,7 +355,10 @@ int main(int , char **)
   //------------------------------------------------------------------
   //clean up
 
-  destroyWindow(highgui_window_name_0);
+  destroyWindow(highgui_window_name);
+
+  //save actual configuration
+  camera_grabber->writeConfiguration();
 
   //stop grabbing-thread if running
   //recording will also be stopped
