@@ -185,8 +185,8 @@ GrabberInterface(configFileName)
 
   for(unsigned int channel = 0; channel < numChannels; channel++)
   {
-    //storage for id's
-    CameraId cam_id = {0,0};
+    //storage for id's, if there is no configuration file, then create one by one
+    CameraId cam_id = {channel,0};
     mCamIds.push_back(cam_id);
 
     //storage for filenames from config-file
@@ -246,7 +246,8 @@ bool CameraGrabber::onDeclareParameters()
     //channel string
     std::string ch = "ch"+boost::lexical_cast<std::string>(channel)+"_";
 
-    //get default value from constructor-value
+    //get default value from constructor-value. Value will be overwritten by configuration interface
+    //so we store it
     CameraId cam_Id = mCamIds.at(channel);
     result = (addParameter(&mCamIds.at(channel).guid,ch+"guid",cam_Id.guid)== CONFIG_SUCCESS) && result;
     result = (addParameter(&mCamIds.at(channel).busId,ch+"busId",cam_Id.busId) == CONFIG_SUCCESS) && result;
