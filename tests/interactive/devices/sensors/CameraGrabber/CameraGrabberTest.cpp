@@ -132,9 +132,6 @@ int main(int , char **)
     cv::Size size = camera_grabber->getCameraFrameSize(0);
     std::cout << "\tChannel 0: " << size.width <<" x " << size.height << std::endl;
 
-    std::cout << "\tCamera Frame Width  : " << size.width << std::endl;
-    std::cout << "\tCamera Frame Height : " << size.height << std::endl;
-
     std::cout << "\tCamera ISO-Speed    : " << camera_grabber->getCameraIsoSpeed(0) << std::endl;
     cedar::dev::sensors::visual::CameraIsoSpeed::Id iso_speed = camera_grabber->getCameraIsoSpeed(0);
     std::cout << "\tCamera ISO-Speed    :" << cedar::dev::sensors::visual::CameraIsoSpeed::type().get(iso_speed).name() << std::endl;
@@ -239,8 +236,9 @@ int main(int , char **)
 
     //------------------------------------------------------------------
     //Size of camera images
-    std::cout << "\nSize of loaded frame:\n";
+    std::cout << "\nSize of loaded frame: " ;
     cv::Size ch0_size = camera_grabber->getSize(0);
+    std::cout << size.width <<" x " << size.height << std::endl;
 
     //check framerate of the grabber-thread (thread isn't started yet)
     //remember: grabberthread have to be started to get new content.
@@ -271,7 +269,7 @@ int main(int , char **)
   while (!frame.empty())
   {
     //to reset values to default-value
-    int shutter_orig=0;
+    int white_balance_orig=0;
 
     //the wanted Property to change
     cedar::dev::sensors::visual::CameraProperty::Id prop_id;
@@ -298,8 +296,8 @@ int main(int , char **)
 
       double brightness = camera_grabber->getCameraProperty(prop_id);
       std::cout << "Brightness before: " << brightness << std::endl;
-      bool test = camera_grabber->setCameraProperty(prop_id, 300);
-      std::cout << "Set Brightness to 300. Result = " << std::boolalpha << test << std::endl;
+      bool test = camera_grabber->setCameraProperty(prop_id, 150);
+      std::cout << "Set Brightness to 150. Result = " << std::boolalpha << test << std::endl;
       brightness = camera_grabber->getCameraProperty(prop_id);
       std::cout << "Brightness after: " << brightness << std::endl;
     }
@@ -312,8 +310,8 @@ int main(int , char **)
 
       double brightness = camera_grabber->getCameraProperty(prop_id);
       std::cout << "Brightness before: " << brightness << std::endl;
-      bool test = camera_grabber->setCameraProperty(prop_id, 10);
-      std::cout << "Set Brightness to 10. Result = " << test << std::endl;
+      bool test = camera_grabber->setCameraProperty(prop_id, 100);
+      std::cout << "Set Brightness to 100. Result = " << test << std::endl;
       brightness = camera_grabber->getCameraProperty(prop_id);
       std::cout << "Brightness after: " << brightness << std::endl;
     }
@@ -321,25 +319,25 @@ int main(int , char **)
     if (counter == 300)
     {
       //wanted id to change
-      prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_EXPOSURE;
+      prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_BLUE_U;
 
       //check old value with new one
-      shutter_orig = static_cast<int>(camera_grabber->getCameraProperty(prop_id));
-      std::cout << "Shutter before: " << shutter_orig << std::endl;
+      white_balance_orig = static_cast<int>(camera_grabber->getCameraProperty(prop_id));
+      std::cout << "White Balance: " << white_balance_orig << std::endl;
       bool test = camera_grabber->setCameraProperty(prop_id, 10);
-      std::cout << "Set Shutter to 10. Result = " <<  test << std::endl;
-      double shutter = camera_grabber->getCameraProperty(prop_id);
-      std::cout << "Shutter after: " << shutter << std::endl;
+      std::cout << "Set White Balance to 10. Result = " <<  test << std::endl;
+      double white_balance = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "White Balance after: " << white_balance << std::endl;
     }
 
     if (counter == 400)
     {
       prop_id = cedar::dev::sensors::visual::CameraProperty::PROP_EXPOSURE;
 
-      bool test = camera_grabber->setCameraProperty(prop_id, shutter_orig);
-      std::cout << "Set Shutter to " << shutter_orig<<". Result = " <<  test << std::endl;
-      double shutter = camera_grabber->getCameraProperty(prop_id);
-      std::cout << "Shutter after: " << shutter << std::endl;
+      bool test = camera_grabber->setCameraProperty(prop_id, CAMERA_PROPERTY_MODE_AUTO);
+      std::cout << "Set White Balance to AUTO. Result = " <<  test << std::endl;
+      double white_balance = camera_grabber->getCameraProperty(prop_id);
+      std::cout << "White Balance after: " << white_balance << std::endl;
     }
 
     //exit after 5 seconds
@@ -348,7 +346,7 @@ int main(int , char **)
       break;
     }
 
-    //wait 10ms (needed for highgui) => get images from thread with 10 fps
+    //wait 10ms (needed for highgui) => get images from thread with 100 fps
     waitKey(10);
   }
 
