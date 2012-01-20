@@ -83,7 +83,6 @@ typedef struct CameraIdStruct
 } CameraId;
 //--------------------------------------------------------------------------------------------------------------------
 
-
 /*! \class cedar::dev::sensors::visual::CameraGrabber
  *  \brief This grabber grabs images from a camera
  *  \remarks This functionality is implemented by using the OpenCV class cv::VideoCapture
@@ -371,11 +370,19 @@ protected:
   void onCleanUp();
 
 
+  // set a parameter to the cv::VideoCapture
+  // implements the cv::VideoCapture.set() method with respect to concurrent access
+  bool setProperty(unsigned int channel, unsigned int prop_id, double value);
+
+  // get a parameter form the cv::VideoCapture
+  // implements the cv::VideoCapture.get() method with respect to concurrent access
+  double getProperty(unsigned int channel, unsigned int prop_id);
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -410,6 +417,13 @@ protected:
    *
    */
   std::vector<std::string> mCameraCapabilitiesFileNames;
+
+  /*! @brief This vector contains the read/write locks for the cv::VideoCaptures
+   *  \remarks
+   *          Used for concurrent access to the cv::VideoCapture
+   *          of the grabber-thread and in the get/set properties
+   */
+  std::vector<QReadWriteLockPtr> mVideoCaptureLocks;
 
 private:
 

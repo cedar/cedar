@@ -85,7 +85,8 @@ public cedar::aux::ConfigurationInterface
 public:
   //!@brief The standard constructor.
   CameraState(
-                           cv::VideoCapture& videoCapture,
+                           cv::VideoCapture videoCapture,
+                           QReadWriteLockPtr videoCaptureLock,
                            const std::string& channelPrefix,
                            SupportedPropertiesSet supportedProperties,
                            const std::string& configFileName
@@ -133,6 +134,14 @@ private:
   // Interface to ConfigurationInterface class;
   bool declareParameter();
 
+  // set a parameter to the cv::VideoCapture
+  // implements the cv::VideoCapture.set() method with respect to concurrent access
+  bool setProperty(unsigned int prop_id, double value);
+
+  // get a parameter form the cv::VideoCapture
+  // implements the cv::VideoCapture.get() method with respect to concurrent access
+  double getProperty(unsigned int prop_id);
+
 
 
   /// @endcond
@@ -165,9 +174,12 @@ private:
   //Essential if more than one camera saved in config-file
   std::string mChannelPrefix;
 
-  cv::VideoCapture& mVideoCapture;
+  cv::VideoCapture mVideoCapture;
 
   SupportedPropertiesSet mSupportedProperties;
+
+  //the lock for the cv::VideoCapture class
+  QReadWriteLockPtr mpVideoCaptureLock;
 
 }; // cedar::dev::sensors::visual::CameraState
 

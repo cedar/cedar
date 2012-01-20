@@ -128,31 +128,31 @@ bool CameraCapabilities::declareParameters()
 
     //property capability one by one
     prop_cap = prop_name + "max_value";
-    result = result && (addParameter(&mCamProperties.at(i).max_value, prop_cap, 255) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).max_value, prop_cap, 255) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "min_value";
-    result = result && (addParameter(&mCamProperties.at(i).min_value, prop_cap, 0) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).min_value, prop_cap, 0) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "is_supported";
-    result = result && (addParameter(&mCamProperties.at(i).is_supported, prop_cap, true) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).is_supported, prop_cap, true) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "is_readable";
-    result = result && (addParameter(&mCamProperties.at(i).is_readable, prop_cap, true) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).is_readable, prop_cap, true) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "is_one_push_capable";
-    result = result && (addParameter(&mCamProperties.at(i).is_one_push_capable, prop_cap, false) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).is_one_push_capable, prop_cap, false) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "is_on_off_capable";
-    result = result && (addParameter(&mCamProperties.at(i).is_on_off_capable, prop_cap, false) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).is_on_off_capable, prop_cap, false) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "is_auto_capable";
-    result = result && (addParameter(&mCamProperties.at(i).is_auto_capable, prop_cap, false) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).is_auto_capable, prop_cap, false) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "is_manual_capable";
-    result = result && (addParameter(&mCamProperties.at(i).is_manual_capable, prop_cap, true) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).is_manual_capable, prop_cap, true) == CONFIG_SUCCESS) && result;
 
     prop_cap = prop_name + "is_absolute_capable";
-    result = result && (addParameter(&mCamProperties.at(i).is_absolute_capable, prop_cap, false) == CONFIG_SUCCESS);
+    result = (addParameter(&mCamProperties.at(i).is_absolute_capable, prop_cap, false) == CONFIG_SUCCESS) && result;
 
   }
   return result;

@@ -159,7 +159,7 @@ bool PictureGrabber::onGrab()
   bool result = true;
   for (unsigned int i=0; i<mNumCams; i++)
   {
-    result &= !mImageMatVector.at(i).empty();
+    result = !mImageMatVector.at(i).empty() && result;
   }
   return true;
 }

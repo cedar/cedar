@@ -70,6 +70,7 @@ CameraConfiguration::CameraConfiguration(
 //----------------------------------------------------------------------------------------------------------------------
 CameraConfiguration::CameraConfiguration(
                                           cv::VideoCapture videoCapture,
+                                          QReadWriteLockPtr videoCaptureLock,
                                           const std::string channelPrefix,
                                           const std::string configurationFileName,
                                           const std::string capabilitiesFileName
@@ -89,6 +90,7 @@ mVideoCapture(videoCapture)
   mConfigurationFileName = configurationFileName;
   mCapabilitiesFileName = capabilitiesFileName;
   mChannelPrefix = channelPrefix;
+  mpVideoCaptureLock = videoCaptureLock;
 
   //mpCamCapabilities = NULL;
   //mpCamState = NULL;
@@ -112,7 +114,7 @@ mVideoCapture(videoCapture)
     }
     //and for local storage of properties and settings
     //on intialization: cameraconfiguration will be restored
-    mpCamState = CameraStatePtr(new CameraState (videoCapture,mChannelPrefix,supp_prop,mConfigurationFileName));
+    mpCamState = CameraStatePtr(new CameraState (videoCapture,mpVideoCaptureLock,mChannelPrefix,supp_prop,mConfigurationFileName));
   }
 
   //all thrown exceptions catched by the shared_pointer structure in the CameraGrabber class
@@ -144,10 +146,22 @@ CameraConfiguration::~CameraConfiguration()
 //--------------------------------------------------------------------------------------------------------------------
 bool CameraConfiguration::writeConfiguration()
 {
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout<<"[CameraConfiguration::writeConfiguration]"<< std::endl;
+  #endif
+
+  bool result = true;
   //Camera Capabilities shouldn't be written
 
   //Save values from the camera
-  return mpCamState->writeConfiguration();
+  result = mpCamState->writeConfiguration() && result;
+
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout<<"[CameraConfiguration::writeConfiguration] result: "
+             << std::boolalpha << result << std::noboolalpha << std::endl;
+  #endif
+
+  return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------

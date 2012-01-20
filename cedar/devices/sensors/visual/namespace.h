@@ -44,6 +44,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
+#include <QReadWriteLock>
 
 //------------------------------------------------------------------------
 // namespace for classes
@@ -116,6 +117,10 @@ namespace cedar
         //! @brief A class which manages the properties and settings of a camera, i.e. the actual state
         class CameraState;
         typedef boost::shared_ptr<CameraState> CameraStatePtr;
+
+        // Shared pointer for QReadWriteLock
+        // used in CameraGrabber
+        typedef boost::shared_ptr<QReadWriteLock> QReadWriteLockPtr;
       }
     }
   }
