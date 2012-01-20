@@ -554,7 +554,8 @@ void CameraGrabber::printAllProperties(unsigned int channel)
   int num_properties = cedar::dev::sensors::visual::CameraProperty::type().list().size();
   for (int i=0; i<num_properties; i++)
   {
-    cedar::dev::sensors::visual::CameraProperty::Id prop_id = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
+    cedar::dev::sensors::visual::CameraProperty::Id prop_id;
+    prop_id = cedar::dev::sensors::visual::CameraProperty::type().list().at(i).id();
     std::string prop_name = cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).name();
     std::string prop_description = cedar::dev::sensors::visual::CameraProperty::type().get(prop_id).prettyString();
     int prop_value = getCameraProperty(channel,prop_id);
