@@ -550,7 +550,7 @@ bool GrabberInterface::saveSnapshotAllCams() const
 
   for (unsigned int cam = 0; cam < mNumCams; ++cam)
   {
-    result = result && saveSnapshot(cam);
+    result = saveSnapshot(cam) && result;
   }
   return result;
 }

@@ -89,6 +89,7 @@ public:
   // \param capabilitiesFileName The filename of the capabilities
   CameraConfiguration(
                        cv::VideoCapture videoCapture,
+                       QReadWriteLockPtr videoCaptureLock,
                        const std::string channelPrefix,
                        const std::string configurationFileName,
                        const std::string capabilitiesFileName
@@ -161,6 +162,8 @@ private:
   std::string mCapabilitiesFileName;
   std::string mChannelPrefix;
   cv::VideoCapture& mVideoCapture;
+  QReadWriteLockPtr mpVideoCaptureLock;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
