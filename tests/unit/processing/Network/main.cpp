@@ -132,6 +132,8 @@ int main(int /* argc */, char** /* argv */)
   std::cout << "Read nested network." << std::endl;
   cedar::proc::NetworkPtr network_nested(new cedar::proc::Network());
   network_nested->readFile("Nested.json");
+
+  std::cout << "testing Network::getElement for nested networks" << std::endl;
   network_nested->getElement<Step>("parent step");
   if (network_nested->getElement<Network>("network child")->getElement<Step>("child step")->getName() != "child step")
   {
@@ -148,6 +150,22 @@ int main(int /* argc */, char** /* argv */)
     ++errors;
     std::cout << "child step was not found in nested network using dot notation" << std::endl;
   }
+
+  std::cout << "testing Network::findPath" << std::endl;
+  if (network_nested->findPath(network_nested->getElement<Step>("network child.child step")) != "network child.child step")
+  {
+    ++errors;
+    std::cout << "path to existing element not recovered" << std::endl;
+  }
+
+  TestModulePtr step_schmild (new TestModule());
+  step_schmild->setName("schmild step");
+  if (network_nested->findPath(step_schmild) != "")
+  {
+    ++errors;
+    std::cout << "path to non-existing element not empty" << std::endl;
+  }
+
 
   // return
   std::cout << "Done. There were " << errors << " errors." << std::endl;
