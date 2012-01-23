@@ -772,3 +772,32 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   }
   return it;
 }
+
+
+std::string cedar::proc::Network::findPath(cedar::proc::ConstElementPtr findMe) const
+{
+  // first, try to find element in this network
+  try
+  {
+    if (findMe == this->getElement<const cedar::proc::Element>(findMe->getName()))
+    {
+      return findMe->getName();
+    }
+  }
+  catch (cedar::proc::InvalidNameException& e) // this can happen if element is not found, no problem, see below
+  {
+  }
+  // if element is not found, search in child networks
+  for (ElementMap::const_iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    if (cedar::proc::ConstNetworkPtr network = boost::shared_dynamic_cast<cedar::proc::Network>(iter->second))
+    {
+      std::string found = network->findPath(findMe);
+      if (found != "" && findMe == network->getElement<const cedar::proc::Element>(found))
+      {
+        return network->getName() + std::string(".") + found;
+      }
+    }
+  }
+  return std::string("");
+}
