@@ -45,6 +45,7 @@
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
 
@@ -79,6 +80,43 @@ void cedar::aux::Configurable::readJson(const std::string& filename)
   boost::property_tree::read_json(filename, configuration);
   this->readConfiguration(configuration);
 }
+
+void cedar::aux::Configurable::readOldConfig(const std::string& filename)
+{
+  cedar::aux::ConfigurationNode configuration;
+  boost::property_tree::read_ini(filename, configuration);
+
+  this->oldFormatToNew(configuration);
+
+  this->readConfiguration(configuration);
+}
+
+void cedar::aux::Configurable::oldFormatToNew(cedar::aux::ConfigurationNode& node)
+{
+  // process all children of the current node
+  for (cedar::aux::ConfigurationNode::iterator iter = node.begin(); iter != node.end(); ++iter)
+  {
+    std::string data = iter->second.data();
+    // remove some characters that come from using the ini parser on the old format
+    if (data.at(data.length() - 1) == ';')
+    {
+      data = data.substr(0, data.length() - 1);
+    }
+    if (data.at(0) == '\"')
+    {
+      data = data.substr(1);
+      if (data.at(data.length() - 1) == '\"')
+      {
+        data = data.substr(0, data.length() - 1);
+      }
+    }
+    iter->second.put_value(data);
+
+    // also process all of the childrens' children
+    this->oldFormatToNew(iter->second);
+  }
+}
+
 
 void cedar::aux::Configurable::writeJson(const std::string& filename) const
 {
