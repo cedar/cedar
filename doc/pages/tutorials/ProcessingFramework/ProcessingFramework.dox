@@ -102,8 +102,9 @@ void SimpleSummation::compute(const cedar::proc::Arguments&)
   cedar::aux::ConstDataPtr op1 = this->getInputSlot("operand1")->getData();
   /* Retreive its stored data and add it to the sum. 
      Note, that we assume that op1 can be cast to MatData!
+     The call to the clone function is necessary to avoid writing into the input matrix.
    */
-  sum = op1->getData<cv::Mat>();
+  sum = op1->getData<cv::Mat>().clone();
 
   // Same as above for the second input.
   cedar::aux::ConstDataPtr op2 = this->getInputSlot("operand2")->getData();
@@ -492,7 +493,7 @@ void SimpleSummation::compute(const cedar::proc::Arguments&)
   }
     
   cv::Mat& sum = mOutput->getData();
-  sum = input_slot->getData(0);
+  sum = input_slot->getData(0)->getData<cv::Mat>().clone();
   
   for (size_t i = 0; i < input_slot->getDataCount(); ++i)
   {
