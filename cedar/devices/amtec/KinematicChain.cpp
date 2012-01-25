@@ -446,4 +446,27 @@ void cedar::dev::amtec::KinematicChain::setMaxAcceleration(unsigned int index, f
   return;
 }
 
+void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double value, double stepTime)
+{
+  QMutexLocker mutex_locker(&mCanBusMutex);
+
+  if(!mpDevice)
+  {
+    std::cout << "Error: No Amtec device!" << std::endl;
+    return;
+  }
+
+  if(index >= mModules.size())
+  {
+    std::cout << "Error: Trying to access the " << index << ". module while only "
+        << mModules.size() << " were found." << std::endl;
+    return;
+  }
+
+  int module = mModules[index];
+  mpDevice->moveStep(module, value, stepTime);
+
+  return;
+}
+
 #endif // CEDAR_USE_AMTEC

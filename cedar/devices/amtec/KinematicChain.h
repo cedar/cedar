@@ -84,7 +84,14 @@ public:
    * @param index
    * @param maxAcc
    */
-void setMaxAcceleration(unsigned int index, float maxAcc);
+  void setMaxAcceleration(unsigned int index, float maxAcc);
+
+  /*!@brief set a joint angle, which should be reached in a given time
+   * @param index index of the joint
+   * @param value new joint angle
+   * @param stepTime time to reach the new joint angle
+   * */
+  void setJointAngle(unsigned int index, double value, double stepTime);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
