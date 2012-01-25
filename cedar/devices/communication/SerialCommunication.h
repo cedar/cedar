@@ -76,6 +76,12 @@ public:
   //!@param config Location and name of the Configuration-File to be used.
   SerialCommunication();
 
+  /*!@brief
+   * @deprecated This constructor is deprecated and only provided for downward-compatibility to the old config
+   *             interface.
+   */
+  CEDAR_DECLARE_DEPRECATED(SerialCommunication(const std::string& config_file));
+
   //!@brief Ends the communication with the device and closes the channel.
   ~SerialCommunication();
 
@@ -156,6 +162,9 @@ private:
   //!@return 1 if initialization was successful, else 0.
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
+  //!@brief Initializes the object.
+  void init();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -189,6 +198,9 @@ private:
    *        appropriate characters.
    */
   std::string mTranslatedEndOfCommandString;
+
+  //!@brief Whether this was read using old config interface compatibility mode.
+  bool mOldConfigMode;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

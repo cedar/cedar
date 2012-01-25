@@ -49,6 +49,7 @@
 
 cedar::dev::com::SerialCommunication::SerialCommunication()
 :
+mOldConfigMode(false),
 _mName(new cedar::aux::StringParameter(this, "Name", "Serial Communication")),
 _mDevicePath(new cedar::aux::StringParameter(this, "DevicePath", "/dev/rfcomm0")),
 _mEndOfCommandString(new cedar::aux::StringParameter(this, "EndOfCommandString", "\\r\\n")),
@@ -71,6 +72,38 @@ _mOS(new cedar::aux::StringParameter(this, "OperatingSystem", "Linux"))
   _mOS->setConstant(true);
 
   mInitialized = false;
+}
+
+
+cedar::dev::com::SerialCommunication::SerialCommunication(const std::string& config_file)
+:
+mOldConfigMode(true),
+_mName(new cedar::aux::StringParameter(this, "Name", "Serial Communication")),
+_mDevicePath(new cedar::aux::StringParameter(this, "DevicePath", "/dev/rfcomm0")),
+_mEndOfCommandString(new cedar::aux::StringParameter(this, "EndOfCommandString", "\\r\\n")),
+_mCFlag(new cedar::aux::IntParameter(this, "CFlag", 0, 0, 1)),
+_mBaudrate(new cedar::aux::UIntParameter(this, "BaudRate", 4098, 0, 1000000)),
+_mTimeOut(new cedar::aux::UIntParameter(this, "TimeOut", 250000, 0, 1000000)),
+_mLatency(new cedar::aux::UIntParameter(this, "Latency", 10000, 0, 1000000)),
+_mDebug(new cedar::aux::BoolParameter(this, "Debug", false)),
+_mOS(new cedar::aux::StringParameter(this, "OperatingSystem", "Linux"))
+{
+  // currently, paramters for this class cannot be changed online.
+  _mName->setConstant(true);
+  _mDevicePath->setConstant(true);
+  _mEndOfCommandString->setConstant(true);
+  _mCFlag->setConstant(true);
+  _mBaudrate->setConstant(true);
+  _mTimeOut->setConstant(true);
+  _mLatency->setConstant(true);
+  _mDebug->setConstant(true);
+  _mOS->setConstant(true);
+
+  mInitialized = false;
+
+  this->readOldConfig(config_file);
+  // this has to be called manually because the virtual function readConfiguration is not called
+//  this->init();
 }
 
 cedar::dev::com::SerialCommunication::~SerialCommunication()
@@ -139,6 +172,11 @@ void cedar::dev::com::SerialCommunication::readConfiguration(const cedar::aux::C
   // read the configuration
   this->Configurable::readConfiguration(node);
 
+  this->init();
+}
+
+void cedar::dev::com::SerialCommunication::init()
+{
   // initialize
   if (mInitialized)
   {
@@ -147,6 +185,11 @@ void cedar::dev::com::SerialCommunication::readConfiguration(const cedar::aux::C
       std::cout << "SerialCommunication: Initialization failed (already initialized)\n";
     }
     return;
+  }
+
+  if (mOldConfigMode)
+  {
+    std::cout << "Warning: you are using the old config interface. Please switch to the new one." << std::endl;
   }
 
   setEndOfCommandString(_mEndOfCommandString->getValue()); // sets end-of-command-string
@@ -163,7 +206,7 @@ void cedar::dev::com::SerialCommunication::readConfiguration(const cedar::aux::C
       {
         std::cout << "SerialCommunication: Error opening Port '" << _mDevicePath << "' on Linux\n";
       }
-      return; //@todo Throw an
+      return; //@todo Throw an exception
     }
 
     tcgetattr(mFileDescriptor, &mTerminal); // save current modem settings

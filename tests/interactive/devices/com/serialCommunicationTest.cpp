@@ -52,8 +52,7 @@
 int main(int argc, char **argv)
 {
   //open the channel
-  cedar::dev::com::SerialCommunication *p_com;
-  p_com = new cedar::dev::com::SerialCommunication();
+  cedar::dev::com::SerialCommunication *p_com = new cedar::dev::com::SerialCommunication();
   p_com->readJson("../../tests/interactive/devices/com/SerialCommunicationConfig.json");
 
   QApplication a(argc, argv);
