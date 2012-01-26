@@ -240,7 +240,7 @@ foreach (libPath ${cedarLibPaths})
     string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libDirName "${libPath}")
 
     # add out-of-source directory tree
-    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}/${CMAKE_BUILD_TYPE}")
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}/")
 
     # add the subdirectory
     add_subdirectory(${libPath} ${subDir})
