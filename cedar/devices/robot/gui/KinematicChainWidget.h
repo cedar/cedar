@@ -38,11 +38,7 @@
 #define KINEMATICCHAINWIDGET_H_
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/devices/debug/lib.h"
-#else
-  #include "cedar/devices/release/lib.h"
-#endif
+#include "cedar/devices/lib.h"
 #include "cedar/devices/robot/gui/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"

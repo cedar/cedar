@@ -42,11 +42,7 @@
 #define CEDAR_DYN_NAMESPACE_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/dynamics/debug/lib.h"
-#else
-  #include "cedar/dynamics/release/lib.h"
-#endif
+#include "cedar/dynamics/lib.h"
 #include "cedar/processing/PluginDeclaration.h"
 
 // SYSTEM INCLUDES
