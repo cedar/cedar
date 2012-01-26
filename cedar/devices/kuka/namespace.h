@@ -42,11 +42,7 @@
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/devices/debug/lib.h"
-#else
-  #include "cedar/devices/release/lib.h"
-#endif
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

@@ -38,11 +38,7 @@
 #define CEDAR_DEV_ROBOT_NAMESPACE_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/devices/debug/lib.h"
-#else
-  #include "cedar/devices/release/lib.h"
-#endif
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>

@@ -35,11 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/auxiliaries/debug/lib.h"
-#else
-  #include "cedar/auxiliaries/release/lib.h"
-#endif
+#include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
