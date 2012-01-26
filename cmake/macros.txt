@@ -211,7 +211,7 @@ macro(cedar_add_library)
   set(sourceFiles ${sourceFiles} ${generatedMocSourceFiles})
 
   # generate rules for building source files from the resources
-  QT4_ADD_RESOURCES(recourceCompilerSrcs ${library_RESOURCES})
+  qt4_add_resources(recourceCompilerSrcs ${library_RESOURCES})
 
   # create ui headers from ui files
   cedar_qt4_wrap_ui(generatedUiHeaders ${uiFiles})
@@ -220,9 +220,8 @@ macro(cedar_add_library)
   # generate lib.h files
   string(TOUPPER "${libraryName}" CAP_LIB_NAME)
   string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
-  string(REGEX REPLACE "/debug" "" libHOutputDir "${CMAKE_CURRENT_BINARY_DIR}")
   
-  set(libHOutputFile "${libHOutputDir}/lib.h")
+  set(libHOutputFile "${CMAKE_CURRENT_BINARY_DIR}/lib.h")
   configure_file("${CEDAR_HOME}/cmake/resources/lib.h.in" ${libHOutputFile})
   set(headerFiles ${headerFiles} ${libHOutputFile})
 
