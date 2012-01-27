@@ -36,8 +36,8 @@
 
 
 // LOCAL INCLUDES
-#include "PictureGrabber.h"
-#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/devices/sensors/visual/PictureGrabber.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 

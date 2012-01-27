@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
-#include "../namespace.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
 // PROJECT INCLUDES
 

@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "CameraConfiguration.h"
+#include "cedar/devices/sensors/visual/camera/CameraConfiguration.h"
 
 // PROJECT INCLUDES
 
@@ -46,28 +46,6 @@ using namespace cedar::dev::sensors::visual;
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-/*
-CameraConfiguration::CameraConfiguration(
-                                          cv::VideoCapture& videoCapture,
-                                          const std::string& configurationFileName,
-                                          unsigned long guid
-                                        )
-{
-  //create default capability file name
-  std::string capability_file_name = CAMERAGRABBER_CAM_CAPABILITIES_FILENAME(guid);
-
-  bool result = doInit(videoCapture,configurationFileName,capability_file_name);
-  if (not result)
-  {
-    CEDAR_THROW
-    (
-      cedar::aux::exc::InitializationException,
-      "[CameraConfiguration::CameraConfiguration] - Critical error in doInit()"
-    );
-  }
-}
-*/
-//----------------------------------------------------------------------------------------------------------------------
 CameraConfiguration::CameraConfiguration(
                                           cv::VideoCapture videoCapture,
                                           QReadWriteLockPtr videoCaptureLock,
@@ -75,31 +53,24 @@ CameraConfiguration::CameraConfiguration(
                                           const std::string configurationFileName,
                                           const std::string capabilitiesFileName
                                         )
-:
-mVideoCapture(videoCapture)
-//mConfigurationFileName(configurationFileName),
-//mCapabilitiesFileName(capabilitiesFileName)
-//mCamCapabilities(NULL),
-//mCamConfigFileStorage(NULL)
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraConfiguration::CameraConfiguration] Config-file: " << configurationFileName << std::endl;
     std::cout << "[CameraConfiguration::CameraConfiguration] Capability-file: " << capabilitiesFileName << std::endl;
   #endif
 
+  mVideoCapture = videoCapture;
   mConfigurationFileName = configurationFileName;
   mCapabilitiesFileName = capabilitiesFileName;
   mChannelPrefix = channelPrefix;
   mpVideoCaptureLock = videoCaptureLock;
 
-  //mpCamCapabilities = NULL;
-  //mpCamState = NULL;
-
   try
   {
-    //create class for capabilities
+    //create class for capabilities of the camera
     mpCamCapabilities = CameraCapabilitiesPtr(new CameraCapabilities(mCapabilitiesFileName));
 
+    //create capabilities structure from capabilities class
     SupportedPropertiesSet supp_prop;
     supp_prop.clear();
 
@@ -218,23 +189,5 @@ bool CameraConfiguration::isAbsoluteCapable(CameraProperty::Id propId)
   return mpCamCapabilities->isAbsoluteCapable(propId);
 }
 
-/*
-double CameraConfiguration::getCameraProperty(
-                          unsigned int channel,
-                          CameraProperty::Id propId
-                        )
-{
-}
-                        
-                        
-bool CameraConfiguration::setCameraProperty(
-                        unsigned int channel,
-                        CameraProperty::Id propId,
-                        double value
-                      );
-{
-}
-                      
-*/                        
 
 

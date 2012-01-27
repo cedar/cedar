@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "CameraIsoSpeed.h"
+#include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
 
 // PROJECT INCLUDES
 

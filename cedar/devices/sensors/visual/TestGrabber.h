@@ -38,7 +38,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
 
 // LOCAL INCLUDES
-#include "GrabberInterface.h"
+#include "cedar/devices/sensors/visual/GrabberInterface.h"
 
 // PROJECT INCLUDES
 

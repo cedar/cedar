@@ -35,14 +35,12 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "CameraGrabber.h"
-#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
-//#include "CameraProperty.h"
+#include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-//#include <dc1394/dc1394.h> //for camera-settings
 #include <boost/lexical_cast.hpp> //for reading values from the configfile
 #include <boost/math/special_functions/round.hpp> //rounding from double to int in cv::VideoCapture get and set methods
 
@@ -207,27 +205,18 @@ CameraGrabber::~CameraGrabber()
   doCleanUp();
 
   //done by shared_pointer
-  /*for (unsigned int channel = 0; channel < mNumCams ; ++channel)
-  {
-    delete mCamCapabilities.at(channel);
-    mCamCapabilities.at(channel) = 0;
-  }
-  mCamCapabilities.clear();
-  */
+  // mCamCapabilities
+  // mVideoCaptureLocks
 
   #ifdef DEBUG_CAMERAGRABBER
     std::cout<<"[CameraGrabber::Destructor]"<< std::endl;
   #endif
-
-
-
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
 //methods
 //----------------------------------------------------------------------------------------------------------------------
-
 
 
 //----------------------------------------------------------------------------------------------------

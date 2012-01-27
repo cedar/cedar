@@ -38,7 +38,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
 
 // LOCAL INCLUDES
-#include "../CameraGrabber.h"
+#include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // PROJECT INCLUDES
@@ -46,24 +46,30 @@
 // SYSTEM INCLUDES
 #include <set>
 
+//--------------------------------------------------------------------------------------------------------------------
 //set to store all supported properties in
 typedef std::set<cedar::dev::sensors::visual::CameraProperty::Id> SupportedPropertiesSet;
 
+//--------------------------------------------------------------------------------------------------------------------
 //maps property enum id to value of the property
 typedef std::map<unsigned int,int> CameraPropertyValues;
 typedef std::pair<unsigned int, int> CameraPropertyValuesPair;
 
+//--------------------------------------------------------------------------------------------------------------------
 //macro to create a pair of property-enum to property value
 #define PROPERTY_VALUE_PAIR(A,B) std::pair<unsigned int,int>((A),(B))
 
 
-typedef struct CameraSettingsStruct
+//--------------------------------------------------------------------------------------------------------------------
+//store the values of the settings of a camera for the configuration interface
+struct CameraSettings
 {
   std::string fps;
   std::string mode;
   std::string iso_speed;
   std::string capability_config_file_name;
-} CameraSettings;
+};
+//--------------------------------------------------------------------------------------------------------------------
 
 
 /*!@brief Stores the properties and the settings of one camera in a configuration file
@@ -98,11 +104,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // Saves the configuration in config-file
+  ///! Save the configuration to the configuration file specified in the constructor
    bool writeConfiguration();
-
-   // declares the supported properties
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -142,8 +145,6 @@ private:
   // implements the cv::VideoCapture.get() method with respect to concurrent access
   double getProperty(unsigned int prop_id);
 
-
-
   /// @endcond
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -154,10 +155,16 @@ public:
 protected:
   // none yet
 private:
-  /*! \brief stores all camera settings local (needed for configurationInterface) */
+
+  /*! \brief This is the struct, for the values of the camera settings
+   *  \remarks This is the local storage for the camera settings
+   *    and is only needed for ConfigurationInterface class
+   */
   CameraSettings mCamSettings;
 
-  /*! \brief stores supported camera properties local (needed for configurationInterface)
+  /*! \brief This is the map, where all supported properties and their actual values stored in
+   *  \remarks This is the local storage for the supported camera properties
+   *    and is only needed for ConfigurationInterface class
    */
   CameraPropertyValues mCamPropertyValues;
 
@@ -170,16 +177,20 @@ protected:
   // none yet
 
 private:
-  //the channel prefix used in the configuration file.
-  //Essential if more than one camera saved in config-file
+  /*! \brief The channel prefix used in the configuration file.
+   *  \remarks This is essential if the configuration of more than one camera should be
+   *    saved in the configuration file
+   */
   std::string mChannelPrefix;
 
+  ///! The already created cv::VideoCapture object from the CameraGrabber class
   cv::VideoCapture mVideoCapture;
 
-  SupportedPropertiesSet mSupportedProperties;
-
-  //the lock for the cv::VideoCapture class
+  ///! The lock for concurrent access to the VideoCapture
   QReadWriteLockPtr mpVideoCaptureLock;
+
+  ///! This is the set, where only the supported properties stored in
+  SupportedPropertiesSet mSupportedProperties;
 
 }; // cedar::dev::sensors::visual::CameraState
 

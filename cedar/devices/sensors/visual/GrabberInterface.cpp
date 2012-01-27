@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "GrabberInterface.h"
+#include "cedar/devices/sensors/visual/GrabberInterface.h"
 
 // PROJECT INCLUDES
 

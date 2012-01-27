@@ -121,6 +121,7 @@ namespace cedar
         // Shared pointer for QReadWriteLock
         // used in CameraGrabber
         typedef boost::shared_ptr<QReadWriteLock> QReadWriteLockPtr;
+
       }
     }
   }

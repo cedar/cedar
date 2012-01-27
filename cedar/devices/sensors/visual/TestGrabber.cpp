@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "TestGrabber.h"
+#include "cedar/devices/sensors/visual/TestGrabber.h"
 
 // PROJECT INCLUDES
 

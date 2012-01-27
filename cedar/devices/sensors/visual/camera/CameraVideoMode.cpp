@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "CameraVideoMode.h"
+#include "cedar/devices/sensors/visual/camera/CameraVideoMode.h"
 
 // PROJECT INCLUDES
 

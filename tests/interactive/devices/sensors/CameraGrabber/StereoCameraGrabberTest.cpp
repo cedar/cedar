@@ -17,7 +17,6 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
-//#include <devices/sensors/visual/CameraGrabber.h>
 
 
 // PROJECT INCLUDES

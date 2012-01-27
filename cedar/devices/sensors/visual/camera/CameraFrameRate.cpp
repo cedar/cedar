@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "CameraFrameRate.h"
+#include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
 
 // PROJECT INCLUDES
 

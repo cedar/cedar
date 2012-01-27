@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "CameraCapabilities.h"
+#include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
 //#include "../../../auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
