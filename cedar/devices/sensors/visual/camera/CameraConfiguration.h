@@ -38,28 +38,29 @@
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIGURATION_H
 
 // LOCAL INCLUDES
-#include "../CameraGrabber.h"
+#include "cedar/devices/sensors/visual/CameraGrabber.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-/*typedef struct CameraPropertiesStruct
-{
-  CameraProperty::Id propId;
-  double value;
-} CameraPropertyValue;
-*/
 
-
-
-
-/*!@brief This class manages the properties and capabilities of a camera.
+/*!@brief This class manage the properties and capabilities of a camera.
  *
  * \remarks
- * main use: manage capabilities and store the property values and the settings with the configuration interface.
- * this is done by an extra class, because the configurationInterface is notcopyable. So it is not possible to
- * implement the CameraCapabilities class in the cameragrabber and store them in a std::vector.
+ *    With the methods of this class, the CameraGraber class can evaluate the available properties
+ *    and their possible values.
+ *
+ *  \par
+ *    The main purpose of this class is to manage all the capabilities and properties of one used camera.
+ *    There will be two classes created: <br>
+ *    1. CameraCapabilities() <br>
+ *        This class have a separate configuration file for the capabilities of the used camera. All supported
+ *        properties and the range of their values will be managed by this class.<br>
+ *    2. CameraState()  <br>
+ *        This class main purpose is to encapsulate the ConfigurationInterface() for the actual set properties
+ *        of the used camera. The configuration normally is written to the same file that your cameragrabber use.
+ *
  */
 class cedar::dev::sensors::visual::CameraConfiguration
 {
@@ -72,21 +73,12 @@ class cedar::dev::sensors::visual::CameraConfiguration
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //! @brief The standard constructor.
-  // \param VideoCaptures Reference to the Vector of all videocaptures.
-  //        These will be used, to read and set the values
-  // \param configurationFileName The filename of the configuration file of used camera
-  // \param guid The guid of the camera. This will be used for the capabilities filename
-  /*CameraConfiguration(
-                       cv::VideoCapture& videoCapture,
-                       const std::string& configurationFileName,
-                       unsigned long guid
-                     );
-  */
-  //! @brief The standard constructor.
-  // \param VideoCaptures Reference to the Vector of all videocaptures.
-  //        These will be used, to read and set the values
-  // \param configurationFileName The filename of the configuration file of used camera
-  // \param capabilitiesFileName The filename of the capabilities
+  // \param VideoCapture The cv::VideoCapture object, which this configuration is assigned to
+  //        This will be used, to read and set the values
+  // \param videoCaptureLock The lock, for the single access to the cv::VideoCapture object
+  // \param configurationFileName The filename for the configuration file used to store camera properties in
+  //        This could be the same file, which the cameragrabber uses for configuration storage
+  // \param capabilitiesFileName The filename of the capabilities. This file have to be adjusted for the used camera
   CameraConfiguration(
                        cv::VideoCapture videoCapture,
                        QReadWriteLockPtr videoCaptureLock,
@@ -103,30 +95,61 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
- /* double getCameraProperty(
-                            unsigned int channel,
-                            CameraProperty::Id propId
-                          );
-                          
-  bool setCameraProperty(
-                          unsigned int channel,
-                          CameraProperty::Id propId,
-                          double value
-                        );
-  */
-  
-   //returns the capabilities of a given property
+
+  //returns the capabilities of a given property
+  /*! \brief Get the minimum possible value that can be set of the given property
+   *  \param propId The id of the property
+   */
   int getMinValue(CameraProperty::Id propId);
+
+  /*! \brief Get the maximum possible value that can be set of the given property
+   *  \param propId The id of the property
+   */
   int getMaxValue(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property is supported by the used camera
+   *  \param propId The id of the  property
+   */
   bool isSupported(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property is readable by the used camera
+   *  \param propId The id of the  property
+   */
   bool isReadable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property supports the OnePushAuto mode
+   *  \remarks OnePushAuto is a special mode.
+   *     It is used as follows: Set a value to a property and then to OnePushAuto mode.
+   *     The camera now will try to hold this value automatically.
+   *  \param propId The id of the  property
+   */
   bool isOnePushCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property could be turn off and on
+   *  \param propId The id of the  property
+   */
   bool isOnOffCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property can be set to auto-mode
+   *  \param propId The id of the  property
+   */
   bool isAutoCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property can be set manually
+   *  \param propId The id of the  property
+   */
   bool isManualCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property can be set to an absolute value
+   *  \param propId The id of the  property
+   */
   bool isAbsoluteCapable(CameraProperty::Id propId);
   
+  /*! \brief This method is called from the CameraGrabber when the configuration
+   *   should be saved
+   */
   bool writeConfiguration();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -152,18 +175,31 @@ protected:
 
 private:
 
-  //manage the capabilities of the camera
+  /// @cond SKIPPED_DOCUMENTATION
+
+  ///! The CameraCapability class manage the capabilities of the camera
   CameraCapabilitiesPtr mpCamCapabilities;
 
-  //manage the properties and settings of the camera
+  ///! The CameraState class manage the properties and settings of the camera, i.e. the actual state
   CameraStatePtr mpCamState;
 
+  ///! The filename of the configuration file for camera settings
   std::string mConfigurationFileName;
+
+  ///! The filename of the capabilities file for camera capabilities
   std::string mCapabilitiesFileName;
+
+  ///! A short string, where the channel number is stored in.
+  // Used as a prefix to store the properties in the configuration file
   std::string mChannelPrefix;
-  cv::VideoCapture& mVideoCapture;
+
+  ///! The already created cv::VideoCapture object from the CameraGrabber class
+  cv::VideoCapture mVideoCapture;
+
+  ///! The lock for concurrent access to the VideoCapture
   QReadWriteLockPtr mpVideoCaptureLock;
 
+  /// @endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -172,11 +208,7 @@ public:
   // none yet (hopefully never!)
 protected:
   // none yet
-
-
-
 private:
-
 
 }; // class cedar::dev::sensors::visual::CameraConfiguration
 

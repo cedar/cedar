@@ -39,15 +39,15 @@
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
 // LOCAL INCLUDES
-#include "GrabberInterface.h"
-#include "camera/CameraIsoSpeed.h"
-#include "camera/CameraProperty.h"
-#include "camera/CameraVideoMode.h"
-#include "camera/CameraFrameRate.h"
-#include "camera/CameraSetting.h"
-#include "camera/CameraCapabilities.h"
-#include "camera/CameraConfiguration.h"
-#include "camera/CameraState.h"
+#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
+#include "cedar/devices/sensors/visual/camera/CameraProperty.h"
+#include "cedar/devices/sensors/visual/camera/CameraVideoMode.h"
+#include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
+#include "cedar/devices/sensors/visual/camera/CameraSetting.h"
+#include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
+#include "cedar/devices/sensors/visual/camera/CameraConfiguration.h"
+#include "cedar/devices/sensors/visual/camera/CameraState.h"
 
 // PROJECT INCLUDES
 
@@ -59,28 +59,32 @@
 #define CAMERA_PROPERTY_NOT_SUPPORTED -1
 
 //sets a feature to auto-mode. The propery have to be auto_capable.
-//Assigning a value to a feature, sets its mode to manual
-#define CAMERA_PROPERTY_MODE_AUTO CV_CAP_PROP_DC1394_MODE_AUTO // =-2
+//Assigning a value to a feature, sets its mode to manual // =-2
+#define CAMERA_PROPERTY_MODE_AUTO CV_CAP_PROP_DC1394_MODE_AUTO
 
-//if a feature is on/off capable, this value turns it off
-#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF //=-4
+//if a feature is on/off capable, this value turns it off //=-4
+#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
 
 //this sets a property to its one_push_auto mode. The feature have to be one_push_auto capable.
 //one_push_auto: set the property to the wanted value and then to one_push_auto.
-//the camera will try to automatically hold this value
-#define CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO CV_CAP_PROP_DC1394_MODE_ONE_PUSH_AUTO //-1
+//the camera will try to automatically hold this value //-1
+#define CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO CV_CAP_PROP_DC1394_MODE_ONE_PUSH_AUTO
 //--------------------------------------------------------------------------------------------------------------------
 
 
 //--------------------------------------------------------------------------------------------------------------------
-  /*! \brief The Id's of the cameras
+  /*! \brief Stores the unique Id of a camera
    *
    */
-typedef struct CameraIdStruct
+struct CameraId
 {
   unsigned int busId;
   unsigned int guid;
-} CameraId;
+};
+//--------------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------------------
+
 //--------------------------------------------------------------------------------------------------------------------
 
 /*! \class cedar::dev::sensors::visual::CameraGrabber
@@ -103,7 +107,8 @@ public:
   /*! \brief  Constructor for a camera grabber with one connected camera
    *  \param configFileName Filename for the configuration
    *  \param camera Device to grab from. Look at OpenCV cv::VideoCapture documentation for details
-   *  \param isGuid This flag should be set, if the value in Parameter camera is the guid of the camera
+   *  \param isGuid This flag have to be set, if the value in parameter camera is the guid of the camera. In this
+   *         case, the camera with this guid will be searched on the bus.
    *  \param finishInitialization Flag, if the initialization should be finished. In this case it isn't possible to
    *         change the camera resolution or the camera framerate if you use a firewire camera. <br>
    *         The settings will be restored from the configfile. If there is no configfile,
@@ -129,7 +134,7 @@ public:
    *  \param configFileName Filename for the configuration
    *  \param camera0 Device to grab from for channel 0. Look at OpenCV cv::VideoCapture documentation for details
    *  \param camera1 Device to grab from for channel 1. Look at OpenCV cv::VideoCapture documentation for details
-   *  \param isGuid This flag should be set, if the values in camera0 or camera1 are the guids of the cameras
+   *  \param isGuid This flag have to be set, if the values in camera0 or camera1 are the guids of the cameras
    *  \param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
    *          Constructor for details
    *  \see CameraGrabber() for details about the used framework
@@ -146,10 +151,12 @@ public:
   /*! \brief Constructor for a camera grabber. The complete configuration will be read from configuration file
    *  \param configFileName Filename for the configuration
    *  \param numCameras How many cameras you want to use
-   *  \param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
-   *          Constructor for details
    *  \remarks
-   *        If the system can't find the wanted camera, initialization will fail.
+   *        If the system can't find the wanted camera, initialization will fail. <br>
+   *        If there is no configuration file with the given name, a new one will be created. But be aware,
+   *        the default camera capabilities filename (declared in defines.h) will be used. It is possible,
+   *        that this file isn't the right one for your camera.
+   *
    *  \par
    *        The camera always will be initialized (i.e. the first frame is already grabbed on initialization)
    */
@@ -367,15 +374,27 @@ protected:
   ///! \brief Sync all Parameters from cameras with the local buffer
   bool onWriteConfiguration();
 
+  ///! \brief Do the local clean up
   void onCleanUp();
 
 
-  // set a parameter to the cv::VideoCapture
-  // implements the cv::VideoCapture.set() method with respect to concurrent access
+  /*! \brief Set a parameter to the cv::VideoCapture
+   *  \remarks
+   *    Implements the cv::VideoCapture.set() method with respect to concurrent access.
+   *    This is the only method which calls VideoCapture.set() and is used internal
+   *  \param channel This is the index of the source channel
+   *  \param prop_id This is an OpenCV constant of the wanted property
+   *  \param value The new value
+   */
   bool setProperty(unsigned int channel, unsigned int prop_id, double value);
 
-  // get a parameter form the cv::VideoCapture
-  // implements the cv::VideoCapture.get() method with respect to concurrent access
+  /*! \brief Get a parameter to the cv::VideoCapture
+   *  \remarks
+   *    Implements the cv::VideoCapture.get() method with respect to concurrent access.
+   *    This is the only method which calls VideoCapture.get() and is used internal
+   *  \param channel This is the index of the source channel
+   *  \param prop_id This is an OpenCV constant of the wanted property
+   */
   double getProperty(unsigned int channel, unsigned int prop_id);
 
 
@@ -409,8 +428,9 @@ protected:
   std::vector<cv::VideoCapture> mVideoCaptures;
   
 
-  //the manager of all settings and properties. One for each camera
-  //std::vector<CameraConfiguration> mCamConfigurations;
+  /*! \brief One manager of settings and properties for each camera.
+   *
+   */
   std::vector<CameraConfigurationPtr> mCamConfigurations;
 
   /*! \brief This vector contains the filenames of the config-files of the camaera capabilities
@@ -418,7 +438,7 @@ protected:
    */
   std::vector<std::string> mCameraCapabilitiesFileNames;
 
-  /*! @brief This vector contains the read/write locks for the cv::VideoCaptures
+  /*! \brief This vector contains the read/write locks for the cv::VideoCaptures
    *  \remarks
    *          Used for concurrent access to the cv::VideoCapture
    *          of the grabber-thread and in the get/set properties
@@ -427,9 +447,12 @@ protected:
 
 private:
 
+  //Set if Initialization should be finished in constructor
   bool mFinishInitialization;
+
+  //Set if the CameraGrabber should search the bus for a camera with the give guid
   bool mCreateGrabberByGuid;
-  //bool mCreateFromConfigFile; // get guid/busId from configfile
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------

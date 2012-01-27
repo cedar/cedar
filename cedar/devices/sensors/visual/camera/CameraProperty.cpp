@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "CameraProperty.h"
+#include "cedar/devices/sensors/visual/camera/CameraProperty.h"
 
 // PROJECT INCLUDES
 

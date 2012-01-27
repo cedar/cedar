@@ -39,12 +39,12 @@
 #define CEDAR_DEV_SENSORS_VISUAL_GRABBER_INTERFACE_H
 
 // LOCAL INCLUDES
-#include "defines.h"
-#include "namespace.h"
+#include "cedar/devices/sensors/visual/defines.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "Exceptions.h"
-#include "../../../auxiliaries/exceptions/InitializationException.h"
-#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/devices/sensors/visual/Exceptions.h"
+#include "cedar/auxiliaries/exceptions/InitializationException.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 

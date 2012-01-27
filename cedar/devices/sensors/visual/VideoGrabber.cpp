@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "VideoGrabber.h"
-#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/devices/sensors/visual/VideoGrabber.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 

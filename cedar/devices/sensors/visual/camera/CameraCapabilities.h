@@ -38,18 +38,22 @@
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
 
 // LOCAL INCLUDES
-#include "../CameraGrabber.h"
+#include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-
-typedef struct CameraPropertyCapabilityStruct
+//--------------------------------------------------------------------------------------------------------------------
+/*! \brief Stores the capability of a property
+ *  \remarks Every property have several ways to be accessed, and a defined range
+ *    where the values can be set.
+ *    This struct stores flags for all possible ways and the range of the values
+ */
+struct CameraPropertyCapability
 {
    cedar::dev::sensors::visual::CameraProperty::Id propId;
-   //int value;
    int max_value;
    int min_value;
    bool is_supported;
@@ -59,18 +63,18 @@ typedef struct CameraPropertyCapabilityStruct
    bool is_auto_capable;
    bool is_manual_capable;
    bool is_absolute_capable;
-} CameraPropertyCapability;
+} ;
+//--------------------------------------------------------------------------------------------------------------------
 
 
 /*!@brief This class manages the capabilities of a camera
- *
- * It implements the configurationInterface private because
+ * \remarks It implements the configurationInterface private because
  * the configuration should never be written
  */
 class cedar::dev::sensors::visual::CameraCapabilities
 :
 public cedar::aux::ConfigurationInterface
-//private cedar::aux::ConfigurationInterface
+
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -93,21 +97,61 @@ public:
 public:
 
   //returns the capabilities of a given property
+  /*! \brief Get the minimum possible value that can be set of the given property
+   *  \param propId The id of the property
+   */
   int getMinValue(CameraProperty::Id propId);
+
+  /*! \brief Get the maximum possible value that can be set of the given property
+   *  \param propId The id of the property
+   */
   int getMaxValue(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property is supported by the used camera
+   *  \param propId The id of the  property
+   */
   bool isSupported(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property is readable by the used camera
+   *  \param propId The id of the  property
+   */
   bool isReadable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property supports the OnePushAuto mode
+   *  \remarks OnePushAuto is a special mode.
+   *     It is used as follows: Set a value to a property and then to OnePushAuto mode.
+   *     The camera now will try to hold this value automatically.
+   *  \param propId The id of the  property
+   */
   bool isOnePushCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property could be turn off and on
+   *  \param propId The id of the  property
+   */
   bool isOnOffCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property can be set to auto-mode
+   *  \param propId The id of the  property
+   */
   bool isAutoCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property can be set manually
+   *  \param propId The id of the  property
+   */
   bool isManualCapable(CameraProperty::Id propId);
+
+  /*! \brief This method tells you, if the given property can be set to an absolute value
+   *  \param propId The id of the  property
+   */
   bool isAbsoluteCapable(CameraProperty::Id propId);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //returns the capabilities of a given camera property
+
+  ///! Returns the capability struct of a given camera property
   CameraPropertyCapability& getCapabilities(CameraProperty::Id propId);
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,7 +167,7 @@ public:
   // none yet (hopefully never!)
 protected:
 
-  //contains every capability of a property
+  ///! Contains every property of the camera (the supported as well as the not supported ones)
   std::vector<CameraPropertyCapability> mCamProperties;
 
 private:
@@ -138,6 +182,7 @@ protected:
   // none yet
 
 private:
+  ///! All properties and settings declared in this method for the ConfigurationInterface class
   bool declareParameters();
 
 

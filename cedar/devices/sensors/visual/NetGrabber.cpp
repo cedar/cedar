@@ -35,11 +35,10 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "NetGrabber.h"
-#include "GrabberInterface.h"
-#include "../../../auxiliaries/net/NetReader.h"
-#include "../../../auxiliaries/net/exceptions/NetException.h"
-#include "../../../auxiliaries/exceptions/IndexOutOfRangeException.h"
+#include "cedar/devices/sensors/visual/NetGrabber.h"
+#include "cedar/auxiliaries/net/NetReader.h"
+#include "cedar/auxiliaries/net/exceptions/NetException.h"
+#include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
 // PROJECT INCLUDES
 

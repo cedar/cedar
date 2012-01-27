@@ -40,8 +40,8 @@
 
 
 // LOCAL INCLUDES
-#include "GrabberInterface.h"
-#include "../../../auxiliaries/net/NetReader.h"
+#include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/auxiliaries/net/NetReader.h"
 
 // PROJECT INCLUDES
 

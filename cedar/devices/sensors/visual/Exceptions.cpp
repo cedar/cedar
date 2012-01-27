@@ -36,7 +36,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "Exceptions.h"
+#include "cedar/devices/sensors/visual/Exceptions.h"
 
 // PROJECT INCLUDES
 
