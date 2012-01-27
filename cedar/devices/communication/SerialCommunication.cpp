@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
+#include <cstdio>
 
 #define clear_my(var, mask)    var &= (~(mask))
 #define set(var, mask)      var |= (mask)
