@@ -99,6 +99,12 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
     }
     p_item->setIcon(icon);
 
+    if (!class_id->getDescription().empty())
+    {
+      QString description = "<p>" + QString::fromStdString(class_id->getDescription()) + "</p>";
+      p_item->setToolTip(description);
+    }
+
     p_item->setData(Qt::UserRole, QVariant(class_id->getClassId().c_str()));
     this->addItem(p_item);
   }

@@ -88,6 +88,7 @@
          have added to the plugin declaration in your plugin.cpp -->
     <element class="yourNamespace.YourClassName">
       <icon>:/icons/the_icon.svg</icon>
+      <description>Description of the step.</description>
     </element>
 
   </declarations>
