@@ -80,12 +80,14 @@ public:
    *  @return joint angle for the given index
    */
   virtual double getJointAngle(unsigned int index);
+
   /*! @brief returns all joint angles
    *
    *  @return a vector filled with the joint angles
    *  \throws std::out_of_range if index is out of range
    */
   virtual void setJointAngle(unsigned int index, double angle);
+
   /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
    *
    * this function restarts the looped thread
