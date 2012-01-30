@@ -60,14 +60,14 @@ int main(int argc, char **argv)
   (
     new cedar::dev::robot::SimulatedKinematicChain
     (
-      "../../../tests/interactive/devices/gl/Cora/cora_arm.conf"
+      "../../../../tests/interactive/devices/gl/Cora/cora_arm.conf"
     )
   );
   cedar::dev::robot::KinematicChainPtr p_cora_head
   (
     new cedar::dev::robot::SimulatedKinematicChain
     (
-      "../../../tests/interactive/devices/gl/Cora/cora_head.conf"
+      "../../../../tests/interactive/devices/gl/Cora/cora_head.conf"
     )
   );
 
