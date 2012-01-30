@@ -90,7 +90,6 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! vector of joint angles, in radians
-  cv::Mat mJointAngles;
+
 }; // class cedar::dev::robot::SimulatedKinematicChain
 #endif // CEDAR_DEV_ROBOT_SIMULATED_KINEMATIC_CHAIN_H
