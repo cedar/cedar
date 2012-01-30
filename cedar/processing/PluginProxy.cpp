@@ -48,6 +48,8 @@
 #include <strsafe.h>
 #endif
 
+//!@todo Make this switchable with configuration?
+#define BOOST_FILESYSTEM_VERSION 2 // we currently use boost's filesystem as version 2.
 #include <boost/filesystem.hpp>
 
 
