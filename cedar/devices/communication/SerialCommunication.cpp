@@ -329,7 +329,7 @@ void cedar::dev::com::SerialCommunication::init()
     std::cout << "SerialCommunication: Port '" << _mDevicePath->getValue() << "' initialized\n";
   }
 #else // WIN32
-  return 0;
+  return;
 #endif // WIN32
 }
 
