@@ -24,8 +24,8 @@
 
     File:        LoopedThread.h
 
-    Maintainer:  Bjoern Weghenkel
-    Email:       bjoern.weghenkel@ini.rub.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.rub.de
     Date:        2010 12 02
 
     Description: Header for the @em cedar::aux::LoopedThread class.
@@ -45,7 +45,7 @@
 #include <string>
 #include <iostream>
 #include <QThread>
-#include "boost/date_time/posix_time/posix_time_types.hpp" //no i/o just types
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 
 /*!@brief Cedar interface for looped threads
@@ -279,6 +279,6 @@ private:
   boost::posix_time::ptime mLastTimeStepStart;
   boost::posix_time::ptime mLastTimeStepEnd;
 
-}; // class cedar::aux::Thread
+}; // class cedar::aux::LoopedThread
 
-#endif // CEDAR_AUX_THREAD_H
+#endif // CEDAR_AUX_LOOPED_THREAD_H

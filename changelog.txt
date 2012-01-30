@@ -36,6 +36,9 @@
 
 == current version ==
 
+- cedar::aux
+  - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
+
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
   - when loading a plugin, the PluginProxy now also looks for a plugin description file. This file may contain some
