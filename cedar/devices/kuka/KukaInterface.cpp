@@ -99,7 +99,7 @@ void cedar::dev::kuka::KukaInterface::init()
   //create a new Instance of the friRemote
   if (_mRemoteHost != std::string("NULL"))
   {
-    mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
+    mpFriRemote = new friRemote(_mServerPort, const_cast<char*>(_mRemoteHost.c_str()));
   }
   else
   {
@@ -110,9 +110,10 @@ void cedar::dev::kuka::KukaInterface::init()
 
   //set step size and idle time for the looped thread
   setStepSize(0);
-  setIdleTime(0);
+  setIdleTime(0.01);
   useFixedStepSize(false);
   //start the thread
+
   start();
 
   mIsInit = true;
@@ -244,7 +245,7 @@ void cedar::dev::kuka::KukaInterface::copyFromFRI()
   mFriQuality = mpFriRemote->getQuality();
   mSampleTime = mpFriRemote->getSampleTime();
   mPowerOn = mpFriRemote->isPowerOn();
-  //Create a std::vector from the float-Array
+  // use temporary float-array to receive the returned variables
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
   for (unsigned i=0; i<LBR_MNJ; i++)
   {

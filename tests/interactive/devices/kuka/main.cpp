@@ -53,12 +53,12 @@ int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
-  KukaInterfacePtr p_kukain(new KukaInterface("../../tests/interactive/devices/kuka/test_arm.conf"));
+  KukaInterfacePtr p_kukain(new KukaInterface("../../../tests/interactive/devices/kuka/test_arm.conf"));
   FriStatusWidget * p_fri_status_widget = new FriStatusWidget(p_kukain);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
   cedar::dev::robot::gui::KinematicChainWidget *p_kinematic_chain_widget
-    = new cedar::dev::robot::gui::KinematicChainWidget(p_kukain, "../../tests/interactive/devices/kuka/kinematic_chain_widget.conf");
+    = new cedar::dev::robot::gui::KinematicChainWidget(p_kukain, "../../../tests/interactive/devices/kuka/kinematic_chain_widget.conf");
   p_kinematic_chain_widget->show();
 
   a.exec();
