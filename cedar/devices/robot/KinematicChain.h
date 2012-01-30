@@ -314,9 +314,10 @@ private:
 protected:
   //!@brief geometry in reference configuration
   cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
+  //!@brief current state of the joint angles
+  cv::Mat mJointAngles;
 private:
   bool mUseCurrentHardwareValues;
-  cv::Mat mJointAngles;
   cv::Mat mJointVelocities;
   cv::Mat mJointAccelerations;
   ActionType mCurrentWorkingMode;
