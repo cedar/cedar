@@ -313,6 +313,11 @@ boost::signals2::connection cedar::aux::Configurable::connectToTreeChangedSignal
 
 void cedar::aux::Configurable::copyFrom(ConstConfigurablePtr src)
 {
+  // check type
+  if (typeid(*this) != typeid(*src))
+  {
+    CEDAR_THROW(cedar::aux::TypeMismatchException, "cannot copy if types do not match");
+  }
   cedar::aux::ConfigurationNode root;
   src->writeConfiguration(root);
   this->readConfiguration(root);
@@ -320,6 +325,11 @@ void cedar::aux::Configurable::copyFrom(ConstConfigurablePtr src)
 
 void cedar::aux::Configurable::copyTo(ConfigurablePtr target) const
 {
+  // check type
+  if (typeid(*this) != typeid(*target))
+  {
+    CEDAR_THROW(cedar::aux::TypeMismatchException, "cannot copy if types do not match");
+  }
   cedar::aux::ConfigurationNode root;
   this->writeConfiguration(root);
   target->readConfiguration(root);
