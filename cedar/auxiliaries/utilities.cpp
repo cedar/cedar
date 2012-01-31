@@ -39,18 +39,18 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#ifdef GCC
+#ifdef __GNUG__
   // for name unmangling/undecorating
   #include <cxxabi.h>
   // for generating stack traces
   #include <execinfo.h>
-#endif // GCC
+#endif // __GNUG__
 
-#ifdef MSVC
+#ifdef _MSC_VER
   #include "cedar/auxiliaries/stringFunctions.h"
   #include <Dbghelp.h>
   #pragma comment(lib, "Dbghelp.lib")
-#endif // MSVC
+#endif // _MSC_VER
 
 
 std::string cedar::aux::unmangleName(const std::type_info& typeinfo)
@@ -60,7 +60,7 @@ std::string cedar::aux::unmangleName(const std::type_info& typeinfo)
 
 std::string cedar::aux::unmangleName(const char* mangledName)
 {
-#ifdef GCC
+#ifdef __GNUG__
   int status;
   char *realname = abi::__cxa_demangle(mangledName, 0, 0, &status);
 
@@ -93,26 +93,26 @@ std::string cedar::aux::unmangleName(const char* mangledName)
   std::string result(realname);
   free(realname);
   return result;
-#else // GCC
+#else // __GNUG__
   std::string name(mangledName);
   if (name.find("class ") == 0 && name.size() > 6)
   {
     name = name.substr(6);
   }
   return name;
-#endif // GCC
+#endif // __GNUG__
 }
 
 std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::StackTrace& trace)
 {
   stream << "Backtrace generated with ";
-#ifdef GCC
-  stream << "GCC";
-#elif defined MSVC
-  stream << "MSVC";
+#ifdef __GNUG__
+  stream << "__GNUG__";
+#elif defined _MSC_VER
+  stream << "_MSC_VER " << #_MSC_VER;
 #else
   stream << "unsupported compiler";
-#endif // GCC
+#endif // __GNUG__
   stream << "." << std::endl;
   stream << "Backtrace contains " << trace.size() << " items:" << std::endl;
 
@@ -141,7 +141,7 @@ std::ostream& cedar::aux::operator<< (std::ostream& stream, const cedar::aux::St
   return stream;
 }
 
-#ifdef GCC
+#ifdef __GNUG__
 void cedar::aux::StackEntry::setRawString(const std::string& rawString)
 {
   std::string tmp = rawString;
@@ -183,9 +183,9 @@ void cedar::aux::StackEntry::setRawString(const std::string& rawString)
     this->mAddress = tmp.substr(idx + 1, idx2 - idx - 1);
   }
 }
-#endif // GCC
+#endif // __GNUG__
 
-#ifdef MSVC
+#ifdef _MSC_VER
 cedar::aux::StackTrace::StackTrace(CONTEXT* context)
 {
   this->init(context);
@@ -277,11 +277,11 @@ void cedar::aux::StackTrace::init(CONTEXT* context)
 }
 
 void init(CONTEXT context);
-#endif // MSVC
+#endif // _MSC_VER
 
 cedar::aux::StackTrace::StackTrace()
 {
-#ifdef GCC
+#ifdef __GNUG__
   // array for the backtraces
   const size_t max_stack_size = 100;
   void *array[max_stack_size];
@@ -308,5 +308,5 @@ cedar::aux::StackTrace::StackTrace()
   CONTEXT context_record;
   RtlCaptureContext(&context_record);
   this->init(&context_record);
-#endif // GCC
+#endif // __GNUG__
 }

@@ -48,10 +48,3 @@ cedar_add_library(cedardev
   cedaraux
 )
 
-# let some of the c++ files know about some cmake variables
-# this is used to include or exclude files, e.g. the Amtec related ones
-
-configure_file(
-	CMakeDefines.h.in
-	"${CEDAR_HOME}/cedar/devices/robot/CMakeDefines.h"
-)

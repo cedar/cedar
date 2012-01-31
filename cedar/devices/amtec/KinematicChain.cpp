@@ -34,8 +34,9 @@
 
 ======================================================================================================================*/
 
-// MAKE AMTEC OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_AMTEC
 
 // CEDAR INCLUDES

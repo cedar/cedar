@@ -49,13 +49,13 @@
 // SYSTEM INCLUDES
 #include <fstream>
 #include <cstdlib>
-#ifdef GCC
+#ifdef __GNUG__
   #include <csignal>
-#elif defined MSVC
+#elif defined _MSC_VER
   #include <signal.h>
 #else
   #error Please implement signal handling for your compiler.
-#endif // GCC
+#endif // __GNUG__
 
 #define CATCH_EXCEPTIONS_IN_GUI
 
@@ -114,7 +114,7 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
   abort();
 }
 
-#ifdef MSVC
+#ifdef _MSC_VER
 LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS exceptions)
 {
   std::ofstream stream;
@@ -148,16 +148,16 @@ LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS excep
   LONG retval = EXCEPTION_CONTINUE_SEARCH;
   return retval;
 }
-#endif // MSVC
+#endif // _MSC_VER
 
 int cedar::proc::gui::IdeApplication::exec()
 {
-#ifdef MSVC
+#ifdef _MSC_VER
   SetUnhandledExceptionFilter(&cedar::proc::gui::IdeApplication::vcCrashHandler);
 #else
   signal(SIGSEGV, &cedar::proc::gui::IdeApplication::signalHandler);
   signal(SIGABRT, &cedar::proc::gui::IdeApplication::signalHandler);
-#endif // MSCV
+#endif // _MSC_VER
 
   this->mpIde->show();
   int ret = this->QApplication::exec();
