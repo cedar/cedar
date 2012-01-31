@@ -38,6 +38,8 @@
 
 - cedar::aux
   - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
+  - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
+    the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde

@@ -50,10 +50,11 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 
 /*!@brief An interface for classes that can store and load parameters from files.
  */
-class cedar::aux::Configurable
+class cedar::aux::Configurable : public boost::noncopyable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -128,6 +129,10 @@ public:
   /*!@brief Resets the changed flag of all parameters associated with this Configurable.
    */
   void resetChangedStates(bool newChangedFlagValue) const;
+
+  void copyFrom(ConstConfigurablePtr src);
+
+  void copyTo(ConfigurablePtr target) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

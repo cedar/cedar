@@ -310,3 +310,17 @@ boost::signals2::connection cedar::aux::Configurable::connectToTreeChangedSignal
 {
   return mTreeChanged.connect(slot);
 }
+
+void cedar::aux::Configurable::copyFrom(ConstConfigurablePtr src)
+{
+  cedar::aux::ConfigurationNode root;
+  src->writeConfiguration(root);
+  this->readConfiguration(root);
+}
+
+void cedar::aux::Configurable::copyTo(ConfigurablePtr target) const
+{
+  cedar::aux::ConfigurationNode root;
+  this->writeConfiguration(root);
+  target->readConfiguration(root);
+}
