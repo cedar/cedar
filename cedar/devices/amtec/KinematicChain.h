@@ -38,7 +38,7 @@
 #define CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_H
 
 // MAKE AMTEC OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+#include "cedar/configuration.h"
 #ifdef CEDAR_USE_AMTEC
 
 // CEDAR INCLUDES

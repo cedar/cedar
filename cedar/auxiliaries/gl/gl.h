@@ -34,11 +34,11 @@
 
 ======================================================================================================================*/
 
-#if defined WIN32
+#if defined _WIN32
   #define NOMINMAX
   #include <Windows.h>
   #include <gl/GL.h>
-#elif defined APPLE
+#elif defined __APPLE__
   #include <OpenGL/gl.h>
 #else
   #include <GL/gl.h>

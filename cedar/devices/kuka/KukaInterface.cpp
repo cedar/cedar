@@ -34,8 +34,9 @@
 
 ======================================================================================================================*/
 
-// MAKE FRI OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_KUKA_LWR
 
 // CEDAR INCLUDES
