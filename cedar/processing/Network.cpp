@@ -773,7 +773,6 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   return it;
 }
 
-
 std::string cedar::proc::Network::findPath(cedar::proc::ConstElementPtr findMe) const
 {
   // first, try to find element in this network
