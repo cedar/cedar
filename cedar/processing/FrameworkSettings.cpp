@@ -130,7 +130,7 @@ void cedar::proc::FrameworkSettings::addKnownPlugin(const std::string& file)
       return;
 
 //do not remove leading slash on apple platform
-#if !defined APPLE
+#if !defined __APPLE__
     if (modified_path.at(0) == '/')
     {
       modified_path = modified_path.substr(1);
