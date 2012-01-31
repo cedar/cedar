@@ -232,7 +232,9 @@ public:
   void reset();
 
   /*!@brief Find the complete path of an element, if it exists in the tree structure
-   * @returns returns the dot-separated path to the element, or empty string if element is not found in tree */
+   * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
+   * @todo instead of returning an empty string, this function should throw an exception (catch it internally
+   * in recursive call) */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
 
   //--------------------------------------------------------------------------------------------------------------------
