@@ -66,6 +66,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+   *
+   * @return    state
+   */
+  bool isMovable();
+
   /*!@brief get current state of a single joint angle
    *
    * @return    joint angle value

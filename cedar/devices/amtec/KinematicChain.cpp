@@ -99,6 +99,12 @@ cedar::dev::amtec::KinematicChain::~KinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::dev::amtec::KinematicChain::isMovable()
+{
+  // todo: change this to something meaningful
+  return true;
+}
+
 bool cedar::dev::amtec::KinematicChain::initDevice()
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
