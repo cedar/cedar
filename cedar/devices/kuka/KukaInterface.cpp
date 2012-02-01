@@ -122,7 +122,16 @@ void cedar::dev::kuka::KukaInterface::init()
 
 bool cedar::dev::kuka::KukaInterface::isMovable()
 {
-  return true;
+  mLock.lockForRead();
+  bool on = mPowerOn;
+  FRI_STATE state = getFriState();
+  mLock.unlock();
+
+  if (on && (state = FRI_STATE_CMD))
+  {
+    return true;
+  }
+  return false;
 }
 
 double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index)
