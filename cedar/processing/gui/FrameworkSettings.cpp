@@ -62,3 +62,15 @@ QWidget(pParent)
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::FrameworkSettings::reject()
+{
+  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
+  settings.load();
+}
+
+void cedar::proc::gui::FrameworkSettings::accept()
+{
+  cedar::proc::FrameworkSettings& settings = cedar::proc::Manager::getInstance().settings();
+  settings.save();
+}

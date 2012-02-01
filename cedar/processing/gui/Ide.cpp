@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/SettingsDialog.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/ElementClassList.h"
@@ -91,6 +92,7 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
   QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
+  QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
 
   QObject::connect
@@ -156,6 +158,12 @@ cedar::proc::gui::Ide::~Ide()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::showSettingsDialog()
+{
+  cedar::proc::gui::SettingsDialog *p_settings = new cedar::proc::gui::SettingsDialog(this);
+  p_settings->show();
+}
 
 void cedar::proc::gui::Ide::increaseZoomLevel()
 {

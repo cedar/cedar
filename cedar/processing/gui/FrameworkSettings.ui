@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <property name="spacing">
     <number>3</number>
    </property>
@@ -32,7 +32,7 @@
          <string>The plugin workspace determines the folder in which the processing framework looks for plugins. In addition, if you add a plugin to your architecture from the workspace, its path is specified relative to this path.</string>
         </property>
         <property name="text">
-         <string>Plugin workspace</string>
+         <string>Plugin workspace*</string>
         </property>
        </widget>
       </item>
@@ -40,6 +40,13 @@
        <widget class="cedar::aux::gui::DirectoryParameter" name="mpPluginWorkspaceEdit" native="true"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>* changes only take effect after a restart of the application</string>
+     </property>
     </widget>
    </item>
   </layout>

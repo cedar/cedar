@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UiSettings.h
+    File:        SettingsDialog.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 02 01
+    Date:        2012 02 0  1
 
     Description:
 
@@ -38,9 +38,7 @@
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/gui/UiSettings.h"
-#include "cedar/processing/gui/Settings.h"
-#include "cedar/auxiliaries/gui/BoolParameter.h"
+#include "cedar/processing/gui/SettingsDialog.h"
 
 // SYSTEM INCLUDES
 
@@ -48,27 +46,28 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::UiSettings::UiSettings(QWidget *pParent)
+cedar::proc::gui::SettingsDialog::SettingsDialog(QWidget *pParent)
 :
-QWidget(pParent)
+QDialog(pParent)
 {
   this->setupUi(this);
 
-  mpUseGraphicsEffectsEdit->setParameter(cedar::proc::gui::Settings::instance().mUseGraphicsItemShadowEffects);
+  QObject::connect(this, SIGNAL(accepted()), this, SLOT(changesAccepted()));
+  QObject::connect(this, SIGNAL(rejected()), this, SLOT(changesRejected()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::proc::gui::UiSettings::reject()
+void cedar::proc::gui::SettingsDialog::changesAccepted()
 {
-  // just (re-)load the settings that are currently stored on the disk
-  cedar::proc::gui::Settings::instance().load();
+  this->mpUiSettingsTab->accept();
+  this->mpProcessingSettingsTab->accept();
 }
 
-void cedar::proc::gui::UiSettings::accept()
+void cedar::proc::gui::SettingsDialog::changesRejected()
 {
-  // write the settings to the disk
-  cedar::proc::gui::Settings::instance().save();
+  this->mpUiSettingsTab->reject();
+  this->mpProcessingSettingsTab->reject();
 }
