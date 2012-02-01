@@ -26,7 +26,7 @@
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2012 01 31
 
     Description:
 
@@ -34,68 +34,40 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_FRAMEWORK_SETTINGS_H
-#define CEDAR_PROC_FRAMEWORK_SETTINGS_H
+#ifndef CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
+#define CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
+
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/processing/gui/ui_FrameworkSettings.h"
 
 // SYSTEM INCLUDES
-#include <set>
+#include <QWidget>
 
 
-/*!@brief A singleton class for storing user-specific parameters related to the processing framework.
- *
- * @todo  Write a widget for these settings.
+/*!@brief A widget for displaying the settings stored in cedar::proc::gui::FrameworkSettings.
  */
-class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
+class cedar::proc::gui::FrameworkSettings : public QWidget, public Ui_FrameworkSettings
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // friend
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  friend class cedar::proc::gui::FrameworkSettings;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FrameworkSettings();
-
-  //!@brief The destructor.
-  ~FrameworkSettings();
+  FrameworkSettings(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief Loads the settings from a file in the user's home directory.
-   */
-  void load();
-
-  /*!@brief Saves the settings to a file in the user's home directory.
-   */
-  void save();
-
-  /*!@brief Adds a plugin to the list of plugins known by the processing framework.
-   */
-  void addKnownPlugin(const std::string& file);
-
-  /*!@brief Returns the set of plugins known by the processing framework.
-   */
-  const std::set<std::string>& getKnownPlugins() const;
-
-  /*!@brief Returns the set of plugin directories known by the processing framework.
-   */
-  const std::set<std::string>& getPluginDirectories() const;
-
-  /*!@brief Returns the plugin workspace directory.
-   *
-   *        This is the first directoriy searched for a plugin.
-   */
-  std::string getPluginWorkspace() const;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -121,18 +93,12 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief Parameter representing the plugin workspace.
-  cedar::aux::DirectoryParameterPtr mPluginWorkspace;
-
-  //!@brief List of directories to use when looking for plugins.
-  cedar::aux::StringSetParameterPtr mPluginIncludeDirectories;
-
-  //!@brief List of known plugins.
-  cedar::aux::StringSetParameterPtr mKnownPlugins;
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::proc::FrameworkSettings
+}; // class cedar::proc::gui::FrameworkSettings
 
-#endif // CEDAR_PROC_FRAMEWORK_SETTINGS_H
+#endif // CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
+

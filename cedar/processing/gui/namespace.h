@@ -59,6 +59,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT DataSlotItem;
       class CEDAR_PROC_LIB_EXPORT ElementClassList;
       class CEDAR_PROC_LIB_EXPORT GraphicsBase;
+      class CEDAR_PROC_LIB_EXPORT FrameworkSettings;
       class CEDAR_PROC_LIB_EXPORT Ide;
       class CEDAR_PROC_LIB_EXPORT IdeApplication;
       class CEDAR_PROC_LIB_EXPORT MatrixPlotInterface;
