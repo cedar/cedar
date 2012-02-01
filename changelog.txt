@@ -55,6 +55,7 @@
     the mouse wheel (hold down ctrl)
   - The property pane now indicates when parameters have been changed since the last save. 
   - more verbose tooltip for data slots
+  - there is now a settings dialog; more settings will be added later.
 
 == Version 0.5.1 ==
 - cedar::proc::steps
