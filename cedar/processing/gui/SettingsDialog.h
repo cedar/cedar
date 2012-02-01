@@ -26,7 +26,7 @@
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 01 31
+    Date:        2012 02 01
 
     Description:
 
@@ -34,24 +34,26 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
-#define CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
+#ifndef CEDAR_PROC_GUI_SETTINGS_DIALOG_H
+#define CEDAR_PROC_GUI_SETTINGS_DIALOG_H
 
 // CEDAR CONFIGURATION
 #include "cedar/configuration.h"
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
-#include "cedar/processing/gui/ui_FrameworkSettings.h"
+#include "cedar/processing/gui/ui_SettingsDialog.h"
 
 // SYSTEM INCLUDES
-#include <QWidget>
+#include <QDialog>
 
 
 /*!@brief A widget for displaying the settings stored in cedar::proc::gui::FrameworkSettings.
  */
-class cedar::proc::gui::FrameworkSettings : public QWidget, public Ui_FrameworkSettings
+class cedar::proc::gui::SettingsDialog : public QDialog, public Ui_SettingsDialog
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -61,15 +63,14 @@ class cedar::proc::gui::FrameworkSettings : public QWidget, public Ui_FrameworkS
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  FrameworkSettings(QWidget *pParent = NULL);
+  SettingsDialog(QWidget *pParent = NULL);
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  void reject();
-
-  void accept();
+public slots:
+  void changesAccepted();
+  void changesRejected();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -100,7 +101,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::proc::gui::FrameworkSettings
+}; // class cedar::proc::gui::SettingsDialog
 
-#endif // CEDAR_PROC_GUI_FRAMEWORK_SETTINGS_H
+#endif // CEDAR_PROC_GUI_SETTINGS_DIALOG_H
 

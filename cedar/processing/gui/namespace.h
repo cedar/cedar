@@ -69,6 +69,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT PluginManagerDialog;
       class CEDAR_PROC_LIB_EXPORT Scene;
       class CEDAR_PROC_LIB_EXPORT Settings;
+      class CEDAR_PROC_LIB_EXPORT SettingsDialog;
       class CEDAR_PROC_LIB_EXPORT StepItem;
       class CEDAR_PROC_LIB_EXPORT ToolBox;
       class CEDAR_PROC_LIB_EXPORT TriggerItem;

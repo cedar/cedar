@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>UI Settings</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="1,0">
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -26,7 +26,7 @@
          <string>Note: these effects may lead to rendering errors. If you experience many such errors, disable these effects.</string>
         </property>
         <property name="text">
-         <string>Use Graphics Effects</string>
+         <string>Use Graphics Effects*</string>
         </property>
        </widget>
       </item>
@@ -34,6 +34,13 @@
        <widget class="cedar::aux::gui::BoolParameter" name="mpUseGraphicsEffectsEdit" native="true"/>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>* changes only take effect after a restart of the application</string>
+     </property>
     </widget>
    </item>
   </layout>
