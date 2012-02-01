@@ -80,6 +80,7 @@ cedar::dev::kuka::KukaInterface::~KukaInterface()
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
+
 void cedar::dev::kuka::KukaInterface::init()
 {
   //The number of joints the KUKA LBR has
@@ -117,6 +118,11 @@ void cedar::dev::kuka::KukaInterface::init()
   start();
 
   mIsInit = true;
+}
+
+bool cedar::dev::kuka::KukaInterface::isMovable()
+{
+  return true;
 }
 
 double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index)
