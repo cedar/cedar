@@ -38,6 +38,8 @@
 
 - cedar::aux
   - fixed a critical bug in LoopedThread::singleStep, which used microseconds instead of milliseconds for step()
+  - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
+    the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
   - Templated functions in cedar::aux::math now have an "alias" version that can be called without a template parameter.
     This function automatically decides which template version to call based on the matrix types. 
 
