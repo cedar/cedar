@@ -99,8 +99,6 @@ std::string cedar::proc::PluginProxy::findPluginDescription(const std::string& p
   std::string plugin_name = cedar::proc::PluginProxy::getPluginNameFromPath(plugin_path);
   plugin_name += ".xml";
 
-  std::cout << plugin_name << std::endl;
-
   // extract the path only
   boost::filesystem::path plugin_dir(plugin_path);
   plugin_dir.remove_filename();
