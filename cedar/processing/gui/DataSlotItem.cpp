@@ -56,6 +56,7 @@
 #include <QMenu>
 #include <iostream>
 #include <QGraphicsScene>
+#include <QTextDocument> // needed for the Qt::escape function
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -218,8 +219,8 @@ void cedar::proc::gui::DataSlotItem::generateTooltip()
   // type info
   if (this->mSlot->getData())
   {
-    tool_tip
-      += QString("<br />") + QString::fromStdString(cedar::aux::unmangleName(typeid(*(this->mSlot->getData().get()))));
+    QString unmangled_name = QString::fromStdString(cedar::aux::unmangleName(typeid(*(this->mSlot->getData().get()))));
+    tool_tip += QString("<br />") + Qt::escape(unmangled_name);
   }
   this->setToolTip(tool_tip);
 }
