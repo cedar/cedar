@@ -72,6 +72,7 @@ namespace cedar
       class CEDAR_PROC_LIB_EXPORT StepItem;
       class CEDAR_PROC_LIB_EXPORT ToolBox;
       class CEDAR_PROC_LIB_EXPORT TriggerItem;
+      class CEDAR_PROC_LIB_EXPORT UiSettings;
       class CEDAR_PROC_LIB_EXPORT View;
       class CEDAR_PROC_LIB_EXPORT ProjectionMappingParameter;
 
