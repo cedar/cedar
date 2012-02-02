@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include "stdio.h"
@@ -170,18 +171,18 @@ ConfigurationInterface(configFileName)
 
 cedar::dev::robot::gui::KinematicChainMonitorWidget::~KinematicChainMonitorWidget()
 {
-  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
-  {
-    mpKinematicChains[i]->stop();
-  }
-  mpTimer->stop();
-  delete mpTimer;
+
 }
 
 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
+
+void cedar::dev::robot::gui::KinematicChainMonitorWidget::timerEvent(QTimerEvent*)
+{
+  update();
+}
 
 void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
 {
@@ -193,18 +194,30 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
   mpGridLayout->setColumnStretch(2,2);
   mpGridLayout->setColumnStretch(3,2);
 
+  // add joint label
+  QLabel* pos_label = new QLabel(QApplication::translate("KinematicChainWindow", "pos"));
+  pos_label->setAlignment(Qt::AlignRight);
+  mpGridLayout->addWidget(pos_label, 0, 1);
+  QLabel* vel_label = new QLabel(QApplication::translate("KinematicChainWindow", "vel"));
+  vel_label->setAlignment(Qt::AlignRight);
+  mpGridLayout->addWidget(vel_label, 0, 2);
+  QLabel* acc_label = new QLabel(QApplication::translate("KinematicChainWindow", "acc"));
+  acc_label->setAlignment(Qt::AlignRight);
+  mpGridLayout->addWidget(acc_label, 0, 3);
+
   for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
   {
-    // add label
+    // add joint label
     char labelText[10];
     sprintf(labelText, "Joint %d", i);
     QLabel *label = new QLabel(QApplication::translate("KinematicChainWindow", labelText));
     mpGridLayout->addWidget(label, i+1, 0);
 
-    // add labels
+    // add value labels
     for(unsigned int j = 0; j < 3; ++j)
     {
       QLabel* p_label = new QLabel;
+      p_label->setAlignment(Qt::AlignRight);
       p_label->setText("0.00");
       mpGridLayout->addWidget(p_label, i+1, j+1);
     }
@@ -214,10 +227,7 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
   setMaximumHeight(0);
 
   // start a timer to update the interface
-  // TODO: why not use the timer of the widget itself here? change that
-  mpTimer = new QTimer();
-  connect(mpTimer, SIGNAL(timeout()), this, SLOT(update()));
-  mpTimer->start(mUpdateInterval);
+  startTimer(mUpdateInterval);
 
   return;
 }
@@ -231,10 +241,9 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::update()
     QLabel* p_velocity_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 2)->widget());
     QLabel* p_acceleration_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 3)->widget());
 
-    // TODO: this won't work, nor compile. Use some num2str function and use mDecimals
-//    p_angle_label->setValue(mpKinematicChains[0]->getJointAngle(i));
-//    p_velocity_label->setValue(mpKinematicChains[0]->getJointVelocity(i));
-//    p_acceleration_label->setValue(mpKinematicChains[0]->getJointAcceleration(i));
+    p_angle_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAngle(i), -(mDecimals+2), 'g', mDecimals, '0'));
+    p_velocity_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointVelocity(i), -(mDecimals+2), 'g', mDecimals, '0'));
+    p_acceleration_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAcceleration(i), -(mDecimals+2), 'g', mDecimals, '0'));
   }
 }
 
