@@ -98,6 +98,7 @@ void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobian
 {
   // transform to local coordinates if necessary
   cv::Mat point_local;
+  mTransformationsLock.lockForRead();
   switch (coordinateFrame)
   {
     case WORLD_COORDINATES :
@@ -119,12 +120,11 @@ void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobian
   
   // calculate Jacobian column by column
   cv::Mat column;
-  mTransformationsLock.lockForRead();
   for (unsigned int j = 0; j <=  jointIndex; j++)
   {
     column = wedgeTwist<double>(rigidToAdjointTransformation<double>(mTransformation)*mJointTwists[j])
-             * mTransformation
-             * mJointTransformations[jointIndex]
+             * mTransformation // change point to world coordinates
+             * mJointTransformations[jointIndex] // change point to root coordinates
              * point_local;
     // export
     result.at<double>(0, j) = column.at<double>(0, 0);
