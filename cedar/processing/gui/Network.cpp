@@ -61,12 +61,17 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::Network::Network(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene)
+cedar::proc::gui::Network::Network(QMainWindow *pMainWindow, qreal width, qreal height, cedar::proc::NetworkPtr network)
 :
-mNetwork(new cedar::proc::Network()),
-mpScene(pScene),
+GraphicsBase(width, height, GRAPHICS_GROUP_NETWORK),
+mNetwork(network),
+mpScene(NULL),
 mpMainWindow(pMainWindow)
 {
+  if (!mNetwork)
+  {
+    mNetwork = cedar::proc::NetworkPtr(new cedar::proc::Network());
+  }
 }
 
 cedar::proc::gui::Network::~Network()
@@ -77,13 +82,28 @@ cedar::proc::gui::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::Network::fitToContents()
+{
+  //!@todo Implement me!
+}
+
+void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
+{
+  //!@todo Implement me!
+}
+
 const std::string& cedar::proc::gui::Network::getFileName() const
 {
   return this->mFileName;
 }
 
-void cedar::proc::gui::Network::addToScene()
+void cedar::proc::gui::Network::addElementsToScene(cedar::proc::gui::Scene* pScene)
 {
+  // currently, switching the scene is not supported.
+  CEDAR_ASSERT(this->mpScene == pScene || this->mpScene == NULL);
+
+  this->mpScene = pScene;
+
   //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.
   this->addStepsToScene();
   this->addTriggersToScene();

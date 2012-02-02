@@ -297,7 +297,7 @@ void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
   this->mpProcessingDrawer->getScene()->reset();
   this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
-  this->mNetwork->addToScene();
+  this->mNetwork->addElementsToScene(this->mpProcessingDrawer->getScene());
 }
 
 void cedar::proc::gui::Ide::architectureToolFinished()
@@ -481,7 +481,7 @@ void cedar::proc::gui::Ide::stopThreads()
 
 void cedar::proc::gui::Ide::newFile()
 {
-  this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
+  this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this)));
 }
 
 void cedar::proc::gui::Ide::save()
@@ -538,7 +538,7 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
-  cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene()));
+  cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this));
 
   try
   {
