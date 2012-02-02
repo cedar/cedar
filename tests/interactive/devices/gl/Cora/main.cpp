@@ -40,7 +40,7 @@
 #include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/gl/CoraArm.h"
 #include "cedar/devices/robot/gl/CoraHead.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -70,6 +70,15 @@ int main(int argc, char **argv)
       "../../../../tests/interactive/devices/gl/Cora/cora_head.conf"
     )
   );
+  p_cora_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  p_cora_arm->setJointVelocity(0, 0.31);
+  p_cora_arm->setJointVelocity(1, -.045);
+  p_cora_arm->setJointVelocity(2, -.015);
+  p_cora_arm->setJointVelocity(3, .025);
+  p_cora_arm->setJointVelocity(4, 0.31);
+  p_cora_arm->setJointVelocity(5, -.045);
+  p_cora_arm->setJointVelocity(6, -.015);
+  p_cora_arm->setJointVelocity(7, .025);
 
   // create models calculation of the transformation
   cedar::dev::robot::KinematicChainModelPtr p_cora_arm_model(new cedar::dev::robot::KinematicChainModel(p_cora_arm));
@@ -100,13 +109,15 @@ int main(int argc, char **argv)
   p_scene_widget->show();
 
   // create widgets
-  cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_cora_arm);
-  cedar::dev::robot::gui::KinematicChainWidget widget_head(p_cora_head);
-  widget_arm.show();
-  widget_head.show();
+  cedar::dev::robot::gui::KinematicChainMonitorWidget monitor_widget_arm(p_cora_arm);
+  cedar::dev::robot::gui::KinematicChainMonitorWidget monitor_widget_head(p_cora_head);
+  monitor_widget_arm.show();
+  monitor_widget_head.show();
 
   p_cora_arm_model->startTimer(50.0);
   p_cora_head_model->startTimer(50.0);
+  p_cora_arm->start();
+  p_cora_head->start();
   viewer.startTimer(50);
   a.exec();
 

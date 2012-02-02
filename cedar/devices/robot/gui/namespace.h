@@ -54,6 +54,8 @@ namespace cedar
       {
         //!@cond SKIPPED_DOCUMENTATION
         CEDAR_DECLARE_DEV_CLASS(KinematicChainWidget);
+        CEDAR_DECLARE_DEV_CLASS(KinematicChainMonitorWidget);
+//        CEDAR_DECLARE_DEV_CLASS(KinematicChainCommandWidget);
         //!@endcond
       }
     }

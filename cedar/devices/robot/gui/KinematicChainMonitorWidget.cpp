@@ -33,7 +33,6 @@
     Credits:
 
 ======================================================================================================================*/
-#ifdef ioannis
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
@@ -205,7 +204,7 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
     // add labels
     for(unsigned int j = 0; j < 3; ++j)
     {
-      QLabel* p_label = new QLabel
+      QLabel* p_label = new QLabel;
       p_label->setText("0.00");
       mpGridLayout->addWidget(p_label, i+1, j+1);
     }
@@ -238,3 +237,4 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::update()
 //    p_acceleration_label->setValue(mpKinematicChains[0]->getJointAcceleration(i));
   }
 }
+

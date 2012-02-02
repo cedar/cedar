@@ -157,3 +157,5 @@ private:
 };
 
 #endif /* CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_COMMAND_WIDGET_H */
+
+#endif
