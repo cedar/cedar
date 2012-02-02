@@ -33,7 +33,6 @@
     Credits:
 
 ======================================================================================================================*/
-#ifdef ioannis
 
 #ifndef CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_MONITOR_WIDGET_H
 #define CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_MONITOR_WIDGET_H
@@ -150,6 +149,4 @@ private:
   int mDecimals;
 };
 
-#endif /* KINEMATICCHAINWIDGET_H_ */
-
-#endif
+#endif /* CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_MONITOR_WIDGET_H */

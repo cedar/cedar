@@ -347,3 +347,4 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
 
   return;
 }
+#endif
