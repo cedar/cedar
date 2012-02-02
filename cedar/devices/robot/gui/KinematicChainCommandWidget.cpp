@@ -33,7 +33,6 @@
     Credits:
 
 ======================================================================================================================*/
-#ifdef ioannis
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gui/KinematicChainCommandWidget.h"
@@ -347,4 +346,3 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
 
   return;
 }
-#endif
