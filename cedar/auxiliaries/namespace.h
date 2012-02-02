@@ -38,11 +38,7 @@
 #define CEDAR_AUX_NAMESPACE_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/auxiliaries/debug/lib.h"
-#else
-  #include "cedar/auxiliaries/release/lib.h"
-#endif
+#include "cedar/auxiliaries/lib.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -124,6 +120,8 @@ namespace cedar
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.
     typedef NumericParameter<unsigned int> UIntParameter;
+    //!@brief A concretization of NumericParameter for int values.
+    typedef NumericParameter<int> IntParameter;
     //!@brief A concretization of ParameterTemplate for strings.
     typedef ParameterTemplate<std::string> StringParameter;
     //!@brief A concretization of ParameterTemplate for booleans.
@@ -138,13 +136,14 @@ namespace cedar
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
     // all intrusive smart pointers
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolVectorParameter);
-    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntVectorParameter);
     //!@endcond
 
@@ -152,6 +151,7 @@ namespace cedar
     class DirectoryParameter;
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DirectoryParameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(FileParameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(EnumParameter);
     //!@endcond
 

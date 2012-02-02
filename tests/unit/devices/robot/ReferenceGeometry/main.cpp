@@ -44,15 +44,13 @@
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::dev::robot;
 
 int main()
 {
   // the number of errors encountered in this test
   int errors = 0;
 
-  ReferenceGeometry reference_geometry("test.conf");
+  cedar::dev::robot::ReferenceGeometry reference_geometry("test.conf");
   std::cout << "name: " << reference_geometry.getName() << "\n";
 
   //--------------------------------------------------------------------------------------------------------------------

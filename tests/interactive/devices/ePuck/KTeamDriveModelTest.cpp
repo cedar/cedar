@@ -51,8 +51,6 @@
 #include <QApplication>
 #include <math.h>
 
-using namespace cedar::aux::gl;
-using namespace cedar::aux::gui;
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
@@ -63,20 +61,19 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create scene
-  ScenePtr p_scene(new cedar::aux::gl::Scene);
+  cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(1);
   p_scene->drawFloor(false);
 
   // create viewer
-  Viewer viewer(p_scene);
+  cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
   viewer.startTimer(50);
 
   //open the channel to the robot
-  cedar::dev::com::SerialCommunication *pCommunication;
-  pCommunication
-  = new cedar::dev::com::SerialCommunication("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.cfg");
+  cedar::dev::com::SerialCommunication *pCommunication = new cedar::dev::com::SerialCommunication();
+  pCommunication->readJson("../../tests/interactive/devices/ePuck/SerialCommunicationConfig.json");
 
   //initialize the e-puck
   cedar::dev::kteam::EPuckDrive *pDrive;
@@ -86,11 +83,11 @@ int main(int argc, char **argv)
   cedar::dev::kteam::DriveModelPtr p_kteam_model(new cedar::dev::kteam::DriveModel(pDrive));
   p_kteam_model->setName("E-Puck");
   //add cylinder representing the robot
-  ObjectPtr p_cylinder(new Cylinder(p_kteam_model, 0.07, 0.05));
+  cedar::aux::gl::ObjectPtr p_cylinder(new cedar::aux::gl::Cylinder(p_kteam_model, 0.07, 0.05));
   p_scene->addObject(p_cylinder);
 
   // create scene widget
-  SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
+  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
   p_scene_widget->show();
 
   //open the control-GUI

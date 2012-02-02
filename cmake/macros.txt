@@ -211,7 +211,7 @@ macro(cedar_add_library)
   set(sourceFiles ${sourceFiles} ${generatedMocSourceFiles})
 
   # generate rules for building source files from the resources
-  QT4_ADD_RESOURCES(recourceCompilerSrcs ${library_RESOURCES})
+  qt4_add_resources(recourceCompilerSrcs ${library_RESOURCES})
 
   # create ui headers from ui files
   cedar_qt4_wrap_ui(generatedUiHeaders ${uiFiles})
@@ -220,6 +220,7 @@ macro(cedar_add_library)
   # generate lib.h files
   string(TOUPPER "${libraryName}" CAP_LIB_NAME)
   string(REGEX REPLACE "CEDAR" "" CAP_LIB_NAME "${CAP_LIB_NAME}")
+  
   set(libHOutputFile "${CMAKE_CURRENT_BINARY_DIR}/lib.h")
   configure_file("${CEDAR_HOME}/cmake/resources/lib.h.in" ${libHOutputFile})
   set(headerFiles ${headerFiles} ${libHOutputFile})
@@ -231,9 +232,38 @@ macro(cedar_add_library)
     string(REGEX REPLACE "${CEDAR_SOURCE_DIR}" "" relativeHeaderFilePath "${headerFilePath}")
     # extract the path to the header file, relative to the cedar build directory
     string(REGEX REPLACE "${CEDAR_BUILD_DIR}/cedar" "" relativeHeaderFilePath "${relativeHeaderFilePath}")
+
+    # Create file groups (this mirrors the actual file structure in visual studio)
+    string(REGEX MATCH "${CEDAR_BUILD_DIR}" isGenerated "${headerFilePath}")
+    string(REGEX REPLACE "/" "\\\\" groupName "${relativeHeaderFilePath}")
+    if (NOT isGenerated)
+      source_group(${groupName} FILES ${headerFile})
+    else(NOT isGenerated)
+      source_group("generated\\\\${groupName}" FILES ${headerFile})
+    endif (NOT isGenerated)
+    
     # add the header file to the 'make install' target
     install(FILES ${headerFile} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/${relativeHeaderFilePath})
   endforeach(headerFile ${headerFiles})
+  
+  # place source files into groups
+  foreach(sourceFile ${sourceFiles})
+    # get the path of the file
+    get_filename_component(sourceFilePath ${sourceFile} PATH)
+    # extract the path to the source file, relative to the cedar source directory
+    string(REGEX REPLACE "${CEDAR_SOURCE_DIR}" "" relativeSourceFilePath "${sourceFilePath}")
+    # extract the path to the source file, relative to the cedar build directory
+    string(REGEX REPLACE "${CEDAR_BUILD_DIR}/cedar" "" relativeSourceFilePath "${relativeSourceFilePath}")
+    
+    # Create file groups (this mirrors the actual file structure in visual studio)
+    string(REGEX MATCH "${CEDAR_BUILD_DIR}" isGenerated "${sourceFilePath}")
+    string(REGEX REPLACE "/" "\\\\" groupName "${relativeSourceFilePath}")
+    if (NOT isGenerated)
+      source_group(${groupName} FILES ${sourceFile})
+    else(NOT isGenerated)
+      source_group("generated\\\\${groupName}" FILES ${sourceFile})
+    endif (NOT isGenerated)
+  endforeach(sourceFile ${sourceFiles})
 
   # add the library and link it to all relevant cedar and third party libraries
   set(CEDAR_LIBS ${CEDAR_LIBS} ${libraryName} CACHE INTERNAL "")

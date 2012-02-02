@@ -45,9 +45,6 @@
 
 // SYSTEM INCLUDES
 
-using namespace cedar::aux;
-using namespace cedar::aux::math;
-
 int main()
 {
   // the number of errors encountered in this test
@@ -57,14 +54,14 @@ int main()
 
   // test sigmoid(double, double, double)
   std::cout << "test no " << test_number++ << std::endl;
-  if (sigmoidExp(5,1000,0) < 0.9)
+  if (cedar::aux::math::sigmoidExp(5,1000,0) < 0.9)
   {
     std::cout << "error in sigmoid(double, double, double)" << std::endl;
     errors++;
   }
   // test sigmoidAbs()
   std::cout << "test no " << test_number++ << std::endl;
-  if (sigmoidAbs(5,1000,0) < 0.9)
+  if (cedar::aux::math::sigmoidAbs(5,1000,0) < 0.9)
   {
     std::cout << "error in sigmoidAbs(double, double, double)" << std::endl;
     errors++;
@@ -75,7 +72,7 @@ int main()
   std::vector<double> test_vector;
   test_vector.push_back(5.0);
   test_vector.push_back(-5.0);
-  std::vector<double> result = sigmoid(test_vector,1000,0);
+  std::vector<double> result = cedar::aux::math::sigmoid(test_vector,1000,0);
   if (result.at(0) < 0.9 || result.at(1) > 0.1)
   {
     std::cout << "error in sigmoid(std::vector<double>, double, double)" << std::endl;
@@ -84,7 +81,7 @@ int main()
 
   // test sigmoidInterval()
   std::cout << "test no " << test_number++ << std::endl;
-  sigmoidInterval(5,1000,0);
+  cedar::aux::math::sigmoidInterval(5,1000,0);
 
   // test sigmoid classes
   std::cout << "test no " << test_number++ << std::endl;
@@ -112,7 +109,10 @@ int main()
   cedar::aux::math::write(sigmoid_my_values);
   cedar::aux::math::write(sigmoid_my_values_double);
 
-  SigmoidDeclarationPtr sigmoid_declaration(new SigmoidDeclarationT<cedar::aux::math::AbsSigmoid>("cedar.aux.math.AbsSigmoid"));
+  cedar::aux::math::SigmoidDeclarationPtr sigmoid_declaration
+  (
+    new cedar::aux::math::SigmoidDeclarationT<cedar::aux::math::AbsSigmoid>("cedar.aux.math.AbsSigmoid")
+  );
   cedar::aux::math::SigmoidPtr my_sigmoid = sigmoid_declaration->getObjectFactory()->allocate();
   sigmoid_my_values = my_sigmoid->compute<float>(my_values);
   sigmoid_my_values_double = my_sigmoid->compute<double>(my_values_double);

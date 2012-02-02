@@ -82,9 +82,6 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
   {
     const ElementDeclarationPtr& class_id = *iter;
     QString label = class_id->getClassName().c_str();
-    label += "\n(";
-    label += class_id->getNamespaceName().c_str();
-    label += ")";
     QListWidgetItem *p_item = new QListWidgetItem(label);
     p_item->setFlags(p_item->flags() | Qt::ItemIsDragEnabled);
 
@@ -98,6 +95,18 @@ void cedar::proc::gui::ElementClassList::showList(const cedar::proc::Declaration
       icon = QIcon(":/steps/no_icon.svg");
     }
     p_item->setIcon(icon);
+
+    QString class_description;
+    class_description += "<nobr>class <big><b>" + QString::fromStdString(class_id->getClassName()) + "</b></big></nobr>";
+    class_description += "<hr />";
+    class_description += "<div align=\"right\"><nobr><small><i>" + QString::fromStdString(class_id->getClassId()) + "</i></small></nobr></div>";
+    if (!class_id->getDescription().empty())
+    {
+      QString description = "<p>" + QString::fromStdString(class_id->getDescription()) + "</p>";
+      class_description += description;
+    }
+
+    p_item->setToolTip(class_description);
 
     p_item->setData(Qt::UserRole, QVariant(class_id->getClassId().c_str()));
     this->addItem(p_item);

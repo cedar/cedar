@@ -44,8 +44,6 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-using namespace cedar::aux;
-using namespace cedar::aux::math;
 
 int main()
 {
@@ -58,33 +56,36 @@ int main()
   std::cout << "test no" << test_number++ << std::endl;
   cv::Mat identity = cv::Mat::eye(3, 3, CV_64FC1);
   std::cout << "this should be the 3x3 identity matrix:" << std::endl;
-  write(identity);
+  cedar::aux::math::write(identity);
 
   double min_val, max_val;
-  min_val = min(identity);
-  max_val = max(identity);
-  if (min_val!=0.0)
+  min_val = cedar::aux::math::min(identity);
+  max_val = cedar::aux::math::max(identity);
+  if (min_val != 0.0)
   {
-    std::cout<<"error in min(const cv::Mat)"<<std::endl;
+    std::cout << "error in min(const cv::Mat)" << std::endl;
     errors++;
   }
-  if ( max_val!=1.0)
+  if (max_val != 1.0)
    {
-     std::cout<<"error in max(const cv::Mat)"<<std::endl;
+     std::cout << "error in max(const cv::Mat)" << std::endl;
      errors++;
    }
   std::cout << "test no" << test_number++ << std::endl;
-  if (normalizeAngle(5.9) <= -cedar::aux::math::pi || normalizeAngle(5.9) > cedar::aux::math::pi)
+  if (cedar::aux::math::normalizeAngle(5.9) <= -cedar::aux::math::pi
+      || cedar::aux::math::normalizeAngle(5.9) > cedar::aux::math::pi)
   {
     std::cout << "error in normalizeAngle(double)" << std::endl;
     errors++;
   }
-  if (normalizeAngle(-cedar::aux::math::pi) <= -cedar::aux::math::pi || normalizeAngle(-cedar::aux::math::pi) > cedar::aux::math::pi)
+  if (cedar::aux::math::normalizeAngle(-cedar::aux::math::pi) <= -cedar::aux::math::pi
+      || cedar::aux::math::normalizeAngle(-cedar::aux::math::pi) > cedar::aux::math::pi)
   {
     std::cout << "error in normalizeAngle(double)" << std::endl;
     errors++;
   }
-  if (normalizeAngle(10000) <= -cedar::aux::math::pi || normalizeAngle(10000) > cedar::aux::math::pi)
+  if (cedar::aux::math::normalizeAngle(10000) <= -cedar::aux::math::pi
+      || cedar::aux::math::normalizeAngle(10000) > cedar::aux::math::pi)
   {
     std::cout << "error in normalizeAngle(double)" << std::endl;
     errors++;

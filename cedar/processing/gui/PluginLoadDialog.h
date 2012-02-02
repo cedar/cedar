@@ -38,11 +38,7 @@
 #define CEDAR_PROC_GUI_PLUGIN_LOAD_DIALOG_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/processing/debug/gui/ui_PluginLoadDialog.h"
-#else
-  #include "cedar/processing/release/gui/ui_PluginLoadDialog.h"
-#endif
+#include "cedar/processing/gui/ui_PluginLoadDialog.h"
 
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/PluginProxy.h"

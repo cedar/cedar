@@ -38,11 +38,7 @@
 #define CEDAR_AUX_GUI_NAMESPACE_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/auxiliaries/debug/lib.h"
-#else
-  #include "cedar/auxiliaries/release/lib.h"
-#endif
+#include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
@@ -76,6 +72,7 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT DoubleParameter;
       class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
       class CEDAR_AUX_LIB_EXPORT EnumParameter;
+      class CEDAR_AUX_LIB_EXPORT FileParameter;
       class CEDAR_AUX_LIB_EXPORT Parameter;
       class CEDAR_AUX_LIB_EXPORT StringParameter;
       class CEDAR_AUX_LIB_EXPORT UIntParameter;

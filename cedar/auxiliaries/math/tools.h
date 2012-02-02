@@ -38,11 +38,7 @@
 #define CEDAR_AUX_MATH_TOOLS_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/auxiliaries/debug/lib.h"
-#else
-  #include "cedar/auxiliaries/release/lib.h"
-#endif
+#include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/assert.h"
@@ -62,6 +58,7 @@
 #define EQN_EPS 1e-9
 #endif
 
+//!@todo The IsZero macros should be called IS_ZERO; maybe this should even be an inline function
 #ifndef IsZero
 #define IsZero(x) ((x) > -EQN_EPS && (x) < EQN_EPS)
 #endif

@@ -41,9 +41,6 @@
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
 
 int main(int, char**)
 {
@@ -52,8 +49,8 @@ int main(int, char**)
   
   // test constructors
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Cylinder testCylinder(p_object);
-  Cylinder cylinder(p_object, 1, 5);
+  cedar::aux::gl::Cylinder testCylinder(p_object);
+  cedar::aux::gl::Cylinder cylinder(p_object, 1, 5);
   
   //--------------------------------------------------------------------------------------------------------------------
   // radius

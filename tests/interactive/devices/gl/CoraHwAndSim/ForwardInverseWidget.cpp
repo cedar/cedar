@@ -50,14 +50,18 @@
 #include <QtGui/QRadioButton>
 
 
-using namespace std;
-using namespace cedar::dev::robot;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-ForwardInverseWidget::ForwardInverseWidget(const KinematicChainPtr &kinematicChain, KinematicChainModelPtr &kinematicChainModel, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+ForwardInverseWidget::ForwardInverseWidget
+(
+  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+  cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel,
+  QWidget * parent, Qt::WindowFlags f
+)
+:
+QWidget(parent, f)
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
@@ -72,7 +76,15 @@ ForwardInverseWidget::ForwardInverseWidget(const KinematicChainPtr &kinematicCha
 }
 
 
-ForwardInverseWidget::ForwardInverseWidget(const std::vector<KinematicChainPtr> &kinematicChains, KinematicChainModelPtr &kinematicChainModel, QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
+ForwardInverseWidget::ForwardInverseWidget
+(
+  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
+  cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel,
+  QWidget *parent,
+  Qt::WindowFlags f
+)
+:
+QWidget(parent, f)
 {
   for(unsigned int i = 1; i < kinematicChains.size(); ++i)
   {
@@ -80,7 +92,7 @@ ForwardInverseWidget::ForwardInverseWidget(const std::vector<KinematicChainPtr> 
     // here, at least we make sure that the number of joints is the same
     if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
     {
-      cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << endl;
+      std::cout << "KinematicChainWidget: Error, kinematic chains do not have the same number of joints!" << std::endl;
       CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
     }
   }
@@ -262,7 +274,7 @@ void ForwardInverseWidget::updateJointValue()
       // value == NaN ?
       if(value != value)
       {
-      	cout << "Invalid values from inverse kinematics!" << endl;
+      	std::cout << "Invalid values from inverse kinematics!" << std::endl;
         return;
       }
     }
@@ -288,7 +300,8 @@ void ForwardInverseWidget::updateJointValue()
     break;
 
   default:
-    cout << "Error: I was not able to determine the corresponding working mode for this signal. This should never happen!" << endl;
+    std::cout << "Error: I was not able to determine the corresponding working mode for this signal. This should never happen!"
+      << std::endl;
   }
 
   return;
@@ -324,14 +337,14 @@ void ForwardInverseWidget::initWindow()
     connect(doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(updateJointValue(void)));
   }
 
-  vector<string> labels;
-  labels.push_back(string("x [m]"));
-  labels.push_back(string("y [m]"));
-  labels.push_back(string("z [m]"));
-  labels.push_back(string("phi"));
-  labels.push_back(string("theta"));
-  labels.push_back(string("gamma"));
-  labels.push_back(string("elbow"));
+  std::vector<std::string> labels;
+  labels.push_back("x [m]");
+  labels.push_back("y [m]");
+  labels.push_back("z [m]");
+  labels.push_back("phi");
+  labels.push_back("theta");
+  labels.push_back("gamma");
+  labels.push_back("elbow");
   //string string_xyz = string("xyz");
   QLabel *label;
 

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -19,114 +19,91 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet Bochum
-                    Institut fuer Neuroinformatik
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
- ----- File:        main.cpp
+    File:        FileParameter.h
 
- ----- Author:      Hendrik Reimann
- ----- Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 11 26
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 01 18
 
- ----- Description: Tests cedar::aux::gl::Chessboard class
+    Description:
 
- ----- Credits:
- ---------------------------------------------------------------------------------------------------------------------*/
+    Credits:
 
-// LOCAL INCLUDES
+======================================================================================================================*/
 
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Chessboard.h"
-#include "cedar/auxiliaries/LogFile.h"
+#ifndef CEDAR_AUX_GUI_FILE_PARAMETER_H
+#define CEDAR_AUX_GUI_FILE_PARAMETER_H
+
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
-#include <string>
+#include <QLineEdit>
 
 
-int main(int, char**)
+/*!@brief A widget for a cedar::aux::DirectoryParameter.
+ */
+class cedar::aux::gui::FileParameter : public cedar::aux::gui::Parameter
 {
-  // the number of errors encountered in this test
-  int errors = 0;
-
-  // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  cedar::aux::gl::Chessboard test_chessboard(p_object);
-  cedar::aux::gl::Chessboard chessboard(p_object, 1, 2, 3, 5, 500);
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
+  Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
-  // length
+  // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: length" << std::endl;
-  chessboard.setLength(10.1);
-  if (chessboard.length() != 10.1)
-  {
-    errors++;
-    std::cout << "ERROR with setLength() or length()" << std::endl;
-  }
+public:
+  //!@brief The standard constructor.
+  FileParameter(QWidget *pParent = NULL);
+
+  //!@brief Destructor
+  virtual ~FileParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
-  // width
+  // public methods
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: width" << std::endl;
-  chessboard.setWidth(11.1);
-  if (chessboard.width() != 11.1)
-  {
-    errors++;
-    std::cout << "ERROR with setWidth() or width()" << std::endl;
-  }
+public:
+
+public slots:
+  /*!@brief Handles a click on the browse button.
+   */
+  void onBrowseClicked();
+
+  /*!@brief Handles a changed parameter pointer.
+   */
+  void parameterPointerChanged();
+
+  /*!@brief Handles a change in the value of the parameter.
+   */
+  void parameterValueChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
-  // height
+  // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: height" << std::endl;
-  chessboard.setHeight(111);
-  if (chessboard.height() != 111.0)
-  {
-    errors++;
-    std::cout << "ERROR with setHeight() or height()" << std::endl;
-  }
+protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
-  // rows
+  // private methods
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: rows" << std::endl;
-  chessboard.setNumberOfRows(32);
-  if (chessboard.numberOfRows() != 32)
-  {
-    errors++;
-    std::cout << "ERROR with setNumberOfRows() or numberOfRows()" << std::endl;
-  }
-  
-  //--------------------------------------------------------------------------------------------------------------------
-  // columns
-  //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: columns" << std::endl;
-  chessboard.setNumberOfColumns(32);
-  if (chessboard.numberOfColumns() != 32)
-  {
-    errors++;
-    std::cout << "ERROR with setNumberOfColumns() or numberOfColumns()" << std::endl;
-  }
+private:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
-  // second color
+  // members
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: second color" << std::endl;
-  chessboard.setSecondColor(0.3, 1, sqrt(2.0)/2);
-  if (
-      chessboard.secondColorR() != 0.3
-      || chessboard.secondColorG() != 1.0
-      || chessboard.secondColorB() != sqrt(2.0)/2
-      )
-  {
-    errors++;
-    std::cout << "ERROR with setSecondColor or secondColorR/G/B" << std::endl;
-  }
-  
-  std::cout << "test finished, there were " << errors << " errors" << std::endl;
-  if (errors > 255)
-  {
-    errors = 255;
-  }
-  return errors;
-}
+protected:
+  // none yet
+private:
+  //! QLineEdit used for displaying the parameter value.
+  QLineEdit *mpEdit;
+
+}; // class cedar::aux::gui::FileParameter
+
+#endif // CEDAR_AUX_GUI_FILE_PARAMETER_H
+

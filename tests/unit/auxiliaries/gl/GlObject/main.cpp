@@ -44,8 +44,6 @@
 #include <string>
 #include <math.h>
 
-using namespace cedar::tests::unit::aux::gl::Object;
-using namespace cedar::aux;
 
 int main(int, char**)
 {
@@ -54,7 +52,7 @@ int main(int, char**)
   
   // create instance of test class
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object);
-  TestObject gl_object(p_object);
+  cedar::tests::unit::aux::gl::Object::TestObject gl_object(p_object);
   
   //--------------------------------------------------------------------------------------------------------------------
   // wire frame

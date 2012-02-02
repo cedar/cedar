@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,63 +22,121 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CommunicationWidget.h
+    File:        FileParameter.h
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
-    Date:        2011 03 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 01 18
 
-    Description: Graphical User Interface for testing the class Communication.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
-#define CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+#ifndef CEDAR_AUX_FILE_PARAMETER_H
+#define CEDAR_AUX_FILE_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/communication/Communication.h"
-#include "cedar/devices/communication/gui/ui_CommunicationWidget.h"
-#include "cedar/devices/communication/gui/namespace.h"
-#include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <Qt>
-#include <QString>
+#include <QDir>
+#include <string>
 
-/*!@brief Graphical User Interface for testing the class Communication.
- *
- * Type the string to be sent into 'command' and click 'send'. The answer of the device is then displayed in 'answer'.
+
+/*!@brief A parameter for directories on the file system.
  */
-class cedar::dev::com::gui::CommunicationWidget : public cedar::aux::gui::BaseWidget, private Ui_CommunicationWidget
+class cedar::aux::FileParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
-private:
-  Q_OBJECT
+public:
+  /*!@brief The mode of the file.
+   *
+   * This mode is used to declare what you intend to do with this file, i.e., read it or write it. Mainly, this is used
+   * to decide whether to show an "open file" or a "save file" dialog.
+   */
+  enum Mode
+  {
+    READ,
+    WRITE
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructs the GUI.
-  //!@param peCommunication Pointer to the communication-class to be tested.
-  CommunicationWidget(cedar::dev::com::Communication *peCommunication);
+  //!@brief The standard constructor.
+  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode)
+  :
+  cedar::aux::Parameter(pOwner, name, false),
+  mMode(mode)
+  {
+  }
 
-  //!@brief Destructs the GUI.
-  virtual ~CommunicationWidget();
+  //!@brief A variant of the standard constructor, adding a default value
+  FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode, const std::string& defaultValue)
+  :
+  cedar::aux::Parameter(pOwner, name, true),
+  mDefault(QString::fromStdString(defaultValue)),
+  mMode(mode)
+  {
+  }
+
+  //!@brief Destructor
+  ~FileParameter()
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
-public slots:
-  /*!@brief Sends the string.
-   *
-   * This function calls 'send' of the linked communication class with the string typed into 'command' as parameter.
-   */
-  void send();
+public:
+  //!@brief reads a directory from a configuration node
+  void setTo(const cedar::aux::ConfigurationNode& node)
+  {
+    this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
+  }
+
+  //!@brief stores a directory as string in a configuration node
+  void putTo(cedar::aux::ConfigurationNode& root) const
+  {
+    root.put(this->getName(), this->mValue.absolutePath().toStdString());
+  }
+
+  //!@brief sets a new directory from string
+  void set(const std::string& value)
+  {
+    this->mValue.setPath(QString::fromStdString(value));
+    emit valueChanged();
+  }
+
+  //!@brief sets a new directory from QDir
+  void set(const QDir& value)
+  {
+    this->mValue = value;
+    emit valueChanged();
+  }
+
+  //!@brief sets directory to default value
+  void makeDefault()
+  {
+    this->set(this->mDefault);
+  }
+
+  //!@brief get the directory
+  const QDir& getValue() const
+  {
+    return this->mValue;
+  }
+
+  Mode getMode() const
+  {
+    return this->mMode;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,10 +155,15 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
-
 private:
-  // pointer to the Communication-class.
-  cedar::dev::com::Communication *mpeCommunication;
-}; // class cedar::dev::com::gui::CommunicationWidget
-#endif // CEDAR_DEV_COM_GUI_COMMUNICATION_WIDGET_H
+  //!@brief The selected file path.
+  QDir mValue;
 
+  //!@brief The default file.
+  QDir mDefault;
+
+  //!@brief Mode of the file
+  Mode mMode;
+}; // class cedar::aux::DirectoryParameter
+
+#endif // CEDAR_AUX_FILE_PARAMETER_H

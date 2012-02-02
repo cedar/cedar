@@ -1,31 +1,43 @@
-/*--------------------------------------------------------------------------
- ----- Institute:   	Ruhr-Universitaet-Bochum
- Institut fuer Neuroinformatik
+/*======================================================================================================================
 
- ----- File:			iiClosedFormInverseKinematics.cpp
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
 
- ----- Author:			Ioannis Iossifidis
- iossifidis@neuroinformatik.rub.de
+    This file is part of cedar.
 
- ----- Date:       	13 Σεπ 2009
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
 
- ----- Description:
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
 
- ----- Copyright:   	(c) Ioannis Iossifidis 13 Σεπ 2009
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
 
- ----- Warranties:		Of course, there's NO WARRANTY OF ANY KIND :-)
+========================================================================================================================
 
- ----- Credits:
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
 
- ----- Project:		hrOpenChainManipulatorLib
+    File:        iiClosedFormInverseKinematics.cpp
 
- --------------------------------------------------------------------------*/
+    Maintainer:  Bjoern Weghenkel
+    Email:       bjoern.weghenkel@ini.ruhr-uni-bochum.de
+    Date:        2011 05 13
+
+    Description: Inverse kinematics for the Cora arm.
+
+    Credits: Ioannis Iossifidis
+
+======================================================================================================================*/
+
 
 #include <iostream>
 #include "iiClosedFormInverseKinematics.hpp"
 
-using namespace std;
-using namespace cv;
 
 ClosedFormInverseKinematics::ClosedFormInverseKinematics()
 {
@@ -41,24 +53,24 @@ ClosedFormInverseKinematics::~ClosedFormInverseKinematics()
 
 void ClosedFormInverseKinematics::InitVariables()
 {
-  mP_u = Mat::zeros(3, 1, CV_64FC1);	// uperarm vector
-  mP_f = Mat::zeros(3, 1, CV_64FC1);	// forearm vector
-  mP_h = Mat::zeros(3, 1, CV_64FC1);	// hand vector
-  mP_g = Mat::zeros(3, 1, CV_64FC1);	// gripper vector
-  mP_W = Mat::zeros(3, 1, CV_64FC1);	// wrist vector
-  mP_T = Mat::zeros(3, 1, CV_64FC1);	// vector to the endeffector
+  mP_u = cv::Mat::zeros(3, 1, CV_64FC1);	// uperarm vector
+  mP_f = cv::Mat::zeros(3, 1, CV_64FC1);	// forearm vector
+  mP_h = cv::Mat::zeros(3, 1, CV_64FC1);	// hand vector
+  mP_g = cv::Mat::zeros(3, 1, CV_64FC1);	// gripper vector
+  mP_W = cv::Mat::zeros(3, 1, CV_64FC1);	// wrist vector
+  mP_T = cv::Mat::zeros(3, 1, CV_64FC1);	// vector to the endeffector
 
   /* mJointAngle(0) denotes the trunk angle
    * and mJointAngle(1) to mJointAngle(8) the angles for the
    * remaining joints*/
-  mJointAngle = Mat::zeros(8, 1, CV_64FC1);
+  mJointAngle = cv::Mat::zeros(8, 1, CV_64FC1);
 
   /* This should replaced by an configFile in odrder to handle flexible different robotarm configurations*/
-  mTrunk    = Mat::zeros(3, 1, CV_64FC1);
-  mShoulder = Mat::zeros(3, 1, CV_64FC1);
-  mUperArm  = Mat::zeros(3, 1, CV_64FC1);
-  mForeArm  = Mat::zeros(3, 1, CV_64FC1);
-  mEef      = Mat::zeros(3, 1, CV_64FC1);
+  mTrunk    = cv::Mat::zeros(3, 1, CV_64FC1);
+  mShoulder = cv::Mat::zeros(3, 1, CV_64FC1);
+  mUperArm  = cv::Mat::zeros(3, 1, CV_64FC1);
+  mForeArm  = cv::Mat::zeros(3, 1, CV_64FC1);
+  mEef      = cv::Mat::zeros(3, 1, CV_64FC1);
 
   mTrunk.at<double>(2, 0)    = 420.5;//400;
   mShoulder.at<double>(0, 0) = 225;
@@ -70,15 +82,15 @@ void ClosedFormInverseKinematics::InitVariables()
   /* Task coordinates
    * Pos in 		[mm]
    * Angles in 	[deg]*/
-  mTaskCoordinates.Pos = Mat::zeros(3, 1, CV_64FC1);
-  mTaskCoordinates.eefOrientationAngle = Mat::zeros(3, 1, CV_64FC1);
+  mTaskCoordinates.Pos = cv::Mat::zeros(3, 1, CV_64FC1);
+  mTaskCoordinates.eefOrientationAngle = cv::Mat::zeros(3, 1, CV_64FC1);
 }
 
 
 void ClosedFormInverseKinematics::Rx(double rotAngle, cv::Mat* pRotMatX)
 {
 
-  (* pRotMatX ) = Mat::zeros(3, 3, CV_64FC1);
+  (* pRotMatX ) = cv::Mat::zeros(3, 3, CV_64FC1);
 
   (* pRotMatX ).at<double>(0,0) = 1;
   (* pRotMatX ).at<double>(1,1) = cos(rotAngle);
@@ -93,7 +105,7 @@ void ClosedFormInverseKinematics::Rx(double rotAngle, cv::Mat* pRotMatX)
 void ClosedFormInverseKinematics::Ry(double rotAngle, cv::Mat* pRotMatY)
 {
 
-  (* pRotMatY ) = Mat::zeros(3, 3, CV_64FC1);
+  (* pRotMatY ) = cv::Mat::zeros(3, 3, CV_64FC1);
 
   (* pRotMatY ).at<double>(0,0) = cos(rotAngle);
   (* pRotMatY ).at<double>(0,2) = sin(rotAngle);
@@ -108,7 +120,7 @@ void ClosedFormInverseKinematics::Ry(double rotAngle, cv::Mat* pRotMatY)
 void ClosedFormInverseKinematics::Rz(double rotAngle, cv::Mat* pRotMatZ)
 {
 
-  (*pRotMatZ) = Mat::zeros(3, 3, CV_64FC1);
+  (*pRotMatZ) = cv::Mat::zeros(3, 3, CV_64FC1);
 
 
   (*pRotMatZ).at<double>(0,0) = cos(rotAngle);
@@ -123,13 +135,13 @@ void ClosedFormInverseKinematics::Rz(double rotAngle, cv::Mat* pRotMatZ)
 
 int ClosedFormInverseKinematics::TaskCoordinatesToArmGeometry()
 {
-	Mat eefVector = Mat::zeros(3,1,CV_64FC1);
-	Mat rotX = Mat::zeros(3,3,CV_64FC1);
-	Mat rotX2 = Mat::zeros(3,3,CV_64FC1);
-	Mat rotY = Mat::zeros(3,3,CV_64FC1);
-  Mat rotY2 = Mat::zeros(3,3,CV_64FC1);
-	Mat rotZ = Mat::zeros(3,3,CV_64FC1);
-	Mat e_z_unit = Mat::zeros(3,1,CV_64FC1);
+	cv::Mat eefVector = cv::Mat::zeros(3,1,CV_64FC1);
+	cv::Mat rotX = cv::Mat::zeros(3,3,CV_64FC1);
+	cv::Mat rotX2 = cv::Mat::zeros(3,3,CV_64FC1);
+	cv::Mat rotY = cv::Mat::zeros(3,3,CV_64FC1);
+  cv::Mat rotY2 = cv::Mat::zeros(3,3,CV_64FC1);
+	cv::Mat rotZ = cv::Mat::zeros(3,3,CV_64FC1);
+	cv::Mat e_z_unit = cv::Mat::zeros(3,1,CV_64FC1);
 
   e_z_unit.at<double>(2, 0) = 1;
 
@@ -168,7 +180,7 @@ int ClosedFormInverseKinematics::TaskCoordinatesToArmGeometry()
   /* From this section the calculation are related to the attached technical report*/
 
   // eef vector
-  Mat p_m = Mat::zeros(3,1,CV_64FC1);// vector to middle of the redundancy circle
+  cv::Mat p_m = cv::Mat::zeros(3,1,CV_64FC1);// vector to middle of the redundancy circle
   //CvMAT p_w = CvMAT(3,1,CV_64FC1);// wrist vector
 
   mP_T = mCalculatedHandState.eefPos; // using the offset cleaned endeffctor postion
@@ -237,9 +249,9 @@ int ClosedFormInverseKinematics::TaskCoordinatesToArmGeometry()
 
 double ClosedFormInverseKinematics::CalcTrunkAng()
 {
-	Mat rotX = Mat::zeros(3, 3, CV_64FC1);
-	Mat rotY = Mat::zeros(3, 3, CV_64FC1);
-	Mat rotZ = Mat::zeros(3, 3, CV_64FC1);
+	cv::Mat rotX = cv::Mat::zeros(3, 3, CV_64FC1);
+	cv::Mat rotY = cv::Mat::zeros(3, 3, CV_64FC1);
+	cv::Mat rotZ = cv::Mat::zeros(3, 3, CV_64FC1);
 
 //	printf("CalcTrunkAng()\n\n");
 	/* Endeffector  orientation
@@ -268,9 +280,9 @@ double ClosedFormInverseKinematics::CalcTrunkAng()
 
 void ClosedFormInverseKinematics::InverseKinematics()
 {
-	Mat rotX = Mat::zeros(3, 3, CV_64FC1);
-	Mat rotY = Mat::zeros(3, 3, CV_64FC1);
-	Mat rotZ = Mat::zeros(3, 3, CV_64FC1);
+	cv::Mat rotX = cv::Mat::zeros(3, 3, CV_64FC1);
+	cv::Mat rotY = cv::Mat::zeros(3, 3, CV_64FC1);
+	cv::Mat rotZ = cv::Mat::zeros(3, 3, CV_64FC1);
 
 	TaskCoordinatesToArmGeometry();
 	/*Calculate joint angle 1 and 2*/
@@ -288,7 +300,7 @@ void ClosedFormInverseKinematics::InverseKinematics()
 	Rx(-mJointAngle.at<double>(1, 0), &rotX);
 	Rz(-mJointAngle.at<double>(2, 0), &rotZ);
 
-	Mat TrafoElbowCS = rotZ * rotX;
+	cv::Mat TrafoElbowCS = rotZ * rotX;
 	mP_f = TrafoElbowCS * mP_f;
 
 	mJointAngle.at<double>(3, 0) = atan2(mP_f.at<double>(2, 0), mP_f.at<double>(1, 0));
@@ -303,7 +315,7 @@ void ClosedFormInverseKinematics::InverseKinematics()
 
 	Rx(-mJointAngle.at<double>(3, 0), &rotX);
 	Rz(-mJointAngle.at<double>(4, 0), &rotZ);
-	Mat TrafoWristCS = rotZ * rotX;
+	cv::Mat TrafoWristCS = rotZ * rotX;
 
 	mP_h =  TrafoWristCS * TrafoElbowCS * mP_h;
 	mJointAngle.at<double>(5, 0) = atan2(mP_h.at<double>(2, 0), mP_h.at<double>(1, 0));
@@ -315,7 +327,7 @@ void ClosedFormInverseKinematics::InverseKinematics()
 	/* calculation of the angle 7*/
 	Rx(-mJointAngle.at<double>(5, 0), &rotX);
 	Rz(-mJointAngle.at<double>(6, 0), &rotZ);
-	Mat TrafoEefCS = rotZ * rotX;
+	cv::Mat TrafoEefCS = rotZ * rotX;
 
 	mP_g =  TrafoEefCS * TrafoWristCS * TrafoElbowCS * mP_g;
 	mJointAngle.at<double>(7, 0) = atan2(mP_g.at<double>(2, 0), mP_g.at<double>(1, 0));
@@ -327,20 +339,20 @@ void ClosedFormInverseKinematics::InverseKinematics()
 
 void ClosedFormInverseKinematics::printMatrix(cv::Mat& mat, const char* name)
 {
-  cout << name << ":" << endl;
+  std::cout << name << ":" << std::endl;
 
   for(int i = 0; i < mat.size().height; ++i)
   {
-    cout << "|\t";
+    std::cout << "|\t";
 
     for(int j = 0; j < mat.size().width; ++j)
     {
-      cout << mat.at<double>(i, j) << "\t";
+      std::cout << mat.at<double>(i, j) << "\t";
     }
 
-    cout << "|" << endl;
+    std::cout << "|" << std::endl;
   }
 
-  cout << endl;
+  std::cout << std::endl;
   return;
 }

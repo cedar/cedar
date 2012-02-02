@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Mathis Richter
-#   Email:       mathis.richter@ini.rub.de
-#   Date:        2010 11 29
+#   Maintainer:  Stephan Zibner
+#   Email:       stephan.zibner@rub.de
+#   Date:        2012 01 31
 #
 #   Description:
 #
@@ -34,34 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_library(cedaraux
-  MOC_HEADERS
-  Object.h
-  gl/Object.h
-  gui/BaseWidget.h
-  gui/BoolParameter.h
-  gui/DataPlotInterface.h
-  gui/DataPlotter.h
-  gui/DirectoryParameter.h
-  gui/DoubleParameter.h
-  gui/DoubleVectorParameter.h
-  gui/EnumParameter.h
-  gui/FileParameter.h
-  gui/Parameter.h
-  gui/Viewer.h
-  gui/SceneWidget.h
-  gui/HistoryPlot.h
-  gui/HistoryPlot0D.h
-  gui/MatrixPlot.h
-  gui/MatrixPlot1D.h
-  gui/MatrixPlot2D.h
-  gui/ImagePlot.h
-  gui/StringParameter.h
-  gui/UIntParameter.h
-  gui/UIntVectorParameter.h
-  Parameter.h
-  kernel/Kernel.h
-  kernel/Gauss.h
-  LINK_LIBRARIES
-  cedarunits
+cedar_add_unit_test(Configurable
+  main.cpp
 )

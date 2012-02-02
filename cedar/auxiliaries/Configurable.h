@@ -50,10 +50,11 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 
 /*!@brief An interface for classes that can store and load parameters from files.
  */
-class cedar::aux::Configurable
+class cedar::aux::Configurable : public boost::noncopyable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // friends
@@ -86,19 +87,31 @@ public:
 public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
   /*!@brief create a tree of type cedar::aux::ConfigurationNode from a json file and try to read the configuration
    * afterward
    */
   void readJson(const std::string& filename);
+
+  /*!@brief   Reads the configuration from an INI file.
+   *
+   * @remarks This method is used for providing downard compatibility to the old config interface. Please don't use it
+   *          for anything else!
+   */
+  void readOldConfig(const std::string& filename);
+
   //!@brief write a configuration for all registered parameters to a root node of type cedar::aux::ConfigurationNode
   virtual void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
   //!@brief write a configuration to a cedar::aux::ConfigurationNode tree and store this tree in a json file
   void writeJson(const std::string& filename) const;
+
   //!@brief get a map of all children of the current Configurable
   const Children& configurableChildren() const;
 
   //!@brief get a const list of all parameters registered at this Configurable
   const ParameterList& getParameters() const;
+
   //!@brief get a list of all parameters registered at this Configurable
   ParameterList& getParameters();
 
@@ -117,6 +130,10 @@ public:
    */
   void resetChangedStates(bool newChangedFlagValue) const;
 
+  void copyFrom(ConstConfigurablePtr src);
+
+  void copyTo(ConfigurablePtr target) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -132,6 +149,9 @@ private:
    * Configurable
    */
   void registerParameter(cedar::aux::ParameterPtr parameter);
+
+  //!@brief Transforms the old config format to one readable in the new interface.
+  void oldFormatToNew(cedar::aux::ConfigurationNode& node);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

@@ -38,11 +38,7 @@
 #define CEDAR_AUX_STRING_FUNCTIONS_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/auxiliaries/debug/lib.h"
-#else
-  #include "cedar/auxiliaries/release/lib.h"
-#endif
+#include "cedar/auxiliaries/lib.h"
 
 // SYSTEM INCLUDES
 #include <vector>

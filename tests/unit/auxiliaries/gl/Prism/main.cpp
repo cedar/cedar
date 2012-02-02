@@ -41,9 +41,6 @@
 // SYSTEM INCLUDES
 #include <string>
 
-using namespace cedar::aux;
-using namespace cedar::aux::gl;
-using namespace std;
 
 int main(int, char**)
 {
@@ -52,8 +49,8 @@ int main(int, char**)
 
   // test constructors
   cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  Prism testPrism(p_object);
-  Prism prism(p_object, 1, 2);
+  cedar::aux::gl::Prism testPrism(p_object);
+  cedar::aux::gl::Prism prism(p_object, 1, 2);
 
   //--------------------------------------------------------------------------------------------------------------------
   // width

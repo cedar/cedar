@@ -40,9 +40,6 @@
 #include <cstdlib>
 #include <iostream>
 
-using namespace std;
-using namespace boost::posix_time;
-
 //!@brief threaded test class
 class MyTestThread : public cedar::aux::LoopedThread {
 
@@ -57,15 +54,15 @@ public:
   MyTestThread(double stepSize, bool delay = false) : LoopedThread(stepSize) 
   {
     mArtificialDelay = delay;
-    srand(microsec_clock::universal_time().time_of_day().total_milliseconds());
+    srand(boost::posix_time::microsec_clock::universal_time().time_of_day().total_milliseconds());
   }
 
   void step(double time)
 	{
-    ptime now = microsec_clock::universal_time();
-    cout << "current time (sec/usec): " << now.time_of_day().seconds()
-         << " / " << now.time_of_day().total_microseconds() % 1000000
-         << " (time in step(): " << time << ")" << endl;
+    boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
+    std::cout << "current time (sec/usec): " << now.time_of_day().seconds()
+              << " / " << now.time_of_day().total_microseconds() % 1000000
+              << " (time in step(): " << time << ")" << std::endl;
     if( mArtificialDelay )
       usleep( rand() % (3*mStepSize.total_microseconds()) );
   }
@@ -99,27 +96,27 @@ int main()
   //thread.useFixedStepSize(false);
   //thread.setSimulatedTime(50);
 
-  cout << "Starting a thread and let it run for 1 seconds ..." << endl;
+  std::cout << "Starting a thread and let it run for 1 seconds ..." << std::endl;
   thread.start();
   thread.wait(1000);
-  cout << "Stopping thread ..." << endl;
+  std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 
-  cout << endl;
-  cout << "Starting thread again with an artificially unreliable execution time ..." << endl;
+  std::cout << std::endl;
+  std::cout << "Starting thread again with an artificially unreliable execution time ..." << std::endl;
   thread.setArtificalDelay(true);
   thread.start();
   thread.wait(1000);
-  cout << "Stopping thread ..." << endl;
+  std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
   thread.setArtificalDelay(false);
 
-  cout << endl;
-  cout << "Starting thread again with step size 0 for one millisecond ..." << endl;
+  std::cout << std::endl;
+  std::cout << "Starting thread again with step size 0 for one millisecond ..." << std::endl;
   thread.setStepSize(0);
   thread.start();
   thread.wait(1);
-  cout << "Stopping thread ..." << endl;
+  std::cout << "Stopping thread ..." << std::endl;
   thread.stop();
 
   return 0;

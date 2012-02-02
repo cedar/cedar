@@ -42,11 +42,7 @@
 #define CEDAR_UNITS_NAMESPACE_H
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/units/debug/lib.h"
-#else
-  #include "cedar/units/release/lib.h"
-#endif
+#include "cedar/units/lib.h"
 
 // SYSTEM INCLUDES
 #include <string>

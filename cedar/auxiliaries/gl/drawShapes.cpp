@@ -35,19 +35,13 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#ifdef DEBUG
-  #include "cedar/auxiliaries/debug/lib.h"
-#else
-  #include "cedar/auxiliaries/release/lib.h"
-#endif
+#include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/constants.h"
 
 // SYSTEM INCLUDES
-
-//using namespace cv;
 
 void cedar::aux::gl::setColor(double R, double G, double B)
 {

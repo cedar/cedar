@@ -104,13 +104,30 @@ public:
     return this->mIconPath;
   }
 
+  //!@brief Method for setting the description of the element.
+  void setDescription(const std::string& description)
+  {
+    this->mDescription = description;
+  }
+
+  //!@brief Returns the description of the element.
+  const std::string& getDescription() const
+  {
+    return this->mDescription;
+  }
+
   /*!@brief Reads some values such as the icon path from the configuration node.
    */
   virtual void read(const cedar::aux::ConfigurationNode& node)
   {
     if (node.find("icon") != node.not_found())
     {
-      this->mIconPath = node.get_child("icon").get_value<std::string>();
+      this->setIconPath(node.get_child("icon").get_value<std::string>());
+    }
+
+    if (node.find("description") != node.not_found())
+    {
+      this->setDescription(node.get_child("description").get_value<std::string>());
     }
   }
 
@@ -134,6 +151,9 @@ protected:
 private:
   //!@brief path to icon included in the graphical representation of this step
   std::string mIconPath;
+
+  //!@brief The description of the class.
+  std::string mDescription;
 };
 
 

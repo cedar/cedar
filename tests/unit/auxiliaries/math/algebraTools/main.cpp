@@ -42,9 +42,6 @@
 
 // SYSTEM INCLUDES
 
-using namespace cedar::aux;
-using namespace cedar::aux::math;
-using namespace std;
 
 int main()
 {
@@ -57,19 +54,19 @@ int main()
   quadric_coefficients[0] = -2;
   quadric_coefficients[1] = -1;
   quadric_coefficients[2] = 1;
-  std::vector<double> solutions_quadric = solveQuadric(quadric_coefficients);
+  std::vector<double> solutions_quadric = cedar::aux::math::solveQuadric(quadric_coefficients);
   if (
         (solutions_quadric.size() == 2)
         && (IsZero(solutions_quadric[0] - 2.0))
         && (IsZero(solutions_quadric[1] + 1.0))
     )
   {
-    std::cout << "working correctly: solveQuadric" << endl;
+    std::cout << "working correctly: solveQuadric" << std::endl;
   }
   else
   {
     errors++;
-    std::cout << "NOT working correctly: solveQuadric!" << endl;
+    std::cout << "NOT working correctly: solveQuadric!" << std::endl;
   }
 
   std::cout << "test: int solveCubic" << std::endl;
@@ -79,7 +76,7 @@ int main()
   cubic_coefficients[1] = 2;
   cubic_coefficients[2] = -5;
   cubic_coefficients[3] = 1;
-  std::vector<double> solutions_cubic = solveCubic(cubic_coefficients);
+  std::vector<double> solutions_cubic = cedar::aux::math::solveCubic(cubic_coefficients);
   if (
        (solutions_cubic.size() == 3)
        && (IsZero(solutions_cubic[0] - 4.0))
@@ -87,11 +84,11 @@ int main()
        && (IsZero(solutions_cubic[2] + 1.0))
     )
   {
-    std::cout << "working correctly: solveCubic" << endl;
+    std::cout << "working correctly: solveCubic" << std::endl;
   }
   else
   {
-    std::cout << "NOT working correctly: solveCubic!" << endl;
+    std::cout << "NOT working correctly: solveCubic!" << std::endl;
   }
 
   std::cout << "test: int solveQuartic" << std::endl;
@@ -103,7 +100,7 @@ int main()
   quartic_coefficients[3] = 16;
   quartic_coefficients[4] = 16;
 
-  std::vector<double> solutions_quartic = solveQuartic(quartic_coefficients);
+  std::vector<double> solutions_quartic = cedar::aux::math::solveQuartic(quartic_coefficients);
   if (
        (solutions_quartic.size() == 3)
        && (IsZero(solutions_quartic[0] - 1.0))
@@ -111,11 +108,11 @@ int main()
        && (IsZero(solutions_quartic[2] + 0.5))
      )
   {
-    std::cout << "working correctly: solveQuartic" << endl;
+    std::cout << "working correctly: solveQuartic" << std::endl;
   }
   else
   {
-    std::cout << "NOT working correctly: solveQuartic!" << endl;
+    std::cout << "NOT working correctly: solveQuartic!" << std::endl;
   }
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;

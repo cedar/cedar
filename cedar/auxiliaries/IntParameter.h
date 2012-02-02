@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,42 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        IntParameter.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 01 19
 
-    Description: Namespace file for cedar::dev::robot.
+    Description: This is a dummy header for the typedef IntParameter (which is actually a
+                 cedar::aux::NumericParameter<int>).
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_AMTEC_NAMESPACE_H
-#define CEDAR_DEV_AMTEC_NAMESPACE_H
+#ifndef CEDAR_AUX_INT_PARAMETER_H
+#define CEDAR_AUX_INT_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/devices/lib.h"
-#include "cedar/devices/robot/CMakeDefines.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/NumericParameter.h"
 
-// SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-
-namespace cedar
-{
-  namespace dev
-  {
-    /*! @brief Namespace for amtec implementation. */
-    namespace amtec
-    {
-#ifdef CEDAR_USE_AMTEC
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_DEV_CLASS(KinematicChain);
-      //!@endcond
-#endif // CEDAR_USE_AMTEC
-    }
-  }
-}
-
-#endif // CEDAR_DEV_AMTEC_NAMESPACE_H
+#endif // CEDAR_AUX_INT_PARAMETER_H

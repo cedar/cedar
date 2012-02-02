@@ -43,14 +43,13 @@
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
-using namespace cedar::tests::unit::aux::gl::Object;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-TestObject::TestObject(cedar::aux::ObjectPtr pObject)
+cedar::tests::unit::aux::gl::Object::TestObject::TestObject(cedar::aux::ObjectPtr pObject)
 :
 cedar::aux::gl::Object(pObject)
 {
@@ -58,7 +57,7 @@ cedar::aux::gl::Object(pObject)
 }
 
 //! destructor
-TestObject::~TestObject()
+cedar::tests::unit::aux::gl::Object::TestObject::~TestObject()
 {
 
 }
@@ -67,7 +66,7 @@ TestObject::~TestObject()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void TestObject::draw()
+void cedar::tests::unit::aux::gl::Object::TestObject::draw()
 {
 
 }

@@ -53,7 +53,6 @@
 // SYSTEM INCLUDES
 #include <iostream>
 
-using namespace cedar::aux;
 
 class TestModule : public cedar::proc::Step
 {

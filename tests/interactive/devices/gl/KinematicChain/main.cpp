@@ -49,29 +49,22 @@
 // SYSTEM INCLUDES
 #include <QApplication>
 
-using namespace std;
-using namespace cv;
-using namespace cedar::aux::gl;
-using namespace cedar::aux::gui;
-using namespace cedar::dev::robot::gl;
-using namespace cedar::dev::robot;
-
 
 int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new SimulatedKinematicChain(std::string("../tests/interactive/devices/gl/KinematicChain/test_arm.conf")));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain("../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
 
   // create model of simulated arm
-  KinematicChainModelPtr p_test_arm_model(new KinematicChainModel(p_test_arm));
+  cedar::dev::robot::KinematicChainModelPtr p_test_arm_model(new cedar::dev::robot::KinematicChainModel(p_test_arm));
 
   // create gl visualization object
   cedar::dev::robot::gl::KinematicChainPtr p_test_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_test_arm_model));
 
   // create scene and viewer to display the arm
-  ScenePtr p_scene(new cedar::aux::gl::Scene);
+  cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
 
@@ -79,12 +72,12 @@ int main(int argc, char **argv)
   p_scene->addObject(p_object);
 
   // create a simple viewer for the scene
-  Viewer viewer(p_scene);
+  cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
 
   // create a widget to control the scene
-  SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
+  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
   p_scene_widget->show();
 
   p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
