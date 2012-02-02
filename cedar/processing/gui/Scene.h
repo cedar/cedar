@@ -71,8 +71,12 @@ public:
 
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
   typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+
   //! Type for associating cedar::proc::Triggers to cedar::proc::gui::TriggerItem.
   typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
+
+  //! Type for associating cedar::proc::Networks to cedar::proc::gui::Networks.
+  typedef std::map<cedar::proc::Network*, cedar::proc::gui::Network*> NetworkMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -154,6 +158,18 @@ public:
    */
   void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
 
+  /*!@brief Adds a given network item to the scene.
+   */
+  cedar::proc::gui::Network* addNetwork
+  (
+    const QPointF& position,
+    cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
+  );
+
+  /*!@brief Adds a given network item to the scene.
+   */
+  void addNetworkItem(cedar::proc::gui::Network *pNetwork);
+
   /*!@brief Sets the current mode, i.e., selection, connecion etc.
    */
   void setMode(MODE mode, const QString& param = "");
@@ -194,6 +210,10 @@ public:
    */
   void setSnapToGrid(bool snap);
 
+  /*!@brief Adds actions to the menu that relate to network groups.
+   */
+  void networkGroupingContextMenuEvent(QMenu& menu);
+
   //--------------------------------------------------------------------------------------------------------------------
   // signals
   //--------------------------------------------------------------------------------------------------------------------
@@ -229,6 +249,15 @@ private:
    */
   void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
+  /*!@brief Adds the names of networks and their subnetworks to an action.
+   */
+  void addNetworkNames(QMenu* pMenu, cedar::proc::ConstNetworkPtr network) const;
+
+private slots:
+  void promoteElementToExistingGroup();
+
+  void promoteElementToNewGroup();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -258,6 +287,9 @@ private:
 
   //! The trigger map.
   TriggerMap mTriggerMap;
+
+  //! The network map.
+  NetworkMap mNetworkMap;
 
   //! The main window containing the scene.
   QMainWindow *mpMainWindow;

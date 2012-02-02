@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
+#include "cedar/processing/Connectable.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -60,7 +61,7 @@
  * @todo Add a slot which reacts to name changes of elements (update map of names to ptrs)
  * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
  */
-class cedar::proc::Network
+class cedar::proc::Network : public cedar::proc::Connectable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
