@@ -109,6 +109,15 @@ public:
 
   ~KinematicChainMonitorWidget();
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // Qt events
+  //--------------------------------------------------------------------------------------------------------------------
+  /*!@brief implementation of handling routine for Qt timer events
+   *
+   * @param    event
+   */
+  void timerEvent(QTimerEvent* event);
+
   //----------------------------------------------------------------------------
   // public methods
   //----------------------------------------------------------------------------
@@ -145,7 +154,6 @@ private:
   static const int mUpdateInterval = 100;
   std::vector<cedar::dev::robot::KinematicChainPtr> mpKinematicChains;
   QGridLayout *mpGridLayout;
-  QTimer *mpTimer;
   int mDecimals;
 };
 
