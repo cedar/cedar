@@ -72,6 +72,10 @@ mpMainWindow(pMainWindow)
   {
     mNetwork = cedar::proc::NetworkPtr(new cedar::proc::Network());
   }
+
+  this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
+                               | QGraphicsItem::ItemIsMovable
+                               );
 }
 
 cedar::proc::gui::Network::~Network()
@@ -84,12 +88,55 @@ cedar::proc::gui::Network::~Network()
 
 void cedar::proc::gui::Network::fitToContents()
 {
-  //!@todo Implement me!
+  qreal padding_top = static_cast<qreal>(0.0);
+  qreal padding_bottom = static_cast<qreal>(5.0);
+  qreal padding_left = static_cast<qreal>(1.0);
+  qreal padding_right = static_cast<qreal>(7.0);
+
+  // when no children are present, we cannot fit them
+  if (this->childItems().empty())
+  {
+    return;
+  }
+
+  QRectF bounds = this->childrenBoundingRect();
+
+  bounds.adjust(padding_left, padding_top, padding_right, padding_bottom);
+
+  this->setWidth(bounds.width());
+  this->setHeight(bounds.height());
+
+  QPointF offset(bounds.left(), bounds.top());
+  this->moveBy(offset.x(), offset.y());
+
+  for (int i = 0; i < this->childItems().size(); ++i)
+  {
+    this->childItems().at(i)->moveBy(-offset.x(), -offset.y());
+  }
 }
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
 {
-  //!@todo Implement me!
+  cedar::proc::ElementPtr element;
+  if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(pElement))
+  {
+    element = p_step->getStep();
+  }
+  else if (cedar::proc::gui::Network* p_network = dynamic_cast<cedar::proc::gui::Network*>(pElement))
+  {
+    element = p_network->network();
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled type in cedar::proc::gui::Network::addElement.");
+  }
+
+  this->network()->add(element);
+
+  if (this->scene() != NULL)
+  {
+    pElement->setParentItem(this);
+  }
 }
 
 const std::string& cedar::proc::gui::Network::getFileName() const

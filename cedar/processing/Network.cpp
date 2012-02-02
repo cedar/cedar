@@ -82,6 +82,37 @@ cedar::proc::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
+{
+  if (this->mElements.find(identifier) == this->mElements.end())
+  {
+    return identifier;
+  }
+
+  unsigned int count = 2;
+  std::string result;
+  do
+  {
+    result = identifier +  " " + cedar::aux::toString(count);
+    ++count;
+  }
+  while(this->mElements.find(result) != this->mElements.end());
+
+  return result;
+}
+
+void cedar::proc::Network::listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const
+{
+  subnetworks.clear();
+  for (ElementMap::const_iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    if (cedar::proc::ConstNetworkPtr network = boost::shared_dynamic_cast<const cedar::proc::Network>(iter->second))
+    {
+      subnetworks.insert(network);
+    }
+  }
+}
+
 void cedar::proc::Network::reset()
 {
   for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)

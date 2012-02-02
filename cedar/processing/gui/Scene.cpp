@@ -241,6 +241,7 @@ void cedar::proc::gui::Scene::networkGroupingContextMenuEvent(QMenu& menu)
 
 void cedar::proc::gui::Scene::addNetworkNames(QMenu* pMenu, cedar::proc::ConstNetworkPtr network) const
 {
+  typedef std::set<cedar::proc::ConstNetworkPtr> Subnetworks;
   QMenu* submenu;
   if (network == this->mNetwork->network())
   {
@@ -253,7 +254,14 @@ void cedar::proc::gui::Scene::addNetworkNames(QMenu* pMenu, cedar::proc::ConstNe
   QAction *p_add_action = submenu->addAction("add to this network");
   QObject::connect(p_add_action, SIGNAL(triggered()), this, SLOT(promoteElementToExistingGroup()));
 
-  //!@todo: Add subnetworks
+  submenu->addSeparator();
+
+  Subnetworks subnetworks;
+  network->listSubnetworks(subnetworks);
+  for (Subnetworks::iterator iter = subnetworks.begin(); iter != subnetworks.end(); ++iter)
+  {
+    this->addNetworkNames(submenu, *iter);
+  }
 }
 
 void cedar::proc::gui::Scene::promoteElementToExistingGroup()
@@ -274,7 +282,9 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       network_item->addElement(p_element);
     }
   }
-
+  std::string name = this->mNetwork->network()->getUniqueIdentifier("new Network");
+  network->setName(name);
+  this->mNetwork->addElement(network_item);
   network_item->fitToContents();
 }
 

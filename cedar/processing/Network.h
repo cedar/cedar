@@ -237,6 +237,17 @@ public:
    * in recursive call) */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
 
+  /*!@brief This method lists all networks that are children of this network.
+   */
+  void listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const;
+
+  /*!@brief Returns a unique identifier containing the given string.
+   *
+   *        If there is no element by the given name, then the identifier is returned, otherwise, it is extended by
+   *        appending a number.
+   */
+  std::string getUniqueIdentifier(const std::string& identifier) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
