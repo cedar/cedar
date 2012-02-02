@@ -145,6 +145,10 @@ public slots:
    */
   void showManagePluginsDialog();
 
+  /*!@brief Shows the settings dialog.
+   */
+  void showSettingsDialog();
+
   /*!@brief Toggles the snap to grid functionality.
    */
   void toggleGrid(bool toggled);

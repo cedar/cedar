@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,24 +22,34 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CMakeDefines.h.in
+    File:        main.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2011 12 16
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 01 31
 
-    Description: File template the CMakeDefines.h files are generated from.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-//!@todo Remove this file and set those variables in the CMake build system. 
+// CEDAR INCLUDES
+#include "cedar/processing/gui/UiSettings.h"
 
-// This file is used to make cmake variables available
-// in the c++ source files
-#ifndef CEDAR_DEVICES_CMAKE_DEFINES
-#define CEDAR_DEVICES_CMAKE_DEFINES
-#cmakedefine CEDAR_USE_AMTEC
-#cmakedefine CEDAR_USE_KUKA_LWR
-#endif
+// SYSTEM INCLUDES
+#include <QApplication>
+
+//------------------------------------------------------------------------------
+// methods
+//------------------------------------------------------------------------------
+
+int main(int argc , char ** argv)
+{
+  QApplication application(argc, argv);
+
+  cedar::proc::gui::UiSettings *p_settings = new cedar::proc::gui::UiSettings();
+  p_settings->show();
+
+  return application.exec();
+}

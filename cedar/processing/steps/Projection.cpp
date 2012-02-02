@@ -56,7 +56,7 @@
 cedar::aux::EnumType<cedar::proc::steps::Projection::CompressionType>
   cedar::proc::steps::Projection::CompressionType::mType;
 
-#ifndef MSVC
+#ifndef _MSC_VER
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::SUM;
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::AVERAGE;
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::MAXIMUM;

@@ -34,7 +34,7 @@
 
 ======================================================================================================================*/
 
-#ifdef CEDAR_FFTW
+#ifdef CEDAR_USE_FFTW
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/FastConvolution.h"
@@ -139,4 +139,4 @@ cv::Mat cedar::aux::conv::FastConvolution::padKernel(const cv::Mat& matrix, cons
   return output;
 }
 
-#endif // CEDAR_FFTW
+#endif // CEDAR_USE_FFTW

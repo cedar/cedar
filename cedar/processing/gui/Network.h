@@ -43,6 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
+#include "cedar/processing/gui/GraphicsBase.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/Network.h"
 
@@ -51,9 +52,10 @@
 
 /*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *
- * @todo More descriptions.
+ *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
+ *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
  */
-class cedar::proc::gui::Network
+class cedar::proc::gui::Network : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -64,7 +66,13 @@ class cedar::proc::gui::Network
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Network(QMainWindow *pMainWindow, cedar::proc::gui::Scene* pScene);
+  Network
+  (
+    QMainWindow *pMainWindow,
+    qreal width = 0,
+    qreal height = 0,
+    cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
+  );
 
   //!@brief Destructor
   ~Network();
@@ -84,10 +92,16 @@ public:
   cedar::proc::NetworkPtr network();
 
   //!@brief add all elements contained in this network to the scene
-  void addToScene();
+  void addElementsToScene(cedar::proc::gui::Scene* pScene);
 
   //!@brief get the current file, to which the network configuration can be saved
   const std::string& getFileName() const;
+
+  //!@brief Resizes the network to fit all its contents.
+  void fitToContents();
+
+  //!@brief Adds an element to the network.
+  void addElement(cedar::proc::gui::GraphicsBase *pElement);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

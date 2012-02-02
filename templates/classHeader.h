@@ -37,6 +37,9 @@
 #ifndef CEDAR_XXX_XXX_H
 #define CEDAR_XXX_XXX_H
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES

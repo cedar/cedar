@@ -47,14 +47,14 @@
 #include "cedar/auxiliaries/BoolParameter.h"
 
 // SYSTEM INCLUDES
-#ifndef WIN32
+#ifndef _WIN32
   #include <termios.h>
   #include <errno.h>
   #include <fcntl.h>
 #else
   // some dummy types for windows.
   struct termios {};
-#endif // WIN32
+#endif // _WIN32
 #include <QTime>
 
 /*!@brief This class provides a string-based communication with an external device using a Serial Port.
