@@ -66,3 +66,6 @@ syntax: regexp
 ^tests/unit/processing/ArchitectureIO/architecture1\.json$
 syntax: regexp
 ^cedar\.conf$
+
+syntax: regexp
+^tests/unit/processing/Network/Nested\.json$
