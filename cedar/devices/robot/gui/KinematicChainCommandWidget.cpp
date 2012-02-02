@@ -45,6 +45,7 @@
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QLabel>
 #include <QtGui/QRadioButton>
+#include <QtGui/QPushButton>
 
 //----------------------------------------------------------------------------
 // constructors and destructor
@@ -199,120 +200,156 @@ cedar::dev::robot::gui::KinematicChainCommandWidget::~KinematicChainCommandWidge
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::dev::robot::gui::KinematicChainCommandWidget::radioButtonAngleClicked()
+void cedar::dev::robot::gui::KinematicChainCommandWidget::timerEvent(QTimerEvent*)
+{
+  update();
+}
+
+void cedar::dev::robot::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
   for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
   {
-    mpKinematicChains[i]->stop();
-    mpKinematicChains[i]->setWorkingMode(KinematicChain::ANGLE);
+    mpKinematicChains[i]->setWorkingMode(static_cast<cedar::dev::robot::KinematicChain::ActionType>(mode));
   }
 }
 
+//void cedar::dev::robot::gui::KinematicChainCommandWidget::radioButtonAngleClicked()
+//{
+//  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+//  {
+//    mpKinematicChains[i]->stop();
+//    mpKinematicChains[i]->setWorkingMode(KinematicChain::ANGLE);
+//  }
+//}
+//
+//
+//void cedar::dev::robot::gui::KinematicChainCommandWidget::radioButtonVelocityClicked()
+//{
+//  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+//  {
+//    mpKinematicChains[i]->stop();
+//    mpKinematicChains[i]->setWorkingMode(KinematicChain::VELOCITY);
+//
+//    // here we check if velocity has to be integrated -- HR: shouldn't this be checked when setting the working mode?
+//    if(!mpKinematicChains[i]->setJointVelocity(0, 0.0))
+//    {
+//      mpKinematicChains[i]->start();
+//    }
+//  }
+//}
+//
+//
+//void cedar::dev::robot::gui::KinematicChainCommandWidget::radioButtonAccelerationClicked()
+//{
+//  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+//  {
+//    mpKinematicChains[i]->stop();
+//    mpKinematicChains[i]->setWorkingMode(KinematicChain::ACCELERATION);
+//
+//    // here we check if acceleration has to be integrated
+//    if(!mpKinematicChains[i]->setJointAcceleration(0, 0.0))
+//    {
+//      mpKinematicChains[i]->start();
+//    }
+//  }
+//}
 
-void cedar::dev::robot::gui::KinematicChainCommandWidget::radioButtonVelocityClicked()
+
+
+//void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoint()
+//{
+//  QDoubleSpinBox *sender = static_cast<QDoubleSpinBox*>(this->sender());
+//  int index_sender = mpGridLayout->indexOf(sender);
+//
+//  int row, column;
+//  int joint, mode;
+//  int dummy1, dummy2;
+//
+//  mpGridLayout->getItemPosition(index_sender, &row, &column, &dummy1, &dummy2);
+//  joint = row - 1;
+//  mode = column - 1;
+//
+//  double value = sender->value();
+//
+//  switch(mode)
+//  {
+//  case 0:
+//    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+//    {
+//      mpKinematicChains[i]->setJointAngle(joint, value);
+//    }
+//    break;
+//
+//  case 1:
+//    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+//    {
+//      mpKinematicChains[i]->setJointVelocity(joint, value);
+//    }
+//    break;
+//
+//  case 2:
+//    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+//    {
+//      mpKinematicChains[i]->setJointAcceleration(joint, value);
+//    }
+//    break;
+//
+//  default:
+//    std::cout << "Error: I was not able to determine the corresponding working mode for this signal. "
+//              << "This should never happen!" << std::endl;
+//  }
+//
+//  return;
+//}
+void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
 {
-  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+  std::vector<double> command_vector;
+  for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
   {
-    mpKinematicChains[i]->stop();
-    mpKinematicChains[i]->setWorkingMode(KinematicChain::VELOCITY);
-
-    // here we check if velocity has to be integrated -- HR: shouldn't this be checked when setting the working mode?
-    if(!mpKinematicChains[i]->setJointVelocity(0, 0.0))
-    {
-      mpKinematicChains[i]->start();
-    }
+    command_vector.push_back(mCommandBoxes[i]->value());
   }
-}
 
-
-void cedar::dev::robot::gui::KinematicChainCommandWidget::radioButtonAccelerationClicked()
-{
-  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
-  {
-    mpKinematicChains[i]->stop();
-    mpKinematicChains[i]->setWorkingMode(KinematicChain::ACCELERATION);
-
-    // here we check if acceleration has to be integrated
-    if(!mpKinematicChains[i]->setJointAcceleration(0, 0.0))
-    {
-      mpKinematicChains[i]->start();
-    }
-  }
-}
-
-
-
-void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoint()
-{
-  QDoubleSpinBox *sender = static_cast<QDoubleSpinBox*>(this->sender());
-  int index_sender = mpGridLayout->indexOf(sender);
-
-  int row, column;
-  int joint, mode;
-  int dummy1, dummy2;
-
-  mpGridLayout->getItemPosition(index_sender, &row, &column, &dummy1, &dummy2);
-  joint = row - 1;
-  mode = column - 1;
-
-  double value = sender->value();
-
-  switch(mode)
+  switch(mpModeBox->currentIndex())
   {
   case 0:
     for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
     {
-      mpKinematicChains[i]->setJointAngle(joint, value);
+      mpKinematicChains[i]->setJointAngles(command_vector);
     }
     break;
-
   case 1:
     for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
     {
-      mpKinematicChains[i]->setJointVelocity(joint, value);
+      mpKinematicChains[i]->setJointVelocities(command_vector);
     }
     break;
 
   case 2:
     for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
     {
-      mpKinematicChains[i]->setJointAcceleration(joint, value);
+      mpKinematicChains[i]->setJointAccelerations(command_vector);
     }
     break;
-
-  default:
-    std::cout << "Error: I was not able to determine the corresponding working mode for this signal. "
-              << "This should never happen!" << std::endl;
   }
-
-  return;
 }
-
 
 void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
 {
-  // layout sketch:
-  // mode selection by drop down box (label: 0, 0; box: 0, 1)
-  // then the command spin boxes, same layout as not
-  // then a "go" button (n+1, 0)
-  // maybe a "command continuously" checkbox (n+1, 1)
-  setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
+  setWindowTitle(QApplication::translate("KinematicChainWindow", "Command"));
 
   mpGridLayout = new QGridLayout();
-  QRadioButton* radioButtonAngle = new QRadioButton(QApplication::translate("KinematicChainWindow", "Angle [rad]"));
-  QRadioButton* radioButtonVelocity = new QRadioButton(QApplication::translate("KinematicChainWindow", "Velocity [rad/s]"));
-  QRadioButton* radioButtonAcceleration = new QRadioButton(QApplication::translate("KinematicChainWindow", "Acceleration [rad/s^2]"));
-  mpGridLayout->addWidget(radioButtonAngle, 0, 0);
-  mpGridLayout->addWidget(radioButtonVelocity, 0, 2);
-  mpGridLayout->addWidget(radioButtonAcceleration, 0, 3);
-  connect(radioButtonAngle, SIGNAL(clicked()), this, SLOT(radioButtonAngleClicked()));
-  connect(radioButtonVelocity, SIGNAL(clicked()), this, SLOT(radioButtonVelocityClicked()));
-  connect(radioButtonAcceleration, SIGNAL(clicked()), this, SLOT(radioButtonAccelerationClicked()));
 
-  mpGridLayout->setColumnStretch(0,1);
-  mpGridLayout->setColumnStretch(1,2);
-  mpGridLayout->setColumnStretch(2,2);
-  mpGridLayout->setColumnStretch(3,2);
+  // mode selection
+  QLabel* mode_label = new QLabel(QApplication::translate("KinematicChainWindow", "mode:"));
+  mode_label->setAlignment(Qt::AlignRight);
+  mpGridLayout->addWidget(mode_label, 0, 0);
+  mpModeBox = new QComboBox();
+  mpModeBox->addItem(QString("pos"));
+  mpModeBox->addItem(QString("vel"));
+  mpModeBox->addItem(QString("acc"));
+  mpModeBox->setCurrentIndex(mpKinematicChains[0]->getWorkingMode());
+  mpGridLayout->addWidget(mpModeBox, 0, 1);
+  connect(mpModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeWorkingMode(int)));
 
   for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
   {
@@ -323,26 +360,27 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
     mpGridLayout->addWidget(label, i+1, 0);
 
     // add spinboxes
-    for(unsigned int j = 0; j < 3; ++j)
-    {
-      QDoubleSpinBox *doubleSpinBox = new QDoubleSpinBox();
-      doubleSpinBox->setRange(-999999.0, 999999.0);
-      doubleSpinBox->setValue(0.0);
-      doubleSpinBox->setDecimals(mDecimals);
-      doubleSpinBox->setSingleStep(mSingleStep);
-      mpGridLayout->addWidget(doubleSpinBox, i+1, j+1);
-      connect(doubleSpinBox, SIGNAL(editingFinished(void)), this, SLOT(commandJoint(void)));
-    }
+    QDoubleSpinBox* command_box = new QDoubleSpinBox();
+    command_box->setRange(-999999.0, 999999.0);
+    command_box->setValue(0.0);
+    command_box->setDecimals(mDecimals);
+    command_box->setSingleStep(mSingleStep);
+    mpGridLayout->addWidget(command_box, i+1, 1);
+    connect(command_box, SIGNAL(editingFinished(void)), this, SLOT(commandJoints(void)));
+    mCommandBoxes.push_back(command_box);
   }
 
-  radioButtonAngle->click();
+  QPushButton* move_button = new QPushButton(QApplication::translate("KinematicChainWindow", "move"));
+  mpGridLayout->addWidget(move_button, mpKinematicChains[0]->getNumberOfJoints()+1, 0);
+  connect(move_button, SIGNAL(pressed()), this, SLOT(commandJoints()));
+
+  mpGridLayout->setColumnStretch(0,1);
+  mpGridLayout->setColumnStretch(1,2);
   setLayout(mpGridLayout);
   setMaximumHeight(0);
+  startTimer(mUpdateInterval);
 
-  // start a timer to update the interface
-  mpTimer = new QTimer();
-  connect(mpTimer, SIGNAL(timeout()), this, SLOT(updateSpinBoxes()));
-  mpTimer->start(mUpdateInterval);
-
+  // todo: add a "command continuously" checkbox
+  // todo: add a "set to measured state" button -- or maybe it's sufficient to do this when the mode is changed
   return;
 }

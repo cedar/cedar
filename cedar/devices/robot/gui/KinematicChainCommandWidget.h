@@ -48,6 +48,7 @@
 #include <QtGui/QGridLayout>
 #include <QtGui/QComboBox>
 #include <QtGui/QWidget>
+#include <QtGui/QDoubleSpinBox>
 
 //!@brief A simple widget to command single joints
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
@@ -110,6 +111,15 @@ public:
 
   ~KinematicChainCommandWidget();
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // Qt events
+  //--------------------------------------------------------------------------------------------------------------------
+  /*!@brief implementation of handling routine for Qt timer events
+   *
+   * @param    event
+   */
+  void timerEvent(QTimerEvent* event);
+
   //----------------------------------------------------------------------------
   // public methods
   //----------------------------------------------------------------------------
@@ -134,10 +144,12 @@ private:
 
 private slots:
 
-  void radioButtonAngleClicked();
-  void radioButtonVelocityClicked();
-  void radioButtonAccelerationClicked();
-  void commandJoint();
+  void changeWorkingMode(int index);
+  void commandJoints();
+//  void radioButtonAngleClicked();
+//  void radioButtonVelocityClicked();
+//  void radioButtonAccelerationClicked();
+//  void commandJoint();
 
   //----------------------------------------------------------------------------
   // members
@@ -148,6 +160,7 @@ protected:
 private:
   static const int mUpdateInterval = 100;
   std::vector<cedar::dev::robot::KinematicChainPtr> mpKinematicChains;
+  std::vector<QDoubleSpinBox*> mCommandBoxes;
   QGridLayout *mpGridLayout;
   QTimer* mpTimer;
   QComboBox* mpModeBox;

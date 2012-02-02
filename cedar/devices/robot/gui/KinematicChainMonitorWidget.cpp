@@ -186,7 +186,7 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::timerEvent(QTimerEvent
 
 void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
 {
-  setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
+  setWindowTitle(QApplication::translate("KinematicChainWindow", "Monitor"));
 
   mpGridLayout = new QGridLayout();
   mpGridLayout->setColumnStretch(0,1);
