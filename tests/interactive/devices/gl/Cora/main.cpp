@@ -41,6 +41,7 @@
 #include "cedar/devices/robot/gl/CoraArm.h"
 #include "cedar/devices/robot/gl/CoraHead.h"
 #include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainCommandWidget.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -111,13 +112,16 @@ int main(int argc, char **argv)
   // create widgets
   cedar::dev::robot::gui::KinematicChainMonitorWidget monitor_widget_arm(p_cora_arm);
   cedar::dev::robot::gui::KinematicChainMonitorWidget monitor_widget_head(p_cora_head);
+  cedar::dev::robot::gui::KinematicChainCommandWidget command_widget_arm(p_cora_arm);
+  cedar::dev::robot::gui::KinematicChainCommandWidget command_widget_head(p_cora_head);
   monitor_widget_arm.show();
-  monitor_widget_head.show();
+//  monitor_widget_head.show();
+  command_widget_arm.show();
+//  command_widget_head.show();
 
   p_cora_arm_model->startTimer(50.0);
   p_cora_head_model->startTimer(50.0);
   p_cora_arm->start();
-  p_cora_head->start();
   viewer.startTimer(50);
   a.exec();
 
