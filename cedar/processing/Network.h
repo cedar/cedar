@@ -237,6 +237,8 @@ public:
    * in recursive call) */
   std::string findPath(cedar::proc::ConstElementPtr findMe) const;
 
+  void promoteSlot(DataSlotPtr promotedSlot);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

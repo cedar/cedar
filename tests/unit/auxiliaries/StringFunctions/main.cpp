@@ -151,8 +151,6 @@ int main()
 
   to_split = "SplitTestSeparatorAtEnd ";
   std::cout << "String to split: " << to_split << std::endl;
-  first;
-  rest;
   cedar::aux::splitFirst(to_split, " ", first, rest);
   std::cout << "Result with separator \" \": ";
   std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
@@ -173,8 +171,6 @@ int main()
 
   to_split = "SplitTestHasNoSeparator";
   std::cout << "String to split: " << to_split << std::endl;
-  first;
-  rest;
   cedar::aux::splitFirst(to_split, " ", first, rest);
   std::cout << "Result with separator \" \": ";
   std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
