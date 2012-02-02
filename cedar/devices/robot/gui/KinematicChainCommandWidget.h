@@ -33,7 +33,6 @@
     Credits:
 
 ======================================================================================================================*/
-#ifdef ioannis
 
 #ifndef CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_COMMAND_WIDGET_H
 #define CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_COMMAND_WIDGET_H
@@ -157,5 +156,3 @@ private:
 };
 
 #endif /* CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_COMMAND_WIDGET_H */
-
-#endif

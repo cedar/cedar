@@ -40,6 +40,7 @@ cedar_add_library(cedardev
   robot/KinematicChainModel.h
   robot/gui/KinematicChainWidget.h
   robot/gui/KinematicChainMonitorWidget.h
+  robot/gui/KinematicChainCommandWidget.h
   kteam/gui/EPuckControlWidget.h
   communication/gui/CommunicationWidget.h
   kuka/gui/FriStatusWidget.h
