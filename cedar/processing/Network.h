@@ -42,8 +42,8 @@
 #define CEDAR_PROC_NETWORK_H
 
 // CEDAR INCLUDES
-#include "cedar/processing/namespace.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -75,6 +75,7 @@ private:
 
   //! Type of the map of elements.
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
+
 public:
   //! Iterator type of the element map.
   typedef ElementMap::iterator ElementMapIterator;
@@ -230,6 +231,12 @@ public:
    */
   void reset();
 
+  /*!@brief Find the complete path of an element, if it exists in the tree structure
+   * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
+   * @todo instead of returning an empty string, this function should throw an exception (catch it internally
+   * in recursive call) */
+  std::string findPath(cedar::proc::ConstElementPtr findMe) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -263,6 +270,14 @@ private:
   /*!@brief Writes the triggers in the network to the configuration node.
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root);
+
+  /*!@brief Reads networks from a configuration node and adds them to the parent network.
+   */
+  void readNetworks(const cedar::aux::ConfigurationNode& root);
+
+  /*!@brief Writes the child networks in the network to the configuration node.
+   */
+  void writeNetworks(cedar::aux::ConfigurationNode& root);
 
   /*!@brief Reads a data connection from a configuration node and adds it to the network.
    */

@@ -80,7 +80,7 @@ int main()
   {
     if (result.at(0) != "Split" || result.at(1) != "Test")
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
@@ -100,7 +100,7 @@ int main()
   {
     if (result.at(0) != to_split)
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
@@ -120,10 +120,162 @@ int main()
   {
     if (result.at(0) != to_split)
     {
-      std::cout << "Error: split returned the wring result." << std::endl;
+      std::cout << "Error: split returned the wrong result." << std::endl;
       ++errors;
     }
   }
+
+  std::cout << "Testing splitFirst." << std::endl;
+
+  to_split = "Split Test Normal Case";
+  std::cout << "String to split: " << to_split << std::endl;
+  std::string first;
+  std::string rest;
+  cedar::aux::splitFirst(to_split, " ", first, rest);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
+  std::cout << std::endl;
+  if (first.length() == 0 || rest.length() == 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (first != "Split" || rest != "Test Normal Case")
+    {
+      std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = "SplitTestSeparatorAtEnd ";
+  std::cout << "String to split: " << to_split << std::endl;
+  first;
+  rest;
+  cedar::aux::splitFirst(to_split, " ", first, rest);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
+  std::cout << std::endl;
+  if (first.length() != to_split.length() - 1 || rest.length() != 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (first != "SplitTestSeparatorAtEnd" || rest != "")
+    {
+      std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = "SplitTestHasNoSeparator";
+  std::cout << "String to split: " << to_split << std::endl;
+  first;
+  rest;
+  cedar::aux::splitFirst(to_split, " ", first, rest);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << first << ", Second string: \"" << rest << "\"";
+  std::cout << std::endl;
+  if (first.length() != to_split.length() || rest.length() != 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (first != "SplitTestHasNoSeparator" || rest != "")
+    {
+      std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
+  std::cout << "Testing splitLast." << std::endl;
+
+  to_split = "Split Test Normal Case";
+  std::cout << "String to split: " << to_split << std::endl;
+  std::string last;
+  cedar::aux::splitLast(to_split, " ", rest, last);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << rest << ", Second string: \"" << last << "\"";
+  std::cout << std::endl;
+  if (rest.length() == 0 || last.length() == 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (rest != "Split Test Normal" || last != "Case")
+    {
+      std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = " SplitTestSeparatorAtBeginning";
+  std::cout << "String to split: " << to_split << std::endl;
+  cedar::aux::splitLast(to_split, " ", rest, last);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << rest << ", Second string: \"" << last << "\"";
+  std::cout << std::endl;
+  if (last.length() != to_split.length() - 1 || rest.length() != 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (last != "SplitTestSeparatorAtBeginning" || rest != "")
+    {
+      std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = "SplitTestSeparatorAtEnd ";
+  std::cout << "String to split: " << to_split << std::endl;
+  cedar::aux::splitLast(to_split, " ", rest, last);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << rest << ", Second string: \"" << last << "\"";
+  std::cout << std::endl;
+  if (last.length() != 0 || rest.length() != to_split.length() - 1)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (rest != "SplitTestSeparatorAtEnd" || last != "")
+    {
+      std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
+  to_split = "SplitTestHasNoSeparator";
+  std::cout << "String to split: " << to_split << std::endl;
+  cedar::aux::splitLast(to_split, " ", rest, last);
+  std::cout << "Result with separator \" \": ";
+  std::cout << "First string: " << rest << ", Second string: \"" << last << "\"";
+  std::cout << std::endl;
+  if (last.length() != to_split.length() || rest.length() != 0)
+  {
+    std::cout << "Error: split result has the wrong size." << std::endl;
+    ++errors;
+  }
+  else
+  {
+    if (last != "SplitTestHasNoSeparator" || rest != "")
+    {
+      std::cout << "Error: split returned the wrong result." << std::endl;
+      ++errors;
+    }
+  }
+
 
   // Join test ---------------------------------------------------------------------------------------------------------
   std::cout << "Testing joining of lists of strings." << std::endl;

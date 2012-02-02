@@ -92,6 +92,74 @@ namespace cedar
       parts.push_back(chunk);
     }
 
+    /*!@brief  Splits a string in two parts, up to the first occurrence of the separator.
+     *
+     *         For example, the string "This is an example" is split into the parts "This" and "is an example"] when
+     *         the separator " " is used.
+     *
+     * @param  str The string to split.
+     * @param  separator The separator.
+     * @param  first First part of the string.
+     * @param  rest Second part of the string - may contain separators.
+     *
+     * @remark If the separator is not found in \em str (e.g., if \em str is empty), the function will return the full
+     *         string in first and "" in rest.
+     */
+    inline void splitFirst
+                (
+                  const std::string& str,
+                  const std::string& separator,
+                  std::string& first,
+                  std::string& rest
+                )
+    {
+      size_t index = str.find(separator);
+      if (index != std::string::npos)
+      {
+        first = str.substr(0, index);
+        rest = str.substr(index + 1, std::string::npos);
+      }
+      else
+      {
+        first = str;
+        rest = "";
+      }
+    }
+
+    /*!@brief  Splits a string in two parts, up to the last occurrence of the separator.
+     *
+     *         For example, the string "This is an example" is split into the parts "This is an" and "example"] when
+     *         the separator " " is used.
+     *
+     * @param  str The string to split.
+     * @param  separator The separator.
+     * @param  rest First part of the string - may contain separators.
+     * @param  last Second part of the string.
+     *
+     * @remark If the separator is not found in \em str (e.g., if \em str is empty), the function will return the full
+     *         string in last and "" in rest.
+     */
+    inline void splitLast
+                (
+                  const std::string& str,
+                  const std::string& separator,
+                  std::string& rest,
+                  std::string& last
+                )
+    {
+      size_t index = str.rfind(separator);
+      if (index != std::string::npos)
+      {
+        rest = str.substr(0, index);
+        last = str.substr(index + 1, std::string::npos);
+      }
+      else
+      {
+        last = str;
+        rest = "";
+      }
+    }
+
     /*!@brief  Joins an iterable list of strings together.
      *
      * @tparam T               type of the container. This container should have a const_iterator where ++const_iterator
