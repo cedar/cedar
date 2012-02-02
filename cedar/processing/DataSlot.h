@@ -59,6 +59,8 @@ class cedar::proc::DataSlot
   friend class cedar::proc::Connectable;
   friend class cedar::proc::DataConnection;
   friend class cedar::proc::Network;
+  friend class cedar::proc::PromotedExternalData;
+  friend class cedar::proc::PromotedOwnedData;
 
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -121,27 +123,31 @@ public:
   //!@brief is this a mandatory connection? i.e. there must be at least one connection using this slot
   bool isMandatory() const;
 
+  //!@brief typo version of getValidity() const
+  CEDAR_DECLARE_DEPRECATED(VALIDITY getValidlity() const);
+
   //!@brief get the current validity of this slot
-  VALIDITY getValidlity() const;
+  virtual VALIDITY getValidity() const;
 
   //!@brief set the current validity of this slot
-  void setValidity(VALIDITY validity);
+  virtual void setValidity(VALIDITY validity);
 
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
+
+  void promote(cedar::proc::NetworkPtr network);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief set the internal DataPtr managed by this slot
+  virtual void setData(cedar::aux::DataPtr data) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief set the internal DataPtr managed by this slot
-  virtual void setData(cedar::aux::DataPtr data) = 0;
   //!@brief get the pointer of this slot's parent
   cedar::proc::Connectable* getParentPtr();
 

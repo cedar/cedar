@@ -45,6 +45,7 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/processing/MultiTrigger.h"
+#include "cedar/processing/Network.h"
 #include "cedar/processing/sources/GaussInput.h"
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/steps/Projection.h"
@@ -58,6 +59,16 @@ using cedar::proc::ElementDeclarationTemplate;
 
 cedar::proc::DeclarationRegistry::DeclarationRegistry()
 {
+  ElementDeclarationPtr network_decl(
+                                      new ElementDeclarationTemplate<cedar::proc::Network>
+                                      (
+                                        "Utilities",
+                                        "cedar.processing.Network"
+                                      )
+                                    );
+  network_decl->setIconPath(":/steps/resize.svg");
+  this->declareClass(network_decl);
+
   ElementDeclarationPtr trigger_declaration(
                                              new ElementDeclarationTemplate<cedar::proc::Trigger>
                                                                                            (

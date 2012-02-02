@@ -51,10 +51,6 @@
 // MACROS
 //#define DEBUG_TRIGGERING
 
-#ifdef DEBUG_TRIGGERING
-#  include "cedar/auxiliaries/System.h"
-#endif // DEBUG_TRIGGERING
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,9 +85,7 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
       if (step->setNextArguments(arguments))
       {
 #ifdef DEBUG_TRIGGERING
-        cedar::aux::System::mCOutLock.lockForWrite();
         std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
-        cedar::aux::System::mCOutLock.unlock();
 #endif // DEBUG_TRIGGERING
         this->mListeners.at(i)->onTrigger(this->shared_from_this());
       }
