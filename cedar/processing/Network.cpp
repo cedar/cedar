@@ -83,6 +83,37 @@ cedar::proc::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
+{
+  if (this->mElements.find(identifier) == this->mElements.end())
+  {
+    return identifier;
+  }
+
+  unsigned int count = 2;
+  std::string result;
+  do
+  {
+    result = identifier +  " " + cedar::aux::toString(count);
+    ++count;
+  }
+  while(this->mElements.find(result) != this->mElements.end());
+
+  return result;
+}
+
+void cedar::proc::Network::listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const
+{
+  subnetworks.clear();
+  for (ElementMap::const_iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    if (cedar::proc::ConstNetworkPtr network = boost::shared_dynamic_cast<const cedar::proc::Network>(iter->second))
+    {
+      subnetworks.insert(network);
+    }
+  }
+}
+
 void cedar::proc::Network::reset()
 {
   for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
@@ -580,6 +611,7 @@ void cedar::proc::Network::writeNetworks(cedar::aux::ConfigurationNode& networks
 #ifdef DEBUG_FILE_WRITING
       std::cout << "Saving " << iter->first << "." << std::endl;
 #endif
+      //cedar::proc::ElementDeclarationPtr decl = DeclarationRegistrySingleton::getInstance()->getDeclarationOf(trigger);
       cedar::aux::ConfigurationNode network_node;
       network->writeTo(network_node);
       networks.push_back(cedar::aux::ConfigurationNode::value_type(iter->first, network_node));
@@ -618,11 +650,7 @@ void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& roo
   }
 }
 
-void cedar::proc::Network::writeDataConnection
-(
-  cedar::aux::ConfigurationNode& root,
-  const cedar::proc::DataConnectionPtr connection
-)
+void cedar::proc::Network::writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection)
 {
   std::string source_str = connection->getSource()->getParent() + "." + connection->getSource()->getName();
   std::string target_str = connection->getTarget()->getParent() + "." + connection->getTarget()->getName();

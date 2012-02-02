@@ -41,16 +41,16 @@
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
 
-#if defined LINUX || defined APPLE
+#if defined __unix__
 #include <stdlib.h>
 #endif
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #include <Shlobj.h>
 #include <comutil.h>
 
 #pragma comment(lib, "comsuppw")
-#endif
+#endif // _WIN32
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,10 +74,10 @@ void cedar::aux::System::openCrashFile(std::ofstream& stream, std::string& crash
 
 std::string cedar::aux::System::getUserHomeDirectory()
 {
-#ifdef UNIX
+#ifdef __unix__
   std::string homedir = getenv("HOME");
   return homedir;
-#elif defined WINDOWS
+#elif defined _WIN32
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_CREATE, 0, &path)))
   {
@@ -98,9 +98,9 @@ std::string cedar::aux::System::getUserHomeDirectory()
 
 std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-#ifdef UNIX
+#ifdef __unix__
   return cedar::aux::System::getUserHomeDirectory();
-#elif defined WINDOWS
+#elif defined _WIN32
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, 0, &path)))
   {
@@ -114,7 +114,7 @@ std::string cedar::aux::System::getUserApplicationDataDirectory()
     //!@todo handle errors
   }
   return "";
-#else
+#else // _WIN32
 #error Implement me for this OS!
-#endif
+#endif // _WIN32
 }
