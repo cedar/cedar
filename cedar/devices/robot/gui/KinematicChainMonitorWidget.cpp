@@ -224,7 +224,6 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
   }
 
   setLayout(mpGridLayout);
-  setMaximumHeight(0);
 
   // start a timer to update the interface
   startTimer(mUpdateInterval);

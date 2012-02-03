@@ -72,7 +72,7 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, QWidget* parent = 0);
 
   /*!@brief Constructor with configuration
    *
@@ -81,7 +81,7 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, const std::string& configFileName, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, const std::string& configFileName, QWidget* parent = 0);
 
   ~RigidBodyWidget();
 
