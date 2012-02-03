@@ -43,7 +43,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/SceneWidget.h"
+#include "cedar/auxiliaries/gui/RigidBodyWidget.h"
 #include "cedar/auxiliaries/Object.h"
+
+#include <QtGui/QLabel>
+
 
 // SYSTEM INCLUDES
 
@@ -517,6 +521,15 @@ void cedar::aux::gui::SceneWidget::init()
   }
   setActiveObject();
   
+  cedar::aux::gui::RigidBodyWidget* p_rigid_body_widget = new cedar::aux::gui::RigidBodyWidget(mpActiveObject->getObject(), this);
+
+  QLabel* p_label = new QLabel;
+  p_label->setAlignment(Qt::AlignCenter);
+  p_label->setText("0.00");
+//  mpRigidBodyWidgetLayout->addWidget(p_label);
+
+  mpRigidBodyWidgetLayout->addWidget(p_rigid_body_widget);
+
   // set widget properties
   QString name = QString("object scene widget");
   setWindowTitle(name);

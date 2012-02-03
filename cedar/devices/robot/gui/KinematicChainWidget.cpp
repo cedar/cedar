@@ -380,7 +380,6 @@ void cedar::dev::robot::gui::KinematicChainWidget::initWindow()
 
   radioButtonAngle->click();
   setLayout(mpGridLayout);
-  setMaximumHeight(0);
 
   // start a timer to update the interface
   mpTimer = new QTimer();

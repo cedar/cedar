@@ -54,11 +54,10 @@
 cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
 (
   const cedar::aux::ObjectPtr &rigidBody,
-  QWidget* parent,
-  Qt::WindowFlags f
+  QWidget* parent
 )
 :
-QWidget(parent, f),
+QWidget(parent),
 mpRigidBody(rigidBody)
 {
   mDecimals = 2;
@@ -82,8 +81,7 @@ cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
 (
   const cedar::aux::ObjectPtr &rigidBody,
   const std::string& configFileName,
-  QWidget *parent,
-  Qt::WindowFlags
+  QWidget* parent
 )
 :
 QWidget(parent),
@@ -256,7 +254,6 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
   mpGridLayout->setColumnStretch(4,2);
   mpGridLayout->setColumnStretch(5,2);
   mpGridLayout->setColumnStretch(6,2);
-  setMaximumHeight(0);
 
   // start a timer to update the interface
   startTimer(mUpdateInterval);
@@ -266,7 +263,7 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
 
 void cedar::aux::gui::RigidBodyWidget::update()
 {
-  cv::Mat T = mpRigidBody->getTransformation();
+  cv::Mat T = mpRigidBody->getTransformation().clone();
 
   // update rotation matrix
   for(unsigned int i = 0; i < 3; i++)
@@ -283,8 +280,8 @@ void cedar::aux::gui::RigidBodyWidget::update()
   mpPositionYSpinBox->blockSignals(true);
   mpPositionZSpinBox->blockSignals(true);
   mpPositionXSpinBox->setValue(T.at<double>(0, 3));
-  mpPositionXSpinBox->setValue(T.at<double>(1, 3));
-  mpPositionXSpinBox->setValue(T.at<double>(2, 3));
+  mpPositionYSpinBox->setValue(T.at<double>(1, 3));
+  mpPositionZSpinBox->setValue(T.at<double>(2, 3));
   mpPositionXSpinBox->blockSignals(false);
   mpPositionYSpinBox->blockSignals(false);
   mpPositionZSpinBox->blockSignals(false);
