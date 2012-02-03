@@ -146,10 +146,8 @@ private slots:
 
   void changeWorkingMode(int index);
   void commandJoints();
-//  void radioButtonAngleClicked();
-//  void radioButtonVelocityClicked();
-//  void radioButtonAccelerationClicked();
-//  void commandJoint();
+  void stopMovement();
+  void copyValuesFromArm();
 
   //----------------------------------------------------------------------------
   // members
