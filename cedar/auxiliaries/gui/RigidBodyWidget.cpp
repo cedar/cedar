@@ -61,9 +61,9 @@ QWidget(parent),
 mpRigidBody(rigidBody)
 {
   mDecimals = 2;
-  mRotationInterval = 25;
+  mRotationInterval = 10;
   mSinglePositionStep = 0.1;
-  mSingleRotationStep = 0.1;
+  mSingleRotationStep = 0.02;
   mXMin = -10.0;
   mXMax = 10.0;
   mYMin = -10.0;
@@ -90,9 +90,9 @@ mpRigidBody(rigidBody)
 {
   // todo: make these configurable
   mDecimals = 2;
-  mRotationInterval = 25;
+  mRotationInterval = 10;
   mSinglePositionStep = 0.1;
-  mSingleRotationStep = 0.1;
+  mSingleRotationStep = 0.02;
   mXMin = -10.0;
   mXMax = 10.0;
   mYMin = -10.0;
@@ -128,6 +128,11 @@ cedar::aux::gui::RigidBodyWidget::~RigidBodyWidget()
 void cedar::aux::gui::RigidBodyWidget::timerEvent(QTimerEvent*)
 {
   update();
+}
+
+void cedar::aux::gui::RigidBodyWidget::setRigidBody(cedar::aux::ObjectPtr pRigidBody)
+{
+  mpRigidBody = pRigidBody;
 }
 
 void cedar::aux::gui::RigidBodyWidget::initWindow()

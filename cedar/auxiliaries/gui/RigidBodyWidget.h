@@ -100,6 +100,12 @@ public:
 
 public:
 
+  /*!@brief set the pointer to the RigidBody
+   *
+   * @param    pRigidBody pointer to the new RigidBody
+   */
+  void setRigidBody(cedar::aux::ObjectPtr pRigidBody);
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
@@ -116,9 +122,13 @@ private:
 
   void initWindow();
 
+public slots:
+
+  //!@brief read data from the rigid body and display them
+  void update();
+
 private slots:
 
-  void update();
   void rotateXPos();
   void rotateXNeg();
   void rotateYPos();
