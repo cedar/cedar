@@ -44,6 +44,8 @@
 #include <iostream>
 #include <QtGui/QApplication>
 #include <QtGui/QLabel>
+#include <QtGui/QPushButton>
+#include <QtGui/QDoubleSpinBox>
 
 //----------------------------------------------------------------------------
 // constructors and destructor
@@ -56,11 +58,20 @@ cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
   Qt::WindowFlags f
 )
 :
-mpRigidBody(rigidBody),
-QWidget(parent, f)
+QWidget(parent, f),
+mpRigidBody(rigidBody)
 {
-  // store a smart pointer to KinematicChain
   mDecimals = 2;
+  mRotationInterval = 25;
+  mSinglePositionStep = 0.1;
+  mSingleRotationStep = 0.1;
+  mXMin = -10.0;
+  mXMax = 10.0;
+  mYMin = -10.0;
+  mYMax = 10.0;
+  mZMin = -10.0;
+  mZMax = 10.0;
+
 
   initWindow();
   return;
@@ -75,12 +86,21 @@ cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
   Qt::WindowFlags
 )
 :
-mpRigidBody(rigidBody),
 QWidget(parent),
-cedar::aux::ConfigurationInterface(configFileName)
+cedar::aux::ConfigurationInterface(configFileName),
+mpRigidBody(rigidBody)
 {
-  // store a smart pointer to KinematicChain
+  // todo: make these configurable
   mDecimals = 2;
+  mRotationInterval = 25;
+  mSinglePositionStep = 0.1;
+  mSingleRotationStep = 0.1;
+  mXMin = -10.0;
+  mXMax = 10.0;
+  mYMin = -10.0;
+  mYMax = 10.0;
+  mZMin = -10.0;
+  mZMax = 10.0;
 
   //
   // read configuration file
@@ -122,36 +142,120 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
   QLabel* label;
   label = new QLabel(QString("x"));
   label->setAlignment(Qt::AlignCenter);
-  mpGridLayout->addWidget(label, 0, 1);
+  mpGridLayout->addWidget(label, 0, 1, 1, 2);
   label = new QLabel(QString("y"));
   label->setAlignment(Qt::AlignCenter);
-  mpGridLayout->addWidget(label, 0, 2);
+  mpGridLayout->addWidget(label, 0, 3, 1, 2);
   label = new QLabel(QString("z"));
   label->setAlignment(Qt::AlignCenter);
-  mpGridLayout->addWidget(label, 0, 3);
+  mpGridLayout->addWidget(label, 0, 5, 1, 2);
   label = new QLabel(QString("pos"));
   label->setAlignment(Qt::AlignRight);
-  mpGridLayout->addWidget(label, 0, 3);
+  mpGridLayout->addWidget(label, 1, 0);
   label = new QLabel(QString("rot"));
   label->setAlignment(Qt::AlignRight);
-  mpGridLayout->addWidget(label, 0, 3);
+  mpGridLayout->addWidget(label, 2, 0);
   label = new QLabel(QString("R"));
   label->setAlignment(Qt::AlignRight);
-  mpGridLayout->addWidget(label, 0, 3);
+  mpGridLayout->addWidget(label, 4, 0);
+
+  // add position spin boxes
+  mpPositionXSpinBox = new QDoubleSpinBox();
+  mpPositionXSpinBox->setRange(mXMin, mXMax);
+  mpPositionXSpinBox->setValue(mpRigidBody->getPositionX());
+  mpPositionXSpinBox->setDecimals(mDecimals);
+  mpPositionXSpinBox->setSingleStep(mSinglePositionStep);
+  connect(mpPositionXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
+  mpGridLayout->addWidget(mpPositionXSpinBox, 1, 1, 1, 2);
+
+  mpPositionYSpinBox = new QDoubleSpinBox();
+  mpPositionYSpinBox->setRange(mYMin, mYMax);
+  mpPositionYSpinBox->setValue(mpRigidBody->getPositionY());
+  mpPositionYSpinBox->setDecimals(mDecimals);
+  mpPositionYSpinBox->setSingleStep(mSinglePositionStep);
+  connect(mpPositionYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
+  mpGridLayout->addWidget(mpPositionYSpinBox, 1, 3, 1, 2);
+
+  mpPositionZSpinBox = new QDoubleSpinBox();
+  mpPositionZSpinBox->setRange(mZMin, mZMax);
+  mpPositionZSpinBox->setValue(mpRigidBody->getPositionZ());
+  mpPositionZSpinBox->setDecimals(mDecimals);
+  mpPositionZSpinBox->setSingleStep(mSinglePositionStep);
+  connect(mpPositionZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
+  mpGridLayout->addWidget(mpPositionZSpinBox, 1, 5, 1, 2);
+
+
+  // add rotation buttons
+  QPushButton* rotation_button;
+  rotation_button = new QPushButton(QString("-"));
+  rotation_button->setMinimumWidth(0);
+  rotation_button->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  rotation_button->setAutoRepeat(true);
+  rotation_button->setAutoRepeatInterval(mRotationInterval);
+  connect(rotation_button, SIGNAL(pressed()), this, SLOT(rotateXNeg()));
+  mpGridLayout->addWidget(rotation_button, 2, 1);
+
+  rotation_button = new QPushButton(QString("+"));
+  rotation_button->setMinimumWidth(0);
+  rotation_button->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  rotation_button->setAutoRepeat(true);
+  rotation_button->setAutoRepeatInterval(mRotationInterval);
+  connect(rotation_button, SIGNAL(pressed()), this, SLOT(rotateXPos()));
+  mpGridLayout->addWidget(rotation_button, 2, 2);
+
+  rotation_button = new QPushButton(QString("-"));
+  rotation_button->setMinimumWidth(0);
+  rotation_button->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  rotation_button->setAutoRepeat(true);
+  rotation_button->setAutoRepeatInterval(mRotationInterval);
+  connect(rotation_button, SIGNAL(pressed()), this, SLOT(rotateYNeg()));
+  mpGridLayout->addWidget(rotation_button, 2, 3);
+
+  rotation_button = new QPushButton(QString("+"));
+  rotation_button->setMinimumWidth(0);
+  rotation_button->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  rotation_button->setAutoRepeat(true);
+  rotation_button->setAutoRepeatInterval(mRotationInterval);
+  connect(rotation_button, SIGNAL(pressed()), this, SLOT(rotateYPos()));
+  mpGridLayout->addWidget(rotation_button, 2, 4);
+
+  rotation_button = new QPushButton(QString("-"));
+  rotation_button->setMinimumWidth(0);
+  rotation_button->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  rotation_button->setAutoRepeat(true);
+  rotation_button->setAutoRepeatInterval(mRotationInterval);
+  connect(rotation_button, SIGNAL(pressed()), this, SLOT(rotateZNeg()));
+  mpGridLayout->addWidget(rotation_button, 2, 5);
+
+  rotation_button = new QPushButton(QString("+"));
+  rotation_button->setMinimumWidth(0);
+  rotation_button->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  rotation_button->setAutoRepeat(true);
+  rotation_button->setAutoRepeatInterval(mRotationInterval);
+  connect(rotation_button, SIGNAL(pressed()), this, SLOT(rotateZPos()));
+  mpGridLayout->addWidget(rotation_button, 2, 6);
+
 
   for(unsigned int i = 3; i < 6; i++)
   {
     for(unsigned int j = 1; j < 4; j++)
     {
-      // add R label
+      // add rotation label
       QLabel* p_label = new QLabel;
       p_label->setAlignment(Qt::AlignCenter);
       p_label->setText("0.00");
-      mpGridLayout->addWidget(p_label, i, j);
+      mpGridLayout->addWidget(p_label, i, j*2-1, 1, 2);
     }
   }
 
   setLayout(mpGridLayout);
+  mpGridLayout->setColumnStretch(0,1);
+  mpGridLayout->setColumnStretch(1,2);
+  mpGridLayout->setColumnStretch(2,2);
+  mpGridLayout->setColumnStretch(3,2);
+  mpGridLayout->setColumnStretch(4,2);
+  mpGridLayout->setColumnStretch(5,2);
+  mpGridLayout->setColumnStretch(6,2);
   setMaximumHeight(0);
 
   // start a timer to update the interface
@@ -162,6 +266,66 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
 
 void cedar::aux::gui::RigidBodyWidget::update()
 {
+  cv::Mat T = mpRigidBody->getTransformation();
 
+  // update rotation matrix
+  for(unsigned int i = 0; i < 3; i++)
+  {
+    for(unsigned int j = 0; j < 3; j++)
+    {
+      QLabel* p_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+3, (j+1)*2)->widget());
+      p_label->setText(QString("%1").arg(T.at<double>(i, j), 0, 'g', mDecimals, '0'));
+    }
+  }
+
+  // update position spin boxes
+  mpPositionXSpinBox->blockSignals(true);
+  mpPositionYSpinBox->blockSignals(true);
+  mpPositionZSpinBox->blockSignals(true);
+  mpPositionXSpinBox->setValue(T.at<double>(0, 3));
+  mpPositionXSpinBox->setValue(T.at<double>(1, 3));
+  mpPositionXSpinBox->setValue(T.at<double>(2, 3));
+  mpPositionXSpinBox->blockSignals(false);
+  mpPositionYSpinBox->blockSignals(false);
+  mpPositionZSpinBox->blockSignals(false);
+}
+
+void cedar::aux::gui::RigidBodyWidget::positionChanged(double)
+{
+  mpRigidBody->setPosition(
+                            mpPositionXSpinBox->value(),
+                            mpPositionYSpinBox->value(),
+                            mpPositionZSpinBox->value()
+                          );
+}
+
+void cedar::aux::gui::RigidBodyWidget::rotateXPos()
+{
+  mpRigidBody->rotate(0, mSingleRotationStep);
+}
+
+void cedar::aux::gui::RigidBodyWidget::rotateXNeg()
+{
+  mpRigidBody->rotate(0, -mSingleRotationStep);
+}
+
+void cedar::aux::gui::RigidBodyWidget::rotateYPos()
+{
+  mpRigidBody->rotate(1, mSingleRotationStep);
+}
+
+void cedar::aux::gui::RigidBodyWidget::rotateYNeg()
+{
+  mpRigidBody->rotate(1, -mSingleRotationStep);
+}
+
+void cedar::aux::gui::RigidBodyWidget::rotateZPos()
+{
+  mpRigidBody->rotate(2, mSingleRotationStep);
+}
+
+void cedar::aux::gui::RigidBodyWidget::rotateZNeg()
+{
+  mpRigidBody->rotate(2, -mSingleRotationStep);
 }
 
