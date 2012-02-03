@@ -48,6 +48,7 @@ cedar_add_library(cedaraux
   gui/EnumParameter.h
   gui/FileParameter.h
   gui/Parameter.h
+  gui/rigidBodyWidget.h
   gui/Viewer.h
   gui/SceneWidget.h
   gui/HistoryPlot.h
