@@ -45,6 +45,7 @@
 // SYSTEM INCLUDES
 #include <QtCore/QTimer>
 #include <QtGui/QGridLayout>
+#include <QtGui/QDoubleSpinBox>
 #include <QtGui/QWidget>
 
 //!@brief A simple widget to monitor the state of a kinematic chain
@@ -118,6 +119,13 @@ private:
 private slots:
 
   void update();
+  void rotateXPos();
+  void rotateXNeg();
+  void rotateYPos();
+  void rotateYNeg();
+  void rotateZPos();
+  void rotateZNeg();
+  void positionChanged(double);
 
   //----------------------------------------------------------------------------
   // members
@@ -128,8 +136,20 @@ protected:
 private:
   static const int mUpdateInterval = 100;
   cedar::aux::ObjectPtr mpRigidBody;
-  QGridLayout *mpGridLayout;
+  QGridLayout* mpGridLayout;
+  QDoubleSpinBox* mpPositionXSpinBox;
+  QDoubleSpinBox* mpPositionYSpinBox;
+  QDoubleSpinBox* mpPositionZSpinBox;
   int mDecimals;
+  int mRotationInterval;
+  double mSinglePositionStep;
+  double mSingleRotationStep;
+  double mXMin;
+  double mXMax;
+  double mYMin;
+  double mYMax;
+  double mZMin;
+  double mZMax;
 };
 
 #endif /* CEDAR_AUX_GUI_RIGID_BODY_WIDGET_H */
