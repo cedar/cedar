@@ -80,80 +80,6 @@ void cedar::aux::gui::SceneWidget::setWireFrame(int state)
   }
 }
 
-void cedar::aux::gui::SceneWidget::setPosition()
-{
-  if(!mSwitchingSelectedObject)
-  {
-    mpActiveObject->getObject()->setPosition(
-                                              mpDoubleSpinBoxPositionX->value(),
-                                              mpDoubleSpinBoxPositionY->value(),
-                                              mpDoubleSpinBoxPositionZ->value()
-                                            );
-  }
-}
-
-void cedar::aux::gui::SceneWidget::rotate()
-{
-  mpRotateXSpinBox->blockSignals(true);
-  mpRotateYSpinBox->blockSignals(true);
-  mpRotateZSpinBox->blockSignals(true);
-  mpDoubleSpinBoxRotation0->blockSignals(true);
-  mpDoubleSpinBoxRotation1->blockSignals(true);
-  mpDoubleSpinBoxRotation2->blockSignals(true);
-  mpDoubleSpinBoxRotation3->blockSignals(true);
-
-  double angle;
-  angle = mpRotateXSpinBox->value();
-  mpActiveObject->getObject()->rotate(0, angle);
-  mpRotateXSpinBox->setValue(0.0);
-  angle = mpRotateYSpinBox->value();
-  mpActiveObject->getObject()->rotate(1, angle);
-  mpRotateYSpinBox->setValue(0.0);
-  angle = mpRotateZSpinBox->value();
-  mpActiveObject->getObject()->rotate(2, angle);
-  mpRotateZSpinBox->setValue(0.0);
-
-  mpDoubleSpinBoxRotation0->setValue(mpActiveObject->getObject()->getOrientationQuaternion(0));
-  mpDoubleSpinBoxRotation1->setValue(mpActiveObject->getObject()->getOrientationQuaternion(1));
-  mpDoubleSpinBoxRotation2->setValue(mpActiveObject->getObject()->getOrientationQuaternion(2));
-  mpDoubleSpinBoxRotation3->setValue(mpActiveObject->getObject()->getOrientationQuaternion(3));
-
-  mpRotateXSpinBox->blockSignals(false);
-  mpRotateYSpinBox->blockSignals(false);
-  mpRotateZSpinBox->blockSignals(false);
-  mpDoubleSpinBoxRotation0->blockSignals(false);
-  mpDoubleSpinBoxRotation1->blockSignals(false);
-  mpDoubleSpinBoxRotation2->blockSignals(false);
-  mpDoubleSpinBoxRotation3->blockSignals(false);
-}
-
-void cedar::aux::gui::SceneWidget::setOrientationQuaternion()
-{
-  if(!mSwitchingSelectedObject)
-  {
-    cv::Mat q(4, 1, CV_64FC1);
-    q.at<double>(0, 0) = mpDoubleSpinBoxRotation0->value();
-    q.at<double>(1, 0) = mpDoubleSpinBoxRotation1->value();
-    q.at<double>(2, 0) = mpDoubleSpinBoxRotation2->value();
-    q.at<double>(3, 0) = mpDoubleSpinBoxRotation3->value();
-    q = q * 1 / norm(q);
-    mpActiveObject->getObject()->setOrientationQuaternion(q);
-    mpDoubleSpinBoxRotation0->blockSignals(true);
-    mpDoubleSpinBoxRotation1->blockSignals(true);
-    mpDoubleSpinBoxRotation2->blockSignals(true);
-    mpDoubleSpinBoxRotation3->blockSignals(true);
-    mpDoubleSpinBoxRotation0->setValue(mpActiveObject->getObject()->getOrientationQuaternion(0));
-    mpDoubleSpinBoxRotation1->setValue(mpActiveObject->getObject()->getOrientationQuaternion(1));
-    mpDoubleSpinBoxRotation2->setValue(mpActiveObject->getObject()->getOrientationQuaternion(2));
-    mpDoubleSpinBoxRotation3->setValue(mpActiveObject->getObject()->getOrientationQuaternion(3));
-    mpDoubleSpinBoxRotation0->blockSignals(false);
-    mpDoubleSpinBoxRotation1->blockSignals(false);
-    mpDoubleSpinBoxRotation2->blockSignals(false);
-    mpDoubleSpinBoxRotation3->blockSignals(false);
-  }
-  //!\todo this does not really make sense yet, should think of better representation, e.g. remove the first box and always norm the others
-}
-
 void cedar::aux::gui::SceneWidget::setColor()
 {
   if(!mSwitchingSelectedObject)
@@ -406,13 +332,6 @@ void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
   mSwitchingSelectedObject = true;
 
   // general parameters
-  mpDoubleSpinBoxPositionX->setValue(mpActiveObject->getObject()->getPositionX());
-  mpDoubleSpinBoxPositionY->setValue(mpActiveObject->getObject()->getPositionY());
-  mpDoubleSpinBoxPositionZ->setValue(mpActiveObject->getObject()->getPositionZ());
-  mpDoubleSpinBoxRotation0->setValue(mpActiveObject->getObject()->getOrientationQuaternion(0));
-  mpDoubleSpinBoxRotation1->setValue(mpActiveObject->getObject()->getOrientationQuaternion(1));
-  mpDoubleSpinBoxRotation2->setValue(mpActiveObject->getObject()->getOrientationQuaternion(2));
-  mpDoubleSpinBoxRotation3->setValue(mpActiveObject->getObject()->getOrientationQuaternion(3));
   mpDoubleSpinBoxColorR->setValue(mpActiveObject->colorR());
   mpDoubleSpinBoxColorG->setValue(mpActiveObject->colorG());
   mpDoubleSpinBoxColorB->setValue(mpActiveObject->colorB());
@@ -519,7 +438,7 @@ void cedar::aux::gui::SceneWidget::init()
   }
   std::cout << "combo box is filled" << std::endl;
   
-  // update rigid body widget
+  // initialize rigid body widget
   mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getObject());
   mpRigidBodyWidgetLayout->addWidget(mpRigidBodyWidget);
   std::cout << "rigid body widget is added" << std::endl;
@@ -547,16 +466,6 @@ void cedar::aux::gui::SceneWidget::init()
   //connecting to slots
   connect(mpComboBoxName, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setActiveObject()));
   connect(mpWireFrameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setWireFrame(int)));
-  connect(mpDoubleSpinBoxPositionX, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
-  connect(mpDoubleSpinBoxPositionY, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
-  connect(mpDoubleSpinBoxPositionZ, SIGNAL(valueChanged(double)), this, SLOT(setPosition()));
-  connect(mpRotateXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(rotate()));
-  connect(mpRotateYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(rotate()));
-  connect(mpRotateZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(rotate()));
-  connect(mpDoubleSpinBoxRotation0, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
-  connect(mpDoubleSpinBoxRotation1, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
-  connect(mpDoubleSpinBoxRotation2, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
-  connect(mpDoubleSpinBoxRotation3, SIGNAL(valueChanged(double)), this, SLOT(setOrientationQuaternion()));
   connect(mpDoubleSpinBoxColorR, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
   connect(mpDoubleSpinBoxColorG, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
   connect(mpDoubleSpinBoxColorB, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
@@ -575,11 +484,4 @@ void cedar::aux::gui::SceneWidget::init()
   connect(mpPushButtonCreateObject, SIGNAL(pressed()), this, SLOT(createObject()));
   connect(mpPushButtonDeleteAllObjects, SIGNAL(pressed()), this, SLOT(deleteAllObjects()));
   connect(mpPushButtonDeleteObject, SIGNAL(pressed()), this, SLOT(deleteObject()));
-  
-  mpDoubleSpinBoxPositionX->setRange(-mpScene->getSceneLimit(), mpScene->getSceneLimit());
-  mpDoubleSpinBoxPositionX->setSingleStep(mpScene->getSceneLimit() * 0.1);
-  mpDoubleSpinBoxPositionY->setRange(-mpScene->getSceneLimit(), mpScene->getSceneLimit());
-  mpDoubleSpinBoxPositionY->setSingleStep(mpScene->getSceneLimit() * 0.1);
-  mpDoubleSpinBoxPositionZ->setRange(-mpScene->getSceneLimit(), mpScene->getSceneLimit());
-  mpDoubleSpinBoxPositionZ->setSingleStep(mpScene->getSceneLimit() * 0.1);
 }
