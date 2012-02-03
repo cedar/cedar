@@ -93,13 +93,13 @@ public slots:
   void setWireFrame(int state);
 
   /*!@brief sets the position of the current object according to the widget control */
-  void setPosition();
+//  void setPosition();
 
   /*!@brief sets the orientation of the current object according to the widget control */
-  void setOrientationQuaternion();
+//  void setOrientationQuaternion();
 
   /*!@brief rotates the currently active object by the values specified in the rotation boxes */
-  void rotate();
+//  void rotate();
 
   /*!@brief sets the color of the current object according to the widget control */
   void setColor();
