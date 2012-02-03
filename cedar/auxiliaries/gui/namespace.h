@@ -53,6 +53,7 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(BaseWidget);
+      CEDAR_DECLARE_AUX_CLASS(RigidBodyWidget);
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
 
