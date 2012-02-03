@@ -52,7 +52,8 @@ cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::Kinemat
 cedar::aux::gl::Object(rpKinematicChainModel),
 mpKinematicChainModel(rpKinematicChainModel)
 {
-
+  mIsDrawingEndEffectorVelocity = true;
+  mIsDrawingEndEffectorAcceleration = false;
 }
 
 cedar::dev::robot::gl::KinematicChain::~KinematicChain()
@@ -72,10 +73,25 @@ void cedar::dev::robot::gl::KinematicChain::draw()
     drawSegment(j);
   }
   drawEndEffector();
-  drawEndEffectorVelocity();
-  drawEndEffectorAcceleration();
-  
+  if (mIsDrawingEndEffectorVelocity)
+  {
+    drawEndEffectorVelocity();
+  }
+  if (mIsDrawingEndEffectorAcceleration)
+  {
+    drawEndEffectorAcceleration();
+  }
   glPopMatrix(); //!\todo check if this is needed
+}
+
+void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorVelocity(bool state)
+{
+  mIsDrawingEndEffectorVelocity = state;
+}
+
+void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorAcceleration(bool state)
+{
+  mIsDrawingEndEffectorAcceleration = state;
 }
 
 void cedar::dev::robot::gl::KinematicChain::drawBase()
