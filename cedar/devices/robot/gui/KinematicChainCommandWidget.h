@@ -44,7 +44,7 @@
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
-#include <QtCore/QTimer>
+#include <QtGui/QCheckBox>
 #include <QtGui/QGridLayout>
 #include <QtGui/QComboBox>
 #include <QtGui/QWidget>
@@ -148,6 +148,7 @@ private slots:
   void commandJoints();
   void stopMovement();
   void copyValuesFromArm();
+  void setKeepSendingState(int state);
 
   //----------------------------------------------------------------------------
   // members
@@ -160,10 +161,11 @@ private:
   std::vector<cedar::dev::robot::KinematicChainPtr> mpKinematicChains;
   std::vector<QDoubleSpinBox*> mCommandBoxes;
   QGridLayout *mpGridLayout;
-  QTimer* mpTimer;
   QComboBox* mpModeBox;
+  QCheckBox* mpKeepMovingBox;
   int mDecimals;
   double mSingleStep;
+  int mTimerId;
 };
 
 #endif /* CEDAR_DEV_ROBOT_GUI_KINEMATIC_CHAIN_COMMAND_WIDGET_H */
