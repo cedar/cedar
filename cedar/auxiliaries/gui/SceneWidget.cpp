@@ -395,6 +395,9 @@ void cedar::aux::gui::SceneWidget::setActiveObject()
   {
     mpActiveObject = mpScene->getObject(mpComboBoxName->currentIndex());
     updateWidgetObjectParameters();
+    cedar::aux::ObjectPtr p_active_object(mpActiveObject->getObject());
+    mpRigidBodyWidget->setRigidBody(p_active_object);
+    mpRigidBodyWidget->update();
   }
 }
 
@@ -514,21 +517,18 @@ void cedar::aux::gui::SceneWidget::init()
   {
     mpComboBoxName->addItem(QString(mpScene->getObject(i)->getObjectName().c_str()));
   }
+  std::cout << "combo box is filled" << std::endl;
   
+  // update rigid body widget
+  mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getObject());
+  mpRigidBodyWidgetLayout->addWidget(mpRigidBodyWidget);
+  std::cout << "rigid body widget is added" << std::endl;
+
   if (mpScene->isEmpty())
   {
     mpObjectSettingsBox->setEnabled(false);
   }
   setActiveObject();
-  
-  cedar::aux::gui::RigidBodyWidget* p_rigid_body_widget = new cedar::aux::gui::RigidBodyWidget(mpActiveObject->getObject(), this);
-
-  QLabel* p_label = new QLabel;
-  p_label->setAlignment(Qt::AlignCenter);
-  p_label->setText("0.00");
-//  mpRigidBodyWidgetLayout->addWidget(p_label);
-
-  mpRigidBodyWidgetLayout->addWidget(p_rigid_body_widget);
 
   // set widget properties
   QString name = QString("object scene widget");

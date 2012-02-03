@@ -177,6 +177,9 @@ private:
   // pointer to the currently selected object
   cedar::aux::gl::ObjectPtr mpActiveObject;
 
+  // pointer to the RigidBodyWidget
+  cedar::aux::gui::RigidBodyWidget* mpRigidBodyWidget;
+
   //! checks whether the widget is currently being changed due to a switch in the selected object
   bool mSwitchingSelectedObject;
 };
