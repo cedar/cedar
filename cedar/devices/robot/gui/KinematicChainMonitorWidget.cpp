@@ -241,9 +241,9 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::update()
     QLabel* p_velocity_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 2)->widget());
     QLabel* p_acceleration_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 3)->widget());
 
-    p_angle_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAngle(i), -(mDecimals+2), 'g', mDecimals, '0'));
-    p_velocity_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointVelocity(i), -(mDecimals+2), 'g', mDecimals, '0'));
-    p_acceleration_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAcceleration(i), -(mDecimals+2), 'g', mDecimals, '0'));
+    p_angle_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAngle(i), 0, 'g', mDecimals, '0'));
+    p_velocity_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointVelocity(i), 0, 'g', mDecimals, '0'));
+    p_acceleration_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAcceleration(i), 0, 'g', mDecimals, '0'));
   }
 }
 
