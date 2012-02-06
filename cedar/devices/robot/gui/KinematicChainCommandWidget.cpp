@@ -62,7 +62,7 @@ QWidget(parent, f)
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
-  mDecimals = 2;
+  mDecimals = 3;
   mSingleStep = 0.01;
 
   initWindow();
