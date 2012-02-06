@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>530</width>
+    <width>544</width>
     <height>790</height>
    </rect>
   </property>
@@ -116,12 +116,6 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
-    <layout class="QVBoxLayout" name="mpRigidBodyWidgetLayout"/>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <layout class="QVBoxLayout" name="mpRigidBodyVisualizationWidgetLayout"/>
-   </item>
    <item row="1" column="0" colspan="2">
     <widget class="QGroupBox" name="mpObjectSettingsBox">
      <property name="enabled">
@@ -130,7 +124,7 @@
      <property name="title">
       <string>Object Settings</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0,0,0,0,0,0,0,0">
+     <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,0,0,0,0,0,0,0">
       <item row="0" column="0">
        <widget class="QLabel" name="mpLabelName_2">
         <property name="text">
@@ -138,7 +132,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2" colspan="7">
+      <item row="0" column="1" colspan="7">
        <widget class="QComboBox" name="mpComboBoxName"/>
       </item>
       <item row="3" column="0">
@@ -148,21 +142,14 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="mpLabelColor">
-        <property name="text">
-         <string>Color (RGB)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="mpLabelColorR_1">
         <property name="text">
          <string>R:</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="2" colspan="2">
+      <item row="4" column="1" colspan="2">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxColorR">
         <property name="maximum">
          <double>1.000000000000000</double>
@@ -172,31 +159,21 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="4">
+      <item row="4" column="3">
        <widget class="QLabel" name="mpLabelColorG_1">
         <property name="text">
          <string>G:</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="5" colspan="2">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxColorG">
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="7">
+      <item row="4" column="6">
        <widget class="QLabel" name="mpLabelColorB_1">
         <property name="text">
          <string>B:</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="8">
+      <item row="4" column="7">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxColorB">
         <property name="maximum">
          <double>1.000000000000000</double>
@@ -206,72 +183,14 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="5">
-       <widget class="QLabel" name="mpLabelSecondColor">
-        <property name="text">
-         <string>second Color (RGB)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="mpLabelColorR_2">
-        <property name="text">
-         <string>R:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="2" colspan="2">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxSecondColorR">
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="4">
-       <widget class="QLabel" name="mpLabelColorG_2">
-        <property name="text">
-         <string>G:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="5" colspan="2">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxSecondColorG">
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="7">
-       <widget class="QLabel" name="mpLabelColorB_2">
-        <property name="text">
-         <string>B:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="8">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxSecondColorB">
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.050000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0" colspan="9">
+      <item row="5" column="0" colspan="8">
        <widget class="QPushButton" name="mpPushButtonDeleteObject">
         <property name="text">
          <string>Delete Object</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="8">
+      <item row="1" column="7">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxHeight">
         <property name="minimum">
          <double>0.100000000000000</double>
@@ -287,26 +206,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="7">
+      <item row="1" column="6">
        <widget class="QLabel" name="mpLabelHeight">
         <property name="text">
          <string>height</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="2">
-       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxLength">
-        <property name="minimum">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>500.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -317,14 +220,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="4" colspan="2">
+      <item row="1" column="3" colspan="2">
        <widget class="QLabel" name="mpLabelWidth">
         <property name="text">
          <string>width</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="6">
+      <item row="1" column="5">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxWidth">
         <property name="minimum">
          <double>0.100000000000000</double>
@@ -347,7 +250,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="2" colspan="2">
+      <item row="2" column="1" colspan="2">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxRadius">
         <property name="minimum">
          <double>0.100000000000000</double>
@@ -363,7 +266,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="6">
+      <item row="2" column="5">
        <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxThickness">
         <property name="minimum">
          <double>0.100000000000000</double>
@@ -376,14 +279,14 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
+      <item row="2" column="3">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>thickness</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="8">
+      <item row="2" column="7">
        <widget class="QCheckBox" name="mpWireFrameCheckBox">
         <property name="enabled">
          <bool>true</bool>
@@ -393,7 +296,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="8">
+      <item row="3" column="7">
        <widget class="QSpinBox" name="mpSpinBoxChessboardColumns">
         <property name="minimum">
          <number>1</number>
@@ -406,14 +309,14 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="6">
+      <item row="3" column="5">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>columns:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2" colspan="2">
+      <item row="3" column="1" colspan="2">
        <widget class="QSpinBox" name="mpSpinBoxChessboardRows">
         <property name="minimum">
          <number>1</number>
@@ -426,7 +329,49 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="5">
+       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxColorG">
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QDoubleSpinBox" name="mpDoubleSpinBoxLength">
+        <property name="minimum">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>500.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="">
+     <property name="title">
+      <string>Rigid body</string>
+     </property>
+     <layout class="QVBoxLayout" name="mpRigidBodyWidgetLayout"/>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="">
+     <property name="title">
+      <string>Rigid body visualization</string>
+     </property>
+     <layout class="QVBoxLayout" name="mpRigidBodyVisualizationWidgetLayout"/>
     </widget>
    </item>
   </layout>

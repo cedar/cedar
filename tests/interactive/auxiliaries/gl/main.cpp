@@ -129,7 +129,7 @@ int main(int argc, char **argv)
   cedar::aux::ObjectPtr p_chessboard_object(new cedar::aux::Object());
   p_chessboard_object->setPosition( 7.5, 1.5, 3 );
   p_chessboard_object->setName(std::string("Caspar the checkered Chessboard"));
-  cedar::aux::gl::ObjectPtr p_chessboard(new cedar::aux::gl::Chessboard(p_chessboard_object, 3, 3, 0.2, 8, 8, 1, 1, 1, 0, 0, 0));
+  cedar::aux::gl::ObjectPtr p_chessboard(new cedar::aux::gl::Chessboard(p_chessboard_object, 3, 3, 0.2, 8, 8, 0, 0, 0));
   p_scene->addObject(p_chessboard);
 
   // create a widget to control the scene

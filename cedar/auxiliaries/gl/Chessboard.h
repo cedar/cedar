@@ -69,12 +69,9 @@ public:
    * @param height extension of the board in z-direction of the object coordinate frame
    * @param rows number of rows in the chessboard
    * @param columns number of columns in the chessboard
-   * @param R1 first color, value for red channel in RGB
-   * @param G1 first color, value for green channel in RGB
-   * @param B1 first color, value for blue channel in RGB
-   * @param R2 second color, value for red channel in RGB
-   * @param G2 second color, value for green channel in RGB
-   * @param B2 second color, value for blue channel in RGB
+   * @param R color, value for red channel in RGB
+   * @param G color, value for green channel in RGB
+   * @param B color, value for blue channel in RGB
    */
   Chessboard(
               cedar::aux::ObjectPtr pObject,
@@ -83,12 +80,9 @@ public:
               double height,
               int rows,
               int columns,
-              double R1 = 1,
-              double G1 = 1,
-              double B1 = 1,
-              double R2 = 0,
-              double G2 = 0,
-              double B2 = 0
+              double R = 0,
+              double G = 0,
+              double B = 0
             );
   
   //--------------------------------------------------------------------------------------------------------------------
@@ -123,13 +117,6 @@ public:
    */
   void setNumberOfColumns(int value);
 
-  /*!@brief sets the secondary color of the board, in RGB
-   * @param R value for red channel in RGB color
-   * @param G value for green channel in RGB color
-   * @param B value for blue channel in RGB color
-   */
-  void setSecondColor(double R, double G, double B);
-
   /*!@brief get extension of the board in x-direction of the object coordinate frame
    * @return extension value
    */
@@ -155,15 +142,6 @@ public:
    */
   int numberOfColumns() const;
   
-  //!@brief returns R value of secondary object color in RGB
-  double secondColorR() const;
-  
-  //!@brief returns G value of secondary object color in RGB
-  double secondColorG() const;
-  
-  //!@brief returns B value of secondary object color in RGB
-  double secondColorB() const;
-  
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -171,9 +149,6 @@ private:
   double mLength;
   double mWidth;
   double mHeight;
-  double mSecondColorR;
-  double mSecondColorG;
-  double mSecondColorB;
   int mNumberOfRows;
   int mNumberOfColumns;
 };

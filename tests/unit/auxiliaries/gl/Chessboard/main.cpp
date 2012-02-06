@@ -108,21 +108,6 @@ int main(int, char**)
     std::cout << "ERROR with setNumberOfColumns() or numberOfColumns()" << std::endl;
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // second color
-  //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: second color" << std::endl;
-  chessboard.setSecondColor(0.3, 1, sqrt(2.0)/2);
-  if (
-      chessboard.secondColorR() != 0.3
-      || chessboard.secondColorG() != 1.0
-      || chessboard.secondColorB() != sqrt(2.0)/2
-      )
-  {
-    errors++;
-    std::cout << "ERROR with setSecondColor or secondColorR/G/B" << std::endl;
-  }
-  
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {

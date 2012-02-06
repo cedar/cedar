@@ -93,21 +93,6 @@ void cedar::aux::gui::SceneWidget::setColor()
   }
 }
 
-void cedar::aux::gui::SceneWidget::setSecondColor()
-{
-  if(!mSwitchingSelectedObject)
-  {
-    if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
-    {
-      ((cedar::aux::gl::Chessboard*)mpActiveObject.get())->setSecondColor(
-                                                                           mpDoubleSpinBoxSecondColorR->value(),
-                                                                           mpDoubleSpinBoxSecondColorG->value(),
-                                                                           mpDoubleSpinBoxSecondColorB->value()
-                                                                         );
-    }
-  }
-}
-
 void cedar::aux::gui::SceneWidget::setRadius(double value)
 {
   if(!mSwitchingSelectedObject)
@@ -348,9 +333,6 @@ void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
   mpDoubleSpinBoxThickness->setEnabled(false);
   mpSpinBoxChessboardRows->setEnabled(false);
   mpSpinBoxChessboardColumns->setEnabled(false);
-  mpDoubleSpinBoxSecondColorR->setEnabled(false);
-  mpDoubleSpinBoxSecondColorG->setEnabled(false);
-  mpDoubleSpinBoxSecondColorB->setEnabled(false);
 
   if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
   {
@@ -399,18 +381,12 @@ void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
     mpDoubleSpinBoxHeight->setEnabled(true);
     mpSpinBoxChessboardRows->setEnabled(true);
     mpSpinBoxChessboardColumns->setEnabled(true);
-    mpDoubleSpinBoxSecondColorR->setEnabled(true);
-    mpDoubleSpinBoxSecondColorG->setEnabled(true);
-    mpDoubleSpinBoxSecondColorB->setEnabled(true);
 
     mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->height());
     mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->width());
     mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->length());
     mpSpinBoxChessboardRows->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->numberOfRows());
     mpSpinBoxChessboardColumns->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->numberOfColumns());
-    mpDoubleSpinBoxSecondColorR->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->secondColorR());
-    mpDoubleSpinBoxSecondColorG->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->secondColorG());
-    mpDoubleSpinBoxSecondColorB->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->secondColorB());
   }
   else if (mpActiveObject->getObjectType().compare("Torus") == 0)
   {
@@ -474,9 +450,6 @@ void cedar::aux::gui::SceneWidget::init()
   connect(mpDoubleSpinBoxColorR, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
   connect(mpDoubleSpinBoxColorG, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
   connect(mpDoubleSpinBoxColorB, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
-  connect(mpDoubleSpinBoxSecondColorR, SIGNAL(valueChanged(double)), this, SLOT(setSecondColor()));
-  connect(mpDoubleSpinBoxSecondColorG, SIGNAL(valueChanged(double)), this, SLOT(setSecondColor()));
-  connect(mpDoubleSpinBoxSecondColorB, SIGNAL(valueChanged(double)), this, SLOT(setSecondColor()));
   connect(mpDoubleSpinBoxRadius, SIGNAL(valueChanged(double)), this, SLOT(setRadius(double)));
   connect(mpDoubleSpinBoxThickness, SIGNAL(valueChanged(double)), this, SLOT(setThickness(double)));
   connect(mpDoubleSpinBoxLength, SIGNAL(valueChanged(double)), this, SLOT(setLength(double)));
