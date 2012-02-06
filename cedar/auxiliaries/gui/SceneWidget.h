@@ -91,21 +91,6 @@ public:
   // slots
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
-  /*!@brief sets the wire frame state of the current object according to the widget control */
-  void setWireFrame(int state);
-
-  /*!@brief sets the position of the current object according to the widget control */
-//  void setPosition();
-
-  /*!@brief sets the orientation of the current object according to the widget control */
-//  void setOrientationQuaternion();
-
-  /*!@brief rotates the currently active object by the values specified in the rotation boxes */
-//  void rotate();
-
-  /*!@brief sets the color of the current object according to the widget control */
-  void setColor();
-
   /*!@brief sets the length of the current object
    * @param value    new length
    */
@@ -130,16 +115,6 @@ public slots:
    * @param value    new thickness
    */
   void setThickness(double value);
-
-  /*!@brief sets the number of rows of the current object according to the widget control
-   * @param value    new number of rows
-   */
-  void setNumberOfRows(int value);
-
-  /*!@brief sets the number of columns of the current object according to the widget control
-   * @param value    new number of columns
-   */
-  void setNumberOfColumns(int value);
 
   /*!@brief creates an object with type and name specified by the widget controls */
   void createObject();

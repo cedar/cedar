@@ -45,6 +45,7 @@
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QCheckBox>
 #include <QtGui/QLineEdit>
+#include <QtGui/QDoubleSpinBox>
 #include <QtGui/QWidget>
 
 //!@brief A simple widget to monitor and change the state of a rigid body visualization
@@ -114,6 +115,7 @@ private slots:
   void setWireFrameState(int state);
   void setLcfState(int state);
   void setAxisLength();
+  void setColor(double);
 
   //----------------------------------------------------------------------------
   // members
@@ -128,6 +130,9 @@ private:
   QCheckBox* mpWireFrameCheckBox;
   QCheckBox* mpLcfCheckBox;
   QLineEdit* mpAxisLengthLineEdit;
+  QDoubleSpinBox* mpRedDoubleSpinBox;
+  QDoubleSpinBox* mpGreenDoubleSpinBox;
+  QDoubleSpinBox* mpBlueDoubleSpinBox;
 };
 
 #endif /* CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H */
