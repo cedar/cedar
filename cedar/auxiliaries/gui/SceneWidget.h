@@ -106,9 +106,6 @@ public slots:
   /*!@brief sets the color of the current object according to the widget control */
   void setColor();
 
-  /*!@brief sets the second color of the current object according to the widget control */
-  void setSecondColor();
-
   /*!@brief sets the length of the current object
    * @param value    new length
    */
