@@ -101,13 +101,7 @@ double cedar::aux::gl::Torus::thickness() const
 
 void cedar::aux::gl::Torus::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw the Torus
   if (mIsVisible)

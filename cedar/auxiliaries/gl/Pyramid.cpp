@@ -84,13 +84,7 @@ cedar::aux::gl::Object(pObject)
 
 void cedar::aux::gl::Pyramid::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)

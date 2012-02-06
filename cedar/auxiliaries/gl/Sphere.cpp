@@ -89,14 +89,8 @@ double cedar::aux::gl::Sphere::radius() const
 
 void cedar::aux::gl::Sphere::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
+  prepareDraw();
   
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
-
   // draw the sphere
   if (mIsVisible)
   {

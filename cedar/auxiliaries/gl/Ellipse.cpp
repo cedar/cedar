@@ -114,13 +114,7 @@ double cedar::aux::gl::Ellipse::thickness() const
 
 void cedar::aux::gl::Ellipse::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw the Ellipse
   if (mIsVisible)
