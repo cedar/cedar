@@ -436,12 +436,10 @@ void cedar::aux::gui::SceneWidget::init()
   {
     mpComboBoxName->addItem(QString(mpScene->getObject(i)->getObjectName().c_str()));
   }
-  std::cout << "combo box is filled" << std::endl;
   
   // initialize rigid body widget
   mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getObject());
   mpRigidBodyWidgetLayout->addWidget(mpRigidBodyWidget);
-  std::cout << "rigid body widget is added" << std::endl;
 
   if (mpScene->isEmpty())
   {
