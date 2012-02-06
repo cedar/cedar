@@ -364,11 +364,12 @@ void cedar::aux::gui::SceneWidget::init()
   
   // initialize rigid body visualization widget
   mpRigidBodyVisualizationWidget = new cedar::aux::gui::RigidBodyVisualizationWidget(mpScene->getObject(0));
-  mpRigidBodyVisualizationWidgetLayout->addWidget(mpRigidBodyVisualizationWidget);
+  mpGridLayout->addWidget(mpRigidBodyVisualizationWidget, 2, 0, 1, 2);
 
   // initialize rigid body widget
   mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getObject());
-  mpRigidBodyWidgetLayout->addWidget(mpRigidBodyWidget);
+  mpGridLayout->addWidget(mpRigidBodyWidget, 3, 0, 1, 2);
+
 
   if (mpScene->isEmpty())
   {

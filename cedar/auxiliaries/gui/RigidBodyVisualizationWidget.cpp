@@ -89,11 +89,8 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
 
   // create widgets and layouts
   QVBoxLayout* main_layout = new QVBoxLayout();
-  QWidget* check_box_widget = new QWidget();
   QHBoxLayout* check_box_layout = new QHBoxLayout();
-  QWidget* edit_widget = new QWidget();
   QHBoxLayout* edit_layout = new QHBoxLayout();
-  QWidget* color_widget = new QWidget();
   QHBoxLayout* color_layout = new QHBoxLayout();
 
   // layout first row
@@ -106,7 +103,6 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
   mpLcfCheckBox = new QCheckBox("local coordinate frame");
   check_box_layout->addWidget(mpLcfCheckBox);
   connect(mpLcfCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLcfState(int)));
-  check_box_widget->setLayout(check_box_layout);
 
   // layout second row
   QLabel* label = new QLabel(QString("coordinate frame axes length:"));
@@ -115,7 +111,6 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
   mpAxisLengthLineEdit = new QLineEdit;
   edit_layout->addWidget(mpAxisLengthLineEdit);
   connect(mpAxisLengthLineEdit, SIGNAL(editingFinished()), this, SLOT(setAxisLength()));
-  edit_widget->setLayout(edit_layout);
 
   // layout third row
   label = new QLabel(QString("R:"));
@@ -143,12 +138,10 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
   color_layout->addWidget(mpBlueDoubleSpinBox);
   connect(mpBlueDoubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setColor(double)));
 
-  color_widget->setLayout(color_layout);
-
   // layout main widget
-  main_layout->addWidget(check_box_widget);
-  main_layout->addWidget(edit_widget);
-  main_layout->addWidget(color_widget);
+  main_layout->addLayout(check_box_layout);
+  main_layout->addLayout(edit_layout);
+  main_layout->addLayout(color_layout);
   this->setLayout(main_layout);
 
   update();
