@@ -37,7 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/RigidBodyWidget.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 #include "stdio.h"
@@ -276,7 +276,12 @@ void cedar::aux::gui::RigidBodyWidget::update()
     for(unsigned int j = 0; j < 3; j++)
     {
       QLabel* p_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+3, (j+1)*2)->widget());
-      p_label->setText(QString("%1").arg(T.at<double>(i, j), 0, 'g', mDecimals, '0'));
+      double r = T.at<double>(i, j);
+      if (IsZero(r))
+      {
+        r = 0;
+      }
+      p_label->setText(QString("%1").arg(r, 0, 'g', mDecimals, '0'));
     }
   }
 
