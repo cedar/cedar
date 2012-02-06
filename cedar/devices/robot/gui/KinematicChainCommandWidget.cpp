@@ -352,6 +352,5 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   mpGridLayout->setColumnStretch(1,2);
   setLayout(mpGridLayout);
 
-  // todo: add a "command continuously" checkbox
   return;
 }

@@ -22,35 +22,36 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBodyWidget.h
+    File:        RigidBodyVisualizationWidget.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
-    Date:        2012 02 01
+    Date:        2012 02 06
 
-    Description: Header for the @em cedar::aux::gui::RigidBodyWidget class.
+    Description: Header for the @em cedar::aux::gui::RigidBodyVisualizationWidget class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_RIGID_BODY_WIDGET_H
-#define CEDAR_AUX_GUI_RIGID_BODY_WIDGET_H
+#ifndef CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H
+#define CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/Object.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QGridLayout>
 #include <QtGui/QDoubleSpinBox>
+#include <QtGui/QCheckBox>
+#include <QtGui/QLineEdit>
 #include <QtGui/QWidget>
 
-//!@brief A simple widget to monitor and change the state of a rigid body
+//!@brief A simple widget to monitor and change the state of a rigid body visualization
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::RigidBodyWidget
-class cedar::aux::gui::RigidBodyWidget
+//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::RigidBodyVisualizationWidget
+class cedar::aux::gui::RigidBodyVisualizationWidget
 :
 public QWidget,
 public cedar::aux::ConfigurationInterface
@@ -67,31 +68,13 @@ public cedar::aux::ConfigurationInterface
 public:
   /*!@brief Constructor without configuration
    *
-   *@param kinematicChain pointer to a kinematic chain
+   *@param rigidBodyVisualization pointer to a rigid body visualization object
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, QWidget* parent = 0);
+  RigidBodyVisualizationWidget(const cedar::aux::gl::ObjectPtr &rigidBodyVisualization, QWidget* parent = 0);
 
-  /*!@brief Constructor with configuration
-   *
-   *@param kinematicChain pointer to a kinematic chain
-   *@param configFileName path of a configuration file
-   *@param parent parent parameter of QWidget
-   *@param f WindowFlags for QWidget
-   */
-  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, const std::string& configFileName, QWidget* parent = 0);
-
-  ~RigidBodyWidget();
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // Qt events
-  //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief implementation of handling routine for Qt timer events
-   *
-   * @param    event
-   */
-  void timerEvent(QTimerEvent* event);
+  ~RigidBodyVisualizationWidget();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -103,7 +86,7 @@ public:
    *
    * @param    pRigidBody pointer to the new RigidBody
    */
-  void setRigidBody(cedar::aux::ObjectPtr pRigidBody);
+  void setRigidBodyVisualization(cedar::aux::gl::ObjectPtr pRigidBodyVisualization);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -128,13 +111,10 @@ public slots:
 
 private slots:
 
-  void rotateXPos();
-  void rotateXNeg();
-  void rotateYPos();
-  void rotateYNeg();
-  void rotateZPos();
-  void rotateZNeg();
-  void positionChanged(double);
+  void setVisibilityState(int state);
+  void setWireFrameState(int state);
+  void setLcfState(int state);
+  void setAxisLength();
 
   //----------------------------------------------------------------------------
   // members
@@ -144,21 +124,12 @@ protected:
 
 private:
   static const int mUpdateInterval = 100;
-  cedar::aux::ObjectPtr mpRigidBody;
+  cedar::aux::gl::ObjectPtr mpRigidBodyVisualization;
   QGridLayout* mpGridLayout;
-  QDoubleSpinBox* mpPositionXSpinBox;
-  QDoubleSpinBox* mpPositionYSpinBox;
-  QDoubleSpinBox* mpPositionZSpinBox;
-  int mDecimals;
-  int mRotationInterval;
-  double mSinglePositionStep;
-  double mSingleRotationStep;
-  double mXMin;
-  double mXMax;
-  double mYMin;
-  double mYMax;
-  double mZMin;
-  double mZMax;
+  QCheckBox* mpVisibleCheckBox;
+  QCheckBox* mpWireFrameCheckBox;
+  QCheckBox* mpLcfCheckBox;
+  QLineEdit* mpAxisLengthLineEdit;
 };
 
-#endif /* CEDAR_AUX_GUI_RIGID_BODY_WIDGET_H */
+#endif /* CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H */

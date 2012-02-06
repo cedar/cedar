@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -62,6 +63,8 @@ void cedar::aux::gl::Object::init()
   mObjectType = std::string("no type");
   mIsVisible = true;
   mIsDrawnAsWireFrame = false;
+  mIsDrawingLocalCoordinateFrame = false;
+  mAxisLength = 1.0;
   mResolution = 10;
   mColorR = 1;
   mColorG = 0;
@@ -71,6 +74,11 @@ void cedar::aux::gl::Object::init()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::gl::Object::isVisible()
+{
+  return mIsVisible;
+}
 
 std::string cedar::aux::gl::Object::getObjectName()
 {
@@ -112,6 +120,27 @@ bool cedar::aux::gl::Object::isDrawnAsWireFrame()
   return mIsDrawnAsWireFrame;
 }
 
+void cedar::aux::gl::Object::setDrawLocalCoordinateFrame(bool state)
+{
+  mIsDrawingLocalCoordinateFrame = state;
+}
+
+bool cedar::aux::gl::Object::isDrawingLocalCoordinateFrame()
+{
+  return mIsDrawingLocalCoordinateFrame;
+}
+
+
+void cedar::aux::gl::Object::setAxisLength(const double value)
+{
+  mAxisLength = value;
+}
+
+double cedar::aux::gl::Object::getAxisLength()
+{
+  return mAxisLength;
+}
+
 void cedar::aux::gl::Object::setResolution(int value)
 {
   mResolution = value;
@@ -127,6 +156,28 @@ void cedar::aux::gl::Object::setColor(double R, double G, double B)
 cedar::aux::ObjectPtr cedar::aux::gl::Object::getObject()
 {
   return mpObject;
+}
+
+void cedar::aux::gl::Object::prepareDraw()
+{
+  // move to origin
+  glPopMatrix();
+  glPushMatrix();
+
+  // move to object coordinates
+  mTransformationTranspose = mpObject->getTransformation().t();
+  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+
+  // draw local coordinate frame
+  drawLocalCoordinateFrame();
+}
+
+void cedar::aux::gl::Object::drawLocalCoordinateFrame()
+{
+  if (mIsDrawingLocalCoordinateFrame)
+  {
+    cedar::aux::gl::drawAxes(mAxisLength);
+  }
 }
 
 void cedar::aux::gl::Object::setVisibility(bool state)
