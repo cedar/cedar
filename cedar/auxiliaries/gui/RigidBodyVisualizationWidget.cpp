@@ -45,6 +45,11 @@
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 #include <QtGui/QLineEdit>
+#include <QtGui/QLabel>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QWidget>
+
 
 //----------------------------------------------------------------------------
 // constructors and destructor
@@ -82,28 +87,38 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
 {
   setWindowTitle(QApplication::translate("RigidBodyVisualizationWidget", "Rigid Body Visualization"));
 
-  mpGridLayout = new QGridLayout();
+  QVBoxLayout* main_layout = new QVBoxLayout();
+  QWidget* check_box_widget = new QWidget();
+  QHBoxLayout* check_box_layout = new QHBoxLayout();
+  QWidget* edit_widget = new QWidget();
+  QHBoxLayout* edit_layout = new QHBoxLayout();
 
   mpVisibleCheckBox = new QCheckBox("visible");
-  mpGridLayout->addWidget(mpVisibleCheckBox, 0, 0);
+  check_box_layout->addWidget(mpVisibleCheckBox);
   connect(mpVisibleCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setVisibilityState(int)));
 
   mpWireFrameCheckBox = new QCheckBox("wire frame");
-  mpGridLayout->addWidget(mpWireFrameCheckBox, 0, 1);
+  check_box_layout->addWidget(mpWireFrameCheckBox);
   connect(mpWireFrameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setWireFrameState(int)));
 
   mpLcfCheckBox = new QCheckBox("local coordinate frame");
-  mpGridLayout->addWidget(mpLcfCheckBox, 1, 0);
+  check_box_layout->addWidget(mpLcfCheckBox);
   connect(mpLcfCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLcfState(int)));
 
+  QLabel* label = new QLabel(QString("coordinate frame axes length:"));
+  label->setAlignment(Qt::AlignCenter);
+  edit_layout->addWidget(label);
+
   mpAxisLengthLineEdit = new QLineEdit;
-  mpGridLayout->addWidget(mpAxisLengthLineEdit, 1, 1);
+  edit_layout->addWidget(mpAxisLengthLineEdit);
   connect(mpAxisLengthLineEdit, SIGNAL(editingFinished()), this, SLOT(setAxisLength()));
 
+  check_box_widget->setLayout(check_box_layout);
+  edit_widget->setLayout(edit_layout);
+  main_layout->addWidget(check_box_widget);
+  main_layout->addWidget(edit_widget);
 
-  setLayout(mpGridLayout);
-//  mpGridLayout->setColumnStretch(0,1);
-//  mpGridLayout->setColumnStretch(1,1);
+  this->setLayout(main_layout);
 
   update();
   return;
@@ -150,7 +165,6 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::update()
 
   // update axis length line edit
   mpAxisLengthLineEdit->blockSignals(true);
-//  mpAxisLengthLineEdit->setText(QString("%1").arg(mpRigidBodyVisualization->getAxisLength(), 'g', 1));
   mpAxisLengthLineEdit->setText(QString("%1").arg(mpRigidBodyVisualization->getAxisLength(), 0, 'g', 1, '0'));
   mpAxisLengthLineEdit->blockSignals(false);
 }

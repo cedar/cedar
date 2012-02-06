@@ -42,7 +42,6 @@
 #include "cedar/auxiliaries/gl/Object.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QGridLayout>
 #include <QtGui/QDoubleSpinBox>
 #include <QtGui/QCheckBox>
 #include <QtGui/QLineEdit>
@@ -125,7 +124,6 @@ protected:
 private:
   static const int mUpdateInterval = 100;
   cedar::aux::gl::ObjectPtr mpRigidBodyVisualization;
-  QGridLayout* mpGridLayout;
   QCheckBox* mpVisibleCheckBox;
   QCheckBox* mpWireFrameCheckBox;
   QCheckBox* mpLcfCheckBox;

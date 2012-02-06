@@ -64,7 +64,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QGroupBox" name="mpGroupBoxLoad">
      <property name="title">
       <string>Load a object set from a file</string>
@@ -90,7 +90,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="4" column="1">
     <widget class="QGroupBox" name="mpGroupBoxSave">
      <property name="title">
       <string>Write out current object set to file</string>
@@ -106,7 +106,7 @@
       <item row="0" column="1">
        <widget class="QLineEdit" name="mpSavePathLineEdit"/>
       </item>
-      <item row="1" column="0" colspan="2">
+      <item row="2" column="0" colspan="2">
        <widget class="QPushButton" name="mpPushButtonSaveSet">
         <property name="text">
          <string>Save object set to file</string>
@@ -423,8 +423,11 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <layout class="QVBoxLayout" name="mpRigidBodyWidgetLayout"/>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <layout class="QVBoxLayout" name="mpRigidBodyVisualizationWidgetLayout"/>
    </item>
   </layout>
  </widget>
