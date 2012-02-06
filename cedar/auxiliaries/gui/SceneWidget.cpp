@@ -73,26 +73,6 @@ cedar::aux::gui::SceneWidget::~SceneWidget()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::SceneWidget::setWireFrame(int state)
-{
-  if(!mSwitchingSelectedObject)
-  {
-    mpActiveObject->drawAsWireFrame(state);
-  }
-}
-
-void cedar::aux::gui::SceneWidget::setColor()
-{
-  if(!mSwitchingSelectedObject)
-  {
-    mpActiveObject->setColor(
-                              mpDoubleSpinBoxColorR->value(),
-                              mpDoubleSpinBoxColorG->value(),
-                              mpDoubleSpinBoxColorB->value()
-                            );
-  }
-}
-
 void cedar::aux::gui::SceneWidget::setRadius(double value)
 {
   if(!mSwitchingSelectedObject)
@@ -204,28 +184,6 @@ void cedar::aux::gui::SceneWidget::setHeight(double value)
   }
 }
 
-void cedar::aux::gui::SceneWidget::setNumberOfRows(int value)
-{
-  if(!mSwitchingSelectedObject)
-  {
-    if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
-    {
-      ((cedar::aux::gl::Chessboard*)mpActiveObject.get())->setNumberOfRows(value);
-    }
-  }
-}
-
-void cedar::aux::gui::SceneWidget::setNumberOfColumns(int value)
-{
-  if(!mSwitchingSelectedObject)
-  {
-    if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
-    {
-      ((cedar::aux::gl::Chessboard*)mpActiveObject.get())->setNumberOfColumns(value);
-    }
-  }
-}
-
 void cedar::aux::gui::SceneWidget::createObject()
 {
   // create the new object
@@ -319,20 +277,12 @@ void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
 {
   mSwitchingSelectedObject = true;
 
-  // general parameters
-  mpDoubleSpinBoxColorR->setValue(mpActiveObject->colorR());
-  mpDoubleSpinBoxColorG->setValue(mpActiveObject->colorG());
-  mpDoubleSpinBoxColorB->setValue(mpActiveObject->colorB());
-  mpWireFrameCheckBox->setChecked(mpActiveObject->isDrawnAsWireFrame());
-
   // disable all elements
   mpDoubleSpinBoxLength->setEnabled(false);
   mpDoubleSpinBoxWidth->setEnabled(false);
   mpDoubleSpinBoxHeight->setEnabled(false);
   mpDoubleSpinBoxRadius->setEnabled(false);
   mpDoubleSpinBoxThickness->setEnabled(false);
-  mpSpinBoxChessboardRows->setEnabled(false);
-  mpSpinBoxChessboardColumns->setEnabled(false);
 
   if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
   {
@@ -379,14 +329,10 @@ void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
     mpDoubleSpinBoxHeight->setEnabled(true);
-    mpSpinBoxChessboardRows->setEnabled(true);
-    mpSpinBoxChessboardColumns->setEnabled(true);
 
     mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->height());
     mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->width());
     mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->length());
-    mpSpinBoxChessboardRows->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->numberOfRows());
-    mpSpinBoxChessboardColumns->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->numberOfColumns());
   }
   else if (mpActiveObject->getObjectType().compare("Torus") == 0)
   {
@@ -446,17 +392,11 @@ void cedar::aux::gui::SceneWidget::init()
   
   //connecting to slots
   connect(mpComboBoxName, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setActiveObject()));
-  connect(mpWireFrameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setWireFrame(int)));
-  connect(mpDoubleSpinBoxColorR, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
-  connect(mpDoubleSpinBoxColorG, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
-  connect(mpDoubleSpinBoxColorB, SIGNAL(valueChanged(double)), this, SLOT(setColor()));
   connect(mpDoubleSpinBoxRadius, SIGNAL(valueChanged(double)), this, SLOT(setRadius(double)));
   connect(mpDoubleSpinBoxThickness, SIGNAL(valueChanged(double)), this, SLOT(setThickness(double)));
   connect(mpDoubleSpinBoxLength, SIGNAL(valueChanged(double)), this, SLOT(setLength(double)));
   connect(mpDoubleSpinBoxWidth, SIGNAL(valueChanged(double)), this, SLOT(setWidth(double)));
   connect(mpDoubleSpinBoxHeight, SIGNAL(valueChanged(double)), this, SLOT(setHeight(double)));
-  connect(mpSpinBoxChessboardRows, SIGNAL(valueChanged(int)), this, SLOT(setNumberOfRows(int)));
-  connect(mpSpinBoxChessboardColumns, SIGNAL(valueChanged(int)), this, SLOT(setNumberOfColumns(int)));
   
   // Buttons
   connect(mpPushButtonCreateObject, SIGNAL(pressed()), this, SLOT(createObject()));

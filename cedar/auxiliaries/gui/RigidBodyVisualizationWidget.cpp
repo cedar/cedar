@@ -87,37 +87,68 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
 {
   setWindowTitle(QApplication::translate("RigidBodyVisualizationWidget", "Rigid Body Visualization"));
 
+  // create widgets and layouts
   QVBoxLayout* main_layout = new QVBoxLayout();
   QWidget* check_box_widget = new QWidget();
   QHBoxLayout* check_box_layout = new QHBoxLayout();
   QWidget* edit_widget = new QWidget();
   QHBoxLayout* edit_layout = new QHBoxLayout();
+  QWidget* color_widget = new QWidget();
+  QHBoxLayout* color_layout = new QHBoxLayout();
 
+  // layout first row
   mpVisibleCheckBox = new QCheckBox("visible");
   check_box_layout->addWidget(mpVisibleCheckBox);
   connect(mpVisibleCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setVisibilityState(int)));
-
   mpWireFrameCheckBox = new QCheckBox("wire frame");
   check_box_layout->addWidget(mpWireFrameCheckBox);
   connect(mpWireFrameCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setWireFrameState(int)));
-
   mpLcfCheckBox = new QCheckBox("local coordinate frame");
   check_box_layout->addWidget(mpLcfCheckBox);
   connect(mpLcfCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setLcfState(int)));
+  check_box_widget->setLayout(check_box_layout);
 
+  // layout second row
   QLabel* label = new QLabel(QString("coordinate frame axes length:"));
   label->setAlignment(Qt::AlignCenter);
   edit_layout->addWidget(label);
-
   mpAxisLengthLineEdit = new QLineEdit;
   edit_layout->addWidget(mpAxisLengthLineEdit);
   connect(mpAxisLengthLineEdit, SIGNAL(editingFinished()), this, SLOT(setAxisLength()));
-
-  check_box_widget->setLayout(check_box_layout);
   edit_widget->setLayout(edit_layout);
+
+  // layout third row
+  label = new QLabel(QString("R:"));
+  label->setAlignment(Qt::AlignRight);
+  color_layout->addWidget(label);
+  mpRedDoubleSpinBox = new QDoubleSpinBox();
+  mpRedDoubleSpinBox->setMaximum(1.0);
+  mpRedDoubleSpinBox->setSingleStep(0.05);
+  color_layout->addWidget(mpRedDoubleSpinBox);
+  connect(mpRedDoubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setColor(double)));
+  label = new QLabel(QString("G:"));
+  label->setAlignment(Qt::AlignRight);
+  color_layout->addWidget(label);
+  mpGreenDoubleSpinBox = new QDoubleSpinBox();
+  mpGreenDoubleSpinBox->setMaximum(1.0);
+  mpGreenDoubleSpinBox->setSingleStep(0.05);
+  color_layout->addWidget(mpGreenDoubleSpinBox);
+  connect(mpGreenDoubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setColor(double)));
+  label = new QLabel(QString("B:"));
+  label->setAlignment(Qt::AlignRight);
+  color_layout->addWidget(label);
+  mpBlueDoubleSpinBox = new QDoubleSpinBox();
+  mpBlueDoubleSpinBox->setMaximum(1.0);
+  mpBlueDoubleSpinBox->setSingleStep(0.05);
+  color_layout->addWidget(mpBlueDoubleSpinBox);
+  connect(mpBlueDoubleSpinBox, SIGNAL(valueChanged(double)), this, SLOT(setColor(double)));
+
+  color_widget->setLayout(color_layout);
+
+  // layout main widget
   main_layout->addWidget(check_box_widget);
   main_layout->addWidget(edit_widget);
-
+  main_layout->addWidget(color_widget);
   this->setLayout(main_layout);
 
   update();
@@ -167,6 +198,17 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::update()
   mpAxisLengthLineEdit->blockSignals(true);
   mpAxisLengthLineEdit->setText(QString("%1").arg(mpRigidBodyVisualization->getAxisLength(), 0, 'g', 1, '0'));
   mpAxisLengthLineEdit->blockSignals(false);
+
+  // update color spin boxes
+  mpRedDoubleSpinBox->blockSignals(true);
+  mpGreenDoubleSpinBox->blockSignals(true);
+  mpBlueDoubleSpinBox->blockSignals(true);
+  mpRedDoubleSpinBox->setValue(mpRigidBodyVisualization->colorR());
+  mpGreenDoubleSpinBox->setValue(mpRigidBodyVisualization->colorG());
+  mpBlueDoubleSpinBox->setValue(mpRigidBodyVisualization->colorB());
+  mpRedDoubleSpinBox->blockSignals(false);
+  mpGreenDoubleSpinBox->blockSignals(false);
+  mpBlueDoubleSpinBox->blockSignals(false);
 }
 
 void cedar::aux::gui::RigidBodyVisualizationWidget::setVisibilityState(int state)
@@ -187,4 +229,13 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::setLcfState(int state)
 void cedar::aux::gui::RigidBodyVisualizationWidget::setAxisLength()
 {
   mpRigidBodyVisualization->setAxisLength(mpAxisLengthLineEdit->text().toDouble());
+}
+
+void cedar::aux::gui::RigidBodyVisualizationWidget::setColor(double)
+{
+  mpRigidBodyVisualization->setColor(
+      mpRedDoubleSpinBox->value(),
+      mpGreenDoubleSpinBox->value(),
+      mpBlueDoubleSpinBox->value()
+    );
 }
