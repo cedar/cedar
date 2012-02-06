@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/RigidBodyWidget.h"
+#include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
 #include "cedar/auxiliaries/Object.h"
 
 #include <QtGui/QLabel>
@@ -324,6 +325,8 @@ void cedar::aux::gui::SceneWidget::setActiveObject()
     cedar::aux::ObjectPtr p_active_object(mpActiveObject->getObject());
     mpRigidBodyWidget->setRigidBody(p_active_object);
     mpRigidBodyWidget->update();
+    mpRigidBodyVisualizationWidget->setRigidBodyVisualization(mpActiveObject);
+    mpRigidBodyVisualizationWidget->update();
   }
 }
 
@@ -437,6 +440,10 @@ void cedar::aux::gui::SceneWidget::init()
     mpComboBoxName->addItem(QString(mpScene->getObject(i)->getObjectName().c_str()));
   }
   
+  // initialize rigid body visualization widget
+  mpRigidBodyVisualizationWidget = new cedar::aux::gui::RigidBodyVisualizationWidget(mpScene->getObject(0));
+  mpRigidBodyVisualizationWidgetLayout->addWidget(mpRigidBodyVisualizationWidget);
+
   // initialize rigid body widget
   mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getObject());
   mpRigidBodyWidgetLayout->addWidget(mpRigidBodyWidget);

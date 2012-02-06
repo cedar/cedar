@@ -58,6 +58,8 @@
 #include "cedar/auxiliaries/gl/Ellipse.h"
 #include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/gui/RigidBodyWidget.h"
+#include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
 #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
 
 // SYSTEM INCLUDES
@@ -176,6 +178,9 @@ private:
 
   // pointer to the currently selected object
   cedar::aux::gl::ObjectPtr mpActiveObject;
+
+  // pointer to the RigidBodyVisualizationWidget
+  cedar::aux::gui::RigidBodyVisualizationWidget* mpRigidBodyVisualizationWidget;
 
   // pointer to the RigidBodyWidget
   cedar::aux::gui::RigidBodyWidget* mpRigidBodyWidget;
