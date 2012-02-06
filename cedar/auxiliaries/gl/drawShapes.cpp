@@ -92,9 +92,6 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
   glVertex3d(l/2, w/2, h/2);
   glVertex3d(-l/2, w/2, h/2);
   glEnd();
-  
-
-
   if (wireFrame)
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
