@@ -49,6 +49,7 @@ cedar_add_library(cedaraux
   gui/FileParameter.h
   gui/Parameter.h
   gui/RigidBodyWidget.h
+  gui/RigidBodyVisualizationWidget.h
   gui/Viewer.h
   gui/SceneWidget.h
   gui/HistoryPlot.h

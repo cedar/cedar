@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2012 02 01
 
-    Description: Implementation of the @em cedar::aux::RigidBodyWidget class.
+    Description: Implementation of the @em cedar::aux::gui::RigidBodyWidget class.
 
     Credits:
 

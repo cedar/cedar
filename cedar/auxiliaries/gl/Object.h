@@ -56,6 +56,7 @@
  */
 class cedar::aux::gl::Object : public QObject
 {
+  // todo: make this class thread safe
 private:
   
   Q_OBJECT
@@ -77,6 +78,9 @@ public:
   //!@brief draws a visualization of the object in the current GL context
   virtual void draw() = 0;
   
+  //!@brief returns visibility state
+  bool isVisible();
+
   //!@brief returns name of the object
   std::string getObjectName();
 
@@ -95,12 +99,28 @@ public:
   //!@brief returns B value of main object color in RGB
   double colorB();
   
-  //!@brief switch betwen drawing the object with full surfaces or as wire frame only
+  //!@brief switch between drawing the object with full surfaces or as wire frame only
   void drawAsWireFrame(const bool state);
 
   //!@brief get state of object being drawn with full surfaces or as wire frame only
   bool isDrawnAsWireFrame();
   
+  //!@brief switch drawing the local coordinate frame of the rigid body
+  void setDrawLocalCoordinateFrame(const bool state);
+
+  //!@brief true if the local coordinate frame of the rigid body is being drawn
+  bool isDrawingLocalCoordinateFrame();
+
+  /*!@brief set the length of the axes in the local coordinate frame visualization
+   * @param value    new axis length
+   */
+  void setAxisLength(const double value);
+
+  /*!@brief get the length of the axes in the local coordinate frame visualization
+   * @param value    new axis length
+   */
+  double getAxisLength();
+
   /*!@brief set the general resolution of the object, 10 is a usual value
    * @param value    new resolution value
    */
@@ -118,6 +138,17 @@ public:
    * @return    smart pointer to the object
    */
   cedar::aux::ObjectPtr getObject();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+
+  //!@brief prepares the drawing by moving to the local coordinate frame of the object
+  void prepareDraw();
+
+  //!@brief draws the local coordinate frame of the rigid body if mIsDrawingLocalCoordinateFrame flag is set
+  void drawLocalCoordinateFrame();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -141,6 +172,10 @@ protected:
   bool mIsVisible;
   //!@brief determines if the object is drawn with full surfaces or as wire frame only
   bool mIsDrawnAsWireFrame;
+  //!@brief determines whether the local coordinate frame of the rigid body is drawn
+  bool mIsDrawingLocalCoordinateFrame;
+  //!@brief length of the local coordinate frame axis arrows
+  double mAxisLength;
   //!@brief determines how well curves and surfaces are approximated (default 10)
   int mResolution;
   
