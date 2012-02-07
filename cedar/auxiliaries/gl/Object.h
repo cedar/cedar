@@ -88,19 +88,19 @@ public:
   std::string getObjectType();
   
   //!@brief returns current resolution
-  int resolution();
+  int getResolution();
   
   //!@brief returns R value of main object color in RGB
-  double colorR();
+  double getColorR();
   
   //!@brief returns G value of main object color in RGB
-  double colorG();
+  double getColorG();
   
   //!@brief returns B value of main object color in RGB
-  double colorB();
+  double getColorB();
   
   //!@brief switch between drawing the object with full surfaces or as wire frame only
-  void drawAsWireFrame(const bool state);
+  void setDrawAsWireFrame(const bool state);
 
   //!@brief get state of object being drawn with full surfaces or as wire frame only
   bool isDrawnAsWireFrame();

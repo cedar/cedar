@@ -58,7 +58,7 @@ int main(int, char**)
   // wire frame
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: wire frame" << std::endl;
-  gl_object.drawAsWireFrame(true);
+  gl_object.setDrawAsWireFrame(true);
   if (!gl_object.isDrawnAsWireFrame())
   {
     errors++;
@@ -70,7 +70,7 @@ int main(int, char**)
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: resolution" << std::endl;
   gl_object.setResolution(55);
-  if (gl_object.resolution() != 55)
+  if (gl_object.getResolution() != 55)
   {
     errors++;
     std::cout << "ERROR with setResolution or resolution" << std::endl;
@@ -82,9 +82,9 @@ int main(int, char**)
   std::cout << "test: color" << std::endl;
   gl_object.setColor(0.3, 1, sqrt(2.0)/2);
   if (
-      gl_object.colorR() != 0.3
-      || gl_object.colorG() != 1.0
-      || gl_object.colorB() != sqrt(2.0)/2
+      gl_object.getColorR() != 0.3
+      || gl_object.getColorG() != 1.0
+      || gl_object.getColorB() != sqrt(2.0)/2
       )
   {
     errors++;

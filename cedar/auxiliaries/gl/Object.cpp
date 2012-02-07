@@ -90,27 +90,27 @@ std::string cedar::aux::gl::Object::getObjectType()
   return mObjectType;
 }
 
-int cedar::aux::gl::Object::resolution()
+int cedar::aux::gl::Object::getResolution()
 {
   return mResolution;
 }
 
-double cedar::aux::gl::Object::colorR()
+double cedar::aux::gl::Object::getColorR()
 {
   return mColorR;
 }
 
-double cedar::aux::gl::Object::colorG()
+double cedar::aux::gl::Object::getColorG()
 {
   return mColorG;
 }
 
-double cedar::aux::gl::Object::colorB()
+double cedar::aux::gl::Object::getColorB()
 {
   return mColorB;
 }
 
-void cedar::aux::gl::Object::drawAsWireFrame(bool state)
+void cedar::aux::gl::Object::setDrawAsWireFrame(bool state)
 {
   mIsDrawnAsWireFrame = state;
 }
@@ -129,7 +129,6 @@ bool cedar::aux::gl::Object::isDrawingLocalCoordinateFrame()
 {
   return mIsDrawingLocalCoordinateFrame;
 }
-
 
 void cedar::aux::gl::Object::setAxisLength(const double value)
 {
