@@ -49,9 +49,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-cedar::tests::unit::aux::gl::Object::TestObject::TestObject(cedar::aux::ObjectPtr pObject)
+cedar::tests::unit::aux::gl::Object::TestObject::TestObject(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::Object(pRigidBody)
 {
   
 }

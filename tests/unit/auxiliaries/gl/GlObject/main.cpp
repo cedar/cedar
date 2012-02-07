@@ -36,7 +36,9 @@
 // LOCAL INCLUDES
 #include "TestObject.h"
 
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/gl/Object.h"
 #include "cedar/auxiliaries/math/tools.h"
 
@@ -51,8 +53,8 @@ int main(int, char**)
   int errors = 0;
   
   // create instance of test class
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object);
-  cedar::tests::unit::aux::gl::Object::TestObject gl_object(p_object);
+  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  cedar::tests::unit::aux::gl::Object::TestObject gl_object(p_rigid_body);
   
   //--------------------------------------------------------------------------------------------------------------------
   // wire frame

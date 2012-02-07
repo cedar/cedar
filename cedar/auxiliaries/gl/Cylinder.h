@@ -59,12 +59,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Cylinder(cedar::aux::ObjectPtr pObject);
+  Cylinder(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param radius    radius of the cylinder
    * @param height    height of the cylinder
    * @param R    color, value for red channel in RGB
@@ -72,7 +72,7 @@ public:
    * @param B    color, value for blue channel in RGB
    */
   Cylinder(
-            cedar::aux::ObjectPtr pObject,
+            cedar::aux::RigidBodyPtr pRigidBody,
             double radius,
             double height,
             double R = 1,

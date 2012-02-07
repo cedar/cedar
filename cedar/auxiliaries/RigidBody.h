@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.h
+    File:        RigidBody.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 12 04
 
-    Description: header of cedar::aux::Object class, providing geometry of a rigid object
+    Description: header of cedar::aux::RigidBody class, providing geometry of a rigid object
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_OBJECT_H
-#define CEDAR_AUX_OBJECT_H
+#ifndef CEDAR_AUX_RIGID_BODY_H
+#define CEDAR_AUX_RIGID_BODY_H
 
 // CEDAR INCLUDES
 #include "namespace.h"
@@ -52,7 +52,7 @@
  *
  * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::Object : public QObject, public cedar::aux::ConfigurationInterface
+class cedar::aux::RigidBody : public QObject, public cedar::aux::ConfigurationInterface
 {
 private:
   Q_OBJECT
@@ -62,12 +62,12 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Object();
+  RigidBody();
   //!@brief constructor for setting saved to a configuration file
-  Object(const std::string& configFileName);
+  RigidBody(const std::string& configFileName);
 
   //!@brief Destructor
-  virtual ~Object();
+  virtual ~RigidBody();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -158,6 +158,6 @@ private:
   //! orientation
   std::vector<double> _mOrientation;
 
-}; // class cedar::aux::Object
+}; // class cedar::aux::RigidBody
 
 #endif // CEDAR_AUX_OBJECT_H

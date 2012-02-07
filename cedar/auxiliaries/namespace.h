@@ -73,7 +73,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(Object);
+    CEDAR_DECLARE_AUX_CLASS(RigidBody);
     CEDAR_DECLARE_AUX_CLASS(System);
     //!@endcond
 

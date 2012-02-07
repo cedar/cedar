@@ -57,12 +57,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Ellipse(cedar::aux::ObjectPtr pObject);
+  Ellipse(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the ellipse in x-direction of the object frame
    * @param width extension of the ellipse in y-direction of the object frame
    * @param thickness distance of the walls to the ellipse
@@ -71,7 +71,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Ellipse(
-           cedar::aux::ObjectPtr pObject,
+           cedar::aux::RigidBodyPtr pRigidBody,
            double length,
            double width,
            double thickness,

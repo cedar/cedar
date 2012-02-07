@@ -58,19 +58,19 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor.
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Sphere(cedar::aux::ObjectPtr pObject);
+  Sphere(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param radius radius of the sphere
    * @param R color, value for red channel in RGB
    * @param G color, value for green channel in RGB
    * @param B color, value for blue channel in RGB
    */
   Sphere(
-          cedar::aux::ObjectPtr pObject,
+          cedar::aux::RigidBodyPtr pRigidBody,
           double radius,
           double R = 1,
           double G = 0,

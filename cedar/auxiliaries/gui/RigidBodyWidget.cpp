@@ -53,7 +53,7 @@
 
 cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
 (
-  const cedar::aux::ObjectPtr &rigidBody,
+  const cedar::aux::RigidBodyPtr &rigidBody,
   QWidget* parent
 )
 :
@@ -79,7 +79,7 @@ mpRigidBody(rigidBody)
 
 cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
 (
-  const cedar::aux::ObjectPtr &rigidBody,
+  const cedar::aux::RigidBodyPtr &rigidBody,
   const std::string& configFileName,
   QWidget* parent
 )
@@ -130,7 +130,7 @@ void cedar::aux::gui::RigidBodyWidget::timerEvent(QTimerEvent*)
   update();
 }
 
-void cedar::aux::gui::RigidBodyWidget::setRigidBody(cedar::aux::ObjectPtr pRigidBody)
+void cedar::aux::gui::RigidBodyWidget::setRigidBody(cedar::aux::RigidBodyPtr pRigidBody)
 {
   mpRigidBody = pRigidBody;
 }

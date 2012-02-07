@@ -57,12 +57,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Cone(cedar::aux::ObjectPtr pObject);
+  Cone(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param radius radius of the cone
    * @param height height of the cone
    * @param R color, value for red channel in RGB
@@ -70,7 +70,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Cone(
-        cedar::aux::ObjectPtr pObject,
+        cedar::aux::RigidBodyPtr pRigidBody,
         double radius,
         double height,
         double R = 1,

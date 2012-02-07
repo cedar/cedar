@@ -45,7 +45,7 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/RigidBodyWidget.h"
 #include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 #include <QtGui/QLabel>
 
@@ -187,44 +187,44 @@ void cedar::aux::gui::SceneWidget::setHeight(double value)
 void cedar::aux::gui::SceneWidget::createObject()
 {
   // create the new object
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  p_object->setName(mpLineEditName->text().simplified().toStdString());
+  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  p_rigid_body->setName(mpLineEditName->text().simplified().toStdString());
   cedar::aux::gl::ObjectPtr p_gl_object;
   if(mpComboBoxType->currentText().compare("Cylinder") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Cylinder(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Cylinder(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Sphere") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Sphere(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Sphere(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Block") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Block(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Block(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Cone") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Cone(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Cone(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Pyramid") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Pyramid(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Pyramid(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Chessboard") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Chessboard(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Chessboard(p_rigid_body));
   }
   else if(mpComboBoxType->currentText().compare("Torus") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Torus(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Torus(p_rigid_body));
   }
   else if(mpComboBoxType->currentText().compare("Ellipse") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Ellipse(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Ellipse(p_rigid_body));
   }
   else if(mpComboBoxType->currentText().compare("Prism") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Prism(p_object));
+    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Prism(p_rigid_body));
   }
 
   // add the new object to the scene and the combo box
@@ -265,8 +265,8 @@ void cedar::aux::gui::SceneWidget::setActiveObject()
   {
     mpActiveObject = mpScene->getObject(mpComboBoxName->currentIndex());
     updateWidgetObjectParameters();
-    cedar::aux::ObjectPtr p_active_object(mpActiveObject->getObject());
-    mpRigidBodyWidget->setRigidBody(p_active_object);
+    cedar::aux::RigidBodyPtr p_active_rigid_body(mpActiveObject->getRigidBody());
+    mpRigidBodyWidget->setRigidBody(p_active_rigid_body);
     mpRigidBodyWidget->update();
     mpRigidBodyVisualizationWidget->setRigidBodyVisualization(mpActiveObject);
     mpRigidBodyVisualizationWidget->update();
@@ -359,7 +359,7 @@ void cedar::aux::gui::SceneWidget::init()
   // fill combo box with names of objects in the scene
   for (int i=0; i<mpScene->numberOfObjects(); i++)
   {
-    mpComboBoxName->addItem(QString(mpScene->getObject(i)->getObjectName().c_str()));
+    mpComboBoxName->addItem(QString(mpScene->getObject(i)->getRigidBodyName().c_str()));
   }
   
   // initialize rigid body visualization widget
@@ -367,7 +367,7 @@ void cedar::aux::gui::SceneWidget::init()
   mpGridLayout->addWidget(mpRigidBodyVisualizationWidget, 2, 0, 1, 2);
 
   // initialize rigid body widget
-  mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getObject());
+  mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getRigidBody());
   mpGridLayout->addWidget(mpRigidBodyWidget, 3, 0, 1, 2);
 
 

@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "drawShapes.h"
-#include "Chessboard.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
 
@@ -44,9 +44,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Chessboard::Chessboard(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Chessboard::Chessboard(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::Object(pRigidBody)
 {
   mLength = 4;
   mWidth = 4;
@@ -56,11 +56,11 @@ cedar::aux::gl::Object(pObject)
   mColorR = 0;
   mColorG = 0;
   mColorB = 0;
-  mObjectType = "Chessboard";
+  mRigidBodyType = "Chessboard";
 }
 
 cedar::aux::gl::Chessboard::Chessboard(
-                                        cedar::aux::ObjectPtr pObject,
+                                        cedar::aux::RigidBodyPtr pRigidBody,
                                         double length,
                                         double width,
                                         double height,
@@ -71,7 +71,7 @@ cedar::aux::gl::Chessboard::Chessboard(
                                         double B
                                       )
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::Object(pRigidBody)
 {
   mLength = length;
   mWidth = width;
@@ -81,7 +81,7 @@ cedar::aux::gl::Object(pObject)
   mColorR = R;
   mColorG = G;
   mColorB = B;
-  mObjectType = "Chessboard";
+  mRigidBodyType = "Chessboard";
 }
 
 void cedar::aux::gl::Chessboard::draw()

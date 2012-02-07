@@ -58,12 +58,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Torus(cedar::aux::ObjectPtr pObject);
+  Torus(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param radius the radius of the circle in the xy-plane
    * @param thickness distance of the torus walls to the circle
    * @param R color, value for red channel in RGB
@@ -71,7 +71,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Torus(
-         cedar::aux::ObjectPtr pObject,
+         cedar::aux::RigidBodyPtr pRigidBody,
          double radius,
          double thickness,
          double R = 1,

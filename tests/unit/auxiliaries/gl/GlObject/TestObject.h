@@ -43,6 +43,7 @@
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
 
@@ -57,7 +58,7 @@ class cedar::tests::unit::aux::gl::Object::TestObject : public cedar::aux::gl::O
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor that gets a configuration file name.
-  TestObject(cedar::aux::ObjectPtr pObject);
+  TestObject(cedar::aux::RigidBodyPtr pRigidBody);
 
   //!@brief Destructor
   virtual ~TestObject();

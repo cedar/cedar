@@ -35,6 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/gl/Object.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -45,9 +46,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Object::Object(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Object::Object(cedar::aux::RigidBodyPtr pRigidBody)
 :
-mpObject(pObject),
+mpRigidBody(pRigidBody),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
   init();
@@ -60,7 +61,7 @@ cedar::aux::gl::Object::~Object()
 
 void cedar::aux::gl::Object::init()
 {
-  mObjectType = std::string("no type");
+  mRigidBodyType = std::string("no type");
   mIsVisible = true;
   mIsDrawnAsWireFrame = false;
   mIsDrawingLocalCoordinateFrame = false;
@@ -81,14 +82,14 @@ bool cedar::aux::gl::Object::isVisible()
   return mIsVisible;
 }
 
-std::string cedar::aux::gl::Object::getObjectName()
+std::string cedar::aux::gl::Object::getRigidBodyName()
 {
-  return mpObject->getName();
+  return mpRigidBody->getName();
 }
 
 std::string cedar::aux::gl::Object::getObjectType()
 {
-  return mObjectType;
+  return mRigidBodyType;
 }
 
 int cedar::aux::gl::Object::getResolution()
@@ -153,9 +154,9 @@ void cedar::aux::gl::Object::setColor(double R, double G, double B)
   mColorB = B;
 }
 
-cedar::aux::ObjectPtr cedar::aux::gl::Object::getObject()
+cedar::aux::RigidBodyPtr cedar::aux::gl::Object::getRigidBody()
 {
-  return mpObject;
+  return mpRigidBody;
 }
 
 void cedar::aux::gl::Object::prepareDraw()
@@ -165,7 +166,7 @@ void cedar::aux::gl::Object::prepareDraw()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
+  mTransformationTranspose = mpRigidBody->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   // draw local coordinate frame
