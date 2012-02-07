@@ -35,9 +35,9 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(GlObject
+cedar_add_unit_test(RigidBodyVisualization
   main.cpp
   namespace.h
-  TestObject.h
-  TestObject.cpp
+  TestVisualization.h
+  TestVisualization.cpp
 )

@@ -28,16 +28,9 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 27
 
-    Description: Visualization of a cylinder
+    Description: manages a cedar::aux::gl::Scene of cedar::aux::gl::RigidBodyVisualizations
 
     Credits: initially designed by Denis Hakenberg
-
-    small guide to add other DrawableObjects in the widget
-      1.) in function init() add 'mpComboBoxType->addItem("Your_ObjectType");'
-      2.) add in the functions setRadius(), setLength(), setWidth() and setHeight()
-          your ObjectType (which paramaters you need)
-      3.) add in the function createObject() your ObjectType
-      4.) add in the function setWidgetObjectParameters() your ObjectType
 
 ======================================================================================================================*/
 
@@ -77,21 +70,21 @@ void cedar::aux::gui::SceneWidget::setRadius(double value)
 {
   if(!mSwitchingSelectedObject)
   {
-    if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
+    if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Cylinder") == 0)
     {
-      ((cedar::aux::gl::Cylinder*)mpActiveObject.get())->setRadius(value);
+      ((cedar::aux::gl::Cylinder*)mpActiveVisualization.get())->setRadius(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Sphere") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Sphere") == 0)
     {
-      ((cedar::aux::gl::Sphere*)mpActiveObject.get())->setRadius(value);
+      ((cedar::aux::gl::Sphere*)mpActiveVisualization.get())->setRadius(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Cone") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Cone") == 0)
     {
-      ((cedar::aux::gl::Cone*)mpActiveObject.get())->setRadius(value);
+      ((cedar::aux::gl::Cone*)mpActiveVisualization.get())->setRadius(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Torus") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Torus") == 0)
     {
-      ((cedar::aux::gl::Torus*)mpActiveObject.get())->setRadius(value);
+      ((cedar::aux::gl::Torus*)mpActiveVisualization.get())->setRadius(value);
     }
   }
 }
@@ -100,13 +93,13 @@ void cedar::aux::gui::SceneWidget::setThickness(double value)
 {
   if(!mSwitchingSelectedObject)
   {
-    if (mpActiveObject->getObjectType().compare("Torus") == 0)
+    if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Torus") == 0)
     {
-      ((cedar::aux::gl::Torus*)mpActiveObject.get())->setThickness(value);
+      ((cedar::aux::gl::Torus*)mpActiveVisualization.get())->setThickness(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Ellipse") == 0)
     {
-      ((cedar::aux::gl::Ellipse*)mpActiveObject.get())->setThickness(value);
+      ((cedar::aux::gl::Ellipse*)mpActiveVisualization.get())->setThickness(value);
     }
   }
 }
@@ -115,21 +108,21 @@ void cedar::aux::gui::SceneWidget::setLength(double value)
 {
   if(!mSwitchingSelectedObject)
   {
-    if (mpActiveObject->getObjectType().compare("Block") == 0)
+    if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Block") == 0)
     {
-      ((cedar::aux::gl::Block*)mpActiveObject.get())->setLength(value);
+      ((cedar::aux::gl::Block*)mpActiveVisualization.get())->setLength(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Pyramid") == 0)
     {
-      ((cedar::aux::gl::Pyramid*)mpActiveObject.get())->setLength(value);
+      ((cedar::aux::gl::Pyramid*)mpActiveVisualization.get())->setLength(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Chessboard") == 0)
     {
-      ((cedar::aux::gl::Chessboard*)mpActiveObject.get())->setLength(value);
+      ((cedar::aux::gl::Chessboard*)mpActiveVisualization.get())->setLength(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Ellipse") == 0)
     {
-      ((cedar::aux::gl::Ellipse*)mpActiveObject.get())->setLength(value);
+      ((cedar::aux::gl::Ellipse*)mpActiveVisualization.get())->setLength(value);
     }
   }
 }
@@ -138,21 +131,21 @@ void cedar::aux::gui::SceneWidget::setWidth(double value)
 {
   if(!mSwitchingSelectedObject)
   {
-    if (mpActiveObject->getObjectType().compare("Block") == 0)
+    if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Block") == 0)
     {
-      ((cedar::aux::gl::Block*)mpActiveObject.get())->setWidth(value);
+      ((cedar::aux::gl::Block*)mpActiveVisualization.get())->setWidth(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Pyramid") == 0)
     {
-      ((cedar::aux::gl::Pyramid*)mpActiveObject.get())->setWidth(value);
+      ((cedar::aux::gl::Pyramid*)mpActiveVisualization.get())->setWidth(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Chessboard") == 0)
     {
-      ((cedar::aux::gl::Chessboard*)mpActiveObject.get())->setWidth(value);
+      ((cedar::aux::gl::Chessboard*)mpActiveVisualization.get())->setWidth(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Ellipse") == 0)
     {
-      ((cedar::aux::gl::Ellipse*)mpActiveObject.get())->setWidth(value);
+      ((cedar::aux::gl::Ellipse*)mpActiveVisualization.get())->setWidth(value);
     }
   }
 }
@@ -161,119 +154,119 @@ void cedar::aux::gui::SceneWidget::setHeight(double value)
 {
   if(!mSwitchingSelectedObject)
   {
-    if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
+    if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Cylinder") == 0)
     {
-      ((cedar::aux::gl::Cylinder*)mpActiveObject.get())->setHeight(value);
+      ((cedar::aux::gl::Cylinder*)mpActiveVisualization.get())->setHeight(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Block") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Block") == 0)
     {
-      ((cedar::aux::gl::Block*)mpActiveObject.get())->setHeight(value);
+      ((cedar::aux::gl::Block*)mpActiveVisualization.get())->setHeight(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Cone") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Cone") == 0)
     {
-      ((cedar::aux::gl::Cone*)mpActiveObject.get())->setHeight(value);
+      ((cedar::aux::gl::Cone*)mpActiveVisualization.get())->setHeight(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Pyramid") == 0)
     {
-      ((cedar::aux::gl::Pyramid*)mpActiveObject.get())->setHeight(value);
+      ((cedar::aux::gl::Pyramid*)mpActiveVisualization.get())->setHeight(value);
     }
-    else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
+    else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Chessboard") == 0)
     {
-      ((cedar::aux::gl::Chessboard*)mpActiveObject.get())->setHeight(value);
+      ((cedar::aux::gl::Chessboard*)mpActiveVisualization.get())->setHeight(value);
     }
   }
 }
 
-void cedar::aux::gui::SceneWidget::createObject()
+void cedar::aux::gui::SceneWidget::createRigidBody()
 {
   // create the new object
   cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
   p_rigid_body->setName(mpLineEditName->text().simplified().toStdString());
-  cedar::aux::gl::ObjectPtr p_gl_object;
+  cedar::aux::gl::RigidBodyVisualizationPtr p_visualization;
   if(mpComboBoxType->currentText().compare("Cylinder") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Cylinder(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Cylinder(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Sphere") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Sphere(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Sphere(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Block") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Block(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Block(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Cone") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Cone(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Cone(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Pyramid") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Pyramid(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Pyramid(p_rigid_body));
   }
   else if (mpComboBoxType->currentText().compare("Chessboard") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Chessboard(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Chessboard(p_rigid_body));
   }
   else if(mpComboBoxType->currentText().compare("Torus") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Torus(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Torus(p_rigid_body));
   }
   else if(mpComboBoxType->currentText().compare("Ellipse") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Ellipse(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Ellipse(p_rigid_body));
   }
   else if(mpComboBoxType->currentText().compare("Prism") == 0)
   {
-    p_gl_object = cedar::aux::gl::ObjectPtr(new cedar::aux::gl::Prism(p_rigid_body));
+    p_visualization = cedar::aux::gl::RigidBodyVisualizationPtr(new cedar::aux::gl::Prism(p_rigid_body));
   }
 
   // add the new object to the scene and the combo box
-  mpScene->addObject(p_gl_object);
+  mpScene->addRigidBodyVisualization(p_visualization);
   mpComboBoxName->addItem(QString(mpLineEditName->text()));
   mpComboBoxName->setCurrentIndex(mpComboBoxName->count() - 1);
   mpLineEditName->setText("");
   mpObjectSettingsBox->setEnabled(true);
 }
 
-void cedar::aux::gui::SceneWidget::deleteObject()
+void cedar::aux::gui::SceneWidget::deleteRigidBody()
 {
   // remove from scene
-  mpScene->deleteObject(mpComboBoxName->currentIndex());
+  mpScene->deleteRigidBodyVisualization(mpComboBoxName->currentIndex());
 
   // remove from comboBox
   mpComboBoxName->removeItem(mpComboBoxName->currentIndex());
 
   // if this was the last one
-  if(mpScene->numberOfObjects() == 0)
+  if(mpScene->getNumberOfRigidBodyVisualizations() == 0)
   {
-    mpActiveObject = cedar::aux::gl::ObjectPtr();
+    mpActiveVisualization = cedar::aux::gl::RigidBodyVisualizationPtr();
     mpObjectSettingsBox->setEnabled(false);
   }
 }
 
-void cedar::aux::gui::SceneWidget::deleteAllObjects()
+void cedar::aux::gui::SceneWidget::deleteAllVisualizations()
 {
   mpScene->clear();
   mpComboBoxName->clear();
-  mpActiveObject = cedar::aux::gl::ObjectPtr();
+  mpActiveVisualization = cedar::aux::gl::RigidBodyVisualizationPtr();
   mpObjectSettingsBox->setEnabled(false);
 }
 
-void cedar::aux::gui::SceneWidget::setActiveObject()
+void cedar::aux::gui::SceneWidget::setActiveVisualization()
 {
   if (!mpScene->isEmpty())
   {
-    mpActiveObject = mpScene->getObject(mpComboBoxName->currentIndex());
-    updateWidgetObjectParameters();
-    cedar::aux::RigidBodyPtr p_active_rigid_body(mpActiveObject->getRigidBody());
+    mpActiveVisualization = mpScene->getRigidBodyVisualization(mpComboBoxName->currentIndex());
+    updateWidget();
+    cedar::aux::RigidBodyPtr p_active_rigid_body(mpActiveVisualization->getRigidBody());
     mpRigidBodyWidget->setRigidBody(p_active_rigid_body);
     mpRigidBodyWidget->update();
-    mpRigidBodyVisualizationWidget->setRigidBodyVisualization(mpActiveObject);
+    mpRigidBodyVisualizationWidget->setRigidBodyVisualization(mpActiveVisualization);
     mpRigidBodyVisualizationWidget->update();
   }
 }
 
-void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
+void cedar::aux::gui::SceneWidget::updateWidget()
 {
   mSwitchingSelectedObject = true;
 
@@ -284,71 +277,71 @@ void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
   mpDoubleSpinBoxRadius->setEnabled(false);
   mpDoubleSpinBoxThickness->setEnabled(false);
 
-  if (mpActiveObject->getObjectType().compare("Cylinder") == 0)
+  if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Cylinder") == 0)
   {
     // enable those elements that apply
     mpDoubleSpinBoxRadius->setEnabled(true);
     mpDoubleSpinBoxHeight->setEnabled(true);
     // set values
-    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Cylinder*)mpActiveObject.get())->height());
-    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Cylinder*)mpActiveObject.get())->radius());
+    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Cylinder*)mpActiveVisualization.get())->height());
+    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Cylinder*)mpActiveVisualization.get())->radius());
   }
-  else if (mpActiveObject->getObjectType().compare("Sphere") == 0)
+  else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Sphere") == 0)
   {
     mpDoubleSpinBoxRadius->setEnabled(true);
-    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Sphere*)mpActiveObject.get())->radius());
+    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Sphere*)mpActiveVisualization.get())->radius());
   }
-  else if (mpActiveObject->getObjectType().compare("Block") == 0)
+  else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Block") == 0)
   {
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
     mpDoubleSpinBoxHeight->setEnabled(true);
-    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Block*)mpActiveObject.get())->height());
-    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Block*)mpActiveObject.get())->width());
-    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Block*)mpActiveObject.get())->length());
+    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Block*)mpActiveVisualization.get())->height());
+    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Block*)mpActiveVisualization.get())->width());
+    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Block*)mpActiveVisualization.get())->length());
   }
-  else if (mpActiveObject->getObjectType().compare("Cone") == 0)
+  else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Cone") == 0)
   {
     mpDoubleSpinBoxRadius->setEnabled(true);
     mpDoubleSpinBoxHeight->setEnabled(true);
-    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Cone*)mpActiveObject.get())->height());
-    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Cone*)mpActiveObject.get())->radius());
+    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Cone*)mpActiveVisualization.get())->height());
+    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Cone*)mpActiveVisualization.get())->radius());
   }
-  else if (mpActiveObject->getObjectType().compare("Pyramid") == 0)
+  else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Pyramid") == 0)
   {
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
     mpDoubleSpinBoxHeight->setEnabled(true);
 
-    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Block*)mpActiveObject.get())->height());
-    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Block*)mpActiveObject.get())->width());
-    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Block*)mpActiveObject.get())->length());
+    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Block*)mpActiveVisualization.get())->height());
+    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Block*)mpActiveVisualization.get())->width());
+    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Block*)mpActiveVisualization.get())->length());
   }
-  else if (mpActiveObject->getObjectType().compare("Chessboard") == 0)
+  else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Chessboard") == 0)
   {
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
     mpDoubleSpinBoxHeight->setEnabled(true);
 
-    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->height());
-    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->width());
-    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Chessboard*)mpActiveObject.get())->length());
+    mpDoubleSpinBoxHeight->setValue(((cedar::aux::gl::Chessboard*)mpActiveVisualization.get())->height());
+    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Chessboard*)mpActiveVisualization.get())->width());
+    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Chessboard*)mpActiveVisualization.get())->length());
   }
-  else if (mpActiveObject->getObjectType().compare("Torus") == 0)
+  else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Torus") == 0)
   {
     mpDoubleSpinBoxRadius->setEnabled(true);
     mpDoubleSpinBoxThickness->setEnabled(true);
-    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Torus*)mpActiveObject.get())->radius());
-    mpDoubleSpinBoxThickness->setValue(((cedar::aux::gl::Torus*)mpActiveObject.get())->thickness());
+    mpDoubleSpinBoxRadius->setValue(((cedar::aux::gl::Torus*)mpActiveVisualization.get())->radius());
+    mpDoubleSpinBoxThickness->setValue(((cedar::aux::gl::Torus*)mpActiveVisualization.get())->thickness());
   }
-  else if (mpActiveObject->getObjectType().compare("Ellipse") == 0)
+  else if (mpActiveVisualization->getRigidBodyVisualizationType().compare("Ellipse") == 0)
   {
     mpDoubleSpinBoxThickness->setEnabled(true);
     mpDoubleSpinBoxLength->setEnabled(true);
     mpDoubleSpinBoxWidth->setEnabled(true);
-    mpDoubleSpinBoxThickness->setValue(((cedar::aux::gl::Ellipse*)mpActiveObject.get())->thickness());
-    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Ellipse*)mpActiveObject.get())->length());
-    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Ellipse*)mpActiveObject.get())->width());
+    mpDoubleSpinBoxThickness->setValue(((cedar::aux::gl::Ellipse*)mpActiveVisualization.get())->thickness());
+    mpDoubleSpinBoxLength->setValue(((cedar::aux::gl::Ellipse*)mpActiveVisualization.get())->length());
+    mpDoubleSpinBoxWidth->setValue(((cedar::aux::gl::Ellipse*)mpActiveVisualization.get())->width());
   }
 
   mSwitchingSelectedObject = false;
@@ -357,17 +350,17 @@ void cedar::aux::gui::SceneWidget::updateWidgetObjectParameters()
 void cedar::aux::gui::SceneWidget::init()
 {
   // fill combo box with names of objects in the scene
-  for (int i=0; i<mpScene->numberOfObjects(); i++)
+  for (int i=0; i<mpScene->getNumberOfRigidBodyVisualizations(); i++)
   {
-    mpComboBoxName->addItem(QString(mpScene->getObject(i)->getRigidBodyName().c_str()));
+    mpComboBoxName->addItem(QString(mpScene->getRigidBodyVisualization(i)->getRigidBodyName().c_str()));
   }
   
   // initialize rigid body visualization widget
-  mpRigidBodyVisualizationWidget = new cedar::aux::gui::RigidBodyVisualizationWidget(mpScene->getObject(0));
+  mpRigidBodyVisualizationWidget = new cedar::aux::gui::RigidBodyVisualizationWidget(mpScene->getRigidBodyVisualization(0));
   mpGridLayout->addWidget(mpRigidBodyVisualizationWidget, 2, 0, 1, 2);
 
   // initialize rigid body widget
-  mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObject(0)->getRigidBody());
+  mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getRigidBodyVisualization(0)->getRigidBody());
   mpGridLayout->addWidget(mpRigidBodyWidget, 3, 0, 1, 2);
 
 
@@ -375,7 +368,7 @@ void cedar::aux::gui::SceneWidget::init()
   {
     mpObjectSettingsBox->setEnabled(false);
   }
-  setActiveObject();
+  setActiveVisualization();
 
   // set widget properties
   QString name = QString("object scene widget");
@@ -392,7 +385,7 @@ void cedar::aux::gui::SceneWidget::init()
   mpComboBoxType->addItem("Prism");
   
   //connecting to slots
-  connect(mpComboBoxName, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setActiveObject()));
+  connect(mpComboBoxName, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(setActiveVisualization()));
   connect(mpDoubleSpinBoxRadius, SIGNAL(valueChanged(double)), this, SLOT(setRadius(double)));
   connect(mpDoubleSpinBoxThickness, SIGNAL(valueChanged(double)), this, SLOT(setThickness(double)));
   connect(mpDoubleSpinBoxLength, SIGNAL(valueChanged(double)), this, SLOT(setLength(double)));
@@ -400,7 +393,7 @@ void cedar::aux::gui::SceneWidget::init()
   connect(mpDoubleSpinBoxHeight, SIGNAL(valueChanged(double)), this, SLOT(setHeight(double)));
   
   // Buttons
-  connect(mpPushButtonCreateObject, SIGNAL(pressed()), this, SLOT(createObject()));
-  connect(mpPushButtonDeleteAllObjects, SIGNAL(pressed()), this, SLOT(deleteAllObjects()));
-  connect(mpPushButtonDeleteObject, SIGNAL(pressed()), this, SLOT(deleteObject()));
+  connect(mpPushButtonCreateObject, SIGNAL(pressed()), this, SLOT(createRigidBody()));
+  connect(mpPushButtonDeleteAllObjects, SIGNAL(pressed()), this, SLOT(deleteAllVisualizations()));
+  connect(mpPushButtonDeleteObject, SIGNAL(pressed()), this, SLOT(deleteRigidBody()));
 }

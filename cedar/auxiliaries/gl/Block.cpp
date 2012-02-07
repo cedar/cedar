@@ -46,7 +46,7 @@
 
 cedar::aux::gl::Block::Block(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = 3;
   mWidth = 2;
@@ -67,7 +67,7 @@ cedar::aux::gl::Block::Block(
               double B
             )
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = length;
   mWidth = width;

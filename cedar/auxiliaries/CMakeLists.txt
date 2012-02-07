@@ -37,7 +37,7 @@
 cedar_add_library(cedaraux
   MOC_HEADERS
   RigidBody.h
-  gl/Object.h
+  gl/RigidBodyVisualization.h
   gui/BaseWidget.h
   gui/BoolParameter.h
   gui/DataPlotInterface.h

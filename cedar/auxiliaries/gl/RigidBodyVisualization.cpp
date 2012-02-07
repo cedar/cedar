@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.cpp
+    File:        RigidBodyVisualization.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
 
@@ -46,7 +46,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Object::Object(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::RigidBodyVisualization::RigidBodyVisualization(cedar::aux::RigidBodyPtr pRigidBody)
 :
 mpRigidBody(pRigidBody),
 mTransformationTranspose(4, 4, CV_64FC1)
@@ -54,12 +54,12 @@ mTransformationTranspose(4, 4, CV_64FC1)
   init();
 }
 
-cedar::aux::gl::Object::~Object()
+cedar::aux::gl::RigidBodyVisualization::~RigidBodyVisualization()
 {
 
 }
 
-void cedar::aux::gl::Object::init()
+void cedar::aux::gl::RigidBodyVisualization::init()
 {
   mRigidBodyType = std::string("no type");
   mIsVisible = true;
@@ -76,90 +76,90 @@ void cedar::aux::gl::Object::init()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::aux::gl::Object::isVisible()
+bool cedar::aux::gl::RigidBodyVisualization::isVisible()
 {
 
   return mIsVisible;
 }
 
-std::string cedar::aux::gl::Object::getRigidBodyName()
+std::string cedar::aux::gl::RigidBodyVisualization::getRigidBodyName()
 {
   return mpRigidBody->getName();
 }
 
-std::string cedar::aux::gl::Object::getObjectType()
+std::string cedar::aux::gl::RigidBodyVisualization::getRigidBodyVisualizationType()
 {
   return mRigidBodyType;
 }
 
-int cedar::aux::gl::Object::getResolution()
+int cedar::aux::gl::RigidBodyVisualization::getResolution()
 {
   return mResolution;
 }
 
-double cedar::aux::gl::Object::getColorR()
+double cedar::aux::gl::RigidBodyVisualization::getColorR()
 {
   return mColorR;
 }
 
-double cedar::aux::gl::Object::getColorG()
+double cedar::aux::gl::RigidBodyVisualization::getColorG()
 {
   return mColorG;
 }
 
-double cedar::aux::gl::Object::getColorB()
+double cedar::aux::gl::RigidBodyVisualization::getColorB()
 {
   return mColorB;
 }
 
-void cedar::aux::gl::Object::setDrawAsWireFrame(bool state)
+void cedar::aux::gl::RigidBodyVisualization::setDrawAsWireFrame(bool state)
 {
   mIsDrawnAsWireFrame = state;
 }
 
-bool cedar::aux::gl::Object::isDrawnAsWireFrame()
+bool cedar::aux::gl::RigidBodyVisualization::isDrawnAsWireFrame()
 {
   return mIsDrawnAsWireFrame;
 }
 
-void cedar::aux::gl::Object::setDrawLocalCoordinateFrame(bool state)
+void cedar::aux::gl::RigidBodyVisualization::setDrawLocalCoordinateFrame(bool state)
 {
   mIsDrawingLocalCoordinateFrame = state;
 }
 
-bool cedar::aux::gl::Object::isDrawingLocalCoordinateFrame()
+bool cedar::aux::gl::RigidBodyVisualization::isDrawingLocalCoordinateFrame()
 {
   return mIsDrawingLocalCoordinateFrame;
 }
 
-void cedar::aux::gl::Object::setAxisLength(const double value)
+void cedar::aux::gl::RigidBodyVisualization::setAxisLength(const double value)
 {
   mAxisLength = value;
 }
 
-double cedar::aux::gl::Object::getAxisLength()
+double cedar::aux::gl::RigidBodyVisualization::getAxisLength()
 {
   return mAxisLength;
 }
 
-void cedar::aux::gl::Object::setResolution(int value)
+void cedar::aux::gl::RigidBodyVisualization::setResolution(int value)
 {
   mResolution = value;
 }
 
-void cedar::aux::gl::Object::setColor(double R, double G, double B)
+void cedar::aux::gl::RigidBodyVisualization::setColor(double R, double G, double B)
 {
   mColorR = R;
   mColorG = G;
   mColorB = B;
 }
 
-cedar::aux::RigidBodyPtr cedar::aux::gl::Object::getRigidBody()
+cedar::aux::RigidBodyPtr cedar::aux::gl::RigidBodyVisualization::getRigidBody()
 {
   return mpRigidBody;
 }
 
-void cedar::aux::gl::Object::prepareDraw()
+void cedar::aux::gl::RigidBodyVisualization::prepareDraw()
 {
   // move to origin
   glPopMatrix();
@@ -173,7 +173,7 @@ void cedar::aux::gl::Object::prepareDraw()
   drawLocalCoordinateFrame();
 }
 
-void cedar::aux::gl::Object::drawLocalCoordinateFrame()
+void cedar::aux::gl::RigidBodyVisualization::drawLocalCoordinateFrame()
 {
   if (mIsDrawingLocalCoordinateFrame)
   {
@@ -181,7 +181,7 @@ void cedar::aux::gl::Object::drawLocalCoordinateFrame()
   }
 }
 
-void cedar::aux::gl::Object::setVisibility(bool state)
+void cedar::aux::gl::RigidBodyVisualization::setVisibility(bool state)
 { 
   mIsVisible = state;
 }

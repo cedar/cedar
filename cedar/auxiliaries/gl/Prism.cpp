@@ -47,7 +47,7 @@
 
 cedar::aux::gl::Prism::Prism(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mWidth = 3;
   mHeight = 1;
@@ -66,7 +66,7 @@ cedar::aux::gl::Prism::Prism(
                               double B
                             )
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mWidth = width;
   mHeight = height;
