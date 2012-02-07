@@ -44,8 +44,9 @@
 
 // SYSTEM INCLUDES
 #include <QObject>
+#include <QReadWriteLock>
 #include <opencv2/opencv.hpp>
-
+#include <QReadWriteLock>
 
 /*!@brief Provides the geometry of a rigid object
  *
@@ -84,13 +85,13 @@ public:
   double getPositionZ() const;
 
   //!@brief returns object frame orientation as a unit quaternion
-  double getOrientationQuaternion(unsigned int component) const;
+  double getOrientationQuaternion(unsigned int component);
 
   //!@brief returns object frame orientation as a unit quaternion
-  cv::Mat getOrientationQuaternion() const;
+  cv::Mat getOrientationQuaternion();
 
   //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
-  cv::Mat getTransformation() const;
+  cv::Mat getTransformation();
 
 public slots:
   /*!@brief set the position of the object frame origin in the world frame
@@ -150,6 +151,8 @@ protected:
   // none yet
 
 private:
+  //! lock for thread safety
+  QReadWriteLock mLock;
   //! position
   std::vector<double> _mPosition;
   //! orientation

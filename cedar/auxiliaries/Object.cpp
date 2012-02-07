@@ -40,7 +40,8 @@
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
-
+#include <QReadLocker>
+#include <QWriteLocker>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -119,6 +120,7 @@ cedar::aux::Object::~Object()
 
 cv::Mat cedar::aux::Object::getPosition()
 {
+  QReadLocker locker(&mLock);
   return mPosition.clone();
 }
 
@@ -137,45 +139,55 @@ double cedar::aux::Object::getPositionZ() const
   return mPosition.at<double>(2, 0);
 }
 
-cv::Mat cedar::aux::Object::getOrientationQuaternion() const
+cv::Mat cedar::aux::Object::getOrientationQuaternion()
 {
+  QReadLocker locker(&mLock);
   return mOrientationQuaternion.clone();
 }
 
-double cedar::aux::Object::getOrientationQuaternion(unsigned int component) const
+double cedar::aux::Object::getOrientationQuaternion(unsigned int component)
 {
+  QReadLocker locker(&mLock);
   return mOrientationQuaternion.at<double>(component, 0);
 }
 
-cv::Mat cedar::aux::Object::getTransformation() const
+cv::Mat cedar::aux::Object::getTransformation()
 {
+  QReadLocker locker(&mLock);
   return mTransformation.clone();
 }
 
 void cedar::aux::Object::setPosition(double x, double y, double z)
 {
+  mLock.lockForWrite();
   mPosition.at<double>(0, 0) = x;
   mPosition.at<double>(1, 0) = y;
   mPosition.at<double>(2, 0) = z;
+  mLock.unlock();
   updateTransformation();
 }
 
 void cedar::aux::Object::setPosition(const cv::Mat& position)
 {
+  mLock.lockForWrite();
   assert(position.type() == mPosition.type());
   mPosition = position.clone();
+  mLock.unlock();
   updateTransformation();
 }
 
 void cedar::aux::Object::setOrientationQuaternion(const cv::Mat quaternion)
 {
+  mLock.lockForWrite();
   assert(quaternion.type() == mOrientationQuaternion.type());
   mOrientationQuaternion = quaternion.clone();
+  mLock.unlock();
   updateTransformation();
 }
 
 void cedar::aux::Object::rotate(unsigned int axis, double angle)
 {
+  mLock.lockForWrite();
   // rotation quaternion
   cv::Mat q_rot = cv::Mat::zeros(4, 1, CV_64FC1);
   q_rot.at<double>(0, 0) = cos(angle/2.0);
@@ -198,12 +210,14 @@ void cedar::aux::Object::rotate(unsigned int axis, double angle)
 
   // set new quaternion
   mOrientationQuaternion = q_new;
+  mLock.unlock();
   updateTransformation();
 }
 
 void cedar::aux::Object::updateTransformation()
 {
-  // now using quaternions
+  QWriteLocker locker(&mLock);
+  // calculate rotation matrix from orientation quaternion
   double a = mOrientationQuaternion.at<double>(0, 0);
   double b = mOrientationQuaternion.at<double>(1, 0);
   double c = mOrientationQuaternion.at<double>(2, 0);
@@ -220,12 +234,12 @@ void cedar::aux::Object::updateTransformation()
   mTransformation.at<double>(1, 2) = 2*c*d - 2*a*b;
   mTransformation.at<double>(2, 2) = a*a - b*b - c*c + d*d;
 
+  // copy position
   mTransformation.at<double>(0, 3) = mPosition.at<double>(0, 0);
   mTransformation.at<double>(1, 3) = mPosition.at<double>(1, 0);
   mTransformation.at<double>(2, 3) = mPosition.at<double>(2, 0);
 
   mTransformation.at<double>(3, 3) = 1;
-
 }
 
 void cedar::aux::Object::init()

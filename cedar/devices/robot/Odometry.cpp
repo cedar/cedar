@@ -58,7 +58,7 @@ cv::Mat cedar::dev::robot::Odometry::getPosition() const
   return position;
 }
 
-double cedar::dev::robot::Odometry::getOrientation() const
+double cedar::dev::robot::Odometry::getOrientation()
 {
   //calculates the orientation from the quaternion stored in Object.h.
   return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));

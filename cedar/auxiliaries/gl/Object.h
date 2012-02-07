@@ -50,7 +50,6 @@
 #include <QObject>
 #include <QGLViewer/qglviewer.h>
 
-
 /*!@brief Base class for simple OpenGL visualizations of geometric objects
  *
  */
@@ -191,6 +190,9 @@ protected:
 
   //!@brief dummy matrix to hold the transpose of the current object transformation (it's what OpenGL needs)
   cv::Mat mTransformationTranspose;
+
+private:
+
 };
 
 #endif  // CEDAR_AUX_GL_OBJECT_H

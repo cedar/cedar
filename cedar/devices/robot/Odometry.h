@@ -53,6 +53,7 @@
  * implementation is handled in its subclasses.
  */
 //!@todo why inheriting from Object here??
+//!@todo if this stays: make this class thread-safe
 class cedar::dev::robot::Odometry : public cedar::aux::Object
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ public:
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].
    */
-  double getOrientation() const;
+  double getOrientation();
 
   /*!@brief The set-function of the robot's position.
    *@param xPosition Position of the robot on the x-axis to be set [in m].
