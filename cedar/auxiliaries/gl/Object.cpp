@@ -77,6 +77,7 @@ void cedar::aux::gl::Object::init()
 
 bool cedar::aux::gl::Object::isVisible()
 {
+
   return mIsVisible;
 }
 
