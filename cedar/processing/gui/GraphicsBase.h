@@ -240,10 +240,13 @@ protected:
 private:
   //!@brief the highlight mode
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
+
   //!@brief the shape of this GraphicsBase
   BaseShape mShape;
+
   //!@brief the current outline color
   QColor mOutlineColor;
+
   //!@brief the current fill color
   QColor mFillColor;
 

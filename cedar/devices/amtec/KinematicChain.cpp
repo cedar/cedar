@@ -465,8 +465,6 @@ void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double
 
   int module = mModules[index];
   mpDevice->moveStep(module, value, stepTime);
-
-  return;
 }
 
 #endif // CEDAR_USE_AMTEC

@@ -45,7 +45,6 @@
 #include <QDir>
 #include <string>
 
-
 /*!@brief A parameter for directories on the file system.
  */
 class cedar::aux::FileParameter : public cedar::aux::Parameter

@@ -296,8 +296,8 @@ void cedar::dev::com::SerialCommunication::init()
     mTerminal.c_cc[VMIN] = 0;
     mTimeoutTalk = 30;
     mTerminal.c_cc[VTIME] = 0; //mTimeoutTalk;
-    mTerminal.c_ispeed = _mBaudrate->getValue(); //38400
-    mTerminal.c_ospeed = _mBaudrate->getValue(); //38400
+    mTerminal.c_ispeed = _mBaudrate->getValue();
+    mTerminal.c_ospeed = _mBaudrate->getValue();
     clear_my(mTerminal.c_cflag, CSIZE|PARENB); // Control modes
     set(mTerminal.c_cflag, CS8 | CSTOPB);
 
