@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.cpp
+    File:        RigidBody.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 12 04
 
-    Description: implementation of cedar::aux::Object class, providing geometry of a rigid object
+    Description: implementation of cedar::aux::RigidBody class, providing geometry of a rigid object
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -46,7 +46,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::Object::Object()
+cedar::aux::RigidBody::RigidBody()
 :
 mTransformation(4, 4, CV_64FC1),
 mPosition(4, 1, CV_64FC1),
@@ -56,7 +56,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
   init();
 }
 
-cedar::aux::Object::Object(const std::string& configFileName)
+cedar::aux::RigidBody::RigidBody(const std::string& configFileName)
 :
 cedar::aux::ConfigurationInterface(configFileName),
 mTransformation(4, 4, CV_64FC1),
@@ -66,8 +66,8 @@ mTransformationTranspose(4, 4, CV_64FC1)
 {
   init();
   addParameter(&_mName, "Name", "<name>");
-  addParameter(&_mPosition, "Object.position", 1.0);
-  addParameter(&_mOrientation, "Object.orientation", 0.0);
+  addParameter(&_mPosition, "RigidBody.position", 1.0);
+  addParameter(&_mOrientation, "RigidBody.orientation", 0.0);
   readOrDefaultConfiguration();
   mPosition.at<double>(0, 0) = _mPosition[0];
   mPosition.at<double>(1, 0) = _mPosition[1];
@@ -109,7 +109,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
   updateTransformation();
 }
 
-cedar::aux::Object::~Object()
+cedar::aux::RigidBody::~RigidBody()
 {
 
 }
@@ -118,46 +118,46 @@ cedar::aux::Object::~Object()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::aux::Object::getPosition()
+cv::Mat cedar::aux::RigidBody::getPosition()
 {
   QReadLocker locker(&mLock);
   return mPosition.clone();
 }
 
-double cedar::aux::Object::getPositionX() const
+double cedar::aux::RigidBody::getPositionX() const
 {
   return mPosition.at<double>(0, 0);
 }
 
-double cedar::aux::Object::getPositionY() const
+double cedar::aux::RigidBody::getPositionY() const
 {
   return mPosition.at<double>(1, 0);
 }
 
-double cedar::aux::Object::getPositionZ() const
+double cedar::aux::RigidBody::getPositionZ() const
 {
   return mPosition.at<double>(2, 0);
 }
 
-cv::Mat cedar::aux::Object::getOrientationQuaternion()
+cv::Mat cedar::aux::RigidBody::getOrientationQuaternion()
 {
   QReadLocker locker(&mLock);
   return mOrientationQuaternion.clone();
 }
 
-double cedar::aux::Object::getOrientationQuaternion(unsigned int component)
+double cedar::aux::RigidBody::getOrientationQuaternion(unsigned int component)
 {
   QReadLocker locker(&mLock);
   return mOrientationQuaternion.at<double>(component, 0);
 }
 
-cv::Mat cedar::aux::Object::getTransformation()
+cv::Mat cedar::aux::RigidBody::getTransformation()
 {
   QReadLocker locker(&mLock);
   return mTransformation.clone();
 }
 
-void cedar::aux::Object::setPosition(double x, double y, double z)
+void cedar::aux::RigidBody::setPosition(double x, double y, double z)
 {
   mLock.lockForWrite();
   mPosition.at<double>(0, 0) = x;
@@ -167,7 +167,7 @@ void cedar::aux::Object::setPosition(double x, double y, double z)
   updateTransformation();
 }
 
-void cedar::aux::Object::setPosition(const cv::Mat& position)
+void cedar::aux::RigidBody::setPosition(const cv::Mat& position)
 {
   mLock.lockForWrite();
   assert(position.type() == mPosition.type());
@@ -176,7 +176,7 @@ void cedar::aux::Object::setPosition(const cv::Mat& position)
   updateTransformation();
 }
 
-void cedar::aux::Object::setOrientationQuaternion(const cv::Mat quaternion)
+void cedar::aux::RigidBody::setOrientationQuaternion(const cv::Mat quaternion)
 {
   mLock.lockForWrite();
   assert(quaternion.type() == mOrientationQuaternion.type());
@@ -185,7 +185,7 @@ void cedar::aux::Object::setOrientationQuaternion(const cv::Mat quaternion)
   updateTransformation();
 }
 
-void cedar::aux::Object::rotate(unsigned int axis, double angle)
+void cedar::aux::RigidBody::rotate(unsigned int axis, double angle)
 {
   mLock.lockForWrite();
   // rotation quaternion
@@ -214,7 +214,7 @@ void cedar::aux::Object::rotate(unsigned int axis, double angle)
   updateTransformation();
 }
 
-void cedar::aux::Object::updateTransformation()
+void cedar::aux::RigidBody::updateTransformation()
 {
   QWriteLocker locker(&mLock);
   // calculate rotation matrix from orientation quaternion
@@ -242,7 +242,7 @@ void cedar::aux::Object::updateTransformation()
   mTransformation.at<double>(3, 3) = 1;
 }
 
-void cedar::aux::Object::init()
+void cedar::aux::RigidBody::init()
 {
   mPosition = 0.0;
   mPosition.at<double>(3, 0) = 1.0;

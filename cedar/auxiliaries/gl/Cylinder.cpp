@@ -45,20 +45,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Cylinder::Cylinder(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Cylinder::Cylinder(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::Object(pRigidBody)
 {
   mRadius = 1;
   mHeight = 2;
   mColorR = 1;
   mColorG = 0;
   mColorB = 0;
-  mObjectType = "Cylinder";
+  mRigidBodyType = "Cylinder";
 }
 
 cedar::aux::gl::Cylinder::Cylinder(
-                                    cedar::aux::ObjectPtr pObject,
+                                    cedar::aux::RigidBodyPtr pRigidBody,
                                     double radius,
                                     double height,
                                     double R,
@@ -66,14 +66,14 @@ cedar::aux::gl::Cylinder::Cylinder(
                                     double B
                                   )
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::Object(pRigidBody)
 {
   mRadius = radius;
   mHeight = height;
   mColorR = R;
   mColorG = G;
   mColorB = B;
-  mObjectType = "Cylinder";
+  mRigidBodyType = "Cylinder";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

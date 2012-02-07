@@ -38,8 +38,10 @@
 #define CEDAR_AUX_GL_CHESSBOARD_H
 
 // CEDAR INCLUDES
-#include "namespace.h"
-#include "Object.h"
+#include "cedar/auxiliaries/gl/namespace.h"
+#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
 
@@ -58,12 +60,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Chessboard(cedar::aux::ObjectPtr pObject);
+  Chessboard(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the board in x-direction of the object coordinate frame
    * @param width extension of the board in y-direction of the object coordinate frame
    * @param height extension of the board in z-direction of the object coordinate frame
@@ -74,7 +76,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Chessboard(
-              cedar::aux::ObjectPtr pObject,
+              cedar::aux::RigidBodyPtr pRigidBody,
               double length,
               double width,
               double height,

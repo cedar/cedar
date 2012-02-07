@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
@@ -71,7 +71,7 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, QWidget* parent = 0);
+  RigidBodyWidget(const cedar::aux::RigidBodyPtr &rigidBody, QWidget* parent = 0);
 
   /*!@brief Constructor with configuration
    *
@@ -80,7 +80,7 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  RigidBodyWidget(const cedar::aux::ObjectPtr &rigidBody, const std::string& configFileName, QWidget* parent = 0);
+  RigidBodyWidget(const cedar::aux::RigidBodyPtr &rigidBody, const std::string& configFileName, QWidget* parent = 0);
 
   ~RigidBodyWidget();
 
@@ -103,7 +103,7 @@ public:
    *
    * @param    pRigidBody pointer to the new RigidBody
    */
-  void setRigidBody(cedar::aux::ObjectPtr pRigidBody);
+  void setRigidBody(cedar::aux::RigidBodyPtr pRigidBody);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -144,7 +144,7 @@ protected:
 
 private:
   static const int mUpdateInterval = 100;
-  cedar::aux::ObjectPtr mpRigidBody;
+  cedar::aux::RigidBodyPtr mpRigidBody;
   QGridLayout* mpGridLayout;
   QDoubleSpinBox* mpPositionXSpinBox;
   QDoubleSpinBox* mpPositionYSpinBox;

@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -55,9 +55,7 @@
  */
 class cedar::aux::gl::Object : public QObject
 {
-  // todo: make this class thread safe
 private:
-  
   Q_OBJECT
   
 public:
@@ -65,7 +63,7 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. */
-  Object(cedar::aux::ObjectPtr pObject);
+  Object(cedar::aux::RigidBodyPtr pRigidBody);
   
   /*!@brief destructor. */
   virtual ~Object();
@@ -81,7 +79,7 @@ public:
   bool isVisible();
 
   //!@brief returns name of the object
-  std::string getObjectName();
+  std::string getRigidBodyName();
 
   //!@brief returns type of the object
   std::string getObjectType();
@@ -136,7 +134,7 @@ public:
    *
    * @return    smart pointer to the object
    */
-  cedar::aux::ObjectPtr getObject();
+  cedar::aux::RigidBodyPtr getRigidBody();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -165,7 +163,7 @@ public slots:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief geometric type of the object
-  std::string mObjectType;
+  std::string mRigidBodyType;
 
   //!@brief the object will only be drawn if this is true
   bool mIsVisible;
@@ -186,7 +184,7 @@ protected:
   double mColorB;
   
   //!@brief pointer to the geometric object that is visualized
-  cedar::aux::ObjectPtr mpObject;
+  cedar::aux::RigidBodyPtr mpRigidBody;
 
   //!@brief dummy matrix to hold the transpose of the current object transformation (it's what OpenGL needs)
   cv::Mat mTransformationTranspose;

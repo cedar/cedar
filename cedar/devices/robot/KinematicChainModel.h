@@ -41,7 +41,7 @@
 #include "cedar/devices/robot/namespace.h"
 #include "ReferenceGeometry.h"
 #include "KinematicChain.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -56,7 +56,7 @@
  * joint angles, this class calculates the rigid transformations to the joint frames and other mappings.The model must
  * be updated, e.g. by starting its timer
  */
-class cedar::dev::robot::KinematicChainModel : public cedar::aux::Object
+class cedar::dev::robot::KinematicChainModel : public cedar::aux::RigidBody
 {
 private:
   //--------------------------------------------------------------------------------------------------------------------

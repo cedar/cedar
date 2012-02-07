@@ -41,7 +41,7 @@
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/Object.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
 
@@ -60,12 +60,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Block(cedar::aux::ObjectPtr pObject);
+  Block(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the block in x-direction of the object coordinate frame
    * @param width extension of the block in y-direction of the object coordinate frame
    * @param height extension of the block in z-direction of the object coordinate frame
@@ -74,7 +74,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Block(
-         cedar::aux::ObjectPtr pObject,
+         cedar::aux::RigidBodyPtr pRigidBody,
          double length,
          double width,
          double height,
