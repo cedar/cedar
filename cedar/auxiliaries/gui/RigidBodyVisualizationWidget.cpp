@@ -196,9 +196,9 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::update()
   mpRedDoubleSpinBox->blockSignals(true);
   mpGreenDoubleSpinBox->blockSignals(true);
   mpBlueDoubleSpinBox->blockSignals(true);
-  mpRedDoubleSpinBox->setValue(mpRigidBodyVisualization->colorR());
-  mpGreenDoubleSpinBox->setValue(mpRigidBodyVisualization->colorG());
-  mpBlueDoubleSpinBox->setValue(mpRigidBodyVisualization->colorB());
+  mpRedDoubleSpinBox->setValue(mpRigidBodyVisualization->getColorR());
+  mpGreenDoubleSpinBox->setValue(mpRigidBodyVisualization->getColorG());
+  mpBlueDoubleSpinBox->setValue(mpRigidBodyVisualization->getColorB());
   mpRedDoubleSpinBox->blockSignals(false);
   mpGreenDoubleSpinBox->blockSignals(false);
   mpBlueDoubleSpinBox->blockSignals(false);
@@ -211,7 +211,7 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::setVisibilityState(int state
 
 void cedar::aux::gui::RigidBodyVisualizationWidget::setWireFrameState(int state)
 {
-  mpRigidBodyVisualization->drawAsWireFrame(state);
+  mpRigidBodyVisualization->setDrawAsWireFrame(state);
 }
 
 void cedar::aux::gui::RigidBodyVisualizationWidget::setLcfState(int state)
