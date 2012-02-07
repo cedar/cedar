@@ -46,7 +46,7 @@
 
 cedar::aux::gl::Cone::Cone(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mRadius = 2;
   mHeight = 2;
@@ -65,7 +65,7 @@ cedar::aux::gl::Cone::Cone(
                             double B
                           )
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mRadius = radius;
   mHeight = height;

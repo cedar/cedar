@@ -79,9 +79,9 @@ int main(int argc, char **argv)
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
 
-  cedar::aux::gl::ObjectPtr p_object;
+  cedar::aux::gl::RigidBodyVisualizationPtr p_object;
   p_object = p_cora_arm_visualization;
-  p_scene->addObject(p_object);
+  p_scene->addRigidBodyVisualization(p_object);
 
   // create a simple viewer for the scene
   cedar::aux::gui::Viewer viewer(p_scene);

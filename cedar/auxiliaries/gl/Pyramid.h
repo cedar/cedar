@@ -39,18 +39,18 @@
 
 // CEDAR INCLUDES
 #include "namespace.h"
-#include "Object.h"
+#include "RigidBodyVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of a pyramid with rectangular base
  *
- * This class visualizes an instance of cedar::aux::Object as a pyramid with specified dimensions
+ * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a pyramid with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Pyramid : public cedar::aux::gl::Object
+class cedar::aux::gl::Pyramid : public cedar::aux::gl::RigidBodyVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------

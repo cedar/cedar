@@ -46,7 +46,7 @@
 
 cedar::aux::gl::Chessboard::Chessboard(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = 4;
   mWidth = 4;
@@ -71,7 +71,7 @@ cedar::aux::gl::Chessboard::Chessboard(
                                         double B
                                       )
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = length;
   mWidth = width;

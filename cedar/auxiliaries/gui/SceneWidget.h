@@ -28,16 +28,9 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 27
 
-    Description: Visualization of a cylinder
+    Description: manages a cedar::aux::gl::Scene of cedar::aux::gl::RigidBodyVisualizations
 
     Credits: initially designed by Denis Hakenberg
-
-    small guide to add other DrawableObjects in the widget
-      1.) in function init() add 'mpComboBoxType->addItem("Your_ObjectType");'
-      2.) add in the functions setRadius(), setLength(), setWidth() and setHeight()
-          your ObjectType (which paramaters you need)
-      3.) add in the function createObject() your ObjectType
-      4.) add in the function setWidgetObjectParameters() your ObjectType
 
 ======================================================================================================================*/
 
@@ -47,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
 #include "cedar/auxiliaries/gl/Cone.h"
@@ -117,23 +110,23 @@ public slots:
   void setThickness(double value);
 
   /*!@brief creates an object with type and name specified by the widget controls */
-  void createObject();
+  void createRigidBody();
 
   /*!@brief deletes the currently selected object */
-  void deleteObject();
+  void deleteRigidBody();
 
   /*!@brief deletes all objects in the scene */
-  void deleteAllObjects();
+  void deleteAllVisualizations();
 
   /*!@brief set the current object according to combo box status */
-  void setActiveObject();
+  void setActiveVisualization();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief updates the parameters displayed in the widget */
-  void updateWidgetObjectParameters();
+  void updateWidget();
   
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -149,7 +142,7 @@ private:
   cedar::aux::gl::ScenePtr mpScene;
 
   // pointer to the currently selected object
-  cedar::aux::gl::ObjectPtr mpActiveObject;
+  cedar::aux::gl::RigidBodyVisualizationPtr mpActiveVisualization;
 
   // pointer to the RigidBodyVisualizationWidget
   cedar::aux::gui::RigidBodyVisualizationWidget* mpRigidBodyVisualizationWidget;

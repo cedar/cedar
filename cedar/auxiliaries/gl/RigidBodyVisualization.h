@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.h
+    File:        RigidBodyVisualization.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GL_OBJECT_H
-#define CEDAR_AUX_GL_OBJECT_H
+#ifndef CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
+#define CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
@@ -53,7 +53,7 @@
 /*!@brief Base class for simple OpenGL visualizations of geometric objects
  *
  */
-class cedar::aux::gl::Object : public QObject
+class cedar::aux::gl::RigidBodyVisualization : public QObject
 {
 private:
   Q_OBJECT
@@ -63,10 +63,10 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. */
-  Object(cedar::aux::RigidBodyPtr pRigidBody);
+  RigidBodyVisualization(cedar::aux::RigidBodyPtr pRigidBody);
   
   /*!@brief destructor. */
-  virtual ~Object();
+  virtual ~RigidBodyVisualization();
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -82,7 +82,7 @@ public:
   std::string getRigidBodyName();
 
   //!@brief returns type of the object
-  std::string getObjectType();
+  std::string getRigidBodyVisualizationType();
   
   //!@brief returns current resolution
   int getResolution();

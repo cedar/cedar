@@ -48,11 +48,7 @@ namespace cedar
       {
         namespace gl
         {
-          //!@brief Namespace for the unit test of object.
-          namespace Object
-          {
-            class TestObject;
-          }
+          class TestVisualization;
         }
       }
     }

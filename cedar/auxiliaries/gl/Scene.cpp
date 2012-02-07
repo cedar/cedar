@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 10 28
 
-    Description: Scene for organizing instances of GlObjectVisualization
+    Description: Scene for organizing instances of cedar::aux::gl::RigidBodyVisualization
 
     Credits:
 
@@ -71,25 +71,25 @@ double cedar::aux::gl::Scene::getSceneLimit() const
   return mSceneLimit;
 }
 
-int cedar::aux::gl::Scene::addObject(cedar::aux::gl::ObjectPtr& rpObject)
+int cedar::aux::gl::Scene::addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr& rpRigidBodyVisualization)
 {
   //!\todo prevent different objects with same names
 //  if (object name exists)
 //  {
 //    return false;
 //  }
-  mObjects.push_back(rpObject);
-  return mObjects.size() - 1;
+  mRigidBodyVisualizations.push_back(rpRigidBodyVisualization);
+  return mRigidBodyVisualizations.size() - 1;
 }
 
-void cedar::aux::gl::Scene::deleteObject(int index)
+void cedar::aux::gl::Scene::deleteRigidBodyVisualization(int index)
 {
-  mObjects.removeAt(index);
+  mRigidBodyVisualizations.removeAt(index);
 }
 
 void cedar::aux::gl::Scene::clear()
 {
-  mObjects.clear();
+  mRigidBodyVisualizations.clear();
 }
 
 void cedar::aux::gl::Scene::draw()
@@ -98,9 +98,9 @@ void cedar::aux::gl::Scene::draw()
   glPushMatrix();
 
   // draw all items in the scene
-  for (int i=0; i<mObjects.size(); i++)
+  for (int i=0; i<mRigidBodyVisualizations.size(); i++)
   {
-    mObjects[ i ]->draw();
+    mRigidBodyVisualizations[ i ]->draw();
   }
   
   // return to origin transformation
@@ -132,19 +132,19 @@ void cedar::aux::gl::Scene::draw()
   }
 }
 
-int cedar::aux::gl::Scene::numberOfObjects() const
+int cedar::aux::gl::Scene::getNumberOfRigidBodyVisualizations() const
 {
-  return mObjects.size();
+  return mRigidBodyVisualizations.size();
 }
 
 bool cedar::aux::gl::Scene::isEmpty() const
 {
-  return (mObjects.size() == 0);
+  return (mRigidBodyVisualizations.size() == 0);
 }
 
-cedar::aux::gl::ObjectPtr cedar::aux::gl::Scene::getObject(int index)
+cedar::aux::gl::RigidBodyVisualizationPtr cedar::aux::gl::Scene::getRigidBodyVisualization(int index)
 {
-  return mObjects[index];
+  return mRigidBodyVisualizations[index];
 }
 
 void cedar::aux::gl::Scene::initGl()

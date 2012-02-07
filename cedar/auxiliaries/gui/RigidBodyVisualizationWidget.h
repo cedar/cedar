@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 
 // SYSTEM INCLUDES
 #include <QtGui/QDoubleSpinBox>
@@ -72,7 +72,7 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  RigidBodyVisualizationWidget(const cedar::aux::gl::ObjectPtr &rigidBodyVisualization, QWidget* parent = 0);
+  RigidBodyVisualizationWidget(const cedar::aux::gl::RigidBodyVisualizationPtr &rigidBodyVisualization, QWidget* parent = 0);
 
   ~RigidBodyVisualizationWidget();
 
@@ -86,7 +86,7 @@ public:
    *
    * @param    pRigidBody pointer to the new RigidBody
    */
-  void setRigidBodyVisualization(cedar::aux::gl::ObjectPtr pRigidBodyVisualization);
+  void setRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -125,7 +125,7 @@ protected:
 
 private:
   static const int mUpdateInterval = 100;
-  cedar::aux::gl::ObjectPtr mpRigidBodyVisualization;
+  cedar::aux::gl::RigidBodyVisualizationPtr mpRigidBodyVisualization;
   QCheckBox* mpVisibleCheckBox;
   QCheckBox* mpWireFrameCheckBox;
   QCheckBox* mpLcfCheckBox;

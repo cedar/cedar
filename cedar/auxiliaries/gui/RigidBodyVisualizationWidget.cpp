@@ -57,7 +57,7 @@
 
 cedar::aux::gui::RigidBodyVisualizationWidget::RigidBodyVisualizationWidget
 (
-  const cedar::aux::gl::ObjectPtr &rigidBodyVisualization,
+  const cedar::aux::gl::RigidBodyVisualizationPtr &rigidBodyVisualization,
   QWidget* parent
 )
 :
@@ -78,7 +78,7 @@ cedar::aux::gui::RigidBodyVisualizationWidget::~RigidBodyVisualizationWidget()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::setRigidBodyVisualization(cedar::aux::gl::ObjectPtr pRigidBodyVisualization)
+void cedar::aux::gui::RigidBodyVisualizationWidget::setRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization)
 {
   mpRigidBodyVisualization = pRigidBodyVisualization;
 }

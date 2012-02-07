@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.cpp
+    File:        TestVisualization.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 19
 
-    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestObject class.
+    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestVisualization class.
 
     Credits:
 
@@ -36,7 +36,7 @@
 
 
 // LOCAL INCLUDES
-#include "TestObject.h"
+#include "TestVisualization.h"
 
 // PROJECT INCLUDES
 
@@ -49,15 +49,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-cedar::tests::unit::aux::gl::Object::TestObject::TestObject(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::tests::unit::aux::gl::TestVisualization::TestVisualization(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   
 }
 
 //! destructor
-cedar::tests::unit::aux::gl::Object::TestObject::~TestObject()
+cedar::tests::unit::aux::gl::TestVisualization::~TestVisualization()
 {
 
 }
@@ -66,7 +66,7 @@ cedar::tests::unit::aux::gl::Object::TestObject::~TestObject()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::tests::unit::aux::gl::Object::TestObject::draw()
+void cedar::tests::unit::aux::gl::TestVisualization::draw()
 {
 
 }
