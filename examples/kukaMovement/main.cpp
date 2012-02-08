@@ -68,7 +68,7 @@ public:
   {
     mArms = arms;
     mSpeed = .05; // movement speed, in meters / second
-    mAllowableDistance = 0.005;
+    mCloseDistance = 0.02;
   };
   ~WorkerThread(){};
 
@@ -93,43 +93,59 @@ private:
       cv::Mat k_hom = (mTarget->getPosition() - mArmModel->calculateEndEffectorPosition());
       cv::Mat k(k_hom, cv::Rect(0, 0, 1, 3));
 
-      if (norm(k) > mAllowableDistance)
-      {
-
-
         cv::Mat direction = k * (1 / norm(k));
-        v = direction * mSpeed;
+        double s = mSpeed;
+        if (norm(k)<mCloseDistance)
+        {
+          s = norm(k);
+        }
+        v = direction * s;
+
         cv::Mat J = mArmModel->calculateEndEffectorJacobian();
         cv::Mat J_pi = cv::Mat::zeros(mArms[0]->getNumberOfJoints(), 3, CV_64FC1);
         cv::invert(J, J_pi, cv::DECOMP_SVD);
         cv::Mat joint_velocities = J_pi * v;
-        std::cout << "p = " << std::endl;
-        cedar::aux::math::write(mArmModel->calculateEndEffectorPosition());
-        std::cout << "g = " << std::endl;
-        cedar::aux::math::write(mTarget->getPosition());
-        std::cout << "k_hom = " << std::endl;
-        cedar::aux::math::write(k_hom);
-        std::cout << "k = " << std::endl;
-        cedar::aux::math::write(k);
-        std::cout << "direction = " << std::endl;
-        cedar::aux::math::write(direction);
 
-        std::cout << "J = " << std::endl;
-        cedar::aux::math::write(J);
-        std::cout << "J_pi = " << std::endl;
-        cedar::aux::math::write(J_pi);
-        std::cout << "joint_velocities = " << std::endl;
-        cedar::aux::math::write(joint_velocities);
+//        std::cout << "p = " << std::endl;
+//        cedar::aux::math::write(mArmModel->calculateEndEffectorPosition());
+//        std::cout << "g = " << std::endl;
+//        cedar::aux::math::write(mTarget->getPosition());
+//        std::cout << "k_hom = " << std::endl;
+//        cedar::aux::math::write(k_hom);
+//        std::cout << "k = " << std::endl;
+//        cedar::aux::math::write(k);
+//        std::cout << "direction = " << std::endl;
+//        cedar::aux::math::write(direction);
+//        std::cout << "J = " << std::endl;
+//        cedar::aux::math::write(J);
+//        std::cout << "J_pi = " << std::endl;
+//        cedar::aux::math::write(J_pi);
+//        std::cout << "joint_velocities = " << std::endl;
+//        cedar::aux::math::write(joint_velocities);
+
         for (unsigned int i=0; i<mArms.size(); i++)
         {
           mArms[i]->setJointVelocities(joint_velocities);
         }
-      }
-      cedar::aux::math::write(v);
+
+//      cedar::aux::math::write(v);
+        std::cout << "moving towards the target" << std::endl;
     }
     else
     {
-      std::cout << "arm not movable" << std::endl;
+      if (mArms.size() > 1)
+      {
+        std::cout << "hardware is present but not movable, mirroring the hardware configuration in the simulator" << std::endl;
+        // hardware is present but not movable, so mirror the hardware state in the simulator
+        for (unsigned int i=0; i<mArms[0]->getNumberOfJoints(); i++)
+        {
+          mArms[0]->setJointAngle(i, mArms[1]->getJointAngle(i));
+        }
+      }
+      else
+      {
+        std::cout << "cannot move simulated arm for some obscure reason" << std::endl;
+      }
     }
     std::cout << "---------------------------" << std::endl;
   };
@@ -139,7 +155,7 @@ public:
   cedar::dev::robot::KinematicChainModelPtr mArmModel;
   cedar::aux::ObjectPtr mTarget;
   double mSpeed;
-  double mAllowableDistance; // distance to target that counts as reached, in meters
+  double mCloseDistance; // distance to target that counts as reached, in meters
 };
 
 
@@ -178,7 +194,7 @@ int main(int argc, char **argv)
   cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
-  p_scene->drawFloor(false);
+  p_scene->drawFloor(true);
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
@@ -189,7 +205,8 @@ int main(int argc, char **argv)
   cedar::aux::ObjectPtr target(new cedar::aux::Object());
   target->setPosition(0.3, -0.7, 0.5);
   target->setName(std::string("target"));
-  cedar::aux::gl::ObjectPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.05, 0, 1, 0));
+  cedar::aux::gl::ObjectPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
+  p_sphere->drawAsWireFrame(true);
   p_scene->addObject(p_sphere);
 
   // create a widget to control the scene
@@ -213,7 +230,6 @@ int main(int argc, char **argv)
   p_arm_sim->setJointAngle(2, 0.1);
   p_arm_sim->setJointAngle(3, 0.2);
   p_arm_sim->setJointAngle(5, 0.2);
-  //TODO: if using hardware, mirror the current values of the hardware here
 
   if (use_hardware)
   {
