@@ -76,10 +76,16 @@ mpMainWindow(pMainWindow)
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
+  mSlotConnection
+    = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
 }
 
 cedar::proc::gui::Network::~Network()
 {
+  if (mSlotConnection.connected())
+  {
+    mSlotConnection.disconnect();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -424,6 +430,60 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
     {
       //!@todo properly warn the user about this in the UI rather than in the console.
       std::cout << "Unknown ui item type: " << type << " in file " << this->mFileName << std::endl;
+    }
+  }
+}
+
+void cedar::proc::gui::Network::checkSlots()
+{
+  this->addDataItems();
+}
+
+void cedar::proc::gui::Network::addDataItems()
+{
+  qreal data_size = 10.0; //!@todo don't hard-code the size of the data items
+  qreal padding = static_cast<qreal>(3);
+  std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
+  std::map<cedar::proc::DataRole::Id, QPointF> add_directions;
+
+  add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -padding - data_size);
+  add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
+
+  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-padding - data_size, 0);
+  add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
+
+  add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0);
+  add_directions[cedar::proc::DataRole::OUTPUT] = QPointF(0, 1);
+
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+      enum_it != cedar::proc::DataRole::type().list().end();
+      ++enum_it)
+  {
+    if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
+      continue;
+
+    // populate step item list
+    mSlotMap[*enum_it] = DataSlotNameMap();
+
+    const QPointF& origin = add_origins[*enum_it];
+    const QPointF& direction = add_directions[*enum_it];
+
+    try
+    {
+      qreal count = 0;
+      cedar::proc::Step::SlotMap& slotmap = this->mNetwork->getDataSlots(*enum_it);
+      for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        cedar::proc::DataSlotPtr slot = iter->second;
+        cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
+        p_item->setPos(origin + count * direction * (data_size + padding) );
+        mSlotMap[slot->getRole()][slot->getName()] = p_item;
+        count += static_cast<qreal>(1.0);
+      }
+    }
+    catch(const cedar::proc::InvalidRoleException&)
+    {
+      // ok -- a step may not have any data for this role.
     }
   }
 }

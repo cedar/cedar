@@ -121,11 +121,11 @@ int main(int, char**)
   TestClassPtr childClass(new TestClass());
   childClass->setName("childClass");
   network->add(childClass);
-  childClass->getInputSlot("input")->promote(network);
-  childClass->getOutputSlot("output")->promote(network);
+  network->promoteSlot(childClass->getInputSlot("input"));
+  network->promoteSlot(childClass->getOutputSlot("output"));
 
   root->add(network);
-  root->connectSlots("rootClass.output", "network.input");
+  root->connectSlots("rootClass.output", "network.childClass.input");
 
   std::cout << "trigger count before: " << childClass->getTriggerCounter() << std::endl;
   rootClass->onTrigger();

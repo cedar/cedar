@@ -47,14 +47,14 @@
 cedar::proc::PromotedOwnedData::PromotedOwnedData
 (
   cedar::proc::DataSlotPtr promotedSlot,
-  cedar::proc::Connectable*
+  cedar::proc::Connectable* parent
 )
 :
 cedar::proc::OwnedData
 (
   promotedSlot->getRole(),
-  promotedSlot->getName(),
-  promotedSlot->getParentPtr(),
+  promotedSlot->getParent() + "." + promotedSlot->getName(),
+  parent, //promotedSlot->getParentPtr(),
   promotedSlot->isMandatory()
 ),
 mDataSlot(promotedSlot)

@@ -135,7 +135,12 @@ public:
   //!@brief checks if this Connectable is the parent of this DataSlotItem
   bool isParent(cedar::proc::ConstConnectablePtr parent) const;
 
-  void promote(cedar::proc::NetworkPtr network);
+  void promote();
+
+  bool isPromoted() const;
+
+  //!@brief get the pointer of this slot's parent
+  cedar::proc::Connectable* getParentPtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -148,8 +153,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief get the pointer of this slot's parent
-  cedar::proc::Connectable* getParentPtr();
+  // non yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -173,6 +177,9 @@ private:
 
   //! Role of the slot (input, output, ...)
   cedar::proc::DataRole::Id mRole;
+
+  //! Promoted flag
+  bool mIsPromoted;
 }; // class cedar::proc::DataSlot
 
 #endif // CEDAR_PROC_DATA_SLOT_H

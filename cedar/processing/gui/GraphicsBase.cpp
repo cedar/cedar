@@ -119,6 +119,13 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
       mPath.lineTo(0, this->height() / static_cast<qreal>(2));
       break;
 
+    case BASE_SHAPE_CROSS:
+      mPath.moveTo(0, this->height());
+      mPath.lineTo(this->width(), 0);
+      mPath.moveTo(0, 0);
+      mPath.lineTo(this->width(), this->height());
+      break;
+
     case BASE_SHAPE_RECT:
     case BASE_SHAPE_ROUND:
       // no custom path is used
@@ -345,6 +352,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
 
       case BASE_SHAPE_DIAMOND:
+      case BASE_SHAPE_CROSS:
         painter->drawPath(mPath);
         break;
     }
@@ -366,6 +374,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
 
       case BASE_SHAPE_DIAMOND:
+      case BASE_SHAPE_CROSS:
         painter->drawPath(mPath);
         break;
     }
@@ -411,6 +420,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
 
       case BASE_SHAPE_DIAMOND:
+      case BASE_SHAPE_CROSS:
         painter->drawPath(mPath);
         break;
     }

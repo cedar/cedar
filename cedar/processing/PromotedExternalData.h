@@ -77,6 +77,8 @@ public:
   //!@brief set the current validity at the promoted slot
   void setValidity(VALIDITY validity);
 
+  const cedar::proc::Connectable* getNetwork() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

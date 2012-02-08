@@ -210,7 +210,11 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
     mElements[instanceName] = element;
     element->resetChangedStates(true);
   }
-  element->setNetwork(this);
+  if (cedar::proc::NetworkPtr old_network = element->getNetwork()) // element was registered elsewhere
+  {
+    old_network->remove(element);
+  }
+  element->setNetwork(boost::shared_static_cast<cedar::proc::Network>(this->shared_from_this()));
 }
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
@@ -865,4 +869,17 @@ std::string cedar::proc::Network::findPath(cedar::proc::ConstElementPtr findMe) 
 void cedar::proc::Network::promoteSlot(DataSlotPtr promotedSlot)
 {
   this->declarePromotedData(promotedSlot);
+  this->mSlotChanged();
+}
+
+void cedar::proc::Network::demoteSlot(const std::string& /*name*/)
+{
+  //!@todo implement demotion of slots
+  std::cout << "todo: implement demotion of slots" << std::endl;
+  this->mSlotChanged();
+}
+
+boost::signals2::connection cedar::proc::Network::connectToSlotChangedSignal(boost::function<void ()> slot)
+{
+  return mSlotChanged.connect(slot);
 }

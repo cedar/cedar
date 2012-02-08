@@ -41,10 +41,13 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/Network.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/Manager.h"
+#include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
@@ -62,7 +65,7 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::StepItem *pParent,
+cedar::proc::gui::DataSlotItem::DataSlotItem(cedar::proc::gui::GraphicsBase *pParent,
                                              cedar::proc::DataSlotPtr slot
                                              )
 :
@@ -88,7 +91,6 @@ mSlot(slot)
       this->setOutlineColor(QColor(140, 140, 140));
     }
   }
-
 }
 
 cedar::proc::gui::DataSlotItem::~DataSlotItem()
@@ -138,6 +140,12 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
     return cedar::proc::gui::CONNECT_NO;
   }
 
+  // ... is this a promoted item?
+  if (p_target->getSlot()->isPromoted())
+  {
+    return cedar::proc::gui::CONNECT_NO;
+  }
+
   // a step cannot connect to itself
   if (this->mpStep == p_target->mpStep)
   {
@@ -147,7 +155,16 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
   if (this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT
       && p_target->mSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
-    switch (p_target->mpStep->getStep()->determineInputValidity(p_target->mSlot, this->mSlot->getData()))
+    cedar::proc::DataSlot::VALIDITY validity;
+    if (cedar::proc::gui::StepItem* p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(p_target))
+    {
+      validity = p_step_item->getStep()->determineInputValidity(p_target->mSlot, this->mSlot->getData());
+    }
+    else if (cedar::proc::gui::Network* p_network_item = dynamic_cast<cedar::proc::gui::Network*>(p_target))
+    {
+      validity = p_network_item->network()->determineInputValidity(p_target->mSlot, this->mSlot->getData());
+    }
+    switch (validity)
     {
       case cedar::proc::DataSlot::VALIDITY_ERROR:
         return cedar::proc::gui::CONNECT_ERROR;
@@ -176,8 +193,41 @@ void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *p
   }
 }
 
-void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * /*event*/)
+void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
+  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ASSERT(p_scene);
+
+  QMenu menu;
+
+  if (this->scene()->selectedItems().size() > 1)
+  {
+    p_scene->networkGroupingContextMenuEvent(menu);
+    menu.exec(event->screenPos());
+    return;
+  }
+  QAction *p_promote_action = menu.addAction("promote slot");
+  // no slot can be promoted to the root network
+  if ((this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->network()) || this->mSlot->isPromoted())
+  {
+    p_promote_action->setEnabled(false);
+  }
+  QAction *p_debug_action = menu.addAction("debug");
+  QAction *a = menu.exec(event->screenPos());
+
+  if (a == NULL)
+    return;
+
+  if (a == p_promote_action)
+  {
+    // Promote in the underlying non-gui. This automatically sends a signal, which creates the GUI representation.
+    this->mSlot->getParentPtr()->getNetwork()->promoteSlot(this->mSlot);
+  }
+  if (a == p_debug_action)
+  {
+    std::cout << this->mSlot->getParent() << " " <<  this->mSlot->getName() << std::endl;
+    std::cout << this->mSlot->getParentPtr()->getNetwork()->getName() << std::endl;
+  }
 }
 
 const std::string& cedar::proc::gui::DataSlotItem::getName() const
@@ -190,7 +240,10 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   //todo: move this out of here and let it be called by a signal
   this->generateTooltip();
   painter->save(); // save current painter settings
-
+  if (mSlot->isPromoted())
+  {
+    this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_CROSS);
+  }
   this->paintFrame(painter, style, widget);
 
   //! @todo make drawing pretty.
