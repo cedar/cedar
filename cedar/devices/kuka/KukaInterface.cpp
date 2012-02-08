@@ -127,8 +127,6 @@ bool cedar::dev::kuka::KukaInterface::isMovable()
   FRI_STATE state = getFriState();
   mLock.unlock();
 
-  std::cout << "KukaInterface::isMovable(), on = " << on << ", state = " << state << std::endl;
-
   if (on && (state == FRI_STATE_CMD))
   {
     return true;
