@@ -677,7 +677,7 @@ void cedar::proc::Connectable::parseDataNameNoRole
 
   // Split the string. Step name is everything before the dot, dataName everything after it.
   connectableName = instr.substr(0, dot_idx);
-  dataName = instr.substr(dot_idx+1, instr.length() - dot_idx - 1);
+  dataName = instr.substr(dot_idx + 1, instr.length() - dot_idx - 1);
 }
 
 void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
@@ -692,7 +692,7 @@ void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
     CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
   }
   std::string dotted_name = promotedSlot->getParent() + "." + promotedSlot->getName();
-  std::cout << dotted_name << std::endl;
+
   // check for duplicate entries in the slot map
   SlotMap::iterator map_iter = iter->second.find(dotted_name);
   if (map_iter != iter->second.end())

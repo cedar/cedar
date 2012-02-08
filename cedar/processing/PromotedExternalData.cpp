@@ -61,6 +61,8 @@ cedar::proc::ExternalData
 mDataSlot(promotedSlot),
 mpNetwork(parent)
 {
+  CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(mDataSlot));
+  this->setCollection(boost::shared_static_cast<cedar::proc::ExternalData>(mDataSlot)->isCollection());
 }
 
 cedar::proc::PromotedExternalData::~PromotedExternalData()
