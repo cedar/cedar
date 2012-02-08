@@ -227,6 +227,10 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   {
     std::cout << this->mSlot->getParent() << " " <<  this->mSlot->getName() << std::endl;
     std::cout << this->mSlot->getParentPtr()->getNetwork()->getName() << std::endl;
+    if (cedar::proc::ExternalDataPtr ext_data = boost::shared_dynamic_cast<cedar::proc::ExternalData>(mSlot))
+    {
+      std::cout << ext_data->isCollection() << std::endl;
+    }
   }
 }
 
@@ -240,6 +244,7 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   //todo: move this out of here and let it be called by a signal
   this->generateTooltip();
   painter->save(); // save current painter settings
+  //!@todo may call setBaseShape when receiving a signal, not every time paint() is called
   if (mSlot->isPromoted())
   {
     this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_CROSS);
