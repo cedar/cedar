@@ -58,7 +58,7 @@ class WorkerThread : public cedar::aux::LoopedThread
 {
 public:
   WorkerThread(
-                const std::vector<cedar::dev::robot::KinematicChainPtr> &arms,
+                cedar::dev::robot::KinematicChainPtr arm,
                 cedar::dev::robot::KinematicChainModelPtr arm_model,
                 cedar::aux::ObjectPtr target
               )
@@ -66,7 +66,7 @@ public:
   mArmModel(arm_model),
   mTarget(target)
   {
-    mArms = arms;
+    mpArm = arm;
     mSpeed = .05; // movement speed, in meters / second
     mCloseDistance = 0.02;
   };
@@ -79,17 +79,10 @@ private:
     // update the model
     mArmModel->update();
 
-    // decide whether the chains are movable
-    bool move = true;
-    for (unsigned int i=0; i<mArms.size(); i++)
+    // decide whether the chain is movable
+    if (mpArm->isMovable())
     {
-      move = (move && mArms[i]->isMovable());
-    }
-
-    // move
-    if (move)
-    {
-      cv::Mat v = cv::Mat::zeros(mArms[0]->getNumberOfJoints(), 1, CV_64FC1);
+      cv::Mat v = cv::Mat::zeros(mpArm->getNumberOfJoints(), 1, CV_64FC1);
       cv::Mat k_hom = (mTarget->getPosition() - mArmModel->calculateEndEffectorPosition());
       cv::Mat k(k_hom, cv::Rect(0, 0, 1, 3));
 
@@ -102,56 +95,18 @@ private:
         v = direction * s;
 
         cv::Mat J = mArmModel->calculateEndEffectorJacobian();
-        cv::Mat J_pi = cv::Mat::zeros(mArms[0]->getNumberOfJoints(), 3, CV_64FC1);
+        cv::Mat J_pi = cv::Mat::zeros(mpArm->getNumberOfJoints(), 3, CV_64FC1);
         cv::invert(J, J_pi, cv::DECOMP_SVD);
         cv::Mat joint_velocities = J_pi * v;
 
-//        std::cout << "p = " << std::endl;
-//        cedar::aux::math::write(mArmModel->calculateEndEffectorPosition());
-//        std::cout << "g = " << std::endl;
-//        cedar::aux::math::write(mTarget->getPosition());
-//        std::cout << "k_hom = " << std::endl;
-//        cedar::aux::math::write(k_hom);
-//        std::cout << "k = " << std::endl;
-//        cedar::aux::math::write(k);
-//        std::cout << "direction = " << std::endl;
-//        cedar::aux::math::write(direction);
-//        std::cout << "J = " << std::endl;
-//        cedar::aux::math::write(J);
-//        std::cout << "J_pi = " << std::endl;
-//        cedar::aux::math::write(J_pi);
-//        std::cout << "joint_velocities = " << std::endl;
-//        cedar::aux::math::write(joint_velocities);
-
-        for (unsigned int i=0; i<mArms.size(); i++)
-        {
-          mArms[i]->setJointVelocities(joint_velocities);
-        }
-
-//      cedar::aux::math::write(v);
+        mpArm->setJointVelocities(joint_velocities);
         std::cout << "moving towards the target" << std::endl;
     }
-    else
-    {
-      if (mArms.size() > 1)
-      {
-        std::cout << "hardware is present but not movable, mirroring the hardware configuration in the simulator" << std::endl;
-        // hardware is present but not movable, so mirror the hardware state in the simulator
-        for (unsigned int i=0; i<mArms[0]->getNumberOfJoints(); i++)
-        {
-          mArms[0]->setJointAngle(i, mArms[1]->getJointAngle(i));
-        }
-      }
-      else
-      {
-        std::cout << "cannot move simulated arm for some obscure reason" << std::endl;
-      }
-    }
-    std::cout << "---------------------------" << std::endl;
+//    std::cout << "---------------------------" << std::endl;
   };
 
 public:
-  std::vector<cedar::dev::robot::KinematicChainPtr> mArms;
+  cedar::dev::robot::KinematicChainPtr mpArm;
   cedar::dev::robot::KinematicChainModelPtr mArmModel;
   cedar::aux::ObjectPtr mTarget;
   double mSpeed;
@@ -163,15 +118,18 @@ int main(int argc, char **argv)
 {
   std::string mode = "0";
   std::string configuration_file_path = "../../examples/kukaMovement/";
+  // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
   { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
     std::cout << "Usage is -c <path to configs> -m <mode>" << std::endl;
-    std::cout << "mode 'hardware': also use the hardware" << std::endl;
+    std::cout << "mode 'simulation': use a simulated arm (default)" << std::endl;
+    std::cout << "mode 'hardware': use the hardware and visualize it" << std::endl;
     return 0;
   }
+  // parse arguments
   for (int i = 1; i < argc; i++)
   {
-    if (i+1 != argc) // Check that we haven't finished parsing already
+    if (i+1 != argc) // check that we haven't finished parsing already
     {
       if (std::string(argv[i]) == "-c")
       {
@@ -189,9 +147,36 @@ int main(int argc, char **argv)
     use_hardware = true;
   }
 
+  // create QApplication and declare widget pointers that might be needed
   QApplication a(argc, argv);
   cedar::dev::kuka::gui::FriStatusWidget* p_fri_status_widget = 0;
-  cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
+
+  // kinematic chain and model
+  cedar::dev::robot::KinematicChainPtr p_arm;
+  if (use_hardware)
+  {
+    // create the hardware interface
+    cedar::dev::kuka::KukaInterfacePtr p_lbr4(new cedar::dev::kuka::KukaInterface(configuration_file_path + "kuka_lbr4.conf"));
+    p_arm = p_lbr4;
+    p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(p_lbr4);
+    p_fri_status_widget->startTimer(100);
+    p_fri_status_widget->show();
+  }
+  else
+  {
+    cedar::dev::robot::KinematicChainPtr p_sim(new cedar::dev::robot::SimulatedKinematicChain(configuration_file_path + "kuka_lbr4.conf"));
+    // set simulated arm to useful initial condition
+    p_sim->setJointAngle(0, 0.1);
+    p_sim->setJointAngle(1, 0.2);
+    p_sim->setJointAngle(2, 0.1);
+    p_sim->setJointAngle(3, 0.2);
+    p_sim->setJointAngle(5, 0.2);
+    p_arm = p_sim;
+  }
+
+  cedar::dev::robot::KinematicChainModelPtr p_arm_model(new cedar::dev::robot::KinematicChainModel(p_arm));
+
+  // create the viewer, scene and objects for the visualization
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
@@ -199,7 +184,6 @@ int main(int argc, char **argv)
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
   viewer.startTimer(50);
-  std::vector<cedar::dev::robot::KinematicChainPtr> kinematic_chains;
 
   // create a target object and add it to the scene
   cedar::aux::ObjectPtr target(new cedar::aux::Object());
@@ -213,39 +197,18 @@ int main(int argc, char **argv)
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
   p_scene_widget->show();
 
-  // kinematic chain and model
-  cedar::dev::robot::KinematicChainPtr p_arm_sim(new cedar::dev::robot::SimulatedKinematicChain(configuration_file_path + "kuka_lbr4.conf"));
-  cedar::dev::robot::KinematicChainModelPtr p_arm_model(new cedar::dev::robot::KinematicChainModel(p_arm_sim));
-  kinematic_chains.push_back(p_arm_sim);
-
   // visualization, scene and viewer
   cedar::dev::robot::gl::KinematicChainPtr p_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_arm_model));
   cedar::aux::gl::ObjectPtr p_object;
   p_object = p_arm_visualization;
   p_scene->addObject(p_object);
 
-  // set simulated arm to useful initial condition
-  p_arm_sim->setJointAngle(0, 0.1);
-  p_arm_sim->setJointAngle(1, 0.2);
-  p_arm_sim->setJointAngle(2, 0.1);
-  p_arm_sim->setJointAngle(3, 0.2);
-  p_arm_sim->setJointAngle(5, 0.2);
-
-  if (use_hardware)
-  {
-    // create the hardware interface
-    cedar::dev::kuka::KukaInterfacePtr p_arm(new cedar::dev::kuka::KukaInterface(configuration_file_path + "kuka_lbr4.conf"));
-    kinematic_chains.push_back(p_arm);
-    p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(p_arm);
-    p_fri_status_widget->startTimer(100);
-    p_fri_status_widget->show();
-  }
-
-  p_kinematic_chain_widget
-   = new cedar::dev::robot::gui::KinematicChainWidget(kinematic_chains, configuration_file_path + "kuka_lbr4_widget.conf");
+  // monitor/command widget for the arm
+  cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget
+    = new cedar::dev::robot::gui::KinematicChainWidget(p_arm, configuration_file_path + "kuka_lbr4_widget.conf");
   p_kinematic_chain_widget->show();
 
-  WorkerThread worker(kinematic_chains, p_arm_model, target);
+  WorkerThread worker(p_arm, p_arm_model, target);
   worker.setStepSize(10);
   worker.start();
 
