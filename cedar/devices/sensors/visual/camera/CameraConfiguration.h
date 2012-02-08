@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        CameraConfiguration.h
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Georg.Hartinger
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2011 12 01
 
-    Description:
+    Description: Header of the @em cedar::devices::visual::CameraConfiguration class.
 
     Credits:
 
@@ -45,9 +45,10 @@
 // SYSTEM INCLUDES
 
 
-/*!@brief This class manage the properties and capabilities of a camera.
+/*! \class cedar::dev::sensors::visual::CameraConfiguration
+ *  \brief This class manage the properties and capabilities of a camera.
  *
- * \remarks
+ *  \remarks
  *    With the methods of this class, the CameraGraber class can evaluate the available properties
  *    and their possible values.
  *
@@ -169,7 +170,7 @@ public:
   // none yet (hopefully never!)
 protected:
 
-  bool doInit();
+  //bool doInit();
 
 
 

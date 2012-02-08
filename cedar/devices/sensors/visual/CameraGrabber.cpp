@@ -760,12 +760,22 @@ bool CameraGrabber::setCameraProperty(unsigned int channel,CameraProperty::Id pr
 
   //------------------------------------------------------
   //check property modes
-  bool special_mode = false;
   if (wanted_value == CAMERA_PROPERTY_MODE_AUTO)
   {
     if (mCamConfigurations.at(channel)->isAutoCapable(propId))
     {
-      special_mode = true;
+      if (setProperty(channel,prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_AUTO)))
+      {
+         return true;
+      }
+      else
+      {
+        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+        std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                  << "\" couldn't set to mode \"auto\""  << std::endl;
+        #endif
+        return false;
+      }
     }
     else
     {
@@ -780,7 +790,18 @@ bool CameraGrabber::setCameraProperty(unsigned int channel,CameraProperty::Id pr
   {
     if (mCamConfigurations.at(channel)->isOnOffCapable(propId))
     {
-      special_mode = true;
+      if (setProperty(channel,prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_OFF)))
+      {
+         return true;
+      }
+      else
+      {
+        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+        std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                  << "\" couldn't switched off"  << std::endl;
+        #endif
+        return false;
+      }
     }
     else
     {
@@ -795,7 +816,18 @@ bool CameraGrabber::setCameraProperty(unsigned int channel,CameraProperty::Id pr
   {
     if (mCamConfigurations.at(channel)->isOnePushCapable(propId))
     {
-      special_mode = true;
+      if (setProperty(channel,prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO)))
+      {
+         return true;
+      }
+      else
+      {
+        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+        std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
+                  << "\" couldn't set to mode \"OnePushAuto\""  << std::endl;
+        #endif
+        return false;
+      }
     }
     else
     {
@@ -805,13 +837,6 @@ bool CameraGrabber::setCameraProperty(unsigned int channel,CameraProperty::Id pr
       #endif
       return false;
     }
-  }
-
-
-  //decide if special mode or manual setting
-  if (special_mode)
-  {
-    //todo: implement special mode
   }
   else
   {
@@ -857,35 +882,36 @@ bool CameraGrabber::setCameraProperty(unsigned int channel,CameraProperty::Id pr
         std::cout << "[CameraGrabber::setCameraProperty] set " << prop_name << " to " << wanted_value << std::endl;
       }
     #endif
-  }
 
-  //check if already set
-  int old_value = boost::math::iround(getCameraProperty(channel,propId));
-  if ( old_value == wanted_value)
-  {
-    return true;
-  }
 
-  //not set, set it
-  int new_value = 0;
-  //if (mVideoCaptures.at(channel).set(propId, static_cast<double>(wanted_value))) asdf
-  if (setProperty(channel,prop_id, static_cast<double>(wanted_value)))
-  {
-    //and check if successful
-    new_value = boost::math::iround(getCameraProperty(channel,propId));
-    if (new_value == wanted_value)
+    //check if already set
+    int old_value = boost::math::iround(getCameraProperty(channel,propId));
+    if ( old_value == wanted_value)
     {
       return true;
     }
-  }
 
-  // an error occurred
-  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-    std::cout << "[CameraGrabber::setCameraProperty] Couldn't set Property "
-              << prop_name
-              << " to " << value << ". " << std::endl;
-  #endif
-  return false;
+    //not set, set it
+    int new_value = 0;
+    //if (mVideoCaptures.at(channel).set(propId, static_cast<double>(wanted_value))) asdf
+    if (setProperty(channel,prop_id, static_cast<double>(wanted_value)))
+    {
+      //and check if successful
+      new_value = boost::math::iround(getCameraProperty(channel,propId));
+      if (new_value == wanted_value)
+      {
+        return true;
+      }
+    }
+
+    // an error occurred
+    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::cout << "[CameraGrabber::setCameraProperty] Couldn't set Property "
+                << prop_name
+                << " to " << value << ". " << std::endl;
+    #endif
+    return false;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

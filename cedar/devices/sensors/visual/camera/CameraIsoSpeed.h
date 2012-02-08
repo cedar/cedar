@@ -55,6 +55,7 @@ class cedar::dev::sensors::visual::CameraIsoSpeed
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
 public:
   typedef cedar::aux::EnumId Id;
 public:
@@ -93,12 +94,14 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   static const Id ISO_100 = 100;
   static const Id ISO_200 = 200;
   static const Id ISO_400 = 400;
   static const Id ISO_800 = 800;
   static const Id ISO_1600 = 1600;
   static const Id ISO_3200 = 3200;
+
     
 protected:
   // none yet
@@ -116,7 +119,9 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
+//!@endcond
+
+}; // cedar::dev::sensors::visual::CameraIsoSpeed
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_ISO_SPEED_H
 

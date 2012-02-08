@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        <filename>
+    File:        CameraConfiguration.cpp
 
-    Maintainer:  <first name> <last name>
-    Email:       <email address>
-    Date:        <creation date YYYY MM DD>
+    Maintainer:  Georg.Hartinger
+    Email:       georg.hartinger@ini.rub.de
+    Date:        2011 12 01
 
-    Description:
+    Description: Implementation of the @em cedar::devices::visual::CameraConfiguration class.
 
     Credits:
 

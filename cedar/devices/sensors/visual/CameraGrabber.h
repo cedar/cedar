@@ -40,6 +40,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
+#include "cedar/devices/sensors/visual/camera/defines.h"
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
 #include "cedar/devices/sensors/visual/camera/CameraVideoMode.h"
@@ -53,39 +54,6 @@
 
 // SYSTEM INCLUDES
 
-//--------------------------------------------------------------------------------------------------------------------
-//mappings from OpenCv constants
-//return value, if a property is not supported from the actual device
-#define CAMERA_PROPERTY_NOT_SUPPORTED -1
-
-//sets a feature to auto-mode. The propery have to be auto_capable.
-//Assigning a value to a feature, sets its mode to manual // =-2
-#define CAMERA_PROPERTY_MODE_AUTO CV_CAP_PROP_DC1394_MODE_AUTO
-
-//if a feature is on/off capable, this value turns it off //=-4
-#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
-
-//this sets a property to its one_push_auto mode. The feature have to be one_push_auto capable.
-//one_push_auto: set the property to the wanted value and then to one_push_auto.
-//the camera will try to automatically hold this value //-1
-#define CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO CV_CAP_PROP_DC1394_MODE_ONE_PUSH_AUTO
-//--------------------------------------------------------------------------------------------------------------------
-
-
-//--------------------------------------------------------------------------------------------------------------------
-  /*! \brief Stores the unique Id of a camera
-   *
-   */
-struct CameraId
-{
-  unsigned int busId;
-  unsigned int guid;
-};
-//--------------------------------------------------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------------------------------------------------
-
-//--------------------------------------------------------------------------------------------------------------------
 
 /*! \class cedar::dev::sensors::visual::CameraGrabber
  *  \brief This grabber grabs images from a camera
@@ -180,18 +148,18 @@ public:
    *   \param channel This is the index of the source you want to get the parameter value.
    *   \param propId This is any supported property-Id<br>
    *     If property-id is not supported or unknown, return value will be -1.
-   *   \remarks Have a look at the OpenCV documentation for VideoCapture::get() for details on supported parameters
-   *           or look at /usr/local/include/opencv2/highgui/highgui_c.h
+   *   \see CameraProperty
    */
   double getCameraProperty(
                             unsigned int channel,
                             CameraProperty::Id propId
                           );
 
-  /*  \brief Get informations on camera 0
+  /*!  \brief Get informations on camera on channel 0
    *  \see getCameraProperty(unsigned int, CameraParam_t)
-   *  \param propId This is any supported property-Id<br>
+   *  \param propId This is any known property-Id<br>
    *     If property-id is not supported or unknown, return value will be -1.
+   *   \see CameraProperty
    */
   double getCameraProperty(
                             CameraProperty::Id propId
@@ -201,11 +169,10 @@ public:
   /*!  \brief With this method, it is possible to set Information on any channel.
    *   \remarks This method passes the arguments directly to the corresponding capture device
    *   \param channel This is the index of the source you want to set the parameter value.
-   *   \param propId This is any supported property-Id<br>
+   *   \param propId This is any known property-Id<br>
    *     If property-id is not supported or unknown, return value will be false.
    *   \param value This is the new value.
-   *   \remarks Have a look at the OpenCV documentation for VideoCapture::get() for details on supported parameters
-   *           or look at /usr/local/include/opencv2/highgui/highgui_c.h
+   *   \see CameraProperty
    */
   bool setCameraProperty(
                           unsigned int channel,
@@ -213,9 +180,8 @@ public:
                           double value
                         );
   
-  /*  \brief Set informations on camera 0
-   *  \see setCameraProperty(unsigned int, CameraParam_t)
-   *   \param propId This is any supported property-Id<br>
+  /*!  \brief Set informations on camera 0
+   *  \param propId This is any knoqn property-Id<br>
    *     If property-id is not supported or unknown, return value will be false.
    *   \param value This is the new value.
    */
@@ -226,12 +192,11 @@ public:
 
   /*! \brief Set values on the camera which have to be adjusted before the first image will be grabbed
    *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param setting The id of the setting you want to change
+   *  \param settingId The id of the setting you want to change
    *  \param value The new value
    *  \remarks
-   *      This method can be used to directly set such a feature (Mode, Fps, IsoSpeed, FrameSize). <br>
-   *      It is advised to use the enum-style getCamera... and setCamera... methods.
-   *  \see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize
+   *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize. <br>
+   *  \see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
    */
   bool setCameraSetting(
                          unsigned int channel,
@@ -241,12 +206,10 @@ public:
 
   /*! \brief Get values of the camera which have to be adjusted before the first image will be grabbed
    *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param setting The id of the setting you want to change
-   *
+   *  \param settingId The id of the setting you want to change
    *  \remarks
-   *      This method can be used to directly get such a feature (Mode, Fps, IsoSpeed, FrameSize) as double <br>
-   *      It is advised to use the enum-style getCamera... and setCamera... methods.
-   *  \see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize
+   *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize. <br>
+   *  \see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
    */
   double getCameraSetting(
                            unsigned int channel,
@@ -255,7 +218,7 @@ public:
 
   /*! \brief Set the video mode of the camera.
    *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param mode The new value
+   *  \param modeId The new value
    *
    * \remarks
    *   This can only be done, if the first frame wasn't already grabbed
@@ -275,7 +238,7 @@ public:
 
   /*! \brief Set the framerate of the camera.
    *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param fps The new value
+   *  \param fpsId The new value
    *
    * \remarks
    *   This can only be done, if the first frame wasn't already grabbed
@@ -298,7 +261,7 @@ public:
 
   /*! \brief Set the ISO-speed of the IEEE1394/firewire bus.
    *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param isoSpeed The new value
+   *  \param isoSpeedId The new value
    *
    * \remarks
    *   This can only be done, if the first frame wasn't already grabbed
@@ -447,10 +410,10 @@ protected:
 
 private:
 
-  //Set if Initialization should be finished in constructor
+  //! Set if Initialization should be finished in constructor
   bool mFinishInitialization;
 
-  //Set if the CameraGrabber should search the bus for a camera with the give guid
+  //! Set if the CameraGrabber should search the bus for a camera with the give guid
   bool mCreateGrabberByGuid;
 
   //--------------------------------------------------------------------------------------------------------------------

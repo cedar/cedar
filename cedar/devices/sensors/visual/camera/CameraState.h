@@ -39,6 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/devices/sensors/visual/camera/defines.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // PROJECT INCLUDES
@@ -46,37 +47,13 @@
 // SYSTEM INCLUDES
 #include <set>
 
-//--------------------------------------------------------------------------------------------------------------------
-//set to store all supported properties in
-typedef std::set<cedar::dev::sensors::visual::CameraProperty::Id> SupportedPropertiesSet;
 
-//--------------------------------------------------------------------------------------------------------------------
-//maps property enum id to value of the property
-typedef std::map<unsigned int,int> CameraPropertyValues;
-typedef std::pair<unsigned int, int> CameraPropertyValuesPair;
-
-//--------------------------------------------------------------------------------------------------------------------
-//macro to create a pair of property-enum to property value
-#define PROPERTY_VALUE_PAIR(A,B) std::pair<unsigned int,int>((A),(B))
-
-
-//--------------------------------------------------------------------------------------------------------------------
-//store the values of the settings of a camera for the configuration interface
-struct CameraSettings
-{
-  std::string fps;
-  std::string mode;
-  std::string iso_speed;
-  std::string capability_config_file_name;
-};
-//--------------------------------------------------------------------------------------------------------------------
-
-
-/*!@brief Stores the properties and the settings of one camera in a configuration file
- *
- * \remarks This class is used by the CameraConfiguration class to store the actual settings of
+/*! \class cedar::dev::sensors::visual::CameraState
+ *  \brief Stores the properties and the settings of one camera in a configuration file
+ *  \remarks This class is used by the CameraConfiguration class to store the actual settings of
  *          this camera
  */
+
 class cedar::dev::sensors::visual::CameraState
 :
 public cedar::aux::ConfigurationInterface
@@ -89,7 +66,15 @@ public cedar::aux::ConfigurationInterface
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The standard constructor.
+  /*!@brief Constructor
+   * \param videoCapture The already created cv::VideoCapture object from the CameraGrabber class
+   * \param channelPrefix The channel number as a prefix for the properties stored in the configuration file
+   * \param supportedProperties A set which contains all supported properties
+   * \param videoCaptureLock A boost::shared_pointer to an Object of QReadWriteLock
+   *                         (also created by the CameraGrabber class)
+   * \param configFileName The filename to store the actual values of the properties and features. You can use the
+   *                        configuration file of the CameraGrabber class
+   */
   CameraState(
                            cv::VideoCapture videoCapture,
                            QReadWriteLockPtr videoCaptureLock,
@@ -117,35 +102,34 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /// @cond SKIPPED_DOCUMENTATION
-  /* This Method reads all parameters and settings from the camera and stores them inside the buffers
-   *  This is needed for the configurationInterface
-   *  The parameters and settings will be stored within the mCamProperties and mCamSettings vectors
+   /*! \brief This Method reads all parameters and settings from the camera and stores them inside the buffers
+    *  \remarks
+   *    This is needed for the configurationInterface
+   *    The parameters and settings will be stored within the mCamProperties and mCamSettings vectors
    */
   void getAllParametersFromCam();
 
-  /*  This Method sets all parameters and settings read from the configfile to the camera
-   *  This is needed for the configurationInterface
+  /*! \brief This Method sets all parameters and settings read from the configfile to the camera
+   *  \remarks This is needed for the configurationInterface
    *  The parameters and settings will be synchronized from the mCamProperties and mCamSettings vector
    */
   bool setAllParametersToCam();
 
-  // create local buffer for camera properties and settings
-  // needed for the ConfigurationInterface class
+  /*! \brief Create local buffer for camera properties and settings
+   *  \remarks needed for the ConfigurationInterface class
+   */
   void createParameterStorage();
 
-  // Interface to ConfigurationInterface class;
+  ///! Interface to ConfigurationInterface class;
   bool declareParameter();
 
-  // set a parameter to the cv::VideoCapture
+  ///! Set a parameter in the cv::VideoCapture class
   // implements the cv::VideoCapture.set() method with respect to concurrent access
   bool setProperty(unsigned int prop_id, double value);
 
-  // get a parameter form the cv::VideoCapture
+  ///! Get a parameter form the cv::VideoCapture
   // implements the cv::VideoCapture.get() method with respect to concurrent access
   double getProperty(unsigned int prop_id);
-
-  /// @endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

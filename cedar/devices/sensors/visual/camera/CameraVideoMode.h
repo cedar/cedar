@@ -56,6 +56,8 @@ class cedar::dev::sensors::visual::CameraVideoMode
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+
+//!@cond SKIPPED_DOCUMENTATION
 public:
   typedef cedar::aux::EnumId Id;
 public:
@@ -103,6 +105,8 @@ public:
   //use MODE_BY_NUM to check which modes supported.
   //OpenCV firewire backend stores supported video modes in a list and
   //it is possible to change the mode through the indizes of this list
+
+
   static const Id MODE_BY_NUM_0 = 0;
   static const Id MODE_BY_NUM_1 = 1;
   static const Id MODE_BY_NUM_2 = 2;
@@ -165,7 +169,8 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
+//!@endcond
+}; // cedar::dev::sensors::visual::CameraVideoMode
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_VIDEO_MODE_H
 

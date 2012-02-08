@@ -69,6 +69,7 @@ class cedar::dev::sensors::visual::CameraProperty
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
 public:
   typedef cedar::aux::EnumId Id;
 public:
@@ -107,6 +108,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   static const Id PROP_BRIGHTNESS    = CV_CAP_PROP_BRIGHTNESS; // = 10
   static const Id PROP_SATURATION    = CV_CAP_PROP_SATURATION; // = 12;
   static const Id PROP_HUE           = CV_CAP_PROP_HUE; //13;
@@ -124,6 +126,7 @@ public:
   static const Id PROP_FOCUS         = CV_CAP_PROP_FOCUS; // 28;
   //static const Id PROP_GUID          = 29; //CV_CAP_PROP_GUID; // 29;
 
+
 protected:
   // none yet
 private:
@@ -140,7 +143,8 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
+//!@endcond
+}; // cedar::dev::sensors::visual::CameraProperty
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTY_H
 

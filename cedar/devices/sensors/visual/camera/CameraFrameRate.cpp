@@ -45,6 +45,7 @@
 cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate>
             cedar::dev::sensors::visual::CameraFrameRate::mType("cedar::dev::sensors::visual::CameraFramerate::");
 
+//!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_1_875;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_3_75;
@@ -55,7 +56,7 @@ const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visu
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_120;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_240;
 #endif // MSVC
-
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
