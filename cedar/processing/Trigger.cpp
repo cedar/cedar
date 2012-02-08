@@ -87,12 +87,12 @@ void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 #ifdef DEBUG_TRIGGERING
         std::cout << "Trigger " << this->getName() << " triggers " << this->mListeners.at(i)->getName() << std::endl;
 #endif // DEBUG_TRIGGERING
-        this->mListeners.at(i)->onTrigger(this->shared_from_this());
+        this->mListeners.at(i)->onTrigger(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
       }
     }
     else
     {
-      this->mListeners.at(i)->onTrigger(this->shared_from_this());
+      this->mListeners.at(i)->onTrigger(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
   }
 }
@@ -110,7 +110,7 @@ void cedar::proc::Trigger::addListener(cedar::proc::TriggerablePtr step)
     this->mListeners.push_back(step);
     if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
     {
-      trigger->notifyConnected(this->shared_from_this());
+      trigger->notifyConnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
   }
 }
@@ -128,7 +128,7 @@ void cedar::proc::Trigger::removeListener(cedar::proc::TriggerablePtr step)
   {
     if (cedar::proc::TriggerPtr trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(step))
     {
-      trigger->notifyDisconnected(this->shared_from_this());
+      trigger->notifyDisconnected(boost::shared_static_cast<cedar::proc::Trigger>(this->shared_from_this()));
     }
     this->mListeners.erase(iter);
   }

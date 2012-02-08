@@ -47,6 +47,8 @@
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -239,6 +241,8 @@ public:
   
   void promoteSlot(DataSlotPtr promotedSlot);
 
+  void demoteSlot(const std::string& name);
+
   /*!@brief This method lists all networks that are children of this network.
    */
   void listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const;
@@ -249,6 +253,8 @@ public:
    *        appending a number.
    */
   std::string getUniqueIdentifier(const std::string& identifier) const;
+
+  boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -319,7 +325,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief a boost signal that is emitted if a change in slot takes place
+  boost::signals2::signal<void ()> mSlotChanged;
 private:
   //! Map associating element names to elements.
   ElementMap mElements;

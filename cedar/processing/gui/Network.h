@@ -48,7 +48,8 @@
 #include "cedar/processing/Network.h"
 
 // SYSTEM INCLUDES
-
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 
 /*!@brief The representation of a cedar::proc::Network in a cedar::proc::gui::Scene.
  *
@@ -58,9 +59,13 @@
 class cedar::proc::gui::Network : public cedar::proc::gui::GraphicsBase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // types
   //--------------------------------------------------------------------------------------------------------------------
-
+public:
+  //!@brief mapping from data slot names to their graphical representation
+  typedef std::map<std::string, cedar::proc::gui::DataSlotItem*> DataSlotNameMap;
+  //!@brief mapping from data role id to a map of all data slots fitting this id
+  typedef std::map<cedar::proc::DataRole::Id, DataSlotNameMap> DataSlotMap;
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -125,6 +130,10 @@ private:
   //!@brief add all triggers contained in this network to a scene
   void addTriggersToScene();
 
+  void checkSlots();
+
+  void addDataItems();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,12 +148,17 @@ private:
   std::string mFileName;
   //!@brief a main window
   QMainWindow *mpMainWindow;
+  //!@brief a map of all data slots of the current step
+  DataSlotMap mSlotMap;
 
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
   //!@brief a vector of triggers, which contains all steps that should be added to the scene
   //        after reading a configuration
   std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
+
+  //! Connection to Network's slot changed signal.
+  boost::signals2::connection mSlotConnection;
 }; // class cedar::proc::gui::NetworkFile
 
 #endif // CEDAR_PROC_GUI_NETWORK_FILE_H

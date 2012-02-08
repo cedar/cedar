@@ -46,6 +46,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/gui/View.h"
+#include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -413,17 +414,23 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
           // source item is a data item
           case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
           {
-            cedar::proc::gui::DataSlotItem *p_source = dynamic_cast<cedar::proc::gui::DataSlotItem *>(mpConnectionStart);
+            cedar::proc::gui::DataSlotItem *p_source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(mpConnectionStart);
             CEDAR_DEBUG_ASSERT(p_source != NULL);
 
             switch (target->getGroup())
             {
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
               {
-                cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem *>(target);
+                cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target);
                 p_source->connectTo(p_data_target);
                 std::string source_name = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name = p_data_target->getSlot()->getParent() + std::string(".") + p_data_target->getSlot()->getName();
+                //!@todo this code is really messy, think about restructuring the GUI
+                if (cedar::proc::ConstPromotedExternalDataPtr ptr = boost::shared_dynamic_cast<const cedar::proc::PromotedExternalData>(p_data_target->getSlot()))
+                {
+                  target_name = ptr->getNetwork()->getName() + std::string(".") + p_data_target->getSlot()->getName();
+                }
+                //!@todo decide, at which network those two steps must be connected
                 mNetwork->network()->connectSlots(source_name, target_name);
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
@@ -651,4 +658,9 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem *pStep)
   CEDAR_DEBUG_ASSERT(this->mStepMap.find(pStep->getStep().get()) != this->mStepMap.end());
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
   delete pStep;
+}
+
+cedar::proc::gui::NetworkPtr cedar::proc::gui::Scene::getRootNetwork()
+{
+  return mNetwork;
 }

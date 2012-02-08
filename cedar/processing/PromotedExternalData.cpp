@@ -54,8 +54,8 @@ cedar::proc::PromotedExternalData::PromotedExternalData
 cedar::proc::ExternalData
 (
   promotedSlot->getRole(),
-  promotedSlot->getName(),
-  promotedSlot->getParentPtr(),
+  promotedSlot->getParent() + "." + promotedSlot->getName(),
+  parent,//promotedSlot->getParentPtr(),
   promotedSlot->isMandatory()
 ),
 mDataSlot(promotedSlot),
@@ -118,4 +118,9 @@ void cedar::proc::PromotedExternalData::setValidity(cedar::proc::DataSlot::VALID
 {
   this->mValidity = validity;
   this->mDataSlot->setValidity(validity);
+}
+
+const cedar::proc::Connectable* cedar::proc::PromotedExternalData::getNetwork() const
+{
+  return this->mpNetwork;
 }

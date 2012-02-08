@@ -691,34 +691,27 @@ void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
 
     CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
   }
-
+  std::string dotted_name = promotedSlot->getParent() + "." + promotedSlot->getName();
+  std::cout << dotted_name << std::endl;
   // check for duplicate entries in the slot map
-  SlotMap::iterator map_iter = iter->second.find(promotedSlot->getName());
+  SlotMap::iterator map_iter = iter->second.find(dotted_name);
   if (map_iter != iter->second.end())
   {
     CEDAR_THROW(cedar::proc::DuplicateNameException, "There is already a " +
                  cedar::proc::DataRole::type().get(promotedSlot->getRole()).prettyString()
-                 + " data-declaration with the name " + promotedSlot->getName() + ".");
+                 + " data-declaration with the name " + dotted_name + ".");
     return;
-  }
-
-  // check the name
-  if (promotedSlot->getName().find('.') != std::string::npos)
-  {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "Data names may not contain the character \".\". \""
-                                                   + promotedSlot->getName() + "\" in Connectable \"" + this->getName()
-                                                   + "\" violates this rule.");
   }
 
   // finally, insert a new data slot with the given parameters
   if (promotedSlot->getRole() == cedar::proc::DataRole::INPUT)
   {
-    iter->second[promotedSlot->getName()]
+    iter->second[dotted_name]
       = cedar::proc::DataSlotPtr(new cedar::proc::PromotedExternalData(promotedSlot, this));
     mSlotConnection
       = boost::shared_dynamic_cast<cedar::proc::ExternalData>
         (
-          iter->second[promotedSlot->getName()]
+          iter->second[dotted_name]
         )->connectToExternalDataChanged
            (
              boost::bind(&cedar::proc::Connectable::checkMandatoryConnections, this)
@@ -726,10 +719,10 @@ void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
   }
   else
   {
-    iter->second[promotedSlot->getName()]
+    iter->second[dotted_name]
       = cedar::proc::DataSlotPtr(new cedar::proc::PromotedOwnedData(promotedSlot, this));
   }
-
+  promotedSlot->promote();
   // since the data has (potentially) changed, re-check the inputs
   this->checkMandatoryConnections();
 }

@@ -57,7 +57,8 @@ mpParent(pParent),
 mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
-mRole(role)
+mRole(role),
+mIsPromoted(false)
 {
 }
 
@@ -133,9 +134,12 @@ bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) co
   return (parent.get() == mpParent);
 }
 
-void cedar::proc::DataSlot::promote(cedar::proc::NetworkPtr network)
+void cedar::proc::DataSlot::promote()
 {
-  cedar::proc::ConnectablePtr myParent = network->getElement<cedar::proc::Connectable>(mpParent->getName());
-  cedar::proc::DataSlotPtr me = myParent->getSlot(this->mRole, this->mName);
-  network->promoteSlot(me);
+  this->mIsPromoted = true;
+}
+
+bool cedar::proc::DataSlot::isPromoted() const
+{
+  return this->mIsPromoted;
 }
