@@ -45,6 +45,7 @@
 cedar::aux::EnumType<cedar::dev::sensors::visual::CameraProperty>
             cedar::dev::sensors::visual::CameraProperty::mType("cedar::dev::sensors::visual::CameraProperty::");
 
+//!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_BRIGHTNESS;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_SATURATION;
@@ -63,7 +64,7 @@ const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visua
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS;
 //const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_GUID;
 #endif // MSVC
-
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

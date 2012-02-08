@@ -59,6 +59,7 @@ class cedar::dev::sensors::visual::CameraFrameRate
   //--------------------------------------------------------------------------------------------------------------------
   // typedefs
   //--------------------------------------------------------------------------------------------------------------------
+//!@cond SKIPPED_DOCUMENTATION
 public:
   typedef cedar::aux::EnumId Id;
 public:
@@ -97,6 +98,7 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
   static const Id FRAMERATE_1_875 = 2;
   static const Id FRAMERATE_3_75 = 4;
   static const Id FRAMERATE_7_5 = 8;
@@ -105,6 +107,8 @@ public:
   static const Id FRAMERATE_60 = 60;
   static const Id FRAMERATE_120 = 120;
   static const Id FRAMERATE_240 = 240;
+
+
 protected:
   // none yet
 private:
@@ -121,7 +125,8 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
+//!@endcond
+}; // cedar::dev::sensors::visual::CameraFrameRate
 
 #endif // CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_FRAMERATE_H
 

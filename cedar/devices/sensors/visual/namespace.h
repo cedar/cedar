@@ -108,18 +108,20 @@ namespace cedar
 
         //! @brief A class which manages all supported properties and settings of a camera
         class CameraConfiguration;
+        //! @brief smart pointer for CameraConfiguration
         typedef boost::shared_ptr<CameraConfiguration> CameraConfigurationPtr;
 
         //! @brief A class to store the capabilities of a specific camera model
         class CameraCapabilities;
+        //! @brief  smart pointer for CameraCapabilieties
         typedef boost::shared_ptr<CameraCapabilities> CameraCapabilitiesPtr;
 
         //! @brief A class which manages the properties and settings of a camera, i.e. the actual state
         class CameraState;
+        //! @brief  smart pointer for CameraStatePtr
         typedef boost::shared_ptr<CameraState> CameraStatePtr;
 
-        // Shared pointer for QReadWriteLock
-        // used in CameraGrabber
+        //! @brief smart pointer for QReadWriteLock used in the CameraGrabber class
         typedef boost::shared_ptr<QReadWriteLock> QReadWriteLockPtr;
 
       }

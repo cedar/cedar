@@ -45,31 +45,11 @@
 
 // SYSTEM INCLUDES
 
-//--------------------------------------------------------------------------------------------------------------------
-/*! \brief Stores the capability of a property
- *  \remarks Every property have several ways to be accessed, and a defined range
- *    where the values can be set.
- *    This struct stores flags for all possible ways and the range of the values
- */
-struct CameraPropertyCapability
-{
-   cedar::dev::sensors::visual::CameraProperty::Id propId;
-   int max_value;
-   int min_value;
-   bool is_supported;
-   bool is_readable;
-   bool is_one_push_capable;
-   bool is_on_off_capable;
-   bool is_auto_capable;
-   bool is_manual_capable;
-   bool is_absolute_capable;
-} ;
-//--------------------------------------------------------------------------------------------------------------------
 
-
-/*!@brief This class manages the capabilities of a camera
- * \remarks It implements the configurationInterface private because
- * the configuration should never be written
+/*! \class cedar::dev::sensors::visual::CameraCapabilities
+ *  \brief This class manages the capabilities of a camera
+ *  \remarks It implements the configurationInterface private because
+ *      the configuration should never be written
  */
 class cedar::dev::sensors::visual::CameraCapabilities
 :
@@ -96,7 +76,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  //returns the capabilities of a given property
   /*! \brief Get the minimum possible value that can be set of the given property
    *  \param propId The id of the property
    */

@@ -45,8 +45,9 @@
 cedar::aux::EnumType<cedar::dev::sensors::visual::CameraVideoMode>
             cedar::dev::sensors::visual::CameraVideoMode::mType("cedar::dev::sensors::visual::CameraVideoMode::");
 
+//!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
-//supported video modes by numer
+//supported video modes by number
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_NOT_SET;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_0 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_BY_NUM_1 ;
@@ -93,7 +94,7 @@ const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visu
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_6 ;
 const cedar::dev::sensors::visual::CameraVideoMode::Id cedar::dev::sensors::visual::CameraVideoMode::MODE_FW_FORMAT7_7 ;
 #endif // MSVC
-
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

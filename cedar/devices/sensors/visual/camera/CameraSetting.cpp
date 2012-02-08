@@ -45,6 +45,7 @@
 cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
             cedar::dev::sensors::visual::CameraSetting::mType("cedar::dev::sensors::visual::CameraSetting::");
 
+//!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_WIDTH ;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_FRAME_HEIGHT;
@@ -52,7 +53,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_MODE;
   const cedar::dev::sensors::visual::CameraSetting::Id cedar::dev::sensors::visual::CameraSetting::SETTING_ISO_SPEED;
 #endif // MSVC
-
+//!@endcond
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
