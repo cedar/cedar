@@ -241,7 +241,7 @@ public:
   
   void promoteSlot(DataSlotPtr promotedSlot);
 
-  void demoteSlot(const std::string& name);
+  void demoteSlot(cedar::proc::DataRole::Id role, const std::string& name);
 
   /*!@brief This method lists all networks that are children of this network.
    */

@@ -436,11 +436,12 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
 
 void cedar::proc::gui::Network::checkSlots()
 {
-  this->addDataItems();
+  this->checkDataItems();
 }
 
-void cedar::proc::gui::Network::addDataItems()
+void cedar::proc::gui::Network::checkDataItems()
 {
+  std::cout << "checkDataItems called" << std::endl;
   qreal data_size = 10.0; //!@todo don't hard-code the size of the data items
   qreal padding = static_cast<qreal>(3);
   std::map<cedar::proc::DataRole::Id, QPointF> add_origins;
@@ -462,6 +463,11 @@ void cedar::proc::gui::Network::addDataItems()
     if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
       continue;
 
+    for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); ++it)
+    {
+      delete it->second;
+    }
+    mSlotMap[*enum_it].clear();
     // populate step item list
     mSlotMap[*enum_it] = DataSlotNameMap();
 

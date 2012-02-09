@@ -44,6 +44,8 @@
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Network.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/PromotedExternalData.h"
+#include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/processing/ExternalData.h"
 #include "cedar/processing/DataRole.h"
 #include "cedar/processing/Manager.h"
@@ -212,6 +214,17 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   {
     p_promote_action->setEnabled(false);
   }
+  QAction *p_demote_action = menu.addAction("demote slot");
+  p_demote_action->setEnabled(false);
+  // no slot can be demoted, if it was not promoted before
+  if
+  (
+    boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(this->mSlot)
+      || boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(this->mSlot)
+  )
+  {
+    p_demote_action->setEnabled(true);
+  }
   QAction *p_debug_action = menu.addAction("debug");
   QAction *a = menu.exec(event->screenPos());
 
@@ -222,6 +235,12 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   {
     // Promote in the underlying non-gui. This automatically sends a signal, which creates the GUI representation.
     this->mSlot->getParentPtr()->getNetwork()->promoteSlot(this->mSlot);
+  }
+  if (a == p_demote_action)
+  {
+    // Demote in the underlying non-gui. This automatically sends a signal, which removes the GUI representation.
+    cedar::proc::Network* network = static_cast<cedar::proc::Network*>(this->mSlot->getParentPtr());
+    network->demoteSlot(this->mSlot->getRole(), this->mSlot->getName());
   }
   if (a == p_debug_action)
   {
@@ -245,6 +264,19 @@ void cedar::proc::gui::DataSlotItem::paint(QPainter* painter, const QStyleOption
   this->generateTooltip();
   painter->save(); // save current painter settings
   //!@todo may call setBaseShape when receiving a signal, not every time paint() is called
+  this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND);
+  if (cedar::proc::ExternalDataPtr ext_data = boost::shared_dynamic_cast<cedar::proc::ExternalData>(mSlot))
+  {
+    if (ext_data->isCollection())
+    {
+      this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_DIAMOND);
+    }
+
+    if (!ext_data->isMandatory())
+    {
+      this->setOutlineColor(QColor(140, 140, 140));
+    }
+  }
   if (mSlot->isPromoted())
   {
     this->setBaseShape(cedar::proc::gui::GraphicsBase::BASE_SHAPE_CROSS);

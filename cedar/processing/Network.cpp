@@ -671,7 +671,11 @@ void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& roo
   }
 }
 
-void cedar::proc::Network::writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection)
+void cedar::proc::Network::writeDataConnection
+     (
+       cedar::aux::ConfigurationNode& root,
+       const cedar::proc::DataConnectionPtr connection
+     )
 {
   std::string source_str = connection->getSource()->getParent() + "." + connection->getSource()->getName();
   std::string target_str = connection->getTarget()->getParent() + "." + connection->getTarget()->getName();
@@ -898,10 +902,16 @@ void cedar::proc::Network::promoteSlot(DataSlotPtr promotedSlot)
   this->mSlotChanged();
 }
 
-void cedar::proc::Network::demoteSlot(const std::string& /*name*/)
+void cedar::proc::Network::demoteSlot(cedar::proc::DataRole::Id role, const std::string& name)
 {
-  //!@todo implement demotion of slots
-  std::cout << "todo: implement demotion of slots" << std::endl;
+  this->removePromotedData(role, name);
+  std::string enum_name = cedar::proc::DataRole::type().get(role).prettyString();
+  std::string promoted_name = name + "." + enum_name;
+  _mPromotedSlots->eraseAll(promoted_name);
+  std::string connectable;
+  std::string child_slot_name;
+  cedar::aux::splitFirst(name, ".", connectable, child_slot_name);
+  this->getElement<cedar::proc::Connectable>(connectable)->getSlot(role, child_slot_name)->demote();
   this->mSlotChanged();
 }
 

@@ -139,6 +139,11 @@ void cedar::proc::DataSlot::promote()
   this->mIsPromoted = true;
 }
 
+void cedar::proc::DataSlot::demote()
+{
+  this->mIsPromoted = false;
+}
+
 bool cedar::proc::DataSlot::isPromoted() const
 {
   return this->mIsPromoted;

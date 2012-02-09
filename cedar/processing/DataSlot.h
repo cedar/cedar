@@ -137,6 +137,8 @@ public:
 
   void promote();
 
+  void demote();
+
   bool isPromoted() const;
 
   //!@brief get the pointer of this slot's parent
