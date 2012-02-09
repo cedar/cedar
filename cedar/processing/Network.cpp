@@ -68,7 +68,7 @@
 
 cedar::proc::Network::Network()
 :
-_mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots"))
+_mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots", std::vector<std::string>()))
 {
 #ifdef DEBUG
   std::cout << "> allocated data (cedar::proc::Network, " << this << ")" << std::endl;
