@@ -25,8 +25,8 @@
 #   File:        CMakeLists.txt
 #
 #   Maintainer:  Hendrik Reimann
-#   Email:       hendrik.reimann@ini.rub.de
-#   Date:        2012 02 09
+#   Email:       hendrik.reimann@ini.rub.de,
+#   Date:        2012 01 31
 #
 #   Description:
 #
@@ -34,4 +34,6 @@
 #
 #=======================================================================================================================
 
-cedar_add_interactive_test("KinematicChainWidget" main.cpp)
+if(CEDAR_USE_KUKA_LWR)
+  cedar_add_executable(kukaMovement PREFIX "examples/")
+endif(CEDAR_USE_KUKA_LWR)

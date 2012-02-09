@@ -69,6 +69,13 @@ public:
   //!@brief draws a visualization of the object in the current GL context
   void draw(void);
   
+  //!@brief flags the drawing state of the end-effector velocity vector
+  void setDisplayEndEffectorVelocity(bool state);
+
+  //!@brief flags the drawing state of the end-effector acceleration vector
+  void setDisplayEndEffectorAcceleration(bool state);
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -94,5 +101,11 @@ protected:
 protected:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
   cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
-}; // class cedar::dev::robot::KinematicChainSimulation
+
+  //! decides whether the end-effector velocity will be drawn
+  bool mIsDrawingEndEffectorVelocity;
+  //! decides whether the end-effector acceleration will be drawn
+  bool mIsDrawingEndEffectorAcceleration;
+
+}; // class cedar::dev::robot::gl::KinematicChain
 #endif // CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H
