@@ -49,6 +49,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/PromotedExternalData.h"
+#include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -66,6 +67,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::proc::Network::Network()
+:
+_mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots"))
 {
 #ifdef DEBUG
   std::cout << "> allocated data (cedar::proc::Network, " << this << ")" << std::endl;
@@ -238,7 +241,11 @@ cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string&
   }
   else
   {
-    CEDAR_THROW(cedar::proc::InvalidNameException, "No element of the name " + name + " was found.");
+    CEDAR_THROW
+    (
+      cedar::proc::InvalidNameException, "No element of the name \"" + name
+        + "\" was found in the network \"" + this->getName() + "\"."
+    );
   }
 }
 
@@ -404,6 +411,8 @@ void cedar::proc::Network::writeTo(cedar::aux::ConfigurationNode& root)
   this->writeDataConnections(connections);
   if (!connections.empty())
     root.add_child("connections", connections);
+
+  this->cedar::aux::Configurable::writeConfiguration(root);
 }
 
 void cedar::proc::Network::writeMetaData(cedar::aux::ConfigurationNode& meta)
@@ -438,6 +447,8 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
 
 void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
 {
+  this->cedar::aux::Configurable::readConfiguration(root);
+
   try
   {
     const cedar::aux::ConfigurationNode& steps = root.get_child("steps");
@@ -462,6 +473,14 @@ void cedar::proc::Network::readFromV1(const cedar::aux::ConfigurationNode& root)
 #if defined DEBUG || defined DEBUG_FILE_READING
     std::cout << "No networks present while reading configuration." << std::endl;
 #endif // defined DEBUG || defined DEBUG_FILE_READING
+  }
+  // post-process networks (load promoted slots)
+  for (ElementMap::iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    if (cedar::proc::NetworkPtr network = boost::shared_dynamic_cast<cedar::proc::Network>(iter->second))
+    {
+      network->processPromotedSlots();
+    }
   }
 
   try
@@ -868,8 +887,19 @@ std::string cedar::proc::Network::findPath(cedar::proc::ConstElementPtr findMe) 
 
 void cedar::proc::Network::promoteSlot(DataSlotPtr promotedSlot)
 {
+  std::cout << "promoteSlot()" << std::endl;
   this->declarePromotedData(promotedSlot);
+  std::string enum_name = cedar::proc::DataRole::type().get(promotedSlot->getRole()).prettyString();
+  std::string promoted_name = promotedSlot->getParent() + "." + promotedSlot->getName() + "." + enum_name;
+  if (std::find(_mPromotedSlots->begin(), _mPromotedSlots->end(), promoted_name) == _mPromotedSlots->end())
+  {
+    _mPromotedSlots->pushBack
+    (
+      promoted_name
+    );
+  }
   this->mSlotChanged();
+  std::cout << "promoteSlotFinished()" << std::endl;
 }
 
 void cedar::proc::Network::demoteSlot(const std::string& /*name*/)
@@ -882,4 +912,59 @@ void cedar::proc::Network::demoteSlot(const std::string& /*name*/)
 boost::signals2::connection cedar::proc::Network::connectToSlotChangedSignal(boost::function<void ()> slot)
 {
   return mSlotChanged.connect(slot);
+}
+
+void cedar::proc::Network::processPromotedSlots()
+{
+  std::cout << "processPromotedSlots was called at " << this->getName() << std::endl;
+  for (ElementMap::const_iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
+  {
+    std::cout << "Element: \"" << iter->first << "\" \"" << iter->second->getName() << "\"" << std::endl;
+  }
+  for
+  (
+    cedar::aux::StringVectorParameter::const_iterator iter = _mPromotedSlots->begin();
+    iter != _mPromotedSlots->end();
+    ++iter
+  )
+  {
+    // check first, if this slot already exists
+    std::cout << *iter << std::endl;
+    std::string full_name = *iter;
+    std::string slot_name;
+    std::string slot_role;
+    cedar::aux::splitLast(full_name, ".", slot_name, slot_role);
+    try
+    {
+      this->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), slot_name);
+    }
+    catch (cedar::proc::InvalidNameException& exc)
+    {
+      std::string child;
+      std::string rest;
+      cedar::aux::splitFirst(slot_name, ".", child, rest);
+      if (cedar::proc::NetworkPtr network = this->getElement<cedar::proc::Network>(child))
+      {
+        network->processPromotedSlots();
+      }
+      else if (cedar::proc::StepPtr step = this->getElement<cedar::proc::Step>(child))
+      {
+        this->promoteSlot(step->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), rest));
+      }
+    }
+    catch (cedar::proc::InvalidRoleException& exc)
+    {
+      std::string child;
+      std::string rest;
+      cedar::aux::splitFirst(slot_name, ".", child, rest);
+      if (cedar::proc::NetworkPtr network = this->getElement<cedar::proc::Network>(child))
+      {
+        network->processPromotedSlots();
+      }
+      else if (cedar::proc::StepPtr step = this->getElement<cedar::proc::Step>(child))
+      {
+        this->promoteSlot(step->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), rest));
+      }
+    }
+  }
 }
