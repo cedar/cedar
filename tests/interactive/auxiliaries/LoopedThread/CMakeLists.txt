@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Bjoern Weghenkel
-#   Email:       bjoern.weghenkel@ini.rub.de
-#   Date:        2010 11 17
+#   Maintainer:  Hendrik Reimann
+#   Email:       hendrik.reimann@ini.rub.de
+#   Date:        2012 02 09
 #
 #   Description:
 #
