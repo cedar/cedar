@@ -634,7 +634,6 @@ void cedar::proc::Network::writeNetworks(cedar::aux::ConfigurationNode& networks
 #ifdef DEBUG_FILE_WRITING
       std::cout << "Saving " << iter->first << "." << std::endl;
 #endif
-      //cedar::proc::ElementDeclarationPtr decl = DeclarationRegistrySingleton::getInstance()->getDeclarationOf(trigger);
       cedar::aux::ConfigurationNode network_node;
       network->writeTo(network_node);
       networks.push_back(cedar::aux::ConfigurationNode::value_type(iter->first, network_node));
@@ -652,7 +651,6 @@ void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& roo
       iter != root.end();
       ++iter)
   {
-    //const std::string& class_id = iter->first;
     const std::string& network_name = iter->first;
     const cedar::aux::ConfigurationNode& network_node = iter->second;
 
@@ -887,7 +885,6 @@ std::string cedar::proc::Network::findPath(cedar::proc::ConstElementPtr findMe) 
 
 void cedar::proc::Network::promoteSlot(DataSlotPtr promotedSlot)
 {
-  std::cout << "promoteSlot()" << std::endl;
   this->declarePromotedData(promotedSlot);
   std::string enum_name = cedar::proc::DataRole::type().get(promotedSlot->getRole()).prettyString();
   std::string promoted_name = promotedSlot->getParent() + "." + promotedSlot->getName() + "." + enum_name;
@@ -899,7 +896,6 @@ void cedar::proc::Network::promoteSlot(DataSlotPtr promotedSlot)
     );
   }
   this->mSlotChanged();
-  std::cout << "promoteSlotFinished()" << std::endl;
 }
 
 void cedar::proc::Network::demoteSlot(const std::string& /*name*/)
@@ -916,11 +912,6 @@ boost::signals2::connection cedar::proc::Network::connectToSlotChangedSignal(boo
 
 void cedar::proc::Network::processPromotedSlots()
 {
-  std::cout << "processPromotedSlots was called at " << this->getName() << std::endl;
-  for (ElementMap::const_iterator iter = this->mElements.begin(); iter != this->mElements.end(); ++iter)
-  {
-    std::cout << "Element: \"" << iter->first << "\" \"" << iter->second->getName() << "\"" << std::endl;
-  }
   for
   (
     cedar::aux::StringVectorParameter::const_iterator iter = _mPromotedSlots->begin();
@@ -929,37 +920,32 @@ void cedar::proc::Network::processPromotedSlots()
   )
   {
     // check first, if this slot already exists
-    std::cout << *iter << std::endl;
     std::string full_name = *iter;
-    std::string slot_name;
-    std::string slot_role;
+    std::string slot_name; // the name of the slot, including step and network prefixes
+    std::string slot_role; // input, output, buffer
     cedar::aux::splitLast(full_name, ".", slot_name, slot_role);
-    try
+    try // is this already a slot of this network?
     {
       this->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), slot_name);
     }
-    catch (cedar::proc::InvalidNameException& exc)
+    catch (cedar::aux::ExceptionBase& exc)
     {
+      if
+      (
+        typeid(exc) != typeid(cedar::proc::InvalidNameException)
+          && typeid(exc) != typeid(cedar::proc::InvalidRoleException)
+      )
+      {
+        throw exc;
+      }
       std::string child;
       std::string rest;
       cedar::aux::splitFirst(slot_name, ".", child, rest);
       if (cedar::proc::NetworkPtr network = this->getElement<cedar::proc::Network>(child))
       {
         network->processPromotedSlots();
-      }
-      else if (cedar::proc::StepPtr step = this->getElement<cedar::proc::Step>(child))
-      {
-        this->promoteSlot(step->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), rest));
-      }
-    }
-    catch (cedar::proc::InvalidRoleException& exc)
-    {
-      std::string child;
-      std::string rest;
-      cedar::aux::splitFirst(slot_name, ".", child, rest);
-      if (cedar::proc::NetworkPtr network = this->getElement<cedar::proc::Network>(child))
-      {
-        network->processPromotedSlots();
+        //!@todo not tested yet! please check if the following line works
+        this->promoteSlot(network->getSlot(cedar::proc::DataRole::type().getFromPrettyString(slot_role), slot_name));
       }
       else if (cedar::proc::StepPtr step = this->getElement<cedar::proc::Step>(child))
       {
