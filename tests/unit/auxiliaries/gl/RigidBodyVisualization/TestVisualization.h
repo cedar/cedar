@@ -22,27 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.h
+    File:        TestVisualization.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 19
 
-    Description: Header for the @em cedar::tests::unit::aux::gl::TestObject class.
+    Description: Header for the @em cedar::tests::unit::aux::gl::TestVisualization class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTS_UNIT_AUX_GL_OBJECT_TEST_OBJECT_H
-#define CEDAR_TESTS_UNIT_AUX_GL_OBJECT_TEST_OBJECT_H
+#ifndef CEDAR_TESTS_UNIT_AUX_RIGID_BODY_VISUALIZATION_TEST_VISUALIZATION_H
+#define CEDAR_TESTS_UNIT_AUX_RIGID_BODY_VISUALIZATION_TEST_VISUALIZATION_H
 
 // LOCAL INCLUDES
 #include "namespace.h"
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
 
@@ -50,17 +51,17 @@
  *
  * More detailed description of the class.
  */
-class cedar::tests::unit::aux::gl::Object::TestObject : public cedar::aux::gl::Object
+class cedar::tests::unit::aux::gl::TestVisualization : public cedar::aux::gl::RigidBodyVisualization
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor that gets a configuration file name.
-  TestObject(cedar::aux::ObjectPtr pObject);
+  TestVisualization(cedar::aux::RigidBodyPtr pRigidBody);
 
   //!@brief Destructor
-  virtual ~TestObject();
+  virtual ~TestVisualization();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

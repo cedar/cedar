@@ -22,114 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.cpp
+    File:        TestVisualization.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 27
+    Date:        2010 11 19
 
-    Description: Virtual class for a simple object geometry for visualization with OpenGL
+    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestVisualization class.
 
     Credits:
 
 ======================================================================================================================*/
 
-// CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/Object.h"
-#include "cedar/auxiliaries/math/tools.h"
+
+// LOCAL INCLUDES
+#include "TestVisualization.h"
+
+// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Object::Object(cedar::aux::ObjectPtr pObject)
+//! constructor
+cedar::tests::unit::aux::gl::TestVisualization::TestVisualization(cedar::aux::RigidBodyPtr pRigidBody)
 :
-mpObject(pObject),
-mTransformationTranspose(4, 4, CV_64FC1)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
-  init();
+  
 }
 
-cedar::aux::gl::Object::~Object()
+//! destructor
+cedar::tests::unit::aux::gl::TestVisualization::~TestVisualization()
 {
 
-}
-
-void cedar::aux::gl::Object::init()
-{
-  mObjectType = std::string("no type");
-  mIsVisible = true;
-  mIsDrawnAsWireFrame = false;
-  mResolution = 10;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-std::string cedar::aux::gl::Object::getObjectName()
+void cedar::tests::unit::aux::gl::TestVisualization::draw()
 {
-  return mpObject->getName();
-}
 
-std::string cedar::aux::gl::Object::getObjectType()
-{
-  return mObjectType;
-}
-
-int cedar::aux::gl::Object::resolution()
-{
-  return mResolution;
-}
-
-double cedar::aux::gl::Object::colorR()
-{
-  return mColorR;
-}
-
-double cedar::aux::gl::Object::colorG()
-{
-  return mColorG;
-}
-
-double cedar::aux::gl::Object::colorB()
-{
-  return mColorB;
-}
-
-void cedar::aux::gl::Object::drawAsWireFrame(bool state)
-{
-  mIsDrawnAsWireFrame = state;
-}
-
-bool cedar::aux::gl::Object::isDrawnAsWireFrame()
-{
-  return mIsDrawnAsWireFrame;
-}
-
-void cedar::aux::gl::Object::setResolution(int value)
-{
-  mResolution = value;
-}
-
-void cedar::aux::gl::Object::setColor(double R, double G, double B)
-{
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-}
-
-cedar::aux::ObjectPtr cedar::aux::gl::Object::getObject()
-{
-  return mpObject;
-}
-
-void cedar::aux::gl::Object::setVisibility(bool state)
-{ 
-  mIsVisible = state;
 }

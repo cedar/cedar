@@ -405,13 +405,14 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 
   mCurrentWorkingMode = actionType;
 
-  // want to reset something?
+  // reset variables where necessary (HR: is that really necessary?)
   switch (mCurrentWorkingMode)
   {
     case ACCELERATION:
       mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
     case VELOCITY:
       mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      start();
     case ANGLE:
       break;
   }

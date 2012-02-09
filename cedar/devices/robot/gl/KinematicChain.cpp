@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/namespace.h"
 
 // SYSTEM INCLUDES
 
@@ -66,16 +67,21 @@ cedar::dev::robot::gl::KinematicChain::~KinematicChain()
 
 void cedar::dev::robot::gl::KinematicChain::draw()
 {
-  drawBase();
-  for (unsigned int j = 0; j < mpKinematicChainModel->getNumberOfJoints(); j++)
+  prepareDraw();
+
+  if (mIsVisible)
   {
-    drawSegment(j);
+    drawBase();
+    for (unsigned int j = 0; j < mpKinematicChainModel->getNumberOfJoints(); j++)
+    {
+      drawSegment(j);
+    }
+    drawEndEffector();
+    drawEndEffectorVelocity();
+    drawEndEffectorAcceleration();
+
+    glPopMatrix(); //!\todo check if this is needed
   }
-  drawEndEffector();
-  drawEndEffectorVelocity();
-  drawEndEffectorAcceleration();
-  
-  glPopMatrix(); //!\todo check if this is needed
 }
 
 void cedar::dev::robot::gl::KinematicChain::drawBase()

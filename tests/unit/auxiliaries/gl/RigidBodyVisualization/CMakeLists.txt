@@ -26,7 +26,7 @@
 #
 #   Maintainer:  Hendrik Reimann
 #   Email:       hendrik.reimann@ini.rub.de
-#   Date:        2010 12 04
+#   Date:        2010 11 29
 #
 #   Description:
 #
@@ -35,6 +35,9 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(Object
+cedar_add_unit_test(RigidBodyVisualization
   main.cpp
+  namespace.h
+  TestVisualization.h
+  TestVisualization.cpp
 )

@@ -99,7 +99,7 @@ void cedar::dev::kuka::KukaInterface::init()
   //create a new Instance of the friRemote
   if (_mRemoteHost != std::string("NULL"))
   {
-    mpFriRemote = new friRemote(_mServerPort, _mRemoteHost.c_str());
+    mpFriRemote = new friRemote(_mServerPort, const_cast<char*>(_mRemoteHost.c_str()));
   }
   else
   {

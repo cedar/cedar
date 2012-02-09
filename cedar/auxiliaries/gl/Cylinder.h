@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 
 // PROJECT INCLUDES
 
@@ -47,24 +47,24 @@
 
 /*!@brief Simple OpenGL visualization of a cylinder
  *
- * This class visualizes an instance of cedar::aux::Object as a cylinder with specified dimensions
+ * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a cylinder with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Cylinder : public cedar::aux::gl::Object
+class cedar::aux::gl::Cylinder : public cedar::aux::gl::RigidBodyVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Cylinder(cedar::aux::ObjectPtr pObject);
+  Cylinder(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param radius    radius of the cylinder
    * @param height    height of the cylinder
    * @param R    color, value for red channel in RGB
@@ -72,7 +72,7 @@ public:
    * @param B    color, value for blue channel in RGB
    */
   Cylinder(
-            cedar::aux::ObjectPtr pObject,
+            cedar::aux::RigidBodyPtr pRigidBody,
             double radius,
             double height,
             double R = 1,

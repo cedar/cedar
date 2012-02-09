@@ -26,7 +26,7 @@
 #
 #   Maintainer:  Hendrik Reimann
 #   Email:       hendrik.reimann@ini.rub.de
-#   Date:        2010 11 29
+#   Date:        2010 12 04
 #
 #   Description:
 #
@@ -35,9 +35,6 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(GlObject
+cedar_add_unit_test(RigidBody
   main.cpp
-  namespace.h
-  TestObject.h
-  TestObject.cpp
 )

@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "DriveModel.h"
+#include "cedar/devices/kteam/DriveModel.h"
 
 // SYSTEM INCLUDES
 
