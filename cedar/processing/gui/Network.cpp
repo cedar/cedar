@@ -73,6 +73,8 @@ mpMainWindow(pMainWindow)
     mNetwork = cedar::proc::NetworkPtr(new cedar::proc::Network());
   }
 
+  this->mNetwork->connectToElementAdded(boost::bind(&cedar::proc::gui::Network::elementAdded, this, _1, _2));
+
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
@@ -121,6 +123,26 @@ void cedar::proc::gui::Network::fitToContents()
   }
 }
 
+bool cedar::proc::gui::Network::isRootNetwork()
+{
+  return this->scene() == NULL;
+}
+
+void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, cedar::proc::ElementPtr pElement)
+{
+  if (!this->isRootNetwork())
+  {
+    cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+    CEDAR_DEBUG_ASSERT(p_scene != NULL);
+    cedar::proc::gui::GraphicsBase *p_element_item = p_scene->getGraphicsItemFor(pElement.get());
+    cedar::proc::gui::GraphicsBase *p_network_item = p_scene->getGraphicsItemFor(pNetwork);
+    CEDAR_ASSERT(p_element_item != NULL);
+    CEDAR_ASSERT(p_network_item != NULL);
+    p_element_item->setParentItem(p_network_item);
+    this->fitToContents();
+  }
+}
+
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)
 {
   cedar::proc::ElementPtr element;
@@ -139,7 +161,7 @@ void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElem
 
   this->network()->add(element);
 
-  if (this->scene() != NULL)
+  if (!this->isRootNetwork())
   {
     pElement->setParentItem(this);
   }

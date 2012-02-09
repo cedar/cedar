@@ -130,6 +130,12 @@ private:
   //!@brief add all triggers contained in this network to a scene
   void addTriggersToScene();
 
+  //!@brief Reacts to elements being added in the underlying network.
+  void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
+
+  //!@brief Determines whether the network is the root network.
+  bool isRootNetwork();
+
   void checkSlots();
 
   void addDataItems();
