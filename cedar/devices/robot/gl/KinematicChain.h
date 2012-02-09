@@ -38,7 +38,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
 
 // SYSTEM INCLUDES
@@ -51,7 +51,7 @@
  * the chain, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer for that scene 
  * (cedar::aux::gl::Viewer). 
  */
-class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::Object
+class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::RigidBodyVisualization
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

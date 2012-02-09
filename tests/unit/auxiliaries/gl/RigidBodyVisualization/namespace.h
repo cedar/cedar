@@ -22,51 +22,37 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.cpp
+    File:        namespace.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
+    Date:        2010 10 21
 
-    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestObject class.
+    Description: Namespace file for cedar::tests::unit::aux::ConfigurationInterface.
 
     Credits:
 
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
-#include "TestObject.h"
+#ifndef CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
+#define CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
 
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
-
-
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//! constructor
-cedar::tests::unit::aux::gl::Object::TestObject::TestObject(cedar::aux::ObjectPtr pObject)
-:
-cedar::aux::gl::Object(pObject)
+namespace cedar
 {
-  
+  namespace tests
+  {
+    namespace unit
+    {
+      namespace aux
+      {
+        namespace gl
+        {
+          class TestVisualization;
+        }
+      }
+    }
+  }
 }
 
-//! destructor
-cedar::tests::unit::aux::gl::Object::TestObject::~TestObject()
-{
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-void cedar::tests::unit::aux::gl::Object::TestObject::draw()
-{
-
-}
+#endif // CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
