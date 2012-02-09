@@ -69,6 +69,11 @@ cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::dev::robot::SimulatedKinematicChain::isMovable()
+{
+  return true;
+}
+
 double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index)
 {
   return mJointAngles.at<double>(index, 0);

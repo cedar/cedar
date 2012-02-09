@@ -120,7 +120,7 @@ public:
    */
   cv::Mat getJointTransformation(unsigned int index);
   
-  /*!@brief calculates cartesian Jacobian of a point/vector
+  /*!@brief calculates cartesian Jacobian of a point/vector, in world coordinates
    *
    * @param point    relevant point for which the Jacobian is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
