@@ -68,7 +68,7 @@ public:
   WorkerThread(
                 cedar::dev::robot::KinematicChainPtr arm,
                 cedar::dev::robot::KinematicChainModelPtr arm_model,
-                cedar::aux::ObjectPtr target
+                cedar::aux::RigidBodyPtr target
               )
   :
   mArmModel(arm_model),
@@ -123,7 +123,7 @@ private:
   //! model of the arm
   cedar::dev::robot::KinematicChainModelPtr mArmModel;
   //! target
-  cedar::aux::ObjectPtr mTarget;
+  cedar::aux::RigidBodyPtr mTarget;
   //! movement speed towards target
   double mSpeed;
   //! distance below which the movement is reduced
@@ -206,16 +206,16 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
 
   // create an arm visualization and add it to the scene
-  cedar::aux::gl::ObjectPtr p_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_arm_model));
-  p_scene->addObject(p_arm_visualization);
+  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_arm_model));
+  p_scene->addRigidBodyVisualization(p_arm_visualization);
 
   // create target object, visualize it and add it to the scene
-  cedar::aux::ObjectPtr target(new cedar::aux::Object());
+  cedar::aux::RigidBodyPtr target(new cedar::aux::RigidBody());
   target->setPosition(0.3, -0.7, 0.5);
   target->setName(std::string("target"));
-  cedar::aux::gl::ObjectPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
-  p_sphere->drawAsWireFrame(true);
-  p_scene->addObject(p_sphere);
+  cedar::aux::gl::RigidBodyVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
+  p_sphere->setDrawAsWireFrame(true);
+  p_scene->addRigidBodyVisualization(p_sphere);
 
   // create a widget to control the scene
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
