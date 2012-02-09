@@ -82,6 +82,14 @@ cedar::proc::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+boost::signals2::connection cedar::proc::Network::connectToElementAdded
+                            (
+                              boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
+                            )
+{
+  return this->mElementAddedSignal.connect(slot);
+}
+
 std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
 {
   if (this->mElements.find(identifier) == this->mElements.end())
@@ -210,6 +218,8 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
     element->resetChangedStates(true);
   }
   element->setNetwork(this);
+
+  this->mElementAddedSignal(this, element);
 }
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
