@@ -256,6 +256,8 @@ public:
 
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
+  void processPromotedSlots();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -327,6 +329,8 @@ private:
 protected:
   //!@brief a boost signal that is emitted if a change in slot takes place
   boost::signals2::signal<void ()> mSlotChanged;
+
+  cedar::aux::StringVectorParameterPtr _mPromotedSlots;
 private:
   //! Map associating element names to elements.
   ElementMap mElements;

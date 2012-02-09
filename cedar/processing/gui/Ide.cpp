@@ -295,6 +295,7 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
   this->mpProcessingDrawer->getScene()->reset();
+  network->network()->setName("root");
   this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
   this->mNetwork->addElementsToScene(this->mpProcessingDrawer->getScene());
