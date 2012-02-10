@@ -45,7 +45,8 @@
 #include "cedar/auxiliaries/gl/glu.h"
 
 // SYSTEM INCLUDES
-
+ #include <QTextStream>
+ #include <QFile>
 
 
   // Location/Normals
@@ -61,14 +62,7 @@
   #define B_POS 2
   #define A_POS 3
 
-  typedef struct
-  {
-    GLfloat location[3];
-    GLfloat tex[2];
-    GLfloat normal[3];
-    GLfloat colour[4];
-    GLubyte padding[16]; // Pads the struct out to 64 bytes for performance increase
-  } Vertex;
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -78,7 +72,7 @@ cedar::dev::robot::gl::KukaArm::KukaArm(cedar::dev::robot::KinematicChainModelPt
 :
 cedar::dev::robot::gl::KinematicChain(rpKinematicChainModel)
 {
-
+  loadData();
 }
 
 cedar::dev::robot::gl::KukaArm::~KukaArm()
@@ -106,7 +100,10 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   verts[2].tex[U_POS] = 1; verts[2].tex[V_POS] = 1;
   verts[3].location[X_POS] = 1;  verts[3].location[Y_POS] = -1; verts[3].location[Z_POS] = 1;
   verts[3].normal[X_POS] = 0; verts[3].normal[Y_POS] = 0; verts[3].normal[Z_POS] = 1;
-  verts[3].tex[U_POS] = 1; verts[0].tex[V_POS] = 0;
+  verts[3].tex[U_POS] = 1; verts[3].tex[V_POS] = 0;
+  verts[4].location[X_POS] = 0;  verts[4].location[Y_POS] = 0; verts[4].location[Z_POS] = 2;
+  verts[4].normal[X_POS] = 0; verts[4].normal[Y_POS] = 0; verts[4].normal[Z_POS] = 1;
+  verts[4].tex[U_POS] = 1; verts[4].tex[V_POS] = 0;
 
 
   // ********* SNIP (I'll let you fill in the rest of the cube here) *********
@@ -115,8 +112,8 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   for (int i = 0; i < 24; i++)
   {
     verts[i].colour[R_POS] = 1.0;
-    verts[i].colour[G_POS] = 1.0;
-    verts[i].colour[B_POS] = 1.0;
+    verts[i].colour[G_POS] = 0.5;
+    verts[i].colour[B_POS] = 0.0;
     verts[i].colour[A_POS] = 1.0;
   }
 
@@ -129,7 +126,12 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   // +------+
   // 0      3
   index[0] = 0; index[1] = 1; index[2] = 2;
-  index[3] = 2; index[4] = 3; index[5] = 0; // Repeated number 2 & 0 as they're shared
+  index[3] = 2; index[4] = 3; index[5] = 0;
+  index[6] = 0; index[7] = 4; index[8] = 3;
+  index[9] = 3; index[10] = 4; index[11] = 2;
+  index[12] = 2; index[13] = 4; index[14] = 1;
+  index[15] = 1; index[16] = 4; index[17] = 0;
+
   // ********* SNIP (I'll let you fill in the rest of the cube here) *********
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -220,3 +222,90 @@ void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 {
 
 }
+
+void cedar::dev::robot::gl::KukaArm::loadData()
+{
+  std::cout << "trying to load data" << std::endl;
+  QFile data("/home/reimajbi/Desktop/meshes/lbr_module.ply");
+  if (data.open(QFile::ReadOnly | QFile::Truncate))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    QTextStream line_stream;
+    QString number;
+
+    // read header
+    for (unsigned int i=0; i<13; i++)
+    {
+      line = text_stream.readLine();
+    }
+
+    // read vertex data
+    for (unsigned int i=0; i<2/*8804*/; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // position x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      verts[i].location[0] = number.toFloat();
+
+      // position y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      verts[i].location[1] = number.toFloat();
+
+      // position z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      verts[i].location[2] = number.toFloat();
+
+      // normal x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      verts[i].normal[0] = number.toFloat();
+
+      // normal y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      verts[i].normal[1] = number.toFloat();
+
+      // normal z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      verts[i].normal[2] = number.toFloat();
+
+
+      std::cout << verts[i].location[0] << std::endl;
+      std::cout << verts[i].location[1] << std::endl;
+      std::cout << verts[i].location[2] << std::endl;
+      std::cout << verts[i].normal[0] << std::endl;
+      std::cout << verts[i].normal[1] << std::endl;
+      std::cout << verts[i].normal[2] << std::endl;
+      std::cout << line.toStdString() << std::endl;
+
+    }
+
+  }
+}
+
+
