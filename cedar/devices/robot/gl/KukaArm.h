@@ -37,11 +37,24 @@
 #ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 #define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 
+#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
+
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/glu.h"
 
 // SYSTEM INCLUDES
+
+  typedef struct
+  {
+    GLfloat location[3];
+    GLfloat tex[2];
+    GLfloat normal[3];
+    GLfloat colour[4];
+    GLubyte padding[16]; // Pads the struct out to 64 bytes for performance increase
+  } Vertex;
 
 /*!@brief Visualization of the KUKA LWR4
  *
@@ -84,6 +97,8 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  //! loads the vertex data from file
+  void loadData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -91,7 +106,8 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  Vertex verts[8804]; // We're making a cube, 6 faces * 4 vertices per face
+  GLubyte index[3738]; // 2 Triangles per face (possible to use quads, but they're being phased out of OpenGL3, so we're using triangles instead)
 }; // class cedar::dev::robot::gl::KukaArm
 #endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 
