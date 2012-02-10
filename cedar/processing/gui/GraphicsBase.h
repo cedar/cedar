@@ -191,6 +191,9 @@ public:
   //!@brief redraw the connections if GraphicsBase instance is moved around
   void updateConnections();
 
+  //!@brief return the number of connections
+  unsigned int getNumberOfConnections();
+
   //!@brief set outline fill color
   void setOutlineColor(const QColor& color);
   //!@brief set fill color
