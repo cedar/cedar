@@ -78,6 +78,9 @@ public:
   //! Type for associating cedar::proc::Networks to cedar::proc::gui::Networks.
   typedef std::map<cedar::proc::Network*, cedar::proc::gui::Network*> NetworkMap;
 
+  //! Type for associating cedar::proc::Elements to cedar::proc::gui::GraphicsBase.
+  typedef std::map<cedar::proc::Element*, cedar::proc::gui::GraphicsBase*> ElementMap;
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -202,6 +205,10 @@ public:
    */
   cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
 
+  /*!@brief Returns the cedar::proc::gui::GraphicsBase item corresponding to the given element.
+   */
+  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::Element* trigger);
+
   /*!@brief Returns, whether snap-to-grid is true.
    */
   bool getSnapToGrid() const;
@@ -255,7 +262,7 @@ private:
 
   /*!@brief Adds the names of networks and their subnetworks to an action.
    */
-  void addNetworkNames(QMenu* pMenu, cedar::proc::ConstNetworkPtr network) const;
+  void addNetworkNames(QMenu* pMenu, cedar::proc::ConstNetworkPtr network, std::string path) const;
 
 private slots:
   void promoteElementToExistingGroup();
@@ -294,6 +301,9 @@ private:
 
   //! The network map.
   NetworkMap mNetworkMap;
+
+  //! Map of all the elements.
+  ElementMap mElementMap;
 
   //! The main window containing the scene.
   QMainWindow *mpMainWindow;

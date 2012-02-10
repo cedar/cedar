@@ -98,6 +98,10 @@ public:
    */
   cedar::proc::ConstDataSlotPtr getSlot() const;
 
+  /*!@brief Returns a pointer to the data slot displayed by this item.
+   */
+  cedar::proc::DataSlotPtr getSlot();
+
   /*!@brief Returns whether this slot can connect to somewhere else.
    *
    * @returns False, if the slot is already connected (and not a collection), true otherwise.

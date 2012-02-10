@@ -108,6 +108,15 @@ public:
   //!@brief Adds an element to the network.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);
 
+  //!@brief Sets the scene containing this item.
+  void setScene(cedar::proc::gui::Scene* pScene);
+
+  //!@brief reads a configuration from a node
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  //!@brief saves a configuration to a node
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -120,15 +129,24 @@ protected:
 private:
 
   //!@brief write scene to a node
-  void writeScene(cedar::aux::ConfigurationNode& root);
+  void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
   //!@brief read scene from a node
   void readScene(cedar::aux::ConfigurationNode& root);
 
-  //!@brief add all steps contained in this network to a scene
+  //!@brief Add all steps contained in this network to a scene.
   void addStepsToScene();
 
-  //!@brief add all triggers contained in this network to a scene
+  //!@brief Add all triggers contained in this network to a scene.
   void addTriggersToScene();
+
+  //!@brief Add all networks contained in this network to a scene.
+  void addNetworksToScene();
+
+  //!@brief Reacts to elements being added in the underlying network.
+  void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
+
+  //!@brief Determines whether the network is the root network.
+  bool isRootNetwork();
 
   void checkSlots();
 
@@ -142,20 +160,28 @@ protected:
 private:
   //!@brief represented network
   cedar::proc::NetworkPtr mNetwork;
+
   //!@brief a scene, which displays the elements contained in this network
   cedar::proc::gui::Scene* mpScene;
+
   //!@brief a filename from which to load a network configuration, or to which to save a configuration
   std::string mFileName;
+
   //!@brief a main window
   QMainWindow *mpMainWindow;
+
   //!@brief a map of all data slots of the current step
   DataSlotMap mSlotMap;
 
   //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
   std::vector<cedar::proc::gui::StepItem*> mpStepsToAdd;
+
   //!@brief a vector of triggers, which contains all steps that should be added to the scene
   //        after reading a configuration
   std::vector<cedar::proc::gui::TriggerItem*> mpTriggersToAdd;
+
+  //!@brief a vector of steps, which contains all steps that should be added to the scene after reading a configuration
+  std::vector<cedar::proc::gui::Network*> mpNetworksToAdd;
 
   //! Connection to Network's slot changed signal.
   boost::signals2::connection mSlotConnection;
