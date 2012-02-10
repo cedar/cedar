@@ -210,7 +210,11 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   }
   QAction *p_promote_action = menu.addAction("promote slot");
   // no slot can be promoted to the root network
-  if ((this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->network()) || this->mSlot->isPromoted())
+  if
+  (
+    (this->mSlot->getParentPtr()->getNetwork() == p_scene->getRootNetwork()->network())
+      || this->mSlot->isPromoted() || this->getNumberOfConnections() != 0
+  )
   {
     p_promote_action->setEnabled(false);
   }
@@ -219,8 +223,9 @@ void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuE
   // no slot can be demoted, if it was not promoted before
   if
   (
-    boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(this->mSlot)
-      || boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(this->mSlot)
+    (boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(this->mSlot)
+      || boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(this->mSlot))
+      && this->getNumberOfConnections() == 0
   )
   {
     p_demote_action->setEnabled(true);
