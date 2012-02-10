@@ -125,17 +125,15 @@ void cedar::proc::gui::Network::fitToContents()
 
 bool cedar::proc::gui::Network::isRootNetwork()
 {
-  return this->scene() == NULL;
+  return this->mpScene && this == this->mpScene->getRootNetwork().get();
 }
 
 void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, cedar::proc::ElementPtr pElement)
 {
-  if (!this->isRootNetwork())
+  if (this->mpScene && !this->isRootNetwork())
   {
-    cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
-    CEDAR_DEBUG_ASSERT(p_scene != NULL);
-    cedar::proc::gui::GraphicsBase *p_element_item = p_scene->getGraphicsItemFor(pElement.get());
-    cedar::proc::gui::GraphicsBase *p_network_item = p_scene->getGraphicsItemFor(pNetwork);
+    cedar::proc::gui::GraphicsBase *p_element_item = this->mpScene->getGraphicsItemFor(pElement.get());
+    cedar::proc::gui::GraphicsBase *p_network_item = this->mpScene->getGraphicsItemFor(pNetwork);
     CEDAR_ASSERT(p_element_item != NULL);
     CEDAR_ASSERT(p_network_item != NULL);
     p_element_item->setParentItem(p_network_item);
@@ -177,8 +175,14 @@ void cedar::proc::gui::Network::addElementsToScene(cedar::proc::gui::Scene* pSce
   this->setScene(pScene);
 
   //!@todo a lot of the code in these functions should probably be cleaned up and moved to the respective classes.
+  this->addNetworksToScene();
   this->addStepsToScene();
   this->addTriggersToScene();
+
+  if (!this->isRootNetwork())
+  {
+    this->fitToContents();
+  }
 }
 
 void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
@@ -189,6 +193,19 @@ void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
   this->mpScene = pScene;
 }
 
+//!@brief Add all networks contained in this network to a scene.
+void cedar::proc::gui::Network::addNetworksToScene()
+{
+  for (size_t i = 0; i < this->mpNetworksToAdd.size(); ++i)
+  {
+    cedar::proc::gui::Network *p_network = this->mpNetworksToAdd.at(i);
+    this->mpScene->addNetworkItem(p_network);
+    p_network->addElementsToScene(this->mpScene);
+  }
+
+  this->mpNetworksToAdd.clear();
+}
+
 void cedar::proc::gui::Network::addStepsToScene()
 {
   // todo should connecting be moved into the step class?
@@ -196,8 +213,14 @@ void cedar::proc::gui::Network::addStepsToScene()
 
   for (size_t i = 0; i < this->mpStepsToAdd.size(); ++i)
   {
-    this->mpScene->addStepItem(this->mpStepsToAdd.at(i));
-    steps_to_connect.push_back(this->mpStepsToAdd.at(i)->getStep());
+    cedar::proc::gui::StepItem *p_step_item = this->mpStepsToAdd.at(i);
+    this->mpScene->addStepItem(p_step_item);
+    steps_to_connect.push_back(p_step_item->getStep());
+
+    if (!this->isRootNetwork())
+    {
+      p_step_item->setParentItem(this);
+    }
   }
   this->mpStepsToAdd.clear();
 
@@ -438,11 +461,13 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
 {
   this->mpStepsToAdd.clear();
   this->mpTriggersToAdd.clear();
+  this->mpNetworksToAdd.clear();
 
   if (root.find("ui") == root.not_found())
   {
     return;
   }
+
   cedar::aux::ConfigurationNode& ui = root.find("ui")->second;
   for (cedar::aux::ConfigurationNode::iterator iter = ui.begin(); iter != ui.end(); ++iter)
   {
@@ -493,6 +518,42 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
       {
         //!@todo warn in the gui
         std::cout << "Invalid trigger item found in " << this->mFileName << std::endl;
+      }
+    }
+    else if (type == "network")
+    {
+      try
+      {
+        std::string network_name;
+        try
+        {
+          network_name = iter->second.get<std::string>("network");
+        }
+        catch(const boost::property_tree::ptree_bad_path&)
+        {
+          CEDAR_THROW(cedar::aux::InvalidNameException, "Cannot read NetworkItem from file: no network name given.");
+        }
+        cedar::proc::NetworkPtr network = this->mNetwork->getElement<cedar::proc::Network>(network_name);
+        cedar::proc::gui::Network *p_network = new cedar::proc::gui::Network(this->mpMainWindow, 10.0, 10.0, network);
+
+        // let the subnetwork read its ui stuff too
+        try
+        {
+          cedar::aux::ConfigurationNode& networks = root.get_child("networks");
+          cedar::aux::ConfigurationNode& network_node = networks.get_child(network->getName());
+          p_network->readScene(network_node);
+        }
+        catch(const boost::property_tree::ptree_bad_path&)
+        {
+          std::cout << "Warninig: could not find ui node for network " << network->getName() << std::endl;
+        }
+
+        this->mpNetworksToAdd.push_back(p_network);
+      }
+      catch(const cedar::aux::InvalidNameException&)
+      {
+        //!@todo warn in the gui
+        std::cout << "Invalid network item found in " << this->mFileName << std::endl;
       }
     }
     else
