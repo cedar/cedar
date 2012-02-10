@@ -214,7 +214,11 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   }
   else if (mElements.find(instanceName) != mElements.end())
   {
-    CEDAR_THROW(cedar::proc::DuplicateNameException, "duplicate entry of elements in this module")
+    CEDAR_THROW
+    (
+      cedar::proc::DuplicateNameException,
+      "Duplicate element name entry \"" + instanceName+ "\" in network \"" + this->getName() + "\""
+    )
   }
   else
   {
