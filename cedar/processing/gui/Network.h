@@ -108,6 +108,15 @@ public:
   //!@brief Adds an element to the network.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);
 
+  //!@brief Sets the scene containing this item.
+  void setScene(cedar::proc::gui::Scene* pScene);
+
+  //!@brief reads a configuration from a node
+  void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
+  //!@brief saves a configuration to a node
+  void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -120,7 +129,7 @@ protected:
 private:
 
   //!@brief write scene to a node
-  void writeScene(cedar::aux::ConfigurationNode& root);
+  void writeScene(cedar::aux::ConfigurationNode& root, cedar::aux::ConfigurationNode& scene);
   //!@brief read scene from a node
   void readScene(cedar::aux::ConfigurationNode& root);
 

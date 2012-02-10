@@ -695,6 +695,7 @@ cedar::proc::gui::Network* cedar::proc::gui::Scene::addNetwork(const QPointF& po
 void cedar::proc::gui::Scene::addNetworkItem(cedar::proc::gui::Network *pNetwork)
 {
   this->addItem(pNetwork);
+  pNetwork->setScene(this);
 
   // we assume that network are only inserted once.
   CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->network().get()) == this->mNetworkMap.end());
