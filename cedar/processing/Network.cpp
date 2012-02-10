@@ -59,8 +59,8 @@
 #include <algorithm>
 
 // Define that helps to debug file reading.
-#define DEBUG_FILE_READING
-#define DEBUG_FILE_WRITING
+//#define DEBUG_FILE_READING
+//#define DEBUG_FILE_WRITING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
