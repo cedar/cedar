@@ -106,8 +106,8 @@ private:
 protected:
   // none yet
 private:
-  Vertex verts[8804]; // We're making a cube, 6 faces * 4 vertices per face
-  GLubyte index[3738]; // 2 Triangles per face (possible to use quads, but they're being phased out of OpenGL3, so we're using triangles instead)
+  Vertex verts[8804];
+  GLushort index[3738*3];
 }; // class cedar::dev::robot::gl::KukaArm
 #endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 

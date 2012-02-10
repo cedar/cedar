@@ -86,30 +86,30 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 
 void cedar::dev::robot::gl::KukaArm::drawBase()
 {
-  Vertex verts[24]; // We're making a cube, 6 faces * 4 vertices per face
-  GLubyte index[36]; // 2 Triangles per face (possible to use quads, but they're being phased out of OpenGL3, so we're using triangles instead)
+//  Vertex verts[24]; // We're making a cube, 6 faces * 4 vertices per face
+//  GLushort index[36]; // 2 Triangles per face (possible to use quads, but they're being phased out of OpenGL3, so we're using triangles instead)
 
-  verts[0].location[X_POS] = -1; verts[0].location[Y_POS] = -1; verts[0].location[Z_POS] = 1;
-  verts[0].normal[X_POS] = 0; verts[0].normal[Y_POS] = 0; verts[0].normal[Z_POS] = 1;
-  verts[0].tex[U_POS] = 0; verts[0].tex[V_POS] = 0;
-  verts[1].location[X_POS] = -1; verts[1].location[Y_POS] = 1;  verts[1].location[Z_POS] = 1;
-  verts[1].normal[X_POS] = 0; verts[1].normal[Y_POS] = 0; verts[1].normal[Z_POS] = 1;
-  verts[1].tex[U_POS] = 0; verts[1].tex[V_POS] = 1;
-  verts[2].location[X_POS] = 1;  verts[2].location[Y_POS] = 1;  verts[2].location[Z_POS] = 1;
-  verts[2].normal[X_POS] = 0; verts[2].normal[Y_POS] = 0; verts[2].normal[Z_POS] = 1;
-  verts[2].tex[U_POS] = 1; verts[2].tex[V_POS] = 1;
-  verts[3].location[X_POS] = 1;  verts[3].location[Y_POS] = -1; verts[3].location[Z_POS] = 1;
-  verts[3].normal[X_POS] = 0; verts[3].normal[Y_POS] = 0; verts[3].normal[Z_POS] = 1;
-  verts[3].tex[U_POS] = 1; verts[3].tex[V_POS] = 0;
-  verts[4].location[X_POS] = 0;  verts[4].location[Y_POS] = 0; verts[4].location[Z_POS] = 2;
-  verts[4].normal[X_POS] = 0; verts[4].normal[Y_POS] = 0; verts[4].normal[Z_POS] = 1;
-  verts[4].tex[U_POS] = 1; verts[4].tex[V_POS] = 0;
+//  verts[0].location[X_POS] = -1; verts[0].location[Y_POS] = -1; verts[0].location[Z_POS] = 1;
+//  verts[0].normal[X_POS] = 0; verts[0].normal[Y_POS] = 0; verts[0].normal[Z_POS] = 1;
+//  verts[0].tex[U_POS] = 0; verts[0].tex[V_POS] = 0;
+//  verts[1].location[X_POS] = -1; verts[1].location[Y_POS] = 1;  verts[1].location[Z_POS] = 1;
+//  verts[1].normal[X_POS] = 0; verts[1].normal[Y_POS] = 0; verts[1].normal[Z_POS] = 1;
+//  verts[1].tex[U_POS] = 0; verts[1].tex[V_POS] = 1;
+//  verts[2].location[X_POS] = 1;  verts[2].location[Y_POS] = 1;  verts[2].location[Z_POS] = 1;
+//  verts[2].normal[X_POS] = 0; verts[2].normal[Y_POS] = 0; verts[2].normal[Z_POS] = 1;
+//  verts[2].tex[U_POS] = 1; verts[2].tex[V_POS] = 1;
+//  verts[3].location[X_POS] = 1;  verts[3].location[Y_POS] = -1; verts[3].location[Z_POS] = 1;
+//  verts[3].normal[X_POS] = 0; verts[3].normal[Y_POS] = 0; verts[3].normal[Z_POS] = 1;
+//  verts[3].tex[U_POS] = 1; verts[3].tex[V_POS] = 0;
+//  verts[4].location[X_POS] = 0;  verts[4].location[Y_POS] = 0; verts[4].location[Z_POS] = 2;
+//  verts[4].normal[X_POS] = 0; verts[4].normal[Y_POS] = 0; verts[4].normal[Z_POS] = 1;
+//  verts[4].tex[U_POS] = 1; verts[4].tex[V_POS] = 0;
 
 
   // ********* SNIP (I'll let you fill in the rest of the cube here) *********
 
   // Colors
-  for (int i = 0; i < 24; i++)
+  for (int i = 0; i < 8804; i++)
   {
     verts[i].colour[R_POS] = 1.0;
     verts[i].colour[G_POS] = 0.5;
@@ -125,12 +125,12 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   // |      |
   // +------+
   // 0      3
-  index[0] = 0; index[1] = 1; index[2] = 2;
-  index[3] = 2; index[4] = 3; index[5] = 0;
-  index[6] = 0; index[7] = 4; index[8] = 3;
-  index[9] = 3; index[10] = 4; index[11] = 2;
-  index[12] = 2; index[13] = 4; index[14] = 1;
-  index[15] = 1; index[16] = 4; index[17] = 0;
+//  index[0] = 0; index[1] = 1; index[2] = 2;
+//  index[3] = 2; index[4] = 3; index[5] = 0;
+//  index[6] = 0; index[7] = 4; index[8] = 3;
+//  index[9] = 3; index[10] = 4; index[11] = 2;
+//  index[12] = 2; index[13] = 4; index[14] = 1;
+//  index[15] = 1; index[16] = 4; index[17] = 0;
 
   // ********* SNIP (I'll let you fill in the rest of the cube here) *********
 
@@ -143,8 +143,8 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   // Allocate space.  We could pass the mesh in here (where the NULL is), but it's actually faster to do it as a
   // separate step.  We also define it as GL_STATIC_DRAW which means we set the data once, and never
   // update it.  This is not a strict rule code wise, but gives hints to the driver as to where to store the data
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 24, NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 24, verts); // Actually upload the data
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * 8804, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 8804, verts); // Actually upload the data
 
   // Set the pointers to our data.  Except for the normal value (which always has a size of 3), we must pass
   // the size of the individual component.  ie. A vertex has 3 points (x, y, z), texture coordinates have 2 (u, v) etc.
@@ -168,7 +168,7 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBOID); // Bind the element array buffer
   // Upload the index array, this can be done the same way as above (with NULL as the data, then a
   // glBufferSubData call, but doing it all at once for convenience)
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLubyte), index, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3738*3 * sizeof(GLushort), index, GL_STATIC_DRAW);
 
 
   // Bind our buffers much like we would for texturing
@@ -190,7 +190,7 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
   // Actually do our drawing, parameters are Primative (Triangles, Quads, Triangle Fans etc), Elements to
   // draw, Type of each element, Start Offset
-  glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
+  glDrawElements(GL_TRIANGLES, 3738*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
 
   // Disable our client state back to normal drawing
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -226,13 +226,14 @@ void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 void cedar::dev::robot::gl::KukaArm::loadData()
 {
   std::cout << "trying to load data" << std::endl;
-  QFile data("/home/reimajbi/Desktop/meshes/lbr_module.ply");
-  if (data.open(QFile::ReadOnly | QFile::Truncate))
+  QFile data("/Users/reimajbi/Desktop/meshes/lbr_base.ply");
+  if (data.open(QFile::ReadOnly))
   {
     QTextStream text_stream(&data);
     QString line;
     QTextStream line_stream;
     QString number;
+    float scale = 0.001; // mm -> m
 
     // read header
     for (unsigned int i=0; i<13; i++)
@@ -241,7 +242,7 @@ void cedar::dev::robot::gl::KukaArm::loadData()
     }
 
     // read vertex data
-    for (unsigned int i=0; i<2/*8804*/; i++)
+    for (unsigned int i=0; i<8804; i++)
     {
       line = text_stream.readLine();
       QTextStream line_stream(&line);
@@ -252,7 +253,7 @@ void cedar::dev::robot::gl::KukaArm::loadData()
       {
         number.append(line_stream.read(1));
       }
-      verts[i].location[0] = number.toFloat();
+      verts[i].location[0] = number.toFloat() * scale;
 
       // position y
       number = "";
@@ -260,7 +261,7 @@ void cedar::dev::robot::gl::KukaArm::loadData()
       {
         number.append(line_stream.read(1));
       }
-      verts[i].location[1] = number.toFloat();
+      verts[i].location[1] = number.toFloat() * scale;
 
       // position z
       number = "";
@@ -268,7 +269,7 @@ void cedar::dev::robot::gl::KukaArm::loadData()
       {
         number.append(line_stream.read(1));
       }
-      verts[i].location[2] = number.toFloat();
+      verts[i].location[2] = number.toFloat() * scale;
 
       // normal x
       number = "";
@@ -293,19 +294,86 @@ void cedar::dev::robot::gl::KukaArm::loadData()
         number.append(line_stream.read(1));
       }
       verts[i].normal[2] = number.toFloat();
-
-
-      std::cout << verts[i].location[0] << std::endl;
-      std::cout << verts[i].location[1] << std::endl;
-      std::cout << verts[i].location[2] << std::endl;
-      std::cout << verts[i].normal[0] << std::endl;
-      std::cout << verts[i].normal[1] << std::endl;
-      std::cout << verts[i].normal[2] << std::endl;
-      std::cout << line.toStdString() << std::endl;
-
     }
 
+
+    // read index data
+    for (unsigned int i=0; i<3738; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // the leading "3"
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+
+      // first index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      index[3*i] = static_cast<GLushort>(number.toInt());
+
+      // second index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      index[3*i+1] = static_cast<GLushort>(number.toInt());
+
+      // third index
+      number = "";
+      while (!line_stream.atEnd())
+      {
+        number.append(line_stream.read(1));
+      }
+      index[3*i+2] = static_cast<GLushort>(number.toInt());
+
+
+    }
   }
+  else
+  {
+    std::cout << "could not read file" << std::endl;
+  }
+
+
+  std::cout << "first vertex: " << std::endl;
+  std::cout << verts[0].location[0] << " ";
+  std::cout << verts[0].location[1] << " ";
+  std::cout << verts[0].location[2] << " ";
+  std::cout << verts[0].normal[0] << " ";
+  std::cout << verts[0].normal[1] << " ";
+  std::cout << verts[0].normal[2] << std::endl;
+
+  std::cout << "last vertex: " << std::endl;
+  std::cout << verts[8803].location[0] << " ";
+  std::cout << verts[8803].location[1] << " ";
+  std::cout << verts[8803].location[2] << " ";
+  std::cout << verts[8803].normal[0] << " ";
+  std::cout << verts[8803].normal[1] << " ";
+  std::cout << verts[8803].normal[2] << std::endl;
+
+  std::cout << "first indices: " << std::endl;
+  std::cout << static_cast<int>(index[0]) << " ";
+  std::cout << static_cast<int>(index[1]) << " ";
+  std::cout << static_cast<int>(index[2]) << std::endl;
+  std::cout << static_cast<int>(index[3]) << " ";
+  std::cout << static_cast<int>(index[4]) << " ";
+  std::cout << static_cast<int>(index[5]) << std::endl;
+
+  std::cout << "last indices: " << std::endl;
+  std::cout << static_cast<int>(index[3736*3]) << " ";
+  std::cout << static_cast<int>(index[3736*3+1]) << " ";
+  std::cout << static_cast<int>(index[3736*3+2]) << std::endl;
+  std::cout << static_cast<int>(index[3737*3]) << " ";
+  std::cout << static_cast<int>(index[3737*3+1]) << " ";
+  std::cout << static_cast<int>(index[3737*3+2]) << std::endl;
 }
 
 
