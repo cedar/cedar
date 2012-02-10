@@ -75,10 +75,10 @@ private:
   //! Type of the trigger connection list.
   typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
 
+public:
   //! Type of the map of elements.
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
 
-public:
   //! Iterator type of the element map.
   typedef ElementMap::iterator ElementMapIterator;
 
@@ -254,6 +254,13 @@ public:
    */
   std::string getUniqueIdentifier(const std::string& identifier) const;
 
+  /*!@brief Register a function pointer to react to an added element.
+   */
+  boost::signals2::connection connectToElementAdded
+  (
+    boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
+  );
+  
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
   void processPromotedSlots();
@@ -340,6 +347,13 @@ private:
 
   //! List of trigger connections in the network.
   TriggerConnectionVector mTriggerConnections;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Signal that is triggered whenever an element is added to the network.
+  boost::signals2::signal<void (cedar::proc::Network*, cedar::proc::ElementPtr)> mElementAddedSignal;
 
 }; // class cedar::proc::Network
 

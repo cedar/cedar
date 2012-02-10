@@ -108,6 +108,11 @@ cedar::proc::ConstDataSlotPtr cedar::proc::gui::DataSlotItem::getSlot() const
   return this->mSlot;
 }
 
+cedar::proc::DataSlotPtr cedar::proc::gui::DataSlotItem::getSlot()
+{
+  return this->mSlot;
+}
+
 bool cedar::proc::gui::DataSlotItem::canConnect() const
 {
   return this->mSlot->getRole() == cedar::proc::DataRole::OUTPUT;

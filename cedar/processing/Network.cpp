@@ -59,8 +59,8 @@
 #include <algorithm>
 
 // Define that helps to debug file reading.
-#define DEBUG_FILE_READING
-#define DEBUG_FILE_WRITING
+//#define DEBUG_FILE_READING
+//#define DEBUG_FILE_WRITING
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -85,6 +85,14 @@ cedar::proc::Network::~Network()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+boost::signals2::connection cedar::proc::Network::connectToElementAdded
+                            (
+                              boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
+                            )
+{
+  return this->mElementAddedSignal.connect(slot);
+}
 
 std::string cedar::proc::Network::getUniqueIdentifier(const std::string& identifier) const
 {
@@ -206,7 +214,11 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
   }
   else if (mElements.find(instanceName) != mElements.end())
   {
-    CEDAR_THROW(cedar::proc::DuplicateNameException, "duplicate entry of elements in this module")
+    CEDAR_THROW
+    (
+      cedar::proc::DuplicateNameException,
+      "Duplicate element name entry \"" + instanceName+ "\" in network \"" + this->getName() + "\""
+    )
   }
   else
   {
@@ -218,6 +230,8 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element)
     old_network->remove(element);
   }
   element->setNetwork(boost::shared_static_cast<cedar::proc::Network>(this->shared_from_this()));
+
+  this->mElementAddedSignal(this, element);
 }
 
 cedar::proc::ConstElementPtr cedar::proc::Network::getElement(const std::string& name) const
