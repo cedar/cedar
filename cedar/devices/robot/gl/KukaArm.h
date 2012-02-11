@@ -43,18 +43,10 @@
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/gl.h"
-#include "cedar/auxiliaries/gl/glu.h"
+//#include "cedar/auxiliaries/gl/glu.h"
 
 // SYSTEM INCLUDES
 
-  typedef struct
-  {
-    GLfloat location[3];
-    GLfloat tex[2];
-    GLfloat normal[3];
-    GLfloat colour[4];
-    GLubyte padding[16]; // Pads the struct out to 64 bytes for performance increase
-  } Vertex;
 
 /*!@brief Visualization of the KUKA LWR4
  *
@@ -66,11 +58,29 @@
 class cedar::dev::robot::gl::KukaArm : public cedar::dev::robot::gl::KinematicChain
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // structs
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief container for vertex and related data
+  typedef struct
+  {
+    GLfloat location[3];
+    GLfloat tex[2];
+    GLfloat normal[3];
+    GLfloat colour[4];
+    GLubyte padding[16]; // Pads the struct out to 64 bytes for performance increase
+  } Vertex;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KukaArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  KukaArm
+  (
+    cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel,
+    const std::string& pathToPolygonData
+  );
   //!@brief destructor
   ~KukaArm();
 
@@ -98,7 +108,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //! loads the vertex data from file
-  void loadData();
+  void loadData(const std::string& pathToPolygonData);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

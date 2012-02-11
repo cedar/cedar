@@ -49,18 +49,18 @@
  #include <QFile>
 
 
-  // Location/Normals
-  #define X_POS 0
-  #define Y_POS 1
-  #define Z_POS 2
-  // Texture Coordinates
-  #define U_POS 0
-  #define V_POS 1
-  // Colours
-  #define R_POS 0
-  #define G_POS 1
-  #define B_POS 2
-  #define A_POS 3
+//  // Location/Normals
+//  #define X_POS 0
+//  #define Y_POS 1
+//  #define Z_POS 2
+//  // Texture Coordinates
+//  #define U_POS 0
+//  #define V_POS 1
+//  // Colours
+//  #define R_POS 0
+//  #define G_POS 1
+//  #define B_POS 2
+//  #define A_POS 3
 
 
 
@@ -68,11 +68,15 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::KukaArm::KukaArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::KukaArm::KukaArm
+(
+  cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel,
+  const std::string& pathToPolygonData
+)
 :
 cedar::dev::robot::gl::KinematicChain(rpKinematicChainModel)
 {
-  loadData();
+  loadData(pathToPolygonData);
 }
 
 cedar::dev::robot::gl::KukaArm::~KukaArm()
@@ -86,53 +90,17 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 
 void cedar::dev::robot::gl::KukaArm::drawBase()
 {
-//  Vertex verts[24]; // We're making a cube, 6 faces * 4 vertices per face
-//  GLushort index[36]; // 2 Triangles per face (possible to use quads, but they're being phased out of OpenGL3, so we're using triangles instead)
-
-//  verts[0].location[X_POS] = -1; verts[0].location[Y_POS] = -1; verts[0].location[Z_POS] = 1;
-//  verts[0].normal[X_POS] = 0; verts[0].normal[Y_POS] = 0; verts[0].normal[Z_POS] = 1;
-//  verts[0].tex[U_POS] = 0; verts[0].tex[V_POS] = 0;
-//  verts[1].location[X_POS] = -1; verts[1].location[Y_POS] = 1;  verts[1].location[Z_POS] = 1;
-//  verts[1].normal[X_POS] = 0; verts[1].normal[Y_POS] = 0; verts[1].normal[Z_POS] = 1;
-//  verts[1].tex[U_POS] = 0; verts[1].tex[V_POS] = 1;
-//  verts[2].location[X_POS] = 1;  verts[2].location[Y_POS] = 1;  verts[2].location[Z_POS] = 1;
-//  verts[2].normal[X_POS] = 0; verts[2].normal[Y_POS] = 0; verts[2].normal[Z_POS] = 1;
-//  verts[2].tex[U_POS] = 1; verts[2].tex[V_POS] = 1;
-//  verts[3].location[X_POS] = 1;  verts[3].location[Y_POS] = -1; verts[3].location[Z_POS] = 1;
-//  verts[3].normal[X_POS] = 0; verts[3].normal[Y_POS] = 0; verts[3].normal[Z_POS] = 1;
-//  verts[3].tex[U_POS] = 1; verts[3].tex[V_POS] = 0;
-//  verts[4].location[X_POS] = 0;  verts[4].location[Y_POS] = 0; verts[4].location[Z_POS] = 2;
-//  verts[4].normal[X_POS] = 0; verts[4].normal[Y_POS] = 0; verts[4].normal[Z_POS] = 1;
-//  verts[4].tex[U_POS] = 1; verts[4].tex[V_POS] = 0;
-
-
-  // ********* SNIP (I'll let you fill in the rest of the cube here) *********
+  prepareDraw();
 
   // Colors
   for (int i = 0; i < 8804; i++)
   {
-    verts[i].colour[R_POS] = 1.0;
-    verts[i].colour[G_POS] = 0.5;
-    verts[i].colour[B_POS] = 0.0;
-    verts[i].colour[A_POS] = 1.0;
+    verts[i].colour[0] = 1.0;
+    verts[i].colour[1] = 0.5;
+    verts[i].colour[2] = 0.0;
+    verts[i].colour[3] = 1.0;
   }
 
-  // Index Array (define our triangles)
-  // A Face looks like (numbers are the array index number of the vertex)
-  // 1      2
-  // +------+
-  // |      |
-  // |      |
-  // +------+
-  // 0      3
-//  index[0] = 0; index[1] = 1; index[2] = 2;
-//  index[3] = 2; index[4] = 3; index[5] = 0;
-//  index[6] = 0; index[7] = 4; index[8] = 3;
-//  index[9] = 3; index[10] = 4; index[11] = 2;
-//  index[12] = 2; index[13] = 4; index[14] = 1;
-//  index[15] = 1; index[16] = 4; index[17] = 0;
-
-  // ********* SNIP (I'll let you fill in the rest of the cube here) *********
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
   GLuint vboID; // Vertex Buffer, this needs to be accessible wherever we draw from, so in C++, this would be a class member, in regular C, it would probably be a global variable;
@@ -147,7 +115,7 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * 8804, verts); // Actually upload the data
 
   // Set the pointers to our data.  Except for the normal value (which always has a size of 3), we must pass
-  // the size of the individual component.  ie. A vertex has 3 points (x, y, z), texture coordinates have 2 (u, v) etc.
+  // the size of the individual component.  i.e. A vertex has 3 points (x, y, z), texture coordinates have 2 (u, v) etc.
   // Basically the arguments are (ignore the first one for the normal pointer), Size (many components to
   // read), Type (what data type is it), Stride (how far to move forward - in bytes - per vertex) and Offset
   // (where in the buffer to start reading the data - in bytes)
@@ -188,7 +156,7 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
   glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
 
-  // Actually do our drawing, parameters are Primative (Triangles, Quads, Triangle Fans etc), Elements to
+  // Actually do our drawing, parameters are Primitive (Triangles, Quads, Triangle Fans etc), Elements to
   // draw, Type of each element, Start Offset
   glDrawElements(GL_TRIANGLES, 3738*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
 
@@ -203,13 +171,6 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
 
 
-//  glBegin(GL_TRIANGLE_STRIP);
-//    glVertex3f(0.5f, 0.5f, 0); // Top Right
-//    glVertex3f(-0.5f, 0.5f, 0); // Top Left
-//    glVertex3f(0.5f, -0.5f, 0); // Bottom Right
-//    glVertex3f(-0.5f, -0.5f, 0); // Bottom Left
-//  glEnd();
-
 
 }
 
@@ -223,10 +184,12 @@ void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 
 }
 
-void cedar::dev::robot::gl::KukaArm::loadData()
+void cedar::dev::robot::gl::KukaArm::loadData(const std::string& pathToPolygonData)
 {
   std::cout << "trying to load data" << std::endl;
-  QFile data("/Users/reimajbi/Desktop/meshes/lbr_base.ply");
+  QString base_data = QString(pathToPolygonData.c_str()) + QString("base.ply");
+  QFile data(base_data);
+//  QFile data("/Users/reimajbi/Desktop/meshes/lbr_base.ply");
   if (data.open(QFile::ReadOnly))
   {
     QTextStream text_stream(&data);
