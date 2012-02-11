@@ -52,6 +52,34 @@
 
 int main(int argc, char **argv)
 {
+  std::string configuration_file_path = "../../../../tests/interactive/devices/gl/Kuka/";
+  std::string polygon_file_path = "";
+  // help requested?
+  if ((argc == 2) && (std::string(argv[1]) == "-h"))
+  { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
+    std::cout << "Usage is -c <path to config file> -p <path to polygon data>" << std::endl;
+    return 0;
+  }
+  // parse arguments
+  for (int i = 1; i < argc; i++)
+  {
+    if (i+1 != argc) // check that we haven't finished parsing already
+    {
+      if (std::string(argv[i]) == "-c")
+      {
+        configuration_file_path = std::string(argv[i+1]);
+      }
+      else if (std::string(argv[i]) == "-p")
+      {
+        polygon_file_path = std::string(argv[i+1]);
+      }
+    }
+  }
+
+
+
+
+
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
@@ -59,15 +87,25 @@ int main(int argc, char **argv)
   (
     new cedar::dev::robot::SimulatedKinematicChain
     (
-      "../../../../tests/interactive/devices/gl/Kuka/kuka_lbr4.conf"
+      configuration_file_path + "kuka_lbr4.conf"
     )
   );
 
   // create models calculation of the transformation
-  cedar::dev::robot::KinematicChainModelPtr p_kuka_arm_model(new cedar::dev::robot::KinematicChainModel(p_kuka_arm));
+  cedar::dev::robot::KinematicChainModelPtr p_kuka_arm_model
+  (
+    new cedar::dev::robot::KinematicChainModel(p_kuka_arm)
+  );
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization(new cedar::dev::robot::gl::KukaArm(p_kuka_arm_model));
+  cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
+  (
+    new cedar::dev::robot::gl::KukaArm
+    (
+      p_kuka_arm_model,
+      polygon_file_path
+    )
+  );
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
