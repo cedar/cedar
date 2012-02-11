@@ -107,9 +107,20 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! loads the vertex data from file
-  void loadData(const std::string& pathToPolygonData);
+  //! draws forward segment
+  void drawForwardSegment();
 
+  //! loads the polygon data from files
+  void loadPolygonData(const std::string& pathToPolygonData);
+
+  //! loads the polygon data of the base
+  void loadBaseData(const QString& dataFile);
+
+  //! loads the polygon data of the base ring
+  void loadBaseRingData(const QString& dataFile);
+
+  //! loads the polygon data of the base ring
+  void loadSegmentData(const QString& dataFile);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -117,8 +128,30 @@ private:
 protected:
   // none yet
 private:
-  Vertex verts[8804];
-  GLushort index[3738*3];
+  // base
+  static const unsigned int mBaseVertexNumber = 8804;
+  static const unsigned int mBaseFacesNumber = 3738;
+  GLuint mBaseVertexVboId; // vertex buffer id
+  GLuint mBaseIndexVboId; // index buffer id
+  Vertex mBaseVertex[mBaseVertexNumber]; // vertex data
+  GLushort mBaseIndex[mBaseFacesNumber*3]; // index data
+
+  // base ring
+  static const unsigned int mBaseRingVertexNumber = 1064;
+  static const unsigned int mBaseRingFacesNumber = 590;
+  GLuint mBaseRingVertexVboId; // vertex buffer id
+  GLuint mBaseRingIndexVboId; // index buffer id
+  Vertex mBaseRingVertex[mBaseRingVertexNumber]; // vertex data
+  GLushort mBaseRingIndex[mBaseRingFacesNumber*3]; // index data
+
+  // segment
+  static const unsigned int mForwardSegmentVertexNumber = 51622;
+  static const unsigned int mForwardSegmentFacesNumber = 17400;
+  GLuint mForwardSegmentVertexVboId; // vertex buffer id
+  GLuint mForwardSegmentIndexVboId; // index buffer id
+  Vertex mForwardSegmentVertex[mForwardSegmentVertexNumber]; // vertex data
+  GLushort mForwardSegmentIndex[mForwardSegmentFacesNumber*3]; // index data
+
 }; // class cedar::dev::robot::gl::KukaArm
 #endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
 
