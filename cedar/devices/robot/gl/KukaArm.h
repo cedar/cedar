@@ -88,7 +88,8 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //!@brief the visualization initializes resources in the current GL context
+  virtual void initializeGl();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
