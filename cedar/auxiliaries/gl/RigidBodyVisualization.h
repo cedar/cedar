@@ -72,6 +72,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief the visualization initializes resources in the current GL context
+  virtual void initializeGl();
+
   //!@brief draws a visualization of the object in the current GL context
   virtual void draw() = 0;
   
