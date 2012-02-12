@@ -75,18 +75,53 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dev::robot::gl::KukaArm::initializeGl()
+{
+  std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
+  // base vertex buffer
+  glGenBuffers(1, &mBaseVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
+  glBindBuffer(GL_ARRAY_BUFFER, mBaseVertexVboId); // Bind the buffer (vertex array data)
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseVertexNumber, mBaseVertex); // Actually upload the data
+  // base index buffer
+  glGenBuffers(1, &mBaseIndexVboId); // Generate buffer
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseIndexVboId); // Bind the element array buffer
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseFacesNumber*3 * sizeof(GLushort), mBaseIndex, GL_STATIC_DRAW);
+
+  // base ring vertex buffer
+  glGenBuffers(1, &mBaseRingVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
+  glBindBuffer(GL_ARRAY_BUFFER, mBaseRingVertexVboId); // Bind the buffer (vertex array data)
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseRingVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseRingVertexNumber, mBaseRingVertex); // Actually upload the data
+  // base ring index buffer
+  glGenBuffers(1, &mBaseRingIndexVboId); // Generate buffer
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseRingIndexVboId); // Bind the element array buffer
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseRingFacesNumber*3 * sizeof(GLushort), mBaseRingIndex, GL_STATIC_DRAW);
+
+  // forward module vertex buffer
+  glGenBuffers(1, &mForwardSegmentVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
+  glBindBuffer(GL_ARRAY_BUFFER, mForwardSegmentVertexVboId); // Bind the buffer (vertex array data)
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mForwardSegmentVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mForwardSegmentVertexNumber, mForwardSegmentVertex); // Actually upload the data
+  // forward module index buffer
+  glGenBuffers(1, &mForwardSegmentIndexVboId); // Generate buffer
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentIndexVboId); // Bind the element array buffer
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentFacesNumber*3 * sizeof(GLushort), mForwardSegmentIndex, GL_STATIC_DRAW);
+
+}
+
 void cedar::dev::robot::gl::KukaArm::drawBase()
 {
   prepareDraw();
 
-  glGenBuffers(1, &mBaseVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-  glBindBuffer(GL_ARRAY_BUFFER, mBaseVertexVboId); // Bind the buffer (vertex array data)
+//  glGenBuffers(1, &mBaseVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
+//  glBindBuffer(GL_ARRAY_BUFFER, mBaseVertexVboId); // Bind the buffer (vertex array data)
 
   // Allocate space.  We could pass the mesh in here (where the NULL is), but it's actually faster to do it as a
   // separate step.  We also define it as GL_STATIC_DRAW which means we set the data once, and never
   // update it.  This is not a strict rule code wise, but gives hints to the driver as to where to store the data
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseVertexNumber, NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseVertexNumber, mBaseVertex); // Actually upload the data
+//  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseVertexNumber, NULL, GL_STATIC_DRAW);
+//  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseVertexNumber, mBaseVertex); // Actually upload the data
 
   // Set the pointers to our data.  Except for the normal value (which always has a size of 3), we must pass
   // the size of the individual component.  i.e. A vertex has 3 points (x, y, z), texture coordinates have 2 (u, v) etc.
@@ -106,11 +141,11 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
   // Our Index Buffer, same as above, the variable needs to be accessible wherever we draw
 //  GLuint mBaseIndexVboId;
-  glGenBuffers(1, &mBaseIndexVboId); // Generate buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseIndexVboId); // Bind the element array buffer
+//  glGenBuffers(1, &mBaseIndexVboId); // Generate buffer
+//  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseIndexVboId); // Bind the element array buffer
   // Upload the index array, this can be done the same way as above (with NULL as the data, then a
   // glBufferSubData call, but doing it all at once for convenience)
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseFacesNumber*3 * sizeof(GLushort), mBaseIndex, GL_STATIC_DRAW);
+//  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseFacesNumber*3 * sizeof(GLushort), mBaseIndex, GL_STATIC_DRAW);
 
 
   // Bind our buffers much like we would for texturing
@@ -143,14 +178,14 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
   // now do the same for the ring
 
-  glGenBuffers(1, &mBaseRingVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-  glBindBuffer(GL_ARRAY_BUFFER, mBaseRingVertexVboId); // Bind the buffer (vertex array data)
+//  glGenBuffers(1, &mBaseRingVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
+//  glBindBuffer(GL_ARRAY_BUFFER, mBaseRingVertexVboId); // Bind the buffer (vertex array data)
 
   // Allocate space.  We could pass the mesh in here (where the NULL is), but it's actually faster to do it as a
   // separate step.  We also define it as GL_STATIC_DRAW which means we set the data once, and never
   // update it.  This is not a strict rule code wise, but gives hints to the driver as to where to store the data
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseRingVertexNumber, NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseRingVertexNumber, mBaseRingVertex); // Actually upload the data
+//  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseRingVertexNumber, NULL, GL_STATIC_DRAW);
+//  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseRingVertexNumber, mBaseRingVertex); // Actually upload the data
 
   // Set the pointers to our data.  Except for the normal value (which always has a size of 3), we must pass
   // the size of the individual component.  i.e. A vertex has 3 points (x, y, z), texture coordinates have 2 (u, v) etc.
@@ -170,11 +205,11 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
   // Our Index Buffer, same as above, the variable needs to be accessible wherever we draw
 //  GLuint mBaseRingIndexVboId;
-  glGenBuffers(1, &mBaseRingIndexVboId); // Generate buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseRingIndexVboId); // Bind the element array buffer
+//  glGenBuffers(1, &mBaseRingIndexVboId); // Generate buffer
+//  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseRingIndexVboId); // Bind the element array buffer
   // Upload the index array, this can be done the same way as above (with NULL as the data, then a
   // glBufferSubData call, but doing it all at once for convenience)
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseRingFacesNumber*3 * sizeof(GLushort), mBaseRingIndex, GL_STATIC_DRAW);
+//  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseRingFacesNumber*3 * sizeof(GLushort), mBaseRingIndex, GL_STATIC_DRAW);
 
 
   // Bind our buffers much like we would for texturing
@@ -233,37 +268,26 @@ void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 
 void cedar::dev::robot::gl::KukaArm::drawForwardSegment()
 {
-  // vertices
-  glGenBuffers(1, &mForwardSegmentVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-  glBindBuffer(GL_ARRAY_BUFFER, mForwardSegmentVertexVboId); // Bind the buffer (vertex array data)
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mForwardSegmentVertexNumber, NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mForwardSegmentVertexNumber, mForwardSegmentVertex); // Actually upload the data
+  // bind the buffers
+  glBindBuffer(GL_ARRAY_BUFFER, mForwardSegmentVertexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentIndexVboId);
+
+  // set the pointers
   glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
   glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
   glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
   glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
-
-  // indices
-  glGenBuffers(1, &mForwardSegmentIndexVboId); // Generate buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentIndexVboId); // Bind the element array buffer
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentFacesNumber*3 * sizeof(GLushort), mForwardSegmentIndex, GL_STATIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, mForwardSegmentVertexVboId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentIndexVboId);
 
   // prepare
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
-  glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
-  glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
-  glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
-  glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
 
   // draw
   glDrawElements(GL_TRIANGLES, mForwardSegmentFacesNumber*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
 
-  // clean up
+  // reset
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
@@ -735,39 +759,39 @@ void cedar::dev::robot::gl::KukaArm::loadSegmentData(const QString& dataFile)
     mForwardSegmentVertex[i].colour[3] = 1.0;
   }
 
-  std::cout << "segment: " << std::endl;
-
-  std::cout << "first vertex: " << std::endl;
-  std::cout << mForwardSegmentVertex[0].location[0] << " ";
-  std::cout << mForwardSegmentVertex[0].location[1] << " ";
-  std::cout << mForwardSegmentVertex[0].location[2] << " ";
-  std::cout << mForwardSegmentVertex[0].normal[0] << " ";
-  std::cout << mForwardSegmentVertex[0].normal[1] << " ";
-  std::cout << mForwardSegmentVertex[0].normal[2] << std::endl;
-
-  std::cout << "last vertex: " << std::endl;
-  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[0] << " ";
-  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[1] << " ";
-  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[2] << " ";
-  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[0] << " ";
-  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[1] << " ";
-  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[2] << std::endl;
-
-  std::cout << "first indices: " << std::endl;
-  std::cout << static_cast<int>(mForwardSegmentIndex[0]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[1]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[2]) << std::endl;
-  std::cout << static_cast<int>(mForwardSegmentIndex[3]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[4]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[5]) << std::endl;
-
-  std::cout << "last indices: " << std::endl;
-  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3+1]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3+2]) << std::endl;
-  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3+1]) << " ";
-  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3+2]) << std::endl;
-
-  std::cout << std::endl;
+//  std::cout << "segment: " << std::endl;
+//
+//  std::cout << "first vertex: " << std::endl;
+//  std::cout << mForwardSegmentVertex[0].location[0] << " ";
+//  std::cout << mForwardSegmentVertex[0].location[1] << " ";
+//  std::cout << mForwardSegmentVertex[0].location[2] << " ";
+//  std::cout << mForwardSegmentVertex[0].normal[0] << " ";
+//  std::cout << mForwardSegmentVertex[0].normal[1] << " ";
+//  std::cout << mForwardSegmentVertex[0].normal[2] << std::endl;
+//
+//  std::cout << "last vertex: " << std::endl;
+//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[0] << " ";
+//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[1] << " ";
+//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[2] << " ";
+//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[0] << " ";
+//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[1] << " ";
+//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[2] << std::endl;
+//
+//  std::cout << "first indices: " << std::endl;
+//  std::cout << static_cast<int>(mForwardSegmentIndex[0]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[1]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[2]) << std::endl;
+//  std::cout << static_cast<int>(mForwardSegmentIndex[3]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[4]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[5]) << std::endl;
+//
+//  std::cout << "last indices: " << std::endl;
+//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3+1]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3+2]) << std::endl;
+//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3+1]) << " ";
+//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3+2]) << std::endl;
+//
+//  std::cout << std::endl;
 }
