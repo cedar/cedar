@@ -169,6 +169,13 @@ void cedar::aux::gl::Scene::initGl()
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
   glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
   glLightfv(GL_LIGHT0, GL_POSITION, position);
+
+  // let all items in the scene initialize their resources in the current Gl context
+  for (int i=0; i<mRigidBodyVisualizations.size(); i++)
+  {
+    mRigidBodyVisualizations[ i ]->initializeGl();
+  }
+
 }
 
 void cedar::aux::gl::Scene::init()
