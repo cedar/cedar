@@ -108,20 +108,17 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! draws forward segment
-  void drawForwardSegment();
+  void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
 
-  //! loads the polygon data from files
   void loadPolygonData(const std::string& pathToPolygonData);
-
-  //! loads the polygon data of the base
-  void loadBaseData(const QString& dataFile);
-
-  //! loads the polygon data of the base ring
+  void loadBaseSegmentData(const QString& dataFile);
   void loadBaseRingData(const QString& dataFile);
-
-  //! loads the polygon data of the base ring
-  void loadSegmentData(const QString& dataFile);
+  void loadForwardSegmentData(const QString& dataFile);
+  void loadForwardRingData(const QString& dataFile);
+  void loadInverseSegmentData(const QString& dataFile);
+  void loadInverseRingData(const QString& dataFile);
+  void loadWristSegmentData(const QString& dataFile);
+  void loadWristSphereData(const QString& dataFile);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -130,12 +127,12 @@ protected:
   // none yet
 private:
   // base
-  static const unsigned int mBaseVertexNumber = 8804;
-  static const unsigned int mBaseFacesNumber = 3738;
-  GLuint mBaseVertexVboId; // vertex buffer id
-  GLuint mBaseIndexVboId; // index buffer id
-  Vertex mBaseVertex[mBaseVertexNumber]; // vertex data
-  GLushort mBaseIndex[mBaseFacesNumber*3]; // index data
+  static const unsigned int mBaseSegmentVertexNumber = 8804;
+  static const unsigned int mBaseSegmentFacesNumber = 3738;
+  GLuint mBaseSegmentVertexVboId; // vertex buffer id
+  GLuint mBaseSegmentIndexVboId; // index buffer id
+  Vertex mBaseSegmentVertex[mBaseSegmentVertexNumber]; // vertex data
+  GLushort mBaseSegmentIndex[mBaseSegmentFacesNumber*3]; // index data
 
   // base ring
   static const unsigned int mBaseRingVertexNumber = 1064;
@@ -145,13 +142,53 @@ private:
   Vertex mBaseRingVertex[mBaseRingVertexNumber]; // vertex data
   GLushort mBaseRingIndex[mBaseRingFacesNumber*3]; // index data
 
-  // segment
+  // forward segment
   static const unsigned int mForwardSegmentVertexNumber = 51622;
   static const unsigned int mForwardSegmentFacesNumber = 17400;
   GLuint mForwardSegmentVertexVboId; // vertex buffer id
   GLuint mForwardSegmentIndexVboId; // index buffer id
   Vertex mForwardSegmentVertex[mForwardSegmentVertexNumber]; // vertex data
   GLushort mForwardSegmentIndex[mForwardSegmentFacesNumber*3]; // index data
+
+  // forward ring
+  static const unsigned int mForwardRingVertexNumber = 1054;
+  static const unsigned int mForwardRingFacesNumber = 590;
+  GLuint mForwardRingVertexVboId; // vertex buffer id
+  GLuint mForwardRingIndexVboId; // index buffer id
+  Vertex mForwardRingVertex[mForwardRingVertexNumber]; // vertex data
+  GLushort mForwardRingIndex[mForwardRingFacesNumber*3]; // index data
+
+  // inverse segment
+  static const unsigned int mInverseSegmentVertexNumber = 51373;
+  static const unsigned int mInverseSegmentFacesNumber = 17234;
+  GLuint mInverseSegmentVertexVboId; // vertex buffer id
+  GLuint mInverseSegmentIndexVboId; // index buffer id
+  Vertex mInverseSegmentVertex[mInverseSegmentVertexNumber]; // vertex data
+  GLushort mInverseSegmentIndex[mInverseSegmentFacesNumber*3]; // index data
+
+  // inverse ring
+  static const unsigned int mInverseRingVertexNumber = 1164;
+  static const unsigned int mInverseRingFacesNumber = 590;
+  GLuint mInverseRingVertexVboId; // vertex buffer id
+  GLuint mInverseRingIndexVboId; // index buffer id
+  Vertex mInverseRingVertex[mInverseRingVertexNumber]; // vertex data
+  GLushort mInverseRingIndex[mInverseRingFacesNumber*3]; // index data
+
+  // wrist segment
+  static const unsigned int mWristSegmentVertexNumber = 57695;
+  static const unsigned int mWristSegmentFacesNumber = 19448;
+  GLuint mWristSegmentVertexVboId; // vertex buffer id
+  GLuint mWristSegmentIndexVboId; // index buffer id
+  Vertex mWristSegmentVertex[mWristSegmentVertexNumber]; // vertex data
+  GLushort mWristSegmentIndex[mWristSegmentFacesNumber*3]; // index data
+
+  // wrist sphere
+  static const unsigned int mWristSphereVertexNumber = 18119;
+  static const unsigned int mWristSphereFacesNumber = 6388;
+  GLuint mWristSphereVertexVboId; // vertex buffer id
+  GLuint mWristSphereIndexVboId; // index buffer id
+  Vertex mWristSphereVertex[mWristSphereVertexNumber]; // vertex data
+  GLushort mWristSphereIndex[mWristSphereFacesNumber*3]; // index data
 
 }; // class cedar::dev::robot::gl::KukaArm
 #endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
