@@ -78,35 +78,77 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 void cedar::dev::robot::gl::KukaArm::initializeGl()
 {
   std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
-  // base vertex buffer
-  glGenBuffers(1, &mBaseVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-  glBindBuffer(GL_ARRAY_BUFFER, mBaseVertexVboId); // Bind the buffer (vertex array data)
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseVertexNumber, NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseVertexNumber, mBaseVertex); // Actually upload the data
-  // base index buffer
-  glGenBuffers(1, &mBaseIndexVboId); // Generate buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseIndexVboId); // Bind the element array buffer
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseFacesNumber*3 * sizeof(GLushort), mBaseIndex, GL_STATIC_DRAW);
+  // base segment
+  glGenBuffers(1, &mBaseSegmentVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mBaseSegmentVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseSegmentVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseSegmentVertexNumber, mBaseSegmentVertex);
+  glGenBuffers(1, &mBaseSegmentIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseSegmentIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseSegmentFacesNumber*3 * sizeof(GLushort), mBaseSegmentIndex, GL_STATIC_DRAW);
 
-  // base ring vertex buffer
-  glGenBuffers(1, &mBaseRingVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-  glBindBuffer(GL_ARRAY_BUFFER, mBaseRingVertexVboId); // Bind the buffer (vertex array data)
+  // base ring
+  glGenBuffers(1, &mBaseRingVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mBaseRingVertexVboId);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseRingVertexNumber, NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseRingVertexNumber, mBaseRingVertex); // Actually upload the data
-  // base ring index buffer
-  glGenBuffers(1, &mBaseRingIndexVboId); // Generate buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseRingIndexVboId); // Bind the element array buffer
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseRingVertexNumber, mBaseRingVertex);
+  glGenBuffers(1, &mBaseRingIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseRingIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseRingFacesNumber*3 * sizeof(GLushort), mBaseRingIndex, GL_STATIC_DRAW);
 
-  // forward module vertex buffer
-  glGenBuffers(1, &mForwardSegmentVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-  glBindBuffer(GL_ARRAY_BUFFER, mForwardSegmentVertexVboId); // Bind the buffer (vertex array data)
+  // forward segment
+  glGenBuffers(1, &mForwardSegmentVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mForwardSegmentVertexVboId);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mForwardSegmentVertexNumber, NULL, GL_STATIC_DRAW);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mForwardSegmentVertexNumber, mForwardSegmentVertex); // Actually upload the data
-  // forward module index buffer
-  glGenBuffers(1, &mForwardSegmentIndexVboId); // Generate buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentIndexVboId); // Bind the element array buffer
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mForwardSegmentVertexNumber, mForwardSegmentVertex);
+  glGenBuffers(1, &mForwardSegmentIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentFacesNumber*3 * sizeof(GLushort), mForwardSegmentIndex, GL_STATIC_DRAW);
+
+  // forward ring
+  glGenBuffers(1, &mForwardRingVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mForwardRingVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mForwardRingVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mForwardRingVertexNumber, mForwardRingVertex);
+  glGenBuffers(1, &mForwardRingIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardRingIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mForwardRingFacesNumber*3 * sizeof(GLushort), mForwardRingIndex, GL_STATIC_DRAW);
+
+  // inverse segment
+  glGenBuffers(1, &mInverseSegmentVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mInverseSegmentVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mInverseSegmentVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mInverseSegmentVertexNumber, mInverseSegmentVertex);
+  glGenBuffers(1, &mInverseSegmentIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mInverseSegmentIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mInverseSegmentFacesNumber*3 * sizeof(GLushort), mInverseSegmentIndex, GL_STATIC_DRAW);
+
+  // inverse ring
+  glGenBuffers(1, &mInverseRingVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mInverseRingVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mInverseRingVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mInverseRingVertexNumber, mInverseRingVertex);
+  glGenBuffers(1, &mInverseRingIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mInverseRingIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mInverseRingFacesNumber*3 * sizeof(GLushort), mInverseRingIndex, GL_STATIC_DRAW);
+
+  // wrist segment
+  glGenBuffers(1, &mWristSegmentVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mWristSegmentVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mWristSegmentVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mWristSegmentVertexNumber, mWristSegmentVertex);
+  glGenBuffers(1, &mWristSegmentIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mWristSegmentIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mWristSegmentFacesNumber*3 * sizeof(GLushort), mWristSegmentIndex, GL_STATIC_DRAW);
+
+  // wrist sphere
+  glGenBuffers(1, &mWristSphereVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mWristSphereVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mWristSphereVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mWristSphereVertexNumber, mWristSphereVertex);
+  glGenBuffers(1, &mWristSphereIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mWristSphereIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mWristSphereFacesNumber*3 * sizeof(GLushort), mWristSphereIndex, GL_STATIC_DRAW);
 
 }
 
@@ -114,132 +156,8 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 {
   prepareDraw();
 
-//  glGenBuffers(1, &mBaseVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-//  glBindBuffer(GL_ARRAY_BUFFER, mBaseVertexVboId); // Bind the buffer (vertex array data)
-
-  // Allocate space.  We could pass the mesh in here (where the NULL is), but it's actually faster to do it as a
-  // separate step.  We also define it as GL_STATIC_DRAW which means we set the data once, and never
-  // update it.  This is not a strict rule code wise, but gives hints to the driver as to where to store the data
-//  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseVertexNumber, NULL, GL_STATIC_DRAW);
-//  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseVertexNumber, mBaseVertex); // Actually upload the data
-
-  // Set the pointers to our data.  Except for the normal value (which always has a size of 3), we must pass
-  // the size of the individual component.  i.e. A vertex has 3 points (x, y, z), texture coordinates have 2 (u, v) etc.
-  // Basically the arguments are (ignore the first one for the normal pointer), Size (many components to
-  // read), Type (what data type is it), Stride (how far to move forward - in bytes - per vertex) and Offset
-  // (where in the buffer to start reading the data - in bytes)
-
-  // Make sure you put glVertexPointer at the end as there is a lot of work that goes on behind the scenes
-  // with it, and if it's set at the start, it has to do all that work for each gl*Pointer call, rather than once at
-  // the end.
-  glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
-  glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
-  glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
-  glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
-
-  // When we get here, all the vertex data is effectively on the card
-
-  // Our Index Buffer, same as above, the variable needs to be accessible wherever we draw
-//  GLuint mBaseIndexVboId;
-//  glGenBuffers(1, &mBaseIndexVboId); // Generate buffer
-//  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseIndexVboId); // Bind the element array buffer
-  // Upload the index array, this can be done the same way as above (with NULL as the data, then a
-  // glBufferSubData call, but doing it all at once for convenience)
-//  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseFacesNumber*3 * sizeof(GLushort), mBaseIndex, GL_STATIC_DRAW);
-
-
-  // Bind our buffers much like we would for texturing
-  glBindBuffer(GL_ARRAY_BUFFER, mBaseVertexVboId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseIndexVboId);
-
-  // Set the state of what we are drawing (I don't think order matters here, but I like to do it in the same
-  // order I set the pointers
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_VERTEX_ARRAY);
-
-  // Reset our pointers.  This doesn't reinitialise any data, only how we walk through it
-  glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
-  glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
-  glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
-  glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
-
-  // Actually do our drawing, parameters are Primitive (Triangles, Quads, Triangle Fans etc), Elements to
-  // draw, Type of each element, Start Offset
-  glDrawElements(GL_TRIANGLES, mBaseFacesNumber*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
-
-  // Disable our client state back to normal drawing
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-
-
-  // now do the same for the ring
-
-//  glGenBuffers(1, &mBaseRingVertexVboId); // Create the buffer ID, this is basically the same as generating texture ID's
-//  glBindBuffer(GL_ARRAY_BUFFER, mBaseRingVertexVboId); // Bind the buffer (vertex array data)
-
-  // Allocate space.  We could pass the mesh in here (where the NULL is), but it's actually faster to do it as a
-  // separate step.  We also define it as GL_STATIC_DRAW which means we set the data once, and never
-  // update it.  This is not a strict rule code wise, but gives hints to the driver as to where to store the data
-//  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mBaseRingVertexNumber, NULL, GL_STATIC_DRAW);
-//  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mBaseRingVertexNumber, mBaseRingVertex); // Actually upload the data
-
-  // Set the pointers to our data.  Except for the normal value (which always has a size of 3), we must pass
-  // the size of the individual component.  i.e. A vertex has 3 points (x, y, z), texture coordinates have 2 (u, v) etc.
-  // Basically the arguments are (ignore the first one for the normal pointer), Size (many components to
-  // read), Type (what data type is it), Stride (how far to move forward - in bytes - per vertex) and Offset
-  // (where in the buffer to start reading the data - in bytes)
-
-  // Make sure you put glVertexPointer at the end as there is a lot of work that goes on behind the scenes
-  // with it, and if it's set at the start, it has to do all that work for each gl*Pointer call, rather than once at
-  // the end.
-  glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
-  glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
-  glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
-  glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
-
-  // When we get here, all the vertex data is effectively on the card
-
-  // Our Index Buffer, same as above, the variable needs to be accessible wherever we draw
-//  GLuint mBaseRingIndexVboId;
-//  glGenBuffers(1, &mBaseRingIndexVboId); // Generate buffer
-//  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseRingIndexVboId); // Bind the element array buffer
-  // Upload the index array, this can be done the same way as above (with NULL as the data, then a
-  // glBufferSubData call, but doing it all at once for convenience)
-//  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mBaseRingFacesNumber*3 * sizeof(GLushort), mBaseRingIndex, GL_STATIC_DRAW);
-
-
-  // Bind our buffers much like we would for texturing
-  glBindBuffer(GL_ARRAY_BUFFER, mBaseRingVertexVboId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBaseRingIndexVboId);
-
-  // Set the state of what we are drawing (I don't think order matters here, but I like to do it in the same
-  // order I set the pointers
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_VERTEX_ARRAY);
-
-  // Reset our pointers.  This doesn't reinitialise any data, only how we walk through it
-  glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
-  glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
-  glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
-  glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
-
-  // Actually do our drawing, parameters are Primitive (Triangles, Quads, Triangle Fans etc), Elements to
-  // draw, Type of each element, Start Offset
-  glDrawElements(GL_TRIANGLES, mBaseRingFacesNumber*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
-
-  // Disable our client state back to normal drawing
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-
-
+  this->drawElement(mBaseSegmentVertexVboId, mBaseSegmentIndexVboId, mBaseSegmentFacesNumber);
+  this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
 }
 
 void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
@@ -256,7 +174,31 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-    this->drawForwardSegment();
+    this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
+    this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
+    break;
+  case 1:
+    glRotated(90.0, 1.0, 0.0, 0.0);
+    this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
+    this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
+    break;
+  case 2:
+    glRotated(180.0, 0.0, 0.0, 1.0);
+    this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
+    this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
+    break;
+  case 3:
+    glRotated(90.0, 1.0, 0.0, 0.0);
+    glRotated(180.0, 0.0, 1.0, 0.0);
+    this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
+    this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
+    break;
+  case 4:
+    this->drawElement(mWristSegmentVertexVboId, mWristSegmentIndexVboId, mWristSegmentFacesNumber);
+    break;
+  case 5:
+    glRotated(90.0, 1.0, 0.0, 0.0);
+    this->drawElement(mWristSphereVertexVboId, mWristSphereIndexVboId, mWristSphereFacesNumber);
     break;
   }
 }
@@ -266,11 +208,11 @@ void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 
 }
 
-void cedar::dev::robot::gl::KukaArm::drawForwardSegment()
+void cedar::dev::robot::gl::KukaArm::drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces)
 {
   // bind the buffers
-  glBindBuffer(GL_ARRAY_BUFFER, mForwardSegmentVertexVboId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mForwardSegmentIndexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
 
   // set the pointers
   glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
@@ -285,7 +227,7 @@ void cedar::dev::robot::gl::KukaArm::drawForwardSegment()
   glEnableClientState(GL_VERTEX_ARRAY);
 
   // draw
-  glDrawElements(GL_TRIANGLES, mForwardSegmentFacesNumber*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
+  glDrawElements(GL_TRIANGLES, numberOfFaces*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
 
   // reset
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -296,18 +238,33 @@ void cedar::dev::robot::gl::KukaArm::drawForwardSegment()
 
 void cedar::dev::robot::gl::KukaArm::loadPolygonData(const std::string& pathToPolygonData)
 {
-  QString base_data_file = QString(pathToPolygonData.c_str()) + QString("base.ply");
-  loadBaseData(base_data_file);
+  QString base_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_segment.ply");
+  loadBaseSegmentData(base_segment_data_file_name);
 
-  QString base_ring_data_file = QString(pathToPolygonData.c_str()) + QString("base_ring.ply");
-  loadBaseRingData(base_ring_data_file);
+  QString base_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_ring.ply");
+  loadBaseRingData(base_ring_data_file_name);
 
-  QString segment_data_file = QString(pathToPolygonData.c_str()) + QString("forward_segment.ply");
-  loadSegmentData(segment_data_file);
+  QString forward_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_segment.ply");
+  loadForwardSegmentData(forward_segment_data_file_name);
+
+  QString forward_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_ring.ply");
+  loadForwardRingData(forward_ring_data_file_name);
+
+  QString inverse_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_segment.ply");
+  loadInverseSegmentData(inverse_segment_data_file_name);
+
+  QString inverse_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_ring.ply");
+  loadInverseRingData(inverse_ring_data_file_name);
+
+  QString wrist_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_segment.ply");
+  loadWristSegmentData(wrist_segment_data_file_name);
+
+  QString wrist_sphere_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_sphere.ply");
+  loadWristSphereData(wrist_sphere_data_file_name);
 
 }
 
-void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
+void cedar::dev::robot::gl::KukaArm::loadBaseSegmentData(const QString& dataFile)
 {
   QFile data(dataFile);
   if (data.open(QFile::ReadOnly))
@@ -325,7 +282,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
     }
 
     // read vertex data
-    for (unsigned int i=0; i<mBaseVertexNumber; i++)
+    for (unsigned int i=0; i<mBaseSegmentVertexNumber; i++)
     {
       line = text_stream.readLine();
       QTextStream line_stream(&line);
@@ -336,7 +293,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseVertex[i].location[0] = number.toFloat() * scale;
+      mBaseSegmentVertex[i].location[0] = number.toFloat() * scale;
 
       // position y
       number = "";
@@ -344,7 +301,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseVertex[i].location[1] = number.toFloat() * scale;
+      mBaseSegmentVertex[i].location[1] = number.toFloat() * scale;
 
       // position z
       number = "";
@@ -352,7 +309,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseVertex[i].location[2] = number.toFloat() * scale;
+      mBaseSegmentVertex[i].location[2] = number.toFloat() * scale;
 
       // normal x
       number = "";
@@ -360,7 +317,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseVertex[i].normal[0] = number.toFloat();
+      mBaseSegmentVertex[i].normal[0] = number.toFloat();
 
       // normal y
       number = "";
@@ -368,7 +325,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseVertex[i].normal[1] = number.toFloat();
+      mBaseSegmentVertex[i].normal[1] = number.toFloat();
 
       // normal z
       number = "";
@@ -376,12 +333,12 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseVertex[i].normal[2] = number.toFloat();
+      mBaseSegmentVertex[i].normal[2] = number.toFloat();
     }
 
 
     // read index data
-    for (unsigned int i=0; i<mBaseFacesNumber; i++)
+    for (unsigned int i=0; i<mBaseSegmentFacesNumber; i++)
     {
       line = text_stream.readLine();
       QTextStream line_stream(&line);
@@ -399,7 +356,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseIndex[3*i] = static_cast<GLushort>(number.toInt());
+      mBaseSegmentIndex[3*i] = static_cast<GLushort>(number.toInt());
 
       // second index
       number = "";
@@ -407,7 +364,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseIndex[3*i+1] = static_cast<GLushort>(number.toInt());
+      mBaseSegmentIndex[3*i+1] = static_cast<GLushort>(number.toInt());
 
       // third index
       number = "";
@@ -415,7 +372,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
       {
         number.append(line_stream.read(1));
       }
-      mBaseIndex[3*i+2] = static_cast<GLushort>(number.toInt());
+      mBaseSegmentIndex[3*i+2] = static_cast<GLushort>(number.toInt());
 
 
     }
@@ -426,47 +383,47 @@ void cedar::dev::robot::gl::KukaArm::loadBaseData(const QString& dataFile)
   }
 
   // Colors
-  for (unsigned int i = 0; i < mBaseVertexNumber; i++)
+  for (unsigned int i = 0; i < mBaseSegmentVertexNumber; i++)
   {
-    mBaseVertex[i].colour[0] = 1.0;
-    mBaseVertex[i].colour[1] = 0.5;
-    mBaseVertex[i].colour[2] = 0.0;
-    mBaseVertex[i].colour[3] = 1.0;
+    mBaseSegmentVertex[i].colour[0] = 1.0;
+    mBaseSegmentVertex[i].colour[1] = 0.5;
+    mBaseSegmentVertex[i].colour[2] = 0.0;
+    mBaseSegmentVertex[i].colour[3] = 1.0;
   }
 //
 //  std::cout << "Base: " << std::endl;
 //
 //  std::cout << "first vertex: " << std::endl;
-//  std::cout << mBaseVertex[0].location[0] << " ";
-//  std::cout << mBaseVertex[0].location[1] << " ";
-//  std::cout << mBaseVertex[0].location[2] << " ";
-//  std::cout << mBaseVertex[0].normal[0] << " ";
-//  std::cout << mBaseVertex[0].normal[1] << " ";
-//  std::cout << mBaseVertex[0].normal[2] << std::endl;
+//  std::cout << mBaseSegmentVertex[0].location[0] << " ";
+//  std::cout << mBaseSegmentVertex[0].location[1] << " ";
+//  std::cout << mBaseSegmentVertex[0].location[2] << " ";
+//  std::cout << mBaseSegmentVertex[0].normal[0] << " ";
+//  std::cout << mBaseSegmentVertex[0].normal[1] << " ";
+//  std::cout << mBaseSegmentVertex[0].normal[2] << std::endl;
 //
 //  std::cout << "last vertex: " << std::endl;
-//  std::cout << mBaseVertex[mBaseVertexNumber-1].location[0] << " ";
-//  std::cout << mBaseVertex[mBaseVertexNumber-1].location[1] << " ";
-//  std::cout << mBaseVertex[mBaseVertexNumber-1].location[2] << " ";
-//  std::cout << mBaseVertex[mBaseVertexNumber-1].normal[0] << " ";
-//  std::cout << mBaseVertex[mBaseVertexNumber-1].normal[1] << " ";
-//  std::cout << mBaseVertex[mBaseVertexNumber-1].normal[2] << std::endl;
+//  std::cout << mBaseSegmentVertex[mBaseSegmentVertexNumber-1].location[0] << " ";
+//  std::cout << mBaseSegmentVertex[mBaseSegmentVertexNumber-1].location[1] << " ";
+//  std::cout << mBaseSegmentVertex[mBaseSegmentVertexNumber-1].location[2] << " ";
+//  std::cout << mBaseSegmentVertex[mBaseSegmentVertexNumber-1].normal[0] << " ";
+//  std::cout << mBaseSegmentVertex[mBaseSegmentVertexNumber-1].normal[1] << " ";
+//  std::cout << mBaseSegmentVertex[mBaseSegmentVertexNumber-1].normal[2] << std::endl;
 //
 //  std::cout << "first indices: " << std::endl;
-//  std::cout << static_cast<int>(mBaseIndex[0]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[1]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[2]) << std::endl;
-//  std::cout << static_cast<int>(mBaseIndex[3]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[4]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[5]) << std::endl;
+//  std::cout << static_cast<int>(mBaseSegmentIndex[0]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[1]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[2]) << std::endl;
+//  std::cout << static_cast<int>(mBaseSegmentIndex[3]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[4]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[5]) << std::endl;
 //
 //  std::cout << "last indices: " << std::endl;
-//  std::cout << static_cast<int>(mBaseIndex[(mBaseFacesNumber-2)*3]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[(mBaseFacesNumber-2)*3+1]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[(mBaseFacesNumber-2)*3+2]) << std::endl;
-//  std::cout << static_cast<int>(mBaseIndex[(mBaseFacesNumber-1)*3]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[(mBaseFacesNumber-1)*3+1]) << " ";
-//  std::cout << static_cast<int>(mBaseIndex[(mBaseFacesNumber-1)*3+2]) << std::endl;
+//  std::cout << static_cast<int>(mBaseSegmentIndex[(mBaseSegmentFacesNumber-2)*3]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[(mBaseSegmentFacesNumber-2)*3+1]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[(mBaseSegmentFacesNumber-2)*3+2]) << std::endl;
+//  std::cout << static_cast<int>(mBaseSegmentIndex[(mBaseSegmentFacesNumber-1)*3]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[(mBaseSegmentFacesNumber-1)*3+1]) << " ";
+//  std::cout << static_cast<int>(mBaseSegmentIndex[(mBaseSegmentFacesNumber-1)*3+2]) << std::endl;
 //
 //  std::cout << std::endl;
 }
@@ -633,7 +590,7 @@ void cedar::dev::robot::gl::KukaArm::loadBaseRingData(const QString& dataFile)
 //  std::cout << std::endl;
 }
 
-void cedar::dev::robot::gl::KukaArm::loadSegmentData(const QString& dataFile)
+void cedar::dev::robot::gl::KukaArm::loadForwardSegmentData(const QString& dataFile)
 {
   QFile data(dataFile);
   if (data.open(QFile::ReadOnly))
@@ -704,8 +661,6 @@ void cedar::dev::robot::gl::KukaArm::loadSegmentData(const QString& dataFile)
       }
       mForwardSegmentVertex[i].normal[2] = number.toFloat();
     }
-    std::cout << "done reading vertices" << std::endl;
-
 
     // read index data
     for (unsigned int i=0; i<mForwardSegmentFacesNumber; i++)
@@ -747,7 +702,7 @@ void cedar::dev::robot::gl::KukaArm::loadSegmentData(const QString& dataFile)
   }
   else
   {
-    std::cout << "could not read polygon file for segment" << std::endl;
+    std::cout << "could not read file forward_segment.ply" << std::endl;
   }
 
   // Colors
@@ -758,40 +713,631 @@ void cedar::dev::robot::gl::KukaArm::loadSegmentData(const QString& dataFile)
     mForwardSegmentVertex[i].colour[2] = 0.0;
     mForwardSegmentVertex[i].colour[3] = 1.0;
   }
+}
 
-//  std::cout << "segment: " << std::endl;
-//
-//  std::cout << "first vertex: " << std::endl;
-//  std::cout << mForwardSegmentVertex[0].location[0] << " ";
-//  std::cout << mForwardSegmentVertex[0].location[1] << " ";
-//  std::cout << mForwardSegmentVertex[0].location[2] << " ";
-//  std::cout << mForwardSegmentVertex[0].normal[0] << " ";
-//  std::cout << mForwardSegmentVertex[0].normal[1] << " ";
-//  std::cout << mForwardSegmentVertex[0].normal[2] << std::endl;
-//
-//  std::cout << "last vertex: " << std::endl;
-//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[0] << " ";
-//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[1] << " ";
-//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].location[2] << " ";
-//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[0] << " ";
-//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[1] << " ";
-//  std::cout << mForwardSegmentVertex[mForwardSegmentVertexNumber-1].normal[2] << std::endl;
-//
-//  std::cout << "first indices: " << std::endl;
-//  std::cout << static_cast<int>(mForwardSegmentIndex[0]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[1]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[2]) << std::endl;
-//  std::cout << static_cast<int>(mForwardSegmentIndex[3]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[4]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[5]) << std::endl;
-//
-//  std::cout << "last indices: " << std::endl;
-//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3+1]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-2)*3+2]) << std::endl;
-//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3+1]) << " ";
-//  std::cout << static_cast<int>(mForwardSegmentIndex[(mForwardSegmentFacesNumber-1)*3+2]) << std::endl;
-//
-//  std::cout << std::endl;
+void cedar::dev::robot::gl::KukaArm::loadForwardRingData(const QString& dataFile)
+{
+  QFile data(dataFile);
+  if (data.open(QFile::ReadOnly))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    QTextStream line_stream;
+    QString number;
+    float scale = 0.001; // mm -> m
+
+    // read header
+    for (unsigned int i=0; i<13; i++)
+    {
+      line = text_stream.readLine();
+    }
+
+    // read vertex data
+    for (unsigned int i=0; i<mForwardRingVertexNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // position x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingVertex[i].location[0] = number.toFloat() * scale;
+
+      // position y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingVertex[i].location[1] = number.toFloat() * scale;
+
+      // position z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingVertex[i].location[2] = number.toFloat() * scale;
+
+      // normal x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingVertex[i].normal[0] = number.toFloat();
+
+      // normal y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingVertex[i].normal[1] = number.toFloat();
+
+      // normal z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingVertex[i].normal[2] = number.toFloat();
+    }
+
+
+    // read index data
+    for (unsigned int i=0; i<mForwardRingFacesNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // the leading "3"
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+
+      // first index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingIndex[3*i] = static_cast<GLushort>(number.toInt());
+
+      // second index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingIndex[3*i+1] = static_cast<GLushort>(number.toInt());
+
+      // third index
+      number = "";
+      while (!line_stream.atEnd())
+      {
+        number.append(line_stream.read(1));
+      }
+      mForwardRingIndex[3*i+2] = static_cast<GLushort>(number.toInt());
+    }
+  }
+  else
+  {
+    std::cout << "could not read file forward_ring.ply" << std::endl;
+  }
+
+  // Colors
+  for (unsigned int i = 0; i < mForwardRingVertexNumber; i++)
+  {
+    mForwardRingVertex[i].colour[0] = 1.0;
+    mForwardRingVertex[i].colour[1] = 1.0;
+    mForwardRingVertex[i].colour[2] = 1.0;
+    mForwardRingVertex[i].colour[3] = 1.0;
+  }
+}
+
+void cedar::dev::robot::gl::KukaArm::loadInverseSegmentData(const QString& dataFile)
+{
+  QFile data(dataFile);
+  if (data.open(QFile::ReadOnly))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    QTextStream line_stream;
+    QString number;
+    float scale = 0.001; // mm -> m
+
+    // read header
+    for (unsigned int i=0; i<13; i++)
+    {
+      line = text_stream.readLine();
+    }
+
+    // read vertex data
+    for (unsigned int i=0; i<mInverseSegmentVertexNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // position x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentVertex[i].location[0] = number.toFloat() * scale;
+
+      // position y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentVertex[i].location[1] = number.toFloat() * scale;
+
+      // position z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentVertex[i].location[2] = number.toFloat() * scale;
+
+      // normal x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentVertex[i].normal[0] = number.toFloat();
+
+      // normal y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentVertex[i].normal[1] = number.toFloat();
+
+      // normal z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentVertex[i].normal[2] = number.toFloat();
+    }
+
+    // read index data
+    for (unsigned int i=0; i<mInverseSegmentFacesNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // the leading "3"
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+
+      // first index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentIndex[3*i] = static_cast<GLushort>(number.toInt());
+
+      // second index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentIndex[3*i+1] = static_cast<GLushort>(number.toInt());
+
+      // third index
+      number = "";
+      while (!line_stream.atEnd())
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseSegmentIndex[3*i+2] = static_cast<GLushort>(number.toInt());
+    }
+  }
+  else
+  {
+    std::cout << "could not read file forward_segment.ply" << std::endl;
+  }
+
+  // Colors
+  for (unsigned int i = 0; i < mInverseSegmentVertexNumber; i++)
+  {
+    mInverseSegmentVertex[i].colour[0] = 1.0;
+    mInverseSegmentVertex[i].colour[1] = 0.5;
+    mInverseSegmentVertex[i].colour[2] = 0.0;
+    mInverseSegmentVertex[i].colour[3] = 1.0;
+  }
+}
+
+void cedar::dev::robot::gl::KukaArm::loadInverseRingData(const QString& dataFile)
+{
+  QFile data(dataFile);
+  if (data.open(QFile::ReadOnly))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    QTextStream line_stream;
+    QString number;
+    float scale = 0.001; // mm -> m
+
+    // read header
+    for (unsigned int i=0; i<13; i++)
+    {
+      line = text_stream.readLine();
+    }
+
+    // read vertex data
+    for (unsigned int i=0; i<mInverseRingVertexNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // position x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingVertex[i].location[0] = number.toFloat() * scale;
+
+      // position y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingVertex[i].location[1] = number.toFloat() * scale;
+
+      // position z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingVertex[i].location[2] = number.toFloat() * scale;
+
+      // normal x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingVertex[i].normal[0] = number.toFloat();
+
+      // normal y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingVertex[i].normal[1] = number.toFloat();
+
+      // normal z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingVertex[i].normal[2] = number.toFloat();
+    }
+
+
+    // read index data
+    for (unsigned int i=0; i<mInverseRingFacesNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // the leading "3"
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+
+      // first index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingIndex[3*i] = static_cast<GLushort>(number.toInt());
+
+      // second index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingIndex[3*i+1] = static_cast<GLushort>(number.toInt());
+
+      // third index
+      number = "";
+      while (!line_stream.atEnd())
+      {
+        number.append(line_stream.read(1));
+      }
+      mInverseRingIndex[3*i+2] = static_cast<GLushort>(number.toInt());
+    }
+  }
+  else
+  {
+    std::cout << "could not read file forward_ring.ply" << std::endl;
+  }
+
+  // Colors
+  for (unsigned int i = 0; i < mInverseRingVertexNumber; i++)
+  {
+    mInverseRingVertex[i].colour[0] = 1.0;
+    mInverseRingVertex[i].colour[1] = 1.0;
+    mInverseRingVertex[i].colour[2] = 1.0;
+    mInverseRingVertex[i].colour[3] = 1.0;
+  }
+}
+
+void cedar::dev::robot::gl::KukaArm::loadWristSegmentData(const QString& dataFile)
+{
+  QFile data(dataFile);
+  if (data.open(QFile::ReadOnly))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    QTextStream line_stream;
+    QString number;
+    float scale = 0.001; // mm -> m
+
+    // read header
+    for (unsigned int i=0; i<13; i++)
+    {
+      line = text_stream.readLine();
+    }
+
+    // read vertex data
+    for (unsigned int i=0; i<mWristSegmentVertexNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // position x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentVertex[i].location[0] = number.toFloat() * scale;
+
+      // position y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentVertex[i].location[1] = number.toFloat() * scale;
+
+      // position z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentVertex[i].location[2] = number.toFloat() * scale;
+
+      // normal x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentVertex[i].normal[0] = number.toFloat();
+
+      // normal y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentVertex[i].normal[1] = number.toFloat();
+
+      // normal z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentVertex[i].normal[2] = number.toFloat();
+    }
+
+    // read index data
+    for (unsigned int i=0; i<mWristSegmentFacesNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // the leading "3"
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+
+      // first index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentIndex[3*i] = static_cast<GLushort>(number.toInt());
+
+      // second index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentIndex[3*i+1] = static_cast<GLushort>(number.toInt());
+
+      // third index
+      number = "";
+      while (!line_stream.atEnd())
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSegmentIndex[3*i+2] = static_cast<GLushort>(number.toInt());
+    }
+  }
+  else
+  {
+    std::cout << "could not read file wrist_segment.ply" << std::endl;
+  }
+
+  // Colors
+  for (unsigned int i = 0; i < mWristSegmentVertexNumber; i++)
+  {
+    mWristSegmentVertex[i].colour[0] = 1.0;
+    mWristSegmentVertex[i].colour[1] = 0.5;
+    mWristSegmentVertex[i].colour[2] = 0.0;
+    mWristSegmentVertex[i].colour[3] = 1.0;
+  }
+}
+
+void cedar::dev::robot::gl::KukaArm::loadWristSphereData(const QString& dataFile)
+{
+  QFile data(dataFile);
+  if (data.open(QFile::ReadOnly))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    QTextStream line_stream;
+    QString number;
+    float scale = 0.001; // mm -> m
+
+    // read header
+    for (unsigned int i=0; i<13; i++)
+    {
+      line = text_stream.readLine();
+    }
+
+    // read vertex data
+    for (unsigned int i=0; i<mWristSphereVertexNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // position x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereVertex[i].location[0] = number.toFloat() * scale;
+
+      // position y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereVertex[i].location[1] = number.toFloat() * scale;
+
+      // position z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereVertex[i].location[2] = number.toFloat() * scale;
+
+      // normal x
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereVertex[i].normal[0] = number.toFloat();
+
+      // normal y
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereVertex[i].normal[1] = number.toFloat();
+
+      // normal z
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereVertex[i].normal[2] = number.toFloat();
+    }
+
+    // read index data
+    for (unsigned int i=0; i<mWristSphereFacesNumber; i++)
+    {
+      line = text_stream.readLine();
+      QTextStream line_stream(&line);
+
+      // the leading "3"
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+
+      // first index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereIndex[3*i] = static_cast<GLushort>(number.toInt());
+
+      // second index
+      number = "";
+      while (!number.endsWith(" "))
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereIndex[3*i+1] = static_cast<GLushort>(number.toInt());
+
+      // third index
+      number = "";
+      while (!line_stream.atEnd())
+      {
+        number.append(line_stream.read(1));
+      }
+      mWristSphereIndex[3*i+2] = static_cast<GLushort>(number.toInt());
+    }
+  }
+  else
+  {
+    std::cout << "could not read file wrist_segment.ply" << std::endl;
+  }
+
+  // Colors
+  for (unsigned int i = 0; i < mWristSphereVertexNumber; i++)
+  {
+    mWristSphereVertex[i].colour[0] = 1.0;
+    mWristSphereVertex[i].colour[1] = 0.5;
+    mWristSphereVertex[i].colour[2] = 0.0;
+    mWristSphereVertex[i].colour[3] = 1.0;
+  }
 }
