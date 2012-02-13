@@ -49,6 +49,16 @@
  #include <QTextStream>
  #include <QFile>
 
+// define constants
+const float cedar::dev::robot::gl::KukaArm::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::dev::robot::gl::KukaArm::mSegment_Ambient[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::dev::robot::gl::KukaArm::mSegment_Diffuse[3] = {1.0f, 0.39215699f, 0.0f};
+const float cedar::dev::robot::gl::KukaArm::mSegment_Specular[3] = {0.40000001f, 0.16078401f, 0.0f};
+const float cedar::dev::robot::gl::KukaArm::mSegment_Shininess[1] = {1.0f};
+const float cedar::dev::robot::gl::KukaArm::mRing_Ambient[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::dev::robot::gl::KukaArm::mRing_Diffuse[3] = {0.17647099f, 0.17647099f, 0.17647099f};
+const float cedar::dev::robot::gl::KukaArm::mRing_Specular[3] = {0.372549f, 0.372549f, 0.372549f};
+const float cedar::dev::robot::gl::KukaArm::mRing_Shininess[1] = {0.42631999f};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -155,9 +165,11 @@ void cedar::dev::robot::gl::KukaArm::initializeGl()
 void cedar::dev::robot::gl::KukaArm::drawBase()
 {
   prepareDraw();
-
+  setMaterial(SEGMENT);
   this->drawElement(mBaseSegmentVertexVboId, mBaseSegmentIndexVboId, mBaseSegmentFacesNumber);
+  setMaterial(RING);
   this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
+  setMaterial(NO_MATERIAL);
 }
 
 void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
@@ -170,35 +182,54 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
   mTransformationTranspose = mpKinematicChainModel->getJointTransformation(index).t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
-  cedar::aux::gl::drawAxes(0.2);
+  if (isDrawingLocalCoordinateFrame())
+  {
+    cedar::aux::gl::drawAxes(0.2);
+  }
   switch (index)
   {
   case 0:
+    setMaterial(SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
+    setMaterial(RING);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
+    setMaterial(NO_MATERIAL);
     break;
   case 1:
     glRotated(90.0, 1.0, 0.0, 0.0);
+    setMaterial(SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
+    setMaterial(RING);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
+    setMaterial(NO_MATERIAL);
     break;
   case 2:
     glRotated(180.0, 0.0, 0.0, 1.0);
+    setMaterial(SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
+    setMaterial(RING);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
+    setMaterial(NO_MATERIAL);
     break;
   case 3:
     glRotated(90.0, 1.0, 0.0, 0.0);
     glRotated(180.0, 0.0, 1.0, 0.0);
+    setMaterial(SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
+    setMaterial(RING);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
+    setMaterial(NO_MATERIAL);
     break;
   case 4:
+    setMaterial(SEGMENT);
     this->drawElement(mWristSegmentVertexVboId, mWristSegmentIndexVboId, mWristSegmentFacesNumber);
+    setMaterial(NO_MATERIAL);
     break;
   case 5:
     glRotated(90.0, 1.0, 0.0, 0.0);
+    setMaterial(SEGMENT);
     this->drawElement(mWristSphereVertexVboId, mWristSphereIndexVboId, mWristSphereFacesNumber);
+    setMaterial(NO_MATERIAL);
     break;
   }
 }
@@ -234,6 +265,32 @@ void cedar::dev::robot::gl::KukaArm::drawElement(const GLuint vertexVboId, const
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void cedar::dev::robot::gl::KukaArm::setMaterial(int material)
+{
+  switch (material)
+  {
+  case NO_MATERIAL:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mNoSpecular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mNoSpecular); //todo: this is probably an error
+    glEnable(GL_COLOR_MATERIAL);
+    break;
+  case SEGMENT:
+    glDisable(GL_COLOR_MATERIAL);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mSegment_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mSegment_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mSegment_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mSegment_Shininess);
+    break;
+  case RING:
+    glDisable(GL_COLOR_MATERIAL);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mRing_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mRing_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mRing_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mRing_Shininess);
+    break;
+  }
 }
 
 void cedar::dev::robot::gl::KukaArm::loadPolygonData(const std::string& pathToPolygonData)

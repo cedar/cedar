@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 
+// define constants
 const float cedar::dev::robot::gl::AmtecChain::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
 
 const float cedar::dev::robot::gl::AmtecChain::mDarkBlueMetal_Ambient[3] = {0.2f, 0.35f, 0.7f};
