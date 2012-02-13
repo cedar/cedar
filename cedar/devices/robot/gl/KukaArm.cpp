@@ -68,12 +68,12 @@ const float cedar::dev::robot::gl::KukaArm::mRing_Shininess[1] = {0.42631999f};
 cedar::dev::robot::gl::KukaArm::KukaArm
 (
   cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel,
-  const std::string& pathToPolygonData
+  const std::string& pathToData
 )
 :
 cedar::dev::robot::gl::KinematicChain(rpKinematicChainModel)
 {
-  loadPolygonData(pathToPolygonData);
+  loadData(pathToData);
 }
 
 cedar::dev::robot::gl::KukaArm::~KukaArm()
@@ -295,43 +295,167 @@ void cedar::dev::robot::gl::KukaArm::setMaterial(int material)
 
 void cedar::dev::robot::gl::KukaArm::loadVertexData
 (
-  const std::string& dataFileName,
+  const QString& dataFileName,
   unsigned int numberOfVertices,
   Vertex* vertices
 )
 {
+  QFile data(dataFileName);
+  if (data.open(QFile::ReadOnly))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    float scale = 0.001; // mm -> m
+    for (unsigned int i=0; i<numberOfVertices; i++)
+    {
+      line = text_stream.readLine();
+      vertices[i].location[0] = line.section(" ", 0, 0).toFloat() * scale;
+      vertices[i].location[1] = line.section(" ", 1, 1).toFloat() * scale;
+      vertices[i].location[2] = line.section(" ", 2, 2).toFloat() * scale;
+      vertices[i].normal[0] = line.section(" ", 3, 3).toFloat();
+      vertices[i].normal[1] = line.section(" ", 4, 4).toFloat();
+      vertices[i].normal[2] = line.section(" ", 5, 5).toFloat();
+    }
+  }
+  else
+  {
+    std::cout << "failed to read vertex data from file " << dataFileName.toStdString() << std::endl;
+  }
 
+//  std::cout << "first vertex: " << std::endl;
+//  std::cout << vertices[0].location[0] << " ";
+//  std::cout << vertices[0].location[1] << " ";
+//  std::cout << vertices[0].location[2] << " ";
+//  std::cout << vertices[0].normal[0] << " ";
+//  std::cout << vertices[0].normal[1] << " ";
+//  std::cout << vertices[0].normal[2] << std::endl;
+//
+//  std::cout << "last vertex: " << std::endl;
+//  std::cout << vertices[numberOfVertices-1].location[0] << " ";
+//  std::cout << vertices[numberOfVertices-1].location[1] << " ";
+//  std::cout << vertices[numberOfVertices-1].location[2] << " ";
+//  std::cout << vertices[numberOfVertices-1].normal[0] << " ";
+//  std::cout << vertices[numberOfVertices-1].normal[1] << " ";
+//  std::cout << vertices[numberOfVertices-1].normal[2] << std::endl;
 }
 
-void cedar::dev::robot::gl::KukaArm::loadPolygonData(const std::string& pathToPolygonData)
+void cedar::dev::robot::gl::KukaArm::loadIndexData
+(
+  const QString& dataFileName,
+  unsigned int numberOfFaces,
+  GLushort* indices
+)
 {
-  QString base_segment_vertex_data_file_name = QString("/Users/reimajbi/Desktop/meshes/data/base_ring_vertex.txt");
+  QFile data(dataFileName);
+  if (data.open(QFile::ReadOnly))
+  {
+    QTextStream text_stream(&data);
+    QString line;
+    QString number;
+    for (unsigned int i=0; i<numberOfFaces; i++)
+    {
+      line = text_stream.readLine();
+      indices[3*i] = static_cast<GLushort>(line.section(" ", 0, 0).toInt());
+      indices[3*i+1] = static_cast<GLushort>(line.section(" ", 1, 1).toInt());
+      indices[3*i+2] = static_cast<GLushort>(line.section(" ", 2, 2).toInt());
+    }
+  }
+  else
+  {
+    std::cout << "failed to read index data from file " << dataFileName.toStdString() << std::endl;
+  }
+//  std::cout << "first indices: " << std::endl;
+//  std::cout << static_cast<int>(indices[0]) << " ";
+//  std::cout << static_cast<int>(indices[1]) << " ";
+//  std::cout << static_cast<int>(indices[2]) << std::endl;
+//  std::cout << static_cast<int>(indices[3]) << " ";
+//  std::cout << static_cast<int>(indices[4]) << " ";
+//  std::cout << static_cast<int>(indices[5]) << std::endl;
+//
+//  std::cout << "last indices: " << std::endl;
+//  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3]) << " ";
+//  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+1]) << " ";
+//  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+2]) << std::endl;
+//  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3]) << " ";
+//  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+1]) << " ";
+//  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+2]) << std::endl;
+//
+//  std::cout << std::endl;
+}
+
+void cedar::dev::robot::gl::KukaArm::loadData(const std::string& pathToPolygonData)
+{
+  // base segment
+  QString base_segment_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_segment_vertex.txt");
   loadVertexData(base_segment_vertex_data_file_name, mBaseSegmentVertexNumber, mBaseSegmentVertex);
+  QString base_segment_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_segment_index.txt");
+  loadIndexData(base_segment_index_data_file_name, mBaseSegmentFacesNumber, mBaseSegmentIndex);
+
+  // base ring
+  QString base_ring_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_ring_vertex.txt");
+  loadVertexData(base_ring_vertex_data_file_name, mBaseRingVertexNumber, mBaseRingVertex);
+  QString base_ring_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_ring_index.txt");
+  loadIndexData(base_ring_index_data_file_name, mBaseRingFacesNumber, mBaseRingIndex);
+
+  // forward segment
+  QString forward_segment_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_segment_vertex.txt");
+  loadVertexData(forward_segment_vertex_data_file_name, mForwardSegmentVertexNumber, mForwardSegmentVertex);
+  QString forward_segment_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_segment_index.txt");
+  loadIndexData(forward_segment_index_data_file_name, mForwardSegmentFacesNumber, mForwardSegmentIndex);
+
+  // forward ring
+  QString forward_ring_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_ring_vertex.txt");
+  loadVertexData(forward_ring_vertex_data_file_name, mForwardRingVertexNumber, mForwardRingVertex);
+  QString forward_ring_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_ring_index.txt");
+  loadIndexData(forward_ring_index_data_file_name, mForwardRingFacesNumber, mForwardRingIndex);
+
+  // inverse segment
+  QString inverse_segment_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_segment_vertex.txt");
+  loadVertexData(inverse_segment_vertex_data_file_name, mInverseSegmentVertexNumber, mInverseSegmentVertex);
+  QString inverse_segment_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_segment_index.txt");
+  loadIndexData(inverse_segment_index_data_file_name, mInverseSegmentFacesNumber, mInverseSegmentIndex);
+
+  // inverse ring
+  QString inverse_ring_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_ring_vertex.txt");
+  loadVertexData(inverse_ring_vertex_data_file_name, mInverseRingVertexNumber, mInverseRingVertex);
+  QString inverse_ring_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_ring_index.txt");
+  loadIndexData(inverse_ring_index_data_file_name, mInverseRingFacesNumber, mInverseRingIndex);
+
+  // wrist segment
+  QString wrist_segment_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_segment_vertex.txt");
+  loadVertexData(wrist_segment_vertex_data_file_name, mWristSegmentVertexNumber, mWristSegmentVertex);
+  QString wrist_segment_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_segment_index.txt");
+  loadIndexData(wrist_segment_index_data_file_name, mWristSegmentFacesNumber, mWristSegmentIndex);
+
+  // wrist sphere
+  QString wrist_sphere_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_sphere_vertex.txt");
+  loadVertexData(wrist_sphere_vertex_data_file_name, mWristSphereVertexNumber, mWristSphereVertex);
+  QString wrist_sphere_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_sphere_index.txt");
+  loadIndexData(wrist_sphere_index_data_file_name, mWristSphereFacesNumber, mWristSphereIndex);
+
+  // wrist ring
+  QString wrist_ring_vertex_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_ring_vertex.txt");
+  loadVertexData(wrist_ring_vertex_data_file_name, mWristRingVertexNumber, mWristRingVertex);
+  QString wrist_ring_index_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_ring_index.txt");
+  loadIndexData(wrist_ring_index_data_file_name, mWristRingFacesNumber, mWristRingIndex);
 
 
-  QString base_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_segment.ply");
-  loadBaseSegmentData(base_segment_data_file_name);
-
-  QString base_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_ring.ply");
-  loadBaseRingData(base_ring_data_file_name);
-
-  QString forward_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_segment.ply");
-  loadForwardSegmentData(forward_segment_data_file_name);
-
-  QString forward_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_ring.ply");
-  loadForwardRingData(forward_ring_data_file_name);
-
-  QString inverse_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_segment.ply");
-  loadInverseSegmentData(inverse_segment_data_file_name);
-
-  QString inverse_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_ring.ply");
-  loadInverseRingData(inverse_ring_data_file_name);
-
-  QString wrist_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_segment.ply");
-  loadWristSegmentData(wrist_segment_data_file_name);
-
-  QString wrist_sphere_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_sphere.ply");
-  loadWristSphereData(wrist_sphere_data_file_name);
+//  QString base_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_segment.ply");
+//  loadBaseSegmentData(base_segment_data_file_name);
+//  QString base_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_ring.ply");
+//  loadBaseRingData(base_ring_data_file_name);
+//  QString forward_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_segment.ply");
+//  loadForwardSegmentData(forward_segment_data_file_name);
+//  QString forward_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("forward_ring.ply");
+//  loadForwardRingData(forward_ring_data_file_name);
+//  QString inverse_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_segment.ply");
+//  loadInverseSegmentData(inverse_segment_data_file_name);
+//  QString inverse_ring_data_file_name = QString(pathToPolygonData.c_str()) + QString("inverse_ring.ply");
+//  loadInverseRingData(inverse_ring_data_file_name);
+//  QString wrist_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_segment.ply");
+//  loadWristSegmentData(wrist_segment_data_file_name);
+//  QString wrist_sphere_data_file_name = QString(pathToPolygonData.c_str()) + QString("wrist_sphere.ply");
+//  loadWristSphereData(wrist_sphere_data_file_name);
 
 }
 
