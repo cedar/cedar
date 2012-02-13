@@ -73,13 +73,18 @@ double cedar::aux::gl::Scene::getSceneLimit() const
 
 int cedar::aux::gl::Scene::addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr& rpRigidBodyVisualization)
 {
-  //!\todo prevent different objects with same names
-//  if (object name exists)
-//  {
-//    return false;
-//  }
   mRigidBodyVisualizations.push_back(rpRigidBodyVisualization);
+  for (unsigned int i=0; i<mViewers.size(); i++)
+  {
+    mViewers[i]->initGl(rpRigidBodyVisualization);
+  }
   return mRigidBodyVisualizations.size() - 1;
+}
+
+int cedar::aux::gl::Scene::addViewer(cedar::aux::gui::Viewer* pViewer)
+{
+  mViewers.push_back(pViewer);
+  return mViewers.size() - 1;
 }
 
 void cedar::aux::gl::Scene::deleteRigidBodyVisualization(int index)

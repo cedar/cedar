@@ -138,6 +138,13 @@ int main(int argc, char **argv)
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
   p_scene_widget->show();
 
+  // create a second viewer for the scene
+  cedar::aux::gui::Viewer viewer_2(p_scene);
+  viewer_2.show();
+  viewer_2.setSceneRadius(10);
+  viewer_2.startTimer(50);
+
+
   a.exec();
   return 0;
 }
