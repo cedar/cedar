@@ -49,13 +49,12 @@ cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr& p_scene)
 :
 mpScene(p_scene)
 {
-  mViewerId = mpScene->addViewer(this);
+  mpScene->addViewer(this);
 }
 
 cedar::aux::gui::Viewer::~Viewer()
 {
-  // todo: take care that the displayed scene removes this viewer from the list
-  // todo: take care that the visualization objects release resources related to this viewer
+  mpScene->removeViewer(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

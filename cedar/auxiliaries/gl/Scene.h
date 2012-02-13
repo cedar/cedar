@@ -91,10 +91,15 @@ public:
   int addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr& rpRigidBodyVisualization);
   
   /*!@brief adds an object to the scene
-   * @param rpRigidBodyVisualization pointer to the object
+   * @param pViewer pointer to the viewer
    * @return index of the object in the scene
    */
   int addViewer(cedar::aux::gui::Viewer* pViewer);
+
+  /*!@brief removes the viewer from the scene
+   * @param pViewer pointer to the viewer
+   */
+  int removeViewer(cedar::aux::gui::Viewer* pViewer);
 
   /*!@brief removes an object from the scene
    * @param index index of the object in the scene
