@@ -111,15 +111,13 @@ int main(int argc, char **argv)
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
+  cedar::aux::gui::Viewer viewer(p_scene);
+  viewer.show();
+  viewer.setSceneRadius(p_scene->getSceneLimit());
 
   cedar::aux::gl::RigidBodyVisualizationPtr p_object;
   p_object = p_kuka_arm_visualization;
   p_scene->addRigidBodyVisualization(p_object);
-
-  // create a simple viewer for the scene
-  cedar::aux::gui::Viewer viewer(p_scene);
-  viewer.show();
-  viewer.setSceneRadius(p_scene->getSceneLimit());
 
   // create a widget to control the scene
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));

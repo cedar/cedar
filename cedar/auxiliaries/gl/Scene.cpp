@@ -74,7 +74,7 @@ double cedar::aux::gl::Scene::getSceneLimit() const
 int cedar::aux::gl::Scene::addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr& rpRigidBodyVisualization)
 {
   mRigidBodyVisualizations.push_back(rpRigidBodyVisualization);
-  for (unsigned int i=0; i<mViewers.size(); i++)
+  for (int i=0; i<mViewers.size(); i++)
   {
     mViewers[i]->initGl(rpRigidBodyVisualization);
   }
@@ -85,6 +85,19 @@ int cedar::aux::gl::Scene::addViewer(cedar::aux::gui::Viewer* pViewer)
 {
   mViewers.push_back(pViewer);
   return mViewers.size() - 1;
+}
+
+int cedar::aux::gl::Scene::removeViewer(cedar::aux::gui::Viewer* pViewer)
+{
+  for (int i=0; i<mViewers.size(); i++)
+  {
+    if (mViewers[i] == pViewer)
+    {
+      mViewers.removeAt(i);
+      return i;
+    }
+  }
+  return 0;
 }
 
 void cedar::aux::gl::Scene::deleteRigidBodyVisualization(int index)

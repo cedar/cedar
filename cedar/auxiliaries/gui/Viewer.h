@@ -92,8 +92,5 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
   cedar::aux::gl::ScenePtr const mpScene;
-
-  //!@brief the id of this viewer in the scene it is displaying
-  int mViewerId;
 };
 #endif  // CEDAR_AUX_GUI_VIEWER_H
