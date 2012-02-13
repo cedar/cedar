@@ -254,12 +254,6 @@ int main(int argc, char **argv)
     = new cedar::dev::robot::gui::KinematicChainWidget(p_arm, configuration_file_path + "kuka_lbr4_widget.conf");
   p_kinematic_chain_widget->show();
 
-  // create the viewer for the visualization
-  cedar::aux::gui::Viewer viewer_2(p_scene);
-  viewer_2.show();
-  viewer_2.setSceneRadius(p_scene->getSceneLimit());
-  viewer_2.startTimer(50);
-
   // create the worker thread
   WorkerThread worker(p_arm, p_arm_model, target);
   worker.setStepSize(10);
