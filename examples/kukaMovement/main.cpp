@@ -40,6 +40,7 @@
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/robot/gl/KukaArm.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/gl/Scene.h"
@@ -135,10 +136,11 @@ int main(int argc, char **argv)
 {
   std::string mode = "0";
   std::string configuration_file_path = "../../examples/kukaMovement/";
+  std::string polygon_file_path = "";
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
   { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-    std::cout << "Usage is -c <path to configs> -m <mode>" << std::endl;
+    std::cout << "Usage is -c <path to configs> -m <mode> -p <path to polygon data>" << std::endl;
     std::cout << "mode 'simulation': use a simulated arm (default)" << std::endl;
     std::cout << "mode 'hardware': use the hardware and visualize it" << std::endl;
     return 0;
@@ -155,6 +157,10 @@ int main(int argc, char **argv)
       else if (std::string(argv[i]) == "-m")
       {
         mode = std::string(argv[i+1]);
+      }
+      else if (std::string(argv[i]) == "-p")
+      {
+        polygon_file_path = std::string(argv[i+1]);
       }
     }
   }
@@ -196,17 +202,39 @@ int main(int argc, char **argv)
   // create a model of the arm
   cedar::dev::robot::KinematicChainModelPtr p_arm_model(new cedar::dev::robot::KinematicChainModel(p_arm));
 
-  // create the viewer and scene for the visualization
+  // create the scene for the visualization
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
+
+  // create the viewer for the visualization
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
   viewer.startTimer(50);
 
   // create an arm visualization and add it to the scene
-  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_arm_model));
+  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization;
+  if (polygon_file_path == "")
+  {
+    cedar::aux::gl::RigidBodyVisualizationPtr p_simple_visualization
+    (
+      new cedar::dev::robot::gl::KinematicChain(p_arm_model)
+    );
+    p_arm_visualization = p_simple_visualization;
+  }
+  else
+  {
+    cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
+    (
+      new cedar::dev::robot::gl::KukaArm
+      (
+        p_arm_model,
+        polygon_file_path
+      )
+    );
+    p_arm_visualization = p_kuka_arm_visualization;
+  }
   p_scene->addRigidBodyVisualization(p_arm_visualization);
 
   // create target object, visualize it and add it to the scene
@@ -225,6 +253,12 @@ int main(int argc, char **argv)
   cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget
     = new cedar::dev::robot::gui::KinematicChainWidget(p_arm, configuration_file_path + "kuka_lbr4_widget.conf");
   p_kinematic_chain_widget->show();
+
+  // create the viewer for the visualization
+//  cedar::aux::gui::Viewer viewer(p_scene);
+//  viewer.show();
+//  viewer.setSceneRadius(p_scene->getSceneLimit());
+//  viewer.startTimer(50);
 
   // create the worker thread
   WorkerThread worker(p_arm, p_arm_model, target);

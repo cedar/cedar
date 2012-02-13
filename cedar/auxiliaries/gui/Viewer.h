@@ -79,6 +79,8 @@ public:
   /*!@brief function being called automatically when a timer is up, usually in a loop */
   void timerEvent(QTimerEvent* pEvent);
 
+  //!@brief call this function to initialize Gl resources for the passed visualization object
+  void initGl(cedar::aux::gl::RigidBodyVisualizationPtr& pVisualization);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -90,5 +92,8 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
   cedar::aux::gl::ScenePtr const mpScene;
+
+  //!@brief the id of this viewer in the scene it is displaying
+  int mViewerId;
 };
 #endif  // CEDAR_AUX_GUI_VIEWER_H
