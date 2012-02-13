@@ -39,6 +39,7 @@
 // PROJECT INCLUDES
 
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 
 // SYSTEM INCLUDES
@@ -50,10 +51,14 @@
 // methods
 //------------------------------------------------------------------------------
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   cedar::dev::robot::KinematicChainPtr p_kinematic_chain(new cedar::dev::robot::SimulatedKinematicChain("../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf"));
   QApplication app(argc, argv);
-  cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain, "../../../../tests/interactive/devices/gui/KinematicChainWidget/test_arm.conf");
+  cedar::dev::robot::gui::KinematicChainWidget widget(p_kinematic_chain);
+  widget.getMonitorWidget()->setDecimals(10);
+  widget.getCommandWidget()->setDecimals(10);
+  widget.getCommandWidget()->setSingleStep(0.12345);
   widget.show();
   return app.exec();
 }

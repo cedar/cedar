@@ -56,118 +56,14 @@ cedar::dev::robot::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
   Qt::WindowFlags f
 )
 :
-QWidget(parent, f)
+QWidget(parent, f),
+mpKinematicChain(kinematicChain)
 {
-  // store a smart pointer to KinematicChain
-  mpKinematicChains.push_back(kinematicChain);
-  mDecimals = 3;
+  mDecimals = 6;
 
   initWindow();
   return;
 }
-
-
-cedar::dev::robot::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
-(
-  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-  const std::string& configFileName,
-  QWidget *parent,
-  Qt::WindowFlags
-)
-:
-QWidget(parent),
-cedar::aux::ConfigurationInterface(configFileName)
-{
-  // store a smart pointer to KinematicChain
-  mpKinematicChains.push_back(kinematicChain);
-  mDecimals = 2;
-
-  //
-  // read configuration file
-  //
-
-  if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChainMonitorWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
-
-  initWindow();
-  return;
-}
-
-
-cedar::dev::robot::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
-(
-  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-  QWidget * parent,
-  Qt::WindowFlags f
-)
-:
-QWidget(parent, f)
-{
-  for(unsigned int i = 1; i < kinematicChains.size(); ++i)
-  {
-    // ideally, the reference geometry behind all the chains should be the same
-    // here, at least we make sure that the number of joints is the same
-    if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
-    {
-      std::cout << "KinematicChainMonitorWidget: Error, kinematic chains do not have the same number of joints!" << std::endl;
-      CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
-    }
-  }
-
-  // store smart pointers to KinematicChains
-  mpKinematicChains = kinematicChains;
-  mDecimals = 2;
-
-  initWindow();
-  return;
-}
-
-
-cedar::dev::robot::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
-(
-  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-  const std::string& configFileName,
-  QWidget *parent,
-  Qt::WindowFlags
-)
-:
-QWidget(parent),
-ConfigurationInterface(configFileName)
-{
-  for(unsigned int i = 1; i < kinematicChains.size(); ++i)
-  {
-    // ideally, the reference geometry behind all the chains should be the same
-    // here, at least we make sure that the number of joints is the same
-    if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
-    {
-      std::cout << "KinematicChainMonitorWidget: Error, kinematic chains do not have the same number of joints!" << std::endl;
-      CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
-    }
-  }
-
-  // store a smart pointer to KinematicChain
-  mpKinematicChains = kinematicChains;
-  mDecimals = 2;
-
-  //
-  // read configuration file
-  //
-
-  if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChainMonitorWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
-
-  initWindow();
-  return;
-}
-
 
 cedar::dev::robot::gui::KinematicChainMonitorWidget::~KinematicChainMonitorWidget()
 {
@@ -205,7 +101,7 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
   acc_label->setAlignment(Qt::AlignRight);
   mpGridLayout->addWidget(acc_label, 0, 3);
 
-  for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
+  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
     // add joint label
     char labelText[10];
@@ -231,18 +127,22 @@ void cedar::dev::robot::gui::KinematicChainMonitorWidget::initWindow()
   return;
 }
 
+void cedar::dev::robot::gui::KinematicChainMonitorWidget::setDecimals(unsigned int decimals)
+{
+  mDecimals = decimals;
+}
+
 void cedar::dev::robot::gui::KinematicChainMonitorWidget::update()
 {
-  for(unsigned i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
+  for(unsigned i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
-    // TODO: there's a static cast here, remove
     QLabel* p_angle_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 1)->widget());
     QLabel* p_velocity_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 2)->widget());
     QLabel* p_acceleration_label = static_cast<QLabel*>(mpGridLayout->itemAtPosition(i+1, 3)->widget());
 
-    p_angle_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAngle(i), 0, 'g', mDecimals, '0'));
-    p_velocity_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointVelocity(i), 0, 'g', mDecimals, '0'));
-    p_acceleration_label->setText(QString("%1").arg(mpKinematicChains[0]->getJointAcceleration(i), 0, 'g', mDecimals, '0'));
+    p_angle_label->setText(QString("%1").arg(mpKinematicChain->getJointAngle(i), 0, 'g', mDecimals, '0'));
+    p_velocity_label->setText(QString("%1").arg(mpKinematicChain->getJointVelocity(i), 0, 'g', mDecimals, '0'));
+    p_acceleration_label->setText(QString("%1").arg(mpKinematicChain->getJointAcceleration(i), 0, 'g', mDecimals, '0'));
   }
 }
 
