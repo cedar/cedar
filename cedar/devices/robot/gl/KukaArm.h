@@ -112,6 +112,8 @@ private:
   //todo: this should be done with a struct for material, as a member in RigidBodyVisualization
   void setMaterial(int material);
 
+  void loadVertexData(const std::string& dataFileName, unsigned int numberOfVertices, Vertex* vertices);
+
   void loadPolygonData(const std::string& pathToPolygonData);
   void loadBaseSegmentData(const QString& dataFile);
   void loadBaseRingData(const QString& dataFile);

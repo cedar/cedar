@@ -293,8 +293,22 @@ void cedar::dev::robot::gl::KukaArm::setMaterial(int material)
   }
 }
 
+void cedar::dev::robot::gl::KukaArm::loadVertexData
+(
+  const std::string& dataFileName,
+  unsigned int numberOfVertices,
+  Vertex* vertices
+)
+{
+
+}
+
 void cedar::dev::robot::gl::KukaArm::loadPolygonData(const std::string& pathToPolygonData)
 {
+  QString base_segment_vertex_data_file_name = QString("/Users/reimajbi/Desktop/meshes/data/base_ring_vertex.txt");
+  loadVertexData(base_segment_vertex_data_file_name, mBaseSegmentVertexNumber, mBaseSegmentVertex);
+
+
   QString base_segment_data_file_name = QString(pathToPolygonData.c_str()) + QString("base_segment.ply");
   loadBaseSegmentData(base_segment_data_file_name);
 
