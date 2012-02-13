@@ -109,6 +109,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
+  //todo: this should be done with a struct for material, as a member in RigidBodyVisualization
+  void setMaterial(int material);
 
   void loadPolygonData(const std::string& pathToPolygonData);
   void loadBaseSegmentData(const QString& dataFile);
@@ -126,6 +128,23 @@ private:
 protected:
   // none yet
 private:
+  //!@brief encodes the different materials
+  enum MaterialType {
+                      NO_MATERIAL,
+                      SEGMENT,
+                      RING
+                    };
+
+  static const float mNoSpecular[3];
+  static const float mSegment_Ambient[3];
+  static const float mSegment_Diffuse[3];
+  static const float mSegment_Specular[3];
+  static const float mSegment_Shininess[1];
+  static const float mRing_Ambient[3];
+  static const float mRing_Diffuse[3];
+  static const float mRing_Specular[3];
+  static const float mRing_Shininess[1];
+
   // base
   static const unsigned int mBaseSegmentVertexNumber = 8804;
   static const unsigned int mBaseSegmentFacesNumber = 3738;
