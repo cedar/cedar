@@ -79,7 +79,7 @@ public:
   KukaArm
   (
     cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel,
-    const std::string& pathToPolygonData
+    const std::string& pathToData
   );
   //!@brief destructor
   ~KukaArm();
@@ -112,9 +112,10 @@ private:
   //todo: this should be done with a struct for material, as a member in RigidBodyVisualization
   void setMaterial(int material);
 
-  void loadVertexData(const std::string& dataFileName, unsigned int numberOfVertices, Vertex* vertices);
+  void loadVertexData(const QString& dataFileName, unsigned int numberOfVertices, Vertex* vertices);
+  void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
+  void loadData(const std::string& pathToPolygonData);
 
-  void loadPolygonData(const std::string& pathToPolygonData);
   void loadBaseSegmentData(const QString& dataFile);
   void loadBaseRingData(const QString& dataFile);
   void loadForwardSegmentData(const QString& dataFile);
@@ -210,6 +211,14 @@ private:
   GLuint mWristSphereIndexVboId; // index buffer id
   Vertex mWristSphereVertex[mWristSphereVertexNumber]; // vertex data
   GLushort mWristSphereIndex[mWristSphereFacesNumber*3]; // index data
+
+  // wrist ring
+  static const unsigned int mWristRingVertexNumber = 3245;
+  static const unsigned int mWristRingFacesNumber = 1630;
+  GLuint mWristRingVertexVboId; // vertex buffer id
+  GLuint mWristRingIndexVboId; // index buffer id
+  Vertex mWristRingVertex[mWristRingVertexNumber]; // vertex data
+  GLushort mWristRingIndex[mWristRingFacesNumber*3]; // index data
 
 }; // class cedar::dev::robot::gl::KukaArm
 #endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
