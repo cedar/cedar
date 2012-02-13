@@ -593,14 +593,12 @@ void cedar::proc::gui::Network::checkDataItems()
   {
     if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
       continue;
-    std::cout << "Size before: " << mSlotMap[*enum_it].size() << std::endl;
     for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); )
     {
       DataSlotNameMap::iterator current_iter = it;
       ++it;
       if (current_iter->second->getNumberOfConnections() == 0)
       {
-        std::cout << "Removed: " << current_iter->second->getSlot()->getName() << std::endl;
         delete current_iter->second;
         mSlotMap[*enum_it].erase(current_iter);
       }
@@ -613,10 +611,8 @@ void cedar::proc::gui::Network::checkDataItems()
     const QPointF& direction = add_directions[*enum_it];
     // move all preserved slots to the upper positions
     qreal count = 0;
-    std::cout << "Size: " << mSlotMap[*enum_it].size() << std::endl;
     for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); ++it)
     {
-      std::cout << "Moved: " << it->second->getSlot()->getName() << std::endl;
       it->second->setPos(origin + count * direction * (data_size + padding));
       count += static_cast<qreal>(1.0);
     }
@@ -642,7 +638,6 @@ void cedar::proc::gui::Network::checkDataItems()
           continue;
         }
         cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
-        std::cout << "New: " << p_item->getSlot()->getName() << std::endl;
         p_item->setPos(origin + count * direction * (data_size + padding) );
         mSlotMap[slot->getRole()][slot->getName()] = p_item;
         count += static_cast<qreal>(1.0);

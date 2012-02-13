@@ -93,7 +93,7 @@ cedar::aux::ConstDataPtr cedar::proc::PromotedExternalData::getData() const
   return this->mDataSlot->getData();
 }
 
-std::string cedar::proc::PromotedExternalData::getPromotionPath()
+std::string cedar::proc::PromotedExternalData::getPromotionPath() const
 {
   // is the promoted slot again promoted itself?
   if
