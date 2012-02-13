@@ -48,6 +48,10 @@
 class cedar::proc::PromotedExternalData : public cedar::proc::ExternalData
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::DataConnection;
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -69,7 +73,7 @@ public:
 
   cedar::aux::ConstDataPtr getData() const;
 
-  std::string getPromotionPath();
+  std::string getPromotionPath() const;
 
   //!@brief get the current validity of the promoted slot
   VALIDITY getValidity() const;

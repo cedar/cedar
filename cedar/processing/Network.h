@@ -325,6 +325,7 @@ private:
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator
+   * @todo clean up this function
    */
   cedar::proc::Network::DataConnectionVector::iterator removeDataConnection
                                                        (

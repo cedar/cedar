@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/PromotedOwnedData.h"
+#include "cedar/processing/Connectable.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -99,4 +100,21 @@ void cedar::proc::PromotedOwnedData::setValidity(cedar::proc::DataSlot::VALIDITY
 {
   this->mValidity = validity;
   this->mDataSlot->setValidity(validity);
+}
+
+std::string cedar::proc::PromotedOwnedData::getPromotionPath() const
+{
+  // is the promoted slot again promoted itself?
+  if
+  (
+    cedar::proc::PromotedOwnedDataPtr promoted
+      = boost::shared_dynamic_cast<cedar::proc::PromotedOwnedData>(mDataSlot)
+  )
+  {
+    return this->mpParent->getName() + "." + promoted->getPromotionPath();
+  }
+  else
+  {
+    return this->mpParent->getName() + "." + mDataSlot->mpParent->getName();
+  }
 }

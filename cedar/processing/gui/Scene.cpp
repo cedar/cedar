@@ -487,7 +487,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 (
                   p_source->getSlot()->getParentPtr()
                 )->getNetwork()->connectSlots(source_name, target_name);
-//                mNetwork->network()->connectSlots(source_name, target_name);
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM
             }
