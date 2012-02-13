@@ -98,26 +98,36 @@ int main(int argc, char **argv)
   );
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
-  (
-    new cedar::dev::robot::gl::KukaArm
+  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization;
+  if (polygon_file_path == "")
+  {
+    cedar::aux::gl::RigidBodyVisualizationPtr p_simple_visualization
     (
-      p_kuka_arm_model,
-      polygon_file_path
-    )
-  );
+      new cedar::dev::robot::gl::KinematicChain(p_kuka_arm_model)
+    );
+    p_arm_visualization = p_simple_visualization;
+  }
+  else
+  {
+    cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
+    (
+      new cedar::dev::robot::gl::KukaArm
+      (
+        p_kuka_arm_model,
+        polygon_file_path
+      )
+    );
+    p_arm_visualization = p_kuka_arm_visualization;
+  }
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
+  p_scene->addRigidBodyVisualization(p_arm_visualization);
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
-
-  cedar::aux::gl::RigidBodyVisualizationPtr p_object;
-  p_object = p_kuka_arm_visualization;
-  p_scene->addRigidBodyVisualization(p_object);
 
   // create a widget to control the scene
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
