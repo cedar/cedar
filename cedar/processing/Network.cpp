@@ -1002,3 +1002,8 @@ void cedar::proc::Network::processPromotedSlots()
     }
   }
 }
+
+const cedar::proc::Network::DataConnectionVector& cedar::proc::Network::getDataConnections() const
+{
+  return this->mDataConnections;
+}

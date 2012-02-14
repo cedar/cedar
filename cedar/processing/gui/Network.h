@@ -117,6 +117,9 @@ public:
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
+  //!@todo dupliate function in Network and StepItem - move to generic parent class
+  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -141,6 +144,9 @@ private:
 
   //!@brief Add all networks contained in this network to a scene.
   void addNetworksToScene();
+
+  //!@brief Add all connections contained in this network to a scene.
+  void addConnections();
 
   //!@brief Reacts to elements being added in the underlying network.
   void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
