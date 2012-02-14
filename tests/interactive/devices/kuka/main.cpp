@@ -84,7 +84,7 @@ int main(int argc, char **argv)
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();
   p_kinematic_chain_widget
-   = new cedar::dev::robot::gui::KinematicChainWidget(p_arm, configuration_file_path + "kuka_lbr4_widget.conf");
+   = new cedar::dev::robot::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
 
   a.exec();

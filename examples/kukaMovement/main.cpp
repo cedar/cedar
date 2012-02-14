@@ -251,7 +251,7 @@ int main(int argc, char **argv)
 
   // monitor/command widget for the arm
   cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget
-    = new cedar::dev::robot::gui::KinematicChainWidget(p_arm, configuration_file_path + "kuka_lbr4_widget.conf");
+    = new cedar::dev::robot::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
 
   // create the worker thread
