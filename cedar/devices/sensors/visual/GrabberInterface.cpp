@@ -232,7 +232,7 @@ bool GrabberInterface::writeConfiguration()
   if (!onWriteConfiguration())
   {
     std::cout << "[GrabberInterface::writeConfiguration] Error while updating the parameters in the derived class. "
-              << "Configuration NOT saved!!";
+              << "Configuration NOT saved!!"<< std::endl;
     return false;
   }
 

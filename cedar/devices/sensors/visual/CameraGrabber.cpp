@@ -645,7 +645,8 @@ std::string CameraGrabber::onGetSourceInfo(unsigned int channel) const
   std::stringstream s;
   s << "Camera channel " << channel
     << ": DeviceID: " << mCamIds.at(channel).busId
-    << ", GUID> " << mCamIds.at(channel).guid;
+    << ", GUID: " << mCamIds.at(channel).guid
+    << " (0x"<<std::hex<<mCamIds.at(channel).guid<<")"<<std::dec ;
     //<< ", Mode: " << CameraVideoMode::type().get(getCameraMode(channel)).name();
   return s.str();
 }
