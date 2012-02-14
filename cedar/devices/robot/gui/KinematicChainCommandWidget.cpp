@@ -99,7 +99,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::setSingleStep(double s
 void cedar::dev::robot::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
   mpKinematicChain->setWorkingMode(static_cast<cedar::dev::robot::KinematicChain::ActionType>(mode));
-  copyValuesFromArm();
+  update();
 }
 
 void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
@@ -131,30 +131,41 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::stopMovement()
   {
     mpKinematicChain->setJointVelocity(j, 0);
   }
-  copyValuesFromArm();
+  update();
 }
 
-void cedar::dev::robot::gui::KinematicChainCommandWidget::copyValuesFromArm()
+void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
 {
+  // update mode box in case the working mode has been changed by third party
+  mpModeBox->blockSignals(true);
+  mpModeBox->setCurrentIndex(static_cast<int>(mpKinematicChain->getWorkingMode()));
+  mpModeBox->blockSignals(false);
+  // update command boxes
   switch(mpModeBox->currentIndex())
   {
   case 0:
     for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
+      mCommandBoxes[j]->blockSignals(true);
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointAngle(j));
+      mCommandBoxes[j]->blockSignals(false);
     }
     break;
   case 1:
     for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
+      mCommandBoxes[j]->blockSignals(true);
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointVelocity(j));
+      mCommandBoxes[j]->blockSignals(false);
     }
     break;
 
   case 2:
     for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
+      mCommandBoxes[j]->blockSignals(true);
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointAcceleration(j));
+      mCommandBoxes[j]->blockSignals(false);
     }
     break;
   }
@@ -198,7 +209,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   // copy button
   QPushButton* copy_button = new QPushButton(QApplication::translate("KinematicChainWindow", "copy"));
   mpGridLayout->addWidget(copy_button, 3, 0);
-  connect(copy_button, SIGNAL(pressed()), this, SLOT(copyValuesFromArm()));
+  connect(copy_button, SIGNAL(pressed()), this, SLOT(update()));
 
   // stop button
   QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "stop!"));
@@ -227,7 +238,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
     mpGridLayout->addWidget(command_box, i, 2);
     mCommandBoxes.push_back(command_box);
   }
-  copyValuesFromArm();
+  update();
 
   mpGridLayout->setColumnStretch(0,1);
   mpGridLayout->setColumnStretch(1,2);

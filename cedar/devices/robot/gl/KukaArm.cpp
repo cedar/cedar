@@ -250,7 +250,8 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
 
 void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 {
-
+  cedar::aux::gl::setColor(1, 1, 1);
+  cedar::aux::gl::drawCross(0.1);
 }
 
 void cedar::dev::robot::gl::KukaArm::drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces)
