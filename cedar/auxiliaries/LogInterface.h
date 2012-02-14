@@ -67,7 +67,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual void message(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title) = 0;
+  virtual void message
+  (
+    cedar::aux::LOG_LEVEL level, 
+    const std::string& message,
+    const std::string& title
+  ) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

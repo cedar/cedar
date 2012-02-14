@@ -139,7 +139,7 @@ std::string cedar::aux::System::locateResource(const std::string& resourcePath)
   
   if (boost::filesystem::exists(resourcePath))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.");
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" locally.", "cedar::aux::System::locateResource");
     return resourcePath;
   }
   
@@ -149,26 +149,26 @@ std::string cedar::aux::System::locateResource(const std::string& resourcePath)
     static bool notified_about_this = false;
     if (!notified_about_this)
     {
-      cedar::aux::LogSingleton::getInstance()->systemInfo("Using CEDAR_RESOURCE_PATH for finding resources.");
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Using CEDAR_RESOURCE_PATH for finding resources.", "cedar::aux::System::locateResource");
       notified_about_this = true;
     }
     std::string path = cedar_resource_path + "/" + resourcePath;
     std::cout << path << std::endl;
     if (boost::filesystem::exists(path))
     {
-      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".");
+      cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", "cedar::aux::System::locateResource");
       return path;
     }
   }
   
   if (boost::filesystem::exists(in_home))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".");
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_home + "\".", "cedar::aux::System::locateResource");
     return in_home;
   }
   if (boost::filesystem::exists(in_install))
   {
-    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".");
+    cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + in_install + "\".", "cedar::aux::System::locateResource");
     return in_install;
   }
   

@@ -44,11 +44,11 @@
 
 int main()
 {
-  cedar::aux::LogSingleton::getInstance()->message("This is a test message.", "Title");
-  cedar::aux::LogSingleton::getInstance()->warning("This is a test warning.", "Title 2");
-  cedar::aux::LogSingleton::getInstance()->error("This is a test error.", "Title 42");
-  cedar::aux::LogSingleton::getInstance()->systemInfo("This is a test system info.", "Route 66");
-  cedar::aux::LogSingleton::getInstance()->message("This is a test message without title.");
-  cedar::aux::LogSingleton::getInstance()->debug("This is a test debug message.", "debug test");
+  cedar::aux::LogSingleton::getInstance()->message("This is a test message.", "SystemTest::main", "Title");
+  cedar::aux::LogSingleton::getInstance()->warning("This is a test warning.", "SystemTest::main", "Title 2");
+  cedar::aux::LogSingleton::getInstance()->error("This is a test error.", "SystemTest::main", "Title 42");
+  cedar::aux::LogSingleton::getInstance()->systemInfo("This is a test system info.", "SystemTest::main", "Route 66");
+  cedar::aux::LogSingleton::getInstance()->message("This is a test message without title.", "SystemTest::main");
+  cedar::aux::LogSingleton::getInstance()->debug("This is a test debug message.", "SystemTest::main", "debug test");
   return 0;
 }

@@ -36,7 +36,7 @@
 ======================================================================================================================*/
 
 #ifndef CEDAR_INTERNAL
-#error Don't use this file outside of cedar!
+#error Do not use this file outside of cedar!
 #endif
 
 #ifndef CEDAR_INTERNALS_H

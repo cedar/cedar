@@ -58,7 +58,7 @@ cedar::aux::Log::~Log()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title)
+void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& /*source*/, const std::string& title)
 {
   if (this->mHandlers.empty())
   {

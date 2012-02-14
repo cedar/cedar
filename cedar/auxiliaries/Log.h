@@ -76,38 +76,41 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title = "");
+  /*!@brief Sends a message through the current log system.
+   * @param source The source of the message. Used for filtering out messages to certain loggers.
+   */
+  void log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title = "");
   
-  inline void debugLog(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title = "")
+  inline void debugLog(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title = "")
   {
 #ifdef DEBUG
-    this->log(level, message, "[debug] " + title);
+    this->log(level, message, source, title);
 #endif // DEBUG
   }
   
-  inline void systemInfo(const std::string& message, const std::string& title = "")
+  inline void systemInfo(const std::string& message, const std::string& source, const std::string& title = "")
   {
-    this->log(cedar::aux::LOG_LEVEL_SYSTEM_INFO, message, title);
+    this->log(cedar::aux::LOG_LEVEL_SYSTEM_INFO, message, source, title);
   }
 
-  inline void message(const std::string& message, const std::string& title = "")
+  inline void message(const std::string& message, const std::string& source, const std::string& title = "")
   {
-    this->log(cedar::aux::LOG_LEVEL_MESSAGE, message, title);
+    this->log(cedar::aux::LOG_LEVEL_MESSAGE, message, source, title);
   }
   
-  inline void warning(const std::string& message, const std::string& title = "")
+  inline void warning(const std::string& message, const std::string& source, const std::string& title = "")
   {
-    this->log(cedar::aux::LOG_LEVEL_WARNING, message, title);
+    this->log(cedar::aux::LOG_LEVEL_WARNING, message, source, title);
   }
   
-  inline void error(const std::string& message, const std::string& title = "")
+  inline void error(const std::string& message, const std::string& source, const std::string& title = "")
   {
-    this->log(cedar::aux::LOG_LEVEL_ERROR, message, title);
+    this->log(cedar::aux::LOG_LEVEL_ERROR, message, source, title);
   }
   
-  inline void debug(const std::string& message, const std::string& title = "")
+  inline void debug(const std::string& message, const std::string& source, const std::string& title = "")
   {
-    this->log(cedar::aux::LOG_LEVEL_DEBUG, message, title);
+    this->log(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);
   }
   
   //--------------------------------------------------------------------------------------------------------------------
