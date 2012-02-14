@@ -72,13 +72,15 @@ public:
   /*!@brief   Finds the path to the resource.
    *
    *          This function locates cedar resources. These resources are usually stored in cedar's resource directory.
+   * 
    * @param   resourcePath The path to the resource, relative to cedar's resource directory.
    *
    * @remarks The function looks for the resource in the following order:
    *          If the environment-variable CEDAR_RESOURCE_PATH is set, the paths stored in it are searched.
    *          Then, the function looks in the current path.
    *          Next, the function looks in ${CEDAR_HOME}, i.e., the directory in which cedar was originally compiled.
-   *          Lastly, the function looks
+   *          Lastly, the function looks in the cedar install directory.
+   *
    */
   static std::string locateResource(const std::string& resourcePath);
 
