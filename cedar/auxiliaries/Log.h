@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,81 +22,105 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        System.h
+    File:        Log.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2012 02 14
 
-    Description:
+    Description: Header for the \em cedar::aux::Log class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_SYSTEM_H
-#define CEDAR_AUX_SYSTEM_H
+#ifndef CEDAR_AUX_LOG_H
+#define CEDAR_AUX_LOG_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
-#include <string>
-#include <QReadWriteLock>
-#include <fstream>
 
-
-/*!@brief Wrapper for some functions that depend on the operating system.
+/*!@brief A class for logging messages in a file.
  */
-class cedar::aux::System
+class cedar::aux::Log
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friend
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::Singleton<cedar::aux::Log>;
+  
+  //--------------------------------------------------------------------------------------------------------------------
+  // types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  struct LogHandler
+  {
+    //!@todo Implement log filters
+    // cedar::aux::LogFilter mpFilter;
+    cedar::aux::LogInterfacePtr mpLogger;
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  // no constructors -- this is a singleton class. Use cedar::aux::LogSingleton.
+
+  //!@brief Destructor
+  ~Log();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief try to get the home directory from standard environment variables
-  static std::string getUserHomeDirectory();
+  void log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title = "");
   
-  //!@brief try to get the directory in which application data of cedar is stored
-  static std::string getUserApplicationDataDirectory();
+  inline void debugLog(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title = "")
+  {
+#ifdef DEBUG
+    this->log(level, message, "[debug] " + title);
+#endif // DEBUG
+  }
   
-  /*!@brief   Finds the path to the resource.
-   *
-   *          This function locates cedar resources. These resources are usually stored in cedar's resource directory.
-   * @param   resourcePath The path to the resource, relative to cedar's resource directory.
-   *
-   * @remarks The function looks for the resource in the following order:
-   *          If the environment-variable CEDAR_RESOURCE_PATH is set, the paths stored in it are searched.
-   *          Then, the function looks in the current path.
-   *          Next, the function looks in ${CEDAR_HOME}, i.e., the directory in which cedar was originally compiled.
-   *          Lastly, the function looks
-   */
-  static std::string locateResource(const std::string& resourcePath);
+  inline void systemInfo(const std::string& message, const std::string& title = "")
+  {
+    this->log(cedar::aux::LOG_LEVEL_SYSTEM_INFO, message, title);
+  }
 
-  /*!@brief This function opens a crash report file in a standardized location.
-   */
-  static void openCrashFile(std::ofstream& stream, std::string& fileName);
-
+  inline void message(const std::string& message, const std::string& title = "")
+  {
+    this->log(cedar::aux::LOG_LEVEL_MESSAGE, message, title);
+  }
+  
+  inline void warning(const std::string& message, const std::string& title = "")
+  {
+    this->log(cedar::aux::LOG_LEVEL_WARNING, message, title);
+  }
+  
+  inline void error(const std::string& message, const std::string& title = "")
+  {
+    this->log(cedar::aux::LOG_LEVEL_ERROR, message, title);
+  }
+  
+  inline void debug(const std::string& message, const std::string& title = "")
+  {
+    this->log(cedar::aux::LOG_LEVEL_DEBUG, message, title);
+  }
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  //!@brief The constructor.
+  Log();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -104,7 +128,10 @@ private:
 protected:
   // none yet
 private:
-  // none yet
-}; // class cedar::aux::System
+  std::vector<LogHandler> mHandlers;
+  
+  cedar::aux::LogInterfacePtr mDefaultLogger;
+};
 
-#endif // CEDAR_AUX_SYSTEM_H
+#endif // CEDAR_AUX_LOG_H
+
