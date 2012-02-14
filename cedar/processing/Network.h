@@ -69,13 +69,13 @@ class cedar::proc::Network : public cedar::proc::Connectable
   // types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Type of the data connection list.
-  typedef std::vector<cedar::proc::DataConnectionPtr> DataConnectionVector;
-
   //! Type of the trigger connection list.
   typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
 
 public:
+  //! Type of the data connection list.
+  typedef std::vector<cedar::proc::DataConnectionPtr> DataConnectionVector;
+
   //! Type of the map of elements.
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
 
@@ -220,6 +220,8 @@ public:
                            const std::string& sourceDataName,
                            std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
+
+  const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
 
   /*!@brief Returns a const reference to the map of names to elements stored in the network.
    */
