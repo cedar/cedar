@@ -380,7 +380,9 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
         {
           std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
           std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-          this->mNetwork->network()->disconnectSlots(source_slot, target_slot);
+          // delete connection in network of source
+          source->getSlot()->getParentPtr()->getNetwork()->disconnectSlots(source_slot, target_slot);
+//          this->mNetwork->network()->disconnectSlots(source_slot, target_slot);
         }
       }
       else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))

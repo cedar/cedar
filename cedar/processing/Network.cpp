@@ -369,7 +369,11 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
       return;
     }
   }
-  CEDAR_THROW(cedar::proc::MissingConnectionException, "This data connection does not exist!");
+  CEDAR_THROW
+  (
+    cedar::proc::MissingConnectionException,
+    "The data connection between " + source  + " and " + target + " in network " + this->getName() + " does not exist!"
+  );
 }
 
 void cedar::proc::Network::disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
