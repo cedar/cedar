@@ -101,6 +101,10 @@ public:
    */
   void setSingleStep(double singleStep);
 
+public slots:
+  //!@brief updates the window parameters with values from the kinematic chain
+  void update();
+
   //----------------------------------------------------------------------------
   // protected methods
   //----------------------------------------------------------------------------
@@ -122,7 +126,6 @@ private slots:
   void changeWorkingMode(int index);
   void commandJoints();
   void stopMovement();
-  void copyValuesFromArm();
   void setKeepSendingState(int state);
 
   //----------------------------------------------------------------------------
