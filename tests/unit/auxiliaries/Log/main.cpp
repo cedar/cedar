@@ -35,20 +35,63 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
+#include "cedar/defines.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/logFilter/Type.h"
+#include "cedar/auxiliaries/LogInterface.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/shared_ptr.hpp>
 #include <string>
+
+class CustomLogger : public cedar::aux::LogInterface
+{
+  public:
+    void message
+    (
+      cedar::aux::LOG_LEVEL /* level */,
+      const std::string& message,
+      const std::string& /* title */
+    )
+    {
+      mMessages.push_back(message);
+      std::cout << "Intercepted message: " << message << std::endl;
+    }
+    
+    std::vector<std::string> mMessages;
+};
+
+CEDAR_GENERATE_POINTER_TYPES(CustomLogger);
 
 int main()
 {
+  int errors = 0;
+  
+  // test general logging capabilities
   cedar::aux::LogSingleton::getInstance()->message("This is a test message.", "SystemTest::main", "Title");
   cedar::aux::LogSingleton::getInstance()->warning("This is a test warning.", "SystemTest::main", "Title 2");
   cedar::aux::LogSingleton::getInstance()->error("This is a test error.", "SystemTest::main", "Title 42");
   cedar::aux::LogSingleton::getInstance()->systemInfo("This is a test system info.", "SystemTest::main", "Route 66");
   cedar::aux::LogSingleton::getInstance()->message("This is a test message without title.", "SystemTest::main");
   cedar::aux::LogSingleton::getInstance()->debug("This is a test debug message.", "SystemTest::main", "debug test");
-  return 0;
+  
+  // test filtering
+  CustomLoggerPtr debug_logger (new CustomLogger());
+  cedar::aux::LogFilterPtr filter (new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_DEBUG));
+  cedar::aux::LogSingleton::getInstance()->addLogger(filter, debug_logger);
+
+  cedar::aux::LogSingleton::getInstance()->message("message", "SystemTest::main");
+  cedar::aux::LogSingleton::getInstance()->debug("debug", "SystemTest::main");
+  cedar::aux::LogSingleton::getInstance()->message("message", "SystemTest::main");
+  cedar::aux::LogSingleton::getInstance()->debug("debug", "SystemTest::main");
+  
+  if (debug_logger->mMessages.size() != 2)
+  {
+    std::cout << "The wrong number of messages was received." << std::endl;
+    ++errors;
+  }
+  
+  return errors;
 }

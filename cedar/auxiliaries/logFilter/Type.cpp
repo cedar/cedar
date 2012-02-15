@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Log.cpp
+    File:        LogFilter.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 02 14
+    Date:        2012 02 15
 
     Description:
 
@@ -35,10 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/Log.h"
-#include "cedar/auxiliaries/LogFilter.h"
-#include "cedar/auxiliaries/LogInterface.h"
-#include "cedar/auxiliaries/ConsoleLog.h"
+#include "cedar/auxiliaries/logFilter/Type.h"
 
 // SYSTEM INCLUDES
 
@@ -46,13 +43,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::Log::Log()
+cedar::aux::logFilter::Type::Type(cedar::aux::LOG_LEVEL level)
 :
-mDefaultLogger(new cedar::aux::ConsoleLog())
-{
-}
-
-cedar::aux::Log::~Log()
+mAcceptedLevel(level)
 {
 }
 
@@ -60,34 +53,13 @@ cedar::aux::Log::~Log()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::Log::clearLoggers()
+bool cedar::aux::logFilter::Type::acceptsMessage
+     (
+       cedar::aux::LOG_LEVEL messageLevel,
+       const std::string& /* message */,
+       const std::string& /* messageSource */,
+       const std::string& /* title */
+     ) const 
 {
-  this->mHandlers.clear();
+  return this->mAcceptedLevel == messageLevel;
 }
-
-void cedar::aux::Log::addLogger(cedar::aux::LogFilterPtr filter, cedar::aux::LogInterfacePtr logger)
-{
-  LogHandler handler;
-  handler.mpFilter = filter;
-  handler.mpLogger = logger;
-  this->mHandlers.push_back(handler);
-}
-
-void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title)
-{
-  // see if any of the filters match
-  for (size_t i = 0; i < this->mHandlers.size(); ++i)
-  {
-    LogHandler& handler = this->mHandlers.at(i);
-    if (handler.mpFilter->acceptsMessage(level, message, source, title))
-    {
-      // if the filter matches, send the message to the corresponding logger.
-      handler.mpLogger->message(level, message, title);
-      return;
-    }
-  }
-
-  // if none of the filters matched, use the default logger
-  this->mDefaultLogger->message(level, message, title);
-}
-
