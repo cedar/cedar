@@ -192,10 +192,10 @@ const cedar::proc::Step::ActionMap& cedar::proc::Step::getActions() const
  */
 void cedar::proc::Step::onNameChanged()
 {
-  if (this->mpRegisteredAt != NULL)
+  if (cedar::proc::ElementPtr parent_network = this->mRegisteredAt.lock())
   {
     // update the name
-    this->mpRegisteredAt->updateObjectName(this);
+    boost::shared_static_cast<cedar::proc::Network>(parent_network)->updateObjectName(this);
 
     // emit a signal to notify anyone interested in this
     emit nameChanged();

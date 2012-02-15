@@ -49,7 +49,7 @@
 
 bool cedar::aux::logFilter::All::acceptsMessage
      (
-       cedar::aux::LOG_LEVEL messageLevel,
+       cedar::aux::LOG_LEVEL /* messageLevel */,
        const std::string& /* message */,
        const std::string& /* messageSource */,
        const std::string& /* title */

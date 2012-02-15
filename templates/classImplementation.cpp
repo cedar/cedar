@@ -34,6 +34,9 @@
 
 ======================================================================================================================*/
 
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 // CEDAR INCLUDES
 
 // SYSTEM INCLUDES

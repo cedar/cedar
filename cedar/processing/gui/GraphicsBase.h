@@ -74,6 +74,8 @@ public:
   const static GraphicsGroup GRAPHICS_GROUP_TRIGGER = 1 << 1;
   //!@brief group DATA ITEM
   const static GraphicsGroup GRAPHICS_GROUP_DATA_ITEM = 1 << 2;
+  //!@brief group for NETWORK
+  const static GraphicsGroup GRAPHICS_GROUP_NETWORK = 1 << 3;
   //!@brief group UNKNOWN
   const static GraphicsGroup GRAPHICS_GROUP_UNKNOWN = 1 << 16;
 
@@ -92,7 +94,8 @@ public:
   {
     BASE_SHAPE_RECT,
     BASE_SHAPE_ROUND,
-    BASE_SHAPE_DIAMOND
+    BASE_SHAPE_DIAMOND,
+    BASE_SHAPE_CROSS
   };
 
 
@@ -192,6 +195,10 @@ public:
   void setOutlineColor(const QColor& color);
   //!@brief set fill color
   void setFillColor(const QColor& color);
+
+  /*!@brief Draw the default graphical representation.
+   */
+  void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

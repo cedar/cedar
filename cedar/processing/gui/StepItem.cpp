@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/Settings.h"
@@ -309,7 +310,18 @@ cedar::proc::gui::StepItem::DataSlotNameMap& cedar::proc::gui::StepItem::getSlot
 
 void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ASSERT(p_scene);
+
   QMenu menu;
+
+  if (this->scene()->selectedItems().size() > 1)
+  {
+    p_scene->networkGroupingContextMenuEvent(menu);
+    menu.exec(event->screenPos());
+    return;
+  }
+
   QMenu *p_data = menu.addMenu("data");
 
   QMenu *p_actions_menu = menu.addMenu("actions");
@@ -328,7 +340,11 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     }
   }
 
-  QAction *p_delete_action = menu.addAction("delete");
+  menu.addSeparator();
+  p_scene->networkGroupingContextMenuEvent(menu);
+
+  //!@todo Implement delete action.
+//  QAction *p_delete_action = menu.addAction("delete");
 
 
   // Actions for data plotting -----------------------------------------------------------------------------------------
@@ -402,10 +418,10 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     this->mStep->callAction(action);
 
   }
-  else if (a == p_delete_action)
-  {
-    //!@todo
-  }
+//  else if (a == p_delete_action)
+//  {
+//    //!@todo
+//  }
 }
 
 void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)

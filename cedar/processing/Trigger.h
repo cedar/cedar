@@ -55,7 +55,6 @@
  *
  */
 class cedar::proc::Trigger : public cedar::proc::Element,
-                             public boost::enable_shared_from_this<cedar::proc::Trigger>,
                              public cedar::proc::Triggerable
 {
   //--------------------------------------------------------------------------------------------------------------------

@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/processing/namespace.h"
+#include "cedar/processing/gui/namespace.h"
 #include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
@@ -52,8 +53,9 @@
 class cedar::proc::FrameworkSettings : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // friend
   //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::gui::FrameworkSettings;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

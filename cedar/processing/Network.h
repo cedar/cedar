@@ -42,10 +42,13 @@
 #define CEDAR_PROC_NETWORK_H
 
 // CEDAR INCLUDES
+#include "cedar/processing/Connectable.h"
 #include "cedar/processing/namespace.h"
 
 // SYSTEM INCLUDES
 #include <vector>
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/connection.hpp>
 
 /*!@brief A collection of cedar::proc::Elements forming some logical unit.
  *
@@ -60,7 +63,7 @@
  * @todo Add a slot which reacts to name changes of elements (update map of names to ptrs)
  * @todo Write a private eraseConnection function to avoid duplicated code in disconnectSlots and remove
  */
-class cedar::proc::Network
+class cedar::proc::Network : public cedar::proc::Connectable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // types
@@ -72,9 +75,10 @@ private:
   //! Type of the trigger connection list.
   typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
 
+public:
   //! Type of the map of elements.
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
-public:
+
   //! Iterator type of the element map.
   typedef ElementMap::iterator ElementMapIterator;
 
@@ -229,6 +233,38 @@ public:
    */
   void reset();
 
+  /*!@brief Find the complete path of an element, if it exists in the tree structure
+   * @returns returns the dot-separated path to the element, or empty string if element is not found in tree
+   * @todo instead of returning an empty string, this function should throw an exception (catch it internally
+   * in recursive call) */
+  std::string findPath(cedar::proc::ConstElementPtr findMe) const;
+  
+  void promoteSlot(DataSlotPtr promotedSlot);
+
+  void demoteSlot(const std::string& name);
+
+  /*!@brief This method lists all networks that are children of this network.
+   */
+  void listSubnetworks(std::set<cedar::proc::ConstNetworkPtr>& subnetworks) const;
+
+  /*!@brief Returns a unique identifier containing the given string.
+   *
+   *        If there is no element by the given name, then the identifier is returned, otherwise, it is extended by
+   *        appending a number.
+   */
+  std::string getUniqueIdentifier(const std::string& identifier) const;
+
+  /*!@brief Register a function pointer to react to an added element.
+   */
+  boost::signals2::connection connectToElementAdded
+  (
+    boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
+  );
+  
+  boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
+
+  void processPromotedSlots();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -263,6 +299,14 @@ private:
    */
   void writeTriggers(cedar::aux::ConfigurationNode& root);
 
+  /*!@brief Reads networks from a configuration node and adds them to the parent network.
+   */
+  void readNetworks(const cedar::aux::ConfigurationNode& root);
+
+  /*!@brief Writes the child networks in the network to the configuration node.
+   */
+  void writeNetworks(cedar::aux::ConfigurationNode& root);
+
   /*!@brief Reads a data connection from a configuration node and adds it to the network.
    */
   void readDataConnection(const cedar::aux::ConfigurationNode& root);
@@ -290,7 +334,10 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //!@brief a boost signal that is emitted if a change in slot takes place
+  boost::signals2::signal<void ()> mSlotChanged;
+
+  cedar::aux::StringVectorParameterPtr _mPromotedSlots;
 private:
   //! Map associating element names to elements.
   ElementMap mElements;
@@ -300,6 +347,13 @@ private:
 
   //! List of trigger connections in the network.
   TriggerConnectionVector mTriggerConnections;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // signals
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Signal that is triggered whenever an element is added to the network.
+  boost::signals2::signal<void (cedar::proc::Network*, cedar::proc::ElementPtr)> mElementAddedSignal;
 
 }; // class cedar::proc::Network
 
