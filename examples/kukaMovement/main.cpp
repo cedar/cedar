@@ -259,6 +259,8 @@ int main(int argc, char **argv)
   worker.setStepSize(10);
 
   // start everything
+  p_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  p_kinematic_chain_widget->getCommandWidget()->update();
   worker.start();
   a.exec();
 
