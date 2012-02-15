@@ -139,7 +139,6 @@ int main(int argc, char **argv)
   widget_arm.show();
 
   p_kuka_arm_model->startTimer(50.0);
-  p_kuka_arm->start();
   viewer.startTimer(50);
   a.exec();
 
