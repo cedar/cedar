@@ -44,6 +44,8 @@
 // SYSTEM INCLUDES
 
 /*!@brief A class for logging messages in a file.
+ *
+ * @todo Make this class thread-safe.
  */
 class cedar::aux::Log
 {
@@ -58,8 +60,10 @@ class cedar::aux::Log
 private:
   struct LogHandler
   {
-    //!@todo Implement log filters
-    // cedar::aux::LogFilter mpFilter;
+    //! Pointer to a filter. When this filter accepts the message, it is sent to the logger.
+    cedar::aux::LogFilterPtr mpFilter;
+    
+    //! Pointer to the logger corresponding to the filter.
     cedar::aux::LogInterfacePtr mpLogger;
   };
 
@@ -112,6 +116,14 @@ public:
   {
     this->log(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);
   }
+  
+  /*! @brief Removes all loggers currently registered.
+   */
+  void clearLoggers();
+  
+  /*! @brief Adds a logger that is activated by a filter.
+   */
+  void addLogger(cedar::aux::LogFilterPtr filter, cedar::aux::LogInterfacePtr logger);
   
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

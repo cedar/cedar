@@ -218,6 +218,7 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES(LogSingleton);
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
+    CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
     //!@endcond
     
