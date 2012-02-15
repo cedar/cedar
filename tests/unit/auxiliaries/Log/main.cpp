@@ -80,7 +80,10 @@ int main()
   // test filtering
   CustomLoggerPtr debug_logger (new CustomLogger());
   cedar::aux::LogFilterPtr filter (new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_DEBUG));
-  cedar::aux::LogSingleton::getInstance()->addLogger(filter, debug_logger);
+  cedar::aux::LogSingleton::getInstance()->addLogger(debug_logger, filter);
+  
+  CustomLoggerPtr all_logger (new CustomLogger());
+  cedar::aux::LogSingleton::getInstance()->addLogger(all_logger);
 
   cedar::aux::LogSingleton::getInstance()->message("message", "SystemTest::main");
   cedar::aux::LogSingleton::getInstance()->debug("debug", "SystemTest::main");
@@ -89,7 +92,13 @@ int main()
   
   if (debug_logger->mMessages.size() != 2)
   {
-    std::cout << "The wrong number of messages was received." << std::endl;
+    std::cout << "The wrong number of messages was received by debug_logger." << std::endl;
+    ++errors;
+  }
+  
+  if (all_logger->mMessages.size() != 2)
+  {
+    std::cout << "The wrong number of messages was received by all_logger." << std::endl;
     ++errors;
   }
   

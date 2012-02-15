@@ -65,7 +65,7 @@ void cedar::aux::Log::clearLoggers()
   this->mHandlers.clear();
 }
 
-void cedar::aux::Log::addLogger(cedar::aux::LogFilterPtr filter, cedar::aux::LogInterfacePtr logger)
+void cedar::aux::Log::addLogger(cedar::aux::LogInterfacePtr logger, cedar::aux::LogFilterPtr filter)
 {
   LogHandler handler;
   handler.mpFilter = filter;

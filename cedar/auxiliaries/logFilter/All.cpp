@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,42 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        All.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2012 02 15
 
-    Description: Namespace file for cedar::aux::logFilter.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_LOG_FILTER_NAMESPACE_H
-#define CEDAR_AUX_LOG_FILTER_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/logFilter/All.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <opencv2/opencv.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::logFilter::All::acceptsMessage
+     (
+       cedar::aux::LOG_LEVEL messageLevel,
+       const std::string& /* message */,
+       const std::string& /* messageSource */,
+       const std::string& /* title */
+     ) const 
 {
-  namespace aux
-  {
-    /*!@brief Namespace for all aux::logFilter classes. */
-    namespace logFilter
-    {
-      CEDAR_DECLARE_AUX_CLASS(All);
-      CEDAR_DECLARE_AUX_CLASS(Type);
-    }
-  }
+  return true;
 }
-
-#endif // CEDAR_AUX_LOG_FILTER_NAMESPACE_H
