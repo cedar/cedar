@@ -146,11 +146,25 @@ void cedar::proc::gui::Connection::update()
   this->setZValue(-1.0);
   QPainterPath path(this->mpSource->getConnectionAnchorInScene());
   QPointF middle_point;
-  middle_point.setX(this->mpSource->getConnectionAnchorInScene().x() + (this->mpTarget->getConnectionAnchorInScene().x()-this->mpSource->getConnectionAnchorInScene().x())/2.0);
-  middle_point.setY(this->mpSource->getConnectionAnchorInScene().y() + (this->mpTarget->getConnectionAnchorInScene().y()-this->mpSource->getConnectionAnchorInScene().y())/2.0);
+  middle_point.setX
+  (
+    this->mpSource->getConnectionAnchorInScene().x()
+      + (this->mpTarget->getConnectionAnchorInScene().x()-this->mpSource->getConnectionAnchorInScene().x())/2.0
+  );
+  middle_point.setY
+  (
+    this->mpSource->getConnectionAnchorInScene().y()
+      + (this->mpTarget->getConnectionAnchorInScene().y()-this->mpSource->getConnectionAnchorInScene().y())/2.0
+  );
   QPointF vector_src_tar;
-  vector_src_tar.setX(this->mpTarget->getConnectionAnchorInScene().x()-this->mpSource->getConnectionAnchorInScene().x());
-  vector_src_tar.setY(this->mpTarget->getConnectionAnchorInScene().y()-this->mpSource->getConnectionAnchorInScene().y());
+  vector_src_tar.setX
+  (
+    this->mpTarget->getConnectionAnchorInScene().x()-this->mpSource->getConnectionAnchorInScene().x()
+  );
+  vector_src_tar.setY
+  (
+    this->mpTarget->getConnectionAnchorInScene().y()-this->mpSource->getConnectionAnchorInScene().y()
+  );
   path.lineTo(this->mpTarget->getConnectionAnchorInScene());
 
   this->setPath(path);

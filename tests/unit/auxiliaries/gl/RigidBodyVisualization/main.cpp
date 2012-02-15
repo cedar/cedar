@@ -34,10 +34,12 @@
  ---------------------------------------------------------------------------------------------------------------------*/
 
 // LOCAL INCLUDES
-#include "TestObject.h"
+#include "TestVisualization.h"
 
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Object.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -51,15 +53,15 @@ int main(int, char**)
   int errors = 0;
   
   // create instance of test class
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object);
-  cedar::tests::unit::aux::gl::Object::TestObject gl_object(p_object);
+  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  cedar::tests::unit::aux::gl::TestVisualization p_visualization(p_rigid_body);
   
   //--------------------------------------------------------------------------------------------------------------------
   // wire frame
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: wire frame" << std::endl;
-  gl_object.drawAsWireFrame(true);
-  if (!gl_object.isDrawnAsWireFrame())
+  p_visualization.setDrawAsWireFrame(true);
+  if (!p_visualization.isDrawnAsWireFrame())
   {
     errors++;
     std::cout << "ERROR with wire frame" << std::endl;
@@ -69,8 +71,8 @@ int main(int, char**)
   // resolution
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: resolution" << std::endl;
-  gl_object.setResolution(55);
-  if (gl_object.resolution() != 55)
+  p_visualization.setResolution(55);
+  if (p_visualization.getResolution() != 55)
   {
     errors++;
     std::cout << "ERROR with setResolution or resolution" << std::endl;
@@ -80,11 +82,11 @@ int main(int, char**)
   // color
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: color" << std::endl;
-  gl_object.setColor(0.3, 1, sqrt(2.0)/2);
+  p_visualization.setColor(0.3, 1, sqrt(2.0)/2);
   if (
-      gl_object.colorR() != 0.3
-      || gl_object.colorG() != 1.0
-      || gl_object.colorB() != sqrt(2.0)/2
+      p_visualization.getColorR() != 0.3
+      || p_visualization.getColorG() != 1.0
+      || p_visualization.getColorB() != sqrt(2.0)/2
       )
   {
     errors++;

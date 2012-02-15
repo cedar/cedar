@@ -22,51 +22,42 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.cpp
+    File:        namespace.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 02 15
 
-    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestObject class.
+    Description: Namespace file for cedar::aux::logFilter.
 
     Credits:
 
 ======================================================================================================================*/
 
+#ifndef CEDAR_AUX_LOG_FILTER_NAMESPACE_H
+#define CEDAR_AUX_LOG_FILTER_NAMESPACE_H
 
-// LOCAL INCLUDES
-#include "TestObject.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/lib.h"
+#include "cedar/defines.h"
 
 // SYSTEM INCLUDES
+#include <boost/smart_ptr.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include <opencv2/opencv.hpp>
 
 
-//----------------------------------------------------------------------------------------------------------------------
-// constructors and destructor
-//----------------------------------------------------------------------------------------------------------------------
-
-//! constructor
-cedar::tests::unit::aux::gl::Object::TestObject::TestObject(cedar::aux::ObjectPtr pObject)
-:
-cedar::aux::gl::Object(pObject)
+namespace cedar
 {
-  
+  namespace aux
+  {
+    /*!@brief Namespace for all aux::logFilter classes. */
+    namespace logFilter
+    {
+      CEDAR_DECLARE_AUX_CLASS(All);
+      CEDAR_DECLARE_AUX_CLASS(Type);
+    }
+  }
 }
 
-//! destructor
-cedar::tests::unit::aux::gl::Object::TestObject::~TestObject()
-{
-
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-void cedar::tests::unit::aux::gl::Object::TestObject::draw()
-{
-
-}
+#endif // CEDAR_AUX_LOG_FILTER_NAMESPACE_H

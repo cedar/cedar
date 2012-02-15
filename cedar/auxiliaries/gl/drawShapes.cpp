@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/gl/gl.h"
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
@@ -92,9 +91,6 @@ void cedar::aux::gl::drawBlock(double l, double w, double h, bool wireFrame)
   glVertex3d(l/2, w/2, h/2);
   glVertex3d(-l/2, w/2, h/2);
   glEnd();
-  
-
-
   if (wireFrame)
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

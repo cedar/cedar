@@ -36,6 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/gl/Cone.h"
 
 // SYSTEM INCLUDES
@@ -48,9 +50,9 @@ int main(int, char**)
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  cedar::aux::gl::Cone testCone(p_object);
-  cedar::aux::gl::Cone cone(p_object, 1, 5);
+  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  cedar::aux::gl::Cone testCone(p_rigid_body);
+  cedar::aux::gl::Cone cone(p_rigid_body, 1, 5);
 
   //--------------------------------------------------------------------------------------------------------------------
   // radius

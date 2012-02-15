@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/gl/gl.h"
+#include "cedar/auxiliaries/gl/namespace.h"
 
 // SYSTEM INCLUDES
 
@@ -52,7 +53,8 @@ cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::Kinemat
 cedar::aux::gl::Object(rpKinematicChainModel),
 mpKinematicChainModel(rpKinematicChainModel)
 {
-
+  mIsDrawingEndEffectorVelocity = true;
+  mIsDrawingEndEffectorAcceleration = false;
 }
 
 cedar::dev::robot::gl::KinematicChain::~KinematicChain()
@@ -66,16 +68,37 @@ cedar::dev::robot::gl::KinematicChain::~KinematicChain()
 
 void cedar::dev::robot::gl::KinematicChain::draw()
 {
-  drawBase();
-  for (unsigned int j = 0; j < mpKinematicChainModel->getNumberOfJoints(); j++)
+  prepareDraw();
+
+  if (mIsVisible)
   {
-    drawSegment(j);
+    drawBase();
+    for (unsigned int j = 0; j < mpKinematicChainModel->getNumberOfJoints(); j++)
+    {
+      drawSegment(j);
+    }
+    drawEndEffector();
+    if (mIsDrawingEndEffectorVelocity)
+    {
+      drawEndEffectorVelocity();
+    }
+    if (mIsDrawingEndEffectorAcceleration)
+    {
+      drawEndEffectorAcceleration();
+    }
+
+    glPopMatrix(); //!\todo check if this is needed
   }
-  drawEndEffector();
-  drawEndEffectorVelocity();
-  drawEndEffectorAcceleration();
-  
-  glPopMatrix(); //!\todo check if this is needed
+}
+
+void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorVelocity(bool state)
+{
+  mIsDrawingEndEffectorVelocity = state;
+}
+
+void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorAcceleration(bool state)
+{
+  mIsDrawingEndEffectorAcceleration = state;
 }
 
 void cedar::dev::robot::gl::KinematicChain::drawBase()

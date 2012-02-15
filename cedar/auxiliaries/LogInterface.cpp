@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,21 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.cpp
+    File:        LogInterface.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 27
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 02 14
 
-    Description: Virtual class for a simple object geometry for visualization with OpenGL
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gl/Object.h"
-#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/LogInterface.h"
 
 // SYSTEM INCLUDES
 
@@ -44,92 +43,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Object::Object(cedar::aux::ObjectPtr pObject)
-:
-mpObject(pObject),
-mTransformationTranspose(4, 4, CV_64FC1)
+cedar::aux::LogInterface::LogInterface()
 {
-  init();
 }
 
-cedar::aux::gl::Object::~Object()
+cedar::aux::LogInterface::~LogInterface()
 {
-
-}
-
-void cedar::aux::gl::Object::init()
-{
-  mObjectType = std::string("no type");
-  mIsVisible = true;
-  mIsDrawnAsWireFrame = false;
-  mResolution = 10;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-std::string cedar::aux::gl::Object::getObjectName()
-{
-  return mpObject->getName();
-}
-
-std::string cedar::aux::gl::Object::getObjectType()
-{
-  return mObjectType;
-}
-
-int cedar::aux::gl::Object::resolution()
-{
-  return mResolution;
-}
-
-double cedar::aux::gl::Object::colorR()
-{
-  return mColorR;
-}
-
-double cedar::aux::gl::Object::colorG()
-{
-  return mColorG;
-}
-
-double cedar::aux::gl::Object::colorB()
-{
-  return mColorB;
-}
-
-void cedar::aux::gl::Object::drawAsWireFrame(bool state)
-{
-  mIsDrawnAsWireFrame = state;
-}
-
-bool cedar::aux::gl::Object::isDrawnAsWireFrame()
-{
-  return mIsDrawnAsWireFrame;
-}
-
-void cedar::aux::gl::Object::setResolution(int value)
-{
-  mResolution = value;
-}
-
-void cedar::aux::gl::Object::setColor(double R, double G, double B)
-{
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-}
-
-cedar::aux::ObjectPtr cedar::aux::gl::Object::getObject()
-{
-  return mpObject;
-}
-
-void cedar::aux::gl::Object::setVisibility(bool state)
-{ 
-  mIsVisible = state;
-}

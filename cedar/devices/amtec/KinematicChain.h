@@ -70,6 +70,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+   *
+   * @return    state
+   */
+  bool isMovable();
+
   /*!@brief returns the max. acceleration of a joint
    *
    * @param index

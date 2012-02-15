@@ -22,41 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        main.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 21
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 02 14
 
-    Description: Namespace file for cedar::tests::unit::aux::ConfigurationInterface.
+    Description: Implements all unit tests for the @em cedar::aux::LogFile class.
 
     Credits:
 
 ======================================================================================================================*/
 
+// LOCAL INCLUDES
+#include "cedar/auxiliaries/System.h"
 
-#ifndef CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
-#define CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
+// PROJECT INCLUDES
 
-namespace cedar
+// SYSTEM INCLUDES
+#include <string>
+
+int main()
 {
-  namespace tests
-  {
-    namespace unit
-    {
-      namespace aux
-      {
-        namespace gl
-        {
-          //!@brief Namespace for the unit test of object.
-          namespace Object
-          {
-            class TestObject;
-          }
-        }
-      }
-    }
-  }
+  std::cout << "Finding resource test: " << cedar::aux::System::locateResource("configs/test.txt") << std::endl;
+  return 0;
 }
-
-#endif // CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
