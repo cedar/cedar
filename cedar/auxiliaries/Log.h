@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/logFilter/All.h"
 
 // SYSTEM INCLUDES
 
@@ -123,7 +124,11 @@ public:
   
   /*! @brief Adds a logger that is activated by a filter.
    */
-  void addLogger(cedar::aux::LogFilterPtr filter, cedar::aux::LogInterfacePtr logger);
+  void addLogger
+  (
+    cedar::aux::LogInterfacePtr logger,
+    cedar::aux::LogFilterPtr filter = cedar::aux::LogFilterPtr(new cedar::aux::logFilter::All())
+  );
   
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
