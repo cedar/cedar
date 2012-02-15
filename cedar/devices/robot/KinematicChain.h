@@ -55,7 +55,10 @@
  * the KinematicChain as a thread to handle velocities and accelerations
  * "manually".
  */
-class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
+class cedar::dev::robot::KinematicChain
+:
+public cedar::dev::robot::Component,
+public cedar::aux::LoopedThread
 {
   //----------------------------------------------------------------------------
   // parameters
