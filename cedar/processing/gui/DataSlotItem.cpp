@@ -153,6 +153,12 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
     return cedar::proc::gui::CONNECT_NO;
   }
 
+  // ... source and target are not in the same network
+  if (this->getSlot()->getParentPtr()->getNetwork() != p_target->getSlot()->getParentPtr()->getNetwork())
+  {
+    return cedar::proc::gui::CONNECT_NO;
+  }
+
   // a step cannot connect to itself
   if (this->mpStep == p_target->mpStep)
   {

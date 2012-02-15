@@ -123,6 +123,7 @@ void cedar::proc::gui::Network::fitToContents()
   {
     this->childItems().at(i)->moveBy(-offset.x(), -offset.y());
   }
+  this->checkDataItems();
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
@@ -158,7 +159,6 @@ void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElem
   {
     CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled type in cedar::proc::gui::Network::addElement.");
   }
-
   this->network()->add(element);
 
   if (!this->isRootNetwork())
@@ -195,7 +195,6 @@ void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
   this->mpScene = pScene;
 }
 
-//!@brief Add all networks contained in this network to a scene.
 void cedar::proc::gui::Network::addNetworksToScene()
 {
   for (size_t i = 0; i < this->mpNetworksToAdd.size(); ++i)
@@ -222,7 +221,6 @@ void cedar::proc::gui::Network::addStepsToScene()
   }
   this->mpStepsToAdd.clear();
 
-  /* restore steps  that don't have a gui description */
   // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
   for (
         cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
@@ -316,7 +314,12 @@ void cedar::proc::gui::Network::addTriggersToScene()
   this->mpTriggersToAdd.clear();
 
   // add TriggerItems for Triggers that don't have one yet (i.e., for which none was present in the configuration tree)
-  for (cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin(); it != this->mNetwork->elements().end(); ++it)
+  for
+  (
+    cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
+      it != this->mNetwork->elements().end();
+      ++it
+  )
   {
     if (cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(it->second->getName()))
     {
@@ -493,7 +496,11 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
         }
         catch (const boost::property_tree::ptree_bad_path&)
         {
-          CEDAR_THROW(cedar::proc::gui::InvalidStepNameException, "Cannot read StepItem from file: no step name given.");
+          CEDAR_THROW
+          (
+            cedar::proc::gui::InvalidStepNameException,
+            "Cannot read StepItem from file: no step name given."
+          );
         }
         this->mpStepsToAdd.push_back(p_step);
       }
@@ -517,7 +524,11 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
         }
         catch (const boost::property_tree::ptree_bad_path&)
         {
-          CEDAR_THROW(cedar::proc::gui::InvalidTriggerNameException, "Cannot read TriggerItem from file: no trigger name given.");
+          CEDAR_THROW
+          (
+            cedar::proc::gui::InvalidTriggerNameException,
+            "Cannot read TriggerItem from file: no trigger name given."
+          );
         }
         this->mpTriggersToAdd.push_back(p_trigger);
       }
