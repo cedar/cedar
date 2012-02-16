@@ -135,7 +135,7 @@ private:
   static const float mRing_Shininess[1];
 
   // base
-  static const unsigned int mBaseSegmentVertexNumber = 8804;
+  static const unsigned int mBaseSegmentVertexNumber = 2564;
   static const unsigned int mBaseSegmentFacesNumber = 3738;
   GLuint mBaseSegmentVertexVboId; // vertex buffer id
   GLuint mBaseSegmentIndexVboId; // index buffer id
@@ -143,7 +143,7 @@ private:
   GLushort mBaseSegmentIndex[mBaseSegmentFacesNumber*3]; // index data
 
   // base ring
-  static const unsigned int mBaseRingVertexNumber = 1064;
+  static const unsigned int mBaseRingVertexNumber = 590;
   static const unsigned int mBaseRingFacesNumber = 590;
   GLuint mBaseRingVertexVboId; // vertex buffer id
   GLuint mBaseRingIndexVboId; // index buffer id
@@ -151,7 +151,7 @@ private:
   GLushort mBaseRingIndex[mBaseRingFacesNumber*3]; // index data
 
   // forward segment
-  static const unsigned int mForwardSegmentVertexNumber = 51622;
+  static const unsigned int mForwardSegmentVertexNumber = 8763;
   static const unsigned int mForwardSegmentFacesNumber = 17400;
   GLuint mForwardSegmentVertexVboId; // vertex buffer id
   GLuint mForwardSegmentIndexVboId; // index buffer id
@@ -159,7 +159,7 @@ private:
   GLushort mForwardSegmentIndex[mForwardSegmentFacesNumber*3]; // index data
 
   // forward ring
-  static const unsigned int mForwardRingVertexNumber = 1054;
+  static const unsigned int mForwardRingVertexNumber = 590;
   static const unsigned int mForwardRingFacesNumber = 590;
   GLuint mForwardRingVertexVboId; // vertex buffer id
   GLuint mForwardRingIndexVboId; // index buffer id
@@ -167,7 +167,7 @@ private:
   GLushort mForwardRingIndex[mForwardRingFacesNumber*3]; // index data
 
   // inverse segment
-  static const unsigned int mInverseSegmentVertexNumber = 51373;
+  static const unsigned int mInverseSegmentVertexNumber = 8731;
   static const unsigned int mInverseSegmentFacesNumber = 17234;
   GLuint mInverseSegmentVertexVboId; // vertex buffer id
   GLuint mInverseSegmentIndexVboId; // index buffer id
@@ -175,7 +175,7 @@ private:
   GLushort mInverseSegmentIndex[mInverseSegmentFacesNumber*3]; // index data
 
   // inverse ring
-  static const unsigned int mInverseRingVertexNumber = 1164;
+  static const unsigned int mInverseRingVertexNumber = 676;
   static const unsigned int mInverseRingFacesNumber = 590;
   GLuint mInverseRingVertexVboId; // vertex buffer id
   GLuint mInverseRingIndexVboId; // index buffer id
@@ -183,7 +183,7 @@ private:
   GLushort mInverseRingIndex[mInverseRingFacesNumber*3]; // index data
 
   // wrist segment
-  static const unsigned int mWristSegmentVertexNumber = 57695;
+  static const unsigned int mWristSegmentVertexNumber = 9836;
   static const unsigned int mWristSegmentFacesNumber = 19448;
   GLuint mWristSegmentVertexVboId; // vertex buffer id
   GLuint mWristSegmentIndexVboId; // index buffer id
@@ -191,7 +191,7 @@ private:
   GLushort mWristSegmentIndex[mWristSegmentFacesNumber*3]; // index data
 
   // wrist sphere
-  static const unsigned int mWristSphereVertexNumber = 18119;
+  static const unsigned int mWristSphereVertexNumber = 3462;
   static const unsigned int mWristSphereFacesNumber = 6388;
   GLuint mWristSphereVertexVboId; // vertex buffer id
   GLuint mWristSphereIndexVboId; // index buffer id
@@ -199,7 +199,7 @@ private:
   GLushort mWristSphereIndex[mWristSphereFacesNumber*3]; // index data
 
   // wrist ring
-  static const unsigned int mWristRingVertexNumber = 3245;
+  static const unsigned int mWristRingVertexNumber = 1890;
   static const unsigned int mWristRingFacesNumber = 1630;
   GLuint mWristRingVertexVboId; // vertex buffer id
   GLuint mWristRingIndexVboId; // index buffer id
