@@ -120,6 +120,11 @@ public:
   //!@todo dupliate function in Network and StepItem - move to generic parent class
   cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
 
+  //!@brief returns a map of all data slots of the same id
+  cedar::proc::gui::Network::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
+
+  void disconnect();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
