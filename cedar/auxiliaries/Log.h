@@ -122,7 +122,7 @@ public:
   
   inline void debug(const std::string& message, const std::string& source, const std::string& title = "")
   {
-    this->log(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);
+    this->debugLog(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);
   }
   
   /*! @brief Removes all loggers currently registered.
