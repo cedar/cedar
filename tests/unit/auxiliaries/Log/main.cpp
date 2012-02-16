@@ -38,6 +38,7 @@
 #include "cedar/defines.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/logFilter/Type.h"
+#include "cedar/auxiliaries/logFilter/All.h"
 #include "cedar/auxiliaries/LogInterface.h"
 
 // PROJECT INCLUDES
@@ -80,6 +81,7 @@ int main()
   // test filtering
   CustomLoggerPtr debug_logger (new CustomLogger());
   cedar::aux::LogFilterPtr filter (new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_DEBUG));
+  filter->setRemovesMessages(true);
   cedar::aux::LogSingleton::getInstance()->addLogger(debug_logger, filter);
   
   CustomLoggerPtr all_logger (new CustomLogger());
@@ -101,6 +103,38 @@ int main()
     std::cout << "The wrong number of messages was received by all_logger." << std::endl;
     ++errors;
   }
+  
+  // test removing of messages
+  cedar::aux::LogSingleton::getInstance()->clearLoggers();
+  CustomLoggerPtr logger1 (new CustomLogger());
+  CustomLoggerPtr logger2 (new CustomLogger());
+  CustomLoggerPtr logger3 (new CustomLogger());
+  
+  // set up the logger pipeline so that only the first and second logger intercept messages.
+  cedar::aux::LogFilterPtr filter1 (new cedar::aux::logFilter::All());
+  filter1->setRemovesMessages(false);
+  cedar::aux::LogFilterPtr filter2 (new cedar::aux::logFilter::All());
+  filter2->setRemovesMessages(true);
+  cedar::aux::LogFilterPtr filter3 (new cedar::aux::logFilter::All());
+  filter3->setRemovesMessages(false);
+  
+  // add loggers
+  cedar::aux::LogSingleton::getInstance()->addLogger(logger1, filter1);
+  cedar::aux::LogSingleton::getInstance()->addLogger(logger2, filter2);
+  cedar::aux::LogSingleton::getInstance()->addLogger(logger3, filter3);
+  
+  // send a message
+  cedar::aux::LogSingleton::getInstance()->message("message", "SystemTest::main");
+  
+  if (logger1->mMessages.size() != 1 || logger2->mMessages.size() != 1 || logger3->mMessages.size() != 0)
+  {
+    std::cout << "Wrong number of messages was received: "
+              << "logger1 has " << logger1->mMessages.size() << "; "
+              << "logger2 has " << logger2->mMessages.size() << "; "
+              << "logger3 has " << logger3->mMessages.size() << std::endl;
+    ++errors;
+  }
+  
   
   return errors;
 }
