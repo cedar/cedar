@@ -75,6 +75,7 @@ void cedar::aux::Log::addLogger(cedar::aux::LogInterfacePtr logger, cedar::aux::
 
 void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title)
 {
+  bool was_accepted = false;
   // see if any of the filters match
   for (size_t i = 0; i < this->mHandlers.size(); ++i)
   {
@@ -83,11 +84,19 @@ void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& messag
     {
       // if the filter matches, send the message to the corresponding logger.
       handler.mpLogger->message(level, message, title);
-      return;
+      was_accepted = true;
+      
+      if (handler.mpFilter->removesMessages())
+      {
+        return;
+      }
     }
   }
 
   // if none of the filters matched, use the default logger
-  this->mDefaultLogger->message(level, message, title);
+  if (!was_accepted)
+  {
+    this->mDefaultLogger->message(level, message, title);
+  }
 }
 
