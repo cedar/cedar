@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,83 +22,73 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        System.h
+    File:        LogFilter.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2012 02 15
 
-    Description:
+    Description: Header for the \em cedar::aux::LogFilter class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_SYSTEM_H
-#define CEDAR_AUX_SYSTEM_H
+#ifndef CEDAR_AUX_LOG_FILTER_H
+#define CEDAR_AUX_LOG_FILTER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
-#include <string>
-#include <QReadWriteLock>
-#include <fstream>
 
-
-/*!@brief Wrapper for some functions that depend on the operating system.
+/*!@brief A class for filtering log messages.
  */
-class cedar::aux::System
+class cedar::aux::LogFilter
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // macros
-  //--------------------------------------------------------------------------------------------------------------------
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The constructor.
+  LogFilter();
+
+  //!@brief Destructor
+  virtual ~LogFilter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief try to get the home directory from standard environment variables
-  static std::string getUserHomeDirectory();
-  
-  //!@brief try to get the directory in which application data of cedar is stored
-  static std::string getUserApplicationDataDirectory();
-  
-  /*!@brief   Finds the path to the resource.
-   *
-   *          This function locates cedar resources. These resources are usually stored in cedar's resource directory.
-   * 
-   * @param   resourcePath The path to the resource, relative to cedar's resource directory.
-   *
-   * @remarks The function looks for the resource in the following order:
-   *          If the environment-variable CEDAR_RESOURCE_PATH is set, the paths stored in it are searched.
-   *          Then, the function looks in the current path.
-   *          Next, the function looks in ${CEDAR_HOME}, i.e., the directory in which cedar was originally compiled.
-   *          Lastly, the function looks in the cedar install directory.
-   *
+  /*!@brief Checks whether this filter accepts the given message.
    */
-  static std::string locateResource(const std::string& resourcePath);
-
-  /*!@brief This function opens a crash report file in a standardized location.
-   */
-  static void openCrashFile(std::ofstream& stream, std::string& fileName);
-
+  virtual bool acceptsMessage
+  (
+    cedar::aux::LOG_LEVEL messageLevel,
+    const std::string& message,
+    const std::string& messageSource,
+    const std::string& title
+  ) const = 0;
+  
+  void setRemovesMessages(bool remove)
+  {
+    this->mRemovesMessages = remove;
+  }
+  
+  bool removesMessages() const
+  {
+    return this->mRemovesMessages;
+  }
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -106,7 +96,9 @@ private:
 protected:
   // none yet
 private:
-  // none yet
-}; // class cedar::aux::System
+  //! If true, then any messages accepted by this filter will not be passed on to any further loggers.
+  bool mRemovesMessages;
+};
 
-#endif // CEDAR_AUX_SYSTEM_H
+#endif // CEDAR_AUX_LOG_FILTER_H
+

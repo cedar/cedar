@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        System.h
+    File:        ConsoleLog.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 07 26
+    Date:        2012 02 14
 
     Description:
 
@@ -34,59 +34,37 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_SYSTEM_H
-#define CEDAR_AUX_SYSTEM_H
+#ifndef CEDAR_AUX_CONSOLE_LOG_H
+#define CEDAR_AUX_CONSOLE_LOG_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/LogInterface.h"
 
 // SYSTEM INCLUDES
-#include <string>
-#include <QReadWriteLock>
-#include <fstream>
 
 
-/*!@brief Wrapper for some functions that depend on the operating system.
+/*!@brief An interface for classes that redirect log outputs to the console.
+ *
+ * @todo describe more.
  */
-class cedar::aux::System
+class cedar::aux::ConsoleLog : public cedar::aux::LogInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  // none yet.
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief try to get the home directory from standard environment variables
-  static std::string getUserHomeDirectory();
-  
-  //!@brief try to get the directory in which application data of cedar is stored
-  static std::string getUserApplicationDataDirectory();
-  
-  /*!@brief   Finds the path to the resource.
-   *
-   *          This function locates cedar resources. These resources are usually stored in cedar's resource directory.
-   * 
-   * @param   resourcePath The path to the resource, relative to cedar's resource directory.
-   *
-   * @remarks The function looks for the resource in the following order:
-   *          If the environment-variable CEDAR_RESOURCE_PATH is set, the paths stored in it are searched.
-   *          Then, the function looks in the current path.
-   *          Next, the function looks in ${CEDAR_HOME}, i.e., the directory in which cedar was originally compiled.
-   *          Lastly, the function looks in the cedar install directory.
-   *
-   */
-  static std::string locateResource(const std::string& resourcePath);
-
-  /*!@brief This function opens a crash report file in a standardized location.
-   */
-  static void openCrashFile(std::ofstream& stream, std::string& fileName);
+  void message(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& title);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -107,6 +85,17 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::aux::System
 
-#endif // CEDAR_AUX_SYSTEM_H
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
+
+private:
+  // none yet
+
+}; // class cedar::aux::ConsoleLog
+
+#endif // CEDAR_AUX_CONSOLE_LOG_H
+

@@ -129,6 +129,11 @@ cedar::aux::DeadReferenceException::DeadReferenceException()
   this->mType = "DeadReferenceException";
 }
 
+cedar::aux::ResourceNotFoundException::ResourceNotFoundException()
+{
+  this->mType = "ResourceNotFoundException";
+}
+
 cedar::aux::MatrixMismatchException::MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB)
 {
   this->mType = "cedar::aux::MatrixMismatchException";
