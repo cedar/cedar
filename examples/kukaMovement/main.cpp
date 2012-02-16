@@ -227,11 +227,7 @@ int main(int argc, char **argv)
   {
     cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
     (
-      new cedar::dev::robot::gl::KukaArm
-      (
-        p_arm_model,
-        polygon_file_path
-      )
+      new cedar::dev::robot::gl::KukaArm(p_arm_model)
     );
     p_arm_visualization = p_kuka_arm_visualization;
   }
