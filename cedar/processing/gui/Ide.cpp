@@ -435,6 +435,15 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
     }
+    // delete networks
+    else if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(items[i]))
+    {
+      // delete one step at a time
+      p_network_drawer->hide();
+      p_network_drawer->removeAllConnections();
+      p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
+      this->mpProcessingDrawer->getScene()->removeNetworkItem(p_network_drawer);
+    }
   }
 }
 

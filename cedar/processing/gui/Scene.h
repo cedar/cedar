@@ -169,6 +169,10 @@ public:
     cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
   );
 
+  /*!@brief Removes a given network item from the scene.
+   */
+  void removeNetworkItem(cedar::proc::gui::Network *pNetwork);
+
   /*!@brief Adds a given network item to the scene.
    */
   void addNetworkItem(cedar::proc::gui::Network *pNetwork);

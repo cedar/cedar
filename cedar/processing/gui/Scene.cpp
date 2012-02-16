@@ -585,6 +585,8 @@ void cedar::proc::gui::Scene::removeTriggerItem(cedar::proc::gui::TriggerItem *p
   // we assume that triggers are only inserted once.
   CEDAR_DEBUG_ASSERT(this->mTriggerMap.find(pTrigger->getTrigger().get()) != this->mTriggerMap.end());
   this->mTriggerMap.erase(mTriggerMap.find(pTrigger->getTrigger().get()));
+  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pTrigger->getTrigger().get()) != this->mElementMap.end());
+  this->mElementMap.erase(mElementMap.find(pTrigger->getTrigger().get()));
   delete pTrigger;
 }
 
@@ -715,6 +717,16 @@ void cedar::proc::gui::Scene::addNetworkItem(cedar::proc::gui::Network *pNetwork
   this->mElementMap[pNetwork->network().get()] = pNetwork;
 }
 
+void cedar::proc::gui::Scene::removeNetworkItem(cedar::proc::gui::Network *pNetwork)
+{
+  // we assume that steps are only inserted once.
+  CEDAR_DEBUG_ASSERT(this->mNetworkMap.find(pNetwork->network().get()) != this->mNetworkMap.end());
+  this->mNetworkMap.erase(mNetworkMap.find(pNetwork->network().get()));
+  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pNetwork->network().get()) != this->mElementMap.end());
+  this->mElementMap.erase(mElementMap.find(pNetwork->network().get()));
+  delete pNetwork;
+}
+
 void cedar::proc::gui::Scene::addProcessingStep(cedar::proc::StepPtr step, QPointF position)
 {
   cedar::proc::gui::StepItem *p_drawer = new cedar::proc::gui::StepItem(step, this->mpMainWindow);
@@ -740,6 +752,8 @@ void cedar::proc::gui::Scene::removeStepItem(cedar::proc::gui::StepItem *pStep)
   // we assume that steps are only inserted once.
   CEDAR_DEBUG_ASSERT(this->mStepMap.find(pStep->getStep().get()) != this->mStepMap.end());
   this->mStepMap.erase(mStepMap.find(pStep->getStep().get()));
+  CEDAR_DEBUG_ASSERT(this->mElementMap.find(pStep->getStep().get()) != this->mElementMap.end());
+  this->mElementMap.erase(mElementMap.find(pStep->getStep().get()));
   delete pStep;
 }
 
