@@ -380,9 +380,11 @@ void cedar::proc::gui::Scene::connectModeProcessMousePress(QGraphicsSceneMouseEv
     if ( (mpConnectionStart = dynamic_cast<cedar::proc::gui::GraphicsBase*>(items[0]))
          && mpConnectionStart->canConnect())
     {
-      QLineF line(mpConnectionStart->getConnectionAnchorInScene(), mpConnectionStart->getConnectionAnchorInScene());
+      QPointF start = mpConnectionStart->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
+      QLineF line(start, start);
       mpNewConnectionIndicator = this->addLine(line);
       mpNewConnectionIndicator->setZValue(-1.0);
+      mpNewConnectionIndicator->setParentItem(mpConnectionStart);
 
       // Highlight all potential connection targets
       QList<QGraphicsItem*> all_items = this->items();
@@ -401,7 +403,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
 {
   if(mpNewConnectionIndicator != NULL)
   {
-    QPointF p2 = pMouseEvent->scenePos();
+    QPointF p2 = pMouseEvent->scenePos() - mpConnectionStart->scenePos();
 
     // try to snap the target position of the line to a valid item, if one is found
     QList<QGraphicsItem*> items = this->items(pMouseEvent->scenePos());
@@ -416,7 +418,7 @@ void cedar::proc::gui::Scene::connectModeProcessMouseMove(QGraphicsSceneMouseEve
             )
         {
           connected = true;
-          p2 = target->getConnectionAnchorInScene();
+          p2 = target->getConnectionAnchorInScene() - mpConnectionStart->scenePos();
         }
       }
     }
