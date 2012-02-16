@@ -37,7 +37,10 @@
 #ifndef CEDAR_AUX_CONV_FAST_CONVOLUTION_H
 #define CEDAR_AUX_CONV_FAST_CONVOLUTION_H
 
-#ifdef CEDAR_FFTW
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
+#ifdef CEDAR_USE_FFTW
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
@@ -93,5 +96,5 @@ private:
 
 }; // cedar::aux::conv::Convolution
 
-#endif // CEDAR_FFTW
+#endif // CEDAR_USE_FFTW
 #endif // CEDAR_AUX_CONV_FAST_CONVOLUTION_H

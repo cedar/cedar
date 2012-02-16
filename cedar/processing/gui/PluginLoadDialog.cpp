@@ -84,11 +84,11 @@ QDialog(pParent)
 
 void cedar::proc::gui::PluginLoadDialog::browseFile()
 {
-#ifdef LINUX
+#ifdef __linux
   QString filter = "Plugins (*.so)";
-#elif defined APPLE
+#elif defined __APPLE__
   QString filter = "Plugins (*.dylib)";
-#elif defined WINDOWS
+#elif defined _WIN32
   QString filter = "Plugins (*.dll)";
 #endif
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastPluginLoadDialogLocation();

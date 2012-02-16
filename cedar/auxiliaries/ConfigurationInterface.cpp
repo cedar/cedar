@@ -44,7 +44,7 @@
 #include <sys/types.h> // for checking if directory exists
 #include <sys/stat.h> // for checking if directory exists
 #include <stdio.h>  // FILENAME_MAX needed for char array
-#ifdef WINDOWS
+#ifdef _WIN32
     #include <direct.h>
     #define getCurrentDir _getcwd
 #else

@@ -34,8 +34,9 @@
 
 ======================================================================================================================*/
 
-// MAKE AMTEC OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_AMTEC
 
 // CEDAR INCLUDES
@@ -471,6 +472,8 @@ void cedar::dev::amtec::KinematicChain::setJointAngle(unsigned int index, double
 
   int module = mModules[index];
   mpDevice->moveStep(module, value, stepTime);
+
+  return;
 }
 
 #endif // CEDAR_USE_AMTEC

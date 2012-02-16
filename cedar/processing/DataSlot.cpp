@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Connectable.h"
+#include "cedar/processing/Network.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -56,7 +57,8 @@ mpParent(pParent),
 mMandatory(isMandatory),
 mValidity(cedar::proc::DataSlot::VALIDITY_UNKNOWN),
 mName(name),
-mRole(role)
+mRole(role),
+mIsPromoted(false)
 {
 }
 
@@ -85,9 +87,14 @@ const std::string& cedar::proc::DataSlot::getText() const
     return this->mText;
 }
 
-cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
+cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidity() const
 {
   return this->mValidity;
+}
+
+cedar::proc::DataSlot::VALIDITY cedar::proc::DataSlot::getValidlity() const
+{
+  return this->getValidity();
 }
 
 void cedar::proc::DataSlot::setValidity(cedar::proc::DataSlot::VALIDITY validity)
@@ -125,4 +132,14 @@ cedar::proc::Connectable* cedar::proc::DataSlot::getParentPtr()
 bool cedar::proc::DataSlot::isParent(cedar::proc::ConstConnectablePtr parent) const
 {
   return (parent.get() == mpParent);
+}
+
+void cedar::proc::DataSlot::promote()
+{
+  this->mIsPromoted = true;
+}
+
+bool cedar::proc::DataSlot::isPromoted() const
+{
+  return this->mIsPromoted;
 }
