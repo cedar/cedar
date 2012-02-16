@@ -38,6 +38,7 @@
 #define CEDAR_AUX_LOG_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/logFilter/All.h"
@@ -86,7 +87,13 @@ public:
    */
   void log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title = "");
   
-  inline void debugLog(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title = "")
+  inline void debugLog
+  (
+    cedar::aux::LOG_LEVEL CEDAR_DEBUG_ONLY(level),
+    const std::string& CEDAR_DEBUG_ONLY(message),
+    const std::string& CEDAR_DEBUG_ONLY(source), 
+    const std::string& CEDAR_DEBUG_ONLY(title) = ""
+  )
   {
 #ifdef DEBUG
     this->log(level, message, source, title);
