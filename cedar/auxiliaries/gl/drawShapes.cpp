@@ -530,7 +530,7 @@ void cedar::aux::gl::drawEllipse(
 
 
 
-  //!\todo check which of these should move to the init function
+  //! todo: check which of these should move to the init function
 //  glEnable(GL_DEPTH_TEST);
 //  glEnable(GL_MAP2_VERTEX_3);
 //  glEnable(GL_AUTO_NORMAL);
@@ -630,3 +630,21 @@ void cedar::aux::gl::drawAxes(double length)
   drawArrow<double>(o, z, length*0.015, length*0.04, length*0.2, 10);
 }
 
+void cedar::aux::gl::drawCross(double length, double width)
+{
+  glLineWidth(width);
+  glBegin(GL_LINES);
+  glVertex3d(-length, 0, 0);
+  glVertex3d(length, 0, 0);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3d(0, -length, 0);
+  glVertex3d(0, length, 0);
+  glEnd();
+
+  glBegin(GL_LINES);
+  glVertex3d(0, 0, -length);
+  glVertex3d(0, 0, length);
+  glEnd();
+}

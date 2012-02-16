@@ -51,58 +51,18 @@
 // constructors and destructor
 //----------------------------------------------------------------------------
 
-//cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
-//(
-//  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-//  QWidget * parent,
-//  Qt::WindowFlags f
-//)
-//:
-//QWidget(parent, f)
-//{
-//  // store a smart pointer to KinematicChain
-//  mpKinematicChains.push_back(kinematicChain);
-//  mDecimals = 2;
-//  mSingleStep = 0.01;
-//
-//  initWindow();
-//  return;
-//}
-
-
 cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
 (
   const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-  const std::string& configFileName,
   QWidget *parent,
   Qt::WindowFlags
 )
 :
-QWidget(parent),
-cedar::aux::ConfigurationInterface(configFileName)
+QWidget(parent)
 {
-  std::vector<cedar::dev::robot::KinematicChainPtr> kinematic_chains;
-  kinematic_chains.push_back(kinematicChain);
-
-  init(kinematic_chains, configFileName);
+  init(kinematicChain);
   return;
 }
-
-cedar::dev::robot::gui::KinematicChainWidget::KinematicChainWidget
-(
-  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-  const std::string& configFileName,
-  QWidget *parent,
-  Qt::WindowFlags
-)
-:
-QWidget(parent),
-ConfigurationInterface(configFileName)
-{
-  init(kinematicChains, configFileName);
-  return;
-}
-
 
 cedar::dev::robot::gui::KinematicChainWidget::~KinematicChainWidget()
 {
@@ -114,22 +74,32 @@ cedar::dev::robot::gui::KinematicChainWidget::~KinematicChainWidget()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::dev::robot::gui::KinematicChainWidget::init(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName)
+void cedar::dev::robot::gui::KinematicChainWidget::init(cedar::dev::robot::KinematicChainPtr kinematicChain)
 {
   setWindowTitle(QApplication::translate("KinematicChainWindow", "KinematicChain"));
 
   QGridLayout* p_layout = new QGridLayout();
   QGroupBox* p_monitor_group = new QGroupBox();
-  p_monitor_group->setTitle("Monitor");
+//  p_monitor_group->setTitle("Monitor");
   p_layout->addWidget(p_monitor_group, 0, 0);
-  cedar::dev::robot::gui::KinematicChainMonitorWidget* monitor_widget = new cedar::dev::robot::gui::KinematicChainMonitorWidget(kinematicChains, configFileName);
-  p_layout->addWidget(monitor_widget, 0, 0);
+  mpMonitorWidget = new cedar::dev::robot::gui::KinematicChainMonitorWidget(kinematicChain, this);
+  p_layout->addWidget(mpMonitorWidget, 0, 0);
   QGroupBox* p_command_group = new QGroupBox();
-  p_command_group->setTitle("Command");
+//  p_command_group->setTitle("Command");
   p_layout->addWidget(p_command_group, 0, 1);
-  cedar::dev::robot::gui::KinematicChainCommandWidget* command_widget = new cedar::dev::robot::gui::KinematicChainCommandWidget(kinematicChains, configFileName);
-  p_layout->addWidget(command_widget, 0, 1);
+  mpCommandWidget = new cedar::dev::robot::gui::KinematicChainCommandWidget(kinematicChain);
+  p_layout->addWidget(mpCommandWidget, 0, 1);
   this->setLayout(p_layout);
 
   this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+}
+
+cedar::dev::robot::gui::KinematicChainMonitorWidget* cedar::dev::robot::gui::KinematicChainWidget::getMonitorWidget()
+{
+  return mpMonitorWidget;
+}
+
+cedar::dev::robot::gui::KinematicChainCommandWidget* cedar::dev::robot::gui::KinematicChainWidget::getCommandWidget()
+{
+  return mpCommandWidget;
 }

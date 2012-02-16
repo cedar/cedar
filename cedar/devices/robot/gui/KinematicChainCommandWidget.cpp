@@ -58,131 +58,12 @@ cedar::dev::robot::gui::KinematicChainCommandWidget::KinematicChainCommandWidget
   Qt::WindowFlags f
 )
 :
-QWidget(parent, f)
+QWidget(parent, f),
+mpKinematicChain(kinematicChain)
 {
-  // store a smart pointer to KinematicChain
-  mpKinematicChains.push_back(kinematicChain);
-  mDecimals = 3;
-  mSingleStep = 0.01;
-
   initWindow();
   return;
 }
-
-
-cedar::dev::robot::gui::KinematicChainCommandWidget::KinematicChainCommandWidget
-(
-  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-  const std::string& configFileName,
-  QWidget* parent,
-  Qt::WindowFlags
-)
-:
-QWidget(parent),
-cedar::aux::ConfigurationInterface(configFileName)
-{
-  // store a smart pointer to KinematicChain
-  mpKinematicChains.push_back(kinematicChain);
-  mDecimals = 2;
-  mSingleStep = 0.01;
-
-  //
-  // read configuration file
-  //
-
-  if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChainCommandWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << std::endl;
-  }
-
-  if(addParameter(&mSingleStep, "kinematicChainWidgetSingleStep", 0.01) != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChainCommandWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
-
-  initWindow();
-  return;
-}
-
-
-cedar::dev::robot::gui::KinematicChainCommandWidget::KinematicChainCommandWidget
-(
-  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-  QWidget* parent,
-  Qt::WindowFlags f
-)
-:
-QWidget(parent, f)
-{
-  for(unsigned int i = 1; i < kinematicChains.size(); ++i)
-  {
-    // ideally, the reference geometry behind all the chains should be the same
-    // here, at least we make sure that the number of joints is the same
-    if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
-    {
-      std::cout << "KinematicChainCommandWidget: Error, kinematic chains do not have the same number of joints!" << std::endl;
-      CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
-    }
-  }
-
-  // store smart pointers to KinematicChains
-  mpKinematicChains = kinematicChains;
-  mDecimals = 2;
-  mSingleStep = 0.01;
-
-  initWindow();
-  return;
-}
-
-
-cedar::dev::robot::gui::KinematicChainCommandWidget::KinematicChainCommandWidget
-(
-  const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-  const std::string& configFileName,
-  QWidget *parent,
-  Qt::WindowFlags
-)
-:
-QWidget(parent),
-ConfigurationInterface(configFileName)
-{
-  for(unsigned int i = 1; i < kinematicChains.size(); ++i)
-  {
-    // here, at least we make sure that the number of joints is the same
-    if(kinematicChains[i]->getNumberOfJoints() != kinematicChains[0]->getNumberOfJoints())
-    {
-      std::cout << "KinematicChainCommandWidget: Error, kinematic chains do not have the same number of joints!" << std::endl;
-      CEDAR_THROW(cedar::aux::InitializationException, "Kinematic chains do not have the same number of joints!");
-    }
-  }
-
-  // store a smart pointer to KinematicChain
-  mpKinematicChains = kinematicChains;
-  mDecimals = 2;
-  mSingleStep = 0.01;
-
-  //
-  // read configuration file
-  //
-
-  if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChainCommandWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << std::endl;
-  }
-
-  if(addParameter(&mSingleStep, "kinematicChainWidgetSingleStep", 0.01) != CONFIG_SUCCESS)
-  {
-    std::cout << "KinematicChainCommandWidget: Error reading 'kinematicChainWidgetSingleStep' from config file!" << std::endl;
-  }
-
-  readOrDefaultConfiguration();
-
-  initWindow();
-  return;
-}
-
 
 cedar::dev::robot::gui::KinematicChainCommandWidget::~KinematicChainCommandWidget()
 {
@@ -199,19 +80,32 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::timerEvent(QTimerEvent
   commandJoints();
 }
 
+void cedar::dev::robot::gui::KinematicChainCommandWidget::setDecimals(unsigned int decimals)
+{
+  for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+  {
+    mCommandBoxes[j]->setDecimals(decimals);
+  }
+}
+
+void cedar::dev::robot::gui::KinematicChainCommandWidget::setSingleStep(double singleStep)
+{
+  for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+  {
+    mCommandBoxes[j]->setSingleStep(singleStep);
+  }
+}
+
 void cedar::dev::robot::gui::KinematicChainCommandWidget::changeWorkingMode(int mode)
 {
-  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
-  {
-    mpKinematicChains[i]->setWorkingMode(static_cast<cedar::dev::robot::KinematicChain::ActionType>(mode));
-  }
-  copyValuesFromArm();
+  mpKinematicChain->setWorkingMode(static_cast<cedar::dev::robot::KinematicChain::ActionType>(mode));
+  update();
 }
 
 void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
 {
   std::vector<double> command_vector;
-  for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
+  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
     command_vector.push_back(mCommandBoxes[i]->value());
   }
@@ -219,23 +113,13 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
   switch(mpModeBox->currentIndex())
   {
   case 0:
-    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
-    {
-      mpKinematicChains[i]->setJointAngles(command_vector);
-    }
+    mpKinematicChain->setJointAngles(command_vector);
     break;
   case 1:
-    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
-    {
-      mpKinematicChains[i]->setJointVelocities(command_vector);
-    }
+    mpKinematicChain->setJointVelocities(command_vector);
     break;
-
   case 2:
-    for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
-    {
-      mpKinematicChains[i]->setJointAccelerations(command_vector);
-    }
+    mpKinematicChain->setJointAccelerations(command_vector);
     break;
   }
 }
@@ -243,37 +127,45 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
 void cedar::dev::robot::gui::KinematicChainCommandWidget::stopMovement()
 {
   mpModeBox->setCurrentIndex(1);
-  for(unsigned int i = 0; i < mpKinematicChains.size(); ++i)
+  for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
   {
-    for(unsigned int j = 0; j < mpKinematicChains[0]->getNumberOfJoints(); ++j)
-    {
-      mpKinematicChains[i]->setJointVelocity(j, 0);
-    }
+    mpKinematicChain->setJointVelocity(j, 0);
   }
-  copyValuesFromArm();
+  update();
 }
 
-void cedar::dev::robot::gui::KinematicChainCommandWidget::copyValuesFromArm()
+void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
 {
+  // update mode box in case the working mode has been changed by third party
+  mpModeBox->blockSignals(true);
+  mpModeBox->setCurrentIndex(static_cast<int>(mpKinematicChain->getWorkingMode()));
+  mpModeBox->blockSignals(false);
+  // update command boxes
   switch(mpModeBox->currentIndex())
   {
   case 0:
-    for(unsigned int j = 0; j < mpKinematicChains[0]->getNumberOfJoints(); ++j)
+    for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
-      mCommandBoxes[j]->setValue(mpKinematicChains[0]->getJointAngle(j));
+      mCommandBoxes[j]->blockSignals(true);
+      mCommandBoxes[j]->setValue(mpKinematicChain->getJointAngle(j));
+      mCommandBoxes[j]->blockSignals(false);
     }
     break;
   case 1:
-    for(unsigned int j = 0; j < mpKinematicChains[0]->getNumberOfJoints(); ++j)
+    for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
-      mCommandBoxes[j]->setValue(mpKinematicChains[0]->getJointVelocity(j));
+      mCommandBoxes[j]->blockSignals(true);
+      mCommandBoxes[j]->setValue(mpKinematicChain->getJointVelocity(j));
+      mCommandBoxes[j]->blockSignals(false);
     }
     break;
 
   case 2:
-    for(unsigned int j = 0; j < mpKinematicChains[0]->getNumberOfJoints(); ++j)
+    for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
-      mCommandBoxes[j]->setValue(mpKinematicChains[0]->getJointAcceleration(j));
+      mCommandBoxes[j]->blockSignals(true);
+      mCommandBoxes[j]->setValue(mpKinematicChain->getJointAcceleration(j));
+      mCommandBoxes[j]->blockSignals(false);
     }
     break;
   }
@@ -305,7 +197,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   mpModeBox->addItem(QString("position"));
   mpModeBox->addItem(QString("velocity"));
   mpModeBox->addItem(QString("acceleration"));
-  mpModeBox->setCurrentIndex(mpKinematicChains[0]->getWorkingMode());
+  mpModeBox->setCurrentIndex(mpKinematicChain->getWorkingMode());
   mpGridLayout->addWidget(mpModeBox, 1, 0);
   connect(mpModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeWorkingMode(int)));
 
@@ -317,7 +209,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   // copy button
   QPushButton* copy_button = new QPushButton(QApplication::translate("KinematicChainWindow", "copy"));
   mpGridLayout->addWidget(copy_button, 3, 0);
-  connect(copy_button, SIGNAL(pressed()), this, SLOT(copyValuesFromArm()));
+  connect(copy_button, SIGNAL(pressed()), this, SLOT(update()));
 
   // stop button
   QPushButton* stop_button = new QPushButton(QApplication::translate("KinematicChainWindow", "stop!"));
@@ -329,7 +221,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   mpGridLayout->addWidget(mpKeepMovingBox, 5, 0);
   connect(mpKeepMovingBox, SIGNAL(stateChanged(int)), this, SLOT(setKeepSendingState(int)));
 
-  for(unsigned int i = 0; i < mpKinematicChains[0]->getNumberOfJoints(); ++i)
+  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
     // add label
     char labelText[10];
@@ -341,12 +233,12 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
     QDoubleSpinBox* command_box = new QDoubleSpinBox();
     command_box->setRange(-999999.0, 999999.0);
     command_box->setValue(0.0);
-    command_box->setDecimals(mDecimals);
-    command_box->setSingleStep(mSingleStep);
+    command_box->setDecimals(6);
+    command_box->setSingleStep(0.01);
     mpGridLayout->addWidget(command_box, i, 2);
     mCommandBoxes.push_back(command_box);
   }
-  copyValuesFromArm();
+  update();
 
   mpGridLayout->setColumnStretch(0,1);
   mpGridLayout->setColumnStretch(1,2);

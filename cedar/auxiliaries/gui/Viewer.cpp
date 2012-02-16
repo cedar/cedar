@@ -49,12 +49,12 @@ cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr& p_scene)
 :
 mpScene(p_scene)
 {
-
+  mpScene->addViewer(this);
 }
 
 cedar::aux::gui::Viewer::~Viewer()
 {
-  
+  mpScene->removeViewer(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,6 +65,11 @@ void cedar::aux::gui::Viewer::init()
 {
   restoreStateFromFile();
   mpScene->initGl();
+}
+
+void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::RigidBodyVisualizationPtr& pVisualization)
+{
+  pVisualization->initializeGl();
 }
 
 void cedar::aux::gui::Viewer::draw()

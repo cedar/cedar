@@ -59,6 +59,15 @@ cedar::aux::gl::RigidBodyVisualization::~RigidBodyVisualization()
 
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gl::RigidBodyVisualization::initializeGl()
+{
+
+}
+
 void cedar::aux::gl::RigidBodyVisualization::init()
 {
   mRigidBodyType = std::string("no type");
@@ -71,10 +80,6 @@ void cedar::aux::gl::RigidBodyVisualization::init()
   mColorG = 0;
   mColorB = 0;
 }
-
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
 
 bool cedar::aux::gl::RigidBodyVisualization::isVisible()
 {
