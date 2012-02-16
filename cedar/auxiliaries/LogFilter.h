@@ -70,6 +70,16 @@ public:
     const std::string& title
   ) const = 0;
   
+  void setRemovesMessages(bool remove)
+  {
+    this->mRemovesMessages = remove;
+  }
+  
+  bool removesMessages() const
+  {
+    return this->mRemovesMessages;
+  }
+  
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -86,7 +96,8 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! If true, then any messages accepted by this filter will not be passed on to any further loggers.
+  bool mRemovesMessages;
 };
 
 #endif // CEDAR_AUX_LOG_FILTER_H
