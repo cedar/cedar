@@ -43,7 +43,6 @@
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/auxiliaries/gl/gl.h"
-//#include "cedar/auxiliaries/gl/glu.h"
 
 // SYSTEM INCLUDES
 
@@ -76,11 +75,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KukaArm
-  (
-    cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel,
-    const std::string& pathToData
-  );
+  KukaArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
   //!@brief destructor
   ~KukaArm();
 
@@ -114,16 +109,7 @@ private:
 
   void loadVertexData(const QString& dataFileName, unsigned int numberOfVertices, Vertex* vertices);
   void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
-  void loadData(const std::string& pathToPolygonData);
-
-  void loadBaseSegmentData(const QString& dataFile);
-  void loadBaseRingData(const QString& dataFile);
-  void loadForwardSegmentData(const QString& dataFile);
-  void loadForwardRingData(const QString& dataFile);
-  void loadInverseSegmentData(const QString& dataFile);
-  void loadInverseRingData(const QString& dataFile);
-  void loadWristSegmentData(const QString& dataFile);
-  void loadWristSphereData(const QString& dataFile);
+  void loadData();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
