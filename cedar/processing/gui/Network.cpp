@@ -692,3 +692,37 @@ cedar::proc::gui::DataSlotItem* cedar::proc::gui::Network::getSlotItem
 
   return iter->second;
 }
+
+cedar::proc::gui::Network::DataSlotNameMap& cedar::proc::gui::Network::getSlotItems
+                                            (
+                                              cedar::proc::DataRole::Id role
+                                            )
+{
+  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   );
+  }
+  return role_map->second;
+}
+
+void cedar::proc::gui::Network::disconnect()
+{
+  // go through all DataSlots and remove connections
+  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
+  {
+    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
+    if (id == cedar::aux::Enum::UNDEFINED)
+    {
+      continue;
+    }
+    cedar::proc::gui::Network::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::Network*>(this)->getSlotItems(id);
+    for (cedar::proc::gui::Network::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
+    {
+      it->second->removeAllConnections();
+    }
+  }
+}
