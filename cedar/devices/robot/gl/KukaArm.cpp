@@ -382,23 +382,23 @@ void cedar::dev::robot::gl::KukaArm::loadIndexData
   {
     std::cout << "failed to read index data from file " << dataFileName.toStdString() << std::endl;
   }
-//  std::cout << "first indices: " << std::endl;
-//  std::cout << static_cast<int>(indices[0]) << " ";
-//  std::cout << static_cast<int>(indices[1]) << " ";
-//  std::cout << static_cast<int>(indices[2]) << std::endl;
-//  std::cout << static_cast<int>(indices[3]) << " ";
-//  std::cout << static_cast<int>(indices[4]) << " ";
-//  std::cout << static_cast<int>(indices[5]) << std::endl;
-//
-//  std::cout << "last indices: " << std::endl;
-//  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3]) << " ";
-//  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+1]) << " ";
-//  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+2]) << std::endl;
-//  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3]) << " ";
-//  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+1]) << " ";
-//  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+2]) << std::endl;
-//
-//  std::cout << std::endl;
+  std::cout << "first indices: " << std::endl;
+  std::cout << static_cast<int>(indices[0]) << " ";
+  std::cout << static_cast<int>(indices[1]) << " ";
+  std::cout << static_cast<int>(indices[2]) << std::endl;
+  std::cout << static_cast<int>(indices[3]) << " ";
+  std::cout << static_cast<int>(indices[4]) << " ";
+  std::cout << static_cast<int>(indices[5]) << std::endl;
+
+  std::cout << "last indices: " << std::endl;
+  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3]) << " ";
+  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+1]) << " ";
+  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+2]) << std::endl;
+  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3]) << " ";
+  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+1]) << " ";
+  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+2]) << std::endl;
+
+  std::cout << std::endl;
 }
 
 void cedar::dev::robot::gl::KukaArm::loadData()
