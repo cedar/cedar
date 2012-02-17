@@ -36,7 +36,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/fwTools/FirewireInterface.h"
+#include "cedar/devices/sensors/visual/grabbertools/FirewireInterface.h"
+
 
 // PROJECT INCLUDES
 
@@ -45,9 +46,9 @@
 #include <dc1394/dc1394.h>
 #include <boost/lexical_cast.hpp>
 
-using namespace grabbertools;
+using namespace cedar::dev::sensors::visual::grabbertools;
 
-int main(int argc, char *argv[])
+int main(int, char *argv[])
 {
   std::cout << argv[0] << " is a program to list all available cameras on the firewire bus\n";
 

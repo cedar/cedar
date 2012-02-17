@@ -37,11 +37,14 @@
 #ifndef FIREWIRE_INTERFACE_H
 #define FIREWIRE_INTERFACE_H
 
+
 // MAKE FIREWIRE OPTIONAL
-#include "cedar/devices/sensors/visual/CMakeDefines.h"
+#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_LIB_DC1394
+//#pragma message "compiling with DC1394 support"
 
 // LOCAL INCLUDES
+#include "cedar/devices/sensors/visual/grabbertools/namespace.h"
 
 // PROJECT INCLUDES
 
@@ -50,14 +53,6 @@
 #include <dc1394/dc1394.h>
 #include <iostream>
 #include <vector>
-
-//using namespace std;
-
-namespace grabbertools
-{
-
-#define EXCEPTION_THROW_ON_ERR throw (getErrorString());
-#define EXCEPTION_THROW_ON_NO_CAM cleanUp(); throw ("No camera handle");
 
 /*!@brief This class is a simple interface to the firewire bus
  *
@@ -69,11 +64,13 @@ namespace grabbertools
  *    4. work with opened device
  *    5. close device
  */
-class FirewireInterface
+class cedar::dev::sensors::visual::grabbertools::FirewireInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
+  #define EXCEPTION_THROW_ON_ERR throw (getErrorString());
+  #define EXCEPTION_THROW_ON_NO_CAM cleanUp(); throw ("No camera handle");
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -201,8 +198,8 @@ protected:
 private:
   // none yet
 
-}; // class cedar::xxx
-}
+}; // cedar::dev::sensors::visual::grabbertools::FirewireInterface
+
 // MAKE FIREWIRE OPTIONAL
 #endif// CEDAR_USE_LIB_DC1394
 #endif // FIREWIRE_INTERFACE_H
