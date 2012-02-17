@@ -44,6 +44,8 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Element.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
@@ -64,9 +66,11 @@ Triggerable(isLooped)
 
 cedar::proc::Trigger::~Trigger()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Trigger)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "freeing data (Trigger " + cedar::aux::toString(this) + ")",
+    "cedar::proc::Trigger::~Trigger()"
+  );
   this->mListeners.clear();
 }
 

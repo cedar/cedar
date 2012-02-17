@@ -39,8 +39,9 @@
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/functions.h"
-#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
@@ -59,6 +60,12 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", 2, 3.0, 0.0, 1000
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 3.0, 0.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", 0.01, 1000.0))
 {
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "Allocated data (cedar::aux::kernel::Gauss " + cedar::aux::toString(this) + ")",
+    "cedar::aux::kernel::Gauss::Gauss()"
+  );
+
   this->onInit();
 }
 
@@ -76,6 +83,12 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", sigmas, 0.0, 1000
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, 0.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "Allocated data (cedar::aux::kernel::Gauss " + cedar::aux::toString(this) + ")",
+    "cedar::aux::kernel::Gauss::Gauss(double, std::vector<double>, std::vector<double>, double, unsigned int)"
+  );
+
   this->mCenters.resize(dimensionality);
   this->mSizes.resize(dimensionality);
   this->onInit();
@@ -83,9 +96,11 @@ _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 
 cedar::aux::kernel::Gauss::~Gauss()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Gauss)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "Freeing data (cedar::aux::kernel::Gauss " + cedar::aux::toString(this) + ")",
+    "cedar::aux::kernel::Gauss::~Gauss()"
+  );
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

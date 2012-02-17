@@ -50,6 +50,7 @@
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
 
@@ -70,16 +71,20 @@ cedar::proc::Network::Network()
 :
 _mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots", std::vector<std::string>()))
 {
-#ifdef DEBUG
-  std::cout << "> allocated data (cedar::proc::Network, " << this << ")" << std::endl;
-#endif // DEBUG
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "allocated data (cedar::proc::Network, " + cedar::aux::toString(this) + ")",
+    "cedar::proc::Network::~Network()"
+  );
 }
 
 cedar::proc::Network::~Network()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (cedar::proc::Network, " << this << ")" << std::endl;
-#endif // DEBUG
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "freeing data (cedar::proc::Network, " + cedar::aux::toString(this) + ")",
+    "cedar::proc::Network::Network()"
+  );
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -444,15 +449,21 @@ void cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode& root)
   }
   catch (const boost::property_tree::ptree_bad_path&)
   {
-    //!@todo Write this to a proper log once we have such a structure
-    std::cout << "Error recognizing file format. Defaulting to current file format version." << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Could not recognize file format. Defaulting to current file format version.",
+      "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
+    );
   }
 
   switch (format_version)
   {
     default:
-      //!@todo Write this to a proper log once we have such a structure
-      std::cout << "Unknown format version " << format_version << ". Defaulting to the current version." << std::endl;
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Unknown format version " + cedar::aux::toString(format_version) + ". Defaulting to the current version.",
+        "cedar::proc::Network::readFrom(const cedar::aux::ConfigurationNode&)"
+      );
     case 1:
       this->readFromV1(root);
       break;

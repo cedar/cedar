@@ -39,6 +39,7 @@
 #include "cedar/processing/PluginDeclaration.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #ifdef __unix__
@@ -210,12 +211,14 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   {
     this->getDeclaration()->readDescription(description);
   }
-#ifdef DEBUG
   else
   {
-    std::cout << "> no plugin description found for " << file << std::endl;
+    cedar::aux::LogSingleton::getInstance()->debug
+    (
+      "no plugin description found for \"" + file + "\"",
+      "cedar::proc::PluginDeclaration::readDeclarations(const cedar::aux::ConfigurationNode&)"
+    );
   }
-#endif // DEBUG
 
   // Finally, if nothing failed, add the plugin to the list of known plugins.
   cedar::proc::Manager::getInstance().settings().addKnownPlugin(file);

@@ -55,6 +55,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -68,6 +69,13 @@
 cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
+
+  // first of all, set the logger
+  cedar::aux::LogSingleton::getInstance()->addLogger
+  (
+    cedar::aux::LogInterfacePtr(new cedar::proc::gui::Ide::Logger(this->mpLog))
+  );
+
   this->loadDefaultPlugins();
   this->resetStepList();
 
@@ -155,9 +163,65 @@ cedar::proc::gui::Ide::~Ide()
 {
 }
 
+cedar::proc::gui::Ide::Logger::Logger(QTextEdit *pLog)
+:
+mpLog(pLog)
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::Logger::message
+     (
+       cedar::aux::LOG_LEVEL level,
+       const std::string& message,
+       const std::string& title
+     )
+{
+  CEDAR_DEBUG_ASSERT(mpLog != NULL);
+
+  QString log_entry;
+
+  QString source;
+  if (!title.empty())
+  {
+    source = "[" + Qt::escape(QString::fromStdString(title)) + "] ";
+  }
+
+  QString type = "?";
+  QString left = "";
+  QString right = "";
+  switch (level)
+  {
+    case cedar::aux::LOG_LEVEL_DEBUG:
+      left = "<font color=\"blue\"><b>";
+      right = "</b></font>";
+      type = "debug";
+      break;
+
+    case cedar::aux::LOG_LEVEL_WARNING:
+      left = "<font color=\"#ffd800\"><b>";
+      right = "</b></font>";
+      type = "warning";
+      break;
+
+
+    case cedar::aux::LOG_LEVEL_ERROR:
+      left = "<font color=\"red\"><b>";
+      right = "</b></font>";
+      type = "error";
+      break;
+
+    default:
+      // nothing to do.
+      break;
+  }
+
+  log_entry = type + "> " + source + " " + left + Qt::escape(QString::fromStdString(message)) + right;
+  mpLog->append(log_entry);
+}
 
 void cedar::proc::gui::Ide::showSettingsDialog()
 {
