@@ -60,7 +60,6 @@ int main()
   cedar::dev::robot::KinematicChainModel acceleration_test_arm_model(p_acceleration_test_arm);
 
   // set test configurations
-  p_test_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
   p_test_arm->setJointAngle(2, -cedar::aux::math::pi*0.5);
   p_test_arm->setJointAngle(3, cedar::aux::math::pi*0.5);
   p_test_arm->setJointVelocity(1, 1);
