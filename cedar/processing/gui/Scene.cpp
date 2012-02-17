@@ -283,8 +283,16 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
 {
   QAction *p_action = dynamic_cast<QAction*>(QObject::sender());
   std::string target_network_name = p_action->data().toString().toStdString();
-  cedar::proc::NetworkPtr target_network
-    = boost::shared_dynamic_cast<cedar::proc::Network>(this->mNetwork->network()->getElement(target_network_name));
+  cedar::proc::NetworkPtr target_network;
+  if (target_network_name == "")
+  {
+    target_network = this->mNetwork->network();
+  }
+  else
+  {
+   target_network
+     = boost::shared_dynamic_cast<cedar::proc::Network>(this->mNetwork->network()->getElement(target_network_name));
+  }
   CEDAR_ASSERT(target_network);
 
   QList<QGraphicsItem *> selected = this->selectedItems();
@@ -312,7 +320,6 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
       network_item->fitToContents();
     }
   }
-
 }
 
 void cedar::proc::gui::Scene::promoteElementToNewGroup()
@@ -328,9 +335,30 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       network_item->addElement(p_element);
     }
   }
-  std::string name = this->mNetwork->network()->getUniqueIdentifier("new Network");
+  /* try to get a grasp on the parent network of the first step - this is the network at which the new network
+   * should be inserted
+   */
+  cedar::proc::NetworkPtr new_parent_network;
+  if (selected.size() > 0)
+  {
+    if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
+    {
+      new_parent_network = p_element->network()->getNetwork();
+    }
+    else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
+    {
+      new_parent_network = p_element->getStep()->getNetwork();
+    }
+  }
+//  std::string name = this->mNetwork->network()->getUniqueIdentifier("new Network");
+  std::cout << "Name of root network: " << mNetwork->network()->getName() << std::endl;
+  std::cout << "Name of network: " << new_parent_network->getName() << std::endl;
+  std::string name = new_parent_network->getUniqueIdentifier("new Network");
   network->setName(name);
-  this->mNetwork->addElement(network_item);
+  dynamic_cast<cedar::proc::gui::Network*>
+  (
+    this->getGraphicsItemFor(new_parent_network.get())
+  )->addElement(network_item);
   network_item->fitToContents();
 }
 
