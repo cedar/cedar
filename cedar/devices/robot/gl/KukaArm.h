@@ -104,6 +104,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
+  void drawBaseBlock();
   //todo: this should be done with a struct for material, as a member in RigidBodyVisualization
   void setMaterial(int material);
 
