@@ -83,7 +83,7 @@ public:
   CameraConfiguration(
                        cv::VideoCapture videoCapture,
                        QReadWriteLockPtr videoCaptureLock,
-                       const std::string channelPrefix,
+                       unsigned int channel,
                        const std::string configurationFileName,
                        const std::string capabilitiesFileName
                      );
@@ -190,9 +190,13 @@ private:
   ///! The filename of the capabilities file for camera capabilities
   std::string mCapabilitiesFileName;
 
+  ///! The channel number for this configuration. This is only used to display this information on the console
+  unsigned int mChannel;
+
   ///! A short string, where the channel number is stored in.
   // Used as a prefix to store the properties in the configuration file
   std::string mChannelPrefix;
+
 
   ///! The already created cv::VideoCapture object from the CameraGrabber class
   cv::VideoCapture mVideoCapture;

@@ -36,7 +36,7 @@
 ======================================================================================================================*/
 
 // MAKE FIREWIRE OPTIONAL
-#include "cedar/devices/sensors/visual/CMakeDefines.h"
+#include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_LIB_DC1394
 
 // LOCAL INCLUDES
@@ -46,7 +46,7 @@
 
 // SYSTEM INCLUDES
 
-using namespace grabbertools;
+using namespace cedar::dev::sensors::visual::grabbertools;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

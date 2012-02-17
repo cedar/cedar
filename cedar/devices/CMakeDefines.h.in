@@ -4,4 +4,5 @@
 #define CEDAR_DEVICES_CMAKE_DEFINES
 #cmakedefine CEDAR_USE_AMTEC
 #cmakedefine CEDAR_USE_KUKA_LWR
+#cmakedefine CEDAR_USE_LIB_DC1394
 #endif

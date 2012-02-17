@@ -162,12 +162,16 @@ else(KUKA_FRI)
     set(CEDAR_USE_KUKA_LWR OFF)
 endif(KUKA_FRI)
 
-#gh find_library(dc1394)...
-#if(LIB_DC1394)
-#
-#else(LIB_DC1394)
-	set(CEDAR_USE_LIB_DC1394)
-#endif(LIB_DC1394)
+# DC1394 firewire
+find_library(LIB_DC1394 dc1394)
+if(LIB_DC1394)
+	message("-- Looking for DC1394 firewire Interface - found")
+	#message("libdc1394 found in ${LIB_DC1394}")
+	set(CEDAR_USE_LIB_DC1394 ON)
+else(LIB_DC1394)
+	message("-- Looking for DC1394 firewire Interface - not found")
+	set(CEDAR_USE_LIB_DC1394 OFF)
+endif(LIB_DC1394)
 
 # YARP
 find_package(YARP REQUIRED)

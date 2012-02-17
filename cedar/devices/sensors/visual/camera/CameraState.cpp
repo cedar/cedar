@@ -51,7 +51,7 @@ using namespace cedar::dev::sensors::visual;
 CameraState::CameraState(
                           cv::VideoCapture videoCapture,
                           QReadWriteLockPtr videoCaptureLock,
-                          const std::string& channelPrefix,
+                          unsigned int channel,
                           SupportedPropertiesSet supportedProperties,
                           const std::string& configFileName
                         )
@@ -60,13 +60,15 @@ ConfigurationInterface(configFileName)
 //mVideoCapture(videoCapture)
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraState::CameraState] Config-file: " << configFileName << std::endl;
+    std::cout << "[CameraState::CameraState] channel "<< channel << " Config-file: " << configFileName << std::endl;
   #endif
 
     mVideoCapture = videoCapture;
-    mChannelPrefix = channelPrefix;
     mSupportedProperties = supportedProperties;
     mpVideoCaptureLock = videoCaptureLock;
+
+    mChannel = channel;
+    mChannelPrefix = "ch"+boost::lexical_cast<std::string>(channel)+"_";
 
     createParameterStorage();
     bool result = declareParameter();
@@ -76,7 +78,9 @@ ConfigurationInterface(configFileName)
 
     if (not result )
     {
-      std::string err = "[CameraCapabilities::CameraCapabilities] - Critical error in constructor";
+      std::string err = "[CameraCapabilities::CameraCapabilities] channel "
+                        + boost::lexical_cast<std::string>(channel)
+                        + " - Critical error in constructor";
       //throwing an exception prevents main-grabber class to clean up => catch this exception
       std::cout << err << std::endl;
       CEDAR_THROW(cedar::aux::exc::InitializationException,err);
@@ -87,7 +91,7 @@ ConfigurationInterface(configFileName)
 CameraState::~CameraState()
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraState::~CameraState] Destroy class" << std::endl;
+    std::cout << "[CameraState::~CameraState] channel "<< mChannel << " Destroy class" << std::endl;
   #endif
 }
 
@@ -99,11 +103,12 @@ CameraState::~CameraState()
 bool CameraState::writeConfiguration()
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraState::writeConfiguration]" << std::endl;
+    std::cout << "[CameraState::writeConfiguration] channel "<< mChannel << std::endl;
   #endif
 
   getAllParametersFromCam();
-  return ConfigurationInterface::writeConfiguration();
+  ConfigurationInterface::writeConfiguration();
+  return true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -166,7 +171,7 @@ bool CameraState::writeConfiguration()
  bool CameraState::setAllParametersToCam()
  {
    #ifdef DEBUG_CAMERAGRABBER
-     std::cout << "[CameraState::setAllParametersToCam]" << std::endl;
+     std::cout << "[CameraState::setAllParametersToCam] channel "<< mChannel << std::endl;
    #endif
 
 
@@ -283,7 +288,7 @@ bool CameraState::writeConfiguration()
  void CameraState::getAllParametersFromCam()
  {
     #ifdef DEBUG_CAMERAGRABBER
-      std::cout << "[CameraState::getAllParametersFromCam]" << std::endl;
+      std::cout << "[CameraState::getAllParametersFromCam] channel "<< mChannel << std::endl;
     #endif
 
    //read settings from camera
@@ -315,7 +320,7 @@ bool CameraState::writeConfiguration()
  bool CameraState::setProperty(unsigned int prop_id, double value)
  {
     #ifdef DEBUG_CAMERAGRABBER
-      std::cout << "[CameraState::setProperty] prop_id " << prop_id
+      std::cout << "[CameraState::setProperty] channel "<< mChannel << " prop_id " << prop_id
                 << " value " << boost::lexical_cast<std::string>(value)
                 << std::endl;
     #endif
@@ -332,7 +337,7 @@ bool CameraState::writeConfiguration()
  double CameraState::getProperty(unsigned int prop_id)
  {
     #ifdef DEBUG_CAMERAGRABBER
-      std::cout << "[CameraState::getProperty] prop_id " << prop_id;
+      std::cout << "[CameraState::getProperty] channel "<< mChannel << " prop_id " << prop_id;
     #endif
    double value;
    mpVideoCaptureLock->lockForWrite();

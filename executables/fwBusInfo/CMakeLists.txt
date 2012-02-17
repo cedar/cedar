@@ -39,5 +39,6 @@
 #=======================================================================================================================
 
 if(CEDAR_USE_LIB_DC1394)
-	cedar_add_executable(saveCapabilities)
+#	message(STATUS "Program fwBusInfo added")
+	cedar_add_executable(fwBusInfo)
 endif(CEDAR_USE_LIB_DC1394)

@@ -40,6 +40,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <boost/lexical_cast.hpp>
 
 using namespace cedar::dev::sensors::visual;
 
@@ -49,21 +50,25 @@ using namespace cedar::dev::sensors::visual;
 CameraConfiguration::CameraConfiguration(
                                           cv::VideoCapture videoCapture,
                                           QReadWriteLockPtr videoCaptureLock,
-                                          const std::string channelPrefix,
+                                          unsigned int channel,
                                           const std::string configurationFileName,
                                           const std::string capabilitiesFileName
                                         )
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraConfiguration::CameraConfiguration] Config-file: " << configurationFileName << std::endl;
-    std::cout << "[CameraConfiguration::CameraConfiguration] Capability-file: " << capabilitiesFileName << std::endl;
+    std::cout << "[CameraConfiguration::CameraConfiguration] channel "<< channel
+              << " Config-file: " << configurationFileName << std::endl;
+    std::cout << "[CameraConfiguration::CameraConfiguration] channel "<< channel
+              << " Capability-file: " << capabilitiesFileName << std::endl;
   #endif
 
   mVideoCapture = videoCapture;
   mConfigurationFileName = configurationFileName;
   mCapabilitiesFileName = capabilitiesFileName;
-  mChannelPrefix = channelPrefix;
   mpVideoCaptureLock = videoCaptureLock;
+
+  mChannel = channel;
+  mChannelPrefix = "ch"+boost::lexical_cast<std::string>(channel)+"_";
 
   try
   {
@@ -85,7 +90,7 @@ CameraConfiguration::CameraConfiguration(
     }
     //and for local storage of properties and settings
     //on intialization: cameraconfiguration will be restored
-    mpCamState = CameraStatePtr(new CameraState (videoCapture,mpVideoCaptureLock,mChannelPrefix,supp_prop,mConfigurationFileName));
+    mpCamState = CameraStatePtr(new CameraState (videoCapture,mpVideoCaptureLock,mChannel,supp_prop,mConfigurationFileName));
   }
 
   //all thrown exceptions catched by the shared_pointer structure in the CameraGrabber class
@@ -105,7 +110,7 @@ CameraConfiguration::CameraConfiguration(
 CameraConfiguration::~CameraConfiguration()
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout << "[CameraConfiguration::~CameraConfiguration] Destroy class" << std::endl;
+    std::cout << "[CameraConfiguration::~CameraConfiguration] channel "<< mChannel << " Destroy class" << std::endl;
   #endif
 }
 
@@ -118,7 +123,7 @@ CameraConfiguration::~CameraConfiguration()
 bool CameraConfiguration::writeConfiguration()
 {
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[CameraConfiguration::writeConfiguration]"<< std::endl;
+    std::cout<<"[CameraConfiguration::writeConfiguration] channel " << mChannel <<  std::endl;
   #endif
 
   bool result = true;
@@ -128,7 +133,7 @@ bool CameraConfiguration::writeConfiguration()
   result = mpCamState->writeConfiguration() && result;
 
   #ifdef DEBUG_CAMERAGRABBER
-    std::cout<<"[CameraConfiguration::writeConfiguration] result: "
+    std::cout<<"[CameraConfiguration::writeConfiguration] channel "<< mChannel << " result: "
              << std::boolalpha << result << std::noboolalpha << std::endl;
   #endif
 

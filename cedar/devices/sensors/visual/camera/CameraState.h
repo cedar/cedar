@@ -78,7 +78,7 @@ public:
   CameraState(
                            cv::VideoCapture videoCapture,
                            QReadWriteLockPtr videoCaptureLock,
-                           const std::string& channelPrefix,
+                           unsigned int channel,
                            SupportedPropertiesSet supportedProperties,
                            const std::string& configFileName
                          );
@@ -161,6 +161,10 @@ protected:
   // none yet
 
 private:
+
+  ///! The channel number for this configuration. This is only used to display this information on the console
+  unsigned int mChannel;
+
   /*! \brief The channel prefix used in the configuration file.
    *  \remarks This is essential if the configuration of more than one camera should be
    *    saved in the configuration file

@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/fwTools/FirewireInterface.h"
+#include "cedar/devices/sensors/visual/grabbertools/FirewireInterface.h"
 
 // PROJECT INCLUDES
 
@@ -51,7 +51,7 @@
 // for the cedar::dev::sensors::visual::CameraGrabber class
 #define CAP_FILE_NAME(GUID) ("camera_"+boost::lexical_cast<std::string>(GUID)+".capabilities")
 
-using namespace grabbertools;
+using namespace cedar::dev::sensors::visual::grabbertools;
 
 // ------------------------------------------------------------------------------------------------------------------
 // anon. namespace for functions
@@ -124,7 +124,7 @@ int main(int , char**)
 {
 
   //create firewire interface
-  FirewireInterface fw_interface;
+  cedar::dev::sensors::visual::grabbertools::FirewireInterface fw_interface;
   
   if (fw_interface.getNumCams() < 1)
   {

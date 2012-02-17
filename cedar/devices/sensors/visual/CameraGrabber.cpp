@@ -437,7 +437,6 @@ bool CameraGrabber::onInit()
     //create and load the camera capabilities
     std::string conf_file_name = ConfigurationInterface::getConfigFileName();
     std::string cap_file_name = mCameraCapabilitiesFileNames.at(channel);
-    std::string channel_prefix = "ch"+boost::lexical_cast<std::string>(channel) + "_";
 
     try
     {
@@ -445,7 +444,7 @@ bool CameraGrabber::onInit()
                                            (
                                              mVideoCaptures.at(channel),
                                              mVideoCaptureLocks.at(channel),
-                                             channel_prefix,
+                                             channel,
                                              conf_file_name,
                                              cap_file_name
                                            )
