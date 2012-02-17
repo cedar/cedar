@@ -83,6 +83,12 @@ public:
   // public methods
   //----------------------------------------------------------------------------
 public:
+  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+   *
+   * @return    state
+   */
+  virtual bool isMovable()=0;
+
   /*!@brief get reference geometry for this kinematic chain
    *
    * @return    reference geometry

@@ -75,18 +75,26 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+   *
+   * @return    state
+   */
+  bool isMovable();
+
   /*! @brief returns angle for a specified joint
    *
    *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
    *  @return joint angle for the given index
    */
   virtual double getJointAngle(unsigned int index);
+
   /*! @brief returns all joint angles
    *
    *  @return a vector filled with the joint angles
    *  \throws std::out_of_range if index is out of range
    */
   virtual void setJointAngle(unsigned int index, double angle);
+
   /*!@brief Sets the mode in which the joints positions are set (angle/velocity/acceleration)
    *
    * this function restarts the looped thread

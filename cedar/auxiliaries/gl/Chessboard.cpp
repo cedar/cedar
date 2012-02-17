@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "drawShapes.h"
-#include "Chessboard.h"
+#include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
 
@@ -44,9 +44,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Chessboard::Chessboard(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Chessboard::Chessboard(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = 4;
   mWidth = 4;
@@ -56,52 +56,37 @@ cedar::aux::gl::Object(pObject)
   mColorR = 0;
   mColorG = 0;
   mColorB = 0;
-  mSecondColorR = 1;
-  mSecondColorG = 1;
-  mSecondColorB = 1;
-  mObjectType = "Chessboard";
+  mRigidBodyType = "Chessboard";
 }
 
 cedar::aux::gl::Chessboard::Chessboard(
-                                        cedar::aux::ObjectPtr pObject,
+                                        cedar::aux::RigidBodyPtr pRigidBody,
                                         double length,
                                         double width,
                                         double height,
                                         int rows,
                                         int cols,
-                                        double R1,
-                                        double G1,
-                                        double B1,
-                                        double R2,
-                                        double G2,
-                                        double B2
+                                        double R,
+                                        double G,
+                                        double B
                                       )
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = length;
   mWidth = width;
   mHeight = height;
   mNumberOfRows = rows;
   mNumberOfColumns = cols;
-  mColorR = R1;
-  mColorG = G1;
-  mColorB = B1;
-  mSecondColorR = R2;
-  mSecondColorG = G2;
-  mSecondColorB = B2;
-  mObjectType = "Chessboard";
+  mColorR = R;
+  mColorG = G;
+  mColorB = B;
+  mRigidBodyType = "Chessboard";
 }
 
 void cedar::aux::gl::Chessboard::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw object
   if (mIsVisible)
@@ -119,7 +104,7 @@ void cedar::aux::gl::Chessboard::draw()
         }
         else
         {
-          gl::setColor(mSecondColorR, mSecondColorG, mSecondColorB);
+          gl::setColor(1, 1, 1);
         } // end if
         drawBlock(l, w, mHeight, mIsDrawnAsWireFrame);
         glTranslated(0, w, 0);
@@ -154,13 +139,6 @@ void cedar::aux::gl::Chessboard::setNumberOfColumns(int value)
   mNumberOfColumns = value;
 }
 
-void cedar::aux::gl::Chessboard::setSecondColor(double R, double G, double B)
-{
-  mSecondColorR = R;
-  mSecondColorG = G;
-  mSecondColorB = B;
-}
-
 double cedar::aux::gl::Chessboard::length() const
 {
   return mLength;
@@ -186,17 +164,3 @@ int cedar::aux::gl::Chessboard::numberOfColumns() const
   return mNumberOfColumns;
 }
 
-double cedar::aux::gl::Chessboard::secondColorR() const
-{
-  return mSecondColorR;
-}
-
-double cedar::aux::gl::Chessboard::secondColorG() const
-{
-  return mSecondColorG;
-}
-
-double cedar::aux::gl::Chessboard::secondColorB() const
-{
-  return mSecondColorB;
-}

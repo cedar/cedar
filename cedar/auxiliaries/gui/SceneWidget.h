@@ -28,16 +28,9 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 27
 
-    Description: Visualization of a cylinder
+    Description: manages a cedar::aux::gl::Scene of cedar::aux::gl::RigidBodyVisualizations
 
     Credits: initially designed by Denis Hakenberg
-
-    small guide to add other DrawableObjects in the widget
-      1.) in function init() add 'mpComboBoxType->addItem("Your_ObjectType");'
-      2.) add in the functions setRadius(), setLength(), setWidth() and setHeight()
-          your ObjectType (which paramaters you need)
-      3.) add in the function createObject() your ObjectType
-      4.) add in the function setWidgetObjectParameters() your ObjectType
 
 ======================================================================================================================*/
 
@@ -47,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
 #include "cedar/auxiliaries/gl/Cone.h"
@@ -58,6 +51,8 @@
 #include "cedar/auxiliaries/gl/Ellipse.h"
 #include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
+#include "cedar/auxiliaries/gui/RigidBodyWidget.h"
+#include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
 #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
 
 // SYSTEM INCLUDES
@@ -89,24 +84,6 @@ public:
   // slots
   //--------------------------------------------------------------------------------------------------------------------
 public slots:
-  /*!@brief sets the wire frame state of the current object according to the widget control */
-  void setWireFrame(int state);
-
-  /*!@brief sets the position of the current object according to the widget control */
-  void setPosition();
-
-  /*!@brief sets the orientation of the current object according to the widget control */
-  void setOrientationQuaternion();
-
-  /*!@brief rotates the currently active object by the values specified in the rotation boxes */
-  void rotate();
-
-  /*!@brief sets the color of the current object according to the widget control */
-  void setColor();
-
-  /*!@brief sets the second color of the current object according to the widget control */
-  void setSecondColor();
-
   /*!@brief sets the length of the current object
    * @param value    new length
    */
@@ -132,34 +109,24 @@ public slots:
    */
   void setThickness(double value);
 
-  /*!@brief sets the number of rows of the current object according to the widget control
-   * @param value    new number of rows
-   */
-  void setNumberOfRows(int value);
-
-  /*!@brief sets the number of columns of the current object according to the widget control
-   * @param value    new number of columns
-   */
-  void setNumberOfColumns(int value);
-
   /*!@brief creates an object with type and name specified by the widget controls */
-  void createObject();
+  void createRigidBody();
 
   /*!@brief deletes the currently selected object */
-  void deleteObject();
+  void deleteRigidBody();
 
   /*!@brief deletes all objects in the scene */
-  void deleteAllObjects();
+  void deleteAllVisualizations();
 
   /*!@brief set the current object according to combo box status */
-  void setActiveObject();
+  void setActiveVisualization();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*!@brief updates the parameters displayed in the widget */
-  void updateWidgetObjectParameters();
+  void updateWidget();
   
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -175,7 +142,13 @@ private:
   cedar::aux::gl::ScenePtr mpScene;
 
   // pointer to the currently selected object
-  cedar::aux::gl::ObjectPtr mpActiveObject;
+  cedar::aux::gl::RigidBodyVisualizationPtr mpActiveVisualization;
+
+  // pointer to the RigidBodyVisualizationWidget
+  cedar::aux::gui::RigidBodyVisualizationWidget* mpRigidBodyVisualizationWidget;
+
+  // pointer to the RigidBodyWidget
+  cedar::aux::gui::RigidBodyWidget* mpRigidBodyWidget;
 
   //! checks whether the widget is currently being changed due to a switch in the selected object
   bool mSwitchingSelectedObject;

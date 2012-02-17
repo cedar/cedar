@@ -117,3 +117,6 @@ else(buildTypeLower MATCHES debug)
   message("-- Building in \"RELEASE\" mode.")
   add_definitions(-DRELEASE)
 endif(buildTypeLower MATCHES debug)
+
+set(CEDAR_INSTALL_RESOURCE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/resources")
+configure_file("${CEDAR_HOME}/cmake/resources/internals.h.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar/internals.h")

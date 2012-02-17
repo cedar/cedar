@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,41 +22,38 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        LogFilter.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 10 21
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 02 15
 
-    Description: Namespace file for cedar::tests::unit::aux::ConfigurationInterface.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/LogFilter.h"
 
-#ifndef CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
-#define CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
+// SYSTEM INCLUDES
 
-namespace cedar
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::LogFilter::LogFilter()
+:
+mRemovesMessages(false)
 {
-  namespace tests
-  {
-    namespace unit
-    {
-      namespace aux
-      {
-        namespace gl
-        {
-          //!@brief Namespace for the unit test of object.
-          namespace Object
-          {
-            class TestObject;
-          }
-        }
-      }
-    }
-  }
 }
 
-#endif // CEDAR_TESTS_UNIT_AUX_GL_OBJECT_NAMESPACE_H
+cedar::aux::LogFilter::~LogFilter()
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+

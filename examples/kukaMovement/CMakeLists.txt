@@ -25,8 +25,8 @@
 #   File:        CMakeLists.txt
 #
 #   Maintainer:  Hendrik Reimann
-#   Email:       hendrik.reimann@ini.rub.de
-#   Date:        2010 11 29
+#   Email:       hendrik.reimann@ini.rub.de,
+#   Date:        2012 01 31
 #
 #   Description:
 #
@@ -34,10 +34,6 @@
 #
 #=======================================================================================================================
 
-
-cedar_add_unit_test(GlObject
-  main.cpp
-  namespace.h
-  TestObject.h
-  TestObject.cpp
-)
+if(CEDAR_USE_KUKA_LWR)
+  cedar_add_executable(kukaMovement PREFIX "examples/")
+endif(CEDAR_USE_KUKA_LWR)

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,52 +22,57 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.h
+    File:        LogInterface.h
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 02 14
 
-    Description: Header for the @em cedar::tests::unit::aux::gl::TestObject class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTS_UNIT_AUX_GL_OBJECT_TEST_OBJECT_H
-#define CEDAR_TESTS_UNIT_AUX_GL_OBJECT_TEST_OBJECT_H
+#ifndef CEDAR_AUX_LOG_INTERFACE_H
+#define CEDAR_AUX_LOG_INTERFACE_H
 
-// LOCAL INCLUDES
-#include "namespace.h"
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
 
-/*!@brief Abstract description of the class.
+
+/*!@brief An interface for classes that redirect log outputs.
  *
- * More detailed description of the class.
+ * @todo describe more.
  */
-class cedar::tests::unit::aux::gl::Object::TestObject : public cedar::aux::gl::Object
+class cedar::aux::LogInterface
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief Constructor that gets a configuration file name.
-  TestObject(cedar::aux::ObjectPtr pObject);
+  //!@brief The standard constructor.
+  LogInterface();
 
   //!@brief Destructor
-  virtual ~TestObject();
+  virtual ~LogInterface();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void draw();
-
+  virtual void message
+  (
+    cedar::aux::LOG_LEVEL level, 
+    const std::string& message,
+    const std::string& title
+  ) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -84,8 +89,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 private:
@@ -94,15 +97,13 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
-  //! test member bool
+  // none yet
 
 private:
   // none yet
 
-}; // class cedar::tests::unit::aux::gl::Object::TestObject
+}; // class cedar::xxx
 
-#endif // CEDAR_TESTS_UNIT_AUX_CONFIGURATION_INTERFACE_TEST_CLASS_H
+#endif // CEDAR_AUX_LOG_INTERFACE_H
 

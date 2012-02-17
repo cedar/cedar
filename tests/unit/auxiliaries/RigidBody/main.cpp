@@ -28,7 +28,7 @@
  ----- Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 12 04
 
- ----- Description: Implements all unit tests for the @em cedar::aux::Object class.
+ ----- Description: Implements all unit tests for the @em cedar::aux::RigidBody class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -36,7 +36,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
 
@@ -51,17 +51,17 @@ int main()
   int errors = 0;
   
   // create instance of test class
-  cedar::aux::Object object;
+  cedar::aux::RigidBody rigid_body;
   
   //--------------------------------------------------------------------------------------------------------------------
   // position
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: position" << std::endl;
-  object.setPosition(1337, 0, cedar::aux::math::pi);
+  rigid_body.setPosition(1337, 0, cedar::aux::math::pi);
   if (
-      object.getPositionX() != 1337.0
-      || object.getPositionY() != 0.0
-      || object.getPositionZ() != cedar::aux::math::pi
+      rigid_body.getPositionX() != 1337.0
+      || rigid_body.getPositionY() != 0.0
+      || rigid_body.getPositionZ() != cedar::aux::math::pi
       )
   {
     errors++;
@@ -72,8 +72,8 @@ int main()
   p1.at<double>(0, 0) = 555.555;
   p1.at<double>(1, 0) = 2;
   p1.at<double>(2, 0) = sqrt(3.0);
-  object.setPosition(p1);
-  cv::Mat p2 = object.getPosition();
+  rigid_body.setPosition(p1);
+  cv::Mat p2 = rigid_body.getPosition();
   if (
       p2.at<double>(0, 0) != 555.555
       || p2.at<double>(1, 0) != 2.0
@@ -93,8 +93,8 @@ int main()
   q1.at<double>(1, 0) = 3.3;
   q1.at<double>(2, 0) = 4.4;
   q1.at<double>(3, 0) = 0.5;
-  object.setOrientationQuaternion(q1);
-  cv::Mat q2 = object.getOrientationQuaternion();
+  rigid_body.setOrientationQuaternion(q1);
+  cv::Mat q2 = rigid_body.getOrientationQuaternion();
   if (
       !IsZero(q2.at<double>(0, 0) - 0.0)
       || q2.at<double>(1, 0) != 3.3
@@ -110,13 +110,13 @@ int main()
   // transformation
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: transformation" << std::endl;
-  object.setPosition(1, 10, 100);
+  rigid_body.setPosition(1, 10, 100);
   cv::Mat q3 = cv::Mat::zeros(4, 1, CV_64FC1);
   q3.at<double>(0, 0) = -0.923879532511287;
   q3.at<double>(2, 0) = 0.38268343236509;
-  object.setOrientationQuaternion(q3);
+  rigid_body.setOrientationQuaternion(q3);
 
-  cv::Mat T = object.getTransformation();
+  cv::Mat T = rigid_body.getTransformation();
   if (
       !IsZero(T.at<double>(0, 0) - sqrt(2.0)/2)
       || !IsZero(T.at<double>(0, 1) - 0.0)
@@ -144,14 +144,14 @@ int main()
   // rotate
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: rotate" << std::endl;
-  object.setPosition(0, 0, 0);
+  rigid_body.setPosition(0, 0, 0);
   cv::Mat q4 = cv::Mat::zeros(4, 1, CV_64FC1);
   q4.at<double>(0, 0) = 1.0;
-  object.setOrientationQuaternion(q4);
-  object.rotate(0, cedar::aux::math::pi/2);
-  object.rotate(1, cedar::aux::math::pi/4);
+  rigid_body.setOrientationQuaternion(q4);
+  rigid_body.rotate(0, cedar::aux::math::pi/2);
+  rigid_body.rotate(1, cedar::aux::math::pi/4);
 
-  cv::Mat D = object.getTransformation();
+  cv::Mat D = rigid_body.getTransformation();
   if (
       !IsZero(D.at<double>(0, 0) - sqrt(2.0)/2)
       || !IsZero(D.at<double>(0, 1) - 0.0)
@@ -182,8 +182,8 @@ int main()
   // configuration file constructor
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: configuration file constructor" << std::endl;
-  cedar::aux::Object configured_object("test.conf");
-  cv::Mat C = configured_object.getTransformation();
+  cedar::aux::RigidBody configured_rigid_body("test.conf");
+  cv::Mat C = configured_rigid_body.getTransformation();
   if (
       !IsZero(C.at<double>(0, 0) - cos(cedar::aux::math::pi/6))
       || !IsZero(C.at<double>(0, 1) - 0)
@@ -204,7 +204,7 @@ int main()
       )
   {
     errors++;
-    std::cout << "ERROR with configured_object(const std::string& configFileName)" << std::endl;
+    std::cout << "ERROR with configured_rigid_body(const std::string& configFileName)" << std::endl;
   }
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;

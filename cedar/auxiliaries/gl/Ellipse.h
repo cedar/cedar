@@ -39,30 +39,30 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of an ellipse
  *
- * This class visualizes an instance of cedar::aux::Object as a torus around an ellipse
+ * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a torus around an ellipse
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Ellipse : public cedar::aux::gl::Object
+class cedar::aux::gl::Ellipse : public cedar::aux::gl::RigidBodyVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Ellipse(cedar::aux::ObjectPtr pObject);
+  Ellipse(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the ellipse in x-direction of the object frame
    * @param width extension of the ellipse in y-direction of the object frame
    * @param thickness distance of the walls to the ellipse
@@ -71,7 +71,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Ellipse(
-           cedar::aux::ObjectPtr pObject,
+           cedar::aux::RigidBodyPtr pRigidBody,
            double length,
            double width,
            double thickness,

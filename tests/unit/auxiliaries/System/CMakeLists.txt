@@ -24,9 +24,9 @@
 #
 #   File:        CMakeLists.txt
 #
-#   Maintainer:  Hendrik Reimann
-#   Email:       hendrik.reimann@ini.rub.de
-#   Date:        2010 12 04
+#   Maintainer:  Oliver Lomp
+#   Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+#   Date:        2012 02 14
 #
 #   Description:
 #
@@ -35,6 +35,4 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(Object
-  main.cpp
-)
+cedar_add_unit_test(System main.cpp)

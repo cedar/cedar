@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -52,8 +52,9 @@
  * informations. Because this class has no access to the robot's sensors, it is an abstract class. The actual
  * implementation is handled in its subclasses.
  */
-//!@todo why inheriting from Object here??
-class cedar::dev::robot::Odometry : public cedar::aux::Object
+//!@todo why inheriting from RigidBody here? HR: this mirrors how KinematicChainModel inherits from RigidBody
+//! - only these classes are sufficiently powerful and provide enough information to satisfy RigidBody requirements
+class cedar::dev::robot::Odometry : public cedar::aux::RigidBody
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -73,7 +74,7 @@ public:
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].
    */
-  double getOrientation() const;
+  double getOrientation();
 
   /*!@brief The set-function of the robot's position.
    *@param xPosition Position of the robot on the x-axis to be set [in m].
