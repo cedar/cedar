@@ -80,7 +80,7 @@ int main()
   
   // test filtering
   CustomLoggerPtr debug_logger (new CustomLogger());
-  cedar::aux::LogFilterPtr filter (new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_DEBUG));
+  cedar::aux::LogFilterPtr filter (new cedar::aux::logFilter::Type(cedar::aux::LOG_LEVEL_SYSTEM_INFO));
   filter->setRemovesMessages(true);
   cedar::aux::LogSingleton::getInstance()->addLogger(debug_logger, filter);
   
@@ -88,9 +88,9 @@ int main()
   cedar::aux::LogSingleton::getInstance()->addLogger(all_logger);
 
   cedar::aux::LogSingleton::getInstance()->message("message", "SystemTest::main");
-  cedar::aux::LogSingleton::getInstance()->debug("debug", "SystemTest::main");
+  cedar::aux::LogSingleton::getInstance()->systemInfo("debug", "SystemTest::main");
   cedar::aux::LogSingleton::getInstance()->message("message", "SystemTest::main");
-  cedar::aux::LogSingleton::getInstance()->debug("debug", "SystemTest::main");
+  cedar::aux::LogSingleton::getInstance()->systemInfo("debug", "SystemTest::main");
   
   if (debug_logger->mMessages.size() != 2)
   {
