@@ -327,18 +327,11 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   cedar::proc::gui::Network* network_item = this->addNetwork(QPointF(0, 0), network);
 
-  QList<QGraphicsItem *> selected = this->selectedItems();
-  for (int i = 0; i < selected.size(); ++i)
-  {
-    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(selected.at(i)))
-    {
-      network_item->addElement(p_element);
-    }
-  }
   /* try to get a grasp on the parent network of the first step - this is the network at which the new network
    * should be inserted
    */
   cedar::proc::NetworkPtr new_parent_network;
+  QList<QGraphicsItem *> selected = this->selectedItems();
   if (selected.size() > 0)
   {
     if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
@@ -350,15 +343,28 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       new_parent_network = p_element->getStep()->getNetwork();
     }
   }
-//  std::string name = this->mNetwork->network()->getUniqueIdentifier("new Network");
-  std::cout << "Name of root network: " << mNetwork->network()->getName() << std::endl;
-  std::cout << "Name of network: " << new_parent_network->getName() << std::endl;
+
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(selected.at(i)))
+    {
+      network_item->addElement(p_element);
+    }
+  }
+
   std::string name = new_parent_network->getUniqueIdentifier("new Network");
   network->setName(name);
-  dynamic_cast<cedar::proc::gui::Network*>
-  (
-    this->getGraphicsItemFor(new_parent_network.get())
-  )->addElement(network_item);
+  if (new_parent_network->getName() == "root")
+  {
+    mNetwork->addElement(network_item);
+  }
+  else
+  {
+    dynamic_cast<cedar::proc::gui::Network*>
+    (
+      this->getGraphicsItemFor(new_parent_network.get())
+    )->addElement(network_item);
+  }
   network_item->fitToContents();
 }
 
