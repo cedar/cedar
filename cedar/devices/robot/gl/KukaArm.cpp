@@ -257,9 +257,9 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
     setMaterial(RING);
     this->drawElement(mWristRingVertexVboId, mWristRingIndexVboId, mWristRingFacesNumber);
     glTranslated(0, 0, -0.007099966);
-    cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, mResolution*2, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, mIsDrawnAsWireFrame);
     glTranslated(0, 0, 0.02);
-    cedar::aux::gl::drawDisk(0.0, 0.0315, mResolution*2, mResolution*2, false, mIsDrawnAsWireFrame);
+    cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, mIsDrawnAsWireFrame);
     setMaterial(NO_MATERIAL);
     break;
   }
