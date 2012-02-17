@@ -66,14 +66,14 @@ public cedar::aux::ConfigurationInterface
   //----------------------------------------------------------------------------
 
 public:
-//!@todo please check if we really need four constructors in this class
+//!@todo decide whether this is the proper way to deal with unwanted configuration interfaces
   /*!@brief Constructor
    *
    *@param kinematicChain pointer to a kinematic chain
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget *parent = 0, Qt::WindowFlags f = 0);
+//  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget *parent = 0, Qt::WindowFlags f = 0);
 
   /*!@brief Constructor
    *
@@ -82,21 +82,21 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName = "", QWidget* parent = 0, Qt::WindowFlags f = 0);
 
   /*!@brief Constructor taking a vector of kinematic chains
    *
    * If a vector of kinematic chains is given, the widgets writes the same
    * values to all of them. It reads the values from the first kinematic chain.
    */
-  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, QWidget *parent = 0, Qt::WindowFlags f = 0);
+//  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, QWidget* parent = 0, Qt::WindowFlags f = 0);
 
   /*!@brief Constructor taking a vector of kinematic chains
    *
    * If a vector of kinematic chains is given, the widgets writes the same
    * values to all of them. It reads the values from the first kinematic chain.
    */
-  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName = "", QWidget* parent = 0, Qt::WindowFlags f = 0);
 
   ~KinematicChainWidget();
 
@@ -120,16 +120,7 @@ protected:
 
 private:
 
-  void initWindow();
-  void setActiveColumn(unsigned int c);
-
-private slots:
-
-  void radioButtonAngleClicked();
-  void radioButtonVelocityClicked();
-  void radioButtonAccelerationClicked();
-  void updateJointValue();
-  void updateSpinBoxes();
+  void init(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName);
 
   //----------------------------------------------------------------------------
   // members
@@ -138,12 +129,8 @@ protected:
   // none yet
 
 private:
-  static const int mUpdateInterval = 100;
-  std::vector<cedar::dev::robot::KinematicChainPtr> mpKinematicChains;
-  QGridLayout *mpGridLayout;
-  QTimer *mpTimer;
-  int mDecimals;
-  double mSingleStep;
+  // none yet
+
 };
 
 #endif /* KINEMATICCHAINWIDGET_H_ */

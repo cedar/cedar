@@ -36,7 +36,8 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/gl/Block.h"
 
 // SYSTEM INCLUDES
@@ -49,9 +50,9 @@ int main(int, char**)
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  cedar::aux::gl::Block test_block(p_object);
-  cedar::aux::gl::Block block(p_object, 1, 2, 3);
+  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  cedar::aux::gl::Block test_block(p_rigid_body);
+  cedar::aux::gl::Block block(p_rigid_body, 1, 2, 3);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

@@ -83,12 +83,12 @@ cedar::aux::LoopedThread::~LoopedThread()
 
 void cedar::aux::LoopedThread::stop(unsigned int time, bool suppressWarning)
 {
-  if (isRunning())
+  if (this->isRunning())
   {
     mStop = true;
     wait(time);
 
-    if (isRunning())
+    if (this->isRunning())
     {
       std::cout << "Warning: Thread is still running after call of stop()!" << std::endl;
     }
@@ -265,7 +265,7 @@ void cedar::aux::LoopedThread::updateStatistics(double stepsTaken)
 
 void cedar::aux::LoopedThread::singleStep()
 {
-  if (!isRunning())
+  if (!this->isRunning())
   {
     if (mSimulatedTime.total_microseconds() == 0)
     {
@@ -280,7 +280,7 @@ void cedar::aux::LoopedThread::singleStep()
 
 bool cedar::aux::LoopedThread::stopRequested()
 {
-  if (isRunning() && mStop == true)
+  if (this->isRunning() && mStop == true)
   {
     return true;
   }

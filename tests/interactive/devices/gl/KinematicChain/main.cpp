@@ -55,7 +55,7 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain("../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain("../../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
 
   // create model of simulated arm
   cedar::dev::robot::KinematicChainModelPtr p_test_arm_model(new cedar::dev::robot::KinematicChainModel(p_test_arm));
@@ -68,8 +68,8 @@ int main(int argc, char **argv)
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
 
-  cedar::aux::gl::ObjectPtr p_object = p_test_arm_visualization;
-  p_scene->addObject(p_object);
+  cedar::aux::gl::RigidBodyVisualizationPtr p_object = p_test_arm_visualization;
+  p_scene->addRigidBodyVisualization(p_object);
 
   // create a simple viewer for the scene
   cedar::aux::gui::Viewer viewer(p_scene);

@@ -44,7 +44,6 @@
 #include <iostream>
 #include <math.h>
 
-
 double cedar::aux::math::normalizeAngle(double value)
 {
   while (value <= -cedar::aux::math::pi)

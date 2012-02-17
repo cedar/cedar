@@ -52,22 +52,21 @@ cv::Mat cedar::dev::robot::Odometry::getPosition() const
   //construct the matrix to return
   cv::Mat position = cv::Mat(2,1,CV_64FC1);
 
-  //store the x- and y-position in the new matrix (gets are from Object.h)
+  //store the x- and y-position in the new matrix (gets are from RigidBody.h)
   position.at<double>(0,0) = getPositionX();
   position.at<double>(1,0) = getPositionY();
   return position;
 }
 
-double cedar::dev::robot::Odometry::getOrientation() const
+double cedar::dev::robot::Odometry::getOrientation()
 {
-  //calculates the orientation from the quaternion stored in Object.h.
+  //calculates the orientation from the quaternion stored in RigidBody.h.
   return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
 }
 
 void cedar::dev::robot::Odometry::setPosition(double xPosition, double yPosition)
 {
-  //calls setPosition of the Object-class
-  Object::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
+  RigidBody::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
 }
 
 void cedar::dev::robot::Odometry::setOrientation(double orientation)
@@ -82,7 +81,7 @@ void cedar::dev::robot::Odometry::setOrientation(double orientation)
   setOrientationQuaternion(orientation_mat);
 }
 
-void cedar::dev::robot::Odometry::timerEvent(QTimerEvent * /* event */)
+void cedar::dev::robot::Odometry::timerEvent(QTimerEvent*)
 {
   update();
 }

@@ -44,7 +44,6 @@
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
 
-
 namespace cedar
 {
   namespace aux
@@ -54,7 +53,8 @@ namespace cedar
     {
       //!@cond SKIPPED_DOCUMENTATION
       CEDAR_DECLARE_AUX_CLASS(Scene);
-      CEDAR_DECLARE_AUX_CLASS(Object);
+      CEDAR_DECLARE_AUX_CLASS(RigidBodyVisualization);
+      CEDAR_DECLARE_DEPRECATED(typedef RigidBodyVisualization Object);
       CEDAR_DECLARE_AUX_CLASS(Block);
       CEDAR_DECLARE_AUX_CLASS(Sphere);
       CEDAR_DECLARE_AUX_CLASS(Cone);

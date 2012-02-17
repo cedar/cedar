@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Object.h
+    File:        RigidBodyVisualization.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -34,13 +34,13 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GL_OBJECT_H
-#define CEDAR_AUX_GL_OBJECT_H
+#ifndef CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
+#define CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -50,14 +50,12 @@
 #include <QObject>
 #include <QGLViewer/qglviewer.h>
 
-
 /*!@brief Base class for simple OpenGL visualizations of geometric objects
  *
  */
-class cedar::aux::gl::Object : public QObject
+class cedar::aux::gl::RigidBodyVisualization : public QObject
 {
 private:
-  
   Q_OBJECT
   
 public:
@@ -65,10 +63,10 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. */
-  Object(cedar::aux::ObjectPtr pObject);
+  RigidBodyVisualization(cedar::aux::RigidBodyPtr pRigidBody);
   
   /*!@brief destructor. */
-  virtual ~Object();
+  virtual ~RigidBodyVisualization();
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -77,30 +75,49 @@ public:
   //!@brief draws a visualization of the object in the current GL context
   virtual void draw() = 0;
   
+  //!@brief returns visibility state
+  bool isVisible();
+
   //!@brief returns name of the object
-  std::string getObjectName();
+  std::string getRigidBodyName();
 
   //!@brief returns type of the object
-  std::string getObjectType();
+  std::string getRigidBodyVisualizationType();
   
   //!@brief returns current resolution
-  int resolution();
+  int getResolution();
   
   //!@brief returns R value of main object color in RGB
-  double colorR();
+  double getColorR();
   
   //!@brief returns G value of main object color in RGB
-  double colorG();
+  double getColorG();
   
   //!@brief returns B value of main object color in RGB
-  double colorB();
+  double getColorB();
   
-  //!@brief switch betwen drawing the object with full surfaces or as wire frame only
-  void drawAsWireFrame(const bool state);
+  //!@brief switch between drawing the object with full surfaces or as wire frame only
+  void setDrawAsWireFrame(const bool state);
 
   //!@brief get state of object being drawn with full surfaces or as wire frame only
   bool isDrawnAsWireFrame();
   
+  //!@brief switch drawing the local coordinate frame of the rigid body
+  void setDrawLocalCoordinateFrame(const bool state);
+
+  //!@brief true if the local coordinate frame of the rigid body is being drawn
+  bool isDrawingLocalCoordinateFrame();
+
+  /*!@brief set the length of the axes in the local coordinate frame visualization
+   * @param value    new axis length
+   */
+  void setAxisLength(const double value);
+
+  /*!@brief get the length of the axes in the local coordinate frame visualization
+   * @param value    new axis length
+   */
+  double getAxisLength();
+
   /*!@brief set the general resolution of the object, 10 is a usual value
    * @param value    new resolution value
    */
@@ -117,7 +134,18 @@ public:
    *
    * @return    smart pointer to the object
    */
-  cedar::aux::ObjectPtr getObject();
+  cedar::aux::RigidBodyPtr getRigidBody();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // protected methods
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+
+  //!@brief prepares the drawing by moving to the local coordinate frame of the object
+  void prepareDraw();
+
+  //!@brief draws the local coordinate frame of the rigid body if mIsDrawingLocalCoordinateFrame flag is set
+  void drawLocalCoordinateFrame();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -135,12 +163,16 @@ public slots:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief geometric type of the object
-  std::string mObjectType;
+  std::string mRigidBodyType;
 
   //!@brief the object will only be drawn if this is true
   bool mIsVisible;
   //!@brief determines if the object is drawn with full surfaces or as wire frame only
   bool mIsDrawnAsWireFrame;
+  //!@brief determines whether the local coordinate frame of the rigid body is drawn
+  bool mIsDrawingLocalCoordinateFrame;
+  //!@brief length of the local coordinate frame axis arrows
+  double mAxisLength;
   //!@brief determines how well curves and surfaces are approximated (default 10)
   int mResolution;
   
@@ -152,10 +184,13 @@ protected:
   double mColorB;
   
   //!@brief pointer to the geometric object that is visualized
-  cedar::aux::ObjectPtr mpObject;
+  cedar::aux::RigidBodyPtr mpRigidBody;
 
   //!@brief dummy matrix to hold the transpose of the current object transformation (it's what OpenGL needs)
   cv::Mat mTransformationTranspose;
+
+private:
+
 };
 
 #endif  // CEDAR_AUX_GL_OBJECT_H

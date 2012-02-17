@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,51 +22,81 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        TestObject.cpp
+    File:        Log.cpp
 
-    Maintainer:  Hendrik Reimann
-    Email:       hendrik.reimann@ini.rub.de
-    Date:        2010 11 19
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 02 14
 
-    Description: Implementation of the @em cedar::tests::unit::aux::gl::TestObject class.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-
-// LOCAL INCLUDES
-#include "TestObject.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/LogFilter.h"
+#include "cedar/auxiliaries/LogInterface.h"
+#include "cedar/auxiliaries/ConsoleLog.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
-
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-//! constructor
-cedar::tests::unit::aux::gl::Object::TestObject::TestObject(cedar::aux::ObjectPtr pObject)
+cedar::aux::Log::Log()
 :
-cedar::aux::gl::Object(pObject)
+mDefaultLogger(new cedar::aux::ConsoleLog())
 {
-  
 }
 
-//! destructor
-cedar::tests::unit::aux::gl::Object::TestObject::~TestObject()
+cedar::aux::Log::~Log()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::tests::unit::aux::gl::Object::TestObject::draw()
+void cedar::aux::Log::clearLoggers()
 {
-
+  this->mHandlers.clear();
 }
+
+void cedar::aux::Log::addLogger(cedar::aux::LogInterfacePtr logger, cedar::aux::LogFilterPtr filter)
+{
+  LogHandler handler;
+  handler.mpFilter = filter;
+  handler.mpLogger = logger;
+  this->mHandlers.push_back(handler);
+}
+
+void cedar::aux::Log::log(cedar::aux::LOG_LEVEL level, const std::string& message, const std::string& source, const std::string& title)
+{
+  bool was_accepted = false;
+  // see if any of the filters match
+  for (size_t i = 0; i < this->mHandlers.size(); ++i)
+  {
+    LogHandler& handler = this->mHandlers.at(i);
+    if (handler.mpFilter->acceptsMessage(level, message, source, title))
+    {
+      // if the filter matches, send the message to the corresponding logger.
+      handler.mpLogger->message(level, message, title);
+      was_accepted = true;
+      
+      if (handler.mpFilter->removesMessages())
+      {
+        return;
+      }
+    }
+  }
+
+  // if none of the filters matched, use the default logger
+  if (!was_accepted)
+  {
+    this->mDefaultLogger->message(level, message, title);
+  }
+}
+
