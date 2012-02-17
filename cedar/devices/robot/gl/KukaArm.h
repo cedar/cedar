@@ -121,7 +121,8 @@ private:
   enum MaterialType {
                       NO_MATERIAL,
                       SEGMENT,
-                      RING
+                      CHROME,
+                      BLACK
                     };
 
   static const float mNoSpecular[3];
@@ -129,10 +130,14 @@ private:
   static const float mSegment_Diffuse[3];
   static const float mSegment_Specular[3];
   static const float mSegment_Shininess[1];
-  static const float mRing_Ambient[3];
-  static const float mRing_Diffuse[3];
-  static const float mRing_Specular[3];
-  static const float mRing_Shininess[1];
+  static const float mChrome_Ambient[3];
+  static const float mChrome_Diffuse[3];
+  static const float mChrome_Specular[3];
+  static const float mChrome_Shininess[1];
+  static const float mBlack_Ambient[3];
+  static const float mBlack_Diffuse[3];
+  static const float mBlack_Specular[3];
+  static const float mBlack_Shininess[1];
 
   // base
   static const unsigned int mBaseSegmentVertexNumber = 2564;
