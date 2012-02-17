@@ -191,7 +191,7 @@ private:
   GLushort mWristSegmentIndex[mWristSegmentFacesNumber*3]; // index data
 
   // wrist sphere
-  static const unsigned int mWristSphereVertexNumber = 3462;
+  static const unsigned int mWristSphereVertexNumber = 3727;
   static const unsigned int mWristSphereFacesNumber = 6388;
   GLuint mWristSphereVertexVboId; // vertex buffer id
   GLuint mWristSphereIndexVboId; // index buffer id
@@ -199,7 +199,7 @@ private:
   GLushort mWristSphereIndex[mWristSphereFacesNumber*3]; // index data
 
   // wrist ring
-  static const unsigned int mWristRingVertexNumber = 1890;
+  static const unsigned int mWristRingVertexNumber = 1937;
   static const unsigned int mWristRingFacesNumber = 1630;
   GLuint mWristRingVertexVboId; // vertex buffer id
   GLuint mWristRingIndexVboId; // index buffer id
