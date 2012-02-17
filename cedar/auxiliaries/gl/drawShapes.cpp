@@ -615,6 +615,7 @@ void cedar::aux::gl::drawEllipse(
 
 void cedar::aux::gl::drawAxes(double length)
 {
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   cv::Mat o = cv::Mat::zeros(3, 1, CV_64FC1);
   cv::Mat x = cv::Mat::zeros(3, 1, CV_64FC1);
   x.at<double>(0, 0) = length;

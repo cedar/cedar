@@ -171,7 +171,14 @@ void cedar::dev::robot::gl::KukaArm::initializeGl()
 void cedar::dev::robot::gl::KukaArm::drawBase()
 {
   prepareDraw();
-  glShadeModel(GL_SMOOTH);
+  if (mIsDrawnAsWireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+  else
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
   setMaterial(SEGMENT);
   this->drawElement(mBaseSegmentVertexVboId, mBaseSegmentIndexVboId, mBaseSegmentFacesNumber);
   setMaterial(RING);
@@ -192,6 +199,14 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
   if (isDrawingLocalCoordinateFrame())
   {
     cedar::aux::gl::drawAxes(0.2);
+  }
+  if (mIsDrawnAsWireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+  else
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
   switch (index)
   {
@@ -338,23 +353,6 @@ void cedar::dev::robot::gl::KukaArm::loadVertexData
   {
     std::cout << "failed to read vertex data from file " << dataFileName.toStdString() << std::endl;
   }
-
-  std::cout << dataFileName.toStdString() << ": " << std::endl;
-  std::cout << "first vertex: " << std::endl;
-  std::cout << vertices[0].location[0] << " ";
-  std::cout << vertices[0].location[1] << " ";
-  std::cout << vertices[0].location[2] << " ";
-  std::cout << vertices[0].normal[0] << " ";
-  std::cout << vertices[0].normal[1] << " ";
-  std::cout << vertices[0].normal[2] << std::endl;
-
-  std::cout << "last vertex: " << std::endl;
-  std::cout << vertices[numberOfVertices-1].location[0] << " ";
-  std::cout << vertices[numberOfVertices-1].location[1] << " ";
-  std::cout << vertices[numberOfVertices-1].location[2] << " ";
-  std::cout << vertices[numberOfVertices-1].normal[0] << " ";
-  std::cout << vertices[numberOfVertices-1].normal[1] << " ";
-  std::cout << vertices[numberOfVertices-1].normal[2] << std::endl;
 }
 
 void cedar::dev::robot::gl::KukaArm::loadIndexData
@@ -382,23 +380,6 @@ void cedar::dev::robot::gl::KukaArm::loadIndexData
   {
     std::cout << "failed to read index data from file " << dataFileName.toStdString() << std::endl;
   }
-  std::cout << "first indices: " << std::endl;
-  std::cout << static_cast<int>(indices[0]) << " ";
-  std::cout << static_cast<int>(indices[1]) << " ";
-  std::cout << static_cast<int>(indices[2]) << std::endl;
-  std::cout << static_cast<int>(indices[3]) << " ";
-  std::cout << static_cast<int>(indices[4]) << " ";
-  std::cout << static_cast<int>(indices[5]) << std::endl;
-
-  std::cout << "last indices: " << std::endl;
-  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3]) << " ";
-  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+1]) << " ";
-  std::cout << static_cast<int>(indices[(numberOfFaces-2)*3+2]) << std::endl;
-  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3]) << " ";
-  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+1]) << " ";
-  std::cout << static_cast<int>(indices[(numberOfFaces-1)*3+2]) << std::endl;
-
-  std::cout << std::endl;
 }
 
 void cedar::dev::robot::gl::KukaArm::loadData()
