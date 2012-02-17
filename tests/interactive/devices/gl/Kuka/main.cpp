@@ -33,9 +33,7 @@
  ----- Credits:
  -----------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
@@ -105,15 +103,13 @@ int main(int argc, char **argv)
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
 
-  // create a widget to control the scene
+  // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  p_scene_widget->show();
-
-  // create widgets
   cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_kuka_arm);
 
+  // show and start everything
+  p_scene_widget->show();
   widget_arm.show();
-
   p_kuka_arm_model->startTimer(50.0);
   viewer.startTimer(50);
   a.exec();
