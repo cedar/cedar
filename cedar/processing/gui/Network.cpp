@@ -69,7 +69,8 @@ cedar::proc::gui::Network::Network(QMainWindow *pMainWindow, qreal width, qreal 
 GraphicsBase(width, height, GRAPHICS_GROUP_NETWORK),
 mNetwork(network),
 mpScene(NULL),
-mpMainWindow(pMainWindow)
+mpMainWindow(pMainWindow),
+mHoldFitToContents(false)
 {
   cedar::aux::LogSingleton::getInstance()->debug
   (
@@ -111,6 +112,11 @@ cedar::proc::gui::Network::~Network()
 
 void cedar::proc::gui::Network::fitToContents()
 {
+  if (mHoldFitToContents)
+  {
+    return;
+  }
+
   qreal padding_top = static_cast<qreal>(0.0);
   qreal padding_bottom = static_cast<qreal>(5.0);
   qreal padding_left = static_cast<qreal>(1.0);
@@ -170,6 +176,21 @@ void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, ced
       this->fitToContents();
     }
   }
+}
+
+void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)
+{
+  typedef std::list<QGraphicsItem*>::const_iterator const_iterator;
+  this->mHoldFitToContents = true;
+  for (const_iterator i = elements.begin(); i != elements.end(); ++i)
+  {
+    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(*i))
+    {
+      this->addElement(p_element);
+    }
+  }
+  this->mHoldFitToContents = false;
+  this->fitToContents();
 }
 
 void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElement)

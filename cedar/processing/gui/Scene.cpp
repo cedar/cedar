@@ -290,14 +290,7 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   cedar::proc::gui::Network *p_network = cedar::aux::asserted_cast<cedar::proc::gui::Network*>(this->getGraphicsItemFor(target_network.get()));
 
   QList<QGraphicsItem *> selected = this->selectedItems();
-  for (int i = 0; i < selected.size(); ++i)
-  {
-    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(selected.at(i)))
-    {
-      p_network->addElement(p_element);
-    }
-  }
-
+  p_network->addElements(selected.toStdList());
 }
 
 void cedar::proc::gui::Scene::promoteElementToNewGroup()
