@@ -54,6 +54,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
@@ -104,16 +105,22 @@ void cedar::proc::gui::StepItem::construct()
     p_effect->setOffset(3.0, 3.0);
     this->setGraphicsEffect(p_effect);
   }
-#ifdef DEBUG
-  std::cout << "> allocated data (cedar::proc::gui::StepItem, " << this << ")" << std::endl;
-#endif // DEBUG
+
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "allocated data (cedar::proc::gui::StepItem, " + cedar::aux::toString(this) + ")",
+    "cedar::proc::gui::StepItem::construct()"
+  );
 }
 
 cedar::proc::gui::StepItem::~StepItem()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (cedar::proc::gui::StepItem, " << this << ")" << std::endl;
-#endif // DEBUG
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "freeing data (cedar::proc::gui::StepItem, " + cedar::aux::toString(this) + ")",
+    "cedar::proc::gui::StepItem::construct()"
+  );
+
   mStateChangedConnection.disconnect();
 }
 

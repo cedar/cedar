@@ -152,6 +152,9 @@ private:
 
   void addDataItems();
 
+  //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
+  void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

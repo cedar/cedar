@@ -50,10 +50,13 @@
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/DataConnection.h"
 #include "cedar/auxiliaries/Data.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QSet>
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
 
@@ -68,6 +71,12 @@ mNetwork(network),
 mpScene(NULL),
 mpMainWindow(pMainWindow)
 {
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "allocated data (cedar::proc::gui::Network, " + cedar::aux::toString(this) + ")",
+    "cedar::proc::gui::Network::Network()"
+  );
+
   if (!mNetwork)
   {
     mNetwork = cedar::proc::NetworkPtr(new cedar::proc::Network());
@@ -84,6 +93,12 @@ mpMainWindow(pMainWindow)
 
 cedar::proc::gui::Network::~Network()
 {
+  cedar::aux::LogSingleton::getInstance()->debug
+  (
+    "freeing data (cedar::proc::gui::Network, " + cedar::aux::toString(this) + ")",
+    "cedar::proc::gui::Network::~Network()"
+  );
+
   if (mSlotConnection.connected())
   {
     mSlotConnection.disconnect();
@@ -107,25 +122,37 @@ void cedar::proc::gui::Network::fitToContents()
     return;
   }
 
+  // find the bounding box of all children
   QRectF bounds = this->childrenBoundingRect();
-
+  // adjust the bow by the paddings specified above
   bounds.adjust(padding_left, padding_top, padding_right, padding_bottom);
 
+  // apply the new bounding box
   this->setWidth(bounds.width());
   this->setHeight(bounds.height());
+  QPointF old_pos_scene = this->scenePos();
+  QPointF new_pos = this->pos() + bounds.topLeft();
+  this->setPos(new_pos);
 
-  QPointF offset(bounds.left(), bounds.top());
-  this->moveBy(offset.x(), offset.y());
-
-  for (int i = 0; i < this->childItems().size(); ++i)
+  // setting a new position moves the children, thus, transform them back to keep their original positions
+  QPointF old_pos_local = this->mapFromScene(old_pos_scene);
+  // using a set avoids moving the same child more than once
+  QSet<QGraphicsItem*> children = this->childItems().toSet();
+  for (QSet<QGraphicsItem*>::iterator i = children.begin(); i != children.end(); ++i)
   {
-    this->childItems().at(i)->moveBy(-offset.x(), -offset.y());
+    QGraphicsItem* p_item = *i;
+    p_item->setPos(old_pos_local + p_item->pos());
   }
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
 {
   return this->mpScene && this == this->mpScene->getRootNetwork().get();
+}
+
+void cedar::proc::gui::Network::transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem)
+{
+  pItem->setPos(this->mapFromItem(pItem, QPointF(0, 0)));
 }
 
 void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, cedar::proc::ElementPtr pElement)
@@ -136,8 +163,12 @@ void cedar::proc::gui::Network::elementAdded(cedar::proc::Network* pNetwork, ced
     cedar::proc::gui::GraphicsBase *p_network_item = this->mpScene->getGraphicsItemFor(pNetwork);
     CEDAR_ASSERT(p_element_item != NULL);
     CEDAR_ASSERT(p_network_item != NULL);
-    p_element_item->setParentItem(p_network_item);
-    this->fitToContents();
+    if (p_element_item->parentItem() != this)
+    {
+      this->transformChildCoordinates(p_element_item);
+      p_element_item->setParentItem(p_network_item);
+      this->fitToContents();
+    }
   }
 }
 
@@ -158,11 +189,6 @@ void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElem
   }
 
   this->network()->add(element);
-
-  if (!this->isRootNetwork())
-  {
-    pElement->setParentItem(this);
-  }
 }
 
 const std::string& cedar::proc::gui::Network::getFileName() const
