@@ -49,8 +49,6 @@
 #include <QtGui/QWidget>
 
 //!@brief A simple widget to monitor the state of a kinematic chain
-//!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainMonitorWidget
 class cedar::dev::robot::gui::KinematicChainMonitorWidget
 :
 public QWidget
@@ -72,7 +70,12 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  KinematicChainMonitorWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  KinematicChainMonitorWidget
+  (
+    cedar::dev::robot::KinematicChainPtr kinematicChain,
+    QWidget *parent = 0,
+    Qt::WindowFlags f = 0
+  );
 
   ~KinematicChainMonitorWidget();
 

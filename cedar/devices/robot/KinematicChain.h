@@ -77,7 +77,7 @@ public:
   //!@brief constructor
   KinematicChain(const std::string& configFileName);
   //!@brief destructor
-  virtual ~KinematicChain() = 0;
+  virtual ~KinematicChain();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -87,7 +87,7 @@ public:
    *
    * @return    state
    */
-  virtual bool isMovable()=0;
+  virtual bool isMovable() = 0;
 
   /*!@brief get reference geometry for this kinematic chain
    *

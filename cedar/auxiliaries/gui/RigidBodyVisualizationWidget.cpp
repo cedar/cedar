@@ -39,7 +39,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include "stdio.h"
+#include <stdio.h>
 #include <iostream>
 #include <QtGui/QApplication>
 #include <QtGui/QLabel>

@@ -131,11 +131,6 @@ void cedar::aux::gl::drawCone(
                                bool wireFrame
                              )
 {
-  
-  //opencv2: 
-  //error: "class cv::MatExpr" has no member named "clone"
-  //Mat line = (end-start)(Rect(0, 0, 1, 3)).clone();
-	
   cv::Mat line = (end-start)(cv::Rect(0, 0, 1, 3));
   // if start = end do nothing
   if (cv::norm(line) == 0)
@@ -160,6 +155,7 @@ void cedar::aux::gl::drawCone(
   // return to saved transformation
   glPopMatrix();
 }
+
 template CEDAR_AUX_LIB_EXPORT
   void cedar::aux::gl::drawCone<double>(
                                           const cv::Mat&,

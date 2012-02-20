@@ -72,7 +72,7 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget* parent = 0, Qt::WindowFlags f = 0);
+  KinematicChainWidget(cedar::dev::robot::KinematicChainPtr kinematicChain, QWidget* parent = 0, Qt::WindowFlags f = 0);
 
   ~KinematicChainWidget();
 

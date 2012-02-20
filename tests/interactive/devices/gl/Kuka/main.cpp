@@ -115,7 +115,6 @@ int main(int argc, char **argv)
   a.exec();
 
   p_kuka_arm->stop();
-  cedar::aux::sleep(cedar::unit::Seconds(1));
-
+  p_kuka_arm->wait();
   return 0;
 }

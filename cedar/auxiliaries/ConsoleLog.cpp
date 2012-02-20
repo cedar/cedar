@@ -52,7 +52,6 @@
 #define COLOR_BROWN "0;33m"
 #define COLOR_RED "0;31m"
 #define COLOR_LIGHT_RED "1;31m"
-//#define COLOR(COLOR_CONSTANT) "\033[" COLOR_CONSTANT "\033[1m\033[5m"
 #define COLOR(COLOR_CONSTANT) "\033[" COLOR_CONSTANT
 #define COLOR_CLEAR "\E[m"
 #endif // __linux

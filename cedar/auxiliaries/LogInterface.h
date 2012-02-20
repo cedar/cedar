@@ -93,17 +93,7 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
-}; // class cedar::xxx
+}; // class cedar::aux::LogInterface
 
 #endif // CEDAR_AUX_LOG_INTERFACE_H
 
