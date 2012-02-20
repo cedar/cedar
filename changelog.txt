@@ -61,6 +61,11 @@
   - The property pane now indicates when parameters have been changed since the last save. 
   - more verbose tooltip for data slots
   - there is now a settings dialog; more settings will be added later.
+  
+- build system
+  - You now no longer need to specify CEDAR_BUILD_DIR in your cedar.conf.
+  - Projects depending on cedar no longer need to define __LINUX__ etc.; this is now done automatically by the build
+    system. 
 
 == Version 0.5.1 ==
 - cedar::proc::steps

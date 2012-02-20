@@ -52,6 +52,7 @@ if( CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR AND NOT MSVC_IDE )
                        'CMakeCache.txt' and the directory 'CMakeFiles'. Please delete them.")
 endif()
 
+
 if (CEDAR_BUILD_DEBUG_VERSION)
   set (CMAKE_BUILD_TYPE debug)
 else(CEDAR_BUILD_DEBUG_VERSION)
@@ -60,6 +61,8 @@ endif(CEDAR_BUILD_DEBUG_VERSION)
 
 # set the directory for source code
 set (CEDAR_SOURCE_DIR           "${CEDAR_HOME}/cedar")
+# build directory
+set (CEDAR_BUILD_DIR      "${CMAKE_CURRENT_BINARY_DIR}")
 # directory for all tests
 set (CEDAR_TEST_DIR             "${CEDAR_HOME}/tests")
 # directory for all unit tests
@@ -89,7 +92,6 @@ endif (CEDAR_BUILD_STATIC_LIBS)
 
 # include the cedar library directory in the library search path
 link_directories(${CEDAR_LIB_DIR})
-message(STATUS ${CEDAR_BUILD_DIR})
 # add the cedar home directory to the ones that need to be included
 include_directories(${CEDAR_HOME} ${CEDAR_TEST_DIR} ${CEDAR_BUILD_DIR})
 
