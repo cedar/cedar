@@ -36,10 +36,11 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gui/KinematicChainCommandWidget.h"
+#include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include "stdio.h"
+#include <stdio.h>
 #include <iostream>
 #include <QtGui/QApplication>
 #include <QtGui/QDoubleSpinBox>
@@ -53,7 +54,7 @@
 
 cedar::dev::robot::gui::KinematicChainCommandWidget::KinematicChainCommandWidget
 (
-  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+  cedar::dev::robot::KinematicChainPtr kinematicChain,
   QWidget * parent,
   Qt::WindowFlags f
 )
@@ -62,7 +63,6 @@ QWidget(parent, f),
 mpKinematicChain(kinematicChain)
 {
   initWindow();
-  return;
 }
 
 cedar::dev::robot::gui::KinematicChainCommandWidget::~KinematicChainCommandWidget()
@@ -121,6 +121,8 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::commandJoints()
   case 2:
     mpKinematicChain->setJointAccelerations(command_vector);
     break;
+  default:
+    CEDAR_THROW(cedar::aux::UnhandledValueException, "This value is not handled here.");
   }
 }
 
@@ -141,10 +143,11 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
   mpModeBox->setCurrentIndex(static_cast<int>(mpKinematicChain->getWorkingMode()));
   mpModeBox->blockSignals(false);
   // update command boxes
+  CEDAR_DEBUG_ASSERT(mpKinematicChain->getNumberOfJoints() == mCommandBoxes.size());
   switch(mpModeBox->currentIndex())
   {
   case 0:
-    for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+    for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
       mCommandBoxes[j]->blockSignals(true);
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointAngle(j));
@@ -152,7 +155,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
     }
     break;
   case 1:
-    for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+    for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
       mCommandBoxes[j]->blockSignals(true);
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointVelocity(j));
@@ -161,13 +164,15 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::update()
     break;
 
   case 2:
-    for(unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
+    for (unsigned int j = 0; j < mpKinematicChain->getNumberOfJoints(); ++j)
     {
       mCommandBoxes[j]->blockSignals(true);
       mCommandBoxes[j]->setValue(mpKinematicChain->getJointAcceleration(j));
       mCommandBoxes[j]->blockSignals(false);
     }
     break;
+  default:
+    CEDAR_THROW(cedar::aux::UnhandledValueException, "This is not a handled case.");
   }
 }
 
@@ -221,7 +226,7 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   mpGridLayout->addWidget(mpKeepMovingBox, 5, 0);
   connect(mpKeepMovingBox, SIGNAL(stateChanged(int)), this, SLOT(setKeepSendingState(int)));
 
-  for(unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
+  for (unsigned int i = 0; i < mpKinematicChain->getNumberOfJoints(); ++i)
   {
     // add label
     char labelText[10];
@@ -243,6 +248,4 @@ void cedar::dev::robot::gui::KinematicChainCommandWidget::initWindow()
   mpGridLayout->setColumnStretch(0,1);
   mpGridLayout->setColumnStretch(1,2);
   setLayout(mpGridLayout);
-
-  return;
 }

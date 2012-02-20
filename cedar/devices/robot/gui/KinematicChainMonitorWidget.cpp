@@ -51,7 +51,7 @@
 
 cedar::dev::robot::gui::KinematicChainMonitorWidget::KinematicChainMonitorWidget
 (
-  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+  cedar::dev::robot::KinematicChainPtr kinematicChain,
   QWidget * parent,
   Qt::WindowFlags f
 )
@@ -69,7 +69,6 @@ cedar::dev::robot::gui::KinematicChainMonitorWidget::~KinematicChainMonitorWidge
 {
 
 }
-
 
 //------------------------------------------------------------------------------
 // methods

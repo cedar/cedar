@@ -116,9 +116,9 @@ void cedar::aux::gl::Scene::draw()
   glPushMatrix();
 
   // draw all items in the scene
-  for (int i=0; i<mRigidBodyVisualizations.size(); i++)
+  for (int i = 0; i < mRigidBodyVisualizations.size(); ++i)
   {
-    mRigidBodyVisualizations[ i ]->draw();
+    mRigidBodyVisualizations[i]->draw();
   }
   
   // return to origin transformation
@@ -189,9 +189,9 @@ void cedar::aux::gl::Scene::initGl()
   glLightfv(GL_LIGHT0, GL_POSITION, position);
 
   // let all items in the scene initialize their resources in the current Gl context
-  for (int i=0; i<mRigidBodyVisualizations.size(); i++)
+  for (int i = 0; i < mRigidBodyVisualizations.size(); ++i)
   {
-    mRigidBodyVisualizations[ i ]->initializeGl();
+    mRigidBodyVisualizations[i]->initializeGl();
   }
 
 }

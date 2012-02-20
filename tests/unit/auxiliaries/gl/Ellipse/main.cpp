@@ -33,16 +33,13 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/gl/Ellipse.h"
 
 // SYSTEM INCLUDES
 #include <string>
-
 
 int main(int, char**)
 {

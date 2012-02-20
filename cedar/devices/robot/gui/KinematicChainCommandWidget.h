@@ -51,8 +51,6 @@
 #include <QtGui/QDoubleSpinBox>
 
 //!@brief A simple widget to command single joints
-//!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainCommandWidget
 class cedar::dev::robot::gui::KinematicChainCommandWidget
 :
 public QWidget
@@ -73,7 +71,12 @@ public:
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-  KinematicChainCommandWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget* parent = 0, Qt::WindowFlags f = 0);
+  KinematicChainCommandWidget
+  (
+    cedar::dev::robot::KinematicChainPtr kinematicChain,
+    QWidget* parent = 0,
+    Qt::WindowFlags f = 0
+  );
 
   ~KinematicChainCommandWidget();
 

@@ -45,9 +45,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr& p_scene)
+cedar::aux::gui::Viewer::Viewer(cedar::aux::gl::ScenePtr pScene)
 :
-mpScene(p_scene)
+mpScene(pScene)
 {
   mpScene->addViewer(this);
 }
@@ -67,7 +67,7 @@ void cedar::aux::gui::Viewer::init()
   mpScene->initGl();
 }
 
-void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::RigidBodyVisualizationPtr& pVisualization)
+void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::RigidBodyVisualizationPtr pVisualization)
 {
   pVisualization->initializeGl();
 }

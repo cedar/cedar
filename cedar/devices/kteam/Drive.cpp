@@ -24,8 +24,8 @@
 
     File:        KTeamDrive.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
     Description: An object of this class represents the differential drive of a PWM-driven robot.

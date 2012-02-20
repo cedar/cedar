@@ -33,9 +33,7 @@
  ----- Credits:
  -----------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -50,10 +48,8 @@
 #include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/auxiliaries/RigidBody.h"
 
-
 // SYSTEM INCLUDES
 #include <QApplication>
-
 
 int main(int argc, char **argv)
 {

@@ -40,7 +40,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include "stdio.h"
+#include <stdio.h>
 #include <iostream>
 #include <QtGui/QApplication>
 #include <QtGui/QLabel>
@@ -70,7 +70,6 @@ mpRigidBody(rigidBody)
   mYMax = 10.0;
   mZMin = -10.0;
   mZMax = 10.0;
-
 
   initWindow();
   return;
