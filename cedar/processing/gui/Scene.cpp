@@ -49,6 +49,7 @@
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
@@ -286,30 +287,14 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   cedar::proc::NetworkPtr target_network
     = boost::shared_dynamic_cast<cedar::proc::Network>(this->mNetwork->network()->getElement(target_network_name));
   CEDAR_ASSERT(target_network);
+  cedar::proc::gui::Network *p_network = cedar::aux::asserted_cast<cedar::proc::gui::Network*>(this->getGraphicsItemFor(target_network.get()));
 
   QList<QGraphicsItem *> selected = this->selectedItems();
   for (int i = 0; i < selected.size(); ++i)
   {
     if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(selected.at(i)))
     {
-      //!@todo Find a better solution for this.
-      cedar::proc::ElementPtr element;
-      if (cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem *>(p_element))
-      {
-        element = p_step_item->getStep();
-      }
-      else
-      {
-        CEDAR_THROW(cedar::aux::UnhandledTypeException,
-                    "Unhandled type in cedar::proc::gui::Scene::promoteElementToExistingGroup.");
-      }
-
-      target_network->add(element);
-      NetworkMap::iterator iter = this->mNetworkMap.find(target_network.get());
-      CEDAR_ASSERT(iter != this->mNetworkMap.end());
-      //!@todo This should be a weal_ptr
-      cedar::proc::gui::Network* network_item = iter->second;
-      network_item->fitToContents();
+      p_network->addElement(p_element);
     }
   }
 
@@ -331,7 +316,6 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   std::string name = this->mNetwork->network()->getUniqueIdentifier("new Network");
   network->setName(name);
   this->mNetwork->addElement(network_item);
-  network_item->fitToContents();
 }
 
 void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
