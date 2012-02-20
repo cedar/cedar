@@ -41,7 +41,12 @@
   - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
     the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
   - Templated functions in cedar::aux::math now have an "alias" version that can be called without a template parameter.
-    This function automatically decides which template version to call based on the matrix types. 
+    This function automatically decides which template version to call based on the matrix types.
+  - Added a function cedar::aux::System::locateResource that helps with finding cedar resources (i.e., config files
+    etc.) independent of the current working directory. See the documentation for details.
+  - Added a new Log class to cedar::aux. Using this is the new standard logging mechanism (over std::cout), as it can be
+    redirected at will, e.g., to the console (default) or some user interface. To access the log, use the corresponding
+    cedar::aux::LogSingleton::getInstance().
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
