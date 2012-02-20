@@ -34,9 +34,9 @@
 
 ======================================================================================================================*/
 
-#if defined (_WIN32)
+#if defined (CEDAR_OS_WINDOWS)
   #include <gl/GLU.h>
-#elif defined (__APPLE__)
+#elif defined (CEDAR_OS_APPLE)
   #include <OpenGL/glu.h>
 #else
   #include <GL/glu.h>

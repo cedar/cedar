@@ -42,12 +42,12 @@
 #include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
-#ifdef __unix__
+#ifdef CEDAR_OS_UNIX
 #include <dlfcn.h>
-#elif defined _WIN32
+#elif defined CEDAR_OS_WINDOWS
 #include <Windows.h>
 #include <strsafe.h>
-#endif
+#endif // CEDAR_OS_UNIX
 
 //!@todo Make this switchable with configuration?
 #define BOOST_FILESYSTEM_VERSION 2 // we currently use boost's filesystem as version 2.
@@ -169,7 +169,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   
   // OS-Dependent code for loading the plugin.
   PluginInterfaceMethod p_interface = NULL;
-#ifdef __unix__
+#ifdef CEDAR_OS_UNIX
   this->mpLibHandle = dlopen(this->mFileName.c_str(), RTLD_NOW);
   if (!this->mpLibHandle)
   {
@@ -185,7 +185,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
   }
 
   //@todo this might segfault if the function pointer points to a bad function; handle this somehow.
-#elif defined _WIN32
+#elif defined CEDAR_OS_WINDOWS
   this->mpLibHandle = LoadLibraryEx(this->mFileName.c_str(), NULL, 0);
   if (!this->mpLibHandle)
   {
@@ -199,7 +199,7 @@ void cedar::proc::PluginProxy::load(const std::string& file)
     //!@todo use GetLastError to read out the error string
     CEDAR_THROW(cedar::proc::PluginException, "Error loading interface function: GetProcAddress failed: " + this->getLastError());
   }
-#endif // __linux / _WIN32
+#endif // CEDAR_OS_UNIX / CEDAR_OS_WINDOWS
   
   this->mDeclaration = cedar::proc::PluginDeclarationPtr(new cedar::proc::PluginDeclaration());
   (*p_interface)(this->mDeclaration);
@@ -229,7 +229,7 @@ cedar::proc::PluginDeclarationPtr cedar::proc::PluginProxy::getDeclaration()
   return this->mDeclaration;
 }
 
-#ifdef _WIN32
+#ifdef CEDAR_OS_WINDOWS
 
 std::string cedar::proc::PluginProxy::getLastError()
 {
@@ -252,4 +252,4 @@ std::string cedar::proc::PluginProxy::getLastError()
   return error;
 }
 
-#endif //def _WIN32
+#endif //def CEDAR_OS_WINDOWS

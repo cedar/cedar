@@ -34,11 +34,13 @@
 
 ======================================================================================================================*/
 
-#if defined _WIN32
+#include "cedar/configuration.h"
+
+#if defined CEDAR_OS_WINDOWS
   #define NOMINMAX
   #include <Windows.h>
   #include <gl/GL.h>
-#elif defined __APPLE__
+#elif defined CEDAR_OS_APPLE
   #include <OpenGL/gl.h>
 #else
   #include <GL/gl.h>

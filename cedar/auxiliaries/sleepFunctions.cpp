@@ -39,11 +39,12 @@
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
-#ifdef _WIN32
+#ifdef CEDAR_OS_WINDOWS
   #include <Windows.h>
 #else
   #include <unistd.h>
-#endif // _WIN32
+#endif // CEDAR_OS_WINDOWS
+#include <iostream>
 
 void cedar::aux::sleep(cedar::unit::Time time)
 {
@@ -51,31 +52,30 @@ void cedar::aux::sleep(cedar::unit::Time time)
   cedar::aux::usleep(static_cast<unsigned int>(us.getRawTime()));
 }
 
-#include <iostream>
 void cedar::aux::usleep(unsigned int microseconds)
 {
-#ifdef _WIN32
+#ifdef CEDAR_OS_WINDOWS
 
-#ifdef _MSC_VER
+#ifdef CEDAR_COMPILER_MSVC
 #pragma message("Warning: Windows can only sleep for milliseconds. Anything lower will be ignored!")
-#elif defined __GNUG__
+#elif defined CEDAR_COMPILER_GCC
 #warning "Warning: Windows can only sleep for milliseconds. Anything lower will be ignored!"
-#endif // _MSC_VER/__GNUG__
+#endif // CEDAR_COMPILER_MSVC/CEDAR_COMPILER_GCC
 
   Sleep(static_cast<DWORD>(microseconds/1000));
 
-#else // _WIN32
+#else // CEDAR_OS_WINDOWS
 
   ::usleep(microseconds);
 
-#endif // _WIN32
+#endif // CEDAR_OS_WINDOWS
 }
 
 void cedar::aux::sleep(unsigned int seconds)
 {
-#ifdef _WIN32
+#ifdef CEDAR_OS_WINDOWS
   Sleep(1000 * static_cast<DWORD>(seconds));
-#else
+#else // CEDAR_OS_WINDOWS
   ::sleep(seconds);
 #endif
 }
