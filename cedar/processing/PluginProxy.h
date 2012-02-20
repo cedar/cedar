@@ -43,9 +43,9 @@
 // SYSTEM INCLUDES
 #include <string>
 
-#ifdef _WIN32
+#ifdef CEDAR_OS_WINDOWS
 #include <Windows.h>
-#endif
+#endif // CEDAR_OS_WINDOWS
 
 /*!@brief A class that encapsulates the OS dependent functionality for dynamically loading libraries.
  */
@@ -99,9 +99,9 @@ private:
   //!@brief Searches for the plugin description file.
   std::string findPluginDescription(const std::string& plugin_path) const;
 
-#ifdef _WIN32
+#ifdef CEDAR_OS_WINDOWS
   std::string getLastError();
-#endif // _WIN32
+#endif // CEDAR_OS_WINDOWS
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -115,9 +115,9 @@ private:
   std::string mFileName;
 
   //! Handle to the dynamically loaded library.
-#ifdef __unix__
+#ifdef CEDAR_OS_UNIX
   void *mpLibHandle;
-#elif defined _WIN32
+#elif defined CEDAR_OS_WINDOWS
   HMODULE mpLibHandle;
 #else
 #error Implement me for your os!
