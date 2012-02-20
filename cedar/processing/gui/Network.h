@@ -108,6 +108,9 @@ public:
   //!@brief Adds an element to the network.
   void addElement(cedar::proc::gui::GraphicsBase *pElement);
 
+  //!@brief Adds a list of elements to the network efficiently.
+  void addElements(const std::list<QGraphicsItem*>& elements);
+
   //!@brief Sets the scene containing this item.
   void setScene(cedar::proc::gui::Scene* pScene);
 
@@ -188,6 +191,10 @@ private:
 
   //! Connection to Network's slot changed signal.
   boost::signals2::connection mSlotConnection;
+
+  //! Fit to contents-calls are temporarily disabled if this is set to true.
+  bool mHoldFitToContents;
+
 }; // class cedar::proc::gui::NetworkFile
 
 #endif // CEDAR_PROC_GUI_NETWORK_FILE_H
