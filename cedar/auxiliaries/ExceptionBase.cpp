@@ -46,14 +46,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //! Constructor
-cedar::aux::ExceptionBase::ExceptionBase(void)
-:
-mType("ExceptionBase")
+cedar::aux::ExceptionBase::ExceptionBase()
 {
 }
 
 //! Destructor
-cedar::aux::ExceptionBase::~ExceptionBase(void) throw ()
+cedar::aux::ExceptionBase::~ExceptionBase() throw ()
 {
 }
 
@@ -61,7 +59,7 @@ cedar::aux::ExceptionBase::~ExceptionBase(void) throw ()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-const std::string& cedar::aux::ExceptionBase::exceptionInfo(void) const
+const std::string& cedar::aux::ExceptionBase::exceptionInfo() const
 {
   std::string info = "";
 
@@ -73,7 +71,7 @@ const std::string& cedar::aux::ExceptionBase::exceptionInfo(void) const
   }
 
   // Add the typename, file and line information
-  info += "Type: " + this->mType;
+  info += "Type: " + this->mAutoType;
   info += "\nFile: " + this->mFileName;
   info += "\nLine: ";
   std::stringstream input_stream;
