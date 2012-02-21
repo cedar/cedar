@@ -381,6 +381,7 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   if (a == NULL)
     return;
 
+  // plot data
   if (a->parentWidget() == p_data)
   {
     std::string data_name = a->data().toString().toStdString();
@@ -396,12 +397,14 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     p_plotter->plot(p_data);
     p_plotter->show();
   }
+  // execute an action
   else if (a->parentWidget() == p_actions_menu)
   {
     std::string action = a->text().toStdString();
     this->mStep->callAction(action);
 
   }
+  // delete the step
   else if (a == p_delete_action)
   {
     //!@todo

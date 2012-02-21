@@ -61,6 +61,21 @@ QDockWidget(title.c_str(), pParent)
 {
   this->setFloating(true);
   this->layout()->setContentsMargins(0, 0, 0, 0);
+
+  QRect geometry = this->geometry();
+  QRect parent_geometry = pParent->frameGeometry();
+  int width = 200;
+  int height = 200;
+  int offset_x = (pParent->width() - width) / 2;
+  int offset_y = (pParent->height() - height) / 2;
+  geometry.setLeft(parent_geometry.left() + geometry.left() + offset_x);
+  geometry.setTop(parent_geometry.left() + geometry.top() + offset_y);
+  geometry.setWidth(width);
+  geometry.setHeight(height);
+
+
+
+  this->setGeometry(geometry);
 }
 
 cedar::aux::gui::DataPlotter::~DataPlotter()
