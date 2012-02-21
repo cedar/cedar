@@ -187,7 +187,6 @@ class cedar::aux::UnmanglingFailedException : public cedar::aux::ExceptionBase
 public:
   UnmanglingFailedException()
   {
-    this->mType = "UnmanglingFailedException";
   }
 };
 

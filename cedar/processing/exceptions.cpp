@@ -42,50 +42,40 @@
 
 cedar::proc::InvalidNameException::InvalidNameException()
 {
-  this->mType = "InvalidNameException";
 }
 
 cedar::proc::InvalidObjectException::InvalidObjectException()
 {
-  this->mType = "InvalidObjectException";
 }
 
 cedar::proc::InvalidRoleException::InvalidRoleException()
 {
-  this->mType = "InvalidRoleException";
 }
 
 cedar::proc::InvalidCategoryException::InvalidCategoryException()
 {
-  this->mType = "InvalidCategoryException";
 }
 
 cedar::proc::DuplicateNameException::DuplicateNameException()
 {
-  this->mType = "DuplicateNameException";
 }
 
 cedar::proc::MissingConnectionException::MissingConnectionException()
 {
-  this->mType = "MissingConnectionException";
 }
 
 cedar::proc::MissingDeclarationException::MissingDeclarationException()
 {
-  this->mType = "MissingDeclarationException";
 }
 
 cedar::proc::InvalidArgumentsException::InvalidArgumentsException()
 {
-  this->mType = "InvalidArgumentsException";
 }
 
 cedar::proc::PluginException::PluginException()
 {
-  this->mType = "PluginException";
 }
 
 cedar::proc::ParseException::ParseException()
 {
-  this->mType = "ParseException";
 }
