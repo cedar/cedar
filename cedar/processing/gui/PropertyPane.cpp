@@ -82,6 +82,8 @@ cedar::proc::gui::PropertyPane::PropertyPane(QWidget *pParent)
 :
 QTableWidget(pParent)
 {
+  this->setSelectionMode(QAbstractItemView::NoSelection);
+  this->setTabKeyNavigation(false);
 }
 
 cedar::proc::gui::PropertyPane::~PropertyPane()

@@ -55,6 +55,12 @@
  *        This widget offers a quick way of creating a user interface for classes that implement the
  *        cedar::aux::Configurable interface. Parameters of the configurable are displayed in a tabular widget by their
  *        name and have an edit widget associated with them.
+ *
+ * @todo  This class should be usable outside of the processing ide; make sure this is the case, and move it to
+ *        cedar::aux.
+ *
+ * @todo  Maybe this should be a QTreeWidget/View to better reflect the tree-like structure of the Configurable
+ *        interface.
  */
 class cedar::proc::gui::PropertyPane : public QTableWidget
 {
