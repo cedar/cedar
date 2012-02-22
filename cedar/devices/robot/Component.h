@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 #include "cedar/devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
