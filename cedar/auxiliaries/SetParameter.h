@@ -150,6 +150,18 @@ public:
     this->mValues.insert(value);
   }
 
+  //!@brief Erases the entry with the given value.
+  void erase(const T& value)
+  {
+    this->mValues.erase(value);
+  }
+
+  //!@brief Checks whether the value is contained in the set.
+  bool contains(const T& value)
+  {
+    return this->mValues.find(value) != this->mValues.end();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
