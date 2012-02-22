@@ -129,7 +129,7 @@ std::string cedar::aux::System::getUserApplicationDataDirectory()
 std::string cedar::aux::System::locateResource(const std::string& resourcePath)
 {
   std::string in_home = CEDAR_HOME_DIRECTORY "/resources/" + resourcePath;
-  std::string in_install = CEDAR_INSTALL_RESOURCE_DIRECTORY "/" + resourcePath;
+  std::string in_install = CEDAR_RESOURCE_INSTALL_DIR "/" + resourcePath;
   std::string cedar_resource_path;
   char *p_resource_path = getenv("CEDAR_RESOURCE_PATH");
   if (p_resource_path)
