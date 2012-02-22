@@ -41,7 +41,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 #include "cedar/auxiliaries/UserData.h"
 #include "cedar/auxiliaries/IntervalData.h"
 

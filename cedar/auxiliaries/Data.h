@@ -43,7 +43,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>

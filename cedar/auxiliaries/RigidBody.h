@@ -38,9 +38,8 @@
 #define CEDAR_AUX_RIGID_BODY_H
 
 // CEDAR INCLUDES
-#include "namespace.h"
-#include "Base.h"
-#include "ConfigurationInterface.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <QObject>

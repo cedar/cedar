@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <vector>
