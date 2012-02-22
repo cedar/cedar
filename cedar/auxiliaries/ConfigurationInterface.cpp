@@ -113,6 +113,16 @@ cedar::aux::ConfigurationInterface::ParameterInfo::~ParameterInfo()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+const std::string& cedar::aux::ConfigurationInterface::getName() const
+{
+  return _mName;
+}
+
+void cedar::aux::ConfigurationInterface::setName(const std::string& rName)
+{
+  _mName = rName;
+}
+
 int cedar::aux::ConfigurationInterface::addParameter(
                                           bool* pMember,
                                           const std::string& name,

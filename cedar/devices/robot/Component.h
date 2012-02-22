@@ -52,7 +52,7 @@
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::robot::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
