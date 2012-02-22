@@ -51,7 +51,7 @@
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::robot::Robot : public cedar::aux::Base
+class cedar::dev::robot::Robot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -112,8 +112,12 @@ private:
 protected:
   //! map of pointers to all sub components
   std::map<std::string, ComponentPtr> mComponents;
+
   //! names of all components and their corresponding sub-components
   std::map<std::string, std::set<std::string> > _mSubComponentNames;
+
+  //! Name of the robot.
+  std::string _mName;
 
 private:
   // none yet

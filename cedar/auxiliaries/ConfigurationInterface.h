@@ -58,7 +58,7 @@
  *
  * @deprecated This interface will be removed in one of the next versions of cedar. Use cedar::aux::Configurable instead.
  */
-class cedar::aux::ConfigurationInterface : public virtual cedar::aux::Base
+class cedar::aux::ConfigurationInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros, structs, enums
@@ -136,6 +136,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+
+  //!@brief Returns the name of the object.
+  //!@return Name of the object.
+  const std::string& getName() const;
+
+  //!@brief Sets the name of the object to the given name.
+  //!@param rName New name of the object.
+  void setName(const std::string& rName);
 
   /*!@brief Adds a parameter to the parameter list.
    * @param pMember    pointer to member variable
@@ -478,6 +486,9 @@ public:
 protected:
   //! the Config object, which holds a tree of stored configuration entries
   libconfig::Config mConfig;
+
+  //! name of the object
+  std::string _mName;
 private:
 
   //! the name of the configuration file
