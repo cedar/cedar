@@ -236,7 +236,7 @@ bool GrabberInterface::writeConfiguration()
     return false;
   }
 
-  //write out the parameter of the configurationInterface
+  //write out the parameter of the Grabber
   bool result = cedar::aux::ConfigurationInterface::writeConfiguration();
 
   #ifdef DEBUG_GRABBER_INTERFACE
