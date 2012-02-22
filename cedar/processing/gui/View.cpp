@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 #include <QResizeEvent>
+#include <QScrollBar>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -51,7 +52,10 @@
 cedar::proc::gui::View::View(QWidget *pParent)
 :
 QGraphicsView(pParent),
-mCurrentZoomLevel(1)
+mCurrentZoomLevel(static_cast<qreal>(1.0)),
+mScrollDx(static_cast<qreal>(0.0)),
+mScrollDy(static_cast<qreal>(0.0)),
+mpScrollTimer(new QTimer(this))
 {
   this->mpScene = new cedar::proc::gui::Scene(this);
   this->setScene(this->mpScene);
@@ -62,6 +66,9 @@ mCurrentZoomLevel(1)
                                            | QPainter::SmoothPixmapTransform
                                            | QPainter::HighQualityAntialiasing
                                            );
+
+  this->mpScrollTimer->setSingleShot(false);
+  QObject::connect(this->mpScrollTimer, SIGNAL(timeout()), this, SLOT(scrollTimerEvent()));
 
   this->setZoomLevel(100);
 }
@@ -88,6 +95,56 @@ void cedar::proc::gui::View::wheelEvent(QWheelEvent *pEvent)
   }
 }
 
+void cedar::proc::gui::View::scrollTimerEvent()
+{
+  // move the horizontal scroll bar
+  this->horizontalScrollBar()->setValue
+                               (
+                                 this->horizontalScrollBar()->value()
+                                   + this->mScrollDx * this->horizontalScrollBar()->singleStep()
+                               );
+
+  // move the vertical scroll bar
+  this->verticalScrollBar()->setValue
+                            (
+                              this->verticalScrollBar()->value()
+                                + this->mScrollDy * this->verticalScrollBar()->singleStep()
+                            );
+}
+
+void cedar::proc::gui::View::mouseMoveEvent(QMouseEvent *pEvent)
+{
+  // scroll the view if connecting to something close to the edge
+  if (this->mpScene->getMode() == cedar::proc::gui::Scene::MODE_CONNECT)
+  {
+    int border = 40;
+    this->mScrollDx = 0;
+    this->mScrollDy = 0;
+    if (pEvent->x() < border)
+    {
+      this->mScrollDx = -1;
+    }
+    else if (pEvent->x() > this->width() - border)
+    {
+      this->mScrollDx = 1;
+    }
+
+    if (pEvent->y() < border)
+    {
+      this->mScrollDy = -1;
+    }
+    else if (pEvent->y() > this->height() - border)
+    {
+      this->mScrollDy = 1;
+    }
+
+  }
+
+  // continue normal event processing
+  QGraphicsView::mouseMoveEvent(pEvent);
+}
+
+
 void cedar::proc::gui::View::setZoomLevel(int newLevel)
 {
   qreal target_zoom = static_cast<qreal>(newLevel)/static_cast<qreal>(100.0);
@@ -106,8 +163,8 @@ cedar::proc::gui::Scene* cedar::proc::gui::View::getScene()
 void cedar::proc::gui::View::resizeEvent(QResizeEvent * pEvent)
 {
   QWidget::resizeEvent(pEvent);
-  //!@todo fix the scene rect
 }
+
 
 void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const QString& param)
 {
@@ -115,9 +172,14 @@ void cedar::proc::gui::View::setMode(cedar::proc::gui::Scene::MODE mode, const Q
   {
     case cedar::proc::gui::Scene::MODE_CONNECT:
       this->setDragMode(QGraphicsView::NoDrag);
+      this->mpScrollTimer->start(100);
       break;
 
     default:
+      if (this->mpScrollTimer->isActive())
+      {
+        this->mpScrollTimer->stop();
+      }
       this->setDragMode(QGraphicsView::RubberBandDrag);
       break;
   }
