@@ -1040,6 +1040,7 @@ cv::Size CameraGrabber::getCameraFrameSize( unsigned int channel)
 //----------------------------------------------------------------------------------------------------
 bool CameraGrabber::setProperty(unsigned int channel, unsigned int prop_id, double value)
 {
+  //return mCamConfigurations.at(channel)->set(prop_id,value);
   bool result;
   mVideoCaptureLocks.at(channel)->lockForWrite();
   result = mVideoCaptures.at(channel).set(prop_id,value);
@@ -1051,6 +1052,7 @@ bool CameraGrabber::setProperty(unsigned int channel, unsigned int prop_id, doub
 //----------------------------------------------------------------------------------------------------
 double CameraGrabber::getProperty(unsigned int channel, unsigned int prop_id)
 {
+  //return mCamConfigurations.at(channel)->get(prop_id,value);
   double value;
   mVideoCaptureLocks.at(channel)->lockForWrite();
   value = mVideoCaptures.at(channel).get(prop_id);

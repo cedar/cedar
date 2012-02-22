@@ -44,8 +44,8 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-//#include <opencv2/highgui/highui_c.h>
-#include "../../../../../../OpenCV-2.3.1/modules/highgui/include/opencv2/highgui/highgui_c.h"
+#include <opencv2/highgui/highgui_c.h>
+//#include "../../../../../../OpenCV/OpenCV-2.3.1_patched/modules/highgui/include/opencv2/highgui/highgui_c.h"
 
 /*!@brief Enum class for camera properties direct mapped from opencv2/highgui/highui_c.h
  * (also in dc1394/control.h)

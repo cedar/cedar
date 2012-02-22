@@ -92,6 +92,14 @@ public:
   ///! Save the configuration to the configuration file specified in the constructor
    bool writeConfiguration();
 
+   ///! Set a parameter in the cv::VideoCapture class
+   // implements the cv::VideoCapture.set() method with respect to concurrent access
+   bool setProperty(unsigned int prop_id, double value);
+
+   ///! Get a parameter form the cv::VideoCapture
+   // implements the cv::VideoCapture.get() method with respect to concurrent access
+   double getProperty(unsigned int prop_id);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -122,14 +130,6 @@ private:
 
   ///! Interface to ConfigurationInterface class;
   bool declareParameter();
-
-  ///! Set a parameter in the cv::VideoCapture class
-  // implements the cv::VideoCapture.set() method with respect to concurrent access
-  bool setProperty(unsigned int prop_id, double value);
-
-  ///! Get a parameter form the cv::VideoCapture
-  // implements the cv::VideoCapture.get() method with respect to concurrent access
-  double getProperty(unsigned int prop_id);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
