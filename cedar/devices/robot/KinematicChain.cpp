@@ -69,7 +69,11 @@ mpReferenceGeometry(new ReferenceGeometry(configFileName))
 //! destructor
 cedar::dev::robot::KinematicChain::~KinematicChain()
 {
-  // todo stop threads here (only if they are running!)
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
 }
 
 //------------------------------------------------------------------------------
