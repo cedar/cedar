@@ -112,7 +112,7 @@ public:
    * @param index    specifies the joint
    * @return    joint angle value
    */
-  virtual double getJointAngle(unsigned int index) = 0;
+  virtual double getJointAngle(unsigned int index) const = 0;
 
   /*!@brief get current state of all joint angles
    *
@@ -131,7 +131,7 @@ public:
    * @param index    specifies the joint
    * @return    joint velocity value
    */
-  virtual double getJointVelocity(unsigned int index);
+  virtual double getJointVelocity(unsigned int index) const;
 
   /*!@brief get current state of all joint velocities
    *
@@ -150,7 +150,7 @@ public:
    * @param index    specifies the joint
    * @return    joint acceleration value
    */
-  virtual double getJointAcceleration(unsigned int index);
+  virtual double getJointAcceleration(unsigned int index) const;
 
   /*!@brief get current state of all joint accelerations
    *

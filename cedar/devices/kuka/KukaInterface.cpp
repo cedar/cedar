@@ -133,7 +133,7 @@ bool cedar::dev::kuka::KukaInterface::isMovable()
   return false;
 }
 
-double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index)
+double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index) const
 {
   double a = 0;
   try

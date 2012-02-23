@@ -208,7 +208,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 }
 
 
-double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint)
+double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint) const
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -234,7 +234,7 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint)
 }
 
 
-double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint)
+double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint) const
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 

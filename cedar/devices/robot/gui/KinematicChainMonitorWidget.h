@@ -126,8 +126,8 @@ protected:
 
 private:
   static const int mUpdateInterval = 100;
-  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
-  QGridLayout *mpGridLayout;
+  cedar::dev::robot::ConstKinematicChainPtr mpKinematicChain;
+  QGridLayout* mpGridLayout;
   unsigned int mDecimals;
 };
 
