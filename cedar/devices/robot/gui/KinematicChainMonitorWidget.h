@@ -45,8 +45,8 @@
 
 // SYSTEM INCLUDES
 #include <QtCore/QTimer>
-#include <QtGui/QGridLayout>
-#include <QtGui/QWidget>
+#include <QGridLayout>
+#include <QWidget>
 
 //!@brief A simple widget to monitor the state of a kinematic chain
 class cedar::dev::robot::gui::KinematicChainMonitorWidget

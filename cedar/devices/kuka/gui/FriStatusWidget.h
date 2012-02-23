@@ -71,7 +71,7 @@ public:
    * @param pKukaIn pointer to an instance of KukaInterface, where this widget gets the data
    * @param parent parent widget
    */
-  FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent=0);
+  FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr pKukaIn, QWidget *parent=0);
 
   //!@brief Destructor
   ~FriStatusWidget();

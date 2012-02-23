@@ -85,10 +85,10 @@ public:
   double getSceneLimit() const;
   
   /*!@brief adds an object to the scene
-   * @param rpRigidBodyVisualization pointer to the object
+   * @param pRigidBodyVisualization pointer to the object
    * @return index of the object in the scene
    */
-  int addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr& rpRigidBodyVisualization);
+  int addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization);
   
   /*!@brief adds an object to the scene
    * @param pViewer pointer to the viewer

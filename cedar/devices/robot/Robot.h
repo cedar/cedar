@@ -71,7 +71,7 @@ public:
    * @return Pointer to the requested component.
    * @param[in] rComponentName Name of the component that is to be returned.
    */
-  ComponentPtr& getComponent(const std::string& rComponentName);
+  ComponentPtr getComponent(const std::string& rComponentName);
 
   /*! @brief Creates a specified component.
    *

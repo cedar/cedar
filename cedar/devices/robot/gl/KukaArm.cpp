@@ -70,9 +70,9 @@ const float cedar::dev::robot::gl::KukaArm::mBlack_Shininess[1] = {0.05};
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::KukaArm::KukaArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::KukaArm::KukaArm(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
 :
-cedar::dev::robot::gl::KinematicChain(rpKinematicChainModel)
+cedar::dev::robot::gl::KinematicChain(pKinematicChainModel)
 {
   loadData();
 }

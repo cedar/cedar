@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_ROBOT_GL_CORA_ARM_H
-#define CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+#ifndef CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
+#define CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
 
 #define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
 
@@ -63,11 +63,16 @@ protected:
   //!@brief container for vertex and related data
   typedef struct
   {
+    //!@brief position of the vertex
     GLfloat location[3];
+    //!@brief texture coordinates
     GLfloat tex[2];
+    //!@brief normal
     GLfloat normal[3];
+    //!@brief color
     GLfloat colour[4];
-    GLubyte padding[16]; // Pads the struct out to 64 bytes for performance increase
+    //!@brief pads the struct out to 64 bytes for performance increase
+    GLubyte padding[16];
   } Vertex;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -75,7 +80,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KukaArm(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  KukaArm(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
   //!@brief destructor
   ~KukaArm();
 
@@ -213,5 +218,5 @@ private:
   GLushort mWristRingIndex[mWristRingFacesNumber*3]; // index data
 
 }; // class cedar::dev::robot::gl::KukaArm
-#endif // CEDAR_DEV_ROBOT_GL_CORA_ARM_H
+#endif // CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
 

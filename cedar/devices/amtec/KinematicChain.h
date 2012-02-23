@@ -59,7 +59,7 @@ class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicCha
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
   //!@brief constructor
   KinematicChain(const std::string& configFileName);
 

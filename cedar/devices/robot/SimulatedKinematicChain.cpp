@@ -45,7 +45,7 @@
 
 cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain
 (
-  const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry
+  const cedar::dev::robot::ReferenceGeometryPtr rpReferenceGeometry
 )
 :
 KinematicChain(rpReferenceGeometry)

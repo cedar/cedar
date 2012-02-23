@@ -47,7 +47,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 ControlThread::ControlThread(
-                              const cedar::dev::robot::KinematicChainPtr &kinematicChain,
+                              const cedar::dev::robot::KinematicChainPtr kinematicChain,
                               const std::string& configFileName
                             )
 :

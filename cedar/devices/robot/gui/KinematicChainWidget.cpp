@@ -41,11 +41,10 @@
 #include "cedar/devices/robot/gui/KinematicChainCommandWidget.h"
 
 // SYSTEM INCLUDES
-#include "stdio.h"
 #include <iostream>
-#include <QtGui/QApplication>
-#include <QtGui/QGridLayout>
-#include <QtGui/QGroupBox>
+#include <QApplication>
+#include <QGridLayout>
+#include <QGroupBox>
 
 //----------------------------------------------------------------------------
 // constructors and destructor
