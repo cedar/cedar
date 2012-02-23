@@ -62,7 +62,11 @@ KinematicChain(configFileName)
 
 cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
-  
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

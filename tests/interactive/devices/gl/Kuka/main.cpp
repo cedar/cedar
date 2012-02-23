@@ -114,7 +114,5 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
   a.exec();
 
-  p_kuka_arm->stop();
-  p_kuka_arm->wait();
   return 0;
 }

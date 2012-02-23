@@ -252,6 +252,7 @@ int main(int argc, char **argv)
 
   // clean up
   worker.stop();
+  worker.wait();
   if (use_hardware)
   {
     delete p_fri_status_widget;
