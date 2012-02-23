@@ -57,7 +57,7 @@ class cedar::dev::robot::gl::CoraHead : public cedar::dev::robot::gl::AmtecChain
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  CoraHead(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  CoraHead(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
   //!@brief destructor
   ~CoraHead();
 

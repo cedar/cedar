@@ -49,9 +49,9 @@
 
 // SYSTEM INCLUDES
 
-#include <QtCore/QTimer>
-#include <QtGui/QGridLayout>
-#include <QtGui/QWidget>
+#include <QTimer>
+#include <QGridLayout>
+#include <QWidget>
 
 
 /*!@brief Widget to control CoRA via forward and reverse kinematic.
@@ -77,7 +77,7 @@ public:
    *@param parent QWidget parent
    *@param f QWidget window flags
    */
-  ForwardInverseWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  ForwardInverseWidget(const cedar::dev::robot::KinematicChainPtr kinematicChain, cedar::dev::robot::KinematicChainModelPtr kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
 
   /*!@brief Constructor
    *
@@ -86,7 +86,7 @@ public:
    *@param parent QWidget parent
    *@param f QWidget window flags
    */
-  ForwardInverseWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  ForwardInverseWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, cedar::dev::robot::KinematicChainModelPtr kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
 
   //!@brief Destructor
   ~ForwardInverseWidget();

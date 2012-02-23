@@ -45,11 +45,11 @@
 //------------------------------------------------------------------------------
 
 //! constructor
-cedar::dev::robot::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+cedar::dev::robot::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry)
 :
 //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
 LoopedThread(12, 0.01),
-mpReferenceGeometry(rpReferenceGeometry)
+mpReferenceGeometry(pReferenceGeometry)
 {
   setWorkingMode(ANGLE);
   mUseCurrentHardwareValues = false;
@@ -76,7 +76,7 @@ cedar::dev::robot::KinematicChain::~KinematicChain()
 // methods
 //------------------------------------------------------------------------------
 
-const cedar::dev::robot::ReferenceGeometryPtr& cedar::dev::robot::KinematicChain::getReferenceGeometry() const
+const cedar::dev::robot::ReferenceGeometryPtr cedar::dev::robot::KinematicChain::getReferenceGeometry() const
 {
   return mpReferenceGeometry;
 }
@@ -88,7 +88,7 @@ unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
 }
 
 
-void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)
+void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr rpGeometry)
 {
   mpReferenceGeometry = rpGeometry;
 }

@@ -40,7 +40,7 @@
 #include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
 #include "cedar/auxiliaries/RigidBody.h"
 
-#include <QtGui/QLabel>
+#include <QLabel>
 
 
 // SYSTEM INCLUDES

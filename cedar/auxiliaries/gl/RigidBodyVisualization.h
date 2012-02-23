@@ -117,7 +117,7 @@ public:
   void setAxisLength(double value);
 
   /*!@brief get the length of the axes in the local coordinate frame visualization
-   * @param value    new axis length
+   * @return axis length
    */
   double getAxisLength() const;
 
@@ -127,11 +127,11 @@ public:
   void setResolution(int value);
   
   /*!@brief sets the main color of the object, in RGB
-   * @param R    value for red channel in RGB color
-   * @param G    value for green channel in RGB color
-   * @param B    value for blue channel in RGB color
+   * @param r    value for red channel in RGB color
+   * @param g    value for green channel in RGB color
+   * @param b    value for blue channel in RGB color
    */
-  void setColor(double R, double G, double B);
+  void setColor(double r, double g, double b);
 
   /*!@brief returns a smart pointer to the object being visualized
    *

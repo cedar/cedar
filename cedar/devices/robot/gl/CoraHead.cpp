@@ -47,9 +47,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::CoraHead::CoraHead(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::CoraHead::CoraHead(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
 :
-cedar::dev::robot::gl::AmtecChain(rpKinematicChainModel)
+cedar::dev::robot::gl::AmtecChain(pKinematicChainModel)
 {
 
 }
