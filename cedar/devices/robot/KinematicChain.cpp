@@ -124,7 +124,7 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix()
 }
 
 
-double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) const
 {
   if (index >= getNumberOfJoints())
   {
@@ -154,7 +154,7 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix()
 }
 
 
-double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index) const
 {
   if (index >= getNumberOfJoints())
   {
