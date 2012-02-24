@@ -80,9 +80,14 @@ public:
   void onStart();
   void onStop();
 
-  cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
+  inline cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
   {
     return this->mSigmoidalActivation;
+  }
+
+  inline cedar::dyn::ConstSpaceCodePtr getFieldActivation() const
+  {
+    return this->mActivation;
   }
 
 public slots:
