@@ -53,6 +53,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed>
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_800;
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_1600;
   const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_3200;
+  const cedar::dev::sensors::visual::CameraIsoSpeed::Id cedar::dev::sensors::visual::CameraIsoSpeed::ISO_NOT_SET;
 #endif // MSVC
 //!@endcond
 
@@ -62,6 +63,12 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraIsoSpeed>
 
 void cedar::dev::sensors::visual::CameraIsoSpeed::construct()
 {
+  mType.type()->def(cedar::aux::Enum(
+                                      cedar::dev::sensors::visual::CameraIsoSpeed::ISO_NOT_SET,
+                                      "ISO_NOT_SET",
+                                      "Bus speed set to automatic"
+                                    ));
+
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraIsoSpeed::ISO_100,
                                       "ISO_100",
@@ -93,6 +100,7 @@ void cedar::dev::sensors::visual::CameraIsoSpeed::construct()
                                       "ISO_3200",
                                       "Bus speed 3200 Mbit/s"
                                     ));
+
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

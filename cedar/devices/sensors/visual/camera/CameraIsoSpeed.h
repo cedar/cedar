@@ -95,6 +95,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  static const Id ISO_NOT_SET = UINT_MAX-2;
   static const Id ISO_100 = 100;
   static const Id ISO_200 = 200;
   static const Id ISO_400 = 400;

@@ -99,6 +99,7 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
+  static const Id FRAMERATE_NOT_SET = UINT_MAX-2;
   static const Id FRAMERATE_1_875 = 2;
   static const Id FRAMERATE_3_75 = 4;
   static const Id FRAMERATE_7_5 = 8;

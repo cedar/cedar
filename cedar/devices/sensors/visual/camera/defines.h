@@ -78,12 +78,12 @@ struct CameraId
 
 //--------------------------------------------------------------------------------------------------------------------
 ///! std::set to store all supported properties in
-typedef std::set<cedar::dev::sensors::visual::CameraProperty::Id> SupportedPropertiesSet;
+//typedef std::set<cedar::dev::sensors::visual::CameraProperty::Id> SupportedPropertiesSet;
 
 //--------------------------------------------------------------------------------------------------------------------
 ///! std::map to map property enum id to the value of the property
-typedef std::map<unsigned int,int> CameraPropertyValues;
-typedef std::pair<unsigned int, int> CameraPropertyValuesPair;
+typedef std::map<cedar::dev::sensors::visual::CameraProperty::Id, double> CameraPropertyValues;
+typedef std::pair<cedar::dev::sensors::visual::CameraProperty::Id, double> CameraPropertyValuesPair;
 
 //--------------------------------------------------------------------------------------------------------------------
 ///! macro to create a pair of property-enum to property value
