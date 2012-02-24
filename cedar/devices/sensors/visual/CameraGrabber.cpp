@@ -41,7 +41,7 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <boost/lexical_cast.hpp> //for reading values from the configfile
+#include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/round.hpp> //rounding from double to int in cv::VideoCapture get and set methods
 
 
@@ -223,7 +223,7 @@ CameraGrabber::~CameraGrabber()
 bool CameraGrabber::onDeclareParameters()
 {
   // The cameragrabber stores only 4 values : guid, busId, createbyguid and the capability-filename for the camera
-  // the rest will be managed by the CameraConfiguration class
+  // the rest will be managed by the CameraStateAndConfig class
 
   bool result = true;
 
@@ -265,7 +265,7 @@ bool CameraGrabber::onWriteConfiguration()
   //write properties of the cameras
   for (unsigned int channel=0; channel<mNumCams; channel++)
   {
-    result = mCamConfigurations.at(channel)->writeConfiguration() && result;
+    result = mCamStateAndConfigs.at(channel)->saveConfiguration() && result;
   }
 
   #ifdef DEBUG_CAMERAGRABBER
@@ -289,7 +289,7 @@ bool CameraGrabber::onInit()
   //open capture one by one, and create storage (cv::Mat) for the frames
   mImageMatVector.clear();
   mVideoCaptures.clear();
-  mCamConfigurations.clear();
+  mCamStateAndConfigs.clear();
 
   #ifdef SHOW_INIT_INFORMATION_CAMERAGRABBER
     std::cout << "CameraGrabber: Initialize Grabber with " << mNumCams << " camera(s) ..." << std::endl;
@@ -435,12 +435,13 @@ bool CameraGrabber::onInit()
     }
 
     //create and load the camera capabilities
-    std::string conf_file_name = ConfigurationInterface::getConfigFileName();
+    std::string conf_file_name = ConfigurationInterface::getConfigFileName()
+                                 +"_ch"+boost::lexical_cast<std::string>(channel);
     std::string cap_file_name = mCameraCapabilitiesFileNames.at(channel);
 
     try
     {
-      CameraConfigurationPtr cam_conf( new CameraConfiguration
+      CameraStateAndConfigPtr cam_conf( new CameraStateAndConfig
                                            (
                                              mVideoCaptures.at(channel),
                                              mVideoCaptureLocks.at(channel),
@@ -449,7 +450,7 @@ bool CameraGrabber::onInit()
                                              cap_file_name
                                            )
                                      );
-      mCamConfigurations.push_back(cam_conf);
+      mCamStateAndConfigs.push_back(cam_conf);
     }
     catch (...)
     {
@@ -681,11 +682,11 @@ double CameraGrabber::getCameraProperty(unsigned int channel,CameraProperty::Id 
 
   std::string info="";
 
-  if (mCamConfigurations.at(channel)->isSupported(propId))
+  if (mCamStateAndConfigs.at(channel)->isSupported(propId))
   {
-    if (mCamConfigurations.at(channel)->isReadable(propId))
+    if (mCamStateAndConfigs.at(channel)->isReadable(propId))
     {
-      return getProperty(channel,static_cast<unsigned int>(propId));
+      return mCamStateAndConfigs.at(channel)->getProperty(static_cast<unsigned int>(propId));
     }
     else
     {
@@ -722,196 +723,13 @@ bool CameraGrabber::setCameraProperty(unsigned int channel,CameraProperty::Id pr
               << boost::math::iround(value) << std::endl;
   #endif
 
-    if (channel >= mNumCams)
+  if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"CameraGrabber::setCameraProperty");
   }
 
-  int wanted_value = boost::math::iround(value);// static_cast<int>(value);
+ return mCamStateAndConfigs.at(channel)->setProperty(propId, value);
 
-  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-    std::string prop_name = CameraProperty::type().get(propId).name();
-    int prop_id = static_cast<int>(propId);
-  #endif
-
-  //------------------------------------------------------
-  //check if undefined properties
-  if ( (propId == cedar::aux::Enum::UNDEFINED) || (value == CAMERA_PROPERTY_NOT_SUPPORTED))
-  {
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraProperty] Undefined or unsupported property \""
-                << prop_name << "\" (ID: "<< prop_id << ")" << std::endl;
-    #endif
-
-    return false;
-  }
-
-  //------------------------------------------------------
-  //check if property is supported from the cam
-  if (!mCamConfigurations.at(channel)->isSupported(propId))
-  {
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraProperty] Property \"" << prop_name
-                << "\" unsupported on channel " << channel << std::endl;
-    #endif
-
-    return false;
-  }
-
-  //------------------------------------------------------
-  //check property modes
-  if (wanted_value == CAMERA_PROPERTY_MODE_AUTO)
-  {
-    if (mCamConfigurations.at(channel)->isAutoCapable(propId))
-    {
-      if (setProperty(channel,prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_AUTO)))
-      {
-         return true;
-      }
-      else
-      {
-        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                  << "\" couldn't set to mode \"auto\""  << std::endl;
-        #endif
-        return false;
-      }
-    }
-    else
-    {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                << "\" doesn't support \"CAMERA_PROPERTY_MODE_AUTO\""  << std::endl;
-      #endif
-      return false;
-    }
-  }
-  else if (wanted_value == CAMERA_PROPERTY_MODE_OFF)
-  {
-    if (mCamConfigurations.at(channel)->isOnOffCapable(propId))
-    {
-      if (setProperty(channel,prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_OFF)))
-      {
-         return true;
-      }
-      else
-      {
-        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                  << "\" couldn't switched off"  << std::endl;
-        #endif
-        return false;
-      }
-    }
-    else
-    {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                << "\" is not on/off capable"  << std::endl;
-      #endif
-      return false;
-    }
-  }
-  else if (wanted_value == CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO)
-  {
-    if (mCamConfigurations.at(channel)->isOnePushCapable(propId))
-    {
-      if (setProperty(channel,prop_id, static_cast<double>(CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO)))
-      {
-         return true;
-      }
-      else
-      {
-        #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                  << "\" couldn't set to mode \"OnePushAuto\""  << std::endl;
-        #endif
-        return false;
-      }
-    }
-    else
-    {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                << "\" is not \"one push auto\" capable"  << std::endl;
-      #endif
-      return false;
-    }
-  }
-  else
-  {
-    //manual setting of property value
-    if (! (mCamConfigurations.at(channel)->isManualCapable(propId)
-           || mCamConfigurations.at(channel)->isAbsoluteCapable(propId)
-          )
-       )
-    {
-      #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                << "\" couldn't set to manual mode"  << std::endl;
-      #endif
-      return false;
-    }
-
-    //check lower and upper boundaries for manual settings
-    int max_value = mCamConfigurations.at(channel)->getMaxValue(propId);
-    int min_value = mCamConfigurations.at(channel)->getMinValue(propId);
-
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      if ( (wanted_value > max_value) || (wanted_value < min_value))
-      {
-          std::cout << "[CameraGrabber::setCameraProperty] Channel "<< channel << ": Property \"" << prop_name
-                    << "\" has a range of [" << min_value << ","<< max_value << "]" << std::endl;
-          std::cout << "[CameraGrabber::setCameraProperty] Your value of "<< value
-                    << " exceeds this boundaries" << std::endl;
-      }
-    #endif
-
-    if (value > max_value)
-    {
-      wanted_value = max_value;
-    }
-    else if (value < min_value)
-    {
-      wanted_value = min_value;
-    }
-
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      if (wanted_value != boost::math::iround(value))
-      {
-        std::cout << "[CameraGrabber::setCameraProperty] set " << prop_name << " to " << wanted_value << std::endl;
-      }
-    #endif
-
-
-    //check if already set
-    int old_value = boost::math::iround(getCameraProperty(channel,propId));
-    if ( old_value == wanted_value)
-    {
-      return true;
-    }
-
-    //not set, set it
-    int new_value = 0;
-    //if (mVideoCaptures.at(channel).set(propId, static_cast<double>(wanted_value))) asdf
-    if (setProperty(channel,prop_id, static_cast<double>(wanted_value)))
-    {
-      //and check if successful
-      new_value = boost::math::iround(getCameraProperty(channel,propId));
-      if (new_value == wanted_value)
-      {
-        return true;
-      }
-    }
-
-    // an error occurred
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraGrabber::setCameraProperty] Couldn't set Property "
-                << prop_name
-                << " to " << value << ". " << std::endl;
-    #endif
-    return false;
-  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -956,7 +774,7 @@ bool CameraGrabber::setCameraSetting( unsigned int channel, CameraSetting::Id se
     }
   #endif
   //return mVideoCaptures.at(channel).set(setting_id, value);
-  return setProperty(channel,setting_id, value);
+  return mCamStateAndConfigs.at(channel)->setSetting(setting_id, value);
 }
 
 
@@ -969,14 +787,12 @@ double CameraGrabber::getCameraSetting( unsigned int channel, CameraSetting::Id 
   }
 
   unsigned int setting_id = static_cast<unsigned int>(settingId);
-  #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-    std::string setting_name = CameraSetting::type().get(settingId).name();
-  #endif
 
   //check if undefined settings
   if ( (settingId == cedar::aux::Enum::UNDEFINED) )
   {
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
+      std::string setting_name = CameraSetting::type().get(settingId).name();
       std::cout << "[CameraGrabber::getCameraSetting] Channel "<< channel
                 << ": Undefined or unsupported settings \""
                 << setting_name << "\" (ID: "<< setting_id << ")" << std::endl;
@@ -985,7 +801,7 @@ double CameraGrabber::getCameraSetting( unsigned int channel, CameraSetting::Id 
   }
 
   //return mVideoCaptures.at(channel).get(setting_id);
-  return getProperty(channel,setting_id);
+  return mCamStateAndConfigs.at(channel)->getSetting(setting_id);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1037,26 +853,3 @@ cv::Size CameraGrabber::getCameraFrameSize( unsigned int channel)
 }
 
 
-//----------------------------------------------------------------------------------------------------
-bool CameraGrabber::setProperty(unsigned int channel, unsigned int prop_id, double value)
-{
-  //return mCamConfigurations.at(channel)->set(prop_id,value);
-  bool result;
-  mVideoCaptureLocks.at(channel)->lockForWrite();
-  result = mVideoCaptures.at(channel).set(prop_id,value);
-  mVideoCaptureLocks.at(channel)->unlock();
-
-  return result;
-}
-
-//----------------------------------------------------------------------------------------------------
-double CameraGrabber::getProperty(unsigned int channel, unsigned int prop_id)
-{
-  //return mCamConfigurations.at(channel)->get(prop_id,value);
-  double value;
-  mVideoCaptureLocks.at(channel)->lockForWrite();
-  value = mVideoCaptures.at(channel).get(prop_id);
-  mVideoCaptureLocks.at(channel)->unlock();
-
-  return value;
-}

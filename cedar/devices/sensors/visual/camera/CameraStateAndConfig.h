@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CameraConfiguration.h
+    File:        CameraStateAndConfig.h
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 12 01
 
-    Description: Header of the @em cedar::devices::visual::CameraConfiguration class.
+    Description: Header of the @em cedar::devices::visual::CameraStateAndConfig class.
 
     Credits:
 
@@ -45,7 +45,7 @@
 // SYSTEM INCLUDES
 
 
-/*! \class cedar::dev::sensors::visual::CameraConfiguration
+/*! \class cedar::dev::sensors::visual::CameraStateAndConfig
  *  \brief This class manage the properties and capabilities of a camera.
  *
  *  \remarks
@@ -58,12 +58,12 @@
  *    1. CameraCapabilities() <br>
  *        This class have a separate configuration file for the capabilities of the used camera. All supported
  *        properties and the range of their values will be managed by this class.<br>
- *    2. CameraState()  <br>
+ *    2. CameraConfig()  <br>
  *        This class main purpose is to encapsulate the ConfigurationInterface() for the actual set properties
  *        of the used camera. The configuration normally is written to the same file that your cameragrabber use.
  *
  */
-class cedar::dev::sensors::visual::CameraConfiguration
+class cedar::dev::sensors::visual::CameraStateAndConfig
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -76,11 +76,12 @@ public:
   //! @brief The standard constructor.
   // \param VideoCapture The cv::VideoCapture object, which this configuration is assigned to
   //        This will be used, to read and set the values
-  // \param videoCaptureLock The lock, for the single access to the cv::VideoCapture object
+  // \param videoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
+  //        through grabbing and/or change settings
   // \param configurationFileName The filename for the configuration file used to store camera properties in
   //        This could be the same file, which the cameragrabber uses for configuration storage
   // \param capabilitiesFileName The filename of the capabilities. This file have to be adjusted for the used camera
-  CameraConfiguration(
+  CameraStateAndConfig(
                        cv::VideoCapture videoCapture,
                        QReadWriteLockPtr videoCaptureLock,
                        unsigned int channel,
@@ -90,20 +91,39 @@ public:
 
 
   //!@brief Destructor
-  ~CameraConfiguration();
+  ~CameraStateAndConfig();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  ///! Set a parameter in the cv::VideoCapture class
-  // implements the cv::VideoCapture.set() method with respect to concurrent access
-  //bool setProperty(unsigned int prop_id, double value);
+  ///! \brief Set a property in the cv::VideoCapture class
+  //   \remarks This method checks if given value is supported
+  bool setProperty(CameraProperty::Id propId, double value);
 
-  ///! Get a parameter form the cv::VideoCapture
-  // implements the cv::VideoCapture.get() method with respect to concurrent access
-  //double getProperty(unsigned int prop_id);
+  /*! \brief Set a property in the cv::VideoCapture class
+   *   \remarks This method checks if given value is supported
+   *   \return return value is either the value of the property or a one of the following constants
+   *    CAMERA_PROPERTY_NOT_SUPPORTED,
+   *    CAMERA_PROPERTY_MODE_AUTO
+   *    CAMERA_PROPERTY_MODE_OFF
+   *    CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO
+   */
+  double getProperty(CameraProperty::Id propId);
+
+  /*! \brief Get the real value of a Property which is set to auto.
+   *  \remarks On all other properties it is the same as getProperty()
+   */
+  double getPropertyValue(CameraProperty::Id propId);
+
+
+  ///! Set a Parameter in the cv::VideoCapture class
+  bool setSetting(CameraSetting::Id settingId, double value);
+
+  ///! Get a Parameter in the cv::VideoCapture class
+  double getSetting(CameraSetting::Id settingId);
+
 
   //returns the capabilities of a given property
   /*! \brief Get the minimum possible value that can be set of the given property
@@ -157,7 +177,7 @@ public:
   /*! \brief This method is called from the CameraGrabber when the configuration
    *   should be saved
    */
-  bool writeConfiguration();
+  bool saveConfiguration();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -169,28 +189,43 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  ///! Set a property in the cv::VideoCapture class
+  // implements the cv::VideoCapture.set() method with respect to concurrent access
+  bool setCamProperty(unsigned int propId, double value);
 
+  ///! Get a property form the cv::VideoCapture
+  // implements the cv::VideoCapture.get() method with respect to concurrent access
+  double getCamProperty(unsigned int propId);
+
+  bool setAllParametersToCam();
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
   // none yet (hopefully never!)
 protected:
-
-  //bool doInit();
-
-
+  // none yet
 
 private:
 
   /// @cond SKIPPED_DOCUMENTATION
 
+  /*! \brief This is the struct, for the values of the camera settings
+   *  \remarks This is the local storage for the camera settings
+   *    and is only needed for ConfigurationInterface class
+   */
+  CameraSettings mCamSettings;
+
+  /*! \brief This is the map, where all properties and their actual values stored in
+   *  \remarks This is used to map those settings like CAMERA_PROPERTY_MODE_AUTO
+   */
+  CameraPropertyValues mCamPropertyValues;
+
   ///! The CameraCapability class manage the capabilities of the camera
   CameraCapabilitiesPtr mpCamCapabilities;
 
-  ///! The CameraState class manage the properties and settings of the camera, i.e. the actual state
-  CameraStatePtr mpCamState;
+  ///! The CameraConfig class manage the properties and settings of the camera, i.e. the actual state
+  CameraConfigPtr mpCamConfig;
 
   ///! The filename of the configuration file for camera settings
   std::string mConfigurationFileName;
@@ -223,7 +258,7 @@ protected:
   // none yet
 private:
 
-}; // class cedar::dev::sensors::visual::CameraConfiguration
+}; // class cedar::dev::sensors::visual::CameraStateAndConfig
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIGURATION_H
 

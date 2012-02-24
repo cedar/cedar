@@ -47,6 +47,7 @@ cedar::aux::EnumType<cedar::dev::sensors::visual::CameraFrameRate>
 
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
+const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_NOT_SET;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_1_875;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_3_75;
 const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_7_5;
@@ -64,6 +65,12 @@ const cedar::dev::sensors::visual::CameraFrameRate::Id cedar::dev::sensors::visu
 
 void cedar::dev::sensors::visual::CameraFrameRate::construct()
 {
+  mType.type()->def(cedar::aux::Enum(
+                                      cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_NOT_SET,
+                                      "FRAMERATE_NOT_SET",
+                                      "Framerate set to automatic"
+                                    ));
+
   mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraFrameRate::FRAMERATE_1_875,
                                       "FRAMERATE_1_875",

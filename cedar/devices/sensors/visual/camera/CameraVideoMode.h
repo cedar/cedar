@@ -100,7 +100,10 @@ public:
   //As return value this mode means, that the camera is not yet in grabbing mode
   //and there was no other mode to set. In the case of a firewire-camera
   //OpenCV uses the best available mode when starting the grabbing
-  static const Id MODE_NOT_SET = -1; //id is unsigned int: -1 is then interpreted as ULONG_MAX
+  static const Id MODE_NOT_SET = UINT_MAX-2;
+
+  //static const Id MODE_NOT_SET = -1;
+  //id is unsigned int: -1 is then interpreted as UINT_MAX (= cedar::aux::Enum::UNDEFINED)
 
   //use MODE_BY_NUM to check which modes supported.
   //OpenCV firewire backend stores supported video modes in a list and

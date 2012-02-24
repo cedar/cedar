@@ -47,8 +47,8 @@
 #include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
 #include "cedar/devices/sensors/visual/camera/CameraSetting.h"
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
-#include "cedar/devices/sensors/visual/camera/CameraConfiguration.h"
-#include "cedar/devices/sensors/visual/camera/CameraState.h"
+#include "cedar/devices/sensors/visual/camera/CameraStateAndConfig.h"
+#include "cedar/devices/sensors/visual/camera/CameraConfig.h"
 
 // PROJECT INCLUDES
 
@@ -349,7 +349,7 @@ protected:
    *  \param prop_id This is an OpenCV constant of the wanted property
    *  \param value The new value
    */
-  bool setProperty(unsigned int channel, unsigned int prop_id, double value);
+ // bool setProperty(unsigned int channel, unsigned int prop_id, double value);
 
   /*! \brief Get a parameter to the cv::VideoCapture
    *  \remarks
@@ -358,7 +358,7 @@ protected:
    *  \param channel This is the index of the source channel
    *  \param prop_id This is an OpenCV constant of the wanted property
    */
-  double getProperty(unsigned int channel, unsigned int prop_id);
+  //double getProperty(unsigned int channel, unsigned int prop_id);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -394,7 +394,7 @@ protected:
   /*! \brief One manager of settings and properties for each camera.
    *
    */
-  std::vector<CameraConfigurationPtr> mCamConfigurations;
+  std::vector<CameraStateAndConfigPtr> mCamStateAndConfigs;
 
   /*! \brief This vector contains the filenames of the config-files of the camaera capabilities
    *
