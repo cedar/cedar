@@ -70,7 +70,7 @@ void cedar::aux::gl::RigidBodyVisualization::initializeGl()
 
 void cedar::aux::gl::RigidBodyVisualization::init()
 {
-  mRigidBodyType = std::string("no type");
+  mRigidBodyType = "no type";
   mIsVisible = true;
   mIsDrawnAsWireFrame = false;
   mIsDrawingLocalCoordinateFrame = false;
@@ -152,11 +152,11 @@ void cedar::aux::gl::RigidBodyVisualization::setResolution(int value)
   mResolution = value;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setColor(double R, double G, double B)
+void cedar::aux::gl::RigidBodyVisualization::setColor(double r, double g, double b)
 {
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
+  mColorR = r;
+  mColorG = g;
+  mColorB = b;
 }
 
 cedar::aux::RigidBodyPtr cedar::aux::gl::RigidBodyVisualization::getRigidBody()

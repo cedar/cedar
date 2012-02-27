@@ -40,13 +40,11 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <stdio.h>
-#include <iostream>
-#include <QtGui/QApplication>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QLabel>
-#include <QtGui/QRadioButton>
-#include <QtGui/QPushButton>
+#include <QApplication>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QRadioButton>
+#include <QPushButton>
 
 //----------------------------------------------------------------------------
 // constructors and destructor

@@ -44,11 +44,11 @@
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QCheckBox>
-#include <QtGui/QGridLayout>
-#include <QtGui/QComboBox>
-#include <QtGui/QWidget>
-#include <QtGui/QDoubleSpinBox>
+#include <QCheckBox>
+#include <QGridLayout>
+#include <QComboBox>
+#include <QWidget>
+#include <QDoubleSpinBox>
 
 //!@brief A simple widget to command single joints
 class cedar::dev::robot::gui::KinematicChainCommandWidget

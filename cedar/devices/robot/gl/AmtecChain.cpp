@@ -86,9 +86,9 @@ const float cedar::dev::robot::gl::AmtecChain::mChrome_Shininess[1] = {0.6};
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::AmtecChain::AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::AmtecChain::AmtecChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
 :
-cedar::dev::robot::gl::KinematicChain(rpKinematicChainModel)
+cedar::dev::robot::gl::KinematicChain(pKinematicChainModel)
 {
 
 }

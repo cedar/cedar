@@ -39,16 +39,14 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
-#include <stdio.h>
-#include <iostream>
-#include <QtGui/QApplication>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QLineEdit>
-#include <QtGui/QLabel>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QApplication>
+#include <QLabel>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QWidget>
 
 
 //----------------------------------------------------------------------------
@@ -57,7 +55,7 @@
 
 cedar::aux::gui::RigidBodyVisualizationWidget::RigidBodyVisualizationWidget
 (
-  const cedar::aux::gl::RigidBodyVisualizationPtr &rigidBodyVisualization,
+  const cedar::aux::gl::RigidBodyVisualizationPtr rigidBodyVisualization,
   QWidget* parent
 )
 :
