@@ -58,7 +58,7 @@ class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::RigidBodyVi
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  KinematicChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
   //!@brief destructor
   ~KinematicChain();
   

@@ -45,9 +45,8 @@
 #include "cedar/devices/robot/gui/KinematicChainCommandWidget.h"
 
 // SYSTEM INCLUDES
-#include <QtCore/QTimer>
-#include <QtGui/QGridLayout>
-#include <QtGui/QWidget>
+#include <QGridLayout>
+#include <QWidget>
 
 //!@brief A simple widget to access all the joints via GUI
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.

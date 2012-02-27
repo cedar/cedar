@@ -45,8 +45,8 @@
 
 // SYSTEM INCLUDES
 #include <QtCore/QTimer>
-#include <QtGui/QGridLayout>
-#include <QtGui/QWidget>
+#include <QGridLayout>
+#include <QWidget>
 
 //!@brief A simple widget to monitor the state of a kinematic chain
 class cedar::dev::robot::gui::KinematicChainMonitorWidget
@@ -126,8 +126,8 @@ protected:
 
 private:
   static const int mUpdateInterval = 100;
-  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
-  QGridLayout *mpGridLayout;
+  cedar::dev::robot::ConstKinematicChainPtr mpKinematicChain;
+  QGridLayout* mpGridLayout;
   unsigned int mDecimals;
 };
 

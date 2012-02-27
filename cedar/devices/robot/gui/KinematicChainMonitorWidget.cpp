@@ -40,10 +40,8 @@
 #include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
-#include "stdio.h"
-#include <iostream>
-#include <QtGui/QApplication>
-#include <QtGui/QLabel>
+#include <QApplication>
+#include <QLabel>
 
 //----------------------------------------------------------------------------
 // constructors and destructor

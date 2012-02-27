@@ -49,12 +49,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::amtec::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+cedar::dev::amtec::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry)
 :
-cedar::dev::robot::KinematicChain(rpReferenceGeometry)
+cedar::dev::robot::KinematicChain(pReferenceGeometry)
 {
   mpDevice = 0;
-  mInitString = std::string("ESD:0,450");
+  mInitString = "ESD:0,450";
   readParamsFromConfigFile();
 
   if(!initDevice())
@@ -70,7 +70,7 @@ cedar::dev::amtec::KinematicChain::KinematicChain(const std::string& configFileN
 cedar::dev::robot::KinematicChain(configFileName)
 {
   mpDevice = 0;
-  mInitString = std::string("ESD:0,450");
+  mInitString = "ESD:0,450";
   readParamsFromConfigFile();
 
   if(!initDevice())
@@ -208,7 +208,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 }
 
 
-double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint)
+double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint) const
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 
@@ -234,7 +234,7 @@ double cedar::dev::amtec::KinematicChain::getJointAngle(unsigned int joint)
 }
 
 
-double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint)
+double cedar::dev::amtec::KinematicChain::getJointVelocity(unsigned int joint) const
 {
   QMutexLocker mutex_locker(&mCanBusMutex);
 

@@ -62,7 +62,7 @@ class cedar::dev::robot::gl::AmtecChain : public cedar::dev::robot::gl::Kinemati
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  AmtecChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel);
+  AmtecChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
   //!@brief destructor
   ~AmtecChain();
 

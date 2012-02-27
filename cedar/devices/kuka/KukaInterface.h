@@ -85,7 +85,7 @@ public:
    *  @param index  index of the joint, since the KUKA LBR has seven of them, it must be in the interval [0,6]
    *  @return joint angle for the given index
    */
-  virtual double getJointAngle(unsigned int index);
+  virtual double getJointAngle(unsigned int index) const;
 
   /*! @brief returns all joint angles
    *
@@ -174,7 +174,7 @@ private:
   //KUKA Vendor-Interface, wrapped by this class
   friRemote *mpFriRemote;
   //locker for read/write protection
-  QReadWriteLock mLock;
+  mutable QReadWriteLock mLock;
   //last commanded joint position
   std::vector<double> mCommandedJointPosition;
   //last measured joint Position

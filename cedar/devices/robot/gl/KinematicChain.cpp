@@ -48,10 +48,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr& rpKinematicChainModel)
+cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
 :
-cedar::aux::gl::Object(rpKinematicChainModel),
-mpKinematicChainModel(rpKinematicChainModel)
+cedar::aux::gl::Object(pKinematicChainModel),
+mpKinematicChainModel(pKinematicChainModel)
 {
   mIsDrawingEndEffectorVelocity = true;
   mIsDrawingEndEffectorAcceleration = false;

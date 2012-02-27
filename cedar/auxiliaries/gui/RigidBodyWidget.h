@@ -43,9 +43,9 @@
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QGridLayout>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QWidget>
+#include <QGridLayout>
+#include <QDoubleSpinBox>
+#include <QWidget>
 
 //!@brief A simple widget to monitor and change the state of a rigid body
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
@@ -67,20 +67,18 @@ public cedar::aux::ConfigurationInterface
 public:
   /*!@brief Constructor without configuration
    *
-   *@param kinematicChain pointer to a kinematic chain
+   *@param rigidBody pointer to a RigidBody chain
    *@param parent parent parameter of QWidget
-   *@param f WindowFlags for QWidget
    */
-  RigidBodyWidget(const cedar::aux::RigidBodyPtr &rigidBody, QWidget* parent = 0);
+  RigidBodyWidget(const cedar::aux::RigidBodyPtr rigidBody, QWidget* parent = 0);
 
   /*!@brief Constructor with configuration
    *
-   *@param kinematicChain pointer to a kinematic chain
+   *@param rigidBody pointer to a RigidBody
    *@param configFileName path of a configuration file
    *@param parent parent parameter of QWidget
-   *@param f WindowFlags for QWidget
    */
-  RigidBodyWidget(const cedar::aux::RigidBodyPtr &rigidBody, const std::string& configFileName, QWidget* parent = 0);
+  RigidBodyWidget(const cedar::aux::RigidBodyPtr rigidBody, const std::string& configFileName, QWidget* parent = 0);
 
   ~RigidBodyWidget();
 

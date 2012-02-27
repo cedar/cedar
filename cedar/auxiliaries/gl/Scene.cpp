@@ -71,12 +71,12 @@ double cedar::aux::gl::Scene::getSceneLimit() const
   return mSceneLimit;
 }
 
-int cedar::aux::gl::Scene::addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr& rpRigidBodyVisualization)
+int cedar::aux::gl::Scene::addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization)
 {
-  mRigidBodyVisualizations.push_back(rpRigidBodyVisualization);
+  mRigidBodyVisualizations.push_back(pRigidBodyVisualization);
   for (int i=0; i<mViewers.size(); i++)
   {
-    mViewers[i]->initGl(rpRigidBodyVisualization);
+    mViewers[i]->initGl(pRigidBodyVisualization);
   }
   return mRigidBodyVisualizations.size() - 1;
 }

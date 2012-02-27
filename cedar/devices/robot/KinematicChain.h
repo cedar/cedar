@@ -73,7 +73,7 @@ private:
   //----------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
   //!@brief constructor
   KinematicChain(const std::string& configFileName);
   //!@brief destructor
@@ -93,7 +93,7 @@ public:
    *
    * @return    reference geometry
    */
-  const ReferenceGeometryPtr& getReferenceGeometry() const;
+  const ReferenceGeometryPtr getReferenceGeometry() const;
 
   /*!@brief get number of joints in this kinematic chain
    *
@@ -105,14 +105,14 @@ public:
    *
    * @param geometry    new reference geometry
    */
-  void setReferenceGeometry(const ReferenceGeometryPtr& geometry);
+  void setReferenceGeometry(const ReferenceGeometryPtr geometry);
 
   /*!@brief get current state of a single joint angle
    *
    * @param index    specifies the joint
    * @return    joint angle value
    */
-  virtual double getJointAngle(unsigned int index) = 0;
+  virtual double getJointAngle(unsigned int index) const = 0;
 
   /*!@brief get current state of all joint angles
    *
@@ -131,7 +131,7 @@ public:
    * @param index    specifies the joint
    * @return    joint velocity value
    */
-  virtual double getJointVelocity(unsigned int index);
+  virtual double getJointVelocity(unsigned int index) const;
 
   /*!@brief get current state of all joint velocities
    *
@@ -150,7 +150,7 @@ public:
    * @param index    specifies the joint
    * @return    joint acceleration value
    */
-  virtual double getJointAcceleration(unsigned int index);
+  virtual double getJointAcceleration(unsigned int index) const;
 
   /*!@brief get current state of all joint accelerations
    *

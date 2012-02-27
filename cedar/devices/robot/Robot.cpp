@@ -65,7 +65,7 @@ cedar::dev::robot::Robot::~Robot(void)
 /*! If the component has not been initialized yet, it will be created using the abstract @em createComponent method.
  *  For that reason, the method is not const.
  */
-cedar::dev::robot::ComponentPtr& cedar::dev::robot::Robot::getComponent(const std::string& rComponentName)
+cedar::dev::robot::ComponentPtr cedar::dev::robot::Robot::getComponent(const std::string& rComponentName)
 {
   // if the requested component is not available ..
   if(!isComponentAvailable(rComponentName))

@@ -82,7 +82,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain);
+  KinematicChainModel(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   virtual ~KinematicChainModel();
   

@@ -45,11 +45,11 @@
 //------------------------------------------------------------------------------
 
 //! constructor
-cedar::dev::robot::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+cedar::dev::robot::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry)
 :
 //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
 LoopedThread(12, 0.01),
-mpReferenceGeometry(rpReferenceGeometry)
+mpReferenceGeometry(pReferenceGeometry)
 {
   setWorkingMode(ANGLE);
   mUseCurrentHardwareValues = false;
@@ -69,14 +69,18 @@ mpReferenceGeometry(new ReferenceGeometry(configFileName))
 //! destructor
 cedar::dev::robot::KinematicChain::~KinematicChain()
 {
-  // todo stop threads here (only if they are running!)
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
 }
 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
 
-const cedar::dev::robot::ReferenceGeometryPtr& cedar::dev::robot::KinematicChain::getReferenceGeometry() const
+const cedar::dev::robot::ReferenceGeometryPtr cedar::dev::robot::KinematicChain::getReferenceGeometry() const
 {
   return mpReferenceGeometry;
 }
@@ -88,7 +92,7 @@ unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
 }
 
 
-void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)
+void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr rpGeometry)
 {
   mpReferenceGeometry = rpGeometry;
 }
@@ -120,7 +124,7 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix()
 }
 
 
-double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) const
 {
   if (index >= getNumberOfJoints())
   {
@@ -150,7 +154,7 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix()
 }
 
 
-double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index) const
 {
   if (index >= getNumberOfJoints())
   {
