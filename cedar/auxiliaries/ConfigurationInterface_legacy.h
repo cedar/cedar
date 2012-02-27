@@ -34,16 +34,12 @@
 
 ======================================================================================================================*/
 
-//!@todo built-in check, if addParameter adds a parameter that is already stored
-
 #ifdef CEDAR_LIBCONFIG_LEGACY_MODE
 
-#include "cedar/auxiliaries/ConfigurationInterface_legacy.h"
+//!@todo built-in check, if addParameter adds a parameter that is already stored
 
-#else // CEDAR_LIBCONFIG_LEGACY_MODE
-
-#ifndef CEDAR_AUX_CONFIGURATION_INTERFACE_H
-#define CEDAR_AUX_CONFIGURATION_INTERFACE_H
+#ifndef CEDAR_AUX_CONFIGURATION_INTERFACE_LEGACY_H
+#define CEDAR_AUX_CONFIGURATION_INTERFACE_LEGACY_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
@@ -504,6 +500,6 @@ private:
   std::vector<std::string> mConfigurationErrors;
 }; // class cedar::aux::ConfigurationInterface
 
-#endif // CEDAR_AUX_CONFIGURATION_INTERFACE_H
+#endif // CEDAR_AUX_CONFIGURATION_INTERFACE_LEGACY_H
 
 #endif // CEDAR_LIBCONFIG_LEGACY_MODE

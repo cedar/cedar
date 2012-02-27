@@ -104,17 +104,25 @@ endif(OpenCV_FOUND)
 # message(STATUS "Found opencv libs ${OpenCV_LIBS}")
 
 # libconfig
-message("Searching for libconfig...")
-find_package(Libconfig REQUIRED)
-if(Libconfig_FOUND)
-  message("libconfig was found in ${Libconfig_INCLUDE_DIRS}")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
-  include_directories(${Libconfig_INCLUDE_DIRS})
-else(Libconfig_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library libconfig was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
-endif(Libconfig_FOUND)
+
+# check if legacy mode is enabled
+
+if (NOT DEFINED CEDAR_LIBCONFIG_LEGACY_MODE OR CEDAR_LIBCONFIG_LEGACY_MODE)
+      
+    message("Searching for libconfig (LEGACY MODE)...")
+    add_definitions(-DCEDAR_LIBCONFIG_LEGACY_MODE)
+    
+    find_package(Libconfig REQUIRED)
+    if(Libconfig_FOUND)
+      message("libconfig was found in ${Libconfig_INCLUDE_DIRS}")
+      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
+      include_directories(${Libconfig_INCLUDE_DIRS})
+    else(Libconfig_FOUND)
+      message(${CEDAR_LIB_ERROR_TYPE} "Required library libconfig was not found on your system!
+      You can try to alter the default search paths in cedar.conf.")
+      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
+    endif(Libconfig_FOUND)
+endif()
 
 # libQGLViewer
 message("Searching for QGLViewer...")
@@ -240,7 +248,7 @@ foreach (libPath ${cedarLibPaths})
     string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libDirName "${libPath}")
 
     # add out-of-source directory tree
-    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}/")
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}")
 
     # add the subdirectory
     add_subdirectory(${libPath} ${subDir})

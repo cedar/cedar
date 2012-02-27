@@ -41,6 +41,11 @@
   - cedar::aux::Configurable now inherits from boost::noncopyable, explicitly stating that you should never use
     the copy constructor. Instead, you should use the functions Configurable::copyTo and Configurable::copyFrom.
   - the cedar::aux::Base class was removed
+  - The old ConfigurationInterface is being phased out now. For this purpose, a transitional interface has been
+    developed that should mostly work with the old code. If you run into trouble, add the following line to your
+    cedar configuration file:
+    set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
+    If you don't have this flag active, libconfig++ is no longer needed as a dependency!
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
