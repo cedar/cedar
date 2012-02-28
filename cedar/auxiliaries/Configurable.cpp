@@ -42,12 +42,15 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
+#include <sstream>
+#include <fstream> // only used for legacy configurable compatibility
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -83,8 +86,21 @@ void cedar::aux::Configurable::readJson(const std::string& filename)
 
 void cedar::aux::Configurable::readOldConfig(const std::string& filename)
 {
+  //!@todo move this code to ConfigurationInterface?
   cedar::aux::ConfigurationNode configuration;
-  boost::property_tree::read_ini(filename, configuration);
+  std::ifstream stream(filename.c_str());
+  CEDAR_ASSERT(stream.good());
+
+  std::string file_contents((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+
+  std::stringstream file_stream;
+//  file_stream << file_contents;
+  // boost regex replace of /* ... */
+  file_contents = cedar::aux::regexReplace(file_contents, "\\Q/*\\E.*\\Q*/\\E", "");
+//  file_contents = cedar::aux::regexReplace(file_contents, "\\n\\n", "\\n");
+  file_stream << file_contents;
+
+  boost::property_tree::read_ini(file_stream, configuration);
 
   this->oldFormatToNew(configuration);
 

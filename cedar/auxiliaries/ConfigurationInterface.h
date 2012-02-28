@@ -42,32 +42,172 @@
 
 #else // CEDAR_LIBCONFIG_LEGACY_MODE
 
+//!@todo This switch also needs to be written into some installed header
 #ifndef CEDAR_AUX_CONFIGURATION_INTERFACE_H
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/UserData.h"
-#include "cedar/auxiliaries/IntervalData.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
+
+// legacy includes
+#include "cedar/auxiliaries/UserData.h"
+#include "cedar/auxiliaries/IntervalData.h"
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <iomanip>
 #include <cstdlib>
-#include <libconfig.h++>
+//#include <libconfig.h++>
+
+
+// some legacy typedefs to keep code from throwing compiler errors
+
+// This prevents compiler errors when including libconfig
+#ifndef __libconfig_hpp
+#define __libconfig_hpp
+#endif // __libconfig_hpp
+
+namespace libconfig
+{
+  struct Setting
+  {
+    enum Type
+    {
+      TypeBoolean,
+      TypeInt,
+      TypeFloat,
+      TypeString,
+      TypeArray,
+      TypeNone
+    };
+
+    int getLength() const
+    {
+      return 0;
+    }
+  };
+
+  struct Config
+  {
+      Setting& lookup(const std::string&)
+      {
+        return mSetting;
+      }
+
+    private:
+      Setting mSetting;
+  };
+}
+
 
 /*!@brief Interface for classes with configuration parameters.
  *
  * @deprecated This interface will be removed in one of the next versions of cedar. Use cedar::aux::Configurable instead.
  */
-class cedar::aux::ConfigurationInterface
+class cedar::aux::ConfigurationInterface : virtual public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros, structs, enums
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  template <typename T>
+  class LegacyParameter : public cedar::aux::Parameter
+  {
+    public:
+      LegacyParameter
+      (
+        cedar::aux::Configurable* pOwner,
+        T* pMember,
+        const std::string& name,
+        const T& defaultValue
+      )
+      :
+      cedar::aux::Parameter(pOwner, name, true),
+      mpMember(pMember),
+      mDefault(defaultValue)
+      {
+      }
+
+      void setTo(const cedar::aux::ConfigurationNode& node)
+      {
+        *mpMember = node.get_value<T>();
+      }
+
+      void putTo(cedar::aux::ConfigurationNode& node) const
+      {
+        node.put(this->getName(), *this->mpMember);
+      }
+
+      void makeDefault()
+      {
+        *mpMember = mDefault;
+      }
+
+    private:
+      T *mpMember;
+      T mDefault;
+  };
+
+  typedef LegacyParameter<bool> BoolLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolLegacyParameter);
+
+  typedef LegacyParameter<int> IntLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLegacyParameter);
+
+  typedef LegacyParameter<unsigned int> UIntLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntLegacyParameter);
+
+  typedef LegacyParameter<double> DoubleLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLegacyParameter);
+
+  typedef LegacyParameter<std::string> StringLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringLegacyParameter);
+
+
+  template <typename T>
+  class LegacyVectorParameter : public cedar::aux::Parameter
+  {
+    public:
+      LegacyVectorParameter
+      (
+        cedar::aux::Configurable* pOwner,
+        std::vector<T>* pMember,
+        const std::string& name,
+        const T& defaultValue
+      )
+      :
+      cedar::aux::Parameter(pOwner, name, true),
+      mpMember(pMember),
+      mDefault(defaultValue)
+      {
+      }
+
+      void setTo(const cedar::aux::ConfigurationNode& node)
+      {
+        std::cout << "vector value: " <<  node.get_value<std::string>() << std::endl;
+      }
+
+      void putTo(cedar::aux::ConfigurationNode& node) const
+      {
+      }
+
+      void makeDefault()
+      {
+      }
+
+    private:
+      std::vector<T> *mpMember;
+      T mDefault;
+  };
+
+  typedef LegacyVectorParameter<bool> BoolLegacyVectorParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolLegacyVectorParameter);
+
 public:
   //!@brief Struct that holds all information about a parameter
   struct ParameterInfo
@@ -88,12 +228,13 @@ public:
     //! flag if a stored integer is unsigned (cannot extend Setting::Type)
     bool mIsUnsigned;
 
-    /*!@brief Contains user defined data. To use this, inherit from UserData and add
-     * your user-data in the derived class.
-     * @remarks The user data will be deleted automatically!
-     */
+    //!@brief Contains user defined data. To use this, inherit from UserData and add
+    // your user-data in the derived class.
+    // @remarks The user data will be deleted automatically!
+    //
     UserData *mpUserData;
   };
+
 
   /*!@brief The type used to store the parameters.
    * @remark When iterating, use this to get ParameterInfoVector::iterator.

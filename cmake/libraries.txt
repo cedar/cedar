@@ -70,7 +70,7 @@ endif (${CMAKE_BUILD_STATIC_LIBS})
 
 message("Searching for boost...")
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.40.0 COMPONENTS system date_time filesystem)
+find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
 
 if(Boost_FOUND)
