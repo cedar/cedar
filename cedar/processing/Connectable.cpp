@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 

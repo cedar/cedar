@@ -50,7 +50,7 @@
  *
  *        Each element is described by a name that uniquely identifies it within a processing module.
  */
-class cedar::proc::Element : public cedar::aux::Configurable
+class cedar::proc::Element : virtual public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
