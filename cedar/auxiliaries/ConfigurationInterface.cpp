@@ -245,20 +245,20 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const std::vector<bool>& defaultValues
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new BoolLegacyVectorParameter(this, pMember, name, defaultValues);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.clear();
-//  for(unsigned int i = 0; i < defaultValues.size(); i++)
-//  {
-//    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
-//  }
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeBoolean;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.clear();
+  for(unsigned int i = 0; i < defaultValues.size(); i++)
+  {
+    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
+  }
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeBoolean;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -267,18 +267,18 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const int& defaultValue
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new IntLegacyVectorParameter(this, pMember, name, defaultValue);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.resize(1);
-//  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mIsUnsigned = false;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.resize(1);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mIsUnsigned = false;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -287,18 +287,18 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const unsigned int& defaultValue
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new UIntLegacyVectorParameter(this, pMember, name, defaultValue);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.resize(1);
-//  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mIsUnsigned = true;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.resize(1);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mIsUnsigned = true;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -307,21 +307,21 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const std::vector<int>& defaultValues
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new IntLegacyVectorParameter(this, pMember, name, defaultValues);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.clear();
-//  for(unsigned int i = 0; i < defaultValues.size(); i++)
-//  {
-//    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
-//  }
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
-//  parameter_info.mIsUnsigned = false;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.clear();
+  for(unsigned int i = 0; i < defaultValues.size(); i++)
+  {
+    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
+  }
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
+  parameter_info.mIsUnsigned = false;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -330,21 +330,21 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const std::vector<unsigned int>& defaultValues
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new UIntLegacyVectorParameter(this, pMember, name, defaultValues);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.clear();
-//  for(unsigned int i = 0; i < defaultValues.size(); i++)
-//  {
-//    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
-//  }
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
-//  parameter_info.mIsUnsigned = true;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.clear();
+  for(unsigned int i = 0; i < defaultValues.size(); i++)
+  {
+    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
+  }
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeInt;
+  parameter_info.mIsUnsigned = true;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -353,17 +353,17 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const double& defaultValue
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new DoubleLegacyVectorParameter(this, pMember, name, defaultValue);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.resize(1);
-//  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeFloat;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.resize(1);
+  parameter_info.mDefaultValues.at(0) = cedar::aux::ConfigurationInterface::toString(defaultValue);
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeFloat;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -372,20 +372,20 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const std::vector<double>& defaultValues
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new DoubleLegacyVectorParameter(this, pMember, name, defaultValues);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.clear();
-//  for(unsigned int i = 0; i < defaultValues.size(); i++)
-//  {
-//    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
-//  }
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeFloat;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.clear();
+  for(unsigned int i = 0; i < defaultValues.size(); i++)
+  {
+    parameter_info.mDefaultValues.push_back(ConfigurationInterface::toString(defaultValues.at(i)));
+  }
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeFloat;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -394,17 +394,17 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const std::string& defaultValue
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new StringLegacyVectorParameter(this, pMember, name, defaultValue);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.resize(1);
-//  parameter_info.mDefaultValues.at(0) = defaultValue;
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeString;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.resize(1);
+  parameter_info.mDefaultValues.at(0) = defaultValue;
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeString;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 int cedar::aux::ConfigurationInterface::addParameter(
@@ -413,20 +413,20 @@ int cedar::aux::ConfigurationInterface::addParameter(
                                           const std::vector<std::string>& defaultValues
                                         )
 {
-  return CONFIG_TYPE_ERROR;
+  new StringLegacyVectorParameter(this, pMember, name, defaultValues);
 
-//  ParameterInfo parameter_info;
-//  parameter_info.mpMember = static_cast<void*> (pMember);
-//  parameter_info.mDefaultValues.clear();
-//  for(unsigned int i = 0; i < defaultValues.size(); i++)
-//  {
-//    parameter_info.mDefaultValues.push_back(defaultValues.at(i));
-//  }
-//  parameter_info.mMembersType = libconfig::Setting::TypeArray;
-//  parameter_info.mName = name;
-//  parameter_info.mIsVectorOfType = libconfig::Setting::TypeString;
-//  mParameterInfos.push_back(parameter_info);
-//  return CONFIG_SUCCESS;
+  ParameterInfo parameter_info;
+  parameter_info.mpMember = static_cast<void*> (pMember);
+  parameter_info.mDefaultValues.clear();
+  for(unsigned int i = 0; i < defaultValues.size(); i++)
+  {
+    parameter_info.mDefaultValues.push_back(defaultValues.at(i));
+  }
+  parameter_info.mMembersType = libconfig::Setting::TypeArray;
+  parameter_info.mName = name;
+  parameter_info.mIsVectorOfType = libconfig::Setting::TypeString;
+  mParameterInfos.push_back(parameter_info);
+  return CONFIG_SUCCESS;
 }
 
 void cedar::aux::ConfigurationInterface::addParameter(int* pMember,
