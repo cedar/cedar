@@ -216,4 +216,14 @@ public:
   ResourceNotFoundException();
 };
 
+/*!@brief Exception that is thrown when unmangling of a name fails.
+ */
+class cedar::aux::FileNotFoundException : public cedar::aux::ExceptionBase
+{
+public:
+  FileNotFoundException()
+  {
+  }
+};
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

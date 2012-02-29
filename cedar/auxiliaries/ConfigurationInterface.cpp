@@ -53,24 +53,24 @@ cedar::aux::ConfigurationInterface::ConfigurationInterface()
 :
 mConfigFileName("")
 {
-//  mParameterInfos.clear();
-//  readConfigurationFile();
+  mParameterInfos.clear();
+  readConfigurationFile();
 }
 
 cedar::aux::ConfigurationInterface::ConfigurationInterface(const std::string& configFileName)
 :
 mConfigFileName(configFileName)
 {
-//  mParameterInfos.clear();
-//  readConfigurationFile();
+  mParameterInfos.clear();
+  readConfigurationFile();
 }
 
 cedar::aux::ConfigurationInterface::ConfigurationInterface(const char* pConfigFileName)
 :
 mConfigFileName(std::string(pConfigFileName))
 {
-//  mParameterInfos.clear();
-//  readConfigurationFile();
+  mParameterInfos.clear();
+  readConfigurationFile();
 }
 
 // Destructor
@@ -457,8 +457,10 @@ int cedar::aux::ConfigurationInterface::readConfigurationFile()
 {
   if (this->mConfigFileName.empty())
   {
+    this->mConfigurationErrors.push_back("Tried to read with an empty file name.");
     return CONFIG_FILE_ERROR;
   }
+
   try
   {
     this->readOldConfig(this->mConfigFileName);
@@ -473,6 +475,13 @@ int cedar::aux::ConfigurationInterface::readConfigurationFile()
         + "\nline: " + cedar::aux::toString(e.line()),
       "cedar::aux::ConfigurationInterface::readConfigurationFile()"
     );
+    this->mConfigurationErrors.push_back("The INI parser threw an error.");
+    return CONFIG_FILE_ERROR;
+  }
+  catch (cedar::aux::FileNotFoundException&)
+  {
+    this->defaultAll();
+    this->mConfigurationErrors.push_back("The specified configuration file does not exist.");
     return CONFIG_FILE_ERROR;
   }
 
@@ -697,7 +706,30 @@ int cedar::aux::ConfigurationInterface::handleSettingNotFoundException(const ced
 
 int cedar::aux::ConfigurationInterface::writeConfiguration()
 {
-  return CONFIG_SUCCESS;
+  if (!this->mConfigFileName.empty())
+  {
+    try
+    {
+      this->writeOldConfig(this->mConfigFileName);
+      return CONFIG_SUCCESS;
+    }
+    catch (boost::property_tree::ini_parser::ini_parser_error& e)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "INI parser error:\nmessage: " + e.message()
+          + "\nfile: " + e.filename()
+          + "\nline: " + cedar::aux::toString(e.line()),
+        "cedar::aux::ConfigurationInterface::writeConfiguration()"
+      );
+      this->mConfigurationErrors.push_back("The INI parser threw an error.");
+      return CONFIG_FILE_ERROR;
+    }
+  }
+  else
+  {
+    return CONFIG_FILE_ERROR;
+  }
 
 //  // export current values of the parameters into the config object
 //  libconfig::Setting &root = mConfig.getRoot();
@@ -1000,7 +1032,23 @@ void cedar::aux::ConfigurationInterface::adjustVectorSize(
 
 void cedar::aux::ConfigurationInterface::readOrDefaultConfiguration()
 {
-  this->readConfigurationFile();
+  if (this->readConfigurationFile() != cedar::aux::ConfigurationInterface::CONFIG_SUCCESS)
+  {
+    cedar::aux::LogSingleton::getInstance()->error
+    (
+      "error (" + mConfigFileName + "): Some parameters missing or corrupt, writing additional parameters to file.",
+      "cedar::aux::ConfigurationInterface::readOrDefaultConfiguration()"
+    );
+
+    if (this->writeConfiguration() != cedar::aux::ConfigurationInterface::CONFIG_SUCCESS)
+    {
+      cedar::aux::LogSingleton::getInstance()->error
+      (
+        "error (" + mConfigFileName + "): Could not write config file, please check file permissions.",
+        "cedar::aux::ConfigurationInterface::readOrDefaultConfiguration()"
+      );
+    }
+  }
 //  // try to read in parameters - on fail, try to write all missing parameters
 //  int result = this->readConfiguration();
 //  if (result != cedar::aux::ConfigurationInterface::CONFIG_SUCCESS)

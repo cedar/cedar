@@ -45,7 +45,7 @@
     developed that should mostly work with the old code. If you run into trouble, add the following line to your
     cedar configuration file:
     set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
-    If you don't have this flag active, libconfig++ is no longer needed as a dependency!
+    If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
