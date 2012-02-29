@@ -58,8 +58,10 @@ template <typename T>
 class cedar::aux::SetParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  typedef typename std::set<T>::const_iterator const_iterator;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -166,6 +168,16 @@ public:
   size_t size() const
   {
     return this->mValues.size();
+  }
+
+  const_iterator begin() const
+  {
+    return this->mValues.begin();
+  }
+
+  const_iterator end() const
+  {
+    return this->mValues.end();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
