@@ -121,7 +121,7 @@ namespace cedar
     template <>
     inline bool translate(const std::string& value_str)
     {
-      return value_str == "true";
+      return (value_str == "true");
     }
 
     template <>
@@ -131,6 +131,27 @@ namespace cedar
       value = cedar::aux::regexReplace(value, "^\\s*\"", "");
       value = cedar::aux::regexReplace(value, "\"\\s*$", "");
       return value;
+    }
+
+    template <typename T>
+    inline std::string retranslate(const T& value)
+    {
+      return cedar::aux::toString(value);
+    }
+
+    template <>
+    inline std::string retranslate(const bool& value)
+    {
+      if (value == true)
+        return "true";
+      else
+        return "false";
+    }
+
+    template <>
+    inline std::string retranslate(const std::string& value)
+    {
+      return "\"" + value + "\"";
     }
   }
 }
@@ -235,31 +256,41 @@ private:
 
       void setTo(const cedar::aux::ConfigurationNode& node)
       {
-        std::vector<std::string> str_values;
+        std::vector<std::string> string_values;
         std::string values = node.get_value<std::string>();
-        this->splitVector(values, str_values);
+        this->splitVector(values, string_values);
 
         this->mpMember->clear();
-        for (size_t i = 0; i < str_values.size(); ++i)
+        for (size_t i = 0; i < string_values.size(); ++i)
         {
-          T value = cedar::_legacyCode::translate<T>(str_values[i]);
+          T value = cedar::_legacyCode::translate<T>(string_values[i]);
           this->mpMember->push_back(value);
         }
       }
 
       void putTo(cedar::aux::ConfigurationNode& node) const
       {
+        std::vector<std::string> list;
+        for (size_t i = 0; i < mpMember->size(); ++i)
+        {
+          const T& value = mpMember->at(i);
+          list.push_back(cedar::_legacyCode::retranslate<T>(value));
+        }
+
+        std::string list_string;
+        this->joinVector(list_string, list);
+        node.put(this->getName(), list_string);
       }
 
       void makeDefault()
       {
         if (this->mHasDefaultVector)
         {
-
+          *this->mpMember = this->mDefaults;
         }
         else
         {
-
+          // TODO ?
         }
       }
 
@@ -280,8 +311,11 @@ private:
         }
       }
 
-      void joinVector(std::string& value, const std::vector<const std::string>& vector)
+      void joinVector(std::string& value, const std::vector<std::string>& vector) const
       {
+        value = "[ ";
+        value += cedar::aux::join(vector, ", ");
+        value += " ]";
       }
 
     private:

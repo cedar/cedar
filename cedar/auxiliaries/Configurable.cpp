@@ -86,10 +86,12 @@ void cedar::aux::Configurable::readJson(const std::string& filename)
 
 void cedar::aux::Configurable::readOldConfig(const std::string& filename)
 {
-  //!@todo move this code to ConfigurationInterface?
   cedar::aux::ConfigurationNode configuration;
   std::ifstream stream(filename.c_str());
-  CEDAR_ASSERT(stream.good());
+  if(!stream.good())
+  {
+    CEDAR_THROW(cedar::aux::FileNotFoundException, "File \"" + filename + "\" could not be opened.");
+  }
 
   std::string file_contents((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
 
@@ -105,6 +107,25 @@ void cedar::aux::Configurable::readOldConfig(const std::string& filename)
   this->oldFormatToNew(configuration);
 
   this->readConfiguration(configuration);
+}
+
+void cedar::aux::Configurable::writeOldConfig(const std::string& filename)
+{
+  std::string dir = filename;
+
+  size_t index;
+  if ( (index = dir.rfind("/")) != std::string::npos )
+  {
+    dir = dir.substr(0, index);
+    boost::filesystem::create_directories(dir);
+  }
+
+  cedar::aux::ConfigurationNode configuration;
+  this->writeConfiguration(configuration);
+
+  this->newFormatToOld(configuration);
+
+  boost::property_tree::write_ini(filename, configuration);
 }
 
 void cedar::aux::Configurable::oldFormatToNew(cedar::aux::ConfigurationNode& node)
@@ -133,6 +154,16 @@ void cedar::aux::Configurable::oldFormatToNew(cedar::aux::ConfigurationNode& nod
   }
 }
 
+void cedar::aux::Configurable::newFormatToOld(cedar::aux::ConfigurationNode& node)
+{
+  for (cedar::aux::ConfigurationNode::iterator iter = node.begin(); iter != node.end(); ++iter)
+  {
+    std::string data = iter->second.data();
+    data += ";";
+    iter->second.put_value(data);
+  }
+}
+
 
 void cedar::aux::Configurable::writeJson(const std::string& filename) const
 {
@@ -142,7 +173,7 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
   if ( (index = dir.rfind("/")) != std::string::npos )
   {
     dir = dir.substr(0, index);
-    boost::filesystem::create_directory(dir);
+    boost::filesystem::create_directories(dir);
   }
 
   cedar::aux::ConfigurationNode configuration;
@@ -179,6 +210,31 @@ cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters
 {
   return this->mParameterList;
 }
+
+void cedar::aux::Configurable::defaultAll()
+{
+  for
+  (
+    ParameterList::const_iterator iter = this->mParameterList.begin();
+    iter != this->mParameterList.end();
+    ++iter
+  )
+  {
+    // reset the changed flag of the parameter
+    (*iter)->makeDefault();
+  }
+
+  for
+  (
+    Children::const_iterator child = this->mChildren.begin();
+    child != this->mChildren.end();
+    ++child
+  )
+  {
+    child->second->defaultAll();
+  }
+}
+
 
 void cedar::aux::Configurable::resetChangedStates(bool newChangedFlagValue) const
 {
