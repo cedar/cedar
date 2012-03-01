@@ -299,6 +299,11 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
   cedar::proc::gui::Network *p_network = cedar::aux::asserted_cast<cedar::proc::gui::Network*>(this->getGraphicsItemFor(target_network.get()));
 
   QList<QGraphicsItem *> selected = this->selectedItems();
+  // reset parent item
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    selected.at(i)->setParentItem(0);
+  }
   p_network->addElements(selected.toStdList());
 }
 
@@ -675,6 +680,10 @@ cedar::proc::gui::GraphicsBase* cedar::proc::gui::Scene::getGraphicsItemFor(ceda
 
   if (iter == this->mElementMap.end())
   {
+    if (mNetwork->network().get() == element)
+    {
+      return mNetwork.get();
+    }
 #ifdef DEBUG
     std::cout << "Could not find base item for element \"" << element->getName() << "\"" << std::endl;
 #endif // DEBUG
