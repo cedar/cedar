@@ -56,6 +56,7 @@
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
+#include <QEvent>
 #include <QSet>
 #include <boost/property_tree/json_parser.hpp>
 #include <iostream>
@@ -88,10 +89,12 @@ mHoldFitToContents(false)
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
                                | QGraphicsItem::ItemIsMovable
                                );
+
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
   this->update();
   this->checkSlots();
+
 }
 
 cedar::proc::gui::Network::~Network()
@@ -112,6 +115,64 @@ cedar::proc::gui::Network::~Network()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
+{
+  switch (change)
+  {
+    case QGraphicsItem::ItemChildAddedChange:
+    {
+      cedar::proc::gui::StepItem *p_item
+        = dynamic_cast<cedar::proc::gui::StepItem*>(value.value<QGraphicsItem*>());
+      if (p_item)
+      {
+        p_item->installSceneEventFilter(this);
+      }
+      return value;
+    }
+
+    case QGraphicsItem::ItemChildRemovedChange:
+    {
+      cedar::proc::gui::StepItem *p_item
+        = dynamic_cast<cedar::proc::gui::StepItem*>(value.value<QGraphicsItem*>());
+      if (p_item)
+      {
+        p_item->removeSceneEventFilter(this);
+      }
+      return value;
+    }
+
+    default:
+      return this->cedar::proc::gui::GraphicsBase::itemChange(change, value);
+  }
+}
+
+bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
+{
+  if (!dynamic_cast<cedar::proc::gui::StepItem*>(pWatched))
+  {
+    return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
+  }
+
+  switch(pEvent->type())
+  {
+//!@todo Resizing the network while moving the mouse doesn't work.
+//    case QEvent::GraphicsSceneMouseMove:
+//    {
+//      this->fitToContents();
+//      break;
+//    }
+
+    case QEvent::GraphicsSceneMouseRelease:
+      this->fitToContents();
+      break;
+
+    default:
+      // nothing to do here
+      break;
+  }
+  return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
+}
+
 void cedar::proc::gui::Network::fitToContents()
 {
   if (mHoldFitToContents)
@@ -130,8 +191,34 @@ void cedar::proc::gui::Network::fitToContents()
     return;
   }
 
+  // get the set of child items
+  QSet<QGraphicsItem*> children = this->childItems().toSet();
+
   // find the bounding box of all children
-  QRectF bounds = this->childrenBoundingRect();
+  QRectF bounds; // = this->childrenBoundingRect();
+  for (QSet<QGraphicsItem*>::iterator i = children.begin(); i != children.end(); ++i)
+  {
+    QGraphicsItem* p_item = *i;
+    if (dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_item))
+    {
+      continue;
+    }
+
+    QRectF item_bounds = p_item->boundingRect();
+    item_bounds |= p_item->childrenBoundingRect();
+    item_bounds = p_item->mapRectToParent(item_bounds);
+
+    if (bounds.isEmpty())
+    {
+      bounds = item_bounds;
+    }
+    else
+    {
+      bounds |= item_bounds;
+    }
+  }
+
+
   // adjust the bow by the paddings specified above
   bounds.adjust(padding_left, padding_top, padding_right, padding_bottom);
 
@@ -140,17 +227,18 @@ void cedar::proc::gui::Network::fitToContents()
   this->setHeight(bounds.height());
   QPointF old_pos_scene = this->scenePos();
   QPointF new_pos = this->pos() + bounds.topLeft();
+
   this->setPos(new_pos);
 
   // setting a new position moves the children, thus, transform them back to keep their original positions
   QPointF old_pos_local = this->mapFromScene(old_pos_scene);
   // using a set avoids moving the same child more than once
-  QSet<QGraphicsItem*> children = this->childItems().toSet();
   for (QSet<QGraphicsItem*>::iterator i = children.begin(); i != children.end(); ++i)
   {
     QGraphicsItem* p_item = *i;
     p_item->setPos(old_pos_local + p_item->pos());
   }
+
   this->checkDataItems();
 }
 
