@@ -128,6 +128,10 @@ public:
 
   void disconnect();
 
+  QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value);
+
+  bool sceneEventFilter(QGraphicsItem *pWatched, QEvent *pEvent);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

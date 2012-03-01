@@ -44,6 +44,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/Network.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
