@@ -568,15 +568,12 @@ protected:
                                        ) const = 0;
 
 
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
   #ifdef ENABLE_CTRL_C_HANDLER
-
     /*! \brief Callback function to respond to a captured CTRL-C event
      *   \remarks
      *      This function calls the doCleanUp function of all registerd grabbers and then exit().
@@ -590,10 +587,7 @@ private:
      *
      */
     static GrabberInstancesVector mInstances;
-
   #endif
-
-    
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -644,7 +638,6 @@ protected:
      *
      */
     double mFpsMeasured;
-
     
 
 private:
@@ -681,8 +674,7 @@ private:
   // none yet
 
 
-
 }; //class cedar::dev::sensors::visual::GrabberInterface
 
 
-#endif
+#endif //CEDAR_DEV_SENSORS_VISUAL_GRABBER_INTERFACE_H

@@ -36,21 +36,17 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
-//#include "../../../auxiliaries/exceptions.h"
 
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-//#include <boost/lexical_cast.hpp> //for reading values from the configfile
 
 using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-CameraCapabilities::CameraCapabilities(
-                                        const std::string& configFileName
-                                      )
+CameraCapabilities::CameraCapabilities(const std::string& configFileName)
 :
 ConfigurationInterface(configFileName)
 {
@@ -115,14 +111,10 @@ bool CameraCapabilities::declareParameters()
   //prepare all parameters for configuration interface
   for (unsigned int i=0; i<mCamProperties.size(); i++)
   {
-    //CameraPropertyCapability& prop = mCamCapabilities.at(i);
-
     //get id of property number i
-    //CameraProperty::Id id = CameraProperty::type().list().at(i).id();
     CameraProperty::Id id = mCamProperties.at(i).propId;
 
     //property type and name
-    //propId = id;
     std::string prop_name = CameraProperty::type().get(id).name() + "_";
     std::string prop_cap;
 
@@ -153,22 +145,18 @@ bool CameraCapabilities::declareParameters()
 
     prop_cap = prop_name + "is_absolute_capable";
     result = (addParameter(&mCamProperties.at(i).is_absolute_capable, prop_cap, false) == CONFIG_SUCCESS) && result;
-
   }
   return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-CameraPropertyCapability&  CameraCapabilities::getCapabilities(CameraProperty::Id propId)
+CameraPropertyCapability& CameraCapabilities::getCapabilities(CameraProperty::Id propId)
 {
   int prop = 0;
   int max_prop = mCamProperties.size();
 
   while ((mCamProperties.at(prop).propId != propId)&& (prop<max_prop))
-//  CameraProperty::Id act_propId = mCamProperties.at(prop).propId;
-//  while ((act_propId != propId)&& (prop<max_prop))
   {
-//    act_propId = mCamProperties.at(prop).propId;
     prop++;
   }
 
@@ -179,7 +167,6 @@ CameraPropertyCapability&  CameraCapabilities::getCapabilities(CameraProperty::I
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,
                 "[CameraCapabilities::getCapabilities] ERROR: Property not found!");
   }
-
   return mCamProperties.at(prop);
 }
 

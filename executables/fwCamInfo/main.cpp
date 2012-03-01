@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        fwcaminfo.cpp
+    File:        main.cpp (fwCamInfo)
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@rub.de

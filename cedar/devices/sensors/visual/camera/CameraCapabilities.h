@@ -65,9 +65,7 @@ public cedar::aux::ConfigurationInterface
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CameraCapabilities(
-                      const std::string& configFileName
-                    );
+  CameraCapabilities(const std::string& configFileName);
 
   //!@brief Destructor
   virtual ~CameraCapabilities();

@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIGURATION_H
-#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIGURATION_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
+#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
@@ -73,14 +73,15 @@ class cedar::dev::sensors::visual::CameraStateAndConfig
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! @brief The standard constructor.
-  // \param VideoCapture The cv::VideoCapture object, which this configuration is assigned to
-  //        This will be used, to read and set the values
-  // \param videoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
-  //        through grabbing and/or change settings
-  // \param configurationFileName The filename for the configuration file used to store camera properties in
-  //        This could be the same file, which the cameragrabber uses for configuration storage
-  // \param capabilitiesFileName The filename of the capabilities. This file have to be adjusted for the used camera
+  /*! \brief The standard constructor.
+   *  \param VideoCapture The cv::VideoCapture object, which this configuration is assigned to
+   *         This will be used, to read and set the values
+   *  \param videoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
+   *         through grabbing and/or change settings
+   *  \param configurationFileName The filename for the configuration file used to store camera properties in
+   *         This could be the same file, which the cameragrabber uses for configuration storage
+   *  \param capabilitiesFileName The filename of the capabilities. This file have to be adjusted for the used camera
+   */
   CameraStateAndConfig(
                        cv::VideoCapture videoCapture,
                        QReadWriteLockPtr videoCaptureLock,
@@ -88,7 +89,6 @@ public:
                        const std::string configurationFileName,
                        const std::string capabilitiesFileName
                      );
-
 
   //!@brief Destructor
   ~CameraStateAndConfig();
@@ -98,16 +98,17 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  ///! \brief Set a property in the cv::VideoCapture class
-  //   \remarks This method checks if given value is supported
+  /*! \brief Set a property in the cv::VideoCapture class
+   *   \remarks This method checks if given value is supported
+   */
   bool setProperty(CameraProperty::Id propId, double value);
 
   /*! \brief Set a property in the cv::VideoCapture class
    *   \remarks This method checks if given value is supported
    *   \return return value is either the value of the property or a one of the following constants
    *    CAMERA_PROPERTY_NOT_SUPPORTED,
-   *    CAMERA_PROPERTY_MODE_AUTO
-   *    CAMERA_PROPERTY_MODE_OFF
+   *    CAMERA_PROPERTY_MODE_AUTO,
+   *    CAMERA_PROPERTY_MODE_OFF,
    *    CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO
    */
   double getProperty(CameraProperty::Id propId);
@@ -124,8 +125,6 @@ public:
   ///! Get a Parameter in the cv::VideoCapture class
   double getSetting(CameraSetting::Id settingId);
 
-
-  //returns the capabilities of a given property
   /*! \brief Get the minimum possible value that can be set of the given property
    *  \param propId The id of the property
    */
@@ -189,12 +188,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  ///! Set a property in the cv::VideoCapture class
-  // implements the cv::VideoCapture.set() method with respect to concurrent access
+  /*! Set a property in the cv::VideoCapture class
+   * implements the cv::VideoCapture.set() method with respect to concurrent access
+   */ 
   bool setCamProperty(unsigned int propId, double value);
 
-  ///! Get a property form the cv::VideoCapture
-  // implements the cv::VideoCapture.get() method with respect to concurrent access
+  /*! Get a property form the cv::VideoCapture
+   * implements the cv::VideoCapture.get() method with respect to concurrent access
+   */
   double getCamProperty(unsigned int propId);
 
   bool setAllParametersToCam();
@@ -264,5 +265,5 @@ private:
 
 }; // class cedar::dev::sensors::visual::CameraStateAndConfig
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIGURATION_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
 

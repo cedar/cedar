@@ -42,12 +42,10 @@
 // SYSTEM INCLUDES
 
 
-
 using namespace cedar::dev::sensors::visual;
 
-
+//Initialize the static member vector containing all instances
 #ifdef ENABLE_CTRL_C_HANDLER
-  //Initialize the static member vector containing all instances
   GrabberInstancesVector GrabberInterface::mInstances;
 #endif
 
@@ -67,7 +65,7 @@ LoopedThread(configFileName)
 
   //initialize local member
   mpReadWriteLock = new QReadWriteLock();
-  mRecord = false;                  //by default no recording
+  mRecord = false;
   mGrabberThreadStartedOnRecording = false;
   mCleanUpAlreadyDone = false;
   mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
@@ -80,7 +78,6 @@ LoopedThread(configFileName)
 //--------------------------------------------------------------------------------------------------------------------
 GrabberInterface::~GrabberInterface()
 {
-
   #ifdef DEBUG_GRABBER_INTERFACE
     std::cout << "[GrabberInterface::~GrabberInterface]" << std::endl;
   #endif
@@ -89,7 +86,6 @@ GrabberInterface::~GrabberInterface()
 
   //remove this grabber-instance from the InstancesVector
   #ifdef ENABLE_CTRL_C_HANDLER
-
     std::vector<GrabberInterface *>::iterator it = mInstances.begin();
 
     while (((*it) != this) && (it != mInstances.end()))
@@ -105,7 +101,6 @@ GrabberInterface::~GrabberInterface()
                   << " deleted from list of all instances." << std::endl;
       #endif
     }
-
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       else
       {
@@ -114,7 +109,6 @@ GrabberInterface::~GrabberInterface()
       }
     #endif
   #endif
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -122,22 +116,21 @@ GrabberInterface::~GrabberInterface()
 //----------------------------------------------------------------------------------------------------------------------
 
 #ifdef ENABLE_CTRL_C_HANDLER
-
   //this function handles the ctrl-c (signal: interrupt)
   //void GrabberInterface::sigIntHandler(int signalNo)
   void GrabberInterface::sigIntHandler(int)
   {
-      #ifdef DEBUG_GRABBER_INTERFACE
-        std::cout << "[GrabberInterface::sigIntHandler] Abnormal program termination catched" << std::endl;
-      #endif
+    #ifdef DEBUG_GRABBER_INTERFACE
+      std::cout << "[GrabberInterface::sigIntHandler] Abnormal program termination catched" << std::endl;
+    #endif
 
-      for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
-      {
-        //only GrabberInterface::doCleanUp() and xxxGrabber::onCleanUp() methods invoked
-        //Note: no destructor involved here
-        (*it)->doCleanUp();
-      }
-      std::exit(1);
+    for (std::vector<GrabberInterface*>::iterator it = mInstances.begin() ; it != mInstances.end();++it)
+    {
+      //only GrabberInterface::doCleanUp() and xxxGrabber::onCleanUp() methods invoked
+      //Note: no destructor involved here
+      (*it)->doCleanUp();
+    }
+    std::exit(1);
   }
 #endif
 
@@ -146,7 +139,6 @@ void GrabberInterface::doCleanUp()
 {
   if (! mCleanUpAlreadyDone)
   {
-  
     #ifdef DEBUG_GRABBER_INTERFACE
       std::cout << "[GrabberInterface::doCleanUp]" << std::endl;
     #endif
@@ -179,7 +171,6 @@ void GrabberInterface::readInit(unsigned int numCams, const std::string& default
   mNumCams = numCams;
 
   #ifdef ENABLE_CTRL_C_HANDLER
-     //if (signal((int) SIGINT, &GrabberInterface::sigIntHandler) == SIG_ERR)
      signal(SIGINT,&GrabberInterface::sigIntHandler);
      signal(SIGABRT,&GrabberInterface::sigIntHandler);
      mInstances.push_back(this);
@@ -210,9 +201,6 @@ void GrabberInterface::readInit(unsigned int numCams, const std::string& default
 void GrabberInterface::applyInit()
 {
   //values from constructor (for guid) override settings from configfile
-
-
-
 
   //initialize the snapshot and recording names with default values
   //depends on no. of cameras
@@ -247,9 +235,7 @@ bool GrabberInterface::writeConfiguration()
   #ifdef DEBUG_GRABBER_INTERFACE
     std::cout << "[GrabberInterface::writeConfiguration] Configuration saved" << std::endl;
   #endif
-  
   return result;
-      
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -258,6 +244,7 @@ unsigned int GrabberInterface::getNumCams() const
   return mNumCams;
 }
 
+//--------------------------------------------------------------------------------------------------------------------
 double GrabberInterface::getFpsMeasured() const
 {
   return mFpsMeasured;
@@ -266,7 +253,6 @@ double GrabberInterface::getFpsMeasured() const
 //--------------------------------------------------------------------------------------------------------------------
 double GrabberInterface::getFps() const
 {
-  //unsigned int fps = round(1000 / LoopedThread::_mStepSize);
   double fps = 1000. / LoopedThread::_mStepSize;
   return fps;
 }
@@ -286,15 +272,12 @@ void GrabberInterface::setFps(double fps)
   double milliseconds = 1000. / fps;
 
   #ifdef DEBUG_GRABBER_INTERFACE
-
     if (wasRunning)
     {
       std::cout << "[GrabberInterface::setFps] thread stopped" << std::endl;
     }
-
     std::cout << "[GrabberInterface::setFps] switch to " << fps <<" fps"<< std::endl;
   #endif
-
 
   //LoopedThread::_mStepSize = milliseconds;  //set param for configuration file
   LoopedThread::setStepSize(milliseconds);        //change speed in thread
@@ -305,9 +288,6 @@ void GrabberInterface::setFps(double fps)
   }
 
   #ifdef DEBUG_GRABBER_INTERFACE
-    //std::cout << "[GrabberInterface::setFps] new values: getFps: " << getFps()
-    //         << ", stepsize " << milliseconds << "ms"<< std::endl;
-
     if (QThread::isRunning())
     {
       std::cout << "[GrabberInterface::setFps] grabberthread running" << std::endl;
@@ -316,7 +296,6 @@ void GrabberInterface::setFps(double fps)
     {
       std::cout << "[GrabberInterface::setFps] grabberthread not running" << std::endl;
     }
-
   #endif
 }
 
@@ -361,8 +340,11 @@ bool GrabberInterface::grab()
   if (! result)
   {
     doCleanUp();
-    CEDAR_THROW(cedar::aux::exc::GrabberGrabException,"[GrabberInterface::grab] Error in grabber \""
-                + _mName + "\" on grabbing: " + error_info);
+    CEDAR_THROW
+    ( 
+      cedar::aux::exc::GrabberGrabException,
+      "[GrabberInterface::grab] Error in grabber \""+ _mName + "\" on grabbing: " + error_info
+    );
   }
 
   //grabbing ok, then
@@ -437,7 +419,6 @@ void GrabberInterface::setSnapshotName(const std::string& snapshotName)
   {
     return;
   }
-
   mSnapshotNames.clear();
 
   //initialize snapshot-names
@@ -496,7 +477,6 @@ void GrabberInterface::setSnapshotName(unsigned int channel, const std::string& 
       //no: use default extension
       name.append(GRABBER_DEFAULT_SNAPSHOT_EXTENSION);
     }
-
     mSnapshotNames.at(channel) = name;
   }
 }
@@ -547,7 +527,6 @@ bool GrabberInterface::saveSnapshot(unsigned int channel) const
     #endif
     return false;
   }
-
   return true;
 }
 
@@ -641,7 +620,6 @@ void GrabberInterface::setRecordName(unsigned int channel, const std::string& re
       //no: use default extension
       name.append(GRABBER_DEFAULT_RECORD_EXTENSION);
     }
-
     mRecordNames.at(channel) = name;
   }
 }
@@ -649,7 +627,6 @@ void GrabberInterface::setRecordName(unsigned int channel, const std::string& re
 //--------------------------------------------------------------------------------------------------------------------
 std::string GrabberInterface::getRecordName(unsigned int channel) const
 {
-
   if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getRecordName");
@@ -665,7 +642,6 @@ bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       std::cout << "[GrabberInterface::startRecording] Warning: Grabber is already recording\n";
     #endif
-
     return true;
   }
 
@@ -704,7 +680,6 @@ bool GrabberInterface::startRecording(double fps, int fourcc, bool color)
     mGrabberThreadStartedOnRecording = true;
     start();
   }
-
   return true;
 }
 
@@ -738,7 +713,6 @@ bool GrabberInterface::isRecording() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-//void GrabberInterface::step(double time  __attribute__ ((__unused__))) //only supported by gcc
 void GrabberInterface::step(double)
 {
   #ifdef DEBUG_GRABBER_STEP

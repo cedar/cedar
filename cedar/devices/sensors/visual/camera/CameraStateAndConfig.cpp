@@ -50,12 +50,12 @@ using namespace cedar::dev::sensors::visual;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 CameraStateAndConfig::CameraStateAndConfig(
-                                          cv::VideoCapture videoCapture,
-                                          QReadWriteLockPtr videoCaptureLock,
-                                          unsigned int channel,
-                                          const std::string configurationFileName,
-                                          const std::string capabilitiesFileName
-                                        )
+                                            cv::VideoCapture videoCapture,
+                                            QReadWriteLockPtr videoCaptureLock,
+                                            unsigned int channel,
+                                            const std::string configurationFileName,
+                                            const std::string capabilitiesFileName
+                                          )
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraStateAndConfig::CameraConfiguration] channel "<< channel
@@ -104,7 +104,6 @@ CameraStateAndConfig::CameraStateAndConfig(
   }
   catch (...)
   {
-
     CEDAR_THROW
     (
       cedar::aux::exc::InitializationException,
@@ -155,13 +154,13 @@ bool CameraStateAndConfig::saveConfiguration()
 bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
 {
 
-  int wanted_value = boost::math::iround(value);// static_cast<int>(value);
+  int wanted_value = boost::math::iround(value);
 
   #ifdef ENABLE_GRABBER_WARNING_OUTPUT
     std::string prop_name = CameraProperty::type().get(propId).name();
     std::stringstream class_info;
     class_info << "[CameraStateAndConfig::setProperty] Channel "<< mChannel
-                                     << ": Property \"" << prop_name << "\" ";
+               << ": Property \"" << prop_name << "\" ";
   #endif
 
   // for cv::VideoCapture.get() we need as an unsigned int
@@ -362,7 +361,6 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
 //--------------------------------------------------------------------------------------------------------------------
 double CameraStateAndConfig::getProperty(CameraProperty::Id propId)
 {
-
   if (propId == cedar::aux::Enum::UNDEFINED)
   {
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
@@ -372,7 +370,6 @@ double CameraStateAndConfig::getProperty(CameraProperty::Id propId)
                 << boost::lexical_cast<int>(propId)
                 << ")" << std::endl;
     #endif
-
     return static_cast<double>(CAMERA_PROPERTY_NOT_SUPPORTED);
   }
 
@@ -396,10 +393,8 @@ double CameraStateAndConfig::getPropertyValue(CameraProperty::Id propId)
       std::cout << "[CameraStateAndConfig::getPropertyValue] Undefined property \""
                 << prop_name << "\" (ID: "<< prop_id << ")" << std::endl;
     #endif
-
     return false;
   }
-
 
   if (isSupported(propId))
   {
@@ -557,7 +552,6 @@ bool CameraStateAndConfig::setAllParametersToCam()
    */
   return true;
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------
 bool CameraStateAndConfig::setSetting(CameraSetting::Id settingId, double value)

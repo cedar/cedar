@@ -121,6 +121,7 @@ namespace cedar
         //! @brief  smart pointer for CameraConfigPtr
         typedef boost::shared_ptr<CameraConfig> CameraConfigPtr;
 
+        //todo: check if this is the right place
         //! @brief smart pointer for QReadWriteLock used in the CameraGrabber class
         typedef boost::shared_ptr<QReadWriteLock> QReadWriteLockPtr;
 
