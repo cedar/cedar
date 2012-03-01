@@ -68,6 +68,7 @@ CameraStateAndConfig::CameraStateAndConfig(
   mConfigurationFileName = configurationFileName;
   mCapabilitiesFileName = capabilitiesFileName;
   mpVideoCaptureLock = videoCaptureLock;
+  mInitialization = true;
 
   mChannel = channel;
   mChannelPrefix = "ch"+boost::lexical_cast<std::string>(channel)+"_";
@@ -79,12 +80,12 @@ CameraStateAndConfig::CameraStateAndConfig(
 
     //create structure with supported properties and their values
     //to monitor the settings made by the user
-    //values dosn't matter, because thezy will be set in onDeclareParameters
+    //values doesn't matter, because they will be set in onDeclareParameters
     //in class CameraConfig
     int num_properties = CameraProperty::type().list().size();
     for (int i=0; i<num_properties; i++)
     {
-      CameraProperty::Id prop_id = CameraProperty::type().list().at(i).id(); //.id() init exception
+      CameraProperty::Id prop_id = CameraProperty::type().list().at(i).id();
       if (mpCamCapabilities->isSupported(prop_id))
       {
         mCamPropertyValues.insert(PROPERTY_VALUE_PAIR(prop_id,0));
@@ -95,17 +96,8 @@ CameraStateAndConfig::CameraStateAndConfig(
       }
     }
 
-
-    //mCamSettings is initialized on readOrDefaultConfiguration
-    //and for local storage of properties and settings
-    mpCamConfig = CameraConfigPtr(new CameraConfig
-                                      (
-                                         mConfigurationFileName,
-                                         mChannel,
-                                         mCamSettings,
-                                         mCamPropertyValues
-                                       )
-                                  );
+    //mCamSettings is initialized in class CameraConfig in method onDeclareParameters
+    mpCamConfig = CameraConfigPtr(new CameraConfig(mConfigurationFileName, mChannel, mCamSettings, mCamPropertyValues));
 
     //now set all restored parameters to the camera
     setAllParametersToCam();
@@ -120,6 +112,7 @@ CameraStateAndConfig::CameraStateAndConfig(
     );
   }
 
+  mInitialization = false;
 
 }
 
@@ -166,6 +159,9 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
 
   #ifdef ENABLE_GRABBER_WARNING_OUTPUT
     std::string prop_name = CameraProperty::type().get(propId).name();
+    std::stringstream class_info;
+    class_info << "[CameraStateAndConfig::setProperty] Channel "<< mChannel
+                                     << ": Property \"" << prop_name << "\" ";
   #endif
 
   // for cv::VideoCapture.get() we need as an unsigned int
@@ -176,8 +172,7 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
   if ( propId == cedar::aux::Enum::UNDEFINED)
   {
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::setCameraProperty] Couldn't set undefined property \""
-                << prop_name << "\" (ID: "<< prop_id << ")" << std::endl;
+      std::cout << class_info << "unknown property (ID: "<< prop_id << ")" << std::endl;
     #endif
 
     return false;
@@ -188,8 +183,10 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
   if (!isSupported(propId))
   {
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::setCameraProperty] Property \"" << prop_name
-                << "\" unsupported on channel " << mChannel << std::endl;
+    if (!mInitialization)
+    {
+      std::cout << class_info << "unsupported!" << std::endl;
+    }
     #endif
 
     mCamPropertyValues[propId] = CAMERA_PROPERTY_NOT_SUPPORTED;
@@ -210,8 +207,7 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
       else
       {
         #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << "[CameraStateAndConfig::setCameraProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                  << "\" couldn't set to mode \"auto\""  << std::endl;
+        std::cout << class_info << "couldn't set to mode \"AUTO\""  << std::endl;
         #endif
         return false;
       }
@@ -219,8 +215,10 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
     else
     {
       #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::setCameraProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                << "\" doesn't support \"CAMERA_PROPERTY_MODE_AUTO\""  << std::endl;
+      if (! mInitialization)
+      {
+        std::cout << class_info << "\" doesn't support mode \"AUTO\""  << std::endl;
+      }
       #endif
       return false;
     }
@@ -237,8 +235,7 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
       else
       {
         #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << "[CameraStateAndConfig::setProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                  << "\" couldn't switched off"  << std::endl;
+        std::cout << class_info << "couldn't switch to \"OFF\""  << std::endl;
         #endif
         return false;
       }
@@ -246,8 +243,10 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
     else
     {
       #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::setProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                << "\" is not on/off capable"  << std::endl;
+      if (!mInitialization)
+      {
+        std::cout << class_info << "\" doesn't support mode \"ON/OFF\""  << std::endl;
+      }
       #endif
       return false;
     }
@@ -264,8 +263,7 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
       else
       {
         #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-        std::cout << "[CameraStateAndConfig::setProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                  << "\" couldn't set to mode \"OnePushAuto\""  << std::endl;
+        std::cout << class_info << "couldn't set to mode \"OnePushAuto\""  << std::endl;
         #endif
         return false;
       }
@@ -273,8 +271,10 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
     else
     {
       #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::setProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                << "\" is not \"one push auto\" capable"  << std::endl;
+      if (!mInitialization)
+      {
+        std::cout << class_info << "\" doesn't support mode \"ONE-PUSH-AUTO\""  << std::endl;
+      }
       #endif
       return false;
     }
@@ -285,8 +285,7 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
     if (! (isManualCapable(propId) || isAbsoluteCapable(propId) )  )
     {
       #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[CameraStateAndConfig::setProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                << "\" couldn't set to manual mode"  << std::endl;
+      std::cout << class_info << "is not able to set values manually"  << std::endl;
       #endif
       return false;
     }
@@ -298,8 +297,8 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
       if ( (wanted_value > max_value) || (wanted_value < min_value))
       {
-          std::cout << "[CameraStateAndConfig::setProperty] Channel "<< mChannel << ": Property \"" << prop_name
-                    << "\" has a range of [" << min_value << ","<< max_value << "]" << std::endl;
+          std::cout << class_info
+                    << "has a range of [" << min_value << ","<< max_value << "]" << std::endl;
           std::cout << "[CameraStateAndConfig::setProperty] Your value of "<< value
                     << " exceeds this boundaries" << std::endl;
       }
@@ -324,7 +323,7 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
 
     //check if already set
     int old_value = boost::math::iround(getProperty(propId));
-    if ( old_value == wanted_value)
+    if (old_value == wanted_value)
     {
       return true;
     }
@@ -356,14 +355,8 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
     //sync with local storage
     mCamPropertyValues[propId] = getProperty(propId);
 
-
     return false;
   }
-
-
-
-
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------

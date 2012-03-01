@@ -35,9 +35,9 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/TestGrabber.h"
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/devices/sensors/visual/defines.h"
+#include "cedar/devices/sensors/visual/TestGrabber.h"
 
 // PROJECT INCLUDES
 
@@ -57,13 +57,13 @@
  *      the interface.
  */
 
-
 using namespace std;
 using namespace cedar::dev::sensors::visual;
 using namespace cedar::aux;
 
+//--------------------------------------------------------------------------------------------------------------------
 //constants
-
+//--------------------------------------------------------------------------------------------------------------------
 #define CHANNEL_0_NAME "CHANNEL_0_NAME"
 #define CHANNEL_1_NAME "CHANNEL_1_NAME"
 #define GRABBER_NAME "TestGrabber"
@@ -71,13 +71,9 @@ using namespace cedar::aux;
 #define CONFIG_FILE_NAME "grabber.config"
 #define LOGFILE "UnitTestStereoGrabber.log"
 
-
-
-
-
 //----------------------------------------------------------------------------------------------------------------------
-
-//int cpp_main(int , char **)
+//main program
+//--------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
   
@@ -128,6 +124,18 @@ int main(int , char **)
   catch (...)
   {
     log_file << "error" << std::endl;
+    errors++;
+  }
+
+  //-----------------------------------------------------------
+  log_file << "test no " << test_number++ <<": getFpsMeasured()" << std::endl;
+  try
+  {
+    grabber_1->getFpsMeasured();
+  }
+  catch (...)
+  {
+    log_file << "error" <<std::endl;
     errors++;
   }
 

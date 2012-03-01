@@ -209,6 +209,11 @@ void GrabberInterface::readInit(unsigned int numCams, const std::string& default
 //--------------------------------------------------------------------------------------------------------------------
 void GrabberInterface::applyInit()
 {
+  //values from constructor (for guid) override settings from configfile
+
+
+
+
   //initialize the snapshot and recording names with default values
   //depends on no. of cameras
   setSnapshotName("snapshot.jpg");

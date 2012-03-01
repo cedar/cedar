@@ -247,6 +247,10 @@ private:
   ///! The lock for concurrent access to the VideoCapture
   QReadWriteLockPtr mpVideoCaptureLock;
 
+  ///! Internal flag for initialization period
+  // Used to suppress warning messages in setProperty on startup
+  bool mInitialization;
+
   /// @endcond
 
   //--------------------------------------------------------------------------------------------------------------------

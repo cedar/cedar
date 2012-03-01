@@ -93,7 +93,7 @@ ConfigurationInterface(configFileName)
   }
 
   //write properties which aren't supported to the properties file
-  writeConfiguration();
+  //writeConfiguration();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

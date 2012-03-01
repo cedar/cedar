@@ -17,6 +17,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
+//#include <cedar/devices/sensors/visual/CameraGrabber.h>
 
 
 // PROJECT INCLUDES
@@ -28,12 +29,28 @@
 //--------------------------------------------------------------------------------------------------------------------
 //constants
 //--------------------------------------------------------------------------------------------------------------------
+
+// grab from device number on the bus (as an integer)
 #define CHANNEL_0_DEVICE 0
 #define CHANNEL_1_DEVICE 1
 
-#define GRABBER_NAME_0 "Stereo_Camera_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_camera_grabber_testcase.config"
+// finish the initialization, i.e. grab the first image on creation of the grabber
+// in this case, it isn't possible to set camera settings (like mode, fps, iso-speed)
+#define FINISH_INITIALIZATION true
 
+// channel_0_device is the bus-id or the guid
+#define IS_GUID false
+
+// the name of the grabber
+// only used in the configuration file
+#define GRABBER_NAME_0 "Stereo_Camera_Grabber_TestCase"
+
+// the basename for the configuration file
+// overall there are more config.files, this one for the grabber itself (call it the main configuration),
+// one for each channel for the camera-capabilities (it's name is stored in the main config.)
+// one for the actual setting of the camera (it's name is derived from the main config.filename
+// with an appendix (_ch0, _ch1, ...)
+#define CONFIG_FILE_NAME "stereo_camera_grabber_testcase.config"
 
 //--------------------------------------------------------------------------------------------------------------------
 // main test program
@@ -59,13 +76,14 @@ int main(int , char **)
   cedar::dev::sensors::visual::CameraGrabber *camera_grabber=NULL;
   try
   {
-    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber(
-                          CONFIG_FILE_NAME_0,
-                          CHANNEL_0_DEVICE,
-                          CHANNEL_1_DEVICE,
-                          false,
-                          true
-                        );
+    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber
+                         (
+                           CONFIG_FILE_NAME,
+                           CHANNEL_0_DEVICE,
+                           CHANNEL_1_DEVICE,
+                           IS_GUID,
+                           FINISH_INITIALIZATION
+                         );
   }
   catch (cedar::aux::exc::InitializationException &e)
   {
@@ -100,69 +118,21 @@ int main(int , char **)
    *  - grabbername is restored from configfile
    */
 
-    camera_grabber->setName(GRABBER_NAME_0);
-    std::cout << "\nGrab channel 0 from \"" << camera_grabber->getSourceInfo()<< "\"" << std::endl;
-    std::cout << "\nGrab channel 1 from \"" << camera_grabber->getSourceInfo(1)<< "\"" << std::endl;
+  camera_grabber->setName(GRABBER_NAME_0);
+  std::cout << "\nGrab channel 0 from \"" << camera_grabber->getSourceInfo()<< "\"" << std::endl;
+  std::cout << "\nGrab channel 1 from \"" << camera_grabber->getSourceInfo(1)<< "\"" << std::endl;
 
-    //Size of camera images
-    std::cout << "\nSize of loaded frame:\n";
-    cv::Size ch0_size = camera_grabber->getSize(0);
-    cv::Size ch1_size = camera_grabber->getSize(1);
-    std::cout << "\tChannel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
-    std::cout << "\tChannel 1: " << ch1_size.width <<" x " << ch1_size.height << std::endl;
+  //Size of camera images
+  std::cout << "\nSize of loaded frame:\n";
+  cv::Size ch0_size = camera_grabber->getSize(0);
+  cv::Size ch1_size = camera_grabber->getSize(1);
+  std::cout << "\tChannel 0: " << ch0_size.width <<" x " << ch0_size.height << std::endl;
+  std::cout << "\tChannel 1: " << ch1_size.width <<" x " << ch1_size.height << std::endl;
 
-    //check framerate of the grabber-thread (thread isn't started yet)
-    //remember: grabberthread have to be started to get new content.
-    //          or call CameraGrabber.grab() manually
-    std::cout << "CameraGrabber thread default FPS : " << camera_grabber->getFps() << std::endl;
-
-    //Set the name for the recording file
-    //This function have special cases
-    //In the mono case, filename is used without changes
-    //In the stereo case, the filenames are constructed like
-    //filename[ch0].ext and filename[ch1].ext
-    //If you want to set the names independently, you can use it with the camera-parameter
-    //Start recording with startRecording() (thread will be started on startRecording!)
-    camera_grabber->setRecordName("Camera_Grabber_TestCase_Recording.avi");
-    //record-filenames now set to Camera_Grabber_TestCase_Recording[ch0].avi
-    //and Camera_Grabber_TestCase_Recording[ch1].avi
-
-
-    //Set Snapshotnames without channel-number (in mono-case: default value is 0)
-    //This is the same behavior as setRecordName()
-    //The type of the file (e.g. bitmap or jpg or something else) depends on extension
-    //look at the documentation of setSnapshotName for details
-    // SnapshotFromCameraGrabber[ch0].bmp and SnapshotFromCameraGrabber[ch1].bmp
-    camera_grabber->setSnapshotName("SnapshotFromCameraGrabber.bmp");
-
-    // rename channel 0 to SnapshotFromCameraGrabber.jpg. Channel 1 isn't altered
-    camera_grabber->setSnapshotName(0,"SnapshotFromCameraGrabber01.jpg");
-
-
-    //Check the constructed filenames
-    std::cout << "Check filenames of snapshots and recordings\n" << std::endl;
-
-    std::cout << "SnapshotName:\t" << camera_grabber->getSnapshotName() <<std::endl;
-    std::cout << "RecordName:\t" << camera_grabber->getRecordName() <<std::endl;
-
-    //enforcing an error and catch it
-    try
-    {
-      std::cout << "\nTry to enforce an exception:\n";
-      std::cout << "SnapshotName_1: " << camera_grabber->getSnapshotName(1) <<std::endl;
-    }
-    catch (cedar::aux::exc::ExceptionBase& e)
-    {
-      //std::cout << "Exception: " <<e.what() << std::endl; //until now: buggy cedar implementation
-      //all grabber exceptions (look at cedar/devices/sensors/visual/exceptions/namespace.h)
-      //can be used without separate include-files
-      std::cout <<e.exceptionInfo()<<std::endl;
-    }
-
-    // Save a snapshot from channel 0 only
-    // Be aware, that existing files will be overwritten without any question
-    //camera_grabber->saveSnapshot(0);
-
+  //check framerate of the grabber-thread (thread isn't started yet)
+  //remember: grabberthread have to be started to get new content.
+  //          or call CameraGrabber.grab() manually
+  std::cout << "CameraGrabber thread default FPS : " << camera_grabber->getFps() << std::endl;
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
@@ -170,40 +140,61 @@ int main(int , char **)
   namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
   namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
 
+  //always use the QReadWriteLock for locking the cv::Mat image object
+  //on access
+  QReadWriteLock *p_lock;
+  p_lock = camera_grabber->getReadWriteLockPointer();
+
   //the first frame is already grabbed on initialization
+  p_lock->lockForRead();
   cv::Mat frame0 = camera_grabber->getImage();
-  cv::Mat frame1 = camera_grabber->getImage();
+  cv::Mat frame1 = camera_grabber->getImage(1);
+  p_lock->unlock();
+
+  unsigned int size_w = frame0.cols + frame1.cols+5;
+  unsigned int size_h = frame0.rows > frame1.rows ? frame0.rows : frame1.rows;
+  cv::Mat pic =  cv::Mat::zeros(size_h, size_w, CV_8UC3);
+
+  cv::Rect left_pic_size(0,0,frame0.cols,frame0.rows);
+  cv::Mat left_pic = pic(left_pic_size);
+  cv::Rect right_pic_size(frame0.cols+5,0,frame1.cols,frame1.rows);
+  cv::Mat right_pic = pic(right_pic_size);
+
+  frame0.copyTo(left_pic);
+  frame1.copyTo(right_pic);
+
+
 
   //start the grabber-thread for updating camera images
-  camera_grabber->setFps(20);
   camera_grabber->start();
-
-  //start recording
-  std::cout << "\nStart Recording\n";
-  camera_grabber->startRecording(20);
 
   //get frames for a while
   unsigned int counter=0;
 
   while (!frame0.empty())
   {
-    imshow(highgui_window_name_0,frame0);
-    imshow(highgui_window_name_1,frame1);
+    imshow(highgui_window_name_0,pic);
 
     //get new images, this is independent from camera-thread
     //if camera-thread is faster than your processing, images will be skipped
+    p_lock->lockForRead();
     frame0 = camera_grabber->getImage();
     frame1 = camera_grabber->getImage(1);
+    p_lock->unlock();
+
+    frame0.copyTo(left_pic);
+    frame1.copyTo(right_pic);
     counter++;
 
-    //after one second, set camera options
-    if (counter == 100)
+    //every second
+    if (! (counter % 100))
     {
-
+      //display real reached fps
+      std::cout << "Thread FPS: " << camera_grabber->getFpsMeasured() << std::endl;
     }
 
     //exit after another second
-    if (counter == 200)
+    if (counter == 500)
     {
       break;
     }
@@ -216,7 +207,6 @@ int main(int , char **)
   //clean up
 
   destroyWindow(highgui_window_name_0);
-  destroyWindow(highgui_window_name_1);
 
   //stop grabbing-thread if running
   //recording will also be stopped

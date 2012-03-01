@@ -49,11 +49,8 @@ using namespace cedar::dev::sensors::visual;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 CameraConfig::CameraConfig(
-                           //cv::VideoCapture videoCapture,
-                           //QReadWriteLockPtr videoCaptureLock,
                            const std::string& configFileName,
                            unsigned int channel,
-                           //SupportedPropertiesSet supportedProperties,
                            CameraSettings &camSettings,
                            CameraPropertyValues &camPropertyValues
                         )
@@ -66,17 +63,11 @@ mCamPropertyValues(camPropertyValues)
     std::cout << "[CameraConfig::CameraState] channel "<< channel << " Config-file: " << configFileName << std::endl;
   #endif
 
-    //mVideoCapture = videoCapture;
-    //mSupportedProperties = supportedProperties;
-    //mpVideoCaptureLock = videoCaptureLock;
-
     mChannel = channel;
     mChannelPrefix = "ch"+boost::lexical_cast<std::string>(channel)+"_";
 
     bool result = declareParameter();
     ConfigurationInterface::readOrDefaultConfiguration();
-    //result = setAllParametersToCam() && result;
-
 
     if (not result )
     {
@@ -130,12 +121,12 @@ bool CameraConfig::declareParameter()
   result = (addParameter(&mCamSettings.mode, param_name, param_value) == CONFIG_SUCCESS) && result;
   //std::cout << "set videomode to default: " << param_value << std::endl;
 
-  param_value = CameraFrameRate::type().get(CAMERA_DEFAULT_FRAMERATE).name();
+  param_value = CameraFrameRate::type().get(CameraFrameRate::FRAMERATE_NOT_SET).name();
   param_name = mChannelPrefix + "cam_framerate";
   result = (addParameter(&mCamSettings.fps, param_name, param_value) == CONFIG_SUCCESS) && result;
   //std::cout << "set FPS to default: " << param_value << std::endl;
 
-  param_value = CameraIsoSpeed::type().get(CAMERA_DEFAULT_ISO_SPEED).name();
+  param_value = CameraIsoSpeed::type().get(CameraIsoSpeed::ISO_NOT_SET).name();
   param_name = mChannelPrefix + "cam_iso_speed";
   result = (addParameter(&mCamSettings.iso_speed, param_name, param_value) == CONFIG_SUCCESS) && result;
 
@@ -165,111 +156,4 @@ bool CameraConfig::declareParameter()
   return result;
 }
 
-
-//----------------------------------------------------------------------------------------------------
-/*void CameraConfig::getAllParametersFromCam()
- {
- #ifdef DEBUG_CAMERAGRABBER
- std::cout << "[CameraConfig::getAllParametersFromCam] channel "<< mChannel << std::endl;
- #endif
-
- //read settings from camera (if set manually)
- unsigned int id_mode = static_cast<unsigned int>(CameraSetting::SETTING_MODE);
- unsigned int act_mode = CameraVideoMode::type().get(mCamSettings.mode).id();
-
- if (act_mode != CameraVideoMode::MODE_NOT_SET)
- {
- mCamSettings.mode = CameraVideoMode::type().get(getProperty(id_mode).name());
- }
-
- unsigned int id_fps = static_cast<unsigned int>(CameraSetting::SETTING_FPS);
- unsigned int act_fps = static_cast<unsigned int>(getProperty(id_fps));
-
- if (mCamSettings.fps != CameraFrameRate::FRAMERATE_NOT_SET)
- {
- mCamSettings.fps = CameraFrameRate::type().get(act_fps).name();
- }
-
- unsigned int id_iso = static_cast<unsigned int>(CameraSetting::SETTING_ISO_SPEED);
- unsigned int act_iso = static_cast<unsigned int>(getProperty(id_iso));
-
- if (mCamSettings.iso_speed != CameraIsoSpeed::ISO_NOT_SET)
- {
- mCamSettings.iso_speed = CameraIsoSpeed::type().get(act_iso).name();
- }
-
- //our map from prop-id to value
- //only supported properties
- CameraPropertyValues::iterator it;
- for ( it=mCamPropertyValues.begin(); it != mCamPropertyValues.end(); it++ )
- {
- //cedar::aux::EnumId prop_id = static_cast<cedar::aux::EnumId>(it->first);
- unsigned int prop_id = it->first;
-
- //read only if property is set to special mode( which are negative constants)
- if (it->second >= 0 )
- {
- it->second = static_cast<int>(getProperty(prop_id));
- }
- }
- }
-
-   switch (propId)
-  {
-    case :
-
-    default:
-
-  }
-
-  switch (key) {
-    case value:
-
-      break;
-    default:
-      break;
-  }
-
-    //read settings from camera (if set manually)
-    unsigned int id_mode = static_cast<unsigned int>(CameraSetting::SETTING_MODE);
-    unsigned int act_mode = CameraVideoMode::type().get(mCamSettings.mode).id();
-
-    if (act_mode != CameraVideoMode::MODE_NOT_SET)
-    {
-      mCamSettings.mode = CameraVideoMode::type().get(getProperty(id_mode).name());
-    }
-
-    unsigned int id_fps = static_cast<unsigned int>(CameraSetting::SETTING_FPS);
-    unsigned int act_fps = static_cast<unsigned int>(getProperty(id_fps));
-
-    if (mCamSettings.fps != CameraFrameRate::FRAMERATE_NOT_SET)
-    {
-      mCamSettings.fps = CameraFrameRate::type().get(act_fps).name();
-    }
-
-    unsigned int id_iso = static_cast<unsigned int>(CameraSetting::SETTING_ISO_SPEED);
-    unsigned int act_iso = static_cast<unsigned int>(getProperty(id_iso));
-
-    if (mCamSettings.iso_speed != CameraIsoSpeed::ISO_NOT_SET)
-    {
-      mCamSettings.iso_speed = CameraIsoSpeed::type().get(act_iso).name();
-    }
-
-    //our map from prop-id to value
-    //only supported properties
-    CameraPropertyValues::iterator it;
-    for ( it=mCamPropertyValues.begin(); it != mCamPropertyValues.end(); it++ )
-    {
-      //cedar::aux::EnumId prop_id = static_cast<cedar::aux::EnumId>(it->first);
-      unsigned int prop_id = it->first;
-
-      //read only if property is set to special mode( which are negative constants)
-      if (it->second >= 0 )
-      {
-        it->second = static_cast<int>(getProperty(prop_id));
-      }
-    }
-
-
- */
 

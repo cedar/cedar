@@ -35,8 +35,8 @@
 ======================================================================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/TestGrabber.h"
 #include "cedar/auxiliaries/LogFile.h"
+#include "cedar/devices/sensors/visual/TestGrabber.h"
 #include "cedar/devices/sensors/visual/defines.h"
 
 // PROJECT INCLUDES
@@ -53,8 +53,7 @@
  *  \file This file implements a test case for the GrabberInterface class
  *
  *  \remarks
- *     The TestGrabber class is used to check the functionality of
- *      the interface.
+ *     The TestGrabber class is used to check the functionality of the interface.
  */
 
 
@@ -62,18 +61,18 @@ using namespace std;
 using namespace cedar::dev::sensors::visual;
 using namespace cedar::aux;
 
+//--------------------------------------------------------------------------------------------------------------------
 //constants
+//--------------------------------------------------------------------------------------------------------------------
 #define CHANNEL_0_NAME "CHANNEL_0_NAME"
 #define GRABBER_NAME "TestGrabber"
 
 #define CONFIG_FILE_NAME "grabber.config"
 #define LOGFILE "UnitTestGrabber.log"
 
-
-
-//----------------------------------------------------------------------------------------------------------------------
-
-//int cpp_main(int , char **)
+//--------------------------------------------------------------------------------------------------------------------
+//main program
+//--------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
 
@@ -124,6 +123,18 @@ int main(int , char **)
   catch (...)
   {
     log_file << "error" << std::endl;
+    errors++;
+  }
+
+  //-----------------------------------------------------------
+  log_file << "test no " << test_number++ <<": getFpsMeasured()" << std::endl;
+  try
+  {
+    grabber_1->getFpsMeasured();
+  }
+  catch (...)
+  {
+    log_file << "error" <<std::endl;
     errors++;
   }
 
@@ -296,7 +307,6 @@ int main(int , char **)
     log_file << "error" <<std::endl;
     errors++;
   }
-
 
   //-----------------------------------------------------------
   //check errors
