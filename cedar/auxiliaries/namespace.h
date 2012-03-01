@@ -189,6 +189,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     /* exceptions */
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
+    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);

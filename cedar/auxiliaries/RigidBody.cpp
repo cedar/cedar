@@ -118,7 +118,7 @@ cedar::aux::RigidBody::~RigidBody()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::aux::RigidBody::getPosition()
+cv::Mat cedar::aux::RigidBody::getPosition() const
 {
   QReadLocker locker(&mLock);
   return mPosition.clone();
@@ -139,19 +139,19 @@ double cedar::aux::RigidBody::getPositionZ() const
   return mPosition.at<double>(2, 0);
 }
 
-cv::Mat cedar::aux::RigidBody::getOrientationQuaternion()
+cv::Mat cedar::aux::RigidBody::getOrientationQuaternion() const
 {
   QReadLocker locker(&mLock);
   return mOrientationQuaternion.clone();
 }
 
-double cedar::aux::RigidBody::getOrientationQuaternion(unsigned int component)
+double cedar::aux::RigidBody::getOrientationQuaternion(unsigned int component) const
 {
   QReadLocker locker(&mLock);
   return mOrientationQuaternion.at<double>(component, 0);
 }
 
-cv::Mat cedar::aux::RigidBody::getTransformation()
+cv::Mat cedar::aux::RigidBody::getTransformation() const
 {
   QReadLocker locker(&mLock);
   return mTransformation.clone();

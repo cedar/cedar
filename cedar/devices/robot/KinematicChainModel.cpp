@@ -46,10 +46,10 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain)
+cedar::dev::robot::KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-cedar::aux::RigidBody(rpKinematicChain->getReferenceGeometry()->getConfigFileName()),
-mpKinematicChain(rpKinematicChain)
+cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
+mpKinematicChain(pKinematicChain)
 {
   init();
 }

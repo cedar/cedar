@@ -72,63 +72,66 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief the visualization initializes resources in the current GL context
+  virtual void initializeGl();
+
   //!@brief draws a visualization of the object in the current GL context
   virtual void draw() = 0;
   
   //!@brief returns visibility state
-  bool isVisible();
+  bool isVisible() const;
 
   //!@brief returns name of the object
-  std::string getRigidBodyName();
+  const std::string& getRigidBodyName() const;
 
   //!@brief returns type of the object
-  std::string getRigidBodyVisualizationType();
+  const std::string& getRigidBodyVisualizationType() const;
   
   //!@brief returns current resolution
-  int getResolution();
+  int getResolution() const;
   
   //!@brief returns R value of main object color in RGB
-  double getColorR();
+  double getColorR() const;
   
   //!@brief returns G value of main object color in RGB
-  double getColorG();
+  double getColorG() const;
   
   //!@brief returns B value of main object color in RGB
-  double getColorB();
+  double getColorB() const;
   
   //!@brief switch between drawing the object with full surfaces or as wire frame only
   void setDrawAsWireFrame(const bool state);
 
   //!@brief get state of object being drawn with full surfaces or as wire frame only
-  bool isDrawnAsWireFrame();
+  bool isDrawnAsWireFrame() const;
   
   //!@brief switch drawing the local coordinate frame of the rigid body
   void setDrawLocalCoordinateFrame(const bool state);
 
   //!@brief true if the local coordinate frame of the rigid body is being drawn
-  bool isDrawingLocalCoordinateFrame();
+  bool isDrawingLocalCoordinateFrame() const;
 
   /*!@brief set the length of the axes in the local coordinate frame visualization
    * @param value    new axis length
    */
-  void setAxisLength(const double value);
+  void setAxisLength(double value);
 
   /*!@brief get the length of the axes in the local coordinate frame visualization
-   * @param value    new axis length
+   * @return axis length
    */
-  double getAxisLength();
+  double getAxisLength() const;
 
   /*!@brief set the general resolution of the object, 10 is a usual value
    * @param value    new resolution value
    */
-  void setResolution(const int value);
+  void setResolution(int value);
   
   /*!@brief sets the main color of the object, in RGB
-   * @param R    value for red channel in RGB color
-   * @param G    value for green channel in RGB color
-   * @param B    value for blue channel in RGB color
+   * @param r    value for red channel in RGB color
+   * @param g    value for green channel in RGB color
+   * @param b    value for blue channel in RGB color
    */
-  void setColor(const double R, const double G, const double B);
+  void setColor(double r, double g, double b);
 
   /*!@brief returns a smart pointer to the object being visualized
    *
@@ -156,7 +159,7 @@ private:
   
 public slots:
   //!@brief turns the visibility of the object on and off
-  void setVisibility(const bool state = true);
+  void setVisibility(bool state = true);
   
   //--------------------------------------------------------------------------------------------------------------------
   // members

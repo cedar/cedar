@@ -53,7 +53,7 @@
  */
 class cedar::proc::Element
 :
-public cedar::aux::Configurable,
+virtual public cedar::aux::Configurable,
 public boost::enable_shared_from_this<cedar::proc::Element>
 {
   //--------------------------------------------------------------------------------------------------------------------

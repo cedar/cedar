@@ -51,6 +51,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QByteArray>

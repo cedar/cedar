@@ -45,7 +45,7 @@ if (CEDAR_STOP_ON_MISSING_LIBRARIES)
   message("-- Will stop when missing libraries.")
 else()
   set(CEDAR_LIB_ERROR_TYPE WARNING)
-  message("-- Will compile despite missing libraries.")
+  message("-- Will not stop if libraries are missing.")
 endif()
 
 # Qt
@@ -57,7 +57,7 @@ if(QT4_FOUND)
   include_directories(${QT_INCLUDE_DIRS})
   message("   Qt was found in ${QT_INCLUDE_DIRS}")
 else(QT4_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library qt4 was not found on your system! 
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qt4 was not found on your system! 
   You can try to alter the default search paths in cedar.conf.")
 endif()
 
@@ -70,7 +70,7 @@ endif (${CMAKE_BUILD_STATIC_LIBS})
 
 message("-- Searching for boost...")
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.40.0 COMPONENTS system date_time filesystem)
+find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
 
 if(Boost_FOUND)
@@ -79,7 +79,7 @@ if(Boost_FOUND)
   #message("Found the following boost libraries: ${Boost_LIBRARIES}")
   #message("Found boost includes at ${Boost_INCLUDE_DIRS}")
 else(Boost_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library boost was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library boost was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
 endif()
 
@@ -98,23 +98,31 @@ if(OpenCV_FOUND)
     set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui opencv_imgproc)
   endif(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
 elseif(OpenCV_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library OpenCV was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library OpenCV was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
 endif(OpenCV_FOUND)
 # message(STATUS "-- Found opencv libs ${OpenCV_LIBS}")
 
 # libconfig
-message("-- Searching for libconfig...")
-find_package(Libconfig REQUIRED)
-if(Libconfig_FOUND)
-  message("   libconfig was found in ${Libconfig_INCLUDE_DIRS}")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
-  include_directories(${Libconfig_INCLUDE_DIRS})
-else(Libconfig_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library libconfig was not found on your system!
-  You can try to alter the default search paths in cedar.conf.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
-endif(Libconfig_FOUND)
+
+# check if legacy mode is enabled
+
+if (NOT DEFINED CEDAR_LIBCONFIG_LEGACY_MODE OR CEDAR_LIBCONFIG_LEGACY_MODE)
+      
+    message("-- Searching for libconfig (LEGACY MODE)...")
+    add_definitions(-DCEDAR_LIBCONFIG_LEGACY_MODE)
+    
+    find_package(Libconfig REQUIRED)
+    if(Libconfig_FOUND)
+      message("   libconfig was found in ${Libconfig_INCLUDE_DIRS}")
+      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
+      include_directories(${Libconfig_INCLUDE_DIRS})
+    else(Libconfig_FOUND)
+      message(${CEDAR_LIB_ERROR_TYPE} "   Required library libconfig was not found on your system!
+      You can try to alter the default search paths in cedar.conf.")
+      set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
+    endif(Libconfig_FOUND)
+endif()
 
 # libQGLViewer
 message("-- Searching for QGLViewer...")
@@ -124,7 +132,7 @@ if(QGLViewer_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QGLViewer_LIBS})
   include_directories(${QGLViewer_INCLUDE_DIRS})
 else(QGLViewer_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library QGLViewer was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library QGLViewer was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized QGLViewer2 debug QGLViewerd2)
 endif(QGLViewer_FOUND)
@@ -137,7 +145,7 @@ if(qwt_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
   include_directories(${qwt_INCLUDE_DIRS})
 else(qwt_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwt was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwt was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwt)
 endif(qwt_FOUND)
@@ -150,7 +158,7 @@ if(qwtplot3d_FOUND)
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
   include_directories(${qwtplot3d_INCLUDE_DIRS})
 else(qwtplot3d_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwtplot3d was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwtplot3d was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwtplot3d)
 endif(qwtplot3d_FOUND)
@@ -232,7 +240,7 @@ foreach (libPath ${cedarLibPaths})
     string(REPLACE ${CEDAR_SOURCE_DIR}/ "" libDirName "${libPath}")
 
     # add out-of-source directory tree
-    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}/")
+    set(subDir "${CEDAR_BUILD_DIR}/cedar/${libDirName}")
 
     # add the subdirectory
     add_subdirectory(${libPath} ${subDir})

@@ -41,20 +41,19 @@
 #include "cedar/devices/lib.h"
 #include "cedar/devices/robot/gui/namespace.h"
 #include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainCommandWidget.h"
 
 // SYSTEM INCLUDES
-#include <QtCore/QTimer>
-#include <QtGui/QGridLayout>
-#include <QtGui/QWidget>
+#include <QGridLayout>
+#include <QWidget>
 
 //!@brief A simple widget to access all the joints via GUI
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
 //class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::KinematicChainWidget
 class cedar::dev::robot::gui::KinematicChainWidget
 :
-public QWidget,
-public cedar::aux::ConfigurationInterface
+public QWidget
 {
   //----------------------------------------------------------------------------
   // macros
@@ -66,37 +65,13 @@ public cedar::aux::ConfigurationInterface
   //----------------------------------------------------------------------------
 
 public:
-//!@todo decide whether this is the proper way to deal with unwanted configuration interfaces
   /*!@brief Constructor
    *
    *@param kinematicChain pointer to a kinematic chain
    *@param parent parent parameter of QWidget
    *@param f WindowFlags for QWidget
    */
-//  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, QWidget *parent = 0, Qt::WindowFlags f = 0);
-
-  /*!@brief Constructor
-   *
-   *@param kinematicChain pointer to a kinematic chain
-   *@param configFileName path of a configuration file
-   *@param parent parent parameter of QWidget
-   *@param f WindowFlags for QWidget
-   */
-  KinematicChainWidget(const cedar::dev::robot::KinematicChainPtr &kinematicChain, const std::string& configFileName = "", QWidget* parent = 0, Qt::WindowFlags f = 0);
-
-  /*!@brief Constructor taking a vector of kinematic chains
-   *
-   * If a vector of kinematic chains is given, the widgets writes the same
-   * values to all of them. It reads the values from the first kinematic chain.
-   */
-//  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, QWidget* parent = 0, Qt::WindowFlags f = 0);
-
-  /*!@brief Constructor taking a vector of kinematic chains
-   *
-   * If a vector of kinematic chains is given, the widgets writes the same
-   * values to all of them. It reads the values from the first kinematic chain.
-   */
-  KinematicChainWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName = "", QWidget* parent = 0, Qt::WindowFlags f = 0);
+  KinematicChainWidget(cedar::dev::robot::KinematicChainPtr kinematicChain, QWidget* parent = 0, Qt::WindowFlags f = 0);
 
   ~KinematicChainWidget();
 
@@ -105,6 +80,15 @@ public:
   //----------------------------------------------------------------------------
 
 public:
+  /*!@brief access the monitor sub-widget
+   * @return pointer to the monitor widget
+   */
+  cedar::dev::robot::gui::KinematicChainMonitorWidget* getMonitorWidget();
+
+  /*!@brief access the command sub-widget
+   * @return pointer to the command widget
+   */
+  cedar::dev::robot::gui::KinematicChainCommandWidget* getCommandWidget();
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -120,7 +104,7 @@ protected:
 
 private:
 
-  void init(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, const std::string& configFileName);
+  void init(cedar::dev::robot::KinematicChainPtr kinematicChain);
 
   //----------------------------------------------------------------------------
   // members
@@ -129,7 +113,8 @@ protected:
   // none yet
 
 private:
-  // none yet
+  cedar::dev::robot::gui::KinematicChainMonitorWidget* mpMonitorWidget;
+  cedar::dev::robot::gui::KinematicChainCommandWidget* mpCommandWidget;
 
 };
 

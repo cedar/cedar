@@ -76,8 +76,8 @@ public:
    * @param   resourcePath The path to the resource, relative to cedar's resource directory.
    *
    * @remarks The function looks for the resource in the following order:
-   *          If the environment-variable CEDAR_RESOURCE_PATH is set, the paths stored in it are searched.
-   *          Then, the function looks in the current path.
+   *          First, the function looks in the current path.
+   *          Then, if the environment-variable CEDAR_RESOURCE_PATH is set, the paths stored in it are searched.
    *          Next, the function looks in ${CEDAR_HOME}, i.e., the directory in which cedar was originally compiled.
    *          Lastly, the function looks in the cedar install directory.
    *

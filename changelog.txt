@@ -47,6 +47,12 @@
   - Added a new Log class to cedar::aux. Using this is the new standard logging mechanism (over std::cout), as it can be
     redirected at will, e.g., to the console (default) or some user interface. To access the log, use the corresponding
     cedar::aux::LogSingleton::getInstance().
+  - the cedar::aux::Base class was removed
+  - The old ConfigurationInterface is being phased out now. For this purpose, a transitional interface has been
+    developed that should mostly work with the old code. If you run into trouble, add the following line to your
+    cedar configuration file:
+    set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
+    If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
@@ -61,11 +67,14 @@
   - The property pane now indicates when parameters have been changed since the last save. 
   - more verbose tooltip for data slots
   - there is now a settings dialog; more settings will be added later.
+  - the tab order in the property pane is now working correctly
   
 - build system
   - You now no longer need to specify CEDAR_BUILD_DIR in your cedar.conf.
   - Projects depending on cedar no longer need to define __LINUX__ etc.; this is now done automatically by the build
     system. 
+  - files in the resource folder are now moved to ${CEDAR_INSTALL_PREFIX}/share/resources. Use the
+    cedar::aux::System::locateResource function to locate them.
 
 == Version 0.5.1 ==
 - cedar::proc::steps

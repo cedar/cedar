@@ -69,6 +69,7 @@
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include <QApplication>
+#include <QHeaderView>
 #include <boost/bind.hpp>
 
 
@@ -82,6 +83,18 @@ cedar::proc::gui::PropertyPane::PropertyPane(QWidget *pParent)
 :
 QTableWidget(pParent)
 {
+  this->setSelectionMode(QAbstractItemView::NoSelection);
+  this->setTabKeyNavigation(false);
+  this->setAlternatingRowColors(true);
+  this->horizontalHeader()->setStretchLastSection(true);
+  this->horizontalHeader()->setVisible(true);
+  this->verticalHeader()->setVisible(false);
+
+  this->setColumnCount(2);
+
+  QStringList labels;
+  labels << "Property" << "Value";
+  this->setHorizontalHeaderLabels(labels);
 }
 
 cedar::proc::gui::PropertyPane::~PropertyPane()

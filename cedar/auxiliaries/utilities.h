@@ -55,34 +55,6 @@ namespace cedar
 {
   namespace aux
   {
-    /*!@brief   If you think a dynamic cast can never fail, use this cast instead.
-     *
-     *          In debug builds, it automatically checks whether you are right. In release mode, it statically casts to
-     *          the desired type.
-     *          The advantage of using this function is a speed gain: dynamic_casts are slow compared to static_casts.
-     *
-     * @remarks The syntax for using this cast is DerivedType* p2 = cedar::aux::asserted_cast<DerivedType*>(p);
-     *          The second template argument does not have to be specified; it is determined automatically by the
-     *          compiler!
-     */
-    template <typename TOut, typename TIn>
-    TOut asserted_cast(TIn pIn)
-    {
-      CEDAR_DEBUG_ASSERT(dynamic_cast<TOut>(pIn) != 0);
-      return static_cast<TOut>(pIn);
-    }
-
-    /*!@brief   If you think a dynamic cast can never fail, use this cast instead.
-     *
-     * @see     cedar::aux::asserted_cast.
-     */
-    template <typename TOut, typename TIn>
-    boost::shared_ptr<TOut> shared_asserted_cast(boost::shared_ptr<TIn> pIn)
-    {
-      CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<TOut>(pIn));
-      return boost::static_pointer_cast<TOut>(pIn);
-    }
-
     /*!@brief Unmangles a c++ name.
      */
     CEDAR_AUX_LIB_EXPORT std::string unmangleName(const char* mangledName);

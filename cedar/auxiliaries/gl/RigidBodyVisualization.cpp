@@ -59,9 +59,18 @@ cedar::aux::gl::RigidBodyVisualization::~RigidBodyVisualization()
 
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::gl::RigidBodyVisualization::initializeGl()
+{
+
+}
+
 void cedar::aux::gl::RigidBodyVisualization::init()
 {
-  mRigidBodyType = std::string("no type");
+  mRigidBodyType = "no type";
   mIsVisible = true;
   mIsDrawnAsWireFrame = false;
   mIsDrawingLocalCoordinateFrame = false;
@@ -72,42 +81,38 @@ void cedar::aux::gl::RigidBodyVisualization::init()
   mColorB = 0;
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-// methods
-//----------------------------------------------------------------------------------------------------------------------
-
-bool cedar::aux::gl::RigidBodyVisualization::isVisible()
+bool cedar::aux::gl::RigidBodyVisualization::isVisible() const
 {
 
   return mIsVisible;
 }
 
-std::string cedar::aux::gl::RigidBodyVisualization::getRigidBodyName()
+const std::string& cedar::aux::gl::RigidBodyVisualization::getRigidBodyName() const
 {
   return mpRigidBody->getName();
 }
 
-std::string cedar::aux::gl::RigidBodyVisualization::getRigidBodyVisualizationType()
+const std::string& cedar::aux::gl::RigidBodyVisualization::getRigidBodyVisualizationType() const
 {
   return mRigidBodyType;
 }
 
-int cedar::aux::gl::RigidBodyVisualization::getResolution()
+int cedar::aux::gl::RigidBodyVisualization::getResolution() const
 {
   return mResolution;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getColorR()
+double cedar::aux::gl::RigidBodyVisualization::getColorR() const
 {
   return mColorR;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getColorG()
+double cedar::aux::gl::RigidBodyVisualization::getColorG() const
 {
   return mColorG;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getColorB()
+double cedar::aux::gl::RigidBodyVisualization::getColorB() const
 {
   return mColorB;
 }
@@ -117,7 +122,7 @@ void cedar::aux::gl::RigidBodyVisualization::setDrawAsWireFrame(bool state)
   mIsDrawnAsWireFrame = state;
 }
 
-bool cedar::aux::gl::RigidBodyVisualization::isDrawnAsWireFrame()
+bool cedar::aux::gl::RigidBodyVisualization::isDrawnAsWireFrame() const
 {
   return mIsDrawnAsWireFrame;
 }
@@ -127,17 +132,17 @@ void cedar::aux::gl::RigidBodyVisualization::setDrawLocalCoordinateFrame(bool st
   mIsDrawingLocalCoordinateFrame = state;
 }
 
-bool cedar::aux::gl::RigidBodyVisualization::isDrawingLocalCoordinateFrame()
+bool cedar::aux::gl::RigidBodyVisualization::isDrawingLocalCoordinateFrame() const
 {
   return mIsDrawingLocalCoordinateFrame;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setAxisLength(const double value)
+void cedar::aux::gl::RigidBodyVisualization::setAxisLength(double value)
 {
   mAxisLength = value;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getAxisLength()
+double cedar::aux::gl::RigidBodyVisualization::getAxisLength() const
 {
   return mAxisLength;
 }
@@ -147,11 +152,11 @@ void cedar::aux::gl::RigidBodyVisualization::setResolution(int value)
   mResolution = value;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setColor(double R, double G, double B)
+void cedar::aux::gl::RigidBodyVisualization::setColor(double r, double g, double b)
 {
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
+  mColorR = r;
+  mColorG = g;
+  mColorB = b;
 }
 
 cedar::aux::RigidBodyPtr cedar::aux::gl::RigidBodyVisualization::getRigidBody()

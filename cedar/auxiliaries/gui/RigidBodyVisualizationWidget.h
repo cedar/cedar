@@ -42,11 +42,11 @@
 #include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 
 // SYSTEM INCLUDES
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QCheckBox>
-#include <QtGui/QLineEdit>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QWidget>
+#include <QDoubleSpinBox>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QDoubleSpinBox>
+#include <QWidget>
 
 //!@brief A simple widget to monitor and change the state of a rigid body visualization
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
@@ -70,9 +70,8 @@ public:
    *
    *@param rigidBodyVisualization pointer to a rigid body visualization object
    *@param parent parent parameter of QWidget
-   *@param f WindowFlags for QWidget
    */
-  RigidBodyVisualizationWidget(const cedar::aux::gl::RigidBodyVisualizationPtr &rigidBodyVisualization, QWidget* parent = 0);
+  RigidBodyVisualizationWidget(const cedar::aux::gl::RigidBodyVisualizationPtr rigidBodyVisualization, QWidget* parent = 0);
 
   ~RigidBodyVisualizationWidget();
 
@@ -84,7 +83,7 @@ public:
 
   /*!@brief set the pointer to the RigidBody
    *
-   * @param    pRigidBody pointer to the new RigidBody
+   * @param    pRigidBodyVisualization pointer to the new RigidBodyVisualization
    */
   void setRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization);
 

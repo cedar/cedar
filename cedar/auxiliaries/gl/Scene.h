@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -84,11 +85,22 @@ public:
   double getSceneLimit() const;
   
   /*!@brief adds an object to the scene
-   * @param rpRigidBodyVisualization pointer to the object
+   * @param pRigidBodyVisualization pointer to the object
    * @return index of the object in the scene
    */
-  int addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr& rpRigidBodyVisualization);
+  int addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization);
   
+  /*!@brief adds an object to the scene
+   * @param pViewer pointer to the viewer
+   * @return index of the object in the scene
+   */
+  int addViewer(cedar::aux::gui::Viewer* pViewer);
+
+  /*!@brief removes the viewer from the scene
+   * @param pViewer pointer to the viewer
+   */
+  int removeViewer(cedar::aux::gui::Viewer* pViewer);
+
   /*!@brief removes an object from the scene
    * @param index index of the object in the scene
    */
@@ -133,6 +145,8 @@ private:
   bool mIsDrawingFloor;
   double mSceneLimit;
   QList<cedar::aux::gl::RigidBodyVisualizationPtr> mRigidBodyVisualizations;
+  // list of viewers currently displaying this scene
+  QList<cedar::aux::gui::Viewer*> mViewers;
 };
 
 #endif  // CEDAR_AUX_GL_SCENE_H

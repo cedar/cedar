@@ -40,6 +40,7 @@
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
+#include "cedar/devices/robot/gl/KukaArm.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/gl/Scene.h"
@@ -47,6 +48,7 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/System.h"
 
 
 // SYSTEM INCLUDES
@@ -65,6 +67,7 @@
 class WorkerThread : public cedar::aux::LoopedThread
 {
 public:
+  //!@brief constructor
   WorkerThread(
                 cedar::dev::robot::KinematicChainPtr arm,
                 cedar::dev::robot::KinematicChainModelPtr arm_model,
@@ -92,28 +95,36 @@ private:
     if (mpArm->isMovable())
     {
       // calculate direction of movement
-      cv::Mat k_hom = (mTarget->getPosition() - mArmModel->calculateEndEffectorPosition());
-      cv::Mat k(k_hom, cv::Rect(0, 0, 1, 3));
-      cv::Mat direction = k * (1 / norm(k));
-
-      // calculate speed of movement
-      double s = mSpeed;
-      if (norm(k) < mCloseDistance)
+      cv::Mat vectorToTarget_hom = (mTarget->getPosition() - mArmModel->calculateEndEffectorPosition());
+      cv::Mat vectorToTarget(vectorToTarget_hom, cv::Rect(0, 0, 1, 3));
+      if (norm(vectorToTarget) == 0)
       {
-        s = norm(k);
+        // target reached
+        mpArm->setJointVelocities(cv::Mat::zeros(mpArm->getNumberOfJoints(), 1, CV_64FC1));
       }
+      else
+      {
+        cv::Mat direction = vectorToTarget * (1 / norm(vectorToTarget));
 
-      // calculate desired end-effector velocity vector
-      cv::Mat v = direction * s;
+        // calculate speed of movement
+        double speed = mSpeed;
+        if (norm(vectorToTarget) < mCloseDistance)
+        {
+          speed = norm(vectorToTarget);
+        }
 
-      // transform to joint velocity vector using simple Jacobian pseudo-inverse approach
-      cv::Mat J = mArmModel->calculateEndEffectorJacobian();
-      cv::Mat J_pi = cv::Mat::zeros(mpArm->getNumberOfJoints(), 3, CV_64FC1);
-      cv::invert(J, J_pi, cv::DECOMP_SVD);
-      cv::Mat joint_velocities = J_pi * v;
+        // calculate desired end-effector velocity vector
+        cv::Mat desiredVelocity = direction * speed;
 
-      // pass command to hardware interface
-      mpArm->setJointVelocities(joint_velocities);
+        // transform to joint velocity vector using simple Jacobian pseudo-inverse approach
+        cv::Mat Jacobian = mArmModel->calculateEndEffectorJacobian();
+        cv::Mat JacobianPseudoInverse = cv::Mat::zeros(mpArm->getNumberOfJoints(), 3, CV_64FC1);
+        cv::invert(Jacobian, JacobianPseudoInverse, cv::DECOMP_SVD);
+        cv::Mat joint_velocities = JacobianPseudoInverse * desiredVelocity;
+
+        // pass command to hardware interface
+        mpArm->setJointVelocities(joint_velocities);
+      }
     }
   };
 
@@ -134,11 +145,11 @@ private:
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file_path = "../../examples/kukaMovement/";
+  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
   { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-    std::cout << "Usage is -c <path to configs> -m <mode>" << std::endl;
+    std::cout << "Usage is -m <mode>" << std::endl;
     std::cout << "mode 'simulation': use a simulated arm (default)" << std::endl;
     std::cout << "mode 'hardware': use the hardware and visualize it" << std::endl;
     return 0;
@@ -148,18 +159,14 @@ int main(int argc, char **argv)
   {
     if (i+1 != argc) // check that we haven't finished parsing already
     {
-      if (std::string(argv[i]) == "-c")
-      {
-        configuration_file_path = std::string(argv[i+1]);
-      }
-      else if (std::string(argv[i]) == "-m")
+      if (std::string(argv[i]) == "-m")
       {
         mode = std::string(argv[i+1]);
       }
     }
   }
   bool use_hardware = false;
-  if (mode == std::string("hardware"))
+  if (mode == "hardware")
   {
     use_hardware = true;
   }
@@ -173,7 +180,7 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    cedar::dev::kuka::KukaInterfacePtr p_lbr4(new cedar::dev::kuka::KukaInterface(configuration_file_path + "kuka_lbr4.conf"));
+    cedar::dev::kuka::KukaInterfacePtr p_lbr4(new cedar::dev::kuka::KukaInterface(configuration_file));
     p_arm = p_lbr4;
     // status widget
     p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(p_lbr4);
@@ -183,7 +190,7 @@ int main(int argc, char **argv)
   else
   {
     // simulated arm
-    cedar::dev::robot::KinematicChainPtr p_sim(new cedar::dev::robot::SimulatedKinematicChain(configuration_file_path + "kuka_lbr4.conf"));
+    cedar::dev::robot::KinematicChainPtr p_sim(new cedar::dev::robot::SimulatedKinematicChain(configuration_file));
     // set simulated arm to useful initial condition
     p_sim->setJointAngle(0, 0.1);
     p_sim->setJointAngle(1, 0.2);
@@ -196,23 +203,30 @@ int main(int argc, char **argv)
   // create a model of the arm
   cedar::dev::robot::KinematicChainModelPtr p_arm_model(new cedar::dev::robot::KinematicChainModel(p_arm));
 
-  // create the viewer and scene for the visualization
+  // create the scene for the visualization
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
+
+  // create the viewer for the visualization
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
   viewer.startTimer(50);
 
   // create an arm visualization and add it to the scene
-  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_arm_model));
-  p_scene->addRigidBodyVisualization(p_arm_visualization);
+  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization;
+  cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
+  (
+    new cedar::dev::robot::gl::KukaArm(p_arm_model)
+  );
+  p_arm_visualization = p_kuka_arm_visualization;
+  p_scene->addRigidBodyVisualization(p_kuka_arm_visualization);
 
   // create target object, visualize it and add it to the scene
   cedar::aux::RigidBodyPtr target(new cedar::aux::RigidBody());
-  target->setPosition(0.3, -0.7, 0.5);
-  target->setName(std::string("target"));
+  target->setPosition(p_arm_model->calculateEndEffectorPosition());
+  target->setName("target");
   cedar::aux::gl::RigidBodyVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);
   p_scene->addRigidBodyVisualization(p_sphere);
@@ -223,7 +237,7 @@ int main(int argc, char **argv)
 
   // monitor/command widget for the arm
   cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget
-    = new cedar::dev::robot::gui::KinematicChainWidget(p_arm, configuration_file_path + "kuka_lbr4_widget.conf");
+    = new cedar::dev::robot::gui::KinematicChainWidget(p_arm);
   p_kinematic_chain_widget->show();
 
   // create the worker thread
@@ -231,11 +245,14 @@ int main(int argc, char **argv)
   worker.setStepSize(10);
 
   // start everything
+  p_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
+  p_kinematic_chain_widget->getCommandWidget()->update();
   worker.start();
   a.exec();
 
   // clean up
   worker.stop();
+  worker.wait();
   if (use_hardware)
   {
     delete p_fri_status_widget;

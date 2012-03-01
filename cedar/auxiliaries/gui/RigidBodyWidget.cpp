@@ -40,12 +40,10 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
-#include "stdio.h"
-#include <iostream>
-#include <QtGui/QApplication>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QDoubleSpinBox>
+#include <QApplication>
+#include <QLabel>
+#include <QPushButton>
+#include <QDoubleSpinBox>
 
 //----------------------------------------------------------------------------
 // constructors and destructor
@@ -53,7 +51,7 @@
 
 cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
 (
-  const cedar::aux::RigidBodyPtr &rigidBody,
+  const cedar::aux::RigidBodyPtr rigidBody,
   QWidget* parent
 )
 :
@@ -71,7 +69,6 @@ mpRigidBody(rigidBody)
   mZMin = -10.0;
   mZMax = 10.0;
 
-
   initWindow();
   return;
 }
@@ -79,7 +76,7 @@ mpRigidBody(rigidBody)
 
 cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
 (
-  const cedar::aux::RigidBodyPtr &rigidBody,
+  const cedar::aux::RigidBodyPtr rigidBody,
   const std::string& configFileName,
   QWidget* parent
 )

@@ -99,7 +99,7 @@ void cedar::dev::kuka::KukaInterface::init()
   _mRemoteHost = "NULL";
 
   //create a new Instance of the friRemote
-  if (_mRemoteHost != std::string("NULL"))
+  if (_mRemoteHost != "NULL")
   {
     mpFriRemote = new friRemote(_mServerPort, const_cast<char*>(_mRemoteHost.c_str()));
   }
@@ -134,7 +134,7 @@ bool cedar::dev::kuka::KukaInterface::isMovable()
   return false;
 }
 
-double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index)
+double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index) const
 {
   double a = 0;
   try

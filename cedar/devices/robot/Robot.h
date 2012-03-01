@@ -39,7 +39,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -51,7 +50,7 @@
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::robot::Robot : public cedar::aux::Base
+class cedar::dev::robot::Robot
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -71,7 +70,7 @@ public:
    * @return Pointer to the requested component.
    * @param[in] rComponentName Name of the component that is to be returned.
    */
-  ComponentPtr& getComponent(const std::string& rComponentName);
+  ComponentPtr getComponent(const std::string& rComponentName);
 
   /*! @brief Creates a specified component.
    *
@@ -112,8 +111,12 @@ private:
 protected:
   //! map of pointers to all sub components
   std::map<std::string, ComponentPtr> mComponents;
+
   //! names of all components and their corresponding sub-components
   std::map<std::string, std::set<std::string> > _mSubComponentNames;
+
+  //! Name of the robot.
+  std::string _mName;
 
 private:
   // none yet

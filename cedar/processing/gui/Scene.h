@@ -228,6 +228,13 @@ public:
   /*!@brief Access the root network
    */
   cedar::proc::gui::NetworkPtr getRootNetwork();
+  
+    /*!@brief Returns the current mode.
+   */
+  MODE getMode() const
+  {
+    return this->mMode;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals

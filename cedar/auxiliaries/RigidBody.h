@@ -38,9 +38,8 @@
 #define CEDAR_AUX_RIGID_BODY_H
 
 // CEDAR INCLUDES
-#include "namespace.h"
-#include "Base.h"
-#include "ConfigurationInterface.h"
+#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -73,7 +72,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief returns position of the object in homogeneous coordinates
-  cv::Mat getPosition();
+  cv::Mat getPosition() const;
 
   //!@brief returns x-position of the object frame origin in world frame
   double getPositionX() const;
@@ -85,13 +84,13 @@ public:
   double getPositionZ() const;
 
   //!@brief returns object frame orientation as a unit quaternion
-  double getOrientationQuaternion(unsigned int component);
+  double getOrientationQuaternion(unsigned int component) const;
 
   //!@brief returns object frame orientation as a unit quaternion
-  cv::Mat getOrientationQuaternion();
+  cv::Mat getOrientationQuaternion() const;
 
   //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
-  cv::Mat getTransformation();
+  cv::Mat getTransformation() const;
 
 public slots:
   /*!@brief set the position of the object frame origin in the world frame
@@ -152,7 +151,7 @@ protected:
 
 private:
   //! lock for thread safety
-  QReadWriteLock mLock;
+  mutable QReadWriteLock mLock;
   //! position
   std::vector<double> _mPosition;
   //! orientation

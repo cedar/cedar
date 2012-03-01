@@ -187,7 +187,6 @@ class cedar::aux::UnmanglingFailedException : public cedar::aux::ExceptionBase
 public:
   UnmanglingFailedException()
   {
-    this->mType = "UnmanglingFailedException";
   }
 };
 
@@ -208,13 +207,23 @@ public:
   MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB);
 };
 
-/*!@brief Exception that is thrown when two matrices do not match in type or size.
+/*!@brief Exception that is thrown when a resource cannot be located by standard means.
  */
 class cedar::aux::ResourceNotFoundException : public cedar::aux::ExceptionBase
 {
 public:
-  //!@brief constructor that takes the two mismatching matrices to generate detailed error information
+  //!@brief Standard constructor.
   ResourceNotFoundException();
+};
+
+/*!@brief Exception that is thrown when unmangling of a name fails.
+ */
+class cedar::aux::FileNotFoundException : public cedar::aux::ExceptionBase
+{
+public:
+  FileNotFoundException()
+  {
+  }
 };
 
 #endif // CEDAR_AUX_EXCEPTIONS_H

@@ -44,10 +44,10 @@
 
 // SYSTEM INCLUDES
 
-#include <QtGui/QApplication>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QLabel>
-#include <QtGui/QRadioButton>
+#include <QApplication>
+#include <QDoubleSpinBox>
+#include <QLabel>
+#include <QRadioButton>
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,9 +56,9 @@
 
 ForwardInverseWidget::ForwardInverseWidget
 (
-  const cedar::dev::robot::KinematicChainPtr &kinematicChain,
-  cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel,
-  QWidget * parent, Qt::WindowFlags f
+  const cedar::dev::robot::KinematicChainPtr kinematicChain,
+  cedar::dev::robot::KinematicChainModelPtr kinematicChainModel,
+  QWidget* parent, Qt::WindowFlags f
 )
 :
 QWidget(parent, f)
@@ -79,7 +79,7 @@ QWidget(parent, f)
 ForwardInverseWidget::ForwardInverseWidget
 (
   const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-  cedar::dev::robot::KinematicChainModelPtr &kinematicChainModel,
+  cedar::dev::robot::KinematicChainModelPtr kinematicChainModel,
   QWidget *parent,
   Qt::WindowFlags f
 )

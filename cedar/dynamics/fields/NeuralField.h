@@ -80,6 +80,16 @@ public:
   void onStart();
   void onStop();
 
+  inline cedar::dyn::ConstSpaceCodePtr getFieldOutput() const
+  {
+    return this->mSigmoidalActivation;
+  }
+
+  inline cedar::dyn::ConstSpaceCodePtr getFieldActivation() const
+  {
+    return this->mActivation;
+  }
+
 public slots:
   //!@brief handle a change in dimensionality, which leads to creating new matrices
   void dimensionalityChanged();

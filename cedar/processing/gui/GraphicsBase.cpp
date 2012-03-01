@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>

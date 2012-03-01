@@ -317,27 +317,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable">
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-       <attribute name="horizontalHeaderStretchLastSection">
-        <bool>true</bool>
-       </attribute>
-       <attribute name="verticalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-       <column>
-        <property name="text">
-         <string>Property</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Value</string>
-        </property>
-       </column>
-      </widget>
+      <widget class="cedar::proc::gui::PropertyPane" name="mpPropertyTable"/>
      </item>
     </layout>
    </widget>

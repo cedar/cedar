@@ -33,14 +33,13 @@
  ----- Credits:
  -----------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/gl/CoraArm.h"
 #include "cedar/devices/robot/gl/CoraHead.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
 #include "cedar/auxiliaries/gui/SceneWidget.h"
@@ -53,25 +52,22 @@
 
 int main(int argc, char **argv)
 {
+  std::string arm_configuration_file = cedar::aux::System::locateResource("configs/cora_arm.conf");
+  std::string head_configuration_file = cedar::aux::System::locateResource("configs/cora_head.conf");
+
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
   cedar::dev::robot::KinematicChainPtr p_cora_arm
   (
-    new cedar::dev::robot::SimulatedKinematicChain
-    (
-      "../../../../tests/interactive/devices/gl/Cora/cora_arm.conf"
-    )
+    new cedar::dev::robot::SimulatedKinematicChain(arm_configuration_file)
   );
   cedar::dev::robot::KinematicChainPtr p_cora_head
   (
-    new cedar::dev::robot::SimulatedKinematicChain
-    (
-      "../../../../tests/interactive/devices/gl/Cora/cora_head.conf"
-    )
+    new cedar::dev::robot::SimulatedKinematicChain(head_configuration_file)
   );
 
-  // create models calculation of the transformation
+  // create geometry models
   cedar::dev::robot::KinematicChainModelPtr p_cora_arm_model(new cedar::dev::robot::KinematicChainModel(p_cora_arm));
   cedar::dev::robot::KinematicChainModelPtr p_cora_head_model(new cedar::dev::robot::KinematicChainModel(p_cora_head));
 
@@ -83,34 +79,33 @@ int main(int argc, char **argv)
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
+  cedar::aux::gui::Viewer viewer(p_scene);
+  viewer.show();
+  viewer.setSceneRadius(p_scene->getSceneLimit());
 
+  // create visualization objects for the head and arm
   cedar::aux::gl::RigidBodyVisualizationPtr p_object;
   p_object = p_cora_arm_visualization;
   p_scene->addRigidBodyVisualization(p_object);
   p_object = p_cora_head_visualization;
   p_scene->addRigidBodyVisualization(p_object);
 
-  // create a simple viewer for the scene
-  cedar::aux::gui::Viewer viewer(p_scene);
-  viewer.show();
-  viewer.setSceneRadius(p_scene->getSceneLimit());
-
-  // create a widget to control the scene
+  // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  p_scene_widget->show();
-
-  // create widgets
   cedar::dev::robot::gui::KinematicChainWidget widget_arm(p_cora_arm);
+  cedar::dev::robot::gui::KinematicChainWidget widget_head(p_cora_head);
 
+  p_scene_widget->show();
   widget_arm.show();
+  widget_head.show();
 
   p_cora_arm_model->startTimer(50.0);
   p_cora_head_model->startTimer(50.0);
-  p_cora_arm->start();
   viewer.startTimer(50);
   a.exec();
 
   p_cora_arm->stop();
+  p_cora_head->stop();
   cedar::aux::sleep(cedar::unit::Seconds(1));
 
   return 0;

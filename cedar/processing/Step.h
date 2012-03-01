@@ -46,7 +46,6 @@
 #include "cedar/processing/Trigger.h"
 #include "cedar/processing/Triggerable.h"
 #include "cedar/processing/Connectable.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <QThread>

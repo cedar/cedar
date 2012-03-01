@@ -83,6 +83,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CEDAR_EXE_DIR}")
 # append a 'cedar' subdirectory to the header install directory, so that the includes are bundled
 set(CEDAR_HEADER_INSTALL_DIR "${CEDAR_HEADER_INSTALL_DIR}/cedar")
 
+# set cedar's resource installation directory
+set(CEDAR_RESOURCE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/cedar")
+
 # Shared or static libraries?
 if (CEDAR_BUILD_STATIC_LIBS)
   set (CEDAR_LIB_TYPE STATIC)
@@ -120,5 +123,5 @@ else(buildTypeLower MATCHES debug)
   add_definitions(-DRELEASE)
 endif(buildTypeLower MATCHES debug)
 
-set(CEDAR_INSTALL_RESOURCE_DIRECTORY "${CMAKE_INSTALL_PREFIX}/share/resources")
+# configure the file exposing internal cmake variables to cedar
 configure_file("${CEDAR_HOME}/cmake/resources/internals.h.in" "${CMAKE_CURRENT_BINARY_DIR}/cedar/internals.h")

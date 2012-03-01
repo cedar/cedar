@@ -129,7 +129,7 @@ std::string cedar::aux::System::getUserApplicationDataDirectory()
 std::string cedar::aux::System::locateResource(const std::string& resourcePath)
 {
   std::string in_home = CEDAR_HOME_DIRECTORY "/resources/" + resourcePath;
-  std::string in_install = CEDAR_INSTALL_RESOURCE_DIRECTORY "/" + resourcePath;
+  std::string in_install = CEDAR_RESOURCE_INSTALL_DIR "/" + resourcePath;
   std::string cedar_resource_path;
   char *p_resource_path = getenv("CEDAR_RESOURCE_PATH");
   if (p_resource_path)
@@ -153,7 +153,6 @@ std::string cedar::aux::System::locateResource(const std::string& resourcePath)
       notified_about_this = true;
     }
     std::string path = cedar_resource_path + "/" + resourcePath;
-    std::cout << path << std::endl;
     if (boost::filesystem::exists(path))
     {
       cedar::aux::LogSingleton::getInstance()->systemInfo("Found resource \"" + resourcePath + "\" at \"" + path + "\".", "cedar::aux::System::locateResource");
