@@ -42,22 +42,22 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CEDAR_CMAKE_DIR}/findScripts)
 
 if (CEDAR_STOP_ON_MISSING_LIBRARIES)
   set(CEDAR_LIB_ERROR_TYPE FATAL_ERROR)
-  message("Will stop when missing libraries.")
+  message("-- Will stop when missing libraries.")
 else()
   set(CEDAR_LIB_ERROR_TYPE WARNING)
-  message("Will compile despite missing libraries.")
+  message("-- Will not stop if libraries are missing.")
 endif()
 
 # Qt
-message("Searching for Qt...")
+message("-- Searching for Qt...")
 find_package(Qt4 4.6.0 COMPONENTS QtCore QtGui QtOpenGL QtXml REQUIRED)
 if(QT4_FOUND)
   include(${QT_USE_FILE})
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QT_LIBRARIES})
   include_directories(${QT_INCLUDE_DIRS})
-  message("Qt was found in ${QT_INCLUDE_DIRS}")
+  message("   Qt was found in ${QT_INCLUDE_DIRS}")
 else(QT4_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library qt4 was not found on your system! 
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qt4 was not found on your system! 
   You can try to alter the default search paths in cedar.conf.")
 endif()
 
@@ -68,40 +68,40 @@ else (${CMAKE_BUILD_STATIC_LIBS})
   set(Boost_USE_STATIC_LIBS OFF)
 endif (${CMAKE_BUILD_STATIC_LIBS})
 
-message("Searching for boost...")
+message("-- Searching for boost...")
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.40.0 COMPONENTS system date_time filesystem regex)
 set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Boost_LIBRARIES})
 
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
-  message("boost was found in ${Boost_INCLUDE_DIRS}")
+  message("   boost was found in ${Boost_INCLUDE_DIRS}")
   #message("Found the following boost libraries: ${Boost_LIBRARIES}")
   #message("Found boost includes at ${Boost_INCLUDE_DIRS}")
 else(Boost_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library boost was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library boost was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
 endif()
 
 # OpenCV
-message("Searching for OpenCV...")
+message("-- Searching for OpenCV...")
 set (OpenCV_DIR ${CEDAR_OPENCV_CMAKE_DIR})
 find_package(OpenCV REQUIRED)
 if(OpenCV_FOUND)
-  message("OpenCV was found in ${OpenCV_INCLUDE_DIRS}")
-if (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
-  message("-- using opencv debug and release libraries.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized opencv_core opencv_highgui opencv_imgproc 
+  message("   OpenCV was found in ${OpenCV_INCLUDE_DIRS}")
+  if (CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
+    message("   using opencv debug and release libraries.")
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized opencv_core opencv_highgui opencv_imgproc 
                                                        debug opencv_cored opencv_highguid opencv_imgprocd)
-else(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
-  message("-- using opencv release libraries.")
-  set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui opencv_imgproc)
-endif(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
+  else(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
+    message("   using opencv release libraries.")
+    set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} opencv_core opencv_highgui opencv_imgproc)
+  endif(CEDAR_BUILD_USE_OPENCV_DEBUG_LIBS)
 elseif(OpenCV_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library OpenCV was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library OpenCV was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
 endif(OpenCV_FOUND)
-# message(STATUS "Found opencv libs ${OpenCV_LIBS}")
+# message(STATUS "-- Found opencv libs ${OpenCV_LIBS}")
 
 # libconfig
 
@@ -109,56 +109,56 @@ endif(OpenCV_FOUND)
 
 if (NOT DEFINED CEDAR_LIBCONFIG_LEGACY_MODE OR CEDAR_LIBCONFIG_LEGACY_MODE)
       
-    message("Searching for libconfig (LEGACY MODE)...")
+    message("-- Searching for libconfig (LEGACY MODE)...")
     add_definitions(-DCEDAR_LIBCONFIG_LEGACY_MODE)
     
     find_package(Libconfig REQUIRED)
     if(Libconfig_FOUND)
-      message("libconfig was found in ${Libconfig_INCLUDE_DIRS}")
+      message("   libconfig was found in ${Libconfig_INCLUDE_DIRS}")
       set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${Libconfig_LIBS})
       include_directories(${Libconfig_INCLUDE_DIRS})
     else(Libconfig_FOUND)
-      message(${CEDAR_LIB_ERROR_TYPE} "Required library libconfig was not found on your system!
+      message(${CEDAR_LIB_ERROR_TYPE} "   Required library libconfig was not found on your system!
       You can try to alter the default search paths in cedar.conf.")
       set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} libconfig++)
     endif(Libconfig_FOUND)
 endif()
 
 # libQGLViewer
-message("Searching for QGLViewer...")
+message("-- Searching for QGLViewer...")
 find_package(QGLViewer REQUIRED)
 if(QGLViewer_FOUND)
-  message("QGLViewer was found in ${QGLViewer_INCLUDE_DIRS}")
+  message("   QGLViewer was found in ${QGLViewer_INCLUDE_DIRS}")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${QGLViewer_LIBS})
   include_directories(${QGLViewer_INCLUDE_DIRS})
 else(QGLViewer_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library QGLViewer was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library QGLViewer was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} optimized QGLViewer2 debug QGLViewerd2)
 endif(QGLViewer_FOUND)
 
 # libQwt
-message("Searching for qwt...")
+message("-- Searching for qwt...")
 find_package(Qwt REQUIRED)
 if(qwt_FOUND)
-  message("qwt was found in ${qwt_INCLUDE_DIRS}")
+  message("   qwt was found in ${qwt_INCLUDE_DIRS}")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwt_LIBS})
   include_directories(${qwt_INCLUDE_DIRS})
 else(qwt_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwt was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwt was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwt)
 endif(qwt_FOUND)
 
 # qwtplot3d
-message("Searching for qwtplot3d...")
+message("-- Searching for qwtplot3d...")
 find_package(QwtPlot3D REQUIRED)
 if(qwtplot3d_FOUND)
-  message("qwtplot3d was found in ${qwtplot3d_INCLUDE_DIRS}")
+  message("   qwtplot3d was found in ${qwtplot3d_INCLUDE_DIRS}")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${qwtplot3d_LIBS})
   include_directories(${qwtplot3d_INCLUDE_DIRS})
 else(qwtplot3d_FOUND)
-  message(${CEDAR_LIB_ERROR_TYPE} "Required library qwtplot3d was not found on your system!
+  message(${CEDAR_LIB_ERROR_TYPE} "   Required library qwtplot3d was not found on your system!
   You can try to alter the default search paths in cedar.conf.")
   set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} qwtplot3d)
 endif(qwtplot3d_FOUND)
@@ -170,16 +170,15 @@ set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${OPENGL_LIBRARY})
 # FFTW
 option(CEDAR_USE_FFTW "Include fast Fourier transform convolution using FFTW." OFF)
 if(CEDAR_USE_FFTW)
-message("Searching for FFTW...")
-find_library(FFTW fftw3 fftw3_threads)
-if(FFTW)
-    message("FFTW was found.")
-    add_definitions(-DCEDAR_FFTW)
+  message("-- Searching for FFTW...")
+  find_library(FFTW fftw3 fftw3_threads)
+  if(FFTW)
+    message("   FFTW was found.")
     set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} fftw3 fftw3_threads)
-else(FFTW)
-    message("Optional library FFTW was not found on your system!")
+  else(FFTW)
+    message("   Optional library FFTW was not found on your system!")
     set(FFTW OFF)
-endif(FFTW)
+  endif(FFTW)
 endif(CEDAR_USE_FFTW)
 
 # libFRI
@@ -201,35 +200,28 @@ endif(KUKA_FRI)
 
 option(CEDAR_USE_AMTEC "Include Amtec related classes and examples if possible." ON)
 
-message("-- Looking for amtecdevice")
+message("-- Looking for Amtec drivers")
 find_library(AMTEC_LIBRARY_DEVICE amtecdevice)
-if(AMTEC_LIBRARY_DEVICE)
-	message("-- Looking for amtecdevice - found")
-else(AMTEC_LIBRARY_DEVICE)
-	message("-- Looking for amtecdevice - not found")
-endif(AMTEC_LIBRARY_DEVICE)
+if(NOT AMTEC_LIBRARY_DEVICE)
+	message("   amtecdevice - not found")
+endif()
 
-message("-- Looking for amtecutil")
 find_library(AMTEC_LIBRARY_UTIL amtecutil)
-if(AMTEC_LIBRARY_UTIL)
-	message("-- Looking for amtecutil - found")
-else(AMTEC_LIBRARY_UTIL)
-	message("-- Looking for amtecutil - not found")
-endif(AMTEC_LIBRARY_UTIL)
+if(NOT AMTEC_LIBRARY_UTIL)
+	message("   amtecutil - not found")
+endif()
 
-message("-- Looking for ntcan")
 find_library(AMTEC_LIBRARY_NTCAN ntcan)
-if(AMTEC_LIBRARY_NTCAN)
-	message("-- Looking for ntcan - found")
-else(AMTEC_LIBRARY_NTCAN)
-	message("-- Looking for ntcan - not found")
-endif(AMTEC_LIBRARY_NTCAN)
+if(NOT AMTEC_LIBRARY_NTCAN)
+	message("   ntcan - not found")
+endif()
 
 if(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
+  message("   Amtec drivers were found")
 	set(CEDAR_THIRD_PARTY_LIBS ${CEDAR_THIRD_PARTY_LIBS} ${AMTEC_LIBRARY_DEVICE} ${AMTEC_LIBRARY_UTIL} ${AMTEC_LIBRARY_NTCAN})
 	set(CEDAR_USE_AMTEC ON)
 else(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
-	message("-- Missing libraries: excluding Amtec dependent files.")
+	message("   Excluding Amtec-dependent files.")
 	set(CEDAR_USE_AMTEC OFF)
 endif(AMTEC_LIBRARY_DEVICE AND AMTEC_LIBRARY_UTIL AND AMTEC_LIBRARY_NTCAN)
 
@@ -255,3 +247,11 @@ foreach (libPath ${cedarLibPaths})
 
   endif(IS_DIRECTORY ${libPath} AND EXISTS "${libPath}/CMakeLists.txt")
 endforeach(libPath)
+
+
+########################################################################################################################
+# write the current configuration values to the file
+set(CEDAR_CONFIGURATION_HEADER_OUTPUT "${CEDAR_BUILD_DIR}/cedar/configuration.h")
+configure_file("${CEDAR_HOME}/cmake/resources/configuration.h.in" "${CEDAR_CONFIGURATION_HEADER_OUTPUT}")
+install(FILES ${CEDAR_CONFIGURATION_HEADER_OUTPUT} DESTINATION ${CEDAR_HEADER_INSTALL_DIR}/)
+message("-- Current configuration was written to ${CEDAR_BUILD_DIR}/cedar/configuration.h")

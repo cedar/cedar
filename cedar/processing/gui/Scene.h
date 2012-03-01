@@ -71,8 +71,15 @@ public:
 
   //! Type for associating cedar::proc::Steps to cedar::proc::gui::StepItems.
   typedef std::map<cedar::proc::Step*, cedar::proc::gui::StepItem*> StepMap;
+
   //! Type for associating cedar::proc::Triggers to cedar::proc::gui::TriggerItem.
   typedef std::map<cedar::proc::Trigger*, cedar::proc::gui::TriggerItem*> TriggerMap;
+
+  //! Type for associating cedar::proc::Networks to cedar::proc::gui::Networks.
+  typedef std::map<cedar::proc::Network*, cedar::proc::gui::Network*> NetworkMap;
+
+  //! Type for associating cedar::proc::Elements to cedar::proc::gui::GraphicsBase.
+  typedef std::map<cedar::proc::Element*, cedar::proc::gui::GraphicsBase*> ElementMap;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -154,6 +161,22 @@ public:
    */
   void removeTriggerItem(cedar::proc::gui::TriggerItem *pTrigger);
 
+  /*!@brief Adds a given network item to the scene.
+   */
+  cedar::proc::gui::Network* addNetwork
+  (
+    const QPointF& position,
+    cedar::proc::NetworkPtr network = cedar::proc::NetworkPtr()
+  );
+
+  /*!@brief Removes a given network item from the scene.
+   */
+  void removeNetworkItem(cedar::proc::gui::Network *pNetwork);
+
+  /*!@brief Adds a given network item to the scene.
+   */
+  void addNetworkItem(cedar::proc::gui::Network *pNetwork);
+
   /*!@brief Sets the current mode, i.e., selection, connecion etc.
    */
   void setMode(MODE mode, const QString& param = "");
@@ -186,6 +209,10 @@ public:
    */
   cedar::proc::gui::TriggerItem* getTriggerItemFor(cedar::proc::Trigger* trigger);
 
+  /*!@brief Returns the cedar::proc::gui::GraphicsBase item corresponding to the given element.
+   */
+  cedar::proc::gui::GraphicsBase* getGraphicsItemFor(cedar::proc::Element* trigger);
+
   /*!@brief Returns, whether snap-to-grid is true.
    */
   bool getSnapToGrid() const;
@@ -194,7 +221,15 @@ public:
    */
   void setSnapToGrid(bool snap);
 
-  /*!@brief Returns the current mode.
+  /*!@brief Adds actions to the menu that relate to network groups.
+   */
+  void networkGroupingContextMenuEvent(QMenu& menu);
+
+  /*!@brief Access the root network
+   */
+  cedar::proc::gui::NetworkPtr getRootNetwork();
+  
+    /*!@brief Returns the current mode.
    */
   MODE getMode() const
   {
@@ -236,6 +271,15 @@ private:
    */
   void connectModeProcessMouseRelease(QGraphicsSceneMouseEvent *pMouseEvent);
 
+  /*!@brief Adds the names of networks and their subnetworks to an action.
+   */
+  void addNetworkNames(QMenu* pMenu, cedar::proc::ConstNetworkPtr network, std::string path) const;
+
+private slots:
+  void promoteElementToExistingGroup();
+
+  void promoteElementToNewGroup();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -265,6 +309,12 @@ private:
 
   //! The trigger map.
   TriggerMap mTriggerMap;
+
+  //! The network map.
+  NetworkMap mNetworkMap;
+
+  //! Map of all the elements.
+  ElementMap mElementMap;
 
   //! The main window containing the scene.
   QMainWindow *mpMainWindow;

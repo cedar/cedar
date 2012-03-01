@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/defines.h"
 
-#ifdef MSVC
+#ifdef CEDAR_COMPILER_MSVC
 
   #pragma warning(disable: 4251)
 
@@ -55,12 +55,12 @@
     #define CEDAR_@CAP_LIB_NAME@_LIB_EXPORT __declspec(dllimport)
   #endif // CEDAR_LIB_EXPORTS_@CAP_LIB_NAME@
 
-#else // MSVC
+#else // CEDAR_COMPILER_MSVC
 
   #define CEDAR_DECLARE_@CAP_LIB_NAME@_CLASS(CLASS_NAME) CEDAR_DECLARE_CLASS(CLASS_NAME)
   #define CEDAR_DECLARE_@CAP_LIB_NAME@_CLASS_INTRUSIVE(CLASS_NAME) CEDAR_DECLARE_CLASS_INTRUSIVE(CLASS_NAME)
   #define CEDAR_@CAP_LIB_NAME@_LIB_EXPORT
 
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 
 #endif // CEDAR_@CAP_LIB_NAME@_LIB_H

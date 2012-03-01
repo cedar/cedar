@@ -44,6 +44,7 @@
 #define CEDAR_DEFINES_H
 
 // CEDAR INCLUDES
+#include "cedar/configuration.h"
 
 // SYSTEM INCLUDES
 #include <boost/shared_ptr.hpp>
@@ -109,9 +110,9 @@
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(CLASS_NAME)
 
 
-#ifdef MSVC
+#ifdef CEDAR_COMPILER_MSVC
 #define CEDAR_DECLARE_DEPRECATED(x) __declspec(deprecated) x
-#elif defined GCC
+#elif defined CEDAR_COMPILER_GCC
 #define CEDAR_DECLARE_DEPRECATED(x) x __attribute__ ((deprecated))
 #else
 #error CEDAR_DECLARE_DEPRECATED is not implemented for this compiler.

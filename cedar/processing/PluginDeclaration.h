@@ -57,17 +57,17 @@
 #   define CEDAR_END_PLUGIN_DECLARATION
 # endif
 
-#ifdef MSVC
+#ifdef CEDAR_COMPILER_MSVC
 #  define CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(function_declaration) \
           CEDAR_BEGIN_PLUGIN_DECLARATION \
           __declspec(dllexport) function_declaration; \
           CEDAR_END_PLUGIN_DECLARATION
-#else
+#else // CEDAR_COMPILER_MSVC
 #  define CEDAR_DECLARE_PROC_PLUGIN_FUNCTION(function_declaration) \
           CEDAR_BEGIN_PLUGIN_DECLARATION \
           function_declaration; \
           CEDAR_END_PLUGIN_DECLARATION
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 
 /*!@brief Collection of declarations from a plugin.
  *

@@ -34,8 +34,9 @@
 
 ======================================================================================================================*/
 
-// MAKE AMTEC OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+// CEDAR CONFIGURATION
+#include "cedar/configuration.h"
+
 #ifdef CEDAR_USE_AMTEC
 
 // CEDAR INCLUDES
@@ -43,7 +44,18 @@
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
+#ifdef CEDAR_OS_LINUX
+  #ifndef __LINUX__
+    #define __LINUX__
+  #endif // __LINUX__
+#endif // CEDAR_OS_LINUX
+
 #include "AmtecDeviceDriver/m5apiw32.h"
+
+#ifdef __LINUX__
+  #undef __LINUX__
+#endif // __LINUX__
+
 #include <QMutexLocker>
 
 //----------------------------------------------------------------------------------------------------------------------

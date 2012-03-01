@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Ide.h"
 #include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
+#include "cedar/processing/gui/SettingsDialog.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/ElementClassList.h"
@@ -54,6 +55,7 @@
 #include "cedar/processing/LoopedTrigger.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -67,6 +69,13 @@
 cedar::proc::gui::Ide::Ide()
 {
   this->setupUi(this);
+
+  // first of all, set the logger
+  cedar::aux::LogSingleton::getInstance()->addLogger
+  (
+    cedar::aux::LogInterfacePtr(new cedar::proc::gui::Ide::Logger(this->mpLog))
+  );
+
   this->loadDefaultPlugins();
   this->resetStepList();
 
@@ -91,6 +100,7 @@ cedar::proc::gui::Ide::Ide()
   QObject::connect(this->mpActionLoad, SIGNAL(triggered()), this, SLOT(load()));
   QObject::connect(this->mpActionLoadPlugin, SIGNAL(triggered()), this, SLOT(showLoadPluginDialog()));
   QObject::connect(this->mpActionManagePlugins, SIGNAL(triggered()), this, SLOT(showManagePluginsDialog()));
+  QObject::connect(this->mpActionSettings, SIGNAL(triggered()), this, SLOT(showSettingsDialog()));
   QObject::connect(this->mpActionShowHideGrid, SIGNAL(toggled(bool)), this, SLOT(toggleGrid(bool)));
 
   QObject::connect
@@ -153,9 +163,71 @@ cedar::proc::gui::Ide::~Ide()
 {
 }
 
+cedar::proc::gui::Ide::Logger::Logger(QTextEdit *pLog)
+:
+mpLog(pLog)
+{
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Ide::Logger::message
+     (
+       cedar::aux::LOG_LEVEL level,
+       const std::string& message,
+       const std::string& title
+     )
+{
+  CEDAR_DEBUG_ASSERT(mpLog != NULL);
+
+  QString log_entry;
+
+  QString source;
+  if (!title.empty())
+  {
+    source = "[" + Qt::escape(QString::fromStdString(title)) + "] ";
+  }
+
+  QString type = "?";
+  QString left = "";
+  QString right = "";
+  switch (level)
+  {
+    case cedar::aux::LOG_LEVEL_DEBUG:
+      left = "<font color=\"blue\"><b>";
+      right = "</b></font>";
+      type = "debug";
+      break;
+
+    case cedar::aux::LOG_LEVEL_WARNING:
+      left = "<font color=\"#ffd800\"><b>";
+      right = "</b></font>";
+      type = "warning";
+      break;
+
+
+    case cedar::aux::LOG_LEVEL_ERROR:
+      left = "<font color=\"red\"><b>";
+      right = "</b></font>";
+      type = "error";
+      break;
+
+    default:
+      // nothing to do.
+      break;
+  }
+
+  log_entry = type + "> " + source + " " + left + Qt::escape(QString::fromStdString(message)) + right;
+  mpLog->append(log_entry);
+}
+
+void cedar::proc::gui::Ide::showSettingsDialog()
+{
+  cedar::proc::gui::SettingsDialog *p_settings = new cedar::proc::gui::SettingsDialog(this);
+  p_settings->show();
+}
 
 void cedar::proc::gui::Ide::increaseZoomLevel()
 {
@@ -287,9 +359,10 @@ void cedar::proc::gui::Ide::showManagePluginsDialog()
 void cedar::proc::gui::Ide::resetTo(cedar::proc::gui::NetworkPtr network)
 {
   this->mpProcessingDrawer->getScene()->reset();
+  network->network()->setName("root");
   this->mNetwork = network;
   this->mpProcessingDrawer->getScene()->setNetwork(network);
-  this->mNetwork->addToScene();
+  this->mNetwork->addElementsToScene(this->mpProcessingDrawer->getScene());
 }
 
 void cedar::proc::gui::Ide::architectureToolFinished()
@@ -371,7 +444,8 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
         {
           std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
           std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-          this->mNetwork->network()->disconnectSlots(source_slot, target_slot);
+          // delete connection in network of source
+          source->getSlot()->getParentPtr()->getNetwork()->disconnectSlots(source_slot, target_slot);
         }
       }
       else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
@@ -424,6 +498,15 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
     }
+    // delete networks
+    else if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(items[i]))
+    {
+      // delete one step at a time
+      p_network_drawer->hide();
+      p_network_drawer->removeAllConnections();
+      p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
+      this->mpProcessingDrawer->getScene()->removeNetworkItem(p_network_drawer);
+    }
   }
 }
 
@@ -473,7 +556,7 @@ void cedar::proc::gui::Ide::stopThreads()
 
 void cedar::proc::gui::Ide::newFile()
 {
-  this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene())));
+  this->resetTo(cedar::proc::gui::NetworkPtr(new cedar::proc::gui::Network(this)));
 }
 
 void cedar::proc::gui::Ide::save()
@@ -530,7 +613,7 @@ void cedar::proc::gui::Ide::load()
 
 void cedar::proc::gui::Ide::loadFile(QString file)
 {
-  cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this, this->mpProcessingDrawer->getScene()));
+  cedar::proc::gui::NetworkPtr network(new cedar::proc::gui::Network(this));
 
   try
   {

@@ -41,11 +41,11 @@
 
 cedar::aux::EnumType<cedar::proc::LoopMode> cedar::proc::LoopMode::mType("cedar::proc::LoopMode::");
 
-#ifndef MSVC
+#ifndef CEDAR_COMPILER_MSVC
 const cedar::proc::LoopMode::Id cedar::proc::LoopMode::FIXED_ADAPTIVE;
 const cedar::proc::LoopMode::Id cedar::proc::LoopMode::FIXED;
 const cedar::proc::LoopMode::Id cedar::proc::LoopMode::REALTIME;
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

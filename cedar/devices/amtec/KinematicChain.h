@@ -38,7 +38,7 @@
 #define CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_H
 
 // MAKE AMTEC OPTIONAL
-#include "cedar/devices/robot/CMakeDefines.h"
+#include "cedar/configuration.h"
 #ifdef CEDAR_USE_AMTEC
 
 // CEDAR INCLUDES
@@ -47,7 +47,22 @@
 #include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
+
+// workaround for amtec drivers needing __LINUX__ define
+#ifdef CEDAR_OS_LINUX
+  #ifndef __LINUX__
+    #define CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_DID__LINUX__DEFINE
+    #define __LINUX__
+  #endif // __LINUX__
+#endif // CEDAR_OS_LINUX
+
 #include "AmtecDeviceDriver/Device/Device.h"
+
+#if defined(__LINUX__) and defined(CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_DID__LINUX__DEFINE)
+  #undef __LINUX__
+  #undef CEDAR_DEV_AMTEC_KINEMATIC_CHAIN_DID__LINUX__DEFINE
+#endif // __LINUX__
+
 #include <QMutex>
 
 /*!@brief KinematicChain implementation for Amtec modules
