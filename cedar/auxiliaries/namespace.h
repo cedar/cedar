@@ -221,7 +221,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
     CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
-    CEDAR_DECLARE_AUX_CLASS(NotLogger);
+    CEDAR_DECLARE_AUX_CLASS(NullLogger);
     //!@endcond
     
     //!@brief Enumeration that defines different log levels.
