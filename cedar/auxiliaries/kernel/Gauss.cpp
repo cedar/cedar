@@ -43,6 +43,7 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -59,6 +60,8 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", 2, 3.0, 0.0, 1000
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 3.0, 0.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", 0.01, 1000.0))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->onInit();
 }
 
@@ -76,6 +79,8 @@ _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", sigmas, 0.0, 1000
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", shifts, 0.0, 10000)),
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->mCenters.resize(dimensionality);
   this->mSizes.resize(dimensionality);
   this->onInit();
@@ -83,9 +88,7 @@ _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 
 cedar::aux::kernel::Gauss::~Gauss()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Gauss)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods
