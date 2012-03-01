@@ -90,6 +90,8 @@ mHoldFitToContents(false)
                                );
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
+  this->update();
+  this->checkSlots();
 }
 
 cedar::proc::gui::Network::~Network()
@@ -149,6 +151,7 @@ void cedar::proc::gui::Network::fitToContents()
     QGraphicsItem* p_item = *i;
     p_item->setPos(old_pos_local + p_item->pos());
   }
+  this->checkDataItems();
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
@@ -208,7 +211,6 @@ void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElem
   {
     CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled type in cedar::proc::gui::Network::addElement.");
   }
-
   this->network()->add(element);
 }
 
@@ -225,7 +227,7 @@ void cedar::proc::gui::Network::addElementsToScene(cedar::proc::gui::Scene* pSce
   this->addNetworksToScene();
   this->addStepsToScene();
   this->addTriggersToScene();
-
+  this->addConnections();
   if (!this->isRootNetwork())
   {
     this->fitToContents();
@@ -240,7 +242,7 @@ void cedar::proc::gui::Network::setScene(cedar::proc::gui::Scene* pScene)
   this->mpScene = pScene;
 }
 
-//!@brief Add all networks contained in this network to a scene.
+// Add all networks contained in this network to a scene.
 void cedar::proc::gui::Network::addNetworksToScene()
 {
   for (size_t i = 0; i < this->mpNetworksToAdd.size(); ++i)
@@ -255,14 +257,10 @@ void cedar::proc::gui::Network::addNetworksToScene()
 
 void cedar::proc::gui::Network::addStepsToScene()
 {
-  // todo should connecting be moved into the step class?
-  std::vector<cedar::proc::StepPtr> steps_to_connect;
-
   for (size_t i = 0; i < this->mpStepsToAdd.size(); ++i)
   {
     cedar::proc::gui::StepItem *p_step_item = this->mpStepsToAdd.at(i);
     this->mpScene->addStepItem(p_step_item);
-    steps_to_connect.push_back(p_step_item->getStep());
 
     if (!this->isRootNetwork())
     {
@@ -271,7 +269,6 @@ void cedar::proc::gui::Network::addStepsToScene()
   }
   this->mpStepsToAdd.clear();
 
-  /* restore steps  that don't have a gui description */
   // add StepItems for steps that don't have one yet (i.e., for which none was present in the configuration tree)
   for (
         cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
@@ -284,62 +281,71 @@ void cedar::proc::gui::Network::addStepsToScene()
       if (this->mpScene->stepMap().find(step.get()) == this->mpScene->stepMap().end())
       {
         this->mpScene->addProcessingStep(step, QPointF(0, 0));
-        steps_to_connect.push_back(step);
       }
     }
   }
+}
 
-  // Connect the steps that haven't been connected yet
-  for (size_t i = 0; i < steps_to_connect.size(); ++i)
+void cedar::proc::gui::Network::addConnections()
+{
+  // browse all connections in a network and create GUI representations
+  for
+  (
+    cedar::proc::Network::DataConnectionVector::const_iterator it = mNetwork->getDataConnections().begin();
+    it != mNetwork->getDataConnections().end();
+    ++it
+  )
   {
-    try
+    cedar::proc::ElementPtr source = mNetwork->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
+    cedar::proc::ElementPtr target = mNetwork->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
+    cedar::proc::gui::DataSlotItem *p_source_slot;
+    cedar::proc::gui::DataSlotItem *p_target_slot;
+    // gui::Network and gui::StepItem have no shared parent class providing getSlotItem(), this is a work-around
+    if (boost::shared_dynamic_cast<cedar::proc::Network>(source))
     {
-      cedar::proc::StepPtr& step = steps_to_connect.at(i);
-
-      cedar::proc::gui::StepItem* p_source_step = this->mpScene->getStepItemFor(step.get());
-      CEDAR_DEBUG_ASSERT(p_source_step != NULL);
-
-      // get the input map
-      cedar::proc::Step::SlotMap& slot_map = step->getDataSlots(cedar::proc::DataRole::OUTPUT);
-      for (cedar::proc::Step::SlotMap::iterator iter = slot_map.begin(); iter != slot_map.end(); ++iter)
-      {
-        const std::string& slot_name = iter->first;
-        cedar::proc::gui::DataSlotItem *p_source_slot = p_source_step->getSlotItem
-                                                                        (
-                                                                          cedar::proc::DataRole::OUTPUT,
-                                                                          slot_name
-                                                                        );
-        CEDAR_DEBUG_ASSERT(p_source_slot != NULL);
-
-        std::vector<cedar::proc::DataConnectionPtr> connections;
-        mNetwork->getDataConnections(step, slot_name, connections);
-
-        for(size_t c = 0; c < connections.size(); ++c)
-        {
-          cedar::proc::DataConnectionPtr con = connections.at(c);
-          cedar::proc::StepPtr target_step
-            = mNetwork->getElement<cedar::proc::Step>(con->getTarget()->getParent());
-
-          cedar::proc::gui::StepItem* p_target_step_item = this->mpScene->getStepItemFor(target_step.get());
-          CEDAR_DEBUG_ASSERT(p_target_step_item != NULL);
-
-          cedar::proc::gui::DataSlotItem *p_target_slot = p_target_step_item->getSlotItem
-                                                                              (
-                                                                                cedar::proc::DataRole::INPUT,
-                                                                                con->getTarget()->getName()
-                                                                              );
-          CEDAR_DEBUG_ASSERT(p_target_slot != NULL);
-
-          cedar::proc::gui::Connection *p_ui_con = new cedar::proc::gui::Connection(p_source_slot, p_target_slot);
-          this->mpScene->addItem(p_ui_con);
-        }
-      }
+      cedar::proc::gui::Network* p_source_network
+        = static_cast<cedar::proc::gui::Network*>(this->mpScene->getGraphicsItemFor(source.get()));
+      p_source_slot = p_source_network->getSlotItem
+                      (
+                        cedar::proc::DataRole::OUTPUT,
+                        (*it)->getSource()->getName()
+                      );
     }
-    catch (const cedar::proc::InvalidRoleException&)
+    else if (boost::shared_dynamic_cast<cedar::proc::Step>(source))
     {
-      // ok -- some steps may not have inputs
-      std::cout << "Step " << steps_to_connect.at(i)->getName() << " has no outputs." << std::endl;
+      cedar::proc::gui::StepItem* p_source_step
+        = static_cast<cedar::proc::gui::StepItem*>(this->mpScene->getGraphicsItemFor(source.get()));
+      p_source_slot = p_source_step->getSlotItem
+                      (
+                        cedar::proc::DataRole::OUTPUT,
+                        (*it)->getSource()->getName()
+                      );
     }
+    if (boost::shared_dynamic_cast<cedar::proc::Network>(target))
+    {
+      cedar::proc::gui::Network* p_target_network
+        = static_cast<cedar::proc::gui::Network*>(this->mpScene->getGraphicsItemFor(target.get()));
+      p_target_slot = p_target_network->getSlotItem
+                      (
+                        cedar::proc::DataRole::INPUT,
+                        (*it)->getTarget()->getName()
+                      );
+    }
+    else if (boost::shared_dynamic_cast<cedar::proc::Step>(target))
+    {
+      cedar::proc::gui::StepItem* p_target_step
+        = static_cast<cedar::proc::gui::StepItem*>(this->mpScene->getGraphicsItemFor(target.get()));
+      p_target_slot = p_target_step->getSlotItem
+                      (
+                        cedar::proc::DataRole::INPUT,
+                        (*it)->getTarget()->getName()
+                      );
+    }
+    CEDAR_DEBUG_ASSERT(p_source_slot);
+    CEDAR_DEBUG_ASSERT(p_target_slot);
+    // got both slots, connect
+    cedar::proc::gui::Connection *p_ui_con = new cedar::proc::gui::Connection(p_source_slot, p_target_slot);
+    this->mpScene->addItem(p_ui_con);
   }
 }
 
@@ -356,7 +362,12 @@ void cedar::proc::gui::Network::addTriggersToScene()
   this->mpTriggersToAdd.clear();
 
   // add TriggerItems for Triggers that don't have one yet (i.e., for which none was present in the configuration tree)
-  for (cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin(); it != this->mNetwork->elements().end(); ++it)
+  for
+  (
+    cedar::proc::Network::ElementMapConstIterator it = this->mNetwork->elements().begin();
+      it != this->mNetwork->elements().end();
+      ++it
+  )
   {
     if (cedar::proc::TriggerPtr trigger = mNetwork->getElement<cedar::proc::Trigger>(it->second->getName()))
     {
@@ -533,7 +544,11 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
         }
         catch (const boost::property_tree::ptree_bad_path&)
         {
-          CEDAR_THROW(cedar::proc::gui::InvalidStepNameException, "Cannot read StepItem from file: no step name given.");
+          CEDAR_THROW
+          (
+            cedar::proc::gui::InvalidStepNameException,
+            "Cannot read StepItem from file: no step name given."
+          );
         }
         this->mpStepsToAdd.push_back(p_step);
       }
@@ -557,7 +572,11 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
         }
         catch (const boost::property_tree::ptree_bad_path&)
         {
-          CEDAR_THROW(cedar::proc::gui::InvalidTriggerNameException, "Cannot read TriggerItem from file: no trigger name given.");
+          CEDAR_THROW
+          (
+            cedar::proc::gui::InvalidTriggerNameException,
+            "Cannot read TriggerItem from file: no trigger name given."
+          );
         }
         this->mpTriggersToAdd.push_back(p_trigger);
       }
@@ -613,10 +632,10 @@ void cedar::proc::gui::Network::readScene(cedar::aux::ConfigurationNode& root)
 
 void cedar::proc::gui::Network::checkSlots()
 {
-  this->addDataItems();
+  this->checkDataItems();
 }
 
-void cedar::proc::gui::Network::addDataItems()
+void cedar::proc::gui::Network::checkDataItems()
 {
   qreal data_size = 10.0; //!@todo don't hard-code the size of the data items
   qreal padding = static_cast<qreal>(3);
@@ -626,7 +645,7 @@ void cedar::proc::gui::Network::addDataItems()
   add_origins[cedar::proc::DataRole::BUFFER] = QPointF(0, -padding - data_size);
   add_directions[cedar::proc::DataRole::BUFFER] = QPointF(1, 0);
 
-  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-padding - data_size, 0);
+  add_origins[cedar::proc::DataRole::INPUT] = QPointF(-2*padding - data_size, 0);
   add_directions[cedar::proc::DataRole::INPUT] = QPointF(0, 1);
 
   add_origins[cedar::proc::DataRole::OUTPUT] = QPointF(this->width() + padding, 0);
@@ -638,20 +657,50 @@ void cedar::proc::gui::Network::addDataItems()
   {
     if ( (*enum_it) == cedar::aux::Enum::UNDEFINED)
       continue;
-
+    for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); )
+    {
+      DataSlotNameMap::iterator current_iter = it;
+      ++it;
+      if (current_iter->second->getNumberOfConnections() == 0)
+      {
+        delete current_iter->second;
+        mSlotMap[*enum_it].erase(current_iter);
+      }
+    }
+//    mSlotMap[*enum_it].clear();
     // populate step item list
-    mSlotMap[*enum_it] = DataSlotNameMap();
+//    mSlotMap[*enum_it] = DataSlotNameMap();
 
     const QPointF& origin = add_origins[*enum_it];
     const QPointF& direction = add_directions[*enum_it];
-
+    // move all preserved slots to the upper positions
+    qreal count = 0;
+    for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); ++it)
+    {
+      it->second->setPos(origin + count * direction * (data_size + padding));
+      count += static_cast<qreal>(1.0);
+    }
+    // now generate new entries for all slots that are not represented
     try
     {
-      qreal count = 0;
       cedar::proc::Step::SlotMap& slotmap = this->mNetwork->getDataSlots(*enum_it);
       for (cedar::proc::Step::SlotMap::iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
       {
         cedar::proc::DataSlotPtr slot = iter->second;
+        // check that there is no graphical representation yet
+        bool represented = false;
+        for (DataSlotNameMap::iterator it = mSlotMap[*enum_it].begin(); it != mSlotMap[*enum_it].end(); ++it)
+        {
+          if (it->second->getSlot()->getName() == slot->getName())
+          {
+            represented = true;
+            break;
+          }
+        }
+        if (represented)
+        {
+          continue;
+        }
         cedar::proc::gui::DataSlotItem *p_item = new cedar::proc::gui::DataSlotItem(this, slot);
         p_item->setPos(origin + count * direction * (data_size + padding) );
         mSlotMap[slot->getRole()][slot->getName()] = p_item;
@@ -661,6 +710,67 @@ void cedar::proc::gui::Network::addDataItems()
     catch(const cedar::proc::InvalidRoleException&)
     {
       // ok -- a step may not have any data for this role.
+    }
+  }
+}
+
+cedar::proc::gui::DataSlotItem* cedar::proc::gui::Network::getSlotItem
+                                (
+                                  cedar::proc::DataRole::Id role, const std::string& name
+                                )
+{
+  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "No slot items stored for role "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   );
+  }
+
+  DataSlotNameMap::iterator iter = role_map->second.find(name);
+  if (iter == role_map->second.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidNameException, "No slot item named \"" + name +
+                                                   "\" found for role "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   + " in Network for network \"" + this->mNetwork->getName() + "\"."
+                                                   );
+  }
+
+  return iter->second;
+}
+
+cedar::proc::gui::Network::DataSlotNameMap& cedar::proc::gui::Network::getSlotItems
+                                            (
+                                              cedar::proc::DataRole::Id role
+                                            )
+{
+  DataSlotMap::iterator role_map = this->mSlotMap.find(role);
+
+  if (role_map == this->mSlotMap.end())
+  {
+    CEDAR_THROW(cedar::proc::InvalidRoleException, "Unknown role  "
+                                                   + cedar::proc::DataRole::type().get(role).prettyString()
+                                                   );
+  }
+  return role_map->second;
+}
+
+void cedar::proc::gui::Network::disconnect()
+{
+  // go through all DataSlots and remove connections
+  for (size_t i = 0; i < cedar::proc::DataRole::type().list().size(); ++i)
+  {
+    cedar::proc::DataRole::Id id = cedar::proc::DataRole::type().list().at(i);
+    if (id == cedar::aux::Enum::UNDEFINED)
+    {
+      continue;
+    }
+    cedar::proc::gui::Network::DataSlotNameMap& map = dynamic_cast<cedar::proc::gui::Network*>(this)->getSlotItems(id);
+    for (cedar::proc::gui::Network::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
+    {
+      it->second->removeAllConnections();
     }
   }
 }

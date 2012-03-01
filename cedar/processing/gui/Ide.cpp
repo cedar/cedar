@@ -444,7 +444,8 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
         {
           std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
           std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-          this->mNetwork->network()->disconnectSlots(source_slot, target_slot);
+          // delete connection in network of source
+          source->getSlot()->getParentPtr()->getNetwork()->disconnectSlots(source_slot, target_slot);
         }
       }
       else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
@@ -496,6 +497,15 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       p_trigger_drawer->removeAllConnections();
       this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
+    }
+    // delete networks
+    else if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(items[i]))
+    {
+      // delete one step at a time
+      p_network_drawer->hide();
+      p_network_drawer->removeAllConnections();
+      p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
+      this->mpProcessingDrawer->getScene()->removeNetworkItem(p_network_drawer);
     }
   }
 }

@@ -137,10 +137,15 @@ public:
 
   void promote();
 
+  void demote();
+
   bool isPromoted() const;
 
   //!@brief get the pointer of this slot's parent
   cedar::proc::Connectable* getParentPtr();
+
+  //!@brief get the const pointer of this slot's parent
+  const cedar::proc::Connectable* getParentPtr() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

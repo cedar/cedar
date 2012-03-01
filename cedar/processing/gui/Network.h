@@ -120,6 +120,14 @@ public:
   //!@brief saves a configuration to a node
   void writeConfiguration(cedar::aux::ConfigurationNode& root) const;
 
+  //!@todo dupliate function in Network and StepItem - move to generic parent class
+  cedar::proc::gui::DataSlotItem* getSlotItem(cedar::proc::DataRole::Id role, const std::string& name);
+
+  //!@brief returns a map of all data slots of the same id
+  cedar::proc::gui::Network::DataSlotNameMap& getSlotItems(cedar::proc::DataRole::Id role);
+
+  void disconnect();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -145,6 +153,9 @@ private:
   //!@brief Add all networks contained in this network to a scene.
   void addNetworksToScene();
 
+  //!@brief Add all connections contained in this network to a scene.
+  void addConnections();
+
   //!@brief Reacts to elements being added in the underlying network.
   void elementAdded(cedar::proc::Network* network, cedar::proc::ElementPtr pElement);
 
@@ -153,7 +164,7 @@ private:
 
   void checkSlots();
 
-  void addDataItems();
+  void checkDataItems();
 
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);

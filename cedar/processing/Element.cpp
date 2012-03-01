@@ -86,3 +86,8 @@ cedar::proc::NetworkPtr cedar::proc::Element::getNetwork()
 {
   return this->mRegisteredAt.lock();
 }
+
+cedar::proc::ConstNetworkPtr cedar::proc::Element::getNetwork() const
+{
+  return this->mRegisteredAt.lock();
+}

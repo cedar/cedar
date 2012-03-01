@@ -58,8 +58,7 @@ cedar::proc::ExternalData
   parent,//promotedSlot->getParentPtr(),
   promotedSlot->isMandatory()
 ),
-mDataSlot(promotedSlot),
-mpNetwork(parent)
+mDataSlot(promotedSlot)
 {
   CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<cedar::proc::ExternalData>(mDataSlot));
   this->setCollection(boost::shared_static_cast<cedar::proc::ExternalData>(mDataSlot)->isCollection());
@@ -94,7 +93,7 @@ cedar::aux::ConstDataPtr cedar::proc::PromotedExternalData::getData() const
   return this->mDataSlot->getData();
 }
 
-std::string cedar::proc::PromotedExternalData::getPromotionPath()
+std::string cedar::proc::PromotedExternalData::getPromotionPath() const
 {
   // is the promoted slot again promoted itself?
   if
@@ -103,11 +102,11 @@ std::string cedar::proc::PromotedExternalData::getPromotionPath()
       = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(mDataSlot)
   )
   {
-    return this->mpNetwork->getName() + "." + promoted->getPromotionPath();
+    return this->mpParent->getName() + "." + promoted->getPromotionPath();
   }
   else
   {
-    return this->mpNetwork->getName() + "." + mDataSlot->mpParent->getName();
+    return this->mpParent->getName() + "." + mDataSlot->mpParent->getName();
   }
 }
 
@@ -122,7 +121,3 @@ void cedar::proc::PromotedExternalData::setValidity(cedar::proc::DataSlot::VALID
   this->mDataSlot->setValidity(validity);
 }
 
-const cedar::proc::Connectable* cedar::proc::PromotedExternalData::getNetwork() const
-{
-  return this->mpNetwork;
-}

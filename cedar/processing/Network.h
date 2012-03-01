@@ -69,13 +69,13 @@ class cedar::proc::Network : public cedar::proc::Connectable
   // types
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //! Type of the data connection list.
-  typedef std::vector<cedar::proc::DataConnectionPtr> DataConnectionVector;
-
   //! Type of the trigger connection list.
   typedef std::vector<cedar::proc::TriggerConnectionPtr> TriggerConnectionVector;
 
 public:
+  //! Type of the data connection list.
+  typedef std::vector<cedar::proc::DataConnectionPtr> DataConnectionVector;
+
   //! Type of the map of elements.
   typedef std::map<std::string, cedar::proc::ElementPtr> ElementMap;
 
@@ -221,6 +221,8 @@ public:
                            std::vector<cedar::proc::DataConnectionPtr>& connections
                          );
 
+  const cedar::proc::Network::DataConnectionVector& getDataConnections() const;
+
   /*!@brief Returns a const reference to the map of names to elements stored in the network.
    */
   const ElementMap& elements() const;
@@ -241,7 +243,7 @@ public:
   
   void promoteSlot(DataSlotPtr promotedSlot);
 
-  void demoteSlot(const std::string& name);
+  void demoteSlot(cedar::proc::DataRole::Id role, const std::string& name);
 
   /*!@brief This method lists all networks that are children of this network.
    */
@@ -325,6 +327,7 @@ private:
 
   /*!@brief remove a DataConnection and do a check, if any TriggerConnections must be deleted as well
    * @returns return the next iterator
+   * @todo clean up this function
    */
   cedar::proc::Network::DataConnectionVector::iterator removeDataConnection
                                                        (

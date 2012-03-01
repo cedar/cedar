@@ -66,7 +66,7 @@ cedar::proc::DeclarationRegistry::DeclarationRegistry()
                                         "cedar.processing.Network"
                                       )
                                     );
-  network_decl->setIconPath(":/steps/resize.svg");
+  network_decl->setIconPath(":/network.svg");
   this->declareClass(network_decl);
 
   ElementDeclarationPtr trigger_declaration(

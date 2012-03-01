@@ -49,6 +49,7 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/TriggerConnection.h"
 #include "cedar/processing/PromotedExternalData.h"
+#include "cedar/processing/PromotedOwnedData.h"
 #include "cedar/auxiliaries/StringVectorParameter.h"
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
@@ -280,8 +281,8 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
   std::string source_slot;
   std::string target_name;
   std::string target_slot;
-  cedar::proc::Connectable::parseDataNameNoRole(source, source_name, source_slot);
-  cedar::proc::Connectable::parseDataNameNoRole(target, target_name, target_slot);
+  cedar::aux::splitFirst(source, ".", source_name, source_slot);
+  cedar::aux::splitFirst(target, ".", target_name, target_slot);
   // check connection
   if (this->isConnected(source, target))
   {
@@ -299,20 +300,23 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
       )
     )
   );
+  std::string real_target_name;
+  std::string real_target_slot;
+  cedar::proc::Connectable::parseDataNameNoRole(target, real_target_name, real_target_slot);
   cedar::proc::TriggerablePtr p_source = this->getElement<cedar::proc::Triggerable>(source_name);
-  cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(target_name);
+  cedar::proc::TriggerablePtr p_target = this->getElement<cedar::proc::Triggerable>(real_target_name);
   // target may be a nested Triggerable, recover!
-  if (!p_target)
-  {
-    cedar::proc::PromotedExternalDataPtr promoted_slot
-      = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>
-        (
-          this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
-        );
-    CEDAR_DEBUG_ASSERT(promoted_slot);
-    std::string path = promoted_slot->getPromotionPath();
-    p_target = this->getElement<cedar::proc::Triggerable>(path);
-  }
+//  if (!p_target)
+//  {
+//    cedar::proc::PromotedExternalDataPtr promoted_slot
+//      = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>
+//        (
+//          this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot)
+//        );
+//    CEDAR_DEBUG_ASSERT(promoted_slot);
+//    std::string path = promoted_slot->getPromotionPath();
+//    p_target = this->getElement<cedar::proc::Triggerable>(path);
+//  }
   CEDAR_DEBUG_ASSERT(p_target);
   if (!p_target->isLooped())
   {
@@ -353,8 +357,8 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
   std::string source_slot;
   std::string target_name;
   std::string target_slot;
-  cedar::proc::Connectable::parseDataNameNoRole(source, source_name, source_slot);
-  cedar::proc::Connectable::parseDataNameNoRole(target, target_name, target_slot);
+  cedar::aux::splitFirst(source, ".", source_name, source_slot);
+  cedar::aux::splitFirst(target, ".", target_name, target_slot);
   for (DataConnectionVector::iterator it = mDataConnections.begin(); it != mDataConnections.end(); ++it)
   {
     cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
@@ -368,7 +372,11 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
       return;
     }
   }
-  CEDAR_THROW(cedar::proc::MissingConnectionException, "This data connection does not exist!");
+  CEDAR_THROW
+  (
+    cedar::proc::MissingConnectionException,
+    "The data connection between " + source  + " and " + target + " in network " + this->getName() + " does not exist!"
+  );
 }
 
 void cedar::proc::Network::disconnectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
@@ -696,7 +704,11 @@ void cedar::proc::Network::readNetworks(const cedar::aux::ConfigurationNode& roo
   }
 }
 
-void cedar::proc::Network::writeDataConnection(cedar::aux::ConfigurationNode& root, const cedar::proc::DataConnectionPtr connection)
+void cedar::proc::Network::writeDataConnection
+     (
+       cedar::aux::ConfigurationNode& root,
+       const cedar::proc::DataConnectionPtr connection
+     )
 {
   std::string source_str = connection->getSource()->getParent() + "." + connection->getSource()->getName();
   std::string target_str = connection->getTarget()->getParent() + "." + connection->getTarget()->getName();
@@ -848,14 +860,28 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                                                        cedar::proc::Network::DataConnectionVector::iterator it
                                                      )
 {
-  std::string source_name = (*it)->getSource()->getParent();
+  const std::string& source_name = (*it)->getSource()->getParent();
   std::string target_name = (*it)->getTarget()->getParent();
+  std::string real_target_name = "";
+  if (cedar::proc::ConstPromotedExternalDataPtr ext = boost::shared_dynamic_cast<const cedar::proc::PromotedExternalData>((*it)->getTarget()))
+  {
+    real_target_name = ext->getPromotionPath();
+  }
+  if (cedar::proc::ConstPromotedOwnedDataPtr owned = boost::shared_dynamic_cast<const cedar::proc::PromotedOwnedData>((*it)->getTarget()))
+  {
+    real_target_name = owned->getPromotionPath();
+  }
   it = mDataConnections.erase(it);
   // if target is not looped, also delete the trigger connection
+  if (real_target_name != "") // the target is a nested element
+  {
+    target_name = real_target_name;
+  }
   cedar::proc::TriggerablePtr triggerable_target = this->getElement<cedar::proc::Triggerable>(target_name);
   CEDAR_DEBUG_ASSERT(triggerable_target);
   if (!this->getElement<cedar::proc::Triggerable>(target_name)->isLooped())
   {
+    target_name = (*it)->getTarget()->getParent(); // reset target_name
     // check that both Connectables are not connected through some other DataSlots
     for (DataConnectionVector::iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
     {
@@ -871,6 +897,10 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
       }
     }
     // found no other connection, delete the TriggerConnection as well
+    if (real_target_name != "") // the target is a nested element
+    {
+      target_name = real_target_name;
+    }
     this->disconnectTrigger(
                              this->getElement<cedar::proc::Triggerable>(source_name)->getFinishedTrigger(),
                              this->getElement<cedar::proc::Triggerable>(target_name)
@@ -923,10 +953,16 @@ void cedar::proc::Network::promoteSlot(DataSlotPtr promotedSlot)
   this->mSlotChanged();
 }
 
-void cedar::proc::Network::demoteSlot(const std::string& /*name*/)
+void cedar::proc::Network::demoteSlot(cedar::proc::DataRole::Id role, const std::string& name)
 {
-  //!@todo implement demotion of slots
-  std::cout << "todo: implement demotion of slots" << std::endl;
+  this->removePromotedData(role, name);
+  std::string enum_name = cedar::proc::DataRole::type().get(role).prettyString();
+  std::string promoted_name = name + "." + enum_name;
+  _mPromotedSlots->eraseAll(promoted_name);
+  std::string connectable;
+  std::string child_slot_name;
+  cedar::aux::splitFirst(name, ".", connectable, child_slot_name);
+  this->getElement<cedar::proc::Connectable>(connectable)->getSlot(role, child_slot_name)->demote();
   this->mSlotChanged();
 }
 
@@ -978,4 +1014,9 @@ void cedar::proc::Network::processPromotedSlots()
       }
     }
   }
+}
+
+const cedar::proc::Network::DataConnectionVector& cedar::proc::Network::getDataConnections() const
+{
+  return this->mDataConnections;
 }
