@@ -74,11 +74,7 @@ mpArgumentsLock(new QReadWriteLock()),
 // initialize parameters
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "allocated data (cedar::proc::Step, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::Step::Step()"
-  );
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();
@@ -91,17 +87,13 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 
 cedar::proc::Step::~Step()
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "freeing data (cedar::proc::Step, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::Step::~Step()"
-  );
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   if (!this->wait(5000))
   {
-    cedar::aux::LogSingleton::getInstance()->debug
+    cedar::aux::LogSingleton::getInstance()->warning
     (
-      "Warning: step " + this->getName() + " is being destroyed while it is still running!",
+      "Step \"" + this->getName() + " is being destroyed while it is still running!",
       "cedar::proc::Step::~Step()"
     );
   }

@@ -277,7 +277,28 @@ void cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& ele
   {
     if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(*i))
     {
-      this->addElement(p_element);
+      // add to network
+      try
+      {
+        this->addElement(p_element);
+      }
+      catch(cedar::aux::DuplicateNameException& exc)
+      {
+        cedar::proc::ElementPtr element;
+        if (cedar::proc::gui::StepItem* p_step = dynamic_cast<cedar::proc::gui::StepItem*>(p_element))
+        {
+          element = p_step->getStep();
+        }
+        else if (cedar::proc::gui::Network* p_network = dynamic_cast<cedar::proc::gui::Network*>(p_element))
+        {
+          element = p_network->network();
+        }
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "An element of name " + element->getName() + " already exists in network " + this->network()->getName() + ".",
+          "cedar::proc::gui::Network::addElements(const std::list<QGraphicsItem*>& elements)"
+        );
+      }
     }
   }
   this->mHoldFitToContents = false;
@@ -299,6 +320,18 @@ void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElem
   {
     CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled type in cedar::proc::gui::Network::addElement.");
   }
+  // check that element does not exist in network
+  try
+  {
+    this->network()->getElement(element->getName());
+    CEDAR_THROW(cedar::aux::DuplicateNameException, "This element already exists.");
+  }
+  catch(cedar::proc::InvalidNameException& exc)
+  {
+    // nothing to do here, this is the good case :)
+  }
+  // reset parent item
+  pElement->setParentItem(0);
   this->network()->add(element);
 }
 

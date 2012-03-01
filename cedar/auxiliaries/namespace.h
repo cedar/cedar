@@ -221,6 +221,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
     CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
+    CEDAR_DECLARE_AUX_CLASS(NotLogger);
     //!@endcond
     
     //!@brief Enumeration that defines different log levels.
@@ -235,7 +236,9 @@ namespace cedar
       //! An error.
       LOG_LEVEL_ERROR,
       //! A debug message. Will only be sent in debug builds!
-      LOG_LEVEL_DEBUG
+      LOG_LEVEL_DEBUG,
+      //! A debug message concerned with memory allocation. Will only be sent in debug builds!
+      LOG_LEVEL_MEM_DEBUG
     };
   }
 }

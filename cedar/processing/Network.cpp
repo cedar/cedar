@@ -54,6 +54,7 @@
 #include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/assert.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
@@ -72,20 +73,12 @@ cedar::proc::Network::Network()
 :
 _mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots", std::vector<std::string>()))
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "allocated data (cedar::proc::Network, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::Network::~Network()"
-  );
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
 
 cedar::proc::Network::~Network()
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "freeing data (cedar::proc::Network, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::Network::Network()"
-  );
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
