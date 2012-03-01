@@ -1,0 +1,175 @@
+/*======================================================================================================================
+
+    Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+
+    This file is part of cedar.
+
+    cedar is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+    License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with cedar. If not, see <http://www.gnu.org/licenses/>.
+
+========================================================================================================================
+
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        exceptions.h
+
+    Maintainer:  Oliver Lomp,
+                 Mathis Richter,
+                 Stephan Zibner
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
+                 mathis.richter@ini.ruhr-uni-bochum.de,
+                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2011 06 17
+
+    Description: Header file for exceptions in the cedar::aux::proc namespace.
+
+    Credits:
+
+======================================================================================================================*/
+
+#ifndef CEDAR_PROC_EXCEPTIONS_H
+#define CEDAR_PROC_EXCEPTIONS_H
+
+#include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/ExceptionBase.h"
+
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ * @todo  There is already an InvalidNameException in aux, so remove this one.
+ */
+class cedar::proc::InvalidNameException : public cedar::aux::ExceptionBase
+{
+  public:
+    InvalidNameException();
+}; // class cedar::proc::InvalidNameException
+
+/*!@brief An exception that occurs when an object is not found in a Registry.
+ */
+class cedar::proc::InvalidObjectException : public cedar::aux::ExceptionBase
+{
+  public:
+    InvalidObjectException();
+}; // class cedar::proc::InvalidObjectException
+
+/*!@brief An exception that occurs when a role is used as an index that is not known.
+ */
+class cedar::proc::InvalidRoleException : public cedar::aux::ExceptionBase
+{
+  public:
+    InvalidRoleException();
+}; // class cedar::proc::InvalidRoleException
+
+/*!@brief An exception that occurs when a category is used as an index that is not known.
+ */
+class cedar::proc::InvalidCategoryException : public cedar::aux::ExceptionBase
+{
+  public:
+    InvalidCategoryException();
+}; // class cedar::proc::InvalidCategoryException
+
+
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::proc::InvalidArgumentsException : public cedar::aux::ExceptionBase
+{
+  public:
+    InvalidArgumentsException();
+}; // class cedar::proc::InvalidArgumentsException
+
+
+/*!@brief An exception that occurs when a name is used as an index that is not known.
+ */
+class cedar::proc::DuplicateNameException: public cedar::aux::ExceptionBase
+{
+  public:
+    DuplicateNameException();
+}; // class cedar::proc::DuplicateNameException
+
+
+/*!@brief An exception that is thrown, when a processing step would be executed while some mandatory connections are
+ *        still missing.
+ */
+class cedar::proc::MissingConnectionException: public cedar::aux::ExceptionBase
+{
+  public:
+    MissingConnectionException();
+}; // class cedar::proc::MissingConnectionException
+
+/*!@brief An exception that is thrown, when a registry cannot find the declaration to which an object belongs
+ */
+class cedar::proc::MissingDeclarationException: public cedar::aux::ExceptionBase
+{
+  public:
+  MissingDeclarationException();
+}; // class cedar::proc::MissingDeclarationException
+
+/*!@brief An exception that is thrown, when a plugin file cannot be found.
+ */
+class cedar::proc::PluginException: public cedar::aux::ExceptionBase
+{
+public:
+  PluginException();
+}; // class cedar::proc::PluginException
+
+/*!@brief An exception that is thrown, when FrameworkSettings encounters a parsing error during loading or saving
+ * of settings.
+ */
+class cedar::proc::ParseException: public cedar::aux::ExceptionBase
+{
+public:
+  ParseException();
+}; // class cedar::proc::ParseException
+
+/*!@brief An exception that is thrown by the Manager, if a connection that is marked for deletion, cannot be found in
+ * the list of connections.
+ */
+class cedar::proc::ConnectionNotFoundException : public cedar::aux::ExceptionBase
+{
+public:
+  ConnectionNotFoundException()
+  {
+  }
+}; // class cedar::proc::ConnectionNotFoundException
+
+/*!@brief An exception that is thrown by Connection, if a weak-pointer check fails. This means the connected item does
+ * not longer exist.
+ */
+class cedar::proc::ConnectionMemberDeletedException : public cedar::aux::ExceptionBase
+{
+public:
+  ConnectionMemberDeletedException()
+  {
+  }
+}; // class cedar::proc::ConnectionMemberDeletedException
+
+/*!@brief An exception that is thrown if a connection is duplicated.
+ */
+class cedar::proc::DuplicateConnectionException : public cedar::aux::ExceptionBase
+{
+public:
+  DuplicateConnectionException()
+  {
+  }
+}; // class cedar::proc::DuplicateConnectionException
+
+/*!@brief An exception that is thrown by ProjectionMapping when a user wants to look up a mapping that does not exist.
+ */
+class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
+{
+public:
+  NoMappingException()
+  {
+  }
+}; // class cedar::proc::NoMappingException
+
+#endif // CEDAR_PROC_EXCEPTIONS_H
