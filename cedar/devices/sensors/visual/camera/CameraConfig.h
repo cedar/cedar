@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
-#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
+#ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
+#define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
@@ -76,14 +76,11 @@ public:
    *                        configuration file of the CameraGrabber class
    */
   CameraConfig(
-                           //cv::VideoCapture videoCapture,
-                           //QReadWriteLockPtr videoCaptureLock,
-                           const std::string& configFileName,
-                           unsigned int channel,
-                           //SupportedPropertiesSet supportedProperties,
-                           CameraSettings &camSettings,
-                           CameraPropertyValues &camPropertyValues
-                         );
+                const std::string& configFileName,
+                unsigned int channel,
+                CameraSettings &camSettings,
+                CameraPropertyValues &camPropertyValues
+              );
   //!@brief Destructor
   ~CameraConfig();
 
@@ -94,42 +91,15 @@ public:
   ///! Save the configuration to the configuration file specified in the constructor
    bool saveConfiguration();
 
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-   ///! Set a parameter in the cv::VideoCapture class
-   // implements the cv::VideoCapture.set() method with respect to concurrent access
-  // bool setProperty(unsigned int propId, double value);
-
-   ///! Get a parameter form the cv::VideoCapture
-   // implements the cv::VideoCapture.get() method with respect to concurrent access
-   //double getProperty(unsigned int propId);
-
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-   /*! \brief This Method reads all parameters and settings from the camera and stores them inside the buffers
-    *  \remarks
-   *    This is needed for the configurationInterface
-   *    The parameters and settings will be stored within the mCamProperties and mCamSettings vectors
-   */
-  //void getAllParametersFromCam();
-
-  /*! \brief This Method sets all parameters and settings read from the configfile to the camera
-   *  \remarks This is needed for the configurationInterface
-   *  The parameters and settings will be synchronized from the mCamProperties and mCamSettings vector
-   */
-  //bool setAllParametersToCam();
-
-  /*! \brief Create local buffer for camera properties and settings
-   *  \remarks needed for the ConfigurationInterface class
-   */
-  //void createParameterStorage();
 
   ///! Interface to ConfigurationInterface class;
   bool declareParameter();
@@ -178,5 +148,5 @@ private:
 
 }; // cedar::dev::sensors::visual::CameraConfig
 
-#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_H
+#endif // CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 

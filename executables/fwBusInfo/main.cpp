@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        fwbusinfo.cpp
+    File:        main.cpp (fwBusInfo)
 
     Maintainer:  Georg.Hartinger
     Email:       georg.hartinger@ini.rub.de

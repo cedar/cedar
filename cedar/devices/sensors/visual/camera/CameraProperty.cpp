@@ -62,7 +62,6 @@ const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visua
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_WHITE_BALANCE_RED_V;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_ZOOM;
 const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_FOCUS;
-//const cedar::dev::sensors::visual::CameraProperty::Id cedar::dev::sensors::visual::CameraProperty::PROP_GUID;
 #endif // MSVC
 //!@endcond
 
@@ -148,12 +147,6 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
                                       "PROP_FOCUS",
                                       "Focus"
                                     ));
- // mType.type()->def(cedar::aux::Enum(
- //                                     cedar::dev::sensors::visual::CameraProperty::PROP_GUID,
- //                                     "PROP_GUID",
- //                                     "The unique ID of the device"
- //                                   ));
-
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

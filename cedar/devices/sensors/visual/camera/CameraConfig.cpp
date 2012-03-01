@@ -49,11 +49,11 @@ using namespace cedar::dev::sensors::visual;
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 CameraConfig::CameraConfig(
-                           const std::string& configFileName,
-                           unsigned int channel,
-                           CameraSettings &camSettings,
-                           CameraPropertyValues &camPropertyValues
-                        )
+                            const std::string& configFileName,
+                            unsigned int channel,
+                            CameraSettings &camSettings,
+                            CameraPropertyValues &camPropertyValues
+                          )
 :
 ConfigurationInterface(configFileName),
 mCamSettings(camSettings),
@@ -79,7 +79,6 @@ mCamPropertyValues(camPropertyValues)
       std::cout << err << std::endl;
       CEDAR_THROW(cedar::aux::exc::InitializationException,err);
     }
-
 }
 
 CameraConfig::~CameraConfig()
@@ -104,7 +103,7 @@ bool CameraConfig::saveConfiguration()
   return true;
 }
 
- //----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 bool CameraConfig::declareParameter()
 {
   //map local buffer of camera properties and settings
@@ -151,7 +150,6 @@ bool CameraConfig::declareParameter()
     {
       it->second = CAMERA_PROPERTY_NOT_SUPPORTED;
     }
-
   }
   return result;
 }

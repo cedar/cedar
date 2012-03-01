@@ -44,15 +44,15 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include "opencv2/highgui/highgui_c.h"
-//#include "../../../../../../OpenCV-2.3.1/modules/highgui/include/opencv2/highgui/highgui_c.h"
+#include <opencv2/highgui/highgui_c.h>
+
 
 
 //(re)defines of our new introduced properties in OpenCv:
 //comment this out, if the patched OpenCv is available
-#define CV_CAP_PROP_ZOOM 27
-#define CV_CAP_PROP_FOCUS 28
-#define CV_CAP_PROP_GUID 29
+//#define CV_CAP_PROP_ZOOM 27
+//#define CV_CAP_PROP_FOCUS 28
+//#define CV_CAP_PROP_GUID 29
 
 
 /*!@brief Enum class for camera properties direct mapped from opencv2/highgui/highui_c.h
@@ -124,8 +124,6 @@ public:
   static const Id PROP_WHITE_BALANCE_RED_V = CV_CAP_PROP_WHITE_BALANCE_RED_V; // 26;
   static const Id PROP_ZOOM          = CV_CAP_PROP_ZOOM; // 27;
   static const Id PROP_FOCUS         = CV_CAP_PROP_FOCUS; // 28;
-  //static const Id PROP_GUID          = 29; //CV_CAP_PROP_GUID; // 29;
-
 
 protected:
   // none yet

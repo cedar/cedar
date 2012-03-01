@@ -109,7 +109,6 @@ public:
   //OpenCV firewire backend stores supported video modes in a list and
   //it is possible to change the mode through the indizes of this list
 
-
   static const Id MODE_BY_NUM_0 = 0;
   static const Id MODE_BY_NUM_1 = 1;
   static const Id MODE_BY_NUM_2 = 2;

@@ -54,7 +54,7 @@ TestGrabber::TestGrabber(
              std::string ChannelName
            )
 :
-  GrabberInterface(configFileName)
+GrabberInterface(configFileName)
 {
   std::cout<<"[TestGrabber::TestGrabber] Create a single channel grabber\n";
 
@@ -168,11 +168,6 @@ std::string TestGrabber::onGetSourceInfo(unsigned int channel) const
   //this is the only pure virtual method of the GrabberInterface class
 
   //no range-check is needed, because this is done in the GrabberInterface::getSourceInfo method
-  /* if (channel >= mNumCams)
-  {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"TestGrabber::onGetSourceInfo");
-  }
-  */
 
   //give some information about the used source like channelname, filename, devicename
   //or something like this

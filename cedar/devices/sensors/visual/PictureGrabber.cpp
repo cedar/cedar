@@ -182,6 +182,5 @@ bool PictureGrabber::setSourceFile(unsigned int channel, const std::string& File
   {
     CEDAR_THROW(cedar::aux::exc::InitializationException,"PictureGrabber::setSourceFile");
   }
-
   return true;
 }
