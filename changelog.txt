@@ -59,6 +59,8 @@
   - when loading a plugin, the PluginProxy now also looks for a plugin description file. This file may contain some
     information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
     steps. See documentation of cedar::proc::PluginDeclaration for details.
+  - added grouping functionality for processing
+  - added promotion of data slots for networks
     
 - processingIde
   - The IDE now remembers whether or not snap to grid is active.
