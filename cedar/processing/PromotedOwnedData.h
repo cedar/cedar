@@ -75,6 +75,8 @@ public:
   //!@brief set the current validity at the promoted slot
   void setValidity(VALIDITY validity);
 
+  std::string getPromotionPath() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

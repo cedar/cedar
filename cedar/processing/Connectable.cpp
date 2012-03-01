@@ -726,3 +726,15 @@ void cedar::proc::Connectable::declarePromotedData(DataSlotPtr promotedSlot)
   // since the data has (potentially) changed, re-check the inputs
   this->checkMandatoryConnections();
 }
+
+void cedar::proc::Connectable::removePromotedData(DataRole::Id role, const std::string& name)
+{
+  std::map<DataRole::Id, SlotMap>::iterator iter = this->mDataConnections.find(role);
+  // check that a slot map was found
+  CEDAR_DEBUG_ASSERT(iter != this->mDataConnections.end());
+  // check for duplicate entries in the slot map
+  SlotMap::iterator map_iter = iter->second.find(name);
+  CEDAR_DEBUG_ASSERT(map_iter != iter->second.end());
+  map_iter->second->demote();
+  iter->second.erase(map_iter);
+}

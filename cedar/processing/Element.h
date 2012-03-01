@@ -82,6 +82,9 @@ public:
   //!@brief get the network at which this element is registered
   cedar::proc::NetworkPtr getNetwork();
 
+  //!@brief get the network at which this element is registered as const
+  cedar::proc::ConstNetworkPtr getNetwork() const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

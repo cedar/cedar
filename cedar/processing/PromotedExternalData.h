@@ -48,6 +48,10 @@
 class cedar::proc::PromotedExternalData : public cedar::proc::ExternalData
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::proc::DataConnection;
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -69,15 +73,13 @@ public:
 
   cedar::aux::ConstDataPtr getData() const;
 
-  std::string getPromotionPath();
+  std::string getPromotionPath() const;
 
   //!@brief get the current validity of the promoted slot
   VALIDITY getValidity() const;
 
   //!@brief set the current validity at the promoted slot
   void setValidity(VALIDITY validity);
-
-  const cedar::proc::Connectable* getNetwork() const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -98,7 +100,6 @@ protected:
   // none yet
 private:
   cedar::proc::DataSlotPtr mDataSlot;
-  cedar::proc::Connectable* mpNetwork;
 }; // class cedar::proc::PromotedExternalData
 
 #endif // CEDAR_PROC_PROMOTED_EXTERNAL_DATA_H

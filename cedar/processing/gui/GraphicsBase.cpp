@@ -75,8 +75,20 @@ mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
-mWidth(new cedar::aux::DoubleParameter(this, "width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
-mHeight(new cedar::aux::DoubleParameter(this, "height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
+mWidth
+(
+  new cedar::aux::DoubleParameter
+      (
+        this, "width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max()
+      )
+),
+mHeight
+(
+  new cedar::aux::DoubleParameter
+      (
+        this, "height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max()
+      )
+),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
@@ -500,4 +512,9 @@ void cedar::proc::gui::GraphicsBase::disconnect(cedar::proc::gui::GraphicsBase*)
 
 void cedar::proc::gui::GraphicsBase::disconnect()
 {
+}
+
+unsigned int cedar::proc::gui::GraphicsBase::getNumberOfConnections()
+{
+  return this->mConnections.size();
 }
