@@ -195,6 +195,8 @@
     <property name="title">
      <string>Windows</string>
     </property>
+    <addaction name="mpActionSettings"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuPlugins"/>
@@ -286,8 +288,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>121</width>
+          <height>310</height>
          </rect>
         </property>
         <attribute name="label">
@@ -444,6 +446,11 @@
   <action name="mpRecentFiles">
    <property name="text">
     <string>Recent files</string>
+   </property>
+  </action>
+  <action name="mpActionSettings">
+   <property name="text">
+    <string>Settings...</string>
    </property>
   </action>
  </widget>
