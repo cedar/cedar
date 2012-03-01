@@ -133,6 +133,18 @@ void cedar::aux::ConsoleLog::message(cedar::aux::LOG_LEVEL level, const std::str
                 << std::endl;
       break;
       
+    case cedar::aux::LOG_LEVEL_MEM_DEBUG:
+      std::cout
+#ifdef __linux
+                << COLOR(COLOR_LIGHT_BLUE)
+#endif // __linux
+                << "memdebug> " << formatted_message
+#ifdef __linux
+                << COLOR_CLEAR
+#endif // __linux
+                << std::endl;
+      break;
+
     default:
       std::cout << "?> " << formatted_message << std::endl;
   }

@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/logFilter/All.h"
 
 // SYSTEM INCLUDES
@@ -137,6 +138,33 @@ public:
     cedar::aux::LogFilterPtr filter = cedar::aux::LogFilterPtr(new cedar::aux::logFilter::All())
   );
   
+
+  /*!@brief Sends a standard message about an object's allocation.
+   */
+  template <typename T>
+  inline void allocating(T* pInstance)
+  {
+    std::string message = "allocating ";
+    message += cedar::aux::unmangleName(typeid(T));
+    message += " (pointer = ";
+    message += cedar::aux::toString(pInstance);
+    message += ")";
+    this->debugLog(cedar::aux::LOG_LEVEL_MEM_DEBUG, message, "memdbg", "memory");
+  }
+
+  /*!@brief Sends a standard message about an object's allocation.
+   */
+  template <typename T>
+  inline void freeing(T* pInstance)
+  {
+    std::string message = "destroyed ";
+    message += cedar::aux::unmangleName(typeid(T));
+    message += " (pointer = ";
+    message += cedar::aux::toString(pInstance);
+    message += ")";
+    this->debugLog(cedar::aux::LOG_LEVEL_MEM_DEBUG, message, "memdbg", "memory");
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

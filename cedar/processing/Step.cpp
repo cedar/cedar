@@ -48,6 +48,7 @@
 #include "cedar/auxiliaries/System.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/defines.h"
 
 // SYSTEM INCLUDES
@@ -73,9 +74,7 @@ mpArgumentsLock(new QReadWriteLock()),
 // initialize parameters
 _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 {
-#ifdef DEBUG
-  std::cout << "> allocated data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   // create the finished trigger singleton.
   this->getFinishedTrigger();
@@ -88,15 +87,15 @@ _mRunInThread(new cedar::aux::BoolParameter(this, "threaded", runInThread))
 
 cedar::proc::Step::~Step()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (cedar::proc::Step: \"" << this->getName() << "\", " << this << ")" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   if (!this->wait(5000))
   {
-#ifdef DEBUG
-    std::cout << "> Warning: step " << this->getName() << " is being destroyed while it is still running!" << std::endl;
-#endif
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Step \"" + this->getName() + " is being destroyed while it is still running!",
+      "cedar::proc::Step::~Step()"
+    );
   }
 
   if (mpArgumentsLock != NULL)
