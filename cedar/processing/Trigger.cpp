@@ -61,16 +61,15 @@ cedar::proc::Trigger::Trigger(const std::string& name, bool isLooped)
 :
 Triggerable(isLooped)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->setName(name);
 }
 
 cedar::proc::Trigger::~Trigger()
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "freeing data (Trigger " + cedar::aux::toString(this) + ")",
-    "cedar::proc::Trigger::~Trigger()"
-  );
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+
   this->mListeners.clear();
 }
 

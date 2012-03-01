@@ -48,14 +48,14 @@
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Manager.h"
-#include "cedar/auxiliaries/Data.h"
 #include "cedar/processing/Step.h"
-#include "cedar/auxiliaries/assert.h"
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
-#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -76,6 +76,8 @@ cedar::proc::gui::GraphicsBase(160, 50,
 mpMainWindow(pMainWindow),
 mStepIcon(":/steps/no_icon.svg")
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->setStep(step);
   
   this->construct();
@@ -89,6 +91,8 @@ cedar::proc::gui::GraphicsBase(160, 50,
 mpMainWindow(pMainWindow),
 mStepIcon(":/steps/no_icon.svg")
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->construct();
 }
 
@@ -105,21 +109,11 @@ void cedar::proc::gui::StepItem::construct()
     p_effect->setOffset(3.0, 3.0);
     this->setGraphicsEffect(p_effect);
   }
-
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "allocated data (cedar::proc::gui::StepItem, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::gui::StepItem::construct()"
-  );
 }
 
 cedar::proc::gui::StepItem::~StepItem()
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "freeing data (cedar::proc::gui::StepItem, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::gui::StepItem::construct()"
-  );
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   mStateChangedConnection.disconnect();
 }
