@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/casts.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QByteArray>
@@ -334,6 +335,46 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   else
   {
     CEDAR_THROW(cedar::aux::UnknownTypeException, "This GUI element type is not known.")
+  }
+  // sanity check - are all elements stored in the same network?
+  for (int i = 0; i < selected.size(); ++i)
+  {
+    if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
+    {
+      if (new_parent_network != p_element->network()->getNetwork())
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Not all selected items are in the same network.",
+          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
+        );
+        return;
+      }
+    }
+    else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
+    {
+      if (new_parent_network != p_element->getStep()->getNetwork())
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Not all selected items are in the same network.",
+          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
+        );
+        return;
+      }
+    }
+    else if (cedar::proc::gui::TriggerItem *p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(0)))
+    {
+      if (new_parent_network != p_element->getTrigger()->getNetwork())
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Not all selected items are in the same network.",
+          "cedar::proc::gui::Scene::promoteElementToNewGroup()"
+        );
+        return;
+      }
+    }
   }
 
   for (int i = 0; i < selected.size(); ++i)
