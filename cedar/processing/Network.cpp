@@ -382,7 +382,11 @@ void cedar::proc::Network::disconnectTrigger(cedar::proc::TriggerPtr source, ced
       return;
     }
   }
-  CEDAR_THROW(cedar::proc::MissingConnectionException, "This trigger connection does not exist!");
+  CEDAR_THROW
+  (
+    cedar::proc::MissingConnectionException,
+    "Network \"" + this->getName() + "\": This trigger connection does not exist!"
+  );
 }
 
 void cedar::proc::Network::readFile(const std::string& filename)
