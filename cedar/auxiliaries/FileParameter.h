@@ -80,6 +80,7 @@ public:
   FileParameter(cedar::aux::Configurable *pOwner, const std::string& name, Mode mode, const std::string& defaultValue)
   :
   cedar::aux::Parameter(pOwner, name, true),
+  mValue(QString::fromStdString(defaultValue)),
   mDefault(QString::fromStdString(defaultValue)),
   mMode(mode)
   {
@@ -107,29 +108,44 @@ public:
   }
 
   //!@brief sets a new directory from string
-  void set(const std::string& value)
+  void setValue(const std::string& value)
   {
     this->mValue.setPath(QString::fromStdString(value));
-    emit valueChanged();
+    this->emitChangedSignal();
   }
 
   //!@brief sets a new directory from QDir
-  void set(const QDir& value)
+  void setValue(const QDir& value)
   {
     this->mValue = value;
-    emit valueChanged();
+    this->emitChangedSignal();
   }
 
   //!@brief sets directory to default value
   void makeDefault()
   {
-    this->set(this->mDefault);
+    this->setValue(this->mDefault);
   }
 
   //!@brief get the directory
   const QDir& getValue() const
   {
     return this->mValue;
+  }
+
+  CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))
+  {
+    this->setValue(value);
+  }
+
+  CEDAR_DECLARE_DEPRECATED(void set(const QDir& value))
+  {
+    this->setValue(value);
+  }
+
+  CEDAR_DECLARE_DEPRECATED(const QDir& get())
+  {
+    return this->getValue();
   }
 
   Mode getMode() const

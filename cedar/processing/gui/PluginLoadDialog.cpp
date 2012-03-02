@@ -96,7 +96,7 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
                               (
                                 this, // parent = 0,
                                 "Select a plugin", // caption = QString(),
-                                last_dir->get().absolutePath(),
+                                last_dir->getValue().absolutePath(),
                                 filter
                               );
   if (!file.isEmpty())
@@ -105,7 +105,7 @@ void cedar::proc::gui::PluginLoadDialog::browseFile()
     this->mpFileNameEdit->lineEdit()->setText(file);
 
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
-    last_dir->set(path);
+    last_dir->setValue(path);
   }
 }
 
