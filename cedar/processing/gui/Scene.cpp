@@ -305,6 +305,12 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
 
 void cedar::proc::gui::Scene::promoteElementToNewGroup()
 {
+  // do not create a new network if there are no elements selected
+  QList<QGraphicsItem *> selected = this->selectedItems();
+  if (selected.size() == 0)
+  {
+    return;
+  }
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   cedar::proc::gui::Network* network_item = this->addNetwork(QPointF(0, 0), network);
 
@@ -312,17 +318,22 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
    * should be inserted
    */
   cedar::proc::NetworkPtr new_parent_network;
-  QList<QGraphicsItem *> selected = this->selectedItems();
-  if (selected.size() > 0)
+
+  if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
   {
-    if (cedar::proc::gui::Network *p_element = dynamic_cast<cedar::proc::gui::Network*>(selected.at(0)))
-    {
-      new_parent_network = p_element->network()->getNetwork();
-    }
-    else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
-    {
-      new_parent_network = p_element->getStep()->getNetwork();
-    }
+    new_parent_network = p_element->network()->getNetwork();
+  }
+  else if (cedar::proc::gui::StepItem *p_element = dynamic_cast<cedar::proc::gui::StepItem*>(selected.at(0)))
+  {
+    new_parent_network = p_element->getStep()->getNetwork();
+  }
+  else if (cedar::proc::gui::TriggerItem *p_element = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected.at(0)))
+  {
+    new_parent_network = p_element->getTrigger()->getNetwork();
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::UnknownTypeException, "This GUI element type is not known.")
   }
 
   for (int i = 0; i < selected.size(); ++i)
@@ -332,7 +343,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       network_item->addElement(p_element);
     }
   }
-
+  CEDAR_DEBUG_ASSERT(new_parent_network);
   std::string name = new_parent_network->getUniqueIdentifier("new Network");
   network->setName(name);
   if (new_parent_network->getName() == "root")
