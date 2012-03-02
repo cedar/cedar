@@ -201,6 +201,12 @@ void cedar::proc::gui::Ide::Logger::message
       type = "debug";
       break;
 
+    case cedar::aux::LOG_LEVEL_MEM_DEBUG:
+      left = "<font color=\"#A0A0A0\"><b>";
+      right = "</b></font>";
+      type = "memdbg";
+      break;
+
     case cedar::aux::LOG_LEVEL_WARNING:
       left = "<font color=\"#ffd800\"><b>";
       right = "</b></font>";
