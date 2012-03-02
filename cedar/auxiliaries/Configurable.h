@@ -142,6 +142,16 @@ public:
 
   void copyTo(ConfigurablePtr target) const;
 
+  /*!@brief Returns the parameter associated with the path.
+   * @todo This should be const, but that conflicts with the intrusive pointers
+   */
+  cedar::aux::ParameterPtr getParameter(const std::string& path);
+
+  /*!@brief Returns the configurable child associated with the path.
+   * @todo This should be const, but that conflicts with the intrusive pointers in getParameter
+   */
+  cedar::aux::ConfigurablePtr getConfigurableChild(const std::string& path);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
