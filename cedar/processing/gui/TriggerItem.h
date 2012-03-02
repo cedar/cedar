@@ -96,6 +96,11 @@ public:
    */
   cedar::proc::TriggerPtr getTrigger();
 
+  /*!@brief returns the instance of Trigger
+   * @return the associated instance of Trigger
+   */
+  cedar::proc::ConstTriggerPtr getTrigger() const;
+
   //!@brief create the context menu for TriggerItem
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 

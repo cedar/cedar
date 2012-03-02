@@ -159,8 +159,7 @@ void cedar::proc::gui::TriggerItem::isDocked(bool docked)
   }
 }
 
-cedar::proc::gui::ConnectValidity
-  cedar::proc::gui::TriggerItem::canConnectTo(GraphicsBase* pTarget) const
+cedar::proc::gui::ConnectValidity cedar::proc::gui::TriggerItem::canConnectTo(GraphicsBase* pTarget) const
 {
   // a trigger cannot connect to its parent (e.g., the step that owns it)
   if (pTarget == this->parentItem())
@@ -179,6 +178,11 @@ cedar::proc::gui::ConnectValidity
     {
       return cedar::proc::gui::CONNECT_NO;
     }
+    // ... source and target are not in the same network
+    else if (this->getTrigger()->getNetwork() != p_step_item->getStep()->getNetwork())
+    {
+      return cedar::proc::gui::CONNECT_NO;
+    }
   }
 
   if (cedar::proc::gui::TriggerItem *p_trigger_item = dynamic_cast<cedar::proc::gui::TriggerItem*>(pTarget))
@@ -186,6 +190,11 @@ cedar::proc::gui::ConnectValidity
     // a trigger cannot be connected to a trigger if the target trigger is owned by a step (i.e., has a parent item) or
     // if it is already a listener of the target
     if(p_trigger_item->parentItem() != NULL || this->mTrigger->isListener(p_trigger_item->getTrigger()))
+    {
+      return cedar::proc::gui::CONNECT_NO;
+    }
+    // ... source and target are not in the same network
+    else if (this->getTrigger()->getNetwork() != p_trigger_item->getTrigger()->getNetwork())
     {
       return cedar::proc::gui::CONNECT_NO;
     }
@@ -258,7 +267,7 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
   {
     QMenu menu;
     p_scene->networkGroupingContextMenuEvent(menu);
-    QAction *a = menu.exec(event->screenPos());
+    menu.exec(event->screenPos());
   }
 }
 
@@ -272,6 +281,11 @@ void cedar::proc::gui::TriggerItem::paint(QPainter* painter, const QStyleOptionG
 }
 
 cedar::proc::TriggerPtr cedar::proc::gui::TriggerItem::getTrigger()
+{
+  return this->mTrigger;
+}
+
+cedar::proc::ConstTriggerPtr cedar::proc::gui::TriggerItem::getTrigger() const
 {
   return this->mTrigger;
 }
