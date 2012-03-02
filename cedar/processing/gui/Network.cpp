@@ -116,13 +116,18 @@ cedar::proc::gui::Network::~Network()
 
 QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
 {
+  cedar::proc::gui::GraphicsBase::GraphicsGroup filtered_groups = 0;
+  filtered_groups |= cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_NETWORK;
+  filtered_groups |= cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP;
+  filtered_groups |= cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER;
+
   switch (change)
   {
     case QGraphicsItem::ItemChildAddedChange:
     {
-      cedar::proc::gui::StepItem *p_item
-        = dynamic_cast<cedar::proc::gui::StepItem*>(value.value<QGraphicsItem*>());
-      if (p_item)
+      cedar::proc::gui::GraphicsBase *p_item
+        = dynamic_cast<cedar::proc::gui::GraphicsBase*>(value.value<QGraphicsItem*>());
+      if(p_item && (p_item->getGroup() & filtered_groups) != 0)
       {
         p_item->installSceneEventFilter(this);
       }
@@ -131,9 +136,9 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
 
     case QGraphicsItem::ItemChildRemovedChange:
     {
-      cedar::proc::gui::StepItem *p_item
-        = dynamic_cast<cedar::proc::gui::StepItem*>(value.value<QGraphicsItem*>());
-      if (p_item)
+      cedar::proc::gui::GraphicsBase *p_item
+        = dynamic_cast<cedar::proc::gui::GraphicsBase*>(value.value<QGraphicsItem*>());
+      if(p_item && (p_item->getGroup() & filtered_groups) != 0)
       {
         p_item->removeSceneEventFilter(this);
       }
@@ -147,7 +152,7 @@ QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange
 
 bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEvent *pEvent)
 {
-  if (!dynamic_cast<cedar::proc::gui::StepItem*>(pWatched))
+  if(!dynamic_cast<cedar::proc::gui::GraphicsBase*>(pWatched))
   {
     return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
   }
