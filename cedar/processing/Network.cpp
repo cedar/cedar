@@ -152,15 +152,6 @@ void cedar::proc::Network::remove(cedar::proc::ConstElementPtr element)
     if ((*data_con)->getSource()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element))
         || (*data_con)->getTarget()->isParent(boost::shared_dynamic_cast<const cedar::proc::Connectable>(element)))
     {
-      // if target is not looped, delete the trigger connection
-//      if (!this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())->isLooped())
-//      {
-//        this->disconnectTrigger(
-//                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getSource()->getParent())->getFinishedTrigger(),
-//                                 this->getElement<cedar::proc::Triggerable>((*data_con)->getTarget()->getParent())
-//                               );
-//      data_con = mDataConnections.erase(data_con);
-//      }
         data_con = this->removeDataConnection(data_con);
     }
     else
