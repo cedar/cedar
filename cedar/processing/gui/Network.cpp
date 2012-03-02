@@ -224,6 +224,10 @@ void cedar::proc::gui::Network::addElement(cedar::proc::gui::GraphicsBase *pElem
   {
     element = p_step->getStep();
   }
+  else if (cedar::proc::gui::TriggerItem* p_step = dynamic_cast<cedar::proc::gui::TriggerItem*>(pElement))
+  {
+    element = p_step->getTrigger();
+  }
   else if (cedar::proc::gui::Network* p_network = dynamic_cast<cedar::proc::gui::Network*>(pElement))
   {
     element = p_network->network();

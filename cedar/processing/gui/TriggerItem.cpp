@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/StepItem.h"
+#include "cedar/processing/gui/Scene.h"
 #include "cedar/processing/gui/Settings.h"
 #include "cedar/processing/gui/exceptions.h"
 #include "cedar/processing/LoopedTrigger.h"
@@ -215,11 +216,17 @@ void cedar::proc::gui::TriggerItem::writeConfiguration(cedar::aux::Configuration
 
 void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
 {
+  cedar::proc::gui::Scene *p_scene = dynamic_cast<cedar::proc::gui::Scene*>(this->scene());
+  CEDAR_DEBUG_ASSERT(p_scene);
+
   if (cedar::proc::LoopedTrigger* p_looped_trigger = dynamic_cast<cedar::proc::LoopedTrigger*>(this->mTrigger.get()))
   {
     QMenu menu;
     QAction *p_start = menu.addAction("start");
     QAction *p_stop = menu.addAction("stop");
+
+    menu.addSeparator();
+    p_scene->networkGroupingContextMenuEvent(menu);
 
     if (p_looped_trigger->isRunning())
     {
@@ -246,6 +253,12 @@ void cedar::proc::gui::TriggerItem::contextMenuEvent(QGraphicsSceneContextMenuEv
 //      effect->setColor(QColor(0, 0, 0));
       this->setFillColor(mDefaultFillColor);
     }
+  }
+  else
+  {
+    QMenu menu;
+    p_scene->networkGroupingContextMenuEvent(menu);
+    QAction *a = menu.exec(event->screenPos());
   }
 }
 
