@@ -77,6 +77,67 @@ void cedar::aux::Configurable::configurationLoaded()
   }
 }
 
+cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path)
+{
+  std::vector<std::string> path_components;
+  cedar::aux::split(path, ".", path_components);
+
+  CEDAR_ASSERT(path_components.size() != 0);
+
+  Children::const_iterator iter = this->mChildren.find(path_components.at(0));
+  if (iter == this->mChildren.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Child \"" + path + "\" not found.");
+  }
+
+  cedar::aux::ConfigurablePtr child = iter->second;
+  if (path_components.size() == 1)
+  {
+    return child;
+  }
+  else
+  {
+    std::vector<std::string> subpath_components;
+
+    std::vector<std::string>::const_iterator first, last;
+    first = path_components.begin();
+    ++first;
+    last = path_components.end();
+    subpath_components.insert(subpath_components.begin(), first, last);
+    std::string subpath = cedar::aux::join(subpath_components, ".");
+    return child->getConfigurableChild(subpath);
+  }
+}
+
+
+cedar::aux::ParameterPtr cedar::aux::Configurable::getParameter(const std::string& path)
+{
+  std::vector<std::string> path_components, subpath_components;
+  cedar::aux::split(path, ".", path_components);
+
+  cedar::aux::Configurable *p_configurable = this;
+
+  if (path_components.size() > 1)
+  {
+    std::vector<std::string>::const_iterator first, last;
+    first = path_components.begin();
+    last = path_components.end();
+    --last;
+    subpath_components.insert(subpath_components.begin(), first, last);
+    std::string subpath = cedar::aux::join(subpath_components, ".");
+    p_configurable = this->getConfigurableChild(subpath).get();
+  }
+
+  ParameterMap::iterator iter = p_configurable->mParameterAssociations.find(path_components.back());
+  if (iter == p_configurable->mParameterAssociations.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter \"" + path + "\" was not found.");
+  }
+  cedar::aux::ParameterPtr parameter = *(iter->second);
+  return parameter;
+}
+
+
 void cedar::aux::Configurable::readJson(const std::string& filename)
 {
   cedar::aux::ConfigurationNode configuration;
