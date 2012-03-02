@@ -420,8 +420,6 @@ void cedar::proc::gui::Ide::sceneItemSelected()
 
 void cedar::proc::gui::Ide::deleteSelectedElements()
 {
-  using cedar::proc::Step;
-  using cedar::proc::Manager;
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
   this->deleteElements(selected_items);
 }
@@ -452,14 +450,16 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       {
         if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
         {
-          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getStep());
+          source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getStep());
+//          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getStep());
         }
       }
       else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
       {
         if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
         {
-          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+          source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getTrigger());
+//          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getTrigger());
         }
       }
       else
@@ -472,6 +472,7 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
 
     }
   }
+  // delete steps and triggers
   for (int i = 0; i < items.size(); ++i)
   {
     // item was deleted previously
@@ -485,9 +486,11 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       // delete one step at a time
       p_drawer->hide();
       p_drawer->removeAllConnections();
-      this->mNetwork->network()->remove(p_drawer->getStep());
+      p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
+//      this->mNetwork->network()->remove(p_drawer->getStep());
       this->mpPropertyTable->resetPointer();
       this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
+      items[i] = NULL;
     }
     // delete triggers
     else if (cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(items[i]))
@@ -495,17 +498,27 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       // delete one step at a time
       p_trigger_drawer->hide();
       p_trigger_drawer->removeAllConnections();
-      this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
+      p_trigger_drawer->getTrigger()->getNetwork()->remove(p_trigger_drawer->getTrigger());
+//      this->mNetwork->network()->remove(p_trigger_drawer->getTrigger());
       this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
+      items[i] = NULL;
     }
+  }
+  // now delete all networks
+  for (int i = 0; i < items.size(); ++i)
+  {
+    // item was deleted previously
+    if (items[i] == NULL)
+      continue;
     // delete networks
-    else if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(items[i]))
+    if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(items[i]))
     {
-      // delete one step at a time
+      // delete one network at a time
       p_network_drawer->hide();
       p_network_drawer->removeAllConnections();
       p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
       this->mpProcessingDrawer->getScene()->removeNetworkItem(p_network_drawer);
+      items[i] = NULL;
     }
   }
 }
