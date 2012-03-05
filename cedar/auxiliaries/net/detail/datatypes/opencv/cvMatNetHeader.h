@@ -62,7 +62,7 @@ namespace cedar {
 struct cvMatNetHeader : MatrixNetHeader
 {
 public:
-  unsigned int cvMatType;
+  /*unsigned*/ int cvMatType;
 };
 
 } } } } // end namespaces
