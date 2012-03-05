@@ -55,19 +55,22 @@ namespace cedar {
     namespace net {
       namespace detail {
 
+// this is a static function
 unsigned int MatrixNetHeaderAccessor::getDataSize(MatrixNetHeader &header)
 {
-  return header.elemSize * header.rows * header.cols;
+  return header.mElementSize * header.mRows * header.mColumns;
 }
 
+// this is a static function
 unsigned int MatrixNetHeaderAccessor::getTotalElements(MatrixNetHeader &header)
 {
-  return header.rows * header.cols;
+  return header.mRows * header.mColumns;
 }
 
-unsigned int MatrixNetHeaderAccessor::getElemSize(MatrixNetHeader &header)
+// this is a static function
+unsigned int MatrixNetHeaderAccessor::getElementSize(MatrixNetHeader &header)
 {
-  return header.elemSize;
+  return header.mElementSize;
 }
 
 

@@ -72,7 +72,7 @@ class SimpleNetWriter : public AbstractNetWriter<T>
   // members
   //---------------------------------------------------------------------------
 private:
-  BufferedPort< BinPortable<T> > BufferOut;
+  BufferedPort< BinPortable<T> > mBufferOut;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -86,7 +86,7 @@ private:
 public:
   explicit SimpleNetWriter(const string &myPortName) 
                                      : AbstractNetWriter<T>(myPortName),
-                                       BufferOut()
+                                       mBufferOut()
   {
 #ifdef DEBUG_NETT
     cout << "  SimpleNetWriter [CONSTRUCTOR]" << endl;
@@ -101,7 +101,7 @@ public:
   //!@brief Destructor
   ~SimpleNetWriter()
   {
-    AbstractNetWriter<T>::lateDestruct();
+    AbstractNetWriter<T>::earlyDestruct();
 #ifdef DEBUG_NETT
     cout << "  ~SimpleNetWriter [DESTRUCTOR]" << endl;
 #endif
@@ -115,14 +115,14 @@ protected:
   //!@brief open the port. called by AbstractNetBase
   bool open()
   {
-    return BufferOut.open( AbstractNetBase::getFullPortName().c_str() ); 
+    return mBufferOut.open( AbstractNetBase::getFullPortName().c_str() ); 
   }
 
   //!@brief close the port. called by AbstractNetBase
   bool close()
   {
-    if (!BufferOut.isClosed())
-      BufferOut.close(); // is void
+    if (!mBufferOut.isClosed())
+      mBufferOut.close(); // is void
 
     return true;
   }
@@ -138,10 +138,10 @@ public:
    */
   void write(const T &t) // may drop packets (non blocking)
   {
-    BinPortable<T> &BinOut= BufferOut.prepare();
+    BinPortable<T> &r_bin_out= mBufferOut.prepare();
 
-    BinOut.content()= t;
-    BufferOut.write();  
+    r_bin_out.content()= t;
+    mBufferOut.write();  
   }
 
 };

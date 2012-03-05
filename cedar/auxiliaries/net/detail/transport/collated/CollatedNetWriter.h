@@ -31,7 +31,7 @@
     Description: Implementation for the user-accessible writing 
                  of a matrix-like type. 
                  We use a yarp::os::Portable-derived type 
-                 called 'CollatedNetPortable' and YARP will handle
+                 called 'YARPCollatedPortable' and YARP will handle
                  the passing of data between us an it.
                  Here we check for consistency of the data the user
                  passed to us.
@@ -46,8 +46,8 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetBase.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedType.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetPortable.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/YARPCollatedPortable.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetWriter.h"
 
@@ -71,38 +71,37 @@ namespace cedar {
  * @see CollatedNetReader
  */
 template <typename T>
-class CollatedNetWriter : 
-                          public CollatedNetBase<T>,
+class CollatedNetWriter : public CollatedNetBase<T>,
                           public AbstractNetWriter<T>
 {
   //---------------------------------------------------------------------------
   // members
   //---------------------------------------------------------------------------
 protected:
-  yarp::os::PortWriterBuffer< CollatedNetPortable< T > > mElemWrapper;
+  yarp::os::PortWriterBuffer< YARPCollatedPortable< T > > mElementWrapper;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
   //---------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  explicit CollatedNetWriter(std::string myPortName) : 
-                                         CollatedNetBase<T>(),
-                                         AbstractNetWriter<T>(myPortName),
-                                         mElemWrapper()
+  explicit CollatedNetWriter(std::string myPortName) 
+    : CollatedNetBase<T>(),
+      AbstractNetWriter<T>(myPortName),
+      mElementWrapper()
   {
 #ifdef DEBUG_NETT
     cout << "  CollatedNetWriter [CONSTRUCTOR]" << endl;
 #endif
-    AbstractNetWriter<T>::lateConstruct();
+    AbstractNetWriter<T>::lateConstruct(); // see CollatedNetReader for comment
 
-    mElemWrapper.attach( CollatedNetBase<T>::mDataPort );
+    mElementWrapper.attach( CollatedNetBase<T>::mDataPort );
   }
 
   //!@brief Destructor
   ~CollatedNetWriter() // doesnt need to be virtual
   {
-    AbstractNetWriter<T>::lateDestruct();
+    AbstractNetWriter<T>::earlyDestruct();
 #ifdef DEBUG_NETT
     cout << "  ~CollatedNetWriter [DESTRUCTOR]" << endl;
 #endif
@@ -126,8 +125,7 @@ public:
 #endif
 
     // verify matrix size (or generate the header for further checks)
-    if (!check_collateddata_for_write(t,
-                                      mElemWrapper.prepare().header() ) )
+    if (!checkCollatedDataForWrite(t, mElementWrapper.prepare().header() ) )
     {
       CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
                    "matrix has wrong size - you wrote matrices of "
@@ -136,8 +134,8 @@ public:
     }
 
     // send it ...
-    mElemWrapper.prepare().content() = t;
-    mElemWrapper.write(true); // TRUE IS IMPORTANT
+    mElementWrapper.prepare().content() = t;
+    mElementWrapper.write(true); // TRUE IS IMPORTANT
   }
 
 };

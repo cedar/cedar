@@ -40,6 +40,11 @@
 #ifndef CEDAR_ABSTRACTNETBASE_H
 #define CEDAR_ABSTRACTNETBASE_H
 
+// Use this to disable the code to start a local process for a yarp nameserver:
+// This lead to more problems than it is worth.
+// Just use a dedicated YARP nameserver for your local network.
+#define CEDAR_NETT_DISABLE_YARPSERVERPROC 
+
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.h"
@@ -62,25 +67,29 @@ namespace cedar {
 
 /*!@brief Shared functionality between AbstractWriter and Reader
  *
- * basic inherit with shared functionality that Writer and Reader
- * will use (e.g. establishing connection with the network)
+ * Basic inherit with shared functionality that Writer and Reader
+ * will use (e.g. establishing connection with the network).
  *
+ * this base class and all derived classes are not copyable.
  */
 class AbstractNetBase : virtual protected InterfaceOpenable,
+                          // virtual inheritance for CollatedNetBase/Writer/Reader
                         boost::noncopyable
+                          // not copyable, because of RAII
 {
   //---------------------------------------------------------------------------
   // members
   //---------------------------------------------------------------------------
 protected:
-//  static 
   yarp::os::Network mNetwork;
 
 private:
   std::string mFullPortName; 
     //the full (user-defines plus hardcoded suffixes) port name:
   bool   mIsConnected; // to speed up valid-network checks
+#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
   pid_t  mServerPID;
+#endif  
 
 
 protected:
@@ -107,8 +116,8 @@ public:
 private:
   //!@brief dont use the standard constructor
   AbstractNetBase();
-  AbstractNetBase(const AbstractNetBase &A); // not copyable
-  AbstractNetBase &operator=(const AbstractNetBase &A); // not copyable
+  // AbstractNetBase(const AbstractNetBase &A); // not copyable, see boost::noncopyable
+  // AbstractNetBase &operator=(const AbstractNetBase &A); // not copyable, see boost::noncopyable
 
 
 
@@ -117,7 +126,6 @@ private:
   // public methods
   //---------------------------------------------------------------------------
 public:
-
 
 
   //---------------------------------------------------------------------------
@@ -134,7 +142,7 @@ protected:
   //        use of virtual functions inside a constructor)
   void lateConstruct();
   //!@brief will be called outside of destructor. see lateConstruct()
-  void lateDestruct();
+  void earlyDestruct();
   //!@brief connection established and valid as far as we know
   bool isConnected();
   //!@brief helper function to connect to ports
@@ -146,10 +154,12 @@ protected:
   // private methods
   //---------------------------------------------------------------------------
 private:
+#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
   //!@brief helper function to start an (external YARP) name server
   bool startNameServer();
   //!@brief helper function to check and start an (external YARP) name server 
   bool checkNameServer();
+#endif  
 
 }; // class end
 

@@ -40,9 +40,9 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypes/interfaces/InterfaceCollatedData.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedTraits.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatNetHeader.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
@@ -69,13 +69,13 @@ public:
   typedef cvMatNetHeader HeaderType;
 
 private:
-  HeaderType mCheckHeader; // local info about matrix-header, to compare
+  HeaderType mLocalHeader; // local info about matrix-header, to compare
                            // with future user inputs
 
   //!@brief prepare (init) the external data, which will be sent
-  void init_externalheader(const CVT &mat, HeaderType &extheader);
+  void initExternalHeader(const CVT &mat, HeaderType &extheader);
   //!@brief prepare (init) the local copy of the header for comparisons
-  void init_checkheader(const HeaderType &extheader);
+  void initLocalHeader(const HeaderType &extheader);
 
 
   //---------------------------------------------------------------------------
@@ -83,9 +83,9 @@ private:
   //---------------------------------------------------------------------------
 protected:
   //!@brief check the data before writing it (opencv implementation)
-  bool check_collateddata_for_write(const CVT &mat, HeaderType &extheader);
+  bool checkCollatedDataForWrite(const CVT &mat, HeaderType &extheader);
   //!@brief check the data before reading it (opencv implementation)
-  bool check_collateddata_for_read(const HeaderType &extheader);
+  bool checkCollatedDataForRead(const HeaderType &extheader);
 
   //---------------------------------------------------------------------------
   // constructors and destructor

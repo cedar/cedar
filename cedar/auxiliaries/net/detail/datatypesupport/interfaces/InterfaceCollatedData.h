@@ -22,27 +22,27 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CollatedTraits.h
+    File:        InterfaceCollatedData.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:30:14 PM CEST
+    Date:        Wed 20 Jul 2011 04:41:29 PM CEST
 
-    Description: traits class for the transferable data type.
-                 Specialize this.
+    Description: the transport part of the NetTransporter framework
+                 needs this interface to be implemented
 
     Credits:
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDTRAITS_H
-#define CEDAR_COLLATEDTRAITS_H
+#ifndef CEDAR_INTERFACECOLLATEDDATA_H
+#define CEDAR_INTERFACECOLLATEDDATA_H
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // PROJECT INCLUDES
-#include <boost/static_assert.hpp>
 
 // SYSTEM INCLUDES
 
@@ -54,28 +54,25 @@ namespace cedar {
       namespace detail {
 
 
-/*!@brief traits struct for a 'collated data type' i.e. a matrix type
+/*!@brief Abstract interface of matrix-like data
  *
- * the traits struct will hold information about necessary helper classes
- * and HAS TO BE SPECIALIZED
+ * we hold typedef-info for the traits-type, data and header-type
  */
-template<class T>
-struct collated_traits
+template<typename T> 
+class InterfaceCollatedData
 {
-  // default traits struct is empty
-  // this should not compile
-  collated_traits()
-  {
-    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
-  }
+protected:
+  typedef CollatedTraits<T>               TraitsType;
+  typedef typename TraitsType::DataType   DataType;
+  typedef typename TraitsType::HeaderType HeaderType;
+
+protected:
+  virtual bool checkCollatedDataForWrite(const DataType &data,
+                                            HeaderType &header) = 0;
+  virtual bool checkCollatedDataForRead(const HeaderType &header) = 0;
 };
 
 
-} } } } // end namespaces 
-
-// specializations (these will compile):
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/CollatedTraits.h"
-
+} } } } // end namespace
 
 #endif
-

@@ -26,60 +26,56 @@
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:43:49 PM CEST
+    Date:        Wed 20 Jul 2011 04:30:14 PM CEST
 
-    Description: collated_traits in the opencv specialization
+    Description: traits class for the transferable data type.
+                 Specialize this.
 
     Credits:
 
 =============================================================================*/
 
-#ifndef CEDAR_COLLATEDTRAITS_OPENCV_H
-#define CEDAR_COLLATEDTRAITS_OPENCV_H
+#ifndef CEDAR_COLLATEDTRAITS_H
+#define CEDAR_COLLATEDTRAITS_H
 
 // LOCAL INCLUDES
-// traits specializations:
 #include "cedar/auxiliaries/net/detail/namespace.h"
 
 // PROJECT INCLUDES
+#include <boost/static_assert.hpp>
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
+
 
 
 namespace cedar {
   namespace aux {
     namespace net {
       namespace detail {
-        template<> struct collated_traits<cv::Mat>;
-        template<> struct collated_traits< cv::Mat_<float> >;
-        template <typename CVT> class cvMatHelper;
-        class cvMatNetHeader; // forward declaration
-      }
-    }
+
+
+/*!@brief traits struct for a 'collated data type' i.e. a matrix type
+ *
+ * the traits struct will hold information about necessary helper classes
+ * and HAS TO BE SPECIALIZED
+ */
+template<class T>
+struct CollatedTraits
+{
+  // default traits struct is empty
+  // this should not compile
+  CollatedTraits()
+  {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
   }
-}
-
-
-//////////////// OPENCV SPECIALIZATION of our traits class
-
-//!@brief collated_traits implementation for cv::Mat
-template<>
-struct cedar::aux::net::detail::collated_traits<cv::Mat>
-{
-  typedef cv::Mat                   data_type;
-  typedef cedar::aux::net::detail::cvMatHelper<cv::Mat>    helper_type;
-  typedef cedar::aux::net::detail::cvMatNetHeader header_type;
 };
 
-//!@brief collated_traits implementation for cv::Mat_<float> 
-template<>
-struct cedar::aux::net::detail::collated_traits< cv::Mat_<float> >
-{
-  typedef cv::Mat_<float>           data_type;
-  typedef cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >    helper_type;
-  typedef cedar::aux::net::detail::cvMatNetHeader header_type;
-};
+
+} } } } // end namespaces 
+
+// specializations (these will compile):
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/CollatedTraits.h"
+
 
 #endif
 

@@ -22,50 +22,29 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        cvMatNetHeader.h
+    File:        CollatedTraits.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:13:06 PM CEST
+    Date:        Wed 20 Jul 2011 05:14:19 PM CEST
 
-    Description: extend the MatrixNetHeader to hold information abaout
-                 the matrix type.
-                 We need this, because cv::Mat is vastly configurable
-                 at runtime
+    Description: CollatedTraits in the opencv specialization.
+                 this file holds some explicit instantiations.
 
     Credits:
 
 =============================================================================*/
 
-#ifndef CEDAR_CVMATNETHEADER_H
-#define CEDAR_CVMATNETHEADER_H
-
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeader.h"
-
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // PROJECT INCLUDES
+#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
-
-/*!@brief packed header with matrix info for network transfer
- *
- * This is the openCV::Mat specialization
- */
-struct cvMatNetHeader : MatrixNetHeader
-{
-public:
-  /*unsigned*/ int cvMatType;
-};
-
-} } } } // end namespaces
-
-#endif
+// explicit instantiation
+template struct cedar::aux::net::detail::CollatedTraits<cv::Mat>;
+template struct cedar::aux::net::detail::CollatedTraits< cv::Mat_<float> >;
 

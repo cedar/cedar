@@ -41,7 +41,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/header/CollatedNetHeader.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/BasicNetHeader.h"
 
 // PROJECT INCLUDES
 
@@ -55,12 +55,12 @@ namespace cedar {
 /*!@brief extend the header struct to matrix data (cols, rows)
  *
  */
-struct MatrixNetHeader : CollatedNetHeader
+struct MatrixNetHeader : BasicNetHeader
 {
 public:
-  /*unsigned*/ int rows;
-  /*unsigned*/ int cols;
-  unsigned int elemSize;
+  /*unsigned*/ int mRows; // cv::Mat uses signed ints for this
+  /*unsigned*/ int mColumns; // cv::Mat uses signed ints for this
+  unsigned int mElementSize;
 };
 
 } } } }  // end namespaces

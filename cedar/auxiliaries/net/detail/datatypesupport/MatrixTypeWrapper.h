@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CollatedType.h
+    File:        MatrixTypeWrapper.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 04:32:21 PM CEST
 
-    Description: CollatedType provides template specializations to access
+    Description: MatrixTypeWrapper provides template specializations to access
                  the transferred type (which will be a 'collated type'
                  == matrix header + matrix body)
 
@@ -41,7 +41,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedTraits.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // PROJECT INCLUDES
 #include <boost/static_assert.hpp>
@@ -64,32 +64,33 @@ namespace cedar {
  * note that for once the member can be accessed directly (publicly)
  */
 template <typename T>
-struct CollatedType
+struct MatrixTypeWrapper
 {
   //---------------------------------------------------------------------------
   // members and typedefs
   //---------------------------------------------------------------------------
 public:
-  typedef collated_traits<T>                traits_type;
-  typedef typename traits_type::data_type   data_type;
-  typedef typename traits_type::header_type header_type;
+  typedef CollatedTraits<T>                 TraitsType;
+  typedef typename TraitsType::DataType     DataType;
+  typedef typename TraitsType::HeaderType   HeaderType;
 
-  header_type header; // yes, it is public. this type is about being accessed
-  data_type   data;   // yes, it is public.                    ... externally
+  HeaderType mHeader; // yes, it is public. this type is about being accessed
+  DataType   mData;   // yes, it is public.                    ... externally
 
   //---------------------------------------------------------------------------
   // constructors and destructor
   //---------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CollatedType() : header(), data()
+  MatrixTypeWrapper() 
+    : mHeader(), mData()
   {
     // important: the size of the matrix will only be obtained later on
     //            - at runtime (think of cv::Mat matrices)
   }
 
   //!@brief Destructor
-  ~CollatedType()
+  ~MatrixTypeWrapper()
   {
   }
 
@@ -101,7 +102,7 @@ public:
     return NULL;
   }
 
-  inline T late_init_data_from_header()
+  inline T lateInitDataFromHeader()
   {
     BOOST_STATIC_ASSERT(sizeof(T) == 0); 
     // this will not compile, need to specialize
@@ -115,6 +116,6 @@ public:
 
 
 // Spezialisierungen: ...
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/CollatedType.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/MatrixTypeWrapper.h"
 
 #endif

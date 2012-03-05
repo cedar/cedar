@@ -31,7 +31,7 @@
     Description: Implementation for the user-accessible reading
                  of a matrix-like type. 
                  We use a yarp::os::Portable-derived type 
-                 called 'CollatedNetPortable' and YARP will handle
+                 called 'YARPCollatedPortable' and YARP will handle
                  the passing of data between us an it.
                  Here we check for consistency before passing
                  the data to the user.
@@ -47,8 +47,8 @@
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetBase.h"
 #include "cedar/auxiliaries/net/detail/transport/AbstractNetReader.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedType.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetPortable.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/YARPCollatedPortable.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // PROJECT INCLUDES
@@ -73,7 +73,7 @@ namespace cedar {
  *
  * partly implemented in CollatedNetBase
  */
-template <typename T, bool block= false>
+template <typename T, bool BLOCK= false>
 class CollatedNetReader : public CollatedNetBase<T>,
                           public AbstractNetReader<T>
 {
@@ -81,28 +81,28 @@ class CollatedNetReader : public CollatedNetBase<T>,
   // members
   //---------------------------------------------------------------------------
 private:
-  yarp::os::PortReaderBuffer< CollatedNetPortable< T > > mElemWrapper;
+  yarp::os::PortReaderBuffer< YARPCollatedPortable< T > > mElementWrapper;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
   //---------------------------------------------------------------------------
 private:
   //!@brief The standard constructor. dont use
-  CollatedNetReader();
+  // CollatedNetReader();
   CollatedNetReader(const CollatedNetReader &C); // not copyable
-  CollatedNetReader &operator=(const CollatedNetReader &C);
+  CollatedNetReader &operator=(const CollatedNetReader &C); // not copyable
 
 public:
   //!@brief use this constructor
   explicit CollatedNetReader(const std::string &myPortName) 
                                        : CollatedNetBase<T>(),
                                          AbstractNetReader<T>(myPortName),
-                                         mElemWrapper()
+                                         mElementWrapper()
   {
 #ifdef DEBUG_NETT
     cout << "  CollatedNetReader [CONSTRUCTOR]" << endl;
 #endif
-    mElemWrapper.setStrict(false); // false= drop old messages, when new
+    mElementWrapper.setStrict(false); // false= drop old messages, when new
                                    // ones come in
 
     AbstractNetReader<T>::lateConstruct();
@@ -110,7 +110,7 @@ public:
       //              AbstractNetBases/Readers constructors, so we
       //              can access virtual functions
 
-    mElemWrapper.attach( CollatedNetBase<T>::mDataPort );
+    mElementWrapper.attach( CollatedNetBase<T>::mDataPort );
   }
 
   // no need for virtual here, as pointers of this will never be passed around
@@ -119,7 +119,7 @@ public:
 #ifdef DEBUG_NETT
     cout << "  ~CollatedNetReader [DESTRUCTOR] begin" << endl;
 #endif
-    AbstractNetReader<T>::lateDestruct();
+    AbstractNetReader<T>::earlyDestruct();
 #ifdef DEBUG_NETT
     cout << "  ~CollatedNetReader [DESTRUCTOR] end" << endl;
 #endif
@@ -142,8 +142,8 @@ public:
    */
   T read()
   {  
-    T retMat;
-    CollatedNetPortable< T > *pNetPortable;
+    T ret_mat;
+    YARPCollatedPortable< T > *p_net_portable;
 
     if (!AbstractNetReader<T>::isConnected())
     {
@@ -155,41 +155,42 @@ public:
       if (!AbstractNetReader<T>::reconnect())
       {
         // do something
+        // user may catch this and choose to retry later on ...
         CEDAR_THROW( cedar::aux::exc::NetWaitingForWriterException,
                      "YARP: cannot connect reader port; waiting for "
                      "writer" );
       }
     }
 
-    pNetPortable= mElemWrapper.read( block ); // Argument: shouldWait
+    p_net_portable= mElementWrapper.read( BLOCK ); // Argument: shouldWait
  
-    if ( pNetPortable == NULL )
+    if ( p_net_portable == NULL )
     {
       CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
                    "YARP: unexpectedly read NULL from port" );
     }
     else
     {
-      retMat= pNetPortable->content();
+      ret_mat= p_net_portable->content();
 
       // thoughts on reference counters:
-      // 1.) YARP creates an instance of CollatedNetPortable in the background,
-      //     we get a pointer to that here
+      // 1.) YARP creates an instance of YARPCollatedPortable in the background,
+      //     we get a pointer to that here (p_net_portable)
       // 2.) ->content() gives us a reference to the data (e.g. cv::Mat)
       //                 so no change there.
-      // 3.) retMat= ...; is a O(1) operation with cv::Mat and
+      // 3.) ret_mat= ...; is a O(1) operation with cv::Mat and
       //                  actually doesnt copy anything, but
       //                  internally increases a reference counter
-      // 4.) return retMat; is another O(1) copy operation and
+      // 4.) return ret_mat; is another O(1) copy operation and
       //                  and counter increase
-      // 5.) when pNetPortable is freed (by yarp)
-      //     and the local retMat is deleted
+      // 5.) when p_net_portable is freed (by yarp)
+      //     and the local ret_mat is deleted (when leaving this function)
       //     there is one reference left to the matrix data, which
       //     is the one we returned to the user code. GOOD!
 
       // verify matrix size (or generate the header for further checks)
 #if 1
-      if (!check_collateddata_for_read( pNetPortable->header() ) )
+      if (!checkCollatedDataForRead( p_net_portable->header() ) )
       {
         CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
                      "matrix has wrong size - you wrote matrices of "
@@ -197,7 +198,7 @@ public:
       }
 #endif
 
-      return retMat;
+      return ret_mat;
     }
   }
 };

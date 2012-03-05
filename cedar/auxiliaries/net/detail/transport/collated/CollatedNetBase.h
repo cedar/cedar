@@ -39,12 +39,12 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypes/interfaces/InterfaceCollatedData.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/transport/interfaces/InterfaceOpenable.h"
 
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedTraits.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedType.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetPortable.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/YARPCollatedPortable.h"
 
 // PROJECT INCLUDES
 
@@ -77,7 +77,8 @@ protected:
   //---------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CollatedNetBase() : mDataPort()
+  CollatedNetBase() 
+    : mDataPort()
   {
 #ifdef DEBUG_NETT
   cout << "  CollatedNetBase [CONSTRUCTOR]" << endl;

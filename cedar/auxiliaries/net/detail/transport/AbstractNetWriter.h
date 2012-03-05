@@ -75,17 +75,17 @@ class AbstractNetWriter : public AbstractNetBase
 private:
   //!@brief The standard constructor. Dont use
   AbstractNetWriter();
-  AbstractNetWriter(const AbstractNetWriter &A); // not copyable
-  AbstractNetWriter &operator=(const AbstractNetWriter &A);
+  // AbstractNetWriter(const AbstractNetWriter &A); // parent is not copyable
+  // AbstractNetWriter &operator=(const AbstractNetWriter &A); // parent is not copyable
 
 
 
 public:
-#define WRITER_PORT_NAME(x) ( (x) + PORT_DELIMINATOR + PORT_SUFFIX_OUT )
+#define CEDAR_NETT_WRITER_PORT_NAME(x) ( (x) + PORT_DELIMINATOR + PORT_SUFFIX_OUT )
   //!@brief Use this constructor. Pass the user-defined port name as argument.
   //        The effective port name will be different.
   explicit AbstractNetWriter(const std::string &myPortName)  
-                   : AbstractNetBase( WRITER_PORT_NAME(myPortName) )
+                   : AbstractNetBase( CEDAR_NETT_WRITER_PORT_NAME(myPortName) )
   {
 #ifdef DEBUG_NETT
     cout << "  AbstractNetWriter [CONSTRUCTOR]" << endl;

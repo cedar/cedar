@@ -87,37 +87,34 @@ private:
 private:
   //!@brief The standard constructor. Dont use!
   AbstractNetReader();
-  AbstractNetReader(const AbstractNetReader &A); // not copyable
-  AbstractNetReader &operator=(const AbstractNetReader &A);
+  // AbstractNetReader(const AbstractNetReader &A); // parent is not copyable
+  // AbstractNetReader &operator=(const AbstractNetReader &A); // parent is not copyable
 
 
 public:
-#define READER_PORT_NAME(x) ( (x) + PORT_DELIMINATOR  \
+#define CEDAR_NETT_READER_PORT_NAME(x) ( (x) + PORT_DELIMINATOR  \
                                   + PORT_SUFFIX_IN + "(" \
                                   + boost::lexical_cast<std::string>(getReaderCounter()) \
                                   + ")" )
   //!@brief use this constructor. Parameter ist the user-defined port name
   explicit AbstractNetReader(const std::string &myPortName) 
-                   : AbstractNetBase( READER_PORT_NAME(myPortName) ),
+                   : AbstractNetBase( CEDAR_NETT_READER_PORT_NAME(myPortName) ),
                      mPortNameWriter()
   {
 #ifdef DEBUG_NETT
     cout << "  AbstractNetReader [CONSTRUCTOR]" << endl;
 #endif
 
-    // ersten freien Readerport im Netzwerk finden
-    {
-      mPortNameWriter= PORT_PREFIX + PORT_DELIMINATOR
+    // look for first unused reader port name in the network
+    mPortNameWriter= PORT_PREFIX + PORT_DELIMINATOR
                        + myPortName
                        + PORT_DELIMINATOR
                        + PORT_SUFFIX_OUT;
 
-      increaseReaderCounter();
-
-    } 
+    increaseReaderCounter();
     
     if( !yarp::os::Network::exists( mPortNameWriter.c_str(),
-                                         true ) // param: true = quiet
+                                         true ) // param: true == quiet
            )
     {
       CEDAR_THROW( cedar::aux::exc::NetWaitingForWriterException,
@@ -139,7 +136,7 @@ public:
 protected:
   int getReaderCounter()
   {
-    return mReaderCounter + 1;
+    return mReaderCounter + 1; // start with 1
   }
 
   void increaseReaderCounter()
@@ -168,9 +165,10 @@ protected:
   // public methods
   //---------------------------------------------------------------------------
 public:
-  //!@brief (try) to connect to my writer. this operation may fail!
+  //!@brief (try) to connect to my writer. this operation may silently fail!
   //
   // returns TRUE for an established reconnection
+  // does not throw an exception
   bool reconnect()
   {
     return connectTo(mPortNameWriter); 

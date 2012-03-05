@@ -31,6 +31,9 @@
     Description: Make sure that the Collated/Simple-type classes 
                  basically behave the same way.
 
+                 Will be used by AbstracNetBase and CollatedNetBase.
+                 Inherit virtually.
+
     Credits:
 
 =============================================================================*/

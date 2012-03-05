@@ -22,57 +22,32 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        InterfaceCollatedData.h
+    File:        MatrixTypeWrapper.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 04:41:29 PM CEST
+    Date:        Wed 20 Jul 2011 05:14:51 PM CEST
 
-    Description: the transport part of the NetTransporter framework
-                 needs this interface to be implemented
+    Description: openCV specialization for MatrixTypeWrapper.
+                 This tells us how to acces an openCV-type.
+                 This file holds explicit instantiations.
 
     Credits:
 
 =============================================================================*/
 
-#ifndef CEDAR_INTERFACECOLLATEDDATA_H
-#define CEDAR_INTERFACECOLLATEDDATA_H
-
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedTraits.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
 
 // PROJECT INCLUDES
+#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
 
 
-namespace cedar {
-  namespace aux {
-    namespace net {
-      namespace detail {
+//////////// explicit instatiation
+template struct cedar::aux::net::detail::MatrixTypeWrapper<cv::Mat>;
+template struct cedar::aux::net::detail::MatrixTypeWrapper< cv::Mat_<float> >;
 
 
-/*!@brief Abstract interface of matrix-like data
- *
- * we hold typedef-info for the traits-type, data and header-type
- */
-template<typename T> 
-class InterfaceCollatedData
-{
-protected:
-  typedef collated_traits<T>                traits_type;
-  typedef typename traits_type::data_type   data_type;
-  typedef typename traits_type::header_type header_type;
-
-protected:
-  virtual bool check_collateddata_for_write(const data_type &data,
-                                            header_type &header) = 0;
-  virtual bool check_collateddata_for_read(const header_type &header) = 0;
-};
-
-
-} } } } // end namespace
-
-#endif
