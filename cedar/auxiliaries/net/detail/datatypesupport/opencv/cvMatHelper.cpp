@@ -40,7 +40,6 @@
 
 #include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeaderAccessor.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

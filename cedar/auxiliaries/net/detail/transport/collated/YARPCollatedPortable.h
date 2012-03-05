@@ -47,7 +47,6 @@
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
 #include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeaderAccessor.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 
 // SYSTEM INCLUDES
@@ -128,7 +127,6 @@ public:
   bool read(yarp::os::ConnectionReader& connection) 
   {
     int header_size, data_size;
-    int i;
 
     header_size= sizeof(mNetType.mHeader);
 
@@ -139,8 +137,7 @@ public:
     connection.expectBlock( (char*)(&mNetType.mHeader),
                             header_size );
 
-    data_size= MatrixNetHeaderAccessor::getDataSize( 
-                 mNetType.mHeader );
+    data_size= mNetType.getDataSize();
 
     ///////////////////////
     // read out the matrix content ...
@@ -173,20 +170,7 @@ public:
     if (mpVals == NULL) // paranoid
       return false;
 
-    // TODO refacture this
-    int num_elements, element_size;
-
-    num_elements= MatrixNetHeaderAccessor::getTotalElements(
-                    mNetType.mHeader);
-    element_size= MatrixNetHeaderAccessor::getElementSize( 
-                 mNetType.mHeader );
-    for (i= 0; i< num_elements; i++)
-    {
-      // we use memcpy as we only know the sizes of the data at runtime
-      memcpy( mNetType.contentAt(i, element_size), // see datatype/ directory
-              mpVals + (i*element_size),
-              element_size );
-    }
+    mNetType.readFromMemory(mpVals); // specialized depending on T
 
     // NetType.mData now holds the matrix data
     return true;
@@ -200,13 +184,10 @@ public:
   // CollatedNetWriter::write()
   bool write(yarp::os::ConnectionWriter& connection) 
   {
-    int header_size, data_size, blocks_array[2], num_elements, element_size;
-    int i;
- 
+    int header_size, data_size, blocks_array[2];
+
     header_size= sizeof(mNetType.mHeader);
-    data_size= MatrixNetHeaderAccessor::getDataSize( mNetType.mHeader );
-    num_elements= MatrixNetHeaderAccessor::getTotalElements( mNetType.mHeader);
-    element_size= MatrixNetHeaderAccessor::getElementSize( mNetType.mHeader );
+    data_size= mNetType.getDataSize();
  
     blocks_array[0]= header_size;
     blocks_array[1]= data_size;
@@ -227,16 +208,7 @@ public:
       mpVals= (char*)malloc( data_size );
     }
 
-    // TODO: refacture this part
-    for (i= 0; i < num_elements; i++)
-    {
-      // copy each element.
-      // we access it with contentAt() which will be specialized for each
-      // transportet data type (see datatype/ directory)
-      memcpy( mpVals + (i * element_size),
-             mNetType.contentAt(i, element_size),
-             element_size );
-    } 
+    mNetType.writeToMemory(mpVals); // specialized depending on T
  
     connection.appendBlock( (char*)mpVals,
                            data_size );
