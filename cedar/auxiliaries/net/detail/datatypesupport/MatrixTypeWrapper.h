@@ -30,7 +30,9 @@
 
     Description: MatrixTypeWrapper provides template specializations to access
                  the transferred type (which will be a 'collated type'
-                 == matrix header + matrix body)
+                 == matrix header + matrix body).
+                 
+                 Note: This class will not be transferred.
 
     Credits:
 
@@ -94,21 +96,83 @@ public:
   {
   }
 
-  // inline as it will be called in inner loop
-  inline void* contentAt(int index, int iElemSize)
-  {
-    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
-    // this will not compile, need to specialize
-    return NULL;
-  }
-
-  inline T lateInitDataFromHeader()
+  T lateInitDataFromHeader()
   {
     BOOST_STATIC_ASSERT(sizeof(T) == 0); 
     // this will not compile, need to specialize
     return 0;
   }
 
+  unsigned int getDataSize() const
+  {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+    return 0;
+  }
+
+  unsigned int getElementCount() const
+  {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+    return 0;
+  }
+
+  unsigned int getElementSize()
+  {
+    return mHeader.mElementSize;
+  }
+
+  void* contentAt(int index, int iElemSize) const
+  {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+    // this will not compile, need to specialize
+    return NULL;
+  }
+
+  void writeToMemory(char *p_vals)
+  {
+    defaultWriteToMemory(p_vals);
+  }
+
+
+  void readFromMemory(const char *p_vals)
+  {
+    defaultReadFromMemory(p_vals);
+  }
+
+private:  
+  void defaultReadFromMemory(const char *p_vals)
+  {
+    int num_elements, element_size, i;
+
+    num_elements= getElementCount();
+    element_size= getElementSize();
+
+    for (i= 0; i< num_elements; i++)
+    {
+      // we use memcpy as we only know the sizes of the data at runtime
+      memcpy( contentAt(i, element_size),
+              p_vals + (i * element_size),
+              element_size );
+    }
+  }
+
+  void defaultWriteToMemory(char *p_vals)
+  {
+    int num_elements, element_size;
+    int i;
+
+    num_elements= getElementCount();
+    element_size= getElementSize();
+
+    for (i= 0; i < num_elements; i++)
+    {
+      // copy each element.
+      // we access it with contentAt() which will be specialized for each
+      // transportet data type
+      memcpy( p_vals + (i * element_size),
+              contentAt(i, element_size),
+              element_size );
+    } 
+  }
 };
 
 

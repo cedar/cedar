@@ -65,7 +65,7 @@ namespace cedar {
 
 
 template <> 
-inline void* MatrixTypeWrapper<cv::Mat>::contentAt(int index, int elemSize) 
+inline void* MatrixTypeWrapper<cv::Mat>::contentAt(int index, int elemSize) const
                 // specialization for class template
 {
   return (void*) &( mData.ptr( index % mHeader.mRows )[ (index 
@@ -84,13 +84,37 @@ inline cv::Mat MatrixTypeWrapper<cv::Mat>::lateInitDataFromHeader()
                     mHeader.mCVMatType );
 }
 
+template <>
+inline unsigned int MatrixTypeWrapper<cv::Mat>::getDataSize() const
+{
+  return mHeader.mElementSize * mHeader.mRows * mHeader.mColumns;
+}
+
+
+template <>
+inline unsigned int MatrixTypeWrapper<cv::Mat>::getElementCount() const
+{
+  return mHeader.mRows * mHeader.mColumns;
+}
+
+template <>
+inline void MatrixTypeWrapper<cv::Mat>::writeToMemory(char *p_vals)
+{
+  defaultWriteToMemory(p_vals);
+}
+
+template <>
+inline void MatrixTypeWrapper<cv::Mat>::readFromMemory(const char *p_vals)
+{
+  defaultReadFromMemory(p_vals);
+}
 
 
 /////// cv::Mat_ (note the underscore!)
 
 
 template <>
-inline void* MatrixTypeWrapper< cv::Mat_<float> >::contentAt(int index, int) 
+inline void* MatrixTypeWrapper< cv::Mat_<float> >::contentAt(int index, int) const
                 // specialization for class template
 {
   return (void*)  &mData( ( index % mHeader.mRows ),
@@ -106,6 +130,19 @@ inline cv::Mat_<float> MatrixTypeWrapper< cv::Mat_<float> >::lateInitDataFromHea
 {
   return cv::Mat_<float>( mHeader.mRows,
                           mHeader.mColumns );
+}
+
+template <>
+inline unsigned int MatrixTypeWrapper< cv::Mat_<float> >::getDataSize() const
+{
+  return mHeader.mElementSize * mHeader.mRows * mHeader.mColumns;
+}
+
+
+template <>
+inline unsigned int MatrixTypeWrapper< cv::Mat_<float> >::getElementCount() const
+{
+  return mHeader.mRows * mHeader.mColumns;
 }
 
 
