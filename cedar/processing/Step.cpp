@@ -89,7 +89,7 @@ cedar::proc::Step::~Step()
 {
   cedar::aux::LogSingleton::getInstance()->freeing(this);
 
-  if (!this->wait(5000))
+  if (!this->QThread::wait(5000))
   {
     cedar::aux::LogSingleton::getInstance()->warning
     (
