@@ -862,6 +862,7 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   {
     real_target_name = owned->getPromotionPath();
   }
+
   // if target is not looped, also delete the trigger connection
   if (real_target_name != "") // the target is a nested element
   {
@@ -873,9 +874,10 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
   {
     target_name = (*it)->getTarget()->getParent(); // reset target_name
     // check that both Connectables are not connected through some other DataSlots
+    cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
+    it = mDataConnections.erase(it);
     for (DataConnectionVector::iterator iter = mDataConnections.begin(); iter != mDataConnections.end(); ++iter)
     {
-      cedar::proc::ConnectablePtr target_connectable = this->getElement<cedar::proc::Connectable>(target_name);
       if ((*iter)->connects(
                              this->getElement<cedar::proc::Connectable>(source_name),
                              target_connectable
@@ -883,7 +885,6 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
          )
       {
         // found another connection between those two Connectables, do not delete done trigger and return
-        it = mDataConnections.erase(it);
         return it;
       }
     }
@@ -898,7 +899,10 @@ cedar::proc::Network::DataConnectionVector::iterator cedar::proc::Network::remov
                            );
     triggerable_target->onTrigger();
   }
-  it = mDataConnections.erase(it);
+  else
+  {
+    it = mDataConnections.erase(it);
+  }
   return it;
 }
 

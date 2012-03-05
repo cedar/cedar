@@ -204,16 +204,16 @@ public slots:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  /*!@brief Deletes the list of gragics items.
+
+  /*!@brief Deletes the list of graphics items.
    *
    * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
    */
   void deleteElements(QList<QGraphicsItem*>& items);
 
-  void deleteElems(QList<QGraphicsItem*>& items);
-
+  /*!@brief Delete a single graphics item.
+   */
   void deleteElement(QGraphicsItem* pItem);
-
 
   /*!@brief Deletes the elements currently selected in the scene.
    *

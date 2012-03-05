@@ -53,6 +53,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -75,6 +76,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->construct();
 }
 
@@ -88,6 +90,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setTrigger(trigger);
   this->construct();
 }
@@ -110,6 +113,7 @@ void cedar::proc::gui::TriggerItem::construct()
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
 {
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
