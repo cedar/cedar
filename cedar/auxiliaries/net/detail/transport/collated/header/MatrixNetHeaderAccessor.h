@@ -65,7 +65,7 @@ class MatrixNetHeaderAccessor
 public:
   static unsigned int getDataSize(MatrixNetHeader &header);
   static unsigned int getTotalElements(MatrixNetHeader &header);
-  static unsigned int getElemSize(MatrixNetHeader &header);
+  static unsigned int getElementSize(MatrixNetHeader &header);
 };
 
 } } } } // end namespaces

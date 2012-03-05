@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CollatedNetPortable.h
+    File:        YARPCollatedPortable.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
@@ -32,7 +32,7 @@
                  uses its yarp::os::BufferedReader/Writer classes.
                  This works analogously to yarp::os::BinPortable -
                  we inherit from yarp::os::Portable.
-                 CollatedNetPortable is templetized around the data type
+                 YARPCollatedPortable is templetized around the data type
                  you want to transport, these read() and write() functions
                  will be called by YARP.
                  Here we prepare the data for its network transport.
@@ -46,21 +46,15 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedType.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/MatrixTypeWrapper.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeaderAccessor.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 
-// PROJECT INCLUDES
+// SYSTEM INCLUDES
 #include <boost/utility.hpp>
 #include <yarp/os/Portable.h>
 #include <yarp/os/ConnectionReader.h>
 #include <yarp/os/ConnectionWriter.h>
-
-// SYSTEM INCLUDES
-
-
-
-
 
 namespace cedar {
   namespace aux {
@@ -75,39 +69,40 @@ namespace cedar {
  * 
  */
 template<class T>
-class CollatedNetPortable : public yarp::os::Portable,
+class YARPCollatedPortable : public yarp::os::Portable,
                             boost::noncopyable
 {
-    // TODO: trennen in Reader und Writer-Teil
+    // TODO: seperate into Reader and Writer parts
 
   //---------------------------------------------------------------------------
   // members
   //---------------------------------------------------------------------------
 private:
-  CollatedType <T>mNetType;
-  char *pVals;  // size 1 byte
-  size_t sizeVals;
+  MatrixTypeWrapper<T> mNetType;
+  char                 *mpVals;  // size 1 byte
+  size_t               mSizeVals;
 
-  typedef collated_traits<T>                traits_type;
-  typedef typename traits_type::data_type   data_type;
-  typedef typename traits_type::header_type header_type;
+  typedef CollatedTraits<T>               TraitsType;
+  typedef typename TraitsType::DataType   DataType;
+  typedef typename TraitsType::HeaderType HeaderType;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
   //---------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  CollatedNetPortable() : mNetType(), pVals(), sizeVals()
+  YARPCollatedPortable() 
+    : mNetType(), mpVals(), mSizeVals()
   { 
-    pVals= NULL;
+    mpVals= NULL;
   }
 
 
   //!@brief Destructor, virtual to be sure
-  virtual ~CollatedNetPortable()
+  virtual ~YARPCollatedPortable()
   {
-    if (pVals != NULL)
-      free(pVals);
+    if (mpVals != NULL)
+      free(mpVals);
   }
 
 
@@ -116,15 +111,15 @@ public:
   //---------------------------------------------------------------------------
 public:
   //!@brief direct reference to the actual data (a copy of this will be transported)
-  data_type& content() 
+  DataType& content() 
   {
-    return mNetType.data;
+    return mNetType.mData;
   }
 
   //!@brief The generated header that will be transported, reference
-  header_type& header()
+  HeaderType& header()
   {
-    return mNetType.header;
+    return mNetType.mHeader;
   }
 
   //!@brief YARP will call this read() and we will prepare the matrix and send it
@@ -132,36 +127,32 @@ public:
   // the content has to be placed into the reference given by content()
   bool read(yarp::os::ConnectionReader& connection) 
   {
-    int iHeaderSize, iDataSize, iNumElements, iElemSize;
+    int header_size, data_size;
     int i;
 
-    iHeaderSize= sizeof(mNetType.header);
+    header_size= sizeof(mNetType.mHeader);
 
     connection.convertTextMode(); // if connection is text-mode, convert!
 
     ////////////////////////
     // read out the header ...
-    connection.expectBlock( (char*)(&mNetType.header),
-                            iHeaderSize );
+    connection.expectBlock( (char*)(&mNetType.mHeader),
+                            header_size );
 
-    iDataSize= MatrixNetHeaderAccessor::getDataSize( 
-                 mNetType.header );
-    iNumElements= MatrixNetHeaderAccessor::getTotalElements(
-                    mNetType.header);
-    iElemSize= MatrixNetHeaderAccessor::getElemSize( 
-                 mNetType.header );
+    data_size= MatrixNetHeaderAccessor::getDataSize( 
+                 mNetType.mHeader );
 
     ///////////////////////
     // read out the matrix content ...
-    if (pVals == NULL) // first time?
+    if (mpVals == NULL) // first time?
     {
       // we only have the data sizes at runtime for some variable types
       // (i.e. cv::Mat) so we can only do this at the time of the first
       // read
     
-      pVals= (char*)malloc( iDataSize );
+      mpVals= (char*)malloc( data_size );
 
-      if (pVals == NULL)
+      if (mpVals == NULL)
       {
         CEDAR_THROW( cedar::aux::exc::NetUnexpectedDataException,
                      "out of memory - cannot alloc transfered data" );
@@ -171,26 +162,33 @@ public:
       // we will validify the data in CollatedNetReader::read()
 
       // generate header if not yet initialized
-      mNetType.data= mNetType.late_init_data_from_header();
+      mNetType.mData= mNetType.lateInitDataFromHeader();
     }
 
-    connection.expectBlock( (char*)pVals,
-                            iDataSize );
+    connection.expectBlock( (char*)mpVals,
+                            data_size );
 
     //////////// Nun haben wir den Daten-Teil ///////////
 
-    if (pVals == NULL) // paranoid
+    if (mpVals == NULL) // paranoid
       return false;
-   
-    for (i= 0; i< iNumElements; i++)
+
+    // TODO refacture this
+    int num_elements, element_size;
+
+    num_elements= MatrixNetHeaderAccessor::getTotalElements(
+                    mNetType.mHeader);
+    element_size= MatrixNetHeaderAccessor::getElementSize( 
+                 mNetType.mHeader );
+    for (i= 0; i< num_elements; i++)
     {
       // we use memcpy as we only know the sizes of the data at runtime
-      memcpy( mNetType.contentAt(i, iElemSize), // see datatype/ directory
-              pVals + (i*iElemSize),
-              iElemSize );
+      memcpy( mNetType.contentAt(i, element_size), // see datatype/ directory
+              mpVals + (i*element_size),
+              element_size );
     }
 
-    // NetType.data now holds the matrix data
+    // NetType.mData now holds the matrix data
     return true;
   }
 
@@ -202,48 +200,46 @@ public:
   // CollatedNetWriter::write()
   bool write(yarp::os::ConnectionWriter& connection) 
   {
-    int iHeaderSize, iDataSize, aiBlocks[2], iNumElements, iElemSize;
+    int header_size, data_size, blocks_array[2], num_elements, element_size;
     int i;
  
-    iHeaderSize= sizeof(mNetType.header);
-    iDataSize= MatrixNetHeaderAccessor::getDataSize( 
-                 mNetType.header );
-    iNumElements= MatrixNetHeaderAccessor::getTotalElements(
-                    mNetType.header);
-    iElemSize= MatrixNetHeaderAccessor::getElemSize( 
-                 mNetType.header );
+    header_size= sizeof(mNetType.mHeader);
+    data_size= MatrixNetHeaderAccessor::getDataSize( mNetType.mHeader );
+    num_elements= MatrixNetHeaderAccessor::getTotalElements( mNetType.mHeader);
+    element_size= MatrixNetHeaderAccessor::getElementSize( mNetType.mHeader );
  
-    aiBlocks[0]= iHeaderSize;
-    aiBlocks[1]= iDataSize;
+    blocks_array[0]= header_size;
+    blocks_array[1]= data_size;
 
-    connection.declareSizes( 2, aiBlocks );
+    connection.declareSizes( 2, blocks_array );
       // yarp: This may improve efficiency in some situations.
 
     //////////////////////////////////////
     // write the generated matrix header to network ...
-    connection.appendBlock( (char*)(&mNetType.header),
-                            sizeof(mNetType.header) );
+    connection.appendBlock( (char*)(&mNetType.mHeader),
+                            sizeof(mNetType.mHeader) );
       // note: YARP will copy this block - TODO: is that necessary?
 
     //////////////////////////////////////
     // write matrix content to network ...
-    if (pVals == NULL)
+    if (mpVals == NULL)
     {
-      pVals= (char*)malloc( iDataSize );
+      mpVals= (char*)malloc( data_size );
     }
 
-    for (i= 0; i < iNumElements; i++)
+    // TODO: refacture this part
+    for (i= 0; i < num_elements; i++)
     {
       // copy each element.
       // we access it with contentAt() which will be specialized for each
       // transportet data type (see datatype/ directory)
-      memcpy( pVals + (i * iElemSize),
-             mNetType.contentAt(i, iElemSize),
-             iElemSize );
+      memcpy( mpVals + (i * element_size),
+             mNetType.contentAt(i, element_size),
+             element_size );
     } 
  
-    connection.appendBlock( (char*)pVals,
-                           iDataSize );
+    connection.appendBlock( (char*)mpVals,
+                           data_size );
       // YARP will copy this block internally TODO: ist that necessary?
  
     connection.convertTextMode(); // if connection is text-mode, convert!

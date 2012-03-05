@@ -39,7 +39,7 @@
 #include "cedar/auxiliaries/net/NetWriter.h"
 #include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

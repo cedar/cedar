@@ -36,10 +36,10 @@
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 
-#include "cedar/auxiliaries/net/detail/datatypes/interfaces/InterfaceCollatedData.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatNetHeader.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/interfaces/InterfaceCollatedData.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatNetHeader.h"
 #include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeaderAccessor.h"
 
 // PROJECT INCLUDES
@@ -50,8 +50,8 @@
 #include <stdlib.h>
 #include <iostream>
 
-
-#define MAGIC_NUMBER 0xabc
+// TODO: make constant
+#define CONST_MAGIC_NUMBER (0xabc)
 
 namespace cedar {
   namespace aux {
@@ -60,58 +60,58 @@ namespace cedar {
 
 // save local copy of the header information. (will be compared later on with
 // user input)
-template <typename CVT> void cvMatHelper<CVT>::init_checkheader(
+template <typename CVT> void cvMatHelper<CVT>::initLocalHeader(
                                                  const HeaderType &header)
 {
-#define CONST_MAGIC_NUMBER (MAGIC_NUMBER)
-
-  // einmalig Header-Infos fuellen 
-  mCheckHeader.magicNumber= CONST_MAGIC_NUMBER;
+  // initially fill the local header with information 
+  mLocalHeader.mMagicNumber= CONST_MAGIC_NUMBER;
                                 // note: this is set here, not copied from
                                 //       the external header
-  mCheckHeader.rows= header.rows;
-  mCheckHeader.cols= header.cols;
-  mCheckHeader.elemSize= header.elemSize;
-  mCheckHeader.cvMatType= header.cvMatType;
+  mLocalHeader.mRows= header.mRows;
+  mLocalHeader.mColumns= header.mColumns;
+  mLocalHeader.mElementSize= header.mElementSize;
+  mLocalHeader.mCVMatType= header.mCVMatType;
 }
 
 // init the *external* header from the matrix, that will be sent over the line
-template <typename CVT> void cvMatHelper<CVT>::cvMatHelper::init_externalheader(
+template <typename CVT> void cvMatHelper<CVT>::initExternalHeader(
                                                    const CVT &mat,
                                                    HeaderType &extheader)
 {
-  extheader.cols= mat.cols;
-  extheader.rows= mat.rows;
-  extheader.elemSize= mat.elemSize();
-  extheader.cvMatType= mat.type();
-  extheader.magicNumber= CONST_MAGIC_NUMBER;
+  extheader.mColumns= mat.cols;
+  extheader.mRows= mat.rows;
+  extheader.mElementSize= mat.elemSize();
+  extheader.mCVMatType= mat.type();
+  extheader.mMagicNumber= CONST_MAGIC_NUMBER;
 }
 
 // check the data before we write it over the network.
 // mainly we have to compare the header-info - and maybe initialize it
 // param: extheader may be changed (initialized)!
-template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(
+template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForWrite(
                                                const CVT &mat,
                                                HeaderType &extheader)
 {
+  // TODO: safer: have a boolean in header to mark initialization status
+
   // first run: Initialize
-  if (!mCheckHeader.cols || !mCheckHeader.rows)
+  if (!mLocalHeader.mColumns || !mLocalHeader.mRows)
   {
     // init the header data (from mat) that will be sent over the line
-    init_externalheader(mat, extheader); // get info from mat!
+    initExternalHeader(mat, extheader); // get info from mat!
 
     // init the local copy of the header that we will save to compare
     // with later user inputs
-    init_checkheader(extheader);
+    initLocalHeader(extheader);
     return true;
   }
-  // all later runs: Compare (with locally save checkheader)
+  // all later runs: Compare (with locally saved localheader to check against)
   else
   {
-    if (mCheckHeader.cols != mat.cols
-        || mCheckHeader.rows != mat.rows
-        || mCheckHeader.elemSize != mat.elemSize() 
-        || mCheckHeader.cvMatType != mat.type() )
+    if (mLocalHeader.mColumns != mat.cols
+        || mLocalHeader.mRows != mat.rows
+        || mLocalHeader.mElementSize != mat.elemSize() 
+        || mLocalHeader.mCVMatType != mat.type() )
     {
 
       return false; // exceptions will not be thrown here
@@ -122,63 +122,56 @@ template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_write(
 
       // we need this for different mat-variables that are passed
       // to the same writer
-      init_externalheader(mat, extheader);
+      initExternalHeader(mat, extheader);
 
       return true;
     }
   }
 }
 
-template <typename CVT> bool cvMatHelper<CVT>::check_collateddata_for_read(
+template <typename CVT> bool cvMatHelper<CVT>::checkCollatedDataForRead(
                                                  const HeaderType &extheader)
 {
-  if (!mCheckHeader.cols || !mCheckHeader.rows)
+  if (!mLocalHeader.mColumns || !mLocalHeader.mRows)
   {
-//std::cout << "first run"  << std::endl;    
     // first run: initialize!
-    init_checkheader(extheader); // get info from header!
+    initLocalHeader(extheader); // get info from header!
 
     // consistency check for the first run
-    if (mCheckHeader.magicNumber != extheader.magicNumber)
-    {                // ^--- was just set in init_checkheader()
+    if (mLocalHeader.mMagicNumber != extheader.mMagicNumber)
+    {                // ^--- was just set in initLocalHeader()
                      //      (and not copied from the extheader)
-//std::cout << "first run magic number failed "  
-//          <<  mCheckHeader.magicNumber << " and "  
-//          << extheader.magicNumber <<  std::endl;    
       return false;
     }
  
-//std::cout << "ALL OK"  << std::endl;    
     return true;
   }
   else
   {
-//std::cout << "other run: "  << std::endl;    
-    // all later runs: just check for consitency
-    if (mCheckHeader.cols != extheader.cols
-        || mCheckHeader.rows != extheader.rows
-        || mCheckHeader.elemSize != extheader.elemSize
-        || mCheckHeader.cvMatType != extheader.cvMatType 
-        || mCheckHeader.magicNumber != extheader.magicNumber 
+    // all later runs: just check for consistency
+    if (mLocalHeader.mColumns != extheader.mColumns
+        || mLocalHeader.mRows != extheader.mRows
+        || mLocalHeader.mElementSize != extheader.mElementSize
+        || mLocalHeader.mCVMatType != extheader.mCVMatType 
+        || mLocalHeader.mMagicNumber != extheader.mMagicNumber 
       )
     {
-//std::cout << "other run: some check failed "  << std::endl;    
       // exceptions will not be thrown here
       return false;
     }
 
-//std::cout << "ALL OK"  << std::endl;    
     return true;
   }
 }
 
-template <typename CVT> cvMatHelper<CVT>::cvMatHelper() : mCheckHeader()
+template <typename CVT> cvMatHelper<CVT>::cvMatHelper() 
+  : mLocalHeader()
 {
 #ifdef DEBUG_NETT
 //  cout << "  cvMatHelper [CONSTRUCTOR]" << endl;
 #endif
-    mCheckHeader.rows= 0;
-    mCheckHeader.cols= 0;
+    mLocalHeader.mRows= 0;
+    mLocalHeader.mColumns= 0;
 }
 
 template <typename CVT> cvMatHelper<CVT>::~cvMatHelper()

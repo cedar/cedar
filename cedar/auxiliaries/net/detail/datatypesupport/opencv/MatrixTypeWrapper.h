@@ -22,13 +22,13 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CollatedType.h
+    File:        MatrixTypeWrapper.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Wed 20 Jul 2011 05:08:06 PM CEST
 
-    Description: openCV specialization for CollatedType.
+    Description: openCV specialization for MatrixTypeWrapper.
                  This tells us how to acces an openCV-type
 
     Credits:
@@ -40,8 +40,8 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/detail/namespace.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedTraits.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/CollatedTraits.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
@@ -51,7 +51,7 @@
 
 
 
-/////////////////// SPECIALIZATIONS of CollatedType
+/////////////////// SPECIALIZATIONS of MatrixTypeWrapper
 
 
 namespace cedar {
@@ -65,47 +65,47 @@ namespace cedar {
 
 
 template <> 
-inline void* CollatedType<cv::Mat>::contentAt(int index, int iElemSize) 
+inline void* MatrixTypeWrapper<cv::Mat>::contentAt(int index, int elemSize) 
                 // specialization for class template
 {
-  return (void*) &( data.ptr( index % header.rows )[ (index 
+  return (void*) &( mData.ptr( index % mHeader.mRows )[ (index 
                                                      - ( index 
-                                                        % header.rows) )
-                                                     / header.rows 
-                                                     * iElemSize] );
+                                                        % mHeader.mRows) )
+                                                     / mHeader.mRows 
+                                                     * elemSize] );
 
 }
 
 template <>
-inline cv::Mat CollatedType<cv::Mat>::late_init_data_from_header()
+inline cv::Mat MatrixTypeWrapper<cv::Mat>::lateInitDataFromHeader()
 {
-  return cv::Mat( header.rows,
-                    header.cols, 
-                    header.cvMatType );
+  return cv::Mat( mHeader.mRows,
+                    mHeader.mColumns, 
+                    mHeader.mCVMatType );
 }
 
 
 
-/////// cv::Mat_ (not the underscore!)
+/////// cv::Mat_ (note the underscore!)
 
 
 template <>
-inline void* CollatedType< cv::Mat_<float> >::contentAt(int index, int __attribute__((unused)) iElemSize) 
+inline void* MatrixTypeWrapper< cv::Mat_<float> >::contentAt(int index, int) 
                 // specialization for class template
 {
-  return (void*)  &data( ( index % header.rows ),
+  return (void*)  &mData( ( index % mHeader.mRows ),
                          ( index 
                              - ( index 
-                                 % header.rows) )
-                         / header.rows 
+                                 % mHeader.mRows) )
+                         / mHeader.mRows 
                          );
 }
 
 template <>
-inline cv::Mat_<float> CollatedType< cv::Mat_<float> >::late_init_data_from_header()
+inline cv::Mat_<float> MatrixTypeWrapper< cv::Mat_<float> >::lateInitDataFromHeader()
 {
-  return cv::Mat_<float>( header.rows,
-                          header.cols );
+  return cv::Mat_<float>( mHeader.mRows,
+                          mHeader.mColumns );
 }
 
 

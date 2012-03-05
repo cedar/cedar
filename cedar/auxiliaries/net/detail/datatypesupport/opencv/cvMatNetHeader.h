@@ -22,32 +22,50 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CollatedType.cpp
+    File:        cvMatNetHeader.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:14:51 PM CEST
+    Date:        Wed 20 Jul 2011 05:13:06 PM CEST
 
-    Description: openCV specialization for CollatedType.
-                 This tells us how to acces an openCV-type.
-                 This file holds explicit instantiations.
+    Description: extend the MatrixNetHeader to hold information abaout
+                 the matrix type.
+                 We need this, because cv::Mat is vastly configurable
+                 at runtime
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_CVMATNETHEADER_H
+#define CEDAR_CVMATNETHEADER_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedType.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeader.h"
+
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
 
+namespace cedar {
+  namespace aux {
+    namespace net {
+      namespace detail {
 
-//////////// explicit instatiation
-template struct cedar::aux::net::detail::CollatedType<cv::Mat>;
-template struct cedar::aux::net::detail::CollatedType< cv::Mat_<float> >;
+/*!@brief packed header with matrix info for network transfer
+ *
+ * This is the openCV::Mat specialization
+ */
+struct cvMatNetHeader : MatrixNetHeader
+{
+public:
+  /*unsigned*/ int mCVMatType; // note: cv::Mat::cvMatType is signed
+};
 
+} } } } // end namespaces
+
+#endif
 

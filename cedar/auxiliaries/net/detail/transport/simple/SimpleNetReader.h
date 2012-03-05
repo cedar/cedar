@@ -28,7 +28,7 @@
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
     Date:        Tue 19 Jul 2011 05:10:54 PM CEST
 
-    Description: To transport a primitiv type (int, short, etc.) we
+    Description: To transport a primitive type (int, short, etc.) we
                  rely on yarp::os::BinPortable.
                  This class implements the user-accessible read() function.
 
@@ -62,14 +62,14 @@ namespace cedar {
  *
  * use in NetReader
  */
-template <typename T, bool block= false>
+template <typename T, bool BLOCK= false>
 class SimpleNetReader : public AbstractNetReader<T>
 {
   //---------------------------------------------------------------------------
   // members
   //---------------------------------------------------------------------------
 private:
-  yarp::os::BufferedPort< yarp::os::BinPortable<T> > BufferIn;
+  yarp::os::BufferedPort< yarp::os::BinPortable<T> > mBufferIn;
 
   //---------------------------------------------------------------------------
   // constructors and destructor
@@ -78,13 +78,13 @@ private:
 private:
   //!@brief The standard constructor. dont use
   SimpleNetReader();
-  SimpleNetReader(const SimpleNetReader &S); // not copyable
-  SimpleNetReader &operator=(const SimpleNetReader &S);
+  // SimpleNetReader(const SimpleNetReader &S); // parent is not copyable
+  // SimpleNetReader &operator=(const SimpleNetReader &S); // parent is not copyable
 
 public:
   explicit SimpleNetReader(const std::string &myPortName) 
                                      : AbstractNetReader<T>(myPortName),
-                                       BufferIn()
+                                       mBufferIn()
   {
     AbstractNetReader<T>::lateConstruct();
       // explanation: lateConstruct() needs to be called outside of
@@ -96,7 +96,7 @@ public:
   //!@brief Destructor
   ~SimpleNetReader()
   {
-    AbstractNetReader<T>::lateDestruct();
+    AbstractNetReader<T>::earlyDestruct();
 #ifdef DEBUG_NETT
     cout << "  ~SimpleNetReader [DESTRUCTOR]" << endl;
 #endif
@@ -110,14 +110,14 @@ protected:
   //!@brief open the port. called by AbstractNetBase
   bool open()
   {
-    return BufferIn.open( AbstractNetBase::getFullPortName().c_str() ); 
+    return mBufferIn.open( AbstractNetBase::getFullPortName().c_str() ); 
   }
 
   //!@brief close the port. called by AbstractNetBase
   bool close()
   {
-    if (!BufferIn.isClosed())
-      BufferIn.close(); // is void
+    if (!mBufferIn.isClosed())
+      mBufferIn.close(); // is void
 
     return true;
   }
@@ -133,12 +133,12 @@ public:
    */
   T read()
   {
-    yarp::os::BinPortable<T> *pBinIn;
+    yarp::os::BinPortable<T> *p_bin_in;
 
-    pBinIn= BufferIn.read( block ); // strict mode!
-    if (pBinIn !=0)
+    p_bin_in= mBufferIn.read( BLOCK ); // strict mode!
+    if (p_bin_in != NULL)
     {
-      return pBinIn->content();
+      return p_bin_in->content();
     }
     else // you never know ...
     {

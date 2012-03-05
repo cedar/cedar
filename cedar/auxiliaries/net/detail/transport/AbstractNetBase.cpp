@@ -68,8 +68,7 @@ const std::string AbstractNetBase::PORT_SUFFIX_OUT("out"); // static
 const std::string AbstractNetBase::PORT_SUFFIX_IN("in"); // static
 
 // static variables:
-
-// YARP-bug. dont be static: Network AbstractNetBase::mNetwork; // static
+// none
 
 
 //-----------------------------------------------------------------------------
@@ -95,6 +94,8 @@ AbstractNetBase::~AbstractNetBase()
 #ifdef DEBUG_NETT
   cout << "  ~AbstractNetBase [DESTRUCTOR]" << endl;
 #endif
+  
+#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
   // we need to kill the child-process that runs an (automatically
   // started) YARP name server.
   // else processes, that wait() for all children of this program
@@ -103,9 +104,10 @@ AbstractNetBase::~AbstractNetBase()
   {
     kill( mServerPID, SIGKILL );
 #ifdef DEBUG_NETT
-  cout << "  killed name server with pid " << mServerPID << endl;
+    cout << "  killed name server with pid " << mServerPID << endl;
 #endif  
   }
+#endif
 }
 
 
@@ -117,6 +119,7 @@ string AbstractNetBase::getFullPortName()
   return mFullPortName;
 }
 
+#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
 bool AbstractNetBase::startNameServer()
 {
   pid_t pid;
@@ -187,7 +190,9 @@ bool AbstractNetBase::startNameServer()
   }
 
 }
+#endif
 
+#ifndef CEDAR_NETT_DISABLE_YARPSERVERPROC 
 bool AbstractNetBase::checkNameServer()
 {
   // look for existing name server
@@ -208,6 +213,7 @@ bool AbstractNetBase::checkNameServer()
   }
   return true;
 }
+#endif
 
 void AbstractNetBase::lateConstruct()
 {
@@ -228,10 +234,10 @@ void AbstractNetBase::lateConstruct()
   }
 }
 
-void AbstractNetBase::lateDestruct()
+void AbstractNetBase::earlyDestruct()
 {
 #ifdef DEBUG_NETT
-  cout << "  AbstractNetBase [lateDestruct]" << endl;
+  cout << "  AbstractNetBase [earlyDestruct]" << endl;
 #endif
   close(); // see lateConstruct()
            // dont use the returnvalue here and dont throw an exception

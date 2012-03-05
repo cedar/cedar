@@ -22,29 +22,51 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CollatedTraits.cpp
+    File:        BasicNetHeader.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Wed 20 Jul 2011 05:14:19 PM CEST
+    Date:        Wed 20 Jul 2011 02:32:04 PM CEST
 
-    Description: collated_traits in the opencv specialization.
-                 this file holds some explicit instantiations.
+    Description: this doesnt do much. Even before we think about 
+                 what a matrix header contains, we want to have some
+                 primitive way to check for corruption.
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_COLLATEDNETHEADER_H
+#define CEDAR_COLLATEDNETHEADER_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/detail/datatypes/CollatedTraits.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
 
-// explicit instantiation
-template struct cedar::aux::net::detail::collated_traits<cv::Mat>;
-template struct cedar::aux::net::detail::collated_traits< cv::Mat_<float> >;
 
+namespace cedar {
+  namespace aux {
+    namespace net {
+      namespace detail {
+
+/*!@brief net portable struct that will hold the header (of a matrix)
+ *
+ * This will be inherited and extended for for example a header for
+ * cv-matrizes.
+ *
+ * These structures are small by default, i.e. dont hold accessor
+ * functions. For accessing the data, 
+ * see the static class MatrixNetHeaderAccessor
+ */
+struct BasicNetHeader
+{
+  unsigned int mMagicNumber;
+};
+
+} } } } // end namespaces
+      
+#endif
