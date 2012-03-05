@@ -421,7 +421,7 @@ void cedar::proc::gui::Ide::sceneItemSelected()
 void cedar::proc::gui::Ide::deleteSelectedElements()
 {
   QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-  this->deleteElems(selected_items);
+  this->deleteElements(selected_items);
 }
 
 bool cedar::proc::gui::Ide::sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem)
@@ -444,7 +444,7 @@ bool cedar::proc::gui::Ide::sortElements(QGraphicsItem* pFirstItem, QGraphicsIte
   return (depth_first_item < depth_second_item);
 }
 
-void cedar::proc::gui::Ide::deleteElems(QList<QGraphicsItem*>& items)
+void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
 {
   // remove connections
   for (int i = 0; i < items.size(); ++i)
@@ -493,7 +493,7 @@ void cedar::proc::gui::Ide::deleteElems(QList<QGraphicsItem*>& items)
   }
   // sort stack (make it a real stack)
   std::sort(delete_stack.begin(), delete_stack.end(), this->sortElements);
-  // while stack is not empty, check if any items must be added
+  // while stack is not empty, check if any items must be added, then delete the current item
   while (delete_stack.size() > 0)
   {
     // look at first item
@@ -502,7 +502,7 @@ void cedar::proc::gui::Ide::deleteElems(QList<QGraphicsItem*>& items)
     if (children.size() != 0)
     {
       // add all children to a separate stack
-      this->deleteElems(children);
+      this->deleteElements(children);
     }
     // now delete the current element
     deleteElement(current_item);
@@ -512,180 +512,34 @@ void cedar::proc::gui::Ide::deleteElems(QList<QGraphicsItem*>& items)
 
 void cedar::proc::gui::Ide::deleteElement(QGraphicsItem* pItem)
 {
-  if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(pItem))
+  // delete step
+  if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(pItem))
   {
-    if (cedar::proc::gui::DataSlotItem* source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getSource()))
-    {
-      if (cedar::proc::gui::DataSlotItem* target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
-      {
-        std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
-        std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-        // delete connection in network of source
-        source->getSlot()->getParentPtr()->getNetwork()->disconnectSlots(source_slot, target_slot);
-      }
-    }
-    else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
-    {
-      if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
-      {
-        source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getStep());
-      }
-    }
-    else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
-    {
-      if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
-      {
-        source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getTrigger());
-      }
-    }
-    else
-    {
-      CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
-    }
-    p_connection->disconnect();
-    delete p_connection;
-  }
-  // delete steps
-  else if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(pItem))
-  {
-    //!\todo move this to destructor
-    // delete one step at a time
     p_drawer->hide();
     p_drawer->removeAllConnections();
     p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
     this->mpPropertyTable->resetPointer();
     this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
   }
-  // delete triggers
+  // delete trigger
   else if (cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(pItem))
   {
-    // delete one step at a time
     p_trigger_drawer->hide();
     p_trigger_drawer->removeAllConnections();
     p_trigger_drawer->getTrigger()->getNetwork()->remove(p_trigger_drawer->getTrigger());
     this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
   }
-  // delete networks
+  // delete network
   else if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(pItem))
   {
-    // delete one network at a time
     p_network_drawer->hide();
     p_network_drawer->removeAllConnections();
     p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
     this->mpProcessingDrawer->getScene()->removeNetworkItem(p_network_drawer);
   }
-}
-
-void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
-{
-  /* remove connnections first -- otherwise they might get deleted multiple times because
-     they get deleted by a step and are still in the list of items.
-   */
-  for (int i = 0; i < items.size(); ++i)
+  else
   {
-    // item was deleted previously
-    if (items[i] == NULL)
-      continue;
-    // delete connections
-    if (cedar::proc::gui::Connection *p_connection = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
-    {
-      if (cedar::proc::gui::DataSlotItem* source = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getSource()))
-      {
-        if (cedar::proc::gui::DataSlotItem* target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_connection->getTarget()))
-        {
-          std::string source_slot = source->getSlot()->getParent() + std::string(".") + source->getName();
-          std::string target_slot = target->getSlot()->getParent() + std::string(".") + target->getName();
-          // delete connection in network of source
-          source->getSlot()->getParentPtr()->getNetwork()->disconnectSlots(source_slot, target_slot);
-        }
-      }
-      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
-      {
-        if (cedar::proc::gui::StepItem* target = dynamic_cast<cedar::proc::gui::StepItem*>(p_connection->getTarget()))
-        {
-          source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getStep());
-//          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getStep());
-        }
-      }
-      else if (cedar::proc::gui::TriggerItem* source = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getSource()))
-      {
-        if (cedar::proc::gui::TriggerItem* target = dynamic_cast<cedar::proc::gui::TriggerItem*>(p_connection->getTarget()))
-        {
-          source->getTrigger()->getNetwork()->disconnectTrigger(source->getTrigger(), target->getTrigger());
-//          this->mNetwork->network()->disconnectTrigger(source->getTrigger(), target->getTrigger());
-        }
-      }
-      else
-      {
-        CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
-      }
-      p_connection->disconnect();
-      delete p_connection;
-      items[i] = NULL;
-    }
-  }
-  // delete steps and triggers
-  for (int i = 0; i < items.size(); ++i)
-  {
-    // item was deleted previously
-    if (items[i] == NULL)
-      continue;
-
-    // delete steps
-    if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(items[i]))
-    {
-      //!\todo move this to destructor
-      // delete one step at a time
-      p_drawer->hide();
-      p_drawer->removeAllConnections();
-      p_drawer->getStep()->getNetwork()->remove(p_drawer->getStep());
-      this->mpPropertyTable->resetPointer();
-      this->mpProcessingDrawer->getScene()->removeStepItem(p_drawer);
-      items[i] = NULL;
-    }
-    // delete triggers
-    else if (cedar::proc::gui::TriggerItem *p_trigger_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(items[i]))
-    {
-      // delete one step at a time
-      std::cout << p_trigger_drawer->getTrigger()->getName() << " deleted" << std::endl;
-      p_trigger_drawer->hide();
-      p_trigger_drawer->removeAllConnections();
-      p_trigger_drawer->getTrigger()->getNetwork()->remove(p_trigger_drawer->getTrigger());
-      this->mpProcessingDrawer->getScene()->removeTriggerItem(p_trigger_drawer);
-      items[i] = NULL;
-    }
-  }
-  // now delete all networks
-  for (int i = 0; i < items.size(); ++i)
-  {
-    // item was deleted previously
-    if (items[i] == NULL)
-      continue;
-    // delete networks
-    if (cedar::proc::gui::Network *p_network_drawer = dynamic_cast<cedar::proc::gui::Network*>(items[i]))
-    {
-      // delete all children
-      QList<QGraphicsItem*> children = p_network_drawer->childItems();
-      // check that we do not delete elements twice
-      for (int child = 0; child < children.size(); ++child)
-      {
-        for (int compared = 0; compared < items.size(); ++compared)
-        {
-          if (children.at(child) == items.at(compared))
-          {
-            items[compared] = NULL;
-          }
-        }
-      }
-      this->deleteElements(children);
-      // delete one network at a time
-      std::cout << p_network_drawer->network()->getName() << " deleted" << std::endl;
-      p_network_drawer->hide();
-      p_network_drawer->removeAllConnections();
-      p_network_drawer->network()->getNetwork()->remove(p_network_drawer->network());
-      this->mpProcessingDrawer->getScene()->removeNetworkItem(p_network_drawer);
-      items[i] = NULL;
-    }
+    // some other representations that do not need to be deleted
   }
 }
 
