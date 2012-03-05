@@ -210,6 +210,11 @@ protected:
    */
   void deleteElements(QList<QGraphicsItem*>& items);
 
+  void deleteElems(QList<QGraphicsItem*>& items);
+
+  void deleteElement(QGraphicsItem* pItem);
+
+
   /*!@brief Deletes the elements currently selected in the scene.
    *
    * @todo This probably belongs somewhere else, e.g., cedar::proc::gui::Scene.
@@ -245,6 +250,9 @@ private:
    */
   void logError(const std::string& message);
 
+  /*!@brief sort two QGraphicsItems measuring their depth in relation to the root network.
+   */
+  static bool sortElements(QGraphicsItem* pFirstItem, QGraphicsItem* pSecondItem);
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

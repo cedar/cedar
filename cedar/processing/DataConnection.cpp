@@ -67,7 +67,11 @@ cedar::proc::DataConnection::~DataConnection()
   {
     // remove the source data from target
     cedar::proc::DataSlotPtr real_target = target_shared;
-    while (cedar::proc::PromotedExternalDataPtr promoted = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(real_target))
+    while
+    (
+      cedar::proc::PromotedExternalDataPtr promoted
+        = boost::shared_dynamic_cast<cedar::proc::PromotedExternalData>(real_target)
+    )
     {
       real_target = promoted->mDataSlot;
     }
