@@ -126,6 +126,34 @@ int main(int /* argc */, char** /* argv */)
     std::cout << "succeeded." << std::endl;
   }
 
+  std::cout << "Testing t += 1s ... ";
+  cedar::unit::Seconds t(1);
+  t += cedar::unit::Seconds(1);
+
+  if (t / cedar::unit::Seconds(1) != 2.0)
+  {
+    std::cout << "failed!" << std::endl;
+    ++errors;
+  }
+  else
+  {
+    std::cout << "succeeded." << std::endl;
+  }
+
+
+  // Comparison operators ----------------------------------------------------------------------------------------------
+  std::cout << "Testing t1 < t2 with seconds ... ";
+  cedar::unit::Seconds t1(1);
+  cedar::unit::Seconds t2(2);
+  if (t1 < t2)
+  {
+    std::cout << "succeeded." << std::endl;
+  }
+  else
+  {
+    std::cout << "failed!" << std::endl;
+    ++errors;
+  }
 
   std::cout << "Done. There were " << errors << " errors." << std::endl;
   return errors;
