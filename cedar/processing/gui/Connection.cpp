@@ -42,6 +42,7 @@
 #include "cedar/processing/gui/Connection.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/auxiliaries/math/constants.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -63,6 +64,7 @@ mpSource(pSource),
 mpTarget(pTarget),
 mpArrow(0)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setFlags(this->flags() | QGraphicsItem::ItemStacksBehindParent | QGraphicsItem::ItemIsSelectable);
   this->setParentItem(pSource);
   pSource->addConnection(this);
@@ -102,6 +104,7 @@ mpArrow(0)
 
 cedar::proc::gui::Connection::~Connection()
 {
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 

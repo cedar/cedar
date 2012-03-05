@@ -53,6 +53,7 @@
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QPainter>
@@ -75,6 +76,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->construct();
 }
 
@@ -88,6 +90,7 @@ cedar::proc::gui::GraphicsBase(30, 30,
                                cedar::proc::gui::GraphicsBase::BASE_SHAPE_ROUND
                                )
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
   this->setTrigger(trigger);
   this->construct();
 }
@@ -110,6 +113,7 @@ void cedar::proc::gui::TriggerItem::construct()
 
 cedar::proc::gui::TriggerItem::~TriggerItem()
 {
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,29 +122,6 @@ cedar::proc::gui::TriggerItem::~TriggerItem()
 
 void cedar::proc::gui::TriggerItem::disconnect(cedar::proc::gui::GraphicsBase* /*pListener*/)
 {
-//  switch (pListener->getGroup())
-//  {
-//    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
-//    {
-//      cedar::proc::gui::StepItem *p_step = cedar::aux::asserted_cast<cedar::proc::gui::StepItem*>(pListener);
-//      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_step->getStep()));
-//      cedar::proc::Manager::getInstance().disconnect(this->getTrigger(), p_step->getStep());
-//      break;
-//    }
-//
-//    case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
-//    {
-//      cedar::proc::gui::TriggerItem *p_trigger = cedar::aux::asserted_cast<cedar::proc::gui::TriggerItem*>(pListener);
-//      CEDAR_DEBUG_ASSERT(this->getTrigger()->isListener(p_trigger->getTrigger()));
-//      this->getTrigger()->removeTrigger(p_trigger->getTrigger());
-//      break;
-//    }
-//
-//    default:
-//      // should never happen: triggers can only be connected to steps and other triggers.
-//      CEDAR_DEBUG_ASSERT(false);
-//      break;
-//  }
 }
 
 void cedar::proc::gui::TriggerItem::isDocked(bool docked)
