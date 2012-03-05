@@ -37,9 +37,9 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/net/NetBlockingReader.h"
-#include "cedar/auxiliaries/net/internals/transport/simple/SimpleNetReader.h"
-#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetReader.h"
-#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetReader.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetReader.h"
+#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>

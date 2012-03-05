@@ -22,41 +22,54 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        MatrixNetHeaderAccessor.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 02:41:42 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: static function to get information out of the
+                 matrix headers (that are transported over the network)
+                 We implement this seperately to keep the actual 
+                 transported class (struct) as small as possible.
 
     Credits:
 
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeader.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeaderAccessor.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
+//-----------------------------------------------------------------------------
+// static functions
+//-----------------------------------------------------------------------------
 
 namespace cedar {
   namespace aux {
     namespace net {
+      namespace detail {
 
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
+unsigned int MatrixNetHeaderAccessor::getDataSize(MatrixNetHeader &header)
+{
+  return header.elemSize * header.rows * header.cols;
+}
 
-} } } // end namespaces
+unsigned int MatrixNetHeaderAccessor::getTotalElements(MatrixNetHeader &header)
+{
+  return header.rows * header.cols;
+}
 
+unsigned int MatrixNetHeaderAccessor::getElemSize(MatrixNetHeader &header)
+{
+  return header.elemSize;
+}
+
+
+} } } } // end namespaces 
 

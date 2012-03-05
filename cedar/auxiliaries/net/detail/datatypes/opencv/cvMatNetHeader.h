@@ -22,27 +22,30 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        cvMatNetHeader.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 05:13:06 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: extend the MatrixNetHeader to hold information abaout
+                 the matrix type.
+                 We need this, because cv::Mat is vastly configurable
+                 at runtime
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_CVMATNETHEADER_H
+#define CEDAR_CVMATNETHEADER_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeader.h"
+
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
@@ -50,13 +53,19 @@
 namespace cedar {
   namespace aux {
     namespace net {
+      namespace detail {
 
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
+/*!@brief packed header with matrix info for network transfer
+ *
+ * This is the openCV::Mat specialization
+ */
+struct cvMatNetHeader : MatrixNetHeader
+{
+public:
+  unsigned int cvMatType;
+};
 
-} } } // end namespaces
+} } } } // end namespaces
 
+#endif
 

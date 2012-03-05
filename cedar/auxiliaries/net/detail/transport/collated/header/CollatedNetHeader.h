@@ -22,41 +22,52 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        CollatedNetHeader.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 02:32:04 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: this doesnt do much. Even before we think about 
+                 what a matrix header contains, we want to have some
+                 primitive way to check for corruption.
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_COLLATEDNETHEADER_H
+#define CEDAR_COLLATEDNETHEADER_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
+
 
 
 namespace cedar {
   namespace aux {
     namespace net {
+      namespace detail {
 
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
+/*!@brief net portable struct that will hold the header (of a matrix)
+ *
+ * This will be inherited and extended for for example a header for
+ * cv-matrizes.
+ *
+ * These structures are small by default, i.e. dont hold accessor
+ * functions. For accessing the data, 
+ * see the static class MatrixNetHeaderAccessor
+ */
+struct CollatedNetHeader
+{
+  // dummy for polymorphism
+  unsigned int magicNumber;
+};
 
-} } } // end namespaces
-
-
+} } } } // end namespaces
+      
+#endif

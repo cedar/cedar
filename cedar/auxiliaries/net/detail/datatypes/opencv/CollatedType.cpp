@@ -22,24 +22,22 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        CollatedType.cpp
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 05:14:51 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: openCV specialization for CollatedType.
+                 This tells us how to acces an openCV-type.
+                 This file holds explicit instantiations.
 
     Credits:
 
 =============================================================================*/
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/datatypes/CollatedType.h"
 
 // PROJECT INCLUDES
 #include <opencv2/opencv.hpp>
@@ -47,16 +45,9 @@
 // SYSTEM INCLUDES
 
 
-namespace cedar {
-  namespace aux {
-    namespace net {
 
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
-
-} } } // end namespaces
+//////////// explicit instatiation
+template struct cedar::aux::net::detail::CollatedType<cv::Mat>;
+template struct cedar::aux::net::detail::CollatedType< cv::Mat_<float> >;
 
 
