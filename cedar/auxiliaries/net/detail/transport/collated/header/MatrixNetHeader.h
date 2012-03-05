@@ -22,41 +22,48 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        MatrixNetHeader.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 02:37:21 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: Header (part of the transported information that contains
+                 the structure information of the data proper) for
+                 matrices. ie rows, columns
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_MATRIXNETHEADER_H
+#define CEDAR_MATRIXNETHEADER_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/CollatedNetHeader.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
-
 
 namespace cedar {
   namespace aux {
     namespace net {
+      namespace detail {
 
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
+/*!@brief extend the header struct to matrix data (cols, rows)
+ *
+ */
+struct MatrixNetHeader : CollatedNetHeader
+{
+public:
+  unsigned int rows;
+  unsigned int cols;
+  unsigned int elemSize;
+};
 
-} } } // end namespaces
+} } } }  // end namespaces
 
+#endif
 

@@ -9,21 +9,21 @@ Directories:
                             As you know, these are template specializations.
                             (see the HOWTO)
 
-  net/internals/            users should not venture in here, 
+  net/detail/            users should not venture in here, 
                             only maintainers. Holds the (internal)
                             implementations of the framework.
 
-  net/internals/transport   holds everything that uses YARP or is
+  net/detail/transport   holds everything that uses YARP or is
                             implecitely built to facilitaty using YARP.
                             Transports the data over the network.
 
-  net/internals/datatypes   holds everything you need to edit, if you
+  net/detail/datatypes   holds everything you need to edit, if you
                             want to add a new supported datatype to
                             the NetReaders/NetWriters, etc.
                             Note: These changes will mostly be
                                   specialization templates
 
-  net/internals/datatypes/opencv holds the opencv compatability stuff
+  net/detail/datatypes/opencv holds the opencv compatability stuff
                                  (internal specialization templates)
 
 Namespaces:
@@ -70,9 +70,9 @@ If you are transfering a simple type using SimpleNetReader/Writer, etc you are d
 
 Matrix-like data types:
 -----------------------
-internals/datatypes/ 
+detail/datatypes/ 
    If you are transfering a matrix-style type, you will need to add 
-   spezializations of the classes you will find under internals/datatypes. 
+   spezializations of the classes you will find under detail/datatypes. 
    Look at what is done in the opencv/ subdirectory: 
 
    The collated_traits traits struct will need some information about 

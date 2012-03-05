@@ -22,41 +22,64 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        CollatedTraits.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 04:43:49 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: collated_traits in the opencv specialization
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_COLLATEDTRAITS_OPENCV_H
+#define CEDAR_COLLATEDTRAITS_OPENCV_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+// traits specializations:
+#include "cedar/auxiliaries/net/detail/namespace.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
+#include <opencv2/opencv.hpp>
 
 
 namespace cedar {
   namespace aux {
     namespace net {
+      namespace detail {
+        template<> struct collated_traits<cv::Mat>;
+        template<> struct collated_traits< cv::Mat_<float> >;
+        template <typename CVT> class cvMatHelper;
+        class cvMatNetHeader; // forward declaration
+      }
+    }
+  }
+}
 
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
 
-} } } // end namespaces
+//////////////// OPENCV SPECIALIZATION of our traits class
 
+//!@brief collated_traits implementation for cv::Mat
+template<>
+struct cedar::aux::net::detail::collated_traits<cv::Mat>
+{
+  typedef cv::Mat                   data_type;
+  typedef cedar::aux::net::detail::cvMatHelper<cv::Mat>    helper_type;
+  typedef cedar::aux::net::detail::cvMatNetHeader header_type;
+};
+
+//!@brief collated_traits implementation for cv::Mat_<float> 
+template<>
+struct cedar::aux::net::detail::collated_traits< cv::Mat_<float> >
+{
+  typedef cv::Mat_<float>           data_type;
+  typedef cedar::aux::net::detail::cvMatHelper< cv::Mat_<float> >    helper_type;
+  typedef cedar::aux::net::detail::cvMatNetHeader header_type;
+};
+
+#endif
 

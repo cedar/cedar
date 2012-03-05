@@ -22,27 +22,28 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        MatrixNetHeaderAccessor.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 02:34:24 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: this doesnt do much. Even before we think about 
+                 what a matrix header contains, we want to have some
+                 primitive way to check for corruption.
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_MATRIXNETHEADERACCESSOR_H
+#define CEDAR_MATRIXNETHEADERACCESSOR_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/header/MatrixNetHeader.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
 
@@ -50,13 +51,23 @@
 namespace cedar {
   namespace aux {
     namespace net {
-
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
-
-} } } // end namespaces
+      namespace detail {
 
 
+/*!@brief static helper for getting data out of the header-structure
+ *
+ * Of course this is not good OOP, but we use this C-style accessors
+ * so that the structs that hold the data can be the smalles possible
+ * for network transfer
+ */
+class MatrixNetHeaderAccessor
+{
+public:
+  static unsigned int getDataSize(MatrixNetHeader &header);
+  static unsigned int getTotalElements(MatrixNetHeader &header);
+  static unsigned int getElemSize(MatrixNetHeader &header);
+};
+
+} } } } // end namespaces
+
+#endif

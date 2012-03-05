@@ -22,41 +22,60 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        CollatedTraits.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 04:30:14 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: traits class for the transferable data type.
+                 Specialize this.
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_COLLATEDTRAITS_H
+#define CEDAR_COLLATEDTRAITS_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
+#include <boost/static_assert.hpp>
 
 // SYSTEM INCLUDES
+
 
 
 namespace cedar {
   namespace aux {
     namespace net {
+      namespace detail {
 
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
 
-} } } // end namespaces
+/*!@brief traits struct for a 'collated data type' i.e. a matrix type
+ *
+ * the traits struct will hold information about necessary helper classes
+ * and HAS TO BE SPECIALIZED
+ */
+template<class T>
+struct collated_traits
+{
+  // default traits struct is empty
+  // this should not compile
+  collated_traits()
+  {
+    BOOST_STATIC_ASSERT(sizeof(T) == 0); 
+  }
+};
 
+
+} } } } // end namespaces 
+
+// specializations (these will compile):
+#include "cedar/auxiliaries/net/detail/datatypes/opencv/CollatedTraits.h"
+
+
+#endif
 

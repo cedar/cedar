@@ -22,41 +22,57 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NetWriter.cpp
+    File:        InterfaceCollatedData.h
 
     Maintainer:  Jean-Stephane Jokeit
     Email:       jean-stephane.jokeit@ini.ruhr-uni-bochum.de
-    Date:        Thu 18 Aug 2011 11:39:36 AM CEST
+    Date:        Wed 20 Jul 2011 04:41:29 PM CEST
 
-    Description: This file only has explicit template initializations.
-                 Please refer to NetWriter.h
+    Description: the transport part of the NetTransporter framework
+                 needs this interface to be implemented
 
     Credits:
 
 =============================================================================*/
 
+#ifndef CEDAR_INTERFACECOLLATEDDATA_H
+#define CEDAR_INTERFACECOLLATEDDATA_H
+
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/NetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/detail/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/datatypes/CollatedTraits.h"
 
 // PROJECT INCLUDES
-#include <opencv2/opencv.hpp>
 
 // SYSTEM INCLUDES
+
 
 
 namespace cedar {
   namespace aux {
     namespace net {
-
-// explicit instatiation:
-template class NetWriter<int>;
-template class NetWriter<float>;
-template class NetWriter<double>;
-template class NetWriter<cv::Mat>;
-
-} } } // end namespaces
+      namespace detail {
 
 
+/*!@brief Abstract interface of matrix-like data
+ *
+ * we hold typedef-info for the traits-type, data and header-type
+ */
+template<typename T> 
+class InterfaceCollatedData
+{
+protected:
+  typedef collated_traits<T>                traits_type;
+  typedef typename traits_type::data_type   data_type;
+  typedef typename traits_type::header_type header_type;
+
+protected:
+  virtual bool check_collateddata_for_write(const data_type &data,
+                                            header_type &header) = 0;
+  virtual bool check_collateddata_for_read(const header_type &header) = 0;
+};
+
+
+} } } } // end namespace
+
+#endif
