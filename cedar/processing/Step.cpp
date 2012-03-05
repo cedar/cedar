@@ -296,13 +296,14 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
       this->run();
     }
   }
-#ifdef DEBUG
   else
   {
-    std::cout << "Step \"" << this->getName() << "\" was busy during its onTrigger() call, computation skipped."
-              << std::endl;
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "Step \"" + this->getName() + "\" was busy during its onTrigger() call, computation skipped.",
+      "cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)"
+    );
   }
-#endif // DEBUG
 }
 
 
