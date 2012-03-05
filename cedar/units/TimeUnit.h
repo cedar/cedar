@@ -116,7 +116,7 @@ public:
   template <unsigned int otherFactor, const char* otherSuffix>
   bool operator< (const TimeUnit<otherFactor, otherSuffix>& other) const
   {
-    return other.mAmountInMicroSeconds < this->mAmountInMicroSeconds;
+    return this->mAmountInMicroSeconds < other.mAmountInMicroSeconds;
   }
 
   /*!@brief The addition operator.
