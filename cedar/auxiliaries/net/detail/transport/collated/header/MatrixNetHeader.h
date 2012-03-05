@@ -58,8 +58,8 @@ namespace cedar {
 struct MatrixNetHeader : CollatedNetHeader
 {
 public:
-  unsigned int rows;
-  unsigned int cols;
+  /*unsigned*/ int rows;
+  /*unsigned*/ int cols;
   unsigned int elemSize;
 };
 

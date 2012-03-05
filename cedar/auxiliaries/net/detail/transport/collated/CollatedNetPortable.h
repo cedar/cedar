@@ -68,7 +68,7 @@ namespace cedar {
       namespace detail {
 
 
-/*!@brief Wrapper around the transported matrix type. handles sending/recieving
+/*!@brief Wrapper around the transported matrix type. handles sending/receiving
  *
  * this will be similar to yarp::BinPortable but with size of the data (matrix)
  * only determinable at runtime
@@ -115,7 +115,7 @@ public:
   // public methods
   //---------------------------------------------------------------------------
 public:
-  //!@brief direct reference to the actual data (a copy of this will be transportet)
+  //!@brief direct reference to the actual data (a copy of this will be transported)
   data_type& content() 
   {
     return mNetType.data;
