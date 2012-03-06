@@ -62,6 +62,7 @@
 #include "cedar/auxiliaries/gui/UIntVectorParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/Log.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
@@ -119,6 +120,7 @@ void cedar::proc::gui::PropertyPane::resetContents()
     this->disconnect(configurable);
   }
 
+
   this->clearContents();
   this->setRowCount(0);
   this->mParameterWidgetRowIndex.clear();
@@ -132,7 +134,14 @@ void cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pCon
       ++iter)
   {
     // disconnect everything between the parameter and this
-    QObject::disconnect(iter->get(), 0, this, 0);
+    if (!QObject::disconnect(iter->get(), 0, this, 0))
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Could not disconnect the slots of the Property pane.",
+        "cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr)"
+      );
+    }
   }
 
   for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
@@ -171,6 +180,7 @@ void cedar::proc::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfig
     this->resetContents();
   }
 
+  this->mDisplayedConfigurable = pConfigurable;
   this->append(pConfigurable->getParameters());
   mSlotConnection
     = pConfigurable->connectToTreeChangedSignal(boost::bind(&cedar::proc::gui::PropertyPane::redraw, this));
