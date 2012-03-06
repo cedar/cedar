@@ -128,7 +128,6 @@ void cedar::proc::gui::PropertyPane::resetContents()
 
 void cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConfigurable)
 {
-  std::cout << "Disconnecting " << pConfigurable.get() << std::endl;
   for (cedar::aux::Configurable::ParameterList::iterator iter = pConfigurable->getParameters().begin();
       iter != pConfigurable->getParameters().end();
       ++iter)
