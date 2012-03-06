@@ -76,6 +76,16 @@ cedar::proc::Trigger::~Trigger()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Trigger::wait()
+{
+  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  {
+    this->mListeners.at(i)->wait();
+  }
+}
+
+
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)

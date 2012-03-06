@@ -89,6 +89,7 @@ void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
                 "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot1D::display.");
   }
+
   if (this->mpCurve != NULL)
   {
     delete this->mpCurve;
@@ -100,6 +101,12 @@ void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
   const cv::Mat& mat = this->mMatData->getData();
   size_t num = cedar::aux::math::get1DMatrixSize(mat);
   data->unlock();
+
+  // skip if the matrix is empty
+  if (num == 0)
+  {
+    return;
+  }
 
   this->buildArrays(num);
 
@@ -187,6 +194,14 @@ void cedar::aux::gui::MatrixPlot1D::timerEvent(QTimerEvent * /* pEvent */)
 
   // Check if the size of the matrix has changed
   unsigned int size = cedar::aux::math::get1DMatrixSize(mat);
+
+  // skip if the array is empty
+  if (size == 0)
+  {
+    this->mMatData->unlock();
+    return;
+  }
+
   if (this->mXValues.size() != size)
   {
     this->buildArrays(size);

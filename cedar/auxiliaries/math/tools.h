@@ -217,7 +217,7 @@ namespace cedar
       inline T getMatrixEntry(const cv::Mat& matrix, int row, int col)
       {
         CEDAR_ASSERT(matrix.type() == CV_8U || matrix.type() == CV_32F || matrix.type() == CV_64F);
-        CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) == 2);
+        CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) <= 2);
 
         switch (matrix.type())
         {

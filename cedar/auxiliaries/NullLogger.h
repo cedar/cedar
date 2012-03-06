@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_NOT_LOGGER_H
-#define CEDAR_AUX_NOT_LOGGER_H
+#ifndef CEDAR_AUX_NULL_LOGGER_H
+#define CEDAR_AUX_NULL_LOGGER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
@@ -51,7 +51,7 @@
  *
  * @remars The logger, it does nothing!
  */
-class cedar::aux::NotLogger : public cedar::aux::LogInterface
+class cedar::aux::NullLogger : public cedar::aux::LogInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -91,7 +91,7 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::aux::NotLogger
+}; // class cedar::aux::NullLogger
 
-#endif // CEDAR_AUX_NOT_LOGGER_H
+#endif // CEDAR_AUX_NULL_LOGGER_H
 
