@@ -50,10 +50,6 @@ namespace cedar
     namespace exc
     {
 
-// PROJECT INCLUDES
-
-// SYSTEM INCLUDES
-
 
 /*!@brief An exception.
  *
