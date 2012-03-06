@@ -38,10 +38,10 @@
 #define CEDAR_NETWRITER_H
 
 // LOCAL INCLUDES
-#include "cedar/auxiliaries/net/internals/namespace.h"
-#include "cedar/auxiliaries/net/internals/transport/simple/SimpleNetWriter.h"
-#include "cedar/auxiliaries/net/internals/transport/collated/CollatedNetWriter.h"
-#include "cedar/auxiliaries/net/internals/datatypes/opencv/cvMatHelper.h"
+#include "cedar/auxiliaries/net/detail/namespace.h"
+#include "cedar/auxiliaries/net/detail/transport/simple/SimpleNetWriter.h"
+#include "cedar/auxiliaries/net/detail/transport/collated/CollatedNetWriter.h"
+#include "cedar/auxiliaries/net/detail/datatypesupport/opencv/cvMatHelper.h"
 
 // PROJECT INCLUDES
 #include <boost/static_assert.hpp>
@@ -73,7 +73,7 @@ namespace cedar {
  *   myWriter.write(mat);
  * @endcode
  *
- * Please also refer to the <a href='../../cedar/auxiliaries/net/HOWTO'>HOWTO</a> for full examples.
+ * Please also refer to the <a href='../../cedar/auxiliaries/net/HOWTO.NetTransporter'>HOWTO</a> for full examples.
  *
  * See also the constructor and the write() function.
  *
