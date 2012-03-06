@@ -132,6 +132,13 @@ public:
   //!@brief Calls the reset signal in a thread-safe manner.
   void callReset();
 
+  /*!@brief The wait method.
+   */
+  void wait()
+  {
+    this->QThread::wait();
+  }
+
 public slots:
   //!@brief This slot is called when the step's name is changed.
   void onNameChanged();
