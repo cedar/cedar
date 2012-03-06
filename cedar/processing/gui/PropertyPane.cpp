@@ -121,24 +121,24 @@ void cedar::proc::gui::PropertyPane::resetContents()
   }
 
 
-  this->clearContents();
-  this->setRowCount(0);
+  this->resetPointer();
   this->mParameterWidgetRowIndex.clear();
   this->mParameterRowIndex.clear();
 }
 
 void cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConfigurable)
 {
+  std::cout << "Disconnecting " << pConfigurable.get() << std::endl;
   for (cedar::aux::Configurable::ParameterList::iterator iter = pConfigurable->getParameters().begin();
       iter != pConfigurable->getParameters().end();
       ++iter)
   {
     // disconnect everything between the parameter and this
-    if (!QObject::disconnect(iter->get(), 0, this, 0))
+    if (!(*iter)->isHidden() && !QObject::disconnect(iter->get(), 0, this, 0))
     {
-      cedar::aux::LogSingleton::getInstance()->warning
+      cedar::aux::LogSingleton::getInstance()->debug
       (
-        "Could not disconnect the slots of the Property pane.",
+        "Could not disconnect the slots of the Property pane for parameter " + (*iter)->getName(),
         "cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr)"
       );
     }
