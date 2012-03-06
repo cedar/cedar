@@ -166,6 +166,13 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
       // nothing to do here
       break;
   }
+
+  // pass the scene event to the parent item(s)
+  if (cedar::proc::gui::Network *p_network = dynamic_cast<cedar::proc::gui::Network*>(this->parentItem()))
+  {
+    return p_network->sceneEventFilter(pWatched, pEvent);
+  }
+
   return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
 }
 
