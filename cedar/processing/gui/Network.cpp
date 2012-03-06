@@ -73,11 +73,7 @@ mpScene(NULL),
 mpMainWindow(pMainWindow),
 mHoldFitToContents(false)
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "allocated data (cedar::proc::gui::Network, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::gui::Network::Network()"
-  );
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   if (!mNetwork)
   {
@@ -98,11 +94,7 @@ mHoldFitToContents(false)
 
 cedar::proc::gui::Network::~Network()
 {
-  cedar::aux::LogSingleton::getInstance()->debug
-  (
-    "freeing data (cedar::proc::gui::Network, " + cedar::aux::toString(this) + ")",
-    "cedar::proc::gui::Network::~Network()"
-  );
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 
   if (mSlotConnection.connected())
   {
