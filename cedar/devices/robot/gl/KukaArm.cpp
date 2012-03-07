@@ -47,8 +47,8 @@
 #include "cedar/devices/robot/gl/KukaArm.h"
 
 // SYSTEM INCLUDES
- #include <QTextStream>
- #include <QFile>
+// #include <QTextStream>
+// #include <QFile>
 
 // define constants
 const float cedar::dev::robot::gl::KukaArm::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
@@ -453,63 +453,6 @@ void cedar::dev::robot::gl::KukaArm::setMaterial(int material)
     glMaterialfv(GL_FRONT, GL_SPECULAR, mBlack_Specular);
     glMaterialfv(GL_FRONT, GL_SHININESS, mBlack_Shininess);
     break;
-  }
-}
-
-void cedar::dev::robot::gl::KukaArm::loadVertexData
-(
-  const QString& dataFileName,
-  unsigned int numberOfVertices,
-  Vertex* vertices
-)
-{
-  QFile data(dataFileName);
-  if (data.open(QFile::ReadOnly))
-  {
-    QTextStream text_stream(&data);
-    QString line;
-    float scale = 0.001; // mm -> m
-    for (unsigned int i=0; i<numberOfVertices; i++)
-    {
-      line = text_stream.readLine();
-      vertices[i].location[0] = line.section(" ", 0, 0).toFloat() * scale;
-      vertices[i].location[1] = line.section(" ", 1, 1).toFloat() * scale;
-      vertices[i].location[2] = line.section(" ", 2, 2).toFloat() * scale;
-      vertices[i].normal[0] = line.section(" ", 3, 3).toFloat();
-      vertices[i].normal[1] = line.section(" ", 4, 4).toFloat();
-      vertices[i].normal[2] = line.section(" ", 5, 5).toFloat();
-    }
-  }
-  else
-  {
-    std::cout << "failed to read vertex data from file " << dataFileName.toStdString() << std::endl;
-  }
-}
-
-void cedar::dev::robot::gl::KukaArm::loadIndexData
-(
-  const QString& dataFileName,
-  unsigned int numberOfFaces,
-  GLushort* indices
-)
-{
-  QFile data(dataFileName);
-  if (data.open(QFile::ReadOnly))
-  {
-    QTextStream text_stream(&data);
-    QString line;
-    QString number;
-    for (unsigned int i=0; i<numberOfFaces; i++)
-    {
-      line = text_stream.readLine();
-      indices[3*i] = static_cast<GLushort>(line.section(" ", 0, 0).toInt());
-      indices[3*i+1] = static_cast<GLushort>(line.section(" ", 1, 1).toInt());
-      indices[3*i+2] = static_cast<GLushort>(line.section(" ", 2, 2).toInt());
-    }
-  }
-  else
-  {
-    std::cout << "failed to read index data from file " << dataFileName.toStdString() << std::endl;
   }
 }
 

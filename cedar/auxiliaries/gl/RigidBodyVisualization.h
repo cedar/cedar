@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
 #define CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
 
+#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
@@ -55,6 +57,25 @@
  */
 class cedar::aux::gl::RigidBodyVisualization : public QObject
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // structs
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  //!@brief container for vertex and related data
+  typedef struct
+  {
+    //!@brief position of the vertex
+    GLfloat location[3];
+    //!@brief texture coordinates
+    GLfloat tex[2];
+    //!@brief normal
+    GLfloat normal[3];
+    //!@brief color
+    GLfloat colour[4];
+    //!@brief pads the struct out to 64 bytes for performance increase
+    GLubyte padding[16];
+  } Vertex;
+
 private:
   Q_OBJECT
   
@@ -149,6 +170,20 @@ protected:
 
   //!@brief draws the local coordinate frame of the rigid body if mIsDrawingLocalCoordinateFrame flag is set
   void drawLocalCoordinateFrame();
+
+  /*!@brief loads vertex data from file into a vertex array
+   * @param dataFileName specifies the file where the vertex data are stored
+   * @param numberOfVertices specifies how many vertices are in the file
+   * @param vertices array of vertices the data is stored into
+   */
+  void loadVertexData(const QString& dataFileName, unsigned int numberOfVertices, Vertex* vertices);
+
+  /*!@brief loads index data from file into a vertex array
+   * @param dataFileName specifies the file where the vertex data are stored
+   * @param numberOfFaces specifies how many faces are in the file (3 indices for each face)
+   * @param vertices array where the data is stored into
+   */
+  void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

@@ -37,8 +37,6 @@
 #ifndef CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
 #define CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
 
-#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
-
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
@@ -56,25 +54,6 @@
  */
 class cedar::dev::robot::gl::KukaArm : public cedar::dev::robot::gl::KinematicChain
 {
-  //--------------------------------------------------------------------------------------------------------------------
-  // structs
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  //!@brief container for vertex and related data
-  typedef struct
-  {
-    //!@brief position of the vertex
-    GLfloat location[3];
-    //!@brief texture coordinates
-    GLfloat tex[2];
-    //!@brief normal
-    GLfloat normal[3];
-    //!@brief color
-    GLfloat colour[4];
-    //!@brief pads the struct out to 64 bytes for performance increase
-    GLubyte padding[16];
-  } Vertex;
-
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
@@ -109,12 +88,11 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
+  //todo: the base block should not be part of the KukaArm visualization, but rather be drawn only as part of the robot
   void drawBaseBlock();
   //todo: this should be done with a struct for material, as a member in RigidBodyVisualization
   void setMaterial(int material);
 
-  void loadVertexData(const QString& dataFileName, unsigned int numberOfVertices, Vertex* vertices);
-  void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
   void loadData();
 
   //--------------------------------------------------------------------------------------------------------------------
