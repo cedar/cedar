@@ -45,11 +45,11 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief A parameter that reads a list of configurable objects from a file.
  *
  * @todo describe more.
  */
-template <class BaseType>
+template <class BaseType> //!@todo Should BaseType include the pointer type?
 class cedar::aux::ObjectListParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
@@ -101,8 +101,11 @@ public:
     {
       cedar::aux::ConfigurablePtr value = *iter;
       cedar::aux::ConfigurationNode value_node;
-      value_node.put_value(value);
-      object_list_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+      value->writeConfiguration(value_node);
+
+      const std::string& type_id = FactorySingleton::getInstance()->getTypeId(value);
+
+      object_list_node.push_back(cedar::aux::ConfigurationNode::value_type(type_id, value_node));
     }
     root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), object_list_node));
   }
@@ -110,7 +113,7 @@ public:
   //!@brief set parameter to default
   virtual void makeDefault()
   {
-
+    //!@todo Fill this method.
   }
 
 
@@ -118,6 +121,22 @@ public:
   size_t size() const
   {
     return mObjectList.size();
+  }
+
+  /*!@brief Returns the object with the given index.
+   *
+   * @todo There needs to be a const variant of this.
+   */
+  BaseTypePtr at(size_t index)
+  {
+    CEDAR_ASSERT(index < this->size());
+
+    return this->mObjectList.at(index);
+  }
+
+  void pushBack(BaseTypePtr object)
+  {
+    this->mObjectList.push_back(object);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -139,7 +158,7 @@ protected:
   // none yet
 private:
   //! vector of pointers to the various objects
-  std::vector<cedar::aux::ConfigurablePtr> mObjectList;
+  std::vector<BaseTypePtr> mObjectList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
