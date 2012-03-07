@@ -22,52 +22,102 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbstractFactoryDerived.h
+    File:        ObjectListParameter.h
 
     Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Email:       oliver.lomp@ini.rub.de
+    Date:        2012 02 15
 
-    Description:
+    Description: Parameter for a list of arbitrary length of dynamically allocatable, configurable objects. Ha!
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
-#define CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
+#ifndef CEDAR_AUX_OBJECT_LIST_PARAMETER_H
+#define CEDAR_AUX_OBJECT_LIST_PARAMETER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Version of cedar::aux::FactoryDerived that works for abstract types.
+/*!@todo describe.
  *
- * @see cedar::aux::FactoryDerived
+ * @todo describe more.
  */
-template <typename BaseType, typename DerivedType>
-class cedar::aux::AbstractFactoryDerived : public AbstractFactory<BaseType>
+template <class BaseType>
+class cedar::aux::ObjectListParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  typedef typename boost::shared_ptr<BaseType> BaseTypePtr;
+  typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseTypePtr> > FactorySingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The standard constructor.
+  ObjectListParameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault = true)
+  :
+  cedar::aux::Parameter(pOwner, name, hasDefault)
+  {}
+
+  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief allocates an object of type DerivedType and returns a pointer to BaseType
-  boost::shared_ptr<BaseType> allocate() const
+  //!@brief set this parameter to a value, read from a configuration node
+  virtual void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
-    return boost::shared_ptr<BaseType> (new DerivedType());
+    this->mObjectList.clear();
+    for (cedar::aux::ConfigurationNode::const_iterator iter = node.begin(); iter != node.end(); ++iter)
+    {
+      const std::string& object_type = iter->first;
+      BaseTypePtr object = FactorySingleton::getInstance()->allocate(object_type);
+
+      object->readConfiguration(iter->second);
+      this->mObjectList.push_back(object);
+    }
+  }
+
+  //!@brief write value to a configuration node
+  virtual void writeToNode(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode object_list_node;
+    for
+    (
+      std::vector<cedar::aux::ConfigurablePtr>::const_iterator iter = this->mObjectList.begin();
+      iter != this->mObjectList.end();
+      ++iter
+    )
+    {
+      cedar::aux::ConfigurablePtr value = *iter;
+      cedar::aux::ConfigurationNode value_node;
+      value_node.put_value(value);
+      object_list_node.push_back(cedar::aux::ConfigurationNode::value_type("", value_node));
+    }
+    root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), object_list_node));
+  }
+
+  //!@brief set parameter to default
+  virtual void makeDefault()
+  {
+
+  }
+
+
+  //!@brief return the size of the vector
+  size_t size() const
+  {
+    return mObjectList.size();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -88,7 +138,8 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! vector of pointers to the various objects
+  std::vector<cedar::aux::ConfigurablePtr> mObjectList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -99,6 +150,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::AbstractFactoryDerived
+}; // class cedar::aux::ObjectListParameter
 
-#endif // CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
+#endif // CEDAR_AUX_OBJECT_LIST_PARAMETER_H
+

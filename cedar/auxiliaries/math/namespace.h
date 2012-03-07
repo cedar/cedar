@@ -68,7 +68,7 @@ namespace cedar
       template <class DerivedClass> class SigmoidDeclarationT;
 
       //!@brief a pointer to a sigmoid factory
-      typedef boost::shared_ptr<cedar::aux::AbstractFactory<Sigmoid> > SigmoidFactoryPtr;
+      typedef boost::shared_ptr< cedar::aux::Factory<SigmoidPtr> > SigmoidFactoryPtr;
     }
   }
 }

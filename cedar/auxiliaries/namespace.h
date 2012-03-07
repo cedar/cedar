@@ -89,11 +89,9 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(Arguments);
     //!@endcond
 
-    template <class T, typename SmartPointerType> class Factory;
-    template <class T, class T2, typename SmartPointerType> class FactoryDerived;
-
-    template <class T> class AbstractFactory;
-    template <class T, class T2> class AbstractFactoryDerived;
+    template <class BaseTypePtr> class Factory;
+    template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
+    template <class BaseTypePtr> class FactoryManager;
 
     template
     <
@@ -116,6 +114,8 @@ namespace cedar
     template <typename T> class VectorParameter;
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
+    //!@brief a template class for lists of objects of arbitrary type
+    template <typename T> class ObjectListParameter;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.

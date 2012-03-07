@@ -101,9 +101,9 @@ public:
   void setConstant(bool value);
 
   //!@brief set this parameter to a value, read from a configuration node
-  virtual void setTo(const cedar::aux::ConfigurationNode& node) = 0;
+  virtual void readFromNode(const cedar::aux::ConfigurationNode& node) = 0;
   //!@brief write value to a configuration node
-  virtual void putTo(cedar::aux::ConfigurationNode& root) const = 0;
+  virtual void writeToNode(cedar::aux::ConfigurationNode& root) const = 0;
   //!@brief set parameter to default
   virtual void makeDefault() = 0;
 

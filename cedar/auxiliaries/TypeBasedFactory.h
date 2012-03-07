@@ -68,7 +68,7 @@ public:
   typedef KeySmartPointerType KeyBaseTypePtr;
 
   //! Type for the factory.
-  typedef boost::shared_ptr<cedar::aux::Factory<ValueBaseType, ValueSmartPointerType> > FactoryPtr;
+  typedef boost::shared_ptr<cedar::aux::Factory<ValueSmartPointerType> > FactoryPtr;
 
 private:
   //! A pair linking a type info to a factory.
@@ -94,7 +94,7 @@ public:
   void add()
   {
     const std::type_info* type = &typeid(Key);
-    FactoryPtr factory(new cedar::aux::FactoryDerived<ValueBaseType, Value, boost::shared_ptr<ValueBaseType> >());
+    FactoryPtr factory(new cedar::aux::FactoryDerived<boost::shared_ptr<ValueBaseType>, boost::shared_ptr<Value> >());
     mKeyTypes.push_back(Pair(type, factory));
   }
 
