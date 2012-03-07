@@ -45,7 +45,8 @@
 #include "cedar/auxiliaries/ObjectListParameter.h"
 
 // SYSTEM INCLUDES
-#include "boost/smart_ptr.hpp"
+#include <boost/smart_ptr.hpp>
+#include <boost/filesystem.hpp>
 
 
 // different test classes
@@ -60,9 +61,20 @@ class TestClassOne : public cedar::aux::Configurable
 public:
   TestClassOne()
   :
-    mUInt(new cedar::aux::UIntParameter(this, "unsigned integer parameter", 4, 0, 10)),
-    mDouble(new cedar::aux::DoubleParameter(this, "double parameter", 5.0, 0.0, 10.0))
-  {}
+  mUInt(new cedar::aux::UIntParameter(this, "unsigned integer parameter", 4, 0, 10)),
+  mDouble(new cedar::aux::DoubleParameter(this, "double parameter", 5.0, 0.0, 10.0))
+  {
+  }
+
+  unsigned int getUIntValue() const
+  {
+    return this->mUInt->getValue();
+  }
+
+  void setUIntValue(unsigned int value)
+  {
+    this->mUInt->setValue(value);
+  }
 
 private:
   cedar::aux::UIntParameterPtr mUInt;
@@ -71,18 +83,18 @@ private:
 
 typedef boost::shared_ptr<TestClassOne> TestClassOnePtr;
 
-class TestClassTwo : public cedar::aux::Configurable
+class TestClassTwo : public TestClassOne
 {
 public:
   TestClassTwo()
   :
-    mUInt(new cedar::aux::UIntParameter(this, "unsigned integer parameter", 4, 0, 10)),
-    mDouble(new cedar::aux::DoubleParameter(this, "double parameter", 5.0, 0.0, 10.0))
-  {}
+  mDouble2(new cedar::aux::DoubleParameter(this, "triple parameter", 5.0, 0.0, 10.0))
+  {
+  }
+
 
 private:
-  cedar::aux::UIntParameterPtr mUInt;
-  cedar::aux::DoubleParameterPtr mDouble;
+  cedar::aux::DoubleParameterPtr mDouble2;
 };
 
 typedef boost::shared_ptr<TestClassTwo> TestClassTwoPtr;
@@ -91,19 +103,134 @@ typedef cedar::aux::Singleton<cedar::aux::FactoryManager<cedar::aux::Configurabl
 bool testClassOneRegistered = FactorySingleton::getInstance()->registerType<TestClassOnePtr>();
 bool testClassTwoRegistered = FactorySingleton::getInstance()->registerType<TestClassTwoPtr>();
 
+typedef cedar::aux::ObjectListParameter<cedar::aux::Configurable> TestListType;
+CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TestListType);
+
+
+int testReading(const std::string& configFile)
+{
+  // the number of errors encountered in this test
+  int errors = 0;
+
+  cedar::aux::ConfigurablePtr configurable_object(new cedar::aux::Configurable());
+
+  TestListTypePtr object_list_parameter(new TestListType(configurable_object.get(), "my first object list"));
+  
+  std::cout << "Reading file " << configFile << std::endl;
+  configurable_object->readJson(configFile);
+  
+  // The test file contains three objects.
+  if (object_list_parameter->size() != 3)
+  {
+    std::cout << "ERROR: Read the wrong number of objects from the list: size = "
+              << object_list_parameter->size() << std::endl;
+    ++errors;
+  }
+  else
+  {
+    std::cout << "Read the correct number of objects from the list." << std::endl;
+  }
+
+  // Check each object for correctness
+  std::cout << "Checking first parameter." << std::endl;
+  if (TestClassOnePtr test = boost::dynamic_pointer_cast<TestClassOne>(object_list_parameter->at(0)))
+  {
+    if (test->getUIntValue() != 0)
+    {
+      std::cout << "ERROR: the first parameter isn't the first one in the configuration file." << std::endl;
+      ++errors;
+    }
+    else
+    {
+      std::cout << "First parameter is ok." << std::endl;
+    }
+  }
+  else
+  {
+    std::cout << "ERROR: First object cannot be cast to TestClassOnePtr" << std::endl;
+    ++errors;
+  }
+
+  std::cout << "Checking second parameter." << std::endl;
+  if (TestClassTwoPtr test = boost::dynamic_pointer_cast<TestClassTwo>(object_list_parameter->at(1)))
+  {
+    if (test->getUIntValue() != 1)
+    {
+      std::cout << "ERROR: the second parameter isn't the second one in the configuration file." << std::endl;
+      ++errors;
+    }
+    else
+    {
+      std::cout << "Second parameter is ok." << std::endl;
+    }
+  }
+  else
+  {
+    std::cout << "ERROR: Second object cannot be cast to TestClassTwoPtr" << std::endl;
+    ++errors;
+  }
+
+  std::cout << "Checking third parameter." << std::endl;
+  if (TestClassOnePtr test = boost::dynamic_pointer_cast<TestClassOne>(object_list_parameter->at(2)))
+  {
+    if (test->getUIntValue() != 2)
+    {
+      std::cout << "ERROR: the third parameter isn't the third one in the configuration file." << std::endl;
+      ++errors;
+    }
+    else
+    {
+      std::cout << "Third parameter is ok." << std::endl;
+    }
+  }
+  else
+  {
+    std::cout << "ERROR: Third object cannot be cast to TestClassOnePtr" << std::endl;
+    ++errors;
+  }
+
+  return errors;
+}
+
+int testWriting()
+{
+  // the number of errors encountered in this test
+  int errors = 0;
+
+  std::cout << "Testing object list population." << std::endl;
+  cedar::aux::ConfigurablePtr configurable_object(new cedar::aux::Configurable());
+  TestListTypePtr object_list_parameter(new TestListType(configurable_object.get(), "my first object list"));
+
+  TestClassOnePtr object1 (new TestClassOne());
+  object1->setUIntValue(0);
+  object_list_parameter->pushBack(object1);
+
+  TestClassTwoPtr object2 (new TestClassTwo());
+  object2->setUIntValue(1);
+  object_list_parameter->pushBack(object2);
+
+  TestClassOnePtr object3 (new TestClassOne());
+  object3->setUIntValue(2);
+  object_list_parameter->pushBack(object3);
+
+  configurable_object->writeJson("tmp.json");
+
+  // the structure above should write the same structure as tested previously.
+  testReading("tmp.json");
+
+  boost::filesystem::remove("tmp.json");
+
+  return errors;
+}
+
 
 int main()
 {
   // the number of errors encountered in this test
   int errors = 0;
 
-  cedar::aux::ConfigurablePtr configurable_object(new cedar::aux::Configurable());
-  typedef cedar::aux::ObjectListParameter<cedar::aux::Configurable> TestListType;
-  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TestListType);
+  errors += testReading("object_list.json");
+  errors += testWriting();
 
-  TestListTypePtr object_list_parameter(new TestListType(configurable_object.get(), "my first object list"));
-  
-  configurable_object->readJson("object_list.json");
-  
   return errors;
 }

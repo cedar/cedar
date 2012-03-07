@@ -113,6 +113,20 @@ public:
 
     return iter->second->allocate();
   }
+
+  std::string getTypeId(BaseTypePtr object)
+  {
+    std::string generated_type_name = cedar::aux::objectTypeToString(object);
+
+    std::map<std::string, std::string>::iterator iter = mTypeNameMapping.find(generated_type_name);
+    if (iter == mTypeNameMapping.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "The type of the object could not be determined.");
+    }
+
+    return iter->second;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------

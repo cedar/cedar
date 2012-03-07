@@ -99,6 +99,14 @@ namespace cedar
       return unmangleName(typeid(T));
     }
 
+    /*!@brief Returns the type of the object pointed to by the given pointer.
+     */
+    template <typename T>
+    std::string objectTypeToString(boost::shared_ptr<T> object)
+    {
+      return unmangleName(typeid(*object));
+    }
+
     /*!@brief Structure holding information about an frame in a stack trace.
      */
     struct CEDAR_AUX_LIB_EXPORT StackEntry
