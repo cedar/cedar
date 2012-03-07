@@ -307,7 +307,20 @@ void cedar::proc::gui::Scene::promoteElementToExistingGroup()
 void cedar::proc::gui::Scene::promoteElementToNewGroup()
 {
   // do not create a new network if there are no elements selected
-  QList<QGraphicsItem *> selected = this->selectedItems();
+  QList<QGraphicsItem*> selected = this->selectedItems();
+  // take out connections
+  for (QList<QGraphicsItem*>::iterator it = selected.begin(); it != selected.end(); )
+  {
+    if (dynamic_cast<cedar::proc::gui::Connection*>(*it))
+    {
+      it = selected.erase(it);
+    }
+    else
+    {
+      ++it;
+    }
+  }
+  // check if there are no selected elements left
   if (selected.size() == 0)
   {
     return;
@@ -336,6 +349,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
   {
     CEDAR_THROW(cedar::aux::UnknownTypeException, "This GUI element type is not known.")
   }
+
   // sanity check - are all elements stored in the same network?
   for (int i = 0; i < selected.size(); ++i)
   {
@@ -345,7 +359,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "Not all selected items are in the same network.",
+          "Not all selected items are in the same network - aborting operation.",
           "cedar::proc::gui::Scene::promoteElementToNewGroup()"
         );
         return;
@@ -357,7 +371,7 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "Not all selected items are in the same network.",
+          "Not all selected items are in the same network - aborting operation.",
           "cedar::proc::gui::Scene::promoteElementToNewGroup()"
         );
         return;
@@ -369,27 +383,21 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
       {
         cedar::aux::LogSingleton::getInstance()->warning
         (
-          "Not all selected items are in the same network.",
+          "Not all selected items are in the same network - aborting operation.",
           "cedar::proc::gui::Scene::promoteElementToNewGroup()"
         );
         return;
       }
     }
   }
-
-  for (int i = 0; i < selected.size(); ++i)
-  {
-    if (cedar::proc::gui::GraphicsBase *p_element = dynamic_cast<cedar::proc::gui::GraphicsBase *>(selected.at(i)))
-    {
-      network_item->addElement(p_element);
-    }
-  }
+  // add the new network to the parent network
   CEDAR_DEBUG_ASSERT(new_parent_network);
   std::string name = new_parent_network->getUniqueIdentifier("new Network");
   network->setName(name);
-  if (new_parent_network->getName() == "root")
+  if (new_parent_network == this->mNetwork->network())
   {
     mNetwork->addElement(network_item);
+    mNetwork->network()->add(network);
   }
   else
   {
@@ -397,7 +405,10 @@ void cedar::proc::gui::Scene::promoteElementToNewGroup()
     (
       this->getGraphicsItemFor(new_parent_network.get())
     )->addElement(network_item);
+    new_parent_network->add(network);
   }
+  // move all elements to the network
+  network_item->addElements(selected.toStdList());
 }
 
 void cedar::proc::gui::Scene::contextMenuEvent(QGraphicsSceneContextMenuEvent* pContextMenuEvent)
@@ -575,7 +586,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
                 source->connectTo(p_trigger);
                 source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
-//                mNetwork->network()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
                 break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
               }
 
@@ -584,7 +594,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
                 cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
                 source->connectTo(p_step_item);
                 source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_step_item->getStep());
-//                mNetwork->network()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP
 

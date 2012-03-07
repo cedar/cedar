@@ -198,6 +198,129 @@ void cedar::proc::Network::add(cedar::proc::ElementPtr element, std::string inst
   this->add(element);
 }
 
+void cedar::proc::Network::add(std::list<cedar::proc::ElementPtr> elements)
+{
+  typedef std::list<cedar::proc::ElementPtr>::iterator iterator;
+  typedef std::list<cedar::proc::ElementPtr>::const_iterator const_iterator;
+  for (iterator it = elements.begin(); it != elements.end(); )
+  {
+    try
+    {
+      this->getElement<cedar::proc::Element>((*it)->getName());
+      it = elements.erase(it);
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "An element of name " + (*it)->getName() + " already exists in network " + this->getName() + ".",
+        "cedar::proc::Network::addElements(std::list<cedar::proc::ElementPtr> elements)"
+      );
+    }
+    catch(cedar::proc::InvalidNameException& exc)
+    {
+      ++it;
+    }
+  }
+  // are any elements left?
+  if (elements.size() == 0)
+  {
+    return;
+  }
+  // check old connections
+  //todo use structs here?
+  std::vector<std::string> data_from;
+  std::vector<std::string> data_to;
+  std::vector<cedar::proc::TriggerPtr> trigger_from;
+  std::vector<cedar::proc::TriggerablePtr> trigger_to;
+  std::vector<cedar::proc::DataSlotPtr> promoted_slots;
+  std::vector<std::string> promoted_data_from;
+  std::vector<std::string> promoted_data_to;
+  cedar::proc::NetworkPtr old_network = (*(elements.begin()))->getNetwork();
+  // remember all data connections between moved elements
+  for
+  (
+    cedar::proc::Network::DataConnectionVector::const_iterator it = old_network->getDataConnections().begin();
+    it != old_network->getDataConnections().end();
+    ++it
+  )
+  {
+    cedar::proc::ElementPtr source = old_network->getElement<cedar::proc::Element>((*it)->getSource()->getParent());
+    cedar::proc::ElementPtr target = old_network->getElement<cedar::proc::Element>((*it)->getTarget()->getParent());
+    iterator source_it = std::find(elements.begin(), elements.end(), source);
+    iterator target_it = std::find(elements.begin(), elements.end(), target);
+    if (source_it != elements.end() && target_it != elements.end())
+    {
+      // this connection must be stored (note that connections are automatically deleted if elements are removed)
+      data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+      data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+    }
+    else if (source_it != elements.end())
+    {
+      promoted_slots.push_back
+      (
+        boost::shared_dynamic_cast<cedar::proc::Connectable>(source)->getOutputSlot((*it)->getSource()->getName())
+      );
+      promoted_data_from.push_back(this->getName() + "." + (*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+      promoted_data_to.push_back((*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+    }
+    else if (target_it != elements.end())
+    {
+      promoted_slots.push_back
+      (
+        boost::shared_dynamic_cast<cedar::proc::Connectable>(target)->getInputSlot((*it)->getTarget()->getName())
+      );
+      promoted_data_from.push_back((*it)->getSource()->getParent() + "." + (*it)->getSource()->getName());
+      promoted_data_to.push_back(this->getName() + "." + (*it)->getTarget()->getParent() + "." + (*it)->getTarget()->getName());
+    }
+  }
+  // remember all trigger connections between moved elements
+  for
+  (
+    iterator it = elements.begin(); it != elements.end(); ++it
+  )
+  {
+    if (cedar::proc::TriggerPtr source_trigger = boost::shared_dynamic_cast<cedar::proc::Trigger>(*it))
+    {
+      for
+      (
+        iterator target = elements.begin(); target != elements.end(); ++target
+      )
+      {
+        cedar::proc::TriggerablePtr target_triggerable = boost::shared_dynamic_cast<cedar::proc::Triggerable>(*target);
+        if (target_triggerable && source_trigger->isListener(target_triggerable))
+        {
+          trigger_from.push_back(source_trigger);
+          trigger_to.push_back(target_triggerable);
+        }
+      }
+    }
+  }
+  // now add each element to the new network
+  for (iterator it = elements.begin(); it != elements.end(); ++it)
+  {
+    this->add(*it);
+  }
+
+  for (unsigned int i = 0; i < promoted_slots.size(); ++i)
+  {
+    this->promoteSlot(promoted_slots.at(i));
+  }
+
+  // restore data connections
+  for (unsigned int i = 0; i < data_from.size(); ++i)
+  {
+    this->connectSlots(data_from.at(i), data_to.at(i));
+  }
+  // restore promoted data connections
+  for (unsigned int i = 0; i < promoted_data_from.size(); ++i)
+  {
+    old_network->connectSlots(promoted_data_from.at(i), promoted_data_to.at(i));
+  }
+  // restore trigger connections
+  for (unsigned int i = 0; i < trigger_from.size(); ++i)
+  {
+    this->connectTrigger(trigger_from.at(i), trigger_to.at(i));
+  }
+}
+
 void cedar::proc::Network::add(cedar::proc::ElementPtr element)
 {
   std::string instanceName = element->getName();

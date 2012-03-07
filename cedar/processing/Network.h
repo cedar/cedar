@@ -145,6 +145,8 @@ public:
    */
   void add(cedar::proc::ElementPtr element);
 
+  void add(std::list<cedar::proc::ElementPtr> elements);
+
   /*!@brief Returns the element with the given name as a pointer of the specified type.
    */
   template <class T>
