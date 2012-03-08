@@ -84,10 +84,10 @@ public:
   double getPositionZ() const;
 
   //!@brief returns object frame orientation as a unit quaternion
-  double getOrientationQuaternion(unsigned int component) const;
+//  double getOrientationQuaternion(unsigned int component) const;
 
   //!@brief returns object frame orientation as a unit quaternion
-  cv::Mat getOrientationQuaternion() const;
+//  cv::Mat getOrientationQuaternion() const;
 
   //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
   cv::Mat getTransformation() const;
@@ -108,7 +108,7 @@ public slots:
   /*!@brief set the orientation of the object frame, given as a unit quaternion
    * @param quaternion    new unit quaternion for the rotation, 4x1 matrix with norm 1
    */
-  void setOrientationQuaternion(const cv::Mat quaternion);
+//  void setOrientationQuaternion(const cv::Mat quaternion);
 
   /*!@brief rotates the object around one of the main axes of the object frame
    * @param axis    index of the axis to rotate around, between 0 and 2
@@ -127,7 +127,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   //!@brief recalculates the rigid transformation to the object frame from position and orientation
-  void updateTransformation();
+//  void updateTransformation();
   //!@brief initialization function
   void init();
 
@@ -139,9 +139,10 @@ protected:
   cv::Mat mTransformation;
 
 private:
-  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
-  cv::Mat mOrientationQuaternion; // quaternion representing the orientation
-  cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
+  std::vector<cv::Mat> mUnitAxes;
+//  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
+//  cv::Mat mOrientationQuaternion; // quaternion representing the orientation
+//  cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
