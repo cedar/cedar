@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
 
 // SYSTEM INCLUDES
 #include <map>
@@ -84,7 +86,7 @@ public:
     // if no type name is supplied, generate type name from actual type
     if (specifiedTypeName.empty())
     {
-      specifiedTypeName = generatedTypeName;
+      specifiedTypeName = cedar::aux::replace(generatedTypeName, "::", ".");
     }
 
     mTypeNameMapping[generatedTypeName] = specifiedTypeName;
@@ -121,7 +123,13 @@ public:
     std::map<std::string, std::string>::iterator iter = mTypeNameMapping.find(generated_type_name);
     if (iter == mTypeNameMapping.end())
     {
-      CEDAR_THROW(cedar::aux::UnknownTypeException, "The type of the object could not be determined.");
+      CEDAR_THROW
+      (
+        cedar::aux::UnknownTypeException,
+        "The type name of the object of type \"" + cedar::aux::objectTypeToString(object)
+        + "\" could not be determined. This most likely means that the type is not registered with the factory manager "
+        + cedar::aux::objectTypeToString(this)
+      );
     }
 
     return iter->second;

@@ -41,12 +41,22 @@
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <limits.h>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declared
+    = cedar::aux::kernel::FactoryManagerSingleton::getInstance()->registerType<cedar::aux::kernel::GaussPtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

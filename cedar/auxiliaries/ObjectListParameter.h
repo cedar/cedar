@@ -81,6 +81,8 @@ public:
   cedar::aux::Parameter(pOwner, name, true)
   {
     this->mDefaults = defaults;
+
+    this->makeDefault();
   }
 
   //!@brief Destructor
@@ -129,6 +131,7 @@ public:
   virtual void makeDefault()
   {
     this->mObjectList = this->mDefaults;
+    std::cout << "Set object list default; size: " << this->size() << std::endl;
   }
 
 
@@ -151,6 +154,7 @@ public:
 
   void pushBack(BaseTypePtr object)
   {
+    //!@todo Check that the object is registered with the factory
     this->mObjectList.push_back(object);
   }
 
