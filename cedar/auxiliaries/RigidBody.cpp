@@ -122,6 +122,11 @@ void cedar::aux::RigidBody::setTransformation(cv::Mat transformation)
   mTransformation = transformation;
 }
 
+void cedar::aux::RigidBody::update()
+{
+
+}
+
 void cedar::aux::RigidBody::setPosition(double x, double y, double z)
 {
   QWriteLocker locker(&mLock);

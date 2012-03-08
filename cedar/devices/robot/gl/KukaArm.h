@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        CoraArm.h
+    File:        KukaArm.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -87,7 +87,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
   //todo: the base block should not be part of the KukaArm visualization, but rather be drawn only as part of the robot
   void drawBaseBlock();
   //todo: this should be done with a struct for material, as a member in RigidBodyVisualization

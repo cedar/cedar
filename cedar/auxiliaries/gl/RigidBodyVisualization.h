@@ -38,6 +38,7 @@
 #define CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
 
 #define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
@@ -184,6 +185,8 @@ protected:
    * @param vertices array where the data is stored into
    */
   void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
+
+  void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
