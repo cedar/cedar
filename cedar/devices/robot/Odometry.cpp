@@ -61,7 +61,10 @@ cv::Mat cedar::dev::robot::Odometry::getPosition() const
 double cedar::dev::robot::Odometry::getOrientation()
 {
   //calculates the orientation from the quaternion stored in RigidBody.h.
-  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
+  //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
+  // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
+  return atan2(getTransformation().at<double>(1, 1) , getTransformation().at<double>(0, 1));
+  //  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
 }
 
 void cedar::dev::robot::Odometry::setPosition(double xPosition, double yPosition)
@@ -78,7 +81,8 @@ void cedar::dev::robot::Odometry::setOrientation(double orientation)
   orientation_mat.at<double>(2,0) = sin(orientation);
   orientation_mat.at<double>(3,0) = 0; //no orientation in z-direction
 
-  setOrientationQuaternion(orientation_mat);
+  //todo: fix this! (HR)
+//  setOrientationQuaternion(orientation_mat);
 }
 
 void cedar::dev::robot::Odometry::timerEvent(QTimerEvent*)

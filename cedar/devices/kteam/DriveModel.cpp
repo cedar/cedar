@@ -145,8 +145,15 @@ void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(int leftEnco
   double dphi = calculateDifferenceOrientation(leftEncoder, mOldEncoder.at<int>(0,0),
                                                rightEncoder, mOldEncoder.at<int>(1,0));
   // calculate new position on x- and y-axis
-  double new_x_position = getPositionX() + ds * getOrientationQuaternion(1);
-  double new_y_position = getPositionY() + ds * getOrientationQuaternion(2);
+  //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
+//  double new_x_position = getPositionX() + ds * getOrientationQuaternion(1);
+//  double new_y_position = getPositionY() + ds * getOrientationQuaternion(2);
+  // get old orientation and calculate new orientation
+//  double new_orientation = getOrientation() + dphi;
+
+  // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
+  double new_x_position = getPositionX() + ds * getTransformation().at<double>(0, 1);
+  double new_y_position = getPositionY() + ds * getTransformation().at<double>(1, 1);
   // get old orientation and calculate new orientation
   double new_orientation = getOrientation() + dphi;
 
