@@ -483,8 +483,8 @@ void cedar::proc::gui::Ide::deleteElements(QList<QGraphicsItem*>& items)
       {
         CEDAR_THROW(cedar::proc::InvalidObjectException, "The source or target of a connection is not valid.");
       }
-      p_connection->disconnect();
-      delete p_connection;
+//      p_connection->disconnect();
+//      delete p_connection;
       items[i] = NULL;
     }
   }

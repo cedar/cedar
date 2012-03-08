@@ -92,6 +92,16 @@ mHoldFitToContents(false)
 
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
+
+  mNetwork->connectToDataConnectionChanged
+  (
+    boost::bind(&cedar::proc::gui::Network::checkDataConnection, this, _1, _2, _3)
+  );
+  mNetwork->connectToTriggerConnectionChanged
+  (
+    boost::bind(&cedar::proc::gui::Network::checkTriggerConnection, this, _1, _2, _3)
+  );
+
   this->update();
   this->checkSlots();
 }
@@ -880,6 +890,92 @@ void cedar::proc::gui::Network::disconnect()
     for (cedar::proc::gui::Network::DataSlotNameMap::iterator it = map.begin(); it != map.end(); ++it)
     {
       it->second->removeAllConnections();
+    }
+  }
+}
+
+void cedar::proc::gui::Network::checkDataConnection
+     (
+       cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added
+     )
+{
+  cedar::proc::gui::DataSlotItem* source_slot
+    = dynamic_cast<cedar::proc::gui::StepItem*>
+      (
+        this->mpScene->getGraphicsItemFor
+        (
+          this->network()->getElement(source->getParent()).get()
+        )
+      )->getSlotItem(cedar::proc::DataRole::OUTPUT, source->getName());
+  cedar::proc::gui::DataSlotItem* target_slot
+    = dynamic_cast<cedar::proc::gui::StepItem*>
+      (
+        this->mpScene->getGraphicsItemFor
+        (
+          this->network()->getElement(target->getParent()).get()
+        )
+      )->getSlotItem(cedar::proc::DataRole::INPUT, target->getName());
+
+  if (added)
+  {
+    source_slot->connectTo(target_slot);
+  }
+  else
+  {
+    QList<QGraphicsItem*> items = this->mpScene->items();
+    for (int i = 0; i < items.size(); ++i)
+    {
+      if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+      {
+        if (con->getSource() == source_slot && con->getTarget() == target_slot)
+        {
+          con->disconnect();
+          this->mpScene->removeItem(con);
+          delete con;
+        }
+      }
+    }
+  }
+}
+
+void cedar::proc::gui::Network::checkTriggerConnection
+     (
+       cedar::proc::TriggerPtr source,
+       cedar::proc::TriggerablePtr target,
+       bool added
+     )
+{
+  std::cout << "checkTriggerConnection" << std::endl;
+  cedar::proc::gui::TriggerItem* source_element
+    = dynamic_cast<cedar::proc::gui::TriggerItem*>
+      (
+        this->mpScene->getGraphicsItemFor
+        (
+          this->network()->getElement(source->getName()).get()
+        ));
+  cedar::proc::gui::GraphicsBase* target_element
+    = this->mpScene->getGraphicsItemFor
+      (
+        this->network()->getElement(boost::shared_dynamic_cast<cedar::proc::Element>(target)->getName()).get()
+      );
+  if (added)
+  {
+    source_element->connectTo(target_element);
+  }
+  else
+  {
+    QList<QGraphicsItem*> items = this->mpScene->items();
+    for (int i = 0; i < items.size(); ++i)
+    {
+      if (cedar::proc::gui::Connection* con = dynamic_cast<cedar::proc::gui::Connection*>(items[i]))
+      {
+        if (con->getSource() == source_element && con->getTarget() == target_element)
+        {
+          con->disconnect();
+          this->mpScene->removeItem(con);
+          delete con;
+        }
+      }
     }
   }
 }

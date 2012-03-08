@@ -447,6 +447,13 @@ void cedar::proc::Network::connectSlots(const std::string& source, const std::st
       p_target->onTrigger();
     }
   }
+  // inform any interested listeners of this new connection
+  mDataConnectionChanged
+  (
+    this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
+    this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot),
+    true
+  );
 }
 
 void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar::proc::TriggerablePtr target)
@@ -458,6 +465,12 @@ void cedar::proc::Network::connectTrigger(cedar::proc::TriggerPtr source, cedar:
   }
   // create connection
   mTriggerConnections.push_back(cedar::proc::TriggerConnectionPtr(new TriggerConnection(source, target)));
+  mTriggerConnectionChanged
+  (
+    source,
+    target,
+    true
+  );
 }
 
 void cedar::proc::Network::disconnectSlots(const std::string& source, const std::string& target)
@@ -479,6 +492,13 @@ void cedar::proc::Network::disconnectSlots(const std::string& source, const std:
        )
     {
       this->removeDataConnection(it);
+      // inform any interested listeners of this new connection
+      mDataConnectionChanged
+      (
+        this->getElement<cedar::proc::Connectable>(source_name)->getOutputSlot(source_slot),
+        this->getElement<cedar::proc::Connectable>(target_name)->getInputSlot(target_slot),
+        false
+      );
       return;
     }
   }
@@ -496,6 +516,12 @@ void cedar::proc::Network::disconnectTrigger(cedar::proc::TriggerPtr source, ced
     if ((*it)->equals(source, target))
     {
       mTriggerConnections.erase(it);
+      mTriggerConnectionChanged
+      (
+        source,
+        target,
+        false
+      );
       return;
     }
   }
@@ -1088,6 +1114,22 @@ void cedar::proc::Network::demoteSlot(cedar::proc::DataRole::Id role, const std:
 boost::signals2::connection cedar::proc::Network::connectToSlotChangedSignal(boost::function<void ()> slot)
 {
   return mSlotChanged.connect(slot);
+}
+
+boost::signals2::connection cedar::proc::Network::connectToTriggerConnectionChanged
+                            (
+                              boost::function<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> slot
+                            )
+{
+  return mTriggerConnectionChanged.connect(slot);
+}
+
+boost::signals2::connection cedar::proc::Network::connectToDataConnectionChanged
+                            (
+                              boost::function<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> slot
+                            )
+{
+  return mDataConnectionChanged.connect(slot);
 }
 
 void cedar::proc::Network::processPromotedSlots()

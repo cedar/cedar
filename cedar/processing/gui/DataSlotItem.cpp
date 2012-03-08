@@ -197,13 +197,10 @@ cedar::proc::gui::ConnectValidity cedar::proc::gui::DataSlotItem::canConnectTo(G
 
 void cedar::proc::gui::DataSlotItem::connectTo(cedar::proc::gui::DataSlotItem *pTarget)
 {
-  cedar::proc::gui::ConnectValidity validity = this->canConnectTo(pTarget);
-  if (validity != cedar::proc::gui::CONNECT_NO)
-  {
-    cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
-    p_connection->setValidity(validity);
-    this->scene()->addItem(p_connection);
-  }
+  //!@todo check validity at non-gui layer
+  cedar::proc::gui::Connection *p_connection = new cedar::proc::gui::Connection(this, pTarget);
+  p_connection->setValidity(cedar::proc::gui::CONNECT_YES);
+  this->scene()->addItem(p_connection);
 }
 
 void cedar::proc::gui::DataSlotItem::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
