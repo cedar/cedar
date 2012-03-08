@@ -127,11 +127,6 @@ int main()
 
   std::cout << "number of errors initialized to zero...\n";
 
-  // Load the dynamics plugin
-  cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
-  cedar::dyn::getPluginDesciption(plugin);
-  cedar::proc::Manager::getInstance().load(plugin);
-
   //===================================================================================================================
   // 1D to 0D
   //===================================================================================================================

@@ -36,11 +36,37 @@
 
 // CEDAR INCLUDES
 #include "cedar/dynamics/sources/Noise.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/processing/ElementDeclaration.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr noise_decl
+    (
+      new cedar::proc::ElementDeclarationTemplate<cedar::dyn::Noise>("Sources", "cedar.dynamics.Noise")
+    );
+    noise_decl->setIconPath(":/steps/noise.svg");
+
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(noise_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
