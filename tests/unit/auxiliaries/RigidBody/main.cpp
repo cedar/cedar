@@ -84,7 +84,7 @@ int main()
     errors++;
     std::cout << "ERROR with setPosition(Mat) or getPosition()" << std::endl;
   }
-  
+
   //--------------------------------------------------------------------------------------------------------------------
   // rotate
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,6 +118,43 @@ int main()
   {
     errors++;
     std::cout << "ERROR with rotate()" << std::endl;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // transformation
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout << "test: transformation" << std::endl;
+  cv::Mat T = cv::Mat::ones(4, 4, CV_64FC1);
+  T.at<double>(0, 0) = 0;
+  T.at<double>(1, 0) = 1;
+  T.at<double>(2, 0) = 0;
+  T.at<double>(0, 1) = -1;
+  T.at<double>(1, 1) = 0;
+  T.at<double>(2, 1) = 0;
+  T.at<double>(0, 2) = 0;
+  T.at<double>(1, 2) = 0;
+  T.at<double>(2, 2) = 1;
+  T.at<double>(0, 3) = 5;
+  T.at<double>(1, 3) = 6;
+  T.at<double>(2, 3) = 7;
+  rigid_body.setTransformation(T);
+  if (
+      rigid_body.getTransformation().at<double>(0, 0) != 0.0
+      || rigid_body.getTransformation().at<double>(1, 0) != 1.0
+      || rigid_body.getTransformation().at<double>(2, 0) != 0.0
+      || rigid_body.getTransformation().at<double>(0, 1) != -1.0
+      || rigid_body.getTransformation().at<double>(1, 1) != 0.0
+      || rigid_body.getTransformation().at<double>(2, 1) != 0.0
+      || rigid_body.getTransformation().at<double>(0, 2) != 0.0
+      || rigid_body.getTransformation().at<double>(1, 2) != 0.0
+      || rigid_body.getTransformation().at<double>(2, 2) != 1.0
+      || rigid_body.getTransformation().at<double>(0, 3) != 5.0
+      || rigid_body.getTransformation().at<double>(1, 3) != 6.0
+      || rigid_body.getTransformation().at<double>(2, 3) != 7.0
+      )
+  {
+    errors++;
+    std::cout << "ERROR with setTransformation(cv::Mat) or getTransformation()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
