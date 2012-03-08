@@ -173,6 +173,10 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
+  void checkDataConnection(cedar::proc::DataSlotPtr source, cedar::proc::DataSlotPtr target, bool added);
+
+  void checkTriggerConnection(cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool added);
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

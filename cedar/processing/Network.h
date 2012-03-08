@@ -265,6 +265,16 @@ public:
     boost::function<void (cedar::proc::Network*, cedar::proc::ElementPtr)> slot
   );
   
+  boost::signals2::connection connectToTriggerConnectionChanged
+  (
+    boost::function<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> slot
+  );
+
+  boost::signals2::connection connectToDataConnectionChanged
+  (
+    boost::function<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> slot
+  );
+
   boost::signals2::connection connectToSlotChangedSignal(boost::function<void ()> slot);
 
   void processPromotedSlots();
@@ -341,6 +351,8 @@ private:
 protected:
   //!@brief a boost signal that is emitted if a change in slot takes place
   boost::signals2::signal<void ()> mSlotChanged;
+  boost::signals2::signal<void (cedar::proc::TriggerPtr, cedar::proc::TriggerablePtr, bool)> mTriggerConnectionChanged;
+  boost::signals2::signal<void (cedar::proc::DataSlotPtr, cedar::proc::DataSlotPtr, bool)> mDataConnectionChanged;
 
   cedar::aux::StringVectorParameterPtr _mPromotedSlots;
 private:

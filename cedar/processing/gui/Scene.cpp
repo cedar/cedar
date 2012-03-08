@@ -546,7 +546,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_DATA_ITEM:
               {
                 cedar::proc::gui::DataSlotItem *p_data_target = dynamic_cast<cedar::proc::gui::DataSlotItem*>(target);
-                p_source->connectTo(p_data_target);
                 std::string source_name
                   = p_source->getSlot()->getParent() + std::string(".") + p_source->getSlot()->getName();
                 std::string target_name
@@ -584,7 +583,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER:
               {
                 cedar::proc::gui::TriggerItem *p_trigger = dynamic_cast<cedar::proc::gui::TriggerItem*>(target);
-                source->connectTo(p_trigger);
                 source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_trigger->getTrigger());
                 break; // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_TRIGGER
               }
@@ -592,7 +590,6 @@ void cedar::proc::gui::Scene::connectModeProcessMouseRelease(QGraphicsSceneMouse
               case cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP:
               {
                 cedar::proc::gui::StepItem *p_step_item = dynamic_cast<cedar::proc::gui::StepItem*>(target);
-                source->connectTo(p_step_item);
                 source->getTrigger()->getNetwork()->connectTrigger(source->getTrigger(), p_step_item->getStep());
                 break;
               } // cedar::proc::gui::GraphicsBase::GRAPHICS_GROUP_STEP

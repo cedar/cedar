@@ -114,6 +114,11 @@ public:
    */
   void connectTo(cedar::proc::gui::TriggerItem *pTarget);
 
+  /*!@brief graphically connect to suiitable GraphicsItem
+   * @param pTarget pointer to GraphicsItem
+   */
+  void connectTo(cedar::proc::gui::GraphicsBase *pTarget);
+
   //!@brief read configuration from a node
   void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
