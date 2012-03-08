@@ -41,6 +41,8 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 
@@ -63,10 +65,23 @@ class cedar::aux::ObjectListParameter : public cedar::aux::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ObjectListParameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault = true)
+  ObjectListParameter(cedar::aux::Configurable *pOwner, const std::string& name)
   :
-  cedar::aux::Parameter(pOwner, name, hasDefault)
-  {}
+  cedar::aux::Parameter(pOwner, name, false)
+  {
+  }
+
+  ObjectListParameter
+  (
+    cedar::aux::Configurable *pOwner,
+    const std::string& name,
+    const std::vector<BaseTypePtr>& defaults
+  )
+  :
+  cedar::aux::Parameter(pOwner, name, true)
+  {
+    this->mDefaults = defaults;
+  }
 
   //!@brief Destructor
 
@@ -94,12 +109,12 @@ public:
     cedar::aux::ConfigurationNode object_list_node;
     for
     (
-      std::vector<cedar::aux::ConfigurablePtr>::const_iterator iter = this->mObjectList.begin();
+      typename std::vector<BaseTypePtr>::const_iterator iter = this->mObjectList.begin();
       iter != this->mObjectList.end();
       ++iter
     )
     {
-      cedar::aux::ConfigurablePtr value = *iter;
+      BaseTypePtr value = *iter;
       cedar::aux::ConfigurationNode value_node;
       value->writeConfiguration(value_node);
 
@@ -113,7 +128,7 @@ public:
   //!@brief set parameter to default
   virtual void makeDefault()
   {
-    //!@todo Fill this method.
+    this->mObjectList = this->mDefaults;
   }
 
 
@@ -159,6 +174,9 @@ protected:
 private:
   //! vector of pointers to the various objects
   std::vector<BaseTypePtr> mObjectList;
+
+  //! The default values.
+  std::vector<BaseTypePtr> mDefaults;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
