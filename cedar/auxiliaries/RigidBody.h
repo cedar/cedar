@@ -92,6 +92,11 @@ public:
   //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
   cv::Mat getTransformation() const;
 
+  /*!@brief sets the transformation matrix
+   * @param transformation \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
+   */
+  void setTransformation(cv::Mat transformation);
+
 public slots:
   /*!@brief set the position of the object frame origin in the world frame
    * @param x    coordinates of

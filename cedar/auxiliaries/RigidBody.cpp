@@ -116,6 +116,12 @@ cv::Mat cedar::aux::RigidBody::getTransformation() const
   return mTransformation.clone();
 }
 
+void cedar::aux::RigidBody::setTransformation(cv::Mat transformation)
+{
+  QWriteLocker locker(&mLock);
+  mTransformation = transformation;
+}
+
 void cedar::aux::RigidBody::setPosition(double x, double y, double z)
 {
   QWriteLocker locker(&mLock);
