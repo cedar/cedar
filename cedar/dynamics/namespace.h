@@ -73,7 +73,7 @@ namespace cedar
     //!@endcond
 
     //!@brief A function for loading the declarations of the dynamics namespace as plugin.
-    CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin);
+    CEDAR_DECLARE_DEPRECATED(CEDAR_DYN_LIB_EXPORT void getPluginDesciption(cedar::proc::PluginDeclarationPtr plugin));
   }
 }
 

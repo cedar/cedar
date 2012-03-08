@@ -41,6 +41,8 @@
 #include "cedar/processing/ProjectionMappingParameter.h"
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Arguments.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
@@ -62,6 +64,33 @@ const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Pr
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::MAXIMUM;
 const cedar::proc::steps::Projection::CompressionType::Id cedar::proc::steps::Projection::CompressionType::MINIMUM;
 #endif
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr projection_decl
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::Projection>
+      (
+        "Utilities",
+        "cedar.processing.Projection"
+      )
+    );
+    projection_decl->setIconPath(":/steps/projection.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(projection_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
