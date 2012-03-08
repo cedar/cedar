@@ -98,6 +98,9 @@ public:
   void setTransformation(cv::Mat transformation);
 
 public slots:
+  //!@brief updates the model
+  virtual void update();
+
   /*!@brief set the position of the object frame origin in the world frame
    * @param x    coordinates of
    * @param y    value for green channel in RGB color

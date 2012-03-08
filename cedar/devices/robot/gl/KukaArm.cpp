@@ -35,8 +35,7 @@
 ======================================================================================================================*/
 
 #define NOMINMAX // to avoid Windows issues
-#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+//#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/System.h"
@@ -392,35 +391,6 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
 void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 {
 
-}
-
-void cedar::dev::robot::gl::KukaArm::drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces)
-{
-  // bind the buffers
-  glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
-
-  // set the pointers
-  glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(12));
-  glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(20));
-  glColorPointer(4, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(32));
-  glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
-
-  // prepare
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_COLOR_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_VERTEX_ARRAY);
-
-  // draw
-  glShadeModel(GL_SMOOTH);
-  glDrawElements(GL_TRIANGLES, numberOfFaces*3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0));
-
-  // reset
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void cedar::dev::robot::gl::KukaArm::setMaterial(int material)

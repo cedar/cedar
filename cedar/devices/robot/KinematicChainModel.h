@@ -19,19 +19,19 @@
 
 ========================================================================================================================
 
-    Institute:   Ruhr-Universitaet Bochum
-                 Institut fuer Neuroinformatik
+ ----- Institute:   Ruhr-Universitaet Bochum
+                    Institut fuer Neuroinformatik
 
-    File:        KinematicChainModel.h
+ ----- File:        KinematicChainModel.h
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 08 30
+ ----- Maintainer:  Hendrik Reimann
+ ----- Email:       hendrik.reimann@ini.rub.de
+ ----- Date:        2010 11 03
 
-    Description: Header for the @em cedar::dev::robot::KinematicChainModel class.
+ ----- Description: Header for the @em cedar::dev::robot::KinematicChainModel class.
+                    Calculates the geometric transformations occurring in a serial chain depending upon joint angles
 
-    Credits:
-
+ ----- Credits:     Mathematics from Murray, Lee, Sastry: A mathematical introduction to robotic manipulation
 ======================================================================================================================*/
 
 #ifndef CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_MODEL_H
@@ -83,6 +83,12 @@ public:
 public:
   //!@brief constructor
   KinematicChainModel(cedar::dev::robot::KinematicChainPtr pKinematicChain);
+  //!@brief constructor with end-effector
+  KinematicChainModel
+  (
+    cedar::dev::robot::KinematicChainPtr pKinematicChain,
+    cedar::aux::RigidBodyPtr pEndEffector
+  );
   //!@brief destructor
   virtual ~KinematicChainModel();
   
@@ -113,6 +119,18 @@ public:
    */
   unsigned int getNumberOfJoints();
   
+  /*!@brief returns a smart-pointer to the end-effector
+   *
+   * @return smart-pointer to the end-effector
+   */
+  cedar::aux::RigidBodyPtr getEndEffector();
+
+  /*!@brief sets the end-effector
+   *
+   * @param pEndEffector new end-effector
+   */
+  void setEndEffector(cedar::aux::RigidBodyPtr pEndEffector);
+
   /*!@brief transformation matrix between base frame and the specified joint frame
    *
    * @param index    index of the joint to which the transformation is given
@@ -271,6 +289,9 @@ protected:
   //!@brief pointer to the kinematic chain that is being modelled
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
+  //!@brief pointer to the rigid body that is the end-effector of the modelled kinematic chain
+  cedar::aux::RigidBodyPtr mpEndEffector;
+
 private:
   // locks
   QReadWriteLock mTransformationsLock;
@@ -287,7 +308,7 @@ private:
   //! transformation matrices to the joint frames in the current configuration
   std::vector<cv::Mat> mJointTransformations;
   //! transformation matrix to the end-effecor frame in the current configuration
-  cv::Mat mEndEffectorTransformation;
+//  cv::Mat mEndEffectorTransformation;
   //! twist coordinates for the transformations induced by rotating the joints in the curent configuration
   std::vector<cv::Mat> mJointTwists;
 }; // class cedar::dev::robot::KinematicChainModel
