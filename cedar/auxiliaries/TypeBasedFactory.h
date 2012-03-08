@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -110,7 +111,7 @@ public:
       }
     }
     std::string message = "Type of the base pointer (";
-    message += typeid(pointer.get()).name();
+    message += cedar::aux::objectTypeToString(pointer);
     message += ") is not handled in the TypeBasedFactory.";
     CEDAR_THROW(cedar::aux::UnknownTypeException, message);
     return FactoryPtr();
