@@ -62,6 +62,8 @@
 #include "cedar/auxiliaries/gui/UIntVectorParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
 #include "cedar/auxiliaries/gui/DirectoryParameter.h"
+#include "cedar/auxiliaries/ObjectListParameter.h"
+#include "cedar/auxiliaries/gui/ObjectListParameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
@@ -289,6 +291,13 @@ cedar::proc::gui::PropertyPane::DataWidgetTypes& cedar::proc::gui::PropertyPane:
     <
       cedar::aux::FileParameter,
       cedar::aux::gui::FileParameter
+    >
+    ();
+
+    cedar::proc::gui::PropertyPane::mDataWidgetTypes.addDerived
+    <
+      cedar::aux::ObjectListParameter,
+      cedar::aux::gui::ObjectListParameter
     >
     ();
 

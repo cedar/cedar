@@ -28,60 +28,43 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2012 03 09
 
-    Description: Parameter for a list of arbitrary length of dynamically allocatable, configurable objects. Ha!
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_OBJECT_LIST_PARAMETER_H
-#define CEDAR_AUX_OBJECT_LIST_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_OBJECT_LIST_PARAMETER_H
+#define CEDAR_AUX_GUI_OBJECT_LIST_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Base class for a parameter that reads a list of configurable objects from a file.
+/*!@brief User interface representation of cedar::aux::ObjectListParameter.
  */
-class cedar::aux::ObjectListParameter : public cedar::aux::Parameter
+class cedar::aux::gui::ObjectListParameter : public cedar::aux::gui::Parameter
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ObjectListParameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
-  :
-  cedar::aux::Parameter(pOwner, name, hasDefault)
-  {
-  }
+
+  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-
-  //!@brief return the size of the vector
-  virtual size_t size() const
-  {
-    // default implementation -- must be overridden in all classes
-    // this cannot be pure virtual, because this class may not be abstract due to restrictions of the gui.
-    return 0;
-  }
-
-  /*!@brief Returns the object with the given index.
-   *
-   * @todo There needs to be a const variant of this.
-   */
-  virtual cedar::aux::ConfigurablePtr configurableAt(size_t /*index*/)
-  {
-    // default implementation -- must be overridden in all classes
-    // this cannot be pure virtual, because this class may not be abstract due to restrictions of the gui.
-    return cedar::aux::ConfigurablePtr();
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -112,7 +95,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::ObjectListParameter
+}; // class cedar::aux::gui::ObjectListParameter
 
-#endif // CEDAR_AUX_OBJECT_LIST_PARAMETER_H
+#endif // CEDAR_AUX_GUI_OBJECT_LIST_PARAMETER_H
 
