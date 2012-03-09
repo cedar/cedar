@@ -234,15 +234,6 @@ private:
   //! The default values.
   std::vector<BaseTypePtr> mDefaults;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::ObjectListParameterTemplate
 
 #endif // CEDAR_AUX_OBJECT_LIST_PARAMETER_TEMPLATE_H

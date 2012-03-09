@@ -53,7 +53,6 @@ namespace cedar
   namespace aux
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Base);
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
@@ -98,6 +97,7 @@ namespace cedar
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
     //!@endcond
 
@@ -109,6 +109,8 @@ namespace cedar
     template <typename T> class VectorParameter;
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
+    //!@brief a template class for storing objects that are allocated dynamically.
+    template <typename T> class ObjectParameterTemplate;
     //!@brief a template class for lists of objects of arbitrary type
     template <typename T> class ObjectListParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
