@@ -186,7 +186,12 @@ protected:
    */
   void loadIndexData(const QString& dataFileName, unsigned int numberOfFaces, GLushort* indices);
 
-  void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
+  void drawElement
+  (
+    const GLuint vertexVboId,
+    const GLuint indexVboId,
+    unsigned int numberOfFaces
+  );
 
   //todo: this should be done with a struct for material
   void setMaterial(int material);

@@ -77,7 +77,7 @@ cedar::dev::robot::gl::Sdh::~Sdh()
 void cedar::dev::robot::gl::Sdh::initializeGl()
 {
   std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
-  // base segment
+  // palm
   glGenBuffers(1, &mPalmVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mPalmVertexVboId);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mPalmVertexNumber, NULL, GL_STATIC_DRAW);
@@ -85,6 +85,24 @@ void cedar::dev::robot::gl::Sdh::initializeGl()
   glGenBuffers(1, &mPalmIndexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mPalmIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mPalmFacesNumber*3 * sizeof(GLushort), mPalmIndex, GL_STATIC_DRAW);
+
+  // root
+  glGenBuffers(1, &mRootVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mRootVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mRootVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mRootVertexNumber, mRootVertex);
+  glGenBuffers(1, &mRootIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mRootIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mRootFacesNumber*3 * sizeof(GLushort), mRootIndex, GL_STATIC_DRAW);
+
+  // knuckle
+  glGenBuffers(1, &mKnuckleVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mKnuckleVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mKnuckleVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mKnuckleVertexNumber, mKnuckleVertex);
+  glGenBuffers(1, &mKnuckleIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mKnuckleIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mKnuckleFacesNumber*3 * sizeof(GLushort), mKnuckleIndex, GL_STATIC_DRAW);
 
 }
 
@@ -109,34 +127,32 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    if (mIsDrawnAsWireFrame)
-    {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
-    else
-    {
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
+    glTranslated(0, 0, .098 - .0175 - 0.025);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
     this->drawElement(mPalmVertexVboId, mPalmIndexVboId, mPalmFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    this->drawElement(mRootVertexVboId, mRootIndexVboId, mRootFacesNumber);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
-//    cedar::aux::gl::drawDisk(.0, .06, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-//    cedar::aux::gl::drawCone(0.0, 0.09, 0.06, 0.06, mResolution, mIsDrawnAsWireFrame);
-//    glTranslated(.0, .0, .09);
-//    cedar::aux::gl::drawDisk(.0, .06, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-//    glTranslated(.0, .0, -.09);
+    glTranslated(0, 0, -.098 + .0175 + 0.025);
 
     // first finger root
     glTranslated(.019053, -0.033, .098);
+    glRotated(mpKinematicChain->getJointAngle(6)*180.0/M_PI, 0, 0, -1);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    glRotated(mpKinematicChain->getJointAngle(6)*180.0/M_PI, 0, 0, -1);
+    glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
-    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mKnuckleVertexVboId, mKnuckleIndexVboId, mKnuckleFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     glRotated(-90, 1, 0, 0);
+    glTranslated(.0, 0.0, .0175);
+//    glRotated(90, 1, 0, 0);
+//    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+//    glRotated(-90, 1, 0, 0);
 
     // first finger proximal link
     glRotated(mpKinematicChain->getJointAngle(0)*180.0/M_PI, 0, -1, 0);
@@ -262,7 +278,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
 void cedar::dev::robot::gl::Sdh::loadData()
 {
-  // base segment
+  // palm
   QString palm_vertex_data_file_name
     = QString(cedar::aux::System::locateResource("meshes/sdh/palm_vertex.txt").c_str());
   loadVertexData(palm_vertex_data_file_name, mPalmVertexNumber, mPalmVertex);
@@ -270,6 +286,21 @@ void cedar::dev::robot::gl::Sdh::loadData()
     = QString(cedar::aux::System::locateResource("meshes/sdh/palm_index.txt").c_str());
   loadIndexData(palm_index_data_file_name, mPalmFacesNumber, mPalmIndex);
 
+  // root
+  QString root_vertex_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/root_vertex.txt").c_str());
+  loadVertexData(root_vertex_data_file_name, mRootVertexNumber, mRootVertex);
+  QString root_index_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/root_index.txt").c_str());
+  loadIndexData(root_index_data_file_name, mRootFacesNumber, mRootIndex);
+
+  // knuckle
+  QString knuckle_vertex_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/knuckle_vertex.txt").c_str());
+  loadVertexData(knuckle_vertex_data_file_name, mKnuckleVertexNumber, mKnuckleVertex);
+  QString knuckle_index_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/knuckle_index.txt").c_str());
+  loadIndexData(knuckle_index_data_file_name, mKnuckleFacesNumber, mKnuckleIndex);
 
 }
 
