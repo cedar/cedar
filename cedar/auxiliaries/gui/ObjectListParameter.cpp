@@ -37,9 +37,23 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ObjectListParameter.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QGridLayout>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate aux::gui parameter with the aux parameter
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->addDerived
+      <
+        cedar::aux::ObjectListParameter,
+        cedar::aux::gui::ObjectListParameter
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

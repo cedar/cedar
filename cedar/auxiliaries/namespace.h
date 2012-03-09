@@ -93,14 +93,7 @@ namespace cedar
     template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
     template <class BaseTypePtr> class FactoryManager;
 
-    template
-    <
-      class KeyBaseType,
-      class ValueBaseType,
-      typename KeySmartPointerType = boost::shared_ptr<KeyBaseType>,
-      typename ValueSmartPointerType = boost::shared_ptr<ValueBaseType>
-    >
-    class TypeBasedFactory;
+    template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
