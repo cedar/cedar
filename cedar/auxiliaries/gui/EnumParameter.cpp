@@ -38,10 +38,24 @@
 #include "cedar/auxiliaries/gui/EnumParameter.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/defines.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
 #include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate aux::gui parameter with the aux parameter
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::aux::EnumParameter,
+        cedar::aux::gui::EnumParameter
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

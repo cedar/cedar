@@ -54,10 +54,8 @@
  */
 template
 <
-  class KeyBaseType,
-  class ValueBaseType,
-  typename KeySmartPointerType, // = boost::shared_ptr<KeyBaseType>
-  typename ValueSmartPointerType // = boost::shared_ptr<ValueBaseType>
+  typename KeyBasePtr,
+  typename ValueBasePtr
 >
 class cedar::aux::TypeBasedFactory
 {
@@ -65,11 +63,11 @@ class cedar::aux::TypeBasedFactory
   // types
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //! Type for a smart pointer to the key type.
-  typedef KeySmartPointerType KeyBaseTypePtr;
+  typedef typename KeyBasePtr::element_type KeyBaseType;
+  typedef typename ValueBasePtr::element_type ValueBaseType;
 
   //! Type for the factory.
-  typedef boost::shared_ptr<cedar::aux::Factory<ValueSmartPointerType> > FactoryPtr;
+  typedef boost::shared_ptr<cedar::aux::Factory<ValueBasePtr> > FactoryPtr;
 
 private:
   //! Struct for the entries in the factory.
@@ -81,7 +79,7 @@ private:
     //! The factory for this type.
     FactoryPtr mFactory;
 
-    virtual bool matches(KeyBaseTypePtr pointer) const
+    virtual bool matches(KeyBasePtr pointer) const
     {
       return *this->mTypeInfo == typeid(*pointer);
     }
@@ -92,7 +90,7 @@ private:
   template <typename T>
   struct DerivableEntry : public Entry
   {
-    bool matches(KeyBaseTypePtr pointer) const
+    bool matches(KeyBasePtr pointer) const
     {
       return boost::dynamic_pointer_cast<T>(pointer);
     }
@@ -116,7 +114,7 @@ public:
    *        After calling this function, the type Key can be used to create objects of the type Value.
    */
   template <class Key, class Value>
-  void add()
+  bool add()
   {
     EntryPtr entry(new Entry());
     entry->mTypeInfo = &typeid(Key);
@@ -125,6 +123,9 @@ public:
                         new cedar::aux::FactoryDerived<boost::shared_ptr<ValueBaseType>, boost::shared_ptr<Value> >()
                       );
     mKeyTypes.push_back(entry);
+
+    // this always returns true to allow the use of static initalization for registering types.
+    return true;
   }
 
   /*!@brief Adds an association into the factory.
@@ -133,7 +134,7 @@ public:
    *        type Value.
    */
   template <class Key, class Value>
-  void addDerived()
+  bool addDerived()
   {
     DerivableEntry<Key> *entry = new DerivableEntry<Key>();
     entry->mTypeInfo = &typeid(Key);
@@ -142,11 +143,14 @@ public:
                         new cedar::aux::FactoryDerived<boost::shared_ptr<ValueBaseType>, boost::shared_ptr<Value> >()
                       );
     mKeyTypes.push_back(EntryPtr(entry));
+
+    // this always returns true to allow the use of static initalization for registering types.
+    return true;
   }
 
   /*!@brief Returns the factory associated with the type of the object pointed to by the parameter.
    */
-  FactoryPtr get(KeyBaseTypePtr pointer)
+  FactoryPtr get(KeyBasePtr pointer)
   {
     for(typename KeyTypes::iterator iter = this->mKeyTypes.begin(); iter != this->mKeyTypes.end(); ++iter)
     {

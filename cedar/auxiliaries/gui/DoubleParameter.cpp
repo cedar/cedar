@@ -41,10 +41,24 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DoubleParameter.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
 #include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate aux::gui parameter with the aux parameter
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::aux::DoubleParameter,
+        cedar::aux::gui::DoubleParameter
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

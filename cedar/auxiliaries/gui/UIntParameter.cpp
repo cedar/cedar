@@ -41,11 +41,24 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/UIntParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
 #include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate aux::gui parameter with the aux parameter
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::aux::UIntParameter,
+        cedar::aux::gui::UIntParameter
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
