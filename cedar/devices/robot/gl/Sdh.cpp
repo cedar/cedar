@@ -76,6 +76,15 @@ cedar::dev::robot::gl::Sdh::~Sdh()
 
 void cedar::dev::robot::gl::Sdh::initializeGl()
 {
+  std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
+  // base segment
+  glGenBuffers(1, &mPalmVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mPalmVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mPalmVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mPalmVertexNumber, mPalmVertex);
+  glGenBuffers(1, &mPalmIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mPalmIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mPalmFacesNumber*3 * sizeof(GLushort), mPalmIndex, GL_STATIC_DRAW);
 
 }
 
@@ -84,6 +93,7 @@ void cedar::dev::robot::gl::Sdh::draw()
   setAxisLength(0);
   setResolution(20);
   setColor(.5, .5, .5);
+
   prepareDraw();
 
   if (mIsVisible)
@@ -99,11 +109,22 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    cedar::aux::gl::drawDisk(.0, .06, mResolution, mResolution, true, mIsDrawnAsWireFrame);
-    cedar::aux::gl::drawCone(0.0, 0.09, 0.06, 0.06, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(.0, .0, .09);
-    cedar::aux::gl::drawDisk(.0, .06, mResolution, mResolution, false, mIsDrawnAsWireFrame);
-    glTranslated(.0, .0, -.09);
+    if (mIsDrawnAsWireFrame)
+    {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+    else
+    {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mPalmVertexVboId, mPalmIndexVboId, mPalmFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+//    cedar::aux::gl::drawDisk(.0, .06, mResolution, mResolution, true, mIsDrawnAsWireFrame);
+//    cedar::aux::gl::drawCone(0.0, 0.09, 0.06, 0.06, mResolution, mIsDrawnAsWireFrame);
+//    glTranslated(.0, .0, .09);
+//    cedar::aux::gl::drawDisk(.0, .06, mResolution, mResolution, false, mIsDrawnAsWireFrame);
+//    glTranslated(.0, .0, -.09);
 
     // first finger root
     glTranslated(.019053, -0.033, .098);
@@ -241,6 +262,13 @@ void cedar::dev::robot::gl::Sdh::draw()
 
 void cedar::dev::robot::gl::Sdh::loadData()
 {
+  // base segment
+  QString palm_vertex_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/palm_vertex.txt").c_str());
+  loadVertexData(palm_vertex_data_file_name, mPalmVertexNumber, mPalmVertex);
+  QString palm_index_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/palm_index.txt").c_str());
+  loadIndexData(palm_index_data_file_name, mPalmFacesNumber, mPalmIndex);
 
 
 }
