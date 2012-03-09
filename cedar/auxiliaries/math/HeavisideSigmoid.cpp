@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        HeavysideSigmoid.cpp
+    File:        HeavisideSigmoid.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -35,8 +35,9 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/HeavysideSigmoid.h"
+#include "cedar/auxiliaries/math/HeavisideSigmoid.h"
 #include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 
@@ -46,7 +47,7 @@
 namespace
 {
   bool registered
-    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavysideSigmoidPtr>();
+    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::HeavisideSigmoidPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,7 +58,7 @@ namespace
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::aux::math::HeavysideSigmoid::compute(double value) const
+double cedar::aux::math::HeavisideSigmoid::compute(double value) const
 {
   return cedar::aux::math::sigmoidHeaviside(value, mThreshold->getValue());
 }
