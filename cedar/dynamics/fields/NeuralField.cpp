@@ -94,10 +94,19 @@ mNeuralNoise(new cedar::aux::MatData(cv::Mat::zeros(10,10,CV_32F))),
 mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 0)),
 mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
-mSigmoid(new cedar::aux::math::AbsSigmoid(0.0, 10.0)),
+// parameters
 _mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
-_mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.0, 1000.0))
+_mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.0, 1000.0)),
+_mSigmoid
+(
+  new cedar::dyn::NeuralField::SigmoidParameter
+  (
+    this,
+    "sigmoid",
+    cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
+  )
+)
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
@@ -112,8 +121,6 @@ _mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.
   this->setOutput("sigmoid(activation)", mSigmoidalActivation);
 
   this->declareInputCollection("input");
-
-  this->addConfigurableChild("sigmoid", this->mSigmoid);
 
   std::vector<double> sigmas;
   std::vector<double> shifts;
@@ -134,13 +141,6 @@ _mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.
                                                                                                       2
                                                                                                     ));
     kernel_defaults.push_back(kernel);
-//    mKernels.push_back(kernel);
-//    std::string kernel_name("lateralKernel");
-//    kernel_name += boost::lexical_cast<std::string>(i);
-//    this->declareBuffer(kernel_name);
-//    this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
-//    this->mKernels.at(i)->hideDimensionality(true);
-//    this->addConfigurableChild(kernel_name, this->mKernels.at(i));
   }
   _mKernels = KernelListParameterPtr
               (
@@ -236,16 +236,17 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     neural_noise = this->mNoiseCorrelationKernel->convolveWith(neural_noise);
     mNoiseCorrelationKernel->getReadWriteLock()->unlock();
     //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
-    sigmoid_u = mSigmoid->compute<float>(
-                                          u
-                                          + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1000.0))
-                                            * neural_noise
-                                        );
+    sigmoid_u = _mSigmoid->getValue()->compute<float>
+                (
+                  u
+                  + sqrt(cedar::unit::Milliseconds(time)/cedar::unit::Milliseconds(1000.0))
+                    * neural_noise
+                );
   }
   else
   {
     // calculate output
-    sigmoid_u = mSigmoid->compute<float>(u);
+    sigmoid_u = _mSigmoid->getValue()->compute<float>(u);
   }
 
   // calculate the lateral interactions for all kernels

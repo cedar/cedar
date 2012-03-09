@@ -49,6 +49,7 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/ObjectParameterTemplate.h"
 #include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/namespace.h"
 
@@ -69,8 +70,12 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
   typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
+
+  typedef cedar::aux::ObjectParameterTemplate<cedar::aux::math::Sigmoid> SigmoidParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(SigmoidParameter);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -149,8 +154,6 @@ protected:
   cedar::aux::DoubleParameterPtr mTau; //!@todo deal with units, now: milliseconds
   //!@brief the global inhibition of the field, which is not contained in the kernel
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
-  //!@brief any sigmoid function
-  cedar::aux::math::SigmoidPtr mSigmoid;
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
 private:
@@ -172,6 +175,8 @@ protected:
   //!@brief The list of kernels for this field.
   KernelListParameterPtr _mKernels;
 
+  //!@brief any sigmoid function
+  SigmoidParameterPtr _mSigmoid;
 private:
   // none yet
 
