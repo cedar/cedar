@@ -40,14 +40,19 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/ObjectListParameter.h"
 
 // SYSTEM INCLUDES
+#include <QComboBox>
+#include <QPushButton>
 
 
 /*!@brief User interface representation of cedar::aux::ObjectListParameter.
  */
 class cedar::aux::gui::ObjectListParameter : public cedar::aux::gui::Parameter
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -57,6 +62,7 @@ class cedar::aux::gui::ObjectListParameter : public cedar::aux::gui::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
+  ObjectListParameter();
 
   //!@brief Destructor
 
@@ -76,7 +82,25 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  cedar::aux::ConfigurablePtr getSelectedInstance();
+
+  inline cedar::aux::ObjectListParameterPtr getObjectList()
+  {
+    //!@todo make this an asserted cast, because it should never fail.
+    return boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(this->getParameter());
+  }
+
+private slots:
+  void parameterPointerChanged();
+
+  void addClicked();
+
+  void removeClicked();
+
+  void editClicked();
+
+  void currentInstanceIndexChanged(int index);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -84,7 +108,21 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! Combo box for selecting the type to add.
+  QComboBox *mpTypeSelector;
+
+  //! Combo box for selecting the instance.
+  QComboBox *mpInstanceSelector;
+
+  //! Button for adding a new child
+  QPushButton *mpAddButton;
+
+  //! Button for removing a child
+  QPushButton *mpRemoveButton;
+
+  //! Button for removing a child
+  QPushButton *mpEditButton;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
