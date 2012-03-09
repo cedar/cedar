@@ -37,26 +37,8 @@
 // CEDAR INCLUDES
 
 #include "cedar/auxiliaries/gui/PropertyPane.h"
-#include "cedar/auxiliaries/BoolParameter.h"
-#include "cedar/auxiliaries/DoubleParameter.h"
-#include "cedar/auxiliaries/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/FileParameter.h"
-#include "cedar/auxiliaries/StringParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
-#include "cedar/auxiliaries/UIntVectorParameter.h"
-#include "cedar/auxiliaries/gui/BoolParameter.h"
-#include "cedar/auxiliaries/gui/DoubleParameter.h"
-#include "cedar/auxiliaries/gui/DoubleVectorParameter.h"
-#include "cedar/auxiliaries/gui/EnumParameter.h"
-#include "cedar/auxiliaries/gui/FileParameter.h"
-#include "cedar/auxiliaries/gui/StringParameter.h"
-#include "cedar/auxiliaries/gui/UIntParameter.h"
-#include "cedar/auxiliaries/gui/UIntVectorParameter.h"
-#include "cedar/auxiliaries/DirectoryParameter.h"
-#include "cedar/auxiliaries/gui/DirectoryParameter.h"
-#include "cedar/auxiliaries/ObjectListParameter.h"
-#include "cedar/auxiliaries/gui/ObjectListParameter.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/utilities.h"
 
@@ -220,77 +202,6 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
     QObject::connect(parameter.get(), SIGNAL(changedFlagChanged()), this, SLOT(parameterChangeFlagChanged()));
   }
 }
-
-//cedar::aux::gui::PropertyPane::DataWidgetTypes& cedar::aux::gui::PropertyPane::dataWidgetTypes()
-//{
-//  //!@todo do this differently, i.e., let each type register itself.
-//  if (cedar::aux::gui::PropertyPane::mDataWidgetTypes.empty())
-//  {
-//    // parameter types in auxiliaries
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-//    <
-//      cedar::aux::DoubleParameter,
-//      cedar::aux::gui::DoubleParameter
-//    >
-//    ();
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::UIntParameter, cedar::aux::gui::UIntParameter>();
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-//    <
-//      cedar::aux::StringParameter,
-//      cedar::aux::gui::StringParameter
-//    >
-//    ();
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-//    <
-//      cedar::aux::BoolParameter,
-//      cedar::aux::gui::BoolParameter
-//    >
-//    ();
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-//    <
-//      cedar::aux::DoubleVectorParameter,
-//      cedar::aux::gui::DoubleVectorParameter
-//    >
-//    ();
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-//    <
-//      cedar::aux::UIntVectorParameter,
-//      cedar::aux::gui::UIntVectorParameter
-//    >
-//    ();
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-//    <
-//      cedar::aux::DirectoryParameter,
-//      cedar::aux::gui::DirectoryParameter
-//    >
-//    ();
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add<cedar::aux::EnumParameter, cedar::aux::gui::EnumParameter>();
-//
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-//    <
-//      cedar::aux::FileParameter,
-//      cedar::aux::gui::FileParameter
-//    >
-//    ();
-//
-//    cedar::aux::gui::PropertyPane::mDataWidgetTypes.addDerived
-//    <
-//      cedar::aux::ObjectListParameter,
-//      cedar::aux::gui::ObjectListParameter
-//    >
-//    ();
-//
-//    // parameter types in processing
-//    //!@todo readd this!
-////    cedar::aux::gui::PropertyPane::mDataWidgetTypes.add
-////    <
-////      cedar::proc::ProjectionMappingParameter,
-////      cedar::proc::gui::ProjectionMappingParameter
-////    >
-////    ();
-//  }
-//  return cedar::aux::gui::PropertyPane::mDataWidgetTypes;
-//}
 
 int cedar::aux::gui::PropertyPane::getSenderParameterRowWidget() const
 {
