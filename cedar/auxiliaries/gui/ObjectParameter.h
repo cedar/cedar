@@ -28,127 +28,54 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
     Date:        2012 03 09
 
-    Description: Parameter for a dynamically allocatable, configurable object. Ha!
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_OBJECT_PARAMETER_TEMPLATE_H
-#define CEDAR_AUX_OBJECT_PARAMETER_TEMPLATE_H
+#ifndef CEDAR_AUX_GUI_OBJECT_PARAMETER_H
+#define CEDAR_AUX_GUI_OBJECT_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
+#include <QComboBox>
+#include <QPushButton>
+#include <boost/signals2.hpp>
 
 
-/*!@todo describe.
+/*!@brief User interface representation of cedar::aux::ObjectListParameter.
  *
- * @todo describe more.
- *
- * @remarks The objects cannot themselves have a parameter with the name "type".
+ * @todo React to a changed value in the parameter
  */
-template <typename BaseType>
-class cedar::aux::ObjectParameterTemplate : public cedar::aux::ObjectParameter
+class cedar::aux::gui::ObjectParameter : public cedar::aux::gui::Parameter
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  typedef boost::shared_ptr<BaseType> BaseTypePtr;
-  typedef boost::shared_ptr<const BaseType> ConstBaseTypePtr;
-  typedef cedar::aux::FactoryManager<BaseTypePtr> FactoryManager;
-  typedef cedar::aux::Singleton<FactoryManager> FactoryManagerSingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief A constructor.
-  ObjectParameterTemplate(cedar::aux::Configurable *pOwner, const std::string& name)
-  :
-  cedar::aux::ObjectParameter(pOwner, name, false)
-  {
-  }
+  //!@brief The standard constructor.
+  ObjectParameter();
 
-  //!@brief A constructor.
-  ObjectParameterTemplate
-  (
-    cedar::aux::Configurable *pOwner,
-    const std::string& name,
-    BaseTypePtr defaultObject
-  )
-  :
-  cedar::aux::ObjectParameter(pOwner, name, true)
-  {
-    this->mDefault = defaultObject;
-
-    this->makeDefault();
-  }
-
+  //!@brief Destructor
+  ~ObjectParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief set parameter to default
-  virtual void makeDefault()
-  {
-    this->setValue(this->mDefault);
-  }
-
-  //!@brief Set this parameter to a value read from a configuration node
-  virtual void readFromNode(const cedar::aux::ConfigurationNode& node)
-  {
-    std::string type = node.get_child("type").get_value<std::string>();
-    BaseTypePtr object = FactoryManagerSingleton::getInstance()->allocate(type);
-    object->readConfiguration(node);
-    this->mObject = object;
-  }
-
-  //!@brief Write the parameter's value to a configuration node.
-  virtual void writeToNode(cedar::aux::ConfigurationNode& root) const
-  {
-    // only store if the object is set.
-    if (this->mObject)
-    {
-      cedar::aux::ConfigurationNode node;
-      const std::string& type_id = FactoryManagerSingleton::getInstance()->getTypeId(this->mObject);
-      node.put("type", type_id);
-      this->mObject->writeConfiguration(node);
-      root.push_back(cedar::aux::ConfigurationNode::value_type(this->getName(), node));
-    }
-  }
-
-  void setValue(BaseTypePtr object)
-  {
-    this->mObject = object;
-
-    this->emitChangedSignal();
-  }
-
-  ConstBaseTypePtr getValue() const
-  {
-    return this->mObject;
-  }
-
-  void listTypes(std::vector<std::string>& types) const
-  {
-    FactoryManagerSingleton::getInstance()->listTypes(types);
-  }
-
-  cedar::aux::ConfigurablePtr getConfigurable()
-  {
-    return this->mObject;
-  }
-
-  void setType(const std::string& type)
-  {
-    BaseTypePtr object = FactoryManagerSingleton::getInstance()->allocate(type);
-    this->setValue(object);
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -160,7 +87,20 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  std::string getSelectedType() const;
+
+  inline cedar::aux::ObjectParameterPtr getObjectParameter()
+  {
+    //!@todo make this an asserted cast, because it should never fail.
+    return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectParameter>(this->getParameter());
+  }
+
+private slots:
+  void parameterPointerChanged();
+
+  void editClicked();
+
+  void currentTypeChanged(int index);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -168,14 +108,22 @@ private:
 protected:
   // none yet
 private:
-  //!@brief The current object instance.
-  BaseTypePtr mObject;
+  //! Combo box for selecting the type to add.
+  QComboBox *mpTypeSelector;
 
-  //!@brief The default object instance.
-  BaseTypePtr mDefault;
+  //! Button for removing a child
+  QPushButton *mpEditButton;
 
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+protected:
+  // none yet
 
-}; // class cedar::aux::ObjectParameterTemplate
+private:
+  // none yet
 
-#endif // CEDAR_AUX_OBJECT_PARAMETER_TEMPLATE_H
+}; // class cedar::aux::gui::ObjectParameter
+
+#endif // CEDAR_AUX_GUI_OBJECT_PARAMETER_H
 

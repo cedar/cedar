@@ -72,7 +72,11 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  virtual void listTypes(std::vector<std::string>& types) const = 0;
+
+  virtual cedar::aux::ConfigurablePtr getConfigurable() = 0;
+
+  virtual void setType(const std::string& type) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
