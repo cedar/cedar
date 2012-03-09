@@ -58,6 +58,7 @@ class cedar::aux::ObjectListParameterTemplate : public cedar::aux::ObjectListPar
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
   typedef typename boost::shared_ptr<BaseType> BaseTypePtr;
+  typedef typename boost::shared_ptr<const BaseType> ConstBaseTypePtr;
   typedef typename cedar::aux::Singleton<cedar::aux::FactoryManager<BaseTypePtr> > FactorySingleton;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -142,7 +143,6 @@ public:
 
   /*!@brief Returns the object with the given index.
    *
-   * @todo There needs to be a const variant of this.
    */
   BaseTypePtr at(size_t index)
   {
@@ -150,6 +150,7 @@ public:
 
     return this->mObjectList.at(index);
   }
+
 
   /*!
    * @remarks This method must be overridden because ConfigurablePtr and BaseTypePtr are not considered covariant types.
@@ -165,6 +166,16 @@ public:
     this->mObjectList.push_back(object);
   }
 
+  void listTypes(std::vector<std::string>& types) const
+  {
+    FactorySingleton::getInstance()->listTypes(types);
+  }
+
+  const std::string& getTypeOfObject(size_t index) const
+  {
+    return FactorySingleton::getInstance()->getTypeId(this->at(index));
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -175,7 +186,17 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*!@brief   Returns the object with the given index.
+   *
+   * @remarks This function is currently private because it returns a non-const pointer. This is necessary because the
+   *          factory manager doesn't know the const pointer equivalent to its managed type.
+   */
+  BaseTypePtr at(size_t index) const
+  {
+    CEDAR_ASSERT(index < this->size());
+
+    return this->mObjectList.at(index);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

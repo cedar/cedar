@@ -116,7 +116,7 @@ public:
     return iter->second->allocate();
   }
 
-  std::string getTypeId(BaseTypePtr object)
+  const std::string& getTypeId(BaseTypePtr object)
   {
     std::string generated_type_name = cedar::aux::objectTypeToString(object);
 
@@ -133,6 +133,19 @@ public:
     }
 
     return iter->second;
+  }
+
+  inline void listTypes(std::vector<std::string>& types) const
+  {
+    for
+    (
+      typename std::map<std::string, FactoryTypePtr>::const_iterator iter = this->mRegisteredFactories.begin();
+      iter != this->mRegisteredFactories.end();
+      ++iter
+    )
+    {
+      types.push_back(iter->first);
+    }
   }
 
   //--------------------------------------------------------------------------------------------------------------------

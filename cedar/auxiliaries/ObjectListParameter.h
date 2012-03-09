@@ -65,23 +65,21 @@ public:
 public:
 
   //!@brief return the size of the vector
-  virtual size_t size() const
-  {
-    // default implementation -- must be overridden in all classes
-    // this cannot be pure virtual, because this class may not be abstract due to restrictions of the gui.
-    return 0;
-  }
+  virtual size_t size() const = 0;
 
   /*!@brief Returns the object with the given index.
    *
    * @todo There needs to be a const variant of this.
    */
-  virtual cedar::aux::ConfigurablePtr configurableAt(size_t /*index*/)
-  {
-    // default implementation -- must be overridden in all classes
-    // this cannot be pure virtual, because this class may not be abstract due to restrictions of the gui.
-    return cedar::aux::ConfigurablePtr();
-  }
+  virtual cedar::aux::ConfigurablePtr configurableAt(size_t index) = 0;
+
+  /*!@brief Fills a vector with the types that can be added to this object list
+   */
+  virtual void listTypes(std::vector<std::string>& types) const = 0;
+
+  /*!@brief Returns the type id of the parameter with the given index.
+   */
+  virtual const std::string& getTypeOfObject(size_t index) const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
