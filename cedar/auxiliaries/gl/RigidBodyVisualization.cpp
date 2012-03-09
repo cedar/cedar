@@ -44,6 +44,20 @@
  #include <QTextStream>
  #include <QFile>
 
+const float cedar::aux::gl::RigidBodyVisualization::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::aux::gl::RigidBodyVisualization::mSegment_Ambient[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::aux::gl::RigidBodyVisualization::mSegment_Diffuse[3] = {1.0f, 0.39215699f, 0.0f};
+const float cedar::aux::gl::RigidBodyVisualization::mSegment_Specular[3] = {0.40000001f, 0.16078401f, 0.0f};
+const float cedar::aux::gl::RigidBodyVisualization::mSegment_Shininess[1] = {1.0f};
+const float cedar::aux::gl::RigidBodyVisualization::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
+const float cedar::aux::gl::RigidBodyVisualization::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
+const float cedar::aux::gl::RigidBodyVisualization::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
+const float cedar::aux::gl::RigidBodyVisualization::mChrome_Shininess[1] = {0.6};
+const float cedar::aux::gl::RigidBodyVisualization::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::aux::gl::RigidBodyVisualization::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
+const float cedar::aux::gl::RigidBodyVisualization::mBlack_Specular[3] = {0.2f, 0.2, 0.2};
+const float cedar::aux::gl::RigidBodyVisualization::mBlack_Shininess[1] = {0.05};
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -273,6 +287,40 @@ void cedar::aux::gl::RigidBodyVisualization::drawElement(const GLuint vertexVboI
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
 }
+
+void cedar::aux::gl::RigidBodyVisualization::setMaterial(int material)
+{
+  switch (material)
+  {
+  case NO_MATERIAL:
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mNoSpecular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mNoSpecular); //todo: this is probably an error
+    glEnable(GL_COLOR_MATERIAL);
+    break;
+  case SEGMENT:
+    glDisable(GL_COLOR_MATERIAL);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mSegment_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mSegment_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mSegment_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mSegment_Shininess);
+    break;
+  case CHROME:
+    glDisable(GL_COLOR_MATERIAL);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mChrome_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mChrome_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mChrome_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mChrome_Shininess);
+    break;
+  case BLACK:
+    glDisable(GL_COLOR_MATERIAL);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mBlack_Ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mBlack_Diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mBlack_Specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mBlack_Shininess);
+    break;
+  }
+}
+
 void cedar::aux::gl::RigidBodyVisualization::setVisibility(bool state)
 { 
   mIsVisible = state;

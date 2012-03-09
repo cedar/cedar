@@ -45,26 +45,6 @@
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
 
-// SYSTEM INCLUDES
-// #include <QTextStream>
-// #include <QFile>
-
-// define constants
-const float cedar::dev::robot::gl::KukaArm::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Ambient[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Diffuse[3] = {1.0f, 0.39215699f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Specular[3] = {0.40000001f, 0.16078401f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mSegment_Shininess[1] = {1.0f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Shininess[1] = {0.6};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Specular[3] = {0.2f, 0.2, 0.2};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Shininess[1] = {0.05};
-
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -182,9 +162,9 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
-  setMaterial(SEGMENT);
+  setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
   this->drawElement(mBaseSegmentVertexVboId, mBaseSegmentIndexVboId, mBaseSegmentFacesNumber);
-  setMaterial(CHROME);
+  setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
   this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
   // move to the base of the block
   glRotated(-60.0, 1.0, 0.0, 0.0);
@@ -198,7 +178,7 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
 
 
-  setMaterial(NO_MATERIAL);
+  setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
 }
 
 void cedar::dev::robot::gl::KukaArm::drawBaseBlock()
@@ -333,57 +313,57 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     break;
   case 1:
     glRotated(90.0, 1.0, 0.0, 0.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     break;
   case 2:
     glRotated(180.0, 0.0, 0.0, 1.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     break;
   case 3:
     glRotated(90.0, 1.0, 0.0, 0.0);
     glRotated(180.0, 0.0, 1.0, 0.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     break;
   case 4:
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
     this->drawElement(mWristSegmentVertexVboId, mWristSegmentIndexVboId, mWristSegmentFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     break;
   case 5:
     glRotated(90.0, 1.0, 0.0, 0.0);
-    setMaterial(SEGMENT);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
     this->drawElement(mWristSphereVertexVboId, mWristSphereIndexVboId, mWristSphereFacesNumber);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     break;
   case 6:
-    setMaterial(BLACK);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
     this->drawElement(mWristRingVertexVboId, mWristRingIndexVboId, mWristRingFacesNumber);
     glTranslated(0, 0, -0.007099966);
-    setMaterial(CHROME);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
     cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, mIsDrawnAsWireFrame);
     glTranslated(0, 0, 0.02);
     cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, mIsDrawnAsWireFrame);
-    setMaterial(NO_MATERIAL);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     break;
   }
 }
@@ -391,39 +371,6 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
 void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 {
 
-}
-
-void cedar::dev::robot::gl::KukaArm::setMaterial(int material)
-{
-  switch (material)
-  {
-  case NO_MATERIAL:
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mNoSpecular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mNoSpecular); //todo: this is probably an error
-    glEnable(GL_COLOR_MATERIAL);
-    break;
-  case SEGMENT:
-    glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mSegment_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mSegment_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mSegment_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mSegment_Shininess);
-    break;
-  case CHROME:
-    glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mChrome_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mChrome_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mChrome_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mChrome_Shininess);
-    break;
-  case BLACK:
-    glDisable(GL_COLOR_MATERIAL);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mBlack_Ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mBlack_Diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mBlack_Specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mBlack_Shininess);
-    break;
-  }
 }
 
 void cedar::dev::robot::gl::KukaArm::loadData()
