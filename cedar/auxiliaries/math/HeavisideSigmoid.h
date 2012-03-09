@@ -60,7 +60,7 @@ class cedar::aux::math::HeavisideSigmoid : public cedar::aux::math::Sigmoid
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  HeavisideSigmoid(double threshold)
+  HeavisideSigmoid(double threshold = 0.0)
   :
   cedar::aux::math::Sigmoid(threshold)
   {
