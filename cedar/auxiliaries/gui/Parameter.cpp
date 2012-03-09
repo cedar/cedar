@@ -63,6 +63,16 @@ cedar::aux::gui::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+const std::string& cedar::aux::Parameter::getName() const
+{
+  return this->mName;
+}
+
+void cedar::aux::Parameter::setName(const std::string& name)
+{
+  this->mName = name;
+}
+
 void cedar::aux::gui::Parameter::setParameter(cedar::aux::ParameterPtr pParameter)
 {
   this->mParameter = pParameter;

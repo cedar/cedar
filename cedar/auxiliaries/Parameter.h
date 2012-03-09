@@ -44,7 +44,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -56,7 +55,7 @@
  *
  * @see @ref ParametersConcept for a description of the parameters concept.
  */
-class cedar::aux::Parameter : public QObject, public cedar::aux::Base
+class cedar::aux::Parameter : public QObject
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -123,6 +122,14 @@ public:
     return this->mChanged;
   }
 
+  //!@brief Returns the name of the object.
+  //!@return Name of the object.
+  const std::string& getName() const;
+
+  //!@brief Sets the name of the object to the given name.
+  //!@param name New name of the object.
+  void setName(const std::string& name);
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -152,6 +159,9 @@ protected:
 private:
   //! The owner of this parameter, i.e., the object using it.
   cedar::aux::Configurable *mpOwner;
+
+  //! The name of the parameter.
+  std::string mName;
 
   //! Whether the parameter should be read automatically. If not, the user has to read it by hand.
   bool mAutoRead;

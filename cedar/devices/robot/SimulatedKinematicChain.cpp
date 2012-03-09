@@ -45,10 +45,10 @@
 
 cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain
 (
-  const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry
+  const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry
 )
 :
-KinematicChain(rpReferenceGeometry)
+KinematicChain(pReferenceGeometry)
 {
   init();
 }
@@ -62,14 +62,23 @@ KinematicChain(configFileName)
 
 cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
 {
-  
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index)
+bool cedar::dev::robot::SimulatedKinematicChain::isMovable()
+{
+  return true;
+}
+
+double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index) const
 {
   return mJointAngles.at<double>(index, 0);
 }

@@ -33,15 +33,13 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
-#include "cedar/auxiliaries/gl/Chessboard.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
 #include <string>
-
 
 int main(int, char**)
 {
@@ -49,9 +47,9 @@ int main(int, char**)
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  cedar::aux::gl::Chessboard test_chessboard(p_object);
-  cedar::aux::gl::Chessboard chessboard(p_object, 1, 2, 3, 5, 500);
+  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  cedar::aux::gl::Chessboard test_chessboard(p_rigid_body);
+  cedar::aux::gl::Chessboard chessboard(p_rigid_body, 1, 2, 3, 5, 500);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length
@@ -108,21 +106,6 @@ int main(int, char**)
     std::cout << "ERROR with setNumberOfColumns() or numberOfColumns()" << std::endl;
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // second color
-  //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: second color" << std::endl;
-  chessboard.setSecondColor(0.3, 1, sqrt(2.0)/2);
-  if (
-      chessboard.secondColorR() != 0.3
-      || chessboard.secondColorG() != 1.0
-      || chessboard.secondColorB() != sqrt(2.0)/2
-      )
-  {
-    errors++;
-    std::cout << "ERROR with setSecondColor or secondColorR/G/B" << std::endl;
-  }
-  
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
   if (errors > 255)
   {

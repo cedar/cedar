@@ -103,7 +103,7 @@ void cedar::aux::gui::DirectoryParameter::parameterPointerChanged()
   cedar::aux::DirectoryParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
   this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->get().absolutePath());
+  this->mpEdit->setText(parameter->getValue().absolutePath());
   this->mpEdit->setReadOnly(true);
 
   QObject::connect(parameter.get(), SIGNAL(valueChanged()), this, SLOT(parameterValueChanged()));
@@ -114,7 +114,7 @@ void cedar::aux::gui::DirectoryParameter::parameterValueChanged()
   cedar::aux::DirectoryParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
   this->mpEdit->setReadOnly(false);
-  this->mpEdit->setText(parameter->get().absolutePath());
+  this->mpEdit->setText(parameter->getValue().absolutePath());
   this->mpEdit->setReadOnly(true);
 }
 
@@ -122,6 +122,6 @@ void cedar::aux::gui::DirectoryParameter::onBrowseClicked()
 {
   cedar::aux::DirectoryParameterPtr parameter;
   parameter = boost::dynamic_pointer_cast<cedar::aux::DirectoryParameter>(this->getParameter());
-  QString value = QFileDialog::getExistingDirectory(this, "Select a directory", parameter->get().absolutePath());
-  parameter->set(value.toStdString());
+  QString value = QFileDialog::getExistingDirectory(this, "Select a directory", parameter->getValue().absolutePath());
+  parameter->setValue(value.toStdString());
 }

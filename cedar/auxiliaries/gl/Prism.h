@@ -39,30 +39,30 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of a prism with a equilateral triangle as base
  *
- * This class visualizes an instance of cedar::aux::Object as a prism with specified dimensions
+ * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a prism with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Prism : public cedar::aux::gl::Object
+class cedar::aux::gl::Prism : public cedar::aux::gl::RigidBodyVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pObject    pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Prism(cedar::aux::ObjectPtr pObject);
+  Prism(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param width edge length of the prism's triangular base
    * @param height height of the prism, i.e. distance between floor (=base) and ceiling
    * @param R color, value for red channel in RGB
@@ -70,7 +70,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Prism(
-         cedar::aux::ObjectPtr pObject,
+         cedar::aux::RigidBodyPtr pRigidBody,
          double width,
          double height,
          double R = 1,

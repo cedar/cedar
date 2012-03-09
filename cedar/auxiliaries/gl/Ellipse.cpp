@@ -44,9 +44,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Ellipse::Ellipse(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Ellipse::Ellipse(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = 2;
   mWidth = 3;
@@ -54,11 +54,11 @@ cedar::aux::gl::Object(pObject)
   mColorR = 1;
   mColorG = 0;
   mColorB = 0;
-  mObjectType = "Ellipse";
+  mRigidBodyType = "Ellipse";
 }
 
 cedar::aux::gl::Ellipse::Ellipse(
-                                  cedar::aux::ObjectPtr pObject,
+                                  cedar::aux::RigidBodyPtr pRigidBody,
                                   double length,
                                   double width,
                                   double thickness,
@@ -67,7 +67,7 @@ cedar::aux::gl::Ellipse::Ellipse(
                                   double B
                                 )
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mLength = length;
   mWidth = width;
@@ -75,7 +75,7 @@ cedar::aux::gl::Object(pObject)
   mColorR = R;
   mColorG = G;
   mColorB = B;
-  mObjectType = "Ellipse";
+  mRigidBodyType = "Ellipse";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -114,13 +114,7 @@ double cedar::aux::gl::Ellipse::thickness() const
 
 void cedar::aux::gl::Ellipse::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
-  
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
+  prepareDraw();
   
   // draw the Ellipse
   if (mIsVisible)

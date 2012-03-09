@@ -39,30 +39,30 @@
 
 // CEDAR INCLUDES
 #include "namespace.h"
-#include "Object.h"
+#include "RigidBodyVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of a pyramid with rectangular base
  *
- * This class visualizes an instance of cedar::aux::Object as a pyramid with specified dimensions
+ * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a pyramid with specified dimensions
  *
- * @remarks To get a simple visualization of the Object on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Pyramid : public cedar::aux::gl::Object
+class cedar::aux::gl::Pyramid : public cedar::aux::gl::RigidBodyVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor.
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    */
-  Pyramid(cedar::aux::ObjectPtr pObject);
+  Pyramid(cedar::aux::RigidBodyPtr pRigidBody);
 
   /*!@brief constructor. 
-   * @param pObject pointer to the aux::Object being visualized
+   * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the pyramid's base in x-direction of object coordinate frame
    * @param width extension of the pyramid's base in y-direction of object coordinate frame
    * @param height height of the pyramid, i.e. distance from base to tip
@@ -71,7 +71,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Pyramid(
-           cedar::aux::ObjectPtr pObject,
+           cedar::aux::RigidBodyPtr pRigidBody,
            double length,
            double width,
            double height,

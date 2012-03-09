@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -47,20 +48,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::kernel::Separable::Separable()
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
 }
 
 cedar::aux::kernel::Separable::Separable(unsigned int dimensionality)
 :
 cedar::aux::kernel::Kernel(dimensionality)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->mKernelParts.resize(dimensionality);
 }
 
 cedar::aux::kernel::Separable::~Separable()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Separable)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
 }
 //----------------------------------------------------------------------------------------------------------------------
 // methods

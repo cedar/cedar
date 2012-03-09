@@ -41,7 +41,7 @@
 #include "cedar/devices/robot/namespace.h"
 #include "ReferenceGeometry.h"
 #include "KinematicChain.h"
-#include "cedar/auxiliaries/Object.h"
+#include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -56,7 +56,7 @@
  * joint angles, this class calculates the rigid transformations to the joint frames and other mappings.The model must
  * be updated, e.g. by starting its timer
  */
-class cedar::dev::robot::KinematicChainModel : public cedar::aux::Object
+class cedar::dev::robot::KinematicChainModel : public cedar::aux::RigidBody
 {
 private:
   //--------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChainModel(cedar::dev::robot::KinematicChainPtr& rpKinematicChain);
+  KinematicChainModel(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   virtual ~KinematicChainModel();
   
@@ -120,7 +120,7 @@ public:
    */
   cv::Mat getJointTransformation(unsigned int index);
   
-  /*!@brief calculates cartesian Jacobian of a point/vector
+  /*!@brief calculates cartesian Jacobian of a point/vector, in world coordinates
    *
    * @param point    relevant point for which the Jacobian is calculated
    * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point

@@ -126,20 +126,20 @@ public:
    * @return    pointer to joint struct
    * @param index    index of the joint
    */
-  const cedar::dev::robot::ReferenceGeometry::JointPtr& getJoint(unsigned int index) const;
+  const cedar::dev::robot::ReferenceGeometry::JointPtr getJoint(unsigned int index) const;
 
   /*!@brief Returns a pointer to the end-effector transformation
    *
    * @return    pointer to endEffector struct
    */
-  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& getEndEffector() const;
+  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr getEndEffector() const;
   
   /*!@brief Returns a pointer to a specific link segment.
    *
    * @return    pointer to link segment struct
    * @param index    index of the link segment
    */
-  const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& getLinkSegment(unsigned int index) const;
+  const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr getLinkSegment(unsigned int index) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

@@ -45,32 +45,32 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Sphere::Sphere(cedar::aux::ObjectPtr pObject)
+cedar::aux::gl::Sphere::Sphere(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mRadius = 2;
   mColorR = 1;
   mColorG = 0;
   mColorB = 0;
-  mObjectType = "Sphere";
+  mRigidBodyType = "Sphere";
 }
 
 cedar::aux::gl::Sphere::Sphere(
-                                cedar::aux::ObjectPtr pObject,
+                                cedar::aux::RigidBodyPtr pRigidBody,
                                 double radius,
                                 double R,
                                 double G,
                                 double B
                               )
 :
-cedar::aux::gl::Object(pObject)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody)
 {
   mRadius = radius;
   mColorR = R;
   mColorG = G;
   mColorB = B;
-  mObjectType = "Sphere";
+  mRigidBodyType = "Sphere";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,14 +89,8 @@ double cedar::aux::gl::Sphere::radius() const
 
 void cedar::aux::gl::Sphere::draw()
 {
-  // move to origin
-  glPopMatrix();
-  glPushMatrix();
+  prepareDraw();
   
-  // move to object coordinates
-  mTransformationTranspose = mpObject->getTransformation().t();
-  glMultMatrixd((GLdouble*)mTransformationTranspose.data);
-
   // draw the sphere
   if (mIsVisible)
   {
