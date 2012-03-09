@@ -43,6 +43,7 @@
 
 // SYSTEM INCLUDES
 #include <QGridLayout>
+#include <QDialog>
 
 //----------------------------------------------------------------------------------------------------------------------
 // associate aux::gui parameter with the aux parameter
@@ -125,7 +126,6 @@ void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
     QString label = QString("%1: ").arg(i) + QString::fromStdString(instance_type);
     this->mpInstanceSelector->addItem(label);
   }
-//  this->mpInstanceSelector->currentIndex();
 }
 
 void cedar::aux::gui::ObjectListParameter::addClicked()
@@ -138,10 +138,27 @@ void cedar::aux::gui::ObjectListParameter::removeClicked()
 
 void cedar::aux::gui::ObjectListParameter::editClicked()
 {
+  //!@todo Store the pointers to the dialogs/property panes hare and update them when an item is added/removed/...
   cedar::aux::ConfigurablePtr configurable = this->getSelectedInstance();
   cedar::aux::gui::PropertyPane *p_display = new cedar::aux::gui::PropertyPane();
-  p_display->show();
+  QDialog *p_dialog = new QDialog();
+  QVBoxLayout *p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
+  p_dialog->setLayout(p_layout);
+  p_layout->addWidget(p_display);
+
+  QString title
+    = QString::fromStdString(this->getObjectList()->getName())
+      + QString("[%1]").arg(this->mpInstanceSelector->currentIndex());
+
+  p_dialog->setWindowTitle(title);
+
+  p_dialog->show();
   p_display->display(configurable);
+
+  // resize to fit contents
+  p_display->adjustSize();
+  p_dialog->adjustSize();
 }
 
 cedar::aux::ConfigurablePtr cedar::aux::gui::ObjectListParameter::getSelectedInstance()
