@@ -89,8 +89,6 @@ protected:
 private:
   //todo: the base block should not be part of the KukaArm visualization, but rather be drawn only as part of the robot
   void drawBaseBlock();
-  //todo: this should be done with a struct for material, as a member in RigidBodyVisualization
-  void setMaterial(int material);
 
   void loadData();
 
@@ -100,29 +98,7 @@ private:
 protected:
   // none yet
 private:
-  //!@brief encodes the different materials
-  enum MaterialType {
-                      NO_MATERIAL,
-                      SEGMENT,
-                      CHROME,
-                      BLACK
-                    };
-
-  static const float mNoSpecular[3];
-  static const float mSegment_Ambient[3];
-  static const float mSegment_Diffuse[3];
-  static const float mSegment_Specular[3];
-  static const float mSegment_Shininess[1];
-  static const float mChrome_Ambient[3];
-  static const float mChrome_Diffuse[3];
-  static const float mChrome_Specular[3];
-  static const float mChrome_Shininess[1];
-  static const float mBlack_Ambient[3];
-  static const float mBlack_Diffuse[3];
-  static const float mBlack_Specular[3];
-  static const float mBlack_Shininess[1];
-
-  // base
+  // base segment
   static const unsigned int mBaseSegmentVertexNumber = 2564;
   static const unsigned int mBaseSegmentFacesNumber = 3738;
   GLuint mBaseSegmentVertexVboId; // vertex buffer id

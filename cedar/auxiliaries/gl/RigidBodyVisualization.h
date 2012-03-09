@@ -188,6 +188,9 @@ protected:
 
   void drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces);
 
+  //todo: this should be done with a struct for material
+  void setMaterial(int material);
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -230,6 +233,27 @@ protected:
   //!@brief dummy matrix to hold the transpose of the current object transformation (it's what OpenGL needs)
   cv::Mat mTransformationTranspose;
 
+  //!@brief encodes the different materials
+  enum MaterialType {
+                      NO_MATERIAL,
+                      SEGMENT,
+                      CHROME,
+                      BLACK
+                    };
+
+  static const float mNoSpecular[3];
+  static const float mSegment_Ambient[3];
+  static const float mSegment_Diffuse[3];
+  static const float mSegment_Specular[3];
+  static const float mSegment_Shininess[1];
+  static const float mChrome_Ambient[3];
+  static const float mChrome_Diffuse[3];
+  static const float mChrome_Specular[3];
+  static const float mChrome_Shininess[1];
+  static const float mBlack_Ambient[3];
+  static const float mBlack_Diffuse[3];
+  static const float mBlack_Specular[3];
+  static const float mBlack_Shininess[1];
 private:
 
 };
