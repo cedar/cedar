@@ -93,14 +93,13 @@ private:
   // dummy for representing and modifying the angles
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
-  // base
-//  static const unsigned int mBaseSegmentVertexNumber = 2564;
-//  static const unsigned int mBaseSegmentFacesNumber = 3738;
-//  GLuint mBaseSegmentVertexVboId; // vertex buffer id
-//  GLuint mBaseSegmentIndexVboId; // index buffer id
-//  Vertex mBaseSegmentVertex[mBaseSegmentVertexNumber]; // vertex data
-//  GLushort mBaseSegmentIndex[mBaseSegmentFacesNumber*3]; // index data
-
+  // base segment
+  static const unsigned int mPalmVertexNumber = 3788;
+  static const unsigned int mPalmFacesNumber = 3414;
+  GLuint mPalmVertexVboId; // vertex buffer id
+  GLuint mPalmIndexVboId; // index buffer id
+  Vertex mPalmVertex[mPalmVertexNumber]; // vertex data
+  GLushort mPalmIndex[mPalmFacesNumber*3]; // index data
 
 
 }; // class cedar::dev::robot::gl::KukaArm
