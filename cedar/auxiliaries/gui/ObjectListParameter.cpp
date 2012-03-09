@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ObjectListParameter.h"
+#include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -94,7 +95,7 @@ cedar::aux::gui::ObjectListParameter::ObjectListParameter()
   QObject::connect(this->mpAddButton, SIGNAL(clicked()), this, SLOT(addClicked()));
   QObject::connect(this->mpRemoveButton, SIGNAL(clicked()), this, SLOT(removeClicked()));
   QObject::connect(this->mpEditButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-  QObject::connect(this->mpInstanceSelector, SIGNAL(currentRowChanged(int)), this, SLOT(currentInstanceIndexChanged(int)));
+  QObject::connect(this->mpInstanceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentInstanceIndexChanged(int)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -124,6 +125,7 @@ void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
     QString label = QString("%1: ").arg(i) + QString::fromStdString(instance_type);
     this->mpInstanceSelector->addItem(label);
   }
+//  this->mpInstanceSelector->currentIndex();
 }
 
 void cedar::aux::gui::ObjectListParameter::addClicked()
@@ -136,7 +138,10 @@ void cedar::aux::gui::ObjectListParameter::removeClicked()
 
 void cedar::aux::gui::ObjectListParameter::editClicked()
 {
-  // TODO open a new configuration widget here.
+  cedar::aux::ConfigurablePtr configurable = this->getSelectedInstance();
+  cedar::aux::gui::PropertyPane *p_display = new cedar::aux::gui::PropertyPane();
+  p_display->show();
+  p_display->display(configurable);
 }
 
 cedar::aux::ConfigurablePtr cedar::aux::gui::ObjectListParameter::getSelectedInstance()
