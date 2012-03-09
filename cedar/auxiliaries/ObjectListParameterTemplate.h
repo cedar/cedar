@@ -160,10 +160,18 @@ public:
     return this->at(index);
   }
 
+  void pushBack(const std::string& typeId)
+  {
+    BaseTypePtr object = FactorySingleton::getInstance()->allocate(typeId);
+    this->pushBack(object);
+  }
+
   void pushBack(BaseTypePtr object)
   {
     //!@todo Check that the object is registered with the factory
     this->mObjectList.push_back(object);
+
+    this->mObjectAdded(this->mObjectList.size() - 1);
   }
 
   void listTypes(std::vector<std::string>& types) const
@@ -171,9 +179,10 @@ public:
     FactorySingleton::getInstance()->listTypes(types);
   }
 
-  const std::string& getTypeOfObject(size_t index) const
+  const std::string& getTypeOfObject(cedar::aux::ConfigurablePtr object) const
   {
-    return FactorySingleton::getInstance()->getTypeId(this->at(index));
+    BaseTypePtr base_ptr = boost::dynamic_pointer_cast<BaseType>(object);
+    return FactorySingleton::getInstance()->getTypeId(base_ptr);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
