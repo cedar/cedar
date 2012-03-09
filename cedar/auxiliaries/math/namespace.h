@@ -67,8 +67,15 @@ namespace cedar
       //!@brief a templated declaration for sigmoid function implementation
       template <class DerivedClass> class SigmoidDeclarationT;
 
-      //!@brief a pointer to a sigmoid factory
-      typedef boost::shared_ptr< cedar::aux::Factory<SigmoidPtr> > SigmoidFactoryPtr;
+      typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
+
+      //!@brief The manager of all sigmoind instances
+      typedef cedar::aux::FactoryManager<SigmoidPtr> SigmoidManager;
+
+      CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
+
+      //!@brief The singleton object of the SigmoidFactory.
+      typedef cedar::aux::Singleton<SigmoidManager> SigmoidManagerSingleton;
     }
   }
 }
