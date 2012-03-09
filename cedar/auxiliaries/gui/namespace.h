@@ -73,6 +73,7 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
       class CEDAR_AUX_LIB_EXPORT EnumParameter;
       class CEDAR_AUX_LIB_EXPORT FileParameter;
+      class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
       class CEDAR_AUX_LIB_EXPORT Parameter;
       class CEDAR_AUX_LIB_EXPORT StringParameter;
       class CEDAR_AUX_LIB_EXPORT UIntParameter;

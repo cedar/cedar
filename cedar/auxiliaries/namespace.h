@@ -104,6 +104,7 @@ namespace cedar
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
     //!@endcond
 
     //!@brief a template class for parameters
@@ -115,7 +116,7 @@ namespace cedar
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
     //!@brief a template class for lists of objects of arbitrary type
-    template <typename T> class ObjectListParameter;
+    template <typename T> class ObjectListParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.

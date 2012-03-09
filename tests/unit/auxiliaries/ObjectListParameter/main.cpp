@@ -42,7 +42,7 @@
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/FactoryDerived.h"
-#include "cedar/auxiliaries/ObjectListParameter.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -103,7 +103,7 @@ typedef cedar::aux::Singleton<cedar::aux::FactoryManager<cedar::aux::Configurabl
 bool testClassOneRegistered = FactorySingleton::getInstance()->registerType<TestClassOnePtr>();
 bool testClassTwoRegistered = FactorySingleton::getInstance()->registerType<TestClassTwoPtr>();
 
-typedef cedar::aux::ObjectListParameter<cedar::aux::Configurable> TestListType;
+typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::Configurable> TestListType;
 CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(TestListType);
 
 

@@ -49,7 +49,7 @@
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
 #include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/ObjectListParameter.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
@@ -69,7 +69,7 @@ class cedar::dyn::NeuralField : public cedar::dyn::Dynamics
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  typedef cedar::aux::ObjectListParameter<cedar::aux::kernel::Kernel> KernelListParameter;
+  typedef cedar::aux::ObjectListParameterTemplate<cedar::aux::kernel::Kernel> KernelListParameter;
   CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(KernelListParameter);
 
   //--------------------------------------------------------------------------------------------------------------------
