@@ -132,6 +132,6 @@ void cedar::aux::gui::FileParameter::onBrowseClicked()
   }
   if (!value.isEmpty())
   {
-    parameter->set(value.toStdString());
+    parameter->setValue(value.toStdString());
   }
 }

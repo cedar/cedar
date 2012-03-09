@@ -43,7 +43,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
@@ -52,7 +51,7 @@
  *
  *        The main task of this base interface is to provide a lock that is available for all derived data.
  */
-class cedar::aux::Data : public cedar::aux::Base
+class cedar::aux::Data
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

@@ -100,7 +100,8 @@ mLoopType(new cedar::aux::EnumParameter(
                                        )
          ),
 //!@todo Make a TimeParameter and use it here instead.
-mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0))
+mLoopTime(new cedar::aux::DoubleParameter(this, "LoopTime", 1.0, 1.0, 1000000.0)),
+mWait(new cedar::aux::BoolParameter(this, "wait", true))
 {
 
   QObject::connect(this->mLoopType.get(), SIGNAL(valueChanged()), this, SLOT(loopModeChanged()));
@@ -185,5 +186,13 @@ void cedar::proc::LoopedTrigger::step(double time)
   cedar::proc::ArgumentsPtr arguments (new cedar::proc::StepTime(cedar::unit::Milliseconds(time)));
 
   this->trigger(arguments);
+
+  //!@todo What's this usleep doing here?
   usleep(100);
+
+  if (this->mWait->getValue())
+  {
+    // wait for all listeners
+    this->cedar::proc::Trigger::wait();
+  }
 }

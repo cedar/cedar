@@ -44,7 +44,7 @@
 // SYSTEM INCLUDES
 
 #include <iostream>
-#include <QtGui/QApplication>
+#include <QApplication>
 
 //------------------------------------------------------------------------------
 // methods

@@ -46,6 +46,4 @@
 //! constructor
 cedar::dev::robot::ComponentNotAvailableException::ComponentNotAvailableException()
 {
-  // set the type name
-  this->mType = "ComponentNotAvailableException";
 }

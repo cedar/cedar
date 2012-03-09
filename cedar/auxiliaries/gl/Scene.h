@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 25
 
-    Description: Scene for organizing instances of cedar::aux::gl::Object
+    Description: Scene for organizing instances of cedar::aux::gl::RigidBodyVisualization
 
     Credits:
 
@@ -39,7 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/Object.h"
+#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gui/Viewer.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -47,9 +48,9 @@
 
 /*!@brief This class visualizes several objects in the same environment
  *
- * An instance of this class manages pointers to several instances of gl::Object.
+ * An instance of this class manages pointers to several instances of gl::RigidBodyVisualization.
  *
- * @remarks To get a simple visualization of the Objects in the scene, create a aux::gui::Viewer for it
+ * @remarks To get a simple visualization of the RigidBodyVisualizations in the scene, create a aux::gui::Viewer for it
  */
 class cedar::aux::gl::Scene
 {
@@ -84,15 +85,26 @@ public:
   double getSceneLimit() const;
   
   /*!@brief adds an object to the scene
-   * @param rpObject pointer to the object
+   * @param pRigidBodyVisualization pointer to the object
    * @return index of the object in the scene
    */
-  int addObject(cedar::aux::gl::ObjectPtr& rpObject);
+  int addRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization);
   
+  /*!@brief adds an object to the scene
+   * @param pViewer pointer to the viewer
+   * @return index of the object in the scene
+   */
+  int addViewer(cedar::aux::gui::Viewer* pViewer);
+
+  /*!@brief removes the viewer from the scene
+   * @param pViewer pointer to the viewer
+   */
+  int removeViewer(cedar::aux::gui::Viewer* pViewer);
+
   /*!@brief removes an object from the scene
    * @param index index of the object in the scene
    */
-  void deleteObject(int index);
+  void deleteRigidBodyVisualization(int index);
   
   /*!@brief removes all objects from the scene */
   void clear();
@@ -105,17 +117,16 @@ public:
    */
   bool isEmpty() const;
   
-  /*!@todo rename getNumberOfObjects
-   * @brief gives the number of objects currently in the scene
+  /*!@brief gives the number of objects currently in the scene
    * @return number of objects currently in the scene
    */
-  int numberOfObjects() const;
+  int getNumberOfRigidBodyVisualizations() const;
   
   /*!@brief access to a single object in the scene
    * @param index index of the desired object within the scene
    * @return pointer to the object with the specified index
    */
-  cedar::aux::gl::ObjectPtr getObject(int index);
+  cedar::aux::gl::RigidBodyVisualizationPtr getRigidBodyVisualization(int index);
   
   /*!@brief initializes gl setup, should be called from all viewers */
   void initGl();
@@ -133,7 +144,9 @@ private:
 private:
   bool mIsDrawingFloor;
   double mSceneLimit;
-  QList<cedar::aux::gl::ObjectPtr> mObjects;
+  QList<cedar::aux::gl::RigidBodyVisualizationPtr> mRigidBodyVisualizations;
+  // list of viewers currently displaying this scene
+  QList<cedar::aux::gui::Viewer*> mViewers;
 };
 
 #endif  // CEDAR_AUX_GL_SCENE_H

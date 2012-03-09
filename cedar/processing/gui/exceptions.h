@@ -55,7 +55,6 @@ class cedar::proc::gui::InvalidStepNameException : public cedar::aux::ExceptionB
 public:
   InvalidStepNameException()
   {
-    this->mType = "InvalidStepNameException";
   }
 }; // class cedar::proc::InvalidStepNameException
 
@@ -66,7 +65,6 @@ class cedar::proc::gui::InvalidTriggerNameException : public cedar::aux::Excepti
 public:
   InvalidTriggerNameException()
   {
-    this->mType = "InvalidTriggerNameException";
   }
 }; // class cedar::proc::InvalidTriggerNameException
 
@@ -77,7 +75,6 @@ class cedar::proc::gui::InvalidModeException : public cedar::aux::ExceptionBase
 public:
   InvalidModeException()
   {
-    this->mType = "InvalidModeException";
   }
 }; // class cedar::proc::InvalidModeException
 

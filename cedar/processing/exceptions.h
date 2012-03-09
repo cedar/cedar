@@ -138,7 +138,6 @@ class cedar::proc::ConnectionNotFoundException : public cedar::aux::ExceptionBas
 public:
   ConnectionNotFoundException()
   {
-    this->mType = "ConnectionNotFoundException";
   }
 }; // class cedar::proc::ConnectionNotFoundException
 
@@ -150,7 +149,6 @@ class cedar::proc::ConnectionMemberDeletedException : public cedar::aux::Excepti
 public:
   ConnectionMemberDeletedException()
   {
-    this->mType = "ConnectionMemberDeletedException";
   }
 }; // class cedar::proc::ConnectionMemberDeletedException
 
@@ -161,7 +159,6 @@ class cedar::proc::DuplicateConnectionException : public cedar::aux::ExceptionBa
 public:
   DuplicateConnectionException()
   {
-    this->mType = "DuplicateConnectionException";
   }
 }; // class cedar::proc::DuplicateConnectionException
 
@@ -172,7 +169,6 @@ class cedar::proc::NoMappingException : public cedar::aux::ExceptionBase
 public:
   NoMappingException()
   {
-    this->mType = "NoMappingException";
   }
 }; // class cedar::proc::NoMappingException
 

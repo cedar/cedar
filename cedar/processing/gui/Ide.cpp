@@ -488,7 +488,7 @@ void cedar::proc::gui::Ide::saveAs()
 
   QString file = QFileDialog::getSaveFileName(this, // parent
                                               "Select where to save", // caption
-                                              last_dir->get().absolutePath(), // initial directory;
+                                              last_dir->getValue().absolutePath(), // initial directory;
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
@@ -508,7 +508,7 @@ void cedar::proc::gui::Ide::saveAs()
     cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
     QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
     cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
-    last_dir->set(path);
+    last_dir->setValue(path);
   }
 }
 
@@ -518,7 +518,7 @@ void cedar::proc::gui::Ide::load()
 
   QString file = QFileDialog::getOpenFileName(this, // parent
                                               "Select which file to load", // caption
-                                              last_dir->get().absolutePath(), // initial directory
+                                              last_dir->getValue().absolutePath(), // initial directory
                                               "json (*.json)" // filter(s), separated by ';;'
                                               );
 
@@ -550,7 +550,7 @@ void cedar::proc::gui::Ide::loadFile(QString file)
   cedar::proc::gui::Settings::instance().appendArchitectureFileToHistory(file.toStdString());
   QString path = file.remove(file.lastIndexOf(QDir::separator()), file.length());
   cedar::aux::DirectoryParameterPtr last_dir = cedar::proc::gui::Settings::instance().lastArchitectureLoadDialogDirectory();
-  last_dir->set(path);
+  last_dir->setValue(path);
 }
 
 void cedar::proc::gui::Ide::keyPressEvent(QKeyEvent* pEvent)

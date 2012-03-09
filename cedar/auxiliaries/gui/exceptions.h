@@ -51,7 +51,6 @@ class cedar::aux::gui::InvalidPlotData : public cedar::aux::ExceptionBase
 public:
   InvalidPlotData()
   {
-    this->mType = "InvalidPlotData";
   }
 }; // class cedar::aux::InvalidPlotData
 

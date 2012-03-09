@@ -40,7 +40,6 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
-#include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
