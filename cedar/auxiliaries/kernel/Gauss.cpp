@@ -71,6 +71,7 @@ _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 3.0, 0.0, 1000
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", 0.01, 1000.0))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+  _mDimensionality->setValue(_mSigmas->size());
 
   this->onInit();
 }
