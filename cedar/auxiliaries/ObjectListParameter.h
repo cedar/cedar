@@ -84,6 +84,8 @@ public:
    */
   virtual void pushBack(const std::string& typeId) = 0;
 
+  virtual void removeObject(size_t index) = 0;
+
   inline boost::signals2::connection connectToObjectAddedSignal(boost::function<void(int)> slot)
   {
     return this->mObjectAdded.connect(slot);
