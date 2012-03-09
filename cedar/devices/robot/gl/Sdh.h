@@ -93,14 +93,29 @@ private:
   // dummy for representing and modifying the angles
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
-  // base segment
-  static const unsigned int mPalmVertexNumber = 3788;
-  static const unsigned int mPalmFacesNumber = 3414;
+  // palm
+  static const unsigned int mPalmVertexNumber = 7103;
+  static const unsigned int mPalmFacesNumber = 6364;
   GLuint mPalmVertexVboId; // vertex buffer id
   GLuint mPalmIndexVboId; // index buffer id
   Vertex mPalmVertex[mPalmVertexNumber]; // vertex data
   GLushort mPalmIndex[mPalmFacesNumber*3]; // index data
 
+  // root
+  static const unsigned int mRootVertexNumber = 5428;
+  static const unsigned int mRootFacesNumber = 4802;
+  GLuint mRootVertexVboId; // vertex buffer id
+  GLuint mRootIndexVboId; // index buffer id
+  Vertex mRootVertex[mRootVertexNumber]; // vertex data
+  GLushort mRootIndex[mRootFacesNumber*3]; // index data
+
+  // knuckle
+  static const unsigned int mKnuckleVertexNumber = 5216;
+  static const unsigned int mKnuckleFacesNumber = 4690;
+  GLuint mKnuckleVertexVboId; // vertex buffer id
+  GLuint mKnuckleIndexVboId; // index buffer id
+  Vertex mKnuckleVertex[mKnuckleVertexNumber]; // vertex data
+  GLushort mKnuckleIndex[mKnuckleFacesNumber*3]; // index data
 
 }; // class cedar::dev::robot::gl::KukaArm
 #endif // CEDAR_DEV_ROBOT_GL_KUKA_ARM_H

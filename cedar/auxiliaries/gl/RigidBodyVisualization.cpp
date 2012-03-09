@@ -259,7 +259,12 @@ void cedar::aux::gl::RigidBodyVisualization::loadIndexData
   }
 }
 
-void cedar::aux::gl::RigidBodyVisualization::drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces)
+void cedar::aux::gl::RigidBodyVisualization::drawElement
+(
+  const GLuint vertexVboId,
+  const GLuint indexVboId,
+  unsigned int numberOfFaces
+)
 {
   // bind the buffers
   glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
@@ -276,6 +281,15 @@ void cedar::aux::gl::RigidBodyVisualization::drawElement(const GLuint vertexVboI
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
+  if (mIsDrawnAsWireFrame)
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+  else
+  {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
+
 
   // draw
   glShadeModel(GL_SMOOTH);
