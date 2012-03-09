@@ -99,6 +99,12 @@ cedar::aux::gui::ObjectListParameter::ObjectListParameter()
   QObject::connect(this->mpInstanceSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentInstanceIndexChanged(int)));
 }
 
+cedar::aux::gui::ObjectListParameter::~ObjectListParameter()
+{
+  mObjectAddedConnection.disconnect();
+  mObjectRemovedConnection.disconnect();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,6 +112,21 @@ cedar::aux::gui::ObjectListParameter::ObjectListParameter()
 void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
 {
   cedar::aux::ObjectListParameterPtr parameter = this->getObjectList();
+
+  // Disconnect old connections (if any) ------------------------------------------------------
+  this->mObjectAddedConnection.disconnect();
+  this->mObjectRemovedConnection.disconnect();
+
+  // Connect to the new parameter's signals ---------------------------------------------------
+  this->mObjectAddedConnection = parameter->connectToObjectAddedSignal
+                                 (
+                                   boost::bind
+                                   (
+                                     &cedar::aux::gui::ObjectListParameter::slotObjectAdded,
+                                     this,
+                                     _1
+                                   )
+                                 );
 
   // Fill types -------------------------------------------------------------------------------
   this->mpTypeSelector->clear();
@@ -122,14 +143,29 @@ void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
   this->mpInstanceSelector->clear();
   for (size_t i = 0; i < parameter->size(); ++i)
   {
-    const std::string& instance_type = parameter->getTypeOfObject(i);
-    QString label = QString("%1: ").arg(i) + QString::fromStdString(instance_type);
-    this->mpInstanceSelector->addItem(label);
+    this->appendObjectToInstanceList(i);
   }
 }
 
 void cedar::aux::gui::ObjectListParameter::addClicked()
 {
+  this->getObjectList()->pushBack(this->getSelectedType());
+}
+
+void cedar::aux::gui::ObjectListParameter::slotObjectAdded(int index)
+{
+  this->appendObjectToInstanceList(index);
+}
+
+void cedar::aux::gui::ObjectListParameter::appendObjectToInstanceList(int index)
+{
+  cedar::aux::ConfigurablePtr object = this->getObjectList()->configurableAt(index);
+  const std::string& instance_type = this->getObjectList()->getTypeOfObject(object);
+  QString label = QString("%1: ").arg(index) + QString::fromStdString(instance_type);
+  this->mpInstanceSelector->addItem(label);
+
+  // The object's index should always correspond to the index in the combo box.
+  CEDAR_DEBUG_ASSERT(index == this->mpInstanceSelector->count() - 1);
 }
 
 void cedar::aux::gui::ObjectListParameter::removeClicked()
@@ -139,6 +175,7 @@ void cedar::aux::gui::ObjectListParameter::removeClicked()
 void cedar::aux::gui::ObjectListParameter::editClicked()
 {
   //!@todo Store the pointers to the dialogs/property panes hare and update them when an item is added/removed/...
+  //!@todo Find a way to make sure these dialogs close when the main window does.
   cedar::aux::ConfigurablePtr configurable = this->getSelectedInstance();
   cedar::aux::gui::PropertyPane *p_display = new cedar::aux::gui::PropertyPane();
   QDialog *p_dialog = new QDialog();
@@ -159,6 +196,19 @@ void cedar::aux::gui::ObjectListParameter::editClicked()
   // resize to fit contents
   p_display->adjustSize();
   p_dialog->adjustSize();
+}
+
+std::string cedar::aux::gui::ObjectListParameter::getSelectedType() const
+{
+  int index = this->mpTypeSelector->currentIndex();
+  if (index != -1)
+  {
+    return this->mpTypeSelector->currentText().toStdString();
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "No type selected.");
+  }
 }
 
 cedar::aux::ConfigurablePtr cedar::aux::gui::ObjectListParameter::getSelectedInstance()

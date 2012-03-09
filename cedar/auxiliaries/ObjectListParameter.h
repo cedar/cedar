@@ -42,6 +42,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
+#include <boost/signals2.hpp>
 
 
 /*!@brief Base class for a parameter that reads a list of configurable objects from a file.
@@ -53,11 +54,9 @@ class cedar::aux::ObjectListParameter : public cedar::aux::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ObjectListParameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
-  :
-  cedar::aux::Parameter(pOwner, name, hasDefault)
-  {
-  }
+  ObjectListParameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault);
+
+  ~ObjectListParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -79,7 +78,21 @@ public:
 
   /*!@brief Returns the type id of the parameter with the given index.
    */
-  virtual const std::string& getTypeOfObject(size_t index) const = 0;
+  virtual const std::string& getTypeOfObject(cedar::aux::ConfigurablePtr object) const = 0;
+
+  /*!@brief Adds an instance of the given type to the end of the object list.
+   */
+  virtual void pushBack(const std::string& typeId) = 0;
+
+  inline boost::signals2::connection connectToObjectAddedSignal(boost::function<void(int)> slot)
+  {
+    return this->mObjectAdded.connect(slot);
+  }
+
+  inline boost::signals2::connection connectToObjectRemovedSignal(boost::function<void(int)> slot)
+  {
+    return this->mObjectRemoved.connect(slot);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,7 +110,12 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  //! Signal that is sent when a new object is added to the parameter.
+  boost::signals2::signal<void (int)> mObjectAdded;
+
+  //! Signal that is sent when an object is removed.
+  boost::signals2::signal<void (int)> mObjectRemoved;
+
 private:
   // none yet
 

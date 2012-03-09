@@ -41,10 +41,12 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/ObjectListParameter.h"
+#include "cedar/auxiliaries/casts.h"
 
 // SYSTEM INCLUDES
 #include <QComboBox>
 #include <QPushButton>
+#include <boost/signals2.hpp>
 
 
 /*!@brief User interface representation of cedar::aux::ObjectListParameter.
@@ -65,6 +67,7 @@ public:
   ObjectListParameter();
 
   //!@brief Destructor
+  ~ObjectListParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -84,11 +87,17 @@ protected:
 private:
   cedar::aux::ConfigurablePtr getSelectedInstance();
 
+  std::string getSelectedType() const;
+
   inline cedar::aux::ObjectListParameterPtr getObjectList()
   {
     //!@todo make this an asserted cast, because it should never fail.
-    return boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(this->getParameter());
+    return cedar::aux::asserted_pointer_cast<cedar::aux::ObjectListParameter>(this->getParameter());
   }
+
+  void slotObjectAdded(int index);
+
+  void appendObjectToInstanceList(int index);
 
 private slots:
   void parameterPointerChanged();
@@ -100,7 +109,6 @@ private slots:
   void editClicked();
 
   void currentInstanceIndexChanged(int index);
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -123,6 +131,11 @@ private:
   //! Button for removing a child
   QPushButton *mpEditButton;
 
+  //! Connection to the parameters instance added signal.
+  boost::signals2::connection mObjectAddedConnection;
+
+  //! Connection to the parameters instance added signal.
+  boost::signals2::connection mObjectRemovedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -94,9 +95,7 @@ void cedar::aux::gui::PropertyPane::resetContents()
   {
     this->disconnect(configurable);
   }
-
-  this->clearContents();
-  this->setRowCount(0);
+  this->resetPointer();
   this->mParameterWidgetRowIndex.clear();
   this->mParameterRowIndex.clear();
 }
@@ -108,7 +107,14 @@ void cedar::aux::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr pConf
       ++iter)
   {
     // disconnect everything between the parameter and this
-    QObject::disconnect(iter->get(), 0, this, 0);
+    if (!QObject::disconnect(iter->get(), 0, this, 0))
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Could not disconnect the slots of the Property pane.",
+        "cedar::proc::gui::PropertyPane::disconnect(cedar::aux::ConfigurablePtr)"
+      );
+    }
   }
 
   for (cedar::aux::Configurable::Children::const_iterator iter = pConfigurable->configurableChildren().begin();
@@ -127,6 +133,8 @@ std::string cedar::aux::gui::PropertyPane::getInstanceTypeId(cedar::aux::Configu
 void cedar::aux::gui::PropertyPane::display(cedar::aux::ConfigurablePtr pConfigurable)
 {
   this->resetContents();
+
+  this->mDisplayedConfigurable = pConfigurable;
 
   std::string label = this->getInstanceTypeId(pConfigurable);
   this->addLabelRow(label);
