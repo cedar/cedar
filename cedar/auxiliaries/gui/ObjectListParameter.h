@@ -97,6 +97,8 @@ private:
 
   void slotObjectAdded(int index);
 
+  void slotObjectRemoved(int index);
+
   void appendObjectToInstanceList(int index);
 
 private slots:

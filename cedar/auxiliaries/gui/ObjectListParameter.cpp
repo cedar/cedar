@@ -128,6 +128,16 @@ void cedar::aux::gui::ObjectListParameter::parameterPointerChanged()
                                    )
                                  );
 
+  this->mObjectRemovedConnection = parameter->connectToObjectRemovedSignal
+                                   (
+                                     boost::bind
+                                     (
+                                       &cedar::aux::gui::ObjectListParameter::slotObjectRemoved,
+                                       this,
+                                       _1
+                                     )
+                                   );
+
   // Fill types -------------------------------------------------------------------------------
   this->mpTypeSelector->clear();
 
@@ -161,7 +171,7 @@ void cedar::aux::gui::ObjectListParameter::appendObjectToInstanceList(int index)
 {
   cedar::aux::ConfigurablePtr object = this->getObjectList()->configurableAt(index);
   const std::string& instance_type = this->getObjectList()->getTypeOfObject(object);
-  QString label = QString("%1: ").arg(index) + QString::fromStdString(instance_type);
+  QString label = QString::fromStdString(instance_type);
   this->mpInstanceSelector->addItem(label);
 
   // The object's index should always correspond to the index in the combo box.
@@ -170,6 +180,20 @@ void cedar::aux::gui::ObjectListParameter::appendObjectToInstanceList(int index)
 
 void cedar::aux::gui::ObjectListParameter::removeClicked()
 {
+  int index = this->mpInstanceSelector->currentIndex();
+  if (index != -1)
+  {
+    this->getObjectList()->removeObject(index);
+  }
+  else
+  {
+    CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "No instance selected.");
+  }
+}
+
+void cedar::aux::gui::ObjectListParameter::slotObjectRemoved(int index)
+{
+  this->mpInstanceSelector->removeItem(index);
 }
 
 void cedar::aux::gui::ObjectListParameter::editClicked()

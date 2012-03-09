@@ -174,6 +174,21 @@ public:
     this->mObjectAdded(this->mObjectList.size() - 1);
   }
 
+  void removeObject(size_t index)
+  {
+    // check the index for correctness
+    if (index >= this->mObjectList.size())
+    {
+      CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "The index is out of range.");
+    }
+
+    // erase the object
+    this->mObjectList.erase(this->mObjectList.begin() + index);
+
+    // emit the signal that the object was removed
+    this->mObjectRemoved(index);
+  }
+
   void listTypes(std::vector<std::string>& types) const
   {
     FactorySingleton::getInstance()->listTypes(types);
