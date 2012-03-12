@@ -82,7 +82,6 @@ cedar::aux::gui::ObjectParameter::ObjectParameter()
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
   QObject::connect(this->mpEditButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-  QObject::connect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
 }
 
 cedar::aux::gui::ObjectParameter::~ObjectParameter()
@@ -98,15 +97,31 @@ void cedar::aux::gui::ObjectParameter::parameterPointerChanged()
   cedar::aux::ObjectParameterPtr parameter = this->getObjectParameter();
 
   // Fill types -------------------------------------------------------------------------------
+
+  // disconnect the signal while we fill the box
+  QObject::disconnect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
+
   this->mpTypeSelector->clear();
 
   std::vector<std::string> types;
   parameter->listTypes(types);
 
+  int current_type = -1;
   for (size_t i = 0; i < types.size(); ++i)
   {
     this->mpTypeSelector->addItem(QString::fromStdString(types.at(i)));
+    if (current_type == -1 && types.at(i) == parameter->getTypeId())
+    {
+      current_type = static_cast<int>(i);
+    }
   }
+
+  this->mpTypeSelector->setCurrentIndex(current_type);
+  this->mpEditButton->setEnabled(current_type != -1);
+
+  // reconnect the signal
+  QObject::connect(this->mpTypeSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(currentTypeChanged(int)));
+
 }
 
 void cedar::aux::gui::ObjectParameter::editClicked()
