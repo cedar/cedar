@@ -222,6 +222,18 @@ private:
     return this->mObjectList.at(index);
   }
 
+  void setChangedFlag(bool changed)
+  {
+    // set the changed flag for the objects managed by the parameter
+    for (size_t i = 0; i < mObjectList.size(); ++i)
+    {
+      this->mObjectList.at(i)->resetChangedStates(changed);
+    }
+
+    // set the changed flag for the parameter itself.
+    this->cedar::aux::Parameter::setChangedFlag(changed);
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
