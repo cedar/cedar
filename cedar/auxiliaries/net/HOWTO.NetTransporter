@@ -29,10 +29,14 @@ I want to read the same data from the network:
   // 'channel'!
 
 
+
+Please adhere to the complete examples at the end of this file for
+truly robust real-life code.
+
 FAQ:
 ====
 
-Question: What datatypes are supported?
+Question: What datatypesupport are supported?
 ---------------------------------------
 
 As you can see the NetReaders and NetWriters are template classes. They
@@ -53,7 +57,7 @@ to transparently wrap around YARP, so you don't need to worry about YARP.
 
 Note, that if you will need an additional 'yarp server' started. It is
 adviseable to have just one dedicated 'yarp server' running for your local
-network, as conflicts may appera otherwise.
+network, as conflicts may appear otherwise.
 
 At the moment, we use mcast as network protocoll. Even for machine-local
 transport. Note: Mcast ist a stateless protocoll, so messages may be lost.

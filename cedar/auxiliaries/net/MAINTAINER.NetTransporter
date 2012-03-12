@@ -1,3 +1,5 @@
+You should look at the NetTransporter HOWTO before reading this.
+
 This file is supposed to help cedar programmers to maintain and add 
 functionality to the NetTransporter (NetWrite, NetReader, etc.) framework.
 
@@ -9,28 +11,31 @@ Directories:
                             As you know, these are template specializations.
                             (see the HOWTO)
 
-  net/internals/            users should not venture in here, 
+  net/detail/            users should not venture in here, 
                             only maintainers. Holds the (internal)
                             implementations of the framework.
+                            Everything in here will be in the sub-namespace
+                            '::detail::'.
 
-  net/internals/transport   holds everything that uses YARP or is
-                            implecitely built to facilitaty using YARP.
+  net/detail/transport   holds everything that uses YARP or is
+                            implicitely built to facilitaty using YARP.
                             Transports the data over the network.
 
-  net/internals/datatypes   holds everything you need to edit, if you
+  net/detail/datatypesupport   holds everything you need to edit, if you
                             want to add a new supported datatype to
                             the NetReaders/NetWriters, etc.
                             Note: These changes will mostly be
-                                  specialization templates
+                                  specialization templates.
 
-  net/internals/datatypes/opencv holds the opencv compatability stuff
+  net/detail/datatypesupport/opencv holds the opencv compatability stuff
                                  (internal specialization templates)
 
 Namespaces:
 ===========
 
-  all user-accessible classes reside 
+  all user-accessible classes reside
     in cedar::aux::net
+
   all internal stuff, users should never use, resides 
     in cedar::aux::net::detail
 
@@ -45,11 +50,12 @@ A closer look at things:
 At the moment, the framework internally is separated into two parts:
   1) Support for simple datatypes (int, char, etc) is realized in an
      internal SimpleNetReader, SimpleNetWriter class.
+
   2) Support for more complex matrix type data is realized in an
      internal CollatedNetReader, CollatedNetWriter class.
      ('collated' in the sense that these classes will transport a packet
      which consists of an informative header part and a larger matrix
-     data entries part 'glued together'.
+     data entries part 'glued together').
 
      These last CollatedNet-Types are adaptable for general matrix type data,
      but are designed with opencv cv::Mat heavily in mind - and at the 
@@ -62,7 +68,7 @@ What to do, if I want to add another transferable data type:
 Edit the NetReader.h, NetWriter.h, etc files to add templates specializations
 with the type you want to transfer.
 Choose the (internal) inherit you use, based on the data type you want
-to transfer.
+to transfer:
 
 Primitive data types:
 ---------------------
@@ -70,9 +76,9 @@ If you are transfering a simple type using SimpleNetReader/Writer, etc you are d
 
 Matrix-like data types:
 -----------------------
-internals/datatypes/ 
+detail/datatypesupport/ 
    If you are transfering a matrix-style type, you will need to add 
-   spezializations of the classes you will find under internals/datatypes. 
+   spezializations of the classes you will find under detail/datatypesupport. 
    Look at what is done in the opencv/ subdirectory: 
 
    The collated_traits traits struct will need some information about 
@@ -80,7 +86,7 @@ internals/datatypes/
 
      1) the data type
      2) the extended transferable (matrix) header type, which may be
-        data type-dependant, since some matrix data types may be adequateley 
+        data type-dependant, since some matrix data types may be adequately 
         represented by a (#row,#columns)-logic, and others may require
         additional information. 
         OpenCV cv::Mat for example, needs the actual element
@@ -88,6 +94,6 @@ internals/datatypes/
      3) a helper class type.
         The OpenCV cv::Mat implementation uses this to implement checks.
  
-   The CollatedType class additionally implements (as a specialized template)
-   functions to to access matrix elements of your transferable type, 
+   The MatrixTypeWrapper class additionally implements (as a specialized template)
+   functions to access matrix elements of your transferable type, 
   
