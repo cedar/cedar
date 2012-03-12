@@ -134,7 +134,8 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  // none yet
+  virtual void setChangedFlag(bool changed);
+
 signals:
   //!@brief a signal that is emitted each time the value of a parameter changes
   void valueChanged();
@@ -149,7 +150,7 @@ signals:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  void setChangedFlag(bool changed);
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

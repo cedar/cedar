@@ -44,9 +44,9 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
+/*!@brief A parameter that can hold an object whose type is determined dynamically by user input.
  *
- * @todo describe more.
+ *        The @em BaseType has to be a type that implements cedar::aux::Configurable.
  *
  * @remarks The objects cannot themselves have a parameter with the name "type".
  */
@@ -168,7 +168,14 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void setChangedFlag(bool changed)
+  {
+    // set the changed flag for the object managed by the parameter
+    this->mObject->resetChangedStates(changed);
+
+    // set the changed flag for the parameter itself.
+    cedar::aux::Parameter::setChangedFlag(changed);
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
