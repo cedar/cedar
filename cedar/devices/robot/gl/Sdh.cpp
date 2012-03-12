@@ -187,9 +187,6 @@ void cedar::dev::robot::gl::Sdh::draw()
     setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
-//    glRotated(90, 1, 0, 0);
-//    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
-//    glRotated(-90, 1, 0, 0);
 
     // first finger proximal link
     glRotated(mpKinematicChain->getJointAngle(0)*180.0/M_PI, 0, -1, 0);
@@ -208,16 +205,8 @@ void cedar::dev::robot::gl::Sdh::draw()
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
-    glTranslated(.0, 0.0, .0175);
-
-
-//    cedar::aux::gl::drawCone(0.0, 0.0865, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, 0.0865);
-//    glRotated(90, 1, 0, 0);
-//    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
-//    glRotated(-90, 1, 0, 0);
-
     // first finger distal link
+    glTranslated(0, 0, 0.104);
     glRotated(mpKinematicChain->getJointAngle(1)*180.0/M_PI, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
@@ -232,12 +221,6 @@ void cedar::dev::robot::gl::Sdh::draw()
     setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
     this->drawElement(mDistalSkinVertexVboId, mDistalSkinIndexVboId, mDistalSkinFacesNumber);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
-    glRotated(-90, 0, 1, 0);
-    glRotated(-90, 1, 0, 0);
-
-//    cedar::aux::gl::drawCone(0.0, 0.06, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-//    glTranslated(0, 0, 0.06);
-//    cedar::aux::gl::drawCone(0.0, 0.0085, 0.01, 0.0, mResolution, mIsDrawnAsWireFrame);
 
     // move back to hand origin and re-save
     glPopMatrix();
@@ -245,13 +228,20 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // second finger root
     glTranslated(-.038105, 0.0, .098);
+    glRotated(180, 0, 0, 1);
+
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
+    glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
-    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mKnuckleVertexVboId, mKnuckleIndexVboId, mKnuckleFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
     // second finger proximal link
@@ -261,22 +251,32 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    cedar::aux::gl::drawCone(0.0, 0.0865, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, 0.0865);
     glRotated(90, 1, 0, 0);
-    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    this->drawElement(mProximalSkinVertexVboId, mProximalSkinIndexVboId, mProximalSkinFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
     // second finger distal link
+    glTranslated(0, 0, 0.104);
     glRotated(mpKinematicChain->getJointAngle(3)*180.0/M_PI, 0, 1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    cedar::aux::gl::drawCone(0.0, 0.06, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, 0.06);
-    cedar::aux::gl::drawCone(0.0, 0.0085, 0.01, 0.0, mResolution, mIsDrawnAsWireFrame);
+    glTranslated(.0, .0, -.104);
+    glRotated(90, 1, 0, 0);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    this->drawElement(mDistalSkinVertexVboId, mDistalSkinIndexVboId, mDistalSkinFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
 
     // move back to hand origin
     glPopMatrix();
@@ -288,9 +288,13 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    glRotated(mpKinematicChain->getJointAngle(6)*180.0/M_PI, 0, 0, 1);
+    glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
-    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mKnuckleVertexVboId, mKnuckleIndexVboId, mKnuckleFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
     // third finger proximal link
@@ -300,22 +304,32 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    cedar::aux::gl::drawCone(0.0, 0.0865, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, 0.0865);
     glRotated(90, 1, 0, 0);
-    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    this->drawElement(mProximalSkinVertexVboId, mProximalSkinIndexVboId, mProximalSkinFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
     // first finger distal link
+    glTranslated(0, 0, 0.104);
     glRotated(mpKinematicChain->getJointAngle(5)*180.0/M_PI, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    cedar::aux::gl::drawCone(0.0, 0.06, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, 0.06);
-    cedar::aux::gl::drawCone(0.0, 0.0085, 0.01, 0.0, mResolution, mIsDrawnAsWireFrame);
+    glTranslated(.0, .0, -.104);
+    glRotated(90, 1, 0, 0);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    this->drawElement(mDistalSkinVertexVboId, mDistalSkinIndexVboId, mDistalSkinFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
 
 
 
