@@ -37,10 +37,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_TEST_GRABBER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -140,7 +138,7 @@ protected:
   bool onInit();
   void onCleanUp();
   bool onDeclareParameters();
-  std::string onGetSourceInfo(unsigned int channel) const;
+  const std::string& onGetSourceInfo(unsigned int channel) const;
   bool onGrab();
 
   //--------------------------------------------------------------------------------------------------------------------

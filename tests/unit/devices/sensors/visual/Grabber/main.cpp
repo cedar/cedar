@@ -163,7 +163,7 @@ int main(int , char **)
   try
   {
     std::string name,result;
-    std::string ext = GRABBER_DEFAULT_RECORD_EXTENSION;
+    std::string ext = "avi";
 
     //set one w/o ext
     name="RecordNameNewName(0)";
@@ -210,7 +210,7 @@ int main(int , char **)
   try
   {
     std::string name;
-    std::string ext = GRABBER_DEFAULT_SNAPSHOT_EXTENSION;
+    std::string ext = ".jpg";
 
     //set one w/o ext
     name="SnapshotNameNewName(0)";

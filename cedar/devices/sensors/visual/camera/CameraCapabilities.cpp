@@ -34,21 +34,18 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraCapabilities.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-CameraCapabilities::CameraCapabilities(const std::string& configFileName)
+cedar::dev::sensors::visual::CameraCapabilities::CameraCapabilities(const std::string& configFileName)
 :
-ConfigurationInterface(configFileName)
+cedar::aux::ConfigurationInterface(configFileName)
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraCapabilities::CameraCapabilities] Config-file: " << configFileName << std::endl;
@@ -93,7 +90,7 @@ ConfigurationInterface(configFileName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-CameraCapabilities::~CameraCapabilities()
+cedar::dev::sensors::visual::CameraCapabilities::~CameraCapabilities()
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraCapabilities::~CameraCapabilities] Destroy class" << std::endl;
@@ -104,7 +101,7 @@ CameraCapabilities::~CameraCapabilities()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool CameraCapabilities::declareParameters()
+bool cedar::dev::sensors::visual::CameraCapabilities::declareParameters()
 {
   bool result = true;
 
@@ -150,7 +147,8 @@ bool CameraCapabilities::declareParameters()
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-CameraPropertyCapability& CameraCapabilities::getCapabilities(CameraProperty::Id propId)
+cedar::dev::sensors::visual::CameraCapabilities::CameraPropertyCapability&
+  cedar::dev::sensors::visual::CameraCapabilities::getCapabilities(CameraProperty::Id propId)
 {
   int prop = 0;
   int max_prop = mCamProperties.size();
@@ -171,55 +169,55 @@ CameraPropertyCapability& CameraCapabilities::getCapabilities(CameraProperty::Id
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-int CameraCapabilities::getMinValue(CameraProperty::Id propId)
+int cedar::dev::sensors::visual::CameraCapabilities::getMinValue(CameraProperty::Id propId)
 {
   return getCapabilities(propId).min_value;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-int CameraCapabilities::getMaxValue(CameraProperty::Id propId)
+int cedar::dev::sensors::visual::CameraCapabilities::getMaxValue(CameraProperty::Id propId)
 {
   return getCapabilities(propId).max_value;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraCapabilities::isSupported(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraCapabilities::isSupported(CameraProperty::Id propId)
 {
   return getCapabilities(propId).is_supported;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraCapabilities::isReadable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraCapabilities::isReadable(CameraProperty::Id propId)
 {
   return getCapabilities(propId).is_readable;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraCapabilities::isOnePushCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraCapabilities::isOnePushCapable(CameraProperty::Id propId)
 {
   return getCapabilities(propId).is_one_push_capable;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraCapabilities::isOnOffCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraCapabilities::isOnOffCapable(CameraProperty::Id propId)
 {
   return getCapabilities(propId).is_on_off_capable;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraCapabilities::isAutoCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraCapabilities::isAutoCapable(CameraProperty::Id propId)
 {
   return getCapabilities(propId).is_auto_capable;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraCapabilities::isManualCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraCapabilities::isManualCapable(CameraProperty::Id propId)
 {
   return getCapabilities(propId).is_manual_capable;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraCapabilities::isAbsoluteCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraCapabilities::isAbsoluteCapable(CameraProperty::Id propId)
 {
   return getCapabilities(propId).is_absolute_capable;
 }

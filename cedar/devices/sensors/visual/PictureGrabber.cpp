@@ -35,17 +35,12 @@
 ======================================================================================================================*/
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
 #include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
 
-
-using namespace cv;
-using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------------------------
 //constructors and destructor
@@ -54,12 +49,12 @@ using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------
 //Constructor for single-file grabber
-PictureGrabber::PictureGrabber(
+cedar::dev::sensors::visual::PictureGrabber::PictureGrabber(
                                 const std::string& configFileName,
                                 const std::string& pictureFileName
                               )
 :
-GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   mSourceFileNames.push_back(pictureFileName);
   readInit(mSourceFileNames.size(),"PictureGrabber");
@@ -68,13 +63,13 @@ GrabberInterface(configFileName)
 
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-file grabber
-PictureGrabber::PictureGrabber(
+cedar::dev::sensors::visual::PictureGrabber::PictureGrabber(
                                 const std::string& configFileName,
                                 const std::string& pictureFileName0,
                                 const std::string& pictureFileName1
                               )
 :
-GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   mSourceFileNames.push_back(pictureFileName0);
   mSourceFileNames.push_back(pictureFileName1);
@@ -84,7 +79,7 @@ GrabberInterface(configFileName)
 }
 
 //----------------------------------------------------------------------------------------------------
-PictureGrabber::~PictureGrabber()
+cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 {
   doCleanUp();
   #ifdef DEBUG_PICTUREGRABBER
@@ -97,7 +92,7 @@ PictureGrabber::~PictureGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool PictureGrabber::onInit()
+bool cedar::dev::sensors::visual::PictureGrabber::onInit()
 {
   //local and/or stored parameters are already initialized
   #ifdef SHOW_INIT_INFORMATION_PICTUREGRABBER
@@ -122,6 +117,7 @@ bool PictureGrabber::onInit()
     }
     else
     {
+      //todo: exception raus
       std::cout << "[PictureGrabber::onInit] ERROR: Grabbing failed\n"
                 << "\tChannel " << i << ": \"" << mSourceFileNames.at(i) << "\"."
                 << std::endl;
@@ -138,13 +134,13 @@ bool PictureGrabber::onInit()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool PictureGrabber::onDeclareParameters()
+bool cedar::dev::sensors::visual::PictureGrabber::onDeclareParameters()
 {
   return true;
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string PictureGrabber::onGetSourceInfo(unsigned int channel) const
+const std::string& cedar::dev::sensors::visual::PictureGrabber::onGetSourceInfo(unsigned int channel) const
 {
   if (channel >= mNumCams)
   {
@@ -154,10 +150,10 @@ std::string PictureGrabber::onGetSourceInfo(unsigned int channel) const
 }
 
 //----------------------------------------------------------------------------------------------------
-bool PictureGrabber::onGrab()
+bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
 {
   bool result = true;
-  for (unsigned int i=0; i<mNumCams; i++)
+  for (unsigned int i = 0; i < mNumCams; i++)
   {
     result = !mImageMatVector.at(i).empty() && result;
   }
@@ -165,7 +161,8 @@ bool PictureGrabber::onGrab()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool PictureGrabber::setSourceFile(unsigned int channel, const std::string& FileName )
+//todo void
+bool cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int channel, const std::string& fileName)
 {
   if (channel >= mNumCams)
   {
@@ -174,8 +171,8 @@ bool PictureGrabber::setSourceFile(unsigned int channel, const std::string& File
 
   //lock image-matrix while writing
   mpReadWriteLock->lockForWrite();
-  mSourceFileNames.at(channel) = FileName;
-  mImageMatVector.at(channel) = cv::imread(FileName);
+  mSourceFileNames.at(channel) = fileName;
+  mImageMatVector.at(channel) = cv::imread(fileName);
   mpReadWriteLock->unlock();
 
   if (mImageMatVector.at(channel).empty())

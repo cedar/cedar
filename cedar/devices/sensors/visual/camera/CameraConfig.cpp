@@ -34,28 +34,29 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraConfig.h"
-
-// PROJECT INCLUDES
+#include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
+#include "cedar/devices/sensors/visual/camera/CameraProperty.h"
+#include "cedar/devices/sensors/visual/camera/CameraVideoMode.h"
+#include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
+#include "cedar/auxiliaries/exceptions/ExceptionBase.h"
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp> //for reading values from the configfile
 
-using namespace cv;
-using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-CameraConfig::CameraConfig(
+cedar::dev::sensors::visual::CameraConfig::CameraConfig(
                             const std::string& configFileName,
                             unsigned int channel,
                             CameraSettings &camSettings,
                             CameraPropertyValues &camPropertyValues
                           )
 :
-ConfigurationInterface(configFileName),
+cedar::aux::ConfigurationInterface(configFileName),
 mCamSettings(camSettings),
 mCamPropertyValues(camPropertyValues)
 {
@@ -77,11 +78,13 @@ mCamPropertyValues(camPropertyValues)
 
       //throwing an exception in a shared-pointer managed class is catched by shared-pointer
       std::cout << err << std::endl;
-      CEDAR_THROW(cedar::aux::exc::InitializationException,err);
+
+      //todo: throw exception
+      //CEDAR_THROW(cedar::aux::exc::InitializationException,err);
     }
 }
 
-CameraConfig::~CameraConfig()
+cedar::dev::sensors::visual::CameraConfig::~CameraConfig()
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraConfig::~CameraState] channel "<< mChannel << " Destroy class" << std::endl;
@@ -93,7 +96,7 @@ CameraConfig::~CameraConfig()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool CameraConfig::saveConfiguration()
+bool cedar::dev::sensors::visual::CameraConfig::saveConfiguration()
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraConfig::writeConfiguration] channel "<< mChannel << std::endl;
@@ -104,7 +107,7 @@ bool CameraConfig::saveConfiguration()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool CameraConfig::declareParameter()
+bool cedar::dev::sensors::visual::CameraConfig::declareParameter()
 {
   //map local buffer of camera properties and settings
   //to the ConfigurationInterface class

@@ -41,9 +41,8 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_LIB_DC1394
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 //#include "cedar/devices/sensors/visual/namespace.h"
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

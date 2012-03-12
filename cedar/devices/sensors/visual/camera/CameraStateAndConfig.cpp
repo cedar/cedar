@@ -34,24 +34,20 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraStateAndConfig.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/round.hpp> //rounding from double to int in cv::VideoCapture get and set methods
 
 
-using namespace cedar::dev::sensors::visual;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-CameraStateAndConfig::CameraStateAndConfig(
+cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig(
                                             cv::VideoCapture videoCapture,
-                                            QReadWriteLockPtr videoCaptureLock,
+                                            QReadWriteLock* pVideoCaptureLock,
                                             unsigned int channel,
                                             const std::string configurationFileName,
                                             const std::string capabilitiesFileName
@@ -67,7 +63,7 @@ CameraStateAndConfig::CameraStateAndConfig(
   mVideoCapture = videoCapture;
   mConfigurationFileName = configurationFileName;
   mCapabilitiesFileName = capabilitiesFileName;
-  mpVideoCaptureLock = videoCaptureLock;
+  mpVideoCaptureLock = pVideoCaptureLock;
   mInitialization = true;
 
   mChannel = channel;
@@ -88,11 +84,11 @@ CameraStateAndConfig::CameraStateAndConfig(
       CameraProperty::Id prop_id = CameraProperty::type().list().at(i).id();
       if (mpCamCapabilities->isSupported(prop_id))
       {
-        mCamPropertyValues.insert(PROPERTY_VALUE_PAIR(prop_id,0));
+        mCamPropertyValues.insert(std::pair<unsigned int,int>(prop_id,0));
       }
       else
       {
-        mCamPropertyValues.insert(PROPERTY_VALUE_PAIR(prop_id,CAMERA_PROPERTY_NOT_SUPPORTED));
+        mCamPropertyValues.insert(std::pair<unsigned int,int>(prop_id,CAMERA_PROPERTY_NOT_SUPPORTED));
       }
     }
 
@@ -116,7 +112,7 @@ CameraStateAndConfig::CameraStateAndConfig(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-CameraStateAndConfig::~CameraStateAndConfig()
+cedar::dev::sensors::visual::CameraStateAndConfig::~CameraStateAndConfig()
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraStateAndConfig::~CameraStateAndConfig] channel "<< mChannel << " Destroy class" << std::endl;
@@ -129,7 +125,7 @@ CameraStateAndConfig::~CameraStateAndConfig()
 
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::saveConfiguration()
+bool cedar::dev::sensors::visual::CameraStateAndConfig::saveConfiguration()
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout<<"[CameraStateAndConfig::writeConfiguration] channel " << mChannel <<  std::endl;
@@ -151,7 +147,7 @@ bool CameraStateAndConfig::saveConfiguration()
 
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
 {
 
   int wanted_value = boost::math::iround(value);
@@ -359,7 +355,7 @@ bool CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-double CameraStateAndConfig::getProperty(CameraProperty::Id propId)
+double cedar::dev::sensors::visual::CameraStateAndConfig::getProperty(CameraProperty::Id propId)
 {
   if (propId == cedar::aux::Enum::UNDEFINED)
   {
@@ -378,7 +374,7 @@ double CameraStateAndConfig::getProperty(CameraProperty::Id propId)
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-double CameraStateAndConfig::getPropertyValue(CameraProperty::Id propId)
+double cedar::dev::sensors::visual::CameraStateAndConfig::getPropertyValue(CameraProperty::Id propId)
 {
   #ifdef ENABLE_GRABBER_WARNING_OUTPUT
     std::string prop_name = CameraProperty::type().get(propId).name();
@@ -411,7 +407,7 @@ double CameraStateAndConfig::getPropertyValue(CameraProperty::Id propId)
 }
 
 //----------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::setCamProperty(unsigned int propId, double value)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::setCamProperty(unsigned int propId, double value)
 {
   bool result;
   mpVideoCaptureLock->lockForWrite();
@@ -421,7 +417,7 @@ bool CameraStateAndConfig::setCamProperty(unsigned int propId, double value)
 }
 
 //----------------------------------------------------------------------------------------------------
-double CameraStateAndConfig::getCamProperty(unsigned int propId)
+double cedar::dev::sensors::visual::CameraStateAndConfig::getCamProperty(unsigned int propId)
 {
   double result;
   mpVideoCaptureLock->lockForWrite();
@@ -430,7 +426,7 @@ double CameraStateAndConfig::getCamProperty(unsigned int propId)
   return result;
 }
 //----------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::setAllParametersToCam()
+bool cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
 {
 #ifdef DEBUG_CAMERAGRABBER
   std::cout << "[CameraState::setAllParametersToCam] channel " << mChannel << std::endl;
@@ -554,14 +550,14 @@ bool CameraStateAndConfig::setAllParametersToCam()
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::setSetting(CameraSetting::Id settingId, double value)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::setSetting(CameraSetting::Id settingId, double value)
 {
   unsigned int prop_id = static_cast<unsigned int>(settingId);
   return setCamProperty(prop_id,value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-double CameraStateAndConfig::getSetting(CameraSetting::Id settingId)
+double cedar::dev::sensors::visual::CameraStateAndConfig::getSetting(CameraSetting::Id settingId)
 {
   switch (settingId)
   {
@@ -581,55 +577,55 @@ double CameraStateAndConfig::getSetting(CameraSetting::Id settingId)
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-int CameraStateAndConfig::getMinValue(CameraProperty::Id propId)
+int cedar::dev::sensors::visual::CameraStateAndConfig::getMinValue(CameraProperty::Id propId)
 {
   return mpCamCapabilities->getMinValue(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-int CameraStateAndConfig::getMaxValue(CameraProperty::Id propId)
+int cedar::dev::sensors::visual::CameraStateAndConfig::getMaxValue(CameraProperty::Id propId)
 {
   return mpCamCapabilities->getMaxValue(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::isSupported(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::isSupported(CameraProperty::Id propId)
 {
   return mpCamCapabilities->isSupported(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::isReadable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::isReadable(CameraProperty::Id propId)
 {
   return mpCamCapabilities->isReadable(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::isOnePushCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::isOnePushCapable(CameraProperty::Id propId)
 {
   return mpCamCapabilities->isOnePushCapable(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::isOnOffCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::isOnOffCapable(CameraProperty::Id propId)
 {
   return mpCamCapabilities->isOnOffCapable(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::isAutoCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::isAutoCapable(CameraProperty::Id propId)
 {
   return mpCamCapabilities->isAutoCapable(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::isManualCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::isManualCapable(CameraProperty::Id propId)
 {
   return mpCamCapabilities->isManualCapable(propId);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool CameraStateAndConfig::isAbsoluteCapable(CameraProperty::Id propId)
+bool cedar::dev::sensors::visual::CameraStateAndConfig::isAbsoluteCapable(CameraProperty::Id propId)
 {
   return mpCamCapabilities->isAbsoluteCapable(propId);
 }

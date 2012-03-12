@@ -34,19 +34,15 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
 #include "cedar/auxiliaries/net/NetReader.h"
 #include "cedar/auxiliaries/net/exceptions/NetException.h"
 #include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 
-// PROJECT INCLUDES
-
-
 // SYSTEM INCLUDES
 
 
-using namespace cedar::dev::sensors::visual;
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,12 +52,9 @@ using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------
 //Constructor for single-channel grabber
-NetGrabber::NetGrabber(
-                        const std::string& configFileName,
-                        const std::string& YarpChannel
-                      )
+cedar::dev::sensors::visual::NetGrabber::NetGrabber(const std::string& configFileName, const std::string& YarpChannel)
 :
-GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   mYarpChannels.push_back(YarpChannel);
   readInit(mYarpChannels.size(),"NetGrabber");
@@ -70,13 +63,14 @@ GrabberInterface(configFileName)
 
 //----------------------------------------------------------------------------------------------------
 //Constructor for stereo-channel grabber
-NetGrabber::NetGrabber(
-                        const std::string& configFileName,
-                        const std::string& YarpChannel0,
-                        const std::string& YarpChannel1
-                      )
+cedar::dev::sensors::visual::NetGrabber::NetGrabber
+(
+  const std::string& configFileName,
+  const std::string& YarpChannel0,
+  const std::string& YarpChannel1
+)
 :
-GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   mYarpChannels.push_back(YarpChannel0);
   mYarpChannels.push_back(YarpChannel1);
@@ -85,7 +79,7 @@ GrabberInterface(configFileName)
 }
 
 //----------------------------------------------------------------------------------------------------
-NetGrabber::~NetGrabber()
+cedar::dev::sensors::visual::NetGrabber::~NetGrabber()
 {
   doCleanUp();
   #ifdef DEBUG_NETGRABBER
@@ -104,7 +98,7 @@ NetGrabber::~NetGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-void NetGrabber::onCleanUp()
+void cedar::dev::sensors::visual::NetGrabber::onCleanUp()
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout<<"[NetGrabber::onCleanUp]"<< std::endl;
@@ -115,7 +109,7 @@ void NetGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool NetGrabber::onInit()
+bool cedar::dev::sensors::visual::NetGrabber::onInit()
 {
   #ifdef DEBUG_NETGRABBER
     std::cout << "\n\nYarpGrabber.onInit()\n";
@@ -192,11 +186,12 @@ bool NetGrabber::onInit()
       }
 
       //ERROR: Somehow YARP doesnt work ... :( typically fatal.
-      catch (cedar::aux::exc::ExceptionBase &E)
+      catch (cedar::aux::exc::ExceptionBase &e)
       {
+        //todo: throw weiter
         std::cout << "[NetGrabber::onInit] ERROR: Initialization failed\n"
                   << "\tChannel " << i << ": "<< mYarpChannels.at(i) << "\n"
-                  << "\t" << E.exceptionInfo()
+                  << "\t" << e.exceptionInfo()
                   << std::endl;
         return false;  //throws an initialization-exception
       }
@@ -281,13 +276,13 @@ bool NetGrabber::onInit()
 
 
 //----------------------------------------------------------------------------------------------------
-bool NetGrabber::onDeclareParameters()
+bool cedar::dev::sensors::visual::NetGrabber::onDeclareParameters()
 {
   return true;
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string NetGrabber::onGetSourceInfo(unsigned int channel) const
+const std::string& cedar::dev::sensors::visual::NetGrabber::onGetSourceInfo(unsigned int channel) const
 {
   //TODO: gather information of used yarp-server too
   if (channel >= mNumCams)
@@ -298,7 +293,7 @@ std::string NetGrabber::onGetSourceInfo(unsigned int channel) const
 }
 
 //----------------------------------------------------------------------------------------------------
-bool NetGrabber::onGrab()
+bool cedar::dev::sensors::visual::NetGrabber::onGrab()
 {
   //unsigned int numCams = getNumCams();
   int result = true;

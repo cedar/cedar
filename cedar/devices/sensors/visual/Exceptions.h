@@ -38,9 +38,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
 #define CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/exceptions/ExceptionBase.h"
-
 
 
 //------------------------------------------------------------------------

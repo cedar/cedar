@@ -167,7 +167,7 @@ int main(int , char **)
   try
   {
     std::string name,result;
-    std::string ext = GRABBER_DEFAULT_RECORD_EXTENSION;
+    std::string ext = "avi";
 
     //set one w/o ext
     name="RecordNameNewName(0)";
@@ -192,18 +192,18 @@ int main(int , char **)
     //set all w/o ext
     name="RecordNameNewName_all";
     grabber_1->setRecordName(name);
-    if (grabber_1->getRecordName(0)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0+ext)
+    if (grabber_1->getRecordName(0)!=name+"ch0"+ext)
       {throw (-1);}
-    if (grabber_1->getRecordName(1)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1+ext)
+    if (grabber_1->getRecordName(1)!=name+"ch1"+ext)
       {throw (-1);}
 
 
     //set all w/ ext
     name="RecordNameNewName_all";
     grabber_1->setRecordName(name+ext);
-    if (grabber_1->getRecordName(0)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0+ext)
+    if (grabber_1->getRecordName(0)!=name+"ch0"+ext)
       {throw (-1);}
-    if (grabber_1->getRecordName(1)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1+ext)
+    if (grabber_1->getRecordName(1)!=name+"ch1"+ext)
       {throw (-1);}
   }
   catch (...)
@@ -232,7 +232,7 @@ int main(int , char **)
   try
   {
     std::string name;
-    std::string ext = GRABBER_DEFAULT_SNAPSHOT_EXTENSION;
+    std::string ext = ".jpg";
 
     //set one w/o ext
     name="SnapshotNameNewName(0)";
@@ -257,18 +257,18 @@ int main(int , char **)
     //set all w/o ext
     name="SnapshotNameNewName_all";
     grabber_1->setSnapshotName(name);
-    if (grabber_1->getSnapshotName(0)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0+ext)
+    if (grabber_1->getSnapshotName(0)!=name+"ch0"+ext)
       {throw (-1);}
-    if (grabber_1->getSnapshotName(1)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1+ext)
+    if (grabber_1->getSnapshotName(1)!=name+"ch1"+ext)
       {throw (-1);}
 
 
     //set all w/ ext
     name="SnapshotNameNewName_all";
     grabber_1->setSnapshotName(name+ext);
-    if (grabber_1->getSnapshotName(0)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_0+ext)
+    if (grabber_1->getSnapshotName(0)!=name+"ch0"+ext)
       {throw (-1);}
-    if (grabber_1->getSnapshotName(1)!=name+GRABBER_SAVE_FILENAMES_ADDITION_CHANNEL_1+ext)
+    if (grabber_1->getSnapshotName(1)!=name+"ch1"+ext)
       {throw (-1);}
 
   }

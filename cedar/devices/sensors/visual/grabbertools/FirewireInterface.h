@@ -43,10 +43,8 @@
 #ifdef CEDAR_USE_LIB_DC1394
 //#pragma message "compiling with DC1394 support"
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/grabbertools/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <inttypes.h>

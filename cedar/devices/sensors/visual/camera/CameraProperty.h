@@ -37,24 +37,46 @@
 #ifndef CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTY_H
 #define CEDAR_CEDAR_DEV_SENSORS_VISUAL_CAMERA_PROPERTY_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/EnumType.h"
 #include "cedar/devices/sensors/visual/namespace.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/highgui/highgui_c.h>
 
 
 
+//--------------------------------------------------------------------------------------------------------------------
 //(re)defines of our new introduced properties in OpenCv:
 //comment this out, if the patched OpenCv is available
-//#define CV_CAP_PROP_ZOOM 27
-//#define CV_CAP_PROP_FOCUS 28
-//#define CV_CAP_PROP_GUID 29
+#ifndef CV_CAP_PROP_ZOOM
+  #define CV_CAP_PROP_ZOOM 27
+#endif
+#ifndef CV_CAP_PROP_FOCUS
+  #define CV_CAP_PROP_FOCUS 28
+#endif
+#ifndef CV_CAP_PROP_GUID
+  #define CV_CAP_PROP_GUID 29
+#endif
+
+//mappings from OpenCV constants
+//return value, if a property is not supported from the actual device
+#define CAMERA_PROPERTY_NOT_SUPPORTED -1
+
+//sets a feature to auto-mode. The propery have to be auto_capable.
+//Assigning a value to a feature, sets its mode to manual // =-2
+#define CAMERA_PROPERTY_MODE_AUTO CV_CAP_PROP_DC1394_MODE_AUTO
+
+//if a feature is on/off capable, this value turns it off //=-4
+#define CAMERA_PROPERTY_MODE_OFF CV_CAP_PROP_DC1394_OFF
+
+//this sets a property to its one_push_auto mode. The feature have to be one_push_auto capable.
+//one_push_auto: set the property to the wanted value and then to one_push_auto.
+//the camera will try to automatically hold this value //-1
+#define CAMERA_PROPERTY_MODE_ONE_PUSH_AUTO CV_CAP_PROP_DC1394_MODE_ONE_PUSH_AUTO
 
 
+//--------------------------------------------------------------------------------------------------------------------
 /*!@brief Enum class for camera properties direct mapped from opencv2/highgui/highui_c.h
  * (also in dc1394/control.h)
  *

@@ -39,10 +39,8 @@
 #include "cedar/devices/robot/CMakeDefines.h"
 #ifdef CEDAR_USE_LIB_DC1394
 
-// LOCAL INCLUDES
-#include "FirewireInterface.h"
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/sensors/visual/grabbertools/FirewireInterface.h"
 
 // SYSTEM INCLUDES
 

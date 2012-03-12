@@ -39,11 +39,9 @@
 #define CEDAR_DEV_SENSORS_VISUAL_NET_GRABBER_H
 
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
 #include "cedar/auxiliaries/net/NetReader.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -57,7 +55,7 @@
 
 class cedar::dev::sensors::visual::NetGrabber
 :
-public GrabberInterface
+public cedar::dev::sensors::visual::GrabberInterface
 {
 //--------------------------------------------------------------------------------------------------------------------
 //macros
@@ -112,7 +110,7 @@ protected:
   bool onInit();
   bool onGrab();
   bool onDeclareParameters();
-  std::string onGetSourceInfo(
+  const std::string& onGetSourceInfo(
                                unsigned int channel
                              ) const;
 
@@ -145,6 +143,7 @@ protected:
    *   \see
    *       mImageMatVector
    */
+  //todo: smart pointer f[r die Netreader
   std::vector<cedar::aux::net::NetReader<cv::Mat>*> mNetReaders;
 
 private:

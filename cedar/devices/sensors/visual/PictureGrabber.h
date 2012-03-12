@@ -38,10 +38,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_PICTURE_GRABBER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -54,7 +52,7 @@
  */
 class cedar::dev::sensors::visual::PictureGrabber
 :
-public GrabberInterface
+public cedar::dev::sensors::visual::GrabberInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -88,21 +86,6 @@ public:
   /*! \brief Destructor */
   ~PictureGrabber();
 
-
-  //------------------------------------------------------------------------
-  //Members
-  //------------------------------------------------------------------------
-
-protected:
-
-
-  //------------------------------------------------------------------------
-  //Methods
-  //------------------------------------------------------------------------
-
-public:
-
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -117,7 +100,7 @@ public:
    */
   bool setSourceFile(
                       unsigned int channel,
-                      const std::string& FileName
+                      const std::string& fileName
                     );
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -129,7 +112,7 @@ protected:
   bool onInit();
   bool onGrab();
   bool onDeclareParameters();
-  std::string onGetSourceInfo(
+  const std::string& onGetSourceInfo(
                                unsigned int channel
                              ) const;
 

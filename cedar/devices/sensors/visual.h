@@ -28,7 +28,7 @@
     Email:       georg.hartinger@rub.de
     Date:        2011 08 01
 
-    Description: Single includefile for @em cedar::devices::sensors::visual::Grabber 
+    Description: Single include file for @em cedar::devices::sensors::visual::Grabber
 
     Credits:
 

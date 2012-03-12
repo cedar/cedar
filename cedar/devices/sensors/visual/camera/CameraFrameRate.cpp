@@ -34,10 +34,8 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/camera/CameraFrameRate.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 

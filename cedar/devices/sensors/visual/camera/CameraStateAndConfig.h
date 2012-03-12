@@ -37,12 +37,15 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_STATE_AND_CONFIG_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
+#include "cedar/devices/sensors/visual/camera/CameraConfig.h"
 
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
+#include <QReadWriteLock>
+
+
 
 
 /*! \class cedar::dev::sensors::visual::CameraStateAndConfig
@@ -66,6 +69,13 @@
 class cedar::dev::sensors::visual::CameraStateAndConfig
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+
+
+
+  //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -84,7 +94,7 @@ public:
    */
   CameraStateAndConfig(
                        cv::VideoCapture videoCapture,
-                       QReadWriteLockPtr videoCaptureLock,
+                       QReadWriteLock* pVideoCaptureLock,
                        unsigned int channel,
                        const std::string configurationFileName,
                        const std::string capabilitiesFileName
@@ -215,12 +225,12 @@ private:
    *  \remarks This is the local storage for the camera settings
    *    and is only needed for ConfigurationInterface class
    */
-  CameraSettings mCamSettings;
+  cedar::dev::sensors::visual::CameraConfig::CameraSettings mCamSettings;
 
   /*! \brief This is the map, where all properties and their actual values stored in
    *  \remarks This is used to map those settings like CAMERA_PROPERTY_MODE_AUTO
    */
-  CameraPropertyValues mCamPropertyValues;
+  cedar::dev::sensors::visual::CameraPropertyValues mCamPropertyValues;
 
   ///! The CameraCapability class manage the capabilities of the camera
   CameraCapabilitiesPtr mpCamCapabilities;
@@ -246,7 +256,7 @@ private:
   cv::VideoCapture mVideoCapture;
 
   ///! The lock for concurrent access to the VideoCapture
-  QReadWriteLockPtr mpVideoCaptureLock;
+  QReadWriteLock *mpVideoCaptureLock;
 
   ///! Internal flag for initialization period
   // Used to suppress warning messages in setProperty on startup

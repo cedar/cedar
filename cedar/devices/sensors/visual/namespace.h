@@ -38,13 +38,14 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_NAMESPACE_H
 #define CEDAR_DEV_SENSORS_VISUAL_NAMESPACE_H
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/devices/lib.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
-#include <QReadWriteLock>
+#include <map>
+
+
 
 //------------------------------------------------------------------------
 // namespace for classes
@@ -59,72 +60,37 @@ namespace cedar
       //! \brief Namespace for all visual sensors like cameras or camera-dummies (i.e. avi-file, picture)
       namespace visual
       {
-        // /** obsolete */
-        //class GrabberManager;
 
-        //! @brief The common interface for all grabber \see GrabberInterface */
-        class GrabberInterface;
-        //!@brief smart pointer for GrabberInterface
-        typedef boost::shared_ptr<GrabberInterface> GrabberInterfacePtr;
-      
+        //!@cond SKIPPED_DOCUMENTATION
+
+        //common interface class
+        CEDAR_DECLARE_DEV_CLASS(GrabberInterface);
         
-        //! @brief A grabber to grab from AVI files \see VideoGrabber */
-        class VideoGrabber;
-        //! @brief smart pointer for VideoGrabber
-        typedef boost::shared_ptr<VideoGrabber> VideoGrabberPtr;
-		
+        //grabber
+        CEDAR_DECLARE_DEV_CLASS(VideoGrabber);
+        CEDAR_DECLARE_DEV_CLASS(NetGrabber);
+        CEDAR_DECLARE_DEV_CLASS(PictureGrabber);
+        CEDAR_DECLARE_DEV_CLASS(CameraGrabber);
         
-        //! @brief A grabber to grab from image files \see PictureGrabber */
-        class NetGrabber;
-        //! @brief smart pointer for NetGrabber
-        typedef boost::shared_ptr<NetGrabber> NetGrabberPtr;
-		
-		
-        //! @brief A grabber to grab from a YARP Server \see NetGrabber */
-        class PictureGrabber;
-        //! @brief smart pointer for PictureGrabber
-        typedef boost::shared_ptr<PictureGrabber> PictureGrabberPtr;
+        //enum classes
+        CEDAR_DECLARE_DEV_CLASS(CameraIsoSpeed);
+        CEDAR_DECLARE_DEV_CLASS(CameraFrameRate);
+        CEDAR_DECLARE_DEV_CLASS(CameraProperty);
+        CEDAR_DECLARE_DEV_CLASS(CameraVideoMode);
+        CEDAR_DECLARE_DEV_CLASS(CameraSetting);
         
+        //misc helper classes
+        CEDAR_DECLARE_DEV_CLASS(CameraStateAndConfig);
+        CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
+        CEDAR_DECLARE_DEV_CLASS(CameraConfig);
         
-        //! @brief A grabber to grab from a Cameras \see CameraGrabber */
-        class CameraGrabber;
-        //! @brief smart pointer for PictureGrabber
-        typedef boost::shared_ptr<CameraGrabber> CameraGrabberPtr;
-        
-        //! @brief An enum for the ISO-speed of the IEEE1394/firewire bus
-        class CameraIsoSpeed;
+        //!@endcond
 
-        //! @brief An enum for the framerate of the camera
-        class CameraFrameRate;
+        ///! map property enum id to the value of the property
+        typedef std::map<unsigned int, double> CameraPropertyValues;
 
-        //! @brief An enum for the camera properties
-        class CameraProperty;
-
-        //! @brief An enum for the video modes of the camera
-        class CameraVideoMode;
-
-        //! @brief An enum for the camera settings
-        class CameraSetting;
-
-        //! @brief A class which manages all supported properties and settings of a camera
-        class CameraStateAndConfig;
-        //! @brief smart pointer for CameraStateAndConfig
-        typedef boost::shared_ptr<CameraStateAndConfig> CameraStateAndConfigPtr;
-
-        //! @brief A class to store the capabilities of a specific camera model
-        class CameraCapabilities;
-        //! @brief  smart pointer for CameraCapabilieties
-        typedef boost::shared_ptr<CameraCapabilities> CameraCapabilitiesPtr;
-
-        //! @brief A class which manages the properties and settings of a camera, i.e. the actual state
-        class CameraConfig;
-        //! @brief  smart pointer for CameraConfigPtr
-        typedef boost::shared_ptr<CameraConfig> CameraConfigPtr;
-
-        //todo: check if this is the right place
-        //! @brief smart pointer for QReadWriteLock used in the CameraGrabber class
-        typedef boost::shared_ptr<QReadWriteLock> QReadWriteLockPtr;
-
+        ///! a pair of property enum id and his value
+        typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
       }
     }
   }

@@ -34,14 +34,10 @@
 
 ======================================================================================================================*/
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/TestGrabber.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-
-using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -49,12 +45,12 @@ using namespace cedar::dev::sensors::visual;
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-TestGrabber::TestGrabber(
+cedar::dev::sensors::visual::TestGrabber::TestGrabber(
              std::string configFileName,
              std::string ChannelName
            )
 :
-GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   std::cout<<"[TestGrabber::TestGrabber] Create a single channel grabber\n";
 
@@ -69,13 +65,13 @@ GrabberInterface(configFileName)
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
-TestGrabber::TestGrabber(
+cedar::dev::sensors::visual::TestGrabber::TestGrabber(
                           std::string configFileName,
                           std::string ChannelName0,
                           std::string ChannelName1
                         )
 :
-GrabberInterface(configFileName)
+cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   std::cout<<"[TestGrabber::TestGrabber] Create a dual channel grabber\n";
 
@@ -90,7 +86,7 @@ GrabberInterface(configFileName)
 
 //----------------------------------------------------------------------------------------------------
 // Destructor
-TestGrabber::~TestGrabber()
+cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
 {
   //call of doCleanup, to do the necessarily cleanup in GrabberInterface
   doCleanUp();
@@ -107,7 +103,7 @@ TestGrabber::~TestGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-bool TestGrabber::onInit()
+bool cedar::dev::sensors::visual::TestGrabber::onInit()
 {
 
   //do the initialization of your Grabber in this method,
@@ -143,7 +139,7 @@ bool TestGrabber::onInit()
 }
 
 //----------------------------------------------------------------------------------------------------
-void TestGrabber::onCleanUp()
+void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
 {
   //do the cleanup of used hardware in this method
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
@@ -152,7 +148,7 @@ void TestGrabber::onCleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool TestGrabber::onDeclareParameters()
+bool cedar::dev::sensors::visual::TestGrabber::onDeclareParameters()
 {
   //declare and initialize parameters and members of your derived class here
   mCounter = 0 ;
@@ -163,7 +159,7 @@ bool TestGrabber::onDeclareParameters()
 }
 
 //----------------------------------------------------------------------------------------------------
-std::string TestGrabber::onGetSourceInfo(unsigned int channel) const
+const std::string& cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(unsigned int channel) const
 {
   //this is the only pure virtual method of the GrabberInterface class
 
@@ -175,7 +171,7 @@ std::string TestGrabber::onGetSourceInfo(unsigned int channel) const
 }
 
 //----------------------------------------------------------------------------------------------------
-bool TestGrabber::onGrab()
+bool cedar::dev::sensors::visual::TestGrabber::onGrab()
 {
   //this is the main grabbing method.
   //read a new picture from the source and set the picture in the mImageMatVector.at()
@@ -186,7 +182,7 @@ bool TestGrabber::onGrab()
 }
 
 //----------------------------------------------------------------------------------------------------
-unsigned int TestGrabber::getCounter()
+unsigned int cedar::dev::sensors::visual::TestGrabber::getCounter()
 {
   //a simple get-method
   unsigned int ct = mCounter;
@@ -195,14 +191,14 @@ unsigned int TestGrabber::getCounter()
 }
 
 //----------------------------------------------------------------------------------------------------
-int TestGrabber::getTestParam()
+int cedar::dev::sensors::visual::TestGrabber::getTestParam()
 {
   //a simple get-method
   return _mTest;
 }
 
 //----------------------------------------------------------------------------------------------------
-void TestGrabber::setTestParam(int mTest)
+void cedar::dev::sensors::visual::TestGrabber::setTestParam(int mTest)
 {
   //a simple set-method
   _mTest=mTest;

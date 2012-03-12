@@ -37,15 +37,34 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CONFIG_H
 
-// LOCAL INCLUDES
-#include "cedar/devices/sensors/visual/CameraGrabber.h"
-#include "cedar/devices/sensors/visual/camera/defines.h"
+// CEDAR INCLUDES
 #include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/devices/sensors/visual/namespace.h"
 
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <set>
+#include <map>
+
+
+namespace cedar
+{
+  namespace dev
+  {
+    namespace sensors
+    {
+      namespace visual
+      {
+        ///! std::map to map property enum id to the value of the property
+
+      //typedef std::map<cedar::dev::sensors::visual::CameraProperty::Id, double> CameraPropertyValues;
+      typedef std::map<unsigned int, double> CameraPropertyValues;
+      //typedef std::pair<cedar::dev::sensors::visual::CameraProperty::Id, double> CameraPropertyValuesPair;
+      typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
+      }
+    }
+  }
+}
 
 
 /*! \class cedar::dev::sensors::visual::CameraConfig
@@ -58,6 +77,26 @@ class cedar::dev::sensors::visual::CameraConfig
 :
 public cedar::aux::ConfigurationInterface
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  /*! \struct CameraSettings
+   *  \brief Structure to store the values of the settings (as an enum string) of a camera for the
+   *    configuration interface
+   */
+  struct CameraSettings
+  {
+    //!@cond SKIPPED_DOCUMENTATION
+    std::string fps;
+    std::string mode;
+    std::string iso_speed;
+    std::string capability_config_file_name;
+    //!@endcond
+  };
+
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -79,7 +118,7 @@ public:
                 const std::string& configFileName,
                 unsigned int channel,
                 CameraSettings &camSettings,
-                CameraPropertyValues &camPropertyValues
+                cedar::dev::sensors::visual::CameraPropertyValues &camPropertyValues
               );
   //!@brief Destructor
   ~CameraConfig();

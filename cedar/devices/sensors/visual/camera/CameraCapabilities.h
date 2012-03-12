@@ -37,11 +37,9 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_CAPABILITIES_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/CameraGrabber.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -54,8 +52,31 @@
 class cedar::dev::sensors::visual::CameraCapabilities
 :
 public cedar::aux::ConfigurationInterface
-
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+  /*! \brief Stores the capability of a property
+   *  \remarks Every property have several ways to be accessed, and a defined range
+   *    where the values can be set.
+   *    This struct stores flags for all possible ways and the range of the values
+   */
+  struct CameraPropertyCapability
+  {
+    //!@cond SKIPPED_DOCUMENTATION
+     cedar::dev::sensors::visual::CameraProperty::Id propId;
+     int max_value;
+     int min_value;
+     bool is_supported;
+     bool is_readable;
+     bool is_one_push_capable;
+     bool is_on_off_capable;
+     bool is_auto_capable;
+     bool is_manual_capable;
+     bool is_absolute_capable;
+     //!@endcond
+  } ;
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------

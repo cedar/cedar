@@ -38,10 +38,8 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 
-// LOCAL INCLUDES
+// CEDAR INCLUDES
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 
@@ -53,7 +51,7 @@
  */
 class cedar::dev::sensors::visual::VideoGrabber
 :
-public GrabberInterface
+public cedar::dev::sensors::visual::GrabberInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -92,7 +90,7 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
- /*! \brief Turn looping on or off (i.e. restart on end) */
+ /*! \brief Turn looping on or off (i.e., restart on end) */
   void setLoop(
                 bool loop = true
               );
@@ -122,6 +120,7 @@ public:
    *		Range is from 0..1<br>
    *		For absolute positioning use setPositionAbs()
    */
+  //todo Relative
   void setPositionRel(
                        double newPositionRel
                      );
@@ -136,6 +135,7 @@ public:
    *  \remarks
    *      For relative positioning use setPostionRel()
    */
+  //todo Absolute
   void setPositionAbs(
                        unsigned int newPositionAbs
                      );
@@ -200,7 +200,7 @@ protected:
   bool onGrab();
 
   bool onDeclareParameters();
-  std::string onGetSourceInfo(unsigned int channel) const;
+  const std::string& onGetSourceInfo(unsigned int channel) const;
   virtual void onCleanUp();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -253,8 +253,6 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
 protected:
   // none yet
 
@@ -264,8 +262,4 @@ private:
 }; // class cedar::dev::sensors::visual::VideoGrabber
 
 #endif // CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
-
-
-
-
 
