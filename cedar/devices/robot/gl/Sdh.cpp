@@ -122,6 +122,24 @@ void cedar::dev::robot::gl::Sdh::initializeGl()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mProximalSkinIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mProximalSkinFacesNumber*3 * sizeof(GLushort), mProximalSkinIndex, GL_STATIC_DRAW);
 
+  // distal link
+  glGenBuffers(1, &mDistalLinkVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mDistalLinkVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mDistalLinkVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mDistalLinkVertexNumber, mDistalLinkVertex);
+  glGenBuffers(1, &mDistalLinkIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mDistalLinkIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mDistalLinkFacesNumber*3 * sizeof(GLushort), mDistalLinkIndex, GL_STATIC_DRAW);
+
+  // distal skin
+  glGenBuffers(1, &mDistalSkinVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mDistalSkinVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mDistalSkinVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mDistalSkinVertexNumber, mDistalSkinVertex);
+  glGenBuffers(1, &mDistalSkinIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mDistalSkinIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mDistalSkinFacesNumber*3 * sizeof(GLushort), mDistalSkinIndex, GL_STATIC_DRAW);
+
 }
 
 void cedar::dev::robot::gl::Sdh::draw()
@@ -206,11 +224,22 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    cedar::aux::gl::drawCone(0.0, 0.06, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, 0.06);
-    cedar::aux::gl::drawCone(0.0, 0.0085, 0.01, 0.0, mResolution, mIsDrawnAsWireFrame);
+    glTranslated(.0, .0, -.104);
+    glRotated(90, 1, 0, 0);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    this->drawElement(mDistalSkinVertexVboId, mDistalSkinIndexVboId, mDistalSkinFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    glRotated(-90, 0, 1, 0);
+    glRotated(-90, 1, 0, 0);
 
-    // move back to hand origin and resave
+//    cedar::aux::gl::drawCone(0.0, 0.06, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
+//    glTranslated(0, 0, 0.06);
+//    cedar::aux::gl::drawCone(0.0, 0.0085, 0.01, 0.0, mResolution, mIsDrawnAsWireFrame);
+
+    // move back to hand origin and re-save
     glPopMatrix();
     glPushMatrix();
 
@@ -349,6 +378,22 @@ void cedar::dev::robot::gl::Sdh::loadData()
   QString proximal_skin_index_data_file_name
     = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_skin_index.txt").c_str());
   loadIndexData(proximal_skin_index_data_file_name, mProximalSkinFacesNumber, mProximalSkinIndex);
+
+  // distal link
+  QString distal_link_vertex_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_link_vertex.txt").c_str());
+  loadVertexData(distal_link_vertex_data_file_name, mDistalLinkVertexNumber, mDistalLinkVertex);
+  QString distal_link_index_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_link_index.txt").c_str());
+  loadIndexData(distal_link_index_data_file_name, mDistalLinkFacesNumber, mDistalLinkIndex);
+
+  // distal skin
+  QString distal_skin_vertex_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_skin_vertex.txt").c_str());
+  loadVertexData(distal_skin_vertex_data_file_name, mDistalSkinVertexNumber, mDistalSkinVertex);
+  QString distal_skin_index_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/distal_skin_index.txt").c_str());
+  loadIndexData(distal_skin_index_data_file_name, mDistalSkinFacesNumber, mDistalSkinIndex);
 
 }
 

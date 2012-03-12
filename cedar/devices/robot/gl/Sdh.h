@@ -133,6 +133,22 @@ private:
   Vertex mProximalSkinVertex[mProximalSkinVertexNumber]; // vertex data
   GLushort mProximalSkinIndex[mProximalSkinFacesNumber*3]; // index data
 
+  // distal link
+  static const unsigned int mDistalLinkVertexNumber = 3386;
+  static const unsigned int mDistalLinkFacesNumber = 2892;
+  GLuint mDistalLinkVertexVboId; // vertex buffer id
+  GLuint mDistalLinkIndexVboId; // index buffer id
+  Vertex mDistalLinkVertex[mDistalLinkVertexNumber]; // vertex data
+  GLushort mDistalLinkIndex[mDistalLinkFacesNumber*3]; // index data
+
+  // distal skin
+  static const unsigned int mDistalSkinVertexNumber = 528;
+  static const unsigned int mDistalSkinFacesNumber = 436;
+  GLuint mDistalSkinVertexVboId; // vertex buffer id
+  GLuint mDistalSkinIndexVboId; // index buffer id
+  Vertex mDistalSkinVertex[mDistalSkinVertexNumber]; // vertex data
+  GLushort mDistalSkinIndex[mDistalSkinFacesNumber*3]; // index data
+
 }; // class cedar::dev::robot::gl::KukaArm
 #endif // CEDAR_DEV_ROBOT_GL_KUKA_ARM_H
 
