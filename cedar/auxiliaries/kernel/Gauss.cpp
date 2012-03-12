@@ -68,7 +68,7 @@ cedar::aux::kernel::Separable(),
 _mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, -10000.0, 10000.0)),
 _mSigmas(new cedar::aux::DoubleVectorParameter(this, "sigmas", 2, 3.0, 0.0, 10000)),
 _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 3.0, 0.0, 10000)),
-_mLimit(new cedar::aux::DoubleParameter(this, "limit", 0.01, 1000.0))
+_mLimit(new cedar::aux::DoubleParameter(this, "limit", 5.0, 0.01, 1000.0))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   _mDimensionality->setValue(_mSigmas->size());
