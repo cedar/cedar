@@ -102,9 +102,7 @@ public:
   //!@brief Set this parameter to a value read from a configuration node
   virtual void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
-    std::cout << "Reading object parameter" << std::endl;
     std::string type = node.get_child("type").get_value<std::string>();
-    std::cout << "Type read: " << type << std::endl;
     BaseTypePtr object = FactoryManagerSingleton::getInstance()->allocate(type);
     object->readConfiguration(node);
     this->mObject = object;

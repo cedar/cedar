@@ -52,6 +52,7 @@
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/convolution/FastConvolution.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -170,6 +171,62 @@ _mSigmoid
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode& node)
+{
+  this->cedar::proc::Step::readConfiguration(node);
+
+  // legacy code for reading kernels with the old format
+  cedar::aux::ConfigurationNode::const_assoc_iterator iter = node.find("numberOfKernels");
+  if (iter != node.not_found())
+  {
+    unsigned int num_kernels = iter->second.get_value<unsigned int>();
+
+    if (num_kernels > 0)
+    {
+      cedar::aux::LogSingleton::getInstance()->warning
+      (
+        "Reading kernels for field \"" + this->getName() + "\" with legacy mode. "
+        "This overrides all kernels previously set!",
+        "cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode&)"
+      );
+
+      /* we have to clear everything here because it is not known whether the kernels already in the list are default
+       * values or values read from the configuration.
+       */
+      this->_mKernels->clear();
+    }
+
+    for (unsigned int i = 0; i < num_kernels; ++i)
+    {
+      // find the configuration node for the kernel
+      cedar::aux::ConfigurationNode::const_assoc_iterator kernel_iter;
+      kernel_iter = node.find("lateralKernel" + cedar::aux::toString(i));
+
+      // check if the kernel node was found
+      if (kernel_iter != node.not_found())
+      {
+        // the old kernels were all Gauss kernels
+        cedar::aux::kernel::GaussPtr kernel (new cedar::aux::kernel::Gauss());
+
+        // read the kernel's configuration
+        kernel->readConfiguration(kernel_iter->second);
+
+        // add the kernel to the managed list
+        this->_mKernels->pushBack(kernel);
+      }
+      else
+      {
+        cedar::aux::LogSingleton::getInstance()->warning
+        (
+          "Could not find legacy kernel description for kernel " + cedar::aux::toString(i)
+           + " in field \"" + this->getName() + "\". Skipping kernel!",
+          "cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode&)"
+        );
+      }
+    }
+  }
+}
 
 void cedar::dyn::NeuralField::reset()
 {
@@ -437,64 +494,6 @@ void cedar::dyn::NeuralField::updateMatrices()
     this->mNoiseCorrelationKernel->setDimensionality(dimensionality);
   }
 }
-
-//void cedar::dyn::NeuralField::numberOfKernelsChanged()
-//{
-//  const unsigned int& new_number = _mNumberOfKernels->getValue();
-//  if (mOldNumberOfKernels < new_number) // more kernels
-//  {
-//    std::vector<double> sigmas;
-//    std::vector<double> shifts;
-//    const unsigned int& field_dimensionality = this->_mDimensionality->getValue();
-//    for (unsigned int dim = 0; dim < field_dimensionality; ++dim)
-//    {
-//      sigmas.push_back(3.0);
-//      shifts.push_back(0.0);
-//    }
-//    // create as many kernels as necessary
-//    for (unsigned int i = mOldNumberOfKernels; i < new_number; i++)
-//    {
-//      cedar::aux::kernel::GaussPtr kernel
-//        = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
-//                                                                      1.0,
-//                                                                      sigmas,
-//                                                                      shifts,
-//                                                                      5.0,
-//                                                                      field_dimensionality
-//                                                                      )
-//                                                                    );
-//      mKernels.push_back(kernel);
-//      std::string kernel_name("lateralKernel");
-//      kernel_name += boost::lexical_cast<std::string>(i);
-//      // try to create a new buffer - if kernel did exist previously, this buffer is already present
-//      try
-//      {
-//        this->declareBuffer(kernel_name);
-//        this->setBuffer(kernel_name, mKernels.at(i)->getKernelRaw());
-//      }
-//      catch(cedar::proc::DuplicateNameException& exc)
-//      {
-//        // buffer already exists...
-//      }
-//      this->mKernels.at(i)->hideDimensionality(true);
-//      this->addConfigurableChild(kernel_name, this->mKernels.at(i));
-//    }
-//  }
-//  else if(mOldNumberOfKernels > new_number) // less kernels
-//  {
-//    for (unsigned int i = mOldNumberOfKernels-1; i >= new_number; --i)
-//    {
-//      mKernels.pop_back();
-//      std::string kernel_name("lateralKernel");
-//      kernel_name += boost::lexical_cast<std::string>(i);
-//      this->removeConfigurableChild(kernel_name);
-//    }
-//  }
-//  // if mOldNumberOfKernels == new_number, nothing must be done
-//
-//  // reset mOldNumberOfKernels
-//  mOldNumberOfKernels = new_number;
-//}
 
 void cedar::dyn::NeuralField::onStart()
 {
