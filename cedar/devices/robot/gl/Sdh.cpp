@@ -104,6 +104,24 @@ void cedar::dev::robot::gl::Sdh::initializeGl()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mKnuckleIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mKnuckleFacesNumber*3 * sizeof(GLushort), mKnuckleIndex, GL_STATIC_DRAW);
 
+  // proximal link
+  glGenBuffers(1, &mProximalLinkVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mProximalLinkVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mProximalLinkVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mProximalLinkVertexNumber, mProximalLinkVertex);
+  glGenBuffers(1, &mProximalLinkIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mProximalLinkIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mProximalLinkFacesNumber*3 * sizeof(GLushort), mProximalLinkIndex, GL_STATIC_DRAW);
+
+  // proximal skin
+  glGenBuffers(1, &mProximalSkinVertexVboId);
+  glBindBuffer(GL_ARRAY_BUFFER, mProximalSkinVertexVboId);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mProximalSkinVertexNumber, NULL, GL_STATIC_DRAW);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * mProximalSkinVertexNumber, mProximalSkinVertex);
+  glGenBuffers(1, &mProximalSkinIndexVboId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mProximalSkinIndexVboId);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mProximalSkinFacesNumber*3 * sizeof(GLushort), mProximalSkinIndex, GL_STATIC_DRAW);
+
 }
 
 void cedar::dev::robot::gl::Sdh::draw()
@@ -145,11 +163,12 @@ void cedar::dev::robot::gl::Sdh::draw()
     }
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
+    glRotated(90, 0, 1, 0);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
     this->drawElement(mKnuckleVertexVboId, mKnuckleIndexVboId, mKnuckleFacesNumber);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
-    glTranslated(.0, 0.0, .0175);
 //    glRotated(90, 1, 0, 0);
 //    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
 //    glRotated(-90, 1, 0, 0);
@@ -161,11 +180,24 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
-    cedar::aux::gl::drawCone(0.0, 0.0865, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
-    glTranslated(0, 0, 0.0865);
     glRotated(90, 1, 0, 0);
-    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+    glRotated(90, 0, 1, 0);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    this->drawElement(mProximalSkinVertexVboId, mProximalSkinIndexVboId, mProximalSkinFacesNumber);
+    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
+
+    glTranslated(.0, 0.0, .0175);
+
+
+//    cedar::aux::gl::drawCone(0.0, 0.0865, 0.01, 0.01, mResolution, mIsDrawnAsWireFrame);
+    glTranslated(0, 0, 0.0865);
+//    glRotated(90, 1, 0, 0);
+//    cedar::aux::gl::drawCone(-0.02, 0.02, 0.02, 0.02, mResolution, mIsDrawnAsWireFrame);
+//    glRotated(-90, 1, 0, 0);
 
     // first finger distal link
     glRotated(mpKinematicChain->getJointAngle(1)*180.0/M_PI, 0, -1, 0);
@@ -301,6 +333,22 @@ void cedar::dev::robot::gl::Sdh::loadData()
   QString knuckle_index_data_file_name
     = QString(cedar::aux::System::locateResource("meshes/sdh/knuckle_index.txt").c_str());
   loadIndexData(knuckle_index_data_file_name, mKnuckleFacesNumber, mKnuckleIndex);
+
+  // proximal link
+  QString proximal_link_vertex_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_link_vertex.txt").c_str());
+  loadVertexData(proximal_link_vertex_data_file_name, mProximalLinkVertexNumber, mProximalLinkVertex);
+  QString proximal_link_index_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_link_index.txt").c_str());
+  loadIndexData(proximal_link_index_data_file_name, mProximalLinkFacesNumber, mProximalLinkIndex);
+
+  // proximal skin
+  QString proximal_skin_vertex_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_skin_vertex.txt").c_str());
+  loadVertexData(proximal_skin_vertex_data_file_name, mProximalSkinVertexNumber, mProximalSkinVertex);
+  QString proximal_skin_index_data_file_name
+    = QString(cedar::aux::System::locateResource("meshes/sdh/proximal_skin_index.txt").c_str());
+  loadIndexData(proximal_skin_index_data_file_name, mProximalSkinFacesNumber, mProximalSkinIndex);
 
 }
 

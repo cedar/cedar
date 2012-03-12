@@ -80,6 +80,7 @@ int main(int argc, char **argv)
   (
     new cedar::dev::robot::KinematicChainModel(p_dummy_arm)
   );
+  p_dummy_arm_model->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
 
   // create gl visualization objects
   cedar::dev::robot::gl::SdhPtr p_hand_visualization
