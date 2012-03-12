@@ -73,21 +73,26 @@ cedar::aux::gui::ObjectListParameter::ObjectListParameter()
   this->setLayout(p_layout);
 
   mpTypeSelector = new QComboBox();
+  mpTypeSelector->setToolTip("Select the type of the object you wish to add.");
   p_layout->addWidget(mpTypeSelector, 0, 0);
 
   mpAddButton = new QPushButton("+");
+  mpAddButton->setToolTip("Add an object of the selected type to the end of the list.");
   mpAddButton->setMaximumWidth(button_size);
   p_layout->addWidget(mpAddButton, 0, 1);
 
   mpInstanceSelector = new QComboBox();
+  mpInstanceSelector->setToolTip("Select an instance in the object list here.");
   p_layout->addWidget(mpInstanceSelector, 1, 0);
 
   mpRemoveButton = new QPushButton("-");
   mpRemoveButton->setMaximumWidth(button_size);
   mpRemoveButton->setEnabled(false);
+  mpRemoveButton->setToolTip("Remove the instance currently selected.");
   p_layout->addWidget(mpRemoveButton, 1, 1);
 
   mpEditButton = new QPushButton("...");
+  mpEditButton->setToolTip("Open a new window to edit the parameters of the instance currently selected.");
   mpEditButton->setMaximumWidth(button_size);
   mpEditButton->setEnabled(false);
   p_layout->addWidget(mpEditButton, 1, 2);

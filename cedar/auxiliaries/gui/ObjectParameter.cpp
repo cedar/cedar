@@ -73,11 +73,13 @@ cedar::aux::gui::ObjectParameter::ObjectParameter()
   this->setLayout(p_layout);
 
   mpTypeSelector = new QComboBox();
+  mpTypeSelector->setToolTip("Select the type of the object.");
   p_layout->addWidget(mpTypeSelector, 0, 0);
 
   mpEditButton = new QPushButton("...");
   mpEditButton->setMaximumWidth(button_size);
   mpEditButton->setEnabled(false);
+  mpEditButton->setToolTip("Opens a new window that lets you edit the parameters of the current object.");
   p_layout->addWidget(mpEditButton, 0, 1);
 
   QObject::connect(this, SIGNAL(parameterPointerChanged()), this, SLOT(parameterPointerChanged()));
