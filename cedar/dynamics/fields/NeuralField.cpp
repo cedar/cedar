@@ -192,7 +192,7 @@ void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationN
       );
 
       /* we have to clear everything here because it is not known whether the kernels already in the list are default
-       * values or values read from the configuration.
+         values or values read from the configuration.
        */
       this->_mKernels->clear();
     }
@@ -224,6 +224,24 @@ void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationN
           "cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode&)"
         );
       }
+    }
+  }
+
+  // legacy reading of the sigmoid
+  cedar::aux::ConfigurationNode::const_assoc_iterator sigmoid_iter = node.find("sigmoid");
+  if (sigmoid_iter != node.not_found())
+  {
+    cedar::aux::ConfigurationNode::const_assoc_iterator type_iter = sigmoid_iter->second.find("type");
+
+    // if there is no type entry in the sigmoid, this must be the old format
+    if (type_iter == sigmoid_iter->second.not_found())
+    {
+      /* If we get to this point, the sigmoid should already contain a pointer to a proper object, but with the default
+         settings. Thus, we let it read the values from the sigmoid node.
+       */
+      CEDAR_DEBUG_ASSERT(this->_mSigmoid->getValue());
+
+      this->_mSigmoid->getValue()->readConfiguration(sigmoid_iter->second);
     }
   }
 }
