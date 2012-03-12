@@ -130,6 +130,7 @@ int main()
   //===================================================================================================================
   // 1D to 0D
   //===================================================================================================================
+  std::cout << "Checking 1D to 0D projections" << std::endl;
   checkValidProjection("configs/config_1Dto0D_average_valid.json", number_of_errors);
   checkValidProjection("configs/config_1Dto0D_max_valid.json", number_of_errors);
   checkValidProjection("configs/config_1Dto0D_min_valid.json", number_of_errors);
@@ -138,12 +139,16 @@ int main()
   //===================================================================================================================
   // 1D to 1D
   //===================================================================================================================
+  std::cout << "Checking 1D to 1D projections" << std::endl;
+  std::cout << "File: config_1Dto1D_0_valid.json" << std::endl;
   checkValidProjection("configs/config_1Dto1D_0_valid.json", number_of_errors);
+  std::cout << "File: config_1Dto1D_drop_invalid.json" << std::endl;
   checkInvalidProjection("configs/config_1Dto1D_drop_invalid.json", number_of_errors);
 
   //===================================================================================================================
   // 1D to 2D
   //===================================================================================================================
+  std::cout << "Checking 1D to 2D projections" << std::endl;
   checkValidProjection("configs/config_1Dto2D_0_valid.json", number_of_errors);
   checkValidProjection("configs/config_1Dto2D_1_valid.json", number_of_errors);
   checkInvalidProjection("configs/config_1Dto2D_drop_invalid.json", number_of_errors);
@@ -151,6 +156,7 @@ int main()
   //===================================================================================================================
   // 1D to 3D
   //===================================================================================================================
+  std::cout << "Checking 1D to 3D projections" << std::endl;
   checkValidProjection("configs/config_1Dto3D_0_valid.json", number_of_errors);
   checkValidProjection("configs/config_1Dto3D_1_valid.json", number_of_errors);
   checkValidProjection("configs/config_1Dto3D_2_valid.json", number_of_errors);
@@ -159,11 +165,13 @@ int main()
   //===================================================================================================================
   // 2D to 0D
   //===================================================================================================================
+  std::cout << "Checking 2D to 0D projections" << std::endl;
   checkValidProjection("configs/config_2Dto0D_valid.json", number_of_errors);
 
   //===================================================================================================================
   // 2D to 1D
   //===================================================================================================================
+  std::cout << "Checking 2D to 1D projections" << std::endl;
   checkInvalidProjection("configs/config_2Dto1D_0_0_invalid.json", number_of_errors);
   checkValidProjection("configs/config_2Dto1D_0_drop_valid.json", number_of_errors);
   checkValidProjection("configs/config_2Dto1D_drop_0_valid.json", number_of_errors);
@@ -172,6 +180,7 @@ int main()
   //===================================================================================================================
   // 2D to 2D
   //===================================================================================================================
+  std::cout << "Checking 2D to 2D projections" << std::endl;
   checkInvalidProjection("configs/config_2Dto2D_0_0_invalid.json", number_of_errors);
   checkValidProjection("configs/config_2Dto2D_0_1_average_valid.json", number_of_errors);
   checkValidProjection("configs/config_2Dto2D_0_1_maximum_valid.json", number_of_errors);
@@ -188,6 +197,7 @@ int main()
   //===================================================================================================================
   // 2D to 3D
   //===================================================================================================================
+  std::cout << "Checking 2D to 3D projections" << std::endl;
   checkInvalidProjection("configs/config_2Dto3D_0_0_invalid.json", number_of_errors);
   checkValidProjection("configs/config_2Dto3D_0_1_valid.json", number_of_errors);
   checkValidProjection("configs/config_2Dto3D_0_2_valid.json", number_of_errors);
@@ -208,11 +218,13 @@ int main()
   //===================================================================================================================
   // 3D to 0D
   //===================================================================================================================
+  std::cout << "Checking 3D to 0D projections" << std::endl;
   checkValidProjection("configs/config_3Dto0D_valid.json", number_of_errors);
 
   //===================================================================================================================
   // 3D to 1D
   //===================================================================================================================
+  std::cout << "Checking 3D to 1D projections" << std::endl;
   checkInvalidProjection("configs/config_3Dto1D_0_0_0_invalid.json", number_of_errors);
   checkInvalidProjection("configs/config_3Dto1D_0_0_drop_invalid.json", number_of_errors);
   checkInvalidProjection("configs/config_3Dto1D_0_drop_0_invalid.json", number_of_errors);
@@ -225,12 +237,14 @@ int main()
   //===================================================================================================================
   // 3D to 2D
   //===================================================================================================================
+  std::cout << "Checking 3D to 2D projections" << std::endl;
   checkValidProjection("configs/config_3Dto2D_0_1_drop_valid.json", number_of_errors);
   checkValidProjection("configs/config_3Dto2D_drop_1_0_valid.json", number_of_errors);
 
   //===================================================================================================================
   // 3D to 3D
   //===================================================================================================================
+  std::cout << "Checking 3D to 3D projections" << std::endl;
   checkValidProjection("configs/config_3Dto3D_0_1_2_valid.json", number_of_errors);
   checkValidProjection("configs/config_3Dto3D_1_2_0_valid.json", number_of_errors);
 
