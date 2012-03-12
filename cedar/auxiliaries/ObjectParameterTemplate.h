@@ -134,6 +134,11 @@ public:
     return this->mObject;
   }
 
+  BaseTypePtr getValue()
+  {
+    return this->mObject;
+  }
+
   void listTypes(std::vector<std::string>& types) const
   {
     FactoryManagerSingleton::getInstance()->listTypes(types);
