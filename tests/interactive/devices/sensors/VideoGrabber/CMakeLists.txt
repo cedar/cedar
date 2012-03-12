@@ -1,0 +1,2 @@
+cedar_add_interactive_test("StereoVideoGrabber" StereoVideoGrabberTest.cpp)
+cedar_add_interactive_test("VideoGrabber" VideoGrabberTest.cpp)
