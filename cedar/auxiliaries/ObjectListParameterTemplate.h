@@ -151,6 +151,12 @@ public:
     return this->mObjectList.at(index);
   }
 
+  /*!@brief Removes all objects from the list.
+   */
+  void clear()
+  {
+    this->mObjectList.clear();
+  }
 
   /*!
    * @remarks This method must be overridden because ConfigurablePtr and BaseTypePtr are not considered covariant types.
