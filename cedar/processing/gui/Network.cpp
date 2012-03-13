@@ -49,6 +49,7 @@
 #include "cedar/processing/DataSlot.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/DataConnection.h"
+#include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/stringFunctions.h"
 #include "cedar/auxiliaries/Log.h"
@@ -88,10 +89,18 @@ mHoldFitToContents(false)
                                | QGraphicsItem::ItemIsMovable
                                );
 
+  mpNameDisplay = new QGraphicsTextItem(this);
+  this->networkNameChanged();
+
+  //!@todo This isn't really a great solution, we need a better one!
+  cedar::aux::ParameterPtr name_param = this->network()->getParameter("name");
+  QObject::connect(name_param.get(), SIGNAL(valueChanged()), this, SLOT(networkNameChanged()));
+
   mSlotConnection
     = mNetwork->connectToSlotChangedSignal(boost::bind(&cedar::proc::gui::Network::checkSlots, this));
   this->update();
   this->checkSlots();
+
 }
 
 cedar::proc::gui::Network::~Network()
@@ -107,6 +116,13 @@ cedar::proc::gui::Network::~Network()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Network::networkNameChanged()
+{
+  this->mpNameDisplay->setPlainText(QString::fromStdString(this->network()->getName()));
+
+  this->fitToContents();
+}
 
 QVariant cedar::proc::gui::Network::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant & value)
 {
@@ -200,11 +216,11 @@ void cedar::proc::gui::Network::fitToContents()
   QSet<QGraphicsItem*> children = this->childItems().toSet();
 
   // find the bounding box of all children
-  QRectF bounds; // = this->childrenBoundingRect();
+  QRectF bounds;
   for (QSet<QGraphicsItem*>::iterator i = children.begin(); i != children.end(); ++i)
   {
     QGraphicsItem* p_item = *i;
-    if (dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_item))
+    if (dynamic_cast<cedar::proc::gui::DataSlotItem*>(p_item) || p_item == this->mpNameDisplay)
     {
       continue;
     }
@@ -227,6 +243,14 @@ void cedar::proc::gui::Network::fitToContents()
   // adjust the bow by the paddings specified above
   bounds.adjust(padding_left, padding_top, padding_right, padding_bottom);
 
+  // extend the bounds to also fit the text properly
+  const QRectF& label_bounds = this->mpNameDisplay->boundingRect();
+  bounds.setTop(bounds.top() - label_bounds.height());
+  bounds.setWidth(std::max(bounds.width(), label_bounds.width()));
+
+  // move the name display
+  this->mpNameDisplay->setPos(bounds.topLeft());
+
   // apply the new bounding box
   this->setWidth(bounds.width());
   this->setHeight(bounds.height());
@@ -243,6 +267,7 @@ void cedar::proc::gui::Network::fitToContents()
     QGraphicsItem* p_item = *i;
     p_item->setPos(old_pos_local + p_item->pos());
   }
+
 
   this->checkDataItems();
 }

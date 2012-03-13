@@ -53,6 +53,7 @@ cedar_add_library(cedarproc
   gui/Scene.h
   gui/SettingsDialog.h
   gui/StepItem.h
+  gui/Network.h
   gui/ToolBox.h
   gui/View.h
   sources/GaussInput.h
