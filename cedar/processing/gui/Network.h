@@ -48,6 +48,7 @@
 #include "cedar/processing/Network.h"
 
 // SYSTEM INCLUDES
+#include <QObject>
 #include <boost/signals2/signal.hpp>
 #include <boost/signals2/connection.hpp>
 
@@ -56,8 +57,10 @@
  *        This class takes care of loading cedar::proc::Networks in a manner that allows them to be added into
  *        cedar::proc::gui::Scenes as either the root network or a subnetwork.
  */
-class cedar::proc::gui::Network : public cedar::proc::gui::GraphicsBase
+class cedar::proc::gui::Network : public QObject, public cedar::proc::gui::GraphicsBase
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // types
   //--------------------------------------------------------------------------------------------------------------------
@@ -173,6 +176,10 @@ private:
   //!@brief Transforms the coordinates of a newly added child into the network's coordinate system.
   void transformChildCoordinates(cedar::proc::gui::GraphicsBase* pItem);
 
+private slots:
+  //!@brief Updates the label of the network.
+  void networkNameChanged();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -209,6 +216,9 @@ private:
 
   //! Fit to contents-calls are temporarily disabled if this is set to true.
   bool mHoldFitToContents;
+
+  //! Text item used for displaying the name of the network.
+  QGraphicsTextItem *mpNameDisplay;
 
 }; // class cedar::proc::gui::NetworkFile
 
