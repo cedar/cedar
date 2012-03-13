@@ -48,6 +48,7 @@
 #include "cedar/processing/gui/View.h"
 #include "cedar/processing/PromotedExternalData.h"
 #include "cedar/processing/exceptions.h"
+#include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/stringFunctions.h"
@@ -75,8 +76,11 @@ mpeParentView(peParentView),
 mpNewConnectionIndicator(NULL),
 mpConnectionStart(NULL),
 mpMainWindow(pMainWindow),
-mSnapToGrid(false)
+mSnapToGrid(false),
+mpConfigurableWidget(NULL)
 {
+  // connect signals/slots
+  QObject::connect(this, SIGNAL(selectionChanged()), this, SLOT(itemSelected()));
 }
 
 cedar::proc::gui::Scene::~Scene()
@@ -86,6 +90,41 @@ cedar::proc::gui::Scene::~Scene()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::gui::Scene::setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget)
+{
+  this->mpConfigurableWidget = pConfigurableWidget;
+}
+
+void cedar::proc::gui::Scene::itemSelected()
+{
+  using cedar::proc::Step;
+  using cedar::proc::Manager;
+
+  if (this->mpConfigurableWidget == NULL)
+  {
+    return;
+  }
+
+  QList<QGraphicsItem *> selected_items = this->selectedItems();
+
+  if (selected_items.size() == 1)
+  {
+    if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]))
+    {
+      this->mpConfigurableWidget->display(p_drawer->getStep());
+    }
+    else if (cedar::proc::gui::TriggerItem *p_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected_items[0]))
+    {
+      this->mpConfigurableWidget->display(p_drawer->getTrigger());
+    }
+  }
+  //!@ todo Handle the cases: multiple
+  else
+  {
+    this->mpConfigurableWidget->resetContents();
+  }
+}
 
 bool cedar::proc::gui::Scene::getSnapToGrid() const
 {
