@@ -139,7 +139,7 @@ public:
   LoopedThread(const char* pConfigFileName);
 
   //!@brief Destructor
-  virtual ~LoopedThread() = 0;
+  virtual ~LoopedThread();
 
   //----------------------------------------------------------------------------
   // public methods

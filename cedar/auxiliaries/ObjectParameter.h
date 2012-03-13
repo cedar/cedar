@@ -22,53 +22,72 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbstractFactoryDerived.h
+    File:        ObjectParameter.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Date:        2012 03 09
 
-    Description:
+    Description: Parameter for a dynamically allocatable, configurable object. Ha!
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
-#define CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
+#ifndef CEDAR_AUX_OBJECT_PARAMETER_H
+#define CEDAR_AUX_OBJECT_PARAMETER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Version of cedar::aux::FactoryDerived that works for abstract types.
+/*!@todo describe.
  *
- * @see cedar::aux::FactoryDerived
+ * @todo describe more.
+ *
+ * @remarks The objects cannot themselves have a parameter with the name "type".
  */
-template <typename BaseType, typename DerivedType>
-class cedar::aux::AbstractFactoryDerived : public AbstractFactory<BaseType>
+class cedar::aux::ObjectParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+public:
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The constructor.
+  ObjectParameter(cedar::aux::Configurable *pOwner, const std::string& name, bool hasDefault)
+  :
+  cedar::aux::Parameter(pOwner, name, hasDefault)
+  {
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief allocates an object of type DerivedType and returns a pointer to BaseType
-  boost::shared_ptr<BaseType> allocate() const
-  {
-    return boost::shared_ptr<BaseType> (new DerivedType());
-  }
+  /*!@brief Lists all the types available to be stored in this parameter.
+   */
+  virtual void listTypes(std::vector<std::string>& types) const = 0;
+
+  /*!@brief   Returns the object currently stored in the parameter as a configurable.
+   */
+  virtual cedar::aux::ConfigurablePtr getConfigurable() = 0;
+
+  /*!@brief   Sets the type of the object stored in the parameter.
+   *
+   * @remarks This will create a new object.
+   */
+  virtual void setType(const std::string& type) = 0;
+
+  //!@brief Returns the type of the object currently stored in the parameter.
+  virtual const std::string& getTypeId() const = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -99,6 +118,7 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::AbstractFactoryDerived
+}; // class cedar::aux::ObjectParameter
 
-#endif // CEDAR_AUX_ABSTRACT_FACTORY_DERIVED_H
+#endif // CEDAR_AUX_OBJECT_PARAMETER_H
+

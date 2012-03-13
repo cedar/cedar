@@ -82,6 +82,24 @@ namespace cedar
       CEDAR_DEBUG_ASSERT(boost::shared_dynamic_cast<TOut>(pIn));
       return boost::static_pointer_cast<TOut>(pIn);
     }
+
+    /*!@brief An asserted dynamic pointer cast for boost::shared_ptr.
+     */
+    template <typename TOut, typename TIn>
+    boost::shared_ptr<TOut> asserted_pointer_cast(boost::shared_ptr<TIn> pIn)
+    {
+      CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<TOut>(pIn));
+      return boost::static_pointer_cast<TOut>(pIn);
+    }
+
+    /*!@brief An asserted dynamic pointer cast for boost::intrusive_ptr.
+     */
+    template <typename TOut, typename TIn>
+    boost::intrusive_ptr<TOut> asserted_pointer_cast(boost::intrusive_ptr<TIn> pIn)
+    {
+      CEDAR_DEBUG_ASSERT(boost::dynamic_pointer_cast<TOut>(pIn));
+      return boost::static_pointer_cast<TOut>(pIn);
+    }
   }
 }
 

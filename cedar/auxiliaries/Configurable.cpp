@@ -331,7 +331,7 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
   )
   {
     // write the parameter to the configuration
-    (*iter)->putTo(root);
+    (*iter)->writeToNode(root);
   }
 
   for
@@ -360,7 +360,7 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
       const cedar::aux::ConfigurationNode& value = node.get_child(parameter->getName());
 
       // set the parameter to the value read from the file
-      parameter->setTo(value);
+      parameter->readFromNode(value);
 
       // reset the changed flag of the parameter
       (*iter)->setChangedFlag(false);

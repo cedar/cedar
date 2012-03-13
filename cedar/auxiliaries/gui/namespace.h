@@ -69,13 +69,17 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
       CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
 
+      class CEDAR_AUX_LIB_EXPORT PropertyPane;
+      CEDAR_DECLARE_AUX_CLASS(Parameter);
+
       class CEDAR_AUX_LIB_EXPORT BoolParameter;
       class CEDAR_AUX_LIB_EXPORT DirectoryParameter;
       class CEDAR_AUX_LIB_EXPORT DoubleParameter;
       class CEDAR_AUX_LIB_EXPORT DoubleVectorParameter;
       class CEDAR_AUX_LIB_EXPORT EnumParameter;
       class CEDAR_AUX_LIB_EXPORT FileParameter;
-      class CEDAR_AUX_LIB_EXPORT Parameter;
+      class CEDAR_AUX_LIB_EXPORT ObjectParameter;
+      class CEDAR_AUX_LIB_EXPORT ObjectListParameter;
       class CEDAR_AUX_LIB_EXPORT StringParameter;
       class CEDAR_AUX_LIB_EXPORT UIntParameter;
       class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
@@ -83,6 +87,13 @@ namespace cedar
       /* Exceptions */
       class InvalidPlotData;
       //!@endcond
+
+      /*! The factory for gui parameters.
+       * @todo It should be possible to add new gui parameters within a plugin.
+       */
+      typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
+
+      typedef cedar::aux::Singleton<ParameterFactory> ParameterFactorySingleton;
     }
   }
 }

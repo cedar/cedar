@@ -41,12 +41,26 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DirectoryParameter.h"
 #include "cedar/auxiliaries/DirectoryParameter.h"
+#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <iostream>
 #include <QFileDialog>
+
+//----------------------------------------------------------------------------------------------------------------------
+// associate aux::gui parameter with the aux parameter
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
+      <
+        cedar::aux::DirectoryParameter,
+        cedar::aux::gui::DirectoryParameter
+      >();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

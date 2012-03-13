@@ -96,13 +96,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief reads a directory from a configuration node
-  void setTo(const cedar::aux::ConfigurationNode& node)
+  void readFromNode(const cedar::aux::ConfigurationNode& node)
   {
     this->mValue.setPath(QString::fromStdString(node.get_value<std::string>()));
   }
 
   //!@brief stores a directory as string in a configuration node
-  void putTo(cedar::aux::ConfigurationNode& root) const
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
   {
     root.put(this->getName(), this->mValue.absolutePath().toStdString());
   }
@@ -131,6 +131,15 @@ public:
   const QDir& getValue() const
   {
     return this->mValue;
+  }
+
+  /*!@brief Returns the path stored in the parameter.
+   *
+   * @remarks This is an alias for calling getValue().path().toStdString(). See the documentation for QDir for details.
+   */
+  std::string getPath()
+  {
+    return this->mValue.path().toStdString();
   }
 
   CEDAR_DECLARE_DEPRECATED(void set(const std::string& value))

@@ -22,51 +22,131 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        AbstractFactory.h
+    File:        FactoryManager.h
 
-    Maintainer:  Oliver Lomp
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2011 03 09
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
+    Date:        2012 02 16
 
-    Description:
+    Description: Manager for factories.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_ABSTRACT_FACTORY_H
-#define CEDAR_AUX_ABSTRACT_FACTORY_H
+#ifndef CEDAR_AUX_FACTORY_MANAGER_H
+#define CEDAR_AUX_FACTORY_MANAGER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
+#include "cedar/auxiliaries/utilities.h"
+#include "cedar/auxiliaries/stringFunctions.h"
+#include "cedar/auxiliaries/FactoryDerived.h"
 
 // SYSTEM INCLUDES
+#include <map>
 
 
-/*!@brief A version of cedar::aux::Factory that works with abstract BaseTypes.
+/*!@todo describe.
  *
- * For a detailed description, refer to the documentation of cedar::aux::Factory.
+ * @todo describe more.
  */
-template <typename BaseType>
-class cedar::aux::AbstractFactory
+template <class BaseTypePtr>
+class cedar::aux::FactoryManager
 {
+  // this class is a singleton
+  friend class cedar::aux::Singleton<FactoryManager<BaseTypePtr> >;
+
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  typedef typename boost::shared_ptr< cedar::aux::Factory<BaseTypePtr> > FactoryTypePtr;
+  typedef typename BaseTypePtr::element_type BaseType;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-public:
+private:
+  //!@brief The private constructor.
+  FactoryManager()
+  {
+  }
+
+  //!@brief Destructor
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief allocates an object of a derived type and returns a pointer to the base type - this function must be
-   * implemented by AbstractFactoryDerived
-   */
-  virtual boost::shared_ptr<BaseType> allocate() const = 0;
+  template <class TypePtr>
+  bool registerType(std::string specifiedTypeName = "")
+  {
+    std::string generatedTypeName = cedar::aux::typeToString<typename TypePtr::element_type>();
+
+    // if no type name is supplied, generate type name from actual type
+    if (specifiedTypeName.empty())
+    {
+      specifiedTypeName = cedar::aux::replace(generatedTypeName, "::", ".");
+    }
+
+    mTypeNameMapping[generatedTypeName] = specifiedTypeName;
+
+    // check if typename exists
+    if (mRegisteredFactories.find(specifiedTypeName) != mRegisteredFactories.end())
+    {
+      CEDAR_THROW(cedar::aux::DuplicateNameException,
+        "A factory already exists for the type name \"" + specifiedTypeName + "\".");
+    }
+
+    mRegisteredFactories[specifiedTypeName] = FactoryTypePtr(new cedar::aux::FactoryDerived<BaseTypePtr, TypePtr>());
+
+    return true;
+  }
+
+  BaseTypePtr allocate(const std::string& typeName)
+  {
+    typename std::map<std::string, FactoryTypePtr>::const_iterator iter = mRegisteredFactories.find(typeName);
+
+    if (iter == mRegisteredFactories.end())
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException,
+        "No factory is registered for the type name \"" + typeName + "\".");
+    }
+
+    return iter->second->allocate();
+  }
+
+  const std::string& getTypeId(BaseTypePtr object)
+  {
+    std::string generated_type_name = cedar::aux::objectTypeToString(object);
+
+    std::map<std::string, std::string>::iterator iter = mTypeNameMapping.find(generated_type_name);
+    if (iter == mTypeNameMapping.end())
+    {
+      CEDAR_THROW
+      (
+        cedar::aux::UnknownTypeException,
+        "The type name of the object of type \"" + cedar::aux::objectTypeToString(object)
+        + "\" could not be determined. This most likely means that the type is not registered with the factory manager "
+        + cedar::aux::objectTypeToString(this)
+      );
+    }
+
+    return iter->second;
+  }
+
+  inline void listTypes(std::vector<std::string>& types) const
+  {
+    for
+    (
+      typename std::map<std::string, FactoryTypePtr>::const_iterator iter = this->mRegisteredFactories.begin();
+      iter != this->mRegisteredFactories.end();
+      ++iter
+    )
+    {
+      types.push_back(iter->first);
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -86,7 +166,8 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  std::map<std::string, FactoryTypePtr> mRegisteredFactories;
+  std::map<std::string, std::string> mTypeNameMapping;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -97,6 +178,6 @@ protected:
 private:
   // none yet
 
-}; // class cedar::aux::AbstractFactory
+}; // class cedar::aux::FactoryManager
 
-#endif // CEDAR_AUX_ABSTRACT_FACTORY_H
+#endif // CEDAR_AUX_FACTORY_MANAGER_H

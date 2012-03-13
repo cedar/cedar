@@ -62,7 +62,7 @@ class cedar::aux::gui::DataPlotter : public QDockWidget
 
 public:
   //!@brief a factory, which is currently not used
-  typedef cedar::aux::TypeBasedFactory<cedar::aux::Data, QWidget> WidgetFactory;
+  typedef cedar::aux::TypeBasedFactory<cedar::aux::DataPtr, boost::shared_ptr<QWidget> > WidgetFactory;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

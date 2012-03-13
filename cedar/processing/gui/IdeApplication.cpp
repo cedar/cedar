@@ -76,7 +76,6 @@ mpIde (NULL)
 
   this->mpIde = new cedar::proc::gui::Ide();
 
-
   QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
 }
 

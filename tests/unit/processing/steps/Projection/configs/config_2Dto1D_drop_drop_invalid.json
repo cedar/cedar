@@ -40,46 +40,51 @@
                 "10",
                 "10"
             ],
-            "numberOfKernels": "2",
             "inputNoiseGain": "0.1",
-            "lateralKernel0":
+            "sigmoid":
             {
-                "dimensionality": "2",
-                "kernelMatrixFile": "dummy_matrix_file.yml",
-                "amplitude": "1",
-                "sigmas":
-                [
-                    "3",
-                    "3"
-                ],
-                "shifts":
-                [
-                    "0",
-                    "0"
-                ],
-                "limit": "5"
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "10"
             },
-            "lateralKernel1":
+            "kernels":
             {
-                "dimensionality": "2",
-                "kernelMatrixFile": "dummy_matrix_file.yml",
-                "amplitude": "1",
-                "sigmas":
-                [
-                    "3",
-                    "3"
-                ],
-                "shifts":
-                [
-                    "0",
-                    "0"
-                ],
-                "limit": "5"
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                },
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "2",
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3",
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0",
+                        "0"
+                    ],
+                    "limit": "5"
+                }
             },
             "noiseCorrelationKernel":
             {
                 "dimensionality": "2",
-                "kernelMatrixFile": "dummy_matrix_file.yml",
                 "amplitude": "0",
                 "sigmas":
                 [
@@ -92,11 +97,6 @@
                     "0"
                 ],
                 "limit": "5"
-            },
-            "sigmoid":
-            {
-                "threshold": "0",
-                "beta": "10"
             }
         },
         "cedar.dynamics.NeuralField":
@@ -111,42 +111,47 @@
             [
                 "10"
             ],
-            "numberOfKernels": "2",
             "inputNoiseGain": "0.1",
-            "lateralKernel0":
+            "sigmoid":
             {
-                "dimensionality": "1",
-                "kernelMatrixFile": "dummy_matrix_file.yml",
-                "amplitude": "1",
-                "sigmas":
-                [
-                    "3"
-                ],
-                "shifts":
-                [
-                    "0"
-                ],
-                "limit": "5"
+                "type": "cedar.aux.math.AbsSigmoid",
+                "threshold": "0",
+                "beta": "10"
             },
-            "lateralKernel1":
+            "kernels":
             {
-                "dimensionality": "1",
-                "kernelMatrixFile": "dummy_matrix_file.yml",
-                "amplitude": "1",
-                "sigmas":
-                [
-                    "3"
-                ],
-                "shifts":
-                [
-                    "0"
-                ],
-                "limit": "5"
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "1",
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0"
+                    ],
+                    "limit": "5"
+                },
+                "cedar.aux.kernel.Gauss":
+                {
+                    "dimensionality": "1",
+                    "amplitude": "1",
+                    "sigmas":
+                    [
+                        "3"
+                    ],
+                    "shifts":
+                    [
+                        "0"
+                    ],
+                    "limit": "5"
+                }
             },
             "noiseCorrelationKernel":
             {
                 "dimensionality": "1",
-                "kernelMatrixFile": "dummy_matrix_file.yml",
                 "amplitude": "0",
                 "sigmas":
                 [
@@ -157,11 +162,6 @@
                     "0"
                 ],
                 "limit": "5"
-            },
-            "sigmoid":
-            {
-                "threshold": "0",
-                "beta": "10"
             }
         },
         "cedar.processing.Projection":
@@ -188,6 +188,7 @@
             "name": "new LoopedTrigger",
             "LoopMode": "FIXED_ADAPTIVE",
             "LoopTime": "1",
+            "wait": "true",
             "listeners":
             [
                 "new NeuralField",
@@ -222,19 +223,11 @@
         },
         {
             "type": "step",
-            "step": "new Projection",
+            "step": "new NeuralField",
             "width": "160",
             "height": "50",
-            "positionX": "-493",
+            "positionX": "-711",
             "positionY": "-345"
-        },
-        {
-            "type": "step",
-            "step": "new GaussInput",
-            "width": "160",
-            "height": "50",
-            "positionX": "-939",
-            "positionY": "-347"
         },
         {
             "type": "step",
@@ -246,10 +239,18 @@
         },
         {
             "type": "step",
-            "step": "new NeuralField",
+            "step": "new GaussInput",
             "width": "160",
             "height": "50",
-            "positionX": "-711",
+            "positionX": "-939",
+            "positionY": "-347"
+        },
+        {
+            "type": "step",
+            "step": "new Projection",
+            "width": "160",
+            "height": "50",
+            "positionX": "-493",
             "positionY": "-345"
         }
     ]

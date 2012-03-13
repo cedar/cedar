@@ -47,6 +47,8 @@ cedar_add_library(cedaraux
   gui/DoubleVectorParameter.h
   gui/EnumParameter.h
   gui/FileParameter.h
+  gui/ObjectParameter.h
+  gui/ObjectListParameter.h
   gui/Parameter.h
   gui/RigidBodyWidget.h
   gui/RigidBodyVisualizationWidget.h
@@ -57,6 +59,7 @@ cedar_add_library(cedaraux
   gui/MatrixPlot.h
   gui/MatrixPlot1D.h
   gui/MatrixPlot2D.h
+  gui/PropertyPane.h
   gui/ImagePlot.h
   gui/StringParameter.h
   gui/UIntParameter.h
