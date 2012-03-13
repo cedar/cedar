@@ -102,12 +102,6 @@ public:
   void keyPressEvent(QKeyEvent* pEvent);
 
 public slots:
-  /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
-   *
-   * @todo This probably belongs somewhere else.
-   */
-  void sceneItemSelected();
-
   /*!@brief Slot that displays exceptions.
    */
   void exception(const QString& message);

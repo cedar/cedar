@@ -76,6 +76,7 @@ cedar::proc::gui::Ide::Ide()
     cedar::aux::LogInterfacePtr(new cedar::proc::gui::Ide::Logger(this->mpLog))
   );
 
+
   this->loadDefaultPlugins();
   this->resetStepList();
 
@@ -87,7 +88,9 @@ cedar::proc::gui::Ide::Ide()
   mpMenuWindows->addAction(this->mpPropertiesWidget->toggleViewAction());
   mpMenuWindows->addAction(this->mpLogWidget->toggleViewAction());
 
-  QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(selectionChanged()), this, SLOT(sceneItemSelected()));
+  // set the property pane as the scene's property displayer
+  this->mpProcessingDrawer->getScene()->setConfigurableWidget(this->mpPropertyTable);
+
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(exception(const QString&)),
                    this, SLOT(exception(const QString&)));
   QObject::connect(this->mpProcessingDrawer->getScene(), SIGNAL(modeFinished()),
@@ -400,27 +403,6 @@ void cedar::proc::gui::Ide::resetStepList()
     p_tab->showList(
                      DeclarationRegistrySingleton::getInstance()->getCategoryEntries(category_name)
                    );
-  }
-}
-
-void cedar::proc::gui::Ide::sceneItemSelected()
-{
-  using cedar::proc::Step;
-  using cedar::proc::Manager;
-  QList<QGraphicsItem *> selected_items = this->mpProcessingDrawer->getScene()->selectedItems();
-
-  //!@ todo Handle the cases: multiple
-  this->mpPropertyTable->resetContents();
-  if (selected_items.size() == 1)
-  {
-    if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]))
-    {
-      this->mpPropertyTable->display(p_drawer->getStep());
-    }
-    else if (cedar::proc::gui::TriggerItem *p_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected_items[0]))
-    {
-      this->mpPropertyTable->display(p_drawer->getTrigger());
-    }
   }
 }
 

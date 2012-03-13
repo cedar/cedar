@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QGraphicsScene>
@@ -229,12 +230,16 @@ public:
    */
   cedar::proc::gui::NetworkPtr getRootNetwork();
   
-    /*!@brief Returns the current mode.
+  /*!@brief Returns the current mode.
    */
   MODE getMode() const
   {
     return this->mMode;
   }
+
+  /*!@brief Sets the widget used for displaying/editing the parameters of configurables.
+   */
+  void setConfigurableWidget(cedar::aux::gui::PropertyPane *pConfigurableWidget);
 
   //--------------------------------------------------------------------------------------------------------------------
   // signals
@@ -280,6 +285,10 @@ private slots:
 
   void promoteElementToNewGroup();
 
+  /*!@brief Slot that is called whenever a different item is selected in the cedar::proc::gui::Scene.
+   */
+  void itemSelected();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
@@ -321,6 +330,9 @@ private:
 
   //! Bool representing whether the snap-to-grid function is active.
   bool mSnapToGrid;
+
+  //! The widget used to display configurables when they are selected in the scene. May be null.
+  cedar::aux::gui::PropertyPane *mpConfigurableWidget;
 
 }; // class ProcessingScene
 
