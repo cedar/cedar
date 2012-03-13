@@ -64,9 +64,11 @@ cedar_add_library(cedaraux
   gui/StringParameter.h
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
+  gui/IntVectorParameter.h
   Parameter.h
   kernel/Kernel.h
   kernel/Gauss.h
+  kernel/Box.h
   LINK_LIBRARIES
   cedarunits
 )

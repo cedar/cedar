@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Gauss.h
+    File:        Box.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 07 07
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 12
 
     Description:
 
@@ -34,13 +34,14 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_KERNEL_GAUSS_H
-#define CEDAR_AUX_KERNEL_GAUSS_H
+#ifndef CEDAR_AUX_KERNEL_BOX_H
+#define CEDAR_AUX_KERNEL_BOX_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/kernel/namespace.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/DoubleParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -48,61 +49,37 @@
 /*!@brief Gauss kernel class.
  *
  */
-class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
+class cedar::aux::kernel::Box : public cedar::aux::kernel::Separable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Gauss();
-  //!@brief Constructor to create an instance of Gauss directly from a set of parameters (without configuration file).
-  Gauss(
-         double amplitude,
-         std::vector<double> sigmas,
-         std::vector<double> shifts,
-         double limit,
-         unsigned int dimensionality
-       );
-  //!@brief Destructor
-  virtual ~Gauss();
+  Box();
+
+  //!@brief The destructor.
+  ~Box();
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief get the sigma of a given dimension
-  double getSigma(unsigned int dimension) const;
-
-  /*!\brief set the sigma of a chosen dimension and Gaussian
-   * \param dimension the dimension
-   * \param sigma the new \f$\sigma\f$
-   */
-  void setSigma(unsigned int dimension, double sigma);
-
-  //!@brief get the shift of the kernel for a given dimension
-  double getShift(unsigned int dimension) const;
-
-  //!@brief set the shift for a given dimension
-  void setShift(unsigned int dimension, double shift);
-
-  //!@brief get the amplitude of the kernel
-  double getAmplitude() const;
-
-  //!@brief set the amplitude of the kernel
-  void setAmplitude(double amplitude);
-
-  //!@brief get the pixel width of the kernel
-  unsigned int getWidth(unsigned int dim) const;
+  inline double getAmplitude() const
+  {
+    return this->_mAmplitude->getValue();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected slots:
-  /*!@brief virtual function to calculate the kernel matrix
+  /*!@brief Updates the box kernel's matrix.
    */
   void calculate();
   //!@brief update the dimensionality of the kernel matrices, triggered by a signal (e.g. a changed parameter value)
@@ -112,20 +89,14 @@ protected slots:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*! virtual function that in the derived classes actually does the job of initializing
-   * the kernel from file
-   * @todo deal with boost PropertyTree here
-   */
-  virtual void onInit();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief vector of pixel sizes of the kernel matrices
-  std::vector<unsigned int> mSizes;
-  //!@brief matrix indices for kernel centers
-  std::vector<int> mCenters;
+  // none yet
+
 private:
   // none yet
 
@@ -133,17 +104,18 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief amplitude of the kernel - after normalization of each dimension, this is applied to the first one
+  //!@brief The amplitude of the kernel.
   cedar::aux::DoubleParameterPtr _mAmplitude;
-  //!@brief sigmas of the Gauss function for each dimension
-  cedar::aux::DoubleVectorParameterPtr _mSigmas;
-  //!@brief shift of the Gauss function from the center for each dimension
-  cedar::aux::DoubleVectorParameterPtr _mShifts;
-  //!@brief scalar value, which is multiplied by the dimensions' sigmas to determine the pixel size
-  cedar::aux::DoubleParameterPtr _mLimit;
+
+  //!@brief The widths of the box kernel for each dimension.
+  cedar::aux::UIntVectorParameterPtr _mWidths;
+
+  //!@brief The shift of the box in each dimension.
+//  cedar::aux::IntVectorParameterPtr _mShifts;
+
 private:
   // none yet
 
-}; // class cedar::aux::kernel::Gauss
+}; // class cedar::aux::kernel::Box
 
-#endif // CEDAR_AUX_KERNEL_GAUSS_H
+#endif // CEDAR_AUX_KERNEL_BOX_H

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Gauss.h
+    File:        IntVectorParameter.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 07 07
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 12
 
     Description:
 
@@ -34,116 +34,83 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_KERNEL_GAUSS_H
-#define CEDAR_AUX_KERNEL_GAUSS_H
+#ifndef CEDAR_AUX_GUI_INT_VECTOR_PARAMETER_H
+#define CEDAR_AUX_GUI_INT_VECTOR_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
-#include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/gui/Parameter.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
+#include <QSpinBox>
 
 
-/*!@brief Gauss kernel class.
+/*!@brief Widget for manipulating vectors of integer values.
  *
+ * @todo This should be abstracted, probably in a template class:
+ *       template <class ParameterType, class WidgetType> NumericVectorParameter,
+ *       where, e.g., ParameterType = UIntVector and WidgetType = QSpinBox. Otherwise, a lot of code might get
+ *       duplicated
  */
-class cedar::aux::kernel::Gauss : public cedar::aux::kernel::Separable
+class cedar::aux::gui::IntVectorParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  Gauss();
-  //!@brief Constructor to create an instance of Gauss directly from a set of parameters (without configuration file).
-  Gauss(
-         double amplitude,
-         std::vector<double> sigmas,
-         std::vector<double> shifts,
-         double limit,
-         unsigned int dimensionality
-       );
-  //!@brief Destructor
-  virtual ~Gauss();
+  IntVectorParameter(QWidget *pParent = NULL);
+
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!\brief get the sigma of a given dimension
-  double getSigma(unsigned int dimension) const;
 
-  /*!\brief set the sigma of a chosen dimension and Gaussian
-   * \param dimension the dimension
-   * \param sigma the new \f$\sigma\f$
-   */
-  void setSigma(unsigned int dimension, double sigma);
+public slots:
+  //!@brief handles a change of the associated parameters
+  void parameterPointerChanged();
 
-  //!@brief get the shift of the kernel for a given dimension
-  double getShift(unsigned int dimension) const;
+  //!@brief handles a change in the parameters
+  void valueChanged(int value);
 
-  //!@brief set the shift for a given dimension
-  void setShift(unsigned int dimension, double shift);
-
-  //!@brief get the amplitude of the kernel
-  double getAmplitude() const;
-
-  //!@brief set the amplitude of the kernel
-  void setAmplitude(double amplitude);
-
-  //!@brief get the pixel width of the kernel
-  unsigned int getWidth(unsigned int dim) const;
+  //!@brief Handles changes in the displayed parameter's properties, e.g., a resizing of the vector.
+  void propertyChanged();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
-protected slots:
-  /*!@brief virtual function to calculate the kernel matrix
-   */
-  void calculate();
-  //!@brief update the dimensionality of the kernel matrices, triggered by a signal (e.g. a changed parameter value)
-  void updateDimensionality();
+protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  /*! virtual function that in the derived classes actually does the job of initializing
-   * the kernel from file
-   * @todo deal with boost PropertyTree here
-   */
-  virtual void onInit();
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief vector of pixel sizes of the kernel matrices
-  std::vector<unsigned int> mSizes;
-  //!@brief matrix indices for kernel centers
-  std::vector<int> mCenters;
-private:
   // none yet
+private:
+  //!@brief a vector of spinboxes for displaying and changing the associated parameters
+  std::vector<QSpinBox*> mSpinboxes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  //!@brief amplitude of the kernel - after normalization of each dimension, this is applied to the first one
-  cedar::aux::DoubleParameterPtr _mAmplitude;
-  //!@brief sigmas of the Gauss function for each dimension
-  cedar::aux::DoubleVectorParameterPtr _mSigmas;
-  //!@brief shift of the Gauss function from the center for each dimension
-  cedar::aux::DoubleVectorParameterPtr _mShifts;
-  //!@brief scalar value, which is multiplied by the dimensions' sigmas to determine the pixel size
-  cedar::aux::DoubleParameterPtr _mLimit;
+  // none yet
+
 private:
   // none yet
 
-}; // class cedar::aux::kernel::Gauss
+}; // class cedar::aux::gui::IntVectorParameter
 
-#endif // CEDAR_AUX_KERNEL_GAUSS_H
+#endif // CEDAR_AUX_GUI_INT_VECTOR_PARAMETER_H
