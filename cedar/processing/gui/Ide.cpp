@@ -164,6 +164,9 @@ cedar::proc::gui::Ide::Ide()
 
 cedar::proc::gui::Ide::~Ide()
 {
+  // remove any custom loggers to prevent segmentation faults
+  //!@todo This should only remove the logger the Ide installed.
+  cedar::aux::LogSingleton::getInstance()->clearLoggers();
 }
 
 cedar::proc::gui::Ide::Logger::Logger(QTextEdit *pLog)
