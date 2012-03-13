@@ -110,13 +110,12 @@ void cedar::proc::gui::Scene::itemSelected()
 
   if (selected_items.size() == 1)
   {
-    if (cedar::proc::gui::StepItem *p_drawer = dynamic_cast<cedar::proc::gui::StepItem*>(selected_items[0]))
+    if (cedar::proc::gui::GraphicsBase *p_item = dynamic_cast<cedar::proc::gui::GraphicsBase*>(selected_items[0]))
     {
-      this->mpConfigurableWidget->display(p_drawer->getStep());
-    }
-    else if (cedar::proc::gui::TriggerItem *p_drawer = dynamic_cast<cedar::proc::gui::TriggerItem*>(selected_items[0]))
-    {
-      this->mpConfigurableWidget->display(p_drawer->getTrigger());
+      if (p_item->getElement())
+      {
+        this->mpConfigurableWidget->display(p_item->getElement());
+      }
     }
   }
   //!@ todo Handle the cases: multiple
