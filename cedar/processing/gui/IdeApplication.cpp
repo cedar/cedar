@@ -49,13 +49,13 @@
 // SYSTEM INCLUDES
 #include <fstream>
 #include <cstdlib>
-#ifdef GCC
+#ifdef CEDAR_COMPILER_GCC
   #include <csignal>
-#elif defined MSVC
+#elif defined CEDAR_COMPILER_MSVC
   #include <signal.h>
 #else
   #error Please implement signal handling for your compiler.
-#endif // GCC
+#endif // CEDAR_COMPILER_GCC
 
 #define CATCH_EXCEPTIONS_IN_GUI
 
@@ -68,6 +68,12 @@ cedar::proc::gui::IdeApplication::IdeApplication(int& argc, char** argv)
 QApplication(argc, argv),
 mpIde (NULL)
 {
+#ifdef CEDAR_OS_LINUX
+  cedar::proc::PluginDeclarationPtr plugin(new cedar::proc::PluginDeclaration());
+  cedar::dyn::getPluginDesciption(plugin);
+  cedar::proc::Manager::getInstance().load(plugin);
+#endif // CEDAR_OS_LINUX
+
   this->mpIde = new cedar::proc::gui::Ide();
 
   QObject::connect(this, SIGNAL(exception(const QString&)), this->mpIde, SLOT(exception(const QString&)));
@@ -114,7 +120,7 @@ void cedar::proc::gui::IdeApplication::signalHandler(int signal_id)
   abort();
 }
 
-#ifdef MSVC
+#ifdef CEDAR_COMPILER_MSVC
 LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS exceptions)
 {
   std::ofstream stream;
@@ -148,16 +154,16 @@ LONG cedar::proc::gui::IdeApplication::vcCrashHandler(LPEXCEPTION_POINTERS excep
   LONG retval = EXCEPTION_CONTINUE_SEARCH;
   return retval;
 }
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
 
 int cedar::proc::gui::IdeApplication::exec()
 {
-#ifdef MSVC
+#ifdef CEDAR_COMPILER_MSVC
   SetUnhandledExceptionFilter(&cedar::proc::gui::IdeApplication::vcCrashHandler);
 #else
   signal(SIGSEGV, &cedar::proc::gui::IdeApplication::signalHandler);
   signal(SIGABRT, &cedar::proc::gui::IdeApplication::signalHandler);
-#endif // MSCV
+#endif // CEDAR_COMPILER_MSVC
 
   this->mpIde->show();
   int ret = this->QApplication::exec();

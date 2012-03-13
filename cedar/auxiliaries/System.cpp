@@ -44,16 +44,16 @@
 #include <boost/filesystem.hpp>
 #include <cstdlib>
 
-#if defined LINUX || defined APPLE
+#if defined CEDAR_OS_UNIX
 #include <stdlib.h>
-#endif
+#endif // CEDAR_OS_UNIX
 
-#ifdef WINDOWS
+#ifdef CEDAR_OS_WINDOWS
 #include <Shlobj.h>
 #include <comutil.h>
 
 #pragma comment(lib, "comsuppw")
-#endif
+#endif // CEDAR_OS_WINDOWS
 
 // INTERNALS HEADER
 #define CEDAR_INTERNAL
@@ -81,10 +81,10 @@ void cedar::aux::System::openCrashFile(std::ofstream& stream, std::string& crash
 
 std::string cedar::aux::System::getUserHomeDirectory()
 {
-#ifdef UNIX
+#ifdef CEDAR_OS_UNIX
   std::string homedir = getenv("HOME");
   return homedir;
-#elif defined WINDOWS
+#elif defined CEDAR_OS_WINDOWS
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Profile, KF_FLAG_CREATE, 0, &path)))
   {
@@ -100,14 +100,14 @@ std::string cedar::aux::System::getUserHomeDirectory()
   return "";
 #else
 #error Implement me for this OS!
-#endif
+#endif // CEDAR_OS_UNIX
 }
 
 std::string cedar::aux::System::getUserApplicationDataDirectory()
 {
-#ifdef UNIX
+#ifdef CEDAR_OS_UNIX
   return cedar::aux::System::getUserHomeDirectory();
-#elif defined WINDOWS
+#elif defined CEDAR_OS_WINDOWS
   LPWSTR path = NULL;
   if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, 0, &path)))
   {
@@ -121,9 +121,9 @@ std::string cedar::aux::System::getUserApplicationDataDirectory()
     //!@todo handle errors
   }
   return "";
-#else
+#else // CEDAR_OS_WINDOWS
 #error Implement me for this OS!
-#endif
+#endif // CEDAR_OS_WINDOWS
 }
 
 std::string cedar::aux::System::locateResource(const std::string& resourcePath)

@@ -44,6 +44,7 @@
 #include "cedar/processing/gui/TriggerItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/Scene.h"
+#include "cedar/processing/gui/Network.h"
 #include "cedar/auxiliaries/math/functions.h"
 #include "cedar/auxiliaries/utilities.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
@@ -76,8 +77,20 @@ mDrawBackground(true),
 mHighlightMode(HIGHLIGHTMODE_NONE),
 mOutlineColor(cedar::proc::gui::GraphicsBase::mDefaultOutlineColor),
 mFillColor(cedar::proc::gui::GraphicsBase::mDefaultFillColor),
-mWidth(new cedar::aux::DoubleParameter(this, "width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
-mHeight(new cedar::aux::DoubleParameter(this, "height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max())),
+mWidth
+(
+  new cedar::aux::DoubleParameter
+      (
+        this, "width", 120.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max()
+      )
+),
+mHeight
+(
+  new cedar::aux::DoubleParameter
+      (
+        this, "height", 50.0, -std::numeric_limits<qreal>::max(), std::numeric_limits<qreal>::max()
+      )
+),
 mGroup(group),
 mAllowedConnectTargets(canConnectTo)
 {
@@ -100,6 +113,11 @@ cedar::proc::gui::GraphicsBase::~GraphicsBase()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::proc::gui::GraphicsBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)
+{
+  this->paintFrame(painter, style, widget);
+}
+
 void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
 {
   this->mShape = shape;
@@ -113,6 +131,13 @@ void cedar::proc::gui::GraphicsBase::setBaseShape(BaseShape shape)
       mPath.lineTo(this->width(), this->height() / static_cast<qreal>(2));
       mPath.lineTo(this->width() / static_cast<qreal>(2), 0);
       mPath.lineTo(0, this->height() / static_cast<qreal>(2));
+      break;
+
+    case BASE_SHAPE_CROSS:
+      mPath.moveTo(0, this->height());
+      mPath.lineTo(this->width(), 0);
+      mPath.moveTo(0, 0);
+      mPath.lineTo(this->width(), this->height());
       break;
 
     case BASE_SHAPE_RECT:
@@ -341,6 +366,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
 
       case BASE_SHAPE_DIAMOND:
+      case BASE_SHAPE_CROSS:
         painter->drawPath(mPath);
         break;
     }
@@ -362,6 +388,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
 
       case BASE_SHAPE_DIAMOND:
+      case BASE_SHAPE_CROSS:
         painter->drawPath(mPath);
         break;
     }
@@ -407,6 +434,7 @@ void cedar::proc::gui::GraphicsBase::paintFrame(QPainter* painter, const QStyleO
         break;
 
       case BASE_SHAPE_DIAMOND:
+      case BASE_SHAPE_CROSS:
         painter->drawPath(mPath);
         break;
     }
@@ -486,4 +514,9 @@ void cedar::proc::gui::GraphicsBase::disconnect(cedar::proc::gui::GraphicsBase*)
 
 void cedar::proc::gui::GraphicsBase::disconnect()
 {
+}
+
+unsigned int cedar::proc::gui::GraphicsBase::getNumberOfConnections()
+{
+  return this->mConnections.size();
 }

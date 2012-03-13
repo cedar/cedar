@@ -121,7 +121,7 @@ public:
     this->log(cedar::aux::LOG_LEVEL_ERROR, message, source, title);
   }
   
-  inline void debug(const std::string& message, const std::string& source, const std::string& title = "")
+  inline void debug(const std::string& message, const std::string& source = "debug", const std::string& title = "")
   {
     this->debugLog(cedar::aux::LOG_LEVEL_DEBUG, message, source, title);
   }

@@ -84,11 +84,11 @@ namespace cedar
       //!@brief function that calculates the cubic root of a floating point value
       inline double fast_cuberoot(double in)
       {
-#ifdef MSVC
+#ifdef CEDAR_COMPILER_MSVC
         return std::pow(in, 1.0/3.0);
-#else // not MSVC
+#else // not CEDAR_COMPILER_MSVC
         return cbrt(in);
-#endif // MSVC
+#endif // CEDAR_COMPILER_MSVC
       }
     }
   }
