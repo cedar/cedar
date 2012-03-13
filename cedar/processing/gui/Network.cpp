@@ -185,26 +185,21 @@ bool cedar::proc::gui::Network::sceneEventFilter(QGraphicsItem * pWatched, QEven
       break;
   }
 
-  // pass the scene event to the parent item(s)
-  if (cedar::proc::gui::Network *p_network = dynamic_cast<cedar::proc::gui::Network*>(this->parentItem()))
-  {
-    return p_network->sceneEventFilter(pWatched, pEvent);
-  }
-
   return cedar::proc::gui::GraphicsBase::sceneEventFilter(pWatched, pEvent);
 }
 
 void cedar::proc::gui::Network::fitToContents()
 {
+  //!@todo This function should take the grid size into account!
   if (mHoldFitToContents)
   {
     return;
   }
 
-  qreal padding_top = static_cast<qreal>(0.0);
+  qreal padding_top = static_cast<qreal>(2.0);
   qreal padding_bottom = static_cast<qreal>(5.0);
-  qreal padding_left = static_cast<qreal>(1.0);
-  qreal padding_right = static_cast<qreal>(7.0);
+  qreal padding_left = static_cast<qreal>(5.0);
+  qreal padding_right = static_cast<qreal>(5.0);
 
   // when no children are present, we cannot fit them
   if (this->childItems().empty())
@@ -241,7 +236,7 @@ void cedar::proc::gui::Network::fitToContents()
 
 
   // adjust the bow by the paddings specified above
-  bounds.adjust(padding_left, padding_top, padding_right, padding_bottom);
+  bounds.adjust(-padding_left, -padding_top, padding_right, padding_bottom);
 
   // extend the bounds to also fit the text properly
   const QRectF& label_bounds = this->mpNameDisplay->boundingRect();
@@ -268,8 +263,13 @@ void cedar::proc::gui::Network::fitToContents()
     p_item->setPos(old_pos_local + p_item->pos());
   }
 
-
   this->checkDataItems();
+
+  // finally, also resize parent item if it is a network
+  if (cedar::proc::gui::Network *p_parent_network = dynamic_cast<cedar::proc::gui::Network *>(this->parentItem()))
+  {
+    p_parent_network->fitToContents();
+  }
 }
 
 bool cedar::proc::gui::Network::isRootNetwork()
