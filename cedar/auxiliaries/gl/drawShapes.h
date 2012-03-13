@@ -37,6 +37,8 @@
 #ifndef CEDAR_AUX_GL_DRAW_SHAPES_H
 #define CEDAR_AUX_GL_DRAW_SHAPES_H
 
+#define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
+
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
 

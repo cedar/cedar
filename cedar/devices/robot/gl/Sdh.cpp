@@ -189,12 +189,14 @@ void cedar::dev::robot::gl::Sdh::draw()
     glRotated(-90, 1, 0, 0);
 
     // first finger proximal link
+    glTranslated(.0, 0.0, .0175);
     glRotated(mpKinematicChain->getJointAngle(0)*180.0/M_PI, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
+    glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
@@ -245,12 +247,14 @@ void cedar::dev::robot::gl::Sdh::draw()
     glRotated(-90, 1, 0, 0);
 
     // second finger proximal link
-    glRotated(mpKinematicChain->getJointAngle(2)*180.0/M_PI, 0, 1, 0);
+    glTranslated(.0, 0.0, .0175);
+    glRotated(mpKinematicChain->getJointAngle(2)*180.0/M_PI, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
+    glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
@@ -263,7 +267,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // second finger distal link
     glTranslated(0, 0, 0.104);
-    glRotated(mpKinematicChain->getJointAngle(3)*180.0/M_PI, 0, 1, 0);
+    glRotated(mpKinematicChain->getJointAngle(3)*180.0/M_PI, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -283,6 +287,7 @@ void cedar::dev::robot::gl::Sdh::draw()
 
     // third finger root
     glTranslated(.019053, 0.033, .098);
+    glRotated(mpKinematicChain->getJointAngle(6)*180.0/M_PI, 0, 0, 1);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
@@ -298,12 +303,14 @@ void cedar::dev::robot::gl::Sdh::draw()
     glRotated(-90, 1, 0, 0);
 
     // third finger proximal link
+    glTranslated(.0, 0.0, .0175);
     glRotated(mpKinematicChain->getJointAngle(4)*180.0/M_PI, 0, -1, 0);
     if (isDrawingLocalCoordinateFrame())
     {
       cedar::aux::gl::drawAxes(0.05);
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
+    glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
     setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
