@@ -74,6 +74,7 @@ cedar::proc::Network::Network()
 _mPromotedSlots(new cedar::aux::StringVectorParameter(this, "promotedSlots", std::vector<std::string>()))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+  _mPromotedSlots->setHidden(true);
 }
 
 cedar::proc::Network::~Network()

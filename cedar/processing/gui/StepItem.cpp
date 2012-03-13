@@ -159,6 +159,7 @@ void cedar::proc::gui::StepItem::redraw()
 
 void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
 {
+  this->setElement(step);
   this->mStep = step;
   this->mClassId = cedar::proc::DeclarationRegistrySingleton::getInstance()->getDeclarationOf(this->mStep);
 
@@ -171,7 +172,6 @@ void cedar::proc::gui::StepItem::setStep(cedar::proc::StepPtr step)
   this->addDataItems();
   this->addTriggerItems();
 
-//  QObject::connect(step.get(), SIGNAL(stateChanged()), this, SLOT(stepStateChanged()));
   mStateChangedConnection = step->connectToStateChanged(boost::bind(&cedar::proc::gui::StepItem::stepStateChanged, this));
   QObject::connect(step.get(), SIGNAL(nameChanged()), this, SLOT(redraw()));
 }

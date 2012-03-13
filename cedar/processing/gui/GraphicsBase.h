@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/Connection.h"
+#include "cedar/processing/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/Configurable.h"
 
@@ -203,6 +204,15 @@ public:
    */
   void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*);
 
+  /*!@brief   Returns the element associated with this graphics item.
+   *
+   * @remarks In cases where this item is not associated with an element, this may return an empty pointer!
+   */
+  inline cedar::proc::ElementPtr getElement()
+  {
+    return this->mElement;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -218,6 +228,13 @@ protected:
    * @remarks This method should only be called during construction.
    */
   void setBaseShape(BaseShape shape);
+
+  /*!@brief Sets the element associated with this graphics item.
+   */
+  inline void setElement(cedar::proc::ElementPtr element)
+  {
+    this->mElement = element;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -247,6 +264,7 @@ public:
 protected:
   //!@brief flag if the background should be drawn
   bool mDrawBackground;
+
 private:
   //!@brief the highlight mode
   cedar::proc::gui::GraphicsBase::HighlightMode mHighlightMode;
@@ -262,6 +280,10 @@ private:
 
   //!@brief The path used for drawing this shape.
   QPainterPath mPath;
+
+  //!@brief The element associated with this graphics item
+  //!@todo Should this be a weak ptr?
+  cedar::proc::ElementPtr mElement;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

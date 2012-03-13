@@ -80,6 +80,8 @@ mHoldFitToContents(false)
     mNetwork = cedar::proc::NetworkPtr(new cedar::proc::Network());
   }
 
+  this->setElement(mNetwork);
+
   this->mNetwork->connectToElementAdded(boost::bind(&cedar::proc::gui::Network::elementAdded, this, _1, _2));
 
   this->setFlags(this->flags() | QGraphicsItem::ItemIsSelectable
