@@ -83,6 +83,7 @@ namespace cedar
       class CEDAR_AUX_LIB_EXPORT StringParameter;
       class CEDAR_AUX_LIB_EXPORT UIntParameter;
       class CEDAR_AUX_LIB_EXPORT UIntVectorParameter;
+      class CEDAR_AUX_LIB_EXPORT IntVectorParameter;
 
       /* Exceptions */
       class InvalidPlotData;

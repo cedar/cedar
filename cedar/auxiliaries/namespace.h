@@ -131,6 +131,8 @@ namespace cedar
     typedef NumericVectorParameter<double> DoubleVectorParameter;
     //!@brief A concretization of NumericVectorParameter for unsigned int values.
     typedef NumericVectorParameter<unsigned int> UIntVectorParameter;
+    //!@brief A concretization of NumericVectorParameter for unsigned int values.
+    typedef NumericVectorParameter<int> IntVectorParameter;
     // all intrusive smart pointers
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolParameter);
@@ -138,6 +140,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntParameter);
+    CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringVectorParameter);
     CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntParameter);
