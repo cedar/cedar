@@ -61,6 +61,7 @@ cedar_add_library(cedarproc
   steps/Projection.h
   steps/Resize.h
   LoopedTrigger.h
+  Network.h
   Step.h
   RESOURCES
   gui/icons/icons.qrc
