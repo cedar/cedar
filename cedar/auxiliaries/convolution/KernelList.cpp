@@ -46,3 +46,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::conv::KernelList::append(cedar::aux::kernel::KernelPtr kernel)
+{
+  this->mKernels.push_back(kernel);
+
+  this->mKernelAddedSignal(this->mKernels.size() - 1);
+}
+
+void cedar::aux::conv::KernelList::remove(size_t index)
+{
+  CEDAR_ASSERT(index < this->size());
+
+  this->mKernels.erase(this->mKernels.begin() + index);
+
+  this->mKernelRemovedSignal(index);
+}

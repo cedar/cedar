@@ -174,6 +174,12 @@ _mConvolution
   this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
+
+  this->_mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
+  this->_mKernels->connectToObjectRemovedSignal(boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1));
+
+  this->transferKernelsToConvolution();
+
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();
 }
@@ -182,9 +188,36 @@ _mConvolution
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dyn::NeuralField::transferKernelsToConvolution()
+{
+  this->getConvolution()->getKernelList().clear();
+  for (size_t kernel = 0; kernel < this->_mKernels->size(); ++ kernel)
+  {
+    this->addKernelToConvolution(this->_mKernels->at(kernel));
+  }
+}
+
+void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
+{
+  this->addKernelToConvolution(this->_mKernels->at(kernelIndex));
+}
+
+void cedar::dyn::NeuralField::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
+{
+  this->getConvolution()->getKernelList().append(kernel);
+}
+
+void cedar::dyn::NeuralField::removeKernelFromConvolution(size_t index)
+{
+  this->getConvolution()->getKernelList().remove(index);
+}
+
 void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   this->cedar::proc::Step::readConfiguration(node);
+
+  // transfer the kernels read by the object list parameter into the convolution structure
+  this->transferKernelsToConvolution();
 
   // legacy code for reading kernels with the old format
   cedar::aux::ConfigurationNode::const_assoc_iterator iter = node.find("numberOfKernels");
@@ -339,32 +372,8 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
 
   lateral_interaction = lateral_convolution(sigmoid_u);
 
-  /* OLD CODE -- //!@todo remove when done.
-  // calculate the lateral interactions for all kernels
-  lateral_interaction = 0.0;
-  //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
-  if (this->_mDimensionality->getValue() == 0)
-  {
-    for (unsigned int i = 0; i < _mKernels->size(); i++)
-    {
-      //!@todo Should/does this not use the data->lock*
-      //!@todo Make this work again!
-//      _mKernels->at(i)->getReadWriteLock()->lockForRead();
-//      lateral_interaction += this->_mKernels->at(i)->getAmplitude() * sigmoid_u;
-//      _mKernels->at(i)->getReadWriteLock()->unlock();
-    }
-  }
-  else if (this->_mDimensionality->getValue() < 3)
-  {
-    for (unsigned int i = 0; i < this->_mKernels->size(); i++)
-    {
-      //!@todo Should/does this not use the data->lock*
-      _mKernels->at(i)->getReadWriteLock()->lockForRead();
-      cv::Mat convolution_buffer = this->_mKernels->at(i)->convolveWith(sigmoid_u);
-      _mKernels->at(i)->getReadWriteLock()->unlock();
-      lateral_interaction += convolution_buffer;
-    }
-  }
+  //!@todo remove when done.
+  /* OLD CODE --
 #ifdef FFTW
   else if (this->_mDimensionality->getValue() < 8)
   {

@@ -46,7 +46,16 @@
 
 cedar::aux::conv::Convolution::Convolution()
 :
-_mBorderType(new cedar::aux::EnumParameter(this, "borderType", cedar::aux::conv::BorderType::typePtr()))
+_mBorderType
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "borderType",
+    cedar::aux::conv::BorderType::typePtr(),
+    cedar::aux::conv::BorderType::Zero
+  )
+)
 {
 }
 

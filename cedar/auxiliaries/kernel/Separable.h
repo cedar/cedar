@@ -76,6 +76,11 @@ public:
   //!@brief convolve this kernel with another matrix
   cv::Mat convolveWith(const cv::Mat& mat) const;
 
+  inline size_t kernelPartCount() const
+  {
+    return this->mKernelParts.size();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
