@@ -148,7 +148,7 @@ _mSigmoid
                 new KernelListParameter
                 (
                   this,
-                  "kernels",
+                  "lateralKernels",
                   kernel_defaults
                 )
               );
