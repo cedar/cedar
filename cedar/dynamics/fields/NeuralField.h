@@ -149,6 +149,21 @@ private:
     return this->_mConvolution->getValue();
   }
 
+  /*!@brief Updates the convolution object when a new kernel is added.
+   */
+  void slotKernelAdded(size_t kernelIndex);
+
+  /*!@brief Adds a kernel to the convolution object.
+   */
+  void addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel);
+
+  /*!@brief Removes a kernel from the convolution object.
+   */
+  void removeKernelFromConvolution(size_t index);
+
+  //!@brief Makes the kernel list stored in the convolution equal to the one in the field.
+  void transferKernelsToConvolution();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

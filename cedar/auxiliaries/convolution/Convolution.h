@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
+#include "cedar/auxiliaries/convolution/BorderType.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
@@ -84,6 +85,12 @@ public:
   inline const cedar::aux::conv::KernelList& getKernelList() const
   {
     return this->mKernelList;
+  }
+
+  //!@brief Get the border type.
+  inline cedar::aux::conv::BorderType::Id getBorderType() const
+  {
+    return this->_mBorderType->getValue();
   }
 
   //--------------------------------------------------------------------------------------------------------------------

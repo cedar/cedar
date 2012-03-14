@@ -47,24 +47,40 @@
 /*!@brief A convolution engine based on OpenCV's filter engine.
  *
  * @todo describe more.
+ *
+ * @todo Intelligent strategies might be used here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
+ *       summed together etc.
+ *
+ * @todo This should not inherit convolution, but be part of it
+ *
+ * @todo Write a unit test for this class
+ *
+ * @todo Make this class thread-safe
  */
 class cedar::aux::conv::OpenCV : public cedar::aux::conv::Convolution
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  enum KernelType
+  {
+    KERNEL_TYPE_UNKNOWN,
+    KERNEL_TYPE_FULL,
+    KERNEL_TYPE_SEPARABLE
+  };
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cv::Mat convolve(const cv::Mat& matrix) const;
+  OpenCV();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  cv::Mat convolve(const cv::Mat& matrix) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -76,7 +92,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void updateKernelType(size_t index);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -84,7 +100,7 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  std::vector<KernelType> mKernelTypes;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
