@@ -45,6 +45,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
+#include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/AbsSigmoid.h"
@@ -106,6 +107,15 @@ _mSigmoid
     this,
     "sigmoid",
     cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
+  )
+),
+_mConvolution
+(
+  new cedar::aux::conv::ConvolutionParameter
+  (
+    this,
+    "convolution",
+    cedar::aux::conv::ConvolutionPtr(new cedar::aux::conv::OpenCV())
   )
 )
 {
@@ -302,6 +312,9 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   const double& h = mRestingLevel->getValue();
   const double& tau = mTau->getValue();
   const double& global_inhibition = mGlobalInhibition->getValue();
+  // having a pointer to the convolution in the same scope as the reference prevents the object from being deleted.
+  cedar::aux::conv::ConvolutionPtr convolution_ptr = this->getConvolution();
+  cedar::aux::conv::Convolution& lateral_convolution = *convolution_ptr;
 
   // if the neural noise correlation kernel has an amplitude != 0, create new random values and convolve
   if (mNoiseCorrelationKernel->getAmplitude() != 0.0)
@@ -324,6 +337,9 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     sigmoid_u = _mSigmoid->getValue()->compute<float>(u);
   }
 
+  lateral_interaction = lateral_convolution(sigmoid_u);
+
+  /* OLD CODE -- //!@todo remove when done.
   // calculate the lateral interactions for all kernels
   lateral_interaction = 0.0;
   //!@todo Wrap this in a cedar::aux::convolve function that automatically selects the proper things
@@ -371,6 +387,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
     }
   }
 #endif
+  */
 
   CEDAR_ASSERT(u.size == sigmoid_u.size);
   CEDAR_ASSERT(u.size == lateral_interaction.size);

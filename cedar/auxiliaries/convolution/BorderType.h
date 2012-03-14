@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.h
+    File:        BorderType.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 14
 
     Description:
 
@@ -34,62 +34,50 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_CONVOLUTION_H
-#define CEDAR_AUX_CONV_CONVOLUTION_H
+#ifndef CEDAR_AUX_CONV_BORDER_TYPE_H
+#define CEDAR_AUX_CONV_BORDER_TYPE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/KernelList.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
 
 
-/*!@brief Base class for convolution engines.
+/*!@todo describe.
  *
  * @todo describe more.
  */
-class cedar::aux::conv::Convolution : public cedar::aux::Configurable
+class cedar::aux::conv::BorderType
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  public:
+    typedef cedar::aux::EnumId Id;
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Convolution();
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method convolves a given matrix with the kernel list stored in this convolution object.
-   */
-  virtual cv::Mat convolve(const cv::Mat& matrix) const = 0;
+    static void construct();
 
-  //!@brief The convolution functor for a single matrix.
-  cv::Mat operator()(const cv::Mat& matrix) const;
+    static const cedar::aux::EnumBase& type();
 
-  //!@brief Method for accessing the kernel list.
-  inline cedar::aux::conv::KernelList& getKernelList()
-  {
-    return this->mKernelList;
-  }
-
-  //!@brief Constant variant of the method for accessing the kernel list.
-  inline const cedar::aux::conv::KernelList& getKernelList() const
-  {
-    return this->mKernelList;
-  }
+    static const cedar::aux::conv::BorderType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -100,20 +88,18 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+    static const Id Cyclic = 0;
+    static const Id Zero = 1;
+    static const Id Replicate = 2;
+    static const Id Reflect = 3;
+
 protected:
   // none yet
 private:
-  //! The list of kernel with which to convolve.
-  cedar::aux::conv::KernelList mKernelList;
+  static cedar::aux::EnumType<cedar::aux::conv::BorderType> mType;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-private:
-  cedar::aux::EnumParameterPtr _mBorderType;
+}; // class cedar::aux::conv::BorderType
 
-}; // cedar::aux::conv::Convolution
+#endif // CEDAR_AUX_CONV_BORDER_TYPE_H
 
-#endif // CEDAR_AUX_CONV_CONVOLUTION_H

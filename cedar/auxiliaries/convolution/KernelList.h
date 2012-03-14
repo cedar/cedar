@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.h
+    File:        KernelList.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 13
 
     Description:
 
@@ -34,62 +34,53 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_CONVOLUTION_H
-#define CEDAR_AUX_CONV_CONVOLUTION_H
+#ifndef CEDAR_AUX_CONV_KERNEL_LIST_H
+#define CEDAR_AUX_CONV_KERNEL_LIST_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/KernelList.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/kernel/namespace.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
+#include <vector>
 
-
-/*!@brief Base class for convolution engines.
+/*!@todo describe.
  *
  * @todo describe more.
  */
-class cedar::aux::conv::Convolution : public cedar::aux::Configurable
+class cedar::aux::conv::KernelList
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Convolution();
+  void append(cedar::aux::kernel::KernelPtr kernel);
+
+  void setKernel(size_t index, cedar::aux::kernel::KernelPtr kernel);
+
+  void resize(size_t size);
+
+  inline size_t size() const
+  {
+    return this->mKernels.size();
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method convolves a given matrix with the kernel list stored in this convolution object.
-   */
-  virtual cv::Mat convolve(const cv::Mat& matrix) const = 0;
-
-  //!@brief The convolution functor for a single matrix.
-  cv::Mat operator()(const cv::Mat& matrix) const;
-
-  //!@brief Method for accessing the kernel list.
-  inline cedar::aux::conv::KernelList& getKernelList()
-  {
-    return this->mKernelList;
-  }
-
-  //!@brief Constant variant of the method for accessing the kernel list.
-  inline const cedar::aux::conv::KernelList& getKernelList() const
-  {
-    return this->mKernelList;
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -103,17 +94,19 @@ private:
 protected:
   // none yet
 private:
-  //! The list of kernel with which to convolve.
-  cedar::aux::conv::KernelList mKernelList;
+  //! A vector of all the kernels in this list.
+  std::vector<cedar::aux::kernel::KernelPtr> mKernels;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  cedar::aux::EnumParameterPtr _mBorderType;
+  // none yet
 
-}; // cedar::aux::conv::Convolution
+}; // class cedar::aux::conv::KernelList
 
-#endif // CEDAR_AUX_CONV_CONVOLUTION_H
+#endif // CEDAR_AUX_CONV_KERNEL_LIST_H
+

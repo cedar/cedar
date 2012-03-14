@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.cpp
+    File:        KernelList.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 13
 
     Description:
 
@@ -35,8 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/Convolution.h"
-#include "cedar/auxiliaries/convolution/BorderType.h"
+#include "cedar/auxiliaries/convolution/KernelList.h"
 
 // SYSTEM INCLUDES
 
@@ -44,16 +43,6 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::conv::Convolution::Convolution()
-:
-_mBorderType(new cedar::aux::EnumParameter(this, "borderType", cedar::aux::conv::BorderType::typePtr()))
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cv::Mat cedar::aux::conv::Convolution::operator()(const cv::Mat& matrix) const
-{
-  return this->convolve(matrix);
-}
