@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.cpp
+    File:        BorderType.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 14
 
     Description:
 
@@ -35,25 +35,49 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
+#include "cedar/auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Static members
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::EnumType<cedar::aux::conv::BorderType> cedar::aux::conv::BorderType::mType("cedar::aux::conv::BorderType::");
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::aux::conv::BorderType::Id cedar::aux::conv::BorderType::Cyclic;
+const cedar::aux::conv::BorderType::Id cedar::aux::conv::BorderType::Zero;
+const cedar::aux::conv::BorderType::Id cedar::aux::conv::BorderType::Replicate;
+const cedar::aux::conv::BorderType::Id cedar::aux::conv::BorderType::Reflect;
+#endif
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::conv::Convolution::Convolution()
-:
-_mBorderType(new cedar::aux::EnumParameter(this, "borderType", cedar::aux::conv::BorderType::typePtr()))
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cv::Mat cedar::aux::conv::Convolution::operator()(const cv::Mat& matrix) const
+
+void cedar::aux::conv::BorderType::construct()
 {
-  return this->convolve(matrix);
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::BorderType::Cyclic, "Cyclic", "cyclic borders"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::BorderType::Zero, "Zero", "zero-filled borders"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::BorderType::Replicate, "Replicate", "replicate borders"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::BorderType::Reflect, "Reflect", "mirror borders"));
+}
+
+const cedar::aux::EnumBase& cedar::aux::conv::BorderType::type()
+{
+  return *cedar::aux::conv::BorderType::typePtr();
+}
+
+const cedar::aux::conv::BorderType::TypePtr& cedar::aux::conv::BorderType::typePtr()
+{
+  return cedar::aux::conv::BorderType::mType.type();
 }

@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.h
+    File:        OpenCV.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 14
 
     Description:
 
@@ -34,24 +34,21 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_CONVOLUTION_H
-#define CEDAR_AUX_CONV_CONVOLUTION_H
+#ifndef CEDAR_AUX_CONVOLUTION_OPENCV_H
+#define CEDAR_AUX_CONVOLUTION_OPENCV_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/KernelList.h"
-#include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/EnumParameter.h"
+#include "cedar/auxiliaries/convolution/Convolution.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
 
 
-/*!@brief Base class for convolution engines.
+/*!@brief A convolution engine based on OpenCV's filter engine.
  *
  * @todo describe more.
  */
-class cedar::aux::conv::Convolution : public cedar::aux::Configurable
+class cedar::aux::conv::OpenCV : public cedar::aux::conv::Convolution
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -61,35 +58,19 @@ class cedar::aux::conv::Convolution : public cedar::aux::Configurable
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Convolution();
+  cv::Mat convolve(const cv::Mat& matrix) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method convolves a given matrix with the kernel list stored in this convolution object.
-   */
-  virtual cv::Mat convolve(const cv::Mat& matrix) const = 0;
-
-  //!@brief The convolution functor for a single matrix.
-  cv::Mat operator()(const cv::Mat& matrix) const;
-
-  //!@brief Method for accessing the kernel list.
-  inline cedar::aux::conv::KernelList& getKernelList()
-  {
-    return this->mKernelList;
-  }
-
-  //!@brief Constant variant of the method for accessing the kernel list.
-  inline const cedar::aux::conv::KernelList& getKernelList() const
-  {
-    return this->mKernelList;
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -103,17 +84,18 @@ private:
 protected:
   // none yet
 private:
-  //! The list of kernel with which to convolve.
-  cedar::aux::conv::KernelList mKernelList;
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  cedar::aux::EnumParameterPtr _mBorderType;
+  // none yet
 
-}; // cedar::aux::conv::Convolution
+}; // class cedar::aux::conv::OpenCV
 
-#endif // CEDAR_AUX_CONV_CONVOLUTION_H
+#endif // CEDAR_AUX_CONVOLUTION_OPENCV_H
+

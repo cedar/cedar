@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.cpp
+    File:        OpenCV.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 14
 
     Description:
 
@@ -35,25 +35,33 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/Convolution.h"
-#include "cedar/auxiliaries/convolution/BorderType.h"
+#include "cedar/auxiliaries/convolution/OpenCV.h"
+#include "cedar/auxiliaries/FactoryManager.h"
+#include "cedar/auxiliaries/Singleton.h"
 
 // SYSTEM INCLUDES
+
+//----------------------------------------------------------------------------------------------------------------------
+// register type with the factory
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registered
+    = cedar::aux::conv::ConvolutionManagerSingleton::getInstance()->registerType<cedar::aux::conv::OpenCVPtr>();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::conv::Convolution::Convolution()
-:
-_mBorderType(new cedar::aux::EnumParameter(this, "borderType", cedar::aux::conv::BorderType::typePtr()))
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cv::Mat cedar::aux::conv::Convolution::operator()(const cv::Mat& matrix) const
+
+cv::Mat cedar::aux::conv::OpenCV::convolve(const cv::Mat& matrix) const
 {
-  return this->convolve(matrix);
+  std::cout << "Convolving with kernel list of size " << this->getKernelList().size() << std::endl;
+
+  //!@todo Implement!
+  return cv::Mat();
 }

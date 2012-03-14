@@ -44,6 +44,7 @@
 // CEDAR INCLUDES
 #include "cedar/dynamics/namespace.h"
 #include "cedar/dynamics/Dynamics.h"
+#include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/DoubleParameter.h"
 #include "cedar/auxiliaries/UIntParameter.h"
 #include "cedar/auxiliaries/DoubleVectorParameter.h"
@@ -141,28 +142,45 @@ private:
   //!@brief Resets the field.
   void reset();
 
+  /*!@brief Returns the convolution object currently selected.
+   */
+  inline cedar::aux::conv::ConvolutionPtr getConvolution()
+  {
+    return this->_mConvolution->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief this SpaceCode matrix contains the current field activity of the NeuralField
   cedar::dyn::SpaceCodePtr mActivation;
+
   //!@brief this SpaceCode matrix contains the current field activity, sent through the sigmoid function
   cedar::dyn::SpaceCodePtr mSigmoidalActivation;
+
   //!@brief this SpaceCode matrix contains the current lateral interactions of the NeuralField, i.e. convolution result
   cedar::dyn::SpaceCodePtr mLateralInteraction;
+
   //!@brief this MatData contains the input noise
   cedar::aux::MatDataPtr mInputNoise;
+
   //!@brief this MatData contains the neural noise
   cedar::aux::MatDataPtr mNeuralNoise;
+
   //!@brief the resting level of a field
   cedar::aux::DoubleParameterPtr mRestingLevel;
+
   //!@brief the relaxation rate of the field
-  cedar::aux::DoubleParameterPtr mTau; //!@todo deal with units, now: milliseconds
+  //!@todo deal with units, now: milliseconds
+  cedar::aux::DoubleParameterPtr mTau;
+
   //!@brief the global inhibition of the field, which is not contained in the kernel
   cedar::aux::DoubleParameterPtr mGlobalInhibition;
+
   //!@brief the noise correlation kernel
   cedar::aux::kernel::GaussPtr mNoiseCorrelationKernel;
+
 private:
   // none yet
 
@@ -184,6 +202,10 @@ protected:
 
   //!@brief any sigmoid function
   SigmoidParameterPtr _mSigmoid;
+
+  //!@brief Parameter that determines the convolution engine used by the field.
+  cedar::aux::conv::ConvolutionParameterPtr _mConvolution;
+
 private:
   // none yet
 
