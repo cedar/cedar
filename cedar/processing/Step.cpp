@@ -235,10 +235,10 @@ void cedar::proc::Step::onTrigger(cedar::proc::TriggerPtr)
   // if there are invalid inputs, stop
   if (!this->allInputsValid())
   {
-    std::string invalid_inputs = cedar::aux::join(mInvalidInputNames, ", ");
+    std::string invalid_inputs = cedar::aux::join(mInvalidInputNames, "\", \"");
 
     this->setState(cedar::proc::Triggerable::STATE_NOT_RUNNING,
-                   "Invalid inputs prevent the step from running. These are:" + invalid_inputs);
+                   "Invalid inputs prevent the step from running. These are: \"" + invalid_inputs + "\"");
     // reset the arguments (we could not process them)
     this->mpArgumentsLock->lockForWrite();
     this->mNextArguments.reset();
@@ -369,14 +369,29 @@ void cedar::proc::Step::run()
   // catch exceptions and translate them to the given state/message
   catch(const cedar::aux::ExceptionBase& e)
   {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "An exception occurred in step \"" + this->getName() + "\": " + e.exceptionInfo(),
+      "cedar::proc::Step::run()"
+    );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + e.exceptionInfo());
   }
   catch(const std::exception& e)
   {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "An exception occurred in step \"" + this->getName() + "\": " + std::string(e.what()),
+      "cedar::proc::Step::run()"
+    );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An exception occurred:\n" + std::string(e.what()));
   }
   catch(...)
   {
+    cedar::aux::LogSingleton::getInstance()->warning
+    (
+      "An exception of unknown type occurred in step \"" + this->getName() + "\".",
+      "cedar::proc::Step::run()"
+    );
     this->setState(cedar::proc::Step::STATE_EXCEPTION, "An unknown exception type occurred.");
   }
 
