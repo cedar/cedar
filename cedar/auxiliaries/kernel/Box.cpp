@@ -62,7 +62,15 @@ namespace
 cedar::aux::kernel::Box::Box()
 :
 cedar::aux::kernel::Separable(),
-_mAmplitude(new cedar::aux::DoubleParameter(this, "amplitude", 1.0, 0.0, std::numeric_limits<double>::max())),
+_mAmplitude(new cedar::aux::DoubleParameter
+            (
+              this,
+              "amplitude",
+              1.0,
+              -std::numeric_limits<double>::max(),
+              std::numeric_limits<double>::max()
+            )
+           ),
 _mWidths
 (
   new cedar::aux::UIntVectorParameter
@@ -71,7 +79,7 @@ _mWidths
     "widths",
     getDimensionality(),
     5,
-    0,
+    1,
     std::numeric_limits<unsigned int>::max()
   )
 )/*, @todo This!
@@ -91,6 +99,7 @@ _mShifts
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mWidths.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
+  QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
 
   this->calculate();
 }
