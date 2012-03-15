@@ -146,7 +146,7 @@ private:
    */
   inline cedar::aux::conv::ConvolutionPtr getConvolution()
   {
-    return this->_mConvolution;
+    return this->_mLateralKernelConvolution;
   }
 
   /*!@brief Updates the convolution object when a new kernel is added.
@@ -219,7 +219,10 @@ protected:
   SigmoidParameterPtr _mSigmoid;
 
   //!@brief Parameter that determines the convolution engine used by the field.
-  cedar::aux::conv::ConvolutionPtr _mConvolution;
+  cedar::aux::conv::ConvolutionPtr _mLateralKernelConvolution;
+
+  //!@brief Parameter that determines the convolution engine used by the field.
+  cedar::aux::conv::ConvolutionPtr _mNoiseCorrelationKernelConvolution;
 
 private:
   // none yet

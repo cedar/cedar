@@ -213,7 +213,7 @@ namespace cedar
        * @deprecated This method is deprecated. It will be replaced by cedar::aux::conv::Convolution in the long run.
        * @todo       Remove this function.
        */
-      cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel);
+      CEDAR_DECLARE_DEPRECATED(cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel));
 
       /*!\brief Same functionality as cvReduce for 2D->1D.
        *

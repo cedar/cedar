@@ -87,11 +87,6 @@ cedar::aux::kernel::Kernel::~Kernel()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::aux::kernel::Kernel::convolveWith(const cv::Mat& mat) const
-{
-  return cedar::aux::math::convolve(mat, this->mKernel->getData());
-}
-
 void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
 {
   _mDimensionality->setHidden(hide);
