@@ -62,7 +62,7 @@ cedar::aux::conv::OpenCV::OpenCV()
 {
   this->getKernelList().connectToKernelAddedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
   this->getKernelList().connectToKernelChangedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
-  this->getKernelList().connectToKernelRemovedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
+  this->getKernelList().connectToKernelRemovedSignal(boost::bind(&cedar::aux::conv::OpenCV::kernelRemoved, this, _1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -210,12 +210,19 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   return result;
 }
 
+void cedar::aux::conv::OpenCV::kernelRemoved(size_t index)
+{
+  CEDAR_DEBUG_ASSERT(index < this->mKernelTypes.size());
+  this->mKernelTypes.erase(this->mKernelTypes.begin() + index);
+}
+
 void cedar::aux::conv::OpenCV::updateKernelType(size_t index)
 {
   if (this->mKernelTypes.size() <= index)
   {
     this->mKernelTypes.resize(index + 1, KERNEL_TYPE_UNKNOWN);
   }
+
 
   cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(index);
   if (boost::dynamic_pointer_cast<const cedar::aux::kernel::Separable>(kernel))

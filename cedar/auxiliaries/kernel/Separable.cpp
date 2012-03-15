@@ -38,6 +38,7 @@
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
@@ -77,4 +78,33 @@ const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimensi
 void cedar::aux::kernel::Separable::setKernelPart(unsigned int dimension, const cv::Mat& mat)
 {
   this->mKernelParts.at(dimension) = mat;
+}
+
+void cedar::aux::kernel::Separable::updateKernelMatrix()
+{
+  //!@todo Implement for more than two dimensions
+  if (this->getDimensionality() == 0)
+  {
+    this->mKernel->lockForWrite();
+    this->mKernel->setData(cv::Mat());
+    this->mKernel->unlock();
+  }
+  else
+  {
+    this->mpReadWriteLockOutput->lockForRead();
+
+    cv::Mat combined = this->mKernelParts.at(0);
+
+    for (size_t i = 1; i < this->mKernelParts.size(); ++i)
+    {
+      combined = combined * this->mKernelParts.at(i).t();
+    }
+
+    this->mpReadWriteLockOutput->unlock();
+
+    this->mKernel->lockForWrite();
+    this->mKernel->setData(combined);
+    this->mKernel->unlock();
+  }
+
 }

@@ -70,7 +70,7 @@ _mWidths
     this,
     "widths",
     getDimensionality(),
-    10,
+    5,
     0,
     std::numeric_limits<unsigned int>::max()
   )
@@ -91,6 +91,8 @@ _mShifts
   cedar::aux::LogSingleton::getInstance()->allocating(this);
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
   QObject::connect(_mWidths.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
+
+  this->calculate();
 }
 
 
@@ -119,11 +121,14 @@ void cedar::aux::kernel::Box::calculate()
 
   if (this->getDimensionality() > 0)
   {
-    this->getKernelPart(0) *= this->getAmplitude();
+    double amplitude = this->getAmplitude();
+    this->getKernelPart(0) *= amplitude;
   }
-  //!@todo Make 0D kernels possible
 
   mpReadWriteLockOutput->unlock();
+
+  //!@todo This should also be done automatically in separable. Also, Gauss shouldn't need to do this by hand, either.
+  this->updateKernelMatrix();
 }
 
 void cedar::aux::kernel::Box::updateDimensionality()
