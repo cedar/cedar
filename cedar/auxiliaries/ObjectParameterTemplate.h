@@ -40,6 +40,8 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/ObjectParameter.h"
+#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/FactoryManager.h"
 
 // SYSTEM INCLUDES
 

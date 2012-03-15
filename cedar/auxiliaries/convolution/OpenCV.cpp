@@ -51,7 +51,7 @@
 namespace
 {
   bool registered
-    = cedar::aux::conv::ConvolutionManagerSingleton::getInstance()->registerType<cedar::aux::conv::OpenCVPtr>();
+    = cedar::aux::conv::EngineManagerSingleton::getInstance()->registerType<cedar::aux::conv::OpenCVPtr>();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,9 +69,9 @@ cedar::aux::conv::OpenCV::OpenCV()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-int cedar::aux::conv::OpenCV::getTranslatedBorderType() const
+int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::Id borderType) const
 {
-  switch (this->getBorderType())
+  switch (borderType)
   {
     case cedar::aux::conv::BorderType::Cyclic:
       return cv::BORDER_WRAP;
@@ -91,15 +91,28 @@ int cedar::aux::conv::OpenCV::getTranslatedBorderType() const
   }
 }
 
-cv::Mat cedar::aux::conv::OpenCV::convolve(const cv::Mat& matrix) const
+cv::Mat cedar::aux::conv::OpenCV::convolve
+        (
+          const cv::Mat& matrix,
+          cedar::aux::conv::BorderType::Id borderType,
+          const std::vector<unsigned int>& anchorVector
+        ) const
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
   //!@todo Remove the kernel convolveWith method once this is done
 
-  //!@todo Proper hot-spot handling
   cv::Point anchor = cv::Point(-1, -1);
 
-  int border_type = this->getTranslatedBorderType();
+  if (anchorVector.size() >= 1)
+  {
+    anchor.x = static_cast<int>(anchorVector.at(0));
+  }
+  if (anchorVector.size() >= 2)
+  {
+    anchor.y = static_cast<int>(anchorVector.at(1));
+  }
+
+  int border_type = this->translateBorderType(borderType);
 
   double delta = 0.0;
 

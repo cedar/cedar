@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.cpp
+    File:        ConvolutionEngine.cpp
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 15
 
     Description:
 
@@ -35,9 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/Convolution.h"
-#include "cedar/auxiliaries/convolution/BorderType.h"
-#include "cedar/auxiliaries/convolution/OpenCV.h"
+#include "cedar/auxiliaries/convolution/Engine.h"
 
 // SYSTEM INCLUDES
 
@@ -45,29 +43,6 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::conv::Convolution::Convolution()
-:
-_mBorderType
-(
-  new cedar::aux::EnumParameter
-  (
-    this,
-    "borderType",
-    cedar::aux::conv::BorderType::typePtr(),
-    cedar::aux::conv::BorderType::Zero
-  )
-),
-_mEngine
-(
-  new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
-)
-{
-}
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cv::Mat cedar::aux::conv::Convolution::operator()(const cv::Mat& matrix) const
-{
-  return this->convolve(matrix);
-}
