@@ -45,7 +45,7 @@
 #include "cedar/processing/exceptions.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/ElementDeclaration.h"
-#include "cedar/auxiliaries/convolution/OpenCV.h"
+#include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/Sigmoid.h"
 #include "cedar/auxiliaries/math/AbsSigmoid.h"
@@ -109,15 +109,7 @@ _mSigmoid
     cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
   )
 ),
-_mConvolution
-(
-  new cedar::aux::conv::ConvolutionParameter
-  (
-    this,
-    "convolution",
-    cedar::aux::conv::ConvolutionPtr(new cedar::aux::conv::OpenCV())
-  )
-)
+_mConvolution(new cedar::aux::conv::Convolution())
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
@@ -172,6 +164,9 @@ _mConvolution
                                                                                         2
                                                                                       ));
   this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
+
+  this->addConfigurableChild("convolution", _mConvolution);
+
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 
@@ -179,6 +174,7 @@ _mConvolution
   this->_mKernels->connectToObjectRemovedSignal(boost::bind(&cedar::dyn::NeuralField::removeKernelFromConvolution, this, _1));
 
   this->transferKernelsToConvolution();
+
 
   // now check the dimensionality and sizes of all matrices
   this->updateMatrices();

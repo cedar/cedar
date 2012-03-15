@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/Engine.h"
 
 // SYSTEM INCLUDES
 
@@ -57,7 +57,7 @@
  *
  * @todo Make this class thread-safe
  */
-class cedar::aux::conv::OpenCV : public cedar::aux::conv::Convolution
+class cedar::aux::conv::OpenCV : public cedar::aux::conv::Engine
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -80,7 +80,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  cv::Mat convolve(const cv::Mat& matrix) const;
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::conv::BorderType::Id borderType,
+    const std::vector<unsigned int>& anchor
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -94,7 +99,7 @@ protected:
 private:
   void updateKernelType(size_t index);
 
-  inline int getTranslatedBorderType() const;
+  inline int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

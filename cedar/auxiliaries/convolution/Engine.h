@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Convolution.h
+    File:        Engine.h
 
-    Maintainer:  Stephan Zibner
-    Email:       stephan.zibner@ini.rub.de
-    Date:        2011 11 28
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 15
 
     Description:
 
@@ -34,27 +34,23 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_CONVOLUTION_H
-#define CEDAR_AUX_CONV_CONVOLUTION_H
+#ifndef CEDAR_AUX_CONV_ENGINE_H
+#define CEDAR_AUX_CONV_ENGINE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/BorderType.h"
-#include "cedar/auxiliaries/convolution/Engine.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
+#include "cedar/auxiliaries/convolution/BorderType.h"
 #include "cedar/auxiliaries/Configurable.h"
-#include "cedar/auxiliaries/EnumParameter.h"
-#include "cedar/auxiliaries/ObjectParameterTemplate.h"
 
 // SYSTEM INCLUDES
-#include <opencv2/opencv.hpp>
 
 
 /*!@brief Base class for convolution engines.
  *
- * @todo The anchor value for the convolution can currently not be set.
+ * @todo describe more.
  */
-class cedar::aux::conv::Convolution : public cedar::aux::Configurable
+class cedar::aux::conv::Engine : public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -64,7 +60,6 @@ class cedar::aux::conv::Convolution : public cedar::aux::Configurable
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  Convolution();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -72,52 +67,36 @@ public:
 public:
   /*!@brief This method convolves a given matrix with the kernel list stored in this convolution object.
    */
-  inline cv::Mat convolve(const cv::Mat& matrix) const
-  {
-    return this->getEngine()->convolve(matrix, this->getBorderType());
-  }
-
-  //!@brief The convolution functor for a single matrix.
-  cv::Mat operator()(const cv::Mat& matrix) const;
+  virtual cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::conv::BorderType::Id borderType,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const = 0;
 
   //!@brief Method for accessing the kernel list.
   inline cedar::aux::conv::KernelList& getKernelList()
   {
-    return this->getEngine()->getKernelList();
+    return this->mKernelList;
   }
 
   //!@brief Constant variant of the method for accessing the kernel list.
   inline const cedar::aux::conv::KernelList& getKernelList() const
   {
-    return this->getEngine()->getKernelList();
-  }
-
-  //!@brief Returns the convolution engine.
-  inline cedar::aux::conv::ConstEnginePtr getEngine() const
-  {
-    return this->_mEngine->getValue();
-  }
-
-  //!@brief Get the border type.
-  inline cedar::aux::conv::BorderType::Id getBorderType() const
-  {
-    return this->_mBorderType->getValue();
+    return this->mKernelList;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief Returns the convolution engine.
-  inline cedar::aux::conv::EnginePtr getEngine()
-  {
-    return this->_mEngine->getValue();
-  }
+  // none yet
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -125,18 +104,19 @@ private:
 protected:
   // none yet
 private:
-  // none yet
+  //! The list of kernel with which to convolve.
+  cedar::aux::conv::KernelList mKernelList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
+
 private:
-  cedar::aux::EnumParameterPtr _mBorderType;
+  // none yet
 
-  cedar::aux::conv::EngineParameterPtr _mEngine;
+}; // class cedar::aux::conv::Engine
 
-}; // cedar::aux::conv::Convolution
+#endif // CEDAR_AUX_CONV_ENGINE_H
 
-#endif // CEDAR_AUX_CONV_CONVOLUTION_H
