@@ -48,14 +48,13 @@
  *
  * @todo describe more.
  *
- * @todo Intelligent strategies might be used here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
+ * @todo Intelligent strategies should be useable here, e.g., when multiple kernels in a row are TYPE_FULL, they can be
  *       summed together etc.
- *
- * @todo This should not inherit convolution, but be part of it
  *
  * @todo Write a unit test for this class
  *
- * @todo Make this class thread-safe
+ * @todo This class should also be able to work with more matrices of more than two dimensions.
+ *
  */
 class cedar::aux::conv::OpenCV : public cedar::aux::conv::Engine
 {

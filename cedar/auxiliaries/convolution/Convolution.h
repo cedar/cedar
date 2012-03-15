@@ -53,6 +53,8 @@
 /*!@brief Base class for convolution engines.
  *
  * @todo The anchor value for the convolution can currently not be set.
+ *
+ * @todo Maybe the actual engine should be shared/shareable across mutliple convolution objects?
  */
 class cedar::aux::conv::Convolution : public cedar::aux::Configurable
 {

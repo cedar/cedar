@@ -99,7 +99,6 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         ) const
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
-  //!@todo Remove the kernel convolveWith method once this is done
 
   cv::Point anchor = cv::Point(-1, -1);
 

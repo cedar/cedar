@@ -109,7 +109,8 @@ _mSigmoid
     cedar::aux::math::SigmoidPtr(new cedar::aux::math::AbsSigmoid(0.0, 10.0))
   )
 ),
-_mConvolution(new cedar::aux::conv::Convolution())
+_mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
+_mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
   _mDimensionality->setValue(2);
   _mSizes->makeDefault();
@@ -164,8 +165,9 @@ _mConvolution(new cedar::aux::conv::Convolution())
                                                                                         2
                                                                                       ));
   this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
+  _mNoiseCorrelationKernelConvolution->getKernelList().append(mNoiseCorrelationKernel);
 
-  this->addConfigurableChild("convolution", _mConvolution);
+  this->addConfigurableChild("convolution", _mLateralKernelConvolution);
 
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
@@ -349,10 +351,9 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
   if (mNoiseCorrelationKernel->getAmplitude() != 0.0)
   {
     cv::randn(neural_noise, cv::Scalar(0), cv::Scalar(1));
-    mNoiseCorrelationKernel->getReadWriteLock()->lockForRead();
-    neural_noise = this->mNoiseCorrelationKernel->convolveWith(neural_noise);
-    mNoiseCorrelationKernel->getReadWriteLock()->unlock();
+    neural_noise = this->_mNoiseCorrelationKernelConvolution->convolve(neural_noise);
     //!@todo not sure, if dividing time by 1000 (which is an implicit tau) makes any sense or should be a parameter
+    //!@todo not sure what sqrt(time) does here (i.e., within the sigmoid); check if this is correct, and, if so, explain it
     sigmoid_u = _mSigmoid->getValue()->compute<float>
                 (
                   u
