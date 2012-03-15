@@ -65,6 +65,7 @@ cedar_add_library(cedaraux
   gui/UIntParameter.h
   gui/UIntVectorParameter.h
   gui/IntVectorParameter.h
+  convolution/Convolution.h
   Parameter.h
   kernel/Kernel.h
   kernel/Gauss.h

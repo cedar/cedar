@@ -55,6 +55,8 @@
  *
  * @todo This class should also be able to work with more matrices of more than two dimensions.
  *
+ * @todo Right now, this computes correlation (it should flip the kernel)
+ *
  */
 class cedar::aux::conv::OpenCV : public cedar::aux::conv::Engine
 {
@@ -96,6 +98,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+  void kernelRemoved(size_t index);
   void updateKernelType(size_t index);
 
   inline int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;

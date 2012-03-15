@@ -97,7 +97,7 @@ mRestingLevel(new cedar::aux::DoubleParameter(this, "restingLevel", -5.0, -100, 
 mTau(new cedar::aux::DoubleParameter(this, "tau", 100.0, 1.0, 10000.0)),
 mGlobalInhibition(new cedar::aux::DoubleParameter(this, "globalInhibition", -0.01, -100.0, 100.0)),
 // parameters
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 0, 1000)),
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 0, 1000)),
 _mSizes(new cedar::aux::UIntVectorParameter(this, "sizes", 2, 10, 1, 1000)),
 _mInputNoiseGain(new cedar::aux::DoubleParameter(this, "inputNoiseGain", 0.1, 0.0, 1000.0)),
 _mSigmoid
@@ -112,17 +112,17 @@ _mSigmoid
 _mLateralKernelConvolution(new cedar::aux::conv::Convolution()),
 _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 {
-  _mDimensionality->setValue(2);
+  //!@todo This call should not be necessary, rather, the vector should do that in its own.
   _mSizes->makeDefault();
+
   //default is two modes/kernels for lateral interaction
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
-  this->declareBuffer("activation");
-  this->setBuffer("activation", mActivation);
-  this->declareBuffer("lateralInteraction");
-  this->setBuffer("lateralInteraction", mLateralInteraction);
+  this->declareBuffer("activation", mActivation);
+  this->declareBuffer("lateralInteraction", mLateralInteraction);
+  this->declareBuffer("lateralKernel", this->_mLateralKernelConvolution->getCombinedKernel());
+  this->declareBuffer("neuralNoiseKernel", this->_mNoiseCorrelationKernelConvolution->getCombinedKernel());
 
-  this->declareOutput("sigmoid(activation)");
-  this->setOutput("sigmoid(activation)", mSigmoidalActivation);
+  this->declareOutput("sigmoid(activation)", mSigmoidalActivation);
 
   this->declareInputCollection("input");
 
@@ -151,7 +151,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
                 new KernelListParameter
                 (
                   this,
-                  "kernels",
+                  "lateralKernels",
                   kernel_defaults
                 )
               );
@@ -167,7 +167,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
   this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
   _mNoiseCorrelationKernelConvolution->getKernelList().append(mNoiseCorrelationKernel);
 
-  this->addConfigurableChild("convolution", _mLateralKernelConvolution);
+  this->addConfigurableChild("lateralKernelConvolution", _mLateralKernelConvolution);
 
   QObject::connect(_mSizes.get(), SIGNAL(valueChanged()), this, SLOT(dimensionSizeChanged()));
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));

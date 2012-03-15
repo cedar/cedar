@@ -45,9 +45,11 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/EnumParameter.h"
 #include "cedar/auxiliaries/ObjectParameterTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+#include <QObject>
 
 
 /*!@brief Base class for convolution engines.
@@ -56,8 +58,10 @@
  *
  * @todo Maybe the actual engine should be shared/shareable across mutliple convolution objects?
  */
-class cedar::aux::conv::Convolution : public cedar::aux::Configurable
+class cedar::aux::conv::Convolution : public QObject, public cedar::aux::Configurable
 {
+  Q_OBJECT
+
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,6 +110,12 @@ public:
     return this->_mBorderType->getValue();
   }
 
+  //!@brief Returns a pointer to the combined kernel.
+  inline cedar::aux::MatDataPtr getCombinedKernel()
+  {
+    return this->mCombinedKernel;
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -121,13 +131,28 @@ private:
     return this->_mEngine->getValue();
   }
 
+  void slotKernelAdded(size_t);
+  void slotKernelChanged(size_t);
+  void slotKernelRemoved(size_t);
+
+private slots:
+  void selectedEngineChanged();
+
+  void updateCombinedKernel();
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   // none yet
 private:
-  // none yet
+  cedar::aux::MatDataPtr mCombinedKernel;
+
+  boost::signals2::connection mKernelAddedConnection;
+
+  boost::signals2::connection mKernelChangedConnection;
+
+  boost::signals2::connection mKernelRemovedConnection;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
