@@ -141,6 +141,15 @@ private:
   //!@brief Resets the field.
   void reset();
 
+  //!@brief Sets the dimensionality of the kernel.
+  void slotKernelAdded(size_t index);
+
+  //!@brief Returns the dimensionality of the field.
+  inline unsigned int getDimensionality() const
+  {
+    return this->_mDimensionality->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
