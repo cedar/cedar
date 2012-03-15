@@ -123,6 +123,27 @@ public:
    */
   void hideDimensionality(bool hide);
 
+  /*!@brief Locks the kernel for reading.
+   */
+  inline void lockForRead() const
+  {
+    this->mpReadWriteLockOutput->lockForRead();
+  }
+
+  /*!@brief Locks the kernel for reading.
+   */
+  inline void lockForWrite() const
+  {
+    this->mpReadWriteLockOutput->lockForWrite();
+  }
+
+  /*!@brief Unlocks the kernel.
+   */
+  inline void unlock() const
+  {
+    this->mpReadWriteLockOutput->unlock();
+  }
+
 public slots:
   //!@todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
   void updateKernel();
@@ -152,7 +173,7 @@ protected:
   //!@brief matrix containing the kernel
   cedar::aux::MatDataPtr mKernel;
   //!@brief read and write lock to protect the kernel when calculating its values
-  QReadWriteLock *mpReadWriteLockOutput;
+  mutable QReadWriteLock *mpReadWriteLockOutput;
 private:
   // none yet
 

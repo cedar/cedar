@@ -69,39 +69,37 @@ cedar::aux::conv::OpenCV::OpenCV()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+int cedar::aux::conv::OpenCV::getTranslatedBorderType() const
+{
+  switch (this->getBorderType())
+  {
+    case cedar::aux::conv::BorderType::Cyclic:
+      return cv::BORDER_WRAP;
+
+    case cedar::aux::conv::BorderType::Reflect:
+      return cv::BORDER_REFLECT;
+
+    case cedar::aux::conv::BorderType::Replicate:
+      return cv::BORDER_REPLICATE;
+
+    case cedar::aux::conv::BorderType::Zero:
+      //!@todo This actually makes the border -1 rather than 0!
+      return cv::BORDER_CONSTANT;
+
+    default:
+      return cv::BORDER_DEFAULT;
+  }
+}
+
 cv::Mat cedar::aux::conv::OpenCV::convolve(const cv::Mat& matrix) const
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
-  //!@todo Thread safety!
   //!@todo Remove the kernel convolveWith method once this is done
 
   //!@todo Proper hot-spot handling
   cv::Point anchor = cv::Point(-1, -1);
 
-  //!@todo Proper border handling
-  int border_type;
-  switch (this->getBorderType())
-  {
-    case cedar::aux::conv::BorderType::Cyclic:
-      border_type = cv::BORDER_WRAP;
-      break;
-
-    case cedar::aux::conv::BorderType::Reflect:
-      border_type = cv::BORDER_REFLECT;
-      break;
-
-    case cedar::aux::conv::BorderType::Replicate:
-      border_type = cv::BORDER_REPLICATE;
-      break;
-
-    case cedar::aux::conv::BorderType::Zero:
-      //!@todo This actually makes the border -1 rather than 0!
-      border_type = cv::BORDER_CONSTANT;
-      break;
-
-    default:
-      border_type = cv::BORDER_DEFAULT;
-  }
+  int border_type = this->getTranslatedBorderType();
 
   double delta = 0.0;
 
@@ -120,6 +118,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve(const cv::Mat& matrix) const
       {
         cedar::aux::kernel::ConstSeparablePtr kernel
           = cedar::aux::asserted_pointer_cast<const cedar::aux::kernel::Separable>(this->getKernelList().getKernel(i));
+
+        kernel->lockForRead();
 
         switch (cedar::aux::math::getDimensionalityOf(matrix))
         {
@@ -152,8 +152,11 @@ cv::Mat cedar::aux::conv::OpenCV::convolve(const cv::Mat& matrix) const
           }
 
           default:
+            kernel->unlock();
             CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
         }
+
+        kernel->unlock();
 
         break;
       }
@@ -163,6 +166,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve(const cv::Mat& matrix) const
       //--------------------------------------------------------------------------------------
       {
         cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(i);
+        kernel->lockForRead();
         cv::Mat kernel_mat = kernel->getKernel();
         switch (cedar::aux::math::getDimensionalityOf(matrix))
         {
@@ -172,8 +176,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve(const cv::Mat& matrix) const
             break;
 
           default:
+            kernel->unlock();
             CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
         }
+        kernel->unlock();
         break;
       }
 
