@@ -42,7 +42,7 @@
 //#include "cedar/devices/sensors/visual/defines.h"
 #include "cedar/devices/sensors/visual/namespace.h"
 #include "cedar/auxiliaries/LoopedThread.h"
-#include "cedar/devices/sensors/visual/Exceptions.h"
+#include "cedar/devices/sensors/visual/exceptions.h"
 #include "cedar/auxiliaries/exceptions/InitializationException.h"
 #include "cedar/auxiliaries/exceptions/IndexOutOfRangeException.h"
 

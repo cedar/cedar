@@ -36,7 +36,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/devices/sensors/visual/Exceptions.h"
+#include "cedar/devices/sensors/visual/exceptions.h"
 
 // SYSTEM INCLUDES
 
