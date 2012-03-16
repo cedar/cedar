@@ -95,7 +95,9 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
   if (this->getDimensionality() == 0)
   {
     this->mKernel->lockForWrite();
-    this->mKernel->setData(cv::Mat());
+    const cv::Mat& kernel = this->mKernelParts.at(0);
+    CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(kernel) == 0);
+    this->mKernel->setData(kernel);
     this->mKernel->unlock();
   }
   else

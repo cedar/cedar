@@ -128,42 +128,49 @@ void cedar::aux::kernel::Gauss::calculateParts()
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && mCenters.size() == 1) || mCenters.size() == dimensionality);
 
   // calculate the kernel parts for every dimension
-  for (unsigned int dim = 0; dim < dimensionality; dim++)
+  if (dimensionality > 0)
   {
-    double sigma = _mSigmas->at(dim);
-    // estimate width
-    if (sigma != 0)
+    for (unsigned int dim = 0; dim < dimensionality; dim++)
     {
-      mSizes.at(dim) = this->getWidth(dim);
-    }
-    else
-    {
-      mSizes.at(dim) = 1;
-    }
-    mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
-    cv::Mat kernel_part = cv::Mat::zeros(mSizes.at(dim), 1, CV_32F);
-
-    // calculate kernel part
-    if (sigma != 0)
-    {
-      for (unsigned int j = 0; j < mSizes.at(dim); j++)
+      double sigma = _mSigmas->at(dim);
+      // estimate width
+      if (sigma != 0)
       {
-        //!\todo move filling up of matrix to some tool function
-        kernel_part.at<float>(j, 0)
-            = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), sigma);
+        mSizes.at(dim) = this->getWidth(dim);
       }
-    }
-    else // discrete case
-    {
-      kernel_part.at<float>(0, 0) = 1;
-    }
-    // normalize
-    kernel_part /= cv::sum(kernel_part).val[0];
+      else
+      {
+        mSizes.at(dim) = 1;
+      }
+      mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
+      cv::Mat kernel_part = cv::Mat::zeros(mSizes.at(dim), 1, CV_32F);
 
-    this->setKernelPart(dim, kernel_part);
+      // calculate kernel part
+      if (sigma != 0)
+      {
+        for (unsigned int j = 0; j < mSizes.at(dim); j++)
+        {
+          //!\todo move filling up of matrix to some tool function
+          kernel_part.at<float>(j, 0)
+              = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), sigma);
+        }
+      }
+      else // discrete case
+      {
+        kernel_part.at<float>(0, 0) = 1;
+      }
+      // normalize
+      kernel_part /= cv::sum(kernel_part).val[0];
+
+      this->setKernelPart(dim, kernel_part);
+    }
+
+    this->setKernelPart(0, amplitude * this->getKernelPart(0));
   }
-
-  this->setKernelPart(0, amplitude * this->getKernelPart(0));
+  else
+  {
+    this->setKernelPart(0, amplitude * cv::Mat::ones(1, 1, CV_32F));
+  }
 
   mpReadWriteLockOutput->unlock();
 }
