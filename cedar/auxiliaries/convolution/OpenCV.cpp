@@ -212,15 +212,13 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
 
   kernel->lockForRead();
 
-  switch (cedar::aux::math::getDimensionalityOf(matrix))
+  switch (kernel->getDimensionality())
   {
     case 1:
     {
       CEDAR_DEBUG_ASSERT(kernel->kernelPartCount() == 1);
       const cv::Mat& kernel_mat = kernel->getKernelPart(0);
-      cv::Mat flipped_kernel;
-      cv::flip(kernel_mat, flipped_kernel, -1);
-      cv::filter2D(matrix, convolved, -1, flipped_kernel, anchor, 0.0, cvBorderType);
+      convolved = this->cvConvolve(matrix, kernel_mat, cvBorderType, anchor);
       break;
     }
 
@@ -234,17 +232,43 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       cv::flip(kernel_mat_x, flipped_kernel_mat_x, -1);
       cv::flip(kernel_mat_y, flipped_kernel_mat_y, -1);
 
-      cv::sepFilter2D
-      (
-        matrix,
-        convolved,
-        -1,
-        flipped_kernel_mat_x,
-        flipped_kernel_mat_y,
-        anchor,
-        0,
-        cvBorderType
-      );
+
+      if (cvBorderType != cv::BORDER_WRAP)
+      {
+        cv::sepFilter2D
+        (
+          matrix,
+          convolved,
+          -1,
+          flipped_kernel_mat_x,
+          flipped_kernel_mat_y,
+          anchor,
+          0,
+          cvBorderType
+        );
+      }
+      else
+      {
+        cv::Mat modified;
+        //@todo For even kernels, this may pad 1 too much
+        int dh = cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_x) / 2;
+        int dw = cedar::aux::math::get1DMatrixSize(flipped_kernel_mat_y) / 2;
+
+        cv::copyMakeBorder(matrix, modified, dh, dh, dw, dw, cv::BORDER_WRAP);
+        cv::sepFilter2D
+        (
+          modified,
+          convolved,
+          -1,
+          flipped_kernel_mat_x,
+          flipped_kernel_mat_y,
+          anchor,
+          0,
+          cv::BORDER_DEFAULT
+        );
+        convolved = convolved(cv::Range(dh, dh + matrix.rows), cv::Range(dw, dw + matrix.cols));
+      }
+
 
       break;
     }
