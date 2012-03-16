@@ -156,6 +156,8 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
                 )
               );
 
+  _mKernels->connectToObjectAddedSignal(boost::bind(&cedar::dyn::NeuralField::slotKernelAdded, this, _1));
+
   // setup noise correlation kernel
   mNoiseCorrelationKernel = cedar::aux::kernel::GaussPtr(new cedar::aux::kernel::Gauss(
                                                                                         0.0,
@@ -186,6 +188,12 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
+{
+  cedar::aux::kernel::KernelPtr kernel = this->_mKernels->at(kernelIndex);
+  this->addKernelToConvolution(kernel);
+}
+
 void cedar::dyn::NeuralField::transferKernelsToConvolution()
 {
   this->getConvolution()->getKernelList().clear();
@@ -193,11 +201,6 @@ void cedar::dyn::NeuralField::transferKernelsToConvolution()
   {
     this->addKernelToConvolution(this->_mKernels->at(kernel));
   }
-}
-
-void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
-{
-  this->addKernelToConvolution(this->_mKernels->at(kernelIndex));
 }
 
 void cedar::dyn::NeuralField::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
@@ -414,7 +417,7 @@ void cedar::dyn::NeuralField::eulerStep(const cedar::unit::Time& time)
         CEDAR_THROW_EXCEPTION(cedar::aux::MatrixMismatchException(input_mat, d_u));
       }
 
-      if (this->_mDimensionality->getValue() == 1)
+      if (this->getDimensionality() == 1)
       {
         d_u += cedar::aux::math::canonicalRowVector(input_mat);
       }
@@ -441,13 +444,13 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
   if(matrix.dims == 2 && matrix.rows == 1 && matrix.cols == 1)
   {
     // if this field is set to more dimensions than the input (in this case 1), they are not compatible
-    if (this->_mDimensionality->getValue() != 0)
+    if (this->getDimensionality() != 0)
       return false;
   }
   else if(matrix.dims == 2 && (matrix.rows == 1 || matrix.cols == 1))
   {
     // if this field is set to more dimensions than the input (in this case 1), they are not compatible
-    if (this->_mDimensionality->getValue() != 1)
+    if (this->getDimensionality() != 1)
       return false;
 
     CEDAR_DEBUG_ASSERT(this->_mSizes->getValue().size() == 1);
@@ -459,7 +462,7 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
   }
   else
   {
-    if (static_cast<int>(this->_mDimensionality->getValue()) != matrix.dims)
+    if (static_cast<int>(this->getDimensionality()) != matrix.dims)
       return false;
     for (unsigned int dim = 0; dim < this->_mSizes->getValue().size(); ++dim)
     {
@@ -472,7 +475,7 @@ bool cedar::dyn::NeuralField::isMatrixCompatibleInput(const cv::Mat& matrix) con
 
 void cedar::dyn::NeuralField::dimensionalityChanged()
 {
-  this->_mSizes->resize(_mDimensionality->getValue(), _mSizes->getDefaultValue());
+  this->_mSizes->resize(this->getDimensionality(), _mSizes->getDefaultValue());
   this->updateMatrices();
 }
 
@@ -483,7 +486,7 @@ void cedar::dyn::NeuralField::dimensionSizeChanged()
 
 void cedar::dyn::NeuralField::updateMatrices()
 {
-  int dimensionality = static_cast<int>(_mDimensionality->getValue());
+  int dimensionality = static_cast<int>(this->getDimensionality());
 
   std::vector<int> sizes(dimensionality);
   for (int dim = 0; dim < dimensionality; ++dim)
