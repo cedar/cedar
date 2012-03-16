@@ -87,7 +87,7 @@ class DemoSeparable1D : public cedar::aux::kernel::Separable
       this->updateKernelMatrix();
     }
 
-    void calculate()
+    void calculateParts()
     {
       // nothing to do -- matrix is fixed.
     }
@@ -108,7 +108,7 @@ class DemoSeparable2D : public cedar::aux::kernel::Separable
       this->updateKernelMatrix();
     }
 
-    void calculate()
+    void calculateParts()
     {
       // nothing to do -- matrix is fixed.
     }
