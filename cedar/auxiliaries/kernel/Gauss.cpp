@@ -124,7 +124,6 @@ void cedar::aux::kernel::Gauss::calculateParts()
 
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && _mSigmas->size() == 1) || _mSigmas->size() == dimensionality);
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && _mShifts->size() == 1) || _mShifts->size() == dimensionality);
-  std::cout << "dimensionality: " << dimensionality << ", mSizes.size: " << mSizes.size() << std::endl;
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && mSizes.size() == 1)   || mSizes.size() == dimensionality);
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && mCenters.size() == 1) || mCenters.size() == dimensionality);
 
@@ -171,12 +170,11 @@ void cedar::aux::kernel::Gauss::calculateParts()
 
 void cedar::aux::kernel::Gauss::setSigma(unsigned int dimension, double sigma)
 {
-  try
+  if (dimension < _mSigmas->size())
   {
     _mSigmas->set(dimension, sigma);
   }
-  //!@todo Catch only the out-of-bounds exception here
-  catch(std::exception& e)
+  else
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Error in cedar::aux::kernel::Gauss::setSigma: vector out of bounds");
   }
@@ -189,12 +187,11 @@ double cedar::aux::kernel::Gauss::getSigma(unsigned int dimension) const
 
 void cedar::aux::kernel::Gauss::setShift(unsigned int dimension, double shift)
 {
-  try
+  if (dimension < this->_mShifts->size())
   {
     _mShifts->set(dimension, shift);
   }
-  //!@todo Catch only the out-of-bounds exception here
-  catch(std::exception& e)
+  else
   {
     CEDAR_THROW(cedar::aux::IndexOutOfRangeException, "Error in cedar::aux::kernel::Gauss::setShift: vector out of bounds");
   }
@@ -238,8 +235,6 @@ void cedar::aux::kernel::Gauss::updateDimensionality()
   {
     new_size = 1;
   }
-
-  std::cout << "dim: " << new_dimensionality << "; new_size: " << new_size << std::endl;
 
   _mSigmas->resize(new_size);
   _mShifts->resize(new_size);
