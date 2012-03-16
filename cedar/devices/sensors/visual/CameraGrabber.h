@@ -56,8 +56,8 @@
 
 
 /*! \class cedar::dev::sensors::visual::CameraGrabber
- *  \brief This grabber grabs images from a camera
- *  \remarks This functionality is implemented by using the OpenCV class cv::VideoCapture
+ *  \brief This grabber grabs images from a camera. This functionality is implemented by
+ *   using the OpenCV class cv::VideoCapture
  */
 class cedar::dev::sensors::visual::CameraGrabber
 :
@@ -138,7 +138,8 @@ public:
    *  \param isGuid This flag have to be set, if the values in camera0 or camera1 are the guids of the cameras
    *  \param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
    *          Constructor for details
-   *  \see CameraGrabber(std::string, unsigned int, bool, bool) for details about the used framework
+   *  \see cedar::dev::sensors::visual::CameraGrabber::CameraGrabber(const std::string&, unsigned int, bool, bool)
+   *       for details about the used framework
    */
   CameraGrabber(
                  const std::string& configFileName,
@@ -149,17 +150,17 @@ public:
                );
 
 
-  /*! \brief Constructor for a camera grabber. The complete configuration will be read from configuration file
+  /*! \brief Constructor for a camera grabber. The complete configuration will be read from configuration file.</br>
+   *   If the system can't find the wanted camera, initialization will fail.
+   *  \par
+   *        The camera always will be initialized (i.e. the first frame is already grabbed on initialization)
    *  \param configFileName Filename for the configuration
    *  \param numCameras How many cameras you want to use
    *  \remarks
-   *        If the system can't find the wanted camera, initialization will fail. <br>
    *        If there is no configuration file with the given name, a new one will be created. But be aware,
    *        the default camera capabilities filename (build with guid or busId) will be used. It is possible,
    *        that this file isn't the right one for your camera.
    *
-   *  \par
-   *        The camera always will be initialized (i.e. the first frame is already grabbed on initialization)
    */
   CameraGrabber(
                  const std::string& configFileName,
@@ -188,11 +189,11 @@ public:
                             CameraProperty::Id propId
                           );
 
-  /*!  \brief Get informations on camera on channel 0
+  /*! \brief Get informations on camera on channel 0
    *  \see getCameraProperty(unsigned int, CameraParam_t)
    *  \param propId This is any known property-Id<br>
    *     If property-id is not supported or unknown, return value will be -1.
-   *   \see CameraProperty
+   *  \see CameraProperty
    */
   double getCameraProperty(
                             CameraProperty::Id propId
@@ -200,7 +201,7 @@ public:
 
 
   /*!  \brief With this method, it is possible to set Information on any channel.
-   *   \remarks This method passes the arguments directly to the corresponding capture device
+   *    This method passes the arguments directly to the corresponding capture device
    *   \param channel This is the index of the source you want to set the parameter value.
    *   \param propId This is any known property-Id<br>
    *     If property-id is not supported or unknown, return value will be false.
@@ -223,12 +224,11 @@ public:
                           double value
                         );
 
-  /*! \brief Set values on the camera which have to be adjusted before the first image will be grabbed
+  /*! \brief Set values on the camera which have to be adjusted before the first image will be grabbed.
+   *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize. <br>
    *  \param channel This is the index of the source you want to set the parameter value.
    *  \param settingId The id of the setting you want to change
    *  \param value The new value
-   *  \remarks
-   *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize. <br>
    *  \see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
    */
   bool setCameraSetting(
