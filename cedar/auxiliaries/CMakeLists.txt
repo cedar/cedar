@@ -67,6 +67,7 @@ cedar_add_library(cedaraux
   gui/IntVectorParameter.h
   convolution/Convolution.h
   Parameter.h
+  kernel/Separable.h
   kernel/Kernel.h
   kernel/Gauss.h
   kernel/Box.h

@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -50,6 +51,7 @@
 cedar::aux::kernel::Separable::Separable()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
 cedar::aux::kernel::Separable::Separable(unsigned int dimensionality)
@@ -59,6 +61,7 @@ cedar::aux::kernel::Kernel(dimensionality)
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
   this->mKernelParts.resize(dimensionality);
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
 cedar::aux::kernel::Separable::~Separable()
@@ -69,6 +72,11 @@ cedar::aux::kernel::Separable::~Separable()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::kernel::Separable::dimensionalityChanged()
+{
+  this->mKernelParts.resize(std::max(static_cast<unsigned int>(1), this->getDimensionality()));
+}
 
 const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimension) const
 {
@@ -83,6 +91,7 @@ void cedar::aux::kernel::Separable::setKernelPart(unsigned int dimension, const 
 void cedar::aux::kernel::Separable::updateKernelMatrix()
 {
   //!@todo Implement for more than two dimensions
+  //!@todo Implement the 0d case properly
   if (this->getDimensionality() == 0)
   {
     this->mKernel->lockForWrite();
