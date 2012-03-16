@@ -51,6 +51,7 @@
 #include <QReadWriteLock>
 #include <boost/utility.hpp>      //boost::noncopyable
 #include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 
 #ifdef ENABLE_CTRL_C_HANDLER
   #include <signal.h>               //CTRL-C handler
@@ -94,15 +95,17 @@ public boost::noncopyable
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+protected:
   ///! \brief Structure to store all channel related stuff inside
-  struct Channel
+  struct GrabberChannel
   {
-    cv::Mat image;
+    cv::Mat imageMat;             ///! the picture frame
     std::string snapshotName;
     std::string recordName;
-    cv::VideoWriter videoWriter;
+    cv::VideoWriter videoWriter;  ///! for recordings
   };
 
+  typedef boost::shared_ptr<GrabberChannel> GrabberChannelPtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constants
@@ -469,7 +472,7 @@ public:
      *		If recording will be restarted without changing the recording filenames, the old files will be
      *		overwritten
      */
-    bool stopRecording();
+    void stopRecording();
 
     /*! \brief Get the state of the recording-flag
      *
@@ -601,6 +604,13 @@ protected:
                                        ) const = 0;
 
 
+    /*! \brief Create and initialize the channel-structure for only channel
+     *
+     *  For Grabber-developers:</br>
+     *  Should be overrided in subclass if more informations on a channel have to be stored
+     */
+    virtual void onAddChannel();
+
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -627,28 +637,9 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
 
-    //std::vector<Channel> mChannels;
+    ///! For every grabbing-channel one structure
+    std::vector<GrabberChannelPtr> mChannels;
 
-    /*! @brief  This vector contains the images grabbed by this grabber. One image per channel.
-     *
-     *        For every channel the last grabbed Image is in this vector.<br>
-     *    \remarks
-     *        The initialization of the matrices have to be done in the
-     *        child classes.
-     *    \see VideoGrabber::onInit doInit
-     */
-    //todo: vector mit struct fuer jeden channel
-    std::vector<cv::Mat> mImageMatVector;
-
-    /*! @brief  The names of the snapshots */
-    std::vector<std::string> mSnapshotNames;
-
-    /*! @brief  The names of the records  */
-    std::vector<std::string> mRecordNames;
-
-    /*! @brief  The names of the VideoWriter classes
-     *          for each capture one */
-    std::vector<cv::VideoWriter> mVideoWriterVector;
 
     /*! @brief  Flag if recording is on     */
     bool mRecord;
@@ -693,6 +684,17 @@ private:
      */
     unsigned int mFpsCounter;
 
+    inline GrabberChannelPtr getChannel(unsigned int channel)
+    {
+      return mChannels.at(channel);
+    }
+
+    inline GrabberChannelPtr getChannel(unsigned int channel) const
+    {
+      return mChannels.at(channel);
+    }
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -707,6 +709,7 @@ protected:
     {
       return "ch["+boost::lexical_cast<std::string>(channel)+"]";
     }
+
 
 private:
   // none yet

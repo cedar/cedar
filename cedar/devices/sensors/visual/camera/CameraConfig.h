@@ -43,28 +43,6 @@
 
 
 // SYSTEM INCLUDES
-#include <set>
-#include <map>
-
-
-namespace cedar
-{
-  namespace dev
-  {
-    namespace sensors
-    {
-      namespace visual
-      {
-        ///! std::map to map property enum id to the value of the property
-
-      //typedef std::map<cedar::dev::sensors::visual::CameraProperty::Id, double> CameraPropertyValues;
-      typedef std::map<unsigned int, double> CameraPropertyValues;
-      //typedef std::pair<cedar::dev::sensors::visual::CameraProperty::Id, double> CameraPropertyValuesPair;
-      typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
-      }
-    }
-  }
-}
 
 
 /*! \class cedar::dev::sensors::visual::CameraConfig
@@ -109,7 +87,7 @@ public:
    * \param videoCapture The already created cv::VideoCapture object from the CameraGrabber class
    * \param channelPrefix The channel number as a prefix for the properties stored in the configuration file
    * \param supportedProperties A set which contains all supported properties
-   * \param videoCaptureLock A boost::shared_pointer to an Object of QReadWriteLock
+   * \param pVideoCaptureLock A boost::shared_pointer to an Object of QReadWriteLock
    *                         (also created by the CameraGrabber class)
    * \param configFileName The filename to store the actual values of the properties and features. You can use the
    *                        configuration file of the CameraGrabber class

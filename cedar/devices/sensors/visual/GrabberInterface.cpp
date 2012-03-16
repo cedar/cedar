@@ -158,6 +158,7 @@ void cedar::dev::sensors::visual::GrabberInterface::doCleanUp()
 
     //do the cleanup in derived class
     onCleanUp();
+    mChannels.clear();
 
     if (mpReadWriteLock)
     {
@@ -197,9 +198,23 @@ bool cedar::dev::sensors::visual::GrabberInterface::onWriteConfiguration()
 }
 
 //--------------------------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::GrabberInterface::onAddChannel()
+{
+  GrabberChannelPtr channel(new GrabberChannel);
+  mChannels.push_back(channel);
+}
+
+//--------------------------------------------------------------------------------------------------------------------
 void cedar::dev::sensors::visual::GrabberInterface::readInit(unsigned int numCams, const std::string& defaultGrabberName )
 {
   mNumCams = numCams;
+
+  //create number of channels
+  for (unsigned int channel=0; channel < mNumCams; channel++)
+  {
+    this->onAddChannel();
+  }
+
 
   #ifdef ENABLE_CTRL_C_HANDLER
      signal(SIGINT,&GrabberInterface::interruptSignalHandler);
@@ -403,7 +418,7 @@ bool cedar::dev::sensors::visual::GrabberInterface::grab()
     {
       try
       {
-        mVideoWriterVector.at(channel) << mImageMatVector.at(channel);
+        getChannel(channel)->videoWriter << getChannel(channel)->imageMat;
       }
       catch (std::exception& e)
       {
@@ -423,7 +438,7 @@ cv::Mat cedar::dev::sensors::visual::GrabberInterface::getImage(unsigned int cha
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getImage");
   }
-  return mImageMatVector.at(channel);
+  return getChannel(channel)->imageMat;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -450,7 +465,6 @@ void cedar::dev::sensors::visual::GrabberInterface::setSnapshotName(const std::s
   {
     return;
   }
-  mSnapshotNames.clear();
 
   //initialize snapshot-names
   std::string name = snapshotName;
@@ -476,21 +490,25 @@ void cedar::dev::sensors::visual::GrabberInterface::setSnapshotName(const std::s
     name = snapshotName;
   }
 
-  //filename depends on no. of cams
-  if (mNumCams > 1)
+  if (mNumCams==1)
   {
-    //insert all into vector
-    mSnapshotNames.push_back(name + this->getChannelSaveFilenameAddition(0) + ext);
-    mSnapshotNames.push_back(name + this->getChannelSaveFilenameAddition(1) + ext);
+    getChannel(0)->snapshotName = name + ext;
   }
   else
   {
-    mSnapshotNames.push_back(name + ext);
+    for (unsigned int channel=0; channel<mNumCams;channel++)
+    {
+      getChannel(channel)->snapshotName = name + this->getChannelSaveFilenameAddition(channel) + ext;
+    }
   }
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GrabberInterface::setSnapshotName(unsigned int channel, const std::string& snapshotName )
+void cedar::dev::sensors::visual::GrabberInterface::setSnapshotName
+(
+  unsigned int channel,
+  const std::string& snapshotName
+)
 {
   if (channel >= mNumCams)
   {
@@ -508,7 +526,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setSnapshotName(unsigned int
       //no: use default extension
       name.append(mGrabberDefaultSnapshotExtension);
     }
-    mSnapshotNames.at(channel) = name;
+    getChannel(channel)->snapshotName = name;
   }
 }
 
@@ -519,7 +537,7 @@ std::string cedar::dev::sensors::visual::GrabberInterface::getSnapshotName(unsig
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getSnapshotName");
   }
-  return mSnapshotNames.at(channel);
+  return getChannel(channel)->snapshotName;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -533,16 +551,16 @@ bool cedar::dev::sensors::visual::GrabberInterface::saveSnapshot(unsigned int ch
   //copy image to local buffer for slow imwrite-function and for error-checking
   cv::Mat imgBuffer;
 
-  if (!mImageMatVector.at(channel).empty())
+  if (!getChannel(channel)->imageMat.empty())
   {
     //Do the snapshot...
     mpReadWriteLock->lockForRead();
-    mImageMatVector.at(channel).copyTo(imgBuffer);
+    getChannel(channel)->imageMat.copyTo(imgBuffer);
     mpReadWriteLock->unlock();
 
     try
     {
-      cv::imwrite(mSnapshotNames.at(channel), imgBuffer);
+      cv::imwrite(getChannel(channel)->snapshotName, imgBuffer);
     }
     catch (std::exception &e)
     {
@@ -580,7 +598,7 @@ cv::Size cedar::dev::sensors::visual::GrabberInterface::getSize(unsigned int cha
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getSize");
   }
-  return mImageMatVector.at(channel).size();
+  return getChannel(channel)->imageMat.size();
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -590,8 +608,6 @@ void cedar::dev::sensors::visual::GrabberInterface::setRecordName(const std::str
   {
     return;
   }
-
-  mRecordNames.clear();
 
   //initialize snapshot-names
   std::string name = recordName;
@@ -609,26 +625,21 @@ void cedar::dev::sensors::visual::GrabberInterface::setRecordName(const std::str
   else
   {
     //no: use default
-    #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[GrabberInterface::setRecordName] Warning: No extension in filename! Using .avi\n";
-    #endif
     ext  = mGrabberDefaultRecordExtension;
     name = recordName;
   }
 
   //filename depends on no. of cams
-  if (mNumCams > 1)
+  if (mNumCams == 1)
   {
-    std::string name_ch0 = name + getChannelSaveFilenameAddition(0) + ext;
-    std::string name_ch1 = name + getChannelSaveFilenameAddition(0) + ext;
-    //std::cout << "[GrabberInterface::setRecordName] : set both recordnames to " << name_ch0 <<"  "<< name_ch1 << std::endl;
-    //insert all into vector
-    mRecordNames.push_back(name_ch0);
-    mRecordNames.push_back(name_ch1);
+    getChannel(0)->recordName = name + ext;
   }
   else
   {
-    mRecordNames.push_back(name + ext);
+    for (unsigned int channel=0; channel<mNumCams;channel++)
+    {
+      getChannel(channel)->recordName = name + this->getChannelSaveFilenameAddition(channel) + ext;
+    }
   }
 }
 
@@ -651,7 +662,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setRecordName(unsigned int c
       //no: use default extension
       name.append(mGrabberDefaultRecordExtension);
     }
-    mRecordNames.at(channel) = name;
+    getChannel(channel)->recordName = name;
   }
 }
 
@@ -662,7 +673,7 @@ const std::string& cedar::dev::sensors::visual::GrabberInterface::getRecordName(
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getRecordName");
   }
-  return mRecordNames.at(channel);
+  return getChannel(channel)->recordName;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -679,29 +690,33 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
   //set the record-flag
   mRecord = true;
 
+  unsigned int recording_channels = 0;
   //write the video-file with the actual grabbing-speed
   //this is independet from speed of the avi-file or the camera framerate
   //double fps = getFps();
 
-  //if there are already any
-  mVideoWriterVector.clear();
-
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    cv::VideoWriter writer(mRecordNames.at(i),fourcc,fps,mImageMatVector.at(i).size(),color);
+    cv::VideoWriter writer(getChannel(channel)->recordName,fourcc,fps,getChannel(channel)->imageMat.size(),color);
 
     if (writer.isOpened())
     {
-      mVideoWriterVector.push_back(writer);
+      getChannel(channel)->videoWriter = writer;
       #ifdef DEBUG_GRABBER_INTERFACE
-        std::cout << "Channel " << i << " recording to " << mRecordNames.at(i) << std::endl;
+        std::cout << "Channel " << i << " recording to " << getChannel(channel)->recordName << std::endl;
       #endif
+      recording_channels++;
     }
   }
 
-  if (mVideoWriterVector.size() != (mNumCams ) )
+  if (recording_channels != mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::GrabberRecordingException,"GrabberInterface::startRecording")
+    CEDAR_THROW
+      (
+        cedar::aux::exc::GrabberRecordingException,
+        "Start recording: only " + boost::lexical_cast<std::string>(recording_channels)
+          + " of " + boost::lexical_cast<std::string>(mNumCams) + " recording!"
+      )
   }
 
   //start the grabberthread if needed
@@ -718,7 +733,7 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GrabberInterface::stopRecording()
+void cedar::dev::sensors::visual::GrabberInterface::stopRecording()
 {
   if (mRecord)
   {
@@ -731,12 +746,12 @@ bool cedar::dev::sensors::visual::GrabberInterface::stopRecording()
       stop();
       mGrabberThreadStartedOnRecording = false;
     }
-    mVideoWriterVector.clear();
-    return true;
-  }
-  else
-  {
-    return true;
+
+    //delete the videowriter
+    for (unsigned int channel=0; channel<mNumCams;channel++)
+    {
+      getChannel(channel)->videoWriter = cv::VideoWriter();
+    }
   }
 }
 

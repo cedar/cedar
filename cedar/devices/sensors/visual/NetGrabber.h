@@ -57,6 +57,28 @@ class cedar::dev::sensors::visual::NetGrabber
 :
 public cedar::dev::sensors::visual::GrabberInterface
 {
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+  //todo:typedef to NetReader
+  typedef boost::shared_ptr<cedar::aux::net::NetReader<cv::Mat> > MatNetReaderPtr;
+
+
+  /*! \struct PictureChannel
+   *  \brief Additional data of a picture grabbing channel
+   */
+  struct NetChannel
+  :
+  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  {
+    std::string channelName;      ///! The name of the used yarp channel
+    MatNetReaderPtr matNetReader; ///! The Yarp Reader class instantiated for cv::Mat
+  };
+
+  typedef boost::shared_ptr<NetChannel> NetChannelPtr;
+
 //--------------------------------------------------------------------------------------------------------------------
 //macros
 //--------------------------------------------------------------------------------------------------------------------
@@ -73,7 +95,7 @@ public:
    */
   NetGrabber(
               const std::string& configFileName,
-              const std::string& YarpChannel
+              const std::string& yarpChannelName
             );
 
 
@@ -84,8 +106,8 @@ public:
    */
   NetGrabber(
               const std::string& configFileName,
-              const std::string& YarpChannel0,
-              const std::string& YarpChannel1
+              const std::string& yarpChannelName0,
+              const std::string& yarpChannelName1
             );
 
   //!@brief Destructor
@@ -115,6 +137,7 @@ protected:
                              ) const;
 
   void onCleanUp();
+  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   //private methods
@@ -131,23 +154,33 @@ public:
   //none yet (hopefully never!)
 
 protected:
+  //none yet
 
-
-  /*! \brief The names of the used yarp channels
-   *
-   */
-  std::vector<std::string> mYarpChannels;
-
-  /*! \brief This vector contains the needed Yarp Readers.
-   *		One for every channel.
-   *   \see
-   *       mImageMatVector
-   */
-  //todo: smart pointer f[r die Netreader
-  std::vector<cedar::aux::net::NetReader<cv::Mat>*> mNetReaders;
 
 private:
-  //none yet
+
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class NetChannelPtr
+  inline NetChannelPtr getChannel(unsigned int channel)
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<NetChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<NetChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
+
+  //!@todo: after merging change to ConstCameraChannelPtr
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  inline boost::shared_ptr<const NetChannel> getChannel(unsigned int channel) const
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<NetChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<const NetChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   //parameters

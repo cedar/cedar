@@ -39,6 +39,7 @@
 #define CEDAR_DEV_SENSORS_VISUAL_CAMERA_GRABBER_H
 
 // LOCAL INCLUDES
+#include "cedar/devices/sensors/visual/defines.h"
 #include "cedar/devices/sensors/visual/GrabberInterface.h"
 #include "cedar/devices/sensors/visual/camera/CameraIsoSpeed.h"
 #include "cedar/devices/sensors/visual/camera/CameraProperty.h"
@@ -71,11 +72,28 @@ public cedar::dev::sensors::visual::GrabberInterface
    */
   struct CameraId
   {
-    ///! The bus id
-    unsigned int busId;
-    ///! The unique id of the device
-    unsigned int guid;
+    unsigned int busId;  ///! The bus id
+    unsigned int guid;   ///! The unique id of the device
   };
+
+
+  /*! \struct CameraChannel
+   *  \brief Additional data of a camera channel
+   */
+  struct CameraChannel
+  :
+  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  {
+    CameraId camId;                             ///! Unique channel id
+    std::string channelInfo;                    ///! The channel information
+    cv::VideoCapture videoCapture;              ///! Camera interface
+    QReadWriteLock* pVideoCaptureLock;          ///! The lock for the concurrent access to the cv::VideoCapture
+    CameraStateAndConfigPtr camStateAndConfig;  ///! The manager of settings and properties
+    std::string camCapabilitiesFileName;        ///! Filename for the capabilities
+  };
+
+  typedef boost::shared_ptr<CameraChannel> CameraChannelPtr;
+
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -87,7 +105,7 @@ public cedar::dev::sensors::visual::GrabberInterface
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! \brief  Constructor for a camera grabber with one connected camera
+  /*! \brief Constructor for a camera grabber with one connected camera
    *  \param configFileName Filename for the configuration
    *  \param camera Device to grab from. Look at OpenCV cv::VideoCapture documentation for details
    *  \param isGuid This flag have to be set, if the value in parameter camera is the guid of the camera. In this
@@ -120,7 +138,7 @@ public:
    *  \param isGuid This flag have to be set, if the values in camera0 or camera1 are the guids of the cameras
    *  \param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
    *          Constructor for details
-   *  \see CameraGrabber() for details about the used framework
+   *  \see CameraGrabber(std::string, unsigned int, bool, bool) for details about the used framework
    */
   CameraGrabber(
                  const std::string& configFileName,
@@ -137,7 +155,7 @@ public:
    *  \remarks
    *        If the system can't find the wanted camera, initialization will fail. <br>
    *        If there is no configuration file with the given name, a new one will be created. But be aware,
-   *        the default camera capabilities filename (declared in defines.h) will be used. It is possible,
+   *        the default camera capabilities filename (build with guid or busId) will be used. It is possible,
    *        that this file isn't the right one for your camera.
    *
    *  \par
@@ -159,7 +177,7 @@ public:
 public:
 
   /*!  \brief With this method, it is possible to get Information on any channel.
-   *   \remarks This method passes the arguments directly to the corresponding capture device
+   *   This method passes the arguments directly to the corresponding capture device
    *   \param channel This is the index of the source you want to get the parameter value.
    *   \param propId This is any supported property-Id<br>
    *     If property-id is not supported or unknown, return value will be -1.
@@ -354,11 +372,21 @@ protected:
   ///! \brief Do the local clean up
   void onCleanUp();
 
+  ///! Create and initialize the channel-structure for ony channel (only used in constructor)
+  void onAddChannel();
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
+
+  ///! Sets the channel-id which depends on the isGuid-flag (only used in constructor)
+  void setChannelId(unsigned int channel, unsigned int id, bool isGuid);
+
+  ///! Sets the channel-info which depends on the created cv::VideoCapture (only used in constructor)
+  void setChannelInfo(unsigned int channel);
+
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -371,41 +399,11 @@ public:
 
 protected:
 
-  //todo: struct fuer jeden channel
+  ///! For every used channel one structure
+  //std::vector<CameraChannel> mCamChannels;
 
 
-  /*! \brief The Id's of the cameras
-   *  \remarks
-   *      this contains the device number on the bus and the guid
-   */
-  std::vector<CameraId> mCamIds;
 
-  /*! \brief This vector contains the needed captures.
-   *    One for every camera.
-   *  \see
-   *    mCameraIds
-   */
-  std::vector<cv::VideoCapture> mVideoCaptures;
-
-
-  /*! \brief One manager of settings and properties for each camera.
-   *
-   */
-  std::vector<CameraStateAndConfigPtr> mCamStateAndConfigs;
-
-  /*! \brief This vector contains the filenames of the config-files of the camaera capabilities
-   *
-   */
-  std::vector<std::string> mCameraCapabilitiesFileNames;
-
-  /*! \brief This vector contains the read/write locks for the cv::VideoCaptures
-   *  \remarks
-   *          Used for concurrent access to the cv::VideoCapture
-   *          of the grabber-thread and in the get/set properties
-   */
-  std::vector<QReadWriteLock*> mVideoCaptureLocks;
-
-  std::vector<std::string> mChannelInfo;
 
 private:
 
@@ -436,6 +434,28 @@ protected:
     return "USE_AUTOGENERATED_FILENAME_WITH_GUID";
   }
 
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr
+  inline CameraChannelPtr getChannel(unsigned int channel)
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<CameraChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<CameraChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
+
+  //!@todo: after merging change to ConstCameraChannelPtr
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class CameraChannelPtr
+  inline boost::shared_ptr<const CameraChannel> getChannel(unsigned int channel) const
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<CameraChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<const CameraChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
 
 private:
   // none yet

@@ -38,7 +38,7 @@
 #ifndef CEDAR_DEV_SENSORS_VISUAL_DEFINES_H
 #define CEDAR_DEV_SENSORS_VISUAL_DEFINES_H
 
-//todo: direkt in den code
+//!@todo: debug-output to logger
 
 
 //------------------------------------------------------------------------

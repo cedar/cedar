@@ -44,12 +44,10 @@
 
 // SYSTEM INCLUDES
 
-using namespace cedar::dev::sensors::visual::grabbertools;
-
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-FirewireInterface::FirewireInterface()
+cedar::dev::sensors::visual::grabbertools::FirewireInterface::FirewireInterface()
 :
 mpFwContext(NULL),
 mpCameraList(NULL),
@@ -88,7 +86,7 @@ mError(DC1394_SUCCESS)
   }
 }
 
-FirewireInterface::~FirewireInterface()
+cedar::dev::sensors::visual::grabbertools::FirewireInterface::~FirewireInterface()
 {
   cleanUp();
 }
@@ -97,7 +95,7 @@ FirewireInterface::~FirewireInterface()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void FirewireInterface::cleanUp()
+void cedar::dev::sensors::visual::grabbertools::FirewireInterface::cleanUp()
 {
   if (mpCameraList)
   {
@@ -118,7 +116,7 @@ void FirewireInterface::cleanUp()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool FirewireInterface::resetFwBus()
+bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::resetFwBus()
 {
   if (!mpCamera)
   {
@@ -126,17 +124,12 @@ bool FirewireInterface::resetFwBus()
   }
 
   mError = dc1394_reset_bus(mpCamera);
-  /*if (mError<0)
-  {
-    std::cout << "ERROR: " << dc1394_error_get_string(mError) << std::endl;
-  }
-  */
   return (mError == DC1394_SUCCESS);
 }
 
 
 //----------------------------------------------------------------------------------------------------------------------
-bool FirewireInterface::resetCam()
+bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::resetCam()
 {
   if (!mpCamera)
   {
@@ -153,13 +146,13 @@ bool FirewireInterface::resetCam()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string FirewireInterface::getErrorString()
+std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::getErrorString() const
 {
   return dc1394_error_get_string(mError);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-unsigned int FirewireInterface::getNumCams()
+unsigned int cedar::dev::sensors::visual::grabbertools::FirewireInterface::getNumCams()
 {
   if (mpCameraList)
   {
@@ -169,7 +162,7 @@ unsigned int FirewireInterface::getNumCams()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint64_t FirewireInterface::getCamGuid(unsigned int camNr)
+uint64_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamGuid(unsigned int camNr)
 {
   if(camNr >= getNumCams())
   {
@@ -180,14 +173,14 @@ uint64_t FirewireInterface::getCamGuid(unsigned int camNr)
 
 
 //----------------------------------------------------------------------------------------------------------------------
-bool FirewireInterface::openCamera(uint64_t camGuid)
+bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::openCamera(uint64_t camGuid)
 {
   mpCamera = dc1394_camera_new(mpFwContext, camGuid);
   return (mpCamera != NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void FirewireInterface::closeCamera()
+void cedar::dev::sensors::visual::grabbertools::FirewireInterface::closeCamera()
 {
   if (mpCamera)
   {
@@ -199,7 +192,7 @@ void FirewireInterface::closeCamera()
 
   
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<std::string> FirewireInterface::getAllFeaturesAsString()
+std::vector<std::string> cedar::dev::sensors::visual::grabbertools::FirewireInterface::getAllFeaturesAsString()
 {
   if (! mpCamera)
   {
@@ -232,7 +225,7 @@ std::vector<std::string> FirewireInterface::getAllFeaturesAsString()
 
 
 //----------------------------------------------------------------------------------------------------------------------
-dc1394featureset_t FirewireInterface::getCamFeatures()
+dc1394featureset_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamFeatures()
 {
   if (! mpCamera)
   {
@@ -251,7 +244,7 @@ dc1394featureset_t FirewireInterface::getCamFeatures()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void FirewireInterface::printAllFeatures()
+void cedar::dev::sensors::visual::grabbertools::FirewireInterface::printAllFeatures()
 {
   if (! mpCamera)
   {
@@ -283,7 +276,7 @@ void FirewireInterface::printAllFeatures()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-dc1394video_modes_t FirewireInterface::getCamVideoModes()
+dc1394video_modes_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamVideoModes()
 {
   if (!mpCamera)
   {
@@ -301,7 +294,10 @@ dc1394video_modes_t FirewireInterface::getCamVideoModes()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-dc1394framerates_t FirewireInterface::getCamFramerates(dc1394video_mode_t mode)
+dc1394framerates_t cedar::dev::sensors::visual::grabbertools::FirewireInterface::getCamFramerates
+(
+  dc1394video_mode_t mode
+)
 {
   if (!mpCamera)
   {
@@ -316,7 +312,10 @@ dc1394framerates_t FirewireInterface::getCamFramerates(dc1394video_mode_t mode)
   return mode_framerates;
 }  
 //----------------------------------------------------------------------------------------------------------------------
-std::string FirewireInterface::DC1394FrameRateToString(dc1394framerate_t framerate)
+std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394FrameRateToString
+(
+  dc1394framerate_t framerate
+) const
 {
   std::string framerates[] =
   {
@@ -334,7 +333,10 @@ std::string FirewireInterface::DC1394FrameRateToString(dc1394framerate_t framera
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string FirewireInterface::DC1394VideoModeToString(dc1394video_mode_t mode)
+std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394VideoModeToString
+(
+  dc1394video_mode_t mode
+) const
 {
   std::string modes[]=
   {
@@ -377,7 +379,10 @@ std::string FirewireInterface::DC1394VideoModeToString(dc1394video_mode_t mode)
 
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string FirewireInterface::DC1394FeatureToString(dc1394feature_t feature)
+std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394FeatureToString
+(
+  dc1394feature_t feature
+) const
 {
   std::string features[]=
   {
@@ -408,7 +413,10 @@ std::string FirewireInterface::DC1394FeatureToString(dc1394feature_t feature)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-std::string FirewireInterface::DC1394FeatureToCameraGrabberPropertyString(dc1394feature_t feature)
+std::string cedar::dev::sensors::visual::grabbertools::FirewireInterface::DC1394FeatureToCameraGrabberPropertyString
+(
+  dc1394feature_t feature
+) const
 {
   //CameraGrabber CameraProperty::Id have the same values like their OpenCv counterparts
   //so we have to translate to DC1394 features

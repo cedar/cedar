@@ -55,6 +55,23 @@ class cedar::dev::sensors::visual::PictureGrabber
 public cedar::dev::sensors::visual::GrabberInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+
+  /*! \struct PictureChannel
+   *  \brief Additional data of a picture grabbing channel
+   */
+  struct PictureChannel
+  :
+  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  {
+    std::string sourceFileName;  //! \brief The filenames
+  };
+
+  typedef boost::shared_ptr<PictureChannel> PictureChannelPtr;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -98,7 +115,7 @@ public:
    *  \param channel which should be changed (default is 0).
    *  \param FileName of the new picture.
    */
-  bool setSourceFile(
+  void setSourceFile(
                       unsigned int channel,
                       const std::string& fileName
                     );
@@ -115,6 +132,7 @@ protected:
   const std::string& onGetSourceInfo(
                                unsigned int channel
                              ) const;
+  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -132,7 +150,30 @@ protected:
   // none yet
 
 private:
-  // none yet
+
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  inline PictureChannelPtr getChannel(unsigned int channel)
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<PictureChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<PictureChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
+
+  //!@todo: after merging change to ConstCameraChannelPtr
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class PictureChannelPtr
+  inline boost::shared_ptr<const PictureChannel> getChannel(unsigned int channel) const
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<PictureChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<const PictureChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -141,8 +182,6 @@ public:
   // none yet (hopefully never!)
 protected:
 
-  //! \brief The filenames
-  std::vector<std::string> mSourceFileNames;
 
 private:
   // none yet

@@ -86,7 +86,7 @@ public:
   /*! \brief The standard constructor.
    *  \param VideoCapture The cv::VideoCapture object, which this configuration is assigned to
    *         This will be used, to read and set the values
-   *  \param videoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
+   *  \param pVideoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
    *         through grabbing and/or change settings
    *  \param configurationFileName The filename for the configuration file used to store camera properties in
    *         This could be the same file, which the cameragrabber uses for configuration storage
