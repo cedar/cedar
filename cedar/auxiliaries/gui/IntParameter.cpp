@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UIntParameter.cpp
+    File:        IntParameter.cpp
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2012 03 16
 
     Description:
 
@@ -39,8 +35,8 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/UIntParameter.h"
-#include "cedar/auxiliaries/UIntParameter.h"
+#include "cedar/auxiliaries/gui/IntParameter.h"
+#include "cedar/auxiliaries/IntParameter.h"
 #include "cedar/auxiliaries/TypeBasedFactory.h"
 #include "cedar/auxiliaries/Singleton.h"
 
@@ -55,8 +51,8 @@ namespace
 {
   bool registered = cedar::aux::gui::ParameterFactorySingleton::getInstance()->add
       <
-        cedar::aux::UIntParameter,
-        cedar::aux::gui::UIntParameter
+        cedar::aux::IntParameter,
+        cedar::aux::gui::IntParameter
       >();
 }
 
@@ -64,7 +60,7 @@ namespace
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::UIntParameter::UIntParameter(QWidget *pParent)
+cedar::aux::gui::IntParameter::IntParameter(QWidget *pParent)
 :
 cedar::aux::gui::Parameter(pParent)
 {
@@ -79,7 +75,7 @@ cedar::aux::gui::Parameter(pParent)
 }
 
 //!@brief Destructor
-cedar::aux::gui::UIntParameter::~UIntParameter()
+cedar::aux::gui::IntParameter::~IntParameter()
 {
 }
 
@@ -87,9 +83,9 @@ cedar::aux::gui::UIntParameter::~UIntParameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::UIntParameter::parameterPointerChanged()
+void cedar::aux::gui::IntParameter::parameterPointerChanged()
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
+  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
 
   this->propertiesChanged();
 
@@ -99,16 +95,16 @@ void cedar::aux::gui::UIntParameter::parameterPointerChanged()
   QObject::connect(parameter.get(), SIGNAL(propertyChanged()), this, SLOT(propertiesChanged()));
 }
 
-void cedar::aux::gui::UIntParameter::propertiesChanged()
+void cedar::aux::gui::IntParameter::propertiesChanged()
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
+  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
   this->mpSpinbox->setMinimum(parameter->getMinimum());
   this->mpSpinbox->setMaximum(parameter->getMaximum());
   this->mpSpinbox->setDisabled(parameter->isConstant());
 }
 
-void cedar::aux::gui::UIntParameter::valueChanged(int value)
+void cedar::aux::gui::IntParameter::valueChanged(int value)
 {
-  cedar::aux::UIntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::UIntParameter>(this->getParameter());
+  cedar::aux::IntParameterPtr parameter = boost::dynamic_pointer_cast<cedar::aux::IntParameter>(this->getParameter());
   parameter->setValue(value);
 }

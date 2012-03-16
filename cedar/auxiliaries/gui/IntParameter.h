@@ -22,15 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        UIntParameter.h
+    File:        IntParameter.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
+    Date:        2012 03 16
 
     Description:
 
@@ -38,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_UINT_PARAMETER_H
-#define CEDAR_AUX_GUI_UINT_PARAMETER_H
+#ifndef CEDAR_AUX_GUI_INT_PARAMETER_H
+#define CEDAR_AUX_GUI_INT_PARAMETER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/Parameter.h"
@@ -49,9 +45,9 @@
 #include <QSpinBox>
 
 
-/*!@brief Widget for representing and manipulating a cedar::aux::UIntParameter.
+/*!@brief Widget for representing and manipulating a cedar::aux::IntParameter.
  */
-class cedar::aux::gui::UIntParameter : public cedar::aux::gui::Parameter
+class cedar::aux::gui::IntParameter : public cedar::aux::gui::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -63,10 +59,10 @@ class cedar::aux::gui::UIntParameter : public cedar::aux::gui::Parameter
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  UIntParameter(QWidget *pParent = NULL);
+  IntParameter(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~UIntParameter();
+  virtual ~IntParameter();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -104,6 +100,6 @@ private:
   //!@brief a spinbox for the represented parameter
   QSpinBox *mpSpinbox;
 
-}; // class cedar::aux::gui::UIntParameter
+}; // class cedar::aux::gui::IntParameter
 
-#endif // CEDAR_AUX_GUI_UINT_PARAMETER_H
+#endif // CEDAR_AUX_GUI_INT_PARAMETER_H
