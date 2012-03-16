@@ -47,7 +47,7 @@
                 "threshold": "0",
                 "beta": "10"
             },
-            "kernels":
+            "lateralKernels":
             {
                 "cedar.aux.kernel.Gauss":
                 {
@@ -119,7 +119,7 @@
                 "threshold": "0",
                 "beta": "10"
             },
-            "kernels":
+            "lateralKernels":
             {
                 "cedar.aux.kernel.Gauss":
                 {
