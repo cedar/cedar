@@ -89,6 +89,8 @@ void stepArchitecture(cedar::proc::NetworkPtr& network, unsigned int numberOfErr
  */
 void checkValidProjection(const std::string& configurationFile, unsigned int numberOfErrors)
 {
+  std::cout << "Checking file \"" << configurationFile << "\" (valid)" << std::endl;
+
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   network->readFile(configurationFile);
 
@@ -108,6 +110,7 @@ void checkValidProjection(const std::string& configurationFile, unsigned int num
  */
 void checkInvalidProjection(const std::string& configurationFile, unsigned int numberOfErrors)
 {
+  std::cout << "Checking file \"" << configurationFile << "\" (invalid)" << std::endl;
   cedar::proc::NetworkPtr network(new cedar::proc::Network());
   network->readFile(configurationFile);
 
