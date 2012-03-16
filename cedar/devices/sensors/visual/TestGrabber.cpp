@@ -45,10 +45,7 @@
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber(
-             std::string configFileName,
-             std::string ChannelName
-           )
+cedar::dev::sensors::visual::TestGrabber::TestGrabber(std::string configFileName, std::string ChannelName)
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
@@ -125,7 +122,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
   for(unsigned int i=0; i<mNumCams;++i)
   {
     cv::Mat frame=cv::Mat();
-    mImageMatVector.push_back(frame);
+    cedar::dev::sensors::visual::GrabberInterface::mChannels.at(i)->imageMat = frame;
   }
 
 

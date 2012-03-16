@@ -56,8 +56,11 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber(
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
-  mSourceFileNames.push_back(pictureFileName);
-  readInit(mSourceFileNames.size(),"PictureGrabber");
+  readInit(1,"PictureGrabber");
+
+  //change/overwrite parameters with constructor values
+  getChannel(0)->sourceFileName = pictureFileName;
+
   applyInit();
 }
 
@@ -71,10 +74,11 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber(
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
-  mSourceFileNames.push_back(pictureFileName0);
-  mSourceFileNames.push_back(pictureFileName1);
+  readInit(2,"PictureGrabber");
 
-  readInit(mSourceFileNames.size(),"PictureGrabber");
+  getChannel(0)->sourceFileName = pictureFileName0;
+  getChannel(1)->sourceFileName = pictureFileName1;
+
   applyInit();
 }
 
@@ -92,6 +96,14 @@ cedar::dev::sensors::visual::PictureGrabber::~PictureGrabber()
 //----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::PictureGrabber::onAddChannel()
+{
+  //create the channel structure for one channel
+  PictureChannelPtr channel(new PictureChannel);
+  mChannels.push_back(channel);
+}
+
+//----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::PictureGrabber::onInit()
 {
   //local and/or stored parameters are already initialized
@@ -104,22 +116,20 @@ bool cedar::dev::sensors::visual::PictureGrabber::onInit()
     std::cout << std::flush;
   #endif
 
-  mImageMatVector.clear();
-
   //for every channel, read from image-file
-  for (unsigned int i = 0; i < mNumCams; ++i)
+  for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
-    cv::Mat frame = cv::imread(mSourceFileNames.at(i));
+    cv::Mat frame = cv::imread(getChannel(channel)->sourceFileName);
 
     if (!frame.empty())
     {
-      mImageMatVector.push_back(frame);
+      getChannel(channel)->imageMat = frame;
     }
     else
     {
       //todo: exception raus
       std::cout << "[PictureGrabber::onInit] ERROR: Grabbing failed\n"
-                << "\tChannel " << i << ": \"" << mSourceFileNames.at(i) << "\"."
+                << "\tChannel " << channel << ": \"" << getChannel(channel)->sourceFileName << "\"."
                 << std::endl;
       return false; //throws initialization exception
     }
@@ -146,38 +156,37 @@ const std::string& cedar::dev::sensors::visual::PictureGrabber::onGetSourceInfo(
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::onGetSourceInfo");
   }
-  return mSourceFileNames.at(channel);
+  return getChannel(channel)->sourceFileName;
 }
 
 //----------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
 {
   bool result = true;
-  for (unsigned int i = 0; i < mNumCams; i++)
+  for (unsigned int channel = 0; channel < mNumCams; channel++)
   {
-    result = !mImageMatVector.at(i).empty() && result;
+    result = !(getChannel(channel)->imageMat.empty()) && result;
   }
   return true;
 }
 
 //----------------------------------------------------------------------------------------------------
-//todo void
-bool cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int channel, const std::string& fileName)
+void cedar::dev::sensors::visual::PictureGrabber::setSourceFile(unsigned int channel, const std::string& fileName)
 {
   if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"PictureGrabber::setPictureFileName");
   }
 
+  getChannel(channel)->sourceFileName = fileName;
+
   //lock image-matrix while writing
   mpReadWriteLock->lockForWrite();
-  mSourceFileNames.at(channel) = fileName;
-  mImageMatVector.at(channel) = cv::imread(fileName);
+  getChannel(channel)->imageMat = cv::imread(fileName);
   mpReadWriteLock->unlock();
 
-  if (mImageMatVector.at(channel).empty())
+  if (getChannel(channel)->imageMat.empty())
   {
-    CEDAR_THROW(cedar::aux::exc::InitializationException,"PictureGrabber::setSourceFile");
+    CEDAR_THROW(cedar::aux::exc::InitializationException,"PictureGrabber: Error on reading from file \""+fileName+"\"");
   }
-  return true;
 }

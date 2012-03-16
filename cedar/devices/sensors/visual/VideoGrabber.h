@@ -53,6 +53,27 @@ class cedar::dev::sensors::visual::VideoGrabber
 :
 public cedar::dev::sensors::visual::GrabberInterface
 {
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+  /*! \struct VideoChannel
+   *  \brief Additional data of a camera channel
+   */
+  struct VideoChannel
+  :
+  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  {
+    cv::VideoCapture videoCapture;              ///! Camera interface
+    std::string sourceFileName;                 ///! Filename of video to grab from
+  };
+
+  typedef boost::shared_ptr<VideoChannel> VideoChannelPtr;
+
+
+
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -201,7 +222,8 @@ protected:
 
   bool onDeclareParameters();
   const std::string& onGetSourceInfo(unsigned int channel) const;
-  virtual void onCleanUp();
+  void onCleanUp();
+  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -216,10 +238,6 @@ public:
   // none yet (hopefully never!)
 protected:
   
-  /*! \brief The filenames
-   */
-  std::vector<std::string> mSourceFileNames;
-
   /*! \brief Indicates if looping is on
    */
   bool _mLoop;
@@ -238,17 +256,38 @@ protected:
    */
   unsigned int mFramesCount;
 
-  /*! \brief This vector contains the needed captures.
-   *		One for every avi-file.
-   *   \see
-   *       mImageMatVector
-   */
-  std::vector<cv::VideoCapture> mVideoCaptures;
 
 
 
 private:
-  // none yet
+  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
+   *  derived class VideoChannelPtr
+   */
+  inline VideoChannelPtr getChannel(unsigned int channel)
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<VideoChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<VideoChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
+
+  //!@todo: after merging change to ConstCameraChannelPtr
+  /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
+   *  derived class VideoChannellPtr
+   */
+  inline boost::shared_ptr<const VideoChannel> getChannel(unsigned int channel) const
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<VideoChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<const VideoChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
