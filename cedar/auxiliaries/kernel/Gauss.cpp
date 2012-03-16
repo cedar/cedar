@@ -71,7 +71,7 @@ _mShifts(new cedar::aux::DoubleVectorParameter(this, "shifts", 2, 0.0, -10000.0,
 _mLimit(new cedar::aux::DoubleParameter(this, "limit", 5.0, 0.01, 1000.0))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
-  _mDimensionality->setValue(_mSigmas->size());
+  this->setDimensionality(_mSigmas->size());
 
   this->onInit();
 }
@@ -107,7 +107,7 @@ cedar::aux::kernel::Gauss::~Gauss()
 
 void cedar::aux::kernel::Gauss::onInit()
 {
-  calculate();
+  updateDimensionality();
   QObject::connect(_mAmplitude.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
   QObject::connect(_mLimit.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
   QObject::connect(_mSigmas.get(), SIGNAL(valueChanged()), this, SLOT(updateKernel()));
@@ -115,123 +115,57 @@ void cedar::aux::kernel::Gauss::onInit()
   QObject::connect(_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(updateDimensionality()));
 }
 
-void cedar::aux::kernel::Gauss::calculate()
+void cedar::aux::kernel::Gauss::calculateParts()
 {
   mpReadWriteLockOutput->lockForWrite();
-  const unsigned int& dimensionality = _mDimensionality->getValue();
+  unsigned int dimensionality = this->getDimensionality();
   const double& amplitude = _mAmplitude->getValue();
   // sanity check
-  CEDAR_DEBUG_ASSERT(dimensionality == _mSigmas->getValue().size());
-  CEDAR_DEBUG_ASSERT(dimensionality == _mShifts->getValue().size());
-  try
-  {
-    this->mKernelParts.resize(dimensionality);
-    mCenters.resize(dimensionality);
-    mSizes.resize(dimensionality);
-    // calculate the kernel parts for every dimension
-    for (unsigned int dim = 0; dim < dimensionality; dim++)
-    {
-      // estimate width
-      if (_mSigmas->at(dim) != 0)
-      {
-        mSizes.at(dim) = getWidth(dim);
-      }
-      else
-      {
-        mSizes.at(dim) = 1;
-      }
-      mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
-      this->setKernelPart(dim, cv::Mat::zeros(mSizes.at(dim), 1, CV_32FC1));
 
-      // calculate kernel part
-      if (_mSigmas->at(dim) != 0)
-      {
-        for (unsigned int j = 0; j < mSizes.at(dim); j++)
-        {
-          //!\todo move filling up of matrix to some tool function
-          this->mKernelParts.at(dim).at<float>(j, 0)
-              = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), _mSigmas->at(dim));
-        }
-      }
-      else // discrete case
-      {
-        this->mKernelParts.at(dim).at<float>(0, 0) = 1;
-      }
-      // normalize
-      this->setKernelPart(dim, this->getKernelPart(dim) * (1. / cv::sum(this->getKernelPart(dim)).val[0]));
-      if (dim == 0)
-      {
-        this->setKernelPart(dim, amplitude * this->getKernelPart(dim));
-      }
-    }
-    // assemble the kernel
-    std::vector<int> sizes(static_cast<size_t>(dimensionality));
-    for (size_t i = 0; i < mSizes.size(); i++)
+  CEDAR_DEBUG_ASSERT((dimensionality == 0 && _mSigmas->size() == 1) || _mSigmas->size() == dimensionality);
+  CEDAR_DEBUG_ASSERT((dimensionality == 0 && _mShifts->size() == 1) || _mShifts->size() == dimensionality);
+  std::cout << "dimensionality: " << dimensionality << ", mSizes.size: " << mSizes.size() << std::endl;
+  CEDAR_DEBUG_ASSERT((dimensionality == 0 && mSizes.size() == 1)   || mSizes.size() == dimensionality);
+  CEDAR_DEBUG_ASSERT((dimensionality == 0 && mCenters.size() == 1) || mCenters.size() == dimensionality);
+
+  // calculate the kernel parts for every dimension
+  for (unsigned int dim = 0; dim < dimensionality; dim++)
+  {
+    double sigma = _mSigmas->at(dim);
+    // estimate width
+    if (sigma != 0)
     {
-      sizes[i] = mSizes.at(i);
-    }
-    if (dimensionality == 1)
-    {
-      mKernel->getData() = cv::Mat(sizes[0], 1, CV_32F);
+      mSizes.at(dim) = this->getWidth(dim);
     }
     else
     {
-      mKernel->getData() = cv::Mat(static_cast<int>(dimensionality), &sizes.at(0), CV_32F);
+      mSizes.at(dim) = 1;
     }
-    cv::Mat& kernel = mKernel->getData();
-    // now fill up the big kernel matrix
-    std::vector<int> position(static_cast<size_t>(dimensionality));
-    unsigned int max_index = 1;
-    double max_index_d = 1.0;
-    for (unsigned int dim = 0; dim < dimensionality; dim++)
+    mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
+    cv::Mat kernel_part = cv::Mat::zeros(mSizes.at(dim), 1, CV_32F);
+
+    // calculate kernel part
+    if (sigma != 0)
     {
-      position[dim] = 0;
-      max_index_d *= mSizes.at(dim);
-      if (max_index_d > std::numeric_limits<unsigned int>::max()/100.0)
+      for (unsigned int j = 0; j < mSizes.at(dim); j++)
       {
-        CEDAR_THROW(cedar::aux::RangeException, "cannot handle kernels of this size");
+        //!\todo move filling up of matrix to some tool function
+        kernel_part.at<float>(j, 0)
+            = cedar::aux::math::gauss(static_cast<int>(j) - mCenters.at(dim), sigma);
       }
     }
-    max_index = static_cast<unsigned int>(max_index_d);
-    for (unsigned int i = 0; i < max_index; i++)
+    else // discrete case
     {
-      float value = 1.0;
-      for (unsigned int dim = 0; dim < dimensionality; dim++)
-      {
-        value *= this->getKernelPart(dim).at<float>(position[dim], 0);
-      }
-      if (dimensionality == 1)
-      {
-        kernel.at<float>(position[0], 0) = value;
-      }
-      else
-      {
-        kernel.at<float>(&position.at(0)) = value;
-      }
-      // increment index
-      position[0]++;
-      for (unsigned int dim = 0; dim < dimensionality; dim++)
-      {
-        if (position[dim] >= static_cast<int>(mSizes.at(dim)))
-        {
-          position[dim] = 0;
-          if (dim+1 < dimensionality)
-          {
-            position[dim+1]++;
-          }
-        }
-      }
+      kernel_part.at<float>(0, 0) = 1;
     }
+    // normalize
+    kernel_part /= cv::sum(kernel_part).val[0];
+
+    this->setKernelPart(dim, kernel_part);
   }
-  catch(std::out_of_range& error)
-  {
-    std::cerr << "> Error (kernel::Gauss) :" << error.what() << " in calculate().\n"
-        << "  Check your configuration files." << std::endl;
-    CEDAR_THROW(
-                 cedar::aux::IndexOutOfRangeException,
-                 "kernel::Gauss has encountered inconsistent vector sizes, check your configuration file"
-               );
-  }
+
+  this->setKernelPart(0, amplitude * this->getKernelPart(0));
+
   mpReadWriteLockOutput->unlock();
 }
 
@@ -298,9 +232,20 @@ unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
 void cedar::aux::kernel::Gauss::updateDimensionality()
 {
   mpReadWriteLockOutput->lockForWrite();
-  unsigned int new_dimensionality = _mDimensionality->getValue();
-  _mSigmas->resize(new_dimensionality, _mSigmas->getDefaultValue());
-  _mShifts->resize(new_dimensionality, _mShifts->getDefaultValue());
+  unsigned int new_dimensionality = this->getDimensionality();
+  unsigned int new_size = new_dimensionality;
+  if (new_dimensionality == 0)
+  {
+    new_size = 1;
+  }
+
+  std::cout << "dim: " << new_dimensionality << "; new_size: " << new_size << std::endl;
+
+  _mSigmas->resize(new_size);
+  _mShifts->resize(new_size);
+  this->mCenters.resize(new_size);
+  this->mSizes.resize(new_size);
   mpReadWriteLockOutput->unlock();
+
   this->updateKernel();
 }

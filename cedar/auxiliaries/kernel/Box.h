@@ -79,9 +79,6 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected slots:
-  /*!@brief Updates the box kernel's matrix.
-   */
-  void calculate();
   //!@brief update the dimensionality of the kernel matrices, triggered by a signal (e.g. a changed parameter value)
   void updateDimensionality();
 
@@ -89,7 +86,9 @@ protected slots:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  /*!@brief Updates the box kernel's matrix.
+   */
+  void calculateParts();
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
