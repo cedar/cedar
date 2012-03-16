@@ -325,22 +325,33 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
   const cv::Point& anchor
 ) const
 {
-  switch (cedar::aux::math::getDimensionalityOf(matrix))
+  if (cedar::aux::math::getDimensionalityOf(matrix) > 2)
   {
-    case 1:
-    case 2:
-    {
-      cv::Mat result;
-      //!@todo Cache the flipped matrices?
-      cv::Mat flipped_kernel;
-      cv::flip(kernel, flipped_kernel, -1);
-      cv::filter2D(matrix, result, -1, flipped_kernel, anchor, 0.0, cvBorderType);
-      return result;
-    }
-
-    default:
-      CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
+    CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
   }
+
+  //!@todo Cache the flipped matrices?
+  cv::Mat flipped_kernel;
+  cv::flip(kernel, flipped_kernel, -1);
+  cv::Mat result;
+
+  if (cvBorderType != cv::BORDER_WRAP)
+  {
+    cv::filter2D(matrix, result, -1, flipped_kernel, anchor, 0.0, cvBorderType);
+  }
+  else
+  {
+    cv::Mat modified;
+    //@todo For even kernels, this may pad 1 too much
+    int dh = flipped_kernel.rows / 2;
+    int dw = flipped_kernel.cols / 2;
+
+    cv::copyMakeBorder(matrix, modified, dh, dh, dw, dw, cv::BORDER_WRAP);
+    cv::filter2D(modified, result, -1, flipped_kernel, anchor, 0.0, cv::BORDER_DEFAULT);
+    result = result(cv::Range(dh, dh + matrix.rows), cv::Range(dw, dw + matrix.cols));
+  }
+
+  return result;
 }
 
 void cedar::aux::conv::OpenCV::kernelRemoved(size_t index)
