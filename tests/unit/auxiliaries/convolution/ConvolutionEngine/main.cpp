@@ -52,6 +52,25 @@ inline int pos_mod(int v1, int m)
   return (v1 + m) % m;
 }
 
+inline int reflect(int value, int size)
+{
+  while (value >= size || value < 0)
+  {
+    if (value < 0)
+    {
+      value = -value;
+    }
+    if (value >= size)
+    {
+      value = 2 * size - value - 1;
+    }
+  }
+
+  CEDAR_DEBUG_ASSERT(value >= 0);
+  CEDAR_DEBUG_ASSERT(value < size);
+  return value;
+}
+
 float border_interpolate(const cv::Mat& mat, int row, int col, cedar::aux::conv::BorderType::Id borderType)
 {
   switch (borderType)
@@ -64,6 +83,27 @@ float border_interpolate(const cv::Mat& mat, int row, int col, cedar::aux::conv:
       int r = std::min(std::max(row, 0), mat.rows - 1);
       int c = std::min(std::max(col, 0), mat.cols - 1);
       return mat.at<float>(r, c);
+    }
+
+    case cedar::aux::conv::BorderType::Reflect:
+    {
+      int r = reflect(row, mat.rows);
+      int c = reflect(col, mat.cols);
+      return mat.at<float>(r, c);
+    }
+
+    case cedar::aux::conv::BorderType::Zero:
+    {
+      if (row >= mat.rows || row < 0)
+      {
+        return 0.0;
+      }
+      if (col >= mat.cols || col < 0)
+      {
+        return 0.0;
+      }
+
+      return mat.at<float>(row, col);
     }
 
     default:
@@ -117,12 +157,32 @@ bool mat_eq(const cv::Mat& mat1, const cv::Mat& mat2)
   return true;
 }
 
+int test_matxmat_convolution
+    (
+      cedar::aux::conv::EnginePtr engine,
+      const cv::Mat& op1,
+      const cv::Mat& op2,
+      cedar::aux::conv::BorderType::Id borderType
+    )
+{
+  cv::Mat res = engine->convolve(op1, op2, borderType);
+  cv::Mat expected = conv(op1, op2, borderType);
+
+  std::cout << op1 << std::endl << " * " << std::endl << op2 << std::endl << " = " << std::endl << res << std::endl;
+  std::cout << " ?= " << std::endl << expected << std::endl;
+
+  if (!mat_eq(res, expected))
+  {
+    std::cout << "ERROR." << std::endl;
+    return 1;
+  }
+  return 0;
+}
+
 int testEngine(cedar::aux::conv::EnginePtr engine)
 {
   //!@todo Test anchoring
-  //!@todo Test that the kernels are mirrored properly
   //!@todo Write a kernel type that allows passing arbitrary matrices to better test everything
-  //!@todo Test the different border types
   //!@todo Test each convolve method in the engine interface
 
   int errors = 0;
@@ -130,7 +190,7 @@ int testEngine(cedar::aux::conv::EnginePtr engine)
   std::cout << "Testing engine of type " << cedar::aux::objectTypeToString(engine) << std::endl;
 
   {
-    std::cout << "Convolving two matrices ..." << std::endl;
+    std::cout << "Convolving two matrices (Replicate) ..." << std::endl;
 
     cv::Mat op1, op2;
     op1 = cv::Mat::zeros(5, 1, CV_32F);
@@ -140,16 +200,55 @@ int testEngine(cedar::aux::conv::EnginePtr engine)
     op2.at<float>(1) = 1;
     op2.at<float>(2) = 0.5;
 
-    cv::Mat res = engine->convolve(op1, op2, cedar::aux::conv::BorderType::Replicate);
-    cv::Mat expected = conv(op1, op2, cedar::aux::conv::BorderType::Replicate);
-    std::cout << op1 << " * " << op2 << " = " << res << std::endl;
-    std::cout << "comparing to: " << expected << std::endl;
+    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Replicate);
+  }
 
-    if (!mat_eq(res, expected))
-    {
-      ++errors;
-      std::cout << "ERROR." << std::endl;
-    }
+  {
+    std::cout << "Convolving two matrices (Reflect) ..." << std::endl;
+
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(3, 3, CV_32F);
+    op1.at<float>(0, 2) = 1;
+    op1.at<float>(1, 2) = 1;
+    op2 = cv::Mat::zeros(3, 3, CV_32F);
+    op2.at<float>(1, 2) = 0.5;
+    op2.at<float>(0, 0) = 0.5;
+
+    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Reflect);
+  }
+
+  {
+    std::cout << "Convolving two matrices (Zero) ..." << std::endl;
+
+    cv::Mat op1, op2;
+    op1 = cv::Mat::ones(3, 3, CV_32F);
+    op2 = cv::Mat::ones(3, 3, CV_32F);
+
+    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Zero);
+  }
+
+  {
+    std::cout << "Convolving two matrices (Zero II) ..." << std::endl;
+
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(3, 3, CV_32F);
+    op2 = cv::Mat::ones(3, 3, CV_32F);
+
+    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Zero);
+  }
+
+  {
+    std::cout << "Convolving two matrices (Cyclic) ..." << std::endl;
+
+    cv::Mat op1, op2;
+    op1 = cv::Mat::zeros(3, 3, CV_32F);
+    op1.at<float>(0, 2) = 1;
+    op1.at<float>(1, 2) = 1;
+    op2 = cv::Mat::zeros(3, 3, CV_32F);
+    op2.at<float>(1, 2) = 0.5;
+    op2.at<float>(0, 0) = 0.5;
+
+    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Cyclic);
   }
 
   return errors;
