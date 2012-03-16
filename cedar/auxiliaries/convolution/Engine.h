@@ -70,7 +70,45 @@ public:
   virtual cv::Mat convolve
   (
     const cv::Mat& matrix,
-    cedar::aux::conv::BorderType::Id borderType,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const = 0;
+
+  virtual cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cv::Mat& kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const = 0;
+
+  virtual cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::kernel::ConstKernelPtr kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const = 0;
+
+
+  /*!@brief   Convolve with a separable kernel.
+   *
+   * @remarks As a default, this method just calls the normal convolve function. Override this in order to implement
+   *          faster convolution for separable kernels.
+   */
+  virtual cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::kernel::ConstSeparablePtr kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const;
+
+  virtual cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
     const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
   ) const = 0;
 

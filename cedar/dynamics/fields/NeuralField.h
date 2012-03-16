@@ -164,6 +164,12 @@ private:
   //!@brief Makes the kernel list stored in the convolution equal to the one in the field.
   void transferKernelsToConvolution();
 
+  //!@brief Returns the dimensionality of the field.
+  inline unsigned int getDimensionality() const
+  {
+    return this->_mDimensionality->getValue();
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------

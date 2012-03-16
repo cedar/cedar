@@ -36,6 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/Engine.h"
+#include "cedar/auxiliaries/kernel/Separable.h"
 
 // SYSTEM INCLUDES
 
@@ -46,3 +47,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+cv::Mat cedar::aux::conv::Engine::convolve
+        (
+          const cv::Mat& matrix,
+          cedar::aux::kernel::ConstSeparablePtr kernel,
+          cedar::aux::conv::BorderType::Id borderType,
+          const std::vector<unsigned int>& anchor
+        )
+        const
+{
+  // default implementation: call the normal convolve method
+  return this->convolve(matrix, cedar::aux::kernel::ConstKernelPtr(kernel), borderType, anchor);
+}

@@ -88,6 +88,38 @@ public:
     const std::vector<unsigned int>& anchor
   ) const;
 
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cv::Mat& kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    const std::vector<unsigned int>& anchor
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::kernel::ConstKernelPtr kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    const std::vector<unsigned int>& anchor
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    const std::vector<unsigned int>& anchor
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::kernel::ConstSeparablePtr kernel,
+    cedar::aux::conv::BorderType::Id borderType,
+    const std::vector<unsigned int>& anchor
+  ) const;
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -99,9 +131,36 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
   void kernelRemoved(size_t index);
+
   void updateKernelType(size_t index);
 
-  inline int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
+  int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
+
+  void translateAnchor(cv::Point& anchor, const std::vector<unsigned int>& anchor_vector) const;
+
+  cv::Mat cvConvolve
+  (
+    const cv::Mat& matrix,
+    const cv::Mat& kernel,
+    int cvBorderType,
+    const cv::Point& anchor
+  ) const;
+
+  cv::Mat cvConvolve
+  (
+    const cv::Mat& matrix,
+    const cedar::aux::kernel::ConstSeparablePtr kernel,
+    int cvBorderType,
+    const cv::Point& anchor
+  ) const;
+
+  cv::Mat cvConvolve
+  (
+    const cv::Mat& matrix,
+    const cedar::aux::kernel::ConstKernelPtr kernel,
+    int cvBorderType,
+    const cv::Point& anchor
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

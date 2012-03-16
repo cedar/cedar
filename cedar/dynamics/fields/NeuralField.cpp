@@ -202,6 +202,7 @@ void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
 
 void cedar::dyn::NeuralField::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
 {
+  kernel->setDimensionality(this->getDimensionality());
   this->getConvolution()->getKernelList().append(kernel);
 }
 

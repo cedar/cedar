@@ -91,6 +91,168 @@ int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::
   }
 }
 
+void cedar::aux::conv::OpenCV::translateAnchor(cv::Point& anchor, const std::vector<unsigned int>& anchor_vector) const
+{
+  anchor = cv::Point(-1, -1);
+
+  if (anchor_vector.size() >= 1)
+  {
+    anchor.x = static_cast<int>(anchor_vector.at(0));
+  }
+  if (anchor_vector.size() >= 2)
+  {
+    anchor.y = static_cast<int>(anchor_vector.at(1));
+  }
+}
+
+
+cv::Mat cedar::aux::conv::OpenCV::convolve
+        (
+          const cv::Mat& matrix,
+          const cv::Mat& kernel,
+          cedar::aux::conv::BorderType::Id borderType,
+          const std::vector<unsigned int>& anchorVector
+        ) const
+{
+  CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
+
+  cv::Point anchor = cv::Point(-1, -1);
+  this->translateAnchor(anchor, anchorVector);
+  int border_type = this->translateBorderType(borderType);
+  return this->cvConvolve(matrix, kernel, border_type, anchor);
+}
+
+cv::Mat cedar::aux::conv::OpenCV::convolve
+        (
+          const cv::Mat& matrix,
+          const cedar::aux::kernel::ConstKernelPtr kernel,
+          cedar::aux::conv::BorderType::Id borderType,
+          const std::vector<unsigned int>& anchorVector
+        ) const
+{
+  cv::Point anchor = cv::Point(-1, -1);
+  this->translateAnchor(anchor, anchorVector);
+  int border_type = this->translateBorderType(borderType);
+  return this->cvConvolve(matrix, kernel, border_type, anchor);
+}
+
+cv::Mat cedar::aux::conv::OpenCV::convolve
+        (
+          const cv::Mat& matrix,
+          const cedar::aux::conv::KernelList& kernelList,
+          cedar::aux::conv::BorderType::Id borderType,
+          const std::vector<unsigned int>& anchorVector
+        ) const
+{
+  cv::Point anchor = cv::Point(-1, -1);
+  this->translateAnchor(anchor, anchorVector);
+  int border_type = this->translateBorderType(borderType);
+
+  cv::Mat result = 0.0 * matrix;
+  for (size_t i = 0; i < kernelList.size(); ++i)
+  {
+    cedar::aux::kernel::ConstKernelPtr kernel = kernelList.getKernel(i);
+    result += this->cvConvolve(matrix, kernel, border_type, anchor);
+  }
+
+  return result;
+}
+
+cv::Mat cedar::aux::conv::OpenCV::convolve
+        (
+          const cv::Mat& matrix,
+          const cedar::aux::kernel::ConstSeparablePtr kernel,
+          cedar::aux::conv::BorderType::Id borderType,
+          const std::vector<unsigned int>& anchorVector
+        ) const
+{
+  cv::Point anchor = cv::Point(-1, -1);
+  this->translateAnchor(anchor, anchorVector);
+  int border_type = this->translateBorderType(borderType);
+
+  return cvConvolve(matrix, kernel, border_type, anchor);
+}
+
+cv::Mat cedar::aux::conv::OpenCV::cvConvolve
+(
+  const cv::Mat& matrix,
+  const cedar::aux::kernel::ConstKernelPtr kernel,
+  int cvBorderType,
+  const cv::Point& anchor
+) const
+{
+  if
+  (
+    cedar::aux::kernel::ConstSeparablePtr separable_kernel
+      = boost::dynamic_pointer_cast<const cedar::aux::kernel::Separable>(kernel)
+  )
+  {
+    return this->cvConvolve(matrix, separable_kernel, cvBorderType, anchor);
+  }
+  else
+  {
+    kernel->lockForRead();
+    cv::Mat result;
+    const cv::Mat& kernel_mat = kernel->getKernel();
+    result = this->cvConvolve(matrix, kernel_mat, cvBorderType, anchor);
+    kernel->unlock();
+    return result;
+  }
+}
+
+cv::Mat cedar::aux::conv::OpenCV::cvConvolve
+        (
+          const cv::Mat& matrix,
+          const cedar::aux::kernel::ConstSeparablePtr kernel,
+          int cvBorderType,
+          const cv::Point& anchor
+        ) const
+{
+  cv::Mat convolved;
+
+  kernel->lockForRead();
+
+  switch (cedar::aux::math::getDimensionalityOf(matrix))
+  {
+    case 1:
+    {
+      CEDAR_DEBUG_ASSERT(kernel->kernelPartCount() == 1);
+      const cv::Mat& kernel_mat = kernel->getKernelPart(0);
+      cv::filter2D(matrix, convolved, -1, kernel_mat, anchor, 0.0, cvBorderType);
+      break;
+    }
+
+    case 2:
+    {
+      CEDAR_DEBUG_ASSERT(kernel->kernelPartCount() == 2);
+      const cv::Mat& kernel_mat_x = kernel->getKernelPart(1);
+      const cv::Mat& kernel_mat_y = kernel->getKernelPart(0);
+
+      cv::sepFilter2D
+      (
+        matrix,
+        convolved,
+        -1,
+        kernel_mat_x,
+        kernel_mat_y,
+        anchor,
+        0,
+        cvBorderType
+      );
+
+      break;
+    }
+
+    default:
+      kernel->unlock();
+      CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
+  }
+
+  kernel->unlock();
+
+  return convolved;
+}
+
 cv::Mat cedar::aux::conv::OpenCV::convolve
         (
           const cv::Mat& matrix,
@@ -101,21 +263,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
 
   cv::Point anchor = cv::Point(-1, -1);
-
-  if (anchorVector.size() >= 1)
-  {
-    anchor.x = static_cast<int>(anchorVector.at(0));
-  }
-  if (anchorVector.size() >= 2)
-  {
-    anchor.y = static_cast<int>(anchorVector.at(1));
-  }
-
+  this->translateAnchor(anchor, anchorVector);
   int border_type = this->translateBorderType(borderType);
-
-  double delta = 0.0;
-
-  int destination_depth = -1; // -1 == same as input
 
   cv::Mat result = 0.0 * matrix;
   for (size_t i = 0; i < this->getKernelList().size(); ++i)
@@ -131,45 +280,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         cedar::aux::kernel::ConstSeparablePtr kernel
           = cedar::aux::asserted_pointer_cast<const cedar::aux::kernel::Separable>(this->getKernelList().getKernel(i));
 
-        kernel->lockForRead();
-
-        switch (cedar::aux::math::getDimensionalityOf(matrix))
-        {
-          case 1:
-          {
-            const cv::Mat& kernel_mat = kernel->getKernelPart(0);
-            cv::filter2D(matrix, convolved, destination_depth, kernel_mat, anchor, delta, border_type);
-            break;
-          }
-
-          case 2:
-          {
-            CEDAR_DEBUG_ASSERT(kernel->kernelPartCount() == 2);
-            const cv::Mat& kernel_mat_x = kernel->getKernelPart(1);
-            const cv::Mat& kernel_mat_y = kernel->getKernelPart(0);
-
-            cv::sepFilter2D
-            (
-              matrix,
-              convolved,
-              destination_depth,
-              kernel_mat_x,
-              kernel_mat_y,
-              anchor,
-              delta,
-              border_type
-            );
-
-            break;
-          }
-
-          default:
-            kernel->unlock();
-            CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
-        }
-
-        kernel->unlock();
-
+        convolved = this->cvConvolve(matrix, kernel, border_type, anchor);
         break;
       }
 
@@ -180,17 +291,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(i);
         kernel->lockForRead();
         cv::Mat kernel_mat = kernel->getKernel();
-        switch (cedar::aux::math::getDimensionalityOf(matrix))
-        {
-          case 1:
-          case 2:
-            cv::filter2D(matrix, convolved, destination_depth, kernel_mat, anchor, delta, border_type);
-            break;
-
-          default:
-            kernel->unlock();
-            CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
-        }
+        convolved = this->cvConvolve(matrix, kernel_mat, border_type, anchor);
         kernel->unlock();
         break;
       }
@@ -208,6 +309,29 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
     result += convolved;
   }
   return result;
+}
+
+cv::Mat cedar::aux::conv::OpenCV::cvConvolve
+(
+  const cv::Mat& matrix,
+  const cv::Mat& kernel,
+  int cvBorderType,
+  const cv::Point& anchor
+) const
+{
+  switch (cedar::aux::math::getDimensionalityOf(matrix))
+  {
+    case 1:
+    case 2:
+    {
+      cv::Mat result;
+      cv::filter2D(matrix, result, -1, kernel, anchor, 0.0, cvBorderType);
+      return result;
+    }
+
+    default:
+      CEDAR_THROW(cedar::aux::UnhandledValueException, "Cannot convolve matrices of the given dimensionality.");
+  }
 }
 
 void cedar::aux::conv::OpenCV::kernelRemoved(size_t index)
