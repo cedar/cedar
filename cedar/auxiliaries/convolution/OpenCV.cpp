@@ -218,7 +218,9 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     {
       CEDAR_DEBUG_ASSERT(kernel->kernelPartCount() == 1);
       const cv::Mat& kernel_mat = kernel->getKernelPart(0);
-      cv::filter2D(matrix, convolved, -1, kernel_mat, anchor, 0.0, cvBorderType);
+      cv::Mat flipped_kernel;
+      cv::flip(kernel_mat, flipped_kernel, -1);
+      cv::filter2D(matrix, convolved, -1, flipped_kernel, anchor, 0.0, cvBorderType);
       break;
     }
 
@@ -228,13 +230,17 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
       const cv::Mat& kernel_mat_x = kernel->getKernelPart(1);
       const cv::Mat& kernel_mat_y = kernel->getKernelPart(0);
 
+      cv::Mat flipped_kernel_mat_x, flipped_kernel_mat_y;
+      cv::flip(kernel_mat_x, flipped_kernel_mat_x, -1);
+      cv::flip(kernel_mat_y, flipped_kernel_mat_y, -1);
+
       cv::sepFilter2D
       (
         matrix,
         convolved,
         -1,
-        kernel_mat_x,
-        kernel_mat_y,
+        flipped_kernel_mat_x,
+        flipped_kernel_mat_y,
         anchor,
         0,
         cvBorderType
@@ -325,7 +331,10 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
     case 2:
     {
       cv::Mat result;
-      cv::filter2D(matrix, result, -1, kernel, anchor, 0.0, cvBorderType);
+      //!@todo Cache the flipped matrices?
+      cv::Mat flipped_kernel;
+      cv::flip(kernel, flipped_kernel, -1);
+      cv::filter2D(matrix, result, -1, flipped_kernel, anchor, 0.0, cvBorderType);
       return result;
     }
 
