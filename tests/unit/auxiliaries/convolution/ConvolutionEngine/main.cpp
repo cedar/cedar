@@ -40,10 +40,81 @@
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/convolution/Engine.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
+#include "cedar/auxiliaries/kernel/Kernel.h"
+#include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/utilities.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
+
+
+//!@todo Test each convolve method in the engine interface
+//!@todo Test anchoring
+
+// some matrices used throughout
+
+// 3x3 matrix containing all numbers from 0 to 8
+cv::Mat numbers_1d;
+cv::Mat numbers_2d;
+
+
+class DemoKernel : public cedar::aux::kernel::Kernel
+{
+  public:
+    DemoKernel(const cv::Mat& matrix)
+    {
+      this->mKernel->setData(matrix);
+    }
+
+    void calculate()
+    {
+      // nothing to do -- matrix is fixed.
+    }
+};
+
+CEDAR_GENERATE_POINTER_TYPES(DemoKernel);
+
+class DemoSeparable1D : public cedar::aux::kernel::Separable
+{
+  public:
+    DemoSeparable1D(const cv::Mat& matrix)
+    :
+    Separable(1)
+    {
+      this->setKernelPart(0, matrix);
+
+      this->updateKernelMatrix();
+    }
+
+    void calculate()
+    {
+      // nothing to do -- matrix is fixed.
+    }
+};
+
+CEDAR_GENERATE_POINTER_TYPES(DemoSeparable1D);
+
+class DemoSeparable2D : public cedar::aux::kernel::Separable
+{
+  public:
+    DemoSeparable2D(const cv::Mat& matrix1, const cv::Mat& matrix2)
+    :
+    Separable(2)
+    {
+      this->setKernelPart(0, matrix1);
+      this->setKernelPart(1, matrix2);
+
+      this->updateKernelMatrix();
+    }
+
+    void calculate()
+    {
+      // nothing to do -- matrix is fixed.
+    }
+};
+
+CEDAR_GENERATE_POINTER_TYPES(DemoSeparable2D);
 
 // this function makes sure that the modulus is always >= 0
 inline int pos_mod(int v1, int m)
@@ -58,7 +129,7 @@ inline int reflect(int value, int size)
   {
     if (value < 0)
     {
-      value = -value;
+      value = -(value + 1);
     }
     if (value >= size)
     {
@@ -179,15 +250,120 @@ int test_matxmat_convolution
   return 0;
 }
 
-int testEngine(cedar::aux::conv::EnginePtr engine)
-{
-  //!@todo Test anchoring
-  //!@todo Write a kernel type that allows passing arbitrary matrices to better test everything
-  //!@todo Test each convolve method in the engine interface
 
+int testMatrixKernelOperation
+    (
+      cedar::aux::conv::EnginePtr engine,
+      const cv::Mat& mat,
+      cedar::aux::kernel::KernelPtr kernel,
+      cedar::aux::conv::BorderType::Id borderType
+    )
+{
+  cv::Mat kernel_mat = kernel->getKernel();
+  cv::Mat expected = conv(mat, kernel_mat, borderType);
+  std::cout << mat << std::endl << "*" << std::endl << kernel_mat << std::endl << " = "
+            << std::endl << expected << std::endl;
+
+  cv::Mat result = engine->convolve(mat, kernel, borderType);
+  if (!mat_eq(expected, result))
+  {
+    std::cout << "ERROR: wrong result, got: " << result << std::endl;
+    return 1;
+  }
+  return 0;
+}
+
+int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::kernel::KernelPtr kernel)
+{
+  int errors = 0;
+
+  {
+    std::cout << "Testing matrix * kernel (Cyclic 1D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Cyclic);
+
+    std::cout << "Testing matrix * kernel (Cyclic 2D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_2d, kernel, cedar::aux::conv::BorderType::Cyclic);
+  }
+
+  {
+    std::cout << "Testing matrix * kernel (Reflect 1D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Reflect);
+
+    std::cout << "Testing matrix * kernel (Reflect 2D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_2d, kernel, cedar::aux::conv::BorderType::Reflect);
+  }
+
+  {
+    std::cout << "Testing matrix * kernel (Replicate 1D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Replicate);
+
+    std::cout << "Testing matrix * kernel (Replicate 2D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_2d, kernel, cedar::aux::conv::BorderType::Replicate);
+  }
+
+  {
+    std::cout << "Testing matrix * kernel (Zero 1D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Zero);
+
+    std::cout << "Testing matrix * kernel (Zero 2D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_2d, kernel, cedar::aux::conv::BorderType::Zero);
+  }
+
+  return errors;
+}
+
+int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
+{
+  int errors = 0;
+
+  std::cout << "Testing matrix * kernel operations (non-separable, symmetric)" << std::endl;
+  {
+    DemoKernelPtr demo_kernel_1d(new DemoKernel(cv::Mat::ones(3, 1, CV_32F)));
+    errors += testMatrixKernelOperations(engine, demo_kernel_1d);
+
+    DemoKernelPtr demo_kernel_2d(new DemoKernel(cv::Mat::ones(3, 3, CV_32F)));
+    errors += testMatrixKernelOperations(engine, demo_kernel_2d);
+  }
+
+  std::cout << "Testing matrix * kernel operations (non-separable, asymmetric)" << std::endl;
+  {
+    DemoKernelPtr demo_kernel_1d(new DemoKernel(numbers_1d));
+    errors += testMatrixKernelOperations(engine, demo_kernel_1d);
+
+    DemoKernelPtr demo_kernel_2d(new DemoKernel(numbers_2d));
+    errors += testMatrixKernelOperations(engine, demo_kernel_2d);
+  }
+
+  std::cout << "Testing matrix * kernel operations (separable, symmetric)" << std::endl;
+  {
+    cv::Mat ones = cv::Mat::ones(3, 1, CV_32F);
+    DemoSeparable1DPtr demo_kernel_1d(new DemoSeparable1D(ones));
+    errors += testMatrixKernelOperations(engine, demo_kernel_1d);
+
+    DemoSeparable2DPtr demo_kernel_2d(new DemoSeparable2D(ones, ones));
+    errors += testMatrixKernelOperations(engine, demo_kernel_2d);
+  }
+
+  std::cout << "Testing matrix * kernel operations (separable, asymmetric)" << std::endl;
+  {
+    DemoSeparable1DPtr demo_kernel_1d(new DemoSeparable1D(numbers_1d));
+    errors += testMatrixKernelOperations(engine, demo_kernel_1d);
+
+    DemoSeparable2DPtr demo_kernel_2d(new DemoSeparable2D(numbers_1d, numbers_1d));
+    errors += testMatrixKernelOperations(engine, demo_kernel_2d);
+  }
+
+
+  return errors;
+}
+
+int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
+{
   int errors = 0;
 
   std::cout << "Testing engine of type " << cedar::aux::objectTypeToString(engine) << std::endl;
+
+  std::cout << "Testing matrix * matrix operations." << std::endl;
 
   {
     std::cout << "Convolving two matrices (Replicate) ..." << std::endl;
@@ -219,44 +395,55 @@ int testEngine(cedar::aux::conv::EnginePtr engine)
 
   {
     std::cout << "Convolving two matrices (Zero) ..." << std::endl;
-
-    cv::Mat op1, op2;
-    op1 = cv::Mat::ones(3, 3, CV_32F);
-    op2 = cv::Mat::ones(3, 3, CV_32F);
-
-    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Zero);
+    errors += test_matxmat_convolution(engine, cv::Mat::ones(3, 3, CV_32F), cv::Mat::ones(3, 3, CV_32F), cedar::aux::conv::BorderType::Zero);
   }
 
   {
     std::cout << "Convolving two matrices (Zero II) ..." << std::endl;
-
-    cv::Mat op1, op2;
-    op1 = cv::Mat::zeros(3, 3, CV_32F);
-    op2 = cv::Mat::ones(3, 3, CV_32F);
-
-    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Zero);
+    errors += test_matxmat_convolution(engine, cv::Mat::zeros(3, 3, CV_32F), cv::Mat::ones(3, 3, CV_32F), cedar::aux::conv::BorderType::Zero);
   }
 
   {
-    std::cout << "Convolving two matrices (Cyclic) ..." << std::endl;
+    std::cout << "Convolving two matrices (Cyclic 1D) ..." << std::endl;
+    errors += test_matxmat_convolution(engine, numbers_1d, cv::Mat::ones(3, 1, CV_32F), cedar::aux::conv::BorderType::Cyclic);
+  }
 
-    cv::Mat op1, op2;
-    op1 = cv::Mat::zeros(3, 3, CV_32F);
-    op1.at<float>(0, 2) = 1;
-    op1.at<float>(1, 2) = 1;
-    op2 = cv::Mat::zeros(3, 3, CV_32F);
-    op2.at<float>(1, 2) = 0.5;
-    op2.at<float>(0, 0) = 0.5;
-
-    errors += test_matxmat_convolution(engine, op1, op2, cedar::aux::conv::BorderType::Cyclic);
+  {
+    std::cout << "Convolving two matrices (Cyclic 2D) ..." << std::endl;
+    errors += test_matxmat_convolution(engine, numbers_2d, cv::Mat::ones(3, 3, CV_32F), cedar::aux::conv::BorderType::Cyclic);
   }
 
   return errors;
 }
 
 
+int testEngine(cedar::aux::conv::EnginePtr engine)
+{
+  int errors = 0;
+  errors += testMatrixMatrixOperations(engine);
+  errors += testMatrixKernelOperations(engine);
+  return errors;
+}
+
 int main()
 {
+  // initialize matrices
+  numbers_2d = cv::Mat(3, 3, CV_32F);
+  numbers_2d.at<float>(0, 0) = 0;
+  numbers_2d.at<float>(0, 1) = 1;
+  numbers_2d.at<float>(0, 2) = 2;
+  numbers_2d.at<float>(1, 0) = 3;
+  numbers_2d.at<float>(1, 1) = 4;
+  numbers_2d.at<float>(1, 2) = 5;
+  numbers_2d.at<float>(2, 0) = 6;
+  numbers_2d.at<float>(2, 1) = 7;
+  numbers_2d.at<float>(2, 2) = 8;
+
+  numbers_1d = cv::Mat(3, 1, CV_32F);
+  numbers_1d.at<float>(0) = 0;
+  numbers_1d.at<float>(1) = 1;
+  numbers_1d.at<float>(2) = 2;
+
   // the number of errors encountered in this test
   int errors = 0;
 
