@@ -256,6 +256,14 @@ cv::Mat cedar::aux::conv::OpenCV::cvConvolve
 
   switch (kernel->getDimensionality())
   {
+    case 0:
+    {
+      const cv::Mat& kernel_mat = kernel->getKernelPart(0);
+      // in the 0d-case, kernel mat is a 1x1 matrix, thus convolution is the same as multiplication
+      convolved = matrix * cedar::aux::math::getMatrixEntry<double>(kernel_mat, 0, 0);
+      break;
+    }
+
     case 1:
     {
       CEDAR_DEBUG_ASSERT(kernel->kernelPartCount() == 1);

@@ -54,8 +54,11 @@
 
 // some matrices used throughout
 
-// 3x3 matrix containing all numbers from 0 to 8
+// 1x1 matrix containing number 1
+cv::Mat numbers_0d;
+// 3x1 matrix containing all numbers from 0 to 3
 cv::Mat numbers_1d;
+// 3x3 matrix containing all numbers from 0 to 8
 cv::Mat numbers_2d;
 
 
@@ -74,6 +77,42 @@ class DemoKernel : public cedar::aux::kernel::Kernel
 };
 
 CEDAR_GENERATE_POINTER_TYPES(DemoKernel);
+
+class DemoKernel0D : public cedar::aux::kernel::Kernel
+{
+  public:
+    DemoKernel0D(double amplitude)
+    {
+      this->mKernel->setData(cv::Mat::ones(1, 1, CV_32F) * amplitude);
+    }
+
+    void calculate()
+    {
+      // nothing to do -- matrix is fixed.
+    }
+};
+
+CEDAR_GENERATE_POINTER_TYPES(DemoKernel0D);
+
+class DemoSeparable0D : public cedar::aux::kernel::Separable
+{
+  public:
+  DemoSeparable0D(double amplitude)
+    :
+    Separable(0)
+    {
+      this->setKernelPart(0, cv::Mat::ones(1, 1, CV_32F) * amplitude);
+
+      this->updateKernelMatrix();
+    }
+
+    void calculateParts()
+    {
+      // nothing to do -- matrix is fixed.
+    }
+};
+
+CEDAR_GENERATE_POINTER_TYPES(DemoSeparable0D);
 
 class DemoSeparable1D : public cedar::aux::kernel::Separable
 {
@@ -278,6 +317,9 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
   int errors = 0;
 
   {
+    std::cout << "Testing matrix * kernel (Cyclic 0D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_0d, kernel, cedar::aux::conv::BorderType::Cyclic);
+
     std::cout << "Testing matrix * kernel (Cyclic 1D)" << std::endl;
     errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Cyclic);
 
@@ -286,6 +328,9 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
   }
 
   {
+    std::cout << "Testing matrix * kernel (Reflect 0D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_0d, kernel, cedar::aux::conv::BorderType::Reflect);
+
     std::cout << "Testing matrix * kernel (Reflect 1D)" << std::endl;
     errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Reflect);
 
@@ -294,6 +339,9 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
   }
 
   {
+    std::cout << "Testing matrix * kernel (Replicate 0D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_0d, kernel, cedar::aux::conv::BorderType::Replicate);
+
     std::cout << "Testing matrix * kernel (Replicate 1D)" << std::endl;
     errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Replicate);
 
@@ -302,6 +350,9 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine, cedar::aux::k
   }
 
   {
+    std::cout << "Testing matrix * kernel (Zero 0D)" << std::endl;
+    errors += testMatrixKernelOperation(engine, numbers_0d, kernel, cedar::aux::conv::BorderType::Zero);
+
     std::cout << "Testing matrix * kernel (Zero 1D)" << std::endl;
     errors += testMatrixKernelOperation(engine, numbers_1d, kernel, cedar::aux::conv::BorderType::Zero);
 
@@ -317,7 +368,11 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
   int errors = 0;
 
   std::cout << "Testing matrix * kernel operations (non-separable, symmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
+    DemoKernel0DPtr demo_kernel_0d(new DemoKernel0D(2.0));
+    errors += testMatrixKernelOperations(engine, demo_kernel_0d);
+
     DemoKernelPtr demo_kernel_1d(new DemoKernel(cv::Mat::ones(3, 1, CV_32F)));
     errors += testMatrixKernelOperations(engine, demo_kernel_1d);
 
@@ -326,6 +381,7 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   std::cout << "Testing matrix * kernel operations (non-separable, asymmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoKernelPtr demo_kernel_1d(new DemoKernel(numbers_1d));
     errors += testMatrixKernelOperations(engine, demo_kernel_1d);
@@ -335,7 +391,11 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   std::cout << "Testing matrix * kernel operations (separable, symmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
+    DemoSeparable0DPtr demo_kernel_0d(new DemoSeparable0D(2.0));
+    errors += testMatrixKernelOperations(engine, demo_kernel_0d);
+
     cv::Mat ones = cv::Mat::ones(3, 1, CV_32F);
     DemoSeparable1DPtr demo_kernel_1d(new DemoSeparable1D(ones));
     errors += testMatrixKernelOperations(engine, demo_kernel_1d);
@@ -345,6 +405,7 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
   }
 
   std::cout << "Testing matrix * kernel operations (separable, asymmetric)" << std::endl;
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     DemoSeparable1DPtr demo_kernel_1d(new DemoSeparable1D(numbers_1d));
     errors += testMatrixKernelOperations(engine, demo_kernel_1d);
@@ -353,7 +414,6 @@ int testMatrixKernelOperations(cedar::aux::conv::EnginePtr engine)
     errors += testMatrixKernelOperations(engine, demo_kernel_2d);
   }
 
-
   return errors;
 }
 
@@ -361,10 +421,8 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
 {
   int errors = 0;
 
-  std::cout << "Testing engine of type " << cedar::aux::objectTypeToString(engine) << std::endl;
-
   std::cout << "Testing matrix * matrix operations." << std::endl;
-
+  std::cout << "-----------------------------------------------------------------------------" << std::endl;
   {
     std::cout << "Convolving two matrices (Replicate) ..." << std::endl;
 
@@ -419,6 +477,9 @@ int testMatrixMatrixOperations(cedar::aux::conv::EnginePtr engine)
 
 int testEngine(cedar::aux::conv::EnginePtr engine)
 {
+  std::cout << "Testing engine of type " << cedar::aux::objectTypeToString(engine) << std::endl;
+  std::cout << "=============================================================================" << std::endl;
+
   int errors = 0;
   errors += testMatrixMatrixOperations(engine);
   errors += testMatrixKernelOperations(engine);
@@ -443,6 +504,10 @@ int main()
   numbers_1d.at<float>(0) = 0;
   numbers_1d.at<float>(1) = 1;
   numbers_1d.at<float>(2) = 2;
+
+
+  numbers_0d = cv::Mat(1, 1, CV_32F);
+  numbers_0d.at<float>(0) = 1;
 
   // the number of errors encountered in this test
   int errors = 0;

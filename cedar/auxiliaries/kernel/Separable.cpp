@@ -60,7 +60,7 @@ cedar::aux::kernel::Kernel(dimensionality)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  this->mKernelParts.resize(dimensionality);
+  this->dimensionalityChanged();
   QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
@@ -75,11 +75,6 @@ cedar::aux::kernel::Separable::~Separable()
 
 unsigned int cedar::aux::kernel::Separable::getSize(size_t dimension) const
 {
-  if (dimension > this->mKernelParts.size())
-  {
-    return 0;
-  }
-
   // make sure that casting to unsigned doesn't have bad sideeffects
   CEDAR_DEBUG_ASSERT(this->getKernelPart(dimension).size[0] >= 0);
   return static_cast<unsigned int>(this->getKernelPart(dimension).size[0]);
@@ -92,6 +87,7 @@ void cedar::aux::kernel::Separable::dimensionalityChanged()
 
 const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimension) const
 {
+  CEDAR_DEBUG_ASSERT(dimension < this->mKernelParts.size());
   return this->mKernelParts.at(dimension);
 }
 
