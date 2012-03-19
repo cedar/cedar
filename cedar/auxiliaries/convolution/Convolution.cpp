@@ -84,10 +84,6 @@ _mEngine
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cv::Mat cedar::aux::conv::Convolution::operator()(const cv::Mat& matrix) const
-{
-  return this->convolve(matrix);
-}
 
 void cedar::aux::conv::Convolution::slotKernelAdded(size_t index)
 {
