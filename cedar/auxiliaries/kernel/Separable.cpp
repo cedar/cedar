@@ -98,8 +98,6 @@ void cedar::aux::kernel::Separable::setKernelPart(unsigned int dimension, const 
 
 void cedar::aux::kernel::Separable::updateKernelMatrix()
 {
-  //!@todo Implement for more than two dimensions
-  //!@todo Implement the 0d case properly
   if (this->getDimensionality() == 0)
   {
     this->mKernel->lockForWrite();
@@ -108,7 +106,7 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
     this->mKernel->setData(kernel);
     this->mKernel->unlock();
   }
-  else
+  else if (this->getDimensionality() <= 2)
   {
     this->mpReadWriteLockOutput->lockForRead();
 
@@ -125,5 +123,8 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
     this->mKernel->setData(combined);
     this->mKernel->unlock();
   }
-
+  else
+  {
+    //!@todo Implement for more than two dimensions
+  }
 }

@@ -95,9 +95,6 @@ public:
   //!@brief set the amplitude of the kernel
   void setAmplitude(double amplitude);
 
-  //!@brief get the pixel width of the kernel
-  unsigned int getWidth(unsigned int dim) const;
-
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -118,6 +115,10 @@ private:
   /*!@brief virtual function to calculate the kernel matrix
    */
   void calculateParts();
+
+  //!@brief A function that heuristically determines width of the kernel in pixels.
+  unsigned int estimateWidth(unsigned int dim) const;
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
