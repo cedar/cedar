@@ -92,6 +92,9 @@ _mLimit(new cedar::aux::DoubleParameter(this, "limit", limit, 0.01, 1000.0))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
+  CEDAR_ASSERT(sigmas.size() == dimensionality);
+  CEDAR_ASSERT(shifts.size() == dimensionality);
+
   this->mCenters.resize(dimensionality);
   this->mSizes.resize(dimensionality);
   this->onInit();
@@ -122,6 +125,7 @@ void cedar::aux::kernel::Gauss::calculateParts()
   const double& amplitude = _mAmplitude->getValue();
   // sanity check
 
+  // assert the correct size of all parameters & lists
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && _mSigmas->size() == 1) || _mSigmas->size() == dimensionality);
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && _mShifts->size() == 1) || _mShifts->size() == dimensionality);
   CEDAR_DEBUG_ASSERT((dimensionality == 0 && mSizes.size() == 1)   || mSizes.size() == dimensionality);
@@ -136,13 +140,13 @@ void cedar::aux::kernel::Gauss::calculateParts()
       // estimate width
       if (sigma != 0)
       {
-        mSizes.at(dim) = this->getWidth(dim);
+        this->mSizes.at(dim) = this->estimateWidth(dim);
       }
       else
       {
-        mSizes.at(dim) = 1;
+        this->mSizes.at(dim) = 1;
       }
-      mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
+      this->mCenters.at(dim) = static_cast<int>(mSizes.at(dim) / 2) + _mShifts->at(dim);
       cv::Mat kernel_part = cv::Mat::zeros(mSizes.at(dim), 1, CV_32F);
 
       // calculate kernel part
@@ -219,7 +223,7 @@ double cedar::aux::kernel::Gauss::getAmplitude() const
   return _mAmplitude->getValue();
 }
 
-unsigned int cedar::aux::kernel::Gauss::getWidth(unsigned int dim) const
+unsigned int cedar::aux::kernel::Gauss::estimateWidth(unsigned int dim) const
 {
   unsigned int tmp;
   /* size of kernel is determined by limit * sigma
