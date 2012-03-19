@@ -83,6 +83,15 @@ namespace cedar
       //!@brief a templated round function
       template <typename T> T round(T val);
 
+      /*!@brief   Limits a number to be in the range [lower, upper].
+       *
+       * @returns max(lower, min(value, upper))
+       */
+      template <typename T> inline T saturate(const T& value, const T& lower, const T& upper)
+      {
+        return std::max(lower, std::min(value, upper));
+      }
+
       //!@brief a helper function to determine the real dimensionality of a cv::Mat (matrix.dims works only for 2+ dims)
       inline unsigned int getDimensionalityOf(cv::Mat matrix)
       {
