@@ -45,9 +45,7 @@
 #include <boost/signals2.hpp>
 #include <vector>
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief This is a structure for storing a list of kernels.
  */
 class cedar::aux::conv::KernelList
 {
