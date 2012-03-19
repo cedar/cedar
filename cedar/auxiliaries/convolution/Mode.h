@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Engine.h
+    File:        Mode.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 15
+    Date:        2012 03 19
 
     Description:
 
@@ -34,97 +34,48 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_ENGINE_H
-#define CEDAR_AUX_CONV_ENGINE_H
+#ifndef CEDAR_AUX_CONV_MODE_H
+#define CEDAR_AUX_CONV_MODE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/KernelList.h"
-#include "cedar/auxiliaries/convolution/BorderType.h"
-#include "cedar/auxiliaries/convolution/Mode.h"
-#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief Base class for convolution engines.
+/*!@brief Enum describing the convolution mode.
  *
- * @todo describe more.
+ *        This parameter describes the mode of the convolution. It has two values:
+ *        <ul>
+ *          <li>@em Full: The result is the full convolution, i.e., nothing is cut away.</li>
+ *          <li>@em Same: The result of the convolution has the same size as the input matrix.</li>
+ *        </ul>
  */
-class cedar::aux::conv::Engine : public cedar::aux::Configurable
+class cedar::aux::conv::Mode
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  public:
+    typedef cedar::aux::EnumId Id;
+    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method convolves a given matrix with the kernel list stored in this convolution object.
-   */
-  virtual cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
-  ) const = 0;
+    static void construct();
 
-  virtual cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    const cv::Mat& kernel,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
-  ) const = 0;
+    static const cedar::aux::EnumBase& type();
 
-  virtual cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    cedar::aux::kernel::ConstKernelPtr kernel,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
-  ) const = 0;
-
-
-  /*!@brief   Convolve with a separable kernel.
-   *
-   * @remarks As a default, this method just calls the normal convolve function. Override this in order to implement
-   *          faster convolution for separable kernels.
-   */
-  virtual cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    cedar::aux::kernel::ConstSeparablePtr kernel,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
-  ) const;
-
-  virtual cv::Mat convolve
-  (
-    const cv::Mat& matrix,
-    const cedar::aux::conv::KernelList& kernel,
-    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
-  ) const = 0;
-
-  //!@brief Method for accessing the kernel list.
-  inline cedar::aux::conv::KernelList& getKernelList()
-  {
-    return this->mKernelList;
-  }
-
-  //!@brief Constant variant of the method for accessing the kernel list.
-  inline const cedar::aux::conv::KernelList& getKernelList() const
-  {
-    return this->mKernelList;
-  }
+    static const cedar::aux::conv::Mode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -141,22 +92,16 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+    static const Id Same = 0;
+    static const Id Full = 1;
+
 protected:
   // none yet
 private:
-  //! The list of kernel with which to convolve.
-  cedar::aux::conv::KernelList mKernelList;
+  static cedar::aux::EnumType<cedar::aux::conv::Mode> mType;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
+}; // class cedar::aux::conv::Mode
 
-private:
-  // none yet
-
-}; // class cedar::aux::conv::Engine
-
-#endif // CEDAR_AUX_CONV_ENGINE_H
+#endif // CEDAR_AUX_CONV_MODE_H
 
