@@ -49,28 +49,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::kernel::Kernel::Kernel()
-:
-mKernel(new cedar::aux::MatData()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 1000))
-{
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
-
-  mpReadWriteLockOutput = new QReadWriteLock();
-  _mDimensionality->setConstant(true);
-}
 
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality)
 :
 cedar::aux::Configurable(),
 mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 1000))
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", dimensionality, 1, 1000))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  std::vector<int> shift_defaults;
+  shift_defaults.resize(dimensionality, 0);
+  _mShift = cedar::aux::IntVectorParameterPtr
+            (
+              new cedar::aux::IntVectorParameter
+              (
+                this,
+                "shift",
+                shift_defaults,
+                std::numeric_limits<int>::min(),
+                std::numeric_limits<int>::max()
+              )
+            );
 
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
+
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
 cedar::aux::kernel::Kernel::~Kernel()
@@ -86,6 +92,11 @@ cedar::aux::kernel::Kernel::~Kernel()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::aux::kernel::Kernel::dimensionalityChanged()
+{
+  this->_mShift->resize(this->getDimensionality(), 0);
+}
 
 void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
 {

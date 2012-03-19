@@ -81,7 +81,7 @@ public:
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
     cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    const std::vector<int>& anchor = std::vector<int>()
   ) const = 0;
 
   virtual cv::Mat convolve

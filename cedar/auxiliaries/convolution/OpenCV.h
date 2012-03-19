@@ -94,7 +94,7 @@ public:
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType,
     cedar::aux::conv::BorderType::Id mode,
-    const std::vector<unsigned int>& anchor
+    const std::vector<int>& anchor
   ) const;
 
   cv::Mat convolve
@@ -137,7 +137,7 @@ private:
 
   int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
 
-  void translateAnchor(cv::Point& anchor, const std::vector<unsigned int>& anchor_vector) const;
+  void translateAnchor(cv::Point& anchor, const std::vector<int>& anchor_vector) const;
 
   cv::Mat cvConvolve
   (

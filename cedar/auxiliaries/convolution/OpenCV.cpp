@@ -92,17 +92,17 @@ int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::
   }
 }
 
-void cedar::aux::conv::OpenCV::translateAnchor(cv::Point& anchor, const std::vector<unsigned int>& anchor_vector) const
+void cedar::aux::conv::OpenCV::translateAnchor(cv::Point& anchor, const std::vector<int>& anchor_vector) const
 {
   anchor = cv::Point(-1, -1);
 
   if (anchor_vector.size() >= 1)
   {
-    anchor.x = static_cast<int>(anchor_vector.at(0));
+    anchor.x = anchor_vector.at(0);
   }
   if (anchor_vector.size() >= 2)
   {
-    anchor.y = static_cast<int>(anchor_vector.at(1));
+    anchor.y = anchor_vector.at(1);
   }
 }
 
@@ -113,7 +113,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& kernel,
           cedar::aux::conv::BorderType::Id borderType,
           cedar::aux::conv::Mode::Id mode,
-          const std::vector<unsigned int>& anchorVector
+          const std::vector<int>& anchorVector
         ) const
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
