@@ -52,11 +52,24 @@
 #include <QObject>
 
 
-/*!@brief Base class for convolution engines.
+/*!@brief   Base class for convolution engines.
  *
- * @todo The anchor value for the convolution can currently not be set.
+ *          This class is the high-level interface for performing convolutions within cedar. An an underlying
+ *          cedar::aux::conv::Engine decides what implementation of the convolution is actually used. There are multiple
+ *          ways of convolving with this class, namely the different @em convolve methods.
  *
- * @todo Maybe the actual engine should be shared/shareable across mutliple convolution objects?
+ *          Some methods can be called with separate kernels or kernel lists, however, the fastest method is usually to
+ *          have a persistent kernel as some implementations (e.g., FFT convolution) store a transformed version of the
+ *          kernel list that is only recalculated as needed.
+ *
+ * @remarks The choice of convolution engine should not affect the outcome of the convolution, only the speed thereof.
+ *
+ * @see     cedar::aux::conv::Engine, cedar::aux::conv::BorderType, cedar::aux::conv::Mode,
+ *          cedar::aux::conv::KernelList, cedar::aux::conv
+ *
+ * @todo    Move the anchor to the kernel base class
+ *
+ * @todo    Provide an interface to all the conv::Engine functions.
  */
 class cedar::aux::conv::Convolution : public QObject, public cedar::aux::Configurable
 {
@@ -70,17 +83,26 @@ class cedar::aux::conv::Convolution : public QObject, public cedar::aux::Configu
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief The default constructor.
   Convolution();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method convolves a given matrix with the kernel list stored in this convolution object.
+  /*!@brief This method convolves a given matrix with the settings stored in this convolution object.
+   *
+   *        Calling this method returns the sum of the convolutions between the input matrix and each kernel stored in
+   *        the kernel list in this convolution object, i.e.,
+   *        \f[
+   *           R = \sum\limits_{l} I * k_l
+   *        \f]
+   *        where \f$R\f$ is the return value of the function, \f$I\f$ is the input image and \f$k_l\f$ are the kernels
+   *        stored in the kernel list.
    */
   inline cv::Mat convolve(const cv::Mat& matrix) const
   {
-    return this->getEngine()->convolve(matrix, this->getBorderType());
+    return this->getEngine()->convolve(matrix, this->getBorderType(), this->getMode());
   }
 
   //!@brief The convolution functor for a single matrix.
@@ -108,6 +130,11 @@ public:
   inline cedar::aux::conv::BorderType::Id getBorderType() const
   {
     return this->_mBorderType->getValue();
+  }
+
+  inline cedar::aux::conv::Mode::Id getMode() const
+  {
+    return this->_mMode->getValue();
   }
 
   //!@brief Returns a pointer to the combined kernel.
@@ -161,6 +188,8 @@ protected:
   // none yet
 private:
   cedar::aux::EnumParameterPtr _mBorderType;
+
+  cedar::aux::EnumParameterPtr _mMode;
 
   cedar::aux::conv::EngineParameterPtr _mEngine;
 

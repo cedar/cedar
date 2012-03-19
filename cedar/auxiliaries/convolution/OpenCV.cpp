@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
+#include "cedar/auxiliaries/convolution/Mode.h"
 #include "cedar/auxiliaries/kernel/Separable.h"
 #include "cedar/auxiliaries/FactoryManager.h"
 #include "cedar/auxiliaries/Singleton.h"
@@ -111,10 +112,14 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& matrix,
           const cv::Mat& kernel,
           cedar::aux::conv::BorderType::Id borderType,
+          cedar::aux::conv::Mode::Id mode,
           const std::vector<unsigned int>& anchorVector
         ) const
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
+
+  //!@todo Implement full mode!
+  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
 
   cv::Point anchor = cv::Point(-1, -1);
   this->translateAnchor(anchor, anchorVector);
@@ -127,11 +132,14 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& matrix,
           const cedar::aux::kernel::ConstKernelPtr kernel,
           cedar::aux::conv::BorderType::Id borderType,
-          const std::vector<unsigned int>& anchorVector
+          cedar::aux::conv::Mode::Id mode
         ) const
 {
+  //!@todo implement mode properly
+  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
   cv::Point anchor = cv::Point(-1, -1);
-  this->translateAnchor(anchor, anchorVector);
+  //!@todo implement anchor
+//  this->translateAnchor(anchor, anchorVector);
   int border_type = this->translateBorderType(borderType);
   return this->cvConvolve(matrix, kernel, border_type, anchor);
 }
@@ -141,12 +149,16 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& matrix,
           const cedar::aux::conv::KernelList& kernelList,
           cedar::aux::conv::BorderType::Id borderType,
-          const std::vector<unsigned int>& anchorVector
+          cedar::aux::conv::Mode::Id mode
         ) const
 {
   cv::Point anchor = cv::Point(-1, -1);
-  this->translateAnchor(anchor, anchorVector);
+  //!@todo implement anchor
+//  this->translateAnchor(anchor, anchorVector);
   int border_type = this->translateBorderType(borderType);
+
+  //!@todo Implement mode
+  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
 
   cv::Mat result = 0.0 * matrix;
   for (size_t i = 0; i < kernelList.size(); ++i)
@@ -163,11 +175,14 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const cv::Mat& matrix,
           const cedar::aux::kernel::ConstSeparablePtr kernel,
           cedar::aux::conv::BorderType::Id borderType,
-          const std::vector<unsigned int>& anchorVector
+          cedar::aux::conv::Mode::Id mode
         ) const
 {
   cv::Point anchor = cv::Point(-1, -1);
-  this->translateAnchor(anchor, anchorVector);
+  //!@todo Implement anchor
+//  this->translateAnchor(anchor, anchorVector);
+  //!@todo Implement mode properly
+  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
   int border_type = this->translateBorderType(borderType);
 
   return cvConvolve(matrix, kernel, border_type, anchor);
@@ -287,13 +302,17 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         (
           const cv::Mat& matrix,
           cedar::aux::conv::BorderType::Id borderType,
-          const std::vector<unsigned int>& anchorVector
+          cedar::aux::conv::Mode::Id mode
         ) const
 {
   CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
 
+  //!@todo Mode handling
+  CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
+
   cv::Point anchor = cv::Point(-1, -1);
-  this->translateAnchor(anchor, anchorVector);
+  //!@todo Handle kernel anchor
+//  this->translateAnchor(anchor, anchorVector);
   int border_type = this->translateBorderType(borderType);
 
   cv::Mat result = 0.0 * matrix;
