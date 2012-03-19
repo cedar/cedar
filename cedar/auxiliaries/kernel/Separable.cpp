@@ -73,6 +73,18 @@ cedar::aux::kernel::Separable::~Separable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+unsigned int cedar::aux::kernel::Separable::getSize(size_t dimension) const
+{
+  if (dimension > this->mKernelParts.size())
+  {
+    return 0;
+  }
+
+  // make sure that casting to unsigned doesn't have bad sideeffects
+  CEDAR_DEBUG_ASSERT(this->getKernelPart(dimension).size[0] >= 0);
+  return static_cast<unsigned int>(this->getKernelPart(dimension).size[0]);
+}
+
 void cedar::aux::kernel::Separable::dimensionalityChanged()
 {
   this->mKernelParts.resize(std::max(static_cast<unsigned int>(1), this->getDimensionality()));

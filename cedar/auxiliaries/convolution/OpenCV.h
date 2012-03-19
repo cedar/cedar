@@ -137,7 +137,18 @@ private:
 
   int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
 
-  void translateAnchor(cv::Point& anchor, const std::vector<int>& anchor_vector) const;
+  void translateAnchor
+  (
+    cv::Point& anchor,
+    const std::vector<int>& anchor_vector,
+    const cv::Mat::MSize& msize
+  ) const;
+
+  void translateAnchor
+  (
+    cv::Point& anchor,
+    cedar::aux::kernel::ConstKernelPtr kernel
+  ) const;
 
   cv::Mat cvConvolve
   (

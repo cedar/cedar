@@ -92,18 +92,48 @@ int cedar::aux::conv::OpenCV::translateBorderType(cedar::aux::conv::BorderType::
   }
 }
 
-void cedar::aux::conv::OpenCV::translateAnchor(cv::Point& anchor, const std::vector<int>& anchor_vector) const
+void cedar::aux::conv::OpenCV::translateAnchor
+     (
+       cv::Point& anchor,
+       const std::vector<int>& anchor_vector,
+       const cv::Mat::MSize& msize
+     ) const
 {
   anchor = cv::Point(-1, -1);
 
-  if (anchor_vector.size() >= 1)
+  if (anchor_vector.size() >= 1 && anchor_vector.at(0) > 0)
   {
-    anchor.x = anchor_vector.at(0);
+    int size = msize[0];
+    anchor.x = cedar::aux::math::saturate(size/2 + anchor_vector.at(0), 0, size - 1);
   }
-  if (anchor_vector.size() >= 2)
+  if (anchor_vector.size() >= 2 && anchor_vector.at(1) > 0)
   {
-    anchor.y = anchor_vector.at(1);
+    int size = msize[1];
+    anchor.y = cedar::aux::math::saturate(size/2 + anchor_vector.at(1), 0, size - 1);
   }
+}
+
+void cedar::aux::conv::OpenCV::translateAnchor
+     (
+       cv::Point& anchor,
+       cedar::aux::kernel::ConstKernelPtr kernel
+     ) const
+{
+  anchor = cv::Point(-1, -1);
+  const std::vector<int> anchor_vector = kernel->getAnchor();
+
+  kernel->lockForRead();
+  if (anchor_vector.size() >= 1 && anchor_vector.at(0) > 0)
+  {
+    int size = static_cast<int>(kernel->getSize(0));
+    anchor.x = cedar::aux::math::saturate(size/2 + anchor_vector.at(0), 0, size - 1);
+  }
+  if (anchor_vector.size() >= 2 && anchor_vector.at(1) > 0)
+  {
+    int size = static_cast<int>(kernel->getSize(1));
+    anchor.y = cedar::aux::math::saturate(size/2 + anchor_vector.at(1), 0, size - 1);
+  }
+  kernel->unlock();
 }
 
 
@@ -122,7 +152,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
 
   cv::Point anchor = cv::Point(-1, -1);
-  this->translateAnchor(anchor, anchorVector);
+  this->translateAnchor(anchor, anchorVector, kernel.size);
   int border_type = this->translateBorderType(borderType);
   return this->cvConvolve(matrix, kernel, border_type, anchor);
 }
@@ -138,8 +168,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   //!@todo implement mode properly
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
   cv::Point anchor = cv::Point(-1, -1);
-  //!@todo implement anchor
-//  this->translateAnchor(anchor, anchorVector);
+  this->translateAnchor(anchor, kernel);
   int border_type = this->translateBorderType(borderType);
   return this->cvConvolve(matrix, kernel, border_type, anchor);
 }
@@ -152,9 +181,6 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           cedar::aux::conv::Mode::Id mode
         ) const
 {
-  cv::Point anchor = cv::Point(-1, -1);
-  //!@todo implement anchor
-//  this->translateAnchor(anchor, anchorVector);
   int border_type = this->translateBorderType(borderType);
 
   //!@todo Implement mode
@@ -164,6 +190,8 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   for (size_t i = 0; i < kernelList.size(); ++i)
   {
     cedar::aux::kernel::ConstKernelPtr kernel = kernelList.getKernel(i);
+    cv::Point anchor = cv::Point(-1, -1);
+    this->translateAnchor(anchor, kernel);
     result += this->cvConvolve(matrix, kernel, border_type, anchor);
   }
 
@@ -179,12 +207,11 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         ) const
 {
   cv::Point anchor = cv::Point(-1, -1);
-  //!@todo Implement anchor
-//  this->translateAnchor(anchor, anchorVector);
   //!@todo Implement mode properly
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
   int border_type = this->translateBorderType(borderType);
 
+  this->translateAnchor(anchor, kernel);
   return cvConvolve(matrix, kernel, border_type, anchor);
 }
 
@@ -310,9 +337,6 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   //!@todo Mode handling
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
 
-  cv::Point anchor = cv::Point(-1, -1);
-  //!@todo Handle kernel anchor
-//  this->translateAnchor(anchor, anchorVector);
   int border_type = this->translateBorderType(borderType);
 
   cv::Mat result = 0.0 * matrix;
@@ -329,6 +353,9 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
         cedar::aux::kernel::ConstSeparablePtr kernel
           = cedar::aux::asserted_pointer_cast<const cedar::aux::kernel::Separable>(this->getKernelList().getKernel(i));
 
+        cv::Point anchor = cv::Point(-1, -1);
+        this->translateAnchor(anchor, kernel);
+
         convolved = this->cvConvolve(matrix, kernel, border_type, anchor);
         break;
       }
@@ -338,6 +365,10 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       //--------------------------------------------------------------------------------------
       {
         cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(i);
+
+        cv::Point anchor = cv::Point(-1, -1);
+        this->translateAnchor(anchor, kernel);
+
         kernel->lockForRead();
         cv::Mat kernel_mat = kernel->getKernel();
         convolved = this->cvConvolve(matrix, kernel_mat, border_type, anchor);

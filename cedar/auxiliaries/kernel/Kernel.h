@@ -144,10 +144,12 @@ public:
 
   /*!@brief Returns the kernel's shift.
    */
-  inline const std::vector<int>& getShift() const
+  inline const std::vector<int>& getAnchor() const
   {
-    return this->_mShift->getValue();
+    return this->_mAnchor->getValue();
   }
+
+  virtual unsigned int getSize(size_t dimension) const;
 
 public slots:
   //!@todo merge update kernel and calculate, if calculate can be set to public and pure virtual works with Qt..
@@ -194,8 +196,8 @@ protected:
   // a file from which the kernel matrix can be loaded
   //cedar::aux::StringParameterPtr _mKernelMatrixFile;
 
-  //!@brief Anchor of the kernel.
-  cedar::aux::IntVectorParameterPtr _mShift;
+  //!@brief Anchor of the kernel, relative to the center.
+  cedar::aux::IntVectorParameterPtr _mAnchor;
 
 private:
   // none yet
