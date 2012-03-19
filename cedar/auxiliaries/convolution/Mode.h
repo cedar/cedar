@@ -57,9 +57,12 @@ class cedar::aux::conv::Mode
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  public:
-    typedef cedar::aux::EnumId Id;
-    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+public:
+  //! The enum id
+  typedef cedar::aux::EnumId Id;
+
+  //! Pointer type to the enum base object of this class.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -71,11 +74,14 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-    static void construct();
+  //! Initialization of the enum values.
+  static void construct();
 
-    static const cedar::aux::EnumBase& type();
+  //! Returns a reference to the base enum object.
+  static const cedar::aux::EnumBase& type();
 
-    static const cedar::aux::conv::Mode::TypePtr& typePtr();
+  //! Returns a pointer to the base enum object.
+  static const cedar::aux::conv::Mode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -93,12 +99,16 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-    static const Id Same = 0;
-    static const Id Full = 1;
+  //! The output image has the same size as the input.
+  static const Id Same = 0;
+
+  //! The output image is large enough so that no values have to be discarded.
+  static const Id Full = 1;
 
 protected:
   // none yet
 private:
+  //! The type object for this enum class.
   static cedar::aux::EnumType<cedar::aux::conv::Mode> mType;
 
 }; // class cedar::aux::conv::Mode
