@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/Convolution.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
+#include "cedar/auxiliaries/convolution/Mode.h"
 #include "cedar/auxiliaries/convolution/OpenCV.h"
 #include "cedar/auxiliaries/kernel/Kernel.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -60,6 +61,16 @@ _mBorderType
     cedar::aux::conv::BorderType::Zero
   )
 ),
+_mMode
+(
+  new cedar::aux::EnumParameter
+  (
+    this,
+    "mode",
+    cedar::aux::conv::Mode::typePtr(),
+    cedar::aux::conv::Mode::Same
+  )
+),
 _mEngine
 (
   new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
@@ -73,10 +84,6 @@ _mEngine
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-cv::Mat cedar::aux::conv::Convolution::operator()(const cv::Mat& matrix) const
-{
-  return this->convolve(matrix);
-}
 
 void cedar::aux::conv::Convolution::slotKernelAdded(size_t index)
 {
@@ -93,7 +100,7 @@ void cedar::aux::conv::Convolution::slotKernelChanged(size_t)
 void cedar::aux::conv::Convolution::slotKernelRemoved(size_t)
 {
   this->updateCombinedKernel();
-  // TODO disconnect kernelUpdated slot!
+  //!@todo disconnect kernelUpdated slot!
 }
 
 void cedar::aux::conv::Convolution::updateCombinedKernel()

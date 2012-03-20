@@ -65,7 +65,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 (
   const cv::Mat& matrix,
   cedar::aux::conv::BorderType::Id borderType,
-  const std::vector<unsigned int>& anchor
+  cedar::aux::conv::Mode::Id mode
 ) const
 {
 
@@ -76,7 +76,8 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   const cv::Mat& kernel,
   cedar::aux::conv::BorderType::Id borderType,
-  const std::vector<unsigned int>& anchor
+  cedar::aux::conv::Mode::Id mode,
+  const std::vector<int>& anchor
 ) const
 {
   return this->convolveInternal(matrix, kernel);
@@ -87,7 +88,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   cedar::aux::kernel::ConstKernelPtr kernel,
   cedar::aux::conv::BorderType::Id borderType,
-  const std::vector<unsigned int>& anchor
+  cedar::aux::conv::Mode::Id mode
 ) const
 {
   return this->convolveInternal(matrix, kernel->getKernel());
@@ -98,7 +99,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const cv::Mat& matrix,
   const cedar::aux::conv::KernelList& kernel,
   cedar::aux::conv::BorderType::Id borderType,
-  const std::vector<unsigned int>& anchor
+  cedar::aux::conv::Mode::Id mode
 ) const
 {
 
@@ -112,11 +113,16 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 
 cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel) const
 {
-  CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) == cedar::aux::math::getDimensionalityOf(kernel));
+//  CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) == cedar::aux::math::getDimensionalityOf(kernel));
+  if (cedar::aux::math::getDimensionalityOf(matrix) == 0 && cedar::aux::math::getDimensionalityOf(kernel) == 0)
+  {
+    return matrix.mul(kernel);
+  }
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
   {
     CEDAR_ASSERT(matrix.size[dim] >= kernel.size[dim])
   }
+
   cv::Mat matrix_64;
   cv::Mat kernel_64;
   if (matrix.type() == CV_32F)

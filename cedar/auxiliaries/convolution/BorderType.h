@@ -44,18 +44,19 @@
 // SYSTEM INCLUDES
 
 
-/*!@todo describe.
- *
- * @todo describe more.
+/*!@brief An enum class for the different kinds of border handling in convolution methods.
  */
 class cedar::aux::conv::BorderType
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  public:
-    typedef cedar::aux::EnumId Id;
-    typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
+public:
+  //! The type of the enum values.
+  typedef cedar::aux::EnumId Id;
+
+  //! The pointer type of the enum base object.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -67,11 +68,17 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-    static void construct();
+  /*!@brief Initializes the enum values.
+   */
+  static void construct();
 
-    static const cedar::aux::EnumBase& type();
+  /*!@brief Returns a reference to the enum base object.
+   */
+  static const cedar::aux::EnumBase& type();
 
-    static const cedar::aux::conv::BorderType::TypePtr& typePtr();
+  /*!@brief Returns a pointer to the enum base object.
+   */
+  static const cedar::aux::conv::BorderType::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -89,14 +96,23 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 public:
-    static const Id Cyclic = 0;
-    static const Id Zero = 1;
-    static const Id Replicate = 2;
-    static const Id Reflect = 3;
+  //! Borders are considered cyclic.
+  static const Id Cyclic = 0;
+
+  //! Values at the borders are considered zero.
+  static const Id Zero = 1;
+
+  //! The values at the borders are the same as those of the closest point in the image.
+  static const Id Replicate = 2;
+
+  //! Borders are mirror-images of the actual image.
+  static const Id Reflect = 3;
 
 protected:
   // none yet
+
 private:
+  //! The enum object.
   static cedar::aux::EnumType<cedar::aux::conv::BorderType> mType;
 
 }; // class cedar::aux::conv::BorderType

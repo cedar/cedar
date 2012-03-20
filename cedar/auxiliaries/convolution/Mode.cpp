@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        ConvolutionEngine.cpp
+    File:        Mode.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 15
+    Date:        2012 03 19
 
     Description:
 
@@ -35,10 +35,25 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/convolution/Engine.h"
-#include "cedar/auxiliaries/kernel/Separable.h"
+#include "cedar/auxiliaries/convolution/Mode.h"
+#include "cedar/auxiliaries/EnumBase.h"
+#include "cedar/auxiliaries/EnumType.h"
 
 // SYSTEM INCLUDES
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// Static members
+//----------------------------------------------------------------------------------------------------------------------
+
+cedar::aux::EnumType<cedar::aux::conv::Mode> cedar::aux::conv::Mode::mType("cedar::aux::conv::Mode::");
+
+#ifndef CEDAR_COMPILER_MSVC
+const cedar::aux::conv::Mode::Id cedar::aux::conv::Mode::Same;
+const cedar::aux::conv::Mode::Id cedar::aux::conv::Mode::Full;
+const cedar::aux::conv::Mode::Id cedar::aux::conv::Mode::Valid;
+#endif
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -48,15 +63,19 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::aux::conv::Engine::convolve
-        (
-          const cv::Mat& matrix,
-          cedar::aux::kernel::ConstSeparablePtr kernel,
-          cedar::aux::conv::BorderType::Id borderType,
-          cedar::aux::conv::BorderType::Id mode
-        )
-        const
+void cedar::aux::conv::Mode::construct()
 {
-  // default implementation: call the normal convolve method
-  return this->convolve(matrix, cedar::aux::kernel::ConstKernelPtr(kernel), borderType, mode);
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Same, "Same", "same"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Full, "Full", "full"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Valid, "Valid", "valid"));
+}
+
+const cedar::aux::EnumBase& cedar::aux::conv::Mode::type()
+{
+  return *cedar::aux::conv::Mode::typePtr();
+}
+
+const cedar::aux::conv::Mode::TypePtr& cedar::aux::conv::Mode::typePtr()
+{
+  return cedar::aux::conv::Mode::mType.type();
 }
