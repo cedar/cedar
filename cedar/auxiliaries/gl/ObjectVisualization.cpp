@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBodyVisualization.cpp
+    File:        ObjectVisualization.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -36,7 +36,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
 
@@ -44,25 +44,25 @@
  #include <QTextStream>
  #include <QFile>
 
-const float cedar::aux::gl::RigidBodyVisualization::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::aux::gl::RigidBodyVisualization::mSegment_Ambient[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::aux::gl::RigidBodyVisualization::mSegment_Diffuse[3] = {1.0f, 0.39215699f, 0.0f};
-const float cedar::aux::gl::RigidBodyVisualization::mSegment_Specular[3] = {0.40000001f, 0.16078401f, 0.0f};
-const float cedar::aux::gl::RigidBodyVisualization::mSegment_Shininess[1] = {1.0f};
-const float cedar::aux::gl::RigidBodyVisualization::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
-const float cedar::aux::gl::RigidBodyVisualization::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
-const float cedar::aux::gl::RigidBodyVisualization::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
-const float cedar::aux::gl::RigidBodyVisualization::mChrome_Shininess[1] = {0.6};
-const float cedar::aux::gl::RigidBodyVisualization::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
-const float cedar::aux::gl::RigidBodyVisualization::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
-const float cedar::aux::gl::RigidBodyVisualization::mBlack_Specular[3] = {0.2f, 0.2, 0.2};
-const float cedar::aux::gl::RigidBodyVisualization::mBlack_Shininess[1] = {0.05};
+const float cedar::aux::gl::ObjectVisualization::mNoSpecular[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::aux::gl::ObjectVisualization::mSegment_Ambient[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::aux::gl::ObjectVisualization::mSegment_Diffuse[3] = {1.0f, 0.39215699f, 0.0f};
+const float cedar::aux::gl::ObjectVisualization::mSegment_Specular[3] = {0.40000001f, 0.16078401f, 0.0f};
+const float cedar::aux::gl::ObjectVisualization::mSegment_Shininess[1] = {1.0f};
+const float cedar::aux::gl::ObjectVisualization::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
+const float cedar::aux::gl::ObjectVisualization::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
+const float cedar::aux::gl::ObjectVisualization::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
+const float cedar::aux::gl::ObjectVisualization::mChrome_Shininess[1] = {0.6};
+const float cedar::aux::gl::ObjectVisualization::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
+const float cedar::aux::gl::ObjectVisualization::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
+const float cedar::aux::gl::ObjectVisualization::mBlack_Specular[3] = {0.2f, 0.2, 0.2};
+const float cedar::aux::gl::ObjectVisualization::mBlack_Shininess[1] = {0.05};
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::RigidBodyVisualization::RigidBodyVisualization(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::ObjectVisualization::ObjectVisualization(cedar::aux::RigidBodyPtr pRigidBody)
 :
 mpRigidBody(pRigidBody),
 mTransformationTranspose(4, 4, CV_64FC1)
@@ -70,7 +70,7 @@ mTransformationTranspose(4, 4, CV_64FC1)
   init();
 }
 
-cedar::aux::gl::RigidBodyVisualization::~RigidBodyVisualization()
+cedar::aux::gl::ObjectVisualization::~ObjectVisualization()
 {
 
 }
@@ -79,12 +79,12 @@ cedar::aux::gl::RigidBodyVisualization::~RigidBodyVisualization()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gl::RigidBodyVisualization::initializeGl()
+void cedar::aux::gl::ObjectVisualization::initializeGl()
 {
 
 }
 
-void cedar::aux::gl::RigidBodyVisualization::init()
+void cedar::aux::gl::ObjectVisualization::init()
 {
   mRigidBodyType = "no type";
   mIsVisible = true;
@@ -97,85 +97,85 @@ void cedar::aux::gl::RigidBodyVisualization::init()
   mColorB = 0;
 }
 
-bool cedar::aux::gl::RigidBodyVisualization::isVisible() const
+bool cedar::aux::gl::ObjectVisualization::isVisible() const
 {
 
   return mIsVisible;
 }
 
-const std::string& cedar::aux::gl::RigidBodyVisualization::getRigidBodyVisualizationType() const
+const std::string& cedar::aux::gl::ObjectVisualization::getObjectVisualizationType() const
 {
   return mRigidBodyType;
 }
 
-int cedar::aux::gl::RigidBodyVisualization::getResolution() const
+int cedar::aux::gl::ObjectVisualization::getResolution() const
 {
   return mResolution;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getColorR() const
+double cedar::aux::gl::ObjectVisualization::getColorR() const
 {
   return mColorR;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getColorG() const
+double cedar::aux::gl::ObjectVisualization::getColorG() const
 {
   return mColorG;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getColorB() const
+double cedar::aux::gl::ObjectVisualization::getColorB() const
 {
   return mColorB;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setDrawAsWireFrame(bool state)
+void cedar::aux::gl::ObjectVisualization::setDrawAsWireFrame(bool state)
 {
   mIsDrawnAsWireFrame = state;
 }
 
-bool cedar::aux::gl::RigidBodyVisualization::isDrawnAsWireFrame() const
+bool cedar::aux::gl::ObjectVisualization::isDrawnAsWireFrame() const
 {
   return mIsDrawnAsWireFrame;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setDrawLocalCoordinateFrame(bool state)
+void cedar::aux::gl::ObjectVisualization::setDrawLocalCoordinateFrame(bool state)
 {
   mIsDrawingLocalCoordinateFrame = state;
 }
 
-bool cedar::aux::gl::RigidBodyVisualization::isDrawingLocalCoordinateFrame() const
+bool cedar::aux::gl::ObjectVisualization::isDrawingLocalCoordinateFrame() const
 {
   return mIsDrawingLocalCoordinateFrame;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setAxisLength(double value)
+void cedar::aux::gl::ObjectVisualization::setAxisLength(double value)
 {
   mAxisLength = value;
 }
 
-double cedar::aux::gl::RigidBodyVisualization::getAxisLength() const
+double cedar::aux::gl::ObjectVisualization::getAxisLength() const
 {
   return mAxisLength;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setResolution(int value)
+void cedar::aux::gl::ObjectVisualization::setResolution(int value)
 {
   mResolution = value;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setColor(double r, double g, double b)
+void cedar::aux::gl::ObjectVisualization::setColor(double r, double g, double b)
 {
   mColorR = r;
   mColorG = g;
   mColorB = b;
 }
 
-cedar::aux::RigidBodyPtr cedar::aux::gl::RigidBodyVisualization::getRigidBody()
+cedar::aux::RigidBodyPtr cedar::aux::gl::ObjectVisualization::getRigidBody()
 {
   return mpRigidBody;
 }
 
-void cedar::aux::gl::RigidBodyVisualization::prepareDraw()
+void cedar::aux::gl::ObjectVisualization::prepareDraw()
 {
   // move to origin
   glPopMatrix();
@@ -189,7 +189,7 @@ void cedar::aux::gl::RigidBodyVisualization::prepareDraw()
   drawLocalCoordinateFrame();
 }
 
-void cedar::aux::gl::RigidBodyVisualization::drawLocalCoordinateFrame()
+void cedar::aux::gl::ObjectVisualization::drawLocalCoordinateFrame()
 {
   if (mIsDrawingLocalCoordinateFrame)
   {
@@ -197,7 +197,7 @@ void cedar::aux::gl::RigidBodyVisualization::drawLocalCoordinateFrame()
   }
 }
 
-void cedar::aux::gl::RigidBodyVisualization::loadVertexData
+void cedar::aux::gl::ObjectVisualization::loadVertexData
 (
   const QString& dataFileName,
   unsigned int numberOfVertices,
@@ -227,7 +227,7 @@ void cedar::aux::gl::RigidBodyVisualization::loadVertexData
   }
 }
 
-void cedar::aux::gl::RigidBodyVisualization::loadIndexData
+void cedar::aux::gl::ObjectVisualization::loadIndexData
 (
   const QString& dataFileName,
   unsigned int numberOfFaces,
@@ -254,7 +254,7 @@ void cedar::aux::gl::RigidBodyVisualization::loadIndexData
   }
 }
 
-void cedar::aux::gl::RigidBodyVisualization::drawElement
+void cedar::aux::gl::ObjectVisualization::drawElement
 (
   const GLuint vertexVboId,
   const GLuint indexVboId,
@@ -297,7 +297,7 @@ void cedar::aux::gl::RigidBodyVisualization::drawElement
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setMaterial(int material)
+void cedar::aux::gl::ObjectVisualization::setMaterial(int material)
 {
   switch (material)
   {
@@ -330,7 +330,7 @@ void cedar::aux::gl::RigidBodyVisualization::setMaterial(int material)
   }
 }
 
-void cedar::aux::gl::RigidBodyVisualization::setVisibility(bool state)
+void cedar::aux::gl::ObjectVisualization::setVisibility(bool state)
 { 
   mIsVisible = state;
 }

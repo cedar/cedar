@@ -162,9 +162,9 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
-  setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
+  setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
   this->drawElement(mBaseSegmentVertexVboId, mBaseSegmentIndexVboId, mBaseSegmentFacesNumber);
-  setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+  setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
   this->drawElement(mBaseRingVertexVboId, mBaseRingIndexVboId, mBaseRingFacesNumber);
   // move to the base of the block
   glRotated(-60.0, 1.0, 0.0, 0.0);
@@ -178,7 +178,7 @@ void cedar::dev::robot::gl::KukaArm::drawBase()
 
 
 
-  setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+  setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
 }
 
 void cedar::dev::robot::gl::KukaArm::drawBaseBlock()
@@ -313,57 +313,57 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
   switch (index)
   {
   case 0:
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 1:
     glRotated(90.0, 1.0, 0.0, 0.0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 2:
     glRotated(180.0, 0.0, 0.0, 1.0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mForwardSegmentVertexVboId, mForwardSegmentIndexVboId, mForwardSegmentFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mForwardRingVertexVboId, mForwardRingIndexVboId, mForwardRingFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 3:
     glRotated(90.0, 1.0, 0.0, 0.0);
     glRotated(180.0, 0.0, 1.0, 0.0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mInverseSegmentVertexVboId, mInverseSegmentIndexVboId, mInverseSegmentFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mInverseRingVertexVboId, mInverseRingIndexVboId, mInverseRingFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 4:
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mWristSegmentVertexVboId, mWristSegmentIndexVboId, mWristSegmentFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 5:
     glRotated(90.0, 1.0, 0.0, 0.0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
     this->drawElement(mWristSphereVertexVboId, mWristSphereIndexVboId, mWristSphereFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   case 6:
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mWristRingVertexVboId, mWristRingIndexVboId, mWristRingFacesNumber);
     glTranslated(0, 0, -0.007099966);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     cedar::aux::gl::drawCone(0.0, 0.02, 0.0315, 0.0315, 45, mIsDrawnAsWireFrame);
     glTranslated(0, 0, 0.02);
     cedar::aux::gl::drawDisk(0.0, 0.0315, 45, 10, false, mIsDrawnAsWireFrame);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
   }
 }

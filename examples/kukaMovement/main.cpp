@@ -215,20 +215,20 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
 
   // create an arm visualization and add it to the scene
-  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization;
+  cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
   cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
   (
     new cedar::dev::robot::gl::KukaArm(p_arm_model)
   );
   p_arm_visualization = p_kuka_arm_visualization;
-  p_scene->addRigidBodyVisualization(p_kuka_arm_visualization);
+  p_scene->addObjectVisualization(p_kuka_arm_visualization);
 
   // create target object, visualize it and add it to the scene
   cedar::aux::RigidBodyPtr target(new cedar::aux::RigidBody());
   target->setPosition(p_arm_model->calculateEndEffectorPosition());
-  cedar::aux::gl::RigidBodyVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
+  cedar::aux::gl::ObjectVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);
-  p_scene->addRigidBodyVisualization(p_sphere);
+  p_scene->addObjectVisualization(p_sphere);
 
   // create a widget to control the scene
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));

@@ -47,7 +47,7 @@
 
 cedar::aux::gl::Cylinder::Cylinder(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pRigidBody)
 {
   mRadius = 1;
   mHeight = 2;
@@ -66,7 +66,7 @@ cedar::aux::gl::Cylinder::Cylinder(
                                     double B
                                   )
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pRigidBody)
 {
   mRadius = radius;
   mHeight = height;

@@ -39,18 +39,18 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of an ellipse
  *
- * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a torus around an ellipse
+ * This class visualizes an instance of cedar::aux::ObjectVisualization as a torus around an ellipse
  *
  * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Ellipse : public cedar::aux::gl::RigidBodyVisualization
+class cedar::aux::gl::Ellipse : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------

@@ -28,7 +28,7 @@
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 11 27
 
-    Description: manages a cedar::aux::gl::Scene of cedar::aux::gl::RigidBodyVisualizations
+    Description: manages a cedar::aux::gl::Scene of cedar::aux::gl::ObjectVisualizations
 
     Credits: initially designed by Denis Hakenberg
 
@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/Block.h"
 #include "cedar/auxiliaries/gl/Sphere.h"
 #include "cedar/auxiliaries/gl/Cone.h"
@@ -52,7 +52,7 @@
 #include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 #include "cedar/auxiliaries/gui/RigidBodyWidget.h"
-#include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
+#include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
 #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
 
 // SYSTEM INCLUDES
@@ -142,10 +142,10 @@ private:
   cedar::aux::gl::ScenePtr mpScene;
 
   // pointer to the currently selected object
-  cedar::aux::gl::RigidBodyVisualizationPtr mpActiveVisualization;
+  cedar::aux::gl::ObjectVisualizationPtr mpActiveVisualization;
 
-  // pointer to the RigidBodyVisualizationWidget
-  cedar::aux::gui::RigidBodyVisualizationWidget* mpRigidBodyVisualizationWidget;
+  // pointer to the ObjectVisualizationWidget
+  cedar::aux::gui::ObjectVisualizationWidget* mpObjectVisualizationWidget;
 
   // pointer to the RigidBodyWidget
   cedar::aux::gui::RigidBodyWidget* mpRigidBodyWidget;

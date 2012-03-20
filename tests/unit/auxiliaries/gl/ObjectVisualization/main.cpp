@@ -39,7 +39,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
 #include "cedar/auxiliaries/RigidBody.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES

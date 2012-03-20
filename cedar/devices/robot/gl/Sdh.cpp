@@ -60,7 +60,7 @@ cedar::dev::robot::gl::Sdh::Sdh
   cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel
 )
 :
-cedar::aux::gl::RigidBodyVisualization(pKinematicChainModel->getRootCoordinateFrame()),
+cedar::aux::gl::ObjectVisualization(pKinematicChainModel->getRootCoordinateFrame()),
 mpKinematicChain(pKinematicChain)
 {
   loadData();
@@ -165,11 +165,11 @@ void cedar::dev::robot::gl::Sdh::draw()
       cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     }
     glTranslated(0, 0, .098 - .0175 - 0.025);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mPalmVertexVboId, mPalmIndexVboId, mPalmFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mRootVertexVboId, mRootIndexVboId, mRootFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     glTranslated(0, 0, -.098 + .0175 + 0.025);
 
     // first finger root
@@ -183,9 +183,9 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mKnuckleVertexVboId, mKnuckleIndexVboId, mKnuckleFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
@@ -200,11 +200,11 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mProximalSkinVertexVboId, mProximalSkinIndexVboId, mProximalSkinFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
@@ -219,11 +219,11 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, .0, -.104);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mDistalSkinVertexVboId, mDistalSkinIndexVboId, mDistalSkinFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
 
     // move back to hand origin and re-save
     glPopMatrix();
@@ -241,9 +241,9 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mKnuckleVertexVboId, mKnuckleIndexVboId, mKnuckleFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
@@ -258,11 +258,11 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mProximalSkinVertexVboId, mProximalSkinIndexVboId, mProximalSkinFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
@@ -277,11 +277,11 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, .0, -.104);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mDistalSkinVertexVboId, mDistalSkinIndexVboId, mDistalSkinFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
 
     // move back to hand origin
     glPopMatrix();
@@ -297,9 +297,9 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mKnuckleVertexVboId, mKnuckleIndexVboId, mKnuckleFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
@@ -314,11 +314,11 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, 0.0, -.0175);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mProximalLinkVertexVboId, mProximalLinkIndexVboId, mProximalLinkFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mProximalSkinVertexVboId, mProximalSkinIndexVboId, mProximalSkinFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     glRotated(-90, 0, 1, 0);
     glRotated(-90, 1, 0, 0);
 
@@ -333,11 +333,11 @@ void cedar::dev::robot::gl::Sdh::draw()
     glTranslated(.0, .0, -.104);
     glRotated(90, 1, 0, 0);
     glRotated(90, 0, 1, 0);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::CHROME);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mDistalLinkVertexVboId, mDistalLinkIndexVboId, mDistalLinkFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::BLACK);
+    setMaterial(cedar::aux::gl::ObjectVisualization::BLACK);
     this->drawElement(mDistalSkinVertexVboId, mDistalSkinIndexVboId, mDistalSkinFacesNumber);
-    setMaterial(cedar::aux::gl::RigidBodyVisualization::NO_MATERIAL);
+    setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
 
 
 
