@@ -226,7 +226,6 @@ int main(int argc, char **argv)
   // create target object, visualize it and add it to the scene
   cedar::aux::RigidBodyPtr target(new cedar::aux::RigidBody());
   target->setPosition(p_arm_model->calculateEndEffectorPosition());
-  target->setName("target");
   cedar::aux::gl::RigidBodyVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);
   p_scene->addRigidBodyVisualization(p_sphere);

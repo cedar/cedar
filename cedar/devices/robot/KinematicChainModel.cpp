@@ -48,7 +48,7 @@
 
 cedar::dev::robot::KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
+//cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
 mpKinematicChain(pKinematicChain)
 {
   init();

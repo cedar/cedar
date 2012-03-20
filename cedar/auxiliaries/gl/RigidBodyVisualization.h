@@ -81,9 +81,6 @@ public:
   //!@brief returns visibility state
   bool isVisible() const;
 
-  //!@brief returns name of the object
-  const std::string& getRigidBodyName() const;
-
   //!@brief returns type of the object
   const std::string& getRigidBodyVisualizationType() const;
   

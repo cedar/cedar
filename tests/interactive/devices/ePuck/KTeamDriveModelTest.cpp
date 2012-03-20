@@ -81,7 +81,6 @@ int main(int argc, char **argv)
                                                      "../../tests/interactive/devices/ePuck/EPuckDriveConfig.cfg");
   //initialize the model of the e-puck
   cedar::dev::kteam::DriveModelPtr p_kteam_model(new cedar::dev::kteam::DriveModel(pDrive));
-  p_kteam_model->setName("E-Puck");
   //add cylinder representing the robot
   cedar::aux::gl::RigidBodyVisualizationPtr p_cylinder(new cedar::aux::gl::Cylinder(p_kteam_model, 0.07, 0.05));
   p_scene->addRigidBodyVisualization(p_cylinder);

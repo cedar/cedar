@@ -39,7 +39,8 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/ConfigurationInterface.h"
+#include "cedar/auxiliaries/DoubleVectorParameter.h"
+#include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
 #include <QObject>
@@ -51,7 +52,7 @@
  *
  * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::RigidBody : public QObject, public cedar::aux::ConfigurationInterface
+class cedar::aux::RigidBody : public QObject, public cedar::aux::Configurable
 {
 private:
   Q_OBJECT
@@ -62,8 +63,6 @@ private:
 public:
   //!@brief The standard constructor.
   RigidBody();
-  //!@brief constructor for setting saved to a configuration file
-  RigidBody(const std::string& configFileName);
 
   //!@brief Destructor
   virtual ~RigidBody();
@@ -71,6 +70,9 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
+  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
   //!@brief returns position of the object in homogeneous coordinates
   cv::Mat getPosition() const;
 
@@ -98,12 +100,17 @@ public slots:
    * @param y    value for green channel in RGB color
    * @param z    value for blue channel in RGB color
    */
-  void setPosition(const double x, const double y, const double z);
+  void setPosition(double x, double y, double z);
 
   /*!@brief set the position of the object frame origin in the world frame
    * @param position    new position in homogeneous coordinates
    */
   void setPosition(const cv::Mat& position);
+
+  /*!@brief set the position of the object frame origin in the world frame
+   * @param position    new position in homogeneous coordinates
+   */
+  void setPosition(const std::vector<double>& position);
 
   /*!@brief set the orientation of the object frame, given as a unit quaternion
    * @param quaternion    new unit quaternion for the rotation, 4x1 matrix with norm 1
@@ -152,10 +159,9 @@ protected:
 private:
   //! lock for thread safety
   mutable QReadWriteLock mLock;
-  //! position
-  std::vector<double> _mPosition;
-  //! orientation
-  std::vector<double> _mOrientation;
+
+  cedar::aux::DoubleVectorParameterPtr _mInitialPosition;
+  cedar::aux::DoubleVectorParameterPtr _mInitialOrientation;
 
 }; // class cedar::aux::RigidBody
 
