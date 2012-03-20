@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -50,9 +51,6 @@
 cedar::aux::RigidBody::RigidBody()
 :
 mTransformation(4, 4, CV_64FC1),
-mPosition(4, 1, CV_64FC1),
-mOrientationQuaternion(4, 1, CV_64FC1),
-mTransformationTranspose(4, 4, CV_64FC1),
 _mInitialPosition
 (
   new cedar::aux::DoubleVectorParameter
@@ -71,6 +69,10 @@ _mInitialPosition
   );
   _mInitialPosition->makeDefault();
   _mInitialOrientation->makeDefault();
+  
+  // todo: check whether this line is necessary
+  mTransformation = cv::Mat::eye(4, 4, CV_64FC1);
+  
   init();
 }
 
@@ -89,74 +91,40 @@ void cedar::aux::RigidBody::readConfiguration(const cedar::aux::ConfigurationNod
   setPosition(_mInitialPosition->getValue());
 
   CEDAR_ASSERT(_mInitialOrientation->size() >=9);
-  // read out quaternion from orientation _mOrientationrix
-  double r;
-  if (IsZero(_mInitialOrientation->at(0) + _mInitialOrientation->at(4) + _mInitialOrientation->at(8) - 3))
-  {
-    mOrientationQuaternion.at<double>(0, 0) = 1;
-  }
-  else
-  { //!\todo: this doesn't really take care of negatives, should compare absolute values, really
-    //!\todo: this should be moved to a general transformation matrix -> quaternion function
-    if (_mInitialOrientation->at(0) > _mInitialOrientation->at(4) && _mInitialOrientation->at(0) > _mInitialOrientation->at(8))
-    {      // Column 0:
-      r  = sqrt(1.0 + _mInitialOrientation->at(0) - _mInitialOrientation->at(4) - _mInitialOrientation->at(8)) * 2.0;
-      mOrientationQuaternion.at<double>(0, 0) = (_mInitialOrientation->at(7) - _mInitialOrientation->at(5)) / r;
-      mOrientationQuaternion.at<double>(1, 0) = 0.25 * r;
-      mOrientationQuaternion.at<double>(2, 0) = (_mInitialOrientation->at(3) + _mInitialOrientation->at(1)) / r;
-      mOrientationQuaternion.at<double>(3, 0) = (_mInitialOrientation->at(2) + _mInitialOrientation->at(6)) / r;
-    }
-    else if (_mInitialOrientation->at(4) > _mInitialOrientation->at(8))
-    {      // Column 1:
-      r  = sqrt(1.0 + _mInitialOrientation->at(4) - _mInitialOrientation->at(0) - _mInitialOrientation->at(8)) * 2.0;
-      mOrientationQuaternion.at<double>(0, 0) = (_mInitialOrientation->at(2) - _mInitialOrientation->at(6)) / r;
-      mOrientationQuaternion.at<double>(1, 0) = (_mInitialOrientation->at(3) + _mInitialOrientation->at(1)) / r;
-      mOrientationQuaternion.at<double>(2, 0) = 0.25 * r;
-      mOrientationQuaternion.at<double>(3, 0) = (_mInitialOrientation->at(7) + _mInitialOrientation->at(5)) / r;
-    }
-    else
-    {            // Column 2:
-      r  = sqrt(1.0 + _mInitialOrientation->at(8) - _mInitialOrientation->at(0) - _mInitialOrientation->at(4)) * 2.0;
-      mOrientationQuaternion.at<double>(0, 0) = (_mInitialOrientation->at(3) - _mInitialOrientation->at(1)) / r;
-      mOrientationQuaternion.at<double>(1, 0) = (_mInitialOrientation->at(6) + _mInitialOrientation->at(2)) / r;
-      mOrientationQuaternion.at<double>(2, 0) = (_mInitialOrientation->at(5) + _mInitialOrientation->at(7)) / r;
-      mOrientationQuaternion.at<double>(3, 0) = 0.25 * r;
-    }
-  }
-  updateTransformation();
+  mTransformation.at<double>(0, 3) = _mInitialPosition->at(0);
+  mTransformation.at<double>(1, 3) = _mInitialPosition->at(1);
+  mTransformation.at<double>(2, 3) = _mInitialPosition->at(2);
+  mTransformation.at<double>(0, 0) = _mInitialOrientation->at(0);
+  mTransformation.at<double>(0, 1) = _mInitialOrientation->at(1);
+  mTransformation.at<double>(0, 2) = _mInitialOrientation->at(2);
+  mTransformation.at<double>(1, 0) = _mInitialOrientation->at(3);
+  mTransformation.at<double>(1, 1) = _mInitialOrientation->at(4);
+  mTransformation.at<double>(1, 2) = _mInitialOrientation->at(5);
+  mTransformation.at<double>(2, 0) = _mInitialOrientation->at(6);
+  mTransformation.at<double>(2, 1) = _mInitialOrientation->at(7);
+  mTransformation.at<double>(2, 2) = _mInitialOrientation->at(8);	
 }
 
 cv::Mat cedar::aux::RigidBody::getPosition() const
 {
+  // todo: check whether this function is tested properly
   QReadLocker locker(&mLock);
-  return mPosition.clone();
+  return mTransformation(cv::Rect(3, 0, 1, 4)).clone();
 }
 
 double cedar::aux::RigidBody::getPositionX() const
 {
-  return mPosition.at<double>(0, 0);
+  return mTransformation.at<double>(0, 3);
 }
 
 double cedar::aux::RigidBody::getPositionY() const
 {
-  return mPosition.at<double>(1, 0);
+  return mTransformation.at<double>(1, 3);
 }
 
 double cedar::aux::RigidBody::getPositionZ() const
 {
-  return mPosition.at<double>(2, 0);
-}
-
-cv::Mat cedar::aux::RigidBody::getOrientationQuaternion() const
-{
-  QReadLocker locker(&mLock);
-  return mOrientationQuaternion.clone();
-}
-
-double cedar::aux::RigidBody::getOrientationQuaternion(unsigned int component) const
-{
-  QReadLocker locker(&mLock);
-  return mOrientationQuaternion.at<double>(component, 0);
+  return mTransformation.at<double>(2, 3);
 }
 
 cv::Mat cedar::aux::RigidBody::getTransformation() const
@@ -165,109 +133,60 @@ cv::Mat cedar::aux::RigidBody::getTransformation() const
   return mTransformation.clone();
 }
 
+void cedar::aux::RigidBody::setTransformation(cv::Mat transformation)
+{
+  QWriteLocker locker(&mLock);
+  mTransformation = transformation;
+}
+
+void cedar::aux::RigidBody::update()
+{
+
+}
+
 void cedar::aux::RigidBody::setPosition(double x, double y, double z)
 {
-  mLock.lockForWrite();
-  mPosition.at<double>(0, 0) = x;
-  mPosition.at<double>(1, 0) = y;
-  mPosition.at<double>(2, 0) = z;
-  mLock.unlock();
-  updateTransformation();
+  QWriteLocker locker(&mLock);
+  mTransformation.at<double>(0, 3) = x;
+  mTransformation.at<double>(1, 3) = y;
+  mTransformation.at<double>(2, 3) = z;
 }
 
 void cedar::aux::RigidBody::setPosition(const cv::Mat& position)
 {
-  mLock.lockForWrite();
-  assert(position.type() == mPosition.type());
-  mPosition = position.clone();
-  mLock.unlock();
-  updateTransformation();
+  // todo: check whether this function is tested properly
+  QWriteLocker locker(&mLock);
+  mTransformation.at<double>(0, 3) = position.at<double>(0, 0);
+  mTransformation.at<double>(1, 3) = position.at<double>(1, 0);
+  mTransformation.at<double>(2, 3) = position.at<double>(2, 0);
 }
 
 void cedar::aux::RigidBody::setPosition(const std::vector<double>& position)
 {
-  mLock.lockForWrite();
+  QWriteLocker locker(&mLock);
   CEDAR_ASSERT(position.size() >=3);
-  mPosition.at<double>(0, 0) = position[0];
-  mPosition.at<double>(1, 0) = position[1];
-  mPosition.at<double>(2, 0) = position[2];
-  mLock.unlock();
-  updateTransformation();
-}
-
-void cedar::aux::RigidBody::setOrientationQuaternion(const cv::Mat quaternion)
-{
-  mLock.lockForWrite();
-  assert(quaternion.type() == mOrientationQuaternion.type());
-  mOrientationQuaternion = quaternion.clone();
-  mLock.unlock();
-  updateTransformation();
+  mTransformation.at<double>(0, 3) = position[0];
+  mTransformation.at<double>(1, 3) = position[1];
+  mTransformation.at<double>(2, 3) = position[2];
 }
 
 void cedar::aux::RigidBody::rotate(unsigned int axis, double angle)
 {
-  mLock.lockForWrite();
-  // rotation quaternion
-  cv::Mat q_rot = cv::Mat::zeros(4, 1, CV_64FC1);
-  q_rot.at<double>(0, 0) = cos(angle/2.0);
-  q_rot.at<double>(axis+1, 0) = sin(angle/2.0);
-
-  // calculate new object orientation quaternion
-  double a1 = mOrientationQuaternion.at<double>(0, 0);
-  double b1 = mOrientationQuaternion.at<double>(1, 0);
-  double c1 = mOrientationQuaternion.at<double>(2, 0);
-  double d1 = mOrientationQuaternion.at<double>(3, 0);
-  double a2 = q_rot.at<double>(0, 0);
-  double b2 = q_rot.at<double>(1, 0);
-  double c2 = q_rot.at<double>(2, 0);
-  double d2 = q_rot.at<double>(3, 0);
-  cv::Mat q_new = cv::Mat::zeros(4, 1, CV_64FC1);
-  q_new.at<double>(0, 0) = a1*a2 - b1*b2 - c1*c2 - d1*d2;
-  q_new.at<double>(1, 0) = a1*b2 + b1*a2 + c1*d2 - d1*c2;
-  q_new.at<double>(2, 0) = a1*c2 - b1*d2 + c1*a2 + d1*b2;
-  q_new.at<double>(3, 0) = a1*d2 + b1*c2 - c1*b2 + d1*a2;
-
-  // set new quaternion
-  mOrientationQuaternion = q_new;
-  mLock.unlock();
-  updateTransformation();
-}
-
-void cedar::aux::RigidBody::updateTransformation()
-{
   QWriteLocker locker(&mLock);
-  // calculate rotation matrix from orientation quaternion
-  double a = mOrientationQuaternion.at<double>(0, 0);
-  double b = mOrientationQuaternion.at<double>(1, 0);
-  double c = mOrientationQuaternion.at<double>(2, 0);
-  double d = mOrientationQuaternion.at<double>(3, 0);
-  mTransformation.at<double>(0, 0) = a*a + b*b - c*c - d*d;
-  mTransformation.at<double>(1, 0) = 2*b*c + 2*a*d;
-  mTransformation.at<double>(2, 0) = 2*b*d - 2*a*c;
-
-  mTransformation.at<double>(0, 1) = 2*b*c - 2*a*d;
-  mTransformation.at<double>(1, 1) = a*a - b*b + c*c - d*d;
-  mTransformation.at<double>(2, 1) = 2*c*d + 2*a*b;
-
-  mTransformation.at<double>(0, 2) = 2*b*d + 2*a*c;
-  mTransformation.at<double>(1, 2) = 2*c*d - 2*a*b;
-  mTransformation.at<double>(2, 2) = a*a - b*b - c*c + d*d;
-
-  // copy position
-  mTransformation.at<double>(0, 3) = mPosition.at<double>(0, 0);
-  mTransformation.at<double>(1, 3) = mPosition.at<double>(1, 0);
-  mTransformation.at<double>(2, 3) = mPosition.at<double>(2, 0);
-
-  mTransformation.at<double>(3, 3) = 1;
+  mTransformation(cv::Rect(0, 0, 3, 3))
+    = mTransformation(cv::Rect(0, 0, 3, 3)) * cedar::aux::math::expAxis<double>(mUnitAxes[axis], angle);
 }
 
 void cedar::aux::RigidBody::init()
 {
-  mPosition = 0.0;
-  mPosition.at<double>(3, 0) = 1.0;
-  mOrientationQuaternion = 0.0;
-  mOrientationQuaternion.at<double>(0, 0) = 1.0;
-  mTransformation = 0.0;
-  mTransformationTranspose = 0.0;
-  updateTransformation();
+  mTransformation = cv::Mat::eye(4, 4, CV_64FC1);
+  cv::Mat x_axis = cv::Mat::zeros(3, 1, CV_64FC1);
+  x_axis.at<double>(0, 0) = 1;
+  mUnitAxes.push_back(x_axis);
+  cv::Mat y_axis = cv::Mat::zeros(3, 1, CV_64FC1);
+  y_axis.at<double>(1, 0) = 1;
+  mUnitAxes.push_back(y_axis);
+  cv::Mat z_axis = cv::Mat::zeros(3, 1, CV_64FC1);
+  z_axis.at<double>(2, 0) = 1;
+  mUnitAxes.push_back(z_axis);
 }

@@ -58,6 +58,7 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(CoraArm);
         CEDAR_DECLARE_DEV_CLASS(CoraHead);
         CEDAR_DECLARE_DEV_CLASS(KukaArm);
+        CEDAR_DECLARE_DEV_CLASS(Sdh);
         //!@endcond
       }
     }

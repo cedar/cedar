@@ -89,7 +89,7 @@ void cedar::aux::gl::Block::draw()
   // draw object
   if (mIsVisible)
   {
-    gl::setColor(mColorR, mColorG, mColorB);
+    cedar::aux::gl::setColor(mColorR, mColorG, mColorB);
     drawBlock(mLength, mWidth, mHeight, mIsDrawnAsWireFrame);
   }
 }
