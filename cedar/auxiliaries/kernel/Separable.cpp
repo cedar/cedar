@@ -40,6 +40,7 @@
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DataTemplate.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/UIntParameter.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
@@ -50,6 +51,7 @@
 cedar::aux::kernel::Separable::Separable()
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
 cedar::aux::kernel::Separable::Separable(unsigned int dimensionality)
@@ -58,7 +60,8 @@ cedar::aux::kernel::Kernel(dimensionality)
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
 
-  this->mKernelParts.resize(dimensionality);
+  this->dimensionalityChanged();
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
 cedar::aux::kernel::Separable::~Separable()
@@ -70,8 +73,21 @@ cedar::aux::kernel::Separable::~Separable()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+unsigned int cedar::aux::kernel::Separable::getSize(size_t dimension) const
+{
+  // make sure that casting to unsigned doesn't have bad sideeffects
+  CEDAR_DEBUG_ASSERT(this->getKernelPart(dimension).size[0] >= 0);
+  return static_cast<unsigned int>(this->getKernelPart(dimension).size[0]);
+}
+
+void cedar::aux::kernel::Separable::dimensionalityChanged()
+{
+  this->mKernelParts.resize(std::max(static_cast<unsigned int>(1), this->getDimensionality()));
+}
+
 const cv::Mat& cedar::aux::kernel::Separable::getKernelPart(unsigned int dimension) const
 {
+  CEDAR_DEBUG_ASSERT(dimension < this->mKernelParts.size());
   return this->mKernelParts.at(dimension);
 }
 
@@ -82,14 +98,15 @@ void cedar::aux::kernel::Separable::setKernelPart(unsigned int dimension, const 
 
 void cedar::aux::kernel::Separable::updateKernelMatrix()
 {
-  //!@todo Implement for more than two dimensions
   if (this->getDimensionality() == 0)
   {
     this->mKernel->lockForWrite();
-    this->mKernel->setData(cv::Mat());
+    const cv::Mat& kernel = this->mKernelParts.at(0);
+    CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(kernel) == 0);
+    this->mKernel->setData(kernel);
     this->mKernel->unlock();
   }
-  else
+  else if (this->getDimensionality() <= 2)
   {
     this->mpReadWriteLockOutput->lockForRead();
 
@@ -106,5 +123,8 @@ void cedar::aux::kernel::Separable::updateKernelMatrix()
     this->mKernel->setData(combined);
     this->mKernel->unlock();
   }
-
+  else
+  {
+    //!@todo Implement for more than two dimensions
+  }
 }

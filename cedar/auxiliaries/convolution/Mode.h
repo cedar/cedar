@@ -22,11 +22,11 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        KernelList.h
+    File:        Mode.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 13
+    Date:        2012 03 19
 
     Description:
 
@@ -34,81 +34,54 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_KERNEL_LIST_H
-#define CEDAR_AUX_CONV_KERNEL_LIST_H
+#ifndef CEDAR_AUX_CONV_MODE_H
+#define CEDAR_AUX_CONV_MODE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/kernel/namespace.h"
+#include "cedar/auxiliaries/EnumBase.h"
 
 // SYSTEM INCLUDES
-#include <boost/signals2.hpp>
-#include <vector>
 
-/*!@brief This is a structure for storing a list of kernels.
+
+/*!@brief Enum describing the convolution mode.
+ *
+ *        This parameter describes the mode of the convolution. It has two values:
+ *        <ul>
+ *          <li>@em Full: The result is the full convolution, i.e., nothing is cut away.</li>
+ *          <li>@em Same: The result of the convolution has the same size as the input matrix.</li>
+ *        </ul>
  */
-class cedar::aux::conv::KernelList
+class cedar::aux::conv::Mode
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
-  // none yet
+public:
+  //! The enum id
+  typedef cedar::aux::EnumId Id;
+
+  //! Pointer type to the enum base object of this class.
+  typedef boost::shared_ptr<cedar::aux::EnumBase> TypePtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void append(cedar::aux::kernel::KernelPtr kernel);
-
-  void remove(size_t index);
-
-  inline void setKernel(size_t index, cedar::aux::kernel::KernelPtr kernel)
-  {
-    this->mKernels.at(index) = kernel;
-
-    this->mKernelChangedSignal(index);
-  }
-
-  inline void resize(size_t size)
-  {
-    this->mKernels.resize(size);
-  }
-
-  inline cedar::aux::kernel::ConstKernelPtr getKernel(size_t i) const
-  {
-    return this->mKernels.at(i);
-  }
-
-  inline size_t size() const
-  {
-    return this->mKernels.size();
-  }
-
-  inline void clear()
-  {
-    this->mKernels.clear();
-  }
-
-  inline boost::signals2::connection connectToKernelAddedSignal(boost::function<void (size_t)> slot)
-  {
-    return this->mKernelAddedSignal.connect(slot);
-  }
-
-  inline boost::signals2::connection connectToKernelChangedSignal(boost::function<void (size_t)> slot)
-  {
-    return this->mKernelChangedSignal.connect(slot);
-  }
-
-  inline boost::signals2::connection connectToKernelRemovedSignal(boost::function<void (size_t)> slot)
-  {
-    return this->mKernelRemovedSignal.connect(slot);
-  }
+  // none
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none yet
+  //! Initialization of the enum values.
+  static void construct();
+
+  //! Returns a reference to the base enum object.
+  static const cedar::aux::EnumBase& type();
+
+  //! Returns a pointer to the base enum object.
+  static const cedar::aux::conv::Mode::TypePtr& typePtr();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -125,28 +98,23 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
   // members
   //--------------------------------------------------------------------------------------------------------------------
+public:
+  //! The output image has the same size as the input.
+  static const Id Same = 0;
+
+  //! The output image is large enough so that no values have to be discarded.
+  static const Id Full = 1;
+
+  //! Only use the results where no border handling was necessary.
+  static const Id Valid = 2;
+
 protected:
   // none yet
 private:
-  //! A vector of all the kernels in this list.
-  std::vector<cedar::aux::kernel::KernelPtr> mKernels;
+  //! The type object for this enum class.
+  static cedar::aux::EnumType<cedar::aux::conv::Mode> mType;
 
-  boost::signals2::signal<void (size_t)> mKernelAddedSignal;
+}; // class cedar::aux::conv::Mode
 
-  boost::signals2::signal<void (size_t)> mKernelChangedSignal;
-
-  boost::signals2::signal<void (size_t)> mKernelRemovedSignal;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
-}; // class cedar::aux::conv::KernelList
-
-#endif // CEDAR_AUX_CONV_KERNEL_LIST_H
+#endif // CEDAR_AUX_CONV_MODE_H
 

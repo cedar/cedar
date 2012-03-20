@@ -49,28 +49,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::kernel::Kernel::Kernel()
-:
-mKernel(new cedar::aux::MatData()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 1000))
-{
-  cedar::aux::LogSingleton::getInstance()->allocating(this);
-
-  mpReadWriteLockOutput = new QReadWriteLock();
-  _mDimensionality->setConstant(true);
-}
 
 cedar::aux::kernel::Kernel::Kernel(unsigned int dimensionality)
 :
 cedar::aux::Configurable(),
 mKernel(new cedar::aux::DataTemplate<cv::Mat>()),
-_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", 2, 1, 1000))
+_mDimensionality(new cedar::aux::UIntParameter(this, "dimensionality", dimensionality, 1, 1000))
 {
   cedar::aux::LogSingleton::getInstance()->allocating(this);
+
+  std::vector<int> anchor_defaults;
+  anchor_defaults.resize(dimensionality, 0);
+  _mAnchor = cedar::aux::IntVectorParameterPtr
+             (
+               new cedar::aux::IntVectorParameter
+               (
+                 this,
+                 "anchor",
+                 anchor_defaults,
+                 std::numeric_limits<int>::min(),
+                 std::numeric_limits<int>::max()
+               )
+             );
 
   mpReadWriteLockOutput = new QReadWriteLock();
   _mDimensionality->setValue(dimensionality);
   _mDimensionality->setConstant(true);
+
+  QObject::connect(this->_mDimensionality.get(), SIGNAL(valueChanged()), this, SLOT(dimensionalityChanged()));
 }
 
 cedar::aux::kernel::Kernel::~Kernel()
@@ -86,6 +92,21 @@ cedar::aux::kernel::Kernel::~Kernel()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+unsigned int cedar::aux::kernel::Kernel::getSize(size_t dimension) const
+{
+  CEDAR_ASSERT(dimension < this->getDimensionality());
+
+  // make sure that casting to unsigned doesn't have bad sideeffects
+  CEDAR_DEBUG_ASSERT(this->mKernel->getData().size[dimension] >= 0);
+
+  return static_cast<unsigned int>(this->mKernel->getData().size[dimension]);
+}
+
+void cedar::aux::kernel::Kernel::dimensionalityChanged()
+{
+  this->_mAnchor->resize(this->getDimensionality(), 0);
+}
 
 void cedar::aux::kernel::Kernel::hideDimensionality(bool hide)
 {

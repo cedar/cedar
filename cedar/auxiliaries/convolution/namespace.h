@@ -52,10 +52,11 @@ namespace cedar
     namespace conv
     {
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(KernelList);
       CEDAR_DECLARE_AUX_CLASS(BorderType);
       CEDAR_DECLARE_AUX_CLASS(Convolution);
       CEDAR_DECLARE_AUX_CLASS(Engine);
+      CEDAR_DECLARE_AUX_CLASS(KernelList);
+      CEDAR_DECLARE_AUX_CLASS(Mode);
 
       // convolution engines
       CEDAR_DECLARE_AUX_CLASS(FFTW);

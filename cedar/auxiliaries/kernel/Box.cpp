@@ -114,7 +114,7 @@ cedar::aux::kernel::Box::~Box()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::kernel::Box::calculate()
+void cedar::aux::kernel::Box::calculateParts()
 {
   mpReadWriteLockOutput->lockForWrite();
 
@@ -135,9 +135,6 @@ void cedar::aux::kernel::Box::calculate()
   }
 
   mpReadWriteLockOutput->unlock();
-
-  //!@todo This should also be done automatically in separable. Also, Gauss shouldn't need to do this by hand, either.
-  this->updateKernelMatrix();
 }
 
 void cedar::aux::kernel::Box::updateDimensionality()

@@ -85,7 +85,7 @@ public:
   (
     const cv::Mat& matrix,
     cedar::aux::conv::BorderType::Id borderType,
-    const std::vector<unsigned int>& anchor
+    cedar::aux::conv::BorderType::Id mode
   ) const;
 
   cv::Mat convolve
@@ -93,7 +93,8 @@ public:
     const cv::Mat& matrix,
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    const std::vector<unsigned int>& anchor
+    cedar::aux::conv::BorderType::Id mode,
+    const std::vector<int>& anchor
   ) const;
 
   cv::Mat convolve
@@ -101,7 +102,7 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    const std::vector<unsigned int>& anchor
+    cedar::aux::conv::BorderType::Id mode
   ) const;
 
   cv::Mat convolve
@@ -109,7 +110,7 @@ public:
     const cv::Mat& matrix,
     const cedar::aux::conv::KernelList& kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    const std::vector<unsigned int>& anchor
+    cedar::aux::conv::BorderType::Id mode
   ) const;
 
   cv::Mat convolve
@@ -117,7 +118,7 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
     cedar::aux::conv::BorderType::Id borderType,
-    const std::vector<unsigned int>& anchor
+    cedar::aux::conv::BorderType::Id mode
   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -136,7 +137,18 @@ private:
 
   int translateBorderType(cedar::aux::conv::BorderType::Id borderType) const;
 
-  void translateAnchor(cv::Point& anchor, const std::vector<unsigned int>& anchor_vector) const;
+  void translateAnchor
+  (
+    cv::Point& anchor,
+    const std::vector<int>& anchor_vector,
+    const cv::Mat::MSize& msize
+  ) const;
+
+  void translateAnchor
+  (
+    cv::Point& anchor,
+    cedar::aux::kernel::ConstKernelPtr kernel
+  ) const;
 
   cv::Mat cvConvolve
   (

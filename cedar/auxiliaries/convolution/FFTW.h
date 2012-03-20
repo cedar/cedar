@@ -73,7 +73,7 @@ public:
   (
     const cv::Mat& matrix,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const;
 
   cv::Mat convolve
@@ -81,7 +81,8 @@ public:
     const cv::Mat& matrix,
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same,
+    const std::vector<int>& anchor = std::vector<int>()
   ) const;
 
   cv::Mat convolve
@@ -89,7 +90,7 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const;
 
   cv::Mat convolve
@@ -97,7 +98,7 @@ public:
     const cv::Mat& matrix,
     const cedar::aux::conv::KernelList& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const;
 
   //--------------------------------------------------------------------------------------------------------------------

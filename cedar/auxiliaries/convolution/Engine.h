@@ -41,6 +41,7 @@
 #include "cedar/auxiliaries/convolution/namespace.h"
 #include "cedar/auxiliaries/convolution/KernelList.h"
 #include "cedar/auxiliaries/convolution/BorderType.h"
+#include "cedar/auxiliaries/convolution/Mode.h"
 #include "cedar/auxiliaries/Configurable.h"
 
 // SYSTEM INCLUDES
@@ -48,7 +49,13 @@
 
 /*!@brief Base class for convolution engines.
  *
- * @todo describe more.
+ *        A convolution engine provides an interchangeable implementation for the convolution functions based on an
+ *        underlying framework such as FFTW or Open CV. It also encapsulates technical details such as transformations
+ *        of kernels and images.
+ *
+ *        In order to actually convolve an image, the cedar::aux::conv::Convolution class should be used.
+ *
+ * @see   cedar::aux::conv::Convolution
  */
 class cedar::aux::conv::Engine : public cedar::aux::Configurable
 {
@@ -65,29 +72,37 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*!@brief This method convolves a given matrix with the kernel list stored in this convolution object.
+  /*!@brief   This method convolves a given matrix with the kernel list stored in this convolution object.
+   *
+   * @returns This method should return \f$ R = \sum\limits_{l} I * K_l\f$ where \f$I\f$ is the input image and
+   *          \f$K_l\f$ are the kernels stored in the engine's kernel list.
    */
   virtual cv::Mat convolve
   (
     const cv::Mat& matrix,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::Mode::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;
 
+  /*!@brief   Convolves two matrices with each other.
+   */
   virtual cv::Mat convolve
   (
     const cv::Mat& matrix,
     const cv::Mat& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same,
+    const std::vector<int>& anchor = std::vector<int>()
   ) const = 0;
 
+  /*!@brief Convolves a matrix with a kernel.
+   */
   virtual cv::Mat convolve
   (
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstKernelPtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;
 
 
@@ -101,15 +116,17 @@ public:
     const cv::Mat& matrix,
     cedar::aux::kernel::ConstSeparablePtr kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
   ) const;
 
+  /*!@brief Convolves a matrix with a kernel list.
+   */
   virtual cv::Mat convolve
   (
     const cv::Mat& matrix,
     const cedar::aux::conv::KernelList& kernel,
     cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
-    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+    cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;
 
   //!@brief Method for accessing the kernel list.
