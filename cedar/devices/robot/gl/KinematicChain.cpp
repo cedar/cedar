@@ -50,7 +50,7 @@
 
 cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
 :
-cedar::aux::gl::RigidBodyVisualization(pKinematicChainModel),
+cedar::aux::gl::RigidBodyVisualization(pKinematicChainModel->getRootCoordinateFrame()),
 mpKinematicChainModel(pKinematicChainModel)
 {
   mIsDrawingEndEffectorVelocity = true;
@@ -109,12 +109,12 @@ void cedar::dev::robot::gl::KinematicChain::drawBase()
 
   // draw the link to the first joint
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
-  cv::Mat proximal = mpKinematicChainModel->getTransformation()(cv::Rect(3, 0, 1, 3)).clone();
+  cv::Mat proximal = mpKinematicChainModel->getRootTransformation()(cv::Rect(3, 0, 1, 3)).clone();
   cv::Mat distal = mpKinematicChainModel->getJointTransformation(0)(cv::Rect(3, 0, 1, 3)).clone();
   cedar::aux::gl::drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getTransformation().t();
+  mTransformationTranspose = mpKinematicChainModel->getRootTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   // draw the base
@@ -155,7 +155,7 @@ void cedar::dev::robot::gl::KinematicChain::drawSegment(unsigned int index)
   }
   else
   {
-    distal = mpKinematicChainModel->calculateEndEffectorTransformation()(cv::Rect(3, 0, 1, 3)).clone();
+    distal = mpKinematicChainModel->getEndEffectorTransformation()(cv::Rect(3, 0, 1, 3)).clone();
   }
   cedar::aux::gl::drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
 }
@@ -167,7 +167,7 @@ void cedar::dev::robot::gl::KinematicChain::drawEndEffector()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->calculateEndEffectorTransformation().t();
+  mTransformationTranspose = mpKinematicChainModel->getEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   
 	// draw the joint

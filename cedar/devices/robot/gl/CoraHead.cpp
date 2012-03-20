@@ -70,7 +70,7 @@ void cedar::dev::robot::gl::CoraHead::drawBase()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getTransformation().t();
+  mTransformationTranspose = mpKinematicChainModel->getRootTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   setMaterial(CHROME);
@@ -204,7 +204,7 @@ void cedar::dev::robot::gl::CoraHead::drawEndEffector()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->calculateEndEffectorTransformation().t();
+  mTransformationTranspose = mpKinematicChainModel->getEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   glPushMatrix();
 

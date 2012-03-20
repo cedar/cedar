@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gl/glu.h"
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/Sdh.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
 
@@ -59,7 +60,7 @@ cedar::dev::robot::gl::Sdh::Sdh
   cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel
 )
 :
-cedar::aux::gl::RigidBodyVisualization(pKinematicChainModel),
+cedar::aux::gl::RigidBodyVisualization(pKinematicChainModel->getRootCoordinateFrame()),
 mpKinematicChain(pKinematicChain)
 {
   loadData();

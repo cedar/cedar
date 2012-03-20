@@ -70,7 +70,7 @@ void cedar::dev::robot::gl::CoraArm::drawBase()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getTransformation().t();
+  mTransformationTranspose = mpKinematicChainModel->getRootTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   setMaterial(DARK_BLUE_METAL);

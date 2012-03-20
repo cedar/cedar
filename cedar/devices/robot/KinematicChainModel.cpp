@@ -36,8 +36,12 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
+#include "cedar/auxiliaries/RigidBody.h"
+
 
 // SYSTEM INCLUDES
 
@@ -50,7 +54,8 @@ cedar::dev::robot::KinematicChainModel::KinematicChainModel(cedar::dev::robot::K
 :
 //cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
 mpKinematicChain(pKinematicChain),
-mpEndEffector(new RigidBody())
+mpRootCoordinateFrame(new cedar::aux::RigidBody()),
+mpEndEffectorCoordinateFrame(new cedar::aux::RigidBody())
 {
   init();
 }
@@ -64,7 +69,8 @@ cedar::dev::robot::KinematicChainModel::KinematicChainModel
 :
 //cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
 mpKinematicChain(pKinematicChain),
-mpEndEffector(pEndEffector)
+mpRootCoordinateFrame(new cedar::aux::RigidBody()),
+mpEndEffectorCoordinateFrame(pEndEffector)
 {
   init();
 }
@@ -86,7 +92,7 @@ void cedar::dev::robot::KinematicChainModel::timerEvent(QTimerEvent*)
 void cedar::dev::robot::KinematicChainModel::update()
 {
   calculateTransformations();
-  mpEndEffector->update();
+  mpEndEffectorCoordinateFrame->update();
 }
 
 unsigned int cedar::dev::robot::KinematicChainModel::getNumberOfJoints()
@@ -94,21 +100,21 @@ unsigned int cedar::dev::robot::KinematicChainModel::getNumberOfJoints()
   return mpKinematicChain->getNumberOfJoints();
 }
 
-cedar::aux::RigidBodyPtr cedar::dev::robot::KinematicChainModel::getEndEffector()
+cedar::aux::RigidBodyPtr cedar::dev::robot::KinematicChainModel::getEndEffectorCoordinateFrame()
 {
-  return mpEndEffector;
+  return mpEndEffectorCoordinateFrame;
 }
 
 void cedar::dev::robot::KinematicChainModel::setEndEffector(cedar::aux::RigidBodyPtr pEndEffector)
 {
-  mpEndEffector = pEndEffector;
+  mpEndEffectorCoordinateFrame = pEndEffector;
 }
 
 cv::Mat cedar::dev::robot::KinematicChainModel::getJointTransformation(unsigned int index)
 {
   cv::Mat T;
   mTransformationsLock.lockForRead();
-  T = mTransformation * mJointTransformations[index];
+  T = mpRootCoordinateFrame->getTransformation() * mJointTransformations[index];
   mTransformationsLock.unlock();
   return T;
 }
@@ -128,7 +134,7 @@ void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobian
   {
     case WORLD_COORDINATES :
     {
-      point_local = (mTransformation * mJointTransformations[jointIndex]).inv() * point;
+      point_local = (mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex]).inv() * point;
       break;
     }
     case BASE_COORDINATES :
@@ -149,10 +155,10 @@ void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobian
   {
     column = cedar::aux::math::wedgeTwist<double>
              (
-               cedar::aux::math::rigidToAdjointTransformation<double>(mTransformation)
+               cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())
                * mJointTwists[j]
              )
-             * mTransformation // change point to world coordinates
+             * mpRootCoordinateFrame->getTransformation() // change point to world coordinates
              * mJointTransformations[jointIndex] // change point to root coordinates
              * point_local;
     // export
@@ -199,7 +205,7 @@ void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobianTemporalD
     }
     case LOCAL_COORDINATES :
     {
-      point_world = mTransformation * mJointTransformations[jointIndex] * point; //... check this
+      point_world = mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex] * point; //... check this
       break;
     }
   }
@@ -214,7 +220,7 @@ void cedar::dev::robot::KinematicChainModel::calculateCartesianJacobianTemporalD
     S1 = cedar::aux::math::wedgeTwist<double>(calculateTwistTemporalDerivative(j)) * point_world;
     S2 = cedar::aux::math::wedgeTwist<double>
          (
-           cedar::aux::math::rigidToAdjointTransformation<double>(mTransformation)
+           cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())
            *mJointTwists[j]
          )
          * calculateVelocity(point_world, jointIndex, WORLD_COORDINATES);
@@ -263,7 +269,7 @@ cv::Mat cedar::dev::robot::KinematicChainModel::calculateVelocity
     }
     case LOCAL_COORDINATES :
     {
-      point_world = mTransformation * mJointTransformations[jointIndex] * point; //... check this
+      point_world = mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex] * point; //... check this
       break;
     }
   }
@@ -297,7 +303,7 @@ cv::Mat cedar::dev::robot::KinematicChainModel::calculateAcceleration
     }
     case LOCAL_COORDINATES :
     {
-      point_world = mTransformation * mJointTransformations[jointIndex] * point; //... check this
+      point_world = mpRootCoordinateFrame->getTransformation() * mJointTransformations[jointIndex] * point; //... check this
       break;
     }
   }
@@ -324,7 +330,7 @@ cv::Mat cedar::dev::robot::KinematicChainModel::calculateSpatialJacobian(unsigne
     }
   }
   mTransformationsLock.unlock();
-  return cedar::aux::math::rigidToAdjointTransformation<double>(mTransformation)*jacobian;
+  return cedar::aux::math::rigidToAdjointTransformation<double>(mpRootCoordinateFrame->getTransformation())*jacobian;
 }
 
 cv::Mat cedar::dev::robot::KinematicChainModel::calculateSpatialJacobianTemporalDerivative(unsigned int index)
@@ -379,23 +385,17 @@ cv::Mat cedar::dev::robot::KinematicChainModel::calculateTwistTemporalDerivative
 
 cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorPosition()
 {
-  return mpEndEffector->getPosition();
-//  cv::Mat position;
-//  mTransformationsLock.lockForRead();
-//  position = (mTransformation*mEndEffectorTransformation)(cv::Rect(3, 0, 1, 4));
-//  mTransformationsLock.unlock();
-//  return position;
+  return mpEndEffectorCoordinateFrame->getPosition();
 }
 
-cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorTransformation()
+cv::Mat cedar::dev::robot::KinematicChainModel::getRootTransformation()
 {
-  return mpEndEffector->getTransformation();
+  return mpRootCoordinateFrame->getTransformation();
+}
 
-//  cv::Mat T;
-//  mTransformationsLock.lockForRead();
-//  T = mTransformation * mEndEffectorTransformation;
-//  mTransformationsLock.unlock();
-//  return T;
+cv::Mat cedar::dev::robot::KinematicChainModel::getEndEffectorTransformation()
+{
+  return mpEndEffectorCoordinateFrame->getTransformation();
 }
 
 cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorJacobian()
@@ -506,11 +506,16 @@ void cedar::dev::robot::KinematicChainModel::calculateTransformations()
   }
 // end-effector
 // mEndEffectorTransformation = mProductsOfExponentials[getNumberOfJoints()-1] * mReferenceEndEffectorTransformation;
-  mpEndEffector->setTransformation
+  mpEndEffectorCoordinateFrame->setTransformation
   (
-    mTransformation
+    mpRootCoordinateFrame->getTransformation()
     * mProductsOfExponentials[getNumberOfJoints()-1]
     * mReferenceEndEffectorTransformation
   );
   mTransformationsLock.unlock();
+}
+
+cedar::aux::RigidBodyPtr cedar::dev::robot::KinematicChainModel::getRootCoordinateFrame()
+{
+  return mpRootCoordinateFrame;
 }

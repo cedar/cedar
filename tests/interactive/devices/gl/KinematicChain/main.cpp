@@ -93,7 +93,7 @@ int main(int argc, char **argv)
   cedar::dev::robot::KinematicChainModelPtr p_second_arm_model(new cedar::dev::robot::KinematicChainModel(p_second_arm));
   cedar::dev::robot::gl::KinematicChainPtr p_second_arm_visualization(new cedar::dev::robot::gl::KinematicChain(p_second_arm_model));
   p_scene->addRigidBodyVisualization(p_second_arm_visualization);
-  p_test_arm_model->setEndEffector(p_second_arm_model);
+  p_test_arm_model->setEndEffector(p_second_arm_model->getRootCoordinateFrame());
   p_second_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
   p_second_arm->setJointVelocity(0, 0.31);
   p_second_arm->setJointVelocity(1, -.45);
