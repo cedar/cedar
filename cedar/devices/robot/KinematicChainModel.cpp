@@ -28,11 +28,11 @@
  ----- Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 11 03
  
- ----- Description: Header for the @em cedar::dev::robot::KinematicChainModel class.
+ ----- Description: implementation of the @em cedar::dev::robot::KinematicChainModel class.
                     Calculates the geometric transformations occurring in a serial chain depending upon joint angles
  
  ----- Credits:     Mathematics from Murray, Lee, Sastry: A mathematical introduction to robotic manipulation
- ---------------------------------------------------------------------------------------------------------------------*/
+======================================================================================================================*/
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/KinematicChainModel.h"
@@ -49,7 +49,22 @@
 cedar::dev::robot::KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
 //cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
-mpKinematicChain(pKinematicChain)
+mpKinematicChain(pKinematicChain),
+mpEndEffector(new RigidBody())
+{
+  init();
+}
+
+
+cedar::dev::robot::KinematicChainModel::KinematicChainModel
+(
+  cedar::dev::robot::KinematicChainPtr pKinematicChain,
+  cedar::aux::RigidBodyPtr pEndEffector
+)
+:
+//cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
+mpKinematicChain(pKinematicChain),
+mpEndEffector(pEndEffector)
 {
   init();
 }
@@ -71,11 +86,22 @@ void cedar::dev::robot::KinematicChainModel::timerEvent(QTimerEvent*)
 void cedar::dev::robot::KinematicChainModel::update()
 {
   calculateTransformations();
+  mpEndEffector->update();
 }
 
 unsigned int cedar::dev::robot::KinematicChainModel::getNumberOfJoints()
 {
   return mpKinematicChain->getNumberOfJoints();
+}
+
+cedar::aux::RigidBodyPtr cedar::dev::robot::KinematicChainModel::getEndEffector()
+{
+  return mpEndEffector;
+}
+
+void cedar::dev::robot::KinematicChainModel::setEndEffector(cedar::aux::RigidBodyPtr pEndEffector)
+{
+  mpEndEffector = pEndEffector;
 }
 
 cv::Mat cedar::dev::robot::KinematicChainModel::getJointTransformation(unsigned int index)
@@ -353,20 +379,23 @@ cv::Mat cedar::dev::robot::KinematicChainModel::calculateTwistTemporalDerivative
 
 cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorPosition()
 {
-  cv::Mat position;
-  mTransformationsLock.lockForRead();
-  position = (mTransformation*mEndEffectorTransformation)(cv::Rect(3, 0, 1, 4));
-  mTransformationsLock.unlock();
-  return position;
+  return mpEndEffector->getPosition();
+//  cv::Mat position;
+//  mTransformationsLock.lockForRead();
+//  position = (mTransformation*mEndEffectorTransformation)(cv::Rect(3, 0, 1, 4));
+//  mTransformationsLock.unlock();
+//  return position;
 }
 
 cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorTransformation()
 {
-  cv::Mat T;
-  mTransformationsLock.lockForRead();
-  T = mTransformation * mEndEffectorTransformation;
-  mTransformationsLock.unlock();
-  return T;
+  return mpEndEffector->getTransformation();
+
+//  cv::Mat T;
+//  mTransformationsLock.lockForRead();
+//  T = mTransformation * mEndEffectorTransformation;
+//  mTransformationsLock.unlock();
+//  return T;
 }
 
 cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorJacobian()
@@ -441,7 +470,7 @@ void cedar::dev::robot::KinematicChainModel::init()
 
   mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
 
-  mEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
+//  mEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
   update();
 }
 
@@ -475,7 +504,13 @@ void cedar::dev::robot::KinematicChainModel::calculateTransformations()
                       )
                       * mReferenceJointTwists[i];
   }
-  // end-effector
-  mEndEffectorTransformation = mProductsOfExponentials[getNumberOfJoints()-1] * mReferenceEndEffectorTransformation;
+// end-effector
+// mEndEffectorTransformation = mProductsOfExponentials[getNumberOfJoints()-1] * mReferenceEndEffectorTransformation;
+  mpEndEffector->setTransformation
+  (
+    mTransformation
+    * mProductsOfExponentials[getNumberOfJoints()-1]
+    * mReferenceEndEffectorTransformation
+  );
   mTransformationsLock.unlock();
 }

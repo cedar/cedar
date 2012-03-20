@@ -84,70 +84,12 @@ int main()
     errors++;
     std::cout << "ERROR with setPosition(Mat) or getPosition()" << std::endl;
   }
-  
-  //--------------------------------------------------------------------------------------------------------------------
-  // orientation
-  //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: orientation" << std::endl;
-  cv::Mat q1 = cv::Mat::zeros(4, 1, CV_64FC1);
-  q1.at<double>(1, 0) = 3.3;
-  q1.at<double>(2, 0) = 4.4;
-  q1.at<double>(3, 0) = 0.5;
-  rigid_body.setOrientationQuaternion(q1);
-  cv::Mat q2 = rigid_body.getOrientationQuaternion();
-  if (
-      !IsZero(q2.at<double>(0, 0) - 0.0)
-      || q2.at<double>(1, 0) != 3.3
-      || q2.at<double>(2, 0) != 4.4
-      || q2.at<double>(3, 0) != 0.5
-      )
-  {
-    errors++;
-    std::cout << "ERROR with setOrientationQuaternion(Mat) or getOrientationQuaternion()" << std::endl;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // transformation
-  //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: transformation" << std::endl;
-  rigid_body.setPosition(1, 10, 100);
-  cv::Mat q3 = cv::Mat::zeros(4, 1, CV_64FC1);
-  q3.at<double>(0, 0) = -0.923879532511287;
-  q3.at<double>(2, 0) = 0.38268343236509;
-  rigid_body.setOrientationQuaternion(q3);
-
-  cv::Mat T = rigid_body.getTransformation();
-  if (
-      !IsZero(T.at<double>(0, 0) - sqrt(2.0)/2)
-      || !IsZero(T.at<double>(0, 1) - 0.0)
-      || !IsZero(T.at<double>(0, 2) - -sqrt(2.0)/2)
-      || !IsZero(T.at<double>(1, 0) - 0)
-      || !IsZero(T.at<double>(1, 1) - 1)
-      || !IsZero(T.at<double>(1, 2) - 0)
-      || !IsZero(T.at<double>(2, 0) - sqrt(2.0)/2)
-      || !IsZero(T.at<double>(2, 1) - 0)
-      || !IsZero(T.at<double>(2, 2) - sqrt(2.0)/2)
-      || !IsZero(T.at<double>(0, 3) - 1)
-      || !IsZero(T.at<double>(1, 3) - 10)
-      || !IsZero(T.at<double>(2, 3) - 100)
-      || !IsZero(T.at<double>(3, 0) - 0)
-      || !IsZero(T.at<double>(3, 1) - 0)
-      || !IsZero(T.at<double>(3, 2) - 0)
-      || !IsZero(T.at<double>(3, 3) - 1)
-      )
-  {
-    errors++;
-    std::cout << "ERROR with getTransformation()" << std::endl;
-  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // rotate
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: rotate" << std::endl;
   rigid_body.setPosition(0, 0, 0);
-  cv::Mat q4 = cv::Mat::zeros(4, 1, CV_64FC1);
-  q4.at<double>(0, 0) = 1.0;
-  rigid_body.setOrientationQuaternion(q4);
   rigid_body.rotate(0, cedar::aux::math::pi/2);
   rigid_body.rotate(1, cedar::aux::math::pi/4);
 
@@ -176,6 +118,43 @@ int main()
   {
     errors++;
     std::cout << "ERROR with rotate()" << std::endl;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // transformation
+  //--------------------------------------------------------------------------------------------------------------------
+  std::cout << "test: transformation" << std::endl;
+  cv::Mat T = cv::Mat::ones(4, 4, CV_64FC1);
+  T.at<double>(0, 0) = 0;
+  T.at<double>(1, 0) = 1;
+  T.at<double>(2, 0) = 0;
+  T.at<double>(0, 1) = -1;
+  T.at<double>(1, 1) = 0;
+  T.at<double>(2, 1) = 0;
+  T.at<double>(0, 2) = 0;
+  T.at<double>(1, 2) = 0;
+  T.at<double>(2, 2) = 1;
+  T.at<double>(0, 3) = 5;
+  T.at<double>(1, 3) = 6;
+  T.at<double>(2, 3) = 7;
+  rigid_body.setTransformation(T);
+  if (
+      rigid_body.getTransformation().at<double>(0, 0) != 0.0
+      || rigid_body.getTransformation().at<double>(1, 0) != 1.0
+      || rigid_body.getTransformation().at<double>(2, 0) != 0.0
+      || rigid_body.getTransformation().at<double>(0, 1) != -1.0
+      || rigid_body.getTransformation().at<double>(1, 1) != 0.0
+      || rigid_body.getTransformation().at<double>(2, 1) != 0.0
+      || rigid_body.getTransformation().at<double>(0, 2) != 0.0
+      || rigid_body.getTransformation().at<double>(1, 2) != 0.0
+      || rigid_body.getTransformation().at<double>(2, 2) != 1.0
+      || rigid_body.getTransformation().at<double>(0, 3) != 5.0
+      || rigid_body.getTransformation().at<double>(1, 3) != 6.0
+      || rigid_body.getTransformation().at<double>(2, 3) != 7.0
+      )
+  {
+    errors++;
+    std::cout << "ERROR with setTransformation(cv::Mat) or getTransformation()" << std::endl;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
