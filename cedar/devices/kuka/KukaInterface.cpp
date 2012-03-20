@@ -119,7 +119,7 @@ void cedar::dev::kuka::KukaInterface::init()
   mIsInit = true;
 }
 
-bool cedar::dev::kuka::KukaInterface::isMovable()
+bool cedar::dev::kuka::KukaInterface::isMovable() const
 {
   mLock.lockForRead();
   bool on = mPowerOn;
@@ -274,7 +274,8 @@ void cedar::dev::kuka::KukaInterface::copyFromFRI()
 //----------------------------------------------------------------------------------------------------------------------
 // wrapped fri-functions
 //----------------------------------------------------------------------------------------------------------------------
-FRI_STATE cedar::dev::kuka::KukaInterface::getFriState()
+// todo: check whether the const works with the locks used here (and whether the locks are useful)
+FRI_STATE cedar::dev::kuka::KukaInterface::getFriState() const
 {
   mLock.lockForRead();
   FRI_STATE s = mFriState;
@@ -282,7 +283,7 @@ FRI_STATE cedar::dev::kuka::KukaInterface::getFriState()
   return s;
 }
 
-FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality()
+FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality() const
 {
   mLock.lockForRead();
   FRI_QUALITY q = mFriQuality;
@@ -290,7 +291,7 @@ FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality()
   return q;
 }
 
-float cedar::dev::kuka::KukaInterface::getSampleTime()
+float cedar::dev::kuka::KukaInterface::getSampleTime() const
 {
   mLock.lockForRead();
   float t = mSampleTime;
@@ -298,7 +299,7 @@ float cedar::dev::kuka::KukaInterface::getSampleTime()
   return t;
 }
 
-bool cedar::dev::kuka::KukaInterface::isPowerOn()
+bool cedar::dev::kuka::KukaInterface::isPowerOn() const
 {
   mLock.lockForRead();
   bool on = mPowerOn;

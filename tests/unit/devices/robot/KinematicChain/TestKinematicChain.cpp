@@ -19,76 +19,61 @@
 
 ========================================================================================================================
 
- ----- Institute:   Ruhr-Universitaet Bochum
-                    Institut fuer Neuroinformatik
- 
- ----- File:        KinematicChain.cpp
- 
- ----- Author:      Hendrik Reimann
- ----- Email:       hendrik.reimann@ini.rub.de
- ----- Date:        2010 11 06
- 
- ----- Description: implementation for the \em cedar::dev::robot::SimulatedKinematicChain class
- 
- ----- Credits:
- ---------------------------------------------------------------------------------------------------------------------*/
+    Institute:   Ruhr-Universitaet Bochum
+                 Institut fuer Neuroinformatik
+
+    File:        TestObject.cpp
+
+    Maintainer:  Hendrik Reimann
+    Email:       hendrik.reimann@ini.rub.de
+    Date:        2012 02 15
+
+    Description: Implementation of the @em cedar::tests::unit::dev::robot::TestKinematicChain class.
+
+    Credits:
+
+======================================================================================================================*/
+
 
 // CEDAR INCLUDES
-#include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/auxiliaries/math/tools.h"
+#include "tests/unit/devices/robot/KinematicChain/TestKinematicChain.h"
 
 // SYSTEM INCLUDES
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain
-(
-  const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry
-)
+//! constructor
+TestKinematicChain::TestKinematicChain(const std::string& configFileName)
 :
-KinematicChain(pReferenceGeometry)
+cedar::dev::robot::KinematicChain(configFileName)
 {
-  init();
+  
 }
 
-cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
-:
-KinematicChain(configFileName)
+//! destructor
+TestKinematicChain::~TestKinematicChain()
 {
-  init();
-}
 
-cedar::dev::robot::SimulatedKinematicChain::~SimulatedKinematicChain()
-{
-  if (isRunning())
-  {
-    this->stop();
-    this->wait();
-  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::robot::SimulatedKinematicChain::isMovable() const
+double TestKinematicChain::getJointAngle(unsigned int) const
+{
+  return 0.0;
+}
+
+void TestKinematicChain::setJointAngle(unsigned int, double)
+{
+
+}
+
+bool TestKinematicChain::isMovable() const
 {
   return true;
-}
-
-double cedar::dev::robot::SimulatedKinematicChain::getJointAngle(unsigned int index) const
-{
-  return mJointAngles.at<double>(index, 0);
-}
-
-void cedar::dev::robot::SimulatedKinematicChain::setJointAngle(unsigned int index, double angle)
-{
-  mJointAngles.at<double>(index, 0) = angle;
-}
-
-void cedar::dev::robot::SimulatedKinematicChain::init()
-{
-  mJointAngles = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 }

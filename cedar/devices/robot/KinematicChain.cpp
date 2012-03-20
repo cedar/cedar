@@ -98,7 +98,7 @@ void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeom
 }
 
 
-std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -111,7 +111,7 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles()
 }
 
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
 {
   cv::Mat dummy = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
@@ -135,7 +135,7 @@ double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) c
 }
 
 
-std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -148,7 +148,7 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities()
 }
 
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
 {
   return mJointVelocities.clone();
 }
@@ -165,7 +165,7 @@ double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int inde
 }
 
 
-std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -178,7 +178,7 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations()
 }
 
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
 {
   return mJointAccelerations.clone();
 }

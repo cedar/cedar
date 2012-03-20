@@ -87,7 +87,7 @@ public:
    *
    * @return    state
    */
-  virtual bool isMovable() = 0;
+  virtual bool isMovable() const = 0;
 
   /*!@brief get reference geometry for this kinematic chain
    *
@@ -118,13 +118,13 @@ public:
    *
    * @return    vector of joint angles
    */
-  std::vector<double> getJointAngles();
+  std::vector<double> getJointAngles() const;
 
   /*!@brief get current state of all joint angles
    *
    * @return    vector of joint angles
    */
-  cv::Mat getJointAnglesMatrix();
+  cv::Mat getJointAnglesMatrix() const;
 
   /*!@brief get current state of a single joint velocity
    *
@@ -137,13 +137,13 @@ public:
    *
    * @return    vector of joint velocities
    */
-  std::vector<double> getJointVelocities();
+  std::vector<double> getJointVelocities() const;
 
   /*!@brief get current state of all joint velocities
    *
    * @return    vector of joint velocities
    */
-  cv::Mat getJointVelocitiesMatrix();
+  cv::Mat getJointVelocitiesMatrix() const;
 
   /*!@brief get current state of a single joint acceleration
    *
@@ -156,13 +156,13 @@ public:
    *
    * @return    vector of joint accelerations
    */
-  std::vector<double> getJointAccelerations();
+  std::vector<double> getJointAccelerations() const;
 
   /*!@brief get current state of all joint accelerations
    *
    * @return    vector of joint accelerations
    */
-  cv::Mat getJointAccelerationsMatrix();
+  cv::Mat getJointAccelerationsMatrix() const;
 
   /*!@brief returns the mode in which the joints positions are set (angle/velocity/acceleration)
    *

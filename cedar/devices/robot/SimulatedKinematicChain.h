@@ -70,7 +70,7 @@ public:
    *
    * @return    state
    */
-  bool isMovable();
+  bool isMovable() const;
 
   /*!@brief get current state of a single joint angle
    *

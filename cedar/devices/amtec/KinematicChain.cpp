@@ -99,7 +99,7 @@ cedar::dev::amtec::KinematicChain::~KinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-bool cedar::dev::amtec::KinematicChain::isMovable()
+bool cedar::dev::amtec::KinematicChain::isMovable() const
 {
   // todo: change this to something meaningful
   return true;
