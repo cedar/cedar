@@ -87,7 +87,7 @@ int main(int , char **)
    *
    * EITHER:
    *  No or new configuration file:
-   *  - loopedThread isn't running (start auto-grabbing with start() )
+   *  - loopedThread isn't running (startGrabber auto-grabbing with startGrabber() )
    *  - grabbername is set to default, i.e. NetGrabber
    *
    * OR:
@@ -118,7 +118,7 @@ int main(int , char **)
     //grabberthread don't have to be started. There is no new content to grab.
 
     //Nevertheless you can create an avi file from your picture-grabbing
-    //In this case you have to start the thread
+    //In this case you have to startGrabber the thread
     net_grabber->setRecordName("RecordedStereoNetGrabber.avi");
 
     //It is possible to create a snaptshot of the pics.
@@ -174,10 +174,10 @@ int main(int , char **)
   cv::Mat frame0 = net_grabber->getImage();
   cv::Mat frame1 = net_grabber->getImage(1);
 
-  //start recording
+  //startGrabber recording
   std::cout << "\nStart Recording\n";
   net_grabber->setFps(15);
-  net_grabber->start();
+  net_grabber->startGrabber();
   net_grabber->startRecording(15);
 
 
@@ -211,10 +211,10 @@ int main(int , char **)
     waitKey(10);
   }
 
-  //stop grabbing-thread if running
+  //stopGrabber grabbing-thread if running
   if (net_grabber->isRunning())
   {
-    net_grabber->stop();
+    net_grabber->stopGrabber();
   }
 
   //------------------------------------------------------------------
@@ -223,11 +223,11 @@ int main(int , char **)
   destroyWindow(highgui_window_name_0);
   destroyWindow(highgui_window_name_1);
 
-  //stop grabbing-thread if running
+  //stopGrabber grabbing-thread if running
   //recording will also be stopped
   if (net_grabber->isRunning())
   {
-    net_grabber->stop();
+    net_grabber->stopGrabber();
   }
 
   if (net_grabber)

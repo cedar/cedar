@@ -119,7 +119,7 @@ void cedar::dev::sensors::visual::VideoGrabber::onCleanUp()
   #endif
 
   //close all captures
-  //mChannels.clear(); done in Grabberinterface
+  //mChannels.clear() is done in Grabberinterface
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -131,14 +131,14 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
     std::cout << "VideoGrabber: Initialize Grabber with " << mNumCams << " cameras ..." << std::endl;
     for (unsigned int channel = 0; channel < mNumCams; ++channel)
     {
-      std::cout << "Channel " << channel << ": capture from: " << mSourceFileNames.at(channel) << "\n";
+      std::cout << "Channel " << channel << ": capture from: " << getChannel(channel)->sourceFileName << "\n";
     }
     std::cout << std::flush;
   #endif
 
 
   //----------------------------------------
-  //open capture one by one, and create storage (cv::Mat) for it
+  //open capture one by one
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
     cv::VideoCapture capture(getChannel(channel)->sourceFileName);
@@ -147,10 +147,8 @@ bool cedar::dev::sensors::visual::VideoGrabber::onInit()
     {
       getChannel(channel)->videoCapture = capture;
 
-      //grab first frame to initialize the camera-memory
-      cv::Mat frame;
-      getChannel(channel)->videoCapture >> frame;
-      getChannel(channel)->imageMat = frame;
+      //grab first frame to initialize the frame-memory
+      getChannel(channel)->videoCapture >> getChannel(channel)->imageMat;
     }
     else
     {
@@ -214,7 +212,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
     if (getChannel(channel)->imageMat.empty())
     {
 
-      //unsigned int pos_Abs = getChannel(0)->videoCapture.get(CV_CAP_PROP_POS_FRAMES);
+      unsigned int pos_Abs = getChannel(0)->videoCapture.get(CV_CAP_PROP_POS_FRAMES);
 
       #ifdef DEBUG_VIDEOGRABBER
         std::cout << "[VideoGrabber::onGrab] Channel  :" << channel << " empty" << std::endl;
@@ -222,13 +220,13 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
       #endif
 
       //error or end of file?
-      if (getPositionAbs() == (mFramesCount-1))
+      if (getPositionAbsolute() == (mFramesCount-1))
       {
 
         if (_mLoop)
         {
           //rewind all channels and grab first frame
-          setPositionAbs(0);
+          setPositionAbsolute(0);
           for (unsigned int i = 0; i < mNumCams; ++i)
           {
             (getChannel(i)->videoCapture) >> getChannel(i)->imageMat;
@@ -242,13 +240,7 @@ bool cedar::dev::sensors::visual::VideoGrabber::onGrab()
         }
         else
         {
-          //set all images to empty matrices
-          //for (unsigned int i = 0; i < mNumCams; ++i)
-          //{
-          //  mImageMatVector.at(i) = cv::Mat();
-          //}
-
-          //don't touch last images
+          //the last frame of the file remains in image buffer
           result = false;
         }
       }
@@ -295,7 +287,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setLoop(bool loop)
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::VideoGrabber::setPositionRel(double newPositionRel)
+void cedar::dev::sensors::visual::VideoGrabber::setPositionRelative(double newPositionRel)
 {
   //getChannel(0)->videoCapture->set(CV_CAP_PROP_POS_AVI_RATIO,newPositionRel); //does nothing
 
@@ -319,14 +311,6 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRel(double newPositio
     new_pos_abs = 0;
   }
 
-  //double test_pos_rel = 1. / ( mFramesCount / act_pos_abs );
-  //double test_new_pos_rel = (test_pos_rel * newPositionRel);
-  //double new_pos_abs = test_new_pos_rel * mFramesCount;
-
-  /*
-   * double new_pos_abs = (act_pos_abs / (act_pos_rel*100)) *newPositionRel;
-   * int    np = static_cast<int> (new_pos_abs);
-   */
   #ifdef DEBUG_VIDEOGRABBER
     std::cout << "[VideoGrabber::setPositionRel] new position wanted (relative 0..1): " << newPositionRel
               << std::endl;
@@ -340,20 +324,20 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionRel(double newPositio
 }
 
 //----------------------------------------------------------------------------------------------------
-double cedar::dev::sensors::visual::VideoGrabber::getPositionRel()
+double cedar::dev::sensors::visual::VideoGrabber::getPositionRelative()
 {
   //the shortest file defines the length of the avi
   //it is possible, that the first file isn't the shortest
   //so we use absolute positions instead of relative
   //return  getChannel(0)->videoCapture.get(CV_CAP_PROP_POS_AVI_RATIO); //from 0..1;
 
-  double pos_abs = static_cast<double>(this->getPositionAbs());
+  double pos_abs = static_cast<double>(this->getPositionAbsolute());
   double count   = static_cast<double>(mFramesCount);
   return pos_abs / count;
 }
 
 //----------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::VideoGrabber::setPositionAbs(unsigned int newPositionAbs)
+void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int newPositionAbs)
 {
   //newPos can't be smaller than zero, because it is an unsigned int
   //only check upper border
@@ -363,7 +347,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbs(unsigned int newP
   }
 
   #ifdef DEBUG_VIDEOGRABBER
-    std::cout << "[VideoGrabber::setPositionAbs] current position: " << getPositionAbs() << std::endl;
+    std::cout << "[VideoGrabber::setPositionAbs] current position: " << getPositionAbsolute() << std::endl;
     std::cout << "[VideoGrabber::setPositionAbs] position set to frame: " << newPositionAbs << std::endl;
   # endif
 
@@ -374,7 +358,7 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbs(unsigned int newP
 }
 
 //----------------------------------------------------------------------------------------------------
-unsigned int cedar::dev::sensors::visual::VideoGrabber::getPositionAbs()
+unsigned int cedar::dev::sensors::visual::VideoGrabber::getPositionAbsolute()
 {
   //the position in all avi's should be the same
   //we use the first capture-device

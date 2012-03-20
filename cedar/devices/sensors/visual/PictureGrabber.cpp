@@ -111,7 +111,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onInit()
     std::cout << "PictureGrabber: Initialize Grabber with " << mNumCams << " pictures ..." << std::endl;
     for (unsigned int i = 0; i < mNumCams; ++i)
     {
-      std::cout << "Channel " << i << ": capture from Picture: " << mSourceFileNames.at(i) << "\n";
+      std::cout << "Channel " << i << ": capture from Picture: " << getChannel(i)->sourceFileName << "\n";
     }
     std::cout << std::flush;
   #endif
@@ -127,7 +127,6 @@ bool cedar::dev::sensors::visual::PictureGrabber::onInit()
     }
     else
     {
-      //todo: exception raus
       std::cout << "[PictureGrabber::onInit] ERROR: Grabbing failed\n"
                 << "\tChannel " << channel << ": \"" << getChannel(channel)->sourceFileName << "\"."
                 << std::endl;

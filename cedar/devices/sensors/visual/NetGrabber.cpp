@@ -147,7 +147,8 @@ bool cedar::dev::sensors::visual::NetGrabber::onInit()
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {
     #ifdef SHOW_INIT_INFORMATION_NETGRABBER
-      std::cout << "NetGrabber: Create channel " << channel << ": " << mYarpChannels.at(channel) << " " << std::flush;
+      std::cout << "NetGrabber: Create channel " << channel << ": " << getChannel(channel)->channelName
+                << " " << std::flush;
     #endif
 
     //try to connect for about 1 to 2 minutes per channel

@@ -65,12 +65,12 @@ namespace cedar
 
 
 
-/*! \brief A simple Grabber class for testing the Grabber interface
+/*! @brief A simple Grabber class for testing the Grabber interface
  *
  *  This grabber class is used to test the grabber interface. It
  *  creates a Grabber with a TestParam (default-value 123) and FPS set to 15
  *
- *  \remarks
+ *  @remarks
  *    This class can also be used as a template to create other classes derived from GrabberInstance
  *
  */
@@ -79,6 +79,26 @@ class cedar::dev::sensors::visual::TestGrabber
 public cedar::dev::sensors::visual::GrabberInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+
+
+  /*! @struct PictureChannel
+   *  @brief Additional data of a grabbing channel
+   *  @remarks For grabber developers<br>
+   *    You don't have to create an extended channel structure, until you need more channel data.
+   *    But when, then you have to implement the onAddChannel() member function as well
+   */
+  struct TestChannel
+  :
+  cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
+  {
+    std::string sourceFileName;  //! @brief The filenames
+  };
+
+  typedef boost::shared_ptr<TestChannel> TestChannelPtr;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -86,25 +106,18 @@ public cedar::dev::sensors::visual::GrabberInterface
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  /*! \brief The constructor for a single channel grabber.
-   *  \param configFileName Filename for a file, where the configuration parameters should be stored
-   *  \param ChannelName  Channel to grab from
+  /*! @brief The constructor for a single channel grabber.
+   *  @param configFileName Filename for a file, where the configuration parameters should be stored
+   *  @param ChannelName  Channel to grab from
    */
-  TestGrabber(
-               std::string configFileName,
-               std::string ChannelName
-             );
+  TestGrabber(std::string configFileName, std::string channelName);
 
-  /*! \brief The constructor for a stereo grabber.
-   *  \param configFileName Filename for a file, where the configuration parameters should be stored
-   *  \param ChannelName0  Channel one to grab from
-   *  \param ChannelName1  Channel two to grab from
+  /*! @brief The constructor for a stereo grabber.
+   *  @param configFileName Filename for a file, where the configuration parameters should be stored
+   *  @param ChannelName0  Channel one to grab from
+   *  @param ChannelName1  Channel two to grab from
    */
-  TestGrabber(
-               std::string configFileName,
-               std::string ChannelName0,
-               std::string ChannelName1
-             );
+  TestGrabber(std::string configFileName, std::string channelName0, std::string channelName1);
 
   //!@brief Destructor
   ~TestGrabber();
@@ -114,17 +127,17 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! \brief Read the counter and reset it to zero
-   *  \remarks The counter counts the framerate (i.e. the call of the grab() method) of LoopedThread.
+  /*! @brief Read the counter and reset it to zero
+   *  @remarks The counter counts the framerate (i.e. the call of the grab() method) of LoopedThread.
    */
   unsigned int getCounter();
 
-  /*! \brief Simple get-function for the test parameter
+  /*! @brief Simple get-function for the test parameter
    *
    */
   int getTestParam();
 
-  /*! \brief Simple set-function for the test parameter
+  /*! @brief Simple set-function for the test parameter
    *
    */
   void setTestParam(int mTest);
@@ -140,12 +153,34 @@ protected:
   bool onDeclareParameters();
   const std::string& onGetSourceInfo(unsigned int channel) const;
   bool onGrab();
+  void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
+  inline TestChannelPtr getChannel(unsigned int channel)
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<TestChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<TestChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
+
+  //!@todo: after merging change to ConstCameraChannelPtr
+  ///! Cast the storage vector from base channel struct "GrabberChannelPtr" to derived class TestChannelPtr
+  inline boost::shared_ptr<const TestChannel> getChannel(unsigned int channel) const
+  {
+    //!@todo: change to asserted_cast
+    //return cedar::aux::asserted_cast<TestChannelPtr>(mChannels.at(channel))
+    return boost::static_pointer_cast<const TestChannel>
+           (
+             cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
+           );
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

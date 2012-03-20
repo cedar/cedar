@@ -45,17 +45,19 @@
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a single-channel grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber(std::string configFileName, std::string ChannelName)
+cedar::dev::sensors::visual::TestGrabber::TestGrabber(std::string configFileName, std::string channelName)
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   std::cout<<"[TestGrabber::TestGrabber] Create a single channel grabber\n";
 
-  //initialize the grabber-source vector
-  mChannelVector.push_back(ChannelName);
+  //read initialization values from configuration file
+  readInit(1,"TestGrabber");
 
-  //call of doInit with number of channels and a default grabbername
-  readInit( mChannelVector.size(),"TestGrabber");
+  //overwrite parameters from configfiles with values from constuctor
+  getChannel(0)->sourceFileName = channelName;
+
+  //now apply the whole configuration
   applyInit();
 }
 
@@ -64,20 +66,22 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 // Constructor for a stereo grabber
 cedar::dev::sensors::visual::TestGrabber::TestGrabber(
                           std::string configFileName,
-                          std::string ChannelName0,
-                          std::string ChannelName1
+                          std::string channelName0,
+                          std::string channelName1
                         )
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
-  std::cout<<"[TestGrabber::TestGrabber] Create a dual channel grabber\n";
+  std::cout<<"[TestGrabber::TestGrabber] Create a stereo channel grabber\n";
 
-  //initialize the grabber-source vector
-  mChannelVector.push_back(ChannelName0);
-  mChannelVector.push_back(ChannelName1);
+  //read initialization values from configuration file
+  readInit(2,"StereoTestGrabber");
 
-  //call of doInit with number of channels and a default grabbername
-  readInit( mChannelVector.size(),"TestGrabber");
+  //overwrite parameters from configfiles with values from constuctor
+  getChannel(0)->sourceFileName = channelName0;
+  getChannel(1)->sourceFileName = channelName1;
+
+  //now apply the whole configuration
   applyInit();
 }
 
@@ -142,6 +146,14 @@ void cedar::dev::sensors::visual::TestGrabber::onCleanUp()
   //on an exception or a CTRL-C only onCleanUp will be invoked (no destructor)
 
   std::cout << "[TestGrabber::onCleanUp] GrabberName: " << getName() << std::endl;
+}
+
+//----------------------------------------------------------------------------------------------------
+void cedar::dev::sensors::visual::TestGrabber::onAddChannel()
+{
+  //create the channel structure for one channel
+  TestChannelPtr channel(new TestChannel);
+  mChannels.push_back(channel);
 }
 
 //----------------------------------------------------------------------------------------------------

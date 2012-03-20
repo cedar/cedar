@@ -92,7 +92,7 @@ int main(int , char **)
    *
    * EITHER:
    *  No or new configuration file:
-   *  - loopedThread isn't running (start auto-grabbing with start() )
+   *  - loopedThread isn't running (startGrabber auto-grabbing with startGrabber() )
    *  - grabbername is set to default, i.e. picture_grabber
    *
    * OR:
@@ -123,7 +123,7 @@ int main(int , char **)
     //grabberthread don't have to be started. There is no new content to grab.
 
     //Nevertheless you can create an avi file from your picture-grabbing
-    //In this case you have to start the thread
+    //In this case you have to startGrabber the thread
     picture_grabber->setRecordName("RecordedPictureGrabber.avi");
 
     //It is possible to create a snaptshot of the pics.
@@ -176,10 +176,10 @@ int main(int , char **)
   cv::Mat frame0 = picture_grabber->getImage();
   cv::Mat frame1 = picture_grabber->getImage(1);
 
-  //start recording
+  //startGrabber recording
   std::cout << "\nStart Recording\n";
   picture_grabber->setFps(15);
-  picture_grabber->start();
+  picture_grabber->startGrabber();
   picture_grabber->startRecording(15);
 
 
@@ -225,11 +225,11 @@ int main(int , char **)
   destroyWindow(highgui_window_name_0);
   destroyWindow(highgui_window_name_1);
 
-  //stop grabbing-thread if running
+  //stopGrabber grabbing-thread if running
   //recording will also be stopped
   if (picture_grabber->isRunning())
   {
-   picture_grabber->stop();
+   picture_grabber->stopGrabber();
   }
 
   if (picture_grabber)

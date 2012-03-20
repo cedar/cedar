@@ -44,9 +44,9 @@
 // SYSTEM INCLUDES
 
 
-/*! \class cedar::dev::sensors::visual::VideoGrabber
- *  \brief This grabber grabs images from video-files
- *  \remarks This grabber will grab from all video-files known by OpenCV and/or ffmpeg
+/*! @class cedar::dev::sensors::visual::VideoGrabber
+ *  @brief This grabber grabs images from video-files
+ *  @remarks This grabber will grab from all video-files known by OpenCV and/or ffmpeg
  *		Please look at their documentation for supported types (i.e. mpg, avi, ogg,...)
  */
 class cedar::dev::sensors::visual::VideoGrabber
@@ -58,8 +58,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-  /*! \struct VideoChannel
-   *  \brief Additional data of a camera channel
+  /*! @struct VideoChannel
+   *  @brief Additional data of a video channel
    */
   struct VideoChannel
   :
@@ -83,25 +83,18 @@ public cedar::dev::sensors::visual::GrabberInterface
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*!	\brief  Constructor for a single-file grabber
-   *	\param configFileName	Filename for the configuration
-   *  \param aviFileName		Filename to grab from
+  /*!	@brief  Constructor for a single-file grabber
+   *	@param configFileName	Filename for the configuration
+   *  @param aviFileName		Filename to grab from
    */
-  VideoGrabber(
-                const std::string& configFileName,
-                const std::string& aviFileName
-              );
+  VideoGrabber(const std::string& configFileName,const std::string& aviFileName);
 
-  /*!	\brief Constructor for a stereo-file grabber
-   *	\param configFileName	Filename for the configuration
-   *  \param aviFileName0	Filename to grab from for channel 0
-   *  \param aviFileName1	Filename to grab from for channel 1
+  /*!	@brief Constructor for a stereo-file grabber
+   *	@param configFileName	Filename for the configuration
+   *  @param aviFileName0	Filename to grab from for channel 0
+   *  @param aviFileName1	Filename to grab from for channel 1
    */
-  VideoGrabber(
-                const std::string& configFileName,
-                const std::string& aviFileName0,
-                const std::string& aviFileName1
-              );
+  VideoGrabber(const std::string& configFileName, const std::string& aviFileName0, const std::string& aviFileName1);
 
   //!@brief Destructor
   ~VideoGrabber();
@@ -111,96 +104,86 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
- /*! \brief Turn looping on or off (i.e., restart on end) */
-  void setLoop(
-                bool loop = true
-              );
+ /*! @brief Turn looping on or off (i.e., restart on end) */
+  void setLoop(bool loop = true);
 
-  /*! \brief set the factor for grabbing speed
-   *  \remarks the speed stored in the AVI-File will be multiplied with this factor.<br>
+  /*! @brief Set the factor for grabbing speed
+   *
+   *   The speed stored in the AVI-File will be multiplied with this factor.<br>
    *		Effective FPS should be SpeedFactor*AVI-Speed<br>
-   *  \remarks
+   *  @remarks
    *		The grabberthread have to be restarted to take effect.<br>
    *		This is done internally (by calling setFPS), but keep that in mind.
-   *  \see
+   *  @see
    *		setFPS
    */
-  void setSpeedFactor(
-                       double speedFactor
-                     );
+  void setSpeedFactor(double speedFactor);
 
-  /*! \brief Get the factor for grabbing speed
-   *  \remarks the speed stored in the AVI-File will be multiplied with this factor
+  /*! @brief Get the factor for grabbing speed
+   *
+   *    The speed stored in the AVI-File will be multiplied with this factor
    *		so effective FPS should be _mSpeedFactor*AVI-Speed
    */
   double getSpeedFactor() const;
 
-  /*! \brief Set postion in the AVI-Files relative
-   *  \param newPositionRel New position in the range is from 0..1
-   *  \remarks
-   *		Range is from 0..1<br>
-   *		For absolute positioning use setPositionAbs()
+  /*! @brief Set postion in the AVI-Files relative
+   *
+   *    Range is from 0..1<br>
+   *    For absolute positioning use setPositionAbsolute()
+   *  @param newPositionRel New position in the range is from 0..1
    */
-  //todo Relative
-  void setPositionRel(
-                       double newPositionRel
-                     );
+  void setPositionRelative(double newPositionRel);
 
-  /*! \brief Return the actual position relative to the file size.
-   *  \return Range is from 0..1
+  /*! @brief Return the actual position relative to the file size.
+   *  @return Range is from 0..1
    */
-  double getPositionRel();
+  double getPositionRelative();
 
-  /*! \brief Set the position in the avi-files absolute
-   *  \param newPositionAbs New position in the range is from 0..FrameCount
-   *  \remarks
+  /*! @brief Set the position in the avi-files to an absolute position
+   *  @param newPositionAbs New position in the range is from 0..FrameCount
+   *  @remarks
    *      For relative positioning use setPostionRel()
    */
-  //todo Absolute
-  void setPositionAbs(
-                       unsigned int newPositionAbs
-                     );
+  void setPositionAbsolute(unsigned int newPositionAbs);
 
-  /*! \brief Return the position in the file, i.e. the framenumber.
-   *  \return Range is from 0..FrameCount
+  /*! @brief Returns the position in the file, i.e. the framenumber.
+   *  @return Range is from 0..FrameCount
    */
-  unsigned int getPositionAbs();
+  unsigned int getPositionAbsolute();
 
-  /*! \brief Get the count of frames in the AVI
-   *  \remarks
+  /*! @brief Get the count of frames in the AVI
+   *
    *		In the case of a stereo grabber and different length
    *		the shortest avi-file determine the length
    */
   unsigned int getFrameCount() const;
 
-  /*! \brief This passes the arguments directly to the corresponding capture
-   *  \remarks With this Method, it is possible to get Information on any channel.
-   *  \param channel This is the index of the source you want parameter value.< br >
-   *  \param propId This is any supported property - Id<br>
-   *	  If property-id is not supported or unknown, return value will be 0.
-   *  \remarks Look at the OpenCV documentation for VideoCapture::get() for details
+  /*! @brief This passes the arguments directly to the corresponding capture
+   *
+   *  With this Method, it is possible to get Information on any channel.
+   *  @param channel This is the index of the source you want parameter value.< br >
+   *  @param propId This is any supported property - Id<br>
+   *	  If property-id is not supported or unknown, return value will be 0
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *
+   *  @remarks Look at the OpenCV documentation for VideoCapture::get() for details
    */
-  double getSourceProperty(
-                            unsigned int channel,
-                            int propId
-                          );
+  double getSourceProperty(unsigned int channel, int propId);
 
-  /*! \brief Get fps for the given channel. This value will be read from the appropriate video-file.
-   *  \remarks
+  /*! @brief Get fps for the given channel. This value will be read from the appropriate video-file.
+   *
    *    Default channel is 0
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  double getSourceFps(
-                       unsigned int channel = 0
-                     );
+  double getSourceFps(unsigned int channel=0);
 
-  /*! \brief Get the codec for the given channel. This value will be read from the appropriate video-file.
-   *  \remarks
+  /*! @brief Get the codec for the given channel. This value will be read from the appropriate video-file.
+   *
    *    Default channel is 0. <br>
    *    This value is the FOURCC-code from the video-file.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  double getSourceEncoding(
-                            unsigned int channel = 0
-                          );
+  double getSourceEncoding(unsigned int channel=0);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -213,8 +196,8 @@ protected:
 
   bool onInit();
 
-  /*! \brief Grab on all available files
-   *  \remarks
+  /*! @brief Grab on all available files
+   *  @remarks
    *      The shortest file determine the end
    *      In case of looping through the files, the shortest file define the restart moment
    */
@@ -238,28 +221,26 @@ public:
   // none yet (hopefully never!)
 protected:
   
-  /*! \brief Indicates if looping is on
+  /*! @brief Indicates if looping is on
    */
   bool _mLoop;
 
-  /*! \brief Factor for grabbing speed
-   *  \remarks the speed stored in the AVI-File will be multiplied with this factor
+  /*! @brief Factor for grabbing speed
+   *  @remarks the speed stored in the AVI-File will be multiplied with this factor
    *    so effective FPS should be _mSpeedFactor*AVI-Speed
    */
   double _mSpeedFactor;
 
-  /*! \brief Count of frames of the shortest file
-   *  \remarks
+  /*! @brief Count of frames of the shortest file
+   *  @remarks
    *		Used for scrolling in the avi-file
-   *  \see
-   *		setPositionRel, getPositionRel, setPositionAbs, setPositionRel
+   *  @see
+   *		setPositionRelative, getPositionRelative, setPositionAbsolute, setPositionRelative
    */
   unsigned int mFramesCount;
 
-
-
-
 private:
+
   /*! Cast the storage vector from base channel struct "GrabberChannelPtr" to
    *  derived class VideoChannelPtr
    */
