@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        FastConvolution.h
+    File:        FFTW.h
 
     Maintainer:  Stephan Zibner
     Email:       stephan.zibner@ini.rub.de
@@ -34,14 +34,14 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_CONV_FAST_CONVOLUTION_H
-#define CEDAR_AUX_CONV_FAST_CONVOLUTION_H
+#ifndef CEDAR_AUX_CONV_FFTW_H
+#define CEDAR_AUX_CONV_FFTW_H
 
 #ifdef CEDAR_FFTW
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/convolution/namespace.h"
-#include "cedar/auxiliaries/convolution/Convolution.h"
+#include "cedar/auxiliaries/convolution/Engine.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -51,7 +51,7 @@
  *
  * @todo describe more.
  */
-class cedar::aux::conv::FastConvolution : public cedar::aux::conv::Convolution
+class cedar::aux::conv::FFTW : public cedar::aux::conv::Engine
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -69,13 +69,42 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  // none
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cv::Mat& kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    cedar::aux::kernel::ConstKernelPtr kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const;
+
+  cv::Mat convolve
+  (
+    const cv::Mat& matrix,
+    const cedar::aux::conv::KernelList& kernel,
+    cedar::aux::conv::BorderType::Id borderType = cedar::aux::conv::BorderType::Replicate,
+    const std::vector<unsigned int>& anchor = std::vector<unsigned int>()
+  ) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cv::Mat convolve(const cv::Mat& matrix, const cv::Mat& kernel) const;
+  cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -91,7 +120,7 @@ protected:
 private:
   // none yet
 
-}; // cedar::aux::conv::Convolution
+}; // cedar::aux::conv::FFTW
 
 #endif // CEDAR_FFTW
-#endif // CEDAR_AUX_CONV_FAST_CONVOLUTION_H
+#endif // CEDAR_AUX_CONV_FFTW_H

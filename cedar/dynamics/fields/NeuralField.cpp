@@ -51,7 +51,6 @@
 #include "cedar/auxiliaries/math/AbsSigmoid.h"
 #include "cedar/auxiliaries/kernel/Gauss.h"
 #include "cedar/auxiliaries/assert.h"
-#include "cedar/auxiliaries/convolution/FastConvolution.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/Log.h"
 
