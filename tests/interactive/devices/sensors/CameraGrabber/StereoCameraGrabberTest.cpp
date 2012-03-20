@@ -109,7 +109,7 @@ int main(int , char **)
    *
    * EITHER:
    *  No or new configuration file:
-   *  - loopedThread isn't running (start auto-grabbing with start() )
+   *  - loopedThread isn't running (startGrabber auto-grabbing with startGrabber() )
    *  - grabbername is set to default, i.e. CameraGrabber
    *
    * OR:
@@ -165,8 +165,8 @@ int main(int , char **)
 
 
 
-  //start the grabber-thread for updating camera images
-  camera_grabber->start();
+  //startGrabber the grabber-thread for updating camera images
+  camera_grabber->startGrabber();
 
   //get frames for a while
   unsigned int counter=0;
@@ -208,11 +208,11 @@ int main(int , char **)
 
   destroyWindow(highgui_window_name_0);
 
-  //stop grabbing-thread if running
+  //stopGrabber grabbing-thread if running
   //recording will also be stopped
   if (camera_grabber->isRunning())
   {
-    camera_grabber->stop();
+    camera_grabber->stopGrabber();
   }
 
   if (camera_grabber)

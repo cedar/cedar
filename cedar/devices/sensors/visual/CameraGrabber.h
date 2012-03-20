@@ -55,8 +55,8 @@
 // SYSTEM INCLUDES
 
 
-/*! \class cedar::dev::sensors::visual::CameraGrabber
- *  \brief This grabber grabs images from a camera. This functionality is implemented by
+/*! @class cedar::dev::sensors::visual::CameraGrabber
+ *  @brief This grabber grabs images from a camera. This functionality is implemented by
  *   using the OpenCV class cv::VideoCapture
  */
 class cedar::dev::sensors::visual::CameraGrabber
@@ -67,8 +67,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-  /*! \struct CameraId
-   *  \brief Store the unique Id of a camera
+  /*! @struct CameraId
+   *  @brief Store the unique Id of a camera
    */
   struct CameraId
   {
@@ -77,8 +77,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   };
 
 
-  /*! \struct CameraChannel
-   *  \brief Additional data of a camera channel
+  /*! @struct CameraChannel
+   *  @brief Additional data of a camera channel
    */
   struct CameraChannel
   :
@@ -105,20 +105,20 @@ public cedar::dev::sensors::visual::GrabberInterface
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! \brief Constructor for a camera grabber with one connected camera
-   *  \param configFileName Filename for the configuration
-   *  \param camera Device to grab from. Look at OpenCV cv::VideoCapture documentation for details
-   *  \param isGuid This flag have to be set, if the value in parameter camera is the guid of the camera. In this
+  /*! @brief Constructor for a camera grabber with one connected camera
+   *  @param configFileName Filename for the configuration
+   *  @param camera Device to grab from. Look at OpenCV cv::VideoCapture documentation for details
+   *  @param isGuid This flag have to be set, if the value in parameter camera is the guid of the camera. In this
    *         case, the camera with this guid will be searched on the bus.
-   *  \param finishInitialization Flag, if the initialization should be finished. In this case it isn't possible to
+   *  @param finishInitialization Flag, if the initialization should be finished. In this case it isn't possible to
    *         change the camera resolution or the camera framerate if you use a firewire camera. <br>
    *         The settings will be restored from the configfile. If there is no configfile,
    *         the best settings (i.e. highest framerate, largest picture size) will be used.
    *         If the finishInitialization flag isn't set, you can change this settings before you grab the first Frame.<br>
    *         But be aware, that getImage() will return empty matrices unless the first frame have been grabbed.
-   *         This is done by starting the grabbing thread via the start() method or manually grab the first picture
+   *         This is done by starting the grabbing thread via the startGrabber() method or manually grab the first picture
    *         with grab().
-   *  \remarks
+   *  @remarks
    *    OpenCV selects the capture framework at the basis of the camera parameter. Use a multiple of 100 to select
    *    the interface or use the CV_CAP_xxx constants in /usr/local/include/opencv2/highgui/highgui_c.h for a
    *    base unit (like CV_CAP_FIREWIRE, CV_CAP_ANY)
@@ -131,14 +131,14 @@ public:
                );
 
 
-  /*! \brief Constructor for a stereo camera grabber
-   *  \param configFileName Filename for the configuration
-   *  \param camera0 Device to grab from for channel 0. Look at OpenCV cv::VideoCapture documentation for details
-   *  \param camera1 Device to grab from for channel 1. Look at OpenCV cv::VideoCapture documentation for details
-   *  \param isGuid This flag have to be set, if the values in camera0 or camera1 are the guids of the cameras
-   *  \param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
+  /*! @brief Constructor for a stereo camera grabber
+   *  @param configFileName Filename for the configuration
+   *  @param camera0 Device to grab from for channel 0. Look at OpenCV cv::VideoCapture documentation for details
+   *  @param camera1 Device to grab from for channel 1. Look at OpenCV cv::VideoCapture documentation for details
+   *  @param isGuid This flag have to be set, if the values in camera0 or camera1 are the guids of the cameras
+   *  @param finishInitialization Flag, if the initialization should be finished. Have a look at the CameraGrabber()
    *          Constructor for details
-   *  \see cedar::dev::sensors::visual::CameraGrabber::CameraGrabber(const std::string&, unsigned int, bool, bool)
+   *  @see cedar::dev::sensors::visual::CameraGrabber::CameraGrabber(const std::string&, unsigned int, bool, bool)
    *       for details about the used framework
    */
   CameraGrabber(
@@ -150,25 +150,21 @@ public:
                );
 
 
-  /*! \brief Constructor for a camera grabber. The complete configuration will be read from configuration file.</br>
+  /*! @brief Constructor for a camera grabber. The complete configuration will be read from configuration file.</br>
    *   If the system can't find the wanted camera, initialization will fail.
-   *  \par
+   *  @par
    *        The camera always will be initialized (i.e. the first frame is already grabbed on initialization)
-   *  \param configFileName Filename for the configuration
-   *  \param numCameras How many cameras you want to use
-   *  \remarks
+   *  @param configFileName Filename for the configuration
+   *  @param numCameras How many cameras you want to use
+   *  @remarks
    *        If there is no configuration file with the given name, a new one will be created. But be aware,
    *        the default camera capabilities filename (build with guid or busId) will be used. It is possible,
    *        that this file isn't the right one for your camera.
-   *
    */
-  CameraGrabber(
-                 const std::string& configFileName,
-                 unsigned int numCameras
-               );
+  CameraGrabber(const std::string& configFileName, unsigned int numCameras);
 
 
-  /*! \brief Destructor */
+  /*! @brief Destructor */
   ~CameraGrabber();
 
 
@@ -177,177 +173,157 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*!  \brief With this method, it is possible to get Information on any channel.
+  /*!  @brief With this method, it is possible to get Information on any channel.
    *   This method passes the arguments directly to the corresponding capture device
-   *   \param channel This is the index of the source you want to get the parameter value.
-   *   \param propId This is any supported property-Id<br>
+   *   @param channel This is the index of the source you want to get the parameter value.
+   *   @param propId This is any supported property-Id<br>
    *     If property-id is not supported or unknown, return value will be -1.
-   *   \see CameraProperty
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *   @see CameraProperty
    */
-  double getCameraProperty(
-                            unsigned int channel,
-                            CameraProperty::Id propId
-                          );
+  double getCameraProperty( unsigned int channel, CameraProperty::Id propId);
 
-  /*! \brief Get informations on camera on channel 0
-   *  \see getCameraProperty(unsigned int, CameraParam_t)
-   *  \param propId This is any known property-Id<br>
-   *     If property-id is not supported or unknown, return value will be -1.
-   *  \see CameraProperty
+  /*! @brief Get the real value of a Property which is set to auto.
+   *   On all other properties it is the same as getCameraProperty()
+   *  @param channel This is the index of the source you want to get the parameter value.
+   *  @param propId This is any known property-Id from class CameraProperty
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @return If property-id is not supported or unknown, or if the property isn't readable,
+   *          the return value will be CAMERA_PROPERTY_NOT_SUPPORTED.
    */
-  double getCameraProperty(
-                            CameraProperty::Id propId
-                          );
+  double getCameraPropertyValue(unsigned int channel, CameraProperty::Id propId);
+
+  /*! @brief Get informations on camera on channel 0
+   *  @see getCameraProperty(unsigned int, CameraParam_t)
+   *  @param propId This is any known property-Id from class CameraProperty
+   *  @return If property-id is not supported or unknown, or if the property isn't readable,
+   *          the return value will be CAMERA_PROPERTY_NOT_SUPPORTED.
+   *  @see CameraProperty
+   */
+  double getCameraProperty(CameraProperty::Id propId);
 
 
-  /*!  \brief With this method, it is possible to set Information on any channel.
+  /*!  @brief With this method, it is possible to set Information on any channel.
    *    This method passes the arguments directly to the corresponding capture device
-   *   \param channel This is the index of the source you want to set the parameter value.
-   *   \param propId This is any known property-Id<br>
+   *   @param channel This is the index of the source you want to set the parameter value.
+   *   @param propId This is any known property-Id<br>
    *     If property-id is not supported or unknown, return value will be false.
-   *   \param value This is the new value.
-   *   \see CameraProperty
+   *   @param value This is the new value.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *   @see CameraProperty
    */
-  bool setCameraProperty(
-                          unsigned int channel,
-                          CameraProperty::Id propId,
-                          double value
-                        );
+  bool setCameraProperty(unsigned int channel, CameraProperty::Id propId, double value);
   
-  /*!  \brief Set informations on camera 0
-   *  \param propId This is any knoqn property-Id<br>
+  /*!  @brief Set informations on camera 0
+   *  @param propId This is any knoqn property-Id<br>
    *     If property-id is not supported or unknown, return value will be false.
-   *   \param value This is the new value.
+   *   @param value This is the new value.
    */
-  bool setCameraProperty(
-                          CameraProperty::Id propId,
-                          double value
-                        );
+  bool setCameraProperty(CameraProperty::Id propId, double value);
 
-  /*! \brief Set values on the camera which have to be adjusted before the first image will be grabbed.
+  /*! @brief Set values on the camera which have to be adjusted before the first image will be grabbed.
    *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize. <br>
-   *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param settingId The id of the setting you want to change
-   *  \param value The new value
-   *  \see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param settingId The id of the setting you want to change
+   *  @param value The new value
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
    */
-  bool setCameraSetting(
-                         unsigned int channel,
-                         CameraSetting::Id settingId,
-                         double value
-                       );
+  bool setCameraSetting(unsigned int channel, CameraSetting::Id settingId, double value);
 
-  /*! \brief Get values of the camera which have to be adjusted before the first image will be grabbed
-   *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param settingId The id of the setting you want to change
-   *  \remarks
+  /*! @brief Get values of the camera which have to be adjusted before the first image will be grabbed
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param settingId The id of the setting you want to change
+   *  @remarks
    *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize. <br>
-   *  \see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *  @see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
    */
-  double getCameraSetting(
-                           unsigned int channel,
-                           CameraSetting::Id settingId
-                         );
+  double getCameraSetting(unsigned int channel, CameraSetting::Id settingId);
 
-  /*! \brief Set the video mode of the camera.
-   *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param modeId The new value
+  /*! @brief Set the video mode of the camera.
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param modeId The new value
    *
-   * \remarks
+   * @remarks
    *   This can only be done, if the first frame wasn't already grabbed
-   * \see getCameraMode
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   * @see getCameraMode
    */
-  bool setCameraMode(
-                      unsigned int channel,
-                      CameraVideoMode::Id modeId
-                    );
+  bool setCameraMode(unsigned int channel, CameraVideoMode::Id modeId);
 
-  /*! \brief Gets the actual mode.
-   *  \param channel This is the index of the source you want to set the parameter value.
+  /*! @brief Gets the actual mode.
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  CameraVideoMode::Id getCameraMode(
-                                     unsigned int channel
-                                   );
+  CameraVideoMode::Id getCameraMode(unsigned int channel);
 
-  /*! \brief Set the framerate of the camera.
-   *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param fpsId The new value
+  /*! @brief Set the framerate of the camera.
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param fpsId The new value
    *
-   * \remarks
    *   This can only be done, if the first frame wasn't already grabbed
-   * \par
+   * @par
    *   If the framerate isn't supported by the actual video mode, a similar mode
    *   will be used. The return value will also be true in this case.
-   * \see setCameraFps
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   * @see setCameraFps
    */
-  bool setCameraFps(
-                     unsigned int channel,
-                     CameraFrameRate::Id fpsId
-                   );
+  bool setCameraFps(unsigned int channel, CameraFrameRate::Id fpsId);
 
-  /*! \brief Gets the actual fps of the camera.
-   *  \param channel This is the index of the source you want to set the parameter value.
+  /*! @brief Gets the actual fps of the camera.
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  CameraFrameRate::Id getCameraFps(
-                                    unsigned int channel
-                                  );
+  CameraFrameRate::Id getCameraFps(unsigned int channel);
 
-  /*! \brief Set the ISO-speed of the IEEE1394/firewire bus.
-   *  \param channel This is the index of the source you want to set the parameter value.
-   *  \param isoSpeedId The new value
+  /*! @brief Set the ISO-speed of the IEEE1394/firewire bus.
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param isoSpeedId The new value
    *
-   * \remarks
+   * @remarks
    *   This can only be done, if the first frame wasn't already grabbed
-   * \par
+   * @par
    *   If the wanted ISO-speed isn't supported by the camera, a similar mode
    *   will be used. The return value will also be true in this case.
-   * \see setCameraIsoSpeed
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   * @see setCameraIsoSpeed
    */
-  bool setCameraIsoSpeed(
-                          unsigned int channel,
-                          CameraIsoSpeed::Id isoSpeedId
-                        );
+  bool setCameraIsoSpeed(unsigned int channel, CameraIsoSpeed::Id isoSpeedId);
 
-  /*! \brief Gets the actual ISO-Speed of the IEEE1394/firewire bus.
-   *  \param channel This is the index of the source you want to set the parameter value.
+  /*! @brief Gets the actual ISO-Speed of the IEEE1394/firewire bus.
+   *  @param channel This is the index of the source you want to set the parameter value.
    */
-  CameraIsoSpeed::Id getCameraIsoSpeed(
-                                        unsigned int channel
-                                      );
+  CameraIsoSpeed::Id getCameraIsoSpeed(unsigned int channel);
 
-  /*! \brief Gets the GUID of the camera
-   *  \param channel This is the index of the source channel
+  /*! @brief Gets the GUID of the camera
+   *  @param channel This is the index of the source channel
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  unsigned int getCameraGuid(
-                              unsigned int channel
-                            );
+  unsigned int getCameraGuid( unsigned int channel);
 
 
-  /*! \brief Gets the actual framesize.
-   *  \param channel This is the index of the source channel.
+  /*! @brief Gets the actual framesize.
+   *  @param channel This is the index of the source channel.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  cv::Size getCameraFrameSize(
-                               unsigned int channel
-                             );
+  cv::Size getCameraFrameSize(unsigned int channel);
 
-  /*! \brief Write out all properties
-   *  \remarks
+  /*! @brief Write out all properties
+   *
    *      The properties are read directly from cam
-   *  \param channel This is the index of the source you want to print the properties.
+   *  @param channel This is the index of the source you want to print the properties.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  //todo: als string zurueckgeben
-  void printAllProperties(
-                           unsigned int channel
-                         );
+  std::vector<std::string> getAllProperties(unsigned int channel);
 
-  /*! \brief Write out all settings
-   *  \remarks
+  /*! @brief Write out all settings
+   *  @remarks
    *      The settings are read directly from cam
-   *  \param channel This is the index of the source you want to print the settings.
+   *  @param channel This is the index of the source you want to print the settings.
+   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    */
-  void printAllSettings(
-                         unsigned int channel
-                       );
+  std::vector<std::string> getAllSettings(unsigned int channel);
 
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -366,10 +342,10 @@ protected:
   bool onDeclareParameters();
   const std::string& onGetSourceInfo(unsigned int channel) const;
 
-  ///! \brief Sync all Parameters from cameras with the local buffer
+  ///! @brief Sync all Parameters from cameras with the local buffer
   bool onWriteConfiguration();
 
-  ///! \brief Do the local clean up
+  ///! @brief Do the local clean up
   void onCleanUp();
 
   ///! Create and initialize the channel-structure for ony channel (only used in constructor)
@@ -387,47 +363,8 @@ private:
   ///! Sets the channel-info which depends on the created cv::VideoCapture (only used in constructor)
   void setChannelInfo(unsigned int channel);
 
-
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // members
-  //--------------------------------------------------------------------------------------------------------------------
-
-public:
-  // none yet (hopefully never!)
-
-
-protected:
-
-  ///! For every used channel one structure
-  //std::vector<CameraChannel> mCamChannels;
-
-
-
-
-private:
-
-  //! Set if Initialization should be finished in constructor
-  bool mFinishInitialization;
-
-  //! Set if the CameraGrabber should search the bus for a camera with the give guid
-  bool mCreateGrabberByGuid;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-public:
-  // none yet (hopefully never!)
-protected:
-
-  ///! \brief Default filename for the config-file of the camera capabilities
-  inline std::string getCapabilitiesFilename(unsigned int guid)
-  {
-    return "camera_"+boost::lexical_cast<std::string>(guid)+".capabilities";
-  }
-
   /*! This string identifies, that the default-filename (containing grabber-guid) should be used
-   * If the entry in the configuraion file is different, then that file will be used
+   * If the entry in the configuration file is different, then that file will be used
    */
   inline std::string useAutogeneratedFilenameString()
   {
@@ -455,6 +392,38 @@ protected:
            (
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
+  }
+
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // members
+  //--------------------------------------------------------------------------------------------------------------------
+
+public:
+  // none yet (hopefully never!)
+
+protected:
+  // none yet
+
+private:
+
+  //! Set if Initialization should be finished in constructor
+  bool mFinishInitialization;
+
+  //! Set if the CameraGrabber should search the bus for a camera with the give guid
+  bool mCreateGrabberByGuid;
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // parameters
+  //--------------------------------------------------------------------------------------------------------------------
+public:
+  // none yet (hopefully never!)
+protected:
+
+  ///! @brief Default filename for the config-file of the camera capabilities
+  inline std::string getCapabilitiesFilename(unsigned int guid)
+  {
+    return "camera_"+boost::lexical_cast<std::string>(guid)+".capabilities";
   }
 
 private:

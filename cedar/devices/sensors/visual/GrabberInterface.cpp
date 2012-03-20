@@ -147,13 +147,13 @@ void cedar::dev::sensors::visual::GrabberInterface::doCleanUp()
 
     mCleanUpAlreadyDone = true;
 
-    //stop LoopedThread
+    //stopGrabber LoopedThread
     if (QThread::isRunning())
     {
       cedar::aux::LoopedThread::stop();
     }
 
-    //stop Recording
+    //stopGrabber Recording
     stopRecording();
 
     //do the cleanup in derived class
@@ -228,14 +228,14 @@ void cedar::dev::sensors::visual::GrabberInterface::readInit(unsigned int numCam
 
   if (!result)
   {
-    CEDAR_THROW(cedar::aux::exc::InitializationException,
+    CEDAR_GRABBER_THROW(cedar::aux::exc::InitializationException,
                 "GrabberInterface::doInit - Error in cedar::aux::ConfigurationInterface::addParameter");
   }
 
   //Parameters in the derived classes
   if (!onDeclareParameters())
   {
-    CEDAR_THROW(cedar::aux::exc::InitializationException,
+    CEDAR_GRABBER_THROW(cedar::aux::exc::InitializationException,
                 "GrabberInterface::doInit - Error in onDeclareParameters in derived class");
   }
 
@@ -259,7 +259,7 @@ void cedar::dev::sensors::visual::GrabberInterface::applyInit()
     //cleanup already initialized channels
     doCleanUp();
 
-    CEDAR_THROW(cedar::aux::exc::InitializationException,
+    CEDAR_GRABBER_THROW(cedar::aux::exc::InitializationException,
                 "[GrabberInterface::doInit] ERROR: onInit in class"+ this->getName());
   }
 }
@@ -276,12 +276,12 @@ bool cedar::dev::sensors::visual::GrabberInterface::writeConfiguration()
   }
 
   //write out the parameter of the Grabber
-  bool result = cedar::aux::ConfigurationInterface::writeConfiguration();
+  int result = cedar::aux::ConfigurationInterface::writeConfiguration();
 
   #ifdef DEBUG_GRABBER_INTERFACE
     std::cout << "[GrabberInterface::writeConfiguration] Configuration saved" << std::endl;
   #endif
-  return result;
+  return static_cast<bool>(result);
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -311,7 +311,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setFps(double fps)
 
   if (wasRunning)
   {
-    stop();
+    stopGrabber();
   }
 
   //cycle time in ms: 1000ms/frames_per_second
@@ -330,7 +330,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setFps(double fps)
 
   if (wasRunning)
   {
-    start();
+    startGrabber();
   }
 
   #ifdef DEBUG_GRABBER_INTERFACE
@@ -346,7 +346,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setFps(double fps)
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GrabberInterface::stop()
+void cedar::dev::sensors::visual::GrabberInterface::stopGrabber()
 {
   LoopedThread::stop();
   mFpsMeasured = 0;
@@ -357,7 +357,7 @@ void cedar::dev::sensors::visual::GrabberInterface::stop()
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-void cedar::dev::sensors::visual::GrabberInterface::start()
+void cedar::dev::sensors::visual::GrabberInterface::startGrabber()
 {
   mFpsMeasured = 0;
   mFpsCounter = 0;
@@ -366,7 +366,7 @@ void cedar::dev::sensors::visual::GrabberInterface::start()
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GrabberInterface::grab()
+void cedar::dev::sensors::visual::GrabberInterface::grab()
 {
   bool result = true;
   std::string error_info;
@@ -386,7 +386,7 @@ bool cedar::dev::sensors::visual::GrabberInterface::grab()
   if (! result)
   {
     doCleanUp();
-    CEDAR_THROW
+    CEDAR_GRABBER_THROW
     ( 
       cedar::aux::exc::GrabberGrabException,
       "[GrabberInterface::grab] Error in grabber \""+ _mName + "\" on grabbing: " + error_info
@@ -409,7 +409,6 @@ bool cedar::dev::sensors::visual::GrabberInterface::grab()
 
     mFpsMeasureStart = boost::posix_time::microsec_clock::local_time();
   }
-  //std::cout << "[GrabberInterface::grab] mFpsCounter: " << mFpsCounter << std::endl;
 
   //check if recording is on
   if (mRecord)
@@ -424,11 +423,11 @@ bool cedar::dev::sensors::visual::GrabberInterface::grab()
       {
         std::stringstream info;
         info << "[GrabberInterface::grab] Error recording channel" << channel << ": " << e.what();
-        CEDAR_THROW(cedar::aux::exc::GrabberRecordingException,info.str());
+        doCleanUp();
+        CEDAR_GRABBER_THROW(cedar::aux::exc::GrabberRecordingException,info.str());
       }
     }
   }
-  return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -436,7 +435,7 @@ cv::Mat cedar::dev::sensors::visual::GrabberInterface::getImage(unsigned int cha
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getImage");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getImage");
   }
   return getChannel(channel)->imageMat;
 }
@@ -452,7 +451,7 @@ std::string cedar::dev::sensors::visual::GrabberInterface::getSourceInfo(unsigne
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getPhysicalSourceInformation");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getPhysicalSourceInformation");
   }
   return onGetSourceInfo(channel);
 }
@@ -512,7 +511,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setSnapshotName
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::setSnapshotName");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::setSnapshotName");
   }
 
   if (snapshotName != "")
@@ -535,17 +534,17 @@ std::string cedar::dev::sensors::visual::GrabberInterface::getSnapshotName(unsig
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getSnapshotName");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getSnapshotName");
   }
   return getChannel(channel)->snapshotName;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GrabberInterface::saveSnapshot(unsigned int channel) const
+void cedar::dev::sensors::visual::GrabberInterface::saveSnapshot(unsigned int channel) const
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::saveSnapshot");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::saveSnapshot");
   }
 
   //copy image to local buffer for slow imwrite-function and for error-checking
@@ -565,30 +564,30 @@ bool cedar::dev::sensors::visual::GrabberInterface::saveSnapshot(unsigned int ch
     catch (std::exception &e)
     {
       std::stringstream info;
-      info << "GrabberInterface::saveSnapshot[ch" << channel << "] - " << e.what();
-      CEDAR_THROW(cedar::aux::exc::GrabberSnapshotException,info.str());
+      info << "[GrabberInterface::saveSnapshot] Channel " << channel << ": " << e.what();
+      CEDAR_GRABBER_THROW(cedar::aux::exc::GrabberSnapshotException,info.str());
     }
   }
   else
   {
+    std::string info = "[GrabberInterface::saveSnapshot] Channel "
+                       + boost::lexical_cast<std::string>(channel)
+                       +": Image matrix is empty!";
     #ifdef ENABLE_GRABBER_WARNING_OUTPUT
-      std::cout << "[GrabberInterface::saveSnapshot] Warning: Nothing to save. Image matrix is empty!\n";
+      std::cout << info << std::endl;
     #endif
-    return false;
+    CEDAR_GRABBER_THROW(cedar::aux::exc::GrabberSnapshotException,info);
   }
-  return true;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::GrabberInterface::saveSnapshotAllCams() const
+void cedar::dev::sensors::visual::GrabberInterface::saveSnapshotAllCams() const
 {
-  bool result = true;
-
   for (unsigned int cam = 0; cam < mNumCams; ++cam)
   {
-    result = saveSnapshot(cam) && result;
+    saveSnapshot(cam);
   }
-  return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -596,7 +595,7 @@ cv::Size cedar::dev::sensors::visual::GrabberInterface::getSize(unsigned int cha
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getSize");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getSize");
   }
   return getChannel(channel)->imageMat.size();
 }
@@ -648,7 +647,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setRecordName(unsigned int c
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::setRecordName");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::setRecordName");
   }
 
   if (recordName != "")
@@ -671,7 +670,7 @@ const std::string& cedar::dev::sensors::visual::GrabberInterface::getRecordName(
 {
   if (channel >= mNumCams)
   {
-    CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getRecordName");
+    CEDAR_GRABBER_THROW(cedar::aux::exc::IndexOutOfRangeException,"GrabberInterface::getRecordName");
   }
   return getChannel(channel)->recordName;
 }
@@ -703,7 +702,7 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
     {
       getChannel(channel)->videoWriter = writer;
       #ifdef DEBUG_GRABBER_INTERFACE
-        std::cout << "Channel " << i << " recording to " << getChannel(channel)->recordName << std::endl;
+        std::cout << "Channel " << channel << " recording to " << getChannel(channel)->recordName << std::endl;
       #endif
       recording_channels++;
     }
@@ -711,7 +710,7 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
 
   if (recording_channels != mNumCams)
   {
-    CEDAR_THROW
+    CEDAR_GRABBER_THROW
       (
         cedar::aux::exc::GrabberRecordingException,
         "Start recording: only " + boost::lexical_cast<std::string>(recording_channels)
@@ -719,7 +718,7 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
       )
   }
 
-  //start the grabberthread if needed
+  //startGrabber the grabberthread if needed
   if (!QThread::isRunning())
   {
     #ifdef DEBUG_GRABBER_INTERFACE
@@ -727,7 +726,7 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
     #endif
 
     mGrabberThreadStartedOnRecording = true;
-    start();
+    startGrabber();
   }
   return true;
 }
@@ -743,7 +742,7 @@ void cedar::dev::sensors::visual::GrabberInterface::stopRecording()
       #ifdef DEBUG_GRABBER_INTERFACE
         std::cout << "[GrabberInterface::stopRecording] autostop the grabberthread" << std::endl;
       #endif
-      stop();
+      stopGrabber();
       mGrabberThreadStartedOnRecording = false;
     }
 
@@ -771,10 +770,7 @@ void cedar::dev::sensors::visual::GrabberInterface::step(double)
   //if something went wrong on grabbing,
   //an exception is being thrown in the grab function
   //right after a cleanup
-  if (!grab())
-  {
-    //LoopedThread::stop();
-  }
+  grab();
 }
 
 

@@ -44,9 +44,9 @@
 // SYSTEM INCLUDES
 
 
-/*! \class cedar::dev::sensors::visual::PictureGrabber
- *  \brief This grabber grabs images from a picture-file
- *  \remarks This functionality is implemented by using the OpenCV class
+/*! @class cedar::dev::sensors::visual::PictureGrabber
+ *  @brief This grabber grabs images from a picture-file
+ *  @remarks This functionality is implemented by using the OpenCV class
  *		cv::ImRead. See their documentation for details about
  *		supported image types.
  */
@@ -59,14 +59,14 @@ public cedar::dev::sensors::visual::GrabberInterface
   //--------------------------------------------------------------------------------------------------------------------
 
 
-  /*! \struct PictureChannel
-   *  \brief Additional data of a picture grabbing channel
+  /*! @struct PictureChannel
+   *  @brief Additional data of a picture grabbing channel
    */
   struct PictureChannel
   :
   cedar::dev::sensors::visual::GrabberInterface::GrabberChannel
   {
-    std::string sourceFileName;  //! \brief The filenames
+    std::string sourceFileName;  //! @brief The filenames
   };
 
   typedef boost::shared_ptr<PictureChannel> PictureChannelPtr;
@@ -80,27 +80,25 @@ public cedar::dev::sensors::visual::GrabberInterface
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! \brief  Constructor for a single-file grabber
-   *  \param configFileName	Filename for the configuration
-   *  \param pictureFileName	Filename to grab from
+  /*! @brief  Constructor for a single-file grabber
+   *  @param configFileName	Filename for the configuration
+   *  @param pictureFileName	Filename to grab from
    */
-  PictureGrabber(
-                  const std::string& configFileName,
-                  const std::string& pictureFileName
-                );
+  PictureGrabber(const std::string& configFileName,const std::string& pictureFileName);
 
-  /*! \brief Constructor for a stereo-file grabber
-   *  \param configFileName		Filename for the configuration
-   *  \param pictureFileName0	Filename to grab from for channel 0
-   *  \param pictureFileName1	Filename to grab from for channel 1
+  /*! @brief Constructor for a stereo-file grabber
+   *  @param configFileName		Filename for the configuration
+   *  @param pictureFileName0	Filename to grab from for channel 0
+   *  @param pictureFileName1	Filename to grab from for channel 1
    */
-  PictureGrabber(
-                  const std::string& configFileName,
-                  const std::string& pictureFileName0,
-                  const std::string& pictureFileName1
-                );
+  PictureGrabber
+  (
+    const std::string& configFileName,
+    const std::string& pictureFileName0,
+    const std::string& pictureFileName1
+  );
 
-  /*! \brief Destructor */
+  /*! @brief Destructor */
   ~PictureGrabber();
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,17 +106,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
 
-  /*! \brief Set a new picture to grab from
-   *  \remarks
+  /*! @brief Set a new picture to grab from
+   *  @remarks
    *	Supported image-types depend on operating system and installed libs. <br>
    *	For details look at the OpenCV-documentation (Section "imread").
-   *  \param channel which should be changed (default is 0).
-   *  \param FileName of the new picture.
+   *  @param channel which should be changed (default is 0).
+   *  @param FileName of the new picture.
    */
-  void setSourceFile(
-                      unsigned int channel,
-                      const std::string& fileName
-                    );
+  void setSourceFile(unsigned int channel, const std::string& fileName);
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -129,9 +124,7 @@ protected:
   bool onInit();
   bool onGrab();
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(
-                               unsigned int channel
-                             ) const;
+  const std::string& onGetSourceInfo(unsigned int channel) const;
   void onAddChannel();
 
   //--------------------------------------------------------------------------------------------------------------------

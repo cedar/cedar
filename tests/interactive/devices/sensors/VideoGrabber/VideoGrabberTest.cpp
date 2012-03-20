@@ -88,7 +88,7 @@ int main(int , char **)
    *  - the framerate is set to the speed stored inside the video-file
    *  - loop is on
    *  - speedFactor is 1
-   *  - loopedThread isn't running (start auto-grabbing with start() )
+   *  - loopedThread isn't running (startGrabber auto-grabbing with startGrabber() )
    *  - grabber name is set to default, i.e. VideoGrabber
    *
    * OR:
@@ -110,8 +110,8 @@ int main(int , char **)
   std::cout << "\nSome informations of the video file:\n";
   std::cout << "\tfourcc : " << video_grabber->getSourceEncoding() << std::endl;
   std::cout << "\tframes : " << video_grabber->getFrameCount() << std::endl;
-  std::cout << "\tpos_rel: " << video_grabber->getPositionRel() << std::endl;
-  std::cout << "\tpos_abs: " << video_grabber->getPositionAbs() << std::endl;
+  std::cout << "\tpos_rel: " << video_grabber->getPositionRelative() << std::endl;
+  std::cout << "\tpos_abs: " << video_grabber->getPositionAbsolute() << std::endl;
   std::cout << "\tFPS    : " << video_grabber->getSourceFps() << std::endl;
 
   //check framerate of the grabber-thred (thread isn't started yet)
@@ -153,30 +153,30 @@ int main(int , char **)
 
   std::cout << "\nGrab the second frame (frame no. 1):"<< std::endl;
   video_grabber->grab();
-  std::cout << "\tPos_Rel: " << video_grabber->getPositionRel() << std::endl;
-  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbs() << std::endl;
+  std::cout << "\tPos_Rel: " << video_grabber->getPositionRelative() << std::endl;
+  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbsolute() << std::endl;
 
   //goto frame 50
   std::cout << "\nScrolling to frame 50:"<< std::endl;
-  video_grabber->setPositionAbs(50);
+  video_grabber->setPositionAbsolute(50);
   video_grabber->grab();
-  std::cout << "\tPos_Rel: " << video_grabber->getPositionRel() << std::endl;
-  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbs() << std::endl;
+  std::cout << "\tPos_Rel: " << video_grabber->getPositionRelative() << std::endl;
+  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbsolute() << std::endl;
 
 //goto the end, i.e. the last frame
   std::cout << "\nScrolling to the end of the file:"<< std::endl;
-  video_grabber->setPositionRel(1);
+  video_grabber->setPositionRelative(1);
   video_grabber->grab();
-  std::cout << "\tPos_Rel: " << video_grabber->getPositionRel() << std::endl;
-  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbs() << std::endl;
+  std::cout << "\tPos_Rel: " << video_grabber->getPositionRelative() << std::endl;
+  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbsolute() << std::endl;
 
 
-  //switch back to start
+  //switch back to startGrabber
   std::cout << "\nScrolling to the beginning of the video-file:"<< std::endl;
-  video_grabber->setPositionRel(0);
+  video_grabber->setPositionRelative(0);
   video_grabber->grab();
-  std::cout << "\tPos_Rel: " << video_grabber->getPositionRel() << std::endl;
-  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbs() << std::endl;
+  std::cout << "\tPos_Rel: " << video_grabber->getPositionRelative() << std::endl;
+  std::cout << "\tPos_Abs: " << video_grabber->getPositionAbsolute() << std::endl;
 
   //with the getSourceProperty member function, it is possible to get other informations
   //supported by OpenCV's VideoCapture.get() function
@@ -194,11 +194,11 @@ int main(int , char **)
   //the first frame is already grabbed on initialization
   cv::Mat frame0 = video_grabber->getImage();
 
-  //start the grabbing-thread 2 times faster then normal
+  //startGrabber the grabbing-thread 2 times faster then normal
   std::cout << "\nSet speed factor of grabbing-thread to 2\n";
   video_grabber->setSpeedFactor(2);
   std::cout << "VideoGrabber thread FPS    : " << video_grabber->getFps() << std::endl;
-  video_grabber->start();
+  video_grabber->startGrabber();
 
   //enable Recording
   //The FPS of Recording is independent from GrabbingThread.
@@ -226,12 +226,12 @@ int main(int , char **)
     //status
     if (++counter_stat %= 3 )
     { std::cout << "Measured FPS: " << video_grabber->getFpsMeasured()
-      << "\tPos_Rel: "<< video_grabber->getPositionRel()
-      << "\tPos_Abs: "<<video_grabber->getPositionAbs()
+      << "\tPos_Rel: "<< video_grabber->getPositionRelative()
+      << "\tPos_Abs: "<<video_grabber->getPositionAbsolute()
       <<std::endl;
     }
 
-    //stop after 500 frames
+    //stopGrabber after 500 frames
     if (--counter_end==0)
     {
       break;
@@ -247,11 +247,11 @@ int main(int , char **)
 
   destroyWindow(highgui_window_name_0);
 
-  //stop grabbing-thread if running
+  //stopGrabber grabbing-thread if running
   //recording will also be stopped
   if (video_grabber->isRunning())
   {
-    video_grabber->stop();
+    video_grabber->stopGrabber();
   }
 
   if (video_grabber)

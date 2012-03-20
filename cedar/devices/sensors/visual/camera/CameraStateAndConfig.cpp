@@ -45,13 +45,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig(
-                                            cv::VideoCapture videoCapture,
-                                            QReadWriteLock* pVideoCaptureLock,
-                                            unsigned int channel,
-                                            const std::string configurationFileName,
-                                            const std::string capabilitiesFileName
-                                          )
+cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig
+(
+  cv::VideoCapture videoCapture,
+  QReadWriteLock* pVideoCaptureLock,
+  unsigned int channel,
+  const std::string configurationFileName,
+  const std::string capabilitiesFileName
+)
 {
   #ifdef DEBUG_CAMERAGRABBER
     std::cout << "[CameraStateAndConfig::CameraConfiguration] channel "<< channel
@@ -426,11 +427,11 @@ double cedar::dev::sensors::visual::CameraStateAndConfig::getCamProperty(unsigne
   return result;
 }
 //----------------------------------------------------------------------------------------------------
-bool cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
+void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
 {
-#ifdef DEBUG_CAMERAGRABBER
-  std::cout << "[CameraState::setAllParametersToCam] channel " << mChannel << std::endl;
-#endif
+  #ifdef DEBUG_CAMERAGRABBER
+    std::cout << "[CameraState::setAllParametersToCam] channel " << mChannel << std::endl;
+  #endif
 
   //all parameters are already read from config-file and stored in mCamPropertyValues,mCamSettings
   //all values in the configuration file have to be valid!!!
@@ -539,14 +540,6 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
   }
   //values set in camera, but there they aren't taken by the camera
   //this gives the default-values created by the cv::CvCapture class
-  /*#ifdef DEBUG_CAMERAGRABBER
-   std::cout << "\n[CameraStateAndConfig::setAllParametersToCam]" << channel << std::endl;
-   printAllSettings(channel);
-   printAllProperties(channel);
-   std::cout << "\n[CameraStateAndConfig::setAllParametersToCam]" << channel << std::endl;
-   #endif
-   */
-  return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------

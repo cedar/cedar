@@ -72,9 +72,9 @@ namespace TEST_GRABBER
       double fps = grabber.getFps();
       std::cout << "Start thread . . . " << std::endl;
 
-      //start grabbing and wait
+      //startGrabber grabbing and wait
       ptime test_start = microsec_clock::local_time();
-      grabber.start();
+      grabber.startGrabber();
 
       //sleep(FPS_TEST_DURATION_IN_SEC);
 
@@ -84,8 +84,8 @@ namespace TEST_GRABBER
         std::cout << "measured fps: "<< grabber.getFpsMeasured()<<std::endl;
        }
 
-      //stop
-      grabber.stop();
+      //stopGrabber
+      grabber.stopGrabber();
       ptime test_end = microsec_clock::local_time();
 
       //calculate real diff:

@@ -116,7 +116,7 @@ int main(int , char **)
    *
    * EITHER:
    *  No or new configuration file:
-   *  - loopedThread isn't running (start threaded background grabbing with start() )
+   *  - loopedThread isn't running (startGrabber threaded background grabbing with startGrabber() )
    *  - grabbername is set to default, i.e. CameraGrabber
    *
    * OR:
@@ -210,12 +210,12 @@ int main(int , char **)
   cv::Mat frame = camera_grabber->getImage();
   pReadWriteLock->unlock();
 
-  //start the grabber-thread for updating camera images
+  //startGrabber the grabber-thread for updating camera images
   //camera_grabber->setFps(15);
   std::cout << "Start grabbing in the background" << std::endl;
-  camera_grabber->start();
+  camera_grabber->startGrabber();
 
-  //start recording
+  //startGrabber recording
   //std::cout << "\nStart Recording\n";
   //camera_grabber->startRecording(15);
 
@@ -255,11 +255,11 @@ int main(int , char **)
   //------------------------------------------------------------------
   //clean up
 
-  //stop grabbing-thread if running
+  //stopGrabber grabbing-thread if running
   //recording will also be stopped
   if (camera_grabber->isRunning())
   {
-    camera_grabber->stop();
+    camera_grabber->stopGrabber();
   }
 
   destroyWindow(highgui_window_name);

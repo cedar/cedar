@@ -46,9 +46,9 @@
 // SYSTEM INCLUDES
 
 
-/*! \class cedar::dev::sensors::visual::NetGrabber
- *	\brief This grabber grabs images from a yarp-server located somewhere in the network
- *  \remarks This functionality is implemented by using the
+/*! @class cedar::dev::sensors::visual::NetGrabber
+ *	@brief This grabber grabs images from a yarp-server located somewhere in the network
+ *  @remarks This functionality is implemented by using the
  *		cedar::aux::net::NetWriter and
  *		cedar::aux::net::NetReader classes.
  */
@@ -66,8 +66,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   typedef boost::shared_ptr<cedar::aux::net::NetReader<cv::Mat> > MatNetReaderPtr;
 
 
-  /*! \struct PictureChannel
-   *  \brief Additional data of a picture grabbing channel
+  /*! @struct PictureChannel
+   *  @brief Additional data of a net grabbing channel
    */
   struct NetChannel
   :
@@ -89,26 +89,19 @@ public cedar::dev::sensors::visual::GrabberInterface
 
 public:
 
-  /*! \brief  Constructor for a single channel grabber
-   *  \param configFileName	Filename for the configuration
-   *  \param YarpChannel	Channel to grab from
+  /*! @brief  Constructor for a single channel grabber
+   *  @param configFileName	Filename for the configuration
+   *  @param YarpChannel	Channel to grab from
    */
-  NetGrabber(
-              const std::string& configFileName,
-              const std::string& yarpChannelName
-            );
+  NetGrabber(const std::string& configFileName,const std::string& yarpChannelName);
 
 
-  /*! \brief  Constructor for a stereo channel grabber
-   *  \param configFileName	Filename for the configuration
-   *  \param YarpChannel0	Name of a channel from the used yarp-server
-   *  \param YarpChannel1	Another name of a channel from the used yarp-server
+  /*! @brief  Constructor for a stereo channel grabber
+   *  @param configFileName	Filename for the configuration
+   *  @param YarpChannel0	Name of a channel from the used yarp-server
+   *  @param YarpChannel1	Another name of a channel from the used yarp-server
    */
-  NetGrabber(
-              const std::string& configFileName,
-              const std::string& yarpChannelName0,
-              const std::string& yarpChannelName1
-            );
+  NetGrabber(const std::string& configFileName,const std::string& yarpChannelName0,const std::string& yarpChannelName1);
 
   //!@brief Destructor
   ~NetGrabber();
@@ -132,9 +125,7 @@ protected:
   bool onInit();
   bool onGrab();
   bool onDeclareParameters();
-  const std::string& onGetSourceInfo(
-                               unsigned int channel
-                             ) const;
+  const std::string& onGetSourceInfo(unsigned int channel) const;
 
   void onCleanUp();
   void onAddChannel();
