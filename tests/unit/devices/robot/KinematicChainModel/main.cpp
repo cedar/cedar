@@ -352,7 +352,7 @@ int main()
   // end-effector transformation
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: calculateEndEffectorTransformation" << std::endl;
-  cv::Mat end_effector_transformation = test_arm_model.calculateEndEffectorTransformation();
+  cv::Mat end_effector_transformation = test_arm_model.getEndEffectorTransformation();
   if (
       !IsZero(end_effector_transformation.at<double>(0, 0) - 0)
       || !IsZero(end_effector_transformation.at<double>(0, 1) - -1)

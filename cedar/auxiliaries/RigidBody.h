@@ -151,10 +151,11 @@ private:
   // members
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+
+private:
   //!@brief rigid transformation to the object
   cv::Mat mTransformation;
 
-private:
   std::vector<cv::Mat> mUnitAxes;
 //  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
 //  cv::Mat mOrientationQuaternion; // quaternion representing the orientation
