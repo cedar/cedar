@@ -51,6 +51,7 @@ cedar::aux::EnumType<cedar::aux::conv::Mode> cedar::aux::conv::Mode::mType("ceda
 #ifndef CEDAR_COMPILER_MSVC
 const cedar::aux::conv::Mode::Id cedar::aux::conv::Mode::Same;
 const cedar::aux::conv::Mode::Id cedar::aux::conv::Mode::Full;
+const cedar::aux::conv::Mode::Id cedar::aux::conv::Mode::Valid;
 #endif
 
 
@@ -64,8 +65,9 @@ const cedar::aux::conv::Mode::Id cedar::aux::conv::Mode::Full;
 
 void cedar::aux::conv::Mode::construct()
 {
-  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Same, "Same", "same size as input"));
-  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Full, "Full", "full result"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Same, "Same", "same"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Full, "Full", "full"));
+  mType.type()->def(cedar::aux::Enum(cedar::aux::conv::Mode::Valid, "Valid", "valid"));
 }
 
 const cedar::aux::EnumBase& cedar::aux::conv::Mode::type()

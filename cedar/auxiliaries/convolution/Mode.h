@@ -105,6 +105,9 @@ public:
   //! The output image is large enough so that no values have to be discarded.
   static const Id Full = 1;
 
+  //! Only use the results where no border handling was necessary.
+  static const Id Valid = 2;
+
 protected:
   // none yet
 private:
