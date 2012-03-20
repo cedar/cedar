@@ -39,6 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/lib.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -169,6 +170,25 @@ namespace cedar
     {
       std::istringstream stream(string);
       return !(stream >> encoding >> value).fail();
+    }
+
+    /*!@brief Overloaded method, provided for convenience.
+     *
+     * @see cedar::aux::fromString
+     */
+    template <class T>
+    T fromString(const std::string& string, std::ios_base& (*encoding)(std::ios_base&))
+    {
+      T result;
+      if (!cedar::aux::fromString(result, string, encoding))
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::ConversionFailedException,
+          "Could not convert the string \"" + string + "\" to the requested type."
+        );
+      }
+      return result;
     }
 
     inline std::string regexReplace(const std::string& input, const std::string& regex, const std::string& replaceText)

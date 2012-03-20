@@ -226,4 +226,14 @@ public:
   }
 };
 
+/*!@brief Exception that occurs when a string cannot be converted to a certain type.
+ */
+class cedar::aux::ConversionFailedException : public cedar::aux::ExceptionBase
+{
+public:
+  ConversionFailedException()
+  {
+  }
+}; // class cedar::aux::UnhandledTypeException
+
 #endif // CEDAR_AUX_EXCEPTIONS_H

@@ -184,6 +184,7 @@ namespace cedar
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     /* exceptions */
+    CEDAR_DECLARE_AUX_CLASS(ConversionFailedException);
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
     CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
