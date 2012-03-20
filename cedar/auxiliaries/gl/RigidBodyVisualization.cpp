@@ -87,11 +87,6 @@ bool cedar::aux::gl::RigidBodyVisualization::isVisible() const
   return mIsVisible;
 }
 
-const std::string& cedar::aux::gl::RigidBodyVisualization::getRigidBodyName() const
-{
-  return mpRigidBody->getName();
-}
-
 const std::string& cedar::aux::gl::RigidBodyVisualization::getRigidBodyVisualizationType() const
 {
   return mRigidBodyType;

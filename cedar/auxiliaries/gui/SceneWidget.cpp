@@ -181,7 +181,6 @@ void cedar::aux::gui::SceneWidget::createRigidBody()
 {
   // create the new object
   cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
-  p_rigid_body->setName(mpLineEditName->text().simplified().toStdString());
   cedar::aux::gl::RigidBodyVisualizationPtr p_visualization;
   if(mpComboBoxType->currentText().compare("Cylinder") == 0)
   {
@@ -352,7 +351,7 @@ void cedar::aux::gui::SceneWidget::init()
   // fill combo box with names of objects in the scene
   for (int i=0; i<mpScene->getNumberOfRigidBodyVisualizations(); i++)
   {
-    mpComboBoxName->addItem(QString(mpScene->getRigidBodyVisualization(i)->getRigidBodyName().c_str()));
+    mpComboBoxName->addItem(QString("some object"));
   }
   
   // initialize rigid body visualization widget

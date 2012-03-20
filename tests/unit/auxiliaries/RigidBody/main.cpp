@@ -179,11 +179,15 @@ int main()
   }
 
   //--------------------------------------------------------------------------------------------------------------------
-  // configuration file constructor
+  // readConfiguration
   //--------------------------------------------------------------------------------------------------------------------
-  std::cout << "test: configuration file constructor" << std::endl;
-  cedar::aux::RigidBody configured_rigid_body("test.conf");
+  std::cout << "test: readConfiguration" << std::endl;
+  cedar::aux::RigidBody configured_rigid_body;
+  std::cout << "constructed cofigured_rigid_body" << std::endl;
+  configured_rigid_body.readJson("test.json");
+  std::cout << "called cofigured_rigid_body.readJson()" << std::endl;
   cv::Mat C = configured_rigid_body.getTransformation();
+  cedar::aux::math::write(C);
   if (
       !IsZero(C.at<double>(0, 0) - cos(cedar::aux::math::pi/6))
       || !IsZero(C.at<double>(0, 1) - 0)

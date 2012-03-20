@@ -40,6 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
 #include <QDoubleSpinBox>
