@@ -128,23 +128,23 @@ unsigned int cedar::dev::robot::ReferenceGeometry::getNumberOfJoints() const
   return _mJoints.size();
 }
 
-const cedar::dev::robot::ReferenceGeometry::JointPtr& cedar::dev::robot::ReferenceGeometry::getJoint
-                                                      (
-                                                        unsigned int index
-                                                      ) const
+const cedar::dev::robot::ReferenceGeometry::JointPtr cedar::dev::robot::ReferenceGeometry::getJoint
+                                                     (
+                                                       unsigned int index
+                                                     ) const
 {
   return _mJoints[index];
 }
 
-const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr& cedar::dev::robot::ReferenceGeometry::getEndEffector() const
+const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr cedar::dev::robot::ReferenceGeometry::getEndEffector() const
 {
   return _mpEndEffector;
 }
 
-const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr& cedar::dev::robot::ReferenceGeometry::getLinkSegment
-                                                            (
-                                                              unsigned int index
-                                                            ) const
+const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr cedar::dev::robot::ReferenceGeometry::getLinkSegment
+                                                           (
+                                                             unsigned int index
+                                                           ) const
 {
   return _mLinkSegments[index];
 }

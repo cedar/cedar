@@ -46,93 +46,78 @@
 
 cedar::aux::UnhandledTypeException::UnhandledTypeException()
 {
-  this->mType = "UnhandledTypeException";
 }
 
 cedar::aux::UnknownTypeException::UnknownTypeException()
 {
-  this->mType = "UnknownTypeException";
 }
 
 cedar::aux::ParameterNotFoundException::ParameterNotFoundException()
 {
-  this->mType = "ParameterNotFoundException";
 }
 
 cedar::aux::DuplicateIdException::DuplicateIdException()
 {
-  this->mType = "DuplicateIdException";
 }
 
 cedar::aux::DuplicateNameException::DuplicateNameException()
 {
-  this->mType = "DuplicateNameException";
 }
 
 cedar::aux::UnknownNameException::UnknownNameException()
 {
-  this->mType = "UnknownNameException";
 }
 
 cedar::aux::UnhandledValueException::UnhandledValueException()
 {
-  this->mType = "UnhandledValueException";
 }
 
 cedar::aux::RangeException::RangeException()
 {
-  this->mType = "RangeException";
 }
 
 cedar::aux::NoDefaultException::NoDefaultException()
 {
-  this->mType = "NoDefaultException";
 }
 
 cedar::aux::InvalidNameException::InvalidNameException()
 {
-  this->mType = "InvalidNameException";
 }
 
 cedar::aux::TypeMismatchException::TypeMismatchException()
 {
-  this->mType = "TypeMismatchException";
 }
 
 cedar::aux::BadConnectionException::BadConnectionException()
 {
-  this->mType = "BadConnectionException";
 }
 
 cedar::aux::FailedAssertionException::FailedAssertionException()
 {
-  this->mType = "FailedAssertionException";
 }
 
 cedar::aux::IndexOutOfRangeException::IndexOutOfRangeException()
 {
-  this->mType = "IndexOutOfRangeException";
 }
 
 cedar::aux::NullPointerException::NullPointerException()
 {
-  this->mType = "NullPointerException";
 }
 
 cedar::aux::InitializationException::InitializationException()
 {
-  this->mType = "InitializationException";
 }
 
 cedar::aux::DeadReferenceException::DeadReferenceException()
 {
-  this->mType = "DeadReferenceException";
+}
+
+cedar::aux::ResourceNotFoundException::ResourceNotFoundException()
+{
 }
 
 cedar::aux::MatrixMismatchException::MatrixMismatchException(const cv::Mat& matA, const cv::Mat& matB)
 {
-  this->mType = "cedar::aux::MatrixMismatchException";
-
   unsigned int dim_a = cedar::aux::math::getDimensionalityOf(matA);
   unsigned int dim_b = cedar::aux::math::getDimensionalityOf(matA);
 

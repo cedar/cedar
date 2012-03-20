@@ -130,6 +130,9 @@ public:
   //!@brief function that connects up a function to Triggerable's state changed signal
   boost::signals2::connection connectToStateChanged(boost::function<void ()> slot);
 
+  //!@brief Waits for the trigger signal to be finished.
+  virtual void wait() = 0;
+
 //signals:
 //  //!@brief Signal that is emitted whenever the Triggerable's state is changed.
 //  void stateChanged();

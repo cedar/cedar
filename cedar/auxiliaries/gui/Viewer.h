@@ -64,7 +64,7 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief the constructor */
-  Viewer(cedar::aux::gl::ScenePtr& p_scene);
+  Viewer(cedar::aux::gl::ScenePtr pScene);
 
   /*!@brief the constructor */
   ~Viewer();
@@ -79,6 +79,8 @@ public:
   /*!@brief function being called automatically when a timer is up, usually in a loop */
   void timerEvent(QTimerEvent* pEvent);
 
+  //!@brief call this function to initialize Gl resources for the passed visualization object
+  void initGl(cedar::aux::gl::RigidBodyVisualizationPtr pVisualization);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
   //--------------------------------------------------------------------------------------------------------------------

@@ -213,6 +213,13 @@ namespace cedar
        */
       CEDAR_AUX_LIB_EXPORT
       void drawAxes(double length);
+
+      /*!@brief draws a hair line cross along the axes of the current coordinate frame
+       * @param length length of each line
+       * @param width width of each line
+       */
+      CEDAR_AUX_LIB_EXPORT
+      void drawCross(double length, double width = 1);
     }
   }
 }

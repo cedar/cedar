@@ -59,7 +59,7 @@ class cedar::dev::amtec::KinematicChain : public cedar::dev::robot::KinematicCha
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry);
+  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
   //!@brief constructor
   KinematicChain(const std::string& configFileName);
 
@@ -70,6 +70,12 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+   *
+   * @return    state
+   */
+  bool isMovable() const;
+
   /*!@brief returns the max. acceleration of a joint
    *
    * @param index
@@ -105,8 +111,8 @@ protected:
 private:
   bool initDevice();
   bool calibrateModule(unsigned int module);
-  double getJointAngle(unsigned int index);
-  double getJointVelocity(unsigned int index);
+  double getJointAngle(unsigned int index) const;
+  double getJointVelocity(unsigned int index) const;
   bool isCalibrated(unsigned int module);
   void readParamsFromConfigFile();
   void setJointAngle(unsigned int index, double value);
@@ -122,7 +128,7 @@ private:
   std::string mInitString;
   int mInit;
   std::vector<int> mModules;
-  QMutex mCanBusMutex;
+  mutable QMutex mCanBusMutex;
 }; // class cedar::dev::amtec::KinematicChain
 #endif // CEDAR_USE_AMTEC
 #endif // CEDAR_DEV_ROBOT_AMTEC_KINEMATIC_CHAIN_H

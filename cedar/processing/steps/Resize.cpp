@@ -37,6 +37,8 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/Resize.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -49,7 +51,7 @@
 #include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
-// static member
+// static members
 //----------------------------------------------------------------------------------------------------------------------
 
 cedar::aux::EnumType<cedar::proc::steps::Resize::Interpolation> cedar::proc::steps::Resize::Interpolation::mType;
@@ -61,6 +63,33 @@ const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::CUBIC;
 const cedar::proc::steps::Resize::Interpolation::Id cedar::proc::steps::Resize::Interpolation::LANCZOS4;
 #endif // MSVC
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr resize_decl
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::Resize>
+      (
+        "Utilities",
+        "cedar.processing.Resize"
+      )
+    );
+    resize_decl->setIconPath(":/steps/resize.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(resize_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

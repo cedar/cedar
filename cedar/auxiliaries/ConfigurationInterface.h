@@ -36,33 +36,311 @@
 
 //!@todo built-in check, if addParameter adds a parameter that is already stored
 
+#ifdef CEDAR_LIBCONFIG_LEGACY_MODE
+
+#include "cedar/auxiliaries/ConfigurationInterface_legacy.h"
+
+#else // CEDAR_LIBCONFIG_LEGACY_MODE
+
+//!@todo This switch also needs to be written into some installed header
 #ifndef CEDAR_AUX_CONFIGURATION_INTERFACE_H
 #define CEDAR_AUX_CONFIGURATION_INTERFACE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/Base.h"
-#include "cedar/auxiliaries/UserData.h"
-#include "cedar/auxiliaries/IntervalData.h"
+#include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
+
+// legacy includes
+#include "cedar/auxiliaries/UserData.h"
+#include "cedar/auxiliaries/IntervalData.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <iomanip>
 #include <cstdlib>
-#include <libconfig.h++>
+//#include <libconfig.h++>
+
+
+// some legacy typedefs to keep code from throwing compiler errors
+
+// This prevents compiler errors when including libconfig
+#ifndef __libconfig_hpp
+#define __libconfig_hpp
+#endif // __libconfig_hpp
+
+namespace libconfig
+{
+  struct Setting
+  {
+    enum Type
+    {
+      TypeBoolean,
+      TypeInt,
+      TypeFloat,
+      TypeString,
+      TypeArray,
+      TypeNone
+    };
+
+    int getLength() const
+    {
+      return 0;
+    }
+  };
+
+  struct Config
+  {
+      Setting& lookup(const std::string&)
+      {
+        return mSetting;
+      }
+
+    private:
+      Setting mSetting;
+  };
+}
+
+namespace cedar
+{
+  namespace _legacyCode
+  {
+    template <typename T>
+    inline T translate(const std::string& value_str)
+    {
+      std::istringstream buffer(value_str);
+      T value;
+      buffer >> value;
+      return value;
+    }
+
+    template <>
+    inline bool translate(const std::string& value_str)
+    {
+      return (value_str == "true");
+    }
+
+    template <>
+    inline std::string translate(const std::string& value_str)
+    {
+      std::string value = value_str;
+      value = cedar::aux::regexReplace(value, "^\\s*\"", "");
+      value = cedar::aux::regexReplace(value, "\"\\s*$", "");
+      return value;
+    }
+
+    template <typename T>
+    inline std::string retranslate(const T& value)
+    {
+      return cedar::aux::toString(value);
+    }
+
+    template <>
+    inline std::string retranslate(const bool& value)
+    {
+      if (value == true)
+        return "true";
+      else
+        return "false";
+    }
+
+    template <>
+    inline std::string retranslate(const std::string& value)
+    {
+      return "\"" + value + "\"";
+    }
+  }
+}
 
 /*!@brief Interface for classes with configuration parameters.
  *
  * @deprecated This interface will be removed in one of the next versions of cedar. Use cedar::aux::Configurable instead.
  */
-class cedar::aux::ConfigurationInterface : public virtual cedar::aux::Base
+class cedar::aux::ConfigurationInterface : virtual public cedar::aux::Configurable
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros, structs, enums
   //--------------------------------------------------------------------------------------------------------------------
+private:
+  template <typename T>
+  class LegacyParameter : public cedar::aux::Parameter
+  {
+    public:
+      LegacyParameter
+      (
+        cedar::aux::Configurable* pOwner,
+        T* pMember,
+        const std::string& name,
+        const T& defaultValue
+      )
+      :
+      cedar::aux::Parameter(pOwner, name, true),
+      mpMember(pMember),
+      mDefault(defaultValue)
+      {
+      }
+
+      void readFromNode(const cedar::aux::ConfigurationNode& node)
+      {
+        *mpMember = node.get_value<T>();
+      }
+
+      void writeToNode(cedar::aux::ConfigurationNode& node) const
+      {
+        node.put(this->getName(), *this->mpMember);
+      }
+
+      void makeDefault()
+      {
+        *mpMember = mDefault;
+      }
+
+    private:
+      T *mpMember;
+      T mDefault;
+  };
+
+  typedef LegacyParameter<bool> BoolLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolLegacyParameter);
+
+  typedef LegacyParameter<int> IntLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLegacyParameter);
+
+  typedef LegacyParameter<unsigned int> UIntLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntLegacyParameter);
+
+  typedef LegacyParameter<double> DoubleLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLegacyParameter);
+
+  typedef LegacyParameter<std::string> StringLegacyParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringLegacyParameter);
+
+
+  template <typename T>
+  class LegacyVectorParameter : public cedar::aux::Parameter
+  {
+    public:
+      LegacyVectorParameter
+      (
+        cedar::aux::Configurable* pOwner,
+        std::vector<T>* pMember,
+        const std::string& name,
+        const T& defaultValue
+      )
+      :
+      cedar::aux::Parameter(pOwner, name, true),
+      mpMember(pMember),
+      mDefault(defaultValue),
+      mHasDefaultVector(false)
+      {
+      }
+
+      LegacyVectorParameter
+      (
+        cedar::aux::Configurable* pOwner,
+        std::vector<T>* pMember,
+        const std::string& name,
+        const std::vector<T>& defaultValues
+      )
+      :
+      cedar::aux::Parameter(pOwner, name, true),
+      mpMember(pMember),
+      mDefaults(defaultValues),
+      mHasDefaultVector(true)
+      {
+      }
+
+      void readFromNode(const cedar::aux::ConfigurationNode& node)
+      {
+        std::vector<std::string> string_values;
+        std::string values = node.get_value<std::string>();
+        this->splitVector(values, string_values);
+
+        this->mpMember->clear();
+        for (size_t i = 0; i < string_values.size(); ++i)
+        {
+          T value = cedar::_legacyCode::translate<T>(string_values[i]);
+          this->mpMember->push_back(value);
+        }
+      }
+
+      void writeToNode(cedar::aux::ConfigurationNode& node) const
+      {
+        std::vector<std::string> list;
+        for (size_t i = 0; i < mpMember->size(); ++i)
+        {
+          const T& value = mpMember->at(i);
+          list.push_back(cedar::_legacyCode::retranslate<T>(value));
+        }
+
+        std::string list_string;
+        this->joinVector(list_string, list);
+        node.put(this->getName(), list_string);
+      }
+
+      void makeDefault()
+      {
+        if (this->mHasDefaultVector)
+        {
+          *this->mpMember = this->mDefaults;
+        }
+        else
+        {
+          // TODO ?
+        }
+      }
+
+    private:
+      void splitVector(const std::string& value, std::vector<std::string>& vector)
+      {
+        std::string text = value;
+        text = cedar::aux::regexReplace(text, "^\\s*\\[\\s*", "");
+        text = cedar::aux::regexReplace(text, "\\s*\\]\\s*$", "");
+
+        cedar::aux::split(text, ",", vector);
+        for (size_t i = 0; i < vector.size(); ++i)
+        {
+          std::string& value = vector.at(i);
+          // remove white spaces at the beginning and end
+          value = cedar::aux::regexReplace(value, "^\\s*", "");
+          value = cedar::aux::regexReplace(value, "\\s*$", "");
+        }
+      }
+
+      void joinVector(std::string& value, const std::vector<std::string>& vector) const
+      {
+        value = "[ ";
+        value += cedar::aux::join(vector, ", ");
+        value += " ]";
+      }
+
+    private:
+      std::vector<T> *mpMember;
+      T mDefault;
+
+      std::vector<T> mDefaults;
+      bool mHasDefaultVector;
+  };
+
+  typedef LegacyVectorParameter<bool> BoolLegacyVectorParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(BoolLegacyVectorParameter);
+
+  typedef LegacyVectorParameter<int> IntLegacyVectorParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(IntLegacyVectorParameter);
+
+  typedef LegacyVectorParameter<unsigned int> UIntLegacyVectorParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(UIntLegacyVectorParameter);
+
+  typedef LegacyVectorParameter<double> DoubleLegacyVectorParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLegacyVectorParameter);
+
+  typedef LegacyVectorParameter<std::string> StringLegacyVectorParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(StringLegacyVectorParameter);
+
 public:
   //!@brief Struct that holds all information about a parameter
   struct ParameterInfo
@@ -83,12 +361,13 @@ public:
     //! flag if a stored integer is unsigned (cannot extend Setting::Type)
     bool mIsUnsigned;
 
-    /*!@brief Contains user defined data. To use this, inherit from UserData and add
-     * your user-data in the derived class.
-     * @remarks The user data will be deleted automatically!
-     */
+    //!@brief Contains user defined data. To use this, inherit from UserData and add
+    // your user-data in the derived class.
+    // @remarks The user data will be deleted automatically!
+    //
     UserData *mpUserData;
   };
+
 
   /*!@brief The type used to store the parameters.
    * @remark When iterating, use this to get ParameterInfoVector::iterator.
@@ -136,6 +415,14 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
+
+  //!@brief Returns the name of the object.
+  //!@return Name of the object.
+  const std::string& getName() const;
+
+  //!@brief Sets the name of the object to the given name.
+  //!@param rName New name of the object.
+  void setName(const std::string& rName);
 
   /*!@brief Adds a parameter to the parameter list.
    * @param pMember    pointer to member variable
@@ -478,6 +765,9 @@ public:
 protected:
   //! the Config object, which holds a tree of stored configuration entries
   libconfig::Config mConfig;
+
+  //! name of the object
+  std::string _mName;
 private:
 
   //! the name of the configuration file
@@ -488,4 +778,7 @@ private:
   std::vector<std::string> mConfigurationErrors;
 }; // class cedar::aux::ConfigurationInterface
 
+// template specialization for bool values
 #endif // CEDAR_AUX_CONFIGURATION_INTERFACE_H
+
+#endif // CEDAR_LIBCONFIG_LEGACY_MODE

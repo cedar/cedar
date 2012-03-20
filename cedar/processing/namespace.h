@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/processing/lib.h"
 #include "cedar/auxiliaries/Singleton.h"
-#include "cedar/auxiliaries/AbstractFactory.h"
+#include "cedar/auxiliaries/Factory.h"
 
 // SYSTEM INCLUDES
 #include <boost/smart_ptr.hpp>
@@ -98,7 +98,7 @@ namespace cedar
     //!@endcond
 
     //!@brief a factory for elements
-    typedef boost::shared_ptr<cedar::aux::AbstractFactory<Element> > ElementFactoryPtr;
+    typedef boost::shared_ptr<cedar::aux::Factory<ElementPtr> > ElementFactoryPtr;
 
     /* Exceptions */
     //!@cond SKIPPED_DOCUMENTATION

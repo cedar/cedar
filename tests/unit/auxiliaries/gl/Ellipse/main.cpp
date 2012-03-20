@@ -33,14 +33,13 @@
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
 
-// LOCAL INCLUDES
-
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/LogFile.h"
+#include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/gl/Ellipse.h"
 
 // SYSTEM INCLUDES
 #include <string>
-
 
 int main(int, char**)
 {
@@ -48,9 +47,9 @@ int main(int, char**)
   int errors = 0;
 
   // test constructors
-  cedar::aux::ObjectPtr p_object(new cedar::aux::Object());
-  cedar::aux::gl::Ellipse testEllipse(p_object);
-  cedar::aux::gl::Ellipse ellipse(p_object, 1, 2, 0.1);
+  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  cedar::aux::gl::Ellipse testEllipse(p_rigid_body);
+  cedar::aux::gl::Ellipse ellipse(p_rigid_body, 1, 2, 0.1);
 
   //--------------------------------------------------------------------------------------------------------------------
   // length

@@ -67,7 +67,7 @@ public:
    * @param index    specifies the joint
    * @return    joint angle value
    */
-  double getJointAngle(unsigned int index);
+  double getJointAngle(unsigned int index) const;
 
   /*!@brief set current state of a single joint angle
    *
@@ -75,6 +75,12 @@ public:
    * @param angle    new joint angle value
    */
   virtual void setJointAngle(unsigned int index, double angle);
+
+  /*!@brief check whether the kinematic chain is currently responsive to movement commands
+   *
+   * @return    state
+   */
+  virtual bool isMovable() const;
 
 
   //--------------------------------------------------------------------------------------------------------------------

@@ -53,7 +53,6 @@ namespace cedar
   namespace aux
   {
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_DECLARE_AUX_CLASS(Base);
     CEDAR_DECLARE_AUX_CLASS(Configurable);
     CEDAR_DECLARE_AUX_CLASS(NamedConfigurable);
     CEDAR_DECLARE_AUX_CLASS(LoopedThread);
@@ -73,7 +72,8 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(Object);
+    CEDAR_DECLARE_AUX_CLASS(RigidBody);
+    CEDAR_DECLARE_DEPRECATED(typedef RigidBody Object);
     CEDAR_DECLARE_AUX_CLASS(System);
     //!@endcond
 
@@ -89,23 +89,16 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(Arguments);
     //!@endcond
 
-    template <class T, typename SmartPointerType> class Factory;
-    template <class T, class T2, typename SmartPointerType> class FactoryDerived;
+    template <class BaseTypePtr> class Factory;
+    template <class BaseTypePtr, class DerivedTypePtr> class FactoryDerived;
+    template <class BaseTypePtr> class FactoryManager;
 
-    template <class T> class AbstractFactory;
-    template <class T, class T2> class AbstractFactoryDerived;
-
-    template
-    <
-      class KeyBaseType,
-      class ValueBaseType,
-      typename KeySmartPointerType = boost::shared_ptr<KeyBaseType>,
-      typename ValueSmartPointerType = boost::shared_ptr<ValueBaseType>
-    >
-    class TypeBasedFactory;
+    template <typename KeyBasePtr, typename ValueBasePtr> class TypeBasedFactory;
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(Parameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectParameter);
+    CEDAR_DECLARE_AUX_CLASS_INTRUSIVE(ObjectListParameter);
     //!@endcond
 
     //!@brief a template class for parameters
@@ -116,6 +109,10 @@ namespace cedar
     template <typename T> class VectorParameter;
     //!@brief a template class for vector parameters (of numeric type)
     template <typename T> class NumericVectorParameter;
+    //!@brief a template class for storing objects that are allocated dynamically.
+    template <typename T> class ObjectParameterTemplate;
+    //!@brief a template class for lists of objects of arbitrary type
+    template <typename T> class ObjectListParameterTemplate;
     //!@brief A concretization of NumericParameter for double values.
     typedef NumericParameter<double> DoubleParameter;
     //!@brief A concretization of NumericParameter for unsigned int values.
@@ -188,6 +185,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(ImageData);
     /* exceptions */
     CEDAR_DECLARE_AUX_CLASS(ExceptionBase);
+    CEDAR_DECLARE_AUX_CLASS(FileNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(BadConnectionException);
     CEDAR_DECLARE_AUX_CLASS(DeadReferenceException);
     CEDAR_DECLARE_AUX_CLASS(DuplicateIdException);
@@ -201,6 +199,7 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(NullPointerException);
     CEDAR_DECLARE_AUX_CLASS(ParameterNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(RangeException);
+    CEDAR_DECLARE_AUX_CLASS(ResourceNotFoundException);
     CEDAR_DECLARE_AUX_CLASS(TypeMismatchException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnhandledValueException);
@@ -208,6 +207,35 @@ namespace cedar
     CEDAR_DECLARE_AUX_CLASS(UnknownTypeException);
     CEDAR_DECLARE_AUX_CLASS(UnmanglingFailedException);
     //!@endcond
+    
+    // Log related classes --------------------------------------------------------------------------------------------
+    CEDAR_DECLARE_AUX_CLASS(Log);
+    typedef cedar::aux::Singleton<cedar::aux::Log> LogSingleton;
+    
+    //!@cond SKIPPED_DOCUMENTATION
+    CEDAR_GENERATE_POINTER_TYPES(LogSingleton);
+    CEDAR_DECLARE_AUX_CLASS(LogInterface);
+    CEDAR_DECLARE_AUX_CLASS(LogFilter);
+    CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
+    CEDAR_DECLARE_AUX_CLASS(NullLogger);
+    //!@endcond
+    
+    //!@brief Enumeration that defines different log levels.
+    enum LOG_LEVEL
+    {
+      //! System information. For example, this could be to inform the user of automatically determined constants/values.
+      LOG_LEVEL_SYSTEM_INFO,
+      //! A normal message.
+      LOG_LEVEL_MESSAGE,
+      //! A warning.
+      LOG_LEVEL_WARNING,
+      //! An error.
+      LOG_LEVEL_ERROR,
+      //! A debug message. Will only be sent in debug builds!
+      LOG_LEVEL_DEBUG,
+      //! A debug message concerned with memory allocation. Will only be sent in debug builds!
+      LOG_LEVEL_MEM_DEBUG
+    };
   }
 }
 

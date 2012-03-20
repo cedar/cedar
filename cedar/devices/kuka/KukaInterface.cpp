@@ -80,6 +80,7 @@ cedar::dev::kuka::KukaInterface::~KukaInterface()
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
+
 void cedar::dev::kuka::KukaInterface::init()
 {
   //The number of joints the KUKA LBR has
@@ -97,7 +98,7 @@ void cedar::dev::kuka::KukaInterface::init()
   _mRemoteHost = "NULL";
 
   //create a new Instance of the friRemote
-  if (_mRemoteHost != std::string("NULL"))
+  if (_mRemoteHost != "NULL")
   {
     mpFriRemote = new friRemote(_mServerPort, const_cast<char*>(_mRemoteHost.c_str()));
   }
@@ -110,7 +111,7 @@ void cedar::dev::kuka::KukaInterface::init()
 
   //set step size and idle time for the looped thread
   setStepSize(0);
-  setIdleTime(0);
+  setIdleTime(0.01);
   useFixedStepSize(false);
   //start the thread
   start();
@@ -118,7 +119,21 @@ void cedar::dev::kuka::KukaInterface::init()
   mIsInit = true;
 }
 
-double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index)
+bool cedar::dev::kuka::KukaInterface::isMovable() const
+{
+  mLock.lockForRead();
+  bool on = mPowerOn;
+  FRI_STATE state = getFriState();
+  mLock.unlock();
+
+  if (on && (state == FRI_STATE_CMD))
+  {
+    return true;
+  }
+  return false;
+}
+
+double cedar::dev::kuka::KukaInterface::getJointAngle(unsigned int index) const
 {
   double a = 0;
   try
@@ -244,7 +259,7 @@ void cedar::dev::kuka::KukaInterface::copyFromFRI()
   mFriQuality = mpFriRemote->getQuality();
   mSampleTime = mpFriRemote->getSampleTime();
   mPowerOn = mpFriRemote->isPowerOn();
-  //Create a std::vector from the float-Array
+  // use temporary float-array to receive the returned variables
   float *pJointPos = mpFriRemote->getMsrMsrJntPosition();
   for (unsigned i=0; i<LBR_MNJ; i++)
   {
@@ -259,7 +274,8 @@ void cedar::dev::kuka::KukaInterface::copyFromFRI()
 //----------------------------------------------------------------------------------------------------------------------
 // wrapped fri-functions
 //----------------------------------------------------------------------------------------------------------------------
-FRI_STATE cedar::dev::kuka::KukaInterface::getFriState()
+// todo: check whether the const works with the locks used here (and whether the locks are useful)
+FRI_STATE cedar::dev::kuka::KukaInterface::getFriState() const
 {
   mLock.lockForRead();
   FRI_STATE s = mFriState;
@@ -267,7 +283,7 @@ FRI_STATE cedar::dev::kuka::KukaInterface::getFriState()
   return s;
 }
 
-FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality()
+FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality() const
 {
   mLock.lockForRead();
   FRI_QUALITY q = mFriQuality;
@@ -275,7 +291,7 @@ FRI_QUALITY cedar::dev::kuka::KukaInterface::getFriQuality()
   return q;
 }
 
-float cedar::dev::kuka::KukaInterface::getSampleTime()
+float cedar::dev::kuka::KukaInterface::getSampleTime() const
 {
   mLock.lockForRead();
   float t = mSampleTime;
@@ -283,7 +299,7 @@ float cedar::dev::kuka::KukaInterface::getSampleTime()
   return t;
 }
 
-bool cedar::dev::kuka::KukaInterface::isPowerOn()
+bool cedar::dev::kuka::KukaInterface::isPowerOn() const
 {
   mLock.lockForRead();
   bool on = mPowerOn;

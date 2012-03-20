@@ -37,12 +37,41 @@
 // CEDAR INCLUDES
 #include "cedar/processing/steps/StaticGain.h"
 #include "cedar/processing/DataSlot.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <iostream>
 #include <vector>
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr static_gain_decl
+    (
+      new ElementDeclarationTemplate<cedar::proc::steps::StaticGain>
+      (
+        "Utilities",
+        "cedar.processing.StaticGain"
+      )
+    );
+    static_gain_decl->setIconPath(":/steps/static_gain.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(static_gain_decl);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

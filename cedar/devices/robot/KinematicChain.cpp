@@ -45,11 +45,11 @@
 //------------------------------------------------------------------------------
 
 //! constructor
-cedar::dev::robot::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr& rpReferenceGeometry)
+cedar::dev::robot::KinematicChain::KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry)
 :
 //!\todo this step size should be set different, should be a parameter, i.e. read in from configuration file
 LoopedThread(12, 0.01),
-mpReferenceGeometry(rpReferenceGeometry)
+mpReferenceGeometry(pReferenceGeometry)
 {
   setWorkingMode(ANGLE);
   mUseCurrentHardwareValues = false;
@@ -69,13 +69,18 @@ mpReferenceGeometry(new ReferenceGeometry(configFileName))
 //! destructor
 cedar::dev::robot::KinematicChain::~KinematicChain()
 {
+  if (isRunning())
+  {
+    this->stop();
+    this->wait();
+  }
 }
 
 //------------------------------------------------------------------------------
 // methods
 //------------------------------------------------------------------------------
 
-const cedar::dev::robot::ReferenceGeometryPtr& cedar::dev::robot::KinematicChain::getReferenceGeometry() const
+const cedar::dev::robot::ReferenceGeometryPtr cedar::dev::robot::KinematicChain::getReferenceGeometry() const
 {
   return mpReferenceGeometry;
 }
@@ -87,13 +92,13 @@ unsigned int cedar::dev::robot::KinematicChain::getNumberOfJoints() const
 }
 
 
-void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr& rpGeometry)
+void cedar::dev::robot::KinematicChain::setReferenceGeometry(const ReferenceGeometryPtr rpGeometry)
 {
   mpReferenceGeometry = rpGeometry;
 }
 
 
-std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -106,7 +111,7 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAngles()
 }
 
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix() const
 {
   cv::Mat dummy = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
 
@@ -119,7 +124,7 @@ cv::Mat cedar::dev::robot::KinematicChain::getJointAnglesMatrix()
 }
 
 
-double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index) const
 {
   if (index >= getNumberOfJoints())
   {
@@ -130,7 +135,7 @@ double cedar::dev::robot::KinematicChain::getJointVelocity(unsigned int index)
 }
 
 
-std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -143,13 +148,13 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointVelocities()
 }
 
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointVelocitiesMatrix() const
 {
   return mJointVelocities.clone();
 }
 
 
-double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index)
+double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int index) const
 {
   if (index >= getNumberOfJoints())
   {
@@ -160,7 +165,7 @@ double cedar::dev::robot::KinematicChain::getJointAcceleration(unsigned int inde
 }
 
 
-std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations()
+std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations() const
 {
   std::vector<double> dummy(getNumberOfJoints());
 
@@ -173,7 +178,7 @@ std::vector<double> cedar::dev::robot::KinematicChain::getJointAccelerations()
 }
 
 
-cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix()
+cv::Mat cedar::dev::robot::KinematicChain::getJointAccelerationsMatrix() const
 {
   return mJointAccelerations.clone();
 }
@@ -405,13 +410,14 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 
   mCurrentWorkingMode = actionType;
 
-  // want to reset something?
+  // reset variables where necessary (HR: is that really necessary?)
   switch (mCurrentWorkingMode)
   {
     case ACCELERATION:
       mJointAccelerations = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
     case VELOCITY:
       mJointVelocities = cv::Mat::zeros(getNumberOfJoints(), 1, CV_64FC1);
+      start();
     case ANGLE:
       break;
   }

@@ -42,12 +42,15 @@
 #include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/Parameter.h"
 #include "cedar/auxiliaries/exceptions.h"
+#include "cedar/auxiliaries/stringFunctions.h"
 
 // SYSTEM INCLUDES
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
+#include <sstream>
+#include <fstream> // only used for legacy configurable compatibility
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
@@ -74,6 +77,67 @@ void cedar::aux::Configurable::configurationLoaded()
   }
 }
 
+cedar::aux::ConfigurablePtr cedar::aux::Configurable::getConfigurableChild(const std::string& path)
+{
+  std::vector<std::string> path_components;
+  cedar::aux::split(path, ".", path_components);
+
+  CEDAR_ASSERT(path_components.size() != 0);
+
+  Children::const_iterator iter = this->mChildren.find(path_components.at(0));
+  if (iter == this->mChildren.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Child \"" + path + "\" not found.");
+  }
+
+  cedar::aux::ConfigurablePtr child = iter->second;
+  if (path_components.size() == 1)
+  {
+    return child;
+  }
+  else
+  {
+    std::vector<std::string> subpath_components;
+
+    std::vector<std::string>::const_iterator first, last;
+    first = path_components.begin();
+    ++first;
+    last = path_components.end();
+    subpath_components.insert(subpath_components.begin(), first, last);
+    std::string subpath = cedar::aux::join(subpath_components, ".");
+    return child->getConfigurableChild(subpath);
+  }
+}
+
+
+cedar::aux::ParameterPtr cedar::aux::Configurable::getParameter(const std::string& path)
+{
+  std::vector<std::string> path_components, subpath_components;
+  cedar::aux::split(path, ".", path_components);
+
+  cedar::aux::Configurable *p_configurable = this;
+
+  if (path_components.size() > 1)
+  {
+    std::vector<std::string>::const_iterator first, last;
+    first = path_components.begin();
+    last = path_components.end();
+    --last;
+    subpath_components.insert(subpath_components.begin(), first, last);
+    std::string subpath = cedar::aux::join(subpath_components, ".");
+    p_configurable = this->getConfigurableChild(subpath).get();
+  }
+
+  ParameterMap::iterator iter = p_configurable->mParameterAssociations.find(path_components.back());
+  if (iter == p_configurable->mParameterAssociations.end())
+  {
+    CEDAR_THROW(cedar::aux::UnknownNameException, "Parameter \"" + path + "\" was not found.");
+  }
+  cedar::aux::ParameterPtr parameter = *(iter->second);
+  return parameter;
+}
+
+
 void cedar::aux::Configurable::readJson(const std::string& filename)
 {
   cedar::aux::ConfigurationNode configuration;
@@ -84,11 +148,45 @@ void cedar::aux::Configurable::readJson(const std::string& filename)
 void cedar::aux::Configurable::readOldConfig(const std::string& filename)
 {
   cedar::aux::ConfigurationNode configuration;
-  boost::property_tree::read_ini(filename, configuration);
+  std::ifstream stream(filename.c_str());
+  if(!stream.good())
+  {
+    CEDAR_THROW(cedar::aux::FileNotFoundException, "File \"" + filename + "\" could not be opened.");
+  }
+
+  std::string file_contents((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+
+  std::stringstream file_stream;
+//  file_stream << file_contents;
+  // boost regex replace of /* ... */
+  file_contents = cedar::aux::regexReplace(file_contents, "\\Q/*\\E.*\\Q*/\\E", "");
+//  file_contents = cedar::aux::regexReplace(file_contents, "\\n\\n", "\\n");
+  file_stream << file_contents;
+
+  boost::property_tree::read_ini(file_stream, configuration);
 
   this->oldFormatToNew(configuration);
 
   this->readConfiguration(configuration);
+}
+
+void cedar::aux::Configurable::writeOldConfig(const std::string& filename)
+{
+  std::string dir = filename;
+
+  size_t index;
+  if ( (index = dir.rfind("/")) != std::string::npos )
+  {
+    dir = dir.substr(0, index);
+    boost::filesystem::create_directories(dir);
+  }
+
+  cedar::aux::ConfigurationNode configuration;
+  this->writeConfiguration(configuration);
+
+  this->newFormatToOld(configuration);
+
+  boost::property_tree::write_ini(filename, configuration);
 }
 
 void cedar::aux::Configurable::oldFormatToNew(cedar::aux::ConfigurationNode& node)
@@ -117,6 +215,16 @@ void cedar::aux::Configurable::oldFormatToNew(cedar::aux::ConfigurationNode& nod
   }
 }
 
+void cedar::aux::Configurable::newFormatToOld(cedar::aux::ConfigurationNode& node)
+{
+  for (cedar::aux::ConfigurationNode::iterator iter = node.begin(); iter != node.end(); ++iter)
+  {
+    std::string data = iter->second.data();
+    data += ";";
+    iter->second.put_value(data);
+  }
+}
+
 
 void cedar::aux::Configurable::writeJson(const std::string& filename) const
 {
@@ -126,7 +234,7 @@ void cedar::aux::Configurable::writeJson(const std::string& filename) const
   if ( (index = dir.rfind("/")) != std::string::npos )
   {
     dir = dir.substr(0, index);
-    boost::filesystem::create_directory(dir);
+    boost::filesystem::create_directories(dir);
   }
 
   cedar::aux::ConfigurationNode configuration;
@@ -164,6 +272,31 @@ cedar::aux::Configurable::ParameterList& cedar::aux::Configurable::getParameters
   return this->mParameterList;
 }
 
+void cedar::aux::Configurable::defaultAll()
+{
+  for
+  (
+    ParameterList::const_iterator iter = this->mParameterList.begin();
+    iter != this->mParameterList.end();
+    ++iter
+  )
+  {
+    // reset the changed flag of the parameter
+    (*iter)->makeDefault();
+  }
+
+  for
+  (
+    Children::const_iterator child = this->mChildren.begin();
+    child != this->mChildren.end();
+    ++child
+  )
+  {
+    child->second->defaultAll();
+  }
+}
+
+
 void cedar::aux::Configurable::resetChangedStates(bool newChangedFlagValue) const
 {
   for
@@ -198,7 +331,7 @@ void cedar::aux::Configurable::writeConfiguration(cedar::aux::ConfigurationNode&
   )
   {
     // write the parameter to the configuration
-    (*iter)->putTo(root);
+    (*iter)->writeToNode(root);
   }
 
   for
@@ -227,7 +360,7 @@ void cedar::aux::Configurable::readConfiguration(const cedar::aux::Configuration
       const cedar::aux::ConfigurationNode& value = node.get_child(parameter->getName());
 
       // set the parameter to the value read from the file
-      parameter->setTo(value);
+      parameter->readFromNode(value);
 
       // reset the changed flag of the parameter
       (*iter)->setChangedFlag(false);

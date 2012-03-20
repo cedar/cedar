@@ -24,8 +24,8 @@
 
     File:        KTeamDriveModel.cpp
 
-    Maintainer:  Andre Bartel
-    Email:       andre.bartel@ini.ruhr-uni-bochum.de
+    Maintainer:  Stephan Zibner
+    Email:       stephan.zibner@ini.ruhr-uni-bochum.de
     Date:        2011 03 19
 
     Description: An object of this class represents the kinematics model of a differential drive robot with encoders.
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "DriveModel.h"
+#include "cedar/devices/kteam/DriveModel.h"
 
 // SYSTEM INCLUDES
 

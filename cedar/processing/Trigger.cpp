@@ -44,6 +44,9 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/Manager.h"
 #include "cedar/processing/Element.h"
+#include "cedar/processing/ElementDeclaration.h"
+#include "cedar/processing/DeclarationRegistry.h"
+#include "cedar/auxiliaries/Log.h"
 
 // SYSTEM INCLUDES
 #include <algorithm>
@@ -55,6 +58,34 @@
 #  include "cedar/auxiliaries/System.h"
 #endif // DEBUG_TRIGGERING
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// register the trigger class
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool declare()
+  {
+    using cedar::proc::ElementDeclarationPtr;
+    using cedar::proc::ElementDeclarationTemplate;
+
+    ElementDeclarationPtr trigger_declaration
+    (
+      new ElementDeclarationTemplate<cedar::proc::Trigger>
+      (
+        "Triggers",
+        "cedar.processing.Trigger"
+      )
+    );
+    trigger_declaration->setIconPath(":/triggers/trigger.svg");
+    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(trigger_declaration);
+
+    return true;
+  }
+
+  bool declared = declare();
+}
+
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,20 +94,31 @@ cedar::proc::Trigger::Trigger(const std::string& name, bool isLooped)
 :
 Triggerable(isLooped)
 {
+  cedar::aux::LogSingleton::getInstance()->allocating(this);
+
   this->setName(name);
 }
 
 cedar::proc::Trigger::~Trigger()
 {
-#ifdef DEBUG
-  std::cout << "> freeing data (Trigger)" << std::endl;
-#endif
+  cedar::aux::LogSingleton::getInstance()->freeing(this);
+
   this->mListeners.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+void cedar::proc::Trigger::wait()
+{
+  for (size_t i = 0; i < this->mListeners.size(); ++i)
+  {
+    this->mListeners.at(i)->wait();
+  }
+}
+
+
 void cedar::proc::Trigger::trigger(cedar::proc::ArgumentsPtr arguments)
 {
   for (size_t i = 0; i < this->mListeners.size(); ++i)

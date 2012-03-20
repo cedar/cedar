@@ -40,7 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/auxiliaries/Base.h"
 #include "cedar/devices/communication/Communication.h"
 
 // SYSTEM INCLUDES
@@ -52,7 +51,7 @@
  *
  * @todo More detailed description of the class.
  */
-class cedar::dev::robot::Component : public virtual cedar::aux::Base
+class cedar::dev::robot::Component
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

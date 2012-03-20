@@ -51,7 +51,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::dev::kuka::gui::FriStatusWidget::FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr &pKukaIn, QWidget *parent)
+cedar::dev::kuka::gui::FriStatusWidget::FriStatusWidget(cedar::dev::kuka::KukaInterfacePtr pKukaIn, QWidget *parent)
 :
 cedar::aux::gui::BaseWidget("FriStatusWidget", parent)
 {
@@ -79,8 +79,8 @@ void cedar::dev::kuka::gui::FriStatusWidget::updateInformation()
 {
   // Translations from status-/quality-values to text
   std::string quality_names[]
-    = { std::string("BAD (0)"), std::string("UNACCEPTABLE (1)"), std::string("GOOD (2)"), std::string("PERFECT (3)") };
-  std::string state_names[] = { std::string("OFF (0)"), std::string("Monitor Mode"), std::string("Command Mode") };
+    = { "BAD (0)", "UNACCEPTABLE (1)", "GOOD (2)", "PERFECT (3)" };
+  std::string state_names[] = { "OFF (0)", "Monitor Mode", "Command Mode" };
   // set Text for Fri state and Fri quality
   mpLabelStateData->setText(state_names[mpKukaIn->getFriState()].c_str());
   mpLabelQualData->setText(quality_names[mpKukaIn->getFriQuality()].c_str());
