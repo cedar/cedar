@@ -87,7 +87,7 @@ int main(int argc, char **argv)
   );
 
   // create gl visualization objects
-  cedar::aux::gl::RigidBodyVisualizationPtr p_arm_visualization;
+  cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
   cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
   (
     new cedar::dev::robot::gl::KukaArm(p_kuka_arm_model)
@@ -98,7 +98,7 @@ int main(int argc, char **argv)
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
-  p_scene->addRigidBodyVisualization(p_arm_visualization);
+  p_scene->addObjectVisualization(p_arm_visualization);
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());

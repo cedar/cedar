@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/namespace.h"
 #include "cedar/auxiliaries/RigidBody.h"
 
@@ -48,12 +48,12 @@
 
 /*!@brief Simple OpenGL visualization of a block, i.e. a parallelepiped with rectangular sides
  *
- * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a block with specified dimensions
+ * This class visualizes an instance of cedar::aux::ObjectVisualization as a block with specified dimensions
  *
  * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Block : public cedar::aux::gl::RigidBodyVisualization
+class cedar::aux::gl::Block : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------

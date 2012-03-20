@@ -40,7 +40,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/KinematicChainModel.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
@@ -49,7 +49,7 @@
 /*!@brief Visualization of the Schunk Dextrous Hand
  * ...
  */
-class cedar::dev::robot::gl::Sdh : public cedar::aux::gl::RigidBodyVisualization
+class cedar::dev::robot::gl::Sdh : public cedar::aux::gl::ObjectVisualization
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

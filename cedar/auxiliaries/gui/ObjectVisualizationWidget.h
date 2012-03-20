@@ -22,24 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBodyVisualizationWidget.h
+    File:        ObjectVisualizationWidget.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2012 02 06
 
-    Description: Header for the @em cedar::aux::gui::RigidBodyVisualizationWidget class.
+    Description: Header for the @em cedar::aux::gui::ObjectVisualizationWidget class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H
-#define CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H
+#ifndef CEDAR_AUX_GUI_OBJECT_VISUALIZATION_WIDGET_H
+#define CEDAR_AUX_GUI_OBJECT_VISUALIZATION_WIDGET_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
@@ -51,8 +51,8 @@
 
 //!@brief A simple widget to monitor and change the state of a rigid body visualization
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::RigidBodyVisualizationWidget
-class cedar::aux::gui::RigidBodyVisualizationWidget
+//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::ObjectVisualizationWidget
+class cedar::aux::gui::ObjectVisualizationWidget
 :
 public QWidget,
 public cedar::aux::ConfigurationInterface
@@ -72,9 +72,9 @@ public:
    *@param rigidBodyVisualization pointer to a rigid body visualization object
    *@param parent parent parameter of QWidget
    */
-  RigidBodyVisualizationWidget(const cedar::aux::gl::RigidBodyVisualizationPtr rigidBodyVisualization, QWidget* parent = 0);
+  ObjectVisualizationWidget(const cedar::aux::gl::ObjectVisualizationPtr rigidBodyVisualization, QWidget* parent = 0);
 
-  ~RigidBodyVisualizationWidget();
+  ~ObjectVisualizationWidget();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -84,9 +84,9 @@ public:
 
   /*!@brief set the pointer to the RigidBody
    *
-   * @param    pRigidBodyVisualization pointer to the new RigidBodyVisualization
+   * @param    pObjectVisualization pointer to the new ObjectVisualization
    */
-  void setRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization);
+  void setObjectVisualization(cedar::aux::gl::ObjectVisualizationPtr pObjectVisualization);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -125,7 +125,7 @@ protected:
 
 private:
   static const int mUpdateInterval = 100;
-  cedar::aux::gl::RigidBodyVisualizationPtr mpRigidBodyVisualization;
+  cedar::aux::gl::ObjectVisualizationPtr mpObjectVisualization;
   QCheckBox* mpVisibleCheckBox;
   QCheckBox* mpWireFrameCheckBox;
   QCheckBox* mpLcfCheckBox;
@@ -135,4 +135,4 @@ private:
   QDoubleSpinBox* mpBlueDoubleSpinBox;
 };
 
-#endif /* CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H */
+#endif /* CEDAR_AUX_GUI_OBJECT_VISUALIZATION_WIDGET_H */

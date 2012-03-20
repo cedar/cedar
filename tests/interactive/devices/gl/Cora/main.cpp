@@ -84,11 +84,11 @@ int main(int argc, char **argv)
   viewer.setSceneRadius(p_scene->getSceneLimit());
 
   // create visualization objects for the head and arm
-  cedar::aux::gl::RigidBodyVisualizationPtr p_object;
+  cedar::aux::gl::ObjectVisualizationPtr p_object;
   p_object = p_cora_arm_visualization;
-  p_scene->addRigidBodyVisualization(p_object);
+  p_scene->addObjectVisualization(p_object);
   p_object = p_cora_head_visualization;
-  p_scene->addRigidBodyVisualization(p_object);
+  p_scene->addObjectVisualization(p_object);
 
   // create control widgets for the scene and the arm
   cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));

@@ -34,15 +34,15 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_TESTS_UNIT_AUX_RIGID_BODY_VISUALIZATION_TEST_VISUALIZATION_H
-#define CEDAR_TESTS_UNIT_AUX_RIGID_BODY_VISUALIZATION_TEST_VISUALIZATION_H
+#ifndef CEDAR_TESTS_UNIT_AUX_OBJECT_VISUALIZATION_TEST_VISUALIZATION_H
+#define CEDAR_TESTS_UNIT_AUX_OBJECT_VISUALIZATION_TEST_VISUALIZATION_H
 
 // LOCAL INCLUDES
 #include "namespace.h"
 
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/RigidBody.h"
 
 // SYSTEM INCLUDES
@@ -51,7 +51,7 @@
  *
  * More detailed description of the class.
  */
-class cedar::tests::unit::aux::gl::TestVisualization : public cedar::aux::gl::RigidBodyVisualization
+class cedar::tests::unit::aux::gl::TestVisualization : public cedar::aux::gl::ObjectVisualization
 {
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor

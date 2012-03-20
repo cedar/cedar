@@ -46,7 +46,7 @@
 
 cedar::aux::gl::Ellipse::Ellipse(cedar::aux::RigidBodyPtr pRigidBody)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pRigidBody)
 {
   mLength = 2;
   mWidth = 3;
@@ -67,7 +67,7 @@ cedar::aux::gl::Ellipse::Ellipse(
                                   double B
                                 )
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pRigidBody)
 {
   mLength = length;
   mWidth = width;

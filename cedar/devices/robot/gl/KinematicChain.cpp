@@ -50,7 +50,7 @@
 
 cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
 :
-cedar::aux::gl::RigidBodyVisualization(pKinematicChainModel->getRootCoordinateFrame()),
+cedar::aux::gl::ObjectVisualization(pKinematicChainModel->getRootCoordinateFrame()),
 mpKinematicChainModel(pKinematicChainModel)
 {
   mIsDrawingEndEffectorVelocity = true;

@@ -67,7 +67,7 @@ void cedar::aux::gui::Viewer::init()
   mpScene->initGl();
 }
 
-void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::RigidBodyVisualizationPtr pVisualization)
+void cedar::aux::gui::Viewer::initGl(cedar::aux::gl::ObjectVisualizationPtr pVisualization)
 {
   pVisualization->initializeGl();
 }

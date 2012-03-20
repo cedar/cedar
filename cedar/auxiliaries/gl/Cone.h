@@ -39,18 +39,18 @@
 
 // CEDAR INCLUDES
 #include "namespace.h"
-#include "RigidBodyVisualization.h"
+#include "ObjectVisualization.h"
 
 // SYSTEM INCLUDES
 
 /*!@brief Simple OpenGL visualization of a cone or truncated cone
  *
- * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a cone with specified dimensions
+ * This class visualizes an instance of cedar::aux::ObjectVisualization as a cone with specified dimensions
  *
  * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Cone : public cedar::aux::gl::RigidBodyVisualization
+class cedar::aux::gl::Cone : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------

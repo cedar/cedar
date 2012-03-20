@@ -92,7 +92,7 @@ int main(int argc, char **argv)
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
   p_scene->setSceneLimit(2);
   p_scene->drawFloor(true);
-  p_scene->addRigidBodyVisualization(p_hand_visualization);
+  p_scene->addObjectVisualization(p_hand_visualization);
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());

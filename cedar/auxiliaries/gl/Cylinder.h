@@ -39,7 +39,7 @@
 
 // LOCAL INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
-#include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
+#include "cedar/auxiliaries/gl/ObjectVisualization.h"
 
 // PROJECT INCLUDES
 
@@ -47,12 +47,12 @@
 
 /*!@brief Simple OpenGL visualization of a cylinder
  *
- * This class visualizes an instance of cedar::aux::RigidBodyVisualization as a cylinder with specified dimensions
+ * This class visualizes an instance of cedar::aux::ObjectVisualization as a cylinder with specified dimensions
  *
  * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
-class cedar::aux::gl::Cylinder : public cedar::aux::gl::RigidBodyVisualization
+class cedar::aux::gl::Cylinder : public cedar::aux::gl::ObjectVisualization
 {
 public:
   //--------------------------------------------------------------------------------------------------------------------

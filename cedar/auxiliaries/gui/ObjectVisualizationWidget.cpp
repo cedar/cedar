@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBodyVisualizationWidget.cpp
+    File:        ObjectVisualizationWidget.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2012 02 01
 
-    Description: Implementation of the @em cedar::aux::RigidBodyVisualizationWidget class.
+    Description: Implementation of the @em cedar::aux::ObjectVisualizationWidget class.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
+#include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
@@ -54,20 +54,20 @@
 // constructors and destructor
 //----------------------------------------------------------------------------
 
-cedar::aux::gui::RigidBodyVisualizationWidget::RigidBodyVisualizationWidget
+cedar::aux::gui::ObjectVisualizationWidget::ObjectVisualizationWidget
 (
-  const cedar::aux::gl::RigidBodyVisualizationPtr rigidBodyVisualization,
+  const cedar::aux::gl::ObjectVisualizationPtr rigidBodyVisualization,
   QWidget* parent
 )
 :
 QWidget(parent),
-mpRigidBodyVisualization(rigidBodyVisualization)
+mpObjectVisualization(rigidBodyVisualization)
 {
   initWindow();
   return;
 }
 
-cedar::aux::gui::RigidBodyVisualizationWidget::~RigidBodyVisualizationWidget()
+cedar::aux::gui::ObjectVisualizationWidget::~ObjectVisualizationWidget()
 {
 
 }
@@ -77,14 +77,14 @@ cedar::aux::gui::RigidBodyVisualizationWidget::~RigidBodyVisualizationWidget()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::setRigidBodyVisualization(cedar::aux::gl::RigidBodyVisualizationPtr pRigidBodyVisualization)
+void cedar::aux::gui::ObjectVisualizationWidget::setObjectVisualization(cedar::aux::gl::ObjectVisualizationPtr pObjectVisualization)
 {
-  mpRigidBodyVisualization = pRigidBodyVisualization;
+  mpObjectVisualization = pObjectVisualization;
 }
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
+void cedar::aux::gui::ObjectVisualizationWidget::initWindow()
 {
-  setWindowTitle(QApplication::translate("RigidBodyVisualizationWidget", "Rigid Body Visualization"));
+  setWindowTitle(QApplication::translate("ObjectVisualizationWidget", "Rigid Body Visualization"));
 
   // create widgets and layouts
   QVBoxLayout* main_layout = new QVBoxLayout();
@@ -148,11 +148,11 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
 
 }
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::update()
+void cedar::aux::gui::ObjectVisualizationWidget::update()
 {
   // update visibility check box
   mpVisibleCheckBox->blockSignals(true);
-  if (mpRigidBodyVisualization->isVisible())
+  if (mpObjectVisualization->isVisible())
   {
     mpVisibleCheckBox->setCheckState(Qt::Checked);
   }
@@ -164,7 +164,7 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::update()
 
   // update wire frame check box
   mpWireFrameCheckBox->blockSignals(true);
-  if (mpRigidBodyVisualization->isDrawnAsWireFrame())
+  if (mpObjectVisualization->isDrawnAsWireFrame())
   {
     mpWireFrameCheckBox->setCheckState(Qt::Checked);
   }
@@ -176,7 +176,7 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::update()
 
   // update local coordinate frame check box
   mpLcfCheckBox->blockSignals(true);
-  if (mpRigidBodyVisualization->isDrawingLocalCoordinateFrame())
+  if (mpObjectVisualization->isDrawingLocalCoordinateFrame())
   {
     mpLcfCheckBox->setCheckState(Qt::Checked);
   }
@@ -188,44 +188,44 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::update()
 
   // update axis length line edit
   mpAxisLengthLineEdit->blockSignals(true);
-  mpAxisLengthLineEdit->setText(QString("%1").arg(mpRigidBodyVisualization->getAxisLength(), 0, 'g', 1, '0'));
+  mpAxisLengthLineEdit->setText(QString("%1").arg(mpObjectVisualization->getAxisLength(), 0, 'g', 1, '0'));
   mpAxisLengthLineEdit->blockSignals(false);
 
   // update color spin boxes
   mpRedDoubleSpinBox->blockSignals(true);
   mpGreenDoubleSpinBox->blockSignals(true);
   mpBlueDoubleSpinBox->blockSignals(true);
-  mpRedDoubleSpinBox->setValue(mpRigidBodyVisualization->getColorR());
-  mpGreenDoubleSpinBox->setValue(mpRigidBodyVisualization->getColorG());
-  mpBlueDoubleSpinBox->setValue(mpRigidBodyVisualization->getColorB());
+  mpRedDoubleSpinBox->setValue(mpObjectVisualization->getColorR());
+  mpGreenDoubleSpinBox->setValue(mpObjectVisualization->getColorG());
+  mpBlueDoubleSpinBox->setValue(mpObjectVisualization->getColorB());
   mpRedDoubleSpinBox->blockSignals(false);
   mpGreenDoubleSpinBox->blockSignals(false);
   mpBlueDoubleSpinBox->blockSignals(false);
 }
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::setVisibilityState(int state)
+void cedar::aux::gui::ObjectVisualizationWidget::setVisibilityState(int state)
 {
-  mpRigidBodyVisualization->setVisibility(state);
+  mpObjectVisualization->setVisibility(state);
 }
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::setWireFrameState(int state)
+void cedar::aux::gui::ObjectVisualizationWidget::setWireFrameState(int state)
 {
-  mpRigidBodyVisualization->setDrawAsWireFrame(state);
+  mpObjectVisualization->setDrawAsWireFrame(state);
 }
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::setLcfState(int state)
+void cedar::aux::gui::ObjectVisualizationWidget::setLcfState(int state)
 {
-  mpRigidBodyVisualization->setDrawLocalCoordinateFrame(state);
+  mpObjectVisualization->setDrawLocalCoordinateFrame(state);
 }
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::setAxisLength()
+void cedar::aux::gui::ObjectVisualizationWidget::setAxisLength()
 {
-  mpRigidBodyVisualization->setAxisLength(mpAxisLengthLineEdit->text().toDouble());
+  mpObjectVisualization->setAxisLength(mpAxisLengthLineEdit->text().toDouble());
 }
 
-void cedar::aux::gui::RigidBodyVisualizationWidget::setColor(double)
+void cedar::aux::gui::ObjectVisualizationWidget::setColor(double)
 {
-  mpRigidBodyVisualization->setColor(
+  mpObjectVisualization->setColor(
       mpRedDoubleSpinBox->value(),
       mpGreenDoubleSpinBox->value(),
       mpBlueDoubleSpinBox->value()

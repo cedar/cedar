@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBodyVisualization.h
+    File:        ObjectVisualization.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
-#define CEDAR_AUX_GL_RIGID_OBJECT_VISUALIZATION_H
+#ifndef CEDAR_AUX_GL_OBJECT_VISUALIZATION_H
+#define CEDAR_AUX_GL_OBJECT_VISUALIZATION_H
 
 #define GL_GLEXT_PROTOTYPES // to avoid a problem with finding some GL stuff, apparently caused by Qt
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -56,7 +56,7 @@
 /*!@brief Base class for simple OpenGL visualizations of geometric objects
  *
  */
-class cedar::aux::gl::RigidBodyVisualization : public QObject
+class cedar::aux::gl::ObjectVisualization : public QObject
 {
   //--------------------------------------------------------------------------------------------------------------------
   // structs
@@ -85,10 +85,10 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. */
-  RigidBodyVisualization(cedar::aux::RigidBodyPtr pRigidBody);
+  ObjectVisualization(cedar::aux::RigidBodyPtr pRigidBody);
   
   /*!@brief destructor. */
-  virtual ~RigidBodyVisualization();
+  virtual ~ObjectVisualization();
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -104,7 +104,7 @@ public:
   bool isVisible() const;
 
   //!@brief returns type of the object
-  const std::string& getRigidBodyVisualizationType() const;
+  const std::string& getObjectVisualizationType() const;
   
   //!@brief returns current resolution
   int getResolution() const;
@@ -260,4 +260,4 @@ private:
 
 };
 
-#endif  // CEDAR_AUX_GL_OBJECT_H
+#endif  // CEDAR_AUX_GL_OBJECT_VISUALIZATION_H
