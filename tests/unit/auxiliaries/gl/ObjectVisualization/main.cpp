@@ -38,7 +38,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/LogFile.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/math/tools.h"
 
@@ -53,8 +53,8 @@ int main(int, char**)
   int errors = 0;
   
   // create instance of test class
-  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
-  cedar::tests::unit::aux::gl::TestVisualization p_visualization(p_rigid_body);
+  cedar::aux::LocalCoordinateFramePtr p_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
+  cedar::tests::unit::aux::gl::TestVisualization p_visualization(p_local_coordinate_frame);
   
   //--------------------------------------------------------------------------------------------------------------------
   // wire frame

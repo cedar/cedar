@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBody.cpp
+    File:        LocalCoordinateFrame.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 12 04
 
-    Description: implementation of cedar::aux::RigidBody class, providing geometry of a rigid object
+    Description: implementation of cedar::aux::LocalCoordinateFrame class, providing geometry of a rigid object
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
 #include "cedar/auxiliaries/assert.h"
@@ -48,7 +48,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::RigidBody::RigidBody()
+cedar::aux::LocalCoordinateFrame::LocalCoordinateFrame()
 :
 mTransformation(4, 4, CV_64FC1),
 _mInitialPosition
@@ -76,7 +76,7 @@ _mInitialPosition
   init();
 }
 
-cedar::aux::RigidBody::~RigidBody()
+cedar::aux::LocalCoordinateFrame::~LocalCoordinateFrame()
 {
 
 }
@@ -85,7 +85,7 @@ cedar::aux::RigidBody::~RigidBody()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::RigidBody::readConfiguration(const cedar::aux::ConfigurationNode& node)
+void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::aux::Configurable::readConfiguration(node);
   setPosition(_mInitialPosition->getValue());
@@ -105,46 +105,46 @@ void cedar::aux::RigidBody::readConfiguration(const cedar::aux::ConfigurationNod
   mTransformation.at<double>(2, 2) = _mInitialOrientation->at(8);	
 }
 
-cv::Mat cedar::aux::RigidBody::getPosition() const
+cv::Mat cedar::aux::LocalCoordinateFrame::getPosition() const
 {
   // todo: check whether this function is tested properly
   QReadLocker locker(&mLock);
   return mTransformation(cv::Rect(3, 0, 1, 4)).clone();
 }
 
-double cedar::aux::RigidBody::getPositionX() const
+double cedar::aux::LocalCoordinateFrame::getPositionX() const
 {
   return mTransformation.at<double>(0, 3);
 }
 
-double cedar::aux::RigidBody::getPositionY() const
+double cedar::aux::LocalCoordinateFrame::getPositionY() const
 {
   return mTransformation.at<double>(1, 3);
 }
 
-double cedar::aux::RigidBody::getPositionZ() const
+double cedar::aux::LocalCoordinateFrame::getPositionZ() const
 {
   return mTransformation.at<double>(2, 3);
 }
 
-cv::Mat cedar::aux::RigidBody::getTransformation() const
+cv::Mat cedar::aux::LocalCoordinateFrame::getTransformation() const
 {
   QReadLocker locker(&mLock);
   return mTransformation.clone();
 }
 
-void cedar::aux::RigidBody::setTransformation(cv::Mat transformation)
+void cedar::aux::LocalCoordinateFrame::setTransformation(cv::Mat transformation)
 {
   QWriteLocker locker(&mLock);
   mTransformation = transformation;
 }
 
-void cedar::aux::RigidBody::update()
+void cedar::aux::LocalCoordinateFrame::update()
 {
 
 }
 
-void cedar::aux::RigidBody::setPosition(double x, double y, double z)
+void cedar::aux::LocalCoordinateFrame::setPosition(double x, double y, double z)
 {
   QWriteLocker locker(&mLock);
   mTransformation.at<double>(0, 3) = x;
@@ -152,7 +152,7 @@ void cedar::aux::RigidBody::setPosition(double x, double y, double z)
   mTransformation.at<double>(2, 3) = z;
 }
 
-void cedar::aux::RigidBody::setPosition(const cv::Mat& position)
+void cedar::aux::LocalCoordinateFrame::setPosition(const cv::Mat& position)
 {
   // todo: check whether this function is tested properly
   QWriteLocker locker(&mLock);
@@ -161,7 +161,7 @@ void cedar::aux::RigidBody::setPosition(const cv::Mat& position)
   mTransformation.at<double>(2, 3) = position.at<double>(2, 0);
 }
 
-void cedar::aux::RigidBody::setPosition(const std::vector<double>& position)
+void cedar::aux::LocalCoordinateFrame::setPosition(const std::vector<double>& position)
 {
   QWriteLocker locker(&mLock);
   CEDAR_ASSERT(position.size() >=3);
@@ -170,14 +170,14 @@ void cedar::aux::RigidBody::setPosition(const std::vector<double>& position)
   mTransformation.at<double>(2, 3) = position[2];
 }
 
-void cedar::aux::RigidBody::rotate(unsigned int axis, double angle)
+void cedar::aux::LocalCoordinateFrame::rotate(unsigned int axis, double angle)
 {
   QWriteLocker locker(&mLock);
   mTransformation(cv::Rect(0, 0, 3, 3))
     = mTransformation(cv::Rect(0, 0, 3, 3)) * cedar::aux::math::expAxis<double>(mUnitAxes[axis], angle);
 }
 
-void cedar::aux::RigidBody::init()
+void cedar::aux::LocalCoordinateFrame::init()
 {
   mTransformation = cv::Mat::eye(4, 4, CV_64FC1);
   cv::Mat x_axis = cv::Mat::zeros(3, 1, CV_64FC1);

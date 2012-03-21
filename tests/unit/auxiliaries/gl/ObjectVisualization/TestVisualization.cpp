@@ -49,9 +49,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 //! constructor
-cedar::tests::unit::aux::gl::TestVisualization::TestVisualization(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::tests::unit::aux::gl::TestVisualization::TestVisualization(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
 {
   
 }

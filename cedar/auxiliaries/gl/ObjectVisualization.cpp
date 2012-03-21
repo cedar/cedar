@@ -62,9 +62,9 @@ const float cedar::aux::gl::ObjectVisualization::mBlack_Shininess[1] = {0.05};
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::ObjectVisualization::ObjectVisualization(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::ObjectVisualization::ObjectVisualization(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
 :
-mpRigidBody(pRigidBody),
+mpLocalCoordinateFrame(pLocalCoordinateFrame),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
   init();
@@ -86,7 +86,7 @@ void cedar::aux::gl::ObjectVisualization::initializeGl()
 
 void cedar::aux::gl::ObjectVisualization::init()
 {
-  mRigidBodyType = "no type";
+  mObjectType = "no type";
   mIsVisible = true;
   mIsDrawnAsWireFrame = false;
   mIsDrawingLocalCoordinateFrame = false;
@@ -105,7 +105,7 @@ bool cedar::aux::gl::ObjectVisualization::isVisible() const
 
 const std::string& cedar::aux::gl::ObjectVisualization::getObjectVisualizationType() const
 {
-  return mRigidBodyType;
+  return mObjectType;
 }
 
 int cedar::aux::gl::ObjectVisualization::getResolution() const
@@ -170,9 +170,9 @@ void cedar::aux::gl::ObjectVisualization::setColor(double r, double g, double b)
   mColorB = b;
 }
 
-cedar::aux::RigidBodyPtr cedar::aux::gl::ObjectVisualization::getRigidBody()
+cedar::aux::LocalCoordinateFramePtr cedar::aux::gl::ObjectVisualization::getLocalCoordinateFrame()
 {
-  return mpRigidBody;
+  return mpLocalCoordinateFrame;
 }
 
 void cedar::aux::gl::ObjectVisualization::prepareDraw()
@@ -182,7 +182,7 @@ void cedar::aux::gl::ObjectVisualization::prepareDraw()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpRigidBody->getTransformation().t();
+  mTransformationTranspose = mpLocalCoordinateFrame->getTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   // draw local coordinate frame

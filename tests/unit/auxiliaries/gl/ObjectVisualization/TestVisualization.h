@@ -43,7 +43,7 @@
 // PROJECT INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
 
@@ -58,7 +58,7 @@ class cedar::tests::unit::aux::gl::TestVisualization : public cedar::aux::gl::Ob
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief Constructor that gets a configuration file name.
-  TestVisualization(cedar::aux::RigidBodyPtr pRigidBody);
+  TestVisualization(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   //!@brief Destructor
   virtual ~TestVisualization();

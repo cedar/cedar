@@ -28,7 +28,7 @@
  ----- Email:       hendrik.reimann@ini.rub.de
  ----- Date:        2010 12 04
 
- ----- Description: Implements all unit tests for the @em cedar::aux::RigidBody class.
+ ----- Description: Implements all unit tests for the @em cedar::aux::LocalCoordinateFrame class.
 
  ----- Credits:
  ---------------------------------------------------------------------------------------------------------------------*/
@@ -36,7 +36,7 @@
 // LOCAL INCLUDES
 
 // PROJECT INCLUDES
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/constants.h"
 
@@ -51,17 +51,17 @@ int main()
   int errors = 0;
   
   // create instance of test class
-  cedar::aux::RigidBody rigid_body;
+  cedar::aux::LocalCoordinateFrame local_coordinate_frame;
   
   //--------------------------------------------------------------------------------------------------------------------
   // position
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: position" << std::endl;
-  rigid_body.setPosition(1337, 0, cedar::aux::math::pi);
+  local_coordinate_frame.setPosition(1337, 0, cedar::aux::math::pi);
   if (
-      rigid_body.getPositionX() != 1337.0
-      || rigid_body.getPositionY() != 0.0
-      || rigid_body.getPositionZ() != cedar::aux::math::pi
+      local_coordinate_frame.getPositionX() != 1337.0
+      || local_coordinate_frame.getPositionY() != 0.0
+      || local_coordinate_frame.getPositionZ() != cedar::aux::math::pi
       )
   {
     errors++;
@@ -72,8 +72,8 @@ int main()
   p1.at<double>(0, 0) = 555.555;
   p1.at<double>(1, 0) = 2;
   p1.at<double>(2, 0) = sqrt(3.0);
-  rigid_body.setPosition(p1);
-  cv::Mat p2 = rigid_body.getPosition();
+  local_coordinate_frame.setPosition(p1);
+  cv::Mat p2 = local_coordinate_frame.getPosition();
   if (
       p2.at<double>(0, 0) != 555.555
       || p2.at<double>(1, 0) != 2.0
@@ -89,11 +89,11 @@ int main()
   // rotate
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: rotate" << std::endl;
-  rigid_body.setPosition(0, 0, 0);
-  rigid_body.rotate(0, cedar::aux::math::pi/2);
-  rigid_body.rotate(1, cedar::aux::math::pi/4);
+  local_coordinate_frame.setPosition(0, 0, 0);
+  local_coordinate_frame.rotate(0, cedar::aux::math::pi/2);
+  local_coordinate_frame.rotate(1, cedar::aux::math::pi/4);
 
-  cv::Mat D = rigid_body.getTransformation();
+  cv::Mat D = local_coordinate_frame.getTransformation();
   if (
       !IsZero(D.at<double>(0, 0) - sqrt(2.0)/2)
       || !IsZero(D.at<double>(0, 1) - 0.0)
@@ -137,20 +137,20 @@ int main()
   T.at<double>(0, 3) = 5;
   T.at<double>(1, 3) = 6;
   T.at<double>(2, 3) = 7;
-  rigid_body.setTransformation(T);
+  local_coordinate_frame.setTransformation(T);
   if (
-      rigid_body.getTransformation().at<double>(0, 0) != 0.0
-      || rigid_body.getTransformation().at<double>(1, 0) != 1.0
-      || rigid_body.getTransformation().at<double>(2, 0) != 0.0
-      || rigid_body.getTransformation().at<double>(0, 1) != -1.0
-      || rigid_body.getTransformation().at<double>(1, 1) != 0.0
-      || rigid_body.getTransformation().at<double>(2, 1) != 0.0
-      || rigid_body.getTransformation().at<double>(0, 2) != 0.0
-      || rigid_body.getTransformation().at<double>(1, 2) != 0.0
-      || rigid_body.getTransformation().at<double>(2, 2) != 1.0
-      || rigid_body.getTransformation().at<double>(0, 3) != 5.0
-      || rigid_body.getTransformation().at<double>(1, 3) != 6.0
-      || rigid_body.getTransformation().at<double>(2, 3) != 7.0
+      local_coordinate_frame.getTransformation().at<double>(0, 0) != 0.0
+      || local_coordinate_frame.getTransformation().at<double>(1, 0) != 1.0
+      || local_coordinate_frame.getTransformation().at<double>(2, 0) != 0.0
+      || local_coordinate_frame.getTransformation().at<double>(0, 1) != -1.0
+      || local_coordinate_frame.getTransformation().at<double>(1, 1) != 0.0
+      || local_coordinate_frame.getTransformation().at<double>(2, 1) != 0.0
+      || local_coordinate_frame.getTransformation().at<double>(0, 2) != 0.0
+      || local_coordinate_frame.getTransformation().at<double>(1, 2) != 0.0
+      || local_coordinate_frame.getTransformation().at<double>(2, 2) != 1.0
+      || local_coordinate_frame.getTransformation().at<double>(0, 3) != 5.0
+      || local_coordinate_frame.getTransformation().at<double>(1, 3) != 6.0
+      || local_coordinate_frame.getTransformation().at<double>(2, 3) != 7.0
       )
   {
     errors++;
@@ -161,11 +161,11 @@ int main()
   // readConfiguration
   //--------------------------------------------------------------------------------------------------------------------
   std::cout << "test: readConfiguration" << std::endl;
-  cedar::aux::RigidBody configured_rigid_body;
-  std::cout << "constructed cofigured_rigid_body" << std::endl;
-  configured_rigid_body.readJson("test.json");
-  std::cout << "called cofigured_rigid_body.readJson()" << std::endl;
-  cv::Mat C = configured_rigid_body.getTransformation();
+  cedar::aux::LocalCoordinateFrame configured_local_coordinate_frame;
+  std::cout << "constructed cofigured_local_coordinate_frame" << std::endl;
+  configured_local_coordinate_frame.readJson("test.json");
+  std::cout << "called cofigured_local_coordinate_frame.readJson()" << std::endl;
+  cv::Mat C = configured_local_coordinate_frame.getTransformation();
   cedar::aux::math::write(C);
   if (
       !IsZero(C.at<double>(0, 0) - cos(cedar::aux::math::pi/6))
@@ -187,7 +187,7 @@ int main()
       )
   {
     errors++;
-    std::cout << "ERROR with configured_rigid_body(const std::string& configFileName)" << std::endl;
+    std::cout << "ERROR with configured_local_coordinate_frame(const std::string& configFileName)" << std::endl;
   }
 
   std::cout << "test finished, there were " << errors << " errors" << std::endl;
