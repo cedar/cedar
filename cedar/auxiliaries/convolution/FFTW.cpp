@@ -113,10 +113,9 @@ cv::Mat cedar::aux::conv::FFTW::convolve
 
 cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel) const
 {
-//  CEDAR_ASSERT(cedar::aux::math::getDimensionalityOf(matrix) == cedar::aux::math::getDimensionalityOf(kernel));
-  if (cedar::aux::math::getDimensionalityOf(matrix) == 0 && cedar::aux::math::getDimensionalityOf(kernel) == 0)
+  if (cedar::aux::math::getDimensionalityOf(kernel) == 0)
   {
-    return matrix.mul(kernel);
+    return matrix * cedar::aux::math::getMatrixEntry<double>(kernel, 0, 0);
   }
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
   {
@@ -149,7 +148,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv
   cv::Mat output = matrix_64.clone();
   output = 0.0;
   cv::Mat padded_kernel = this->padKernel(matrix_64, kernel_64);
-
+  std::cout << "padded kernel: " << padded_kernel << std::endl;
   unsigned int transformed_elements = 1;
   double number_of_elements = 1.0;
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix_64) - 1; ++dim)
