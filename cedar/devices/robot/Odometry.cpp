@@ -52,7 +52,7 @@ cv::Mat cedar::dev::robot::Odometry::getPosition() const
   //construct the matrix to return
   cv::Mat position = cv::Mat(2,1,CV_64FC1);
 
-  //store the x- and y-position in the new matrix (gets are from RigidBody.h)
+  //store the x- and y-position in the new matrix (gets are from LocalCoordinateFrame.h)
   position.at<double>(0,0) = getPositionX();
   position.at<double>(1,0) = getPositionY();
   return position;
@@ -60,7 +60,7 @@ cv::Mat cedar::dev::robot::Odometry::getPosition() const
 
 double cedar::dev::robot::Odometry::getOrientation()
 {
-  //calculates the orientation from the quaternion stored in RigidBody.h.
+  //calculates the orientation from the quaternion stored in LocalCoordinateFrame.h.
   //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
   // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
   return atan2(getTransformation().at<double>(1, 1) , getTransformation().at<double>(0, 1));
@@ -69,7 +69,7 @@ double cedar::dev::robot::Odometry::getOrientation()
 
 void cedar::dev::robot::Odometry::setPosition(double xPosition, double yPosition)
 {
-  RigidBody::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
+  LocalCoordinateFrame::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
 }
 
 void cedar::dev::robot::Odometry::setOrientation(double orientation)

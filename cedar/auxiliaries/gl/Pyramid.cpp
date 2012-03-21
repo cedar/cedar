@@ -44,9 +44,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Pyramid::Pyramid(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::Pyramid::Pyramid(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
 :
-cedar::aux::gl::ObjectVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
 {
   mLength = 2;
   mWidth = 3;
@@ -54,11 +54,11 @@ cedar::aux::gl::ObjectVisualization(pRigidBody)
   mColorR = 1;
   mColorG = 0;
   mColorB = 0;
-  mRigidBodyType = "Pyramid";
+  mObjectType = "Pyramid";
 }
 
 cedar::aux::gl::Pyramid::Pyramid(
-                                  cedar::aux::RigidBodyPtr pRigidBody,
+                                  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
                                   double length,
                                   double width,
                                   double height,
@@ -67,7 +67,7 @@ cedar::aux::gl::Pyramid::Pyramid(
                                   double B
                                 )
 :
-cedar::aux::gl::ObjectVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
 {
   mLength = length;
   mWidth = width;
@@ -75,7 +75,7 @@ cedar::aux::gl::ObjectVisualization(pRigidBody)
   mColorR = R;
   mColorG = G;
   mColorB = B;
-  mRigidBodyType = "Pyramid";
+  mObjectType = "Pyramid";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

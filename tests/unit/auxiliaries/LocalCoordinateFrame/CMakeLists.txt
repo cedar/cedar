@@ -35,6 +35,6 @@
 #=======================================================================================================================
 
 
-cedar_add_unit_test(RigidBody
+cedar_add_unit_test(LocalCoordinateFrame
   main.cpp
 )

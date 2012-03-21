@@ -45,9 +45,9 @@
 
 /*!@brief Simple OpenGL visualization of an ellipse
  *
- * This class visualizes an instance of cedar::aux::ObjectVisualization as a torus around an ellipse
+ * This class visualizes a torus around an ellipse
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
 class cedar::aux::gl::Ellipse : public cedar::aux::gl::ObjectVisualization
@@ -57,12 +57,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    */
-  Ellipse(cedar::aux::RigidBodyPtr pRigidBody);
+  Ellipse(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the ellipse in x-direction of the object frame
    * @param width extension of the ellipse in y-direction of the object frame
    * @param thickness distance of the walls to the ellipse
@@ -71,7 +71,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Ellipse(
-           cedar::aux::RigidBodyPtr pRigidBody,
+           cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
            double length,
            double width,
            double thickness,

@@ -72,8 +72,9 @@ namespace cedar
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_DECLARE_AUX_CLASS(LogFile);
     CEDAR_DECLARE_AUX_CLASS(MatrixIterator);
-    CEDAR_DECLARE_AUX_CLASS(RigidBody);
-    CEDAR_DECLARE_DEPRECATED(typedef RigidBody Object);
+    CEDAR_DECLARE_AUX_CLASS(LocalCoordinateFrame);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame Object);
+    CEDAR_DECLARE_DEPRECATED(typedef LocalCoordinateFrame RigidBody);
     CEDAR_DECLARE_AUX_CLASS(System);
     //!@endcond
 

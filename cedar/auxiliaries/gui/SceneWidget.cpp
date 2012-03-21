@@ -36,9 +36,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/SceneWidget.h"
-#include "cedar/auxiliaries/gui/RigidBodyWidget.h"
+#include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
 #include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 #include <QLabel>
 
@@ -177,46 +177,46 @@ void cedar::aux::gui::SceneWidget::setHeight(double value)
   }
 }
 
-void cedar::aux::gui::SceneWidget::createRigidBody()
+void cedar::aux::gui::SceneWidget::createVisualization()
 {
   // create the new object
-  cedar::aux::RigidBodyPtr p_rigid_body(new cedar::aux::RigidBody());
+  cedar::aux::LocalCoordinateFramePtr p_local_coordinate_frame(new cedar::aux::LocalCoordinateFrame());
   cedar::aux::gl::ObjectVisualizationPtr p_visualization;
   if(mpComboBoxType->currentText().compare("Cylinder") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Cylinder(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Cylinder(p_local_coordinate_frame));
   }
   else if (mpComboBoxType->currentText().compare("Sphere") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Sphere(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Sphere(p_local_coordinate_frame));
   }
   else if (mpComboBoxType->currentText().compare("Block") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Block(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Block(p_local_coordinate_frame));
   }
   else if (mpComboBoxType->currentText().compare("Cone") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Cone(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Cone(p_local_coordinate_frame));
   }
   else if (mpComboBoxType->currentText().compare("Pyramid") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Pyramid(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Pyramid(p_local_coordinate_frame));
   }
   else if (mpComboBoxType->currentText().compare("Chessboard") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Chessboard(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Chessboard(p_local_coordinate_frame));
   }
   else if(mpComboBoxType->currentText().compare("Torus") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Torus(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Torus(p_local_coordinate_frame));
   }
   else if(mpComboBoxType->currentText().compare("Ellipse") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Ellipse(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Ellipse(p_local_coordinate_frame));
   }
   else if(mpComboBoxType->currentText().compare("Prism") == 0)
   {
-    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Prism(p_rigid_body));
+    p_visualization = cedar::aux::gl::ObjectVisualizationPtr(new cedar::aux::gl::Prism(p_local_coordinate_frame));
   }
 
   // add the new object to the scene and the combo box
@@ -227,7 +227,7 @@ void cedar::aux::gui::SceneWidget::createRigidBody()
   mpObjectSettingsBox->setEnabled(true);
 }
 
-void cedar::aux::gui::SceneWidget::deleteRigidBody()
+void cedar::aux::gui::SceneWidget::deleteVisualization()
 {
   // remove from scene
   mpScene->deleteObjectVisualization(mpComboBoxName->currentIndex());
@@ -257,9 +257,9 @@ void cedar::aux::gui::SceneWidget::setActiveVisualization()
   {
     mpActiveVisualization = mpScene->getObjectVisualization(mpComboBoxName->currentIndex());
     updateWidget();
-    cedar::aux::RigidBodyPtr p_active_rigid_body(mpActiveVisualization->getRigidBody());
-    mpRigidBodyWidget->setRigidBody(p_active_rigid_body);
-    mpRigidBodyWidget->update();
+    cedar::aux::LocalCoordinateFramePtr p_active_rigid_body(mpActiveVisualization->getLocalCoordinateFrame());
+    mpLocalCoordinateFrameWidget->setLocalCoordinateFrame(p_active_rigid_body);
+    mpLocalCoordinateFrameWidget->update();
     mpObjectVisualizationWidget->setObjectVisualization(mpActiveVisualization);
     mpObjectVisualizationWidget->update();
   }
@@ -359,8 +359,11 @@ void cedar::aux::gui::SceneWidget::init()
   mpGridLayout->addWidget(mpObjectVisualizationWidget, 2, 0, 1, 2);
 
   // initialize rigid body widget
-  mpRigidBodyWidget = new cedar::aux::gui::RigidBodyWidget(mpScene->getObjectVisualization(0)->getRigidBody());
-  mpGridLayout->addWidget(mpRigidBodyWidget, 3, 0, 1, 2);
+  mpLocalCoordinateFrameWidget = new cedar::aux::gui::LocalCoordinateFrameWidget
+  (
+    mpScene->getObjectVisualization(0)->getLocalCoordinateFrame()
+  );
+  mpGridLayout->addWidget(mpLocalCoordinateFrameWidget, 3, 0, 1, 2);
 
 
   if (mpScene->isEmpty())
@@ -392,7 +395,7 @@ void cedar::aux::gui::SceneWidget::init()
   connect(mpDoubleSpinBoxHeight, SIGNAL(valueChanged(double)), this, SLOT(setHeight(double)));
   
   // Buttons
-  connect(mpPushButtonCreateObject, SIGNAL(pressed()), this, SLOT(createRigidBody()));
+  connect(mpPushButtonCreateObject, SIGNAL(pressed()), this, SLOT(createVisualization()));
   connect(mpPushButtonDeleteAllObjects, SIGNAL(pressed()), this, SLOT(deleteAllVisualizations()));
-  connect(mpPushButtonDeleteObject, SIGNAL(pressed()), this, SLOT(deleteRigidBody()));
+  connect(mpPushButtonDeleteObject, SIGNAL(pressed()), this, SLOT(deleteVisualization()));
 }

@@ -51,7 +51,7 @@
 #include "cedar/auxiliaries/gl/Ellipse.h"
 #include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
-#include "cedar/auxiliaries/gui/RigidBodyWidget.h"
+#include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
 #include "cedar/auxiliaries/gui/ObjectVisualizationWidget.h"
 #include "cedar/auxiliaries/gui/ui_SceneWidget.h"
 
@@ -110,10 +110,10 @@ public slots:
   void setThickness(double value);
 
   /*!@brief creates an object with type and name specified by the widget controls */
-  void createRigidBody();
+  void createVisualization();
 
   /*!@brief deletes the currently selected object */
-  void deleteRigidBody();
+  void deleteVisualization();
 
   /*!@brief deletes all objects in the scene */
   void deleteAllVisualizations();
@@ -147,8 +147,8 @@ private:
   // pointer to the ObjectVisualizationWidget
   cedar::aux::gui::ObjectVisualizationWidget* mpObjectVisualizationWidget;
 
-  // pointer to the RigidBodyWidget
-  cedar::aux::gui::RigidBodyWidget* mpRigidBodyWidget;
+  // pointer to the LocalCoordinateFrameWidget
+  cedar::aux::gui::LocalCoordinateFrameWidget* mpLocalCoordinateFrameWidget;
 
   //! checks whether the widget is currently being changed due to a switch in the selected object
   bool mSwitchingSelectedObject;

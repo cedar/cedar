@@ -45,9 +45,9 @@
 
 /*!@brief Simple OpenGL visualization of a cone or truncated cone
  *
- * This class visualizes an instance of cedar::aux::ObjectVisualization as a cone with specified dimensions
+ * This class visualizes a cone with specified dimensions
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
 class cedar::aux::gl::Cone : public cedar::aux::gl::ObjectVisualization
@@ -57,12 +57,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    */
-  Cone(cedar::aux::RigidBodyPtr pRigidBody);
+  Cone(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius radius of the cone
    * @param height height of the cone
    * @param R color, value for red channel in RGB
@@ -70,7 +70,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Cone(
-        cedar::aux::RigidBodyPtr pRigidBody,
+        cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
         double radius,
         double height,
         double R = 1,

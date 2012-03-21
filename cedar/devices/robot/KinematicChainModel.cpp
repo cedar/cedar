@@ -40,7 +40,7 @@
 #include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/auxiliaries/math/tools.h"
 #include "cedar/auxiliaries/math/screwCalculus.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 
 // SYSTEM INCLUDES
@@ -52,10 +52,9 @@
 
 cedar::dev::robot::KinematicChainModel::KinematicChainModel(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-//cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
 mpKinematicChain(pKinematicChain),
-mpRootCoordinateFrame(new cedar::aux::RigidBody()),
-mpEndEffectorCoordinateFrame(new cedar::aux::RigidBody())
+mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
+mpEndEffectorCoordinateFrame(new cedar::aux::LocalCoordinateFrame())
 {
   init();
 }
@@ -64,12 +63,11 @@ mpEndEffectorCoordinateFrame(new cedar::aux::RigidBody())
 cedar::dev::robot::KinematicChainModel::KinematicChainModel
 (
   cedar::dev::robot::KinematicChainPtr pKinematicChain,
-  cedar::aux::RigidBodyPtr pEndEffector
+  cedar::aux::LocalCoordinateFramePtr pEndEffector
 )
 :
-//cedar::aux::RigidBody(pKinematicChain->getReferenceGeometry()->getConfigFileName()),
 mpKinematicChain(pKinematicChain),
-mpRootCoordinateFrame(new cedar::aux::RigidBody()),
+mpRootCoordinateFrame(new cedar::aux::LocalCoordinateFrame()),
 mpEndEffectorCoordinateFrame(pEndEffector)
 {
   init();
@@ -100,12 +98,12 @@ unsigned int cedar::dev::robot::KinematicChainModel::getNumberOfJoints()
   return mpKinematicChain->getNumberOfJoints();
 }
 
-cedar::aux::RigidBodyPtr cedar::dev::robot::KinematicChainModel::getEndEffectorCoordinateFrame()
+cedar::aux::LocalCoordinateFramePtr cedar::dev::robot::KinematicChainModel::getEndEffectorCoordinateFrame()
 {
   return mpEndEffectorCoordinateFrame;
 }
 
-void cedar::dev::robot::KinematicChainModel::setEndEffector(cedar::aux::RigidBodyPtr pEndEffector)
+void cedar::dev::robot::KinematicChainModel::setEndEffector(cedar::aux::LocalCoordinateFramePtr pEndEffector)
 {
   mpEndEffectorCoordinateFrame = pEndEffector;
 }
@@ -470,7 +468,6 @@ void cedar::dev::robot::KinematicChainModel::init()
 
   mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
 
-//  mEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
   update();
 }
 
@@ -505,7 +502,6 @@ void cedar::dev::robot::KinematicChainModel::calculateTransformations()
                       * mReferenceJointTwists[i];
   }
 // end-effector
-// mEndEffectorTransformation = mProductsOfExponentials[getNumberOfJoints()-1] * mReferenceEndEffectorTransformation;
   mpEndEffectorCoordinateFrame->setTransformation
   (
     mpRootCoordinateFrame->getTransformation()
@@ -515,7 +511,7 @@ void cedar::dev::robot::KinematicChainModel::calculateTransformations()
   mTransformationsLock.unlock();
 }
 
-cedar::aux::RigidBodyPtr cedar::dev::robot::KinematicChainModel::getRootCoordinateFrame()
+cedar::aux::LocalCoordinateFramePtr cedar::dev::robot::KinematicChainModel::getRootCoordinateFrame()
 {
   return mpRootCoordinateFrame;
 }

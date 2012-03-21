@@ -36,7 +36,7 @@
 
 cedar_add_library(cedaraux
   MOC_HEADERS
-  RigidBody.h
+  LocalCoordinateFrame.h
   gl/ObjectVisualization.h
   gui/BaseWidget.h
   gui/BoolParameter.h
@@ -51,7 +51,7 @@ cedar_add_library(cedaraux
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
   gui/Parameter.h
-  gui/RigidBodyWidget.h
+  gui/LocalCoordinateFrameWidget.h
   gui/ObjectVisualizationWidget.h
   gui/Viewer.h
   gui/SceneWidget.h

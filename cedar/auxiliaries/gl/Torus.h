@@ -46,9 +46,9 @@
 
 /*!@brief Simple OpenGL visualization of a torus around a circle
  *
- * This class visualizes an instance of cedar::aux::RigidBody as a torus with specified dimensions
+ * This class visualizes a torus with specified dimensions
  *
- * @remarks To get a simple visualization of the ObjectVisualization on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
 class cedar::aux::gl::Torus : public cedar::aux::gl::ObjectVisualization
@@ -58,12 +58,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    */
-  Torus(cedar::aux::RigidBodyPtr pRigidBody);
+  Torus(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius the radius of the circle in the xy-plane
    * @param thickness distance of the torus walls to the circle
    * @param R color, value for red channel in RGB
@@ -71,7 +71,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Torus(
-         cedar::aux::RigidBodyPtr pRigidBody,
+         cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
          double radius,
          double thickness,
          double R = 1,

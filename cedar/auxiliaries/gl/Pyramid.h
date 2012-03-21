@@ -45,9 +45,9 @@
 
 /*!@brief Simple OpenGL visualization of a pyramid with rectangular base
  *
- * This class visualizes an instance of cedar::aux::ObjectVisualization as a pyramid with specified dimensions
+ * This class visualizes a pyramid with specified dimensions
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
 class cedar::aux::gl::Pyramid : public cedar::aux::gl::ObjectVisualization
@@ -57,12 +57,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor.
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    */
-  Pyramid(cedar::aux::RigidBodyPtr pRigidBody);
+  Pyramid(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the pyramid's base in x-direction of object coordinate frame
    * @param width extension of the pyramid's base in y-direction of object coordinate frame
    * @param height height of the pyramid, i.e. distance from base to tip
@@ -71,7 +71,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Pyramid(
-           cedar::aux::RigidBodyPtr pRigidBody,
+           cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
            double length,
            double width,
            double height,

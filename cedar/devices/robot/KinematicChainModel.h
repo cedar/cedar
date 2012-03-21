@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
 #include <string>
@@ -85,7 +85,7 @@ public:
   KinematicChainModel
   (
     cedar::dev::robot::KinematicChainPtr pKinematicChain,
-    cedar::aux::RigidBodyPtr pEndEffector
+    cedar::aux::LocalCoordinateFramePtr pEndEffector
   );
   //!@brief destructor
   virtual ~KinematicChainModel();
@@ -121,13 +121,13 @@ public:
    *
    * @return smart-pointer to the end-effector
    */
-  cedar::aux::RigidBodyPtr getEndEffectorCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr getEndEffectorCoordinateFrame();
 
   /*!@brief sets the end-effector
    *
    * @param pEndEffector new end-effector
    */
-  void setEndEffector(cedar::aux::RigidBodyPtr pEndEffector);
+  void setEndEffector(cedar::aux::LocalCoordinateFramePtr pEndEffector);
 
   /*!@brief transformation matrix between base frame and the specified joint frame
    *
@@ -270,7 +270,7 @@ public:
   cv::Mat calculateEndEffectorAcceleration();
 
   // temporarily needed before this is being merged with KinematicChain
-  cedar::aux::RigidBodyPtr getRootCoordinateFrame();
+  cedar::aux::LocalCoordinateFramePtr getRootCoordinateFrame();
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
@@ -297,10 +297,10 @@ protected:
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
   //!@brief pointer to the rigid body representing the modeled kinematic chain
-  cedar::aux::RigidBodyPtr mpRootCoordinateFrame;
+  cedar::aux::LocalCoordinateFramePtr mpRootCoordinateFrame;
 
   //!@brief pointer to the rigid body representing the end-effector of the modeled kinematic chain
-  cedar::aux::RigidBodyPtr mpEndEffectorCoordinateFrame;
+  cedar::aux::LocalCoordinateFramePtr mpEndEffectorCoordinateFrame;
 
 private:
   // locks

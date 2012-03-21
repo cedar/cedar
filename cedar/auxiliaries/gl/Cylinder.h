@@ -47,9 +47,9 @@
 
 /*!@brief Simple OpenGL visualization of a cylinder
  *
- * This class visualizes an instance of cedar::aux::ObjectVisualization as a cylinder with specified dimensions
+ * This class visualizes a cylinder with specified dimensions
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
 class cedar::aux::gl::Cylinder : public cedar::aux::gl::ObjectVisualization
@@ -59,12 +59,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    */
-  Cylinder(cedar::aux::RigidBodyPtr pRigidBody);
+  Cylinder(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param radius    radius of the cylinder
    * @param height    height of the cylinder
    * @param R    color, value for red channel in RGB
@@ -72,7 +72,7 @@ public:
    * @param B    color, value for blue channel in RGB
    */
   Cylinder(
-            cedar::aux::RigidBodyPtr pRigidBody,
+            cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
             double radius,
             double height,
             double R = 1,

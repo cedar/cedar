@@ -44,9 +44,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::Chessboard::Chessboard(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::Chessboard::Chessboard(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame)
 :
-cedar::aux::gl::ObjectVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
 {
   mLength = 4;
   mWidth = 4;
@@ -56,11 +56,11 @@ cedar::aux::gl::ObjectVisualization(pRigidBody)
   mColorR = 0;
   mColorG = 0;
   mColorB = 0;
-  mRigidBodyType = "Chessboard";
+  mObjectType = "Chessboard";
 }
 
 cedar::aux::gl::Chessboard::Chessboard(
-                                        cedar::aux::RigidBodyPtr pRigidBody,
+                                        cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
                                         double length,
                                         double width,
                                         double height,
@@ -71,7 +71,7 @@ cedar::aux::gl::Chessboard::Chessboard(
                                         double B
                                       )
 :
-cedar::aux::gl::ObjectVisualization(pRigidBody)
+cedar::aux::gl::ObjectVisualization(pLocalCoordinateFrame)
 {
   mLength = length;
   mWidth = width;
@@ -81,7 +81,7 @@ cedar::aux::gl::ObjectVisualization(pRigidBody)
   mColorR = R;
   mColorG = G;
   mColorB = B;
-  mRigidBodyType = "Chessboard";
+  mObjectType = "Chessboard";
 }
 
 void cedar::aux::gl::Chessboard::draw()

@@ -71,7 +71,7 @@ public:
   WorkerThread(
                 cedar::dev::robot::KinematicChainPtr arm,
                 cedar::dev::robot::KinematicChainModelPtr arm_model,
-                cedar::aux::RigidBodyPtr target
+                cedar::aux::LocalCoordinateFramePtr target
               )
   :
   mArmModel(arm_model),
@@ -134,7 +134,7 @@ private:
   //! model of the arm
   cedar::dev::robot::KinematicChainModelPtr mArmModel;
   //! target
-  cedar::aux::RigidBodyPtr mTarget;
+  cedar::aux::LocalCoordinateFramePtr mTarget;
   //! movement speed towards target
   double mSpeed;
   //! distance below which the movement is reduced
@@ -224,7 +224,7 @@ int main(int argc, char **argv)
   p_scene->addObjectVisualization(p_kuka_arm_visualization);
 
   // create target object, visualize it and add it to the scene
-  cedar::aux::RigidBodyPtr target(new cedar::aux::RigidBody());
+  cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
   target->setPosition(p_arm_model->calculateEndEffectorPosition());
   cedar::aux::gl::ObjectVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);

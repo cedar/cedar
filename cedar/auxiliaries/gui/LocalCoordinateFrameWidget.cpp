@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBodyWidget.cpp
+    File:        LocalCoordinateFrameWidget.cpp
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2012 02 01
 
-    Description: Implementation of the @em cedar::aux::gui::RigidBodyWidget class.
+    Description: Implementation of the @em cedar::aux::gui::LocalCoordinateFrameWidget class.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/RigidBodyWidget.h"
+#include "cedar/auxiliaries/gui/LocalCoordinateFrameWidget.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/math/tools.h"
 
@@ -49,14 +49,14 @@
 // constructors and destructor
 //----------------------------------------------------------------------------
 
-cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
+cedar::aux::gui::LocalCoordinateFrameWidget::LocalCoordinateFrameWidget
 (
-  const cedar::aux::RigidBodyPtr rigidBody,
+  const cedar::aux::LocalCoordinateFramePtr localCoordinateFrame,
   QWidget* parent
 )
 :
 QWidget(parent),
-mpRigidBody(rigidBody)
+mpLocalCoordinateFrame(localCoordinateFrame)
 {
   mDecimals = 2;
   mRotationInterval = 10;
@@ -74,16 +74,16 @@ mpRigidBody(rigidBody)
 }
 
 
-cedar::aux::gui::RigidBodyWidget::RigidBodyWidget
+cedar::aux::gui::LocalCoordinateFrameWidget::LocalCoordinateFrameWidget
 (
-  const cedar::aux::RigidBodyPtr rigidBody,
-  const std::string& configFileName,
+  const cedar::aux::LocalCoordinateFramePtr localCoordinateFrame,
+  const std::string& configurationFileName,
   QWidget* parent
 )
 :
 QWidget(parent),
-cedar::aux::ConfigurationInterface(configFileName),
-mpRigidBody(rigidBody)
+cedar::aux::ConfigurationInterface(configurationFileName),
+mpLocalCoordinateFrame(localCoordinateFrame)
 {
   // todo: make these configurable
   mDecimals = 2;
@@ -103,7 +103,7 @@ mpRigidBody(rigidBody)
 
   if(addParameter(&mDecimals, "kinematicChainWidgetDecimals", 2) != CONFIG_SUCCESS)
   {
-    std::cout << "RigidBodyWidget: Error reading 'kinematicChainWidgetDecimals' from config file!" << std::endl;
+    std::cout << "LocalCoordinateFrameWidget: Error reading 'Decimals' from config file!" << std::endl;
   }
 
   readOrDefaultConfiguration();
@@ -112,7 +112,7 @@ mpRigidBody(rigidBody)
   return;
 }
 
-cedar::aux::gui::RigidBodyWidget::~RigidBodyWidget()
+cedar::aux::gui::LocalCoordinateFrameWidget::~LocalCoordinateFrameWidget()
 {
 
 }
@@ -122,19 +122,22 @@ cedar::aux::gui::RigidBodyWidget::~RigidBodyWidget()
 // methods
 //------------------------------------------------------------------------------
 
-void cedar::aux::gui::RigidBodyWidget::timerEvent(QTimerEvent*)
+void cedar::aux::gui::LocalCoordinateFrameWidget::timerEvent(QTimerEvent*)
 {
   update();
 }
 
-void cedar::aux::gui::RigidBodyWidget::setRigidBody(cedar::aux::RigidBodyPtr pRigidBody)
+void cedar::aux::gui::LocalCoordinateFrameWidget::setLocalCoordinateFrame
+(
+  cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame
+)
 {
-  mpRigidBody = pRigidBody;
+  mpLocalCoordinateFrame = pLocalCoordinateFrame;
 }
 
-void cedar::aux::gui::RigidBodyWidget::initWindow()
+void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
 {
-  setWindowTitle(QApplication::translate("RigidBodyWidget", "Rigid Body"));
+  setWindowTitle(QApplication::translate("LocalCoordinateFrameWidget", "Rigid Body"));
 
   mpGridLayout = new QGridLayout();
 
@@ -162,7 +165,7 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
   // add position spin boxes
   mpPositionXSpinBox = new QDoubleSpinBox();
   mpPositionXSpinBox->setRange(mXMin, mXMax);
-  mpPositionXSpinBox->setValue(mpRigidBody->getPositionX());
+  mpPositionXSpinBox->setValue(mpLocalCoordinateFrame->getPositionX());
   mpPositionXSpinBox->setDecimals(mDecimals);
   mpPositionXSpinBox->setSingleStep(mSinglePositionStep);
   connect(mpPositionXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
@@ -170,7 +173,7 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
 
   mpPositionYSpinBox = new QDoubleSpinBox();
   mpPositionYSpinBox->setRange(mYMin, mYMax);
-  mpPositionYSpinBox->setValue(mpRigidBody->getPositionY());
+  mpPositionYSpinBox->setValue(mpLocalCoordinateFrame->getPositionY());
   mpPositionYSpinBox->setDecimals(mDecimals);
   mpPositionYSpinBox->setSingleStep(mSinglePositionStep);
   connect(mpPositionYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
@@ -178,7 +181,7 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
 
   mpPositionZSpinBox = new QDoubleSpinBox();
   mpPositionZSpinBox->setRange(mZMin, mZMax);
-  mpPositionZSpinBox->setValue(mpRigidBody->getPositionZ());
+  mpPositionZSpinBox->setValue(mpLocalCoordinateFrame->getPositionZ());
   mpPositionZSpinBox->setDecimals(mDecimals);
   mpPositionZSpinBox->setSingleStep(mSinglePositionStep);
   connect(mpPositionZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
@@ -263,9 +266,9 @@ void cedar::aux::gui::RigidBodyWidget::initWindow()
   return;
 }
 
-void cedar::aux::gui::RigidBodyWidget::update()
+void cedar::aux::gui::LocalCoordinateFrameWidget::update()
 {
-  cv::Mat T = mpRigidBody->getTransformation().clone();
+  cv::Mat T = mpLocalCoordinateFrame->getTransformation().clone();
 
   // update rotation matrix
   for(unsigned int i = 0; i < 3; i++)
@@ -294,42 +297,43 @@ void cedar::aux::gui::RigidBodyWidget::update()
   mpPositionZSpinBox->blockSignals(false);
 }
 
-void cedar::aux::gui::RigidBodyWidget::positionChanged(double)
+void cedar::aux::gui::LocalCoordinateFrameWidget::positionChanged(double)
 {
-  mpRigidBody->setPosition(
-                            mpPositionXSpinBox->value(),
-                            mpPositionYSpinBox->value(),
-                            mpPositionZSpinBox->value()
-                          );
+  mpLocalCoordinateFrame->setPosition
+  (
+    mpPositionXSpinBox->value(),
+    mpPositionYSpinBox->value(),
+    mpPositionZSpinBox->value()
+  );
 }
 
-void cedar::aux::gui::RigidBodyWidget::rotateXPos()
+void cedar::aux::gui::LocalCoordinateFrameWidget::rotateXPos()
 {
-  mpRigidBody->rotate(0, mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(0, mSingleRotationStep);
 }
 
-void cedar::aux::gui::RigidBodyWidget::rotateXNeg()
+void cedar::aux::gui::LocalCoordinateFrameWidget::rotateXNeg()
 {
-  mpRigidBody->rotate(0, -mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(0, -mSingleRotationStep);
 }
 
-void cedar::aux::gui::RigidBodyWidget::rotateYPos()
+void cedar::aux::gui::LocalCoordinateFrameWidget::rotateYPos()
 {
-  mpRigidBody->rotate(1, mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(1, mSingleRotationStep);
 }
 
-void cedar::aux::gui::RigidBodyWidget::rotateYNeg()
+void cedar::aux::gui::LocalCoordinateFrameWidget::rotateYNeg()
 {
-  mpRigidBody->rotate(1, -mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(1, -mSingleRotationStep);
 }
 
-void cedar::aux::gui::RigidBodyWidget::rotateZPos()
+void cedar::aux::gui::LocalCoordinateFrameWidget::rotateZPos()
 {
-  mpRigidBody->rotate(2, mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(2, mSingleRotationStep);
 }
 
-void cedar::aux::gui::RigidBodyWidget::rotateZNeg()
+void cedar::aux::gui::LocalCoordinateFrameWidget::rotateZNeg()
 {
-  mpRigidBody->rotate(2, -mSingleRotationStep);
+  mpLocalCoordinateFrame->rotate(2, -mSingleRotationStep);
 }
 

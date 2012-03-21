@@ -41,16 +41,16 @@
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 
 // SYSTEM INCLUDES
 
 
 /*!@brief Simple OpenGL visualization of a block, i.e. a parallelepiped with rectangular sides
  *
- * This class visualizes an instance of cedar::aux::ObjectVisualization as a block with specified dimensions
+ * This class visualizes a block with specified dimensions
  *
- * @remarks To get a simple visualization of the RigidBody on screen, add an instance of this class to a
+ * @remarks To get a simple visualization of the object on screen, add an instance of this class to a
  * cedar::aux::gl::Scene and create a cedar::aux::gui::Viewer for it
  */
 class cedar::aux::gl::Block : public cedar::aux::gl::ObjectVisualization
@@ -60,12 +60,12 @@ public:
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
   /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    */
-  Block(cedar::aux::RigidBodyPtr pRigidBody);
+  Block(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   /*!@brief constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
    * @param length extension of the block in x-direction of the object coordinate frame
    * @param width extension of the block in y-direction of the object coordinate frame
    * @param height extension of the block in z-direction of the object coordinate frame
@@ -74,7 +74,7 @@ public:
    * @param B color, value for blue channel in RGB
    */
   Block(
-         cedar::aux::RigidBodyPtr pRigidBody,
+         cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame,
          double length,
          double width,
          double height,

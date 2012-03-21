@@ -22,20 +22,20 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBody.h
+    File:        LocalCoordinateFrame.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2010 12 04
 
-    Description: header of cedar::aux::RigidBody class, providing geometry of a rigid object
+    Description: header of cedar::aux::LocalCoordinateFrame class, providing geometry of a rigid object
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_RIGID_BODY_H
-#define CEDAR_AUX_RIGID_BODY_H
+#ifndef CEDAR_AUX_LOCAL_COORDINATE_FRAME_H
+#define CEDAR_AUX_LOCAL_COORDINATE_FRAME_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/namespace.h"
@@ -52,7 +52,7 @@
  *
  * rigid between world coordinate frame and object coordinate frame
  */
-class cedar::aux::RigidBody : public QObject, public cedar::aux::Configurable
+class cedar::aux::LocalCoordinateFrame : public QObject, public cedar::aux::Configurable
 {
 private:
   Q_OBJECT
@@ -62,10 +62,10 @@ private:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  RigidBody();
+  LocalCoordinateFrame();
 
   //!@brief Destructor
-  virtual ~RigidBody();
+  virtual ~LocalCoordinateFrame();
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -84,12 +84,6 @@ public:
 
   //!@brief returns z-position of the object frame origin in world frame
   double getPositionZ() const;
-
-  //!@brief returns object frame orientation as a unit quaternion
-//  double getOrientationQuaternion(unsigned int component) const;
-
-  //!@brief returns object frame orientation as a unit quaternion
-//  cv::Mat getOrientationQuaternion() const;
 
   //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
   cv::Mat getTransformation() const;
@@ -115,16 +109,10 @@ public slots:
    */
   void setPosition(const cv::Mat& position);
 
-
   /*!@brief set the position of the object frame origin in the world frame
    * @param position    new position in homogeneous coordinates
    */
   void setPosition(const std::vector<double>& position);
-
-  /*!@brief set the orientation of the object frame, given as a unit quaternion
-   * @param quaternion    new unit quaternion for the rotation, 4x1 matrix with norm 1
-   */
-//  void setOrientationQuaternion(const cv::Mat quaternion);
 
   /*!@brief rotates the object around one of the main axes of the object frame
    * @param axis    index of the axis to rotate around, between 0 and 2
@@ -142,8 +130,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  //!@brief recalculates the rigid transformation to the object frame from position and orientation
-//  void updateTransformation();
   //!@brief initialization function
   void init();
 
@@ -157,9 +143,6 @@ private:
   cv::Mat mTransformation;
 
   std::vector<cv::Mat> mUnitAxes;
-//  cv::Mat mPosition; // position of the point obstacle, in homogeneous coordinates
-//  cv::Mat mOrientationQuaternion; // quaternion representing the orientation
-//  cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
@@ -174,6 +157,6 @@ private:
   cedar::aux::DoubleVectorParameterPtr _mInitialPosition;
   cedar::aux::DoubleVectorParameterPtr _mInitialOrientation;
 
-}; // class cedar::aux::RigidBody
+}; // class cedar::aux::LocalCoordinateFrame
 
-#endif // CEDAR_AUX_OBJECT_H
+#endif // CEDAR_AUX_LOCAL_COORDINATE_FRAME_H

@@ -43,7 +43,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gl/namespace.h"
 #include "cedar/auxiliaries/namespace.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
@@ -84,8 +84,10 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. */
-  ObjectVisualization(cedar::aux::RigidBodyPtr pRigidBody);
+  /*!@brief standard constructor.
+   * @param pLocalCoordinateFrame pointer to the LocalCoordinateFrame of the visualized object
+   */
+  ObjectVisualization(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
   
   /*!@brief destructor. */
   virtual ~ObjectVisualization();
@@ -152,11 +154,11 @@ public:
    */
   void setColor(double r, double g, double b);
 
-  /*!@brief returns a smart pointer to the object being visualized
+  /*!@brief returns a smart pointer to the local coordinate frame of the visualized object
    *
-   * @return    smart pointer to the object
+   * @return smart pointer to the LocalCoordinateFrame
    */
-  cedar::aux::RigidBodyPtr getRigidBody();
+  cedar::aux::LocalCoordinateFramePtr getLocalCoordinateFrame();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -209,7 +211,7 @@ public slots:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //!@brief geometric type of the object
-  std::string mRigidBodyType;
+  std::string mObjectType;
 
   //!@brief the object will only be drawn if this is true
   bool mIsVisible;
@@ -229,8 +231,8 @@ protected:
   //!@brief object color in RGB, B channel
   double mColorB;
   
-  //!@brief pointer to the geometric object that is visualized
-  cedar::aux::RigidBodyPtr mpRigidBody;
+  //!@brief pointer to the LocalCoordinateFrame of the visualized object
+  cedar::aux::LocalCoordinateFramePtr mpLocalCoordinateFrame;
 
   //!@brief dummy matrix to hold the transpose of the current object transformation (it's what OpenGL needs)
   cv::Mat mTransformationTranspose;

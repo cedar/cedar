@@ -22,24 +22,24 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        RigidBodyWidget.h
+    File:        LocalCoordinateFrameWidget.h
 
     Maintainer:  Hendrik Reimann
     Email:       hendrik.reimann@ini.rub.de
     Date:        2012 02 01
 
-    Description: Header for the @em cedar::aux::gui::RigidBodyWidget class.
+    Description: Header for the @em cedar::aux::gui::LocalCoordinateFrameWidget class.
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_RIGID_BODY_WIDGET_H
-#define CEDAR_AUX_GUI_RIGID_BODY_WIDGET_H
+#ifndef CEDAR_AUX_GUI_LOCAL_COORDINATE_FRAME_WIDGET_H
+#define CEDAR_AUX_GUI_LOCAL_COORDINATE_FRAME_WIDGET_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/RigidBody.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
 #include "cedar/auxiliaries/ConfigurationInterface.h"
 
 // SYSTEM INCLUDES
@@ -49,8 +49,8 @@
 
 //!@brief A simple widget to monitor and change the state of a rigid body
 //!@todo I removed the CEDAR_DEV_LIB_EXPORT here, check if this still runs on Windows.
-//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::RigidBodyWidget
-class cedar::aux::gui::RigidBodyWidget
+//class CEDAR_DEV_LIB_EXPORT cedar::dev::robot::gui::LocalCoordinateFrameWidget
+class cedar::aux::gui::LocalCoordinateFrameWidget
 :
 public QWidget,
 public cedar::aux::ConfigurationInterface
@@ -67,20 +67,25 @@ public cedar::aux::ConfigurationInterface
 public:
   /*!@brief Constructor without configuration
    *
-   *@param rigidBody pointer to a RigidBody chain
+   *@param localCoordinateFrame pointer to the LocalCoordinateFrame being controlled by the widget
    *@param parent parent parameter of QWidget
    */
-  RigidBodyWidget(const cedar::aux::RigidBodyPtr rigidBody, QWidget* parent = 0);
+  LocalCoordinateFrameWidget(const cedar::aux::LocalCoordinateFramePtr localCoordinateFrame, QWidget* parent = 0);
 
   /*!@brief Constructor with configuration
    *
-   *@param rigidBody pointer to a RigidBody
+   *@param localCoordinateFrame pointer to the LocalCoordinateFrame being controlled by the widget
    *@param configFileName path of a configuration file
    *@param parent parent parameter of QWidget
    */
-  RigidBodyWidget(const cedar::aux::RigidBodyPtr rigidBody, const std::string& configFileName, QWidget* parent = 0);
+  LocalCoordinateFrameWidget
+  (
+    const cedar::aux::LocalCoordinateFramePtr localCoordinateFrame,
+    const std::string& configurationFileName,
+    QWidget* parent = 0
+  );
 
-  ~RigidBodyWidget();
+  ~LocalCoordinateFrameWidget();
 
   //--------------------------------------------------------------------------------------------------------------------
   // Qt events
@@ -97,11 +102,11 @@ public:
 
 public:
 
-  /*!@brief set the pointer to the RigidBody
+  /*!@brief set the pointer to the LocalCoordinateFrame
    *
-   * @param    pRigidBody pointer to the new RigidBody
+   * @param    pLocalCoordinateFrame pointer to the new LocalCoordinateFrame
    */
-  void setRigidBody(cedar::aux::RigidBodyPtr pRigidBody);
+  void setLocalCoordinateFrame(cedar::aux::LocalCoordinateFramePtr pLocalCoordinateFrame);
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -142,7 +147,7 @@ protected:
 
 private:
   static const int mUpdateInterval = 100;
-  cedar::aux::RigidBodyPtr mpRigidBody;
+  cedar::aux::LocalCoordinateFramePtr mpLocalCoordinateFrame;
   QGridLayout* mpGridLayout;
   QDoubleSpinBox* mpPositionXSpinBox;
   QDoubleSpinBox* mpPositionYSpinBox;
@@ -159,4 +164,4 @@ private:
   double mZMax;
 };
 
-#endif /* CEDAR_AUX_GUI_RIGID_BODY_WIDGET_H */
+#endif /* CEDAR_AUX_GUI_LOCAL_COORDINATE_FRAME_WIDGET_H */
