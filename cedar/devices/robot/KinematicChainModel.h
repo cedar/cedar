@@ -317,8 +317,6 @@ private:
   std::vector<cv::Mat> mProductsOfExponentials;
   //! transformation matrices to the joint frames in the current configuration
   std::vector<cv::Mat> mJointTransformations;
-  //! transformation matrix to the end-effecor frame in the current configuration
-//  cv::Mat mEndEffectorTransformation;
   //! twist coordinates for the transformations induced by rotating the joints in the curent configuration
   std::vector<cv::Mat> mJointTwists;
 }; // class cedar::dev::robot::KinematicChainModel

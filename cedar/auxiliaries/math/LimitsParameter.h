@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -30,7 +30,7 @@
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
                  mathis.richter@ini.ruhr-uni-bochum.de,
                  stephan.zibner@ini.ruhr-uni-bochum.de
-    Date:        2011 07 06
+    Date:        2012 03 21
 
     Description:
 
@@ -38,8 +38,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_NUMERIC_PARAMETER_H
-#define CEDAR_AUX_NUMERIC_PARAMETER_H
+#ifndef CEDAR_AUX_MATH_LIMITS_PARAMETER_H
+#define CEDAR_AUX_MATH_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/ParameterTemplate.h"
@@ -50,7 +50,7 @@
 /*!@brief A base class template for numeric parameters.
  */
 template <typename T>
-class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
+class cedar::aux::LimitsParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -60,33 +60,48 @@ class cedar::aux::NumericParameter : public cedar::aux::ParameterTemplate<T>
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief The constructor.
-  NumericParameter(cedar::aux::Configurable *pOwner,
-                   const std::string& name,
-                   const T& defaultValue,
-                   const T& minimum,
-                   const T& maximum)
+  //!@brief the constructor
+  LimitsParameter
+  (
+    cedar::aux::Configurable* pOwner,
+    const std::string& name,
+    const T& defaultLowerLimit,
+    const T& defaultUpperLimit,
+    const T& defaultLowerLimitMinimum,
+    const T& defaultLowerLimitMaximum,
+    const T& defaultUpperLimitMinimum,
+    const T& defaultUpperLimitMaximum
+  )
   :
-  cedar::aux::ParameterTemplate<T>(pOwner, name, defaultValue),
-  mMinimum(minimum),
-  mMaximum(maximum)
+  cedar::aux::Parameter(pOwner, name, defaultValue),
+  mLowerLimitMinimum(defaultLowerLimitMinimum),
+  mLowerLimitMaximum(defaultLowerLimitMaximum),
+  mUpperLimitMinimum(defaultUpperLimitMinimum),
+  mUpperLimitMaximum(defaultUpperLimitMaximum)
   {
   }
 
-  //!@brief The constructor.
-  NumericParameter(cedar::aux::Configurable *pOwner,
-                   const std::string& name,
-                   const T& minimum,
-                   const T& maximum)
+  //!@brief the constructor
+  LimitsParameter
+  (
+    cedar::aux::Configurable *pOwner,
+    const std::string& name,
+    const T& defaultLowerLimitMinimum,
+    const T& defaultLowerLimitMaximum,
+    const T& defaultUpperLimitMinimum,
+    const T& defaultUpperLimitMaximum
+  )
   :
-  cedar::aux::ParameterTemplate<T>(pOwner, name),
-  mMinimum(minimum),
-  mMaximum(maximum)
+  cedar::aux::Parameter(pOwner, name),
+  mLowerLimitMinimum(defaultLowerLimitMinimum),
+  mLowerLimitMaximum(defaultLowerLimitMaximum),
+  mUpperLimitMinimum(defaultUpperLimitMinimum),
+  mUpperLimitMaximum(defaultUpperLimitMaximum)
   {
   }
 
   //!@brief Destructor
-  ~NumericParameter()
+  ~LimitsParameter()
   {
   }
 
@@ -94,30 +109,58 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  //!@brief get the minimum value of this parameter
-  const T& getMinimum() const
+  //!@brief get the minimum value of the lower limit
+  const T& getLowerLimitMinimum() const
   {
-    return this->mMinimum;
+    return this->mLowerLimitMinimum;
   }
 
-  //!@brief set the minimum value of this parameter
-  void setMinimum(const T& value)
+  //!@brief set the minimum value of the lower limit
+  void setLowerLimitMinimum(const T& value)
   {
-    this->mMinimum = value;
+    this->mLowerLimitMinimum = value;
 
     this->emitPropertyChangedSignal();
   }
 
-  //!@brief get the maximum value of this parameter
-  const T& getMaximum() const
+  //!@brief get the maximum value of the lower limit
+  const T& getLowerLimitMaximum() const
   {
-    return this->mMaximum;
+    return this->mLowerLimitMaximum;
   }
 
-  //!@brief set the maximum value of this parameter
-  void setMaximum(const T& value)
+  //!@brief set the maximum value of the lower limit
+  void setLowerLimitMaximum(const T& value)
   {
-    this->mMaximum = value;
+    this->mLowerLimitMaximum = value;
+
+    this->emitPropertyChangedSignal();
+  }
+
+  //!@brief get the minimum value of the upper limit
+  const T& getUpperLimitMinimum() const
+  {
+    return this->mUpperLimitMinimum;
+  }
+
+  //!@brief set the minimum value of the upper limit
+  void setUpperLimitMinimum(const T& value)
+  {
+    this->mUpperLimitMinimum = value;
+
+    this->emitPropertyChangedSignal();
+  }
+
+  //!@brief get the maximum value of the upper limit
+  const T& getUpperLimitMaximum() const
+  {
+    return this->mUpperLimitMaximum;
+  }
+
+  //!@brief set the maximum value of the upper limit
+  void setUpperLimitMaximum(const T& value)
+  {
+    this->mUpperLimitMaximum = value;
 
     this->emitPropertyChangedSignal();
   }
@@ -140,12 +183,19 @@ private:
 protected:
   // none yet
 private:
-  //!@brief The minimum value, if applicable to the type.
-  T mMinimum;
+  //!@brief The minimum value of the lower limit
+  T mLowerLimitMinimum;
 
-  //!@brief The maximum value, if applicable to the type.
-  T mMaximum;
+  //!@brief The maximum value of the lower limit
+  T mLowerLimitMaximum;
 
-}; // class cedar::aux::NumericParameter
+  //!@brief The minimum value of the upper limit
+  T mUpperLimitMinimum;
 
-#endif // CEDAR_AUX_NUMERIC_PARAMETER_H
+  //!@brief The maximum value of the upper limit
+  T mUpperLimitMaximum;
+
+
+}; // class cedar::aux::math::LimitsParameter
+
+#endif // CEDAR_AUX_MATH_LIMITS_PARAMETER_H
