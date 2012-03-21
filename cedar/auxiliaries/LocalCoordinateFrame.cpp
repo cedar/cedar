@@ -51,24 +51,24 @@
 cedar::aux::LocalCoordinateFrame::LocalCoordinateFrame()
 :
 mTransformation(4, 4, CV_64FC1),
-_mInitialPosition
+_mInitialTranslation
 (
   new cedar::aux::DoubleVectorParameter
   (
-    this, "initial position", 3, 0.0, -std::numeric_limits<double>::max(), -std::numeric_limits<double>::max()
+    this, "initial translation", 3, 0.0, -std::numeric_limits<double>::max(), -std::numeric_limits<double>::max()
   )
 )
 {
-  std::vector<double> initial_orientation_default(9, 0.0);
-  initial_orientation_default[0] = 1.0;
-  initial_orientation_default[4] = 1.0;
-  initial_orientation_default[8] = 1.0;
-  _mInitialOrientation = cedar::aux::DoubleVectorParameterPtr
+  std::vector<double> initial_rotation_default(9, 0.0);
+  initial_rotation_default[0] = 1.0;
+  initial_rotation_default[4] = 1.0;
+  initial_rotation_default[8] = 1.0;
+  _mInitialRotation = cedar::aux::DoubleVectorParameterPtr
   (
-    new cedar::aux::DoubleVectorParameter(this, "initial orientation", initial_orientation_default, -1.0, 1.0)
+    new cedar::aux::DoubleVectorParameter(this, "initial rotation", initial_rotation_default, -1.0, 1.0)
   );
-  _mInitialPosition->makeDefault();
-  _mInitialOrientation->makeDefault();
+  _mInitialTranslation->makeDefault();
+  _mInitialRotation->makeDefault();
   
   // todo: check whether this line is necessary
   mTransformation = cv::Mat::eye(4, 4, CV_64FC1);
@@ -88,43 +88,48 @@ cedar::aux::LocalCoordinateFrame::~LocalCoordinateFrame()
 void cedar::aux::LocalCoordinateFrame::readConfiguration(const cedar::aux::ConfigurationNode& node)
 {
   cedar::aux::Configurable::readConfiguration(node);
-  setPosition(_mInitialPosition->getValue());
+  setTranslation(_mInitialTranslation->getValue());
 
-  CEDAR_ASSERT(_mInitialOrientation->size() >=9);
-  mTransformation.at<double>(0, 3) = _mInitialPosition->at(0);
-  mTransformation.at<double>(1, 3) = _mInitialPosition->at(1);
-  mTransformation.at<double>(2, 3) = _mInitialPosition->at(2);
-  mTransformation.at<double>(0, 0) = _mInitialOrientation->at(0);
-  mTransformation.at<double>(0, 1) = _mInitialOrientation->at(1);
-  mTransformation.at<double>(0, 2) = _mInitialOrientation->at(2);
-  mTransformation.at<double>(1, 0) = _mInitialOrientation->at(3);
-  mTransformation.at<double>(1, 1) = _mInitialOrientation->at(4);
-  mTransformation.at<double>(1, 2) = _mInitialOrientation->at(5);
-  mTransformation.at<double>(2, 0) = _mInitialOrientation->at(6);
-  mTransformation.at<double>(2, 1) = _mInitialOrientation->at(7);
-  mTransformation.at<double>(2, 2) = _mInitialOrientation->at(8);	
+  CEDAR_ASSERT(_mInitialRotation->size() >=9);
+  mTransformation.at<double>(0, 3) = _mInitialTranslation->at(0);
+  mTransformation.at<double>(1, 3) = _mInitialTranslation->at(1);
+  mTransformation.at<double>(2, 3) = _mInitialTranslation->at(2);
+  mTransformation.at<double>(0, 0) = _mInitialRotation->at(0);
+  mTransformation.at<double>(0, 1) = _mInitialRotation->at(1);
+  mTransformation.at<double>(0, 2) = _mInitialRotation->at(2);
+  mTransformation.at<double>(1, 0) = _mInitialRotation->at(3);
+  mTransformation.at<double>(1, 1) = _mInitialRotation->at(4);
+  mTransformation.at<double>(1, 2) = _mInitialRotation->at(5);
+  mTransformation.at<double>(2, 0) = _mInitialRotation->at(6);
+  mTransformation.at<double>(2, 1) = _mInitialRotation->at(7);
+  mTransformation.at<double>(2, 2) = _mInitialRotation->at(8);	
 }
 
-cv::Mat cedar::aux::LocalCoordinateFrame::getPosition() const
+cv::Mat cedar::aux::LocalCoordinateFrame::getTranslation() const
 {
-  // todo: check whether this function is tested properly
   QReadLocker locker(&mLock);
   return mTransformation(cv::Rect(3, 0, 1, 4)).clone();
 }
 
-double cedar::aux::LocalCoordinateFrame::getPositionX() const
+double cedar::aux::LocalCoordinateFrame::getTranslationX() const
 {
   return mTransformation.at<double>(0, 3);
 }
 
-double cedar::aux::LocalCoordinateFrame::getPositionY() const
+double cedar::aux::LocalCoordinateFrame::getTranslationY() const
 {
   return mTransformation.at<double>(1, 3);
 }
 
-double cedar::aux::LocalCoordinateFrame::getPositionZ() const
+double cedar::aux::LocalCoordinateFrame::getTranslationZ() const
 {
   return mTransformation.at<double>(2, 3);
+}
+
+cv::Mat cedar::aux::LocalCoordinateFrame::getRotation() const
+{
+  QReadLocker locker(&mLock);
+  return mTransformation(cv::Rect(0, 0, 3, 3)).clone();
 }
 
 cv::Mat cedar::aux::LocalCoordinateFrame::getTransformation() const
@@ -144,7 +149,7 @@ void cedar::aux::LocalCoordinateFrame::update()
 
 }
 
-void cedar::aux::LocalCoordinateFrame::setPosition(double x, double y, double z)
+void cedar::aux::LocalCoordinateFrame::setTranslation(double x, double y, double z)
 {
   QWriteLocker locker(&mLock);
   mTransformation.at<double>(0, 3) = x;
@@ -152,24 +157,76 @@ void cedar::aux::LocalCoordinateFrame::setPosition(double x, double y, double z)
   mTransformation.at<double>(2, 3) = z;
 }
 
-void cedar::aux::LocalCoordinateFrame::setPosition(const cv::Mat& position)
+void cedar::aux::LocalCoordinateFrame::setTranslation(const cv::Mat& translation)
+{
+  QWriteLocker locker(&mLock);
+  mTransformation.at<double>(0, 3) = translation.at<double>(0, 0);
+  mTransformation.at<double>(1, 3) = translation.at<double>(1, 0);
+  mTransformation.at<double>(2, 3) = translation.at<double>(2, 0);
+}
+
+void cedar::aux::LocalCoordinateFrame::setTranslation(const std::vector<double>& translation)
+{
+  QWriteLocker locker(&mLock);
+  CEDAR_ASSERT(translation.size() >=3);
+  mTransformation.at<double>(0, 3) = translation[0];
+  mTransformation.at<double>(1, 3) = translation[1];
+  mTransformation.at<double>(2, 3) = translation[2];
+}
+
+void cedar::aux::LocalCoordinateFrame::translate(double x, double y, double z)
+{
+  QWriteLocker locker(&mLock);
+  mTransformation.at<double>(0, 3) = mTransformation.at<double>(0, 3) + x;
+  mTransformation.at<double>(1, 3) = mTransformation.at<double>(1, 3) + y;
+  mTransformation.at<double>(2, 3) = mTransformation.at<double>(2, 3) + z;
+}
+
+void cedar::aux::LocalCoordinateFrame::translate(const cv::Mat& translation)
 {
   // todo: check whether this function is tested properly
   QWriteLocker locker(&mLock);
-  mTransformation.at<double>(0, 3) = position.at<double>(0, 0);
-  mTransformation.at<double>(1, 3) = position.at<double>(1, 0);
-  mTransformation.at<double>(2, 3) = position.at<double>(2, 0);
+  mTransformation(cv::Rect(3, 0, 1, 3))
+    = mTransformation(cv::Rect(3, 0, 1, 3)) + translation(cv::Rect(0, 0, 1, 3));
 }
 
-void cedar::aux::LocalCoordinateFrame::setPosition(const std::vector<double>& position)
+void cedar::aux::LocalCoordinateFrame::translate(const std::vector<double>& translation)
 {
   QWriteLocker locker(&mLock);
-  CEDAR_ASSERT(position.size() >=3);
-  mTransformation.at<double>(0, 3) = position[0];
-  mTransformation.at<double>(1, 3) = position[1];
-  mTransformation.at<double>(2, 3) = position[2];
+  CEDAR_ASSERT(translation.size() >=3);
+  mTransformation.at<double>(0, 3) = mTransformation.at<double>(0, 3) + translation[0];
+  mTransformation.at<double>(1, 3) = mTransformation.at<double>(1, 3) + translation[1];
+  mTransformation.at<double>(2, 3) = mTransformation.at<double>(2, 3) + translation[2];
 }
 
+void cedar::aux::LocalCoordinateFrame::setRotation(const cv::Mat& rotation)
+{
+  QWriteLocker locker(&mLock);
+  mTransformation.at<double>(0, 0) = rotation.at<double>(0, 0);
+  mTransformation.at<double>(0, 1) = rotation.at<double>(0, 1);
+  mTransformation.at<double>(0, 2) = rotation.at<double>(0, 2);
+  mTransformation.at<double>(1, 0) = rotation.at<double>(1, 0);
+  mTransformation.at<double>(1, 1) = rotation.at<double>(1, 1);
+  mTransformation.at<double>(1, 2) = rotation.at<double>(1, 2);
+  mTransformation.at<double>(2, 0) = rotation.at<double>(2, 0);
+  mTransformation.at<double>(2, 1) = rotation.at<double>(2, 1);
+  mTransformation.at<double>(2, 2) = rotation.at<double>(2, 2);
+}
+
+void cedar::aux::LocalCoordinateFrame::setRotation(const std::vector<double>& rotation)
+{
+  QWriteLocker locker(&mLock);
+  CEDAR_ASSERT(rotation.size() >=0);
+  mTransformation.at<double>(0, 0) = rotation[0];
+  mTransformation.at<double>(0, 1) = rotation[1];
+  mTransformation.at<double>(0, 2) = rotation[2];
+  mTransformation.at<double>(1, 0) = rotation[3];
+  mTransformation.at<double>(1, 1) = rotation[4];
+  mTransformation.at<double>(1, 2) = rotation[5];
+  mTransformation.at<double>(2, 0) = rotation[6];
+  mTransformation.at<double>(2, 1) = rotation[7];
+  mTransformation.at<double>(2, 2) = rotation[8];
+}
 void cedar::aux::LocalCoordinateFrame::rotate(unsigned int axis, double angle)
 {
   QWriteLocker locker(&mLock);

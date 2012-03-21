@@ -95,7 +95,7 @@ int main(int argc, char **argv)
   p_epuck_control->show();
 
   //change the robot's initial orientation
-  p_kteam_model->setOrientation(M_PI / 2);
+  p_kteam_model->setRotation(M_PI / 2);
 
   //start the program
   a.exec();

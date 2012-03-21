@@ -95,7 +95,7 @@ private:
     if (mpArm->isMovable())
     {
       // calculate direction of movement
-      cv::Mat vectorToTarget_hom = (mTarget->getPosition() - mArmModel->calculateEndEffectorPosition());
+      cv::Mat vectorToTarget_hom = (mTarget->getTranslation() - mArmModel->calculateEndEffectorPosition());
       cv::Mat vectorToTarget(vectorToTarget_hom, cv::Rect(0, 0, 1, 3));
       if (norm(vectorToTarget) == 0)
       {
@@ -225,7 +225,7 @@ int main(int argc, char **argv)
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
-  target->setPosition(p_arm_model->calculateEndEffectorPosition());
+  target->setTranslation(p_arm_model->calculateEndEffectorPosition());
   cedar::aux::gl::ObjectVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);
   p_scene->addObjectVisualization(p_sphere);

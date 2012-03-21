@@ -70,23 +70,23 @@ public:
   /*!@brief The get-function of the robot's current position.
    *@return Vector with position on x- (1st element) and y-axis (2nd element) [both in m]
    */
-  cv::Mat getPosition() const;
+  cv::Mat getTranslation() const;
 
   /*!@brief The get-function of the robot's current orientation.
    *@return The current orientation [in rad].
    */
-  double getOrientation();
+  double getRotation();
 
   /*!@brief The set-function of the robot's position.
-   *@param xPosition Position of the robot on the x-axis to be set [in m].
-   *@param yPosition Position of the robot on the y-axis to be set [in m].
+   *@param x new translation of the robot coordinate system on the world x-axis [in m].
+   *@param y new translation of the robot coordinate system on the world y-axis [in m].
    */
-  void setPosition(double xPosition, double yPosition);
+  void setTranslation(double x, double y);
 
   /*!@brief The set-function of the robot's orientation.
    *@param orientation Orientation of the robot [in rad].
    */
-  void setOrientation(double orientation);
+  void setRotation(double angle);
 
   //!@brief Sets the Debug-flag
   void setDebug(bool debug);
