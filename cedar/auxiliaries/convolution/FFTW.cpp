@@ -117,6 +117,10 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv
   {
     return matrix * cedar::aux::math::getMatrixEntry<double>(kernel, 0, 0);
   }
+  else if (cedar::aux::math::getDimensionalityOf(matrix) == 0)
+  {
+    return kernel * cedar::aux::math::getMatrixEntry<double>(matrix, 0, 0);
+  }
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
   {
     CEDAR_ASSERT(matrix.size[dim] >= kernel.size[dim])
@@ -198,7 +202,12 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv
 
 cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& kernel) const
 {
-  //!@todo do some asserting here
+  /* prepare the kernel for Fourier transform (pad to matrix size and flip); example for 2D:
+   * 010    211
+   * 121 => 100 anchor moves to 0,0
+   * 010    001
+   */
+
   cv::Mat output = matrix.clone();
   output = 0.0;
   std::vector<cv::Range> region;
@@ -210,8 +219,17 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
   {
     int kernel_center = kernel.size[dim]/2;
     regions.at(0).push_back(cv::Range(0, kernel_center + 1)); // lower limit
-    regions.at(1).push_back(cv::Range(matrix.size[dim] - kernel_center, matrix.size[dim])); // upper limit
-    kernel_regions.at(0).push_back(cv::Range(0, kernel_center)); // lower limit
+    if (dim >= cedar::aux::math::getDimensionalityOf(kernel)) // fix for strange kernels (kind of a ridge padding)
+    {
+      regions.at(1).push_back(cv::Range(matrix.size[dim] - 1, matrix.size[dim])); // upper limit
+      kernel_regions.at(0).push_back(cv::Range(0, 1)); // lower limit
+    }
+    else
+    {
+      regions.at(1).push_back(cv::Range(matrix.size[dim] - kernel_center, matrix.size[dim])); // upper limit
+      kernel_regions.at(0).push_back(cv::Range(0, kernel_center)); // lower limit
+    }
+
     kernel_regions.at(1).push_back(cv::Range(kernel_center, kernel.size[dim])); // upper limit
   }
   for (size_t part = 0; part < static_cast<unsigned int>((1 << cedar::aux::math::getDimensionalityOf(matrix))); ++part)
@@ -236,13 +254,13 @@ cv::Mat cedar::aux::conv::FFTW::padKernel(const cv::Mat& matrix, const cv::Mat& 
         kernel_index[dim] = kernel_regions.at(0).at(dim);
       }
     }
-  // if 1.0 is missing, the temporary cv::Mat view onto output is replaced by kernel, instead of setting the values
-  // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
     if (cedar::aux::math::getDimensionalityOf(matrix) == 1)
     {
       output_index[1] = cv::Range(0,1);
       kernel_index[1] = cv::Range(0,1);
     }
+  // if 1.0 is missing, the temporary cv::Mat view onto output is replaced by kernel, instead of setting the values
+  // at the specified region to the values of kernel (1.0 * kernel returns a cv::MatExpr, not cv::Mat...)
     output(output_index) = 1.0 * kernel(kernel_index);
   }
   return output;
