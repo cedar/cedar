@@ -38,6 +38,7 @@
 #define CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/namespace.h"
 #include "cedar/devices/robot/namespace.h"
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
@@ -57,10 +58,36 @@
  */
 class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
 {
+  //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+  //TODO: these are needed in more situations and should be a global cedar thing, check where to put them
+  //!@brief an enum defining coordinate systems
+  enum COORDINATE_SYSTEM
+  {
+    WORLD_COORDINATES,
+    BASE_COORDINATES,
+    LOCAL_COORDINATES
+  };
+
+  //!@brief describes the hardware properties of a joint.
+  class Joint : public cedar::aux::Configurable
+  {
+    //! position of a joint in 3D space
+    cedar::aux::DoubleVectorParameterPtr position;
+    //! axis the joint moves in, in 3D space
+    cedar::aux::DoubleVectorParameterPtr axis;
+    //! minimum and maximum angular values
+    cedar::aux::math::Limits<double> angleLimits;
+    //! minimum and maximum velocity values
+    cedar::aux::math::Limits<double> velocityLimits;
+  };
+
   //----------------------------------------------------------------------------
   // parameters
   //----------------------------------------------------------------------------
 public:
+
   //!@brief The different modes to operate the kinematic chain
   enum ActionType { ANGLE, VELOCITY, ACCELERATION };
 protected:
@@ -73,11 +100,19 @@ private:
   //----------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
-  //!@brief constructor
   KinematicChain(const std::string& configFileName);
+  //!@brief constructor
+  KinematicChain(const std::string& configFileName, cedar::aux::LocalCoordinateFramePtr pEndEffector);
   //!@brief destructor
   virtual ~KinematicChain();
+
+  //--------------------------------------------------------------------------------------------------------------------
+  // Qt slots
+  //--------------------------------------------------------------------------------------------------------------------
+public slots:
+
+//!@brief updates the geometry to the current configuration of the kinematic chain
+  void updateTransformations();
 
   //----------------------------------------------------------------------------
   // public methods
@@ -89,23 +124,11 @@ public:
    */
   virtual bool isMovable() const = 0;
 
-  /*!@brief get reference geometry for this kinematic chain
-   *
-   * @return    reference geometry
-   */
-  const ReferenceGeometryPtr getReferenceGeometry() const;
-
   /*!@brief get number of joints in this kinematic chain
    *
    * @return    number of joints
    */
   unsigned int getNumberOfJoints() const;
-
-  /*!@brief set a new reference geometry
-   *
-   * @param geometry    new reference geometry
-   */
-  void setReferenceGeometry(const ReferenceGeometryPtr geometry);
 
   /*!@brief get current state of a single joint angle
    *
@@ -299,6 +322,169 @@ public:
    */
   virtual void start(Priority priority = InheritPriority);
 
+  /*!@brief returns a smart-pointer to the local coordinate frame of the end-effector
+   *
+   * @return smart-pointer to the end-effector
+   */
+  cedar::aux::LocalCoordinateFramePtr getEndEffectorCoordinateFrame();
+
+  /*!@brief returns a smart-pointer to the local coordinate frame of the robot root
+   *
+   * @return smart-pointer to the end-effector
+   */
+  cedar::aux::LocalCoordinateFramePtr getRootCoordinateFrame();
+
+  /*!@brief sets the end-effector
+   *
+   * @param pEndEffector new end-effector
+   */
+  void setEndEffector(cedar::aux::LocalCoordinateFramePtr pEndEffector);
+
+  /*!@brief transformation matrix between base frame and the specified joint frame
+   *
+   * @param index    index of the joint to which the transformation is given
+   * @return    rigid transformation matrix, 4 \f$\times\f$ 4
+   */
+  cv::Mat getJointTransformation(unsigned int index);
+
+  /*!@brief calculates cartesian Jacobian of a point/vector, in world coordinates
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param result    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   */
+  void calculateCartesianJacobian
+  (
+    const cv::Mat& point,
+    unsigned int jointIndex,
+    cv::Mat& result,
+    unsigned int coordinateFrame
+  );
+
+  /*!@brief calculates Cartesian Jacobian of a point/vector
+   * slightly slower than calculateJacobian()
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
+   */
+  cv::Mat calculateCartesianJacobian
+  (
+    const cv::Mat& point,
+    unsigned int jointIndex,
+    unsigned int coordinateFrame
+  );
+
+  //! \todo explain coordinate system enum and give default
+  /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param result    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   */
+  void calculateCartesianJacobianTemporalDerivative
+  (
+    const cv::Mat& point,
+    unsigned int jointIndex,
+    cv::Mat& result,
+    unsigned int coordinateFrame
+  );
+
+  /*!@brief calculates the temporal derivative of the Cartesian Jacobian of a point/vector given in homogeneous
+   * coordinates of the relevant joint frame
+   *
+   * @param point    relevant point for which the Jacobian is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    Jacobian of the given point, in base coordinates, 3 \f$\times\f$ N matrix, where N = number of joints
+   */
+  cv::Mat calculateCartesianJacobianTemporalDerivative
+  (
+    const cv::Mat& point,
+    unsigned int jointIndex,
+    unsigned int coordinateFrame
+  );
+
+  /*!@brief calculates cartesian velocity of a point
+   *
+   * @param point    point for which the velocity is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    velocity of the given point, in world coordinates (homogeneous) 4 \f$\times\f$ 1 matrix
+   */
+  cv::Mat calculateVelocity
+  (
+    const cv::Mat& point,
+    unsigned int jointIndex,
+    unsigned int coordinateFrame
+  );
+
+  /*!@brief gives the spatial Jacobian in the current configuration
+   *
+   * @param index    index of the joint up to which rotations are considered
+   * @return    spatial Jacobian, 6 \f$\times\f$ N matrix, where N = number of joints
+   */
+  cv::Mat calculateSpatialJacobian(unsigned int index);
+
+  /*!@brief gives the temporal derivative of the spatial Jacobian in the current configuration
+   *
+   * @param index    index of the joint up to which rotations are considered
+   * @return    derivative of the spatial Jacobian, 6 \f$\times\f$ N matrix, where N = number of joints
+   */
+  cv::Mat calculateSpatialJacobianTemporalDerivative(unsigned int index);
+
+  /*!@brief calculates cartesian acceleration of a point
+   *
+   * @param point    point for which the acceleration is calculated
+   * @param jointIndex    index of the joint frame the point is fixed to, joints after that will not move the point
+   * @param coordinateFrame    specifies in which coordinate frame the point is represented
+   * @return    acceleration of the given point, in world coordinates (homogeneous) 4 \f$\times\f$ 1 matrix
+   */
+  cv::Mat calculateAcceleration
+  (
+    const cv::Mat& point,
+    unsigned int jointIndex,
+    unsigned int coordinateFrame
+  );
+
+  /*!@brief gives the end-effector position in the current configuration
+   *
+   * @return    end effector position in homogeneous coordinates, 4 \f$\times\f$ 1 matrix
+   */
+  cv::Mat calculateEndEffectorPosition();
+
+  /*!@brief gives the transformation from base frame to the end-effector frame in the current configuration
+   *
+   * @return    rigid transformation matrix from world to root frame, 4 \f$\times\f$ 4 matrix
+   */
+  cv::Mat getRootTransformation();
+
+  /*!@brief gives the transformation from base frame to the end-effector frame in the current configuration
+   *
+   * @return    rigid transformation matrix from world to end-effector frame, 4 \f$\times\f$ 4 matrix
+   */
+  cv::Mat getEndEffectorTransformation();
+
+  /*!@brief gives the cartesian end-effector Jacobian in the current configuration
+   *
+   * @return    end effector Jacobian, 3 \f$\times\f$ N matrix, where N = number of joints
+   */
+  cv::Mat calculateEndEffectorJacobian();
+
+  /*!@brief gives the cartesian end-effector velocity
+   *
+   * @return    end effector velocity, 4 \f$\times\f$ 1 matrix (homogeneous coordinates)
+   */
+  cv::Mat calculateEndEffectorVelocity();
+
+  /*!@brief gives the cartesian end-effector acceleration
+   *
+   * @return    end effector acceleration, 4 \f$\times\f$ 1 matrix (homogeneous coordinates)
+   */
+  cv::Mat calculateEndEffectorAcceleration();
 
   //----------------------------------------------------------------------------
   // protected methods
@@ -314,12 +500,21 @@ private:
   void applyAngleLimits(cv::Mat &angles);
   void applyVelocityLimits(cv::Mat &velocities);
 
+  //!@brief calculates the transformations to the joint frames for the given joint angle vector
+  void calculateTransformations();
+
+  /*!@brief gives the temporal derivative of a joint twist in the current configuration
+   *
+   * @param index    index of the joint twist
+   * @return    derivative of the joint twist, 6 \f$\times\f$ 1 matrix
+   */
+  cv::Mat calculateTwistTemporalDerivative(unsigned int index);
+
+
   //----------------------------------------------------------------------------
   // members
   //----------------------------------------------------------------------------
 protected:
-  //!@brief geometry in reference configuration
-  cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
   //!@brief current state of the joint angles
   cv::Mat mJointAngles;
 private:
@@ -327,6 +522,28 @@ private:
   cv::Mat mJointVelocities;
   cv::Mat mJointAccelerations;
   ActionType mCurrentWorkingMode;
+  //!@brief pointer to the root coordinate frame of the kinematic chain
+  cedar::aux::LocalCoordinateFramePtr mpRootCoordinateFrame;
+
+  //!@brief pointer to the local coordinate frame of the end-effector
+  cedar::aux::LocalCoordinateFramePtr mpEndEffectorCoordinateFrame;
+
+  // locking for thread safety
+  QReadWriteLock mTransformationsLock;
+  //! twist coordinates for the transformations induced by rotating the joints (assuming reference configurations)
+  std::vector<cv::Mat> mReferenceJointTwists;
+  //! transformations to the joint frames (assuming reference configurations)
+  std::vector<cv::Mat> mReferenceJointTransformations;
+  //! transformations to the end-effector frame (assuming reference configurations)
+  cv::Mat mReferenceEndEffectorTransformation;
+    //! exponentials of joint twists with specified joint angle
+  std::vector<cv::Mat> mTwistExponentials;
+  //! transformation matrices between joints, generated by exponential map of joint twists
+  std::vector<cv::Mat> mProductsOfExponentials;
+  //! transformation matrices to the joint frames in the current configuration
+  std::vector<cv::Mat> mJointTransformations;
+  //! twist coordinates for the transformations induced by rotating the joints in the curent configuration
+  std::vector<cv::Mat> mJointTwists;
 }; // class cedar::dev::robot::KinematicChain
 #endif // CEDAR_DEV_ROBOT_KINEMATIC_CHAIN_H
 

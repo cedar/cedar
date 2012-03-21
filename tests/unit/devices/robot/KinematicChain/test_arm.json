@@ -1,19 +1,34 @@
 {
-	"rigidBody":
+	"root coordinate frame":
 	{
-		"position":
+		"initial translation":
 		[
 			"0.0",
 			"1.0",
 			"0.0"
 		],
-		"orientation":
+		"initial rotation":
 		[
 			"0.0", "-1.0", "0.0",
 			"1.0", "0.0", "0.0",
 			"0.0", "0.0", "1.0"
 		]
-	}
+	},
+	"end-effector coordinate frame":
+	{
+		"initial translation":
+		[
+			"0.0",
+			"0.0",
+			"1.0"
+		],
+		"initial rotation":
+		[
+			"0.0", "-1.0", "0.0",
+			"1.0", "0.0", "0.0",
+			"0.0", "0.0", "1.0"
+		]
+	},
     "joints":
     [
         {
@@ -88,20 +103,5 @@
 				"0.0"
 			]
 		}
-	],
-	"endEffector":
-	{
-		"position":
-		[
-			"0.0",
-			"0.0",
-			"1.0"
-		],
-		"orientation":
-		[
-			"0.0", "-1.0", "0.0",
-			"1.0", "0.0", "0.0",
-			"0.0", "0.0", "1.0"
-		]
-	}
+	]
 }
