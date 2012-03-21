@@ -191,6 +191,27 @@ namespace cedar
       return result;
     }
 
+    /*!@brief Template function that converts a string to a simple data type.
+     *
+     * @param string The string the value will be extracted from.
+     */
+    template <class T>
+    bool fromString(const std::string& string)
+    {
+      T result;
+      std::istringstream stream(string);
+      if((stream >> result).fail())
+      {
+        CEDAR_THROW
+        (
+          cedar::aux::ConversionFailedException,
+          "Could not convert the string \"" + string + "\" to the requested type."
+        );
+      }
+
+      return result;
+    }
+
     inline std::string regexReplace(const std::string& input, const std::string& regex, const std::string& replaceText)
     {
       // based on http://www.boost.org/doc/libs/1_49_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
