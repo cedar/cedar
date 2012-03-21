@@ -50,6 +50,7 @@
 #include <QReadWriteLock>
 #include <qwt/qwt_plot.h>
 #include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_plot_marker.h>
 #include <opencv2/opencv.hpp>
 
 /*!@brief Matrix plot that can display 1D matrices (i.e. vectors).
@@ -88,6 +89,17 @@ public:
   void display(cedar::aux::DataPtr matData);
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
+
+  /*!
+   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+   */
+  void attachMarker(QwtPlotMarker *pMarker);
+
+  /*!@brief Detaches and deletes all markers added to this plot.
+   *
+   * @remarks This method is a temporary way to provide annotations, a more general one will be added soon.
+   */
+  void clearMarkers();
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

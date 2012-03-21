@@ -80,6 +80,16 @@ cedar::aux::gui::MatrixPlot1D::~MatrixPlot1D()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::MatrixPlot1D::attachMarker(QwtPlotMarker *pMarker)
+{
+  pMarker->attach(this->mpPlot);
+}
+
+void cedar::aux::gui::MatrixPlot1D::clearMarkers()
+{
+  this->mpPlot->detachItems(QwtPlotMarker::Rtti_PlotMarker, true);
+}
+
 void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
 {
   this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
