@@ -60,7 +60,7 @@ mpLocalCoordinateFrame(localCoordinateFrame)
 {
   mDecimals = 2;
   mRotationInterval = 10;
-  mSinglePositionStep = 0.1;
+  mSingleTranslationStep = 0.1;
   mSingleRotationStep = 0.02;
   mXMin = -10.0;
   mXMax = 10.0;
@@ -88,7 +88,7 @@ mpLocalCoordinateFrame(localCoordinateFrame)
   // todo: make these configurable
   mDecimals = 2;
   mRotationInterval = 10;
-  mSinglePositionStep = 0.1;
+  mSingleTranslationStep = 0.1;
   mSingleRotationStep = 0.02;
   mXMin = -10.0;
   mXMax = 10.0;
@@ -163,29 +163,29 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
   mpGridLayout->addWidget(label, 4, 0);
 
   // add position spin boxes
-  mpPositionXSpinBox = new QDoubleSpinBox();
-  mpPositionXSpinBox->setRange(mXMin, mXMax);
-  mpPositionXSpinBox->setValue(mpLocalCoordinateFrame->getPositionX());
-  mpPositionXSpinBox->setDecimals(mDecimals);
-  mpPositionXSpinBox->setSingleStep(mSinglePositionStep);
-  connect(mpPositionXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
-  mpGridLayout->addWidget(mpPositionXSpinBox, 1, 1, 1, 2);
+  mpTranslationXSpinBox = new QDoubleSpinBox();
+  mpTranslationXSpinBox->setRange(mXMin, mXMax);
+  mpTranslationXSpinBox->setValue(mpLocalCoordinateFrame->getTranslationX());
+  mpTranslationXSpinBox->setDecimals(mDecimals);
+  mpTranslationXSpinBox->setSingleStep(mSingleTranslationStep);
+  connect(mpTranslationXSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
+  mpGridLayout->addWidget(mpTranslationXSpinBox, 1, 1, 1, 2);
 
-  mpPositionYSpinBox = new QDoubleSpinBox();
-  mpPositionYSpinBox->setRange(mYMin, mYMax);
-  mpPositionYSpinBox->setValue(mpLocalCoordinateFrame->getPositionY());
-  mpPositionYSpinBox->setDecimals(mDecimals);
-  mpPositionYSpinBox->setSingleStep(mSinglePositionStep);
-  connect(mpPositionYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
-  mpGridLayout->addWidget(mpPositionYSpinBox, 1, 3, 1, 2);
+  mpTranslationYSpinBox = new QDoubleSpinBox();
+  mpTranslationYSpinBox->setRange(mYMin, mYMax);
+  mpTranslationYSpinBox->setValue(mpLocalCoordinateFrame->getTranslationY());
+  mpTranslationYSpinBox->setDecimals(mDecimals);
+  mpTranslationYSpinBox->setSingleStep(mSingleTranslationStep);
+  connect(mpTranslationYSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
+  mpGridLayout->addWidget(mpTranslationYSpinBox, 1, 3, 1, 2);
 
-  mpPositionZSpinBox = new QDoubleSpinBox();
-  mpPositionZSpinBox->setRange(mZMin, mZMax);
-  mpPositionZSpinBox->setValue(mpLocalCoordinateFrame->getPositionZ());
-  mpPositionZSpinBox->setDecimals(mDecimals);
-  mpPositionZSpinBox->setSingleStep(mSinglePositionStep);
-  connect(mpPositionZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
-  mpGridLayout->addWidget(mpPositionZSpinBox, 1, 5, 1, 2);
+  mpTranslationZSpinBox = new QDoubleSpinBox();
+  mpTranslationZSpinBox->setRange(mZMin, mZMax);
+  mpTranslationZSpinBox->setValue(mpLocalCoordinateFrame->getTranslationZ());
+  mpTranslationZSpinBox->setDecimals(mDecimals);
+  mpTranslationZSpinBox->setSingleStep(mSingleTranslationStep);
+  connect(mpTranslationZSpinBox, SIGNAL(valueChanged(double)), this, SLOT(positionChanged(double)));
+  mpGridLayout->addWidget(mpTranslationZSpinBox, 1, 5, 1, 2);
 
 
   // add rotation buttons
@@ -286,24 +286,24 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::update()
   }
 
   // update position spin boxes
-  mpPositionXSpinBox->blockSignals(true);
-  mpPositionYSpinBox->blockSignals(true);
-  mpPositionZSpinBox->blockSignals(true);
-  mpPositionXSpinBox->setValue(T.at<double>(0, 3));
-  mpPositionYSpinBox->setValue(T.at<double>(1, 3));
-  mpPositionZSpinBox->setValue(T.at<double>(2, 3));
-  mpPositionXSpinBox->blockSignals(false);
-  mpPositionYSpinBox->blockSignals(false);
-  mpPositionZSpinBox->blockSignals(false);
+  mpTranslationXSpinBox->blockSignals(true);
+  mpTranslationYSpinBox->blockSignals(true);
+  mpTranslationZSpinBox->blockSignals(true);
+  mpTranslationXSpinBox->setValue(T.at<double>(0, 3));
+  mpTranslationYSpinBox->setValue(T.at<double>(1, 3));
+  mpTranslationZSpinBox->setValue(T.at<double>(2, 3));
+  mpTranslationXSpinBox->blockSignals(false);
+  mpTranslationYSpinBox->blockSignals(false);
+  mpTranslationZSpinBox->blockSignals(false);
 }
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::positionChanged(double)
 {
-  mpLocalCoordinateFrame->setPosition
+  mpLocalCoordinateFrame->setTranslation
   (
-    mpPositionXSpinBox->value(),
-    mpPositionYSpinBox->value(),
-    mpPositionZSpinBox->value()
+    mpTranslationXSpinBox->value(),
+    mpTranslationYSpinBox->value(),
+    mpTranslationZSpinBox->value()
   );
 }
 

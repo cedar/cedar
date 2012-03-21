@@ -70,14 +70,14 @@ int cedar::dev::kteam::DriveModel::init(cedar::dev::kteam::Drive *peDrive)
   // Initialization of members
   mpeDrive = 0;
   mOldEncoder = cv::Mat(2, 1, CV_64FC1);
-  mOldEncoder.at<double>(0,0) = 0;
-  mOldEncoder.at<double>(1,0) = 0;
+  mOldEncoder.at<double>(0, 0) = 0;
+  mOldEncoder.at<double>(1, 0) = 0;
   mpeDrive = peDrive;
   mDebug = false; //set true for debug-informations on console
 
   // set starting-position
-  setPosition(0,0);
-  setOrientation(0);
+  setTranslation(0, 0);
+  setRotation(0);
   mpeDrive->resetEncoder();
 
   // start update-timer and running-time
@@ -132,7 +132,7 @@ void cedar::dev::kteam::DriveModel::update()
   if(mDebug)
   {
     // output for importing into matlab
-    std::cout << getPositionX() << " " << getPositionY() << " " << getOrientation() << "\n";
+    std::cout << getTranslationX() << " " << getTranslationY() << " " << getRotation() << "\n";
   }
 }
 
@@ -146,20 +146,20 @@ void cedar::dev::kteam::DriveModel::calculatePositionAndOrientation(int leftEnco
                                                rightEncoder, mOldEncoder.at<int>(1,0));
   // calculate new position on x- and y-axis
   //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
-//  double new_x_position = getPositionX() + ds * getOrientationQuaternion(1);
-//  double new_y_position = getPositionY() + ds * getOrientationQuaternion(2);
+//  double new_x_position = getTranslationX() + ds * getOrientationQuaternion(1);
+//  double new_y_position = getTranslationY() + ds * getOrientationQuaternion(2);
   // get old orientation and calculate new orientation
 //  double new_orientation = getOrientation() + dphi;
 
   // this assumes the heading direction of the vehicle is the x-axis of the local coordinate system
-  double new_x_position = getPositionX() + ds * getTransformation().at<double>(0, 1);
-  double new_y_position = getPositionY() + ds * getTransformation().at<double>(1, 1);
+  double new_x_position = getTranslationX() + ds * getTransformation().at<double>(0, 1);
+  double new_y_position = getTranslationY() + ds * getTransformation().at<double>(1, 1);
   // get old orientation and calculate new orientation
-  double new_orientation = getOrientation() + dphi;
+  double new_orientation = getRotation() + dphi;
 
   // update both position and orientation
-  setPosition(new_x_position, new_y_position);
-  setOrientation(new_orientation);
+  setTranslation(new_x_position, new_y_position);
+  setRotation(new_orientation);
 }
 
 double cedar::dev::kteam::DriveModel::calculateDifferencePosition

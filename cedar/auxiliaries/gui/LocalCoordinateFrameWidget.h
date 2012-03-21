@@ -149,12 +149,12 @@ private:
   static const int mUpdateInterval = 100;
   cedar::aux::LocalCoordinateFramePtr mpLocalCoordinateFrame;
   QGridLayout* mpGridLayout;
-  QDoubleSpinBox* mpPositionXSpinBox;
-  QDoubleSpinBox* mpPositionYSpinBox;
-  QDoubleSpinBox* mpPositionZSpinBox;
+  QDoubleSpinBox* mpTranslationXSpinBox;
+  QDoubleSpinBox* mpTranslationYSpinBox;
+  QDoubleSpinBox* mpTranslationZSpinBox;
   int mDecimals;
   int mRotationInterval;
-  double mSinglePositionStep;
+  double mSingleTranslationStep;
   double mSingleRotationStep;
   double mXMin;
   double mXMax;

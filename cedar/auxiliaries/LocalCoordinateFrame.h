@@ -73,19 +73,34 @@ public:
   //!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
   virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
 
-  //!@brief returns position of the object in homogeneous coordinates
-  cv::Mat getPosition() const;
+  /*!@brief returns translation of the object in homogeneous coordinates
+   * @return translation of the local frame origin in the world frame
+   */
+  cv::Mat getTranslation() const;
 
-  //!@brief returns x-position of the object frame origin in world frame
-  double getPositionX() const;
+  /*!@brief returns x-translation of the local frame origin in world frame
+   * @return translation of the local frame origin in the world frame
+   */
+  double getTranslationX() const;
 
-  //!@brief returns y-position of the object frame origin in world frame
-  double getPositionY() const;
+  /*!@brief returns y-translation of the local frame origin in world frame
+   * @return translation of the local frame origin in the world frame in x-direction
+   */
+  double getTranslationY() const;
 
-  //!@brief returns z-position of the object frame origin in world frame
-  double getPositionZ() const;
+  /*!@brief returns z-translation of the local frame origin in world frame
+   * @return translation of the local frame origin in the world frame in y-direction
+   */
+  double getTranslationZ() const;
 
-  //!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
+  /*!@brief returns rotation of the local frame origin in world frame
+   * @return rotation of the local frame relative to the world frame
+   */
+  cv::Mat getRotation() const;
+
+  /*!@brief returns the \f$4 \times 4\f$ rigid transformation matrix of the object frame relative to the world frame
+   * @return transformation of the local frame relative to the world frame
+   */
   cv::Mat getTransformation() const;
 
   /*!@brief sets the transformation matrix
@@ -97,23 +112,49 @@ public slots:
   //!@brief updates the model
   virtual void update();
 
-  /*!@brief set the position of the object frame origin in the world frame
-   * @param x    coordinates of
-   * @param y    value for green channel in RGB color
-   * @param z    value for blue channel in RGB color
+  /*!@brief set the translation of the object frame origin in the world frame
+   * @param x new translation along the x-axis
+   * @param y new translation along the y-axis
+   * @param z new translation along the z-axis
    */
-  void setPosition(double x, double y, double z);
+  void setTranslation(double x, double y, double z);
 
-  /*!@brief set the position of the object frame origin in the world frame
-   * @param position    new position in homogeneous coordinates
+  /*!@brief set the translation of the object frame origin in the world frame
+   * @param translation new translation vector in homogeneous coordinates
    */
-  void setPosition(const cv::Mat& position);
+  void setTranslation(const cv::Mat& translation);
 
-  /*!@brief set the position of the object frame origin in the world frame
-   * @param position    new position in homogeneous coordinates
+  /*!@brief set the translation of the object frame origin in the world frame
+   * @param translation new translation vector in homogeneous coordinates
    */
-  void setPosition(const std::vector<double>& position);
+  void setTranslation(const std::vector<double>& translation);
 
+  /*!@brief add the provided values to the translation of the local frame origin in the world frame
+   * @param x additional translation along the x-axis
+   * @param y additional translation along the y-axis
+   * @param z additional translation along the z-axis
+   */
+  void translate(double x, double y, double z);
+
+  /*!@brief set the translation of the object frame origin in the world frame
+   * @param translation additional translation in homogeneous coordinates
+   */
+  void translate(const cv::Mat& translation);
+
+  /*!@brief set the translation of the object frame origin in the world frame
+   * @param translation additional translation in homogeneous coordinates
+   */
+  void translate(const std::vector<double>& translation);
+
+  /*!@brief set the rotation of the object frame in the world frame
+   * @param rotation new rotation matrix
+   */
+  void setRotation(const cv::Mat& rotation);
+
+  /*!@brief set the rotation of the object frame in the world frame
+   * @param  rotation new rotation matrix
+   */
+  void setRotation(const std::vector<double>& rotation);
   /*!@brief rotates the object around one of the main axes of the object frame
    * @param axis    index of the axis to rotate around, between 0 and 2
    * @param angle    value of angle that the object is rotated by
@@ -154,8 +195,8 @@ private:
   //! lock for thread safety
   mutable QReadWriteLock mLock;
 
-  cedar::aux::DoubleVectorParameterPtr _mInitialPosition;
-  cedar::aux::DoubleVectorParameterPtr _mInitialOrientation;
+  cedar::aux::DoubleVectorParameterPtr _mInitialTranslation;
+  cedar::aux::DoubleVectorParameterPtr _mInitialRotation;
 
 }; // class cedar::aux::LocalCoordinateFrame
 

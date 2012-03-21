@@ -47,18 +47,18 @@
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-cv::Mat cedar::dev::robot::Odometry::getPosition() const
+cv::Mat cedar::dev::robot::Odometry::getTranslation() const
 {
   //construct the matrix to return
-  cv::Mat position = cv::Mat(2,1,CV_64FC1);
+  cv::Mat translation = cv::Mat(2,1,CV_64FC1);
 
   //store the x- and y-position in the new matrix (gets are from LocalCoordinateFrame.h)
-  position.at<double>(0,0) = getPositionX();
-  position.at<double>(1,0) = getPositionY();
-  return position;
+  translation.at<double>(0,0) = getTranslationX();
+  translation.at<double>(1,0) = getTranslationY();
+  return translation;
 }
 
-double cedar::dev::robot::Odometry::getOrientation()
+double cedar::dev::robot::Odometry::getRotation()
 {
   //calculates the orientation from the quaternion stored in LocalCoordinateFrame.h.
   //todo: changed to use matrices instead of quaternions, check whether this still works (HR)
@@ -67,19 +67,19 @@ double cedar::dev::robot::Odometry::getOrientation()
   //  return atan2(getOrientationQuaternion(2) , getOrientationQuaternion(1));
 }
 
-void cedar::dev::robot::Odometry::setPosition(double xPosition, double yPosition)
+void cedar::dev::robot::Odometry::setTranslation(double x, double y)
 {
-  LocalCoordinateFrame::setPosition(xPosition, yPosition, 0); //sets x- and y-position only (z-position = 0)
+  LocalCoordinateFrame::setTranslation(x, y, 0); //sets x- and y-position only (z-position = 0)
 }
 
-void cedar::dev::robot::Odometry::setOrientation(double orientation)
+void cedar::dev::robot::Odometry::setRotation(double angle)
 {
   //construct a new matrix as parameter for setOrientationQuaternion
-  cv::Mat orientation_mat = cv::Mat(4, 1, CV_64FC1);
-  orientation_mat.at<double>(0,0) = 0; //orientation is a unit-quaternion
-  orientation_mat.at<double>(1,0) = cos(orientation);
-  orientation_mat.at<double>(2,0) = sin(orientation);
-  orientation_mat.at<double>(3,0) = 0; //no orientation in z-direction
+  cv::Mat rotation = cv::Mat(4, 1, CV_64FC1);
+  rotation.at<double>(0,0) = 0; //orientation is a unit-quaternion
+  rotation.at<double>(1,0) = cos(angle);
+  rotation.at<double>(2,0) = sin(angle);
+  rotation.at<double>(3,0) = 0; //no rotation in z-direction
 
   //todo: fix this! (HR)
 //  setOrientationQuaternion(orientation_mat);

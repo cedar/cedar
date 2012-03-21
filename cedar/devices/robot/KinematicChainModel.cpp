@@ -383,7 +383,7 @@ cv::Mat cedar::dev::robot::KinematicChainModel::calculateTwistTemporalDerivative
 
 cv::Mat cedar::dev::robot::KinematicChainModel::calculateEndEffectorPosition()
 {
-  return mpEndEffectorCoordinateFrame->getPosition();
+  return mpEndEffectorCoordinateFrame->getTranslation();
 }
 
 cv::Mat cedar::dev::robot::KinematicChainModel::getRootTransformation()
