@@ -76,6 +76,10 @@ namespace cedar
 
       //!@brief The singleton object of the SigmoidFactory.
       typedef cedar::aux::Singleton<SigmoidManager> SigmoidManagerSingleton;
+
+      template <class T> class LimitsParameter;
+      typedef LimitsParameter<double> DoubleLimitsParameter;
+      CEDAR_GENERATE_POINTER_TYPES(DoubleLimitsParameter);
     }
   }
 }

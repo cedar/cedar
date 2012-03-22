@@ -22,23 +22,23 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Limits.cpp
+    File:        LimitsParameter.cpp
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
     Date:        2010 12 09
 
-    Description: Specialization for the @em cedar::aux::math::Limits struct.
+    Description: Specialization for the @em cedar::aux::math::LimitsParameter struct.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/math/LimitsParameter.h"
 
 // SYSTEM INCLUDES
 
-template struct cedar::aux::math::Limits<double>;
-template struct cedar::aux::math::Limits<int>;
-template struct cedar::aux::math::Limits<unsigned int>;
+template struct cedar::aux::math::LimitsParameter<double>;
+template struct cedar::aux::math::LimitsParameter<int>;
+template struct cedar::aux::math::LimitsParameter<unsigned int>;

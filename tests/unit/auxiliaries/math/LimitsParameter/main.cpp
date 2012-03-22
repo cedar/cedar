@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
- 
+
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,23 +22,43 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        Limits.cpp
+    File:        main.cpp
 
     Maintainer:  Mathis Richter
     Email:       mathis.richter@ini.rub.de
-    Date:        2010 12 09
+    Date:        2012 03 21
 
-    Description: Specialization for the @em cedar::aux::math::Limits struct.
+    Description: Unit tests for the LimitsParameter class.
 
     Credits:
 
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/Limits.h"
+#include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
-template struct cedar::aux::math::Limits<double>;
-template struct cedar::aux::math::Limits<int>;
-template struct cedar::aux::math::Limits<unsigned int>;
+
+int main()
+{
+  // the number of errors encountered in this test
+  int number_of_errors = 0;
+
+  cedar::aux::math::LimitsParameter<double> limits_parameter;
+  limits_parameter.readJson("limits.json");
+
+  if (isZero(limits_parameter.getMinimum() - (-2.0)))
+  {
+    std::cout << "minimum was not read correctly\n";
+    ++number_of_errors;
+  }
+  if (isZero(limits_parameter.getMaximum() - (2.2)))
+  {
+    std::cout << "maximum was not read correctly\n";
+    ++number_of_errors;
+  }
+
+  return number_of_errors;
+}

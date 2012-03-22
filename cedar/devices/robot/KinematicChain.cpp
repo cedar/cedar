@@ -36,6 +36,9 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/KinematicChain.h"
+#include "cedar/auxiliaries/LocalCoordinateFrame.h"
+#include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/math/screwCalculus.h"
 
 // SYSTEM INCLUDES
 
@@ -419,6 +422,8 @@ void cedar::dev::robot::KinematicChain::setWorkingMode(ActionType actionType)
 
 void cedar::dev::robot::KinematicChain::init()
 {
+  // todo: integrate init() method of ReferenceGeometry
+
   this->addConfigurableChild("root coordinate frame", mpRootCoordinateFrame);
   this->addConfigurableChild("end-effector coordinate frame", mpEndEffectorCoordinateFrame);
 
@@ -901,4 +906,18 @@ void cedar::dev::robot::KinematicChain::calculateTransformations()
   mTransformationsLock.unlock();
 }
 
+const cedar::dev::robot::KinematicChain::JointPtr cedar::dev::robot::KinematicChain::getJoint
+(
+  unsigned int index
+) const
+{
+  return _mJoints[index];
+}
 
+const cedar::dev::robot::KinematicChain::LinkSegmentPtr cedar::dev::robot::KinematicChain::getLinkSegment
+(
+  unsigned int index
+) const
+{
+  return _mLinkSegments[index];
+}
