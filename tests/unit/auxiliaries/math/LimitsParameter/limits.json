@@ -1,0 +1,7 @@
+{
+	"limits":
+	[
+		minimum: "-2.0",
+		maximum: "2.2"
+	]
+}

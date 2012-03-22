@@ -89,10 +89,10 @@ void cedar::dev::robot::ReferenceGeometry::init()
 
     addParameter(&(p_joint->position), parameter_path + "position", 0.0);
     addParameter(&(p_joint->axis), parameter_path + "axis", 0.0);
-    addParameter(&(p_joint->angleLimits.min), parameter_path + "angleLimits.[0]", 0.0);
-    addParameter(&(p_joint->angleLimits.max), parameter_path + "angleLimits.[1]", 0.0);
-    addParameter(&(p_joint->velocityLimits.min), parameter_path + "velocityLimits.[0]", 0.0);
-    addParameter(&(p_joint->velocityLimits.max), parameter_path + "velocityLimits.[1]", 0.0);
+    addParameter(&(p_joint->angleLimits.mMinimum), parameter_path + "angleLimits.[0]", 0.0);
+    addParameter(&(p_joint->angleLimits.mMinimum), parameter_path + "angleLimits.[1]", 0.0);
+    addParameter(&(p_joint->velocityLimits.mMinimum), parameter_path + "velocityLimits.[0]", 0.0);
+    addParameter(&(p_joint->velocityLimits.mMaximum), parameter_path + "velocityLimits.[1]", 0.0);
   }
   
   // add parameter for end effector information

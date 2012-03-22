@@ -22,14 +22,10 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        NumericParameter.h
+    File:        LimitsParameter.h
 
-    Maintainer:  Oliver Lomp,
-                 Mathis Richter,
-                 Stephan Zibner
-    Email:       oliver.lomp@ini.ruhr-uni-bochum.de,
-                 mathis.richter@ini.ruhr-uni-bochum.de,
-                 stephan.zibner@ini.ruhr-uni-bochum.de
+    Maintainer:  Mathis Richter
+    Email:       mathis.richter@ini.rub.de
     Date:        2012 03 21
 
     Description:
@@ -42,19 +38,20 @@
 #define CEDAR_AUX_MATH_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/ParameterTemplate.h"
+#include "cedar/auxiliaries/Parameter.h"
 
 // SYSTEM INCLUDES
 
 
-/*!@brief A base class template for numeric parameters.
+/*!@brief A base class template for parameters describing (numerical) limits.
  */
 template <typename T>
 class cedar::aux::LimitsParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
-  // macros
+  // nested types
   //--------------------------------------------------------------------------------------------------------------------
+  typedef typename boost::shared_ptr<cedar::aux::math::Limits<T> > LimitsPtr;
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -109,6 +106,62 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  /*!@brief Read limits from a configuration tree.
+   *
+   * @param root root of the configuration node holding the limits information
+   */
+  void readFromNode(const cedar::aux::ConfigurationNode& root)
+  {
+    cedar::aux::ConfigurationNode minimum_child = root.get_child("minimum");
+    mLimits.mMinimum = minimum_child.get_value<T>();
+
+    cedar::aux::ConfigurationNode maximum_child = root.get_child("maximum");
+    mLimits.mMaximum = maximum_child.get_value<T>();
+  }
+
+  /*!@brief Write the current limits into a configuration tree.
+   *
+   * @param root root of the configuration node the limits information will be written to
+   */
+  void writeToNode(cedar::aux::ConfigurationNode& root) const
+  {
+    cedar::aux::ConfigurationNode limits_node;
+
+    cedar::aux::ConfigurationNode minimum_node;
+    minimum_node.put_value(mLimits.mMinimum);
+    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("minimum", minimum_node));
+
+    cedar::aux::ConfigurationNode maximum_node;
+    maximum_node.put_value(mLimits.mMaximum);
+    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("maximum", maximum_node));
+
+    root.push_back(cedar::aux::ConfigurationNode::value_type(getName(), limits_node));
+  }
+
+  void setMinimum(const T& minimum)
+  {
+    this->mLimits.mMinimum = minimum;
+    this->emitPropertyChangedSignal();
+  }
+
+  void setMaximum(const T& maximum)
+  {
+    // todo: check whether the new maximum is inside the
+    this->mLimits.mMaximum = maximum;
+    this->emitPropertyChangedSignal();
+  }
+
+  const T& getMinimum() const
+  {
+    return this->mLimits.mMinimum;
+  }
+
+  const T& getMaximum() const
+  {
+    return this->mLimits.mMaximum;
+  }
+
   //!@brief get the minimum value of the lower limit
   const T& getLowerLimitMinimum() const
   {
@@ -119,7 +172,6 @@ public:
   void setLowerLimitMinimum(const T& value)
   {
     this->mLowerLimitMinimum = value;
-
     this->emitPropertyChangedSignal();
   }
 
@@ -185,16 +237,14 @@ protected:
 private:
   //!@brief The minimum value of the lower limit
   T mLowerLimitMinimum;
-
   //!@brief The maximum value of the lower limit
   T mLowerLimitMaximum;
-
   //!@brief The minimum value of the upper limit
   T mUpperLimitMinimum;
-
   //!@brief The maximum value of the upper limit
   T mUpperLimitMaximum;
 
+  LimitsPtr mLimits;
 
 }; // class cedar::aux::math::LimitsParameter
 
