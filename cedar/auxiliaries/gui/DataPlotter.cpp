@@ -46,18 +46,17 @@
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
+#include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
-
-cedar::aux::gui::DataPlotter::WidgetFactory cedar::aux::gui::DataPlotter::mTypePlotters;
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::DataPlotter::DataPlotter(QWidget *pParent)
 :
-QWidget(pParent)
+cedar::aux::gui::PlotInterface(pParent)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
@@ -110,15 +109,6 @@ void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::str
   }
 
   this->layout()->addWidget(p_plot);
-}
-
-cedar::aux::gui::DataPlotter::WidgetFactory& cedar::aux::gui::DataPlotter::getWidgetFactory()
-{
-  if (cedar::aux::gui::DataPlotter::mTypePlotters.empty())
-  {
-    cedar::aux::gui::DataPlotter::mTypePlotters.add<cedar::aux::MatData, QWidget>();
-  }
-  return cedar::aux::gui::DataPlotter::mTypePlotters;
 }
 
 void cedar::aux::gui::DataPlotter::dataChanged()

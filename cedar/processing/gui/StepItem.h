@@ -45,6 +45,7 @@
 #include "cedar/processing/Step.h"
 #include "cedar/processing/gui/namespace.h"
 #include "cedar/processing/gui/GraphicsBase.h"
+#include "cedar/auxiliaries/gui/namespace.h"
 
 // SYSTEM INCLUDES
 #include <QMainWindow>
@@ -140,11 +141,25 @@ protected:
 private:
   //!@briefs adds graphical representations for all data items
   void addDataItems();
+
   //!@brief adds graphical representations for all triggers contained in the step
   void addTriggerItems();
+
   //!@brief sets the represented step
   void setStep(cedar::proc::StepPtr step);
 
+  void addRoleSeparator(const cedar::aux::Enum& e, QMenu* pMenu);
+
+  //!@brief Fills the menu with available plots
+  void fillPlots(QMenu* pMenu, std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap);
+
+  //!@brief Opens a new DockWidget to show the plot.
+  void showPlot
+  (
+    QGraphicsSceneContextMenuEvent *event,
+    cedar::aux::gui::PlotInterface* plot,
+    cedar::proc::DataSlotPtr slot
+  );
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
