@@ -41,7 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/kuka/KukaInterface.h"
 #include "cedar/auxiliaries/exceptions.h"
-#include "cedar/devices/robot/ReferenceGeometry.h"
+#include "cedar/auxiliaries/math/LimitsParameter.h"
 
 // SYSTEM INCLUDES
 
@@ -230,9 +230,9 @@ void cedar::dev::kuka::KukaInterface::step(double)
           {
             //if the joint position exceeds the one in the reference geometry, reset the angle
             mCommandedJointPosition.at(i)
-              = std::max<double>(mCommandedJointPosition.at(i), getReferenceGeometry()->getJoint(i)->angleLimits.min);
+              = std::max<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getLowerLimit());
             mCommandedJointPosition.at(i)
-              = std::min<double>(mCommandedJointPosition.at(i), getReferenceGeometry()->getJoint(i)->angleLimits.max);
+              = std::min<double>(mCommandedJointPosition.at(i), getJoint(i)->_mpAngleLimits->getUpperLimit());
             //copy commanded joint position
             commanded_joint[i] = float(mCommandedJointPosition[i]);
           }

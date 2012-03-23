@@ -52,8 +52,8 @@ int main()
   
   // create instance of test class
   std::cout << "reading kinematic chain from conig file ..." << std::endl;
-  cedar::dev::robot::ReferenceGeometryPtr p_reference_geometry(new cedar::dev::robot::ReferenceGeometry("test.conf"));
-  cedar::dev::robot::SimulatedKinematicChain test_arm(p_reference_geometry);
+//  cedar::dev::robot::ReferenceGeometryPtr p_reference_geometry(new cedar::dev::robot::ReferenceGeometry("test.conf"));
+  cedar::dev::robot::SimulatedKinematicChain test_arm("test.conf");
   
   //--------------------------------------------------------------------------------------------------------------------
   // single angle

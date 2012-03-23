@@ -424,49 +424,49 @@ void cedar::dev::robot::KinematicChainModel::init()
   omega.at<double>(0, 0) = 1;
   for (unsigned int j=0; j<getNumberOfJoints(); j++)
   {
-    cedar::dev::robot::ReferenceGeometry::JointPtr joint = mpKinematicChain->getReferenceGeometry()->getJoint(j);
-    p = cv::Mat::zeros(3, 1, CV_64FC1);
-    p.at<double>(0, 0) = joint->position[0];
-    p.at<double>(1, 0) = joint->position[1];
-    p.at<double>(2, 0) = joint->position[2];
-    omega = cv::Mat::zeros(3, 1, CV_64FC1);
-    omega.at<double>(0, 0) = joint->axis[0];
-    omega.at<double>(1, 0) = joint->axis[1];
-    omega.at<double>(2, 0) = joint->axis[2];
-    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
-
-    mReferenceJointTwists.push_back(xi.clone());
-    T = cv::Mat::eye(4, 4, CV_64FC1);
-    T.at<double>(0, 3) = joint->position[0];
-    T.at<double>(1, 3) = joint->position[1];
-    T.at<double>(2, 3) = joint->position[2];
-    mReferenceJointTransformations.push_back(T.clone());
-    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
-    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
+//    cedar::dev::robot::ReferenceGeometry::JointPtr joint = mpKinematicChain->getReferenceGeometry()->getJoint(j);
+//    p = cv::Mat::zeros(3, 1, CV_64FC1);
+//    p.at<double>(0, 0) = joint->position[0];
+//    p.at<double>(1, 0) = joint->position[1];
+//    p.at<double>(2, 0) = joint->position[2];
+//    omega = cv::Mat::zeros(3, 1, CV_64FC1);
+//    omega.at<double>(0, 0) = joint->axis[0];
+//    omega.at<double>(1, 0) = joint->axis[1];
+//    omega.at<double>(2, 0) = joint->axis[2];
+//    xi = cedar::aux::math::twistCoordinates<double>(p, omega);
+//
+//    mReferenceJointTwists.push_back(xi.clone());
+//    T = cv::Mat::eye(4, 4, CV_64FC1);
+//    T.at<double>(0, 3) = joint->position[0];
+//    T.at<double>(1, 3) = joint->position[1];
+//    T.at<double>(2, 3) = joint->position[2];
+//    mReferenceJointTransformations.push_back(T.clone());
+//    mTwistExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+//    mProductsOfExponentials.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+//    mJointTransformations.push_back(cv::Mat::zeros(4, 4, CV_64FC1));
+//    mJointTwists.push_back(cv::Mat::zeros(6, 1, CV_64FC1));
   }
 
   // end effector
-  mReferenceEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
-  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr endEffector
-    = mpKinematicChain->getReferenceGeometry()->getEndEffector();
-  
-  mReferenceEndEffectorTransformation.at<double>(0, 3) = endEffector->position[0];
-  mReferenceEndEffectorTransformation.at<double>(1, 3) = endEffector->position[1];
-  mReferenceEndEffectorTransformation.at<double>(2, 3) = endEffector->position[2];
-
-  mReferenceEndEffectorTransformation.at<double>(0, 0) = endEffector->orientation[0];
-  mReferenceEndEffectorTransformation.at<double>(0, 1) = endEffector->orientation[1];
-  mReferenceEndEffectorTransformation.at<double>(0, 2) = endEffector->orientation[2];
-  mReferenceEndEffectorTransformation.at<double>(1, 0) = endEffector->orientation[3];
-  mReferenceEndEffectorTransformation.at<double>(1, 1) = endEffector->orientation[4];
-  mReferenceEndEffectorTransformation.at<double>(1, 2) = endEffector->orientation[5];
-  mReferenceEndEffectorTransformation.at<double>(2, 0) = endEffector->orientation[6];
-  mReferenceEndEffectorTransformation.at<double>(2, 1) = endEffector->orientation[7];
-  mReferenceEndEffectorTransformation.at<double>(2, 2) = endEffector->orientation[8];
-
-  mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
+//  mReferenceEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
+//  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr endEffector
+//    = mpKinematicChain->getReferenceGeometry()->getEndEffector();
+//
+//  mReferenceEndEffectorTransformation.at<double>(0, 3) = endEffector->position[0];
+//  mReferenceEndEffectorTransformation.at<double>(1, 3) = endEffector->position[1];
+//  mReferenceEndEffectorTransformation.at<double>(2, 3) = endEffector->position[2];
+//
+//  mReferenceEndEffectorTransformation.at<double>(0, 0) = endEffector->orientation[0];
+//  mReferenceEndEffectorTransformation.at<double>(0, 1) = endEffector->orientation[1];
+//  mReferenceEndEffectorTransformation.at<double>(0, 2) = endEffector->orientation[2];
+//  mReferenceEndEffectorTransformation.at<double>(1, 0) = endEffector->orientation[3];
+//  mReferenceEndEffectorTransformation.at<double>(1, 1) = endEffector->orientation[4];
+//  mReferenceEndEffectorTransformation.at<double>(1, 2) = endEffector->orientation[5];
+//  mReferenceEndEffectorTransformation.at<double>(2, 0) = endEffector->orientation[6];
+//  mReferenceEndEffectorTransformation.at<double>(2, 1) = endEffector->orientation[7];
+//  mReferenceEndEffectorTransformation.at<double>(2, 2) = endEffector->orientation[8];
+//
+//  mReferenceEndEffectorTransformation.at<double>(3, 3) = 1.0;
 
   update();
 }

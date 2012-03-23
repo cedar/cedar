@@ -51,12 +51,12 @@ int main()
   int errors = 0;
   
   // create instances of test class
-  cedar::dev::robot::ReferenceGeometryPtr p_reference_geometry(new cedar::dev::robot::ReferenceGeometry("test.conf"));
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain(p_reference_geometry));
+//  cedar::dev::robot::ReferenceGeometryPtr p_reference_geometry(new cedar::dev::robot::ReferenceGeometry("test.conf"));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain("test.conf"));
   cedar::dev::robot::KinematicChainModel test_arm_model(p_test_arm);
 
-  cedar::dev::robot::ReferenceGeometryPtr p_acceleration_reference_geometry(new cedar::dev::robot::ReferenceGeometry("acceleration_test_arm.conf"));
-  cedar::dev::robot::KinematicChainPtr p_acceleration_test_arm (new cedar::dev::robot::SimulatedKinematicChain(p_acceleration_reference_geometry));
+//  cedar::dev::robot::ReferenceGeometryPtr p_acceleration_reference_geometry(new cedar::dev::robot::ReferenceGeometry("acceleration_test_arm.conf"));
+  cedar::dev::robot::KinematicChainPtr p_acceleration_test_arm (new cedar::dev::robot::SimulatedKinematicChain("acceleration_test_arm.conf"));
   cedar::dev::robot::KinematicChainModel acceleration_test_arm_model(p_acceleration_test_arm);
 
   // set test configurations
