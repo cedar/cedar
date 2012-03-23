@@ -117,7 +117,7 @@ private:
   QLabel *mpImageDisplay;
 
   //! Data displayed by the plot.
-  cedar::aux::ImageDataPtr mData;
+  cedar::aux::MatDataPtr mData;
 
   //! Converted image.
   QImage mImage;
