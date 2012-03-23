@@ -56,7 +56,11 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated arm
-  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain("../../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf"));
+  cedar::dev::robot::KinematicChainPtr p_test_arm(new cedar::dev::robot::SimulatedKinematicChain
+  (
+    "../../../../tests/interactive/devices/gl/KinematicChain/test_arm.conf")
+  );
+  p_test_arm->readJson("../../../../tests/interactive/devices/gl/KinematicChain/test_arm.json");
 
   // create model of simulated arm
   cedar::dev::robot::KinematicChainModelPtr p_test_arm_model(new cedar::dev::robot::KinematicChainModel(p_test_arm));
