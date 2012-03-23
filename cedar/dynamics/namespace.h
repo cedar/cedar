@@ -59,15 +59,13 @@ namespace cedar
     template <typename T> class Activation;
     //!@brief a specialization for double values
     typedef Activation<double> DoubleActivation;
-    //!@brief a specialization for cv::Mat
-    typedef Activation<cv::Mat> MatActivation;
 
     //!@cond SKIPPED_DOCUMENTATION
     CEDAR_GENERATE_POINTER_TYPES(DoubleActivation);
-    CEDAR_GENERATE_POINTER_TYPES(MatActivation);
     CEDAR_DECLARE_DYN_CLASS(Dynamics);
     CEDAR_DECLARE_DYN_CLASS(SpaceCode);
     CEDAR_DECLARE_DYN_CLASS(NeuralField);
+    CEDAR_DECLARE_DYN_CLASS(MatActivation);
     CEDAR_DECLARE_DYN_CLASS(Preshape);
     CEDAR_DECLARE_DYN_CLASS(Noise);
     //!@endcond

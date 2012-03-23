@@ -173,9 +173,6 @@ namespace cedar
     //!@brief a templated version of cedar::aux::Data
     template <typename T> class DataTemplate;
 
-    //!@brief A concretization of DataTemplate for simple matrices (cv::Mat).
-    typedef DataTemplate<cv::Mat> MatData;
-
     //!@brief A concretization of DataTemplate for simple points (cv::Point).
     typedef DataTemplate<cv::Point> CvPointData;
 
@@ -183,7 +180,7 @@ namespace cedar
     typedef DataTemplate<double> DoubleData;
 
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(MatData);
+    CEDAR_DECLARE_AUX_CLASS(MatData);
     CEDAR_GENERATE_POINTER_TYPES(CvPointData);
     CEDAR_GENERATE_POINTER_TYPES(DoubleData);
     CEDAR_DECLARE_AUX_CLASS(ImageData);

@@ -38,7 +38,7 @@
 #define CEDAR_AUX_IMAGE_DATA_H
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/DataTemplate.h"
+#include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/namespace.h"
 
 // SYSTEM INCLUDES
