@@ -103,7 +103,11 @@ namespace cedar
 
       // The manager for plot widgets
       typedef
-          cedar::aux::TypeHierarchyMap<cedar::aux::Data, cedar::aux::gui::PlotDeclarationPtr>
+          cedar::aux::TypeHierarchyMap
+          <
+            cedar::aux::Data,
+            std::vector<cedar::aux::gui::PlotDeclarationPtr>
+          >
           PlotDeclarationManager;
 
       typedef cedar::aux::Singleton<PlotDeclarationManager> PlotDeclarationManagerSingleton;

@@ -354,22 +354,27 @@ void cedar::proc::gui::StepItem::fillPlots
         else
         {
           // fill all possible plots into the menu
-          try
+          std::set<ConstPlotNodePtr> bases;
+          cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->findBases(data, bases);
+          if (bases.empty())
           {
-            std::set<ConstPlotNodePtr> bases;
-            cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->findDeepest(data, bases);
+            QAction *p_action = p_menu->addAction("no plots available");
+            p_action->setDisabled(true);
+          }
+          else
+          {
             for(std::set<ConstPlotNodePtr>::iterator iter = bases.begin(); iter != bases.end(); ++iter)
             {
               ConstPlotNodePtr node = *iter;
-              cedar::aux::gui::PlotDeclarationPtr declaration = node->getData();
-              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
-              p_action->setData(QString::fromStdString(slot_iter->first));
-              declMap[p_action] = std::make_pair(declaration, e);
+              const std::vector<cedar::aux::gui::PlotDeclarationPtr>& declarations = node->getData();
+              for (size_t i = 0; i < declarations.size(); ++i)
+              {
+                cedar::aux::gui::PlotDeclarationPtr declaration = declarations.at(i);
+                QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
+                p_action->setData(QString::fromStdString(slot_iter->first));
+                declMap[p_action] = std::make_pair(declaration, e);
+              }
             }
-          }
-          catch (cedar::aux::UnknownTypeException&)
-          {
-            p_menu->addAction(QString::fromStdString("Type not found:" + cedar::aux::objectTypeToString(data)));
           }
         }
       }

@@ -131,7 +131,18 @@ public:
 public:
   void declare()
   {
-    cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->insert<DataType>(this->shared_from_this());
+    try
+    {
+      std::vector<cedar::aux::gui::PlotDeclarationPtr>& declarations =
+        cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
+      declarations.push_back(this->shared_from_this());
+    }
+    catch(cedar::aux::UnknownTypeException&)
+    {
+      std::vector<cedar::aux::gui::PlotDeclarationPtr> declarations;
+      declarations.push_back(this->shared_from_this());
+      cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->insert<DataType>(declarations);
+    }
   }
 
   std::string getPlotClass() const

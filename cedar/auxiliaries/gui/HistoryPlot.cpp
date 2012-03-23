@@ -41,6 +41,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/HistoryPlot.h"
 #include "cedar/auxiliaries/gui/HistoryPlot0D.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/DoubleData.h"
@@ -48,6 +49,22 @@
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registerPlot()
+  {
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::DoubleData, cedar::aux::gui::HistoryPlot> DeclarationType;
+    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
+    decl->declare();
+    return true;
+  }
+
+  bool registered = registerPlot();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
