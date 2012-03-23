@@ -74,12 +74,12 @@ cedar::aux::Parameter::~Parameter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void intrusive_ptr_add_ref(cedar::aux::Parameter *pObject)
+void intrusive_ptr_add_ref(cedar::aux::Parameter* pObject)
 {
   pObject->mReferenceCount += 1;
 }
 
-void intrusive_ptr_release(cedar::aux::Parameter *pObject)
+void intrusive_ptr_release(cedar::aux::Parameter* pObject)
 {
   pObject->mReferenceCount -= 1;
 

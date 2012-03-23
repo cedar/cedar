@@ -216,7 +216,7 @@ void cedar::aux::LocalCoordinateFrame::setRotation(const cv::Mat& rotation)
 void cedar::aux::LocalCoordinateFrame::setRotation(const std::vector<double>& rotation)
 {
   QWriteLocker locker(&mLock);
-  CEDAR_ASSERT(rotation.size() >=0);
+  CEDAR_ASSERT(rotation.size() >=9);
   mTransformation.at<double>(0, 0) = rotation[0];
   mTransformation.at<double>(0, 1) = rotation[1];
   mTransformation.at<double>(0, 2) = rotation[2];

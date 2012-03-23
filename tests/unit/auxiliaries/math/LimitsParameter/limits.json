@@ -1,7 +1,7 @@
 {
-	"limits":
-	[
-		minimum: "-2.0",
-		maximum: "2.2"
-	]
+  "limits":
+  {
+    "lower limit": "-2.0",
+    "upper limit": "2.2"
+  }
 }
