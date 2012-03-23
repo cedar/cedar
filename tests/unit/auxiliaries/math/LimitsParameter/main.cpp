@@ -36,29 +36,131 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/math/LimitsParameter.h"
+#include "cedar/auxiliaries/Configurable.h"
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
 
+class TestClass : public cedar::aux::Configurable
+{
+public:
+  TestClass()
+  :
+  mpLimitsParameter(new cedar::aux::math::LimitsParameter<double>(this, "limits", -10.0, 1.0, -1.0, 10.0))
+  {
+  }
+
+  double getLowerLimit() const
+  {
+    return this->mpLimitsParameter->getLowerLimit();
+  }
+
+  double getUpperLimit() const
+  {
+    return this->mpLimitsParameter->getUpperLimit();
+  }
+
+  void setLowerLimit(double value)
+  {
+    this->mpLimitsParameter->setLowerLimit(value);
+  }
+
+  void setUpperLimit(double value)
+  {
+    this->mpLimitsParameter->setUpperLimit(value);
+  }
+  cedar::aux::math::DoubleLimitsParameterPtr getLimitsParameter()
+  {
+    return this->mpLimitsParameter;
+  }
+
+private:
+  cedar::aux::math::DoubleLimitsParameterPtr mpLimitsParameter;
+};
+
+CEDAR_GENERATE_POINTER_TYPES(TestClass);
 
 int main()
 {
   // the number of errors encountered in this test
   int number_of_errors = 0;
 
-  cedar::aux::math::LimitsParameter<double> limits_parameter;
-  limits_parameter.readJson("limits.json");
+  TestClassPtr limited(new TestClass);
 
-  if (isZero(limits_parameter.getMinimum() - (-2.0)))
+  // read from file
+  limited->readJson("limits.json");
+  if (!(IsZero(limited->getLowerLimit() - (-2.0))))
   {
-    std::cout << "minimum was not read correctly\n";
+    std::cout << "lower limit was not read correctly, read:" << limited->getLowerLimit() << std::endl;
     ++number_of_errors;
   }
-  if (isZero(limits_parameter.getMaximum() - (2.2)))
+  if (!(IsZero(limited->getUpperLimit() - (2.2))))
   {
-    std::cout << "maximum was not read correctly\n";
+    std::cout << "upper limit was not read correctly, read:" << limited->getUpperLimit()<< std::endl;
     ++number_of_errors;
   }
+
+  // check extrema
+  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-10.0))))
+  {
+    std::cout << "lower limit minimum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (1.0))))
+  {
+    std::cout << "lower limit maximum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-1.0))))
+  {
+    std::cout << "upper limit minimum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (10.0))))
+  {
+    std::cout << "upper limit maximum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+
+  // check set functions
+  limited->setLowerLimit(-5.6);
+  if (!(IsZero(limited->getLowerLimit() - (-5.6))))
+  {
+    std::cout << "lower limit was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  limited->setUpperLimit(6.7);
+  if (!(IsZero(limited->getUpperLimit() - (6.7))))
+  {
+    std::cout << "upper limit was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  limited->getLimitsParameter()->setLowerLimitMinimum(-12.3);
+  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMinimum() - (-12.3))))
+  {
+    std::cout << "lower limit minimum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  limited->getLimitsParameter()->setLowerLimitMaximum(3.4);
+  if (!(IsZero(limited->getLimitsParameter()->getLowerLimitMaximum() - (3.4))))
+  {
+    std::cout << "lower limit maximum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  limited->getLimitsParameter()->setUpperLimitMinimum(-4.5);
+  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMinimum() - (-4.5))))
+  {
+    std::cout << "upper limit minimum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+  limited->getLimitsParameter()->setUpperLimitMaximum(6.7);
+  if (!(IsZero(limited->getLimitsParameter()->getUpperLimitMaximum() - (6.7))))
+  {
+    std::cout << "upper limit maximum was not set correctly" << std::endl;
+    ++number_of_errors;
+  }
+
+
 
   return number_of_errors;
 }

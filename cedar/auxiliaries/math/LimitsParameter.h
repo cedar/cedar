@@ -38,7 +38,9 @@
 #define CEDAR_AUX_MATH_LIMITS_PARAMETER_H
 
 // CEDAR INCLUDES
+#include "cedar/auxiliaries/math/namespace.h"
 #include "cedar/auxiliaries/Parameter.h"
+#include "cedar/auxiliaries/math/Limits.h"
 
 // SYSTEM INCLUDES
 
@@ -46,7 +48,7 @@
 /*!@brief A base class template for parameters describing (numerical) limits.
  */
 template <typename T>
-class cedar::aux::LimitsParameter : public cedar::aux::Parameter
+class cedar::aux::math::LimitsParameter : public cedar::aux::Parameter
 {
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
@@ -70,7 +72,9 @@ public:
     const T& defaultUpperLimitMaximum
   )
   :
-  cedar::aux::Parameter(pOwner, name, defaultValue),
+  cedar::aux::Parameter(pOwner, name),
+  mLowerLimitDefault(defaultLowerLimit),
+  mUpperLimitDefault(defaultUpperLimit),
   mLowerLimitMinimum(defaultLowerLimitMinimum),
   mLowerLimitMaximum(defaultLowerLimitMaximum),
   mUpperLimitMinimum(defaultUpperLimitMinimum),
@@ -81,7 +85,7 @@ public:
   //!@brief the constructor
   LimitsParameter
   (
-    cedar::aux::Configurable *pOwner,
+    cedar::aux::Configurable* pOwner,
     const std::string& name,
     const T& defaultLowerLimitMinimum,
     const T& defaultLowerLimitMaximum,
@@ -113,11 +117,11 @@ public:
    */
   void readFromNode(const cedar::aux::ConfigurationNode& root)
   {
-    cedar::aux::ConfigurationNode minimum_child = root.get_child("minimum");
-    mLimits.mMinimum = minimum_child.get_value<T>();
+    cedar::aux::ConfigurationNode lower_limit_child = root.get_child("lower limit");
+    mLimits.mLowerLimit = lower_limit_child.get_value<T>();
 
-    cedar::aux::ConfigurationNode maximum_child = root.get_child("maximum");
-    mLimits.mMaximum = maximum_child.get_value<T>();
+    cedar::aux::ConfigurationNode upper_limit_child = root.get_child("upper limit");
+    mLimits.mUpperLimit = upper_limit_child.get_value<T>();
   }
 
   /*!@brief Write the current limits into a configuration tree.
@@ -128,38 +132,45 @@ public:
   {
     cedar::aux::ConfigurationNode limits_node;
 
-    cedar::aux::ConfigurationNode minimum_node;
-    minimum_node.put_value(mLimits.mMinimum);
-    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("minimum", minimum_node));
+    cedar::aux::ConfigurationNode lower_limit_node;
+    lower_limit_node.put_value(mLimits.mLowerLimit);
+    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("lower limit", lower_limit_node));
 
-    cedar::aux::ConfigurationNode maximum_node;
-    maximum_node.put_value(mLimits.mMaximum);
-    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("maximum", maximum_node));
+    cedar::aux::ConfigurationNode upper_limit_node;
+    upper_limit_node.put_value(mLimits.mUpperLimit);
+    limits_node.push_back(cedar::aux::ConfigurationNode::value_type("upper limit", upper_limit_node));
 
     root.push_back(cedar::aux::ConfigurationNode::value_type(getName(), limits_node));
   }
 
-  void setMinimum(const T& minimum)
+  //!@brief set value to default
+  void makeDefault()
   {
-    this->mLimits.mMinimum = minimum;
+    this->setLowerLimit(mLowerLimitDefault);
+    this->setUpperLimit(mUpperLimitDefault);
+  }
+
+  void setLowerLimit(const T& value)
+  {
+    this->mLimits.mLowerLimit = value;
     this->emitPropertyChangedSignal();
   }
 
-  void setMaximum(const T& maximum)
+  void setUpperLimit(const T& value)
   {
-    // todo: check whether the new maximum is inside the
-    this->mLimits.mMaximum = maximum;
+    // todo: check whether the new upper limit is inside the
+    this->mLimits.mUpperLimit = value;
     this->emitPropertyChangedSignal();
   }
 
-  const T& getMinimum() const
+  const T& getLowerLimit() const
   {
-    return this->mLimits.mMinimum;
+    return this->mLimits.mLowerLimit;
   }
 
-  const T& getMaximum() const
+  const T& getUpperLimit() const
   {
-    return this->mLimits.mMaximum;
+    return this->mLimits.mUpperLimit;
   }
 
   //!@brief get the minimum value of the lower limit
@@ -235,6 +246,10 @@ private:
 protected:
   // none yet
 private:
+  //!@brief The default value of the lower limit
+  T mLowerLimitDefault;
+  //!@brief The default value of the upper limit
+  T mUpperLimitDefault;
   //!@brief The minimum value of the lower limit
   T mLowerLimitMinimum;
   //!@brief The maximum value of the lower limit
@@ -244,7 +259,7 @@ private:
   //!@brief The maximum value of the upper limit
   T mUpperLimitMaximum;
 
-  LimitsPtr mLimits;
+  cedar::aux::math::Limits<T> mLimits;
 
 }; // class cedar::aux::math::LimitsParameter
 

@@ -79,7 +79,7 @@ namespace cedar
 
       template <class T> class LimitsParameter;
       typedef LimitsParameter<double> DoubleLimitsParameter;
-      CEDAR_GENERATE_POINTER_TYPES(DoubleLimitsParameter);
+      CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(DoubleLimitsParameter);
     }
   }
 }
