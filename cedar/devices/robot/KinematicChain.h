@@ -66,7 +66,7 @@ public cedar::dev::robot::Component,
 public cedar::aux::LoopedThread,
 public cedar::aux::Configurable
 {
-protected:
+public:
   //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
@@ -135,6 +135,12 @@ public slots:
   // public methods
   //----------------------------------------------------------------------------
 public:
+  /*!@brief read a configuration for all registered parameters from a cedar::aux::ConfigurationNode
+   *
+   * @param node json node providing the configuration
+   */
+  virtual void readConfiguration(const cedar::aux::ConfigurationNode& node);
+
   /*!@brief check whether the kinematic chain is currently responsive to movement commands
    *
    * @return    state

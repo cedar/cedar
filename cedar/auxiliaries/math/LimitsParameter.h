@@ -158,7 +158,7 @@ public:
 
   void setUpperLimit(const T& value)
   {
-    // todo: check whether the new upper limit is inside the
+    // todo: check whether the new upper limit is inside the provided extrema
     this->mLimits.mUpperLimit = value;
     this->emitPropertyChangedSignal();
   }
