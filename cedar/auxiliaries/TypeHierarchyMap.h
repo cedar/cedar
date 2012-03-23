@@ -121,6 +121,11 @@ public:
         return this->mData;
       }
 
+      DataType& getData()
+      {
+        return this->mData;
+      }
+
       template <class T>
       NodePtr insert(ConstRootTypePtr probeInstance, const DataType& data, NodePtr correspondingNode = NodePtr())
       {
@@ -169,43 +174,51 @@ public:
         return correspondingNode;
       }
 
+
+      void print
+      (
+        const std::string& indentation = "",
+        std::set<ConstNodePtr> visited = std::set<ConstNodePtr>()
+      ) const
+      {
+        if (visited.find(this->shared_from_this()) != visited.end())
+        {
+          std::cout << indentation << " LOOP!" << std::endl;
+          return;
+        }
+
+        std::cout << indentation << cedar::aux::objectTypeToString(this->mProbeInstance)
+                  << " <" << this << ">" << std::endl;
+        visited.insert(this->shared_from_this());
+
+        for
+        (
+          const_children_iterator iter = this->childrenBegin();
+          iter != this->childrenEnd();
+          ++iter
+        )
+        {
+          (*iter)->print(indentation + " ", visited);
+        }
+      }
+
       /*!@brief Returns all known base classes of instance.
        */
       void findBases(ConstRootTypePtr instance, std::set<ConstNodePtr>& bases) const
       {
-        std::set<ConstNodePtr> nodes;
-        this->findDeepest(instance, nodes);
-        while (!nodes.empty())
+        if (this->matchesDerived(instance))
         {
-          // take out first leaf
-          ConstNodePtr node = *(nodes.begin());
-          nodes.erase(nodes.begin());
-
-          // add it to the bases
-          bases.insert(node);
-
-          // add all its parents to the leafs (in order to explore them as well
-          nodes.insert(node->mParents.begin(), node->mParents.end());
+          bases.insert(this->shared_from_this());
         }
-      }
 
-      void findDeepest(ConstRootTypePtr instance, std::set<ConstNodePtr>& nodes) const
-      {
-        if (this->mChildren.empty())
+        for
+        (
+          const_children_iterator iter = this->childrenBegin();
+          iter != this->childrenEnd();
+          ++iter
+        )
         {
-          if (this->matchesDerived(instance))
-          {
-            nodes.insert(this->shared_from_this());
-          }
-        }
-        else
-        {
-          // check all children
-          for (const_children_iterator iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
-          {
-            ConstNodePtr child = *iter;
-            child->findDeepest(instance, nodes);
-          }
+          (*iter)->findBases(instance, bases);
         }
       }
 
@@ -543,12 +556,26 @@ public:
     return node;
   }
 
-  /*!@brief Returns the leaf nodes that represent classes that the class of instance inherits.
+  /*!@brief Returns all the data along the path of the instance.
    */
-  void findDeepest(ConstRootTypePtr instance, std::set<ConstNodePtr>& nodes) const
+  NodePtr find(ConstRootTypePtr instance)
   {
-    nodes.clear();
-    this->mRootNode->findDeepest(instance, nodes);
+    ConstNodePtr node = this->getRootNode()->find(instance);
+
+    if (!node)
+    {
+      CEDAR_THROW(cedar::aux::UnknownTypeException, "The type cannot be found in this hierarchy.");
+    }
+
+    return boost::const_pointer_cast<Node>(node);
+  }
+
+  /*!@brief Returns the base classes of the instance.
+   */
+  void findBases(ConstRootTypePtr instance, std::set<ConstNodePtr>& bases) const
+  {
+    bases.clear();
+    this->mRootNode->findBases(instance, bases);
   }
 
   size_t size() const
@@ -558,6 +585,13 @@ public:
 
   template <class T>
   ConstNodePtr find() const
+  {
+    RootTypePtr instance(new T());
+    return this->find(instance);
+  }
+
+  template <class T>
+  NodePtr find()
   {
     RootTypePtr instance(new T());
     return this->find(instance);

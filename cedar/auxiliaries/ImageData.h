@@ -53,7 +53,7 @@ class cedar::aux::ImageData : public cedar::aux::MatData
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  ImageData(const cv::Mat& value)
+  ImageData(const cv::Mat& value = cv::Mat())
   :
   cedar::aux::MatData(value)
   {

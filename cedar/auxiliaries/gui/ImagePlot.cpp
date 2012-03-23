@@ -40,6 +40,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/ImagePlot.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/assert.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
 #include "cedar/auxiliaries/ImageData.h"
@@ -47,6 +48,28 @@
 // SYSTEM INCLUDES
 #include <QVBoxLayout>
 #include <iostream>
+
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registerPlot()
+  {
+    // for images
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::ImageData, cedar::aux::gui::ImagePlot> DeclarationType;
+    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
+    decl->declare();
+
+    // for matrices
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::ImagePlot> DeclarationTypeM;
+    boost::shared_ptr<DeclarationTypeM> m_decl(new DeclarationTypeM());
+    m_decl->declare();
+    return true;
+  }
+
+  bool registered = registerPlot();
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
