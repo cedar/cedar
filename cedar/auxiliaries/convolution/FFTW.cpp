@@ -119,7 +119,8 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv
   }
   else if (cedar::aux::math::getDimensionalityOf(matrix) == 0)
   {
-    return kernel * cedar::aux::math::getMatrixEntry<double>(matrix, 0, 0);
+
+    return cv::Mat(1, 1, kernel.type(), cv::sum(kernel * cedar::aux::math::getMatrixEntry<double>(matrix, 0, 0)));
   }
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix) - 1; ++dim)
   {
