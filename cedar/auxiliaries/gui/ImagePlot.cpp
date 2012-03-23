@@ -122,6 +122,7 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
 
     case CV_32FC1:
     {
+      //!@todo This should color-code when the data is not an image (i.e., a matrix)
       //!@todo Some code here is redundant
       // find min and max for scaling
       double min, max;
@@ -182,11 +183,11 @@ void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::strin
   if (mTimerId != 0)
     this->killTimer(mTimerId);
 
-  this->mData = boost::shared_dynamic_cast<cedar::aux::ImageData>(data);
+  this->mData = boost::dynamic_pointer_cast<cedar::aux::MatData>(data);
   if (!this->mData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Cannot cast to cedar::aux::ImageData in cedar::aux::gui::ImagePlot::display.");
+                "Cannot cast to cedar::aux::MatData in cedar::aux::gui::ImagePlot::display.");
   }
 
   mpImageDisplay->setText("no image loaded");
