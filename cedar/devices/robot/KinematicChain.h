@@ -45,6 +45,7 @@
 #include "cedar/devices/robot/Component.h"
 #include "cedar/auxiliaries/LoopedThread.h"
 #include "cedar/auxiliaries/Configurable.h"
+#include "cedar/auxiliaries/ObjectListParameterTemplate.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -59,7 +60,11 @@
  * the KinematicChain as a thread to handle velocities and accelerations
  * "manually".
  */
-class cedar::dev::robot::KinematicChain : public cedar::dev::robot::Component, public cedar::aux::LoopedThread
+class cedar::dev::robot::KinematicChain
+:
+public cedar::dev::robot::Component,
+public cedar::aux::LoopedThread,
+public cedar::aux::Configurable
 {
 protected:
   //--------------------------------------------------------------------------------------------------------------------
@@ -77,34 +82,24 @@ protected:
   //!@brief describes the hardware properties of a joint.
   struct Joint : cedar::aux::Configurable
   {
-    //! position of a joint in 3D space
-    cedar::aux::DoubleVectorParameterPtr _mPosition;
-    //! axis the joint moves in, in 3D space
-    cedar::aux::DoubleVectorParameterPtr _mAxis;
-    //! minimum and maximum angular values
-    cedar::aux::math::DoubleLimitsParameterPtr _mAngleLimits;
+    //! constructor
+    Joint();
+    //! position of the joint in robot root coordinates
+    cedar::aux::DoubleVectorParameterPtr _mpPosition;
+    //! axis of rotation of the joint, in robot root coordinates
+    cedar::aux::DoubleVectorParameterPtr _mpAxis;
+    //! minimum and maximum angle values
+    cedar::aux::math::DoubleLimitsParameterPtr _mpAngleLimits;
     //! minimum and maximum velocity values
-    cedar::aux::math::DoubleLimitsParameterPtr _mVelocityLimits;
-  };
-
-  //!@brief Describes the hardware properties of a link segment.
-  struct LinkSegment : cedar::aux::Configurable
-  {
-    //! position of center of mass in 3D space
-    cedar::aux::DoubleVectorParameterPtr _mCenterOfMassPosition;
-    //! orientation of center of mass in 3D space
-    cedar::aux::DoubleVectorParameterPtr _mOrientation;
-    //! inertia moments in 3D space
-    cedar::aux::DoubleVectorParameterPtr _mInertiaMoments;
+    cedar::aux::math::DoubleLimitsParameterPtr _mpVelocityLimits;
   };
 
 public:
   //! smart pointer definition for the Joint struct
   typedef boost::shared_ptr<cedar::dev::robot::KinematicChain::Joint> JointPtr;
-  //! smart pointer definition for the EndEffector struct
-  typedef boost::shared_ptr<cedar::dev::robot::KinematicChain::EndEffector> EndEffectorPtr;
-  //! smart pointer definition for the LinkSegment struct
-  typedef boost::shared_ptr<cedar::dev::robot::KinematicChain::LinkSegment> LinkSegmentPtr;
+  typedef cedar::aux::ObjectListParameterTemplate<cedar::dev::robot::KinematicChain::Joint> JointListParameter;
+  CEDAR_GENERATE_POINTER_TYPES_INTRUSIVE(JointListParameter);
+
 
   //----------------------------------------------------------------------------
   // parameters
@@ -158,14 +153,6 @@ public:
    * @param index    index of the joint
    */
   const cedar::dev::robot::KinematicChain::JointPtr getJoint(unsigned int index) const;
-
-  /*!@brief Returns a pointer to a specific link segment.
-   *
-   * @return    pointer to link segment struct
-   * @param index    index of the link segment
-   */
-  const cedar::dev::robot::KinematicChain::LinkSegmentPtr getLinkSegment(unsigned int index) const;
-
 
   /*!@brief get current state of a single joint angle
    *
@@ -534,8 +521,8 @@ protected:
 private:
   void step(double time);
   void init();
-  void applyAngleLimits(cv::Mat &angles);
-  void applyVelocityLimits(cv::Mat &velocities);
+  void applyAngleLimits(cv::Mat& angles);
+  void applyVelocityLimits(cv::Mat& velocities);
 
   //!@brief calculates the transformations to the joint frames for the given joint angle vector
   void calculateTransformations();
@@ -560,15 +547,14 @@ private:
   cv::Mat mJointVelocities;
   cv::Mat mJointAccelerations;
   ActionType mCurrentWorkingMode;
+
+  //! vector of all joints
+  JointListParameterPtr mpJoints;
+
   //!@brief pointer to the root coordinate frame of the kinematic chain
   cedar::aux::LocalCoordinateFramePtr mpRootCoordinateFrame;
   //!@brief pointer to the local coordinate frame of the end-effector
   cedar::aux::LocalCoordinateFramePtr mpEndEffectorCoordinateFrame;
-
-  //! vector of all joints
-  std::vector<cedar::dev::robot::ReferenceGeometry::JointPtr> _mJoints;
-  //! vector of all link segments
-  std::vector<cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr> _mLinkSegments;
 
   // locking for thread safety
   QReadWriteLock mTransformationsLock;

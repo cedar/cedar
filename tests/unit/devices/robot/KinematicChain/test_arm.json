@@ -3,8 +3,8 @@
 	{
 		"initial translation":
 		[
+			"2.0",
 			"0.0",
-			"1.0",
 			"0.0"
 		],
 		"initial rotation":
@@ -19,34 +19,35 @@
 		"initial translation":
 		[
 			"0.0",
-			"0.0",
-			"1.0"
+			"2.0",
+			"8.0"
 		],
 		"initial rotation":
 		[
-			"0.0", "-1.0", "0.0",
 			"1.0", "0.0", "0.0",
+			"0.0", "1.0", "0.0",
 			"0.0", "0.0", "1.0"
 		]
 	},
     "joints":
-    [
-        {
-            "angleLimits":
-            {
-				"min": "-3.1415927",
-				"max": "3.1415927"
+    {
+	    "cedar.dev.robot.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-3.1415927",
+				"upper limit": "3.1415927"
 			},
-            "velocityLimits":
-            {
-				"min": "-5.0",
-				"max": "5.0"
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
 			},
 			"position":
 			[
 				"0.0", 
-				"0.0",
-				"0.3"
+				"2.0",
+				"0.0"
 			],
 			"axis":
 			[
@@ -55,22 +56,23 @@
 				"0.0"
 			]
 		},
-        {
-            "angleLimits":
-            {
-				"min": "-3.1415927",
-				"max": "3.1415927"
+	    "cedar.dev.robot.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-3.1415927",
+				"upper limit": "3.1415927"
 			},
-            "velocityLimits":
-            {
-				"min": "-5.0",
-				"max": "5.0"
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
 			},
 			"position":
 			[
 				"0.0", 
-				"0.0",
-				"0.5"
+				"2.0",
+				"2.0"
 			],
 			"axis":
 			[
@@ -79,22 +81,48 @@
 				"0.0"
 			]
 		},
-        {
-            "angleLimits":
-            {
-				"min": "-3.1415927",
-				"max": "3.1415927"
+	    "cedar.dev.robot.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-3.1415927",
+				"upper limit": "3.1415927"
 			},
-            "velocityLimits":
-            {
-				"min": "-5.0",
-				"max": "5.0"
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
 			},
 			"position":
 			[
 				"0.0", 
-				"0.0",
-				"0.7"
+				"2.0",
+				"4.0"
+			],
+			"axis":
+			[
+				"0.0", 
+				"1.0",
+				"0.0"
+			]
+		},
+	    "cedar.dev.robot.KinematicChain.Joint":
+	    {
+	        "angle limits":
+	        {
+				"lower limit": "-3.1415927",
+				"upper limit": "3.1415927"
+			},
+	        "velocity limits":
+	        {
+				"lower limit": "-5.0",
+				"upper limit": "5.0"
+			},
+			"position":
+			[
+				"0.0", 
+				"2.0",
+				"6.0"
 			],
 			"axis":
 			[
@@ -103,5 +131,5 @@
 				"0.0"
 			]
 		}
-	]
+	}
 }

@@ -46,36 +46,36 @@ class TestClass : public cedar::aux::Configurable
 public:
   TestClass()
   :
-  mpLimitsParameter(new cedar::aux::math::LimitsParameter<double>(this, "limits", -10.0, 1.0, -1.0, 10.0))
+  _mpLimitsParameter(new cedar::aux::math::LimitsParameter<double>(this, "limits", -10.0, 1.0, -1.0, 10.0))
   {
   }
 
   double getLowerLimit() const
   {
-    return this->mpLimitsParameter->getLowerLimit();
+    return this->_mpLimitsParameter->getLowerLimit();
   }
 
   double getUpperLimit() const
   {
-    return this->mpLimitsParameter->getUpperLimit();
+    return this->_mpLimitsParameter->getUpperLimit();
   }
 
   void setLowerLimit(double value)
   {
-    this->mpLimitsParameter->setLowerLimit(value);
+    this->_mpLimitsParameter->setLowerLimit(value);
   }
 
   void setUpperLimit(double value)
   {
-    this->mpLimitsParameter->setUpperLimit(value);
+    this->_mpLimitsParameter->setUpperLimit(value);
   }
   cedar::aux::math::DoubleLimitsParameterPtr getLimitsParameter()
   {
-    return this->mpLimitsParameter;
+    return this->_mpLimitsParameter;
   }
 
 private:
-  cedar::aux::math::DoubleLimitsParameterPtr mpLimitsParameter;
+  cedar::aux::math::DoubleLimitsParameterPtr _mpLimitsParameter;
 };
 
 CEDAR_GENERATE_POINTER_TYPES(TestClass);
