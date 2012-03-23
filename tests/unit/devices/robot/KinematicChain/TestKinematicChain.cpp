@@ -63,14 +63,14 @@ TestKinematicChain::~TestKinematicChain()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-double TestKinematicChain::getJointAngle(unsigned int) const
+double TestKinematicChain::getJointAngle(unsigned int index) const
 {
-  return 0.0;
+  return mJointAngles.at<double>(index, 0);
 }
 
-void TestKinematicChain::setJointAngle(unsigned int, double)
+void TestKinematicChain::setJointAngle(unsigned int index, double angle)
 {
-
+  mJointAngles.at<double>(index, 0) = angle;
 }
 
 bool TestKinematicChain::isMovable() const
