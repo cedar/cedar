@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
 #include "cedar/auxiliaries/gl/gl.h"
 
@@ -58,8 +58,7 @@ public:
   //!@brief constructor
   Sdh
   (
-    cedar::dev::robot::KinematicChainPtr pKinematicChain,
-    cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel
+    cedar::dev::robot::KinematicChainPtr pKinematicChain
   );
   //!@brief destructor
   ~Sdh();
@@ -90,7 +89,6 @@ private:
 protected:
   // none yet
 private:
-  // dummy for representing and modifying the angles
   cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
   // palm

@@ -48,7 +48,7 @@
 /*!@brief Visualization of the KUKA LWR4
  *
  * This class provides a simple OpenGL visualization of the KUKA LWR4 arm. It has to be provided with a pointer to an
- * instance of KinematicChainModel of the arm, used to get the transformations to the joint coordinate frames.
+ * instance of KinematicChain of the arm, used to get the transformations to the joint coordinate frames.
  * To actually display the arm, add an instance of this class to a scene (cedar::aux::gl::Scene) and create a viewer
  * for that scene (cedar::aux::gl::Viewer).
  */
@@ -59,7 +59,7 @@ class cedar::dev::robot::gl::KukaArm : public cedar::dev::robot::gl::KinematicCh
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KukaArm(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
+  KukaArm(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   ~KukaArm();
 

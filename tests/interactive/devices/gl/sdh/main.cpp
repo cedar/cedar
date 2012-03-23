@@ -35,7 +35,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/gl/Sdh.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/System.h"
@@ -76,16 +75,12 @@ int main(int argc, char **argv)
 
   // create dummy kinematic chain and model to represent the joint angles
   cedar::dev::robot::KinematicChainPtr p_dummy_arm(new cedar::dev::robot::SimulatedKinematicChain(configuration_file));
-  cedar::dev::robot::KinematicChainModelPtr p_dummy_arm_model
-  (
-    new cedar::dev::robot::KinematicChainModel(p_dummy_arm)
-  );
-  p_dummy_arm_model->getRootCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
+  p_dummy_arm->getRootCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
 
   // create gl visualization objects
   cedar::dev::robot::gl::SdhPtr p_hand_visualization
   (
-    new cedar::dev::robot::gl::Sdh(p_dummy_arm, p_dummy_arm_model)
+    new cedar::dev::robot::gl::Sdh(p_dummy_arm)
   );
 
   // create scene and viewer to display the arm
@@ -104,7 +99,6 @@ int main(int argc, char **argv)
   // show and start everything
   p_scene_widget->show();
   widget_arm.show();
-  p_dummy_arm_model->startTimer(50.0);
   viewer.startTimer(50);
   a.exec();
 

@@ -38,7 +38,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/namespace.h"
-#include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES

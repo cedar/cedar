@@ -47,9 +47,9 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::dev::robot::gl::CoraHead::CoraHead(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel)
+cedar::dev::robot::gl::CoraHead::CoraHead(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
-cedar::dev::robot::gl::AmtecChain(pKinematicChainModel)
+cedar::dev::robot::gl::AmtecChain(pKinematicChain)
 {
 
 }
@@ -70,7 +70,7 @@ void cedar::dev::robot::gl::CoraHead::drawBase()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getRootTransformation().t();
+  mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   setMaterial(CHROME);
@@ -103,7 +103,7 @@ void cedar::dev::robot::gl::CoraHead::drawSegment(unsigned int index)
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getJointTransformation(index).t();
+  mTransformationTranspose = mpKinematicChain->getJointTransformation(index).t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
 
   switch (index)
@@ -204,7 +204,7 @@ void cedar::dev::robot::gl::CoraHead::drawEndEffector()
   glPushMatrix();
 
   // move to object coordinates
-  mTransformationTranspose = mpKinematicChainModel->getEndEffectorTransformation().t();
+  mTransformationTranspose = mpKinematicChain->getEndEffectorTransformation().t();
   glMultMatrixd((GLdouble*)mTransformationTranspose.data);
   glPushMatrix();
 
