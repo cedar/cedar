@@ -59,17 +59,17 @@
 
 cedar::aux::gui::MatrixPlot1D::MatrixPlot1D(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent)
+cedar::aux::gui::PlotInterface(pParent)
 {
   this->init();
 }
 
-cedar::aux::gui::MatrixPlot1D::MatrixPlot1D(cedar::aux::DataPtr matData, QWidget *pParent)
+cedar::aux::gui::MatrixPlot1D::MatrixPlot1D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent)
+cedar::aux::gui::PlotInterface(pParent)
 {
   this->init();
-  this->display(matData);
+  this->plot(matData, title);
 }
 
 cedar::aux::gui::MatrixPlot1D::~MatrixPlot1D()
@@ -90,14 +90,14 @@ void cedar::aux::gui::MatrixPlot1D::clearMarkers()
   this->mpPlot->detachItems(QwtPlotMarker::Rtti_PlotMarker, true);
 }
 
-void cedar::aux::gui::MatrixPlot1D::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::MatrixPlot1D::plot(cedar::aux::DataPtr data, const std::string& /* title */)
 {
   this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
 
   if (!this->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot1D::display.");
+                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot1D::plot.");
   }
 
   if (this->mpCurve != NULL)

@@ -39,7 +39,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QLabel>
@@ -50,7 +50,7 @@
 
 /*!@brief A plot for images.
  */
-class cedar::aux::gui::ImagePlot : public DataPlotInterface
+class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -76,7 +76,7 @@ public:
    * @param data A pointer to the data to display. If this isn't a pointer to a cedar::aux::ImageData, the function
    *             throws.
    */
-  void display(cedar::aux::DataPtr data);
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
   /*!@brief Updates the plot periodically.
    */

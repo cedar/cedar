@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -55,7 +55,7 @@
  *
  * @todo Write more detailed description of the class here.
  */
-class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::DataPlotInterface
+class cedar::aux::gui::MatrixPlot : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -77,7 +77,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display a MatData
-  void display(cedar::aux::DataPtr data);
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
   //!@brief return vector of standard colors
   static const Qwt3D::ColorVector& getStandardColorVector();

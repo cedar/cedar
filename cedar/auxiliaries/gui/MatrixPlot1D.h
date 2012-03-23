@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -57,7 +57,7 @@
  *
  * @todo Write more detailed description of the class here.
  */
-class cedar::aux::gui::MatrixPlot1D : public DataPlotInterface
+class cedar::aux::gui::MatrixPlot1D : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -76,7 +76,7 @@ public:
   MatrixPlot1D(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  MatrixPlot1D(cedar::aux::DataPtr matData, QWidget *pParent = NULL);
+  MatrixPlot1D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~MatrixPlot1D();
@@ -86,7 +86,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display data
-  void display(cedar::aux::DataPtr matData);
+  void plot(cedar::aux::DataPtr matData, const std::string& title);
   //!@brief handle timer events
   void timerEvent(QTimerEvent *pEvent);
 

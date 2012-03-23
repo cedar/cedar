@@ -53,7 +53,7 @@
  *
  * This class decides, which plot fits best the given data and instantiate a plot of the right type.
  */
-class cedar::aux::gui::DataPlotter : public QDockWidget
+class cedar::aux::gui::DataPlotter : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -69,7 +69,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataPlotter(const std::string& title, QWidget *pParent = NULL);
+  DataPlotter(QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~DataPlotter();
@@ -79,7 +79,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief plot data
-  void plot(cedar::aux::DataPtr data);
+  void plot(cedar::aux::DataPtr data, const std::string& title);
 
   //!@brief access the widget factory (not implemented)
   static WidgetFactory& getWidgetFactory();
@@ -108,6 +108,10 @@ protected:
 private:
   //!@brief the displayed data
   cedar::aux::DataPtr mData;
+
+  //!@brief The title of the data being displayed.
+  std::string mTitle;
+
   //!@brief factory from data to fitting plot - not used
   static WidgetFactory mTypePlotters;
 }; // class cedar::aux::gui::DataPlotter

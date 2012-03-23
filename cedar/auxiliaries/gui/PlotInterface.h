@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotInterface.h
+    File:        PlotInterface.h
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
@@ -34,8 +34,8 @@
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
-#define CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
+#ifndef CEDAR_AUX_GUI_PLOT_INTERFACE_H
+#define CEDAR_AUX_GUI_PLOT_INTERFACE_H
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
@@ -46,7 +46,7 @@
 
 /*!@brief A unified interface for widgets that plot instances of cedar::proc::Data.
  */
-class cedar::aux::gui::DataPlotInterface : public QWidget
+class cedar::aux::gui::PlotInterface : public QWidget
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -57,10 +57,10 @@ class cedar::aux::gui::DataPlotInterface : public QWidget
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief The standard constructor.
-  DataPlotInterface(QWidget *pParent = NULL);
+  PlotInterface(QWidget *pParent = NULL);
 
   //!@brief Destructor
-  virtual ~DataPlotInterface();
+  virtual ~PlotInterface();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -72,12 +72,14 @@ public:
    *
    * @param data The data to display.
    */
-  virtual void display(cedar::aux::DataPtr data) = 0;
+  virtual void plot(cedar::aux::DataPtr data, const std::string& title) = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
+  // none yet
+
 signals:
   //! Signal that is emitted when the plotter detects a change in data that it cannot handle.
   void dataChanged();
@@ -95,6 +97,7 @@ protected:
   // none yet
 private:
   // none yet
-}; // class cedar::aux::gui::DataPlotInterface
 
-#endif // CEDAR_AUX_GUI_DATA_PLOT_INTERFACE_H
+}; // class cedar::aux::gui::PlotInterface
+
+#endif // CEDAR_AUX_GUI_PLOT_INTERFACE_H

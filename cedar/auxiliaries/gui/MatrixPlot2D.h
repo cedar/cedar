@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 #include <QWidget>
@@ -58,7 +58,7 @@
  *
  * @todo Write more detailed description of the class here.
  */
-class cedar::aux::gui::MatrixPlot2D : public DataPlotInterface
+class cedar::aux::gui::MatrixPlot2D : public PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -101,7 +101,7 @@ public:
   MatrixPlot2D(QWidget *pParent = NULL);
 
   //!@brief Constructor expecting a DataPtr.
-  MatrixPlot2D(cedar::aux::DataPtr matData, QWidget *pParent = NULL);
+  MatrixPlot2D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent = NULL);
 
   //!@brief Destructor
   ~MatrixPlot2D();
@@ -111,7 +111,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief display data
-  void display(cedar::aux::DataPtr matData);
+  void plot(cedar::aux::DataPtr matData, const std::string& title);
   //!@brief show or hide the plot grid
   void showGrid(bool show);
   //!@brief handle timer events
