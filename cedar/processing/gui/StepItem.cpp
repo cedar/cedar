@@ -363,6 +363,7 @@ void cedar::proc::gui::StepItem::fillPlots
           }
           else
           {
+            std::set<std::string> plots_already_added;
             for(std::set<ConstPlotNodePtr>::iterator iter = bases.begin(); iter != bases.end(); ++iter)
             {
               ConstPlotNodePtr node = *iter;
@@ -370,9 +371,14 @@ void cedar::proc::gui::StepItem::fillPlots
               for (size_t i = 0; i < declarations.size(); ++i)
               {
                 cedar::aux::gui::PlotDeclarationPtr declaration = declarations.at(i);
-                QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
-                p_action->setData(QString::fromStdString(slot_iter->first));
-                declMap[p_action] = std::make_pair(declaration, e);
+                std::string plot_class = declaration->getPlotClass();
+                if (plots_already_added.find(plot_class) == plots_already_added.end())
+                {
+                  plots_already_added.insert(plot_class);
+                  QAction *p_action = p_menu->addAction(QString::fromStdString(plot_class));
+                  p_action->setData(QString::fromStdString(slot_iter->first));
+                  declMap[p_action] = std::make_pair(declaration, e);
+                }
               }
             }
           }
