@@ -113,6 +113,11 @@ _mpVelocityLimits(new cedar::aux::math::LimitsParameter<double>(this, "velocity 
 // methods
 //------------------------------------------------------------------------------
 
+void cedar::dev::robot::KinematicChain::timerEvent(QTimerEvent*)
+{
+  updateTransformations();
+}
+
 void cedar::dev::robot::KinematicChain::updateTransformations()
 {
   calculateTransformations();

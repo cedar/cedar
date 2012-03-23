@@ -56,11 +56,10 @@
 
 cedar::dev::robot::gl::Sdh::Sdh
 (
-  cedar::dev::robot::KinematicChainPtr pKinematicChain,
-  cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel
+  cedar::dev::robot::KinematicChainPtr pKinematicChain
 )
 :
-cedar::aux::gl::ObjectVisualization(pKinematicChainModel->getRootCoordinateFrame()),
+cedar::aux::gl::ObjectVisualization(pKinematicChain->getRootCoordinateFrame()),
 mpKinematicChain(pKinematicChain)
 {
   loadData();

@@ -39,7 +39,7 @@
 // CEDAR INCLUDES
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/auxiliaries/gl/ObjectVisualization.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
+#include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -58,7 +58,7 @@ class cedar::dev::robot::gl::KinematicChain : public cedar::aux::gl::ObjectVisua
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(cedar::dev::robot::KinematicChainModelPtr pKinematicChainModel);
+  KinematicChain(cedar::dev::robot::KinematicChainPtr pKinematicChain);
   //!@brief destructor
   ~KinematicChain();
   
@@ -100,7 +100,7 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 protected:
   //! model of the kinematics, used for calculating transformations to the joint and end-effector frames
-  cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
+  cedar::dev::robot::KinematicChainPtr mpKinematicChain;
 
   //! decides whether the end-effector velocity will be drawn
   bool mIsDrawingEndEffectorVelocity;

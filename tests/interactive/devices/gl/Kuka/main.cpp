@@ -35,7 +35,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
 #include "cedar/devices/robot/gui/KinematicChainWidget.h"
 #include "cedar/auxiliaries/System.h"
@@ -80,17 +79,11 @@ int main(int argc, char **argv)
   // create simulated kinematic chains
   cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain(configuration_file));
 
-  // create models calculation of the transformation
-  cedar::dev::robot::KinematicChainModelPtr p_kuka_arm_model
-  (
-    new cedar::dev::robot::KinematicChainModel(p_kuka_arm)
-  );
-
   // create gl visualization objects
   cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
   cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
   (
-    new cedar::dev::robot::gl::KukaArm(p_kuka_arm_model)
+    new cedar::dev::robot::gl::KukaArm(p_kuka_arm)
   );
   p_arm_visualization = p_kuka_arm_visualization;
 
@@ -110,7 +103,6 @@ int main(int argc, char **argv)
   // show and start everything
   p_scene_widget->show();
   widget_arm.show();
-  p_kuka_arm_model->startTimer(50.0);
   viewer.startTimer(50);
   a.exec();
 
