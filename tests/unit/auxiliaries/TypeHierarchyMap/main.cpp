@@ -96,7 +96,7 @@ void printNodePath(AHierarchy::ConstNodePtr node, const std::string& indentation
   std::cout << indentation << node->getData() << " <" << node.get() << ">" << std::endl;
   for
   (
-    AHierarchy::Node::const_parent_iterator iter = node->parentsBegin();
+    AHierarchy::Node::const_parents_iterator iter = node->parentsBegin();
     iter != node->parentsEnd();
     ++iter
   )
@@ -130,7 +130,7 @@ void printNodeWithChildren
 
   for
   (
-    AHierarchy::Node::const_child_iterator iter = node->childrenBegin();
+    AHierarchy::Node::const_children_iterator iter = node->childrenBegin();
     iter != node->childrenEnd();
     ++iter
   )

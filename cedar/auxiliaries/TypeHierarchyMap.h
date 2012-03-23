@@ -77,8 +77,8 @@ public:
       typedef std::set<NodePtr> Children;
       typedef std::set<NodeWeakPtr> Parents;
     public:
-      typedef typename Children::const_iterator const_child_iterator;
-      typedef typename Parents::const_iterator const_parent_iterator;
+      typedef typename Children::const_iterator const_children_iterator;
+      typedef typename Parents::const_iterator const_parents_iterator;
       typedef typename Children::iterator children_iterator;
       typedef typename Parents::iterator parents_iterator;
 
@@ -90,22 +90,22 @@ public:
       {
       }
 
-      const_child_iterator childrenBegin() const
+      const_children_iterator childrenBegin() const
       {
         return this->mChildren.begin();
       }
 
-      const_child_iterator childrenEnd() const
+      const_children_iterator childrenEnd() const
       {
         return this->mChildren.end();
       }
 
-      const_parent_iterator parentsBegin() const
+      const_parents_iterator parentsBegin() const
       {
         return this->mParents.begin();
       }
 
-      const_parent_iterator parentsEnd() const
+      const_parents_iterator parentsEnd() const
       {
         return this->mParents.end();
       }
@@ -132,7 +132,7 @@ public:
         bool is_child = false;
         for
         (
-          const_child_iterator child_iter = this->mChildren.begin();
+          const_children_iterator child_iter = this->mChildren.begin();
           child_iter != this->mChildren.end();
           ++child_iter
         )
@@ -169,6 +169,46 @@ public:
         return correspondingNode;
       }
 
+      /*!@brief Returns all known base classes of instance.
+       */
+      void findBases(ConstRootTypePtr instance, std::set<ConstNodePtr>& bases) const
+      {
+        std::set<ConstNodePtr> nodes;
+        this->findDeepest(instance, nodes);
+        while (!nodes.empty())
+        {
+          // take out first leaf
+          ConstNodePtr node = *(nodes.begin());
+          nodes.erase(nodes.begin());
+
+          // add it to the bases
+          bases.insert(node);
+
+          // add all its parents to the leafs (in order to explore them as well
+          nodes.insert(node->mParents.begin(), node->mParents.end());
+        }
+      }
+
+      void findDeepest(ConstRootTypePtr instance, std::set<ConstNodePtr>& nodes) const
+      {
+        if (this->mChildren.empty())
+        {
+          if (this->matchesDerived(instance))
+          {
+            nodes.insert(this->shared_from_this());
+          }
+        }
+        else
+        {
+          // check all children
+          for (const_children_iterator iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
+          {
+            ConstNodePtr child = *iter;
+            child->findDeepest(instance, nodes);
+          }
+        }
+      }
+
       ConstNodePtr find(ConstRootTypePtr instance) const
       {
         if (this->matchesExact(instance))
@@ -178,7 +218,7 @@ public:
         else
         {
           // check all children
-          for (const_child_iterator iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
+          for (const_children_iterator iter = this->mChildren.begin(); iter != this->mChildren.end(); ++iter)
           {
             ConstNodePtr child = *iter;
             // isDerived can avoid checking all the children; this should save some time.
@@ -214,7 +254,7 @@ public:
         else
         {
           // ... or it is a parent of the parents of this node, or their parents, and so on
-          for (const_parent_iterator iter = this->mParents.begin(); iter != this->mParents.end(); ++iter)
+          for (const_parents_iterator iter = this->mParents.begin(); iter != this->mParents.end(); ++iter)
           {
             CEDAR_ASSERT(iter->lock());
             if (iter->lock()->isAncestor(node))
@@ -326,7 +366,7 @@ public:
           to_explore.pop();
 
           // insert all unexplored children
-          for (const_child_iterator iter = current->mChildren.begin(); iter != current->mChildren.end(); ++iter)
+          for (const_children_iterator iter = current->mChildren.begin(); iter != current->mChildren.end(); ++iter)
           {
             if (nodes.find(*iter) == nodes.end())
             {
@@ -335,7 +375,7 @@ public:
             }
           }
           // insert all unexplored parents
-          for (const_parent_iterator iter = current->mParents.begin(); iter != current->mParents.end(); ++iter)
+          for (const_parents_iterator iter = current->mParents.begin(); iter != current->mParents.end(); ++iter)
           {
             CEDAR_ASSERT(iter->lock());
             if (nodes.find(iter->lock()) == nodes.end())
@@ -357,7 +397,7 @@ public:
         std::set<NodePtr> children_to_remove;
         for
         (
-          const_child_iterator child_iter = this->mChildren.begin();
+          const_children_iterator child_iter = this->mChildren.begin();
           child_iter != this->mChildren.end();
           ++child_iter
         )
@@ -501,6 +541,14 @@ public:
     }
 
     return node;
+  }
+
+  /*!@brief Returns the leaf nodes that represent classes that the class of instance inherits.
+   */
+  void findDeepest(ConstRootTypePtr instance, std::set<ConstNodePtr>& nodes) const
+  {
+    nodes.clear();
+    this->mRootNode->findDeepest(instance, nodes);
   }
 
   size_t size() const

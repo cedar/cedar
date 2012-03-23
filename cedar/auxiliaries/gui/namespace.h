@@ -58,17 +58,6 @@ namespace cedar
       CEDAR_DECLARE_AUX_CLASS(SceneWidget);
       CEDAR_DECLARE_AUX_CLASS(Viewer);
 
-      /* Plot widgets */
-      CEDAR_DECLARE_AUX_CLASS(PlotInterface);
-      CEDAR_DECLARE_AUX_CLASS(DataPlotter);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot1D);
-      CEDAR_DECLARE_AUX_CLASS(MatrixPlot2D);
-      CEDAR_DECLARE_AUX_CLASS(ImagePlot);
-
-      CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
-      CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
-
       class CEDAR_AUX_LIB_EXPORT PropertyPane;
       CEDAR_DECLARE_AUX_CLASS(Parameter);
 
@@ -95,6 +84,29 @@ namespace cedar
       typedef cedar::aux::TypeBasedFactory<cedar::aux::ParameterPtr, cedar::aux::gui::ParameterPtr> ParameterFactory;
 
       typedef cedar::aux::Singleton<ParameterFactory> ParameterFactorySingleton;
+
+      /* Plotting related classes */
+      //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(PlotDeclaration);
+      template <class DataType, class PlotType> class PlotDeclarationTemplate;
+
+      CEDAR_DECLARE_AUX_CLASS(PlotInterface);
+      CEDAR_DECLARE_AUX_CLASS(DataPlotter);
+      CEDAR_DECLARE_AUX_CLASS(MatrixPlot);
+      CEDAR_DECLARE_AUX_CLASS(MatrixPlot1D);
+      CEDAR_DECLARE_AUX_CLASS(MatrixPlot2D);
+      CEDAR_DECLARE_AUX_CLASS(ImagePlot);
+
+      CEDAR_DECLARE_AUX_CLASS(HistoryPlot);
+      CEDAR_DECLARE_AUX_CLASS(HistoryPlot0D);
+      //!@endcond
+
+      // The manager for plot widgets
+      typedef
+          cedar::aux::TypeHierarchyMap<cedar::aux::Data, cedar::aux::gui::PlotDeclarationPtr>
+          PlotDeclarationManager;
+
+      typedef cedar::aux::Singleton<PlotDeclarationManager> PlotDeclarationManagerSingleton;
     }
   }
 }

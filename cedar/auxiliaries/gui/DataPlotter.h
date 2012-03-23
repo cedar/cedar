@@ -43,7 +43,7 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/namespace.h"
-#include "cedar/auxiliaries/TypeBasedFactory.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 #include "cedar/auxiliaries/Data.h"
 
 // SYSTEM INCLUDES
@@ -53,7 +53,7 @@
  *
  * This class decides, which plot fits best the given data and instantiate a plot of the right type.
  */
-class cedar::aux::gui::DataPlotter : public QWidget
+class cedar::aux::gui::DataPlotter : public cedar::aux::gui::PlotInterface
 {
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -80,9 +80,6 @@ public:
 public:
   //!@brief plot data
   void plot(cedar::aux::DataPtr data, const std::string& title);
-
-  //!@brief access the widget factory (not implemented)
-  static WidgetFactory& getWidgetFactory();
 
 public slots:
   //!@brief slot that induces a redraw if data changes
@@ -112,7 +109,5 @@ private:
   //!@brief The title of the data being displayed.
   std::string mTitle;
 
-  //!@brief factory from data to fitting plot - not used
-  static WidgetFactory mTypePlotters;
 }; // class cedar::aux::gui::DataPlotter
 #endif // CEDAR_PROC_GUI_DATA_PLOTTER_H

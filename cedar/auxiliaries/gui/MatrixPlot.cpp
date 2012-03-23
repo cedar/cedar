@@ -45,6 +45,7 @@
 #include "cedar/auxiliaries/gui/MatrixPlot1D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
+#include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -57,6 +58,25 @@
 #include <QPushButton>
 #include <iostream>
 
+//----------------------------------------------------------------------------------------------------------------------
+// type registration
+//----------------------------------------------------------------------------------------------------------------------
+namespace
+{
+  bool registerPlot()
+  {
+    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::MatrixPlot> DeclarationType;
+    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
+    decl->declare();
+    return true;
+  }
+
+  bool registered = registerPlot();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
 Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 //----------------------------------------------------------------------------------------------------------------------
