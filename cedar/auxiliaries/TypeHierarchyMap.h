@@ -394,7 +394,6 @@ public:
 
         if (this->mParents.find(parent) == this->mParents.end())
         {
-          std::cout << "  ->added." << std::endl;
           this->mParents.insert(parent);
           parent->addChild(this->shared_from_this());
         }
@@ -409,7 +408,6 @@ public:
 
         if (this->mChildren.find(child) == this->mChildren.end())
         {
-          std::cout << "  ->added." << std::endl;
           this->mChildren.insert(child);
           child->addParent(this->shared_from_this());
         }
