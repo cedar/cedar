@@ -40,7 +40,6 @@ cedar_add_library(cedaraux
   gl/RigidBodyVisualization.h
   gui/BaseWidget.h
   gui/BoolParameter.h
-  gui/DataPlotInterface.h
   gui/DataPlotter.h
   gui/DirectoryParameter.h
   gui/DoubleParameter.h
@@ -51,6 +50,7 @@ cedar_add_library(cedaraux
   gui/ObjectParameter.h
   gui/ObjectListParameter.h
   gui/Parameter.h
+  gui/PlotInterface.h
   gui/RigidBodyWidget.h
   gui/RigidBodyVisualizationWidget.h
   gui/Viewer.h

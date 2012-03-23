@@ -22,7 +22,7 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        DataPlotInterface.cpp
+    File:        PlotInterface.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.rub.de
@@ -35,7 +35,7 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/DataPlotInterface.h"
+#include "cedar/auxiliaries/gui/PlotInterface.h"
 
 // SYSTEM INCLUDES
 
@@ -43,13 +43,13 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gui::DataPlotInterface::DataPlotInterface(QWidget *pParent)
+cedar::aux::gui::PlotInterface::PlotInterface(QWidget *pParent)
 :
 QWidget(pParent)
 {
 }
 
-cedar::aux::gui::DataPlotInterface::~DataPlotInterface()
+cedar::aux::gui::PlotInterface::~PlotInterface()
 {
 }
 

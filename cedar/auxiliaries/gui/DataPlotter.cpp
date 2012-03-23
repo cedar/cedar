@@ -55,27 +55,13 @@ cedar::aux::gui::DataPlotter::WidgetFactory cedar::aux::gui::DataPlotter::mTypeP
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-cedar::aux::gui::DataPlotter::DataPlotter(const std::string& title, QWidget *pParent)
+cedar::aux::gui::DataPlotter::DataPlotter(QWidget *pParent)
 :
-QDockWidget(title.c_str(), pParent)
+QWidget(pParent)
 {
-  this->setFloating(true);
+  QVBoxLayout *p_layout = new QVBoxLayout();
+  this->setLayout(p_layout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
-
-  QRect geometry = this->geometry();
-  QRect parent_geometry = pParent->frameGeometry();
-  int width = 200;
-  int height = 200;
-  int offset_x = (pParent->width() - width) / 2;
-  int offset_y = (pParent->height() - height) / 2;
-  geometry.setLeft(parent_geometry.left() + geometry.left() + offset_x);
-  geometry.setTop(parent_geometry.left() + geometry.top() + offset_y);
-  geometry.setWidth(width);
-  geometry.setHeight(height);
-
-
-
-  this->setGeometry(geometry);
 }
 
 cedar::aux::gui::DataPlotter::~DataPlotter()
@@ -86,15 +72,17 @@ cedar::aux::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
-void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data)
+void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::string& title)
 {
-  mData = data;
+  this->mData = data;
+  this->mTitle = title;
+
   //!@todo doesn't work this way -- related to the to-do entry below.
 //  PlotWidgetInterface *p_widget = getWidgetFactory().get(data)->allocateRaw();
 //  p_widget->plot(data);
 
   //!@todo find a better solution for this!
-  cedar::aux::gui::DataPlotInterface *p_plot = NULL;
+  cedar::aux::gui::PlotInterface *p_plot = NULL;
   if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
   {
     p_plot = new cedar::aux::gui::ImagePlot(this);
@@ -112,8 +100,16 @@ void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data)
     CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::aux::gui::DataPlotter::plot.");
   }
   connect(p_plot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
-  p_plot->display(data);
-  this->setWidget(p_plot);
+  p_plot->plot(data, title);
+
+  // safely remove all children
+  QLayoutItem *child;
+  while ((child = this->layout()->takeAt(0)) != 0)
+  {
+    delete child;
+  }
+
+  this->layout()->addWidget(p_plot);
 }
 
 cedar::aux::gui::DataPlotter::WidgetFactory& cedar::aux::gui::DataPlotter::getWidgetFactory()
@@ -127,5 +123,5 @@ cedar::aux::gui::DataPlotter::WidgetFactory& cedar::aux::gui::DataPlotter::getWi
 
 void cedar::aux::gui::DataPlotter::dataChanged()
 {
-  this->plot(mData);
+  this->plot(mData, this->mTitle);
 }

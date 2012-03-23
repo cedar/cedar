@@ -61,6 +61,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QGraphicsDropShadowEffect>
+#include <QLayout>
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -388,15 +389,26 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     std::string data_name = a->data().toString().toStdString();
     const cedar::aux::Enum& e = action_type_map[a];
     cedar::aux::DataPtr p_data = this->mStep->getData(e, data_name);
+    cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
 
     //!@todo It would be better if setting the title would be part of the actual widget
-    std::string title = this->mStep->getSlot(e, data_name)->getText();
+    std::string title = slot->getText();
     title += " (" + this->mStep->getName();
-    title += "." + data_name + ")";
+    title += "." + slot->getName() + ")";
 
-    cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter(title, mpMainWindow);
-    p_plotter->plot(p_data);
-    p_plotter->show();
+    QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), mpMainWindow);
+    p_dock->setFloating(true);
+    p_dock->layout()->setContentsMargins(0, 0, 0, 0);
+
+    QRect geometry = p_dock->geometry();
+    geometry.setTopLeft(event->screenPos());
+    geometry.setSize(QSize(200, 200));
+    p_dock->setGeometry(geometry);
+
+    cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter();
+    p_dock->setWidget(p_plotter);
+    p_plotter->plot(p_data, slot->getText());
+    p_dock->show();
   }
   // execute an action
   else if (a->parentWidget() == p_actions_menu)

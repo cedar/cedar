@@ -65,7 +65,7 @@ Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -85,7 +85,7 @@ cedar::aux::gui::MatrixPlot::~MatrixPlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::string& title)
 {
   this->mData= boost::shared_dynamic_cast<cedar::aux::MatData>(data);
   if (!this->mData)
@@ -113,17 +113,17 @@ void cedar::aux::gui::MatrixPlot::display(cedar::aux::DataPtr data)
   switch (dims)
   {
     case 0:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::HistoryPlot0D(this->mData, title);
       this->layout()->addWidget(this->mpCurrentPlotWidget);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
     case 1:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot1D(this->mData, title);
       this->layout()->addWidget(this->mpCurrentPlotWidget);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;
     case 2:
-      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData);
+      this->mpCurrentPlotWidget = new cedar::aux::gui::MatrixPlot2D(this->mData, title);
       this->layout()->addWidget(this->mpCurrentPlotWidget);
       connect(this->mpCurrentPlotWidget, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
       break;

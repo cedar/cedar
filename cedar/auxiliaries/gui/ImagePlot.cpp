@@ -53,7 +53,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::ImagePlot::ImagePlot(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mTimerId(0)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -154,7 +154,7 @@ void cedar::aux::gui::ImagePlot::imageFromMat(const cv::Mat& mat)
   ).rgbSwapped();
 }
 
-void cedar::aux::gui::ImagePlot::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::ImagePlot::plot(cedar::aux::DataPtr data, const std::string& /* title */)
 {
   if (mTimerId != 0)
     this->killTimer(mTimerId);

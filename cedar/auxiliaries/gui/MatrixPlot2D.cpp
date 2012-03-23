@@ -60,7 +60,7 @@
 
 cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent)
+cedar::aux::gui::PlotInterface(pParent)
 {
   this->init();
 }
@@ -85,14 +85,14 @@ mZoom(zoom)
   mShift[2]    = shiftZ;
 }
 
-cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cedar::aux::DataPtr matData, QWidget *pParent)
+cedar::aux::gui::MatrixPlot2D::MatrixPlot2D(cedar::aux::DataPtr matData, const std::string& title, QWidget *pParent)
 :
-cedar::aux::gui::DataPlotInterface(pParent),
+cedar::aux::gui::PlotInterface(pParent),
 mShowGridLines(false),
 mppArrayData(NULL)
 {
   this->init();
-  this->display(matData);
+  this->plot(matData, title);
 }
 
 cedar::aux::gui::MatrixPlot2D::~MatrixPlot2D()
@@ -163,14 +163,14 @@ void cedar::aux::gui::MatrixPlot2D::Perspective::applyTo(Qwt3D::Plot3D* pPlot)
   pPlot->setZoom(mZoom);
 }
 
-void cedar::aux::gui::MatrixPlot2D::display(cedar::aux::DataPtr data)
+void cedar::aux::gui::MatrixPlot2D::plot(cedar::aux::DataPtr data, const std::string& /* title */)
 {
   this->mMatData = boost::shared_dynamic_cast<cedar::aux::MatData>(data);
 
   if (!this->mMatData)
   {
     CEDAR_THROW(cedar::aux::gui::InvalidPlotData,
-                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot2D::display.");
+                "Could not cast to cedar::aux::MatData in cedar::aux::gui::MatrixPlot2D::plot.");
   }
 
   this->startTimer(60); //!@todo make the refresh time configurable.
