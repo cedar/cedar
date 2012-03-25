@@ -82,10 +82,7 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief get a factory for this declared sigmoid type
-  cedar::aux::math::SigmoidFactoryPtr getObjectFactory()
-  {
-    return this->mpClassFactory;
-  }
+  cedar::aux::math::SigmoidFactoryPtr getObjectFactory();
 
   //!@brief get the id of the declared sigmoid class
   const std::string& getClassId() const
