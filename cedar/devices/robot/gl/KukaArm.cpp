@@ -59,11 +59,11 @@ const float cedar::dev::robot::gl::KukaArm::mSegment_Shininess[1] = {1.0f};
 const float cedar::dev::robot::gl::KukaArm::mChrome_Ambient[3] = {0.25f, 0.25f, 0.25f};
 const float cedar::dev::robot::gl::KukaArm::mChrome_Diffuse[3] = {0.4f, 0.4f, 0.4f};
 const float cedar::dev::robot::gl::KukaArm::mChrome_Specular[3] = {0.774597f, 0.774597f, 0.774597f};
-const float cedar::dev::robot::gl::KukaArm::mChrome_Shininess[1] = {0.6};
+const float cedar::dev::robot::gl::KukaArm::mChrome_Shininess[1] = {0.6f};
 const float cedar::dev::robot::gl::KukaArm::mBlack_Ambient[3] = {0.0f, 0.0f, 0.0f};
 const float cedar::dev::robot::gl::KukaArm::mBlack_Diffuse[3] = {0.01f, 0.01f, 0.01f};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Specular[3] = {0.2f, 0.2, 0.2};
-const float cedar::dev::robot::gl::KukaArm::mBlack_Shininess[1] = {0.05};
+const float cedar::dev::robot::gl::KukaArm::mBlack_Specular[3] = {0.2f, 0.2f, 0.2f};
+const float cedar::dev::robot::gl::KukaArm::mBlack_Shininess[1] = {0.05f};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,6 +88,8 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 
 void cedar::dev::robot::gl::KukaArm::initializeGl()
 {
+  //!@todo The following doesn't compile on windows! Needs glext.h
+#ifndef WIN32
   std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
   // base segment
   glGenBuffers(1, &mBaseSegmentVertexVboId);
@@ -170,6 +172,7 @@ void cedar::dev::robot::gl::KukaArm::initializeGl()
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mWristRingIndexVboId);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mWristRingFacesNumber*3 * sizeof(GLushort), mWristRingIndex, GL_STATIC_DRAW);
 
+#endif // WIN32
 }
 
 void cedar::dev::robot::gl::KukaArm::drawBase()
@@ -396,6 +399,8 @@ void cedar::dev::robot::gl::KukaArm::drawEndEffector()
 
 void cedar::dev::robot::gl::KukaArm::drawElement(const GLuint vertexVboId, const GLuint indexVboId, const unsigned int numberOfFaces)
 {
+  //!@todo The following doesn't compile on windows! Needs glext.h
+#ifndef WIN32
   // bind the buffers
   glBindBuffer(GL_ARRAY_BUFFER, vertexVboId);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVboId);
@@ -421,6 +426,7 @@ void cedar::dev::robot::gl::KukaArm::drawElement(const GLuint vertexVboId, const
   glDisableClientState(GL_COLOR_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_VERTEX_ARRAY);
+#endif
 }
 
 void cedar::dev::robot::gl::KukaArm::setMaterial(int material)
@@ -468,7 +474,7 @@ void cedar::dev::robot::gl::KukaArm::loadVertexData
   {
     QTextStream text_stream(&data);
     QString line;
-    float scale = 0.001; // mm -> m
+    float scale = 0.001f; // mm -> m
     for (unsigned int i=0; i<numberOfVertices; i++)
     {
       line = text_stream.readLine();

@@ -21,12 +21,12 @@
 
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
-
-    File:        AbsSigmoid.cpp
+                 
+    File:        SigmoidDeclaration.cpp
 
     Maintainer:  Oliver Lomp
     Email:       oliver.lomp@ini.ruhr-uni-bochum.de
-    Date:        2012 03 09
+    Date:        2012 03 25
 
     Description:
 
@@ -35,31 +35,18 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/math/AbsSigmoid.h"
-#include "cedar/auxiliaries/FactoryManager.h"
-#include "cedar/auxiliaries/Singleton.h"
+#include "cedar/auxiliaries/math/SigmoidDeclaration.h"
 
 // SYSTEM INCLUDES
 
 //----------------------------------------------------------------------------------------------------------------------
-// register class with the sigmoid factory manager
-//----------------------------------------------------------------------------------------------------------------------
-
-namespace
-{
-  bool registered
-    = cedar::aux::math::SigmoidManagerSingleton::getInstance()->registerType<cedar::aux::math::AbsSigmoidPtr>();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
+cedar::aux::math::SigmoidFactoryPtr cedar::aux::math::SigmoidDeclaration::getObjectFactory()
+{
+  return this->mpClassFactory;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
-double cedar::aux::math::AbsSigmoid::compute(double value) const
-{
-  return cedar::aux::math::sigmoidAbs(value, mBeta->getValue(), mThreshold->getValue());
-}
