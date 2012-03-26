@@ -156,6 +156,8 @@ public:
   void clear()
   {
     this->mObjectList.clear();
+
+    this->emitChangedSignal();
   }
 
   /*!
@@ -178,6 +180,7 @@ public:
     this->mObjectList.push_back(object);
 
     this->mObjectAdded(this->mObjectList.size() - 1);
+    this->emitChangedSignal();
   }
 
   void removeObject(size_t index)
@@ -193,6 +196,8 @@ public:
 
     // emit the signal that the object was removed
     this->mObjectRemoved(index);
+
+    this->emitChangedSignal();
   }
 
   void listTypes(std::vector<std::string>& types) const
