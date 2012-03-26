@@ -80,6 +80,8 @@ void cedar::proc::DeclarationRegistry::declareClass(cedar::proc::ElementDeclarat
     CEDAR_DEBUG_ASSERT(category_iter != this->mDeclarationsByCategory.end());
   }
   category_iter->second.push_back(pDeclaration);
+
+  std::cout << "Declaring class in " << this << ": " << pDeclaration->getClassId() << std::endl;
 }
 
 const cedar::proc::DeclarationRegistry::CategoryList& cedar::proc::DeclarationRegistry::getCategories() const
