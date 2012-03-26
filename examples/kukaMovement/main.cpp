@@ -41,7 +41,6 @@
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
@@ -70,11 +69,9 @@ public:
   //!@brief constructor
   WorkerThread(
                 cedar::dev::robot::KinematicChainPtr arm,
-                cedar::dev::robot::KinematicChainModelPtr arm_model,
                 cedar::aux::LocalCoordinateFramePtr target
               )
   :
-  mArmModel(arm_model),
   mTarget(target)
   {
     mpArm = arm;
@@ -88,14 +85,14 @@ private:
   // step function calculating and passing the movement command for each time step
   void step(double)
   {
-    // update the model
-    mArmModel->update();
+    // update state variables
+    mpArm->updateTransformations();
 
     // if movable, calculate and pass movement command
     if (mpArm->isMovable())
     {
       // calculate direction of movement
-      cv::Mat vectorToTarget_hom = (mTarget->getTranslation() - mArmModel->calculateEndEffectorPosition());
+      cv::Mat vectorToTarget_hom = (mTarget->getTranslation() - mpArm->calculateEndEffectorPosition());
       cv::Mat vectorToTarget(vectorToTarget_hom, cv::Rect(0, 0, 1, 3));
       if (norm(vectorToTarget) == 0)
       {
@@ -117,7 +114,7 @@ private:
         cv::Mat desiredVelocity = direction * speed;
 
         // transform to joint velocity vector using simple Jacobian pseudo-inverse approach
-        cv::Mat Jacobian = mArmModel->calculateEndEffectorJacobian();
+        cv::Mat Jacobian = mpArm->calculateEndEffectorJacobian();
         cv::Mat JacobianPseudoInverse = cv::Mat::zeros(mpArm->getNumberOfJoints(), 3, CV_64FC1);
         cv::invert(Jacobian, JacobianPseudoInverse, cv::DECOMP_SVD);
         cv::Mat joint_velocities = JacobianPseudoInverse * desiredVelocity;
@@ -131,8 +128,6 @@ private:
 private:
   //! hardware interface
   cedar::dev::robot::KinematicChainPtr mpArm;
-  //! model of the arm
-  cedar::dev::robot::KinematicChainModelPtr mArmModel;
   //! target
   cedar::aux::LocalCoordinateFramePtr mTarget;
   //! movement speed towards target
@@ -200,9 +195,6 @@ int main(int argc, char **argv)
     p_arm = p_sim;
   }
 
-  // create a model of the arm
-  cedar::dev::robot::KinematicChainModelPtr p_arm_model(new cedar::dev::robot::KinematicChainModel(p_arm));
-
   // create the scene for the visualization
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
   p_scene->setSceneLimit(2);
@@ -218,14 +210,14 @@ int main(int argc, char **argv)
   cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
   cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
   (
-    new cedar::dev::robot::gl::KukaArm(p_arm_model)
+    new cedar::dev::robot::gl::KukaArm(p_arm)
   );
   p_arm_visualization = p_kuka_arm_visualization;
   p_scene->addObjectVisualization(p_kuka_arm_visualization);
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
-  target->setTranslation(p_arm_model->calculateEndEffectorPosition());
+  target->setTranslation(p_arm->calculateEndEffectorPosition());
   cedar::aux::gl::ObjectVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);
   p_scene->addObjectVisualization(p_sphere);
@@ -240,7 +232,7 @@ int main(int argc, char **argv)
   p_kinematic_chain_widget->show();
 
   // create the worker thread
-  WorkerThread worker(p_arm, p_arm_model, target);
+  WorkerThread worker(p_arm, target);
   worker.setStepSize(10);
 
   // start everything

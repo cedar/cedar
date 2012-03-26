@@ -45,7 +45,6 @@
 // PROJECT INCLUDES
 
 #include "cedar/devices/robot/KinematicChain.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
 
 // SYSTEM INCLUDES
 
@@ -77,7 +76,11 @@ public:
    *@param parent QWidget parent
    *@param f QWidget window flags
    */
-  ForwardInverseWidget(const cedar::dev::robot::KinematicChainPtr kinematicChain, cedar::dev::robot::KinematicChainModelPtr kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  ForwardInverseWidget
+  (
+    const cedar::dev::robot::KinematicChainPtr kinematicChain,
+    QWidget *parent = 0, Qt::WindowFlags f = 0
+  );
 
   /*!@brief Constructor
    *
@@ -86,7 +89,11 @@ public:
    *@param parent QWidget parent
    *@param f QWidget window flags
    */
-  ForwardInverseWidget(const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains, cedar::dev::robot::KinematicChainModelPtr kinematicChainModel, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  ForwardInverseWidget
+  (
+    const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
+    QWidget *parent = 0, Qt::WindowFlags f = 0
+  );
 
   //!@brief Destructor
   ~ForwardInverseWidget();
@@ -139,7 +146,6 @@ private:
   static const int mUpdateInterval = 100;
 
   std::vector<cedar::dev::robot::KinematicChainPtr> mpKinematicChains;
-  cedar::dev::robot::KinematicChainModelPtr mpKinematicChainModel;
   ClosedFormInverseKinematics *mpClosedFormInverseKinematics;
   QGridLayout *mpGridLayout;
   QTimer *mpTimer;
