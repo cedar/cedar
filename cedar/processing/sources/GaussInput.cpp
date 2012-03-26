@@ -72,7 +72,7 @@ namespace
       )
     );
     input_decl->setIconPath(":/steps/gauss_input.svg");
-    cedar::aux::Singleton<cedar::proc::DeclarationRegistry>::getInstance()->declareClass(input_decl);
+    cedar::proc::DeclarationRegistrySingleton::getInstance()->declareClass(input_decl);
 
     return true;
   }

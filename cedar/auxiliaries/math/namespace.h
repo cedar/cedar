@@ -68,14 +68,7 @@ namespace cedar
       template <class DerivedClass> class SigmoidDeclarationT;
 
       typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
-
-      //!@brief The manager of all sigmoind instances
-      typedef cedar::aux::FactoryManager<SigmoidPtr> SigmoidManager;
-
       CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
-
-      //!@brief The singleton object of the SigmoidFactory.
-      typedef cedar::aux::Singleton<SigmoidManager> SigmoidManagerSingleton;
     }
   }
 }
