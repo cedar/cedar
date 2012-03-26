@@ -48,7 +48,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@brief Basic interface for all sigmoid functions.
  */
 class cedar::aux::math::Sigmoid : public Configurable
@@ -69,9 +68,7 @@ public:
   }
 
   //!@brief Destructor
-  virtual ~Sigmoid()
-  {
-  }
+  virtual ~Sigmoid();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

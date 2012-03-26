@@ -57,11 +57,11 @@ namespace cedar
       template <typename T> struct Limits;
 
       //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_CLASS(Sigmoid);
-      CEDAR_DECLARE_CLASS(AbsSigmoid);
-      CEDAR_DECLARE_CLASS(ExpSigmoid);
-      CEDAR_DECLARE_CLASS(HeavisideSigmoid);
-      CEDAR_DECLARE_CLASS(SigmoidDeclaration);
+      CEDAR_DECLARE_AUX_CLASS(Sigmoid);
+      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
+      CEDAR_DECLARE_AUX_CLASS(SigmoidDeclaration);
       //!@endcond
 
       //!@brief a templated declaration for sigmoid function implementation
