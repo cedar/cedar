@@ -57,7 +57,6 @@
 ForwardInverseWidget::ForwardInverseWidget
 (
   const cedar::dev::robot::KinematicChainPtr kinematicChain,
-  cedar::dev::robot::KinematicChainModelPtr kinematicChainModel,
   QWidget* parent, Qt::WindowFlags f
 )
 :
@@ -65,7 +64,6 @@ QWidget(parent, f)
 {
   // store a smart pointer to KinematicChain
   mpKinematicChains.push_back(kinematicChain);
-  mpKinematicChainModel = kinematicChainModel;
   mDecimals = 3;
   mSingleStep = 0.01;
   mpClosedFormInverseKinematics = new ClosedFormInverseKinematics();
@@ -79,7 +77,6 @@ QWidget(parent, f)
 ForwardInverseWidget::ForwardInverseWidget
 (
   const std::vector<cedar::dev::robot::KinematicChainPtr> &kinematicChains,
-  cedar::dev::robot::KinematicChainModelPtr kinematicChainModel,
   QWidget *parent,
   Qt::WindowFlags f
 )
@@ -99,7 +96,6 @@ QWidget(parent, f)
 
   // store smart pointers to KinematicChains
   mpKinematicChains = kinematicChains;
-  mpKinematicChainModel = kinematicChainModel;
   mDecimals = 3;
   mSingleStep = 0.01;
   mpClosedFormInverseKinematics = new ClosedFormInverseKinematics();
@@ -178,15 +174,14 @@ void ForwardInverseWidget::updateSpinBoxes()
 
   // update task coordinates
 
-  mpKinematicChainModel->update();
 
   for(unsigned i = 0; i < 3; ++i)
   {
     QDoubleSpinBox *p_spin_box = static_cast<QDoubleSpinBox*>(mpGridLayout->itemAtPosition(i+1, 3)->widget());
-
+    mpKinematicChains[i]->updateTransformations();
     if(!p_spin_box->hasFocus())
     {
-      p_spin_box->setValue(mpKinematicChainModel->calculateEndEffectorPosition().at<double>(i, 0));
+      p_spin_box->setValue(mpKinematicChains[i]->calculateEndEffectorPosition().at<double>(i, 0));
     }
   }
 

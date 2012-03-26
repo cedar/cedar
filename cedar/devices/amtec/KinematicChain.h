@@ -43,7 +43,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/devices/amtec/namespace.h"
-#include "cedar/devices/robot/ReferenceGeometry.h"
 #include "cedar/devices/robot/KinematicChain.h"
 
 // SYSTEM INCLUDES

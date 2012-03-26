@@ -51,30 +51,28 @@
 
 int main(int argc, char **argv)
 {
-  std::string arm_configuration_file = cedar::aux::System::locateResource("configs/cora_arm.conf");
-  std::string head_configuration_file = cedar::aux::System::locateResource("configs/cora_head.conf");
+  std::string arm_configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
+  std::string head_configuration_file_old = cedar::aux::System::locateResource("configs/cora_head.conf");
+  std::string arm_configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
+  std::string head_configuration_file = cedar::aux::System::locateResource("configs/cora_head.json");
 
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
   cedar::dev::robot::KinematicChainPtr p_cora_arm
   (
-    new cedar::dev::robot::SimulatedKinematicChain(arm_configuration_file)
+    new cedar::dev::robot::SimulatedKinematicChain(arm_configuration_file_old)
   );
+  p_cora_arm->readJson(arm_configuration_file);
   cedar::dev::robot::KinematicChainPtr p_cora_head
   (
-    new cedar::dev::robot::SimulatedKinematicChain(head_configuration_file)
+    new cedar::dev::robot::SimulatedKinematicChain(head_configuration_file_old)
   );
+  p_cora_head->readJson(head_configuration_file);
 
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization
-  (
-    new cedar::dev::robot::gl::CoraArm(p_cora_arm)
-  );
-  cedar::dev::robot::gl::KinematicChainPtr p_cora_head_visualization
-  (
-    new cedar::dev::robot::gl::CoraHead(p_cora_head)
-  );
+  cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_cora_arm));
+  cedar::dev::robot::gl::KinematicChainPtr p_cora_head_visualization(new cedar::dev::robot::gl::CoraHead(p_cora_head));
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene());
@@ -100,6 +98,8 @@ int main(int argc, char **argv)
   widget_arm.show();
   widget_head.show();
 
+  p_cora_arm->startTimer(50.0);
+  p_cora_head->startTimer(50.0);
   viewer.startTimer(50);
   a.exec();
 

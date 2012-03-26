@@ -39,7 +39,6 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/amtec/KinematicChain.h"
-#include "cedar/devices/robot/KinematicChainModel.h"
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/gl/CoraArm.h"
 #include "cedar/devices/robot/gl/CoraHead.h"
@@ -57,6 +56,7 @@ int main(int argc, char **argv)
 {
   QApplication a(argc, argv);
 
+  // todo: this is not a good setup, change this to a similar structure as the KUKA example
   // create kinematic chains
   cedar::dev::robot::KinematicChainPtr p_cora_arm_sim
   (
@@ -68,11 +68,8 @@ int main(int argc, char **argv)
     p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr(new cedar::dev::amtec::KinematicChain("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf"));
   }
 
-  // create models calculation of the transformation
-  cedar::dev::robot::KinematicChainModelPtr p_cora_arm_model(new cedar::dev::robot::KinematicChainModel(p_cora_arm_sim));
-
   // create gl visualization objects
-  cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_cora_arm_model));
+  cedar::dev::robot::gl::KinematicChainPtr p_cora_arm_visualization(new cedar::dev::robot::gl::CoraArm(p_cora_arm_sim));
 
   // create scene and viewer to display the arm
   cedar::aux::gl::ScenePtr p_scene(new cedar::aux::gl::Scene);
@@ -99,10 +96,10 @@ int main(int argc, char **argv)
   {
     kinematic_chains.push_back(p_cora_arm_hw);
   }
-  ForwardInverseWidget output_widget(kinematic_chains, p_cora_arm_model);
+  ForwardInverseWidget output_widget(kinematic_chains);
   output_widget.show();
 
-  p_cora_arm_model->startTimer(50.0);
+  p_cora_arm_sim->startTimer(50.0);
   viewer.startTimer(50);
   a.exec();
 
