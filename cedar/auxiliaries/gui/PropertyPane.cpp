@@ -254,13 +254,14 @@ void cedar::aux::gui::PropertyPane::addPropertyRow(cedar::aux::ParameterPtr para
         = boost::dynamic_pointer_cast<cedar::aux::ObjectListParameter>(parameter)
     )
     {
+      QObject::connect(list_parameter.get(), SIGNAL(valueChanged()), this, SLOT(redraw()));
+
       for (size_t i = 0; i < list_parameter->size(); ++i)
       {
         cedar::aux::ConfigurablePtr configurable = list_parameter->configurableAt(i);
         std::string label = list_parameter->getName() + "[" + cedar::aux::toString(i) + "]";
         this->addLabelRow(label);
         this->append(configurable->getParameters());
-        QObject::connect(list_parameter.get(), SIGNAL(valueChanged()), this, SLOT(redraw()));
       }
     }
   }
