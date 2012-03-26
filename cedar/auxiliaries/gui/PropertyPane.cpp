@@ -51,6 +51,7 @@
 #include <QDoubleSpinBox>
 #include <QApplication>
 #include <QHeaderView>
+#include <QScrollBar>
 #include <boost/bind.hpp>
 
 
@@ -316,7 +317,18 @@ void cedar::aux::gui::PropertyPane::resetPointer()
 
 void cedar::aux::gui::PropertyPane::redraw()
 {
+  int current_scroll_position = 0;
+  if (QScrollBar *p_scroll_bar = this->verticalScrollBar())
+  {
+    current_scroll_position = p_scroll_bar->value();
+  }
+
   cedar::aux::ConfigurablePtr displayed = this->mDisplayedConfigurable.lock();
   this->resetContents();
   this->display(displayed);
+
+  if (QScrollBar *p_scroll_bar = this->verticalScrollBar())
+  {
+    p_scroll_bar->setValue(current_scroll_position);
+  }
 }
