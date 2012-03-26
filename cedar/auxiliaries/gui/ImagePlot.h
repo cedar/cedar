@@ -58,6 +58,18 @@ class cedar::aux::gui::ImagePlot : public cedar::aux::gui::PlotInterface
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
+  // nested types
+  //--------------------------------------------------------------------------------------------------------------------
+private:
+  //! Enum for quickly accessing the type of the data displayed by the viewer.
+  enum DataType
+  {
+    DATA_TYPE_IMAGE,
+    DATA_TYPE_MAT,
+    DATA_TYPE_UNKNOWN
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
 public:
@@ -124,5 +136,13 @@ private:
 
   //! Id of the timer used for updating the plot.
   int mTimerId;
+
+  //! Type of the data.
+  DataType mDataType;
+
+  static std::vector<char> mLookupTableR;
+  static std::vector<char> mLookupTableG;
+  static std::vector<char> mLookupTableB;
+
 }; // class cedar::aux::gui::ImagePlot
 #endif // CEDAR_AUX_GUI_IMAGE_PLOT_H
