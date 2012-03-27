@@ -51,30 +51,17 @@
 int main(int argc, char **argv)
 {
   // using kuka configuration as dummy
-  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
-//  std::string polygon_file_path = "";
-  // help requested?
-  if ((argc == 2) && (std::string(argv[1]) == "-h"))
-  { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-    std::cout << "Usage is -c <config file> -p <path to polygon data>" << std::endl;
-    return 0;
-  }
-  // parse arguments
-  for (int i = 1; i < argc; i++)
-  {
-    if (i+1 != argc) // check that we haven't finished parsing already
-    {
-      if (std::string(argv[i]) == "-c")
-      {
-        configuration_file = std::string(argv[i+1]);
-      }
-    }
-  }
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
   // create dummy kinematic chain and model to represent the joint angles
-  cedar::dev::robot::KinematicChainPtr p_dummy_arm(new cedar::dev::robot::SimulatedKinematicChain(configuration_file));
+  cedar::dev::robot::KinematicChainPtr p_dummy_arm
+  (
+    new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old)
+  );
+  p_dummy_arm->readJson(configuration_file);
   p_dummy_arm->getRootCoordinateFrame()->setTransformation(cv::Mat::eye(4, 4, CV_64FC1));
 
   // create gl visualization objects

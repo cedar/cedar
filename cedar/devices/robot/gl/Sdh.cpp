@@ -76,7 +76,6 @@ cedar::dev::robot::gl::Sdh::~Sdh()
 
 void cedar::dev::robot::gl::Sdh::initializeGl()
 {
-  std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
   // palm
   glGenBuffers(1, &mPalmVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mPalmVertexVboId);
