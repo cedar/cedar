@@ -71,6 +71,8 @@ public:
    *        This is the main method that is called whenever a data plotter is requested to plot a different data.
    *
    * @param data The data to display.
+   *
+   * @todo Should data be const?
    */
   virtual void plot(cedar::aux::DataPtr data, const std::string& title) = 0;
 

@@ -57,7 +57,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 cedar::aux::gui::DataPlotter::DataPlotter(QWidget *pParent)
 :
-cedar::aux::gui::PlotInterface(pParent)
+cedar::aux::gui::MultiPlotInterface(pParent),
+mpCurrentPlot(NULL)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
@@ -72,6 +73,35 @@ cedar::aux::gui::DataPlotter::~DataPlotter()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+bool cedar::aux::gui::DataPlotter::canAppend(cedar::aux::ConstDataPtr data) const
+{
+  if (this->mpCurrentPlot != NULL)
+  {
+    if (cedar::aux::gui::MultiPlotInterface* multi_plotter
+          = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlot))
+    {
+      return multi_plotter->canAppend(data);
+    }
+  }
+  return false;
+}
+
+void cedar::aux::gui::DataPlotter::doAppend(cedar::aux::DataPtr data, const std::string& title)
+{
+  if (this->mpCurrentPlot == NULL)
+  {
+    this->plot(data, title);
+  }
+  else
+  {
+    cedar::aux::gui::MultiPlotInterface* multi_plotter
+      = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlot);
+
+    CEDAR_ASSERT(multi_plotter);
+    multi_plotter->append(data, title);
+  }
+}
+
 void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::string& title)
 {
   this->mData = data;
@@ -81,20 +111,20 @@ void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::str
   cedar::aux::gui::PlotDeclarationPtr declaration
     = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
 
-  // create the plot
-  cedar::aux::gui::PlotInterface *p_plot = declaration->createPlot();
-  connect(p_plot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
-  p_plot->plot(data, title);
-
-  // safely remove all children
-  QLayoutItem *child;
-  while ((child = this->layout()->takeAt(0)) != 0)
+  // remove current plot
+  if (this->mpCurrentPlot != NULL)
   {
-    delete child;
+    delete this->mpCurrentPlot;
+    this->mpCurrentPlot = NULL;
   }
 
+  // create the plot
+  this->mpCurrentPlot = declaration->createPlot();
+  QObject::connect(this->mpCurrentPlot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
+  this->mpCurrentPlot->plot(data, title);
+
   // add the plot to the layout
-  this->layout()->addWidget(p_plot);
+  this->layout()->addWidget(this->mpCurrentPlot);
 }
 
 void cedar::aux::gui::DataPlotter::dataChanged()
