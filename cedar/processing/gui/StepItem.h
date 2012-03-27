@@ -156,10 +156,14 @@ private:
   //!@brief Opens a new DockWidget to show the plot.
   void showPlot
   (
-    QGraphicsSceneContextMenuEvent *event,
+    const QPoint& position,
     cedar::aux::gui::PlotInterface* plot,
-    cedar::proc::DataSlotPtr slot
+    cedar::proc::DataSlotPtr slot,
+    std::string title = ""
   );
+
+  //! Opens plots for all data in this step.
+  void plotAll(const QPoint& position);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members

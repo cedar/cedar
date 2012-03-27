@@ -90,7 +90,7 @@ Qwt3D::ColorVector cedar::aux::gui::MatrixPlot::mStandardColorVector;
 
 cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 :
-cedar::aux::gui::PlotInterface(pParent),
+cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
@@ -110,6 +110,37 @@ cedar::aux::gui::MatrixPlot::~MatrixPlot()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+bool cedar::aux::gui::MatrixPlot::canAppend(cedar::aux::ConstDataPtr data) const
+{
+  if (this->mpCurrentPlotWidget == NULL)
+  {
+    return false;
+  }
+  else if
+  (
+    cedar::aux::gui::MultiPlotInterface *p_multi_plot
+      = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget)
+  )
+  {
+    return p_multi_plot->canAppend(data);
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void cedar::aux::gui::MatrixPlot::doAppend(cedar::aux::DataPtr data, const std::string& title)
+{
+  CEDAR_DEBUG_ASSERT(this->mpCurrentPlotWidget != NULL);
+  cedar::aux::gui::MultiPlotInterface *p_multi_plot
+    = dynamic_cast<cedar::aux::gui::MultiPlotInterface*>(this->mpCurrentPlotWidget);
+
+  CEDAR_DEBUG_ASSERT(p_multi_plot != NULL);
+  p_multi_plot->append(data, title);
+}
+
 void cedar::aux::gui::MatrixPlot::plot(cedar::aux::DataPtr data, const std::string& title)
 {
   this->mData= boost::shared_dynamic_cast<cedar::aux::MatData>(data);

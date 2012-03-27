@@ -384,38 +384,6 @@ void cedar::proc::gui::StepItem::fillPlots
               }
             }
           }
-
-          /*
-          // fill all possible plots into the menu
-          std::set<ConstPlotNodePtr> bases;
-          cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->findBases(data, bases);
-          if (bases.empty())
-          {
-            QAction *p_action = p_menu->addAction("no plots available");
-            p_action->setDisabled(true);
-          }
-          else
-          {
-            std::set<std::string> plots_already_added;
-            for(std::set<ConstPlotNodePtr>::iterator iter = bases.begin(); iter != bases.end(); ++iter)
-            {
-              ConstPlotNodePtr node = *iter;
-              const std::vector<cedar::aux::gui::PlotDeclarationPtr>& declarations = node->getData();
-              for (size_t i = 0; i < declarations.size(); ++i)
-              {
-                cedar::aux::gui::PlotDeclarationPtr declaration = declarations.at(i);
-                std::string plot_class = declaration->getPlotClass();
-                if (plots_already_added.find(plot_class) == plots_already_added.end())
-                {
-                  plots_already_added.insert(plot_class);
-                  QAction *p_action = p_menu->addAction(QString::fromStdString(plot_class));
-                  p_action->setData(QString::fromStdString(slot_iter->first));
-                  declMap[p_action] = std::make_pair(declaration, e);
-                }
-              }
-            }
-          }
-          */
         }
       }
     }
@@ -427,22 +395,26 @@ void cedar::proc::gui::StepItem::fillPlots
 }
 void cedar::proc::gui::StepItem::showPlot
 (
-  QGraphicsSceneContextMenuEvent *event,
+  const QPoint& position,
   cedar::aux::gui::PlotInterface* pPlot,
-  cedar::proc::DataSlotPtr slot
+  cedar::proc::DataSlotPtr slot,
+  std::string title
 )
 {
   //!@todo It would be better if setting the title would be part of the actual widget
-  std::string title = slot->getText();
-  title += " (" + this->mStep->getName();
-  title += "." + slot->getName() + ")";
+  if (title.empty())
+  {
+    title = slot->getText();
+    title += " (" + this->mStep->getName();
+    title += "." + slot->getName() + ")";
+  }
 
   QDockWidget *p_dock = new QDockWidget(QString::fromStdString(title), mpMainWindow);
   p_dock->setFloating(true);
   p_dock->layout()->setContentsMargins(0, 0, 0, 0);
 
   QRect geometry = p_dock->geometry();
-  geometry.setTopLeft(event->screenPos());
+  geometry.setTopLeft(position);
   geometry.setSize(QSize(200, 200));
   p_dock->setGeometry(geometry);
 
@@ -455,7 +427,13 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
   QMenu menu;
   QMenu *p_data = menu.addMenu("data");
 
+  menu.addSeparator();
+
+  QAction *p_plot_all = menu.addAction("plot all");
   QMenu *p_advanced_plotting = menu.addMenu("advanced plotting");
+
+  menu.addSeparator();
+
   std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> > advanced_plot_map;
   this->fillPlots(p_advanced_plotting, advanced_plot_map);
 
@@ -531,7 +509,12 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
     cedar::aux::gui::DataPlotter *p_plotter = new cedar::aux::gui::DataPlotter();
     p_plotter->plot(p_data, slot->getText());
-    this->showPlot(event, p_plotter, slot);
+    this->showPlot(event->screenPos(), p_plotter, slot);
+  }
+  // plot all data slots
+  else if (a == p_plot_all)
+  {
+    this->plotAll(event->screenPos());
   }
   // execute an action
   else if (a->parentWidget() == p_actions_menu)
@@ -551,12 +534,53 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
     cedar::proc::DataSlotPtr slot = this->mStep->getSlot(e, data_name);
     cedar::aux::gui::PlotInterface *p_plotter = declaration->createPlot();
     p_plotter->plot(p_data, slot->getText());
-    this->showPlot(event, p_plotter, slot);
+    this->showPlot(event->screenPos(), p_plotter, slot);
   }
   // delete the step
   else if (a == p_delete_action)
   {
     //!@todo
+  }
+}
+
+void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
+{
+  cedar::aux::gui::DataPlotter *p_plotter = NULL;
+  for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
+       enum_it != cedar::proc::DataRole::type().list().end();
+       ++enum_it)
+  {
+    const cedar::aux::Enum& e = *enum_it;
+
+    try
+    {
+      const cedar::proc::Step::SlotMap& slotmap = this->mStep->getDataSlots(e.id());
+      for (cedar::proc::Step::SlotMap::const_iterator iter = slotmap.begin(); iter != slotmap.end(); ++iter)
+      {
+        cedar::proc::DataSlotPtr slot = iter->second;
+        cedar::aux::DataPtr data = slot->getData();
+        const std::string& title = slot->getText();
+
+        // skip slots that aren't set
+        if (data)
+        {
+          if (p_plotter == NULL || !p_plotter->canAppend(data))
+          {
+            p_plotter = new cedar::aux::gui::DataPlotter();
+            p_plotter->plot(data, title);
+            this->showPlot(position, p_plotter, slot, this->getStep()->getName());
+          }
+          else
+          {
+            p_plotter->append(data, title);
+          }
+        }
+      }
+    }
+    catch (const cedar::proc::InvalidRoleException& e)
+    {
+      // that's ok, a step may not have any data in a certain role.
+    }
   }
 }
 
