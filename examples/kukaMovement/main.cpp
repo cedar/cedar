@@ -140,7 +140,8 @@ private:
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
   // help requested?
   if ((argc == 2) && (std::string(argv[1]) == "-h"))
   { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
@@ -175,7 +176,8 @@ int main(int argc, char **argv)
   if (use_hardware)
   {
     // hardware interface
-    cedar::dev::kuka::KukaInterfacePtr p_lbr4(new cedar::dev::kuka::KukaInterface(configuration_file));
+    cedar::dev::kuka::KukaInterfacePtr p_lbr4(new cedar::dev::kuka::KukaInterface(configuration_file_old));
+    p_lbr4->readJson(configuration_file);
     p_arm = p_lbr4;
     // status widget
     p_fri_status_widget = new cedar::dev::kuka::gui::FriStatusWidget(p_lbr4);
@@ -185,7 +187,8 @@ int main(int argc, char **argv)
   else
   {
     // simulated arm
-    cedar::dev::robot::KinematicChainPtr p_sim(new cedar::dev::robot::SimulatedKinematicChain(configuration_file));
+    cedar::dev::robot::KinematicChainPtr p_sim(new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old));
+    p_sim->readJson(configuration_file);
     // set simulated arm to useful initial condition
     p_sim->setJointAngle(0, 0.1);
     p_sim->setJointAngle(1, 0.2);
@@ -217,6 +220,7 @@ int main(int argc, char **argv)
 
   // create target object, visualize it and add it to the scene
   cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
+  p_arm->updateTransformations();
   target->setTranslation(p_arm->calculateEndEffectorPosition());
   cedar::aux::gl::ObjectVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);

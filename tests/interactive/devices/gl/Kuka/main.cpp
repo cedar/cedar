@@ -50,34 +50,14 @@
 
 int main(int argc, char **argv)
 {
-  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
-  std::string polygon_file_path = "";
-  // help requested?
-  if ((argc == 2) && (std::string(argv[1]) == "-h"))
-  { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-    std::cout << "Usage is -c <config file> -p <path to polygon data>" << std::endl;
-    return 0;
-  }
-  // parse arguments
-  for (int i = 1; i < argc; i++)
-  {
-    if (i+1 != argc) // check that we haven't finished parsing already
-    {
-      if (std::string(argv[i]) == "-c")
-      {
-        configuration_file = std::string(argv[i+1]);
-      }
-    }
-  }
-
-
-
-
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
 
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain(configuration_file));
+  cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old));
+  p_kuka_arm->readJson(configuration_file);
 
   // create gl visualization objects
   cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
@@ -103,7 +83,8 @@ int main(int argc, char **argv)
   // show and start everything
   p_scene_widget->show();
   widget_arm.show();
-  viewer.startTimer(50);
+  viewer.startTimer(20);
+  p_kuka_arm->startTimer(20);
   a.exec();
 
   return 0;
