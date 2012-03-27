@@ -87,6 +87,7 @@ namespace cedar
 
       /* Plotting related classes */
       //!@cond SKIPPED_DOCUMENTATION
+      CEDAR_DECLARE_AUX_CLASS(PlotManager);
       CEDAR_DECLARE_AUX_CLASS(PlotDeclaration);
       template <class DataType, class PlotType> class PlotDeclarationTemplate;
 
