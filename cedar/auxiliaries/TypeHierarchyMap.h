@@ -110,7 +110,6 @@ public:
         return this->mParents.end();
       }
 
-
       void setData(const DataType& data)
       {
         this->mData = data;
@@ -256,6 +255,71 @@ public:
         return this->mParents.find(weaky) != this->mParents.end();
       }
 
+      /*!@brief Returns the node that matchest type of instance closest.
+       *
+       *        When the tree contains an exact match, this match is returned. Otherwise, the deepest node in the
+       *        hierarchy still matching the instance's type is returned.
+       */
+      ConstNodePtr getClosest(ConstRootTypePtr instance) const
+      {
+        std::map<ConstNodePtr, unsigned int> depth_map;
+        unsigned int deepest = 0;
+        ConstNodePtr deepest_node;
+
+        std::queue<ConstNodePtr> queue;
+        queue.push(this->shared_from_this());
+        depth_map[this->shared_from_this()] = 0;
+
+        while (!queue.empty())
+        {
+          ConstNodePtr node = queue.front();
+          queue.pop();
+
+          if (node->matchesExact(instance))
+          {
+            return node;
+          }
+
+          CEDAR_DEBUG_ASSERT(depth_map.find(this->shared_from_this()) != depth_map.end());
+          unsigned int depth = depth_map[this->shared_from_this()];
+
+          if (node->matchesDerived(instance))
+          {
+            if (depth > deepest)
+            {
+              deepest_node = node;
+              deepest = depth;
+            }
+          }
+
+          for
+          (
+            const_children_iterator iter = node->childrenBegin();
+            iter != node->childrenEnd();
+            ++iter
+          )
+          {
+            ConstNodePtr child_node = *iter;
+            queue.push(child_node);
+            unsigned int new_depth = depth + 1;
+
+            typename std::map<ConstNodePtr, unsigned int>::const_iterator depth_iter = depth_map.find(child_node);
+            if (depth_iter != depth_map.end())
+            {
+              new_depth = std::max(depth_iter->second, new_depth);
+            }
+
+            depth_map[this->shared_from_this()] = new_depth;
+          }
+        }
+
+        if (!deepest_node)
+        {
+          CEDAR_THROW(cedar::aux::UnknownTypeException, "Could not find a matching node for the instance.");
+        }
+
+        return deepest_node;
+      }
 
       bool isAncestor(ConstNodePtr node) const
       {
@@ -576,6 +640,11 @@ public:
   {
     bases.clear();
     this->mRootNode->findBases(instance, bases);
+  }
+
+  const DataType& getClosest(ConstRootTypePtr instance) const
+  {
+    return this->mRootNode->getClosest(instance)->getData();
   }
 
   size_t size() const

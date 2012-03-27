@@ -40,12 +40,13 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
-#include "cedar/auxiliaries/DoubleData.h"
+/*#include "cedar/auxiliaries/DoubleData.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/ImageData.h"
 #include "cedar/auxiliaries/gui/MatrixPlot.h"
 #include "cedar/auxiliaries/gui/ImagePlot.h"
-#include "cedar/auxiliaries/gui/HistoryPlot.h"
+#include "cedar/auxiliaries/gui/HistoryPlot.h"*/
+#include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/exceptions.h"
 
 // SYSTEM INCLUDES
@@ -76,28 +77,12 @@ void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::str
   this->mData = data;
   this->mTitle = title;
 
-  //!@todo doesn't work this way -- related to the to-do entry below.
-//  PlotWidgetInterface *p_widget = getWidgetFactory().get(data)->allocateRaw();
-//  p_widget->plot(data);
+  // get the declaration corresponding to the data to be plotted
+  cedar::aux::gui::PlotDeclarationPtr declaration
+    = cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data);
 
-  //!@todo find a better solution for this!
-  cedar::aux::gui::PlotInterface *p_plot = NULL;
-  if (dynamic_cast<cedar::aux::ImageData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::ImagePlot(this);
-  }
-  else if (dynamic_cast<cedar::aux::MatData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::MatrixPlot(this);
-  }
-  else if (dynamic_cast<cedar::aux::DoubleData*>(data.get()))
-  {
-    p_plot = new cedar::aux::gui::HistoryPlot(this);
-  }
-  else
-  {
-    CEDAR_THROW(cedar::aux::UnhandledTypeException, "Unhandled data type in cedar::aux::gui::DataPlotter::plot.");
-  }
+  // create the plot
+  cedar::aux::gui::PlotInterface *p_plot = declaration->createPlot();
   connect(p_plot, SIGNAL(dataChanged()), this, SLOT(dataChanged()));
   p_plot->plot(data, title);
 
@@ -108,6 +93,7 @@ void cedar::aux::gui::DataPlotter::plot(cedar::aux::DataPtr data, const std::str
     delete child;
   }
 
+  // add the plot to the layout
   this->layout()->addWidget(p_plot);
 }
 

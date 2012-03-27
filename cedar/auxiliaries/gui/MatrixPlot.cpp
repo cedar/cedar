@@ -45,7 +45,7 @@
 #include "cedar/auxiliaries/gui/MatrixPlot1D.h"
 #include "cedar/auxiliaries/gui/MatrixPlot2D.h"
 #include "cedar/auxiliaries/gui/exceptions.h"
-#include "cedar/auxiliaries/gui/PlotDeclaration.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/exceptions.h"
 #include "cedar/auxiliaries/MatData.h"
 #include "cedar/auxiliaries/math/tools.h"
@@ -65,9 +65,14 @@ namespace
 {
   bool registerPlot()
   {
-    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::MatData, cedar::aux::gui::MatrixPlot> DeclarationType;
-    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
-    decl->declare();
+    using cedar::aux::MatData;
+    using cedar::aux::gui::MatrixPlot;
+
+    typedef cedar::aux::gui::PlotDeclarationTemplate<MatData, MatrixPlot> DeclarationType;
+
+    boost::shared_ptr<DeclarationType> declaration(new DeclarationType());
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
+    cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<MatData, MatrixPlot>();
     return true;
   }
 

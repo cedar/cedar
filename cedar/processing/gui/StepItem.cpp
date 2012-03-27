@@ -39,7 +39,6 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-#include "cedar/auxiliaries/gui/DataPlotter.h"
 #include "cedar/processing/gui/StepItem.h"
 #include "cedar/processing/gui/DataSlotItem.h"
 #include "cedar/processing/gui/TriggerItem.h"
@@ -51,6 +50,8 @@
 #include "cedar/processing/ElementDeclaration.h"
 #include "cedar/processing/DeclarationRegistry.h"
 #include "cedar/processing/namespace.h"
+#include "cedar/auxiliaries/gui/DataPlotter.h"
+#include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/gui/PlotDeclaration.h"
 #include "cedar/auxiliaries/TypeHierarchyMap.h"
 #include "cedar/auxiliaries/Data.h"
@@ -329,8 +330,8 @@ void cedar::proc::gui::StepItem::fillPlots
        std::map<QAction*, std::pair<cedar::aux::gui::PlotDeclarationPtr, cedar::aux::Enum> >& declMap
      )
 {
-  typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
-  typedef cedar::aux::gui::PlotDeclarationManager::ConstNodePtr ConstPlotNodePtr;
+  /*typedef cedar::aux::gui::PlotDeclarationManager::Node PlotNode;
+  typedef cedar::aux::gui::PlotDeclarationManager::ConstNodePtr ConstPlotNodePtr;*/
 
   for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
       enum_it != cedar::proc::DataRole::type().list().end();
@@ -353,6 +354,38 @@ void cedar::proc::gui::StepItem::fillPlots
         }
         else
         {
+          std::set<cedar::aux::gui::PlotDeclarationPtr> plots;
+          cedar::aux::gui::PlotManagerSingleton::getInstance()->getPlotClassesFor(data, plots);
+
+          if (plots.empty())
+          {
+            QAction *p_action = p_menu->addAction("no plots available");
+            p_action->setDisabled(true);
+          }
+          else
+          {
+            for
+            (
+              std::set<cedar::aux::gui::PlotDeclarationPtr>::iterator iter = plots.begin();
+              iter != plots.end();
+              ++iter
+            )
+            {
+              cedar::aux::gui::PlotDeclarationPtr declaration = *iter;
+              QAction *p_action = p_menu->addAction(QString::fromStdString(declaration->getPlotClass()));
+              p_action->setData(QString::fromStdString(slot_iter->first));
+              declMap[p_action] = std::make_pair(declaration, e);
+
+              if (declaration == cedar::aux::gui::PlotManagerSingleton::getInstance()->getDefaultDeclarationFor(data))
+              {
+                QFont font = p_action->font();
+                font.setBold(true);
+                p_action->setFont(font);
+              }
+            }
+          }
+
+          /*
           // fill all possible plots into the menu
           std::set<ConstPlotNodePtr> bases;
           cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->findBases(data, bases);
@@ -382,6 +415,7 @@ void cedar::proc::gui::StepItem::fillPlots
               }
             }
           }
+          */
         }
       }
     }

@@ -54,6 +54,11 @@
 class cedar::aux::gui::PlotDeclaration : public boost::enable_shared_from_this<cedar::aux::gui::PlotDeclaration>
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // friends
+  //--------------------------------------------------------------------------------------------------------------------
+  friend class cedar::aux::gui::PlotManager;
+
+  //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
@@ -69,8 +74,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  virtual void declare() = 0;
-
   virtual std::string getPlotClass() const = 0;
 
   virtual cedar::aux::gui::PlotInterface *createPlot() = 0;
@@ -85,7 +88,7 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  virtual void declare() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -129,22 +132,6 @@ public:
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
 public:
-  void declare()
-  {
-    try
-    {
-      std::vector<cedar::aux::gui::PlotDeclarationPtr>& declarations =
-        cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
-      declarations.push_back(this->shared_from_this());
-    }
-    catch(cedar::aux::UnknownTypeException&)
-    {
-      std::vector<cedar::aux::gui::PlotDeclarationPtr> declarations;
-      declarations.push_back(this->shared_from_this());
-      cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->insert<DataType>(declarations);
-    }
-  }
-
   std::string getPlotClass() const
   {
     return cedar::aux::typeToString<PlotType>();
@@ -165,7 +152,21 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  void declare()
+  {
+    try
+    {
+      std::vector<cedar::aux::gui::PlotDeclarationPtr>& declarations =
+        cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->find<DataType>()->getData();
+      declarations.push_back(this->shared_from_this());
+    }
+    catch(cedar::aux::UnknownTypeException&)
+    {
+      std::vector<cedar::aux::gui::PlotDeclarationPtr> declarations;
+      declarations.push_back(this->shared_from_this());
+      cedar::aux::gui::PlotDeclarationManagerSingleton::getInstance()->insert<DataType>(declarations);
+    }
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
