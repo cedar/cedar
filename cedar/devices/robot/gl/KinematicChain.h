@@ -75,6 +75,30 @@ public:
   //!@brief flags the drawing state of the end-effector acceleration vector
   void setDisplayEndEffectorAcceleration(bool state);
 
+  /*!@brief sets the joint radius to the new value
+   *
+   * @param value new radius
+   */
+  double getJointRadius();
+
+  /*!@brief sets the link radius to the new value
+   *
+   * @return radius
+   */
+  double getLinkRadius();
+
+  /*!@brief sets the joint radius to the new value
+   *
+   * @return radius
+   */
+  void setJointRadius(double value);
+
+  /*!@brief sets the link radius to the new value
+   *
+   * @param value new radius
+   */
+  void setLinkRadius(double value);
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -106,6 +130,12 @@ protected:
   bool mIsDrawingEndEffectorVelocity;
   //! decides whether the end-effector acceleration will be drawn
   bool mIsDrawingEndEffectorAcceleration;
+
+private:
+  //! radius of the joints
+  double mJointRadius;
+  //! radius of the links
+  double mLinkRadius;
 
 }; // class cedar::dev::robot::gl::KinematicChain
 #endif // CEDAR_DEV_ROBOT_GL_KINEMATIC_CHAIN_H

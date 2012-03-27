@@ -51,7 +51,9 @@
 cedar::dev::robot::gl::KinematicChain::KinematicChain(cedar::dev::robot::KinematicChainPtr pKinematicChain)
 :
 cedar::aux::gl::ObjectVisualization(pKinematicChain->getRootCoordinateFrame()),
-mpKinematicChain(pKinematicChain)
+mpKinematicChain(pKinematicChain),
+mJointRadius(0.05),
+mLinkRadius(0.035)
 {
   mIsDrawingEndEffectorVelocity = true;
   mIsDrawingEndEffectorAcceleration = false;
@@ -101,6 +103,28 @@ void cedar::dev::robot::gl::KinematicChain::setDisplayEndEffectorAcceleration(bo
   mIsDrawingEndEffectorAcceleration = state;
 }
 
+double cedar::dev::robot::gl::KinematicChain::getJointRadius()
+{
+  return mJointRadius;
+}
+
+double cedar::dev::robot::gl::KinematicChain::getLinkRadius()
+{
+  return mLinkRadius;
+}
+
+void cedar::dev::robot::gl::KinematicChain::setJointRadius(double value)
+{
+  mJointRadius = value;
+}
+
+void cedar::dev::robot::gl::KinematicChain::setLinkRadius(double value)
+{
+  mLinkRadius = value;
+}
+
+
+
 void cedar::dev::robot::gl::KinematicChain::drawBase()
 {
   // move to origin
@@ -111,7 +135,7 @@ void cedar::dev::robot::gl::KinematicChain::drawBase()
   glColor4d(mColorR/2, mColorG/2, mColorB/2, 0);
   cv::Mat proximal = mpKinematicChain->getRootTransformation()(cv::Rect(3, 0, 1, 3)).clone();
   cv::Mat distal = mpKinematicChain->getJointTransformation(0)(cv::Rect(3, 0, 1, 3)).clone();
-  cedar::aux::gl::drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
 
   // move to object coordinates
   mTransformationTranspose = mpKinematicChain->getRootTransformation().t();
@@ -139,7 +163,7 @@ void cedar::dev::robot::gl::KinematicChain::drawSegment(unsigned int index)
   
   // draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
-  cedar::aux::gl::drawSphere(.05, mResolution, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawSphere(mJointRadius, mResolution, mResolution, mIsDrawnAsWireFrame);
   
   // move to origin transformation and re-save it to the stack
   glPopMatrix();
@@ -157,7 +181,7 @@ void cedar::dev::robot::gl::KinematicChain::drawSegment(unsigned int index)
   {
     distal = mpKinematicChain->getEndEffectorTransformation()(cv::Rect(3, 0, 1, 3)).clone();
   }
-  cedar::aux::gl::drawCone<double>(proximal, distal, .035, .035, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawCone<double>(proximal, distal, mLinkRadius, mLinkRadius, mResolution, mIsDrawnAsWireFrame);
 }
 
 void cedar::dev::robot::gl::KinematicChain::drawEndEffector()
@@ -172,7 +196,7 @@ void cedar::dev::robot::gl::KinematicChain::drawEndEffector()
   
 	// draw the joint
   glColor4d(mColorR, mColorG, mColorB, 0);
-  cedar::aux::gl::drawSphere(.05, mResolution, mResolution, mIsDrawnAsWireFrame);
+  cedar::aux::gl::drawSphere(mJointRadius, mResolution, mResolution, mIsDrawnAsWireFrame);
 }
 
 void cedar::dev::robot::gl::KinematicChain::drawEndEffectorVelocity()
