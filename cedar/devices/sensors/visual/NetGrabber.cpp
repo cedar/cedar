@@ -293,11 +293,11 @@ bool cedar::dev::sensors::visual::NetGrabber::onDeclareParameters()
 //----------------------------------------------------------------------------------------------------
 const std::string& cedar::dev::sensors::visual::NetGrabber::onGetSourceInfo(unsigned int channel) const
 {
-  //TODO: gather information of used yarp-server too
   if (channel >= mNumCams)
   {
     CEDAR_THROW(cedar::aux::exc::IndexOutOfRangeException,"NetGrabber::onGetSourceInfo");
   }
+  //TODO: perhaps it is possible to gather information of used yarp-server too
   return getChannel(channel)->channelName;
 }
 

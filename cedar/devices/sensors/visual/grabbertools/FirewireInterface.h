@@ -52,7 +52,9 @@
 #include <iostream>
 #include <vector>
 
-/*!@brief This class is a simple interface to the firewire bus
+/*!@brief This class is a simple interface to the firewire bus.
+ *
+ *    It is only used for the grabbertools and not for the grabber itself
  *
  * \remarks: Opens the bus and handles the firewire device context handle.<br>
  *  USAGE:

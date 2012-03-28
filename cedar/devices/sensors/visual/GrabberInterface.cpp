@@ -325,7 +325,7 @@ void cedar::dev::sensors::visual::GrabberInterface::setFps(double fps)
     std::cout << "[GrabberInterface::setFps] switch to " << fps <<" fps"<< std::endl;
   #endif
 
-  //LoopedThread::_mStepSize = milliseconds;  //set param for configuration file
+  //LoopedThread::_mStepSize = milliseconds;  //set param for configuration file (bug in LoopedThread)
   LoopedThread::setStepSize(milliseconds);        //change speed in thread
 
   if (wasRunning)
@@ -578,7 +578,6 @@ void cedar::dev::sensors::visual::GrabberInterface::saveSnapshot(unsigned int ch
     #endif
     CEDAR_GRABBER_THROW(cedar::aux::exc::GrabberSnapshotException,info);
   }
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -690,9 +689,9 @@ bool cedar::dev::sensors::visual::GrabberInterface::startRecording(double fps, i
   mRecord = true;
 
   unsigned int recording_channels = 0;
+
   //write the video-file with the actual grabbing-speed
-  //this is independet from speed of the avi-file or the camera framerate
-  //double fps = getFps();
+  //this is independent from the speed of the avi-file or the camera framerate
 
   for (unsigned int channel = 0; channel < mNumCams; ++channel)
   {

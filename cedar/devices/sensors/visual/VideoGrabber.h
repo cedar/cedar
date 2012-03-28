@@ -34,7 +34,6 @@
 
 ======================================================================================================================*/
 
-
 #ifndef CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 #define CEDAR_DEV_SENSORS_VISUAL_VIDEO_GRABBER_H
 
@@ -58,6 +57,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+  //!@cond SKIPPED_DOCUMENTATION
+
   /*! @struct VideoChannel
    *  @brief Additional data of a video channel
    */
@@ -71,8 +72,7 @@ public cedar::dev::sensors::visual::GrabberInterface
 
   typedef boost::shared_ptr<VideoChannel> VideoChannelPtr;
 
-
-
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -99,7 +99,6 @@ public:
   //!@brief Destructor
   ~VideoGrabber();
 
-
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -112,7 +111,7 @@ public:
    *   The speed stored in the AVI-File will be multiplied with this factor.<br>
    *		Effective FPS should be SpeedFactor*AVI-Speed<br>
    *  @remarks
-   *		The grabberthread have to be restarted to take effect.<br>
+   *		The grabber thread have to be restarted to take effect.<br>
    *		This is done internally (by calling setFPS), but keep that in mind.
    *  @see
    *		setFPS
@@ -153,7 +152,7 @@ public:
 
   /*! @brief Get the count of frames in the AVI
    *
-   *		In the case of a stereo grabber and different length
+   *		In the case of a stereo grabber and different length,
    *		the shortest avi-file determine the length
    */
   unsigned int getFrameCount() const;
@@ -267,8 +266,6 @@ private:
              cedar::dev::sensors::visual::GrabberInterface::mChannels.at(channel)
            );
   }
-
-
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

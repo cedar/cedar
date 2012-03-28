@@ -166,7 +166,7 @@ bool cedar::dev::sensors::visual::PictureGrabber::onGrab()
   {
     result = !(getChannel(channel)->imageMat.empty()) && result;
   }
-  return true;
+  return result;
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -57,6 +57,8 @@ public cedar::aux::ConfigurationInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+  //!@cond SKIPPED_DOCUMENTATION
+
   /*! \brief Stores the capability of a property
    *  \remarks Every property have several ways to be accessed, and a defined range
    *    where the values can be set.
@@ -64,7 +66,6 @@ public cedar::aux::ConfigurationInterface
    */
   struct CameraPropertyCapability
   {
-    //!@cond SKIPPED_DOCUMENTATION
      cedar::dev::sensors::visual::CameraProperty::Id propId;
      int max_value;
      int min_value;
@@ -75,8 +76,10 @@ public cedar::aux::ConfigurationInterface
      bool is_auto_capable;
      bool is_manual_capable;
      bool is_absolute_capable;
-     //!@endcond
   } ;
+
+  //!@endcond
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------

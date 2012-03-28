@@ -59,20 +59,22 @@ public cedar::aux::ConfigurationInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 public:
+
+  //!@cond SKIPPED_DOCUMENTATION
+
   /*! \struct CameraSettings
    *  \brief Structure to store the values of the settings (as an enum string) of a camera for the
    *    configuration interface
    */
   struct CameraSettings
   {
-    //!@cond SKIPPED_DOCUMENTATION
     std::string fps;
     std::string mode;
     std::string iso_speed;
     std::string capability_config_file_name;
-    //!@endcond
   };
 
+  //!@endcond
 
 
   //--------------------------------------------------------------------------------------------------------------------
