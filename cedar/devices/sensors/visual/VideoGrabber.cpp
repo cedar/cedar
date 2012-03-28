@@ -361,7 +361,6 @@ void cedar::dev::sensors::visual::VideoGrabber::setPositionAbsolute(unsigned int
 unsigned int cedar::dev::sensors::visual::VideoGrabber::getPositionAbsolute()
 {
   //the position in all avi's should be the same
-  //we use the first capture-device
   return getChannel(0)->videoCapture.get(CV_CAP_PROP_POS_FRAMES);
 }
 

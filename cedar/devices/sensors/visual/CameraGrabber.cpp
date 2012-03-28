@@ -590,6 +590,7 @@ bool cedar::dev::sensors::visual::CameraGrabber::onGrab()
 {
   int result = true;
 
+  //todo: test this for better performance
   //grab and retrieve
   /*
    * for(unsigned int i = 0; i < mNumCams; ++i)

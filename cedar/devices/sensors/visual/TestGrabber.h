@@ -82,6 +82,7 @@ public cedar::dev::sensors::visual::GrabberInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+  //!@cond SKIPPED_DOCUMENTATION
 
   /*! @struct PictureChannel
    *  @brief Additional data of a grabbing channel
@@ -98,6 +99,8 @@ public cedar::dev::sensors::visual::GrabberInterface
 
   typedef boost::shared_ptr<TestChannel> TestChannelPtr;
 
+  //!@endcond
+
   //--------------------------------------------------------------------------------------------------------------------
   // macros
   //--------------------------------------------------------------------------------------------------------------------
@@ -108,14 +111,14 @@ public cedar::dev::sensors::visual::GrabberInterface
 public:
   /*! @brief The constructor for a single channel grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param ChannelName  Channel to grab from
+   *  @param channelName  Channel to grab from
    */
   TestGrabber(std::string configFileName, std::string channelName);
 
   /*! @brief The constructor for a stereo grabber.
    *  @param configFileName Filename for a file, where the configuration parameters should be stored
-   *  @param ChannelName0  Channel one to grab from
-   *  @param ChannelName1  Channel two to grab from
+   *  @param channelName0  Channel one to grab from
+   *  @param channelName1  Channel two to grab from
    */
   TestGrabber(std::string configFileName, std::string channelName0, std::string channelName1);
 

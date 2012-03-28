@@ -1,6 +1,6 @@
-directory grabbertools:
+Directory grabbertools:
 
-the files in this directory contains only the common classes for the grabbertools defined in cedar\executables.
+The files in this directory contains only the common classes for the grabbertools defined in cedar\executables.
 
 These tools are:
 	- fwCameraSaveCapabilities : program to search for all cameras on the firewire bus and save their
@@ -11,4 +11,4 @@ These tools are:
 	- fwCamInfo : display informations and capabilities of the properties of a given camera on the firewire bus
 	
 	
-You can find them after compiling of cedar in the directory cedar/bin
+You can find them after compiling of cedar in the directory cedar/bin/

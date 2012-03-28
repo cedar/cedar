@@ -84,13 +84,13 @@ namespace cedar
         CEDAR_DECLARE_DEV_CLASS(CameraCapabilities);
         CEDAR_DECLARE_DEV_CLASS(CameraConfig);
         
-        //!@endcond
-
         ///! map property enum id to the value of the property
         typedef std::map<unsigned int, double> CameraPropertyValues;
 
         ///! a pair of property enum id and his value
         typedef std::pair<unsigned int, double> CameraPropertyValuesPair;
+
+        //!@endcond
       }
     }
   }

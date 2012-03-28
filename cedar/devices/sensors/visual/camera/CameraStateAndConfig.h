@@ -84,10 +84,11 @@ class cedar::dev::sensors::visual::CameraStateAndConfig
   //--------------------------------------------------------------------------------------------------------------------
 public:
   /*! \brief The standard constructor.
-   *  \param VideoCapture The cv::VideoCapture object, which this configuration is assigned to
+   *  \param videoCapture The cv::VideoCapture object, which this configuration is assigned to
    *         This will be used, to read and set the values
    *  \param pVideoCaptureLock The lock, for the concurrent access to the cv::VideoCapture object
    *         through grabbing and/or change settings
+   *  \param channel The number of the channel which this class is assigned to
    *  \param configurationFileName The filename for the configuration file used to store camera properties in
    *         This could be the same file, which the cameragrabber uses for configuration storage
    *  \param capabilitiesFileName The filename of the capabilities. This file have to be adjusted for the used camera
@@ -204,10 +205,13 @@ private:
   bool setCamProperty(unsigned int propId, double value);
 
   /*! Get a property form the cv::VideoCapture
-   * implements the cv::VideoCapture.get() method with respect to concurrent access
+   * Implements the cv::VideoCapture.get() method with respect to concurrent access
    */
   double getCamProperty(unsigned int propId);
 
+  /*! Read the channel properties from mCamPropertyValues and set it to the camera
+   *  The Properties only set, if the property isn't set to auto or default
+   */
   void setAllParametersToCam();
   //--------------------------------------------------------------------------------------------------------------------
   // members

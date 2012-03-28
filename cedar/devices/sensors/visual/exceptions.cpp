@@ -41,27 +41,6 @@
 // SYSTEM INCLUDES
 
 
-//----------------------------------------------------------------------------------------------------------------------
-cedar::aux::exc::GrabberSnapshotException::GrabberSnapshotException()
-{
-  // Set the type name.
-  this->mType = "GrabberSnapshotException";
-}
-
-
-//----------------------------------------------------------------------------------------------------------------------
-cedar::aux::exc::GrabberRecordingException::GrabberRecordingException()
-{
-  // Set the type name.
-  this->mType = "GrabberRecordingException";
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-cedar::aux::exc::GrabberGrabException::GrabberGrabException()
-{
-  // Set the type name.
-  this->mType = "GrabberGrabException";
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 

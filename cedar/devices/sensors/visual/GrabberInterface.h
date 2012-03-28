@@ -82,7 +82,7 @@
  *      Initialize in the constructor of a derived class the filenames or camera-device-names.
  *      At the end of the constructor, call doInit() with the number of channels you use and with a default name.
  *      At the beginning of the destructor, call doCleanUp() and do the cleanup in this function.
- *      To get an example look at the VideoGrabber-class. <br><br>
+ *      To get an example look at the VideoGrabber or the TestGrabber-class. <br><br>
  *
  *
  */
@@ -96,6 +96,8 @@ public boost::noncopyable
   //--------------------------------------------------------------------------------------------------------------------
 
 protected:
+  //!@cond SKIPPED_DOCUMENTATION
+
   ///! @brief Structure to store all channel related stuff inside
   struct GrabberChannel
   {
@@ -117,8 +119,6 @@ protected:
   static const std::string mGrabberDefaultRecordExtension;
   static const std::string mGrabberDefaultSnapshotExtension;
 
-
-
   //------------------------------------------------------------------------
   // Defines the how often getFpsMeasured() will be updated (in frames).
   // Default value is every 5 frames
@@ -130,6 +130,8 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
   //#define CEDAR_GRABBER_THROW(Exception_type, message) doCleanUp(); CEDAR_THROW(Exception_type, message);
   #define CEDAR_GRABBER_THROW(Exception_type, message) CEDAR_THROW(Exception_type, message);
+
+  //!@endcond
 
 #ifdef ENABLE_CTRL_C_HANDLER
   /* @brief Typedef for a vector containing the instances of all used grabbers
@@ -354,7 +356,7 @@ public:
      *
      *  @return The integer return value of ConfigurationInterface::writeConfiguration() is casted to boolean
      *
-     *  @remarks For grabber developers<@br>
+     *  @remarks For grabber developers<br>
      *    This method evokes onWriteConfiguration of the grabber. Implement in the derived class this function,
      *    if there are any parameters have to be changed right before saving
      *  @see onWriteConfiguration
@@ -583,7 +585,7 @@ protected:
 
     /*! @brief Create and initialize the channel-structure for only one channel
      *
-     *  For Grabber-developers:</br>
+     *  For grabber-developers:<br>
      *  Should be overrided in derived class, if more informations on a channel have to be stored
      */
     virtual void onAddChannel();
@@ -662,11 +664,17 @@ private:
      */
     unsigned int mFpsCounter;
 
+    /*! Get the pointer to the channel structure of the specified channel
+     *  @param channel The channel number of the wanted channel structure
+     */
     inline GrabberChannelPtr getChannel(unsigned int channel)
     {
       return mChannels.at(channel);
     }
 
+    /*! Get the const pointer to the channel structure of the specified channel
+     *  @param channel The channel number of the wanted channel structure
+     */
     inline GrabberChannelPtr getChannel(unsigned int channel) const
     {
       return mChannels.at(channel);

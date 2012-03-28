@@ -58,6 +58,7 @@ public cedar::dev::sensors::visual::GrabberInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+  //!@cond SKIPPED_DOCUMENTATION
 
   /*! @struct PictureChannel
    *  @brief Additional data of a picture grabbing channel
@@ -70,6 +71,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   };
 
   typedef boost::shared_ptr<PictureChannel> PictureChannelPtr;
+
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -111,7 +114,7 @@ public:
    *	Supported image-types depend on operating system and installed libs. <br>
    *	For details look at the OpenCV-documentation (Section "imread").
    *  @param channel which should be changed (default is 0).
-   *  @param FileName of the new picture.
+   *  @param fileName of the new picture.
    */
   void setSourceFile(unsigned int channel, const std::string& fileName);
 
@@ -175,10 +178,8 @@ public:
   // none yet (hopefully never!)
 protected:
 
-
 private:
   // none yet
-
 
 }; //class cedar::dev::sensors::visual::PictureGrabber
 

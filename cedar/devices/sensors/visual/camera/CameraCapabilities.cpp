@@ -84,9 +84,6 @@ cedar::aux::ConfigurationInterface(configFileName)
       mCamProperties.at(i).is_readable = false;
     }
   }
-
-  //write properties which aren't supported to the properties file
-  //writeConfiguration();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

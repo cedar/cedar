@@ -62,6 +62,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+  //!@cond SKIPPED_DOCUMENTATION
+
   //todo:typedef to NetReader
   typedef boost::shared_ptr<cedar::aux::net::NetReader<cv::Mat> > MatNetReaderPtr;
 
@@ -79,6 +81,8 @@ public cedar::dev::sensors::visual::GrabberInterface
 
   typedef boost::shared_ptr<NetChannel> NetChannelPtr;
 
+  //!@endcond
+
 //--------------------------------------------------------------------------------------------------------------------
 //macros
 //--------------------------------------------------------------------------------------------------------------------
@@ -89,17 +93,17 @@ public cedar::dev::sensors::visual::GrabberInterface
 
 public:
 
-  /*! @brief  Constructor for a single channel grabber
+  /*! @brief Constructor for a single channel grabber
    *  @param configFileName	Filename for the configuration
-   *  @param YarpChannel	Channel to grab from
+   *  @param yarpChannelName Channel to grab from
    */
   NetGrabber(const std::string& configFileName,const std::string& yarpChannelName);
 
 
-  /*! @brief  Constructor for a stereo channel grabber
+  /*! @brief Constructor for a stereo channel grabber
    *  @param configFileName	Filename for the configuration
-   *  @param YarpChannel0	Name of a channel from the used yarp-server
-   *  @param YarpChannel1	Another name of a channel from the used yarp-server
+   *  @param yarpChannelName0	Name of a channel from the used yarp-server used for channel 0
+   *  @param yarpChannelName1	Another name of a channel from the used yarp-server used for channel 1
    */
   NetGrabber(const std::string& configFileName,const std::string& yarpChannelName0,const std::string& yarpChannelName1);
 

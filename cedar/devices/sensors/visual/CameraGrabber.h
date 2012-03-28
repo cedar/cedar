@@ -67,6 +67,8 @@ public cedar::dev::sensors::visual::GrabberInterface
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
+  //!@cond SKIPPED_DOCUMENTATION
+
   /*! @struct CameraId
    *  @brief Store the unique Id of a camera
    */
@@ -92,9 +94,10 @@ public cedar::dev::sensors::visual::GrabberInterface
     std::string camCapabilitiesFileName;        ///! Filename for the capabilities
   };
 
+  ///! A smart pointer for the CameraChannel struct
   typedef boost::shared_ptr<CameraChannel> CameraChannelPtr;
 
-
+  //!@endcond
 
   //--------------------------------------------------------------------------------------------------------------------
   // macros
@@ -150,7 +153,7 @@ public:
                );
 
 
-  /*! @brief Constructor for a camera grabber. The complete configuration will be read from configuration file.</br>
+  /*! @brief Constructor for a camera grabber. The complete configuration will be read from configuration file.<br>
    *   If the system can't find the wanted camera, initialization will fail.
    *  @par
    *        The camera always will be initialized (i.e. the first frame is already grabbed on initialization)
@@ -174,16 +177,18 @@ public:
 public:
 
   /*!  @brief With this method, it is possible to get Information on any channel.
+   *
    *   This method passes the arguments directly to the corresponding capture device
    *   @param channel This is the index of the source you want to get the parameter value.
    *   @param propId This is any supported property-Id<br>
    *     If property-id is not supported or unknown, return value will be -1.
-   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *   @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    *   @see CameraProperty
    */
   double getCameraProperty( unsigned int channel, CameraProperty::Id propId);
 
   /*! @brief Get the real value of a Property which is set to auto.
+   *
    *   On all other properties it is the same as getCameraProperty()
    *  @param channel This is the index of the source you want to get the parameter value.
    *  @param propId This is any known property-Id from class CameraProperty
@@ -209,13 +214,13 @@ public:
    *   @param propId This is any known property-Id<br>
    *     If property-id is not supported or unknown, return value will be false.
    *   @param value This is the new value.
-   *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
+   *   @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    *   @see CameraProperty
    */
   bool setCameraProperty(unsigned int channel, CameraProperty::Id propId, double value);
   
   /*!  @brief Set informations on camera 0
-   *  @param propId This is any knoqn property-Id<br>
+   *   @param propId This is any knoqn property-Id<br>
    *     If property-id is not supported or unknown, return value will be false.
    *   @param value This is the new value.
    */
@@ -232,21 +237,21 @@ public:
   bool setCameraSetting(unsigned int channel, CameraSetting::Id settingId, double value);
 
   /*! @brief Get values of the camera which have to be adjusted before the first image will be grabbed
+   *
+   *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize
+   *      before initialization will be finished.
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @param settingId The id of the setting you want to change
-   *  @remarks
-   *      This method can be used to directly set Mode, Fps, IsoSpeed and FrameSize. <br>
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    *  @see  setCameraMode, setCameraFps, setCameraIsoSpeed, setCameraFrameSize, CameraSetting
    */
   double getCameraSetting(unsigned int channel, CameraSetting::Id settingId);
 
   /*! @brief Set the video mode of the camera.
+   *
+   *   This can only be done, if the first frame wasn't already grabbed
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @param modeId The new value
-   *
-   * @remarks
-   *   This can only be done, if the first frame wasn't already grabbed
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels
    * @see getCameraMode
    */
@@ -259,10 +264,10 @@ public:
   CameraVideoMode::Id getCameraMode(unsigned int channel);
 
   /*! @brief Set the framerate of the camera.
-   *  @param channel This is the index of the source you want to set the parameter value.
-   *  @param fpsId The new value
    *
    *   This can only be done, if the first frame wasn't already grabbed
+   *  @param channel This is the index of the source you want to set the parameter value.
+   *  @param fpsId The new value
    * @par
    *   If the framerate isn't supported by the actual video mode, a similar mode
    *   will be used. The return value will also be true in this case.
@@ -278,11 +283,10 @@ public:
   CameraFrameRate::Id getCameraFps(unsigned int channel);
 
   /*! @brief Set the ISO-speed of the IEEE1394/firewire bus.
+   *
+   *   This can only be done, if the first frame wasn't already grabbed
    *  @param channel This is the index of the source you want to set the parameter value.
    *  @param isoSpeedId The new value
-   *
-   * @remarks
-   *   This can only be done, if the first frame wasn't already grabbed
    * @par
    *   If the wanted ISO-speed isn't supported by the camera, a similar mode
    *   will be used. The return value will also be true in this case.
@@ -318,7 +322,7 @@ public:
   std::vector<std::string> getAllProperties(unsigned int channel);
 
   /*! @brief Write out all settings
-   *  @remarks
+   *
    *      The settings are read directly from cam
    *  @param channel This is the index of the source you want to print the settings.
    *  @throw cedar::aux::IndexOutOfRangeException Thrown, if channel doesn't fit to number of channels

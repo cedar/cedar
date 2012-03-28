@@ -122,11 +122,15 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
 
 
   //-------------------------------------------------
-  //create empty picture-matrices one by one
-  for(unsigned int i=0; i<mNumCams;++i)
+  //load pictures one by one
+  for(unsigned int channel=0; channel<mNumCams;++channel)
   {
+    //there is no need to create new matrices, empty ones are
+    //already initialized within the channel structure
     cv::Mat frame=cv::Mat();
-    cedar::dev::sensors::visual::GrabberInterface::mChannels.at(i)->imageMat = frame;
+
+    //apply the new content to the channel image
+    getChannel(channel)->imageMat = frame;
   }
 
 
@@ -175,7 +179,7 @@ const std::string& cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(uns
   //no range-check is needed, because this is done in the GrabberInterface::getSourceInfo method
 
   //give some information about the used source like channelname, filename, devicename
-  //or something like this
+  //or something like that
   return mChannelVector.at(channel);
 }
 
@@ -184,6 +188,12 @@ bool cedar::dev::sensors::visual::TestGrabber::onGrab()
 {
   //this is the main grabbing method.
   //read a new picture from the source and set the picture in the mImageMatVector.at()
+
+  for(unsigned int channel=0; channel<mNumCams;++channel)
+   {
+     //apply the new content to the channel image
+     //getChannel(channel)->imageMat = <grab_new_content>;
+   }
 
   //here we just want to count how often onGrab is invoked, due to a fps-check
   mCounter ++;

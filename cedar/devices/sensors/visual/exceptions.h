@@ -74,7 +74,7 @@ namespace cedar
 
 //--------------------------------------------------------------------------------------------------------------------
 /*!@brief Exception for errors while saving a snapshots
- * \remarks
+ *
  *    This exception would be thrown when an error occurs while writing a snapshot to disk
  */
 class cedar::aux::exc::GrabberSnapshotException
@@ -83,14 +83,17 @@ public cedar::aux::exc::ExceptionBase
 {
 public:
   //!@brief The standard constructor.
-  GrabberSnapshotException(void);
+  GrabberSnapshotException(void)
+  {
+    // Set the type name.
+    this->mType = "GrabberSnapshotException";
+  }
 };
-
 
 //--------------------------------------------------------------------------------------------------------------------
 
-/*!@brief Exception for errors while recording a stream
- * \remarks
+/*! @brief Exception for errors while recording a stream
+ *
  *    This exception would be thrown when an error occurs during recording.
  */
 class cedar::aux::exc::GrabberRecordingException
@@ -99,14 +102,18 @@ public cedar::aux::exc::ExceptionBase
 {
 public:
   //!@brief The standard constructor.
-  GrabberRecordingException(void);
+  GrabberRecordingException(void)
+  {
+    // Set the type name.
+    this->mType = "GrabberRecordingException";
+  }
 };
 
 
 //--------------------------------------------------------------------------------------------------------------------
 
-/*!@brief Exception for errors while recording a stream
- * \remarks
+/*! @brief Exception for errors while recording a stream
+ *
  *    This exception would be thrown when an error occurs during recording.
  * \note
  *    This is a critical exception. The grabber-cleanup is performed right before this exception is thrown.<br>
@@ -118,7 +125,12 @@ public cedar::aux::exc::ExceptionBase
 {
 public:
   //!@brief The standard constructor.
-  GrabberGrabException(void);
+  GrabberGrabException(void)
+  {
+    // Set the type name.
+    this->mType = "GrabberGrabException";
+  }
 };
+
 
 #endif /* CEDAR_DEV_SENSORS_VISUAL_EXCEPTIONS_H */
