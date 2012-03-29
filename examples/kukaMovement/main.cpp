@@ -37,7 +37,7 @@
 
 // PROJECT INCLUDES
 #include "cedar/devices/kuka/gui/FriStatusWidget.h"
-#include "cedar/devices/robot/gui/KinematicChainWidget.h"
+#include "cedar/devices/robot/gui/KinematicChainMonitorWidget.h"
 #include "cedar/devices/robot/KinematicChain.h"
 #include "cedar/devices/robot/gl/KinematicChain.h"
 #include "cedar/devices/robot/gl/KukaArm.h"
@@ -210,38 +210,36 @@ int main(int argc, char **argv)
   viewer.startTimer(50);
 
   // create an arm visualization and add it to the scene
-  cedar::aux::gl::ObjectVisualizationPtr p_arm_visualization;
-  cedar::dev::robot::gl::KinematicChainPtr p_kuka_arm_visualization
-  (
-    new cedar::dev::robot::gl::KukaArm(p_arm)
-  );
-  p_arm_visualization = p_kuka_arm_visualization;
-  p_scene->addObjectVisualization(p_kuka_arm_visualization);
+  cedar::dev::robot::gl::KinematicChainPtr p_arm_visualization(new cedar::dev::robot::gl::KukaArm(p_arm));
+  p_arm_visualization->setDisplayEndEffectorVelocity(false);
+  p_scene->addObjectVisualization(p_arm_visualization);
 
   // create target object, visualize it and add it to the scene
-  cedar::aux::LocalCoordinateFramePtr target(new cedar::aux::LocalCoordinateFrame());
+  cedar::aux::LocalCoordinateFramePtr p_target(new cedar::aux::LocalCoordinateFrame());
   p_arm->updateTransformations();
-  target->setTranslation(p_arm->calculateEndEffectorPosition());
-  cedar::aux::gl::ObjectVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(target, 0.055, 0, 1, 0));
+  p_target->setTranslation(p_arm->calculateEndEffectorPosition());
+  cedar::aux::gl::ObjectVisualizationPtr p_sphere(new cedar::aux::gl::Sphere(p_target, 0.055, 0, 1, 0));
   p_sphere->setDrawAsWireFrame(true);
   p_scene->addObjectVisualization(p_sphere);
 
-  // create a widget to control the scene
-  cedar::aux::gui::SceneWidgetPtr p_scene_widget(new cedar::aux::gui::SceneWidget(p_scene));
-  p_scene_widget->show();
+  // create a widget to control the target
+  cedar::aux::gui::LocalCoordinateFrameWidgetPtr p_target_widget
+  (
+    new cedar::aux::gui::LocalCoordinateFrameWidget(p_target)
+  );
+  p_target_widget->show();
 
   // monitor/command widget for the arm
-  cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget
-    = new cedar::dev::robot::gui::KinematicChainWidget(p_arm);
+  cedar::dev::robot::gui::KinematicChainMonitorWidget* p_kinematic_chain_widget
+    = new cedar::dev::robot::gui::KinematicChainMonitorWidget(p_arm);
   p_kinematic_chain_widget->show();
 
   // create the worker thread
-  WorkerThread worker(p_arm, target);
+  WorkerThread worker(p_arm, p_target);
   worker.setStepSize(10);
 
   // start everything
   p_arm->setWorkingMode(cedar::dev::robot::KinematicChain::VELOCITY);
-  p_kinematic_chain_widget->getCommandWidget()->update();
   worker.start();
   a.exec();
 
