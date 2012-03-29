@@ -137,7 +137,7 @@ void cedar::aux::gui::LocalCoordinateFrameWidget::setLocalCoordinateFrame
 
 void cedar::aux::gui::LocalCoordinateFrameWidget::initWindow()
 {
-  setWindowTitle(QApplication::translate("LocalCoordinateFrameWidget", "Rigid Body"));
+  setWindowTitle(QString("Local Coordinate Frame"));
 
   mpGridLayout = new QGridLayout();
 

@@ -67,7 +67,6 @@ cedar::dev::robot::gl::KukaArm::~KukaArm()
 
 void cedar::dev::robot::gl::KukaArm::initializeGl()
 {
-  std::cout << "initializing resources for KUKA LBR4 visualization" << std::endl;
   // base segment
   glGenBuffers(1, &mBaseSegmentVertexVboId);
   glBindBuffer(GL_ARRAY_BUFFER, mBaseSegmentVertexVboId);
@@ -351,7 +350,7 @@ void cedar::dev::robot::gl::KukaArm::drawSegment(unsigned int index)
     break;
   case 5:
     glRotated(90.0, 1.0, 0.0, 0.0);
-    setMaterial(cedar::aux::gl::ObjectVisualization::SEGMENT);
+    setMaterial(cedar::aux::gl::ObjectVisualization::CHROME);
     this->drawElement(mWristSphereVertexVboId, mWristSphereIndexVboId, mWristSphereFacesNumber);
     setMaterial(cedar::aux::gl::ObjectVisualization::NO_MATERIAL);
     break;
