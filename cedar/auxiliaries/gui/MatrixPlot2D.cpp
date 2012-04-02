@@ -193,6 +193,7 @@ void cedar::aux::gui::MatrixPlot2D::init()
                                             ));
   // create a new layout for the widget
   QVBoxLayout *p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
 
   // create the plot object and add it to this widget

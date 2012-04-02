@@ -166,6 +166,7 @@ void cedar::aux::gui::MatrixPlot1D::init()
   this->setPalette(palette);
 
   QVBoxLayout *p_layout = new QVBoxLayout();
+  p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
 
   mpPlot = new QwtPlot(this);

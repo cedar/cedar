@@ -61,6 +61,7 @@
 
 // SYSTEM INCLUDES
 #include <QPainter>
+#include <QLabel>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include <QGraphicsDropShadowEffect>
@@ -545,6 +546,25 @@ void cedar::proc::gui::StepItem::contextMenuEvent(QGraphicsSceneContextMenuEvent
 
 void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
 {
+  int grid_spacing = 2;
+  int columns = 2;
+
+  // initialize dock
+  QDockWidget *p_dock = new QDockWidget(QString::fromStdString(this->getStep()->getName()), this->mpMainWindow);
+  p_dock->setFloating(true);
+  p_dock->setContentsMargins(0, 0, 0, 0);
+
+  // initialize widget & layout
+  QWidget *p_widget = new QWidget();
+  p_widget->setContentsMargins(0, 0, 0, 0);
+  p_dock->setWidget(p_widget);
+  QGridLayout *p_layout = new QGridLayout();
+  p_layout->setContentsMargins(grid_spacing, grid_spacing, grid_spacing, grid_spacing);
+  p_layout->setSpacing(grid_spacing);
+  p_widget->setLayout(p_layout);
+
+  // iterate over all data slots
+  int count = 0;
   cedar::aux::gui::DataPlotter *p_plotter = NULL;
   for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
        enum_it != cedar::proc::DataRole::type().list().end();
@@ -566,9 +586,21 @@ void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
         {
           if (p_plotter == NULL || !p_plotter->canAppend(data))
           {
+            int column = count % columns;
+            int row = count / columns;
+
+            // label
+            QLabel *p_label = new QLabel(QString::fromStdString(slot->getText()));
+            p_layout->addWidget(p_label, 2 * row, column);
+            p_layout->setRowStretch(2*row, 0);
+
+            // plotter
             p_plotter = new cedar::aux::gui::DataPlotter();
             p_plotter->plot(data, title);
-            this->showPlot(position, p_plotter, slot, this->getStep()->getName());
+            p_layout->addWidget(p_plotter, 2 * row + 1, column);
+            p_layout->setRowStretch(2*row + 1, 1);
+
+            count += 1;
           }
           else
           {
@@ -582,6 +614,18 @@ void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
       // that's ok, a step may not have any data in a certain role.
     }
   }
+
+  // adapt size of plot widget/layout
+  int base_size = 200;
+  p_dock->setGeometry
+  (
+    QRect
+    (
+      position,
+      QSize(base_size * p_layout->columnCount(), base_size * p_layout->rowCount() / 2)
+    )
+  );
+  p_dock->show();
 }
 
 void cedar::proc::gui::StepItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* style, QWidget* widget)

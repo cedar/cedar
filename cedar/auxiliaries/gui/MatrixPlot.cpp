@@ -93,9 +93,12 @@ cedar::aux::gui::MatrixPlot::MatrixPlot(QWidget *pParent)
 cedar::aux::gui::MultiPlotInterface(pParent),
 mpCurrentPlotWidget(NULL)
 {
+
   QVBoxLayout *p_layout = new QVBoxLayout();
-  p_layout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(p_layout);
+
+  this->setContentsMargins(0, 0, 0, 0);
+  p_layout->setContentsMargins(0, 0, 0, 0);
 
   if (pParent != NULL)
   {
