@@ -129,14 +129,17 @@ public:
     cedar::aux::conv::BorderType::Id mode = cedar::aux::conv::Mode::Same
   ) const = 0;
 
-  //!@brief Method for accessing the kernel list.
-  inline cedar::aux::conv::KernelList& getKernelList()
+  //!@brief method for setting the kernel list
+  virtual void setKernelList(cedar::aux::conv::KernelListPtr kernelList);
+
+  //!@brief method for accessing the kernel list
+  inline cedar::aux::conv::KernelListPtr getKernelList()
   {
     return this->mKernelList;
   }
 
   //!@brief Constant variant of the method for accessing the kernel list.
-  inline const cedar::aux::conv::KernelList& getKernelList() const
+  inline cedar::aux::conv::ConstKernelListPtr getKernelList() const
   {
     return this->mKernelList;
   }
@@ -160,7 +163,7 @@ protected:
   // none yet
 private:
   //! The list of kernel with which to convolve.
-  cedar::aux::conv::KernelList mKernelList;
+  cedar::aux::conv::KernelListPtr mKernelList;
 
   //--------------------------------------------------------------------------------------------------------------------
   // parameters

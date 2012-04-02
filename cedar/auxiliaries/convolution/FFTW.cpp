@@ -68,7 +68,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id mode
 ) const
 {
-  return this->convolveInternal(matrix, this->getKernelList().getCombinedKernel(), borderType);
+  return this->convolveInternal(matrix, this->getKernelList()->getCombinedKernel(), borderType);
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolve
@@ -167,7 +167,7 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal
   cv::Mat output = matrix_64.clone();
   output = 0.0;
   cv::Mat padded_kernel = this->padKernel(matrix_64, kernel_64);
-  std::cout << "padded kernel: " << padded_kernel << std::endl;
+
   unsigned int transformed_elements = 1;
   double number_of_elements = 1.0;
   for (unsigned int dim = 0 ; dim < cedar::aux::math::getDimensionalityOf(matrix_64) - 1; ++dim)
