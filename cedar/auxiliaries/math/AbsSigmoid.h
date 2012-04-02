@@ -48,7 +48,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@brief Sigmoid function that is based on absolute values.
  *
  *        This function behaves similar to cedar::aux::math::ExpSigmoid, but computing it is less costly.

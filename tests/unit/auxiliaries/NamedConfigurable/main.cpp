@@ -22,55 +22,46 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        main.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 11
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ruhr-uni-bochum.de
+    Date:        2012 04 02
 
-    Description: Namespace file for cedar::aux::math.
+    Description: 
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_NAMESPACE_H
-#define CEDAR_AUX_MATH_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/NamedConfigurable.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
+#include <vector>
+#include <string>
+#include <iostream>
 
-
-namespace cedar
+class TestClass : public cedar::aux::NamedConfigurable
 {
-  namespace aux
+};
+
+CEDAR_GENERATE_POINTER_TYPES(TestClass);
+
+int main()
+{
+  // the number of errors encountered in this test
+  int errors = 0;
+
+  TestClassPtr test_class(new TestClass());
+  test_class->setName("test_name");
+  std::string name = test_class->getName();
+  if (name != "test_name")
   {
-    /*!@brief Namespace for all math classes. */
-    namespace math
-    {
-      //!@brief a templated class for representing limits (i.e. an interval) of some type
-      template <typename T> struct Limits;
-
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Sigmoid);
-      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(SigmoidDeclaration);
-      //!@endcond
-
-      //!@brief a templated declaration for sigmoid function implementation
-      template <class DerivedClass> class SigmoidDeclarationT;
-
-      typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
-      CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
-    }
+    std::cout << "Wrong name was read; ";
+    ++errors;
   }
-}
+  std::cout << "Read name \"" << name << "\"." << std::endl;
 
-#endif // CEDAR_AUX_MATH_NAMESPACE_H
+  return errors;
+}

@@ -1,7 +1,7 @@
 /*======================================================================================================================
 
     Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
-
+ 
     This file is part of cedar.
 
     cedar is free software: you can redistribute it and/or modify it under
@@ -22,55 +22,31 @@
     Institute:   Ruhr-Universitaet Bochum
                  Institut fuer Neuroinformatik
 
-    File:        namespace.h
+    File:        Sigmoid.cpp
 
-    Maintainer:  Mathis Richter
-    Email:       mathis.richter@ini.rub.de
-    Date:        2010 11 11
+    Maintainer:  Oliver Lomp
+    Email:       oliver.lomp@ini.ruhr-uni-bochum.de
+    Date:        2012 03 25
 
-    Description: Namespace file for cedar::aux::math.
+    Description:
 
     Credits:
 
 ======================================================================================================================*/
 
-#ifndef CEDAR_AUX_MATH_NAMESPACE_H
-#define CEDAR_AUX_MATH_NAMESPACE_H
-
 // CEDAR INCLUDES
-#include "cedar/namespace.h"
-#include "cedar/auxiliaries/namespace.h"
-#include "cedar/defines.h"
+#include "cedar/auxiliaries/math/Sigmoid.h"
 
 // SYSTEM INCLUDES
-#include <boost/smart_ptr.hpp>
 
+//----------------------------------------------------------------------------------------------------------------------
+// constructors and destructor
+//----------------------------------------------------------------------------------------------------------------------
 
-namespace cedar
+cedar::aux::math::Sigmoid::~Sigmoid()
 {
-  namespace aux
-  {
-    /*!@brief Namespace for all math classes. */
-    namespace math
-    {
-      //!@brief a templated class for representing limits (i.e. an interval) of some type
-      template <typename T> struct Limits;
-
-      //!@cond SKIPPED_DOCUMENTATION
-      CEDAR_DECLARE_AUX_CLASS(Sigmoid);
-      CEDAR_DECLARE_AUX_CLASS(AbsSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(ExpSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(HeavisideSigmoid);
-      CEDAR_DECLARE_AUX_CLASS(SigmoidDeclaration);
-      //!@endcond
-
-      //!@brief a templated declaration for sigmoid function implementation
-      template <class DerivedClass> class SigmoidDeclarationT;
-
-      typedef cedar::aux::Factory<SigmoidPtr> SigmoidFactory;
-      CEDAR_GENERATE_POINTER_TYPES(SigmoidFactory);
-    }
-  }
 }
 
-#endif // CEDAR_AUX_MATH_NAMESPACE_H
+//----------------------------------------------------------------------------------------------------------------------
+// methods
+//----------------------------------------------------------------------------------------------------------------------

@@ -48,7 +48,6 @@
 
 // SYSTEM INCLUDES
 
-
 /*!@brief Basic interface for all sigmoid functions.
  */
 class cedar::aux::math::Sigmoid : public Configurable
@@ -69,9 +68,7 @@ public:
   }
 
   //!@brief Destructor
-  virtual ~Sigmoid()
-  {
-  }
+  virtual ~Sigmoid();
 
   //--------------------------------------------------------------------------------------------------------------------
   // public methods
@@ -130,4 +127,30 @@ private:
   // none yet
 };
 
+#include "cedar/auxiliaries/FactoryManager.h"
+
+namespace cedar
+{
+  namespace aux
+  {
+    namespace math
+    {
+      //!@brief The manager of all sigmoind instances
+      typedef cedar::aux::FactoryManager<SigmoidPtr> SigmoidManager;
+
+#ifdef MSVC
+#ifdef CEDAR_LIB_EXPORTS_AUX
+      // dllexport
+      template class __declspec(dllexport) cedar::aux::Singleton<SigmoidManager>;
+#else // CEDAR_LIB_EXPORTS_AUX
+    // dllimport
+      extern template class __declspec(dllimport) cedar::aux::Singleton<SigmoidManager>;
+#endif // CEDAR_LIB_EXPORTS_AUX
+#endif // MSVC
+
+      //!@brief The singleton object of the SigmoidFactory.
+      typedef cedar::aux::Singleton<SigmoidManager> SigmoidManagerSingleton;
+    }
+  }
+}
 #endif  // CEDAR_AUX_MATH_SIGMOID_H

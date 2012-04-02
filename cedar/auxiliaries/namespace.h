@@ -212,10 +212,8 @@ namespace cedar
     
     // Log related classes --------------------------------------------------------------------------------------------
     CEDAR_DECLARE_AUX_CLASS(Log);
-    typedef cedar::aux::Singleton<cedar::aux::Log> LogSingleton;
     
     //!@cond SKIPPED_DOCUMENTATION
-    CEDAR_GENERATE_POINTER_TYPES(LogSingleton);
     CEDAR_DECLARE_AUX_CLASS(LogInterface);
     CEDAR_DECLARE_AUX_CLASS(LogFilter);
     CEDAR_DECLARE_AUX_CLASS(ConsoleLog);
