@@ -102,9 +102,13 @@ void cedar::aux::gui::MatrixPlot1D::applyStyle(size_t lineId, QwtPlotCurve *pCur
     mLineColors.clear();
     mLineStyles.clear();
 
-    mLineColors.push_back(QColor(255, 0, 0));
-    mLineColors.push_back(QColor(0, 255, 0));
-    mLineColors.push_back(QColor(0, 0, 255));
+    mLineColors.push_back(QColor(0, 121, 177));
+    mLineColors.push_back(QColor(48, 162, 26));
+    mLineColors.push_back(QColor(224, 49, 37));
+    mLineColors.push_back(QColor(217, 220, 0));
+    mLineColors.push_back(QColor(118, 0, 177));
+    mLineColors.push_back(QColor(46, 221, 190));
+    mLineColors.push_back(QColor(245, 156, 16));
 
     mLineStyles.push_back(Qt::SolidLine);
     mLineStyles.push_back(Qt::DashLine);
