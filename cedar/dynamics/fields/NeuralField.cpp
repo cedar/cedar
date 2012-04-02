@@ -166,7 +166,7 @@ _mNoiseCorrelationKernelConvolution(new cedar::aux::conv::Convolution())
                                                                                         2
                                                                                       ));
   this->addConfigurableChild("noiseCorrelationKernel", mNoiseCorrelationKernel);
-  _mNoiseCorrelationKernelConvolution->getKernelList().append(mNoiseCorrelationKernel);
+  _mNoiseCorrelationKernelConvolution->getKernelList()->append(mNoiseCorrelationKernel);
 
   this->addConfigurableChild("lateralKernelConvolution", _mLateralKernelConvolution);
 
@@ -195,7 +195,7 @@ void cedar::dyn::NeuralField::slotKernelAdded(size_t kernelIndex)
 
 void cedar::dyn::NeuralField::transferKernelsToConvolution()
 {
-  this->getConvolution()->getKernelList().clear();
+  this->getConvolution()->getKernelList()->clear();
   for (size_t kernel = 0; kernel < this->_mKernels->size(); ++ kernel)
   {
     this->addKernelToConvolution(this->_mKernels->at(kernel));
@@ -205,12 +205,12 @@ void cedar::dyn::NeuralField::transferKernelsToConvolution()
 void cedar::dyn::NeuralField::addKernelToConvolution(cedar::aux::kernel::KernelPtr kernel)
 {
   kernel->setDimensionality(this->getDimensionality());
-  this->getConvolution()->getKernelList().append(kernel);
+  this->getConvolution()->getKernelList()->append(kernel);
 }
 
 void cedar::dyn::NeuralField::removeKernelFromConvolution(size_t index)
 {
-  this->getConvolution()->getKernelList().remove(index);
+  this->getConvolution()->getKernelList()->remove(index);
 }
 
 void cedar::dyn::NeuralField::readConfiguration(const cedar::aux::ConfigurationNode& node)

@@ -61,9 +61,6 @@ namespace
 
 cedar::aux::conv::OpenCV::OpenCV()
 {
-  this->getKernelList().connectToKernelAddedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
-  this->getKernelList().connectToKernelChangedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
-  this->getKernelList().connectToKernelRemovedSignal(boost::bind(&cedar::aux::conv::OpenCV::kernelRemoved, this, _1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -146,7 +143,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           const std::vector<int>& anchorVector
         ) const
 {
-  CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
+  CEDAR_DEBUG_ASSERT(this->getKernelList()->size() == this->mKernelTypes.size());
 
   //!@todo Implement full mode!
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
@@ -340,7 +337,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
           cedar::aux::conv::Mode::Id mode
         ) const
 {
-  CEDAR_DEBUG_ASSERT(this->getKernelList().size() == this->mKernelTypes.size());
+  CEDAR_DEBUG_ASSERT(this->getKernelList()->size() == this->mKernelTypes.size());
 
   //!@todo Mode handling
   CEDAR_ASSERT(mode == cedar::aux::conv::Mode::Same);
@@ -348,7 +345,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
   int border_type = this->translateBorderType(borderType);
 
   cv::Mat result = 0.0 * matrix;
-  for (size_t i = 0; i < this->getKernelList().size(); ++i)
+  for (size_t i = 0; i < this->getKernelList()->size(); ++i)
   {
     cv::Mat convolved;
 
@@ -359,7 +356,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       //--------------------------------------------------------------------------------------
       {
         cedar::aux::kernel::ConstSeparablePtr kernel
-          = cedar::aux::asserted_pointer_cast<const cedar::aux::kernel::Separable>(this->getKernelList().getKernel(i));
+          = cedar::aux::asserted_pointer_cast<const cedar::aux::kernel::Separable>(this->getKernelList()->getKernel(i));
 
         cv::Point anchor = cv::Point(-1, -1);
         this->translateAnchor(anchor, kernel);
@@ -372,7 +369,7 @@ cv::Mat cedar::aux::conv::OpenCV::convolve
       case KERNEL_TYPE_FULL:
       //--------------------------------------------------------------------------------------
       {
-        cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(i);
+        cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(i);
 
         cv::Point anchor = cv::Point(-1, -1);
         this->translateAnchor(anchor, kernel);
@@ -450,7 +447,7 @@ void cedar::aux::conv::OpenCV::updateKernelType(size_t index)
   }
 
 
-  cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(index);
+  cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(index);
   if (boost::dynamic_pointer_cast<const cedar::aux::kernel::Separable>(kernel))
   {
     this->mKernelTypes.at(index) = KERNEL_TYPE_SEPARABLE;
@@ -459,4 +456,16 @@ void cedar::aux::conv::OpenCV::updateKernelType(size_t index)
   {
     this->mKernelTypes.at(index) = KERNEL_TYPE_FULL;
   }
+}
+
+void cedar::aux::conv::OpenCV::setKernelList(cedar::aux::conv::KernelListPtr kernelList)
+{
+  this->Engine::setKernelList(kernelList);
+  for (size_t i = 0; i < this->getKernelList()->size(); ++i)
+  {
+    this->updateKernelType(i);
+  }
+  this->getKernelList()->connectToKernelAddedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
+  this->getKernelList()->connectToKernelChangedSignal(boost::bind(&cedar::aux::conv::OpenCV::updateKernelType, this, _1));
+  this->getKernelList()->connectToKernelRemovedSignal(boost::bind(&cedar::aux::conv::OpenCV::kernelRemoved, this, _1));
 }

@@ -71,6 +71,7 @@ _mMode
     cedar::aux::conv::Mode::Same
   )
 ),
+mKernelList(new cedar::aux::conv::KernelList()),
 _mEngine
 (
   new cedar::aux::conv::EngineParameter(this, "engine", cedar::aux::conv::EnginePtr(new cedar::aux::conv::OpenCV()))
@@ -87,7 +88,7 @@ _mEngine
 
 void cedar::aux::conv::Convolution::slotKernelAdded(size_t index)
 {
-  cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(index);
+  cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList()->getKernel(index);
   QObject::connect(kernel.get(), SIGNAL(kernelUpdated()), this, SLOT(updateCombinedKernel()));
   this->updateCombinedKernel();
 }
@@ -105,7 +106,7 @@ void cedar::aux::conv::Convolution::slotKernelRemoved(size_t)
 
 void cedar::aux::conv::Convolution::updateCombinedKernel()
 {
-  cv::Mat new_combined_kernel = this->getKernelList().getCombinedKernel();
+  cv::Mat new_combined_kernel = this->getKernelList()->getCombinedKernel();
   this->mCombinedKernel->lockForWrite();
   this->mCombinedKernel->setData(new_combined_kernel);
   this->mCombinedKernel->unlock();
@@ -113,25 +114,25 @@ void cedar::aux::conv::Convolution::updateCombinedKernel()
 
 void cedar::aux::conv::Convolution::selectedEngineChanged()
 {
+  this->getEngine()->setKernelList(this->getKernelList());
   mKernelAddedConnection.disconnect();
   mKernelChangedConnection.disconnect();
   mKernelRemovedConnection.disconnect();
 
   // connect to the new kernel list.
-  mKernelAddedConnection = this->getKernelList().connectToKernelAddedSignal
+  mKernelAddedConnection = this->getKernelList()->connectToKernelAddedSignal
                            (
                              boost::bind(&cedar::aux::conv::Convolution::slotKernelAdded, this, _1)
                            );
 
-  mKernelChangedConnection = this->getKernelList().connectToKernelChangedSignal
+  mKernelChangedConnection = this->getKernelList()->connectToKernelChangedSignal
                              (
                                boost::bind(&cedar::aux::conv::Convolution::slotKernelChanged, this, _1)
                              );
 
-  mKernelRemovedConnection = this->getKernelList().connectToKernelRemovedSignal
+  mKernelRemovedConnection = this->getKernelList()->connectToKernelRemovedSignal
                              (
                                boost::bind(&cedar::aux::conv::Convolution::slotKernelRemoved, this, _1)
                              );
-
   this->updateCombinedKernel();
 }
