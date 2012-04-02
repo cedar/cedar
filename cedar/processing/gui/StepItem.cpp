@@ -57,6 +57,7 @@
 #include "cedar/auxiliaries/Data.h"
 #include "cedar/auxiliaries/Singleton.h"
 #include "cedar/auxiliaries/Log.h"
+#include "cedar/auxiliaries/casts.h"
 #include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
@@ -565,6 +566,8 @@ void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
 
   // iterate over all data slots
   int count = 0;
+  QLabel *p_last_label = NULL;
+  bool is_multiplot = false;
   cedar::aux::gui::DataPlotter *p_plotter = NULL;
   for (std::vector<cedar::aux::Enum>::const_iterator enum_it = cedar::proc::DataRole::type().list().begin();
        enum_it != cedar::proc::DataRole::type().list().end();
@@ -584,27 +587,29 @@ void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
         // skip slots that aren't set
         if (data)
         {
+          int column = count % columns;
+          int row = 2 * (count / columns);
+
           if (p_plotter == NULL || !p_plotter->canAppend(data))
           {
-            int column = count % columns;
-            int row = count / columns;
-
             // label
-            QLabel *p_label = new QLabel(QString::fromStdString(slot->getText()));
-            p_layout->addWidget(p_label, 2 * row, column);
-            p_layout->setRowStretch(2*row, 0);
+            p_last_label = new QLabel(QString::fromStdString(slot->getText()));
+            p_layout->addWidget(p_last_label, row, column);
+            p_layout->setRowStretch(row, 0);
 
             // plotter
             p_plotter = new cedar::aux::gui::DataPlotter();
             p_plotter->plot(data, title);
-            p_layout->addWidget(p_plotter, 2 * row + 1, column);
-            p_layout->setRowStretch(2*row + 1, 1);
+            p_layout->addWidget(p_plotter, row + 1, column);
+            p_layout->setRowStretch(row + 1, 1);
 
             count += 1;
           }
           else
           {
             p_plotter->append(data, title);
+            p_last_label->setText("");
+            is_multiplot = true;
           }
         }
       }
@@ -613,6 +618,12 @@ void cedar::proc::gui::StepItem::plotAll(const QPoint& position)
     {
       // that's ok, a step may not have any data in a certain role.
     }
+  }
+
+  // if there is only one plot and it is a multiplot, we need no label
+  if (count == 1 && is_multiplot)
+  {
+    delete p_last_label;
   }
 
   // adapt size of plot widget/layout
