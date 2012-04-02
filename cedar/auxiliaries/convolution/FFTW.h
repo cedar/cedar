@@ -105,7 +105,7 @@ public:
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-  cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel) const;
+  cv::Mat convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel, cedar::aux::conv::BorderType::Id borderType) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // private methods

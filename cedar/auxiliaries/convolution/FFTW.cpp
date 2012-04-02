@@ -68,7 +68,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id mode
 ) const
 {
-
+  return this->convolveInternal(matrix, this->getKernelList().getCombinedKernel(), borderType);
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolve
@@ -80,7 +80,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   const std::vector<int>& anchor
 ) const
 {
-  return this->convolveInternal(matrix, kernel);
+  return this->convolveInternal(matrix, kernel, borderType);
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolve
@@ -91,7 +91,7 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id mode
 ) const
 {
-  return this->convolveInternal(matrix, kernel->getKernel());
+  return this->convolveInternal(matrix, kernel->getKernel(), borderType);
 }
 
 cv::Mat cedar::aux::conv::FFTW::convolve
@@ -102,16 +102,15 @@ cv::Mat cedar::aux::conv::FFTW::convolve
   cedar::aux::conv::Mode::Id mode
 ) const
 {
-
+  return this->convolveInternal(matrix, kernel.getCombinedKernel(), borderType);
 }
 
-
-
-
-
-
-
-cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv::Mat& kernel) const
+cv::Mat cedar::aux::conv::FFTW::convolveInternal
+        (
+          const cv::Mat& matrix,
+          const cv::Mat& kernel,
+          cedar::aux::conv::BorderType::Id borderType
+        ) const
 {
   if (cedar::aux::math::getDimensionalityOf(kernel) == 0)
   {
@@ -148,7 +147,22 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv
     CEDAR_ASSERT(kernel.type() == CV_64F);
     kernel_64 = kernel;
   }
-
+  // border interpolate
+  if (borderType != cedar::aux::conv::BorderType::Cyclic)
+  {
+    cv::Mat padded_matrix;
+    cv::copyMakeBorder
+    (
+      matrix_64,
+      padded_matrix,
+      kernel_64.size[1]/2,
+      kernel_64.size[1]/2,
+      kernel_64.size[0]/2,
+      kernel_64.size[0]/2,
+      borderType
+    );
+    matrix_64 = padded_matrix;
+  }
 
   cv::Mat output = matrix_64.clone();
   output = 0.0;
@@ -189,6 +203,15 @@ cv::Mat cedar::aux::conv::FFTW::convolveInternal(const cv::Mat& matrix, const cv
   fftw_free(matrix_fourier);
   fftw_free(result_fourier);
   fftw_free(kernel_fourier);
+
+  // border interpolate
+  if (borderType != cedar::aux::conv::BorderType::Cyclic)
+  {
+    int dh = kernel_64.size[1] / 2;
+    int dw = kernel_64.size[0] / 2;
+    output = output(cv::Range(dh, dh + matrix.rows), cv::Range(dw, dw + matrix.cols));
+  }
+
   if (matrix.type() == CV_32F)
   {
     cv::Mat output_32;
