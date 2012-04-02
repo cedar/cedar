@@ -146,6 +146,14 @@ bool cedar::aux::gui::MatrixPlot1D::canAppend(cedar::aux::ConstDataPtr data) con
     return false;
   }
 
+  if
+  (
+    this->mPlotSeriesVector.size() == 0
+    || cedar::aux::math::get1DMatrixSize(mat_data->getData()) != this->mPlotSeriesVector.at(0)->mXValues.size())
+  {
+    return false;
+  }
+
   return true;
 }
 
@@ -271,6 +279,8 @@ void cedar::aux::gui::MatrixPlot1D::showLegend(bool show)
     if (p_legend == NULL)
     {
       p_legend = new QwtLegend();
+      p_legend->setFrameStyle(QFrame::Box);
+      p_legend->setFrameShadow(QFrame::Sunken);
       this->mpPlot->insertLegend(p_legend, QwtPlot::BottomLegend);
     }
   }
