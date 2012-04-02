@@ -54,6 +54,13 @@
 #include <iostream>
 
 //----------------------------------------------------------------------------------------------------------------------
+// static members
+//----------------------------------------------------------------------------------------------------------------------
+
+std::vector<QColor> cedar::aux::gui::MatrixPlot1D::mLineColors;
+std::vector<Qt::PenStyle> cedar::aux::gui::MatrixPlot1D::mLineStyles;
+
+//----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -86,6 +93,46 @@ cedar::aux::gui::MatrixPlot1D::~MatrixPlot1D()
 // methods
 //----------------------------------------------------------------------------------------------------------------------
 
+void cedar::aux::gui::MatrixPlot1D::applyStyle(size_t lineId, QwtPlotCurve *pCurve)
+{
+  // initialize vectors, if this has not happened, yet
+  if (mLineColors.empty() || mLineStyles.empty())
+  {
+    mLineColors.clear();
+    mLineStyles.clear();
+
+    mLineColors.push_back(QColor(255, 0, 0));
+    mLineColors.push_back(QColor(0, 255, 0));
+    mLineColors.push_back(QColor(0, 0, 255));
+
+    mLineStyles.push_back(Qt::SolidLine);
+    mLineStyles.push_back(Qt::DashLine);
+    mLineStyles.push_back(Qt::DotLine);
+    mLineStyles.push_back(Qt::DashDotLine);
+    mLineStyles.push_back(Qt::DashDotDotLine);
+    mLineStyles.push_back(Qt::CustomDashLine);
+  }
+
+  const size_t color_count = mLineColors.size();
+  const size_t style_count = mLineStyles.size();
+  const size_t max_line_id = mLineStyles.size() * mLineStyles.size();
+
+  size_t line_id = lineId % max_line_id;
+  size_t color_id = line_id % color_count;
+  size_t style_id = (line_id / color_count) % style_count;
+
+  // get old pen
+  QPen pen = pCurve->pen();
+
+  // modify accordingly
+  pen.setColor(mLineColors.at(color_id));
+  pen.setStyle(mLineStyles.at(style_id));
+  pen.setWidthF(2);
+
+  // pass pen back to curve
+  pCurve->setPen(pen);
+}
+
 bool cedar::aux::gui::MatrixPlot1D::canAppend(cedar::aux::ConstDataPtr data) const
 {
   cedar::aux::ConstMatDataPtr mat_data = boost::dynamic_pointer_cast<const cedar::aux::MatData>(data);
@@ -101,6 +148,8 @@ void cedar::aux::gui::MatrixPlot1D::doAppend(cedar::aux::DataPtr data, const std
 {
   PlotSeriesPtr plot_series(new PlotSeries());
 
+  size_t line_id = mPlotSeriesVector.size();
+
   mpLock->lockForWrite();
   mPlotSeriesVector.push_back(plot_series);
 
@@ -114,7 +163,7 @@ void cedar::aux::gui::MatrixPlot1D::doAppend(cedar::aux::DataPtr data, const std
   }
 
   plot_series->mpCurve = new QwtPlotCurve(title.c_str());
-  this->setPlotStyle(plot_series->mpCurve);
+  applyStyle(line_id, plot_series->mpCurve);
 
   data->lockForRead();
   const cv::Mat& mat = plot_series->mMatData->getData();
@@ -171,13 +220,6 @@ void cedar::aux::gui::MatrixPlot1D::init()
 
   mpPlot = new QwtPlot(this);
   this->layout()->addWidget(mpPlot);
-}
-
-void cedar::aux::gui::MatrixPlot1D::setPlotStyle(QwtPlotCurve *pCurve)
-{
-  QPen pen = pCurve->pen();
-  pen.setWidthF(2);
-  pCurve->setPen(pen);
 }
 
 void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)

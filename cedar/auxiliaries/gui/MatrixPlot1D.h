@@ -148,13 +148,13 @@ private:
   //!@brief initialize
   void init();
 
-  //!@brief set the plot style
-  void setPlotStyle(QwtPlotCurve *pCurve);
-
   //!@brief (Re-)initializes the x and y value arrays.
   void buildArrays(PlotSeriesPtr series, unsigned int new_size);
 
   void doAppend(cedar::aux::DataPtr data, const std::string& title);
+
+  //!@brief Applies a plot style to a given curve.
+  static void applyStyle(size_t lineId, QwtPlotCurve *pCurve);
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -169,6 +169,13 @@ private:
 
   //! For locking the plot itself.
   QReadWriteLock *mpLock;
+
+  //! A vector containing all the colors used for plot lines.
+  static std::vector<QColor> mLineColors;
+
+  //! A vector containing all the line stypes for the plot.
+  static std::vector<Qt::PenStyle> mLineStyles;
+
 }; // class cedar::aux::gui::MatrixPlot1D
 
 #endif // CEDAR_AUX_GUI_MATRIX_PLOT_1D_H
