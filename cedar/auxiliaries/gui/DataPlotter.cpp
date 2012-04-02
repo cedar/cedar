@@ -62,6 +62,8 @@ mpCurrentPlot(NULL)
 {
   QVBoxLayout *p_layout = new QVBoxLayout();
   this->setLayout(p_layout);
+
+  this->setContentsMargins(0, 0, 0, 0);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 }
 
