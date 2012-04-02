@@ -47,6 +47,7 @@
 #include "cedar/auxiliaries/math/tools.h"
 
 // SYSTEM INCLUDES
+#include <qwt/qwt_legend.h>
 #include <QContextMenuEvent>
 #include <QVBoxLayout>
 #include <QPalette>
@@ -227,6 +228,7 @@ void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
   QMenu menu(this);
   QAction *p_antialiasing = menu.addAction("antialiasing");
   p_antialiasing->setCheckable(true);
+
   bool combined = true;
   for (size_t i = 0; i < this->mPlotSeriesVector.size(); ++i)
   {
@@ -234,6 +236,11 @@ void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
     combined &= series->mpCurve->testRenderHint(QwtPlotItem::RenderAntialiased);
   }
   p_antialiasing->setChecked(combined);
+
+  QAction *p_legend = menu.addAction("legend");
+  p_legend->setCheckable(true);
+  QObject::connect(p_legend, SIGNAL(toggled(bool)), this, SLOT(showLegend(bool)));
+  p_legend->setChecked(this->mpPlot->legend() != NULL);
 
   QAction *p_action = menu.exec(pEvent->globalPos());
   if (p_action == NULL)
@@ -248,6 +255,30 @@ void cedar::aux::gui::MatrixPlot1D::contextMenuEvent(QContextMenuEvent *pEvent)
       PlotSeriesPtr series = this->mPlotSeriesVector.at(i);
       series->mpCurve->setRenderHint(QwtPlotItem::RenderAntialiased, p_action->isChecked());
     }
+  }
+}
+
+void cedar::aux::gui::MatrixPlot1D::showLegend(bool show)
+{
+  if (show)
+  {
+    // show legend
+    QwtLegend *p_legend = this->mpPlot->legend();
+    if (p_legend == NULL)
+    {
+      p_legend = new QwtLegend();
+      this->mpPlot->insertLegend(p_legend, QwtPlot::BottomLegend);
+    }
+  }
+  else
+  {
+    // remove legend
+    delete this->mpPlot->legend();
+
+    // the following takes care of properly laying out everything again
+    QSize size = this->size();
+    this->resize(QSize(0, 0));
+    this->resize(size);
   }
 }
 
