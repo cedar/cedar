@@ -78,10 +78,6 @@ private:
 
     ~PlotSeries()
     {
-      if (this->mpCurve)
-      {
-        delete this->mpCurve;
-      }
     }
 
     //!@brief the displayed data

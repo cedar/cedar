@@ -217,7 +217,10 @@ void cedar::aux::gui::MatrixPlot2D::timerEvent(QTimerEvent * /* pEvent */)
   if (this->isVisible() && this->mMatData)
   {
     this->updateArrayData();
-    CEDAR_DEBUG_ASSERT(this->mppArrayData != NULL);
+    if(this->mppArrayData == NULL)
+    {
+      return;
+    }
     this->mpPlot->createDataset(this->mppArrayData, mDataRows, mDataCols);
     this->mpPlot->updateGL();
   }
