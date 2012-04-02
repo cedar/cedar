@@ -105,32 +105,7 @@ void cedar::aux::conv::Convolution::slotKernelRemoved(size_t)
 
 void cedar::aux::conv::Convolution::updateCombinedKernel()
 {
-  //!@todo make that this works for more than one/two dimensional kernels
-  cv::Mat new_combined_kernel = cv::Mat::zeros(1, 1, CV_32F);
-
-  for (size_t i = 0; i < this->getKernelList().size(); ++i)
-  {
-    cedar::aux::kernel::ConstKernelPtr kernel = this->getKernelList().getKernel(i);
-    kernel->lockForRead();
-    cv::Mat kernel_mat = kernel->getKernel();
-    kernel->unlock();
-
-    if (kernel_mat.rows > new_combined_kernel.rows || kernel_mat.cols > new_combined_kernel.cols)
-    {
-      int dw = std::max(0, (kernel_mat.cols - new_combined_kernel.cols + 1)/2);
-      int dh = std::max(0, (kernel_mat.rows - new_combined_kernel.rows + 1)/2);
-      cv::copyMakeBorder(new_combined_kernel, new_combined_kernel, dh, dh, dw, dw, cv::BORDER_CONSTANT, cv::Scalar(0));
-    }
-    int row_lower = (new_combined_kernel.rows - kernel_mat.rows)/2;
-    int row_upper = row_lower + kernel_mat.rows;
-    int col_lower = (new_combined_kernel.cols - kernel_mat.cols)/2;
-    int col_upper = col_lower + kernel_mat.cols;
-    cv::Range row_range(row_lower, row_upper);
-    cv::Range col_range(col_lower, col_upper);
-
-    new_combined_kernel(row_range, col_range) += kernel_mat;
-  }
-
+  cv::Mat new_combined_kernel = this->getKernelList().getCombinedKernel();
   this->mCombinedKernel->lockForWrite();
   this->mCombinedKernel->setData(new_combined_kernel);
   this->mCombinedKernel->unlock();
