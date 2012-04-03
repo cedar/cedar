@@ -76,7 +76,7 @@ public:
 public:
   virtual std::string getPlotClass() const = 0;
 
-  virtual cedar::aux::gui::PlotInterface *createPlot() = 0;
+  virtual cedar::aux::gui::PlotInterface* createPlot() = 0;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -97,16 +97,6 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::PlotDeclaration
 
 /*!@todo describe.
@@ -176,14 +166,6 @@ protected:
 private:
   // none yet
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
 };
 
 #endif // CEDAR_AUX_GUI_PLOT_DECLARATION_H

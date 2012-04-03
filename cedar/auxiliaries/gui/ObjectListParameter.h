@@ -139,15 +139,6 @@ private:
   //! Connection to the parameters instance added signal.
   boost::signals2::connection mObjectRemovedConnection;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::ObjectListParameter
 
 #endif // CEDAR_AUX_GUI_OBJECT_LIST_PARAMETER_H

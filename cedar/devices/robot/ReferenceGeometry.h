@@ -95,11 +95,11 @@ protected:
 
 public:
   //! smart pointer definition for the Joint struct
-  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::Joint> JointPtr;
+  CEDAR_GENERATE_POINTER_TYPES(Joint);
   //! smart pointer definition for the EndEffector struct
-  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::EndEffector> EndEffectorPtr;
+  CEDAR_GENERATE_POINTER_TYPES(EndEffector);
   //! smart pointer definition for the LinkSegment struct
-  typedef boost::shared_ptr<cedar::dev::robot::ReferenceGeometry::LinkSegment> LinkSegmentPtr;
+  CEDAR_GENERATE_POINTER_TYPES(LinkSegment);
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -126,20 +126,20 @@ public:
    * @return    pointer to joint struct
    * @param index    index of the joint
    */
-  const cedar::dev::robot::ReferenceGeometry::JointPtr getJoint(unsigned int index) const;
+  cedar::dev::robot::ReferenceGeometry::ConstJointPtr getJoint(unsigned int index) const;
 
   /*!@brief Returns a pointer to the end-effector transformation
    *
    * @return    pointer to endEffector struct
    */
-  const cedar::dev::robot::ReferenceGeometry::EndEffectorPtr getEndEffector() const;
+  cedar::dev::robot::ReferenceGeometry::ConstEndEffectorPtr getEndEffector() const;
   
   /*!@brief Returns a pointer to a specific link segment.
    *
    * @return    pointer to link segment struct
    * @param index    index of the link segment
    */
-  const cedar::dev::robot::ReferenceGeometry::LinkSegmentPtr getLinkSegment(unsigned int index) const;
+  cedar::dev::robot::ReferenceGeometry::ConstLinkSegmentPtr getLinkSegment(unsigned int index) const;
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods

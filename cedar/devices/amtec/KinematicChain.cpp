@@ -84,15 +84,13 @@ cedar::dev::amtec::KinematicChain::~KinematicChain()
 {
   for(unsigned int i = 0; i < mModules.size(); ++i)
   {
-    setJointVelocity(i, 0.0);
+    this->setJointVelocity(i, 0.0);
   }
 
   if(mpDevice)
   {
     delete mpDevice;
   }
-
-  return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -164,10 +162,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
 
   readOrDefaultConfiguration();
 
-  //
   // print module mapping to console
-  //
-
   std::cout << "Mapping of joints to modules:" << std::endl;
   std::cout << "amtecModuleMap = [ " << mModules[0];
   for (unsigned int i = 1; i < mModules.size(); ++i)
@@ -176,10 +171,7 @@ bool cedar::dev::amtec::KinematicChain::initDevice()
   }
   std::cout << " ];" << std::endl;
 
-  //
   // calibrate and configure the modules
-  //
-
   mutex_locker.unlock();
 
   for(unsigned int i = 0; i < mModules.size(); ++i)

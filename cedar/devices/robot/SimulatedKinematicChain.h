@@ -56,7 +56,7 @@ class cedar::dev::robot::SimulatedKinematicChain : public cedar::dev::robot::Kin
   //--------------------------------------------------------------------------------------------------------------------
 public:
   //!@brief constructor
-  SimulatedKinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
+  SimulatedKinematicChain(cedar::dev::robot::ConstReferenceGeometryPtr pReferenceGeometry);
   //!@brief constructor
   SimulatedKinematicChain(const std::string& configFileName);
   //!@brief destructor

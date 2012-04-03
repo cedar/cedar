@@ -80,7 +80,6 @@ cedar::dev::kuka::KukaInterface::~KukaInterface()
 //----------------------------------------------------------------------------------------------------------------------
 // public member functions
 //----------------------------------------------------------------------------------------------------------------------
-
 void cedar::dev::kuka::KukaInterface::init()
 {
   //The number of joints the KUKA LBR has
@@ -100,6 +99,7 @@ void cedar::dev::kuka::KukaInterface::init()
   //create a new Instance of the friRemote
   if (_mRemoteHost != "NULL")
   {
+    // friRemote cannot handle const char*
     mpFriRemote = new friRemote(_mServerPort, const_cast<char*>(_mRemoteHost.c_str()));
   }
   else

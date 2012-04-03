@@ -143,10 +143,10 @@ protected:
 private:
   static const int mUpdateInterval = 100;
   cedar::aux::RigidBodyPtr mpRigidBody;
-  QGridLayout* mpGridLayout;
-  QDoubleSpinBox* mpPositionXSpinBox;
-  QDoubleSpinBox* mpPositionYSpinBox;
-  QDoubleSpinBox* mpPositionZSpinBox;
+  QGridLayout *mpGridLayout;
+  QDoubleSpinBox *mpPositionXSpinBox;
+  QDoubleSpinBox *mpPositionYSpinBox;
+  QDoubleSpinBox *mpPositionZSpinBox;
   int mDecimals;
   int mRotationInterval;
   double mSinglePositionStep;

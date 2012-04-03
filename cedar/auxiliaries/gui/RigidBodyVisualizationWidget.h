@@ -125,13 +125,13 @@ protected:
 private:
   static const int mUpdateInterval = 100;
   cedar::aux::gl::RigidBodyVisualizationPtr mpRigidBodyVisualization;
-  QCheckBox* mpVisibleCheckBox;
-  QCheckBox* mpWireFrameCheckBox;
-  QCheckBox* mpLcfCheckBox;
-  QLineEdit* mpAxisLengthLineEdit;
-  QDoubleSpinBox* mpRedDoubleSpinBox;
-  QDoubleSpinBox* mpGreenDoubleSpinBox;
-  QDoubleSpinBox* mpBlueDoubleSpinBox;
+  QCheckBox *mpVisibleCheckBox;
+  QCheckBox *mpWireFrameCheckBox;
+  QCheckBox *mpLcfCheckBox;
+  QLineEdit *mpAxisLengthLineEdit;
+  QDoubleSpinBox *mpRedDoubleSpinBox;
+  QDoubleSpinBox *mpGreenDoubleSpinBox;
+  QDoubleSpinBox *mpBlueDoubleSpinBox;
 };
 
 #endif /* CEDAR_AUX_GUI_RIGID_BODY_VISUALIZATION_WIDGET_H */

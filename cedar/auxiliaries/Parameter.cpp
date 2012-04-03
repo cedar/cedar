@@ -155,3 +155,13 @@ void cedar::aux::Parameter::setConstant(bool value)
 
   emit propertyChanged();
 }
+
+const std::string& cedar::aux::Parameter::getName() const
+{
+  return this->mName;
+}
+
+void cedar::aux::Parameter::setName(const std::string& name)
+{
+  this->mName = name;
+}

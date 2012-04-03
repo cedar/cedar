@@ -40,12 +40,6 @@
 
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/gui/DataPlotter.h"
-/*#include "cedar/auxiliaries/DoubleData.h"
-#include "cedar/auxiliaries/MatData.h"
-#include "cedar/auxiliaries/ImageData.h"
-#include "cedar/auxiliaries/gui/MatrixPlot.h"
-#include "cedar/auxiliaries/gui/ImagePlot.h"
-#include "cedar/auxiliaries/gui/HistoryPlot.h"*/
 #include "cedar/auxiliaries/gui/PlotManager.h"
 #include "cedar/auxiliaries/exceptions.h"
 

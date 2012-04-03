@@ -63,7 +63,6 @@ QWidget(parent),
 mpRigidBodyVisualization(rigidBodyVisualization)
 {
   initWindow();
-  return;
 }
 
 cedar::aux::gui::RigidBodyVisualizationWidget::~RigidBodyVisualizationWidget()
@@ -143,8 +142,6 @@ void cedar::aux::gui::RigidBodyVisualizationWidget::initWindow()
   this->setLayout(main_layout);
 
   update();
-  return;
-
 }
 
 void cedar::aux::gui::RigidBodyVisualizationWidget::update()

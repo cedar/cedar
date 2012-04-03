@@ -41,15 +41,6 @@
 #include "cedar/auxiliaries/gui/namespace.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
-#include "cedar/auxiliaries/gl/Block.h"
-#include "cedar/auxiliaries/gl/Sphere.h"
-#include "cedar/auxiliaries/gl/Cone.h"
-#include "cedar/auxiliaries/gl/Cylinder.h"
-#include "cedar/auxiliaries/gl/Pyramid.h"
-#include "cedar/auxiliaries/gl/Prism.h"
-#include "cedar/auxiliaries/gl/Torus.h"
-#include "cedar/auxiliaries/gl/Ellipse.h"
-#include "cedar/auxiliaries/gl/Chessboard.h"
 #include "cedar/auxiliaries/gui/BaseWidget.h"
 #include "cedar/auxiliaries/gui/RigidBodyWidget.h"
 #include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
@@ -64,6 +55,7 @@
  * object can be changed by spin boxes. Objects can be deleted from and added to the scene.
  *
  * @remarks Not all functionalities are implemented yet.
+ * @todo completely overhaul this widget!
  */
 class cedar::aux::gui::SceneWidget : public cedar::aux::gui::BaseWidget, private Ui_SceneWidget
 {

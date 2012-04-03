@@ -80,6 +80,7 @@ public:
   void timerEvent(QTimerEvent* pEvent);
 
   //!@brief call this function to initialize Gl resources for the passed visualization object
+  //!@todo why does this function just calls another function at pVisualization?
   void initGl(cedar::aux::gl::RigidBodyVisualizationPtr pVisualization);
   //--------------------------------------------------------------------------------------------------------------------
   // private methods
