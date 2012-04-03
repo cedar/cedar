@@ -49,7 +49,6 @@
 #include "cedar/auxiliaries/gl/Sphere.h"
 #include "cedar/auxiliaries/System.h"
 
-
 // SYSTEM INCLUDES
 #include <vector>
 #include <QApplication>
@@ -246,6 +245,8 @@ int main(int argc, char **argv)
   // clean up
   worker.stop();
   worker.wait();
+  p_arm->stop();
+  p_arm->wait();
   if (use_hardware)
   {
     delete p_fri_status_widget;

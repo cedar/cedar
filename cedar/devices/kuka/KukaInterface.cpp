@@ -65,7 +65,8 @@ cedar::dev::kuka::KukaInterface::~KukaInterface()
   {
     //stop the looped Thread
     stop();
-    //TODO The following line is not true at this point, the script "kukain.src" is not ready yet!
+    wait();
+    //TODO The following line is not used at this point, the script "kukain.src" is not ready yet!
     //If the script "kukain.src" is started on the KUKA-LBR, the first boolean value means "Stop the FRI"
     //it won't throw an exception, because the index is 0 and therefore valid
     mpFriRemote->setToKRLBool(0, true);
@@ -177,7 +178,7 @@ void cedar::dev::kuka::KukaInterface::setWorkingMode(cedar::dev::robot::Kinemati
   //Reset the commanded position to the measured joint position
   mCommandedJointPosition = mMeasuredJointPosition;
   //restart the thread, since it was stopped by KinematicChain::setWorkingMode()
-  this ->start();
+  this->start();
 }
 
 /*
@@ -186,7 +187,7 @@ void cedar::dev::kuka::KukaInterface::setWorkingMode(cedar::dev::robot::Kinemati
  */
 void cedar::dev::kuka::KukaInterface::start(Priority priority)
 {
-  if(isRunning())
+  if (isRunning())
   {
     return;
   }

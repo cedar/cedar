@@ -37,7 +37,8 @@
 #include "ForwardInverseWidget.h"
 #include "iiClosedFormInverseKinematics.hpp"
 
-// PROJECT INCLUDES
+// CEDAR INCLUDES
+#include "cedar/auxiliaries/System.h"
 #include "cedar/devices/amtec/KinematicChain.h"
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/devices/robot/gl/CoraArm.h"
@@ -58,14 +59,21 @@ int main(int argc, char **argv)
 
   // todo: this is not a good setup, change this to a similar structure as the KUKA example
   // create kinematic chains
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/cora_arm.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/cora_arm.json");
   cedar::dev::robot::KinematicChainPtr p_cora_arm_sim
   (
-    new cedar::dev::robot::SimulatedKinematicChain("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf")
+    new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old)
   );
+  p_cora_arm_sim->readJson(configuration_file);
   cedar::dev::robot::KinematicChainPtr p_cora_arm_hw;
   if(useHardware)
   {
-    p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr(new cedar::dev::amtec::KinematicChain("../../../tests/interactive/devices/gl/CoraHwAndSim/cora_arm.conf"));
+    p_cora_arm_hw = cedar::dev::robot::KinematicChainPtr
+    (
+      new cedar::dev::amtec::KinematicChain(configuration_file_old)
+    );
+    p_cora_arm_hw->readJson(configuration_file);
   }
 
   // create gl visualization objects
@@ -84,10 +92,6 @@ int main(int argc, char **argv)
   cedar::aux::gui::Viewer viewer(p_scene);
   viewer.show();
   viewer.setSceneRadius(p_scene->getSceneLimit());
-
-  // create a widget to control the scene
-  //SceneWidgetPtr p_scene_widget(new SceneWidget(p_scene));
-  //p_scene_widget->show();
 
   // create control widgets
   std::vector<cedar::dev::robot::KinematicChainPtr> kinematic_chains;
