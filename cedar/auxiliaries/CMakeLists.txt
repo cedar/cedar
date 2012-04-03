@@ -1,0 +1,73 @@
+#=======================================================================================================================
+#
+#   Copyright 2011 Institut fuer Neuroinformatik, Ruhr-Universitaet Bochum, Germany
+# 
+#   This file is part of cedar.
+#
+#   cedar is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   cedar is distributed in the hope that it will be useful, but WITHOUT ANY
+#   WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+#   License for more details.
+#
+#   You should have received a copy of the GNU Lesser General Public License
+#   along with cedar. If not, see <http://www.gnu.org/licenses/>.
+#
+#=======================================================================================================================
+#
+#   Institute:   Ruhr-Universitaet Bochum
+#                Institut fuer Neuroinformatik
+#
+#   File:        CMakeLists.txt
+#
+#   Maintainer:  Mathis Richter
+#   Email:       mathis.richter@ini.rub.de
+#   Date:        2010 11 29
+#
+#   Description:
+#
+#   Credits:
+#
+#=======================================================================================================================
+
+cedar_add_library(cedaraux
+  MOC_HEADERS
+  RigidBody.h
+  gl/RigidBodyVisualization.h
+  gui/BaseWidget.h
+  gui/BoolParameter.h
+  gui/DataPlotter.h
+  gui/DirectoryParameter.h
+  gui/DoubleParameter.h
+  gui/DoubleVectorParameter.h
+  gui/EnumParameter.h
+  gui/FileParameter.h
+  gui/IntParameter.h
+  gui/ObjectParameter.h
+  gui/ObjectListParameter.h
+  gui/Parameter.h
+  gui/PlotInterface.h
+  gui/RigidBodyWidget.h
+  gui/RigidBodyVisualizationWidget.h
+  gui/Viewer.h
+  gui/SceneWidget.h
+  gui/HistoryPlot.h
+  gui/HistoryPlot0D.h
+  gui/MatrixPlot.h
+  gui/MatrixPlot1D.h
+  gui/MatrixPlot2D.h
+  gui/PropertyPane.h
+  gui/ImagePlot.h
+  gui/StringParameter.h
+  gui/UIntParameter.h
+  gui/UIntVectorParameter.h
+  Parameter.h
+  kernel/Kernel.h
+  kernel/Gauss.h
+  LINK_LIBRARIES
+  cedarunits
+)
