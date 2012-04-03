@@ -397,7 +397,7 @@ void cedar::dev::robot::KinematicChainModel::init()
   omega.at<double>(0, 0) = 1;
   for (unsigned int j=0; j<getNumberOfJoints(); j++)
   {
-    cedar::dev::robot::ReferenceGeometry::JointPtr joint = mpKinematicChain->getReferenceGeometry()->getJoint(j);
+    cedar::dev::robot::ReferenceGeometry::ConstJointPtr joint = mpKinematicChain->getReferenceGeometry()->getJoint(j);
     p = cv::Mat::zeros(3, 1, CV_64FC1);
     p.at<double>(0, 0) = joint->position[0];
     p.at<double>(1, 0) = joint->position[1];
@@ -422,7 +422,7 @@ void cedar::dev::robot::KinematicChainModel::init()
 
   // end effector
   mReferenceEndEffectorTransformation = cv::Mat::zeros(4, 4, CV_64FC1);
-  cedar::dev::robot::ReferenceGeometry::EndEffectorPtr endEffector
+  cedar::dev::robot::ReferenceGeometry::ConstEndEffectorPtr endEffector
     = mpKinematicChain->getReferenceGeometry()->getEndEffector();
   
   mReferenceEndEffectorTransformation.at<double>(0, 3) = endEffector->position[0];
