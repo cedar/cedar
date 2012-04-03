@@ -47,8 +47,8 @@
 
 
 //--------------------------------------------------------------------------------------------------------------------
-//(re)defines of our new introduced properties in OpenCv:
-//comment this out, if the patched OpenCv is available
+//(re)defines of our new introduced properties in OpenCV:
+//delete this, if the patched OpenCV is available
 #ifndef CV_CAP_PROP_ZOOM
   #define CV_CAP_PROP_ZOOM 27
 #endif

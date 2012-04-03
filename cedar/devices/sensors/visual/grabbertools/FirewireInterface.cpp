@@ -137,11 +137,6 @@ bool cedar::dev::sensors::visual::grabbertools::FirewireInterface::resetCam()
   }
 
   mError = dc1394_camera_reset(mpCamera);
-  /*if (mError<0)
-  {
-    std::cout << "ERROR: " << dc1394_error_get_string(mError) << std::endl;
-  }
-  */
   return (mError == DC1394_SUCCESS);
 }
 

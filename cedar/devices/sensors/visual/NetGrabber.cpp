@@ -78,7 +78,6 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
   //overwrite with settings from constructor
   getChannel(0)->channelName = yarpChannelName0;
   getChannel(1)->channelName = yarpChannelName1;
-
   applyInit();
 }
 

@@ -133,13 +133,15 @@ protected:
 private:
 
   /*! \brief This is the struct, for the values of the camera settings
-   *  \remarks This is the local storage for the camera settings
+   *
+   *    This is the local storage for the camera settings
    *    and is only needed for ConfigurationInterface class
    */
   CameraSettings &mCamSettings;
 
   /*! \brief This is the map, where all supported properties and their actual values stored in
-   *  \remarks This is the local storage for the supported camera properties
+   *
+   *    This is the local storage for the supported camera properties
    *    and is only needed for ConfigurationInterface class
    */
   CameraPropertyValues &mCamPropertyValues;
@@ -148,7 +150,8 @@ private:
   unsigned int mChannel;
 
   /*! \brief The channel prefix used in the configuration file.
-   *  \remarks This is essential if the configuration of more than one camera should be
+   *
+   *    This is essential if the configuration of more than one camera should be
    *    saved in the configuration file
    */
   std::string mChannelPrefix;

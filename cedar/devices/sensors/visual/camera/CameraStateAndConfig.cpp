@@ -109,7 +109,6 @@ cedar::dev::sensors::visual::CameraStateAndConfig::CameraStateAndConfig
   }
 
   mInitialization = false;
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -150,7 +149,6 @@ bool cedar::dev::sensors::visual::CameraStateAndConfig::saveConfiguration()
 //--------------------------------------------------------------------------------------------------------------------
 bool cedar::dev::sensors::visual::CameraStateAndConfig::setProperty(CameraProperty::Id propId, double value)
 {
-
   int wanted_value = boost::math::iround(value);
 
   #ifdef ENABLE_GRABBER_WARNING_OUTPUT
@@ -433,12 +431,6 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
     std::cout << "[CameraState::setAllParametersToCam] channel " << mChannel << std::endl;
   #endif
 
-  //all parameters are already read from config-file and stored in mCamPropertyValues,mCamSettings
-  //all values in the configuration file have to be valid!!!
-
-  //---------------------------------------------
-  // Settings
-  //---------------------------------------------
   CameraVideoMode::Id id_mode = CameraVideoMode::type().get(mCamSettings.mode).id();
   if (id_mode == cedar::aux::Enum::UNDEFINED)
   {
@@ -484,7 +476,6 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
     setCamProperty(static_cast<unsigned int> (CameraSetting::SETTING_FPS), static_cast<unsigned int> (id_fps));
   }
 
-  //---------------------------------------------
   CameraIsoSpeed::Id id_iso = CameraIsoSpeed::type().get(mCamSettings.iso_speed).id();
   if (id_iso == cedar::aux::Enum::UNDEFINED)
   {
@@ -520,9 +511,8 @@ void cedar::dev::sensors::visual::CameraStateAndConfig::setAllParametersToCam()
     setCamProperty(static_cast<unsigned int> (CameraSetting::SETTING_ISO_SPEED), static_cast<unsigned int> (id_iso));
   }
 
-  //---------------------------------------------
   //properties for each channel
-  //our map from prop-id to value
+  //the map from prop-id to value
   CameraPropertyValues::iterator it;
 
   for (it = mCamPropertyValues.begin(); it != mCamPropertyValues.end(); it++)

@@ -17,37 +17,22 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/PictureGrabber.h"
-//#include <devices/sensors/visual/PictureGrabber.h>
-
-
-// PROJECT INCLUDES
-
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
 
-
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-#define FILE_NAME_0 "/usr/local/src/OpenCV-2.2.0/samples/c/puzzle.png"
-#define FILE_NAME_1 "/usr/local/src/OpenCV-2.2.0/samples/c/fruits.jpg"
-
-#define GRABBER_NAME_0 "Picture_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "picture_grabber_testcase.config"
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
-
-using namespace cv;
-
 int main(int , char **)
 {
+
+  const std::string FILE_NAME_0 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1024x768.jpg";
+  const std::string FILE_NAME_1 = "/usr/share/wallpapers/Vector_Sunset/contents/images/1280x1024.jpg";
+
+  const std::string GRABBER_NAME_0 = "Picture_Grabber_TestCase";
+  const std::string CONFIG_FILE_NAME_0 = "picture_grabber_testcase.config";
+
   //title of highgui window
-  std::string highgui_window_name_0 = (std::string) GRABBER_NAME_0 + ":" + FILE_NAME_0;
+  const std::string highgui_window_name_0 = FILE_NAME_0;
 
   std::cout << "\n\nInteractive test of the PictureGrabber class (mono)\n";
   std::cout << "-----------------------------------------------------\n\n";
@@ -154,7 +139,7 @@ int main(int , char **)
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
   std::cout << "\nShow pictures\n";
-  namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed on initialization
   cv::Mat frame0 = picture_grabber->getImage();
@@ -166,7 +151,7 @@ int main(int , char **)
   //startRecording starts the grabbing-thread if not running
   //the speed of the grabbingthread is independent of the speed writing to
   //the avi-file. The video will only be shorter or longer.
-  picture_grabber->startRecording(15);
+  picture_grabber->startRecording(15,CV_FOURCC('M','P','4','2'));
 
   //get frames for a while
   unsigned int counter=0;
@@ -198,13 +183,13 @@ int main(int , char **)
     }
 
     //wait 100ms (needed for highgui)
-    waitKey(100);
+    cv::waitKey(100);
   }
 
   //------------------------------------------------------------------
   //clean up
 
-  destroyWindow(highgui_window_name_0);
+  cv::destroyWindow(highgui_window_name_0);
 
   //stop grabbing-thread if running
   //recording will also be stopped

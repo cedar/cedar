@@ -23,46 +23,38 @@
 
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
+#include <boost/lexical_cast.hpp>
 
-
-//--------------------------------------------------------------------------------------------------------------------
-// grabber config
-//--------------------------------------------------------------------------------------------------------------------
-
-// grab from device number on the bus (as an integer)
-#define CHANNEL_0_DEVICE 0
-//#define CHANNEL_0_DEVICE 197055
-
-// finish the initialization, i.e. grab the first image on creation of the grabber
-// in this case, it isn't possible to set camera settings (like mode, fps, iso-speed)
-#define FINISH_INITIALIZATION true
-
-// channel_0_device is the bus-id or the guid
-#define IS_GUID false
-
-// the name of the grabber
-// only used in the configuration file
-#define GRABBER_NAME "Camera_Grabber_TestCase"
-
-// the basename for the configuration file
-// overall there are more config.files, this one for the grabber itself (call it the main configuration),
-// one for each channel for the camera-capabilities (it's name is stored in the main config.)
-// one for the actual setting of the camera (it's name is derived from the main config.filename
-// with an appendix (_ch0, _ch1, ...)
-#define CONFIG_FILE_NAME "camera_grabber_simple_testcase.config"
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
-
-using namespace cv;
 
 
 int main(int , char **)
 {
+
+  // grab from device number on the bus (as an integer)
+  const int CHANNEL_0_DEVICE = 0;
+  //  const int CHANNEL_0_DEVICE = 197055;
+
+  // finish the initialization, i.e. grab the first image on creation of the grabber
+  // in this case, it isn't possible to set camera settings (like mode, fps, iso-speed)
+  const bool  FINISH_INITIALIZATION = true;
+
+  // channel_0_device is the bus-id or the guid
+  const bool  IS_GUID = false;
+
+  // the name of the grabber
+  // only used in the configuration file
+  const std::string GRABBER_NAME = "Camera_Grabber_TestCase";
+
+  // the basename for the configuration file
+  // overall there are more config.files, this one for the grabber itself (call it the main configuration),
+  // one for each channel for the camera-capabilities (it's name is stored in the main config.)
+  // one for the actual setting of the camera (it's name is derived from the main config.filename
+  // with an appendix (_ch0, _ch1, ...)
+  const std::string CONFIG_FILE_NAME = "camera_grabber_simple_testcase.config";
+
+
   //title of highgui window
-  std::string highgui_window_name = (std::string) GRABBER_NAME + ": CHANNEL_0_DEVICE" ;
+  std::string highgui_window_name = GRABBER_NAME + ": " + boost::lexical_cast<std::string>(CHANNEL_0_DEVICE);
 
 
   std::cout << "\n\nInteractive test of the CameraGrabber class\n";
@@ -75,12 +67,13 @@ int main(int , char **)
   cedar::dev::sensors::visual::CameraGrabber *camera_grabber=NULL;
   try
   {
-    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber(
-                                                                     CONFIG_FILE_NAME,
-                                                                     CHANNEL_0_DEVICE,
-                                                                     IS_GUID,
-                                                                     FINISH_INITIALIZATION
-                                                                   );
+    camera_grabber = new cedar::dev::sensors::visual::CameraGrabber
+                         (
+                           CONFIG_FILE_NAME,
+                           CHANNEL_0_DEVICE,
+                           IS_GUID,
+                           FINISH_INITIALIZATION
+                         );
   }
   catch (cedar::aux::exc::InitializationException &e)
   {
@@ -198,7 +191,7 @@ int main(int , char **)
 
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
-  namedWindow(highgui_window_name,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed and could be read
   //always use the QReadWriteLock for locking the cv::Mat image object
@@ -225,7 +218,7 @@ int main(int , char **)
   //get frames for a while
   while (!frame.empty())
   {
-    imshow(highgui_window_name,frame);
+    cv::imshow(highgui_window_name,frame);
 
     //get new images, this is independent from camera-thread
     //if camera-thread is faster than your processing, images will be skipped
@@ -249,7 +242,7 @@ int main(int , char **)
     }
 
     //wait 10ms (needed for highgui) => get images from thread with 100 fps
-    waitKey(10);
+    cv::waitKey(10);
   }
 
   //------------------------------------------------------------------
@@ -262,7 +255,7 @@ int main(int , char **)
     camera_grabber->stopGrabber();
   }
 
-  destroyWindow(highgui_window_name);
+  cv::destroyWindow(highgui_window_name);
   //camera_grabber->writeConfiguration();
 
   if (camera_grabber)

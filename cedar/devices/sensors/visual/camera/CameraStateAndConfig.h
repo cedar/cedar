@@ -45,13 +45,9 @@
 // SYSTEM INCLUDES
 #include <QReadWriteLock>
 
-
-
-
 /*! \class cedar::dev::sensors::visual::CameraStateAndConfig
  *  \brief This class manage the properties and capabilities of a camera.
  *
- *  \remarks
  *    With the methods of this class, the CameraGraber class can evaluate the available properties
  *    and their possible values.
  *
@@ -110,7 +106,8 @@ public:
 public:
 
   /*! \brief Set a property in the cv::VideoCapture class
-   *   \remarks This method checks if given value is supported
+   *
+   *    This method checks if given value is supported
    */
   bool setProperty(CameraProperty::Id propId, double value);
 
@@ -125,7 +122,8 @@ public:
   double getProperty(CameraProperty::Id propId);
 
   /*! \brief Get the real value of a Property which is set to auto.
-   *  \remarks On all other properties it is the same as getProperty()
+   *
+   *    On all other properties it is the same as getProperty()
    */
   double getPropertyValue(CameraProperty::Id propId);
 
@@ -157,7 +155,8 @@ public:
   bool isReadable(CameraProperty::Id propId);
 
   /*! \brief This method tells you, if the given property supports the OnePushAuto mode
-   *  \remarks OnePushAuto is a special mode.
+   *
+   *  OnePushAuto is a special mode.<br>
    *     It is used as follows: Set a value to a property and then to OnePushAuto mode.
    *     The camera now will try to hold this value automatically.
    *  \param propId The id of the  property

@@ -60,9 +60,10 @@ public cedar::aux::ConfigurationInterface
   //!@cond SKIPPED_DOCUMENTATION
 
   /*! \brief Stores the capability of a property
-   *  \remarks Every property have several ways to be accessed, and a defined range
+   *
+   *    Every property have several capabilities and a defined range
    *    where the values can be set.
-   *    This struct stores flags for all possible ways and the range of the values
+   *    This struct stores flags for all capabilities and the range of the values
    */
   struct CameraPropertyCapability
   {
@@ -119,7 +120,8 @@ public:
   bool isReadable(CameraProperty::Id propId);
 
   /*! \brief This method tells you, if the given property supports the OnePushAuto mode
-   *  \remarks OnePushAuto is a special mode.
+   *
+   *     OnePushAuto is a special mode. <br>
    *     It is used as follows: Set a value to a property and then to OnePushAuto mode.
    *     The camera now will try to hold this value automatically.
    *  \param propId The id of the  property

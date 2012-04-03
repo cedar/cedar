@@ -41,7 +41,7 @@
 
 
 cedar::aux::EnumType<cedar::dev::sensors::visual::CameraSetting>
-            cedar::dev::sensors::visual::CameraSetting::mType("cedar::dev::sensors::visual::CameraSetting::");
+                     cedar::dev::sensors::visual::CameraSetting::mType("cedar::dev::sensors::visual::CameraSetting::");
 
 //!@cond SKIPPED_DOCUMENTATION
 #ifndef MSVC
@@ -84,12 +84,11 @@ void cedar::dev::sensors::visual::CameraSetting::construct()
                                       "SETTING_ISO_SPEED",
                                       "Set the speed of the IEEE1394/firewire bus"
                                     ));
-
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
-
 
 const cedar::aux::EnumBase& cedar::dev::sensors::visual::CameraSetting::type()
 {

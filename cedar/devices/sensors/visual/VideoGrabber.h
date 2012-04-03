@@ -45,7 +45,8 @@
 
 /*! @class cedar::dev::sensors::visual::VideoGrabber
  *  @brief This grabber grabs images from video-files
- *  @remarks This grabber will grab from all video-files known by OpenCV and/or ffmpeg
+ *
+ *    This grabber will grab from all video-files known by OpenCV and/or ffmpeg
  *		Please look at their documentation for supported types (i.e. mpg, avi, ogg,...)
  */
 class cedar::dev::sensors::visual::VideoGrabber
@@ -111,7 +112,7 @@ public:
    *   The speed stored in the AVI-File will be multiplied with this factor.<br>
    *		Effective FPS should be SpeedFactor*AVI-Speed<br>
    *  @remarks
-   *		The grabber thread have to be restarted to take effect.<br>
+   *		The grabber thread have to be restarted to take setLoop effect.<br>
    *		This is done internally (by calling setFPS), but keep that in mind.
    *  @see
    *		setFPS
@@ -139,9 +140,9 @@ public:
   double getPositionRelative();
 
   /*! @brief Set the position in the avi-files to an absolute position
-   *  @param newPositionAbs New position in the range is from 0..FrameCount
-   *  @remarks
+   *
    *      For relative positioning use setPostionRel()
+   *  @param newPositionAbs New position in the range is from 0..FrameCount
    */
   void setPositionAbsolute(unsigned int newPositionAbs);
 
@@ -196,8 +197,8 @@ protected:
   bool onInit();
 
   /*! @brief Grab on all available files
-   *  @remarks
-   *      The shortest file determine the end
+   *
+   *      The shortest file determine the end.<br>
    *      In case of looping through the files, the shortest file define the restart moment
    */
   bool onGrab();
@@ -231,7 +232,7 @@ protected:
   double _mSpeedFactor;
 
   /*! @brief Count of frames of the shortest file
-   *  @remarks
+   *
    *		Used for scrolling in the avi-file
    *  @see
    *		setPositionRelative, getPositionRelative, setPositionAbsolute, setPositionRelative

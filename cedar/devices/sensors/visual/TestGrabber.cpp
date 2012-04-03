@@ -64,11 +64,12 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 
 //----------------------------------------------------------------------------------------------------
 // Constructor for a stereo grabber
-cedar::dev::sensors::visual::TestGrabber::TestGrabber(
-                          std::string configFileName,
-                          std::string channelName0,
-                          std::string channelName1
-                        )
+cedar::dev::sensors::visual::TestGrabber::TestGrabber
+(
+  std::string configFileName,
+  std::string channelName0,
+  std::string channelName1
+)
 :
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
@@ -93,7 +94,7 @@ cedar::dev::sensors::visual::TestGrabber::~TestGrabber()
   doCleanUp();
 
   //do memory de-allocation in the destructor
-  mChannelVector.clear();
+  //all stuff in the mChannels vector is cleared by the shared pointer
 
   //some debug-output
   std::cout<<"[TestGrabber::~TestGrabber] GrabberName: " << getName() << std::endl;
@@ -116,7 +117,7 @@ bool cedar::dev::sensors::visual::TestGrabber::onInit()
 
   for (unsigned int i = 0; i < mNumCams; ++i)
   {
-    std::cout << "Channel " << i << ": " << mChannelVector.at(i) << "\n";
+    std::cout << "Channel " << i << ": " << getChannel(i)->sourceFileName << "\n";
   }
   std::cout << std::flush;
 
@@ -180,7 +181,7 @@ const std::string& cedar::dev::sensors::visual::TestGrabber::onGetSourceInfo(uns
 
   //give some information about the used source like channelname, filename, devicename
   //or something like that
-  return mChannelVector.at(channel);
+  return getChannel(channel)->sourceFileName;
 }
 
 //----------------------------------------------------------------------------------------------------

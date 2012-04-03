@@ -59,7 +59,6 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 
   //overwrite configuration with constructor-values
   getChannel(0)->sourceFileName = aviFileName;
-
   applyInit();
 }
 

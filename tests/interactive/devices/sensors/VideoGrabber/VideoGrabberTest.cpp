@@ -18,36 +18,18 @@
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/VideoGrabber.h"
 
-// PROJECT INCLUDES
-
 // SYSTEM INCLUDES
-//#include <iostream>
-//#include <exception>
-
-
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-//"/opt/matlab/R2010b/toolbox/images/imdemos/traffic.avi";
-#define FILE_NAME_0 "/opt/matlab/R2010b/toolbox/images/imdemos/rhinos.avi"
-
-#define GRABBER_NAME_0 "Video_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "video_grabber_testcase.config"
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
-
-using namespace cv;
 
 
 int main(int , char **)
 {
+
+  const std::string FILE_NAME_0 = "/opt/matlab/R2010b/toolbox/images/imdemos/rhinos.avi";
+  const std::string GRABBER_NAME_0 = "Video_Grabber_TestCase";
+  const std::string CONFIG_FILE_NAME_0 = "video_grabber_testcase.config";
+
   //title of highgui window
-  std::string highgui_window_name_0 = (std::string) GRABBER_NAME_0 + ":" + FILE_NAME_0;
-
-
+  const std::string highgui_window_name_0 = GRABBER_NAME_0 + ":" + FILE_NAME_0;
 
   std::cout << "\n\nInteractive test of the VideoGrabber class\n";
   std::cout << "--------------------------------------------\n\n";
@@ -189,16 +171,23 @@ int main(int , char **)
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
   std::cout << "\nDisplay video in highgui window\n";
-  namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
 
-  //the first frame is already grabbed on initialization
   cv::Mat frame0 = video_grabber->getImage();
 
   //startGrabber the grabbing-thread 2 times faster then normal
   std::cout << "\nSet speed factor of grabbing-thread to 2\n";
   video_grabber->setSpeedFactor(2);
   std::cout << "VideoGrabber thread FPS    : " << video_grabber->getFps() << std::endl;
+
+
   video_grabber->startGrabber();
+
+
+  //from now on, you have to be aware, that the grabbing thread writes on the image
+  //so use the ReadWriteLock
+  QReadWriteLock * pReadWriteLock;
+  pReadWriteLock = video_grabber->getReadWriteLockPointer();
 
   //enable Recording
   //The FPS of Recording is independent from GrabbingThread.
@@ -220,8 +209,12 @@ int main(int , char **)
   //here: never because we have set loop to true
   while (!frame0.empty())
   {
-    imshow(highgui_window_name_0,frame0);
-    frame0 = video_grabber->getImage();
+    cv::imshow(highgui_window_name_0,frame0);
+
+    //get images with respect to grabbing-thread
+    pReadWriteLock->lockForRead();
+    cv::Mat frame0 = video_grabber->getImage();
+    pReadWriteLock->unlock();
 
     //status
     if (++counter_stat %= 3 )
@@ -238,14 +231,14 @@ int main(int , char **)
     }
     //wait 10ms (needed for highgui)
     //you can change this to 100 or 500, and see the difference
-    waitKey(10);
+    cv::waitKey(10);
   }
 
 
   //------------------------------------------------------------------
   //clean up
 
-  destroyWindow(highgui_window_name_0);
+  cv::destroyWindow(highgui_window_name_0);
 
   //stopGrabber grabbing-thread if running
   //recording will also be stopped

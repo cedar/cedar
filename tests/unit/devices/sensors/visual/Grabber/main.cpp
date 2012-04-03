@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Unit test for the behavior of the GrabberInterface.
+    Description: Unit test for the behavior of the GrabberInterface (mono case)
 
     Credits:
 
@@ -39,45 +39,26 @@
 #include "cedar/devices/sensors/visual/TestGrabber.h"
 #include "cedar/devices/sensors/visual/defines.h"
 
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <cstdlib>
-#include <iostream>
 #include <opencv2/opencv.hpp>
-
-//#include <boost/test/included/prg_exec_monitor.hpp>
-
 
 /*!
  *  \file This file implements a test case for the GrabberInterface class
- *
- *  \remarks
- *     The TestGrabber class is used to check the functionality of the interface.
  */
-
-
-using namespace std;
-using namespace cedar::dev::sensors::visual;
-using namespace cedar::aux;
-
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-#define CHANNEL_0_NAME "CHANNEL_0_NAME"
-#define GRABBER_NAME "TestGrabber"
-
-#define CONFIG_FILE_NAME "grabber.config"
-#define LOGFILE "UnitTestGrabber.log"
 
 //--------------------------------------------------------------------------------------------------------------------
 //main program
 //--------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
+  const std::string CHANNEL_0_NAME = "CHANNEL_0_NAME";
+  const std::string GRABBER_NAME = "TestGrabber";
+  const std::string CONFIG_FILE_NAME = "grabber.config";
+  const std::string LOGFILE = "UnitTestGrabber.log";
 
   //create logfile
-  LogFile log_file(LOGFILE);
+  cedar::aux::LogFile log_file(LOGFILE);
   log_file.addTimeStamp();
   log_file << std::endl;
 
@@ -88,15 +69,17 @@ int main(int , char **)
 
 
   //------------------------------------------------------------------------------------------------------------------
-  //create a stereo-test-grabber (only a dummy grabber for testing)
-  TestGrabber *grabber_1 = new TestGrabber(CONFIG_FILE_NAME,CHANNEL_0_NAME);
+  //create a test-grabber (only a dummy grabber for testing)
+  cedar::dev::sensors::visual::TestGrabber *grabber_1 = new cedar::dev::sensors::visual::TestGrabber
+                                                            (
+                                                              CONFIG_FILE_NAME,
+                                                              CHANNEL_0_NAME
+                                                            );
 
   //-----------------------------------------------------------
   log_file << "test no " << test_number++ <<": setName() and getName()" << std::endl;
   try
   {
-    if (grabber_1->getName() != "TestGrabber") { throw (-1); }
-
     std::string name = "NewTestGrabber";
     grabber_1->setName(name);
     if (grabber_1->getName() != name ) {throw (-1);}
@@ -106,8 +89,6 @@ int main(int , char **)
     log_file << "error" << std::endl;
     errors++;
   }
-
-
 
   //-----------------------------------------------------------
   log_file << "test no " << test_number++ <<": setFps() and getFps()" << std::endl;
@@ -163,23 +144,29 @@ int main(int , char **)
   try
   {
     std::string name,result;
-    std::string ext = "avi";
+    const std::string ext = cedar::dev::sensors::visual::GrabberInterface::mGrabberDefaultRecordExtension;
 
     //set one w/o ext
     name="RecordNameNewName(0)";
     grabber_1->setRecordName(0,name);
-    if ( grabber_1->getRecordName() != name+ext ) {throw (-1);}
-    if ( grabber_1->getRecordName(0) != name+ext ) {throw (-1);}
+    result = grabber_1->getRecordName();
+    if ( result != name+ext ) {throw (-1);}
+    result =  grabber_1->getRecordName(0);
+    if ( result != name+ext ) {throw (-1);}
+
 
     //set one w/ ext
     name="RecordNameNewName(0).avi";
     grabber_1->setRecordName(0,name);
-    if (grabber_1->getRecordName() != name) {throw (-1);}
+    result = grabber_1->getRecordName();
+    if (result != name) {throw (-1);}
 
     //set all w/o ext
     name="RecordNameNewName_all";
     grabber_1->setRecordName(name);
-    if (grabber_1->getRecordName()!=name+ext) {throw (-1);}
+    result = grabber_1->getRecordName();
+    if (result != name+ext) {throw (-1);}
+
 
     //set all w/ ext
     name="RecordNameNewName_all.avi";
@@ -209,19 +196,26 @@ int main(int , char **)
   log_file << "test no " << test_number++ <<": setSnapshotName() and getSnapshotName()" << std::endl;
   try
   {
-    std::string name;
-    std::string ext = ".jpg";
+    std::string name, result, expected;
+    const std::string ext = cedar::dev::sensors::visual::GrabberInterface::mGrabberDefaultSnapshotExtension;
 
     //set one w/o ext
     name="SnapshotNameNewName(0)";
     grabber_1->setSnapshotName(0,name);
-    if (grabber_1->getSnapshotName() != name+ext ) {throw (-1);}
-    if (grabber_1->getSnapshotName(0) != name+ext ) {throw (-1);}
+    result = grabber_1->getSnapshotName();
+    expected = name+ext;
+    if (result != expected ) {throw (-1);}
+
+    result = grabber_1->getSnapshotName(0);
+    expected = name+ext;
+    if (result != expected ) {throw (-1);}
 
     //set one w/ ext
     name="SnapshotNameNewName(0).jpg";
     grabber_1->setSnapshotName(0,name);
-    if (grabber_1->getSnapshotName() != name) {throw (-1);}
+    result = grabber_1->getSnapshotName();
+    expected = name;
+    if (result != expected ) {throw (-1);}
 
     //set all w/o ext
     name="SnapshotNameNewName_all";
@@ -237,21 +231,6 @@ int main(int , char **)
   catch (...)
   {
     log_file << "error" << std::endl;
-    errors++;
-  }
-
-  //-----------------------------------------------------------
-  //check saveSnapshot
-  log_file << "test no " << test_number++ <<": saveSnapshot" << std::endl;
-  try
-  {
-    grabber_1->saveSnapshot(0);
-    grabber_1->saveSnapshot();
-    grabber_1->saveSnapshotAllCams();
-  }
-  catch (...)
-  {
-    log_file << "error in saveSnapshot or saveSnapshotAllCams" << std::endl;
     errors++;
   }
 

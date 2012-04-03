@@ -29,11 +29,7 @@
 //--------------------------------------------------------------------------------------------------------------------
 //constants
 //--------------------------------------------------------------------------------------------------------------------
-#define FILE_NAME_0 "/usr/local/src/OpenCV-2.2.0/samples/c/puzzle.png"
-#define FILE_NAME_1 "/usr/local/src/OpenCV-2.2.0/samples/c/fruits.jpg"
 
-#define GRABBER_NAME_0 "Stereo_Picture_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_picture_grabber_testcase.config"
 
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -47,9 +43,16 @@ using namespace cv;
 int main(int , char **)
 {
 
+  const std::string FILE_NAME_0 = "/usr/local/src/OpenCV-2.2.0/samples/c/puzzle.png";
+  const std::string FILE_NAME_1 = "/usr/local/src/OpenCV-2.2.0/samples/c/fruits.jpg";
+
+  const std::string GRABBER_NAME_0 = "Stereo_Picture_Grabber_TestCase";
+  const std::string CONFIG_FILE_NAME_0 = "stereo_picture_grabber_testcase.config";
+
+
   //title of highgui window
-  std::string highgui_window_name_0 = (std::string) "0 " + GRABBER_NAME_0 + ":" + FILE_NAME_0;
-  std::string highgui_window_name_1 = (std::string) "1 " + GRABBER_NAME_0 + ":" + FILE_NAME_1;
+  const std::string highgui_window_name_0 = "0 " + GRABBER_NAME_0 + ":" + FILE_NAME_0;
+  const std::string highgui_window_name_1 = "1 " + GRABBER_NAME_0 + ":" + FILE_NAME_1;
 
 
   std::cout << "\n\nInteractive test of the PictureGrabber class (stereo)\n";

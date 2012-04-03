@@ -41,15 +41,6 @@
 //!@todo: debug-output to logger
 
 
-//------------------------------------------------------------------------
-// Enable the CTRL-C handler.
-// If CTRL-C handler is activated, also some additions to the
-// GrabberInterface will be enabled:
-// 1) a static member vector to store pointer to all instances of created grabbers
-// 2) a static member function which handle the interrupt signal
-// 3) some additional code in GrabberInterface.cpp to handle these issues
-//------------------------------------------------------------------------
-#define ENABLE_CTRL_C_HANDLER
 
 
 //------------------------------------------------------------------------

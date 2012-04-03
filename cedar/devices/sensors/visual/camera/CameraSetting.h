@@ -44,7 +44,7 @@
 // SYSTEM INCLUDES
 #include <opencv2/highgui/highgui_c.h>
 
-/*!@brief Enum class for camera properties direct mapped from opencv2/highgui/highui_c.h
+/*!@brief Enum class for camera settings direct mapped from opencv2/highgui/highui_c.h
  * (also in dc1394/control.h)
  *
  * Use this type for the CameraGrabber::setCameraProperty() and getCameraProperty() method

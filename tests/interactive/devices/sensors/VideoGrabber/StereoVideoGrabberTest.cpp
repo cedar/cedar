@@ -21,33 +21,21 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-//#include <iostream>
 //#include <exception>
-
-
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-#define FILE_NAME_0 "/opt/matlab/R2010b/toolbox/images/imdemos/rhinos.avi"
-#define FILE_NAME_1 "/opt/matlab/R2010b/toolbox/images/imdemos/traffic.avi"
-
-#define GRABBER_NAME_0 "Stereo_Video_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_video_grabber_testcase.config"
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
-
-using namespace cv;
-
 
 int main(int , char **)
 {
-  //title of highgui window
-  std::string highgui_window_name_0 = (std::string) GRABBER_NAME_0 + ":" + FILE_NAME_0;
-  std::string highgui_window_name_1 = (std::string) GRABBER_NAME_0 + ":" + FILE_NAME_1;
 
+  const std::string FILE_NAME_0 = "/opt/matlab/R2010b/toolbox/images/imdemos/rhinos.avi";
+  const std::string FILE_NAME_1 = "/opt/matlab/R2010b/toolbox/images/imdemos/traffic.avi";
+
+  const std::string GRABBER_NAME_0 = "Stereo_Video_Grabber_TestCase";
+  const std::string CONFIG_FILE_NAME_0 = "stereo_video_grabber_testcase.config";
+
+
+  //title of highgui window
+  const std::string highgui_window_name_0 = "0 " + GRABBER_NAME_0 + ":" + FILE_NAME_0;
+  const std::string highgui_window_name_1 = "1 " + GRABBER_NAME_0 + ":" + FILE_NAME_1;
 
 
   std::cout << "\n\nInteractive test of the VideoGrabber class (stereo case)\n";
@@ -210,12 +198,18 @@ int main(int , char **)
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
   std::cout << "\nDisplay videos in highgui window\n";
-  namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-  namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed on initialization
+  QReadWriteLock * pReadWriteLock;
+  pReadWriteLock = video_grabber->getReadWriteLockPointer();
+
+  //get images with respect to grabbing-thread
+  pReadWriteLock->lockForRead();
   cv::Mat frame0 = video_grabber->getImage();
   cv::Mat frame1 = video_grabber->getImage(1);
+  pReadWriteLock->unlock();
 
   //startGrabber the grabbing-thread 2 times faster then normal
   std::cout << "\nSet speed factor of grabbing-thread to 2\n";
@@ -243,10 +237,13 @@ int main(int , char **)
   //here: never because we have set loop to true
   while (!frame0.empty())
   {
-    imshow(highgui_window_name_0,frame0);
-    imshow(highgui_window_name_1,frame1);
-    frame0 = video_grabber->getImage(0);
-    frame1 = video_grabber->getImage(1);
+    cv::imshow(highgui_window_name_0,frame0);
+    cv::imshow(highgui_window_name_1,frame1);
+
+    pReadWriteLock->lockForRead();
+    cv::Mat frame0 = video_grabber->getImage();
+    cv::Mat frame1 = video_grabber->getImage(1);
+    pReadWriteLock->unlock();
 
     //status
     if (++counter_stat %= 3 )
@@ -263,15 +260,15 @@ int main(int , char **)
     }
     //wait 10ms (needed for highgui)
     //you can change this to 100 or 500, and see the difference
-    waitKey(10);
+    cv::waitKey(10);
   }
 
 
   //------------------------------------------------------------------
   //clean up
 
-  destroyWindow(highgui_window_name_0);
-  destroyWindow(highgui_window_name_1);
+  cv::destroyWindow(highgui_window_name_0);
+  cv::destroyWindow(highgui_window_name_1);
 
   //stopGrabber grabbing-thread if running
   //recording will also be stopped
