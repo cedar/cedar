@@ -82,10 +82,7 @@ public:
   /*!@brief this function calculates the sigmoid function for a given float value.
    * Included for backward-compatibility
    */
-  virtual float compute(float value) const
-  {
-    return static_cast<float>(compute(static_cast<double>(value)));
-  }
+  virtual float compute(float value) const;
 
   /*!@brief this function calculates the sigmoid function for an n-dimensional matrix.
    *

@@ -39,6 +39,7 @@
 #include "cedar/auxiliaries/gl/RigidBodyVisualization.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 
@@ -46,8 +47,19 @@
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
 
-cedar::aux::gl::RigidBodyVisualization::RigidBodyVisualization(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::RigidBodyVisualization::RigidBodyVisualization
+(
+  cedar::aux::RigidBodyPtr pRigidBody,
+  const std::string& rigidBodyType,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
+mRigidBodyType(rigidBodyType),
+mColorR(colorR),
+mColorG(colorG),
+mColorB(colorB),
 mpRigidBody(pRigidBody),
 mTransformationTranspose(4, 4, CV_64FC1)
 {
@@ -56,7 +68,6 @@ mTransformationTranspose(4, 4, CV_64FC1)
 
 cedar::aux::gl::RigidBodyVisualization::~RigidBodyVisualization()
 {
-
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,20 +76,16 @@ cedar::aux::gl::RigidBodyVisualization::~RigidBodyVisualization()
 
 void cedar::aux::gl::RigidBodyVisualization::initializeGl()
 {
-
 }
 
 void cedar::aux::gl::RigidBodyVisualization::init()
 {
-  mRigidBodyType = "no type";
+  //@todo (review) move this to the constructor
   mIsVisible = true;
   mIsDrawnAsWireFrame = false;
   mIsDrawingLocalCoordinateFrame = false;
   mAxisLength = 1.0;
   mResolution = 10;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
 }
 
 bool cedar::aux::gl::RigidBodyVisualization::isVisible() const
