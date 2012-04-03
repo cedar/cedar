@@ -84,7 +84,7 @@ void cedar::aux::gui::ObjectVisualizationWidget::setObjectVisualization(cedar::a
 
 void cedar::aux::gui::ObjectVisualizationWidget::initWindow()
 {
-  setWindowTitle(QApplication::translate("ObjectVisualizationWidget", "Rigid Body Visualization"));
+  setWindowTitle(QString("Object Visualization"));
 
   // create widgets and layouts
   QVBoxLayout* main_layout = new QVBoxLayout();

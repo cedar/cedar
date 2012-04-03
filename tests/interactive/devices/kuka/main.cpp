@@ -43,7 +43,7 @@
 #include "cedar/devices/robot/SimulatedKinematicChain.h"
 #include "cedar/auxiliaries/gl/Scene.h"
 #include "cedar/auxiliaries/gui/Viewer.h"
-
+#include "cedar/auxiliaries/System.h"
 
 // SYSTEM INCLUDES
 #include <vector>
@@ -57,28 +57,15 @@ using cedar::dev::robot::KinematicChainPtr;
 int main(int argc, char **argv)
 {
   std::string mode = "0";
-  std::string configuration_file_path = "../../../tests/interactive/devices/kuka/";
-  if ((argc == 2) && (std::string(argv[1]) == "-h"))
-  { // Check the value of argc. If not enough parameters have been passed, inform user and exit.
-    std::cout << "Usage is -c <path to configs>" << std::endl;
-    return 0;
-  }
-  for (int i = 1; i < argc; i++)
-  {
-    if (i+1 != argc) // Check that we haven't finished parsing already
-    {
-      if (std::string(argv[i]) == "-c")
-      {
-        configuration_file_path = std::string(argv[i+1]);
-      }
-    }
-  }
+  std::string configuration_file_old = cedar::aux::System::locateResource("configs/kuka_lwr4.conf");
+  std::string configuration_file = cedar::aux::System::locateResource("configs/kuka_lwr4.json");
   QApplication a(argc, argv);
   FriStatusWidget* p_fri_status_widget = 0;
   cedar::dev::robot::gui::KinematicChainWidget* p_kinematic_chain_widget = 0;
 
   // create the hardware interface
-  KukaInterfacePtr p_arm(new KukaInterface(configuration_file_path + "kuka_lbr4.conf"));
+  KukaInterfacePtr p_arm(new cedar::dev::kuka::KukaInterface(configuration_file_old));
+  p_arm->readJson(configuration_file);
   p_fri_status_widget = new FriStatusWidget(p_arm);
   p_fri_status_widget->startTimer(100);
   p_fri_status_widget->show();

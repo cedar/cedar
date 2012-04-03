@@ -44,7 +44,6 @@
 #include "cedar/auxiliaries/gui/SceneWidget.h"
 #include "cedar/auxiliaries/sleepFunctions.h"
 
-
 // SYSTEM INCLUDES
 #include <QApplication>
 
