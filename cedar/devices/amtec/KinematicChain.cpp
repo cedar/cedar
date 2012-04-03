@@ -59,11 +59,14 @@ cedar::dev::robot::KinematicChain(configFileName)
   mInitString = "ESD:0,450";
   readParamsFromConfigFile();
 
-  if(!initDevice())
-  {
-    std::cout << "Error initializing the Amtec module!" << std::endl;
-    CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
-  }
+  // todo: this cannot be called from the constructor any more, because the number of joints is not known yet
+  // current solution is to make it initDevice() public and call it from the main program after readJson() was called
+  // a restructuring of this system might be in order
+//  if(!initDevice())
+//  {
+//    std::cout << "Error initializing the Amtec module!" << std::endl;
+//    CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
+//  }
 }
 
 cedar::dev::amtec::KinematicChain::~KinematicChain()

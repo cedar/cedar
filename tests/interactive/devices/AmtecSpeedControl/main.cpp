@@ -55,11 +55,16 @@ int main(int /* argc */, char ** /* argv[] */)
 
   try
   {
-    cedar::dev::robot::KinematicChainPtr p_kinematic_chain
+    cedar::dev::amtec::KinematicChainPtr p_kinematic_chain
     (
       new cedar::dev::amtec::KinematicChain(configuration_file_old)
     );
     p_kinematic_chain->readJson(configuration_file);
+    if(!p_kinematic_chain->initDevice())
+    {
+      std::cout << "Error initializing the Amtec module!" << std::endl;
+      CEDAR_THROW(cedar::aux::InitializationException, "Error initializing the Amtec module!");
+    }
     ControlThread thread(p_kinematic_chain, configuration_file);
     std::cout << "moving arm for 15s just by controling velocity..." << std::endl;
     thread.start();

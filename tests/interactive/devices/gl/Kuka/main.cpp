@@ -56,7 +56,10 @@ int main(int argc, char **argv)
   QApplication a(argc, argv);
 
   // create simulated kinematic chains
-  cedar::dev::robot::KinematicChainPtr p_kuka_arm(new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old));
+  cedar::dev::robot::KinematicChainPtr p_kuka_arm
+  (
+    new cedar::dev::robot::SimulatedKinematicChain(configuration_file_old)
+  );
   p_kuka_arm->readJson(configuration_file);
 
   // create gl visualization objects
