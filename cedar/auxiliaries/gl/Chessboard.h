@@ -59,11 +59,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
-   */
-  Chessboard(cedar::aux::RigidBodyPtr pRigidBody);
-
   /*!@brief constructor. 
    * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the board in x-direction of the object coordinate frame
@@ -71,20 +66,20 @@ public:
    * @param height extension of the board in z-direction of the object coordinate frame
    * @param rows number of rows in the chessboard
    * @param columns number of columns in the chessboard
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Chessboard(
               cedar::aux::RigidBodyPtr pRigidBody,
-              double length,
-              double width,
-              double height,
-              int rows,
-              int columns,
-              double R = 0,
-              double G = 0,
-              double B = 0
+              double length = 4.0,
+              double width = 4.0,
+              double height = 0.2,
+              int rows = 8,
+              int columns = 8,
+              double colorR = 0,
+              double colorG = 0,
+              double colorB = 0
             );
   
   //--------------------------------------------------------------------------------------------------------------------

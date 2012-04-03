@@ -56,28 +56,23 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor.
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
-   */
-  Pyramid(cedar::aux::RigidBodyPtr pRigidBody);
-
   /*!@brief constructor. 
    * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the pyramid's base in x-direction of object coordinate frame
    * @param width extension of the pyramid's base in y-direction of object coordinate frame
    * @param height height of the pyramid, i.e. distance from base to tip
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Pyramid(
            cedar::aux::RigidBodyPtr pRigidBody,
-           double length,
-           double width,
-           double height,
-           double R=1,
-           double G=0,
-           double B=0
+           double length = 2.0,
+           double width = 3.0,
+           double height = 2.0,
+           double colorR = 1,
+           double colorG = 0,
+           double colorB = 0
          );
   
   //--------------------------------------------------------------------------------------------------------------------

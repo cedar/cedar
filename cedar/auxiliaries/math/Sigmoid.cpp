@@ -50,3 +50,8 @@ cedar::aux::math::Sigmoid::~Sigmoid()
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
+
+float cedar::aux::math::Sigmoid::compute(float value) const
+{
+  return static_cast<float>(compute(static_cast<double>(value)));
+}

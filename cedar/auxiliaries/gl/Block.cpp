@@ -43,39 +43,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::gl::Block::Block(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::Block::Block
+(
+  cedar::aux::RigidBodyPtr pRigidBody,
+  double length,
+  double width,
+  double height,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Block", colorR, colorG, colorB),
+mLength(length),
+mWidth(width),
+mHeight(height)
 {
-  mLength = 3;
-  mWidth = 2;
-  mHeight = 1;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mRigidBodyType = "Block";
-}
-
-cedar::aux::gl::Block::Block(
-              cedar::aux::RigidBodyPtr pRigidBody,
-              double length,
-              double width,
-              double height,
-              double R,
-              double G,
-              double B
-            )
-:
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
-{
-  mLength = length;
-  mWidth = width;
-  mHeight = height;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mRigidBodyType = "Block";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -58,12 +58,13 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief the constructor */
+  //!@brief the constructor
   Scene();
   
-  /*!@brief the destructor */
+  /*!@brief the destructor
+     @todo something is not destroyed properly, find out what happens and fix it */
   ~Scene();
-  //!\todo something is not destroyed properly, find out what happens and fix it
+
   
   //--------------------------------------------------------------------------------------------------------------------
   // public methods

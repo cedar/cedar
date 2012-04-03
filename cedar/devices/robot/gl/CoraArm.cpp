@@ -40,6 +40,7 @@
 #include "cedar/devices/robot/gl/namespace.h"
 #include "cedar/devices/robot/gl/CoraArm.h"
 #include "cedar/auxiliaries/gl/drawShapes.h"
+#include "cedar/auxiliaries/gl/gl.h"
 
 // SYSTEM INCLUDES
 

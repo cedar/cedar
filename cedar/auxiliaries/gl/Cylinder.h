@@ -58,11 +58,6 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
-   */
-  Cylinder(cedar::aux::RigidBodyPtr pRigidBody);
-
   /*!@brief constructor. 
    * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param radius    radius of the cylinder
@@ -73,11 +68,11 @@ public:
    */
   Cylinder(
             cedar::aux::RigidBodyPtr pRigidBody,
-            double radius,
-            double height,
-            double R = 1,
-            double G = 0,
-            double B = 0
+            double radius = 1.0,
+            double height = 2.0,
+            double colorR = 1,
+            double colorG = 0,
+            double colorB = 0
           );
   
   //--------------------------------------------------------------------------------------------------------------------

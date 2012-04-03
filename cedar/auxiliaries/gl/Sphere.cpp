@@ -44,33 +44,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::gl::Sphere::Sphere(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::Sphere::Sphere
+(
+  cedar::aux::RigidBodyPtr pRigidBody,
+  double radius,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Sphere", colorR, colorG, colorB),
+mRadius(radius)
 {
-  mRadius = 2;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mRigidBodyType = "Sphere";
-}
-
-cedar::aux::gl::Sphere::Sphere(
-                                cedar::aux::RigidBodyPtr pRigidBody,
-                                double radius,
-                                double R,
-                                double G,
-                                double B
-                              )
-:
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
-{
-  mRadius = radius;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mRigidBodyType = "Sphere";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

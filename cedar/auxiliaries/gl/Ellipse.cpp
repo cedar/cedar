@@ -43,39 +43,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor
 //----------------------------------------------------------------------------------------------------------------------
-
-cedar::aux::gl::Ellipse::Ellipse(cedar::aux::RigidBodyPtr pRigidBody)
+cedar::aux::gl::Ellipse::Ellipse
+(
+  cedar::aux::RigidBodyPtr pRigidBody,
+  double length,
+  double width,
+  double thickness,
+  double colorR,
+  double colorG,
+  double colorB
+)
 :
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
+cedar::aux::gl::RigidBodyVisualization(pRigidBody, "Ellipse", colorR, colorG, colorB),
+mLength(length),
+mWidth(width),
+mThickness(thickness)
 {
-  mLength = 2;
-  mWidth = 3;
-  mThickness = .3;
-  mColorR = 1;
-  mColorG = 0;
-  mColorB = 0;
-  mRigidBodyType = "Ellipse";
-}
-
-cedar::aux::gl::Ellipse::Ellipse(
-                                  cedar::aux::RigidBodyPtr pRigidBody,
-                                  double length,
-                                  double width,
-                                  double thickness,
-                                  double R,
-                                  double G,
-                                  double B
-                                )
-:
-cedar::aux::gl::RigidBodyVisualization(pRigidBody)
-{
-  mLength = length;
-  mWidth = width;
-  mThickness = thickness;
-  mColorR = R;
-  mColorG = G;
-  mColorB = B;
-  mRigidBodyType = "Ellipse";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

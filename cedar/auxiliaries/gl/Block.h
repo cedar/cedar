@@ -59,28 +59,23 @@ public:
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
   //--------------------------------------------------------------------------------------------------------------------
-  /*!@brief standard constructor. 
-   * @param pRigidBody pointer to the aux::RigidBody being visualized
-   */
-  Block(cedar::aux::RigidBodyPtr pRigidBody);
-
   /*!@brief constructor. 
    * @param pRigidBody pointer to the aux::RigidBody being visualized
    * @param length extension of the block in x-direction of the object coordinate frame
    * @param width extension of the block in y-direction of the object coordinate frame
    * @param height extension of the block in z-direction of the object coordinate frame
-   * @param R color, value for red channel in RGB
-   * @param G color, value for green channel in RGB
-   * @param B color, value for blue channel in RGB
+   * @param colorR color, value for red channel in RGB
+   * @param colorG color, value for green channel in RGB
+   * @param colorB color, value for blue channel in RGB
    */
   Block(
          cedar::aux::RigidBodyPtr pRigidBody,
-         double length,
-         double width,
-         double height,
-         double R=1,
-         double G=0,
-         double B=0
+         double length = 3,
+         double width = 2,
+         double height = 1,
+         double colorR = 1,
+         double colorG = 0,
+         double colorB = 0
        );
   
   //--------------------------------------------------------------------------------------------------------------------
