@@ -17,33 +17,21 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
-//#include <devices/sensors/visual/NetGrabber.h>
-
-// PROJECT INCLUDES
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
 
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-#define YARP_CHANNEL_0 "Net_Grabber_TestCase_Channel"
-
-#define GRABBER_NAME_0 "Net_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "net_grabber_testcase.config"
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
-
-using namespace cv;
-
 int main(int , char **)
 {
+
+  const std::string  YARP_CHANNEL_0 = "Net_Grabber_TestCase_Channel";
+  const std::string  GRABBER_NAME_0 = "Net_Grabber_TestCase";
+  const std::string  CONFIG_FILE_NAME_0 = "net_grabber_testcase.config";
+
+
   //title of highgui window
-  std::string highgui_window_name_0 = (std::string) GRABBER_NAME_0 + ": " + YARP_CHANNEL_0;
+  std::string highgui_window_name_0 = GRABBER_NAME_0 + ": " + YARP_CHANNEL_0;
 
   std::cout << "\n\nInteractive test of the NetGrabber class (mono)\n";
   std::cout << "-----------------------------------------------------\n\n";
@@ -136,11 +124,15 @@ int main(int , char **)
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
   std::cout << "\nDisplay the grabbed pictures\n";
-  namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
 
-  //the first frame is already grabbed on initialization
-  //it is in the internal buffer and can be used
-  cv::Mat frame0 = net_grabber->getImage();
+  QReadWriteLock * pReadWriteLock;
+  pReadWriteLock = net_grabber->getReadWriteLockPointer();
+
+  //get images with respect to grabbing-thread
+  pReadWriteLock->lockForRead();
+  cv::Mat frame = net_grabber->getImage();
+  pReadWriteLock->unlock();
 
   //start recording
   net_grabber->setFps(15);
@@ -154,10 +146,14 @@ int main(int , char **)
   //get frames for a while
   unsigned int counter=0;
 
-  while (!frame0.empty())
+  while (!frame.empty())
   {
-    imshow(highgui_window_name_0,frame0);
-    frame0 = net_grabber->getImage();
+    cv::imshow(highgui_window_name_0,frame);
+
+    pReadWriteLock->lockForRead();
+    cv::Mat frame = net_grabber->getImage();
+    pReadWriteLock->unlock();
+
 
     counter++;
 
@@ -177,13 +173,13 @@ int main(int , char **)
     }
 
     //wait 10ms (needed for highgui)
-    waitKey(10);
+    cv::waitKey(10);
   }
 
   //------------------------------------------------------------------
   //clean up
 
-  destroyWindow(highgui_window_name_0);
+  cv::destroyWindow(highgui_window_name_0);
 
   //stop grabbing-thread if running
   //recording will also be stopped

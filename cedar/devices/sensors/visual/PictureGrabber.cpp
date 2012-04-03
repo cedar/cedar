@@ -60,7 +60,6 @@ cedar::dev::sensors::visual::GrabberInterface(configFileName)
 
   //change/overwrite parameters with constructor values
   getChannel(0)->sourceFileName = pictureFileName;
-
   applyInit();
 }
 
@@ -75,10 +74,8 @@ cedar::dev::sensors::visual::PictureGrabber::PictureGrabber(
 cedar::dev::sensors::visual::GrabberInterface(configFileName)
 {
   readInit(2,"PictureGrabber");
-
   getChannel(0)->sourceFileName = pictureFileName0;
   getChannel(1)->sourceFileName = pictureFileName1;
-
   applyInit();
 }
 

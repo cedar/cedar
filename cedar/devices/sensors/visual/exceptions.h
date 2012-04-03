@@ -115,7 +115,7 @@ public:
 /*! @brief Exception for errors while recording a stream
  *
  *    This exception would be thrown when an error occurs during recording.
- * \note
+ * \remarks
  *    This is a critical exception. The grabber-cleanup is performed right before this exception is thrown.<br>
  *    In this case, it is not possible to work any longer with this grabber.
  */

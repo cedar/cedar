@@ -48,7 +48,8 @@
 
 /*! @class cedar::dev::sensors::visual::NetGrabber
  *	@brief This grabber grabs images from a yarp-server located somewhere in the network
- *  @remarks This functionality is implemented by using the
+ *
+ *   This functionality is implemented by using the
  *		cedar::aux::net::NetWriter and
  *		cedar::aux::net::NetReader classes.
  */

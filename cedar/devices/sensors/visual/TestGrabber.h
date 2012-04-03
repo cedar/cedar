@@ -70,7 +70,7 @@ namespace cedar
  *  This grabber class is used to test the grabber interface. It
  *  creates a Grabber with a TestParam (default-value 123) and FPS set to 15
  *
- *  @remarks
+ *  @remarks For grabber developers<br>
  *    This class can also be used as a template to create other classes derived from GrabberInstance
  *
  */
@@ -193,8 +193,6 @@ public:
 protected:
   // none yet
 private:
-  //!@brief The vector where the channelnames stored in
-  std::vector<std::string> mChannelVector;
 
   //!@brief The counter
   unsigned int mCounter;

@@ -119,7 +119,7 @@ void cedar::dev::sensors::visual::CameraProperty::construct()
                                       "PROP_TEMPERATURE",
                                       "Temperature"
                                     ));
- mType.type()->def(cedar::aux::Enum(
+  mType.type()->def(cedar::aux::Enum(
                                       cedar::dev::sensors::visual::CameraProperty::PROP_TRIGGER,
                                       "PROP_TRIGGER",
                                       "Trigger"

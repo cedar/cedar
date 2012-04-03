@@ -100,9 +100,6 @@ public:
   //OpenCV uses the best available mode when starting the grabbing
   static const Id MODE_NOT_SET = UINT_MAX-2;
 
-  //static const Id MODE_NOT_SET = -1;
-  //id is unsigned int: -1 is then interpreted as UINT_MAX (= cedar::aux::Enum::UNDEFINED)
-
   //use MODE_BY_NUM to check which modes supported.
   //OpenCV firewire backend stores supported video modes in a list and
   //it is possible to change the mode through the indizes of this list

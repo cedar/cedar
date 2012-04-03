@@ -91,7 +91,6 @@ cedar::dev::sensors::visual::CameraConfig::~CameraConfig()
   #endif
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 // methods
 //----------------------------------------------------------------------------------------------------------------------
@@ -142,9 +141,6 @@ bool cedar::dev::sensors::visual::CameraConfig::declareParameter()
     cedar::aux::EnumId param_id = static_cast<cedar::aux::EnumId> (it->first);
     std::string param_name = mChannelPrefix + CameraProperty::type().get(param_id).name();
     double param_old_val = it->second;
-
-    //std::stringstream param_name_ch;
-    //param_name_ch<<"ch"<<channel<<"_"<<param_name;
 
     result = (addParameter(param_adr, param_name, CAMERA_PROPERTY_MODE_AUTO) == CONFIG_SUCCESS) && result;
 

@@ -28,7 +28,7 @@
     Email:       georg.hartinger@ini.rub.de
     Date:        2011 08 01
 
-    Description: Unit test for the behavior of the GrabberInterface.
+    Description: Unit test for the behavior of the GrabberInterface (stereo-case)
 
     Credits:
 
@@ -42,43 +42,25 @@
 // PROJECT INCLUDES
 
 // SYSTEM INCLUDES
-#include <cstdlib>
-#include <iostream>
 #include <opencv2/opencv.hpp>
-
-//#include <boost/test/included/prg_exec_monitor.hpp>
 
 
 /*!
- *  \file This file implements a test case for the GrabberInterface class
- *
- *  \remarks
- *      A simple TestGrabber class is used to check the functionality of
- *      the interface.
+ *  \file This file implements a test case for the GrabberInterface class for a stereo grabber
  */
 
-using namespace std;
-using namespace cedar::dev::sensors::visual;
-using namespace cedar::aux;
-
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-#define CHANNEL_0_NAME "CHANNEL_0_NAME"
-#define CHANNEL_1_NAME "CHANNEL_1_NAME"
-#define GRABBER_NAME "TestGrabber"
-
-#define CONFIG_FILE_NAME "grabber.config"
-#define LOGFILE "UnitTestStereoGrabber.log"
-
-//----------------------------------------------------------------------------------------------------------------------
-//main program
-//--------------------------------------------------------------------------------------------------------------------
 int main(int , char **)
 {
   
+  const std::string CHANNEL_0_NAME = "CHANNEL_0_NAME";
+  const std::string CHANNEL_1_NAME = "CHANNEL_1_NAME";
+  const std::string GRABBER_NAME = "TestGrabber";
+  const std::string CONFIG_FILE_NAME = "grabber.config";
+  const std::string LOGFILE = "UnitTestStereoGrabber.log";
+
+
   //create logfile
-  LogFile log_file(LOGFILE);
+  cedar::aux::LogFile log_file(LOGFILE);
   log_file.addTimeStamp();
   log_file << std::endl;
 
@@ -90,14 +72,17 @@ int main(int , char **)
 
   //------------------------------------------------------------------------------------------------------------------
   //create a stereo-test-grabber (only a dummy grabber for testing)
-  TestGrabber *grabber_1 = new TestGrabber(CONFIG_FILE_NAME,CHANNEL_0_NAME,CHANNEL_1_NAME);
+  cedar::dev::sensors::visual::TestGrabber *grabber_1 = new cedar::dev::sensors::visual::TestGrabber
+                                                            (
+                                                              CONFIG_FILE_NAME,
+                                                              CHANNEL_0_NAME,
+                                                              CHANNEL_1_NAME
+                                                            );
 
   //-----------------------------------------------------------
   log_file << "test no " << test_number++ <<": setName() and getName()" << std::endl;
   try
   {
-    if (grabber_1->getName() != "TestGrabber") { throw (-1); }
-
     std::string name = "NewTestGrabber";
     grabber_1->setName(name);
     if (grabber_1->getName() != name ) {throw (-1);}
@@ -108,9 +93,7 @@ int main(int , char **)
     errors++;
   }
 
-
-
-	//-----------------------------------------------------------
+  //-----------------------------------------------------------
   log_file << "test no " << test_number++ <<": setFps() and getFps()" << std::endl;
 
   try
@@ -164,47 +147,64 @@ int main(int , char **)
 
   //-----------------------------------------------------------
   log_file << "test no " << test_number++ <<": setRecordName() and getRecordName()" << std::endl;
+
+  //the default extension used in cedar. please check this.
   try
   {
-    std::string name,result;
-    std::string ext = "avi";
+    std::string name,result,expected;
+    std::string ext = cedar::dev::sensors::visual::GrabberInterface::mGrabberDefaultRecordExtension;
 
     //set one w/o ext
     name="RecordNameNewName(0)";
     grabber_1->setRecordName(0,name);
     result = grabber_1->getRecordName(0);
-    if ( result != name+ext ) {throw (-1);}
+    expected = name + ext;
+    if ( result != expected ) {throw (-1);}
 
     name="RecordNameNewName(1)";
     grabber_1->setRecordName(1,name);
     result = grabber_1->getRecordName(1);
-    if ( result != name+ext )  {throw (-1);}
+    expected = name + ext;
+    if ( result != expected ) {throw (-1);}
 
     //set one w/ ext
     name="RecordNameNewName(0).avi";
     grabber_1->setRecordName(0,name);
-    if (grabber_1->getRecordName(0) != name) {throw (-1);}
+
+    result = grabber_1->getRecordName(0);
+    expected = name;
+    if (result != expected) {throw (-1);}
 
     name="RecordNameNewName(1).avi";
     grabber_1->setRecordName(1,name);
-    if (grabber_1->getRecordName(1) != name) {throw (-1);}
+    result = grabber_1->getRecordName(1);
+    expected = name;
+    if (result != expected) {throw (-1);}
 
     //set all w/o ext
     name="RecordNameNewName_all";
     grabber_1->setRecordName(name);
-    if (grabber_1->getRecordName(0)!=name+"ch0"+ext)
-      {throw (-1);}
-    if (grabber_1->getRecordName(1)!=name+"ch1"+ext)
-      {throw (-1);}
+    result = grabber_1->getRecordName(0);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(0)+ext;
+    if (result != expected) {throw (-1);}
+
+    grabber_1->setRecordName(name);
+    result = grabber_1->getRecordName(1);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(1)+ext;
+    if (result != expected) {throw (-1);}
+
 
 
     //set all w/ ext
     name="RecordNameNewName_all";
     grabber_1->setRecordName(name+ext);
-    if (grabber_1->getRecordName(0)!=name+"ch0"+ext)
-      {throw (-1);}
-    if (grabber_1->getRecordName(1)!=name+"ch1"+ext)
-      {throw (-1);}
+    result = grabber_1->getRecordName(0);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(0)+ext;
+    if (result != expected) {throw (-1);}
+
+    result = grabber_1->getRecordName(1);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(1)+ext;
+    if (result != expected) {throw (-1);}
   }
   catch (...)
   {
@@ -224,15 +224,12 @@ int main(int , char **)
     errors++;
   }
 
-
-
-
   //-----------------------------------------------------------
   log_file << "test no " << test_number++ <<": setSnapshotName() and getSnapshotName()" << std::endl;
   try
   {
-    std::string name;
-    std::string ext = ".jpg";
+    std::string name,result,expected;
+    const std::string ext = cedar::dev::sensors::visual::GrabberInterface::mGrabberDefaultSnapshotExtension ;
 
     //set one w/o ext
     name="SnapshotNameNewName(0)";
@@ -257,40 +254,32 @@ int main(int , char **)
     //set all w/o ext
     name="SnapshotNameNewName_all";
     grabber_1->setSnapshotName(name);
-    if (grabber_1->getSnapshotName(0)!=name+"ch0"+ext)
-      {throw (-1);}
-    if (grabber_1->getSnapshotName(1)!=name+"ch1"+ext)
-      {throw (-1);}
+
+    result = grabber_1->getSnapshotName(0);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(0)+ext;
+    if (result != expected) {throw (-1);}
+
+    result = grabber_1->getSnapshotName(1);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(1)+ext;
+    if (result != expected) {throw (-1);}
 
 
     //set all w/ ext
     name="SnapshotNameNewName_all";
     grabber_1->setSnapshotName(name+ext);
-    if (grabber_1->getSnapshotName(0)!=name+"ch0"+ext)
-      {throw (-1);}
-    if (grabber_1->getSnapshotName(1)!=name+"ch1"+ext)
-      {throw (-1);}
+
+    result = grabber_1->getSnapshotName(0);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(0)+ext;
+    if (result != expected) {throw (-1);}
+
+    result = grabber_1->getSnapshotName(1);
+    expected = name+grabber_1->getChannelSaveFilenameAddition(1)+ext;
+    if (result != expected) {throw (-1);}
 
   }
   catch (...)
   {
     log_file << "error" << std::endl;
-    errors++;
-  }
-
-  //-----------------------------------------------------------
-  //check saveSnapshot
-  log_file << "test no " << test_number++ <<": saveSnapshot" << std::endl;
-  try
-  {
-    grabber_1->saveSnapshot(0);
-    grabber_1->saveSnapshot(1);
-    grabber_1->saveSnapshot();
-    grabber_1->saveSnapshotAllCams();
-  }
-  catch (...)
-  {
-    log_file << "error in saveSnapshot or saveSnapshotAllCams" << std::endl;
     errors++;
   }
 
@@ -329,10 +318,6 @@ int main(int , char **)
 
     result = grabber_1->getSourceInfo(1);
     if (result.empty()) { throw (-1); }
-
-
-    //throw (-1);
-
   }
   catch (...)
   {

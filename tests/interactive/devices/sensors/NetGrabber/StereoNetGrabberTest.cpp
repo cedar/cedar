@@ -17,40 +17,23 @@
 
 // LOCAL INCLUDES
 #include "cedar/devices/sensors/visual/NetGrabber.h"
-//#include <devices/sensors/visual/NetGrabber.h>
-
-// PROJECT INCLUDES
-
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
 
 
-
-//--------------------------------------------------------------------------------------------------------------------
-//constants
-//--------------------------------------------------------------------------------------------------------------------
-#define YARP_CHANNEL_0 "Net_Grabber_TestCase_Channel_0"
-#define YARP_CHANNEL_1 "Net_Grabber_TestCase_Channel_1"
-
-#define GRABBER_NAME_0 "Stereo_Net_Grabber_TestCase"
-#define CONFIG_FILE_NAME_0 "stereo_net_grabber_testcase.config"
-
-
-//--------------------------------------------------------------------------------------------------------------------
-// main test program
-//--------------------------------------------------------------------------------------------------------------------
-
-
-using namespace cv;
-
-
 int main(int , char **)
 {
 
+  const std::string  YARP_CHANNEL_0 = "Net_Grabber_TestCase_Channel_0";
+  const std::string  YARP_CHANNEL_1 = "Net_Grabber_TestCase_Channel_1";
+
+  const std::string  GRABBER_NAME_0 = "Stereo_Net_Grabber_TestCase";
+  const std::string  CONFIG_FILE_NAME_0 = "stereo_net_grabber_testcase.config";
+
   //title of highgui window
-  std::string highgui_window_name_0 = (std::string) "0 " + GRABBER_NAME_0 + ": " + YARP_CHANNEL_0;
-  std::string highgui_window_name_1 = (std::string) "1 " + GRABBER_NAME_0 + ": " + YARP_CHANNEL_1;
+  std::string highgui_window_name_0 = "0 " + GRABBER_NAME_0 + ": " + YARP_CHANNEL_0;
+  std::string highgui_window_name_1 = "1 " + GRABBER_NAME_0 + ": " + YARP_CHANNEL_1;
 
 
   std::cout << "\n\nInteractive test of the NetGrabber class (stereo)\n";
@@ -167,12 +150,18 @@ int main(int , char **)
   //------------------------------------------------------------------
   //Create an OpenCV highgui window to show grabbed frames
   std::cout << "\nDisplay received pictures\n";
-  namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
-  namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_0,CV_WINDOW_KEEPRATIO);
+  cv::namedWindow(highgui_window_name_1,CV_WINDOW_KEEPRATIO);
 
   //the first frame is already grabbed on initialization
+  QReadWriteLock * pReadWriteLock;
+  pReadWriteLock = net_grabber->getReadWriteLockPointer();
+
+  //get images with respect to grabbing-thread
+  pReadWriteLock->lockForRead();
   cv::Mat frame0 = net_grabber->getImage();
   cv::Mat frame1 = net_grabber->getImage(1);
+  pReadWriteLock->unlock();
 
   //startGrabber recording
   std::cout << "\nStart Recording\n";
@@ -189,9 +178,10 @@ int main(int , char **)
     imshow(highgui_window_name_0,frame0);
     imshow(highgui_window_name_1,frame1);
 
-    //it is not necessary to do this, unless a new picture should be used
+    pReadWriteLock->lockForRead();
     frame0 = net_grabber->getImage();
     frame1 = net_grabber->getImage(1);
+    pReadWriteLock->unlock();
     counter++;
 
     //after one second, do something
@@ -208,7 +198,7 @@ int main(int , char **)
     }
 
     //wait 10ms (needed for highgui)
-    waitKey(10);
+    cv::waitKey(10);
   }
 
   //stopGrabber grabbing-thread if running
@@ -220,8 +210,8 @@ int main(int , char **)
   //------------------------------------------------------------------
   //clean up
 
-  destroyWindow(highgui_window_name_0);
-  destroyWindow(highgui_window_name_1);
+  cv::destroyWindow(highgui_window_name_0);
+  cv::destroyWindow(highgui_window_name_1);
 
   //stopGrabber grabbing-thread if running
   //recording will also be stopped

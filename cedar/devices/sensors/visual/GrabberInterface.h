@@ -92,10 +92,21 @@ public cedar::aux::LoopedThread,
 public boost::noncopyable
 {
   //--------------------------------------------------------------------------------------------------------------------
+  // constants
+  //--------------------------------------------------------------------------------------------------------------------
+
+  // Defines the default file formats of recordings and snapshot.
+  // This extension will only be used, if there is no extension
+  // in the new name parameter given to setSnapshotName() or setRecordName()
+public:
+  static const std::string mGrabberDefaultRecordExtension;
+  static const std::string mGrabberDefaultSnapshotExtension;
+
+protected:
+  //--------------------------------------------------------------------------------------------------------------------
   // nested types
   //--------------------------------------------------------------------------------------------------------------------
 
-protected:
   //!@cond SKIPPED_DOCUMENTATION
 
   ///! @brief Structure to store all channel related stuff inside
@@ -109,20 +120,16 @@ protected:
 
   typedef boost::shared_ptr<GrabberChannel> GrabberChannelPtr;
 
-  //--------------------------------------------------------------------------------------------------------------------
-  // constants
-  //--------------------------------------------------------------------------------------------------------------------
+  ///! @brief Typedef for a vector containing the instances of all used grabbers
+  typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
 
-  // Defines the default file formats of recordings and snapshot.
-  // This extension will only be used, if there is no extension
-  // in the new name parameter given to setSnapshotName() or setRecordName()
-  static const std::string mGrabberDefaultRecordExtension;
-  static const std::string mGrabberDefaultSnapshotExtension;
+  //--------------------------------------------------------------------------------------------------------------------
+  // Parameter
+  //--------------------------------------------------------------------------------------------------------------------
 
   //------------------------------------------------------------------------
   // Defines the how often getFpsMeasured() will be updated (in frames).
   // Default value is every 5 frames
-  //------------------------------------------------------------------------
   static const int UPDATE_FPS_MEASURE_FRAME_COUNT = 5;
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -133,12 +140,6 @@ protected:
 
   //!@endcond
 
-#ifdef ENABLE_CTRL_C_HANDLER
-  /* @brief Typedef for a vector containing the instances of all used grabbers
-   *
-   */
-  typedef std::vector<cedar::dev::sensors::visual::GrabberInterface*> GrabberInstancesVector;
-#endif
 
   //--------------------------------------------------------------------------------------------------------------------
   // constructors and destructor
@@ -151,8 +152,17 @@ protected:
    *    Use a derived class instead.
    *  @param
    *    configFileName The filename where the configuration parameters should be stored in
+   *  @param
+   *    registerTerminationHandler Set this flag if the CTRL-C handler should be registerd via the "signal" function
+   *
+   *    // 1) a static member vector to store pointer to all instances of created grabbers
+   *    // 2) a static member function which handle the interrupt signal
+   *    // 3) some additional code in GrabberInterface.cpp to handle these issues
+   *    //------------------------------------------------------------------------
+   *
+   *
    */
-  GrabberInterface(const std::string& configFileName);
+  GrabberInterface(const std::string& configFileName, bool registerTerminationHandler=true);
 
 public:
 
@@ -209,24 +219,24 @@ public:
     void setFps(double fps);
 
     /*! @brief Get the framerate of actual grabbing speed
-     *  @remarks
+     *
      *          Calculates the framerate by counting the invocation of the grab() method
      *          This value is updated every 5 (default value set in defines.h) grabbed frames
      */
     double getFpsMeasured() const;
 
     /*! @brief Stop the grabbing thread
-     *  @remarks
+     *
      *          This method invokes internally LoopedThread::stop() and does
      *          some cleanup like stopRecording or set the measured FPS to zero
      */
     void stopGrabber();
 
     /*! @brief Start the grabbing thread
-     *  @remarks
+     *
      *          This method invokes internally LoopedThread::start() and does
-     *          some initialization due to the measurement of FPS.
-     *  @par
+     *          some initialization due to the measurement of FPS. <br>
+     *
      *          To control the grabbing speed (i.e. the FPS) use
      *          setFps(), getFps() or getFpsMeasured()
      */
@@ -262,7 +272,7 @@ public:
     void grab();
 
     /*! @brief Get a pointer to the QReadWriteLock.
-     *  @remarks
+     *
      *      Used for concurrent reading/writing to the image matrices
      */
     QReadWriteLock* getReadWriteLockPointer() const;
@@ -458,6 +468,17 @@ public:
      */
     bool isRecording() const;
 
+    /*! @brief Defines the additions to the filename.
+     *
+     *   Will be used in a stereo-grabber if you use setSnapshotName(YourNewName)
+     *   or setRecordName(YourNewName) to set both filenames at once
+     *
+     *  @param channel
+     *    This is the index of the source you want the snapshot from.<br>
+     */
+    std::string getChannelSaveFilenameAddition(int channel) const;
+
+
 
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
@@ -595,7 +616,6 @@ protected:
   //--------------------------------------------------------------------------------------------------------------------
 private:
 
-  #ifdef ENABLE_CTRL_C_HANDLER
 
     /*! @brief Callback function to respond to a captured CTRL-C event
      *
@@ -606,11 +626,6 @@ private:
      */
     static void interruptSignalHandler(int signalNo);
 
-    /*! @brief The vector containing the instances of all created grabbers
-     *
-     */
-    static GrabberInstancesVector mInstances;
-  #endif
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -644,25 +659,29 @@ protected:
     
 private:
     
-    /*! @brief Flag which indicates if the GrabberThread was started during startRecording
-     */
+    ///! @brief Flag which indicates if the GrabberThread was started during startRecording
     bool mGrabberThreadStartedOnRecording;
 
-    /*! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
-     */
+    ///! @brief Flag which indicates if the CleanUp was already done (perhaps due to an error)
     bool mCleanUpAlreadyDone;
     
-    /*! @brief Timestamp at startGrabber time to measure the real fps of grabbing
-     */
+    ///! @brief Timestamp at startGrabber time to measure the real fps of grabbing
     boost::posix_time::ptime mFpsMeasureStart;
 
-    /*! @brief Timestamp at end time to measure the real fps of grabbing
-     */
+    ///! @brief Timestamp at end time to measure the real fps of grabbing
     boost::posix_time::ptime mFpsMeasureStop;
 
-    /*! @brief Counter to measure the real fps of grabbing
-     */
+    ///! @brief Counter to measure the real fps of grabbing
     unsigned int mFpsCounter;
+
+    ///! @brief The vector containing references to the instances of all created grabbers
+    static GrabberInstancesVector mInstances;
+
+    ///! @brief Flag which indicates if the CTRL-C Handler should be registered or not
+    static bool mRegisterTerminationHandler;
+
+    ///! @brief Flag, if this is the first instance of a grabber (used for the ctrl-c handler)
+    bool mFirstGrabberInstance;
 
     /*! Get the pointer to the channel structure of the specified channel
      *  @param channel The channel number of the wanted channel structure
@@ -685,16 +704,6 @@ private:
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
 protected:
-
-    /*! @brief Defines the additions to the filename.
-     *
-     * Will be used in a stereo-grabber if you use setSnapshotName(string)
-     * or setRecordName(string) to set both filenames at once
-     */
-    inline std::string getChannelSaveFilenameAddition(int channel)
-    {
-      return "ch["+boost::lexical_cast<std::string>(channel)+"]";
-    }
 
 
 private:
