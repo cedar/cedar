@@ -96,6 +96,11 @@ public:
    * */
   void setJointAngle(unsigned int index, double value, double stepTime);
 
+  /*!brief initialize the amtec device
+   * @return flag set to true if initialized successfully
+   */
+  bool initDevice();
+
   //--------------------------------------------------------------------------------------------------------------------
   // protected methods
   //--------------------------------------------------------------------------------------------------------------------
@@ -106,7 +111,6 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  bool initDevice();
   bool calibrateModule(unsigned int module);
   double getJointAngle(unsigned int index) const;
   double getJointVelocity(unsigned int index) const;
