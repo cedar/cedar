@@ -155,7 +155,4 @@ private:
   mutable std::string mExceptionInfo;
 }; // class cedar::aux::ExeptionBase
 
-// this must be down here because it is used by the CEDAR_THROW macro but needs the macro itself.
- // #include "cedar/auxiliaries/utilities.h"
-
 #endif // CEDAR_AUX_EXCEPTION_BASE_H
