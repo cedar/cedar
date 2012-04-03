@@ -37,6 +37,7 @@
 // CEDAR INCLUDES
 #include "cedar/auxiliaries/RigidBody.h"
 #include "cedar/auxiliaries/math/tools.h"
+#include "cedar/auxiliaries/assert.h"
 
 // SYSTEM INCLUDES
 #include <opencv2/opencv.hpp>
@@ -170,7 +171,7 @@ void cedar::aux::RigidBody::setPosition(double x, double y, double z)
 void cedar::aux::RigidBody::setPosition(const cv::Mat& position)
 {
   mLock.lockForWrite();
-  assert(position.type() == mPosition.type());
+  CEDAR_ASSERT(position.type() == mPosition.type());
   mPosition = position.clone();
   mLock.unlock();
   updateTransformation();
@@ -179,7 +180,7 @@ void cedar::aux::RigidBody::setPosition(const cv::Mat& position)
 void cedar::aux::RigidBody::setOrientationQuaternion(const cv::Mat quaternion)
 {
   mLock.lockForWrite();
-  assert(quaternion.type() == mOrientationQuaternion.type());
+  CEDAR_ASSERT(quaternion.type() == mOrientationQuaternion.type());
   mOrientationQuaternion = quaternion.clone();
   mLock.unlock();
   updateTransformation();

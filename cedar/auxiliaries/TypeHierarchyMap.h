@@ -49,8 +49,7 @@
 /*!@todo describe.
  *
  * @todo describe more.
- *
- * @todo Right now, this cannot deal with multiple inheritance. Should it ever be able to do so?
+
  * @remarks RootType must provide a default constructor.
  */
 template <typename RootType, typename DataType>

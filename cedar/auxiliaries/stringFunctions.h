@@ -196,7 +196,7 @@ namespace cedar
      * @param string The string the value will be extracted from.
      */
     template <class T>
-    bool fromString(const std::string& string)
+    T fromString(const std::string& string)
     {
       T result;
       std::istringstream stream(string);

@@ -46,12 +46,15 @@
     cedar configuration file:
     set (CEDAR_LIBCONFIG_LEGACY_MODE      1           CACHE BOOL "Use libconfig legacy mode.")
     If you set this flag to 0, libconfig++ is no longer needed as a dependency! Some unit tests may fail, though.
+  - merged AbstractFactory and AbstractFactoryDerived with Factory and FactoryDerived (including some changes to the interfaces)
+  - introduced new FactoryManager class
 
 - cedar::proc
   - added directional arrows for graphical connections in processingIde
   - when loading a plugin, the PluginProxy now also looks for a plugin description file. This file may contain some
     information about your plugin in case you don't want to hardcode it, e.g., it can contain icon paths for processing
     steps. See documentation of cedar::proc::PluginDeclaration for details.
+  - Overhauled the plotting system.
     
 - processingIde
   - The IDE now remembers whether or not snap to grid is active.

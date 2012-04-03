@@ -53,7 +53,9 @@
  */
 class cedar::aux::RigidBody : public QObject, public cedar::aux::ConfigurationInterface
 {
-private:
+  //--------------------------------------------------------------------------------------------------------------------
+  // macros
+  //--------------------------------------------------------------------------------------------------------------------
   Q_OBJECT
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -143,6 +145,9 @@ private:
   cv::Mat mOrientationQuaternion; // quaternion representing the orientation
   cv::Mat mTransformationTranspose; // transpose equivalent to representation compatible with OpenGl
 
+  //! lock for thread safety
+  mutable QReadWriteLock mLock;
+
   //--------------------------------------------------------------------------------------------------------------------
   // parameters
   //--------------------------------------------------------------------------------------------------------------------
@@ -150,8 +155,6 @@ protected:
   // none yet
 
 private:
-  //! lock for thread safety
-  mutable QReadWriteLock mLock;
   //! position
   std::vector<double> _mPosition;
   //! orientation
