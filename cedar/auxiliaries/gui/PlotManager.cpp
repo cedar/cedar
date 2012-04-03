@@ -78,6 +78,7 @@ void cedar::aux::gui::PlotManager::getPlotClassesFor
     }
   }
 }
+
 void cedar::aux::gui::PlotManager::declare(cedar::aux::gui::PlotDeclarationPtr declaration)
 {
   declaration->declare();

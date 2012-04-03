@@ -68,7 +68,7 @@ class cedar::aux::gui::PropertyPane : public QTableWidget
 public:
   /*!@brief The standard constructor.
    */
-  PropertyPane(QWidget *pParent = NULL);
+  PropertyPane(QWidget* pParent = NULL);
 
   //!@brief Destructor.
   ~PropertyPane();

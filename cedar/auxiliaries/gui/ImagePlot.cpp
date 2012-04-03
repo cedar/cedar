@@ -61,12 +61,6 @@ namespace
     boost::shared_ptr<DeclarationTypeM> declaration(new DeclarationTypeM());
     cedar::aux::gui::PlotManagerSingleton::getInstance()->declare(declaration);
 
-    // for images
-//    typedef cedar::aux::gui::PlotDeclarationTemplate<cedar::aux::ImageData, cedar::aux::gui::ImagePlot> DeclarationType;
-//    boost::shared_ptr<DeclarationType> decl(new DeclarationType());
-//    decl->declare();
-//    cedar::aux::gui::PlotManagerSingleton->getInstance()->declare(decl);
-
     cedar::aux::gui::PlotManagerSingleton::getInstance()->setDefault<cedar::aux::ImageData, cedar::aux::gui::ImagePlot>();
 
     return true;
@@ -173,6 +167,7 @@ void cedar::aux::gui::ImagePlot::timerEvent(QTimerEvent * /*pEvent*/)
   this->resizePixmap();
 }
 
+//!@todo encapsulate lookup table functionality in own class
 cv::Mat cedar::aux::gui::ImagePlot::threeChannelGrayscale(const cv::Mat& in) const
 {
   if (mLookupTableR.empty() || mLookupTableG.empty() || mLookupTableB.empty())

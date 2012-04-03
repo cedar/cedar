@@ -169,7 +169,7 @@ void cedar::aux::gui::HistoryPlot0D::plot(cedar::aux::DataPtr data, const std::s
   this->startTimer(30); //!@todo make the refresh time configurable.
 }
 
-void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent * /* pEvent */)
+void cedar::aux::gui::HistoryPlot0D::timerEvent(QTimerEvent* /* pEvent */)
 {
   if (!this->isVisible())
   {

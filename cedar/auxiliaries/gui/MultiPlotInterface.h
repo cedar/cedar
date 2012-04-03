@@ -93,16 +93,6 @@ protected:
   // none yet
 private:
   // none yet
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  // none yet
-
 }; // class cedar::aux::gui::MultiPlotInterface
 
 #endif // CEDAR_AUX_GUI_MULTI_PLOT_INTERFACE_H

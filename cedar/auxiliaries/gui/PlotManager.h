@@ -96,7 +96,17 @@ protected:
   // private methods
   //--------------------------------------------------------------------------------------------------------------------
 private:
-  // none yet
+  static void normalizeTypeName(std::string& typeName)
+  {
+    typeName = cedar::aux::replace(typeName, "::", ".");
+  }
+
+  static std::string getNormalizedTypeName(const std::string& typeName)
+  {
+    std::string ret = typeName;
+    normalizeTypeName(ret);
+    return ret;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   // members
@@ -109,25 +119,6 @@ private:
 
   //! Mapping from plot type strings to declarations
   std::map<std::string, cedar::aux::gui::PlotDeclarationPtr> mPlotTypeDeclarations;
-
-  //--------------------------------------------------------------------------------------------------------------------
-  // parameters
-  //--------------------------------------------------------------------------------------------------------------------
-protected:
-  // none yet
-
-private:
-  static void normalizeTypeName(std::string& typeName)
-  {
-    typeName = cedar::aux::replace(typeName, "::", ".");
-  }
-
-  static std::string getNormalizedTypeName(const std::string& typeName)
-  {
-    std::string ret = typeName;
-    normalizeTypeName(ret);
-    return ret;
-  }
 
 }; // class cedar::aux::gui::PlotManager
 

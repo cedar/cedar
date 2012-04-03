@@ -39,11 +39,18 @@
 #include "cedar/auxiliaries/gui/RigidBodyWidget.h"
 #include "cedar/auxiliaries/gui/RigidBodyVisualizationWidget.h"
 #include "cedar/auxiliaries/RigidBody.h"
-
-#include <QLabel>
-
+#include "cedar/auxiliaries/gl/Block.h"
+#include "cedar/auxiliaries/gl/Sphere.h"
+#include "cedar/auxiliaries/gl/Cone.h"
+#include "cedar/auxiliaries/gl/Cylinder.h"
+#include "cedar/auxiliaries/gl/Pyramid.h"
+#include "cedar/auxiliaries/gl/Prism.h"
+#include "cedar/auxiliaries/gl/Torus.h"
+#include "cedar/auxiliaries/gl/Ellipse.h"
+#include "cedar/auxiliaries/gl/Chessboard.h"
 
 // SYSTEM INCLUDES
+#include <QLabel>
 
 //----------------------------------------------------------------------------------------------------------------------
 // constructors and destructor

@@ -45,17 +45,17 @@
 
 cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain
 (
-  const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry
+  cedar::dev::robot::ConstReferenceGeometryPtr pReferenceGeometry
 )
 :
-KinematicChain(pReferenceGeometry)
+cedar::dev::robot::KinematicChain(pReferenceGeometry)
 {
   init();
 }
 
 cedar::dev::robot::SimulatedKinematicChain::SimulatedKinematicChain(const std::string& configFileName)
 :
-KinematicChain(configFileName)
+cedar::dev::robot::KinematicChain(configFileName)
 {
   init();
 }

@@ -73,7 +73,7 @@ private:
   //----------------------------------------------------------------------------
 public:
   //!@brief constructor
-  KinematicChain(const cedar::dev::robot::ReferenceGeometryPtr pReferenceGeometry);
+  KinematicChain(cedar::dev::robot::ConstReferenceGeometryPtr pReferenceGeometry);
   //!@brief constructor
   KinematicChain(const std::string& configFileName);
   //!@brief destructor
@@ -93,7 +93,7 @@ public:
    *
    * @return    reference geometry
    */
-  const ReferenceGeometryPtr getReferenceGeometry() const;
+  cedar::dev::robot::ConstReferenceGeometryPtr getReferenceGeometry() const;
 
   /*!@brief get number of joints in this kinematic chain
    *
@@ -105,7 +105,7 @@ public:
    *
    * @param geometry    new reference geometry
    */
-  void setReferenceGeometry(const ReferenceGeometryPtr geometry);
+  void setReferenceGeometry(cedar::dev::robot::ConstReferenceGeometryPtr geometry);
 
   /*!@brief get current state of a single joint angle
    *
@@ -319,7 +319,7 @@ private:
   //----------------------------------------------------------------------------
 protected:
   //!@brief geometry in reference configuration
-  cedar::dev::robot::ReferenceGeometryPtr mpReferenceGeometry;
+  cedar::dev::robot::ConstReferenceGeometryPtr mpReferenceGeometry;
   //!@brief current state of the joint angles
   cv::Mat mJointAngles;
 private:

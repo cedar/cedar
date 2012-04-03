@@ -35,7 +35,6 @@
 ======================================================================================================================*/
 
 // CEDAR INCLUDES
-
 #include "cedar/auxiliaries/gui/PropertyPane.h"
 #include "cedar/auxiliaries/gui/Parameter.h"
 #include "cedar/auxiliaries/Parameter.h"
